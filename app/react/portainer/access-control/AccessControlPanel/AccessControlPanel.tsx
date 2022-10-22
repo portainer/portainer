@@ -49,7 +49,7 @@ export function AccessControlPanel({
     <div className="row">
       <div className="col-sm-12">
         <TableContainer>
-          <TableTitle label="Access control" icon="eye" featherIcon />
+          <TableTitle label="Access control" icon="eye" />
           <AccessControlPanelDetails
             resourceType={resourceType}
             resourceControl={resourceControl}
@@ -59,7 +59,7 @@ export function AccessControlPanel({
             <div className="row">
               <div>
                 <Button color="link" onClick={toggleEditMode}>
-                  <Icon icon="edit" className="space-right" feather />
+                  <Icon icon="edit" className="space-right" />
                   Change ownership
                 </Button>
               </div>

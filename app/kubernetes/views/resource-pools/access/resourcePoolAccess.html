@@ -20,7 +20,7 @@
   <div class="row" ng-if="ctrl.pool">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="layers" feather-icon="true" title-text="Namespace"></rd-widget-header>
+        <rd-widget-header icon="layers" title-text="Namespace"></rd-widget-header>
         <rd-widget-body>
           <table class="table">
             <tbody>
@@ -46,7 +46,7 @@
             <div class="form-group">
               <span class="col-sm-12 small text-warning">
                 <p class="vertical-center">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                   Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
                 </p>
               </span>
@@ -78,7 +78,7 @@
                   ng-click="ctrl.authorizeAccess()"
                   button-spinner="ctrl.actionInProgress"
                 >
-                  <span class="vertical-center" ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon> Create access</span>
+                  <span class="vertical-center" ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" class="vertical-center"></pr-icon> Create access</span>
                   <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
                 </button>
               </div>

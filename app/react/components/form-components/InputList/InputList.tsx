@@ -137,7 +137,7 @@ export function InputList<T = DefaultType>({
                       onClick={() => handleMoveUp(index)}
                       className="vertical-center btn-only-icon"
                     >
-                      <Icon icon="arrow-up" feather />
+                      <Icon icon="arrow-up" />
                     </Button>
                     <Button
                       size="medium"
@@ -146,7 +146,7 @@ export function InputList<T = DefaultType>({
                       onClick={() => handleMoveDown(index)}
                       className="vertical-center btn-only-icon"
                     >
-                      <Icon icon="arrow-down" feather />
+                      <Icon icon="arrow-down" />
                     </Button>
                   </>
                 )}
@@ -157,7 +157,7 @@ export function InputList<T = DefaultType>({
                     onClick={() => handleRemoveItem(key, item)}
                     className="vertical-center btn-only-icon"
                   >
-                    <Icon icon="trash-2" feather size="md" />
+                    <Icon icon="trash-2" size="md" />
                   </Button>
                 )}
               </div>

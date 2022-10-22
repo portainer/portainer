@@ -4,18 +4,18 @@
   <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
       <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
-        <pr-icon icon="'list'" feather="true"></pr-icon> Advanced mode
+        <pr-icon icon="'list'"></pr-icon> Advanced mode
       </button>
       <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
-        <pr-icon icon="'edit'" feather="true"></pr-icon> Simple mode
+        <pr-icon icon="'edit'"></pr-icon> Simple mode
       </button>
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="$ctrl.formValues.IsSimple">
-      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
       Switch to advanced mode to copy and paste multiple key/values
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple">
-      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
       Generate a configuration entry per line, use YAML format
     </div>
   </div>
@@ -23,7 +23,7 @@
   <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
     <div class="col-sm-12 vertical-center">
       <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
-        <pr-icon class="vertical-center" icon="'plus'" feather="true"></pr-icon> Create entry
+        <pr-icon class="vertical-center" icon="'plus'"></pr-icon> Create entry
       </button>
       <button
         ng-if="
@@ -34,7 +34,7 @@
         ngf-select="$ctrl.addEntryFromFile($file)"
         data-cy="k8sConfigCreate-createConfigsFromFileButton"
       >
-        <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Create key/value from file
+        <pr-icon icon="'upload'" class="vertical-center"></pr-icon> Create key/value from file
       </button>
       <button
         ng-if="$ctrl.isDockerConfig && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET"
@@ -44,7 +44,7 @@
         ngf-accept="'.json'"
         data-cy="k8sConfigCreate-createConfigsFromFileButton"
       >
-        <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Upload docker config file
+        <pr-icon icon="'upload'" class="vertical-center"></pr-icon> Upload docker config file
       </button>
       <button
         ng-if="$ctrl.formValues.Type === $ctrl.KubernetesSecretTypeOptions.TLS.value && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET"
@@ -53,7 +53,7 @@
         ngf-select="$ctrl.addEntryFromFile($file)"
         data-cy="k8sConfigCreate-createConfigsFromFileButton"
       >
-        <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Upload TLS key/cert file
+        <pr-icon icon="'upload'" class="vertical-center"></pr-icon> Upload TLS key/cert file
       </button>
       <portainer-tooltip message="'Maximum upload file size is 1MB'"></portainer-tooltip>
     </div>
@@ -86,16 +86,16 @@
           "
         >
           <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
-            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required. </p>
+            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required. </p>
           </ng-messages>
           <div>
             <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined" class="vertical-center">
-              <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon>This key is already defined.
+              <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon>This key is already defined.
             </p>
           </div>
           <p ng-if="$ctrl.state.invalidKeys[index]" class="vertical-center">
-            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon> This key is invalid. A valid key must consist of alphanumeric
-            characters, '-', '_' or '.'
+            <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon> This key is invalid. A valid key must consist of alphanumeric characters, '-', '_'
+            or '.'
           </p>
         </div>
       </div>
@@ -116,9 +116,7 @@
         ></textarea>
         <div class="small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
           <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
-            <p ng-message="required" class="vertical-center"
-              ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p
-            >
+            <p ng-message="required" class="vertical-center"><pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
           </ng-messages>
         </div>
       </div>
@@ -143,10 +141,10 @@
           ng-click="$ctrl.removeEntry(index, entry)"
           data-cy="k8sConfigDetail-removeEntryButton{{ index }}"
         >
-          <pr-icon class="vertical-center" icon="'trash-2'" feather="true"></pr-icon> Remove entry
+          <pr-icon class="vertical-center" icon="'trash-2'"></pr-icon> Remove entry
         </button>
         <span class="small text-muted" ng-if="entry.Used">
-          <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+          <pr-icon icon="'info'" mode="'primary'"></pr-icon>
           This key is currently used by one or more applications
         </span>
       </div>

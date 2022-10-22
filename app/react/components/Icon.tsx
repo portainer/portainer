@@ -7,7 +7,6 @@ import Svg, { SvgIcons } from './Svg';
 
 export interface IconProps {
   icon: ReactNode | ComponentType<unknown>;
-  featherIcon?: boolean;
 }
 
 export type IconMode =
@@ -27,13 +26,21 @@ export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface Props {
   icon: ReactNode | ComponentType<{ size?: string | number }>;
-  feather?: boolean;
   className?: string;
   size?: IconSize;
   mode?: IconMode;
+  inline?: boolean;
+  ariaLabel?: string;
 }
 
-export function Icon({ icon, feather, className, mode, size }: Props) {
+export function Icon({
+  icon,
+  className,
+  mode,
+  size,
+  inline,
+  ariaLabel,
+}: Props) {
   const classes = clsx(
     className,
     'icon',
@@ -45,7 +52,12 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
     const Icon = isValidElementType(icon) ? icon : null;
 
     return (
-      <span className={classes} aria-hidden="true" role="img">
+      <span
+        className={classes}
+        aria-hidden="true"
+        role="img"
+        aria-label={ariaLabel}
+      >
         {Icon == null ? <>{icon}</> : <Icon size="1em" />}
       </span>
     );
@@ -57,27 +69,25 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
       <Svg
         icon={svgIcon as keyof typeof SvgIcons}
         className={clsx(classes, '!flex')}
+        aria-label={ariaLabel}
       />
     );
   }
 
-  if (feather) {
-    const iconName = icon
-      .split('-')
-      .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
-      .join('') as keyof typeof featherIcons;
-    const IconComponent = featherIcons[iconName];
-    if (!IconComponent) {
-      throw new Error(`Feather icon not found: ${iconName}`);
-    }
-    return <IconComponent className={classes} />;
+  const iconName = icon
+    .split('-')
+    .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
+    .join('') as keyof typeof featherIcons;
+  const IconComponent = featherIcons[iconName];
+  if (!IconComponent) {
+    return (
+      <Svg
+        icon={'placeholder' as keyof typeof SvgIcons}
+        className={clsx(classes, inline ? '!inline' : '!flex')}
+        aria-label={ariaLabel}
+      />
+    );
   }
 
-  return (
-    <i
-      className={clsx(icon.startsWith('fa-') ? `fa ${icon}` : icon, classes)}
-      aria-hidden="true"
-      role="img"
-    />
-  );
+  return <IconComponent className={classes} aria-label={ariaLabel} />;
 }

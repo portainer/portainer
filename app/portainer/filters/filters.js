@@ -95,13 +95,13 @@ export function endpointTypeName(type) {
 
 export function environmentTypeIcon(type) {
   if (type === 3) {
-    return 'fab fa-microsoft';
+    return 'grid';
   } else if (type === 4) {
-    return 'fa fa-cloud';
+    return 'cloud';
   } else if (type === 5 || type === 6 || type === 7) {
-    return 'fas fa-dharmachakra';
+    return 'svg-kubernetes2';
   }
-  return 'fab fa-docker';
+  return 'svg-dockericon';
 }
 
 export function ownershipIcon(ownership) {

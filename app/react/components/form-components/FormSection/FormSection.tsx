@@ -29,7 +29,6 @@ export function FormSection({
             <Icon
               icon={isExpanded ? 'chevron-down' : 'chevron-right'}
               className="shrink-0"
-              feather
             />
           </button>
         )}

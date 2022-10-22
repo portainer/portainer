@@ -36,7 +36,7 @@ export function UpdateNotification() {
       )}
     >
       <div className={clsx(styles.dismissTitle, 'vertical-center')}>
-        <Icon icon="download-cloud" mode="primary" feather size="md" />
+        <Icon icon="download-cloud" mode="primary" size="md" />
         <span className="space-left">
           New version available {LatestVersion}
         </span>

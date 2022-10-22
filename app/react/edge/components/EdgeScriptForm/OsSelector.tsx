@@ -1,4 +1,5 @@
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
+import { Icon } from '@@/Icon';
 
 import { OS } from './types';
 
@@ -20,7 +21,7 @@ export function OsSelector({ onChange, value }: Props) {
               value: 'linux',
               label: (
                 <>
-                  <i className="fab fa-linux space-right" aria-hidden="true" />
+                  <Icon icon="svg-linux" className="mr-1" />
                   Linux
                 </>
               ),
@@ -29,10 +30,7 @@ export function OsSelector({ onChange, value }: Props) {
               value: 'win',
               label: (
                 <>
-                  <i
-                    className="fab fa-windows space-right"
-                    aria-hidden="true"
-                  />
+                  <Icon icon="grd" className="mr-1" />
                   Windows
                 </>
               ),

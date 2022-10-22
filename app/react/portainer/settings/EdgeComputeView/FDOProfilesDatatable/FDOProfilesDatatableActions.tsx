@@ -30,7 +30,7 @@ export function FDOProfilesDatatableActions({
   return (
     <div className="actionBar">
       <Link to="portainer.endpoints.profile" className="space-left">
-        <Button disabled={!isFDOEnabled} icon="plus-circle" featherIcon>
+        <Button disabled={!isFDOEnabled} icon="plus-circle">
           Add Profile
         </Button>
       </Link>
@@ -39,7 +39,6 @@ export function FDOProfilesDatatableActions({
         disabled={!isFDOEnabled || selectedItems.length !== 1}
         onClick={() => onDuplicateProfileClick()}
         icon="plus-circle"
-        featherIcon
       >
         Duplicate
       </Button>
@@ -49,7 +48,6 @@ export function FDOProfilesDatatableActions({
         color="danger"
         onClick={() => onDeleteProfileClick()}
         icon="trash-2"
-        featherIcon
       >
         Remove
       </Button>

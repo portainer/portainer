@@ -3,7 +3,7 @@
 <div class="row" ng-if="image.RepoTags.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="tag" feather-icon="true" title-text="Image tags"></rd-widget-header>
+      <rd-widget-header icon="tag" title-text="Image tags"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -16,19 +16,19 @@
                   <span class="input-group-btn" style="padding: 0px 5px">
                     <span style="margin: 0px 5px" authorization="DockerImagePush">
                       <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)">
-                        <pr-icon icon="'upload'" feather="true" class="text-white"></pr-icon>
+                        <pr-icon icon="'upload'" class="text-white"></pr-icon>
                       </a>
                     </span>
 
                     <span class="my-0 mx-1" authorization="DockerImageCreate">
                       <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)">
-                        <pr-icon icon="'download'" feather="true" class="text-white"></pr-icon>
+                        <pr-icon icon="'download'" class="text-white"></pr-icon>
                       </a>
                     </span>
 
                     <span class="my-0 mx-1" authorization="DockerImageDelete">
                       <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
-                        <pr-icon icon="'trash-2'" feather="true" class="text-white"></pr-icon>
+                        <pr-icon icon="'trash-2'" class="text-white"></pr-icon>
                       </a>
                     </span>
                   </span>
@@ -39,18 +39,18 @@
           <div class="form-group">
             <div class="col-sm-12">
               <span class="small text-muted" authorization="DockerImageDelete">
-                Note: you can click on the upload icon <pr-icon icon="'upload'" feather="true"></pr-icon> to push an image or on the download icon
-                <pr-icon icon="'download'" feather="true"></pr-icon> to pull an image or on the trash icon <pr-icon icon="'trash-2'" feather="true"></pr-icon> to delete a tag.
+                Note: you can click on the upload icon <pr-icon icon="'upload'"></pr-icon> to push an image or on the download icon <pr-icon icon="'download'"></pr-icon> to pull an
+                image or on the trash icon <pr-icon icon="'trash-2'"></pr-icon> to delete a tag.
               </span>
             </div>
             <div class="col-sm-12">
               <span id="downloadResourceHint" class="createResource ml-0" style="display: none">
                 Download in progress...
-                <i class="fa fa-circle-notch fa-spin ml-0.5" aria-hidden="true"></i>
+                <pr-icon icon="'svg-circlenotch'" class-name="'animate-spin-slow ml-0.5'"></pr-icon>
               </span>
               <span id="uploadResourceHint" class="createResource ml-0.5" style="display: none">
                 Upload in progress...
-                <i class="fa fa-circle-notch fa-spin ml-0.5" aria-hidden="true"></i>
+                <pr-icon icon="'svg-circlenotch'" class-name="'animate-spin-slow ml-0.5'"></pr-icon>
               </span>
             </div>
           </div>
@@ -63,7 +63,7 @@
 <div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="tag" feather-icon="true" title-text="Tag the image"></rd-widget-header>
+      <rd-widget-header icon="tag" title-text="Tag the image"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
@@ -98,7 +98,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="list" feather-icon="true" title-text="Image details"></rd-widget-header>
+      <rd-widget-header icon="list" title-text="Image details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -107,7 +107,7 @@
               <td>
                 {{ image.Id }}
                 <button authorization="DockerImageDelete" class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)">
-                  <pr-icon icon="'trash-2'" feather="true"></pr-icon> Delete this image
+                  <pr-icon icon="'trash-2'"></pr-icon> Delete this image
                 </button>
                 <button
                   authorization="DockerImageGet"
@@ -116,7 +116,7 @@
                   button-spinner="$ctrl.exportInProgress"
                   ng-disabled="state.exportInProgress"
                 >
-                  <pr-icon icon="'download'" feather="true"></pr-icon>
+                  <pr-icon icon="'download'"></pr-icon>
                   <span ng-hide="state.exportInProgress">Export this image</span>
                   <span ng-show="state.exportInProgress">Export in progress...</span>
                 </button>
@@ -165,7 +165,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="list" feather-icon="true" title-text="Dockerfile details"></rd-widget-header>
+      <rd-widget-header icon="list" title-text="Dockerfile details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -217,7 +217,7 @@
 <div class="row" ng-if="history.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="list" feather-icon="true" title-text="Image layers"></rd-widget-header>
+      <rd-widget-header icon="list" title-text="Image layers"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>
@@ -266,7 +266,7 @@
                     {{ layer.CreatedBy | imagelayercommand | truncate: 130 }}
                     <span ng-if="layer.CreatedBy.length > 130" class="ml-1">
                       <a id="layer-command-expander{{ $index }}" class="btn" ng-click="toggleLayerCommand($index)">
-                        <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon>
+                        <pr-icon icon="'plus'" mode="'alt'"></pr-icon>
                       </a>
                     </span>
                   </span>

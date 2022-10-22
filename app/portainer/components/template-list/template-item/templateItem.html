@@ -15,7 +15,7 @@
         </span>
         <div class="inline-flex items-center space-left blocklist-item-subtitle">
           <div ng-if="$ctrl.model.Type != 3" class="vertical-center">
-            <i class="fab fa-linux space-right" aria-hidden="true" ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform"></i>
+            <pr-icon ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform" icon="'svg-linux'" class="mr-1"></pr-icon>
             <span ng-if="!$ctrl.model.Platform"> &amp; </span>
             <pr-icon
               icon="'svg-microsoft'"

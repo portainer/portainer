@@ -3,7 +3,7 @@
 <information-panel title-text="Caution" ng-if="state.mode == 'duplicate'">
   <span class="small">
     <p class="text-muted">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+      <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
       The new container may fail to start if the image is changed, and settings from the previous container aren't compatible. Common causes include entrypoint, cmd or
       <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">other settings</a> set by an image.
     </p>
@@ -25,7 +25,7 @@
           <!-- !name-input -->
           <div class="col-sm-12 form-section-title"> Image configuration </div>
           <div ng-if="!formValues.RegistryModel.Registry && fromContainer">
-            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
             <span class="small text-danger" style="margin-left: 5px">
               The Docker registry for the <code>{{ config.Image }}</code> image is not registered inside Portainer, you will not be able to create a container. Please register that
               registry first.
@@ -104,7 +104,7 @@
                 ></portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="addPortBinding()">
-                <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> publish a new network port
+                <pr-icon icon="'plus'" mode="'alt'"></pr-icon> publish a new network port
               </span>
             </div>
             <!-- port-mapping-input-list -->
@@ -117,7 +117,7 @@
                 </div>
                 <!-- !host-port -->
                 <span style="margin: 0 10px 0 10px">
-                  <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+                  <pr-icon icon="'svg-arrowright'"></pr-icon>
                 </span>
                 <!-- container-port -->
                 <div class="input-group col-sm-4 input-group-sm">
@@ -132,7 +132,7 @@
                     <label class="btn btn-light" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                   </div>
                   <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
-                    <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                    <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                   </button>
                 </div>
                 <!-- !protocol-actions -->
@@ -191,7 +191,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cog" title-text="Advanced container settings"></rd-widget-header>
+      <rd-widget-header icon="settings" title-text="Advanced container settings"></rd-widget-header>
       <rd-widget-body>
         <ul class="nav nav-pills nav-justified">
           <li class="active interactive"><a data-target="#command" data-toggle="tab">Command & logging</a></li>
@@ -335,7 +335,7 @@
                     style="margin-left: 10px"
                     ng-click="!formValues.LogDriverName || formValues.LogDriverName === 'none' || addLogDriverOpt(formValues.LogDriverName)"
                   >
-                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add logging driver option
+                    <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add logging driver option
                   </span>
                 </div>
                 <!-- logging-opts-input-list -->
@@ -350,7 +350,7 @@
                       <input type="text" class="form-control" ng-model="opt.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeLogDriverOpt($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -368,7 +368,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Volume mapping</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addVolume()">
-                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> map additional volume
+                    <pr-icon icon="'plus'" mode="'alt'"></pr-icon> map additional volume
                   </span>
                 </div>
                 <!-- volumes-input-list -->
@@ -389,7 +389,7 @@
                           <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
                         </div>
                         <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                          <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                          <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -397,7 +397,7 @@
                     <!-- !volume-line1 -->
                     <!-- volume-line2 -->
                     <div class="col-sm-12 form-inline" style="margin-top: 5px">
-                      <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+                      <pr-icon icon="'svg-arrowright'"></pr-icon>
                       <!-- volume -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                         <span class="input-group-addon">volume</span>
@@ -526,7 +526,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Hosts file entries</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addExtraHost()">
-                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add additional entry
+                    <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add additional entry
                   </span>
                 </div>
                 <!-- extra-hosts-input-list -->
@@ -537,7 +537,7 @@
                       <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -554,9 +554,7 @@
               <div class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Labels</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()">
-                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add label
-                  </span>
+                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()"> <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add label </span>
                 </div>
                 <!-- labels-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px">
@@ -570,7 +568,7 @@
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-sm btn-light" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -645,9 +643,7 @@
               <div ng-if="showDeviceMapping" class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Devices</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDevice()">
-                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add device
-                  </span>
+                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDevice()"> <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add device </span>
                 </div>
                 <!-- devices-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px">
@@ -661,7 +657,7 @@
                       <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0" />
                     </div>
                     <button class="btn btn-sm btn-light" type="button" ng-click="removeDevice($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -672,9 +668,7 @@
               <div ng-if="showSysctls" class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Sysctls</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addSysctl()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> add sysctl
-                  </span>
+                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addSysctl()"> <pr-icon icon="'plus'"></pr-icon> add sysctl </span>
                 </div>
                 <!-- sysctls-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px">
@@ -688,7 +682,7 @@
                       <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-sm btn-light" type="button" ng-click="removeSysctl($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -753,7 +747,7 @@
                   <div class="col-sm-8 small text-muted">
                     <div ng-messages="resourceForm.memory-reservation.$error">
                       <p class="vertical-center text-warning">
-                        <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
+                        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
                       </p>
                     </div>
                   </div>
@@ -790,7 +784,7 @@
                   <div class="col-sm-8 small text-muted">
                     <div ng-messages="resourceForm.memory-limit.$error">
                       <p class="vertical-center text-warning">
-                        <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
+                        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
                       </p>
                     </div>
                   </div>
@@ -829,7 +823,8 @@
                   </div>
                   <div class="col-sm-12" ng-if="state.settingUnlimitedResources">
                     <p class="text-muted mr-4">
-                      <i class="fa fa-exclamation-circle text-warning mt-10" aria-hidden="true"></i> Updating any resource value to ‘unlimited' will redeploy this container.
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mt-10'"></pr-icon>
+                      Updating any resource value to ‘unlimited' will redeploy this container.
                     </p>
                   </div>
                 </div>

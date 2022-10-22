@@ -63,9 +63,9 @@
     </button>
     <span class="vertical-center">
       {{ $ctrl.tlscaCert.name }}
-      <pr-icon icon="'check'" feather="true" class="icon-success" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert"></pr-icon>
-      <pr-icon icon="'x'" feather="true" class="icon-danger" ng-if="!$ctrl.tlscaCert"></pr-icon>
-      <pr-icon icon="'fa fa-circle-notch fa-spin'" ng-if="$ctrl.uploadInProgress"></pr-icon>
+      <pr-icon icon="'check'" class="icon-success" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert"></pr-icon>
+      <pr-icon icon="'x'" class="icon-danger" ng-if="!$ctrl.tlscaCert"></pr-icon>
+      <pr-icon icon="'svg-circlenotch'" class-name="'animate-spin-slow ml-0.5'" ng-if="$ctrl.uploadInProgress"></pr-icon>
     </span>
   </div>
 </div>

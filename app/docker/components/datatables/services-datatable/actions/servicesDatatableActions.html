@@ -9,7 +9,7 @@
       ng-click="$ctrl.updateAction($ctrl.selectedItems)"
       data-cy="service-updateServiceButton"
     >
-      <pr-icon icon="'refresh-cw'" feather="true"></pr-icon>Update
+      <pr-icon icon="'refresh-cw'"></pr-icon>Update
     </button>
     <button
       type="button"
@@ -19,10 +19,11 @@
       ng-click="$ctrl.removeAction($ctrl.selectedItems)"
       data-cy="service-removeServiceButton"
     >
-      <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+      <pr-icon icon="'trash-2'"></pr-icon>Remove
     </button>
   </div>
   <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.services.new" ng-if="$ctrl.showAddAction" authorization="DockerServiceCreate">
-    <i class="fa fa-plus space-right" aria-hidden="true"></i>Add service
+    <pr-icon icon="'plus'" class-name="'mr-1'"></pr-icon>
+    Add service
   </button>
 </div>

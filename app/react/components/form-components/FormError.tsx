@@ -10,7 +10,7 @@ interface Props {
 export function FormError({ children, className }: PropsWithChildren<Props>) {
   return (
     <p className={clsx(`text-muted small vertical-center`, className)}>
-      <Icon icon="alert-triangle" className="icon-warning" feather />
+      <Icon icon="alert-triangle" className="icon-warning" />
       <span className="text-warning">{children}</span>
     </p>
   );

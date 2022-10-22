@@ -9,8 +9,6 @@ interface Props {
   alt?: string;
   size?: BadgeSize;
   className?: string;
-  // additional fallback badge props
-  feather?: boolean;
 }
 
 export function FallbackImage({
@@ -19,7 +17,6 @@ export function FallbackImage({
   alt,
   size,
   className,
-  feather,
 }: Props) {
   const [error, setError] = useState(false);
 
@@ -39,5 +36,5 @@ export function FallbackImage({
   }
 
   // fallback icon if there is an error loading the image
-  return <BadgeIcon icon={fallbackIcon} featherIcon={feather} size={size} />;
+  return <BadgeIcon icon={fallbackIcon} size={size} />;
 }

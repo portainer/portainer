@@ -9,8 +9,6 @@ import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 import { useResourceGroups } from '../queries/useResourceGroups';
 import { useSubscriptions } from '../queries/useSubscriptions';
 
-import SubscriptionsIcon from './icon-subscription.svg?c';
-
 export function DashboardView() {
   const environmentId = useEnvironmentId();
 
@@ -35,7 +33,7 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
-              icon={SubscriptionsIcon}
+              icon="svg-subscription"
               type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (

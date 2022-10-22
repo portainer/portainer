@@ -23,16 +23,20 @@
               <div class="col-sm-12" style="display: flex; justify-content: center" ng-if="ctrl.state.showOAuthLogin">
                 <a ng-href="{{ ctrl.OAuthLoginURI }}">
                   <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
-                    <i class="fab fa-microsoft" aria-hidden="true"></i> Login with Microsoft
+                    <pr-icon icon="'svg-microsoft'"></pr-icon>
+                    Login with Microsoft
                   </div>
                   <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Google'">
-                    <i class="fab fa-google" aria-hidden="true"></i> Login with Google
+                    <pr-icon icon="'svg-google'"></pr-icon>
+                    Login with Google
                   </div>
                   <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Github'">
-                    <i class="fab fa-github" aria-hidden="true"></i> Login with Github
+                    <pr-icon icon="'svg-github'"></pr-icon>
+                    Login with Github
                   </div>
                   <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
-                    <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
+                    <pr-icon icon="'log-in'"></pr-icon>
+                    Login with OAuth
                   </div>
                 </a>
               </div>
@@ -92,7 +96,7 @@
                   tooltip-class="portainer-tooltip"
                   uib-tooltip="{{ ctrl.state.passwordInputType === 'password' ? 'Show password' : 'Hide password' }}"
                 >
-                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye-off' : 'eye'" feather="true" size="'md'"></pr-icon>
+                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye-off' : 'eye'" size="'md'"></pr-icon>
                 </button>
               </div>
             </div>
@@ -118,7 +122,7 @@
 
           <!-- error message -->
           <div class="pull-right" ng-if="ctrl.state.AuthenticationError">
-            <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'alert-triangle'" mode="'danger'"></pr-icon>
             <span class="small text-danger">{{ ctrl.state.AuthenticationError }}</span>
           </div>
         </div>

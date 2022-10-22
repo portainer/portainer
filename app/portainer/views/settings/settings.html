@@ -3,7 +3,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="settings" feather-icon="true" title-text="Application settings"></rd-widget-header>
+      <rd-widget-header icon="settings" title-text="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- snapshot-interval -->
@@ -172,7 +172,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="box" feather-icon="true" title-text="Hidden containers"></rd-widget-header>
+      <rd-widget-header icon="box" title-text="Hidden containers"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
           <div class="form-group">
@@ -188,7 +188,7 @@
               <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar" />
             </div>
             <div class="col-sm-12 col-md-2">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><pr-icon icon="'plus'" class-name="'mr-1'"></pr-icon>Add filter</button>
             </div>
           </div>
           <div class="form-group">
@@ -207,7 +207,8 @@
                     <td>{{ label.value }}</td>
                     <td>
                       <button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)">
-                        <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
+                        <pr-icon icon="'trash-2'" class-name="'mr-1'"></pr-icon>
+                        Remove</button
                       >
                     </td>
                   </tr>
@@ -231,7 +232,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="download" feather-icon="true" title-text="Backup Portainer"></rd-widget-header>
+      <rd-widget-header icon="download" title-text="Backup Portainer"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
           <div class="col-sm-12 form-section-title"> Backup configuration </div>
@@ -373,7 +374,7 @@
             <div class="form-group col-md-12" ng-show="backupPortainerForm.password_S3.$invalid">
               <div class="small text-warning">
                 <div ng-messages="backupPortainerForm.password_S3.$error">
-                  <p ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true"></pr-icon> This field is required.</p>
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
                 </div>
               </div>
             </div>
@@ -389,7 +390,10 @@
                   limited-feature-disabled
                   limited-feature-class="limited-be"
                 >
-                  <span> <i class="fa fa-upload" aria-hidden="true"></i> Export backup</span>
+                  <span>
+                    <pr-icon icon="'upload'" class-name="'mr-1'"></pr-icon>
+                    Export backup
+                  </span>
                 </button>
               </div>
             </div>
@@ -433,7 +437,7 @@
             <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
               <div class="small text-warning">
                 <div ng-messages="backupPortainerForm.password.$error">
-                  <p ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true"></pr-icon> This field is required.</p>
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
                 </div>
               </div>
             </div>

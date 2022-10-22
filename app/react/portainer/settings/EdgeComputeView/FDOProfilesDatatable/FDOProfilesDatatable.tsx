@@ -77,7 +77,7 @@ export function FDOProfilesDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon="list" featherIcon label="Device Profiles">
+      <TableTitle icon="list" label="Device Profiles">
         <FDOProfilesDatatableActions
           isFDOEnabled={isFDOEnabled}
           selectedItems={selectedFlatRows.map((row) => row.original)}

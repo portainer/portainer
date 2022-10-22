@@ -4,12 +4,12 @@
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -32,7 +32,7 @@
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle aria-label="Settings">
-              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+              <pr-icon icon="'more-vertical'"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -53,7 +53,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -76,7 +76,8 @@
                   <label for="select_all"></label>
                 </span>
                 <a ng-click="$ctrl.expandAll()">
-                  <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+                  <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
+                  <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
                 </a>
               </th>
               <th>
@@ -156,7 +157,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
+                <pr-icon ng-if="item.Expanded" icon="'chevron-down'" class-name="'mr-1'"></pr-icon>
+                <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" class-name="'mr-1'"></pr-icon>
               </td>
               <td>
                 <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{
@@ -169,8 +171,9 @@
                 {{ item.Mode }}
                 <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
                 <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
-                  <a class="interactive" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
-                    <i class="fa fa-arrows-alt-v" aria-hidden="true"></i> Scale
+                  <a class="interactive vertical-center" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
+                    <pr-icon icon="'svg-compress'"></pr-icon>
+                    Scale
                   </a>
                 </span>
                 <span ng-if="item.Mode === 'replicated' && item.Scale">
@@ -184,20 +187,25 @@
                     auto-focus
                     ng-click="$event.stopPropagation();"
                   />
-                  <a class="interactive" ng-click="item.Scale = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>
-                  <a class="interactive" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
+                  <a class="interactive vertical-center" ng-click="item.Scale = false; $event.stopPropagation();">
+                    <pr-icon icon="'x'"></pr-icon>
+                  </a>
+                  <a class="interactive vertical-center" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();">
+                    <pr-icon icon="'check-square'"></pr-icon>
+                  </a>
                 </span>
               </td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a
                   ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort"
                   ng-repeat="p in item.Ports"
-                  class="image-tag"
+                  class="image-tag vertical-center"
                   ng-href="http://{{ $ctrl.endpointPublicUrl }}:{{ p.PublishedPort }}"
                   target="_blank"
                   ng-click="$event.stopPropagation();"
                 >
-                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
+                  <pr-icon icon="'external-link'"></pr-icon>
+                  {{ p.PublishedPort }}:{{ p.TargetPort }}
                 </a>
                 <span ng-if="!item.Ports || item.Ports.length === 0">-</span>
               </td>

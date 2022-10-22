@@ -4,18 +4,15 @@
   <!-- stack-form -->
   <stack-from-template-form
     ng-if="state.selectedTemplate && (state.selectedTemplate.Type === 2 || state.selectedTemplate.Type === 3)"
-    template="state.selectedTemplate"
-    form-values="formValues"
-    state="state"
-    create-template="createTemplate"
-    unselect-template="unselectTemplate"
-  >
+    template="state.selectedTemplate" form-values="formValues" state="state" create-template="createTemplate"
+    unselect-template="unselectTemplate">
   </stack-from-template-form>
   <!-- !stack-form -->
   <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 1">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title">
+      </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal" name="selectedTemplateType1">
           <!-- description -->
@@ -31,7 +28,8 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-6">
-              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)" />
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name"
+                placeholder="e.g. web (optional)" />
             </div>
           </div>
           <!-- !name-input -->
@@ -39,7 +37,8 @@
           <div class="form-group">
             <label for="container_network" class="col-sm-2 control-label text-left">Network</label>
             <div class="col-sm-6">
-              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network">
+              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'"
+                ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>
@@ -52,7 +51,8 @@
               <portainer-tooltip ng-if="var.description" message="var.description"></portainer-tooltip>
             </label>
             <div class="col-sm-6">
-              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />
+              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value"
+                id="field_{{ $index }}" />
               <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
                 <option selected disabled hidden value="">Select value</option>
                 <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
@@ -64,11 +64,13 @@
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <div class="form-group col-sm-12">
-            <a class="small interactive vertical-center" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
-              <pr-icon icon="'plus'" feather="true"></pr-icon> Show advanced options
+            <a class="small interactive vertical-center" ng-if="!state.showAdvancedOptions"
+              ng-click="state.showAdvancedOptions = true;">
+              <pr-icon icon="'plus'"></pr-icon> Show advanced options
             </a>
-            <a class="small interactive vertical-center" ng-if="state.showAdvancedOptions" ng-click="state.showAdvancedOptions = false;">
-              <pr-icon icon="'minus'" feather="true"></pr-icon> Hide advanced options
+            <a class="small interactive vertical-center" ng-if="state.showAdvancedOptions"
+              ng-click="state.showAdvancedOptions = false;">
+              <pr-icon icon="'minus'"></pr-icon> Hide advanced options
             </a>
           </div>
           <div ng-if="state.showAdvancedOptions">
@@ -77,19 +79,22 @@
               <div class="col-sm-12">
                 <label class="control-label text-left">Port mapping</label>
                 <div class="mt-1" ng-if="state.selectedTemplate.Ports.length > 0">
-                  <div class="small text-muted">Portainer will automatically assign a port if you leave the host port empty.</div>
+                  <div class="small text-muted">Portainer will automatically assign a port if you leave the host port
+                    empty.</div>
                   <div class="form-inline mt-2" ng-repeat="portBinding in state.selectedTemplate.Ports">
                     <!-- host-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">host</span>
-                      <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
+                      <input type="text" class="form-control" ng-model="portBinding.hostPort"
+                        placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
                     </div>
                     <!-- !host-port -->
-                    <pr-icon icon="'arrow-right'" feather="true"></pr-icon>
+                    <pr-icon icon="'arrow-right'"></pr-icon>
                     <!-- container-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">container</span>
-                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80" />
+                      <input type="text" class="form-control" ng-model="portBinding.containerPort"
+                        placeholder="e.g. 80" />
                     </div>
                     <!-- !container-port -->
                     <!-- protocol-actions -->
@@ -99,15 +104,16 @@
                         <label class="btn btn-light" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                       </div>
                       <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
-                        <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                       </button>
                     </div>
                     <!-- !protocol-actions -->
                   </div>
                 </div>
                 <div class="col-sm-12">
-                  <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addPortBinding()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add map additional port
+                  <span class="form-group small interactive text-muted mt-2 vertical-center"
+                    ng-click="addPortBinding()">
+                    <pr-icon icon="'plus'"></pr-icon> Add map additional port
                   </span>
                 </div>
               </div>
@@ -118,25 +124,30 @@
               <div class="col-sm-12">
                 <label class="control-label text-left">Volume mapping</label>
                 <div class="mt-1" ng-if="state.selectedTemplate.Volumes.length > 0">
-                  <div class="small text-muted">Portainer will automatically create and map a local volume when using the <b>auto</b> option.</div>
+                  <div class="small text-muted">Portainer will automatically create and map a local volume when using
+                    the <b>auto</b> option.</div>
                   <div class="mt-2" ng-repeat="volume in state.selectedTemplate.Volumes">
                     <!-- volume-line1 -->
                     <div class="form-inline">
                       <!-- container-path -->
                       <div class="input-group input-group-sm col-sm-6">
                         <span class="input-group-addon">container</span>
-                        <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container" />
+                        <input type="text" class="form-control" ng-model="volume.container"
+                          placeholder="e.g. /path/in/container" />
                       </div>
                       <!-- !container-path -->
                       <!-- volume-type -->
                       <div class="input-group col-sm-5 space-left">
                         <div class="btn-group btn-group-sm">
-                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.bind = ''">Auto</label>
-                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.bind = ''">Volume</label>
-                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.bind = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
+                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'auto'"
+                            ng-click="volume.bind = ''">Auto</label>
+                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'"
+                            ng-click="volume.bind = ''">Volume</label>
+                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'"
+                            ng-click="volume.bind = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
                         </div>
                         <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                          <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                          <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -144,13 +155,14 @@
                     <!-- !volume-line1 -->
                     <!-- volume-line2 -->
                     <div class="form-inline mt-1" ng-if="volume.type !== 'auto'">
-                      <pr-icon icon="'arrow-right'" feather="true"></pr-icon>
+                      <pr-icon icon="'arrow-right'"></pr-icon>
                       <!-- volume -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                         <div class="col-sm-12 input-group">
                           <span class="input-group-addon">volume</span>
                           <div class="col-sm-12 input-group">
-                            <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes">
+                            <select class="form-control" ng-model="volume.bind"
+                              ng-options="vol.Name as vol.Name for vol in availableVolumes">
                               <option value="" disabled selected>Select a volume</option>
                             </select>
                           </div>
@@ -160,7 +172,8 @@
                       <!-- bind -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
                         <span class="input-group-addon">host</span>
-                        <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host" />
+                        <input type="text" class="form-control" ng-model="volume.bind"
+                          placeholder="e.g. /path/on/host" />
                       </div>
                       <!-- !bind -->
                       <!-- read-only -->
@@ -177,7 +190,7 @@
                 </div>
                 <div class="col-sm-12">
                   <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addVolume()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add map additional volume
+                    <pr-icon icon="'plus'"></pr-icon> Add map additional volume
                   </span>
                 </div>
               </div>
@@ -192,16 +205,17 @@
                   <div class="form-inline mt-2" ng-repeat="(idx, host) in state.selectedTemplate.Hosts track by $index">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP" />
+                      <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]"
+                        placeholder="e.g. host:IP" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
                 <div class="col-sm-12">
                   <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addExtraHost()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add additional entry
+                    <pr-icon icon="'plus'"></pr-icon> Add additional entry
                   </span>
                 </div>
               </div>
@@ -216,21 +230,22 @@
                   <div class="form-inline mt-2" ng-repeat="label in state.selectedTemplate.Labels">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
+                      <input type="text" class="form-control" ng-model="label.name"
+                        placeholder="e.g. com.example.foo" />
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
                 <!-- !labels-input-list -->
                 <div class="col-sm-12">
                   <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addLabel()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add label
+                    <pr-icon icon="'plus'"></pr-icon> Add label
                   </span>
                 </div>
               </div>
@@ -240,7 +255,8 @@
             <div class="form-group mt-4">
               <label for="container_hostname" class="col-sm-2 control-label text-left">Hostname</label>
               <div class="col-sm-6">
-                <input type="text" name="container_hostname" class="form-control" ng-model="state.selectedTemplate.Hostname" placeholder="leave empty to use docker default" />
+                <input type="text" name="container_hostname" class="form-control"
+                  ng-model="state.selectedTemplate.Hostname" placeholder="leave empty to use docker default" />
               </div>
             </div>
             <!-- !hostname -->
@@ -250,18 +266,15 @@
           <div class="form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary"
-                ng-disabled="state.actionInProgress || !formValues.network"
-                ng-click="createTemplate()"
-                button-spinner="state.actionInProgress"
-              >
+              <button type="button" class="btn btn-primary" ng-disabled="state.actionInProgress || !formValues.network"
+                ng-click="createTemplate()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
-              <button type="button" class="btn btn-default" ng-click="unselectTemplate(state.selectedTemplate)">Hide</button>
-              <span class="text-danger space-left" ng-if="state.formValidationError">{{ state.formValidationError }}</span>
+              <button type="button" class="btn btn-default"
+                ng-click="unselectTemplate(state.selectedTemplate)">Hide</button>
+              <span class="text-danger space-left" ng-if="state.formValidationError">{{ state.formValidationError
+                }}</span>
             </div>
           </div>
           <!-- !actions -->
@@ -274,14 +287,9 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <template-list
-      ng-if="templates"
-      title-text="Templates"
-      title-icon="edit"
-      templates="templates"
-      table-key="templates"
-      select-action="selectTemplate"
-      show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
-    ></template-list>
+    <template-list ng-if="templates" title-text="Templates" title-icon="edit" templates="templates"
+      table-key="templates" select-action="selectTemplate"
+      show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25">
+    </template-list>
   </div>
 </div>

@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 
+import { Icon } from '@@/Icon';
+
 import styles from './ViewLoading.module.css';
 
 interface Props {
@@ -18,7 +20,7 @@ export function ViewLoading({ message }: Props) {
       {message && (
         <span className={styles.message}>
           {message}
-          <i className="fa fa-cog fa-spin space-left" />
+          <Icon icon="settings" className="spin ml-1" />
         </span>
       )}
     </div>

@@ -23,7 +23,7 @@
           <div class="col-sm-12 small text-warning">
             <div ng-messages="dupStackForm.new_stack_name.$error">
               <p ng-message="pattern">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                 <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
               </p>
             </div>
@@ -42,7 +42,10 @@
             style="margin-top: 7px; margin-left: 0"
             button-spinner="$ctrl.state.migrationInProgress"
           >
-            <span ng-hide="$ctrl.state.migrationInProgress"> <i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Migrate </span>
+            <span ng-hide="$ctrl.state.migrationInProgress">
+              <pr-icon icon="'svg-arrowright'" class-name="'mr-1'"></pr-icon>
+              Migrate
+            </span>
             <span ng-show="$ctrl.state.migrationInProgress">Migration in progress...</span>
           </button>
           <button
@@ -52,7 +55,10 @@
             style="margin-top: 7px; margin-left: 0"
             button-spinner="$ctrl.state.duplicationInProgress"
           >
-            <span ng-hide="$ctrl.state.duplicationInProgress"> <i class="fa fa-clone space-right" aria-hidden="true"></i> Duplicate </span>
+            <span ng-hide="$ctrl.state.duplicationInProgress">
+              <pr-icon icon="'copy'" class-name="'space-right'"></pr-icon>
+              Duplicate
+            </span>
             <span ng-show="$ctrl.state.duplicationInProgress">Duplication in progress...</span>
           </button>
         </div>

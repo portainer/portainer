@@ -55,7 +55,7 @@
       <div class="col-sm-9" ng-if="$ctrl.teams.length > 0">
         <div class="col-sm-12 small text-muted">
           <p class="vertical-center">
-            <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'"></pr-icon>
             The default team option will be disabled when automatic team membership is enabled
           </p>
         </div>
@@ -75,7 +75,7 @@
             ng-disabled="!$ctrl.settings.DefaultTeamID || $ctrl.settings.OAuthAutoMapTeamMemberships"
             ng-if="$ctrl.teams.length > 0"
           >
-            <pr-icon icon="'x'" feather="true" size="'md'"></pr-icon>
+            <pr-icon icon="'x'" size="'md'"></pr-icon>
           </button>
         </div>
       </div>
@@ -115,7 +115,7 @@
       <label class="col-sm-3 col-lg-2 control-label text-left"> Statically assigned teams </label>
       <div class="col-sm-9 col-lg-10">
         <span class="label label-default interactive vertical-center ml-4" ng-click="$ctrl.addTeamMembershipMapping()">
-          <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+          <pr-icon icon="'plus-circle'"></pr-icon>
           add team mapping
         </span>
 
@@ -137,12 +137,12 @@
             </select>
           </div>
           <button type="button" class="btn btn-md btn-danger" ng-click="$ctrl.removeTeamMembership($index)">
-            <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+            <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
           </button>
 
           <div>
             <div class="small text-warning vertical-center mt-1" ng-show="!mapping.ClaimValRegex">
-              <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
               Claim value regex is required.
             </div>
           </div>
@@ -368,11 +368,11 @@
   <div class="form-group" ng-if="$ctrl.state.provider != 'custom'">
     <div class="col-sm-12">
       <a class="small interactive vertical-center" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
-        <pr-icon icon="'tool'" feather="true"></pr-icon>
+        <pr-icon icon="'tool'"></pr-icon>
         Override default configuration
       </a>
       <a class="small interactive vertical-center" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.useDefaultProviderConfiguration($ctrl.state.provider)">
-        <pr-icon icon="'settings'" feather="true"></pr-icon>
+        <pr-icon icon="'settings'"></pr-icon>
         Use default configuration
       </a>
     </div>

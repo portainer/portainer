@@ -3,6 +3,8 @@ import _ from 'lodash';
 
 import type { DockerContainer, Port } from '@/react/docker/containers/types';
 
+import { Icon } from '@@/Icon';
+
 import { useRowContext } from '../RowContext';
 
 export const ports: Column<DockerContainer> = {
@@ -37,7 +39,7 @@ function PortsCell({ value: ports }: Props) {
       target="_blank"
       rel="noreferrer"
     >
-      <i className="fa fa-external-link-alt" aria-hidden="true" />
+      <Icon icon="external-link" />
       {port.public}:{port.private}
     </a>
   ));

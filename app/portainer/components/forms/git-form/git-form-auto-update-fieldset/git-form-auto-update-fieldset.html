@@ -12,7 +12,7 @@
     </div>
   </div>
   <div class="small vertical-center" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
     <span class="text-warning"
       >Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?</span
     >
@@ -38,10 +38,10 @@
     <div class="col-sm-8">
       <span class="text-muted"> {{ $ctrl.model.RepositoryWebhookURL | truncatelr }} </span>
       <button type="button" class="btn btn-sm btn-light btn-sm space-left vertical-center" ng-if="$ctrl.model.RepositoryWebhookURL" ng-click="$ctrl.copyWebhook()">
-        <pr-icon icon="'copy'" size="'sm'" feather="true"></pr-icon> Copy link
+        <pr-icon icon="'copy'" size="'sm'"></pr-icon> Copy link
       </button>
       <span>
-        <pr-icon icon="'check'" mode="'success'" feather="true" style="display: none"></pr-icon>
+        <pr-icon icon="'check'" mode="'success'" style="display: none"></pr-icon>
       </span>
     </div>
   </div>
@@ -62,9 +62,9 @@
         <div class="form-group col-md-12 pt-1" ng-show="autoUpdateForm.repository_fetch_interval.$touched && autoUpdateForm.repository_fetch_interval.$invalid">
           <div class="small text-warning">
             <div ng-messages="autoUpdateForm.repository_fetch_interval.$error">
-              <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
-              <p ng-message="invalidIntervalFormat"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Please enter a valid time interval.</p>
-              <p ng-message="minimumInterval"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum interval is 1m</p>
+              <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+              <p ng-message="invalidIntervalFormat"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Please enter a valid time interval.</p>
+              <p ng-message="minimumInterval"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Minimum interval is 1m</p>
             </div>
           </div>
         </div>
@@ -97,11 +97,11 @@
     </div>
   </div>
   <div class="small vertical-center" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
     <span class="text-muted">When enabled, enforces automatic deployment at each interval or webhook invocation.</span>
   </div>
   <div class="small vertical-center" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
     <span class="text-muted">When enabled, updates from the git repository will occur automatically at an interval or webhook.</span>
   </div>
 </ng-form>

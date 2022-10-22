@@ -3,6 +3,8 @@ import { CellProps, Column } from 'react-table';
 import { ContainerGroup } from '@/react/azure/types';
 import { getPorts } from '@/react/azure/utils';
 
+import { Icon } from '@@/Icon';
+
 export const ports: Column<ContainerGroup> = {
   Header: 'Published Ports',
   accessor: (container) => getPorts(container),
@@ -26,8 +28,8 @@ function PortsCell({
 
   return ports.map((port) => (
     <a className="image-tag" href={`http://${ip}:${port.host}`} key={port.host}>
-      <i className="fa fa-external-link-alt" aria-hidden="true" /> {ip}:
-      {port.host}
+      <Icon icon="external-link" className="mr-1" />
+      {ip}:{port.host}
     </a>
   ));
 }

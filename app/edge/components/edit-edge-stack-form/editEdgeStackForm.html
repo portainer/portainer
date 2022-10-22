@@ -9,7 +9,7 @@
   <div class="form-group" ng-if="!$ctrl.validateEndpointsForDeployment()">
     <div class="col-sm-12">
       <div class="small text-muted space-right text-warning">
-        <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
         One or more of the selected Edge group contains Edge Docker endpoints that cannot be used with a Kubernetes Edge stack.
       </div>
     </div>
@@ -24,7 +24,7 @@
   <div class="form-group" ng-if="$ctrl.model.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
     <div class="col-sm-12">
       <div class="small text-muted space-right">
-        <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all the
         Compose format options are supported by Kompose at the moment.
       </div>

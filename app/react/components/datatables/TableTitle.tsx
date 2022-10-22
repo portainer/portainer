@@ -4,14 +4,12 @@ import { Icon } from '@@/Icon';
 
 interface Props {
   icon?: ReactNode | ComponentType<unknown>;
-  featherIcon?: boolean;
   label: string;
   description?: JSX.Element;
 }
 
 export function TableTitle({
   icon,
-  featherIcon,
   label,
   children,
   description,
@@ -22,11 +20,7 @@ export function TableTitle({
         <div className="toolBarTitle">
           {icon && (
             <div className="widget-icon">
-              <Icon
-                icon={icon}
-                feather={featherIcon}
-                className="space-right feather"
-              />
+              <Icon icon={icon} className="space-right feather" />
             </div>
           )}
 

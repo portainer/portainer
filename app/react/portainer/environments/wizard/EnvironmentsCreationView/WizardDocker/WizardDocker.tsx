@@ -4,6 +4,7 @@ import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -23,28 +24,28 @@ const defaultOptions: BoxSelectorOption<
 >[] = [
   {
     id: 'agent',
-    icon: 'svg-agent',
+    icon: <BadgeIcon icon="zap" size="3xl" />,
     label: 'Agent',
     description: '',
     value: 'agent',
   },
   {
     id: 'api',
-    icon: 'svg-api',
+    icon: <BadgeIcon icon="svg-dataflow2" size="3xl" />,
     label: 'API',
     description: '',
     value: 'api',
   },
   {
     id: 'socket',
-    icon: 'svg-socket',
+    icon: <BadgeIcon icon="svg-plug" size="3xl" />,
     label: 'Socket',
     description: '',
     value: 'socket',
   },
   {
     id: 'edgeAgent',
-    icon: 'svg-edgeagent',
+    icon: <BadgeIcon icon="cloud" size="3xl" />,
     label: 'Edge Agent',
     description: '',
     value: 'edgeAgent',

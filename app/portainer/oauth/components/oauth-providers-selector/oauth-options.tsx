@@ -11,7 +11,6 @@ export const options = [
   {
     id: 'microsoft',
     icon: Microsoft,
-    featherIcon: true,
     label: 'Microsoft',
     description: 'Microsoft OAuth provider',
     value: 'microsoft',

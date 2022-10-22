@@ -5,7 +5,7 @@
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
         <input
           type="text"
           class="searchInput"
@@ -21,18 +21,22 @@
           <thead>
             <tr>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Name'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Name')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('GroupName')">
-                  Group
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Group'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'GroupName'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'GroupName' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('GroupName')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>

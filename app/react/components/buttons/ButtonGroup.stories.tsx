@@ -1,6 +1,8 @@
 import { Meta, Story } from '@storybook/react';
 import { PropsWithChildren } from 'react';
 
+import { Icon } from '@@/Icon';
+
 import { Button } from './Button';
 import { ButtonGroup, Props } from './ButtonGroup';
 
@@ -15,27 +17,23 @@ function Template({
   return (
     <ButtonGroup size={size}>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="danger" onClick={() => {}}>
-        <i className="fa fa-stop space-right" aria-hidden="true" />
+        <Icon icon="square" />
         Stop
       </Button>
-      <Button color="danger" onClick={() => {}}>
-        <i className="fa fa-bomb space-right" aria-hidden="true" />
-        Kill
-      </Button>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-sync space-right" aria-hidden="true" />
+        <Icon icon="refresh-cw" />
         Restart
       </Button>
       <Button color="primary" disabled onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Resume
       </Button>
       <Button color="danger" onClick={() => {}}>
-        <i className="fa fa-trash-alt space-right" aria-hidden="true" />
+        <Icon icon="trash-2" />
         Remove
       </Button>
     </ButtonGroup>
@@ -51,19 +49,19 @@ export function Xsmall() {
   return (
     <ButtonGroup size="xsmall">
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="danger" onClick={() => {}}>
-        <i className="fa fa-stop space-right" aria-hidden="true" />
+        <Icon icon="square" />
         Stop
       </Button>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-sync space-right" aria-hidden="true" />
+        <Icon icon="refresh-cw" />
         Restart
       </Button>
     </ButtonGroup>
@@ -74,19 +72,19 @@ export function Small() {
   return (
     <ButtonGroup size="small">
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="danger" onClick={() => {}}>
-        <i className="fa fa-stop space-right" aria-hidden="true" />
+        <Icon icon="square" />
         Stop
       </Button>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-sync space-right" aria-hidden="true" />
+        <Icon icon="refresh-cw" />
         Restart
       </Button>
     </ButtonGroup>
@@ -97,19 +95,19 @@ export function Large() {
   return (
     <ButtonGroup size="large">
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="danger" onClick={() => {}}>
-        <i className="fa fa-stop space-right" aria-hidden="true" />
+        <Icon icon="square" />
         Stop
       </Button>
       <Button color="light" onClick={() => {}}>
-        <i className="fa fa-play space-right" aria-hidden="true" />
+        <Icon icon="play" />
         Start
       </Button>
       <Button color="primary" onClick={() => {}}>
-        <i className="fa fa-sync space-right" aria-hidden="true" />
+        <Icon icon="refresh-cw" />
         Restart
       </Button>
     </ButtonGroup>

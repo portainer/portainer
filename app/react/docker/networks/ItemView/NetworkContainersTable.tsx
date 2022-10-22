@@ -41,7 +41,7 @@ export function NetworkContainersTable({
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <TableContainer>
-          <TableTitle label="Containers in network" icon="server" featherIcon />
+          <TableTitle label="Containers in network" icon="server" />
           <Table className="nopadding">
             <DetailsTable
               headers={tableHeaders}
@@ -82,7 +82,6 @@ export function NetworkContainersTable({
                       >
                         <Icon
                           icon="trash-2"
-                          feather
                           class-name="icon-secondary icon-md"
                         />
                         Leave Network

@@ -1,5 +1,7 @@
 import { Meta } from '@storybook/react';
 
+import { Icon } from '@@/Icon';
+
 import { LoadingButton } from './LoadingButton';
 
 export default {
@@ -15,7 +17,8 @@ interface Args {
 function Template({ loadingText, isLoading }: Args) {
   return (
     <LoadingButton loadingText={loadingText} isLoading={isLoading}>
-      <i className="fa fa-download" aria-hidden="true" /> Download
+      <Icon icon="download" />
+      Download
     </LoadingButton>
   );
 }
@@ -30,7 +33,8 @@ export const Example = Template.bind({});
 export function IsLoading() {
   return (
     <LoadingButton loadingText="loading" isLoading>
-      <i className="fa fa-download" aria-hidden="true" /> Download
+      <Icon icon="download" />
+      Download
     </LoadingButton>
   );
 }

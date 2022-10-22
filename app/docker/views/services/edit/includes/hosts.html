@@ -1,9 +1,9 @@
 <div>
   <rd-widget>
-    <rd-widget-header icon="list" feather-icon="true" title-text="Hosts file entries">
+    <rd-widget-header icon="list" title-text="Hosts file entries">
       <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating ||addHostsEntry(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" feather="true"></pr-icon> add host entry
+          <pr-icon icon="'plus'"></pr-icon> add host entry
         </a>
       </div>
     </rd-widget-header>
@@ -46,7 +46,7 @@
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-dangerlight" type="button" ng-click="removeHostsEntry(service, $index)" ng-disabled="isUpdating">
-                    <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                    <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                   </button>
                 </span>
               </div>

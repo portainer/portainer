@@ -55,7 +55,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
     <RowProvider context={{ environment }}>
       <Datatable
         titleOptions={{
-          icon: 'fa-cubes',
+          icon: 'svg-cubes',
           title: 'Containers',
         }}
         settingsStore={settings}

@@ -31,7 +31,6 @@ interface DefaultTableSettings
 interface TitleOptionsVisible {
   title: string;
   icon?: IconProps['icon'];
-  featherIcon?: IconProps['featherIcon'];
   hide?: never;
 }
 
@@ -165,7 +164,6 @@ export function Datatable<
               <Table.Title
                 label={titleOptions.title}
                 icon={titleOptions.icon}
-                featherIcon={titleOptions.featherIcon}
                 description={description}
               >
                 <SearchBar value={searchBarValue} onChange={setGlobalFilter} />

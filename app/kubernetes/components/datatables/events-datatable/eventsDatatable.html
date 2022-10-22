@@ -7,7 +7,7 @@
       {{ $ctrl.titleText }}
     </div>
     <div class="searchBar">
-      <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+      <pr-icon icon="'search'" class="vertical-center"></pr-icon>
       <input
         type="text"
         class="searchInput ml-1"
@@ -21,7 +21,7 @@
     </div>
     <div class="settings">
       <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'"></pr-icon></span>
         <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
           <div class="tableMenu">
             <div class="menuHeader"> Table settings </div>
@@ -41,7 +41,7 @@
                     <option value="300">5min</option>
                   </select>
                   <span>
-                    <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
+                    <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'"></pr-icon>
                   </span>
                 </div>
               </div>

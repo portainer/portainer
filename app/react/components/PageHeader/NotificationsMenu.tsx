@@ -69,7 +69,7 @@ export function NotificationsMenu() {
             'th-dark:text-gray-warm-7'
           )}
         >
-          <Icon icon="bell" feather />
+          <Icon icon="bell" />
           <span className={badge ? notificationStyles.badge : ''} />
         </div>
       </MenuButton>
@@ -126,7 +126,7 @@ export function NotificationsMenu() {
           </>
         ) : (
           <div className="flex flex-col items-center">
-            <Icon icon="bell" feather size="xl" />
+            <Icon icon="bell" size="xl" />
             <p className="my-5">You have no notifications yet.</p>
           </div>
         )}
@@ -160,9 +160,9 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
       <div className={notificationStyles.container}>
         <div className={notificationStyles.notificationIcon}>
           {notification.type === 'success' ? (
-            <Icon icon="check-circle" feather size="lg" mode="success" />
+            <Icon icon="check-circle" size="lg" mode="success" />
           ) : (
-            <Icon icon="alert-circle" feather size="lg" mode="danger" />
+            <Icon icon="alert-circle" size="lg" mode="danger" />
           )}
         </div>
         <div className={notificationStyles.notificationBody}>
@@ -187,7 +187,7 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
             data-cy="notification-deleteButton"
             size="large"
           >
-            <Icon icon="trash-2" feather />
+            <Icon icon="trash-2" />
           </Button>
         </div>
       </div>

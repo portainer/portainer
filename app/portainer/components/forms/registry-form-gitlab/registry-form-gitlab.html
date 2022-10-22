@@ -18,7 +18,7 @@
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_username.$error">
             <p ng-message="required" class="vertical-center">
-              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              <pr-icon icon="'alert-triangle'"></pr-icon>
               This field is required.
             </p>
           </div>
@@ -36,7 +36,7 @@
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
             <p ng-message="required" class="vertical-center">
-              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              <pr-icon icon="'alert-triangle'"></pr-icon>
               This field is required.
             </p>
           </div>
@@ -54,7 +54,7 @@
         ng-if="!$ctrl.state.overrideConfiguration"
         ng-click="$ctrl.state.overrideConfiguration = true;"
       >
-        <pr-icon icon="'tool'" feather="true"></pr-icon>
+        <pr-icon icon="'tool'"></pr-icon>
         Override default configuration
       </button>
       <button
@@ -63,7 +63,7 @@
         ng-if="$ctrl.state.overrideConfiguration"
         ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()"
       >
-        <pr-icon icon="'settings'" feather="true"></pr-icon>
+        <pr-icon icon="'settings'"></pr-icon>
         Use default configuration
       </button>
     </div>
@@ -81,7 +81,7 @@
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.instance_url.$error">
             <p ng-message="required" class="vertical-center">
-              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              <pr-icon icon="'alert-triangle'"></pr-icon>
               This field is required.
             </p>
           </div>
@@ -102,7 +102,7 @@
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_url.$error">
             <p ng-message="required" class="vertical-center">
-              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              <pr-icon icon="'alert-triangle'"></pr-icon>
               This field is required.
             </p>
           </div>
@@ -126,7 +126,7 @@
   <div class="form-group">
     <span class="col-sm-12 text-muted small"> Select the project's registries you want to manage. Portainer will create one registry for each selected project. </span>
     <span class="col-sm-12 text-muted small vertical-center">
-      <pr-icon icon="'alert-triangle'" feather="true" class-name="'icon-warning'"></pr-icon>
+      <pr-icon icon="'alert-triangle'" class-name="'icon-warning'"></pr-icon>
       If you can't select a project, make sure that registry feature is activated on it.
     </span>
   </div>
