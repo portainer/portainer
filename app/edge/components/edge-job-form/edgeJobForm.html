@@ -19,10 +19,10 @@
         <div class="small text-warning">
           <div ng-messages="edgeJobForm.edgejob_name.$error">
             <p ng-message="required" class="vertical-center">
-              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
             </p>
             <p ng-message="pattern" class="vertical-center">
-              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
+              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
             </p>
           </div>
         </div>
@@ -42,7 +42,7 @@
           <input type="radio" id="config_basic" ng-model="$ctrl.formValues.cronMethod" value="basic" />
           <label for="config_basic">
             <div class="boxselector_header vertical-center">
-              <pr-icon icon="'calendar'" feather="true"></pr-icon>
+              <pr-icon icon="'calendar'"></pr-icon>
               Basic configuration
             </div>
             <p>Select date from calendar</p>
@@ -52,7 +52,7 @@
           <input type="radio" id="config_advanced" ng-model="$ctrl.formValues.cronMethod" value="advanced" />
           <label for="config_advanced">
             <div class="boxselector_header vertical-center">
-              <pr-icon icon="'edit'" feather="true"></pr-icon>
+              <pr-icon icon="'edit'"></pr-icon>
               Advanced configuration
             </div>
             <p>Write your own cron rule</p>
@@ -82,7 +82,7 @@
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.datepicker.$error">
               <p ng-message="required" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
               </p>
             </div>
           </div>
@@ -108,7 +108,7 @@
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.edgejob_value.$error">
               <p ng-message="required" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
               </p>
             </div>
           </div>
@@ -137,10 +137,10 @@
           <div class="small text-warning">
             <div ng-messages="edgeJobForm.edgejob_cron.$error">
               <p ng-message="required" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
               </p>
               <p ng-message="pattern" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field format is invalid.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field format is invalid.
               </p>
             </div>
           </div>
@@ -161,7 +161,7 @@
             <input type="radio" id="method_editor" ng-model="$ctrl.formValues.method" value="editor" />
             <label for="method_editor">
               <div class="boxselector_header vertical-center">
-                <pr-icon icon="'edit'" feather="true"></pr-icon>
+                <pr-icon icon="'edit'"></pr-icon>
                 Web editor
               </div>
               <p>Use our Web editor</p>
@@ -171,7 +171,7 @@
             <input type="radio" id="method_upload" ng-model="$ctrl.formValues.method" value="upload" />
             <label for="method_upload">
               <div class="boxselector_header vertical-center">
-                <pr-icon icon="'upload'" feather="true"></pr-icon>
+                <pr-icon icon="'upload'"></pr-icon>
                 Upload
               </div>
               <p>Upload from your computer</p>
@@ -208,7 +208,7 @@
         <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
         <span class="space-left">
           {{ $ctrl.model.File.name }}
-          <span ng-if="!$ctrl.model.File"><pr-icon icon="'x'" class-name="'icon icon-danger'" feather="true"></pr-icon></span>
+          <span ng-if="!$ctrl.model.File"><pr-icon icon="'x'" class-name="'icon icon-danger'"></pr-icon></span>
         </span>
       </div>
     </div>

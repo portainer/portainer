@@ -15,8 +15,8 @@
           <div>
             <a ng-click="togglePanel()" class="vertical-center">
               <span>
-                <pr-icon icon="'chevron-down'" feather="true" ng-if="state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
-                <pr-icon icon="'chevron-right'" feather="true" ng-if="!state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-down'" ng-if="state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" ng-if="!state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
               </span>
               <span class="form-section-title">New Portainer installation</span>
             </a>
@@ -54,16 +54,10 @@
               <div class="col-sm-8">
                 <div class="input-group">
                   <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" />
-                  <span class="input-group-addon"
-                    ><i
-                      ng-class="
-                        { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
-                          form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword
-                        ]
-                      "
-                      aria-hidden="true"
-                    ></i
-                  ></span>
+                  <span class="input-group-addon !rounded-r-[5px]">
+                    <pr-icon ng-if="form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword" icon="'check'" mode="'success'"></pr-icon>
+                    <pr-icon ng-if="form.password.$viewValue === '' || form.password.$viewValue !== formValues.ConfirmPassword" icon="'x'" mode="'danger'"></pr-icon>
+                  </span>
                 </div>
               </div>
             </div>
@@ -72,9 +66,9 @@
             <div class="form-group">
               <div class="col-sm-12 text-warning">
                 <p class="vertical-center">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                   <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
-                  <pr-icon class="fa green-icon" icon="'check'" feather="true" ng-if="form.password.$valid && formValues.Password"></pr-icon>
+                  <pr-icon class="fa green-icon" icon="'check'" ng-if="form.password.$valid && formValues.Password"></pr-icon>
                 </p>
               </div>
             </div>
@@ -119,8 +113,8 @@
           <div>
             <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup" class="vertical-center">
               <span
-                ><pr-icon icon="'chevron-down'" feather="true" ng-if="state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon>
-                <pr-icon icon="'chevron-right'" feather="true" ng-if="!state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon
+                ><pr-icon icon="'chevron-down'" ng-if="state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" ng-if="!state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon
               ></span>
               <span class="form-section-title">Restore Portainer from backup</span>
             </a>
@@ -145,7 +139,7 @@
                     <input type="radio" id="restore_file" checked="checked" />
                     <label for="restore_file" data-cy="init-selectLocalFile">
                       <div class="boxselector_header">
-                        <pr-icon icon="'upload'" feather="true"></pr-icon>
+                        <pr-icon icon="'upload'"></pr-icon>
                         Upload backup file
                       </div>
                       <p></p>
@@ -155,7 +149,7 @@
                     <input type="radio" id="restore_s3" disabled />
                     <label for="restore_s3" class="boxselector_disabled">
                       <div class="boxselector_header">
-                        <pr-icon icon="'download'" feather="true"></pr-icon>
+                        <pr-icon icon="'download'"></pr-icon>
                         Retrieve from S3
                       </div>
                       <p
@@ -189,7 +183,7 @@
                 >
                 <span class="space-left vertical-center">
                   {{ formValues.BackupFile.name }}
-                  <pr-icon icon="'x-circle'" class-name="'icon-danger'" feather="true" ng-if="!formValues.BackupFile"></pr-icon>
+                  <pr-icon icon="'x-circle'" class-name="'icon-danger'" ng-if="!formValues.BackupFile"></pr-icon>
                 </span>
               </div>
             </div>

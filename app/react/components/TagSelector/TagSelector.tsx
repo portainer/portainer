@@ -74,7 +74,7 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
               key={tag.value}
             >
               {tag.label}
-              <Icon icon="trash-2" feather />
+              <Icon icon="trash-2" />
             </button>
           ))}
         </FormControl>

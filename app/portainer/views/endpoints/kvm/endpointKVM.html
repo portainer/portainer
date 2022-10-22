@@ -2,11 +2,11 @@
   title="'KVM Control'"
   breadcrumbs="[
     { label:'Environments', link:'portainer.endpoints' },
-    { 
+    {
       label:$state.endpoint.Name,
-      link: 'portainer.endpoints.endpoint', 
+      link: 'portainer.endpoints.endpoint',
       linkParams:{id: $state.endpoint.Id}
-    }, 
+    },
     $state.deviceName,
     'KVM Control']"
 >
@@ -19,9 +19,9 @@
         <rd-widget-body classes="no-padding">
           <div class="toolBar">
             <div class="toolBarTitle">KVM Control</div>
-            <i class="interactive fa fa-times fa-lg pull-right" aria-hidden="true" ui-sref="edge.devices"></i>
-            <i ng-click="maximize()" title="Maximize" class="interactive fa fa-window-maximize fa-lg pull-right" style="margin-right: 10px" aria-hidden="true"></i>
-            <i ng-click="minimize()" title="Minimize" class="interactive fa fa-window-minimize fa-lg pull-right" style="margin-right: 10px" aria-hidden="true"></i>
+            <pr-icon icon="'x'" ui-sref="edge.devices" class-name="interactive pull-right" size="'lg'"></pr-icon>
+            <pr-icon ng-click="maximize()" title="Maximize" icon="'maximize-2'" class-name="!mr-2 interactive  pull-right" size="'lg'"></pr-icon>
+            <pr-icon ng-click="minimize()" title="Minimize" icon="'minimize-2'" class-name="!mr-2 interactive pull-right" size="'lg'"></pr-icon>
           </div>
           <div class="actionBar">
             <kvm-control device-id="$state.deviceId" server="$state.mpsServer" token="$state.mpsToken"> </kvm-control>

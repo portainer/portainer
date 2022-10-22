@@ -27,8 +27,8 @@ export function KubectlShellButton({ environmentId }: Props) {
         onClick={() => handleOpen()}
         className={clsx(styles.root, '!flex')}
       >
-        <Icon icon="terminal" feather className="vertical-center" size="md" />{' '}
-        kubectl shell
+        <Icon icon="terminal" className="vertical-center" size="md" /> kubectl
+        shell
       </Button>
 
       {open &&

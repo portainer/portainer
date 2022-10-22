@@ -20,7 +20,7 @@ const meta: Meta<WidgetProps> = {
   args: {
     loading: false,
     title: 'Title',
-    icon: 'fa-rocket',
+    icon: 'svg-rocket',
     bodyText: 'Body',
     footerText: 'Footer',
   },

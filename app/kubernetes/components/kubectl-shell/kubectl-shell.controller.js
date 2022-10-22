@@ -22,7 +22,7 @@ export default class KubectlShellController {
   disconnect() {
     if (this.state.shell.connected) {
       this.state.shell.connected = false;
-      this.state.icon = 'fas fa-window-minimize';
+      this.state.icon = 'minimize-2';
       this.state.shell.socket.close();
       this.state.shell.term.dispose();
       this.TerminalWindow.terminalclose();
@@ -37,11 +37,11 @@ export default class KubectlShellController {
   miniRestore() {
     if (this.state.css === 'mini') {
       this.state.css = 'normal';
-      this.state.icon = 'fas fa-window-minimize';
+      this.state.icon = 'minimize-2';
       this.TerminalWindow.terminalopen();
     } else {
       this.state.css = 'mini';
-      this.state.icon = 'fas fa-window-restore';
+      this.state.icon = 'svg-restorewindow';
       this.TerminalWindow.terminalclose();
     }
   }
@@ -111,7 +111,7 @@ export default class KubectlShellController {
     return this.$async(async () => {
       this.state = {
         css: 'normal',
-        icon: 'fa-window-minimize',
+        icon: 'minimize-2',
         shell: {
           connected: false,
           socket: null,

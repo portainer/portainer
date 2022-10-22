@@ -123,7 +123,7 @@ export function EdgeDevicesDatatable({
     <div className="row">
       <div className="col-sm-12">
         <TableContainer>
-          <TableTitle icon="box" featherIcon label="Edge Devices">
+          <TableTitle icon="box" label="Edge Devices">
             <SearchBar value={search} onChange={handleSearchBarChange} />
             <TableActions>
               <EdgeDevicesDatatableActions

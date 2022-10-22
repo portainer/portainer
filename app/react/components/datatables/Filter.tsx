@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
 
+import { Icon } from '@@/Icon';
+
 export const DefaultFilter = filterHOC('Filter by state');
 
 interface MultipleSelectionFilterProps {
@@ -28,14 +30,7 @@ export function MultipleSelectionFilter({
           className={clsx('table-filter', { 'filter-active': enabled })}
         >
           Filter
-          <i
-            className={clsx(
-              'fa',
-              'space-left',
-              enabled ? 'fa-check' : 'fa-filter'
-            )}
-            aria-hidden="true"
-          />
+          <Icon icon={enabled ? 'check' : 'filter'} className="ml-1" />
         </MenuButton>
         <MenuPopover className="dropdown-menu">
           <div className="tableMenu">

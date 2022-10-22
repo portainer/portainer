@@ -2,9 +2,9 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle vertical-center"> <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon> Edge Stacks </div>
+        <div class="toolBarTitle vertical-center"> <pr-icon icon="$ctrl.titleIcon"></pr-icon> Edge Stacks </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class-name="'icon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'icon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -23,18 +23,16 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="edgeStack-removeStackButton"
           >
-            <pr-icon icon="'trash-2'" feather="true"></pr-icon> Remove
+            <pr-icon icon="'trash-2'"></pr-icon> Remove
           </button>
-          <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.stacks.new" data-cy="edgeStack-addStackButton">
-            <pr-icon icon="'plus'" feather="true"></pr-icon> Add stack
-          </button>
+          <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.stacks.new" data-cy="edgeStack-addStackButton"> <pr-icon icon="'plus'"></pr-icon> Add stack </button>
         </div>
         <div class="settings !w-2.5" data-cy="edgeStack-stackTableSettings">
           <span class="setting mr-0" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
-                <div class="menuHeader"> <pr-icon icon="'settings'" feather="true"></pr-icon> Table settings </div>
+                <div class="menuHeader"> <pr-icon icon="'settings'"></pr-icon> Table settings </div>
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
@@ -57,7 +55,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span class="inline-block w-3">
-                        <pr-icon id="refreshRateChange" icon="'check'" style="display: none" mode="'success'" feather="true"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" style="display: none" mode="'success'"></pr-icon>
                       </span>
                     </div>
                   </div>

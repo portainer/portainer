@@ -11,7 +11,7 @@ test('should show provided resource value', async () => {
 });
 
 test('should show provided resource type', async () => {
-  const { getByLabelText } = renderComponent(0, '', 'Test');
+  const { getByLabelText } = renderComponent(0, 'user', 'Test');
   const title = getByLabelText('resourceType');
 
   expect(title).toBeVisible();
@@ -19,11 +19,11 @@ test('should show provided resource type', async () => {
 });
 
 test('should have accessibility label created from the provided resource type', async () => {
-  const { getByLabelText } = renderComponent(0, '', 'testLabel');
+  const { getByLabelText } = renderComponent(0, 'user', 'testLabel');
 
   expect(getByLabelText('testLabel')).toBeTruthy();
 });
 
-function renderComponent(value = 0, icon = '', type = '') {
+function renderComponent(value = 0, icon = 'user', type = '') {
   return render(<DashboardItem value={value} icon={icon} type={type} />);
 }

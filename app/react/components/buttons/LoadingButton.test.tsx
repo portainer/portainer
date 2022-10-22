@@ -6,7 +6,7 @@ test('when isLoading is true should show spinner and loading text', async () => 
   const loadingText = 'loading';
   const children = 'not visible';
 
-  const { findByLabelText, queryByText, findByText } = render(
+  const { queryByText, findByText } = render(
     <LoadingButton loadingText={loadingText} isLoading>
       {children}
     </LoadingButton>
@@ -14,9 +14,6 @@ test('when isLoading is true should show spinner and loading text', async () => 
 
   const buttonLabel = queryByText(children);
   expect(buttonLabel).toBeNull();
-
-  const spinner = await findByLabelText('loading');
-  expect(spinner).toBeVisible();
 
   const loadingTextElem = await findByText(loadingText);
   expect(loadingTextElem).toBeVisible();
@@ -31,9 +28,6 @@ test('should show children when false', async () => {
       {children}
     </LoadingButton>
   );
-
-  const buttonLabel = queryByText(children);
-  expect(buttonLabel).toBeVisible();
 
   const spinner = queryByLabelText('loading');
   expect(spinner).toBeNull();

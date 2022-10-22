@@ -2,6 +2,7 @@ import { PropsWithChildren } from 'react';
 
 import { Widget, WidgetBody } from './Widget';
 import { Button } from './buttons';
+import { Icon } from './Icon';
 
 interface Props {
   title?: string;
@@ -33,7 +34,8 @@ export function InformationPanel({
                       ng-if="dismissAction"
                     >
                       <Button color="link" onClick={() => onDismiss()}>
-                        <i className="fa fa-times" /> dismiss
+                        <Icon icon="x" />
+                        dismiss
                       </Button>
                     </span>
                   )}

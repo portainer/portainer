@@ -44,7 +44,6 @@ export function CreateTeamForm({ users, teams }: Props) {
           <Widget.Title
             icon="plus"
             title="Add a new team"
-            featherIcon
             className="vertical-center"
           />
           <Widget.Body>
@@ -124,7 +123,7 @@ export function CreateTeamForm({ users, teams }: Props) {
                         isLoading={isSubmitting || addTeamMutation.isLoading}
                         loadingText="Creating team..."
                       >
-                        <Icon icon="plus" feather size="md" />
+                        <Icon icon="plus" size="md" />
                         Create team
                       </LoadingButton>
                     </div>

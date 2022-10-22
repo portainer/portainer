@@ -18,7 +18,7 @@ export function NetworkOptionsTable({ options }: Props) {
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <TableContainer>
-          <TableTitle label="Network options" icon="share-2" featherIcon />
+          <TableTitle label="Network options" icon="share-2" />
           <Table className="nopadding">
             <DetailsTable dataCy="networkDetails-networkOptionsTable">
               {networkEntries.map(([key, value]) => (

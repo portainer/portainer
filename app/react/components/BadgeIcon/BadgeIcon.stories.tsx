@@ -29,7 +29,7 @@ function Template({
   size?: BadgeSize;
   icon: string;
 }) {
-  return <BadgeIcon icon={icon} size={size} featherIcon />;
+  return <BadgeIcon icon={icon} size={size} />;
 }
 
 export const Example = Template.bind({});

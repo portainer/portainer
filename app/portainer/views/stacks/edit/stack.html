@@ -7,7 +7,10 @@
         <uib-tabset active="state.activeTab">
           <!-- tab-info -->
           <uib-tab index="0">
-            <uib-tab-heading> <i class="fa fa-th-list" aria-hidden="true"></i> Stack </uib-tab-heading>
+            <uib-tab-heading>
+              <pr-icon icon="'list'"></pr-icon>
+              Stack
+            </uib-tab-heading>
             <div style="margin-top: 10px">
               <!-- stack-information -->
               <div ng-if="external || orphaned">
@@ -15,7 +18,7 @@
                 <div class="form-group">
                   <span class="small">
                     <p class="text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
                       <span ng-if="external">This stack was created outside of Portainer. Control over this stack is limited.</span>
                       <span ng-if="orphaned">This stack is orphaned. You can re-associate it with the current environment using the "Associate to this environment" feature.</span>
                     </p>
@@ -36,7 +39,7 @@
                     class="btn btn-xs btn-success"
                     ng-click="startStack()"
                   >
-                    <i class="fa fa-play space-right" aria-hidden="true"></i>
+                    <pr-icon icon="'play'"></pr-icon>
                     Start this stack
                   </button>
 
@@ -47,12 +50,12 @@
                     class="btn btn-xs btn-light"
                     ng-click="stopStack()"
                   >
-                    <pr-icon icon="'stop-circle'" feather="true"></pr-icon>
+                    <pr-icon icon="'stop-circle'"></pr-icon>
                     Stop this stack
                   </button>
 
                   <button authorization="PortainerStackDelete" class="btn btn-xs btn-light" ng-click="removeStack()" ng-if="!external || stack.Type == 1">
-                    <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                    <pr-icon icon="'trash-2'"></pr-icon>
                     Delete this stack
                   </button>
 
@@ -61,7 +64,7 @@
                     class="btn btn-primary btn-xs"
                     ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
                   >
-                    <pr-icon icon="'plus'" feather="true"></pr-icon>
+                    <pr-icon icon="'plus'"></pr-icon>
                     Create template from stack
                   </button>
                   <button
@@ -72,7 +75,7 @@
                     button-spinner="state.actionInProgress"
                     class="btn btn-primary btn-xs"
                   >
-                    <i class="fa fa-arrow-right space-right" aria-hidden="true"></i>
+                    <pr-icon icon="'arrow-right'" class-name="'mr-1'"></pr-icon>
                     <span ng-hide="state.actionInProgress">Detach from Git</span>
                     <span ng-show="state.actionInProgress">Detachment in progress...</span>
                   </button>
@@ -96,7 +99,7 @@
                         button-spinner="state.actionInProgress"
                         style="margin-left: -5px"
                       >
-                        <i class="fa fa-sync" aria-hidden="true" style="margin-right: 3px"></i>
+                        <pr-icon icon="'refresh-cw'" class="!mr-1"></pr-icon>
                         <span ng-hide="state.actionInProgress">Associate</span>
                         <span ng-show="state.actionInProgress">Association in progress...</span>
                       </button>
@@ -129,7 +132,10 @@
           <!-- !tab-info -->
           <!-- tab-file -->
           <uib-tab index="1" select="showEditor()" ng-if="!external && (!stack.GitConfig || stack.FromAppTemplate)">
-            <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
+            <uib-tab-heading>
+              <pr-icon icon="'edit-2'" class-name="'mr-1'"></pr-icon>
+              Editor
+            </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == STACK_TYPES.DockerCompose && composeSyntaxMaxVersion == 2">

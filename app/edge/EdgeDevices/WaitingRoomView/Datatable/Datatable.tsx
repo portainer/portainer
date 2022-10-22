@@ -109,7 +109,7 @@ export function DataTable({
     <div className="row">
       <div className="col-sm-12">
         <Table.Container>
-          <Table.Title label="Edge Devices Waiting Room" icon="">
+          <Table.Title label="Edge Devices Waiting Room" icon="box">
             <SearchBar
               onChange={handleSearchBarChange}
               value={searchBarValue}

@@ -4,7 +4,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="trello" feather-icon="true" title-text="Cluster information">
+      <rd-widget-header icon="trello" title-text="Cluster information">
         <div class="pull-right">
           <button type="button" class="btn btn-sm btn-primary" ng-click="changeShowInformationPanel(true)" ng-if="!state.ShowInformationPanel">Show</button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="changeShowInformationPanel(false)" ng-if="state.ShowInformationPanel">Hide</button>
@@ -51,11 +51,10 @@
           </div>
         </form>
         <form class="form-horizontal">
-          <div class="col-sm-12 form-section-title"> Refresh </div>
+          <div class="col-sm-12 form-section-title"> Refresh rate </div>
           <div class="form-group">
             <label for="refreshRate" class="col-sm-2 margin-sm-top control-label text-left">
-              Rate
-              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="display: none"></i>
+              <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" size="'sm'" style="display: none"></pr-icon>
             </label>
             <div class="col-sm-2">
               <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">
@@ -75,7 +74,7 @@
 <div class="row" ng-if="visualizerData">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="trello" feather-icon="true" title-text="Cluster visualizer"></rd-widget-header>
+      <rd-widget-header icon="trello" title-text="Cluster visualizer"></rd-widget-header>
       <rd-widget-body>
         <div class="visualizer_container">
           <div class="node" ng-repeat="node in visualizerData.nodes | orderBy : ['Role', 'Hostname'] track by $index">
@@ -84,8 +83,8 @@
                 <div>
                   <b>{{ node.Name || node.Hostname }}</b>
                   <span class="node_platform">
-                    <i class="fab fa-linux" aria-hidden="true" ng-if="node.PlatformOS === 'linux'"></i>
-                    <i class="fab fa-windows" aria-hidden="true" ng-if="node.PlatformOS === 'windows'"></i>
+                    <pr-icon ng-if="node.PlatformOS === 'linux'" icon="'svg-linux'"></pr-icon>
+                    <pr-icon ng-if="node.PlatformOS === 'windows'" icon="'grid'"></pr-icon>
                   </span>
                 </div>
               </div>

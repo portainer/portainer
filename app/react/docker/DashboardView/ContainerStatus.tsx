@@ -17,37 +17,21 @@ export function ContainerStatus({ containers }: Props) {
     <div className="pull-right">
       <div>
         <div className="vertical-center space-right pr-5">
-          <Icon
-            icon="power"
-            className={clsx('icon icon-sm icon-success')}
-            feather
-          />
+          <Icon icon="power" className={clsx('icon icon-sm icon-success')} />
           {runningContainersFilter(containers)} running
         </div>
         <div className="vertical-center space-right">
-          <Icon
-            icon="power"
-            className={clsx('icon icon-sm icon-danger')}
-            feather
-          />
+          <Icon icon="power" className={clsx('icon icon-sm icon-danger')} />
           {stoppedContainersFilter(containers)} stopped
         </div>
       </div>
       <div>
         <div className="vertical-center space-right pr-5">
-          <Icon
-            icon="heart"
-            className={clsx('icon icon-sm icon-success')}
-            feather
-          />
+          <Icon icon="heart" className={clsx('icon icon-sm icon-success')} />
           {healthyContainersFilter(containers)} healthy
         </div>
         <div className="vertical-center space-right">
-          <Icon
-            icon="heart"
-            className={clsx('icon icon-sm icon-danger')}
-            feather
-          />
+          <Icon icon="heart" className={clsx('icon icon-sm icon-danger')} />
           {unhealthyContainersFilter(containers)} unhealthy
         </div>
       </div>

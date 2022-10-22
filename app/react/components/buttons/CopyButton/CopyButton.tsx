@@ -33,7 +33,7 @@ export function CopyButton({
         title="Copy Value"
         type="button"
       >
-        <Icon icon="copy" feather />
+        <Icon icon="copy" />
         {children}
       </Button>
 
@@ -45,7 +45,7 @@ export function CopyButton({
           'vertical-center'
         )}
       >
-        <Icon icon="check" feather />
+        <Icon icon="check" />
         {displayText && <span className="space-left">{displayText}</span>}
       </span>
     </div>

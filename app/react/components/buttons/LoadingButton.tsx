@@ -1,5 +1,7 @@
 import { PropsWithChildren } from 'react';
 
+import { Icon } from '@@/Icon';
+
 import { type Props as ButtonProps, Button } from './Button';
 
 interface Props extends ButtonProps {
@@ -24,10 +26,10 @@ export function LoadingButton({
     >
       {isLoading ? (
         <>
-          <i
-            className="fa fa-circle-notch fa-spin space-right"
-            aria-label="loading"
-            aria-hidden="true"
+          <Icon
+            icon="svg-circlenotch"
+            className="animate-spin-slow ml-1"
+            ariaLabel="loading"
           />
           {loadingText}
         </>

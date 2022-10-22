@@ -31,17 +31,12 @@ export function EnvironmentStatsDocker({
   return (
     <div className="blocklist-item-line endpoint-item">
       <span className="blocklist-item-desc">
-        <Stat
-          value={addPlural(snapshot.StackCount, 'stack')}
-          icon="layers"
-          featherIcon
-        />
+        <Stat value={addPlural(snapshot.StackCount, 'stack')} icon="layers" />
 
         {!!snapshot.Swarm && (
           <Stat
             value={addPlural(snapshot.ServiceCount, 'service')}
             icon="shuffle"
-            featherIcon
           />
         )}
 
@@ -54,13 +49,8 @@ export function EnvironmentStatsDocker({
         <Stat
           value={addPlural(snapshot.VolumeCount, 'volume')}
           icon="database"
-          featherIcon
         />
-        <Stat
-          value={addPlural(snapshot.ImageCount, 'image')}
-          icon="list"
-          featherIcon
-        />
+        <Stat value={addPlural(snapshot.ImageCount, 'image')} icon="list" />
       </span>
 
       <span className="small text-muted space-x-2 vertical-center">
@@ -71,7 +61,6 @@ export function EnvironmentStatsDocker({
           <Stat
             value={addPlural(snapshot.NodeCount, 'node')}
             icon="hard-drive"
-            featherIcon
           />
         )}
         <AgentVersionTag version={agentVersion} type={type} />
@@ -96,37 +85,13 @@ function ContainerStats({
   const containersCount = running + stopped;
 
   return (
-    <Stat
-      value={addPlural(containersCount, 'container')}
-      icon="box"
-      featherIcon
-    >
+    <Stat value={addPlural(containersCount, 'container')} icon="box">
       {containersCount > 0 && (
         <span className="space-x-2 space-right">
-          <Stat
-            value={running}
-            icon="power"
-            featherIcon
-            iconClass="icon-success"
-          />
-          <Stat
-            value={stopped}
-            icon="power"
-            featherIcon
-            iconClass="icon-danger"
-          />
-          <Stat
-            value={healthy}
-            icon="heart"
-            featherIcon
-            iconClass="icon-success"
-          />
-          <Stat
-            value={unhealthy}
-            icon="heart"
-            featherIcon
-            iconClass="icon-warning"
-          />
+          <Stat value={running} icon="power" iconClass="icon-success" />
+          <Stat value={stopped} icon="power" iconClass="icon-danger" />
+          <Stat value={healthy} icon="heart" iconClass="icon-success" />
+          <Stat value={unhealthy} icon="heart" iconClass="icon-warning" />
         </span>
       )}
     </Stat>

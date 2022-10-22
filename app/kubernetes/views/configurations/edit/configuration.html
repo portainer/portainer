@@ -66,7 +66,7 @@
                 <pr-icon icon="'svg-clockrewind'"></pr-icon>
                 Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -84,7 +84,7 @@
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()" data-cy="k8sConfigDetail-yamlTab">
               <uib-tab-heading>
-                <pr-icon icon="'code'" feather="true"></pr-icon>
+                <pr-icon icon="'code'"></pr-icon>
                 YAML
               </uib-tab-heading>
               <div class="!pt-5 px-5" ng-if="ctrl.state.showEditorTab">
@@ -114,7 +114,7 @@
 
             <div class="form-group" ng-if="ctrl.state.secretWarningMessage">
               <div class="col-sm-12 small text-warning vertical-center pt-5">
-                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                 <span>{{ ctrl.state.secretWarningMessage }}</span>
               </div>
             </div>
@@ -158,11 +158,9 @@
                   <td>
                     <div style="white-space: pre-wrap">{{ item.Value }}</div>
                     <div style="margin-top: 2px">
-                      <span class="btn btn-primary btn-xs" ng-click="ctrl.copyConfigurationValue($index)">
-                        <pr-icon icon="'copy'" feather="true" class-name="'mr-0.5'"></pr-icon>Copy
-                      </span>
+                      <span class="btn btn-primary btn-xs" ng-click="ctrl.copyConfigurationValue($index)"> <pr-icon icon="'copy'" class-name="'mr-0.5'"></pr-icon>Copy </span>
                       <span id="copyValueNotification_{{ $index }}" style="display: none; color: #23ae89; margin-left: 5px" class="small">
-                        <pr-icon icon="'check'" feather="true"></pr-icon> copied
+                        <pr-icon icon="'check'"></pr-icon> copied
                       </span>
                     </div>
                   </td>

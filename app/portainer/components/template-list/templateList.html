@@ -3,26 +3,20 @@
     <div class="toolBar">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
-          <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          <pr-icon icon="$ctrl.titleIcon"></pr-icon>
         </div>
         {{ $ctrl.titleText }}
       </div>
       <div class="searchBar vertical-center">
-        <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search for a template..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-          data-cy="template-searchInput"
-        />
+        <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search for a template..." auto-focus ng-model-options="{ debounce: 300 }"
+          data-cy="template-searchInput" />
       </div>
       <div class="actionBar !gap-3" ng-if="$ctrl.showAddAction">
-        <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="docker.templates.new" data-cy="template-addTemplateButton">
-          <pr-icon icon="'plus'" feather="true"></pr-icon>Add template
+        <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="docker.templates.new"
+          data-cy="template-addTemplateButton">
+          <pr-icon icon="'plus'"></pr-icon>Add template
         </button>
       </div>
     </div>
@@ -30,50 +24,34 @@
       <div class="actionBar">
         <div class="row">
           <div class="col-sm-3">
-            <template-list-dropdown
-              options="$ctrl.state.categories"
-              on-change="($ctrl.applyCategoriesFilter)"
-              placeholder="'Category'"
-              value="$ctrl.state.selectedCategory"
-            ></template-list-dropdown>
+            <template-list-dropdown options="$ctrl.state.categories" on-change="($ctrl.applyCategoriesFilter)"
+              placeholder="'Category'" value="$ctrl.state.selectedCategory"></template-list-dropdown>
           </div>
           <div class="col-sm-3">
-            <template-list-dropdown
-              options="$ctrl.state.typeFilters"
-              on-change="($ctrl.applyTypeFilter)"
-              placeholder="'Type'"
-              value="$ctrl.state.filterByType"
-            ></template-list-dropdown>
+            <template-list-dropdown options="$ctrl.state.typeFilters" on-change="($ctrl.applyTypeFilter)"
+              placeholder="'Type'" value="$ctrl.state.filterByType"></template-list-dropdown>
           </div>
           <div class="col-sm-3 col-sm-offset-3">
-            <template-list-sort
-              on-change="($ctrl.changeOrderBy)"
-              on-descending="($ctrl.invertOrder)"
-              options="$ctrl.state.orderByFields"
-              sort-by-button="true"
-              sort-by-descending="$ctrl.state.orderDesc"
-              placeholder="'Sort By'"
-              value="$ctrl.state.selectedOrderBy"
-            ></template-list-sort>
+            <template-list-sort on-change="($ctrl.changeOrderBy)" on-descending="($ctrl.invertOrder)"
+              options="$ctrl.state.orderByFields" sort-by-button="true" sort-by-descending="$ctrl.state.orderDesc"
+              placeholder="'Sort By'" value="$ctrl.state.selectedOrderBy"></template-list-sort>
           </div>
         </div>
       </div>
       <div class="blocklist !px-[20px] gap-y-2 !pb-[20px]">
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByTemplateType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
-          model="template"
-          type-label="{{ template.Type === 1 ? 'container' : 'stack' }}"
-          on-select="($ctrl.selectAction)"
-        >
+          model="template" type-label="{{ template.Type === 1 ? 'container' : 'stack' }}"
+          on-select="($ctrl.selectAction)">
           <template-item-actions ng-if="template.Type === 2 || template.Type === 3">
-            <button ng-click="$event.stopPropagation(); $ctrl.duplicateTemplate(template)" class="btn btn-primary btn-xs"> Copy as Custom </button>
+            <button ng-click="$event.stopPropagation(); $ctrl.duplicateTemplate(template)"
+              class="btn btn-primary btn-xs"> Copy as Custom </button>
           </template-item-actions>
         </template-item>
         <div ng-if="!$ctrl.templates" class="text-center text-muted"> Loading... </div>
         <div
           ng-if="($ctrl.templates | filter: $ctrl.filterByTemplateType | filter: $ctrl.filterByCategory | filter: $ctrl.state.textFilter).length === 0"
-          class="text-center text-muted"
-        >
+          class="text-center text-muted">
           No templates available.
         </div>
       </div>

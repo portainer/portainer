@@ -74,7 +74,7 @@ export function Annotations({
               type="button"
               onClick={() => removeAnnotation(i)}
             >
-              <Icon icon="trash-2" size="md" feather />
+              <Icon icon="trash-2" size="md" />
             </button>
           </div>
         </div>

@@ -28,12 +28,7 @@ class PortainerEndpointInitFormValueEndpointSection {
 }
 
 export const PortainerEndpointInitFormValueEndpointSections = Object.freeze([
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.DOCKER_LOCAL, 'Docker', 'fab fa-docker', 'Manage the local Docker environment'),
-  new PortainerEndpointInitFormValueEndpointSection(
-    PortainerEndpointConnectionTypes.KUBERNETES_LOCAL,
-    'Kubernetes',
-    'fas fa-dharmachakra',
-    'Manage the local Kubernetes environment'
-  ),
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AGENT, 'Agent', 'fa fa-bolt', 'Connect to a Portainer agent'),
+  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.DOCKER_LOCAL, 'Docker', 'svg-dockericon', 'Manage the local Docker environment'),
+  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.KUBERNETES_LOCAL, 'Kubernetes', 'svg-kubernetes2', 'Manage the local Kubernetes environment'),
+  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AGENT, 'Agent', 'zap', 'Connect to a Portainer agent'),
 ]);

@@ -4,12 +4,12 @@
       <div class="toolBar vertical-center">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
           <span>{{ $ctrl.titleText }}</span>
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+          <pr-icon icon="'search'" class="searchIcon"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -27,11 +27,11 @@
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
           >
-            <pr-icon icon="'trash-2'" feather="true" class-name="'icon-white'"></pr-icon>
+            <pr-icon icon="'trash-2'" class-name="'icon-white'"></pr-icon>
             <span>Remove</span>
           </button>
           <button type="button" class="btn btn-sm btn-primary vertical-center" ng-click="$ctrl.onClickAdd()">
-            <pr-icon icon="'plus'" feather="true" class-name="'icon-white'"></pr-icon>
+            <pr-icon icon="'plus'" class-name="'icon-white'"></pr-icon>
             <span>Add access token</span>
           </button>
         </div>

@@ -3,11 +3,11 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <span><pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon></span>
+          <span><pr-icon icon="$ctrl.titleIcon"></pr-icon></span>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar">
-          <span><pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon></span>
+          <span><pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon></span>
           <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
         </div>
       </div>
@@ -18,8 +18,8 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Endpoint')">
                   Environment
-                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Endpoint' && !$ctrl.state.reverseOrder"></pr-icon></span>
-                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Endpoint' && $ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-down'" ng-if="$ctrl.state.orderBy === 'Endpoint' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" ng-if="$ctrl.state.orderBy === 'Endpoint' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
               <th> Actions </th>

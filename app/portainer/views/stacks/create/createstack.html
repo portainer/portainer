@@ -23,7 +23,7 @@
                 <div class="small text-warning">
                   <div ng-messages="createStackForm.stack_name.$error">
                     <p ng-message="pattern">
-                      <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span>
+                      <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span>
                       This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').
                     </p>
                   </div>
@@ -40,7 +40,7 @@
               <div style="margin-bottom: 7px">
                 This stack will be deployed using the equivalent of <code>docker compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
               </div>
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+              <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
               Note: Due to a limitation of libcompose, the name of the stack will be standardized to remove all special characters and uppercase letters.
             </div>
             <span class="col-sm-12 text-muted small" ng-if="state.StackType === 2 && composeSyntaxMaxVersion > 2">
@@ -56,7 +56,7 @@
                   <input type="radio" id="method_editor" ng-model="state.Method" value="editor" />
                   <label for="method_editor">
                     <div class="boxselector_header">
-                      <pr-icon icon="'edit'" feather="true"></pr-icon>
+                      <pr-icon icon="'edit'"></pr-icon>
                       Web editor
                     </div>
                     <p>Use our Web editor</p>
@@ -66,7 +66,7 @@
                   <input type="radio" id="method_upload" ng-model="state.Method" value="upload" />
                   <label for="method_upload">
                     <div class="boxselector_header">
-                      <pr-icon icon="'upload'" feather="true"></pr-icon>
+                      <pr-icon icon="'upload'"></pr-icon>
                       Upload
                     </div>
                     <p>Upload from your computer</p>
@@ -76,7 +76,7 @@
                   <input type="radio" id="method_repository" ng-model="state.Method" value="repository" />
                   <label for="method_repository">
                     <div class="boxselector_header">
-                      <pr-icon icon="'git-pull-request'" feather="true"></pr-icon>
+                      <pr-icon icon="'git-pull-request'"></pr-icon>
                       Repository
                     </div>
                     <p>Use a git repository</p>
@@ -86,7 +86,7 @@
                   <input type="radio" id="method_template" ng-model="state.Method" value="template" />
                   <label for="method_template">
                     <div class="boxselector_header">
-                      <pr-icon icon="'edit'" feather="true"></pr-icon>
+                      <pr-icon icon="'edit'"></pr-icon>
                       Custom template
                     </div>
                     <p>Use a custom template</p>
@@ -109,12 +109,12 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <button type="button" class="btn btn-sm btn-light" ngf-select="uploadFile($file)">
-                  <pr-icon icon="'upload'" feather="true"></pr-icon>
+                  <pr-icon icon="'upload'"></pr-icon>
                   Select file</button
                 >
                 <span style="margin-left: 5px">
                   {{ formValues.StackFile.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.StackFile" aria-hidden="true"></i>
+                  <pr-icon icon="'x'" mode="'danger'" ng-if="!formValues.StackFile"></pr-icon>
                 </span>
               </div>
             </div>

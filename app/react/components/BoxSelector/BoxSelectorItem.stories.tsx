@@ -11,7 +11,7 @@ const meta: Meta = {
   args: {
     selected: false,
     description: 'description',
-    icon: 'fa-rocket',
+    icon: 'svg-rocket',
     label: 'label',
   },
 };

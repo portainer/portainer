@@ -10,13 +10,7 @@ interface Props extends IconProps {
   children?: ReactNode;
 }
 
-export function DashboardItem({
-  value,
-  icon,
-  type,
-  children,
-  featherIcon,
-}: Props) {
+export function DashboardItem({ value, icon, type, children }: Props) {
   return (
     <div
       className={clsx(
@@ -35,7 +29,7 @@ export function DashboardItem({
             'th-highcontrast:bg-blue-3 th-highcontrast:text-blue-8'
           )}
         >
-          <Icon icon={icon} feather={featherIcon} className="feather" />
+          <Icon icon={icon} className="feather" />
         </div>
 
         <div className="flex flex-col justify-around">

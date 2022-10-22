@@ -31,7 +31,6 @@ export function TextTip({
       <i className="icon-container">
         <Icon
           icon="alert-circle"
-          feather
           className={clsx(`${iconClass}`, 'space-right')}
         />
       </i>

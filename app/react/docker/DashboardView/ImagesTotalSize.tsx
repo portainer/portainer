@@ -14,7 +14,7 @@ export function useImagesTotalSizeComponent(imagesTotalSize: number) {
 export function ImagesTotalSize({ imagesTotalSize }: Props) {
   return (
     <div className="vertical-center">
-      <Icon icon="pie-chart" className={clsx('space-right')} feather />
+      <Icon icon="pie-chart" className={clsx('space-right')} />
       {humanize(imagesTotalSize)}
     </div>
   );

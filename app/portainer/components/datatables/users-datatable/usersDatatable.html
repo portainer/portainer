@@ -4,13 +4,13 @@
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
           {{ $ctrl.titleText }}
         </div>
 
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <pr-icon icon="'search'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -29,7 +29,7 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="user-removeUserButton"
           >
-            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+            <pr-icon icon="'trash-2'"></pr-icon>Remove
           </button>
         </div>
       </div>
@@ -89,8 +89,8 @@
               <td>
                 <span class="vertical-center">
                   <pr-icon icon="'svg-usercircle'" ng-if="item.Role === 1 && !item.isTeamLeader"></pr-icon>
-                  <pr-icon icon="'user'" ng-if="item.Role !== 1 && item.isTeamLeader" feather="true"></pr-icon>
-                  <pr-icon icon="'user-plus'" ng-if="item.Role !== 1 && !item.isTeamLeader" feather="true"></pr-icon>
+                  <pr-icon icon="'user'" ng-if="item.Role !== 1 && item.isTeamLeader"></pr-icon>
+                  <pr-icon icon="'user-plus'" ng-if="item.Role !== 1 && !item.isTeamLeader"></pr-icon>
                   {{ item.RoleName ? item.RoleName : '-' }}
                 </span>
               </td>

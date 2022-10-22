@@ -6,7 +6,7 @@
       <rd-widget-body>
         <uib-tabset active="state.activeTab">
           <uib-tab index="0">
-            <uib-tab-heading class="vertical-center"> <pr-icon icon="'tool'" feather="true" class="leading-none"></pr-icon> Builder </uib-tab-heading>
+            <uib-tab-heading class="vertical-center"> <pr-icon icon="'tool'" class="leading-none"></pr-icon> Builder </uib-tab-heading>
             <form class="form-horizontal">
               <div class="col-sm-12 form-section-title"> Naming </div>
               <!-- names -->
@@ -16,17 +16,13 @@
               <div class="form-group">
                 <div class="col-sm-12">
                   <label class="control-label text-left">Names</label>
-                  <span class="label label-default interactive" class="ml-2.5" ng-click="addImageName()">
-                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add additional name
-                  </span>
+                  <span class="label label-default interactive" class="ml-2.5" ng-click="addImageName()"> <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add additional name </span>
                 </div>
               </div>
               <!-- !names -->
               <div class="form-group" ng-if="formValues.ImageNames.length === 0">
                 <span class="col-sm-12 text-danger small">
-                  <p class="vertical-center">
-                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'sm'" feather="true"></pr-icon> You must specify at least one name for the image.
-                  </p>
+                  <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'danger'" size="'sm'"></pr-icon> You must specify at least one name for the image. </p>
                 </span>
               </div>
               <!-- name-input-list -->
@@ -46,22 +42,22 @@
                           <span class="input-group-addon">name</span>
                           <input type="text" class="form-control" ng-model="item.Name" ng-change="checkName($index)" placeholder="e.g. my-image:my-tag" auto-focus />
                           <span class="input-group-addon" ng-if="!item.Valid">
-                            <pr-icon icon="'x'" mode="'danger'" feather="true"></pr-icon>
+                            <pr-icon icon="'x'" mode="'danger'"></pr-icon>
                           </span>
                           <span class="input-group-addon" ng-if="item.Valid">
-                            <pr-icon icon="'check'" mode="'success'" feather="true"></pr-icon>
+                            <pr-icon icon="'check'" mode="'success'"></pr-icon>
                           </span>
                         </div>
                         <!-- !name-input -->
                         <!-- actions -->
                         <div class="input-group col-sm-2 input-group-sm">
                           <button class="btn btn-dangerlight btn-only-icon" type="button" ng-click="removeImageName($index)">
-                            <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                            <pr-icon icon="'trash-2'"></pr-icon>
                           </button>
                         </div>
                         <!-- !actions -->
                         <div class="small text-warning" ng-if="!item.Valid">
-                          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                          <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                           <span ng-if="!item.Unique">The image name must be unique</span>
                           <span ng-if="item.Unique"
                             >The image name must consist of between 2 and 255 lowercase alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span
@@ -83,7 +79,7 @@
                       <input type="radio" id="method_editor" ng-model="state.BuildType" value="editor" ng-click="toggleEditor()" />
                       <label for="method_editor">
                         <div class="boxselector_header vertical-center">
-                          <pr-icon icon="'edit'" feather="true"></pr-icon>
+                          <pr-icon icon="'edit'"></pr-icon>
                           Web editor
                         </div>
                         <p>Use our Web editor</p>
@@ -93,7 +89,7 @@
                       <input type="radio" id="method_upload" ng-model="state.BuildType" value="upload" ng-click="saveEditorContent()" />
                       <label for="method_upload">
                         <div class="boxselector_header vertical-center">
-                          <pr-icon icon="'upload'" feather="true"></pr-icon>
+                          <pr-icon icon="'upload'"></pr-icon>
                           Upload
                         </div>
                         <p>Upload a tarball or a Dockerfile from your computer</p>
@@ -103,7 +99,7 @@
                       <input type="radio" id="method_url" ng-model="state.BuildType" value="url" ng-click="saveEditorContent()" />
                       <label for="method_url">
                         <div class="boxselector_header vertical-center">
-                          <pr-icon icon="'globe'" feather="true"></pr-icon>
+                          <pr-icon icon="'globe'"></pr-icon>
                           URL
                         </div>
                         <p>Specify a URL to a file</p>
@@ -162,7 +158,7 @@
                     <button class="btn btn-sm btn-primary" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">Select file</button>
                     <span class="space-left">
                       {{ formValues.UploadFile.name }}
-                      <span ng-if="!formValues.UploadFile"><pr-icon icon="'x'" mode="'danger'" feather="true" size="'md'"></pr-icon></span>
+                      <span ng-if="!formValues.UploadFile"><pr-icon icon="'x'" mode="'danger'" size="'md'"></pr-icon></span>
                     </span>
                   </div>
                 </div>
@@ -184,7 +180,7 @@
                 <div class="col-sm-12 form-section-title"> URL </div>
                 <div class="form-group">
                   <span class="col-sm-12 small vertical-center">
-                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                     <span class="text-muted"
                       >Specify the URL to a Dockerfile, a tarball or a public Git repository (suffixed by <b>.git</b>). When using a Git repository URL, build contexts can be
                       specified as in the <a href="https://docs.docker.com/engine/reference/commandline/build/#git-repositories">Docker documentation.</a></span
@@ -205,7 +201,7 @@
                 </div>
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small vertical-center">
-                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                     Indicate the path to the Dockerfile within the tarball/repository (ignored when using a Dockerfile).
                   </span>
                 </div>
@@ -248,7 +244,7 @@
             </form>
           </uib-tab>
           <uib-tab index="1" disable="!buildLogs">
-            <uib-tab-heading class="vertical-center"> <pr-icon icon="'file-text'" feather="true" class="leading-none"></pr-icon> Output </uib-tab-heading>
+            <uib-tab-heading class="vertical-center"> <pr-icon icon="'file-text'" class="leading-none"></pr-icon> Output </uib-tab-heading>
             <pre class="log_viewer">
               <div ng-repeat="line in buildLogs track by $index" class="line"><p class="inner_line" ng-click="active=!active" ng-class="{'line_selected': active}">{{ line }}</p></div>
               <div ng-if="!buildLogs.length" class="line"><p class="inner_line">No build output available.</p></div>

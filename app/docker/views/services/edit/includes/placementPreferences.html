@@ -1,9 +1,9 @@
 <div ng-if="service.ServicePreferences" id="service-placement-preferences">
   <rd-widget>
-    <rd-widget-header icon="list" feather-icon="true" title-text="Placement preferences">
+    <rd-widget-header icon="list" title-text="Placement preferences">
       <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addPlacementPreference(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" feather="true"></pr-icon> placement preference
+          <pr-icon icon="'plus'"></pr-icon> placement preference
         </a>
       </div>
     </rd-widget-header>
@@ -46,7 +46,7 @@
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-dangerlight" type="button" ng-click="removePlacementPreference(service, $index)" ng-disabled="isUpdating">
-                    <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                    <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                   </button>
                 </span>
               </div>

@@ -3,13 +3,13 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-magic" title-text="Import Device Set up"></rd-widget-header>
+      <rd-widget-header icon="svg-magic" title-text="Import Device Set up"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="fdoForm">
           <!-- info -->
           <span class="small">
             <p class="text-muted" style="margin-top: 10px">
-              <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+              <pr-icon icon="'info'" mode="'primary'" class-name="'mr-0.5'"></pr-icon>
               You are setting up a Portainer Edge Agent that will initiate the communications with the Portainer instance and your FDO Devices.
             </p>
           </span>
@@ -20,7 +20,7 @@
             <div class="form-group" ng-show="!state.vouchersUploaded">
               <span class="small col-sm-12">
                 <p class="text-muted" style="margin-top: 10px">
-                  <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'info'" mode="'primary'" class-name="'mr-0.5'"></pr-icon>
                   Import one or more Manufacturer's Ownership Vouchers to initiate device attestation
                 </p>
               </span>
@@ -35,7 +35,10 @@
                   button-spinner="state.vouchersUploading"
                   multiple
                 >
-                  <span ng-hide="state.vouchersUploading">Upload <i class="fa fa-upload" aria-hidden="true" style="margin-left: 5px"></i></span>
+                  <span ng-hide="state.vouchersUploading"
+                    >Upload
+                    <pr-icon icon="'upload'" class-name="'ml-1'"></pr-icon>
+                  </span>
                   <span ng-show="state.vouchersUploading">Uploading Voucher...</span>
                 </button>
               </div>
@@ -47,7 +50,7 @@
             </div>
             <div class="form-group" ng-show="state.vouchersUploaded">
               <div class="col-sm-12">
-                <p>Ownership Voucher Uploaded <i class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 5px"></i></p>
+                <p>Ownership Voucher Uploaded <pr-icon icon="'check'" mode="'success'"></pr-icon></p>
               </div>
             </div>
           </div>
@@ -57,7 +60,7 @@
           <div>
             <span class="small">
               <p class="text-muted" style="margin-top: 10px">
-                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'info'" mode="'primary'" class-name="'mr-0.5'"></pr-icon>
                 Device name will serve as your reference name in Portainer
               </p>
             </span>
@@ -81,7 +84,10 @@
             <div class="form-group" ng-show="fdoForm.device_name.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="fdoForm.device_name.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    This field is required.</p
+                  >
                 </div>
               </div>
             </div>
@@ -89,7 +95,7 @@
             <!-- suffix input -->
             <span class="small">
               <p class="text-muted" style="margin-top: 10px">
-                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'info'" mode="'primary'" class-name="'mr-0.5'"></pr-icon>
                 Suffix starting number will be appended to the end of the Device name, if initiating multiple devices this will be incrementally increased
               </p>
             </span>
@@ -113,8 +119,14 @@
             <div class="form-group" ng-show="fdoForm.suffix.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="fdoForm.suffix.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                  <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field needs to be a positive integer number.</p>
+                  <p ng-message="required">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    This field is required.</p
+                  >
+                  <p ng-message="pattern">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    This field needs to be a positive integer number.</p
+                  >
                 </div>
               </div>
             </div>
@@ -142,7 +154,10 @@
             <div class="form-group" ng-show="fdoForm.endpoint_url.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="fdoForm.endpoint_url.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    This field is required.</p
+                  >
                 </div>
               </div>
             </div>
@@ -165,7 +180,7 @@
           <div>
             <span class="small">
               <p class="text-muted" style="margin-top: 10px">
-                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'info'" mode="'primary'" class-name="'mr-0.5'"></pr-icon>
                 This is just an option if your device is under a certain group
               </p>
             </span>

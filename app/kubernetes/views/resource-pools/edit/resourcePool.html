@@ -14,7 +14,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading class="vertical-center"> <pr-icon icon="'layers'" feather="true"></pr-icon> Namespace </uib-tab-heading>
+              <uib-tab-heading class="vertical-center"> <pr-icon icon="'layers'"></pr-icon> Namespace </uib-tab-heading>
               <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px">
                 <!-- name-input -->
                 <div class="form-group">
@@ -53,7 +53,7 @@
                 <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable && !ctrl.isQuotaValid()">
                   <div class="col-sm-12 small text-warning">
                     <p class="vertical-center">
-                      <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                       Not enough resources available in the cluster to apply a resource reservation.
                     </p>
                   </div>
@@ -110,7 +110,7 @@
                       <div class="col-sm-8 small text-warning">
                         <div ng-messages="resourcePoolEditForm.pool_name.$error">
                           <p class="vertical-center">
-                            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and
+                            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and
                             {{ ctrl.state.sliderMaxMemory }}.
                           </p>
                         </div>
@@ -142,7 +142,7 @@
                 <div class="form-group">
                   <div class="col-sm-12 small text-muted">
                     <p class="vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                       You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of
                       load balancers in this namespace.
                     </p>
@@ -191,7 +191,7 @@
                     <div class="form-group">
                       <div class="col-sm-12 small text-muted">
                         <p class="vertical-center">
-                          <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                          <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                           Define which registries can be used by users who have access to this namespace.
                         </p>
                       </div>
@@ -224,7 +224,7 @@
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
                     <p class="vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                       Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
                       effectively prevent the usage of a specific storage option inside this namespace.
                     </p>
@@ -283,13 +283,12 @@
               <uib-tab-heading class="vertical-center">
                 <pr-icon icon="'svg-clockrewind'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="fa-history"
                 dataset="ctrl.events"
                 table-key="kubernetes.resourcepool.events"
                 order-by="Date"
@@ -299,7 +298,7 @@
               ></kubernetes-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
-              <uib-tab-heading class="vertical-center"><pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
+              <uib-tab-heading class="vertical-center"><pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="resource-pool-yaml" data="ctrl.pool.Yaml"></kubernetes-yaml-inspector>
               </div>

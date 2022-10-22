@@ -2,9 +2,9 @@
   title="'Container console'"
   breadcrumbs="[
     { label:'Containers', link:'docker.containers' },
-    { 
+    {
       label:(container.Name | trimcontainername),
-      link: 'docker.containers.container', 
+      link: 'docker.containers.container',
       linkParams:container.Id
     }, 'Console']"
 >
@@ -13,7 +13,7 @@
 <div class="row" ng-init="initView()" ng-show="loaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="terminal" feather-icon="true" title-text="Execute"></rd-widget-header>
+      <rd-widget-header icon="terminal" title-text="Execute"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div ng-if="state === states.disconnected">
@@ -23,8 +23,8 @@
               <div class="col-lg-11 col-sm-10">
                 <div class="input-group" ng-if="!formValues.isCustomCommand">
                   <span class="input-group-addon">
-                    <i class="fab fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
-                    <i class="fab fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
+                    <pr-icon ng-if="imageOS == 'linux'" icon="'svg-linux'"></pr-icon>
+                    <pr-icon ng-if="imageOS == 'windows'" icon="'grid'"></pr-icon>
                   </span>
                   <select class="form-control" ng-model="formValues.command" id="command">
                     <option value="ash" ng-if="imageOS == 'linux'">/bin/ash</option>
@@ -61,8 +61,8 @@
                 <button type="button" class="btn btn-primary" ng-disabled="!container.State.Running" ng-click="connectExec()">
                   <span>Connect</span>
                 </button>
-                <span class="small text-danger" ng-hide="container.State.Running">
-                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span class="small text-danger vertical-center" ng-hide="container.State.Running">
+                  <pr-icon icon="'alert-triangle'" mode="'danger'"></pr-icon>
                   The container is not running.
                 </span>
               </div>

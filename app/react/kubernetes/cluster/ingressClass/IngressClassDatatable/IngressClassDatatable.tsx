@@ -84,7 +84,6 @@ export function IngressClassDatatable({
         titleOptions={{
           icon: 'database',
           title: 'Ingress controllers',
-          featherIcon: true,
         }}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
@@ -144,7 +143,7 @@ export function IngressClassDatatable({
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
             <span className="flex items-center text-warning mt-1">
-              <Icon icon="alert-triangle" feather className="!mr-1" />
+              <Icon icon="alert-triangle" className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
             </span>
           )}

@@ -8,7 +8,7 @@ export interface Props extends IconProps {
   size?: BadgeSize;
 }
 
-export function BadgeIcon({ icon, featherIcon, size = '3xl' }: Props) {
+export function BadgeIcon({ icon, size = '3xl' }: Props) {
   const sizeClasses = iconSizeToClasses(size);
   return (
     <div
@@ -22,7 +22,7 @@ export function BadgeIcon({ icon, featherIcon, size = '3xl' }: Props) {
    `
       )}
     >
-      <Icon icon={icon} feather={featherIcon} className="feather !flex" />
+      <Icon icon={icon} className="feather !flex" />
     </div>
   );
 }

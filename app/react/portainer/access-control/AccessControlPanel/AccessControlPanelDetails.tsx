@@ -10,6 +10,7 @@ import { useUsers } from '@/portainer/users/queries';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { Icon } from '@@/Icon';
 
 import {
   ResourceControlOwnership,
@@ -169,7 +170,7 @@ function InheritanceMessage({
   return (
     <tr>
       <td colSpan={2} aria-label="inheritance-message">
-        <i className="fa fa-info-circle space-right" aria-hidden="true" />
+        <Icon icon="info" mode="primary" className="mr-1" />
         {children}
         <Tooltip message={tooltip} />
       </td>

@@ -5,6 +5,7 @@ import { FormError } from '@@/form-components/FormError';
 import { InputGroup } from '@@/form-components/InputGroup';
 import { InputList } from '@@/form-components/InputList';
 import { ItemProps } from '@@/form-components/InputList/InputList';
+import { Icon } from '@@/Icon';
 
 import styles from './PortsMappingField.module.css';
 
@@ -82,7 +83,7 @@ function Item({
         </InputGroup>
 
         <span className="mx-3">
-          <i className="fa fa-long-arrow-alt-right" aria-hidden="true" />
+          <Icon icon="svg-arrowright" />
         </span>
 
         <InputGroup size="small">

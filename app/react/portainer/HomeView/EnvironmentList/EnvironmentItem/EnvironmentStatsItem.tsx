@@ -13,7 +13,6 @@ export function Stat({
   value,
   icon,
   children,
-  featherIcon,
   iconClass,
 }: PropsWithChildren<Props>) {
   return (
@@ -21,7 +20,6 @@ export function Stat({
       <Icon
         className={clsx('icon icon-sm space-right', iconClass)}
         icon={icon}
-        feather={featherIcon}
       />
       <span>{value}</span>
       {children && <span className="space-left">{children}</span>}

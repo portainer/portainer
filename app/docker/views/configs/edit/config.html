@@ -3,7 +3,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="clipboard" feather-icon="true" title-text="Config details"></rd-widget-header>
+      <rd-widget-header icon="clipboard" title-text="Config details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -16,10 +16,10 @@
               <td>
                 {{ config.Id }}
                 <button authorization="DockerConfigDelete" class="btn btn-xs btn-dangerlight" ng-click="removeConfig(config.Id)"
-                  ><pr-icon icon="'trash-2'" feather="true"></pr-icon>Delete this config</button
+                  ><pr-icon icon="'trash-2'"></pr-icon>Delete this config</button
                 >
                 <button authorization="DockerConfigCreate" class="btn btn-xs btn-secondary" ui-sref="docker.configs.new({id: config.Id})"
-                  ><pr-icon icon="'copy'" feather="true"></pr-icon>Clone config</button
+                  ><pr-icon icon="'copy'"></pr-icon>Clone config</button
                 >
               </td>
             </tr>
@@ -63,7 +63,7 @@
 <div class="row" ng-if="config">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="code" feather-icon="true" title-text="Config content"></rd-widget-header>
+      <rd-widget-header icon="code" title-text="Config content"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">

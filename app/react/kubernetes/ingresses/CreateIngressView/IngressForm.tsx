@@ -199,7 +199,7 @@ export function IngressForm({
             <div className="col-sm-12 px-0 text-muted !mb-0">
               <div className="mb-2">Annotations</div>
               <p className="vertical-center text-muted small">
-                <Icon icon="info" mode="primary" feather />
+                <Icon icon="info" mode="primary" />
                 <span>
                   You can specify{' '}
                   <a
@@ -355,7 +355,7 @@ export function IngressForm({
                     </div>
 
                     <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
-                      <Icon icon="info" mode="primary" size="md" feather />
+                      <Icon icon="info" mode="primary" size="md" />
                       <span>
                         Add a secret via{' '}
                         <Link
@@ -375,10 +375,10 @@ export function IngressForm({
                 )}
                 {host.NoHost && (
                   <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
-                    <Icon icon="info" mode="primary" size="md" feather />A
-                    fallback rule has no host specified. This rule only applies
-                    when an inbound request has a hostname that does not match
-                    with any of your other rules.
+                    <Icon icon="info" mode="primary" size="md" />A fallback rule
+                    has no host specified. This rule only applies when an
+                    inbound request has a hostname that does not match with any
+                    of your other rules.
                   </p>
                 )}
 

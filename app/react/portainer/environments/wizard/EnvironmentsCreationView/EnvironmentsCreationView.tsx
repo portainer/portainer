@@ -92,11 +92,11 @@ export function EnvironmentCreationView() {
                   )}
                 >
                   <Button disabled={isFirstStep} onClick={onPreviousClick}>
-                    <Icon icon="arrow-left" feather /> Previous
+                    <Icon icon="arrow-left" /> Previous
                   </Button>
                   <Button onClick={onNextClick}>
                     {isLastStep ? 'Close' : 'Next'}
-                    <Icon icon="arrow-right" feather />
+                    <Icon icon="arrow-right" />
                   </Button>
                 </div>
               </FormSection>

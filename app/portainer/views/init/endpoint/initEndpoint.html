@@ -28,7 +28,9 @@
                     <input type="radio" id="{{ type.Id }}" ng-model="ctrl.formValues.ConnectionType" ng-value="type.Value" />
                     <label for="{{ type.Id }}">
                       <div class="boxselector_header">
-                        <i ng-class="type.Classes" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon ng-if="type.Title === 'Docker'" icon="'svg-dockericon'"></pr-icon>
+                        <pr-icon ng-if="type.Title === 'Kubernetes'" icon="'svg-kubernetes2'"></pr-icon>
+                        <pr-icon ng-if="type.Title === 'Agent'" icon="'zap'"></pr-icon>
                         {{ type.Title }}
                       </div>
                       <p>{{ type.Description }}</p>
@@ -59,11 +61,17 @@
                   ng-click="ctrl.createEndpoint()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
+                  <span ng-hide="ctrl.state.actionInProgress">
+                    <pr-icon icon="'zap'"></pr-icon>
+                    Connect</span
+                  >
                   <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
                 </button>
                 <button type="submit" class="btn btn-sm btn-default" ng-click="ctrl.skipEndpointCreation()" button-spinner="ctrl.state.actionInProgress">
-                  <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-share" aria-hidden="true"></i> Skip</span>
+                  <span ng-hide="ctrl.state.actionInProgress">
+                    <pr-icon icon="'share-2'"></pr-icon>
+                    Skip</span
+                  >
                 </button>
               </div>
             </div>

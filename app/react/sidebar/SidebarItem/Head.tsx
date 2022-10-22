@@ -57,9 +57,7 @@ export function Head({
       data-tip={label}
       data-cy={dataCy}
     >
-      {!!icon && (
-        <Icon icon={icon} feather className={clsx('flex [&>svg]:w-4')} />
-      )}
+      {!!icon && <Icon icon={icon} className={clsx('flex [&>svg]:w-4')} />}
       {isOpen && <span>{label}</span>}
 
       <ReactTooltip

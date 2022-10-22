@@ -4,13 +4,13 @@
       <div>
         <div class="form-section-title mb-1">Access</div>
         <div class="vertical-center">
-          <pr-icon icon="'info'" mode="'primary'" feather="true" size="'sm'" class="vertical-center"></pr-icon>
+          <pr-icon icon="'info'" mode="'primary'" size="'sm'" class="vertical-center"></pr-icon>
           <span class="small text-muted"> Effective role for each environment will be displayed for the selected user </span>
         </div>
       </div>
     </div>
     <div class="searchBar vertical-center">
-      <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+      <pr-icon icon="'search'" class="vertical-center"></pr-icon>
       <input
         type="text"
         class="searchInput ml-1"
@@ -55,12 +55,8 @@
           <td
             >{{ item.TeamName ? 'Team' : 'User' }} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{ item.AccessLocation }}
             <code ng-if="item.GroupName">{{ item.GroupName }}</code>
-            <a ng-if="!item.GroupName && $ctrl.isAdmin" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
-              ><pr-icon icon="'users'" feather="true"></pr-icon> Manage access
-            </a>
-            <a ng-if="item.GroupName && $ctrl.isAdmin" ui-sref="portainer.groups.group.access({id: item.GroupId})"
-              ><pr-icon icon="'users'" feather="true"></pr-icon> Manage access
-            </a>
+            <a ng-if="!item.GroupName && $ctrl.isAdmin" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"><pr-icon icon="'users'"></pr-icon> Manage access </a>
+            <a ng-if="item.GroupName && $ctrl.isAdmin" ui-sref="portainer.groups.group.access({id: item.GroupId})"><pr-icon icon="'users'"></pr-icon> Manage access </a>
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">

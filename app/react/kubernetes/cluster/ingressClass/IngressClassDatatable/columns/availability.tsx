@@ -20,7 +20,7 @@ export const availability: Column<IngressControllerClassMap> = {
 function AvailailityCell({ value }: CellProps<IngressControllerClassMap>) {
   return (
     <Badge type={value ? 'success' : 'danger'}>
-      <Icon icon={value ? 'check' : 'x'} feather className="!mr-1" />
+      <Icon icon={value ? 'check' : 'x'} className="!mr-1" />
       {value ? 'Allowed' : 'Disallowed'}
     </Badge>
   );

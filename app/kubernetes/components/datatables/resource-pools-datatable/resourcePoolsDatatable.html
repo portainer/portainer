@@ -6,12 +6,12 @@
         <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
           <div class="toolBarTitle vertical-center">
             <div class="widget-icon space-right">
-              <pr-icon icon="'layers'" feather="true"></pr-icon>
+              <pr-icon icon="'layers'"></pr-icon>
             </div>
             Namespaces
           </div>
           <div class="searchBar vertical-center">
-            <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+            <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
             <input
               type="text"
               class="searchInput"
@@ -31,19 +31,19 @@
               ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
               data-cy="k8sNamespace-removeNamespaceButton"
             >
-              <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+              <pr-icon icon="'trash-2'"></pr-icon>Remove
             </button>
             <button type="button" class="btn btn-sm btn-secondary !ml-0" ui-sref="kubernetes.resourcePools.new" data-cy="k8sNamespace-addNamespaceWithFormButton">
-              <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Add with form
+              <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Add with form
             </button>
             <button type="button" class="btn btn-sm btn-primary !ml-0" ui-sref="kubernetes.deploy" data-cy="k8sNamespace-deployFromManifestButton">
-              <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Create from manifest
+              <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Create from manifest
             </button>
           </div>
           <div class="settings">
             <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
               <span uib-dropdown-toggle>
-                <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
+                <pr-icon icon="'more-vertical'" class-name="'!mr-0 !h-4'"></pr-icon>
               </span>
               <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
                 <div class="tableMenu">
@@ -68,7 +68,7 @@
                           <option value="300">5min</option>
                         </select>
                         <span>
-                          <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                          <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                         </span>
                       </div>
                     </div>
@@ -84,7 +84,7 @@
 
         <div class="flex flex-row w-full" ng-if="!$ctrl.settings.showSystem && $ctrl.isAdmin">
           <span class="small text-muted mt-1 vertical-center">
-            <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="vertical-center"></pr-icon>
             <div> System resources are hidden, this can be changed in the table settings. </div>
           </span>
         </div>
@@ -164,7 +164,7 @@
               <td>{{ item.Namespace.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
               <td ng-if="$ctrl.isAdmin">
                 <a class="vertical-center" ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
-                  <pr-icon icon="'users'" feather="true"></pr-icon>
+                  <pr-icon icon="'users'"></pr-icon>
                   Manage access
                 </a>
                 <span ng-if="!$ctrl.canManageAccess(item)">-</span>

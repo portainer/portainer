@@ -51,7 +51,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Logs"
           >
-            <Icon icon="file-text" feather className="space-right" />
+            <Icon icon="file-text" className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -63,7 +63,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Inspect"
           >
-            <Icon icon="info" feather className="space-right" />
+            <Icon icon="info" className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -75,7 +75,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Stats"
           >
-            <Icon icon="bar-chart" feather className="space-right" />
+            <Icon icon="bar-chart" className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -87,7 +87,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Exec Console"
           >
-            <Icon icon="terminal" feather className="space-right" />
+            <Icon icon="terminal" className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -99,7 +99,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Attach Console"
           >
-            <Icon icon="paperclip" feather className="space-right" />
+            <Icon icon="paperclip" className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -122,7 +122,7 @@ function TaskQuickActions({ taskId, state }: TaskProps) {
             params={{ id: taskId }}
             title="Logs"
           >
-            <Icon icon="file-text" feather className="space-right" />
+            <Icon icon="file-text" className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -130,7 +130,7 @@ function TaskQuickActions({ taskId, state }: TaskProps) {
       {state.showQuickActionInspect && (
         <Authorized authorizations="DockerTaskInspect">
           <Link to="docker.tasks.task" params={{ id: taskId }} title="Inspect">
-            <Icon icon="info" feather className="space-right" />
+            <Icon icon="info" className="space-right" />
           </Link>
         </Authorized>
       )}

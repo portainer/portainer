@@ -16,15 +16,19 @@
         <div class="form-group">
           <label for="template_name" class="col-sm-2 control-label text-left">Name</label>
           <div class="col-sm-6">
-            <input type="text" name="template_name" class="form-control" ng-model="$ctrl.formValues.name" ng-pattern="$ctrl.nameRegex" placeholder="e.g. myStack" required />
+            <input type="text" name="template_name" class="form-control" ng-model="$ctrl.formValues.name"
+              ng-pattern="$ctrl.nameRegex" placeholder="e.g. myStack" required />
             <div class="form-group" ng-if="stackTemplateForm.template_name.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="stackTemplateForm.template_name.$error">
                   <p ng-message="pattern" class="vertical-center">
-                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
-                    <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or
+                      'abc-123').</span>
                   </p>
-                  <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>This field is required.
+                  </p>
                 </div>
               </div>
             </div>
@@ -56,25 +60,27 @@
         <div class="form-section-title"> Actions </div>
         <div class="form-group">
           <div class="col-sm-12">
-            <button
-              type="button"
-              class="btn btn-primary"
+            <button type="button" class="btn btn-primary"
               ng-disabled="$ctrl.state.actionInProgress || !$ctrl.formValues.name || !$ctrl.state.deployable || stackTemplateForm.$invalid"
-              ng-click="$ctrl.createTemplate()"
-              button-spinner="$ctrl.state.actionInProgress"
-            >
+              ng-click="$ctrl.createTemplate()" button-spinner="$ctrl.state.actionInProgress">
               <span ng-hide="$ctrl.state.actionInProgress">Deploy the stack</span>
               <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
             </button>
-            <button type="button" class="btn btn-default" ng-click="$ctrl.unselectTemplate($ctrl.template)">Hide</button>
+            <button type="button" class="btn btn-default"
+              ng-click="$ctrl.unselectTemplate($ctrl.template)">Hide</button>
             <div class="form-group" ng-if="$ctrl.state.formValidationError">
               <div class="col-sm-12 small text-danger" ng-if="$ctrl.state.formValidationError">
-                <p class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>{{ $ctrl.state.formValidationError }}</p>
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>{{ $ctrl.state.formValidationError }}
+                </p>
               </div>
             </div>
             <div class="form-group" ng-if="!$ctrl.state.deployable">
               <div class="col-sm-12 small text-danger" ng-if="!$ctrl.state.deployable">
-                <p class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>This template type cannot be deployed on this environment.</p>
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>This template type cannot be deployed on
+                  this environment.
+                </p>
               </div>
             </div>
           </div>

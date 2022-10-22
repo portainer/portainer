@@ -10,6 +10,7 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BoxSelector } from '@@/BoxSelector';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -25,14 +26,14 @@ interface Props {
 const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   {
     id: 'agent_endpoint',
-    icon: 'svg-agent',
+    icon: <BadgeIcon icon="zap" size="3xl" />,
     label: 'Agent',
     value: EnvironmentCreationTypes.AgentEnvironment,
     description: '',
   },
   {
     id: 'edgeAgent',
-    icon: 'svg-edgeagent',
+    icon: <BadgeIcon icon="cloud" size="3xl" />,
     label: 'Edge Agent',
     description: '',
     value: EnvironmentCreationTypes.EdgeAgentEnvironment,
@@ -40,7 +41,7 @@ const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   },
   {
     id: 'kubeconfig_endpoint',
-    icon: 'svg-cloudimport',
+    icon: <BadgeIcon icon="upload-cloud" size="3xl" />,
     label: 'Import',
     value: EnvironmentCreationTypes.KubeConfigEnvironment,
     description: 'Import an existing Kubernetes config',

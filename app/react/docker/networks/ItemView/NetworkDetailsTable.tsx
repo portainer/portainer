@@ -32,7 +32,7 @@ export function NetworkDetailsTable({
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <TableContainer>
-          <TableTitle label="Network details" icon="share-2" featherIcon />
+          <TableTitle label="Network details" icon="share-2" />
           <Table className="nopadding">
             <DetailsTable dataCy="networkDetails-detailsTable">
               {/* networkRowContent */}
@@ -49,7 +49,6 @@ export function NetworkDetailsTable({
                     >
                       <Icon
                         icon="trash-2"
-                        feather
                         className="space-right"
                         aria-hidden="true"
                       />

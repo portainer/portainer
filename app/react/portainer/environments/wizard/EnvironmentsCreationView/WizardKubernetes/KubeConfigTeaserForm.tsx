@@ -6,6 +6,7 @@ import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
+import { Icon } from '@@/Icon';
 
 const initialValues = {
   kubeConfig: '',
@@ -85,7 +86,8 @@ export function KubeConfigTeaserForm() {
                 isLoading={false}
                 disabled
               >
-                <i className="fa fa-plug" aria-hidden="true" /> Connect
+                <Icon icon="svg-plug" />
+                Connect
               </LoadingButton>
             </div>
           </div>

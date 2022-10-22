@@ -8,7 +8,7 @@
           <div class="col-sm-12 form-section-title"> Host and Filesystem </div>
           <div ng-if="!$ctrl.isAgent" class="form-group">
             <span class="col-sm-12 text-muted small vertical-center">
-              <pr-icon icon="'info'" feather="true" mode="'primary'" class-name="space-right"></pr-icon>
+              <pr-icon icon="'info'" mode="'primary'" class-name="space-right"></pr-icon>
               These features are only available for an Agent enabled environments.
             </span>
           </div>
@@ -141,7 +141,7 @@
 
           <div class="form-group" ng-if="$ctrl.isContainerEditDisabled()">
             <span class="col-sm-12 text-muted small">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+              <pr-icon icon="'info'" mode="'primary'" class-name="'mr-0.5'"></pr-icon>
               Note: The recreate/duplicate/edit feature is currently disabled (for non-admin users) by one or more security settings.
             </span>
           </div>

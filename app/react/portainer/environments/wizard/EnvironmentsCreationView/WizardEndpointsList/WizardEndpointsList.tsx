@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-
 import {
   environmentTypeIcon,
   endpointTypeName,
@@ -17,6 +15,7 @@ import {
 
 import { EdgeIndicator } from '@@/EdgeIndicator';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Icon } from '@@/Icon';
 
 import styles from './WizardEndpointsList.module.css';
 
@@ -49,12 +48,9 @@ export function WizardEndpointsList({ environmentIds }: Props) {
         {environments.map((environment) => (
           <div className={styles.wizardListWrapper} key={environment.Id}>
             <div className={styles.wizardListImage}>
-              <i
-                aria-hidden="true"
-                className={clsx(
-                  'space-right',
-                  environmentTypeIcon(environment.Type)
-                )}
+              <Icon
+                icon={environmentTypeIcon(environment.Type)}
+                className="mr-1"
               />
             </div>
             <div className={styles.wizardListTitle}>{environment.Name}</div>

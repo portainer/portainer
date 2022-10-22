@@ -2,9 +2,9 @@
   title="'Container inspect'"
   breadcrumbs="[
     { label:'Containers', link:'docker.containers' },
-    { 
+    {
       label:(containerInfo.Name | trimcontainername),
-      link: 'docker.containers.container', 
+      link: 'docker.containers.container',
       linkParams:containerInfo.Id
     }, 'Inspect']"
 >
@@ -13,10 +13,10 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="circle" feather-icon="true" title-text="Inspect">
+      <rd-widget-header icon="circle" title-text="Inspect">
         <span class="btn-group btn-group-sm">
-          <label class="btn btn-light" ng-model="state.DisplayTextView" uib-btn-radio="false"><pr-icon icon="'code'" feather="true"></pr-icon>Tree</label>
-          <label class="btn btn-light" ng-model="state.DisplayTextView" uib-btn-radio="true"><pr-icon icon="'file'" feather="true"></pr-icon>Text</label>
+          <label class="btn btn-light" ng-model="state.DisplayTextView" uib-btn-radio="false"><pr-icon icon="'code'"></pr-icon>Tree</label>
+          <label class="btn btn-light" ng-model="state.DisplayTextView" uib-btn-radio="true"><pr-icon icon="'file'"></pr-icon>Text</label>
         </span>
       </rd-widget-header>
       <rd-widget-body>

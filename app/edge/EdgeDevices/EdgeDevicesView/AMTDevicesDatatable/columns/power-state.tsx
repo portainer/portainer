@@ -3,6 +3,8 @@ import clsx from 'clsx';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
+import { Icon } from '@@/Icon';
+
 import { useRowContext } from './RowContext';
 
 enum PowerState {
@@ -48,7 +50,9 @@ export function PowerStateCell({
       >
         {parsePowerState(device.powerState)}
       </span>
-      <span>{isLoading && <i className="fa fa-cog fa-spin space-left" />}</span>
+      <span>
+        {isLoading && <Icon icon="settings" className="spin space-left" />}
+      </span>
     </>
   );
 }

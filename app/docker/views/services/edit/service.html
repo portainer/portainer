@@ -12,7 +12,7 @@
 <div class="row">
   <div class="col-lg-9 col-md-9 col-xs-9">
     <rd-widget>
-      <rd-widget-header icon="shuffle" feather-icon="true" title-text="Service details"></rd-widget-header>
+      <rd-widget-header icon="shuffle" title-text="Service details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -78,10 +78,13 @@
               <td ng-if="webhookURL">
                 <span class="text-muted">{{ webhookURL | truncatelr }}</span>
                 <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="webhookURL" ng-click="copyWebhook()">
-                  <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span>
+                  <span>
+                    <pr-icon icon="'copy'" class-name="'mr-1'"></pr-icon>
+                    Copy link</span
+                  >
                 </button>
                 <span>
-                  <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
+                  <pr-icon id="copyNotification" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                 </span>
               </td>
             </tr>
@@ -89,52 +92,62 @@
               <td colspan="2">
                 <p class="small text-muted" authorization="DockerServiceUpdate">
                   Note: you can only rollback one level of changes. Clicking the rollback button without making a new change will undo your previous rollback </p
-                ><p>
+                ><div class="flex gap-x-2 gap-y-1 flex-wrap">
                   <a
                     authorization="DockerServiceLogs"
                     ng-if="applicationState.endpoint.apiVersion >= 1.3"
                     class="btn btn-primary btn-sm"
                     type="button"
                     ui-sref="docker.services.service.logs({id: service.Id})"
-                    ><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a
+                  >
+                    <pr-icon icon="'file-text'"></pr-icon>Service logs</a
                   >
                   <button
                     authorization="DockerServiceUpdate"
                     type="button"
-                    class="btn btn-primary btn-sm"
+                    class="btn btn-primary btn-sm !ml-0"
                     ng-disabled="state.updateInProgress || isUpdating"
                     ng-click="forceUpdateService(service)"
                     button-spinner="state.updateInProgress"
                     ng-if="applicationState.endpoint.apiVersion >= 1.25"
                   >
-                    <span ng-hide="state.updateInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Update the service</span>
+                    <span ng-hide="state.updateInProgress" class="vertical-center">
+                      <pr-icon icon="'refresh-cw'"></pr-icon>
+                      Update the service</span
+                    >
                     <span ng-show="state.updateInProgress">Update in progress...</span>
                   </button>
                   <button
                     authorization="DockerServiceUpdate"
                     type="button"
-                    class="btn btn-primary btn-sm"
+                    class="btn btn-primary btn-sm !ml-0"
                     ng-disabled="state.rollbackInProgress || isUpdating"
                     ng-click="rollbackService(service)"
                     button-spinner="state.rollbackInProgress"
                     ng-if="applicationState.endpoint.apiVersion >= 1.25"
                   >
-                    <span ng-hide="state.rollbackInProgress"><i class="fa fa-undo space-right" aria-hidden="true"></i>Rollback the service</span>
+                    <span ng-hide="state.rollbackInProgress" class="vertical-center">
+                      <pr-icon icon="'rotate-ccw'"></pr-icon>
+                      Rollback the service</span
+                    >
                     <span ng-show="state.rollbackInProgress">Rollback in progress...</span>
                   </button>
                   <button
                     authorization="DockerServiceDelete"
                     type="button"
-                    class="btn btn-danger btn-sm"
+                    class="btn btn-danger btn-sm !ml-0"
                     ng-disabled="state.deletionInProgress || isUpdating"
                     ng-click="removeService()"
                     button-spinner="state.deletionInProgress"
                   >
-                    <span ng-hide="state.deletionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete the service</span>
+                    <span ng-hide="state.deletionInProgress" class="vertical-center">
+                      <pr-icon icon="'trash-2'"></pr-icon>
+                      Delete the service</span
+                    >
                     <span ng-show="state.deletionInProgress">Deletion in progress...</span>
                   </button>
-                </p></td
-              >
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -163,7 +176,7 @@
 
   <div class="col-lg-3 col-md-3 col-xs-3">
     <rd-widget>
-      <rd-widget-header icon="fa-bars" title-text="Quick navigation"></rd-widget-header>
+      <rd-widget-header icon="menu" title-text="Quick navigation"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <ul class="nav nav-pills nav-stacked">
           <li><a href ng-click="goToItem('service-env-variables')">Environment variables</a></li>

@@ -63,7 +63,7 @@
           limited-feature-tabindex="-1"
         />
         <button class="btn btn-md btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)" ng-if="$index > 0">
-          <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+          <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
         </button>
       </div>
     </div>
@@ -79,7 +79,7 @@
       limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
       limited-feature-disabled
     >
-      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      <pr-icon icon="'plus-circle'"></pr-icon>
       add group search configuration
     </button>
   </div>
@@ -96,7 +96,7 @@
       Fetch Admin Group(s)
     </button>
     <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="ml-6 vertical-center">
-      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
       No groups found
     </span>
   </div>

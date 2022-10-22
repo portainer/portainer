@@ -61,8 +61,8 @@ export function HomeView() {
                       <Option
                         icon={
                           localEnvironmentAdded.type === EnvironmentType.Docker
-                            ? 'fab fa-docker'
-                            : 'fas fa-dharmachakra'
+                            ? 'svg-dockericon'
+                            : 'svg-kubernetes2'
                         }
                         title="Get Started"
                         description="Proceed using the local environment which Portainer is running in"
@@ -73,7 +73,7 @@ export function HomeView() {
                   <Link to="portainer.wizard.endpoints" className={styles.link}>
                     <Option
                       title="Add Environments"
-                      icon="fa fa-plug"
+                      icon="svg-plug"
                       description="Connect to other environments"
                     />
                   </Link>

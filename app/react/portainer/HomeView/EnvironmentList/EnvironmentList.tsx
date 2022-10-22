@@ -178,7 +178,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
       <div className="row">
         <div className="col-sm-12">
           <TableContainer>
-            <TableTitle icon="hard-drive" featherIcon label="Environments" />
+            <TableTitle icon="hard-drive" label="Environments" />
 
             <TableActions className={styles.actionBar}>
               <div className={styles.description}>
