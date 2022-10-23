@@ -8,6 +8,8 @@ import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/Acce
 import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceRegistriesSelector';
 import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
 import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
+import { PlacementsDatatable } from '@/react/kubernetes/applications/ItemView/PlacementsDatatable';
 
 export const componentsModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -82,4 +84,8 @@ export const componentsModule = angular
       'onChange',
       'supportGlobalDeployment',
     ])
+  )
+  .component(
+    'kubernetesApplicationPlacementsDatatable',
+    r2a(withCurrentUser(PlacementsDatatable), ['dataset', 'onRefresh'])
   ).name;

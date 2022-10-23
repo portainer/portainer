@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models';
 import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
-import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
+import { nodeAffinityValues } from './application';
 
 angular
   .module('portainer.kubernetes')
@@ -65,22 +65,7 @@ angular
   })
   .filter('kubernetesApplicationConstraintNodeAffinityValue', function () {
     'use strict';
-    return function (values, operator) {
-      if (operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN || operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.NOT_IN) {
-        return values;
-      } else if (
-        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.EXISTS ||
-        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.DOES_NOT_EXIST
-      ) {
-        return '';
-      } else if (
-        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN ||
-        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN
-      ) {
-        return values[0];
-      }
-      return '';
-    };
+    return nodeAffinityValues;
   })
   .filter('kubernetesNodeLabelHumanReadbleText', function () {
     'use strict';
