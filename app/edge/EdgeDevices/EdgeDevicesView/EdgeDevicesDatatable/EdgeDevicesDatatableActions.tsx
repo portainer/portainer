@@ -1,6 +1,6 @@
 import { useRouter } from '@uirouter/react';
 
-import type { Environment } from '@/portainer/environments/types';
+import type { Environment } from '@/react/portainer/environments/types';
 import {
   confirmAsync,
   confirmDestructiveAsync,
@@ -8,7 +8,7 @@ import {
 import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
 import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
-import { deleteEndpoint } from '@/portainer/environments/environment.service';
+import { deleteEndpoint } from '@/react/portainer/environments/environment.service';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';

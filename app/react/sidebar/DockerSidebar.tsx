@@ -15,7 +15,7 @@ import {
   type Environment,
   type EnvironmentId,
   EnvironmentStatus,
-} from '@/portainer/environments/types';
+} from '@/react/portainer/environments/types';
 import {
   Authorized,
   useUser,

@@ -1,4 +1,4 @@
-import { EnvironmentId } from '../environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 export type UserId = number;
 

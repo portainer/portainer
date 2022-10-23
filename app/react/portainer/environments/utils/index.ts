@@ -1,4 +1,4 @@
-import { Environment, EnvironmentType, PlatformType } from './types';
+import { Environment, EnvironmentType, PlatformType } from '../types';
 
 export function getPlatformType(envType: EnvironmentType) {
   switch (envType) {

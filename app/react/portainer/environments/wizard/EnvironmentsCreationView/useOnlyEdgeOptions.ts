@@ -1,4 +1,4 @@
-import { EnvironmentCreationTypes } from '@/portainer/environments/types';
+import { EnvironmentCreationTypes } from '@/react/portainer/environments/types';
 
 import { BoxSelectorOption } from '@@/BoxSelector';
 

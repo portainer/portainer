@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
 
 import { getDevices } from '@/portainer/hostmanagement/open-amt/open-amt.service';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import * as notifications from '@/portainer/services/notifications';
 

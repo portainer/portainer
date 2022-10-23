@@ -11,10 +11,10 @@ import {
 } from 'react';
 
 import { isAdmin } from '@/portainer/users/user.helpers';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getUser } from '../users/user.service';
 import { User, UserId } from '../users/types';
-import { EnvironmentId } from '../environments/types';
 
 import { useLocalStorage } from './useLocalStorage';
 

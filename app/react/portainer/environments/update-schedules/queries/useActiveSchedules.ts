@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { EdgeUpdateSchedule, ScheduleType, StatusType } from '../types';
 

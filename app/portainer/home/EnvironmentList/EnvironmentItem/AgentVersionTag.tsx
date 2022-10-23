@@ -1,10 +1,10 @@
 import { Zap } from 'react-feather';
 
-import { EnvironmentType } from '@/portainer/environments/types';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 import {
   isAgentEnvironment,
   isEdgeEnvironment,
-} from '@/portainer/environments/utils';
+} from '@/react/portainer/environments/utils';
 
 interface Props {
   type: EnvironmentType;

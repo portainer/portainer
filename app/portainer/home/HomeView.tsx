@@ -1,12 +1,13 @@
 import { useRouter } from '@uirouter/react';
 import { useState } from 'react';
 
+import { Environment } from '@/react/portainer/environments/types';
+import { snapshotEndpoints } from '@/react/portainer/environments/environment.service';
+import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
+
 import { PageHeader } from '@@/PageHeader';
 
 import * as notifications from '../services/notifications';
-import { Environment } from '../environments/types';
-import { snapshotEndpoints } from '../environments/environment.service';
-import { isEdgeEnvironment } from '../environments/utils';
 import { confirmAsync } from '../services/modal.service/confirm';
 import { buildTitle } from '../services/modal.service/utils';
 

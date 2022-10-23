@@ -1,4 +1,4 @@
-import { useEnvironment } from '../environments/queries/useEnvironment';
+import { useEnvironment } from '@/react/portainer/environments/queries/useEnvironment';
 
 import { useEnvironmentId } from './useEnvironmentId';
 

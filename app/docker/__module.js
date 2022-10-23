@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { EnvironmentStatus } from '@/portainer/environments/types';
+import { EnvironmentStatus } from '@/react/portainer/environments/types';
 
 import { reactModule } from './react';
 

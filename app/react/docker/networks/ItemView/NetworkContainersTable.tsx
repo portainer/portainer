@@ -1,5 +1,5 @@
 import { Authorized } from '@/portainer/hooks/useUser';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Icon } from '@/react/components/Icon';
 
 import { Table, TableContainer, TableTitle } from '@@/datatables';

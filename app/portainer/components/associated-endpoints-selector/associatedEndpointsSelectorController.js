@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import { EdgeTypes } from '@/portainer/environments/types';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { EdgeTypes } from '@/react/portainer/environments/types';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { getTags } from '@/portainer/tags/tags.service';
 
 class AssoicatedEndpointsSelectorController {
