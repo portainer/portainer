@@ -185,7 +185,7 @@
               <div class="col-sm-12 form-section-title"> Networking </div>
               <ingress-class-datatable
                 ng-if="$ctrl.state.ingressAvailabilityPerNamespace"
-                on-change-availability="($ctrl.onChangeIngressControllerAvailability)"
+                on-change-controllers="($ctrl.onChangeIngressControllerAvailability)"
                 ingress-controllers="$ctrl.ingressControllers"
                 description="'Enable the ingress controllers that users can select when publishing applications in this namespace.'"
                 no-ingress-controller-label="'No ingress controllers found in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster.'"

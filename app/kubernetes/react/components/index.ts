@@ -12,9 +12,10 @@ export const componentsModule = angular
   .component(
     'ingressClassDatatable',
     r2a(IngressClassDatatable, [
-      'onChangeAvailability',
+      'onChangeControllers',
       'description',
       'ingressControllers',
+      'allowNoneIngressClass',
       'isLoading',
       'noIngressControllerLabel',
       'view',

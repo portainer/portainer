@@ -96,15 +96,16 @@ export function useIngresses(
         const serviceNamesInNamespace = servicesInNamespace?.map(
           (service) => service.Name
         );
-        if (ing.Paths) {
-          ing.Paths.forEach((path, pIndex) => {
-            if (!serviceNamesInNamespace?.includes(path.ServiceName)) {
-              filteredIngresses[iIndex].Paths[pIndex].HasService = false;
-            } else {
-              filteredIngresses[iIndex].Paths[pIndex].HasService = true;
-            }
-          });
-        }
+        ing.Paths?.forEach((path, pIndex) => {
+          if (
+            !serviceNamesInNamespace?.includes(path.ServiceName) &&
+            filteredIngresses[iIndex].Paths
+          ) {
+            filteredIngresses[iIndex].Paths[pIndex].HasService = false;
+          } else {
+            filteredIngresses[iIndex].Paths[pIndex].HasService = true;
+          }
+        });
       });
       return filteredIngresses;
     },
@@ -188,6 +189,7 @@ export function useIngressControllers(
     },
     {
       enabled: !!namespace,
+      cacheTime: 0,
       ...withError('Unable to get ingress controllers'),
     }
   );

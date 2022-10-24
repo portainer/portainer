@@ -7,7 +7,7 @@ import (
 
 func (m *Migrator) migrateDBVersionToDB70() error {
 	log.Info().Msg("- add IngressAvailabilityPerNamespace field")
-	if err := m.addIngressAvailabilityPerNamespaceFieldDB70(); err != nil {
+	if err := m.updateIngressFieldsForEnvDB70(); err != nil {
 		return err
 	}
 
@@ -50,7 +50,7 @@ func (m *Migrator) migrateDBVersionToDB70() error {
 	return nil
 }
 
-func (m *Migrator) addIngressAvailabilityPerNamespaceFieldDB70() error {
+func (m *Migrator) updateIngressFieldsForEnvDB70() error {
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
@@ -58,6 +58,7 @@ func (m *Migrator) addIngressAvailabilityPerNamespaceFieldDB70() error {
 
 	for _, endpoint := range endpoints {
 		endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace = true
+		endpoint.Kubernetes.Configuration.AllowNoneIngressClass = false
 
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {

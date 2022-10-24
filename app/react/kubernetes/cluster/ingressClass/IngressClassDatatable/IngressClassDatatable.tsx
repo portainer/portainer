@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { confirmWarn } from '@/portainer/services/modal.service/confirm';
 
@@ -14,28 +14,63 @@ import { createStore } from './datatable-store';
 const useStore = createStore('ingressClasses');
 
 interface Props {
-  onChangeAvailability: (
+  onChangeControllers: (
     controllerClassMap: IngressControllerClassMap[]
   ) => void; // angular function to save the ingress class list
   description: string;
   ingressControllers: IngressControllerClassMap[] | undefined;
+  allowNoneIngressClass: boolean;
   isLoading: boolean;
   noIngressControllerLabel: string;
   view: string;
 }
 
 export function IngressClassDatatable({
-  onChangeAvailability,
+  onChangeControllers,
   description,
   ingressControllers,
+  allowNoneIngressClass,
   isLoading,
   noIngressControllerLabel,
   view,
 }: Props) {
-  const [ingControllerFormValues, setIngControllerFormValues] =
-    useState(ingressControllers);
+  const [ingControllerFormValues, setIngControllerFormValues] = useState(
+    ingressControllers || []
+  );
   const settings = useStore();
   const columns = useColumns();
+
+  useEffect(() => {
+    if (allowNoneIngressClass === undefined) {
+      return;
+    }
+
+    let newIngFormValues: IngressControllerClassMap[];
+    const isCustomTypeExist = ingControllerFormValues.some(
+      (ic) => ic.Type === 'custom'
+    );
+    if (allowNoneIngressClass) {
+      newIngFormValues = [...ingControllerFormValues];
+      // add the ingress controller type 'custom' with a 'none' ingress class name
+      if (!isCustomTypeExist) {
+        newIngFormValues.push({
+          Name: 'none',
+          ClassName: 'none',
+          Type: 'custom',
+          Availability: true,
+          New: false,
+          Used: false,
+        });
+      }
+    } else {
+      newIngFormValues = ingControllerFormValues.filter(
+        (ingController) => ingController.ClassName !== 'none'
+      );
+    }
+    setIngControllerFormValues(newIngFormValues);
+    onChangeControllers(newIngFormValues);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowNoneIngressClass, onChangeControllers]);
 
   return (
     <div className="-mx-[15px]">
@@ -134,7 +169,7 @@ export function IngressClassDatatable({
       );
       if (view === 'namespace') {
         setIngControllerFormValues(updatedIngressControllers);
-        onChangeAvailability(updatedIngressControllers);
+        onChangeControllers(updatedIngressControllers);
         return;
       }
 
@@ -180,14 +215,14 @@ export function IngressClassDatatable({
           callback: (confirmed) => {
             if (confirmed) {
               setIngControllerFormValues(updatedIngressControllers);
-              onChangeAvailability(updatedIngressControllers);
+              onChangeControllers(updatedIngressControllers);
             }
           },
         });
         return;
       }
       setIngControllerFormValues(updatedIngressControllers);
-      onChangeAvailability(updatedIngressControllers);
+      onChangeControllers(updatedIngressControllers);
     }
   }
 }
@@ -196,10 +231,13 @@ function isUnsavedChanges(
   oldIngressControllers: IngressControllerClassMap[],
   newIngressControllers: IngressControllerClassMap[]
 ) {
-  for (let i = 0; i < oldIngressControllers.length; i += 1) {
+  if (oldIngressControllers.length !== newIngressControllers.length) {
+    return true;
+  }
+  for (let i = 0; i < newIngressControllers.length; i += 1) {
     if (
-      oldIngressControllers[i].Availability !==
-      newIngressControllers[i].Availability
+      oldIngressControllers[i]?.Availability !==
+      newIngressControllers[i]?.Availability
     ) {
       return true;
     }
