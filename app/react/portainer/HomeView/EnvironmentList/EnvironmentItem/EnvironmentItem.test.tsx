@@ -1,7 +1,7 @@
 import {
   EnvironmentGroup,
   EnvironmentGroupId,
-} from '@/portainer/environment-groups/types';
+} from '@/react/portainer/environments/environment-groups/types';
 import { Environment } from '@/react/portainer/environments/types';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';

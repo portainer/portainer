@@ -11,13 +11,13 @@ import {
   PlatformType,
   EdgeTypes,
 } from '@/react/portainer/environments/types';
-import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   refetchIfAnyOffline,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
-import { useGroups } from '@/portainer/environment-groups/queries';
+import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { useAgentVersionsList } from '@/react/portainer/environments/queries/useAgentVersionsList';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';

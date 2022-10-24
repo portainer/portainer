@@ -1,5 +1,5 @@
 import { TagId } from '@/portainer/tags/types';
-import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 
 export type EnvironmentId = number;
 
