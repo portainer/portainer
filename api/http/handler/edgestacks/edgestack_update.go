@@ -75,6 +75,8 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}
 
+	endpointsToAdd := map[portainer.EndpointID]bool{}
+
 	if payload.EdgeGroups != nil {
 		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 		if err != nil {
@@ -105,7 +107,6 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			}
 		}
 
-		endpointsToAdd := map[portainer.EndpointID]bool{}
 		for endpointID := range newRelatedSet {
 			if !oldRelatedSet[endpointID] {
 				endpointsToAdd[endpointID] = true
@@ -143,12 +144,13 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
+
 	if payload.DeploymentType == portainer.EdgeStackDeploymentCompose {
 		if stack.EntryPoint == "" {
 			stack.EntryPoint = filesystem.ComposeFileDefaultName
 		}
 
-		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+		_, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
@@ -159,8 +161,9 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		stack.ManifestPath = manifestPath
+	}
 
-	} else {
+	if payload.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		if stack.ManifestPath == "" {
 			stack.ManifestPath = filesystem.ManifestFileDefaultName
 		}
@@ -176,11 +179,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))
 		if err != nil {
-			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
+			return httperror.InternalServerError("Unable to persist updated Kubernetes manifest file on disk", err)
 		}
 	}
 
-	if payload.Version != nil && *payload.Version != stack.Version {
+	versionUpdated := payload.Version != nil && *payload.Version != stack.Version
+	if versionUpdated {
 		stack.Version = *payload.Version
 		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}

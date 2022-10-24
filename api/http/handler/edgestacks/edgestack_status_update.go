@@ -14,19 +14,22 @@ import (
 type updateStatusPayload struct {
 	Error      string
 	Status     *portainer.EdgeStackStatusType
-	EndpointID *portainer.EndpointID
+	EndpointID portainer.EndpointID
 }
 
 func (payload *updateStatusPayload) Validate(r *http.Request) error {
 	if payload.Status == nil {
 		return errors.New("Invalid status")
 	}
-	if payload.EndpointID == nil {
+
+	if payload.EndpointID == 0 {
 		return errors.New("Invalid EnvironmentID")
 	}
+
 	if *payload.Status == portainer.StatusError && govalidator.IsNull(payload.Error) {
 		return errors.New("Error message is mandatory when status is error")
 	}
+
 	return nil
 }
 
@@ -62,7 +65,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(*payload.EndpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(payload.EndpointID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -74,10 +77,10 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	stack.Status[*payload.EndpointID] = portainer.EdgeStackStatus{
+	stack.Status[payload.EndpointID] = portainer.EdgeStackStatus{
 		Type:       *payload.Status,
 		Error:      payload.Error,
-		EndpointID: *payload.EndpointID,
+		EndpointID: payload.EndpointID,
 	}
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
