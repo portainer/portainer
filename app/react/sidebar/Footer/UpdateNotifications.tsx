@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import clsx from 'clsx';
 
 import { getVersionStatus } from '@/portainer/services/api/status.service';
-import { useUIState } from '@/portainer/hooks/useUIState';
+import { useUIState } from '@/react/hooks/useUIState';
 
 import { Icon } from '@@/Icon';
 

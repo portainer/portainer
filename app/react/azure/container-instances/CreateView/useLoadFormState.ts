@@ -6,7 +6,7 @@ import {
   Subscription,
 } from '@/react/azure/types';
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { useProvider } from '@/react/azure/queries/useProvider';
 import { useResourceGroups } from '@/react/azure/queries/useResourceGroups';
 import { useSubscriptions } from '@/react/azure/queries/useSubscriptions';

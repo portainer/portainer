@@ -1,6 +1,6 @@
 import { components, OptionProps } from 'react-select';
 
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 import { Select } from '@@/form-components/ReactSelect';
 

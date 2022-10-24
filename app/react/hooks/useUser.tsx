@@ -12,9 +12,8 @@ import {
 
 import { isAdmin } from '@/portainer/users/user.helpers';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-
-import { getUser } from '../users/user.service';
-import { User, UserId } from '../users/types';
+import { getUser } from '@/portainer/users/user.service';
+import { User, UserId } from '@/portainer/users/types';
 
 import { useLocalStorage } from './useLocalStorage';
 

@@ -4,7 +4,7 @@ import sanitize from 'sanitize-html';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuid } from 'uuid';
 
-import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
+import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
 import { notificationsStore } from '@/react/portainer/notifications/notifications-store';
 import { ToastNotification } from '@/react/portainer/notifications/types';
 

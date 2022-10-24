@@ -1,7 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { keyBuilder } from '@/portainer/hooks/useLocalStorage';
+import { keyBuilder } from '@/react/hooks/useLocalStorage';
 import {
   paginationSettings,
   sortableSettings,

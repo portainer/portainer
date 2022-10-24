@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Home } from 'react-feather';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { useIsTeamLeader } from '@/portainer/users/queries';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 

@@ -1,7 +1,7 @@
 import { CellProps, Column } from 'react-table';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useContainerGpus } from '@/react/docker/containers/queries/gpus';
 
 export const gpus: Column<DockerContainer> = {

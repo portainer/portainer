@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-import { UserProvider } from '@/portainer/hooks/useUser';
+import { UserProvider } from '@/react/hooks/useUser';
 
 export function withCurrentUser<T>(
   WrappedComponent: ComponentType<T>

@@ -1,5 +1,5 @@
 import { server, rest } from '@/setup-tests/server';
-import { UserContext } from '@/portainer/hooks/useUser';
+import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { renderWithQueryClient, within } from '@/react-tools/test-utils';
 import { Team, TeamId } from '@/react/portainer/users/teams/types';

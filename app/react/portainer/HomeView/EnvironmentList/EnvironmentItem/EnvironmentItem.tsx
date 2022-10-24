@@ -18,7 +18,7 @@ import {
 } from '@/react/portainer/environments/utils';
 import type { TagId } from '@/portainer/tags/types';
 import { useTags } from '@/portainer/tags/queries';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';

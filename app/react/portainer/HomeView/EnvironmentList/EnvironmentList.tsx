@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { RefreshCcw } from 'react-feather';
 import _ from 'lodash';
 
-import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
+import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import {
   Environment,
   EnvironmentType,
@@ -12,7 +12,7 @@ import {
   EdgeTypes,
 } from '@/react/portainer/environments/types';
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
+import { useDebounce } from '@/react/hooks/useDebounce';
 import {
   refetchIfAnyOffline,
   useEnvironmentList,
@@ -21,7 +21,7 @@ import { useGroups } from '@/react/portainer/environments/environment-groups/que
 import { useTags } from '@/portainer/tags/queries';
 import { useAgentVersionsList } from '@/react/portainer/environments/queries/useAgentVersionsList';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
