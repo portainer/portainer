@@ -1,4 +1,4 @@
-import type { FeatureId } from '@/portainer/feature-flags/enums';
+import type { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { IconProps } from '@@/Icon';
 

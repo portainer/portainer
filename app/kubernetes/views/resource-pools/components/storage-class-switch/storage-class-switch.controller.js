@@ -1,4 +1,4 @@
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 class StorageClassSwitchController {
   /* @ngInject */

@@ -6,7 +6,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import {
   useRedirectFeatureFlag,
   FeatureFlag,
-} from '@/portainer/feature-flags/useRedirectFeatureFlag';
+} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';

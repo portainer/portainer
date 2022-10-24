@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 export default class AuthLogsViewController {
   /* @ngInject */
