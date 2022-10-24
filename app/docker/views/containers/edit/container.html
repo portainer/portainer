@@ -83,7 +83,7 @@
               <td ng-if="!container.edit">
                 {{ container.Name | trimcontainername }}
                 <a authorization="DockerContainerRename" href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"
-                  ><pr-icon icon="'edit'" className="'space-right'"></pr-icon
+                  ><pr-icon icon="'edit'" class-name="'space-right'"></pr-icon
                 ></a>
               </td>
               <td ng-if="container.edit">
@@ -141,19 +141,19 @@
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
                   <a authorization="DockerContainerLogs" class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })"
-                    ><pr-icon icon="'file-text'" className="'space-right'"></pr-icon>Logs</a
+                    ><pr-icon icon="'file-text'" class-name="'space-right'"></pr-icon>Logs</a
                   >
                   <a authorization="DockerContainerInspect" class="btn" type="button" ui-sref="docker.containers.container.inspect({ id: container.Id })"
-                    ><pr-icon icon="'info'" className="'space-right'"></pr-icon>Inspect</a
+                    ><pr-icon icon="'info'" class-name="'space-right'"></pr-icon>Inspect</a
                   >
                   <a authorization="DockerContainerStats" class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })"
-                    ><pr-icon icon="'bar-chart'" className="'space-right'"></pr-icon>Stats</a
+                    ><pr-icon icon="'bar-chart'" class-name="'space-right'"></pr-icon>Stats</a
                   >
                   <a authorization="DockerExecStart" class="btn" type="button" ui-sref="docker.containers.container.exec({ id: container.Id })"
-                    ><pr-icon icon="'terminal'" className="'space-right'"></pr-icon>Console</a
+                    ><pr-icon icon="'terminal'" class-name="'space-right'"></pr-icon>Console</a
                   >
                   <a authorization="DockerContainerAttach" class="btn" type="button" ui-sref="docker.containers.container.attach({ id: container.Id })"
-                    ><pr-icon icon="'paperclip'" className="'space-right'"></pr-icon>Attach</a
+                    ><pr-icon icon="'paperclip'" class-name="'space-right'"></pr-icon>Attach</a
                   >
                 </div>
               </td>

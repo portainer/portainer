@@ -19,9 +19,9 @@
         <rd-widget-body classes="no-padding">
           <div class="toolBar">
             <div class="toolBarTitle">KVM Control</div>
-            <pr-icon icon="'x'" ui-sref="edge.devices" class-name="interactive pull-right" size="'lg'"></pr-icon>
-            <pr-icon ng-click="maximize()" title="Maximize" icon="'maximize-2'" class-name="!mr-2 interactive  pull-right" size="'lg'"></pr-icon>
-            <pr-icon ng-click="minimize()" title="Minimize" icon="'minimize-2'" class-name="!mr-2 interactive pull-right" size="'lg'"></pr-icon>
+            <pr-icon icon="'x'" ui-sref="edge.devices" class-name="'interactive pull-right'" size="'lg'"></pr-icon>
+            <pr-icon ng-click="maximize()" title="Maximize" icon="'maximize-2'" class-name="'!mr-2 interactive  pull-right'" size="'lg'"></pr-icon>
+            <pr-icon ng-click="minimize()" title="Minimize" icon="'minimize-2'" class-name="'!mr-2 interactive pull-right'" size="'lg'"></pr-icon>
           </div>
           <div class="actionBar">
             <kvm-control device-id="$state.deviceId" server="$state.mpsServer" token="$state.mpsToken"> </kvm-control>
