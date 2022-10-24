@@ -82,7 +82,7 @@ export function NetworkContainersTable({
                       >
                         <Icon
                           icon="trash-2"
-                          class-name="icon-secondary icon-md"
+                          className="icon-secondary icon-md"
                         />
                         Leave Network
                       </Button>

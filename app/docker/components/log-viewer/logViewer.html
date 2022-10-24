@@ -61,16 +61,16 @@
                 class="btn btn-primary btn-sm"
                 ng-click="$ctrl.copy()"
                 ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length"
-                ><pr-icon icon="'copy'" class-name="space-right"></pr-icon>Copy</button
+                ><pr-icon icon="'copy'" class-name="'space-right'"></pr-icon>Copy</button
               >
               <button
                 class="btn btn-primary btn-sm"
                 ng-click="$ctrl.copySelection()"
                 ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length || !$ctrl.state.selectedLines.length"
-                ><pr-icon icon="'copy'" class-name="space-right"></pr-icon>Copy selected lines</button
+                ><pr-icon icon="'copy'" class-name="'space-right'"></pr-icon>Copy selected lines</button
               >
               <button class="btn btn-primary btn-sm" ng-click="$ctrl.clearSelection()" ng-disabled="$ctrl.state.selectedLines.length === 0"
-                ><pr-icon icon="'x'" class-name="space-right"></pr-icon>Unselect</button
+                ><pr-icon icon="'x'" class-name="'space-right'"></pr-icon>Unselect</button
               >
               <span>
                 <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
