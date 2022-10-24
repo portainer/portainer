@@ -6,7 +6,6 @@ import {
   stripProtocol,
 } from '@/portainer/filters/filters';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { EdgeIndicator } from '@/portainer/home/EnvironmentList/EnvironmentItem';
 import {
   isEdgeEnvironment,
   isUnassociatedEdgeEnvironment,
@@ -16,6 +15,7 @@ import {
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
 
+import { EdgeIndicator } from '@@/EdgeIndicator';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import styles from './WizardEndpointsList.module.css';

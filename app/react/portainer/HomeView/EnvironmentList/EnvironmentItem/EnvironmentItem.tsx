@@ -23,9 +23,9 @@ import { useUser } from '@/portainer/hooks/useUser';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 import { Button } from '@@/buttons';
+import { EdgeIndicator } from '@@/EdgeIndicator';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
-import { EdgeIndicator } from './EdgeIndicator';
 import { EnvironmentStats } from './EnvironmentStats';
 import styles from './EnvironmentItem.module.css';
 import { EnvironmentStatusBadge } from './EnvironmentStatusBadge';

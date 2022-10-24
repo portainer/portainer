@@ -1,9 +1,10 @@
 import { components, OptionProps } from 'react-select';
 
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
-import { Filter } from '@/portainer/home/types';
 
 import { Select } from '@@/form-components/ReactSelect';
+
+import { Filter } from './types';
 
 interface Props<TValue = number> {
   filterOptions?: Filter<TValue>[];

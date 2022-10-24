@@ -4,12 +4,11 @@ import { useState } from 'react';
 import { Environment } from '@/react/portainer/environments/types';
 import { snapshotEndpoints } from '@/react/portainer/environments/environment.service';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
+import * as notifications from '@/portainer/services/notifications';
+import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import { buildTitle } from '@/portainer/services/modal.service/utils';
 
 import { PageHeader } from '@@/PageHeader';
-
-import * as notifications from '../services/notifications';
-import { confirmAsync } from '../services/modal.service/confirm';
-import { buildTitle } from '../services/modal.service/utils';
 
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
