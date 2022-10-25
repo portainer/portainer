@@ -8,23 +8,23 @@ export async function getNamespace(
   namespace: string
 ) {
   try {
-    const { data: ingress } = await axios.get<Namespaces>(
+    const { data: ns } = await axios.get<Namespaces>(
       buildUrl(environmentId, namespace)
     );
-    return ingress;
+    return ns;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve network details');
+    throw parseAxiosError(e as Error, 'Unable to retrieve namespace');
   }
 }
 
 export async function getNamespaces(environmentId: EnvironmentId) {
   try {
-    const { data: ingresses } = await axios.get<Namespaces>(
+    const { data: namespaces } = await axios.get<Namespaces>(
       buildUrl(environmentId)
     );
-    return ingresses;
+    return namespaces;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve network details');
+    throw parseAxiosError(e as Error, 'Unable to retrieve namespaces');
   }
 }
 
