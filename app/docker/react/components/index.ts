@@ -23,6 +23,7 @@ import { ProcessesDatatable } from '@/react/docker/containers/StatsView/Processe
 import { ScaleServiceButton } from '@/react/docker/services/ListView/ServicesDatatable/columns/schedulingMode/ScaleServiceButton';
 import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatable';
 import { StacksDatatable } from '@/react/docker/stacks/ListView/StacksDatatable';
+import { NetworksDatatable } from '@/react/docker/networks/ListView/NetworksDatatable';
 
 import { containersModule } from './containers';
 import { servicesModule } from './services';
@@ -55,6 +56,14 @@ const ngModule = angular
       withUIRouter(withReactQuery(withCurrentUser(StackContainersDatatable))),
       ['environment', 'stackName']
     )
+  )
+  .component(
+    'networksDatatable',
+    r2a(withUIRouter(withCurrentUser(NetworksDatatable)), [
+      'dataset',
+      'onRefresh',
+      'onRemove',
+    ])
   )
   .component(
     'gpusList',

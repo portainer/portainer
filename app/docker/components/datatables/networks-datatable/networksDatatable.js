@@ -1,4 +1,4 @@
-angular.module('portainer.docker').component('networksDatatable', {
+angular.module('portainer.docker').component('ngNetworksDatatable', {
   templateUrl: './networksDatatable.html',
   controller: 'NetworksDatatableController',
   bindings: {
