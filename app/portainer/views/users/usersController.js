@@ -131,6 +131,7 @@ angular.module('portainer.app').controller('UsersController', [
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
           $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
+          $scope.teamSync = data.settings.TeamSync;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve users and teams');
