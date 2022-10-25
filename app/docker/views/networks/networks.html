@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <networks-datatable
+    <ng-networks-datatable
       title-text="Networks"
       title-icon="share-2"
       dataset="networks"
@@ -11,6 +11,8 @@
       remove-action="removeAction"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
       refresh-callback="getNetworks"
-    ></networks-datatable>
+    ></ng-networks-datatable>
   </div>
 </div>
+
+<networks-datatable ng-if="networks" dataset="networks" on-refresh="" on-remove="(removeAction)"></networks-datatable>
