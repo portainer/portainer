@@ -1,7 +1,8 @@
 import { ping } from '@/docker/services/ping';
-
-import { Environment } from '../environments/types';
-import { PortainerEndpointTypes } from '../models/endpoint/models';
+import {
+  Environment,
+  EnvironmentType,
+} from '@/react/portainer/environments/types';
 
 interface State {
   currentEndpoint: Environment | null;
@@ -29,10 +30,7 @@ export function EndpointProvider() {
       state.pingInterval = null;
     }
 
-    if (
-      endpoint &&
-      endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment
-    ) {
+    if (endpoint && endpoint.Type === EnvironmentType.EdgeAgentOnDocker) {
       state.pingInterval = setInterval(() => ping(endpoint.Id), 60 * 1000);
     }
   }
