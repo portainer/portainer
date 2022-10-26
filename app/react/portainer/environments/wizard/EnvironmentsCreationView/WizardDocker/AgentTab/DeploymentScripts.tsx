@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';

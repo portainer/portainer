@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
 
@@ -48,11 +48,12 @@ export function ContainersDatatable({
   );
 
   const containersQuery = useContainers(
-    environment,
+    environment.Id,
     true,
     undefined,
     settings.autoRefreshRate * 1000
   );
+
   return (
     <RowProvider context={{ environment }}>
       <Datatable
@@ -76,6 +77,7 @@ export function ContainersDatatable({
           const columnsToHide = tableInstance.allColumns.filter((colInstance) =>
             hidableColumns?.includes(colInstance.id)
           );
+
           return (
             <>
               <ColumnVisibilityMenu<DockerContainer>

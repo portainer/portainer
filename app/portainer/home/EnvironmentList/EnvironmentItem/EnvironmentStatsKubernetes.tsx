@@ -1,7 +1,7 @@
 import {
   EnvironmentType,
   KubernetesSnapshot,
-} from '@/portainer/environments/types';
+} from '@/react/portainer/environments/types';
 import { humanize } from '@/portainer/filters/filters';
 import { addPlural } from '@/portainer/helpers/strings';
 

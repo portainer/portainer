@@ -47,9 +47,10 @@ class KubernetesConfigureController {
     this.limitedFeature = FeatureId.K8S_SETUP_DEFAULT;
     this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
     this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
-    this.onChangeAvailability = this.onChangeAvailability.bind(this);
+    this.onChangeControllers = this.onChangeControllers.bind(this);
     this.onChangeEnableResourceOverCommit = this.onChangeEnableResourceOverCommit.bind(this);
     this.onToggleIngressAvailabilityPerNamespace = this.onToggleIngressAvailabilityPerNamespace.bind(this);
+    this.onToggleAllowNoneIngressClass = this.onToggleAllowNoneIngressClass.bind(this);
     this.onChangeStorageClassAccessMode = this.onChangeStorageClassAccessMode.bind(this);
   }
   /* #endregion */
@@ -71,12 +72,24 @@ class KubernetesConfigureController {
   /* #endregion */
 
   /* #region  INGRESS CLASSES UI MANAGEMENT */
-  onChangeAvailability(controllerClassMap) {
+  onChangeControllers(controllerClassMap) {
     this.ingressControllers = controllerClassMap;
   }
 
   hasTraefikIngress() {
     return _.find(this.formValues.IngressClasses, { Type: this.IngressClassTypes.TRAEFIK });
+  }
+
+  toggleAdvancedIngSettings() {
+    this.$scope.$evalAsync(() => {
+      this.state.isIngToggleSectionExpanded = !this.state.isIngToggleSectionExpanded;
+    });
+  }
+
+  onToggleAllowNoneIngressClass() {
+    this.$scope.$evalAsync(() => {
+      this.formValues.AllowNoneIngressClass = !this.formValues.AllowNoneIngressClass;
+    });
   }
 
   onToggleIngressAvailabilityPerNamespace() {
@@ -109,6 +122,7 @@ class KubernetesConfigureController {
     endpoint.Kubernetes.Configuration.IngressClasses = ingressClasses;
     endpoint.Kubernetes.Configuration.RestrictDefaultNamespace = this.formValues.RestrictDefaultNamespace;
     endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace = this.formValues.IngressAvailabilityPerNamespace;
+    endpoint.Kubernetes.Configuration.AllowNoneIngressClass = this.formValues.AllowNoneIngressClass;
     endpoint.ChangeWindow = this.state.autoUpdateSettings;
   }
 
@@ -256,6 +270,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
+      isIngToggleSectionExpanded: false,
       endpointId: this.$state.params.endpointId,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
@@ -315,6 +330,7 @@ class KubernetesConfigureController {
         return ic;
       });
       this.formValues.IngressAvailabilityPerNamespace = this.endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace;
+      this.formValues.AllowNoneIngressClass = this.endpoint.Kubernetes.Configuration.AllowNoneIngressClass;
 
       this.oldFormValues = Object.assign({}, this.formValues);
     } catch (err) {

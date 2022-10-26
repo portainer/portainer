@@ -1,6 +1,6 @@
 import { useInfo } from '@/docker/services/system.service';
-import { Environment } from '@/portainer/environments/types';
-import { isAgentEnvironment } from '@/portainer/environments/utils';
+import { Environment } from '@/react/portainer/environments/types';
+import { isAgentEnvironment } from '@/react/portainer/environments/utils';
 
 import { PageHeader } from '@@/PageHeader';
 
@@ -16,9 +16,7 @@ export function ListView({ endpoint: environment }: Props) {
   const envInfoQuery = useInfo(environment.Id, (info) => !!info.Swarm?.NodeID);
 
   const isSwarmManager = !!envInfoQuery.data;
-  let isHostColumnVisible = isAgent && isSwarmManager;
-  isHostColumnVisible = true;
-
+  const isHostColumnVisible = isAgent && isSwarmManager;
   return (
     <>
       <PageHeader

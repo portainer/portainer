@@ -1,7 +1,7 @@
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { FeatureId } from 'Portainer/feature-flags/enums';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { StackStatus, StackType } from '@/react/docker/stacks/types';
 
 angular.module('portainer.app').controller('StackController', [

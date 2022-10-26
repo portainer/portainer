@@ -1,6 +1,6 @@
 import { map } from 'lodash';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 export class EndpointsController {
   /* @ngInject */

@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { EnvironmentStatus } from '@/portainer/environments/types';
+import { EnvironmentStatus } from '@/react/portainer/environments/types';
 
 import { reactModule } from './react';
 
@@ -597,6 +597,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
+
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);

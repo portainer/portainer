@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { deleteContainerGroup } from '@/react/azure/services/container-groups.service';
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { useContainerGroups } from '@/react/azure/queries/useContainerGroups';
 import { useSubscriptions } from '@/react/azure/queries/useSubscriptions';

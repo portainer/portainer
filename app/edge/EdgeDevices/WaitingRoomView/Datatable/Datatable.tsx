@@ -8,7 +8,7 @@ import {
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { Button } from '@@/buttons';

@@ -90,11 +90,11 @@ func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, 
 
 	var infos []models.K8sIngressInfo
 	for _, ingress := range ingressList.Items {
-		ingressClass := ingress.Spec.IngressClassName
 		var info models.K8sIngressInfo
 		info.Name = ingress.Name
 		info.UID = string(ingress.UID)
 		info.Namespace = namespace
+		ingressClass := ingress.Spec.IngressClassName
 		info.ClassName = ""
 		if ingressClass != nil {
 			info.ClassName = *ingressClass
@@ -113,6 +113,10 @@ func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, 
 		// Gather list of paths and hosts.
 		hosts := make(map[string]struct{})
 		for _, r := range ingress.Spec.Rules {
+			// We collect all exiting hosts in a map to avoid duplicates.
+			// Then, later convert it to a slice for the frontend.
+			hosts[r.Host] = struct{}{}
+
 			if r.HTTP == nil {
 				continue
 			}
@@ -124,12 +128,10 @@ func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, 
 				path.IngressName = info.Name
 				path.Host = r.Host
 
-				// We collect all exiting hosts in a map to avoid duplicates.
-				// Then, later convert it to a slice for the frontend.
-				hosts[r.Host] = struct{}{}
-
 				path.Path = p.Path
-				path.PathType = string(*p.PathType)
+				if p.PathType != nil {
+					path.PathType = string(*p.PathType)
+				}
 				path.ServiceName = p.Backend.Service.Name
 				path.Port = int(p.Backend.Service.Port.Number)
 				info.Paths = append(info.Paths, path)
@@ -154,7 +156,9 @@ func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInf
 
 	ingress.Name = info.Name
 	ingress.Namespace = info.Namespace
-	ingress.Spec.IngressClassName = &info.ClassName
+	if info.ClassName != "" {
+		ingress.Spec.IngressClassName = &info.ClassName
+	}
 	ingress.Annotations = info.Annotations
 
 	// Store TLS information.
@@ -224,7 +228,9 @@ func (kcl *KubeClient) UpdateIngress(namespace string, info models.K8sIngressInf
 
 	ingress.Name = info.Name
 	ingress.Namespace = info.Namespace
-	ingress.Spec.IngressClassName = &info.ClassName
+	if info.ClassName != "" {
+		ingress.Spec.IngressClassName = &info.ClassName
+	}
 	ingress.Annotations = info.Annotations
 
 	// Store TLS information.

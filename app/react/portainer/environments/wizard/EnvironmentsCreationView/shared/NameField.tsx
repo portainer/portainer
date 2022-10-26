@@ -2,7 +2,7 @@ import { Field, useField } from 'formik';
 import { string } from 'yup';
 import { debounce } from 'lodash';
 
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';

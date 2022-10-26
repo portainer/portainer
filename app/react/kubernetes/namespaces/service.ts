@@ -1,5 +1,5 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Namespaces } from './types';
 

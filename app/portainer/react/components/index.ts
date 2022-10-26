@@ -147,6 +147,7 @@ export const componentsModule = angular
       'name',
       'placeholder',
       'teams',
+      'disabled',
     ])
   )
   .component(

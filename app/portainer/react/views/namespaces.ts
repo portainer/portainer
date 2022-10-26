@@ -23,19 +23,8 @@ function config($stateRegistryProvider: StateRegistry) {
       },
     },
     params: { namespace: ''},
-    onEnter: /* @ngInject */ function onEnter(
-      $async: (fn: () => Promise<void>) => Promise<void>, $state: StateService, $stateParams: StateParams
-    ){
-      eval('debugger')
-   
-      // console.log('11111')
-      return async ()=>{
-        
-      }
-
-    },
     resolve: {
-      namespace: /* @ngInject */ function namespace($transition$,$stateParams) { 
+      namespace: /* @ngInject */ function namespace($stateParams) { 
         const {namespace} =  $stateParams
         return namespace
       }

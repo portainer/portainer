@@ -92,4 +92,8 @@ export interface DockerContainerResponse {
   Portainer: PortainerMetadata;
   IsPortainer: boolean;
   Host: string;
+
+  EnvironmentId?: number;
+  EnvironmentStatus?: number;
+  PublicURL: string;
 }

@@ -6,7 +6,7 @@ import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurit
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
-import { isEdgeEnvironment } from '@/portainer/environments/utils';
+import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { GpusListAngular } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { EnvironmentStatus } from '@/portainer/environments/types';
+import { EnvironmentStatus } from '@/react/portainer/environments/types';
 
 interface Props {
   status: EnvironmentStatus;

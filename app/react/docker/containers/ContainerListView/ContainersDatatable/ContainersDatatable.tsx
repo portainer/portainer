@@ -1,10 +1,8 @@
 import _ from 'lodash';
 import { useQuery } from 'react-query';
 
-import {Environment, EnvironmentId, NamespaceContainer} from '@/portainer/environments/types';
+import {Environment, EnvironmentId, NamespaceContainer} from '@/react/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';
-// import { useShowGPUsColumn } from '@/react/docker/containers/utils';
-// import { useEnvironment } from '@/portainer/environments/queries/useEnvironment';
 import { useContainers } from '@/react/docker/containers/queries/containers';
 import { getEndpoint } from '@/portainer/environments/environment.service';
 import {withError} from "@/react-tools/react-query";
@@ -13,11 +11,11 @@ import { TableSettingsMenu, Datatable } from '@@/datatables';
 import { buildAction, QuickActionsSettings } from '@@/datatables/QuickActionsSettings';
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
 
-import { createStore } from '../../ListView/ContainersDatatable/datatable-store';
-import { ContainersDatatableSettings } from '../../ListView/ContainersDatatable/ContainersDatatableSettings';
-import { useColumns } from '../../ListView/ContainersDatatable/columns';
-import { ContainersDatatableActions } from '../../ListView/ContainersDatatable/ContainersDatatableActions';
-// import { RowProvider } from '../../ListView/ContainersDatatable/RowContext';
+import { createStore } from "./datatable-store";
+import { ContainersDatatableSettings } from "./ContainersDatatableSettings";
+import { useColumns } from "./columns";
+import { ContainersDatatableActions } from "./ContainersDatatableActions";
+
 
 const storageKey = 'namespacesContainers';
 const useStore = createStore(storageKey);
@@ -36,12 +34,13 @@ export interface Props {
   namespace: NamespaceContainer;
 }
 
-export function useEnvironmentById(id?: number) {
-    return useQuery(['environments', id], () => (id ? getEndpoint(id) : null), {
-        ...withError('Failed loading environment'),
-        staleTime: 50,
-        enabled: !!id,
-    });
+function useEnvironmentById(id?: EnvironmentId) {
+  const result = useQuery(['environments', id], async () => (id ? getEndpoint(id) : null), {
+                ...withError('Failed loading environment'),
+                staleTime: 50,
+                enabled: !!id,
+              })
+  return result.data as Environment;
 }
 
 export function ContainersDatatable({ isHostColumnVisible, namespace }: Props) {
@@ -52,38 +51,45 @@ export function ContainersDatatable({ isHostColumnVisible, namespace }: Props) {
   const hidableColumns = _.compact(
     columns.filter((col) => col.canHide).map((col) => col.id)
   );
-
-  const endpointIds = Object.values(Object.values(namespace.Containers).map(v => v.EndpointId)
-                                       .filter((x, index, self) => self.indexOf(x) === index))
   
+  const endpointIds = _.uniq(_.map(namespace.Containers, 'EndpointId'))
   console.log('endpointIds = ', endpointIds)
   
-  const environment = useEnvironmentById(3);
-  console.log('environments = ', environment)
+  const containers = _.map(namespace.Containers, item =>({Id: item.ContainerId}))
+  
 
-  // eval('debugger')
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-  // const containersQuery = environment.data ? useContainers(environment.data, true, undefined, settings.autoRefreshRate * 1000) : null
-  const containersQuery = useContainers(environment.data, true, undefined, settings.autoRefreshRate * 1000)
+  let tableData = []
 
-  // const containersQuery = any
+  // for (let i = 0; i < endpointIds.length; i++) {
+  //   const id = endpointIds[i]
+  // }
 
-  // console.log('containersQuery = ', containersQuery)
+  const environment = useEnvironmentById(3)
+  console.log('environment = ', environment)
 
-  // const environments = endpointIds.map((id) => {
-  //   const res = useEnvironmentById(id)
-  //   return res.data
-  // })
-  // console.log('environments = ', environment)
+  const containersQuery = useContainers(
+    environment.Id,
+    true,
+    undefined,
+    settings.autoRefreshRate * 1000
+  );
 
-  // const containersQuery = environments.map(item => {
-  //   console.log('environment = ', item)
-  //   return useContainers(item, true, undefined, settings.autoRefreshRate * 1000)
-  // })
+  const response = _.map(containersQuery.data as DockerContainer[], item => (_.merge(item, {
+      EnvironmentId: environment.Id,
+      EnvironmentStatus: environment.Status,
+      Host: environment.URL,
+      PublicURL: environment.PublicURL,
+    })
+  ))
+  
+  tableData = _.merge(tableData, response) 
 
- 
+  console.log('containers = ', containers)  
+  console.log('tableData = ', tableData)
 
-  // const containersQuery = {data: []}
+  const queryData = _.intersectionBy(tableData, containers, 'Id')
+  console.log('queryData = ', queryData)
+
 
   return (
       <Datatable
@@ -97,7 +103,7 @@ export function ContainersDatatable({ isHostColumnVisible, namespace }: Props) {
           <ContainersDatatableActions
             selectedItems={selectedRows}
             isAddActionVisible
-            endpointId={1}
+            endpointId={environment.Id}
           />
         )}
         isLoading={containersQuery.isLoading}
@@ -117,9 +123,7 @@ export function ContainersDatatable({ isHostColumnVisible, namespace }: Props) {
                 }}
                 value={settings.hiddenColumns}
               />
-              <TableSettingsMenu
-                quickActions={<QuickActionsSettings actions={actions} />}
-              >
+              <TableSettingsMenu quickActions={<QuickActionsSettings actions={actions} />} >
                 <ContainersDatatableSettings
                   isRefreshVisible
                   settings={settings}
@@ -129,7 +133,7 @@ export function ContainersDatatable({ isHostColumnVisible, namespace }: Props) {
           );
         }}
         storageKey={storageKey}
-        dataset={containersQuery.data || []}
+        dataset={queryData || []}
         emptyContentLabel="No containers found"
       />
   );

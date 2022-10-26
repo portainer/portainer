@@ -1,7 +1,7 @@
 import { useRouter } from '@uirouter/react';
 
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
-import { EdgeTypes } from '@/portainer/environments/types';
+import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
+import { EdgeTypes } from '@/react/portainer/environments/types';
 
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';

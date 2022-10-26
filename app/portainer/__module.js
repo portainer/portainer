@@ -484,17 +484,6 @@ angular
         },
       };
 
-      // let namespaceContainer = {
-      //   name: 'portainer.namespaces.containers',
-      //   url: '/container',
-      //   views: {
-      //     'content@': {
-      //       templateUrl: './views/namespaces/containers/namespaceContainer.html',
-      //       controller: 'NamespaceContainerController',
-      //     },
-      //   },
-      // };
-
       $stateRegistryProvider.register(root);
       $stateRegistryProvider.register(endpointRoot);
       $stateRegistryProvider.register(portainer);

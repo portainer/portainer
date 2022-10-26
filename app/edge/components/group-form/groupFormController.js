@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
-import { EdgeTypes } from '@/portainer/environments/types';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { EdgeTypes } from '@/react/portainer/environments/types';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 export class EdgeGroupFormController {
   /* @ngInject */
