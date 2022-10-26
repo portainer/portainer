@@ -14,21 +14,7 @@ import { GpusListAngular } from '@/react/portainer/environments/wizard/Environme
 angular.module('portainer.app').component('gpusList', GpusListAngular).controller('EndpointController', EndpointController);
 
 /* @ngInject */
-function EndpointController(
-  $async,
-  $scope,
-  $state,
-  $transition$,
-  $filter,
-  clipboard,
-  EndpointService,
-  GroupService,
-
-  Notifications,
-  Authentication,
-  SettingsService,
-  ModalService
-) {
+function EndpointController($async, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, Notifications, Authentication, SettingsService, ModalService) {
   $scope.onChangeCheckInInterval = onChangeCheckInInterval;
   $scope.setFieldValue = setFieldValue;
   $scope.onChangeTags = onChangeTags;
@@ -107,12 +93,6 @@ function EndpointController(
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
-  $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
-    return $scope.$evalAsync(() => {
-      $scope.state.allowSelfSignedCerts = checked;
-    });
-  };
-
   $scope.onDisassociateEndpoint = async function () {
     ModalService.confirmDisassociate((confirmed) => {
       if (confirmed) {
@@ -186,10 +166,6 @@ function EndpointController(
   $scope.updateEndpoint = async function () {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
-    var TLS = securityData.TLS;
-    var TLSMode = securityData.TLSMode;
-    var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
-    var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
     if (isEdgeEnvironment(endpoint.Type) && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
       let confirmed = await confirmDestructiveAsync({
@@ -219,17 +195,21 @@ function EndpointController(
       Gpus: endpoint.Gpus,
       GroupID: endpoint.GroupId,
       TagIds: endpoint.TagIds,
-      TLS: TLS,
-      TLSSkipVerify: TLSSkipVerify,
-      TLSSkipClientVerify: TLSSkipClientVerify,
-      TLSCACert: TLSSkipVerify || securityData.TLSCACert === endpoint.TLSConfig.TLSCACert ? null : securityData.TLSCACert,
-      TLSCert: TLSSkipClientVerify || securityData.TLSCert === endpoint.TLSConfig.TLSCert ? null : securityData.TLSCert,
-      TLSKey: TLSSkipClientVerify || securityData.TLSKey === endpoint.TLSConfig.TLSKey ? null : securityData.TLSKey,
+      TLS: securityData.TLS,
+      TLSSkipVerify: securityData.TLSSkipVerify,
+      TLSSkipClientVerify: securityData.TLSSkipVerify,
+      TLSCACert: securityData.TLSSkipVerify ? null : securityData.TLSCACert,
+      TLSCert: securityData.TLSSkipVerify ? null : securityData.TLSCert,
+      TLSKey: securityData.TLSSkipVerify ? null : securityData.TLSKey,
       AzureApplicationID: endpoint.AzureCredentials.ApplicationID,
       AzureTenantID: endpoint.AzureCredentials.TenantID,
       AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
       EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
     };
+
+    if (!$scope.showSecurity) {
+      delete payload.TLS;
+    }
 
     if (
       $scope.endpointType !== 'local' &&
@@ -327,6 +307,10 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.initialTagIds = endpoint.TagIds.slice();
         $scope.groups = groups;
+
+        if (endpoint.Type === PortainerEndpointTypes.DockerEnvironment) {
+          $scope.showSecurity = true;
+        }
 
         configureState();
 
