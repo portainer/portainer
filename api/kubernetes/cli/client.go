@@ -304,7 +304,7 @@ func (factory *ClientFactory) migrateEndpointIngresses(e *portainer.Endpoint) er
 		}
 	}
 
-	if len(allow) == 0 {
+	if len(allow["none"]) == 0 {
 		// We don't need to toggle on Allow None at all.
 		return nil
 	}
