@@ -5,7 +5,7 @@ import lightmode from '@/assets/ico/theme/lightmode.svg?c';
 import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
 // general icons
 import arrowsupdown from '@/assets/ico/arrows-updown.svg?c';
-import arrowright from '@/assets/ico/arrow-right-long.svg?c';
+import arrowrightlong from '@/assets/ico/arrow-right-long.svg?c';
 import asterisk from '@/assets/ico/asterisk.svg?c';
 import bomb from '@/assets/ico/bomb.svg?c';
 import checked from '@/assets/ico/checked.svg?c';
@@ -81,7 +81,7 @@ export const SvgIcons = {
   dataflow,
   dataflow2,
   arrowsupdown,
-  arrowright,
+  arrowrightlong,
   asterisk,
   bomb,
   checked,

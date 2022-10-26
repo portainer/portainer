@@ -7,6 +7,7 @@ import {
   useTable,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+import { Box } from 'react-feather';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -109,7 +110,7 @@ export function DataTable({
     <div className="row">
       <div className="col-sm-12">
         <Table.Container>
-          <Table.Title label="Edge Devices Waiting Room" icon="box">
+          <Table.Title label="Edge Devices Waiting Room" icon={Box}>
             <SearchBar
               onChange={handleSearchBarChange}
               value={searchBarValue}

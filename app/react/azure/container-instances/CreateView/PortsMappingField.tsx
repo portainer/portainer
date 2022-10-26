@@ -83,7 +83,7 @@ function Item({
         </InputGroup>
 
         <span className="mx-3">
-          <Icon icon="svg-arrowright" />
+          <Icon icon="svg-arrowrightlong" />
         </span>
 
         <InputGroup size="small">

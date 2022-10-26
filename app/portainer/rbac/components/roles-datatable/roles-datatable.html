@@ -1,12 +1,12 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <rd-widget-header icon="svg-filecode">
-        <header-title>
-          {{ $ctrl.titleText }}
-        </header-title>
-        <div class="searchBar vertical-center h-[30px]">
-          <pr-icon icon="'search'" class="vertical-center"></pr-icon>
+      <div class="toolBar vertical-center">
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="'svg-filecode'" feather="true" class="vertical-center" class-name="'icon-white icon-primary icon-nested-blue'"></pr-icon>{{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
           <input
             type="text"
             class="searchInput ml-1"
@@ -17,7 +17,7 @@
             ng-model-options="{ debounce: 300 }"
           />
         </div>
-      </rd-widget-header>
+      </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>

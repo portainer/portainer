@@ -8,7 +8,7 @@ export function EdgeLoadingSpinner() {
   return (
     <div className={clsx('row', styles.root)}>
       Connecting to the Edge environment...
-      <Icon icon="settings" className="spin space-left" />
+      <Icon icon="settings" className="animate-spin-slow space-left" />
     </div>
   );
 }

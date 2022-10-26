@@ -68,7 +68,7 @@ export function Icon({
     return (
       <Svg
         icon={svgIcon as keyof typeof SvgIcons}
-        className={clsx(classes, '!flex')}
+        className={clsx(classes, inline ? '!inline' : '!flex')}
         aria-label={ariaLabel}
       />
     );

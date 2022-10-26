@@ -51,7 +51,9 @@ export function PowerStateCell({
         {parsePowerState(device.powerState)}
       </span>
       <span>
-        {isLoading && <Icon icon="settings" className="spin space-left" />}
+        {isLoading && (
+          <Icon icon="settings" className="animate-spin-slow space-left" />
+        )}
       </span>
     </>
   );

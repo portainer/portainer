@@ -20,7 +20,7 @@ export function ViewLoading({ message }: Props) {
       {message && (
         <span className={styles.message}>
           {message}
-          <Icon icon="settings" className="spin ml-1" />
+          <Icon icon="settings" className="animate-spin-slow ml-1" />
         </span>
       )}
     </div>

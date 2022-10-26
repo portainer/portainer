@@ -30,7 +30,7 @@ export function OsSelector({ onChange, value }: Props) {
               value: 'win',
               label: (
                 <>
-                  <Icon icon="grd" className="mr-1" />
+                  <Icon icon="grid" className="mr-1" />
                   Windows
                 </>
               ),
