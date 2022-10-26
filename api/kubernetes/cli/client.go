@@ -303,14 +303,6 @@ func (factory *ClientFactory) migrateEndpointIngresses(e *portainer.Endpoint) er
 		}
 	}
 
-	if len(allow["none"]) == 0 {
-		// We don't need to toggle on Allow None at all.
-		return nil
-	}
-
-	// Globally "allow none".
-	e.Kubernetes.Configuration.AllowNoneIngressClass = true
-
 	// Locally, disable "allow none" for namespaces not inside shouldAllowNone.
 	var newClasses []portainer.KubernetesIngressClassConfig
 	for _, c := range classes {
@@ -331,19 +323,23 @@ func (factory *ClientFactory) migrateEndpointIngresses(e *portainer.Endpoint) er
 	}
 
 	// Handle "none".
-	var disallowNone []string
-	for namespace := range namespaces {
-		if _, ok := allow["none"][namespace]; ok {
-			continue
+	if len(allow["none"]) != 0 {
+		e.Kubernetes.Configuration.AllowNoneIngressClass = true
+		var disallowNone []string
+		for namespace := range namespaces {
+			if _, ok := allow["none"][namespace]; ok {
+				continue
+			}
+			disallowNone = append(disallowNone, namespace)
 		}
-		disallowNone = append(disallowNone, namespace)
+		newClasses = append(newClasses, portainer.KubernetesIngressClassConfig{
+			Name:              "none",
+			Type:              "custom",
+			GloballyBlocked:   false,
+			BlockedNamespaces: disallowNone,
+		})
 	}
-	newClasses = append(newClasses, portainer.KubernetesIngressClassConfig{
-		Name:              "none",
-		Type:              "custom",
-		GloballyBlocked:   false,
-		BlockedNamespaces: disallowNone,
-	})
+
 	e.Kubernetes.Configuration.IngressClasses = newClasses
 	e.PostInitMigrations.MigrateIngresses = false
 	return factory.dataStore.Endpoint().UpdateEndpoint(e.ID, e)
