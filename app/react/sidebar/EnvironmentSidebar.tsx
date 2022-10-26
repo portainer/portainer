@@ -1,6 +1,6 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
-import { X, Slash } from 'react-feather';
+import { X, Slash } from 'lucide-react';
 import clsx from 'clsx';
 import angular from 'angular';
 

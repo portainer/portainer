@@ -2,7 +2,7 @@ import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
 
-import { Eye, EyeOff, Users } from 'react-feather';
+import { Eye, EyeOff, Users } from 'lucide-react';
 import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
 
 export function truncateLeftRight(text, max, left, right) {
@@ -95,7 +95,7 @@ export function endpointTypeName(type) {
 
 export function environmentTypeIcon(type) {
   if (type === 3) {
-    return 'grid';
+    return 'layout-grid';
   } else if (type === 4) {
     return 'cloud';
   } else if (type === 5 || type === 6 || type === 7) {

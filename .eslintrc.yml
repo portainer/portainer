@@ -104,7 +104,6 @@ overrides:
       'react/jsx-no-bind': off
       'no-await-in-loop': 'off'
       'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
-      'regex/invalid': ['error', [{ 'regex': 'data-feather="(.*)"', 'message': 'Please use `react-feather` package instead' }]]
   - files:
       - app/**/*.test.*
     extends:

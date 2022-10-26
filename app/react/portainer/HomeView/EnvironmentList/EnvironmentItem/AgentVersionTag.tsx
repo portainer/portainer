@@ -1,4 +1,4 @@
-import { Zap } from 'react-feather';
+import { Zap } from 'lucide-react';
 
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import {

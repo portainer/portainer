@@ -1,5 +1,5 @@
 import ReactTooltip from 'react-tooltip';
-import { HelpCircle } from 'react-feather';
+import { HelpCircle } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -21,7 +21,7 @@ export function LimitedToBeIndicator({ tooltipId, featureId }: Props) {
             <span className="text-warning-9">Pro Feature</span>
           </a>
           <HelpCircle
-            className="feather !text-warning-7"
+            className="lucide !text-warning-7"
             data-tip
             data-for={tooltipId}
             tooltip-append-to-body="true"

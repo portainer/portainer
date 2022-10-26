@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Home } from 'react-feather';
+import { Home } from 'lucide-react';
 
 import { useUser } from '@/react/hooks/useUser';
 import { useIsTeamLeader } from '@/portainer/users/queries';

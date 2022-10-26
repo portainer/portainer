@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
-import { Briefcase } from 'react-feather';
+import { Briefcase } from 'lucide-react';
 
 import './BEFeatureIndicator.css';
 

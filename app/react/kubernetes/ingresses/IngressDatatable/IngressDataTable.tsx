@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'react-feather';
+import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';

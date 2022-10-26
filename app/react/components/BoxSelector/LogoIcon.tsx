@@ -10,7 +10,7 @@ export function LogoIcon({ icon }: Props) {
    inline-flex items-center justify-center
 `}
     >
-      <Icon icon={icon} className="feather !flex" />
+      <Icon icon={icon} className="lucide !flex" />
     </div>
   );
 }

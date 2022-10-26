@@ -9,7 +9,7 @@ import {
   Trello,
   Clipboard,
   Edit,
-} from 'react-feather';
+} from 'lucide-react';
 
 import {
   type Environment,

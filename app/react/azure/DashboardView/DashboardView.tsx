@@ -1,4 +1,4 @@
-import { Package } from 'react-feather';
+import { Package } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 

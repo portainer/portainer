@@ -29,7 +29,7 @@ export function DashboardItem({ value, icon, type, children }: Props) {
             'th-highcontrast:bg-blue-3 th-highcontrast:text-blue-8'
           )}
         >
-          <Icon icon={icon} className="feather" />
+          <Icon icon={icon} className="lucide" />
         </div>
 
         <div className="flex flex-col justify-around">

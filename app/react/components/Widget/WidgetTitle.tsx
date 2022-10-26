@@ -24,7 +24,7 @@ export function WidgetTitle({
       <div className="row">
         <span className={clsx('pull-left vertical-center', className)}>
           <div className="widget-icon">
-            <Icon icon={icon} className="space-right feather" />
+            <Icon icon={icon} className="space-right lucide" />
           </div>
           <span>{title}</span>
         </span>

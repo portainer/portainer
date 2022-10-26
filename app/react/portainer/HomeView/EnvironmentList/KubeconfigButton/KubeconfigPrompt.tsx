@@ -1,4 +1,4 @@
-import { X } from 'react-feather';
+import { X } from 'lucide-react';
 import clsx from 'clsx';
 import { useState } from 'react';
 import { DialogOverlay } from '@reach/dialog';

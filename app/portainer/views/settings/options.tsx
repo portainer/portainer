@@ -1,4 +1,4 @@
-import { DownloadCloud, UploadCloud } from 'react-feather';
+import { DownloadCloud, UploadCloud } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 

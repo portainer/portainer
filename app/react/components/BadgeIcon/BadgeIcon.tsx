@@ -22,7 +22,7 @@ export function BadgeIcon({ icon, size = '3xl' }: Props) {
    `
       )}
     >
-      <Icon icon={icon} className="feather !flex" />
+      <Icon icon={icon} className="lucide !flex" />
     </div>
   );
 }

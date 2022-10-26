@@ -1,4 +1,4 @@
-import { ChevronsLeft, ChevronsRight } from 'react-feather';
+import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 import clsx from 'clsx';
 
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';

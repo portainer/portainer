@@ -20,7 +20,7 @@ export function TableTitle({
         <div className="toolBarTitle">
           {icon && (
             <div className="widget-icon">
-              <Icon icon={icon} className="space-right feather" />
+              <Icon icon={icon} className="space-right lucide" />
             </div>
           )}
 

@@ -1,5 +1,5 @@
 import { ChangeEvent, ReactNode } from 'react';
-import { Plus, RefreshCw, Trash2 } from 'react-feather';
+import { Plus, RefreshCw, Trash2 } from 'lucide-react';
 
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
