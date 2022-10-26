@@ -138,7 +138,7 @@ func (m *Migrator) Migrate() error {
 			if err != nil {
 				return err
 			}
-		} else if schemaVersion.Equal(migration.version) {
+		} else if schemaVersion.Equal(semver.MustParse(portainer.APIVersion)) {
 			// If new migrations have been added for this version then we run them all again over
 			// the same data.
 			if newMigrationCount < len(migration.migrationFuncs) {
