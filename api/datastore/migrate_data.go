@@ -5,30 +5,61 @@ import (
 	"runtime/debug"
 
 	portainer "github.com/portainer/portainer/api"
+	portaineree "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/cli"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/database/models"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
 
-	werrors "github.com/pkg/errors"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
 const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 
 func (store *Store) MigrateData() error {
-	// Backup Database
-	backupPath, err := store.Backup()
+	// migrate new version bucket if required (doesn't write anything to db yet)
+	version, err := store.getOrMigrateLegacyVersion()
 	if err != nil {
-		return werrors.Wrap(err, "while backing up db before migration")
+		return errors.Wrap(err, "while migrating legacy version")
 	}
 
-	migratorParams := &migrator.MigratorParameters{
+	migratorParams := store.newMigratorParameters(version)
+	migrator := migrator.NewMigrator(migratorParams)
+	migrator.Init()
+
+	if !migrator.NeedsMigration() {
+		return nil
+	}
+
+	// before we alter anything in the DB, create a backup
+	backupPath, err := store.Backup(version)
+	if err != nil {
+		return errors.Wrap(err, "while backing up database")
+	}
+
+	err = store.FailSafeMigrate(migrator, version)
+	if err != nil {
+		err = store.restoreWithOptions(&BackupOptions{BackupPath: backupPath})
+		if err != nil {
+			return errors.Wrap(err, "failed to restore database")
+		}
+
+		fmt.Println("Restored database to previous version")
+		return errors.Wrap(err, "failed to migrate database")
+	}
+
+	return nil
+}
+
+func (store *Store) newMigratorParameters(version *models.Version) *migrator.MigratorParameters {
+	return &migrator.MigratorParameters{
+		CurrentVersion:          version,
 		EndpointGroupService:    store.EndpointGroupService,
 		EndpointService:         store.EndpointService,
 		EndpointRelationService: store.EndpointRelationService,
 		ExtensionService:        store.ExtensionService,
-		FDOProfilesService:      store.FDOProfilesService,
 		RegistryService:         store.RegistryService,
 		ResourceControlService:  store.ResourceControlService,
 		RoleService:             store.RoleService,
@@ -44,42 +75,31 @@ func (store *Store) MigrateData() error {
 		DockerhubService:        store.DockerHubService,
 		AuthorizationService:    authorization.NewService(store),
 	}
-
-	// restore on error
-	err = store.connectionMigrateData(migratorParams)
-	if err != nil {
-		log.Error().Err(err).Msg("while DB migration, restoring DB")
-
-		// Restore options
-		options := BackupOptions{
-			BackupPath: backupPath,
-		}
-
-		err := store.restoreWithOptions(&options)
-		if err != nil {
-			log.Fatal().
-				Str("database_file", store.databasePath()).
-				Str("backup", options.BackupPath).Err(err).
-				Msg("failed restoring the backup, Portainer database file needs to restored manually by replacing the database file with a recent backup")
-		}
-	}
-
-	return err
 }
 
 // FailSafeMigrate backup and restore DB if migration fail
-func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
+func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models.Version) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			store.Rollback(true)
 			// return error with cause and stacktrace (recover() doesn't include a stacktrace)
 			err = fmt.Errorf("%v %s", e, string(debug.Stack()))
 		}
 	}()
 
-	// !Important: we must use a named return value in the function definition and not a local
-	// !variable referenced from the closure or else the return value will be incorrectly set
-	return migrator.Migrate()
+	// now update the version to the new struct (if required)
+	err = store.finishMigrateLegacyVersion(version)
+	if err != nil {
+		return errors.Wrap(err, "while updating version")
+	}
+
+	log.Info().Msg("migrating database from version " + version.SchemaVersion + " to " + portaineree.APIVersion)
+
+	err = migrator.Migrate()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // MigrateData automatically migrate the data based on the Version.
@@ -88,29 +108,29 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParameters) error {
 	migrator := migrator.NewMigrator(migratorParams)
 
-	v, err := migratorParams.VersionService.Version()
+	version, err := migratorParams.VersionService.Version()
 	if err != nil {
 		return err
 	}
 
 	// backup db file before upgrading DB to support rollback
 	isUpdating, err := migratorParams.VersionService.IsUpdating()
-	if err != nil && err != errors.ErrObjectNotFound {
+	if err != nil && err != dserrors.ErrObjectNotFound {
 		return err
 	}
 
-	if !isUpdating && v.SchemaVersion != portainer.APIVersion {
+	if !isUpdating && version.SchemaVersion != portainer.APIVersion {
 		err = store.backupVersion(migrator)
 		if err != nil {
-			return werrors.Wrapf(err, "failed to backup database")
+			return errors.Wrapf(err, "failed to backup database")
 		}
 	}
 
-	if v.SchemaVersion != portainer.APIVersion {
-		log.Info().Msgf("migrating database from version %s to %s ", v.SchemaVersion, portainer.APIVersion)
+	if version.SchemaVersion != portainer.APIVersion {
+		log.Info().Msgf("migrating database from version %s to %s ", version.SchemaVersion, portainer.APIVersion)
 	}
 
-	err = store.FailSafeMigrate(migrator)
+	err = store.FailSafeMigrate(migrator, version)
 	if err != nil {
 		log.Error().Err(err).Msg("an error occurred during database migration")
 		return err

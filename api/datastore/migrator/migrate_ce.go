@@ -11,14 +11,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// !NOTE: Migration funtions should be idempotent.
+// !NOTE: Migration funtions should ideally be idempotent.
 // Which simply means the function can run over the same data many times but only transform it once.
-// In practice this really just means an extra check or two to ensure we're not valid data.
+// In practice this really just means an extra check or two to ensure we're not destroying valid data.
+// This is not a hard rule though.  Understand the limitations.  A migration function may only run over
+// the data more than once if a new migration function is added and the version of your database schema is
+// the same.  e.g. two developers working on the same version add two different functions for different things.
+// This increases the migration funcs count and so they all run again.
 
-func (m *Migrator) initMigrations() []migrations {
+type Migrations struct {
+	version        *semver.Version
+	migrationFuncs MigrationFuncs
+}
+
+type MigrationFuncs []func() error
+
+var migrations []Migrations
+
+func (m *Migrator) Init() {
 	// !IMPORTANT: Do not be tempted to alter the order of these migrations.
 	// !           Even though one of them look out of order.
-	return []migrations{
+	migrations = []Migrations{
 		newMigration("1.0.0", dbTooOldError), // default version found after migration
 
 		newMigration("1.21",
@@ -73,17 +86,12 @@ func (m *Migrator) initMigrations() []migrations {
 	}
 }
 
-type migrations struct {
-	version        *semver.Version
-	migrationFuncs []func() error
-}
-
 func migrationError(err error, context string) error {
 	return errors.Wrap(err, "failed in "+context)
 }
 
-func newMigration(v string, funcs ...func() error) migrations {
-	return migrations{
+func newMigration(v string, funcs ...func() error) Migrations {
+	return Migrations{
 		version:        semver.MustParse(v),
 		migrationFuncs: funcs,
 	}
@@ -118,12 +126,12 @@ func (m *Migrator) Migrate() error {
 		return migrationError(err, "invalid db schema version")
 	}
 
-	migrations := m.initMigrations()
+	newMigrationCount := 0
+	versionUpdateRequired := false // dirty flag is used to indicate if any migrations have been updated
 
-	count := version.MigratorCount
 	for _, migration := range migrations {
 		if schemaVersion.LessThan(migration.version) {
-			count = 0 // reset build number
+			versionUpdateRequired = true
 
 			log.Info().Msgf("migrating db to %s", migration.version.String())
 			err := runMigrations(migration.migrationFuncs)
@@ -133,26 +141,29 @@ func (m *Migrator) Migrate() error {
 		} else if schemaVersion.Equal(migration.version) {
 			// If new migrations have been added for this version then we run them all again over
 			// the same data.
-			if count < len(migration.migrationFuncs) {
+			if newMigrationCount < len(migration.migrationFuncs) {
+				versionUpdateRequired = true
 				err := runMigrations(migration.migrationFuncs)
 				if err != nil {
 					return err
 				}
 
-				count = len(migration.migrationFuncs)
+				newMigrationCount = len(migration.migrationFuncs)
 			}
 		}
 	}
 
-	version.SchemaVersion = portainer.APIVersion
-	version.MigratorCount = count
+	if versionUpdateRequired {
+		version.SchemaVersion = portainer.APIVersion
+		version.MigratorCount = newMigrationCount
 
-	err = m.versionService.UpdateVersion(version)
-	if err != nil {
-		return migrationError(err, "StoreDBVersion")
+		err = m.versionService.UpdateVersion(version)
+		if err != nil {
+			return migrationError(err, "StoreDBVersion")
+		}
+
+		log.Info().Msgf("migrating DB to %s", portainer.APIVersion)
 	}
-
-	log.Info().Msgf("migrating DB to %s", portainer.APIVersion)
 
 	// reset DB updating status
 	return m.versionService.StoreIsUpdating(false)
@@ -166,4 +177,21 @@ func runMigrations(migrationFuncs []func() error) error {
 		}
 	}
 	return nil
+}
+
+func (m *Migrator) NeedsMigration() bool {
+	if m.Edition() != portainer.PortainerCE {
+		return true
+	}
+
+	if m.SemanticVersion().LessThan(semver.MustParse(portainer.APIVersion)) {
+		return true
+	}
+
+	latestMigrations := migrations[len(migrations)-1]
+	if latestMigrations.version.Equal(m.SemanticVersion()) && m.currentVersion.MigratorCount < len(latestMigrations.migrationFuncs) {
+		return true
+	}
+
+	return false
 }

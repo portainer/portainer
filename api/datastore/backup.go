@@ -6,6 +6,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -70,8 +71,14 @@ func getBackupRestoreOptions(backupDir string) *BackupOptions {
 }
 
 // Backup current database with default options
-func (store *Store) Backup() (string, error) {
-	return store.backupWithOptions(nil)
+func (store *Store) Backup(version *models.Version) (string, error) {
+	if version == nil {
+		return store.backupWithOptions(nil)
+	}
+
+	return store.backupWithOptions(&BackupOptions{
+		Version: version.SchemaVersion,
+	})
 }
 
 func (store *Store) setupOptions(options *BackupOptions) *BackupOptions {

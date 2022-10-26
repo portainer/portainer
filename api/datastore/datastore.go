@@ -53,8 +53,6 @@ func (store *Store) Open() (newStore bool, err error) {
 		return false, err
 	}
 
-	store.VersionService.Migrate()
-
 	// If no settings object exists then assume we have a new store
 	_, err = store.SettingsService.Settings()
 	if err != nil {
@@ -79,7 +77,7 @@ func (store *Store) BackupTo(w io.Writer) error {
 
 // CheckCurrentEdition checks if current edition is community edition
 func (store *Store) CheckCurrentEdition() error {
-	if store.edition() != portainer.PortainerCE {
+	if store.edition() != portainer.Edition {
 		return portainerErrors.ErrWrongDBEdition
 	}
 	return nil

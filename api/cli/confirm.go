@@ -2,14 +2,14 @@ package cli
 
 import (
 	"bufio"
-	"log"
+	"fmt"
 	"os"
 	"strings"
 )
 
 // Confirm starts a rollback db cli application
 func Confirm(message string) (bool, error) {
-	log.Printf("%s [y/N]", message)
+	fmt.Printf("%s [y/N]", message)
 
 	reader := bufio.NewReader(os.Stdin)
 	answer, err := reader.ReadString('\n')

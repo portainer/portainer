@@ -44,7 +44,7 @@ import (
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -109,17 +109,20 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	}
 
 	if isNew {
-		uid := uuid.New()
+		instanceId, err := uuid.NewV4()
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed generating instance id")
+		}
 
 		// from MigrateData
 		v := models.Version{
 			SchemaVersion: portainer.APIVersion,
 			Edition:       int(portainer.PortainerCE),
-			InstanceID:    uid.String(),
+			InstanceID:    instanceId.String(),
 		}
 		store.VersionService.UpdateVersion(&v)
 
-		err := updateSettingsFromFlags(store, flags)
+		err = updateSettingsFromFlags(store, flags)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed updating settings from flags")
 		}

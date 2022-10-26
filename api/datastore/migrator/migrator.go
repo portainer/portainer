@@ -1,7 +1,11 @@
 package migrator
 
 import (
+	"github.com/Masterminds/semver"
+	"github.com/rs/zerolog/log"
+
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
 	"github.com/portainer/portainer/api/dataservices/endpoint"
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
@@ -25,6 +29,7 @@ import (
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
 	Migrator struct {
+		currentVersion          *models.Version
 		endpointGroupService    *endpointgroup.Service
 		endpointService         *endpoint.Service
 		endpointRelationService *endpointrelation.Service
@@ -48,6 +53,7 @@ type (
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
 	MigratorParameters struct {
+		CurrentVersion          *models.Version
 		EndpointGroupService    *endpointgroup.Service
 		EndpointService         *endpoint.Service
 		EndpointRelationService *endpointrelation.Service
@@ -73,6 +79,7 @@ type (
 // NewMigrator creates a new Migrator.
 func NewMigrator(parameters *MigratorParameters) *Migrator {
 	return &Migrator{
+		currentVersion:          parameters.CurrentVersion,
 		endpointGroupService:    parameters.EndpointGroupService,
 		endpointService:         parameters.EndpointService,
 		endpointRelationService: parameters.EndpointRelationService,
@@ -93,4 +100,21 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		authorizationService:    parameters.AuthorizationService,
 		dockerhubService:        parameters.DockerhubService,
 	}
+}
+
+func (m *Migrator) Version() string {
+	return m.currentVersion.SchemaVersion
+}
+
+func (m *Migrator) Edition() portainer.SoftwareEdition {
+	return portainer.SoftwareEdition(m.currentVersion.Edition)
+}
+
+func (m *Migrator) SemanticVersion() *semver.Version {
+	v, err := semver.NewVersion(m.currentVersion.SchemaVersion)
+	if err != nil {
+		log.Fatal().Stack().Err(err).Msg("failed to parse current version")
+	}
+
+	return v
 }

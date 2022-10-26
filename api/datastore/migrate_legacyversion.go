@@ -1,4 +1,4 @@
-package version
+package datastore
 
 import (
 	portaineree "github.com/portainer/portainer/api"
@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	bucketName         = "version"
 	legacyDBVersionKey = "DB_VERSION"
 	legacyInstanceKey  = "INSTANCE_ID"
 	legacyEditionKey   = "EDITION"
@@ -66,59 +67,56 @@ func dbVersionToSemanticVersion(dbVersion int) string {
 	return "2.16.0"
 }
 
-// migrateLegacyVersion to new Version struct
-func (service *Service) migrateLegacyVersion() error {
+// getOrMigrateLegacyVersion to new Version struct
+func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
 	dbVersion := 24
 	edition := int(portaineree.PortainerCE)
 	instanceId := ""
 
 	// If we already have a version key, we don't need to migrate
-	_, err := service.Version()
-	if err != nil {
-		if !dataservices.IsErrObjectNotFound(err) {
-			return err
-		}
-	} else {
-		return nil
+	v, err := store.VersionService.Version()
+	if err == nil || !dataservices.IsErrObjectNotFound(err) {
+		return v, err
 	}
 
-	err = service.connection.GetObject(BucketName, []byte(legacyDBVersionKey), &dbVersion)
+	err = store.connection.GetObject(bucketName, []byte(legacyDBVersionKey), &dbVersion)
 	if err != nil && !dataservices.IsErrObjectNotFound(err) {
-		return err
+		return nil, err
 	}
 
-	err = service.connection.GetObject(BucketName, []byte(legacyEditionKey), &edition)
+	err = store.connection.GetObject(bucketName, []byte(legacyEditionKey), &edition)
 	if err != nil && !dataservices.IsErrObjectNotFound(err) {
-		return err
+		return nil, err
 	}
 
-	err = service.connection.GetObject(BucketName, []byte(legacyInstanceKey), &instanceId)
+	err = store.connection.GetObject(bucketName, []byte(legacyInstanceKey), &instanceId)
 	if err != nil && !dataservices.IsErrObjectNotFound(err) {
-		return err
+		return nil, err
 	}
 
-	err = service.StoreIsUpdating(true)
-	if err != nil {
-		return err
-	}
-
-	defer service.StoreIsUpdating(false)
-
-	v := &models.Version{
+	v = &models.Version{
 		SchemaVersion: dbVersionToSemanticVersion(dbVersion),
 		Edition:       edition,
 		InstanceID:    string(instanceId),
 	}
 
-	err = service.UpdateVersion(v)
+	defer store.VersionService.StoreIsUpdating(false)
+	err = store.VersionService.StoreIsUpdating(true)
 	if err != nil {
-		return err
+		return v, err
 	}
 
-	// Remove legacy keys if present
-	service.connection.DeleteObject(BucketName, []byte(legacyDBVersionKey))
-	service.connection.DeleteObject(BucketName, []byte(legacyEditionKey))
-	service.connection.DeleteObject(BucketName, []byte(legacyInstanceKey))
+	return v, nil
+}
 
-	return nil
+// finishMigrateLegacyVersion writes the new version to the DB and removes the old version keys from the DB
+func (store *Store) finishMigrateLegacyVersion(versionToWrite *models.Version) error {
+	err := store.VersionService.UpdateVersion(versionToWrite)
+
+	// Remove legacy keys if present
+	store.connection.DeleteObject(bucketName, []byte(legacyDBVersionKey))
+	store.connection.DeleteObject(bucketName, []byte(legacyEditionKey))
+	store.connection.DeleteObject(bucketName, []byte(legacyInstanceKey))
+
+	return err
 }

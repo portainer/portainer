@@ -18,10 +18,6 @@ type Service struct {
 	connection portainer.Connection
 }
 
-func (service *Service) BucketName() string {
-	return BucketName
-}
-
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
@@ -114,9 +110,4 @@ func (service *Service) Version() (*models.Version, error) {
 // UpdateVersion persists a Version object.
 func (service *Service) UpdateVersion(version *models.Version) error {
 	return service.connection.UpdateObject(BucketName, []byte(versionKey), version)
-}
-
-// Migrate version structure from legacy version.
-func (service *Service) Migrate() error {
-	return service.migrateLegacyVersion()
 }
