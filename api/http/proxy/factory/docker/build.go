@@ -29,9 +29,13 @@ type postDockerfileRequest struct {
 func buildOperation(request *http.Request) error {
 	contentTypeHeader := request.Header.Get("Content-Type")
 
-	mediaType, _, err := mime.ParseMediaType(contentTypeHeader)
-	if err != nil {
-		return err
+	mediaType := ""
+	if contentTypeHeader != "" {
+		var err error
+		mediaType, _, err = mime.ParseMediaType(contentTypeHeader)
+		if err != nil {
+			return err
+		}
 	}
 
 	var buffer []byte
@@ -49,7 +53,8 @@ func buildOperation(request *http.Request) error {
 
 	case "application/json":
 		var req postDockerfileRequest
-		if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		err := json.NewDecoder(request.Body).Decode(&req)
+		if err != nil {
 			return err
 		}
 
