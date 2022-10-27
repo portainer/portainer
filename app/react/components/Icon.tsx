@@ -80,13 +80,10 @@ export function Icon({
     .join('') as keyof typeof featherIcons;
   const IconComponent = featherIcons[iconName];
   if (!IconComponent) {
-    return (
-      <Svg
-        icon={'placeholder' as keyof typeof SvgIcons}
-        className={clsx(classes, inline ? '!inline' : '!flex')}
-        aria-label={ariaLabel}
-      />
-    );
+    // console error so that the error is logged but no functionality is broken
+    // eslint-disable-next-line no-console
+    console.error(`Icon not found: '${icon}'`);
+    return null;
   }
 
   return <IconComponent className={classes} aria-label={ariaLabel} />;

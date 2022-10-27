@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-
 import { Icon } from '@/react/components/Icon';
 
 import { DockerContainer } from '../containers/types';
@@ -17,21 +15,21 @@ export function ContainerStatus({ containers }: Props) {
     <div className="pull-right">
       <div>
         <div className="vertical-center space-right pr-5">
-          <Icon icon="power" className={clsx('icon icon-sm icon-success')} />
+          <Icon icon="power" className="icon icon-sm icon-success" />
           {runningContainersFilter(containers)} running
         </div>
         <div className="vertical-center space-right">
-          <Icon icon="power" className={clsx('icon icon-sm icon-danger')} />
+          <Icon icon="power" className="icon icon-sm icon-danger" />
           {stoppedContainersFilter(containers)} stopped
         </div>
       </div>
       <div>
         <div className="vertical-center space-right pr-5">
-          <Icon icon="heart" className={clsx('icon icon-sm icon-success')} />
+          <Icon icon="heart" className="icon icon-sm icon-success" />
           {healthyContainersFilter(containers)} healthy
         </div>
         <div className="vertical-center space-right">
-          <Icon icon="heart" className={clsx('icon icon-sm icon-danger')} />
+          <Icon icon="heart" className="icon icon-sm icon-danger" />
           {unhealthyContainersFilter(containers)} unhealthy
         </div>
       </div>

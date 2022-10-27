@@ -25,6 +25,7 @@ export function SortbySelector({
   sortByButton,
   value,
 }: Props) {
+  const sorted = sortByButton && !!value;
   return (
     <div className={styles.sortByContainer}>
       <div className={styles.sortByElement}>
@@ -40,16 +41,13 @@ export function SortbySelector({
         <button
           className={clsx(styles.sortButton, 'h-[34px]')}
           type="button"
-          disabled={!sortByButton || !value}
+          disabled={!sorted}
           onClick={(e) => {
             e.preventDefault();
             onDescending();
           }}
         >
-          <TableHeaderSortIcons
-            sorted={sortByButton && !!value}
-            descending={sortByDescending}
-          />
+          <TableHeaderSortIcons sorted={sorted} descending={sortByDescending} />
         </button>
       </div>
     </div>

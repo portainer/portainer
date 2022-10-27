@@ -45,7 +45,7 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
               isCheckVisible ? styles.alertVisible : styles.alertHidden,
               styles.check
             )}
-            // onTransitionEnd={() => setIsCheckVisible(false)}
+            onTransitionEnd={() => setIsCheckVisible(false)}
           >
             <Icon icon="check" className="!ml-1" mode="success" />
           </span>

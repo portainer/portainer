@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 
-import { Icon } from '@@/Icon';
+import CircleNotch from '@/assets/ico/circle-notch.svg?c';
 
 import { type Props as ButtonProps, Button } from './Button';
 
@@ -23,19 +23,18 @@ export function LoadingButton({
       {...buttonProps}
       type={type}
       disabled={disabled || isLoading}
+      icon={LoadingButtonIcon(isLoading)}
     >
-      {isLoading ? (
-        <>
-          <Icon
-            icon="svg-circlenotch"
-            className="animate-spin-slow ml-1"
-            ariaLabel="loading"
-          />
-          {loadingText}
-        </>
-      ) : (
-        children
-      )}
+      {isLoading ? loadingText : children}
     </Button>
   );
+}
+
+function LoadingButtonIcon(isLoading: boolean) {
+  if (isLoading) {
+    return (
+      <CircleNotch className="animate-spin-slow mr-1" aria-label="loading" />
+    );
+  }
+  return null;
 }
