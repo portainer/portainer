@@ -16,19 +16,3 @@ export class PortainerEndpointInitFormValues {
     this.AzureAuthenticationKey = '';
   }
 }
-
-class PortainerEndpointInitFormValueEndpointSection {
-  constructor(value, title, classes, description) {
-    this.Id = value;
-    this.Value = value;
-    this.Title = title;
-    this.Classes = classes;
-    this.Description = description;
-  }
-}
-
-export const PortainerEndpointInitFormValueEndpointSections = Object.freeze([
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.DOCKER_LOCAL, 'Docker', 'svg-dockericon', 'Manage the local Docker environment'),
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.KUBERNETES_LOCAL, 'Kubernetes', 'svg-kubernetes2', 'Manage the local Kubernetes environment'),
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AGENT, 'Agent', 'zap', 'Connect to a Portainer agent'),
-]);
