@@ -42,6 +42,7 @@ angular.module('portainer.app').component('groupAssociationTable', {
     };
 
     this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
+      console.log(this.tags, tagIds);
       return idsToTagNames(this.tags, tagIds).join(', ') || '-';
     };
 
