@@ -58,7 +58,7 @@ export function Icon({
         role="img"
         aria-label={ariaLabel}
       >
-        {Icon == null ? <>{icon}</> : <Icon size="1em" />}
+        {Icon == null ? <>{icon}</> : <Icon />}
       </span>
     );
   }

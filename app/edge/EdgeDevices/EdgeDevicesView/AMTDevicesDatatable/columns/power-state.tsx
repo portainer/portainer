@@ -1,9 +1,8 @@
 import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
+import { Settings } from 'react-feather';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-
-import { Icon } from '@@/Icon';
 
 import { useRowContext } from './RowContext';
 
@@ -52,7 +51,7 @@ export function PowerStateCell({
       </span>
       <span>
         {isLoading && (
-          <Icon icon="settings" className="animate-spin-slow space-left" />
+          <Settings className="animate-spin-slow space-left feather" />
         )}
       </span>
     </>

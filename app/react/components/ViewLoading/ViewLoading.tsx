@@ -1,6 +1,5 @@
 import clsx from 'clsx';
-
-import { Icon } from '@@/Icon';
+import { Settings } from 'react-feather';
 
 import styles from './ViewLoading.module.css';
 
@@ -20,7 +19,7 @@ export function ViewLoading({ message }: Props) {
       {message && (
         <span className={styles.message}>
           {message}
-          <Icon icon="settings" className="animate-spin-slow ml-1" />
+          <Settings className="animate-spin-slow ml-1 !inline feather" />
         </span>
       )}
     </div>

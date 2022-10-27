@@ -1,7 +1,8 @@
 import { ChangeEvent, ReactNode } from 'react';
+import { Trash2 } from 'react-feather';
 
-import { Icon } from '@@/Icon';
 import { FormError } from '@@/form-components/FormError';
+import { Button } from '@@/buttons';
 
 import { Annotation } from './types';
 
@@ -69,13 +70,12 @@ export function Annotations({
             )}
           </div>
           <div className="col-sm-3 !pl-0 !m-0">
-            <button
+            <Button
               className="btn btn-sm btn-dangerlight btn-only-icon !ml-0"
               type="button"
               onClick={() => removeAnnotation(i)}
-            >
-              <Icon icon="trash-2" size="md" />
-            </button>
+              icon={Trash2}
+            />
           </div>
         </div>
       ))}

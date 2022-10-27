@@ -9,6 +9,7 @@ import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
+import { Bell, Trash2 } from 'react-feather';
 
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/react/hooks/useUser';
@@ -69,7 +70,7 @@ export function NotificationsMenu() {
             'th-dark:text-gray-warm-7'
           )}
         >
-          <Icon icon="bell" />
+          <Bell className="feather" />
           <span className={badge ? notificationStyles.badge : ''} />
         </div>
       </MenuButton>
@@ -186,9 +187,8 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
             }}
             data-cy="notification-deleteButton"
             size="large"
-          >
-            <Icon icon="trash-2" />
-          </Button>
+            icon={Trash2}
+          />
         </div>
       </div>
     </ReachMenuLink>
