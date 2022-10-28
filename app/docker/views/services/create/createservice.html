@@ -30,18 +30,20 @@
           <div class="col-sm-12 form-section-title"> Scheduling </div>
           <!-- scheduling-mode -->
           <div class="form-group">
-            <div class="col-sm-12">
-              <label class="control-label text-left"> Scheduling mode </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px">
+            <div>
+              <label class="control-label text-left col-lg-2 col-sm-1"> Scheduling mode </label>
+              <div class="btn-group btn-group-sm col-sm-8">
                 <label class="btn btn-light" ng-model="formValues.Mode" uib-btn-radio="'global'">Global</label>
                 <label class="btn btn-light" ng-model="formValues.Mode" uib-btn-radio="'replicated'">Replicated</label>
               </div>
             </div>
           </div>
           <div class="form-group form-inline" ng-if="formValues.Mode === 'replicated'">
-            <div class="col-sm-12">
-              <label class="control-label text-left"> Replicas </label>
-              <input type="number" class="form-control" ng-model="formValues.Replicas" id="replicas" placeholder="e.g. 3" style="margin-left: 20px" />
+            <div>
+              <label class="control-label text-left col-lg-2 col-sm-1"> Replicas </label>
+              <div class="col-sm-8">
+                <input type="number" class="form-control" ng-model="formValues.Replicas" id="replicas" placeholder="e.g. 3" />
+              </div>
             </div>
           </div>
           <!-- !scheduling-mode -->

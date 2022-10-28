@@ -34,7 +34,7 @@
                 <option value="bind">Bind</option>
               </select>
             </td>
-            <td>
+            <td style="padding-top: 25px">
               <select
                 class="form-control"
                 ng-model="mount.Source"
@@ -57,7 +57,7 @@
               />
               <div class="col-sm-12 small text-warning" ng-show="!mount.Source"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Source is required. </div>
             </td>
-            <td>
+            <td style="padding-top: 25px">
               <input
                 type="text"
                 class="form-control"
@@ -70,7 +70,7 @@
               <div class="col-sm-12 small text-warning" ng-show="!mount.Target"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Target is required. </div>
             </td>
             <td authorization="DockerServiceUpdate">
-              <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating" />
+              <input type="checkbox" class="witch" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating" />
             </td>
             <td authorization="DockerServiceUpdate">
               <span class="input-group-btn">
