@@ -236,7 +236,7 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
-	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
 	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack && payload.Type != portainer.KubernetesStack {
