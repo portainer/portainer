@@ -157,7 +157,9 @@ export function CreateIngressView() {
   const existingIngressClass = useMemo(
     () =>
       ingressControllersResults.data?.find(
-        (i) => i.ClassName === ingressRule.IngressClassName
+        (i) =>
+          i.ClassName === ingressRule.IngressClassName ||
+          (i.Type === 'custom' && ingressRule.IngressClassName === '')
       ),
     [ingressControllersResults.data, ingressRule.IngressClassName]
   );
@@ -175,12 +177,13 @@ export function CreateIngressView() {
     (!existingIngressClass ||
       (existingIngressClass && !existingIngressClass.Availability)) &&
     ingressRule.IngressClassName &&
-    ingressControllersResults.data
+    !ingressControllersResults.isLoading
   ) {
+    const optionLabel = !ingressRule.IngressType
+      ? `${ingressRule.IngressClassName} - NOT FOUND`
+      : `${ingressRule.IngressClassName} - DISALLOWED`;
     ingressClassOptions.push({
-      label: !ingressRule.IngressType
-        ? `${ingressRule.IngressClassName} - NOT FOUND`
-        : `${ingressRule.IngressClassName} - DISALLOWED`,
+      label: optionLabel,
       value: ingressRule.IngressClassName,
     });
   }
@@ -206,7 +209,8 @@ export function CreateIngressView() {
       !!params.name &&
       ingressesResults.data &&
       !ingressRule.IngressName &&
-      ingressControllersResults.data
+      !ingressControllersResults.isLoading &&
+      !ingressControllersResults.isLoading
     ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
@@ -214,13 +218,16 @@ export function CreateIngressView() {
       );
       if (ing) {
         const type = ingressControllersResults.data?.find(
-          (c) => c.ClassName === ing.ClassName
+          (c) =>
+            c.ClassName === ing.ClassName ||
+            (c.Type === 'custom' && !ing.ClassName)
         )?.Type;
-        const r = prepareRuleFromIngress(ing);
+        const r = prepareRuleFromIngress(ing, type);
         r.IngressType = type || r.IngressType;
         setIngressRule(r);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     params.name,
     ingressesResults.data,
@@ -635,7 +642,7 @@ export function CreateIngressView() {
     setIngressRule(rule);
   }
 
-  function addNewAnnotation(type?: 'rewrite' | 'regex') {
+  function addNewAnnotation(type?: 'rewrite' | 'regex' | 'ingressClass') {
     const rule = { ...ingressRule };
 
     const annotation: Annotation = {
@@ -643,13 +650,21 @@ export function CreateIngressView() {
       Value: '',
       ID: uuidv4(),
     };
-    if (type === 'rewrite') {
-      annotation.Key = 'nginx.ingress.kubernetes.io/rewrite-target';
-      annotation.Value = '/$1';
-    }
-    if (type === 'regex') {
-      annotation.Key = 'nginx.ingress.kubernetes.io/use-regex';
-      annotation.Value = 'true';
+    switch (type) {
+      case 'rewrite':
+        annotation.Key = 'nginx.ingress.kubernetes.io/rewrite-target';
+        annotation.Value = '/$1';
+        break;
+      case 'regex':
+        annotation.Key = 'nginx.ingress.kubernetes.io/use-regex';
+        annotation.Value = 'true';
+        break;
+      case 'ingressClass':
+        annotation.Key = 'kubernetes.io/ingress.class';
+        annotation.Value = '';
+        break;
+      default:
+        break;
     }
     rule.Annotations = rule.Annotations || [];
     rule.Annotations?.push(annotation);
@@ -689,10 +704,13 @@ export function CreateIngressView() {
   function handleCreateIngressRules() {
     const rule = { ...ingressRule };
 
+    const classNameToSend =
+      rule.IngressClassName === 'none' ? '' : rule.IngressClassName;
+
     const ingress: Ingress = {
       Namespace: namespace,
       Name: rule.IngressName,
-      ClassName: rule.IngressClassName,
+      ClassName: classNameToSend,
       Hosts: rule.Hosts.map((host) => host.Host),
       Paths: preparePaths(rule.IngressName, rule.Hosts),
       TLS: prepareTLS(rule.Hosts),

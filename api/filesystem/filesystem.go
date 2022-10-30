@@ -163,7 +163,7 @@ func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExi
 	}
 
 	if !exists {
-		return errors.New(fmt.Sprintf("File (%s) doesn't exist", fromFilePath))
+		return fmt.Errorf("File (%s) doesn't exist", fromFilePath)
 	}
 
 	finput, err := os.Open(fromFilePath)

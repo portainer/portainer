@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 
@@ -29,15 +29,19 @@ type postDockerfileRequest struct {
 func buildOperation(request *http.Request) error {
 	contentTypeHeader := request.Header.Get("Content-Type")
 
-	mediaType, _, err := mime.ParseMediaType(contentTypeHeader)
-	if err != nil {
-		return err
+	mediaType := ""
+	if contentTypeHeader != "" {
+		var err error
+		mediaType, _, err = mime.ParseMediaType(contentTypeHeader)
+		if err != nil {
+			return err
+		}
 	}
 
 	var buffer []byte
 	switch mediaType {
 	case "":
-		body, err := ioutil.ReadAll(request.Body)
+		body, err := io.ReadAll(request.Body)
 		if err != nil {
 			return err
 		}
@@ -49,7 +53,8 @@ func buildOperation(request *http.Request) error {
 
 	case "application/json":
 		var req postDockerfileRequest
-		if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		err := json.NewDecoder(request.Body).Decode(&req)
+		if err != nil {
 			return err
 		}
 
@@ -81,7 +86,7 @@ func buildOperation(request *http.Request) error {
 
 			log.Info().Str("filename", hdr.Filename).Int64("size", hdr.Size).Msg("upload the file to build image")
 
-			content, err := ioutil.ReadAll(f)
+			content, err := io.ReadAll(f)
 			if err != nil {
 				return err
 			}
@@ -105,7 +110,7 @@ func buildOperation(request *http.Request) error {
 		return nil
 	}
 
-	request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
+	request.Body = io.NopCloser(bytes.NewReader(buffer))
 	request.ContentLength = int64(len(buffer))
 	request.Header.Set("Content-Type", "application/x-tar")
 

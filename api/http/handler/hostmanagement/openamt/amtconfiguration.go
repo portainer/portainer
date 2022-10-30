@@ -169,12 +169,8 @@ func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfigu
 	configuration.MPSToken = ""
 
 	settings.OpenAMTConfiguration = configuration
-	err = handler.DataStore.Settings().UpdateSettings(settings)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return handler.DataStore.Settings().UpdateSettings(settings)
 }
 
 func (handler *Handler) disableOpenAMT() error {

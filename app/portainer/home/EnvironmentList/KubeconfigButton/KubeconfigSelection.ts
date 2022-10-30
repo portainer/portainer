@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 export function useSelection() {
   const [selection, setSelection] = useState<Record<EnvironmentId, boolean>>(

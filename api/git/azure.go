@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -100,7 +99,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to build download url")
 	}
-	zipFile, err := ioutil.TempFile("", "azure-git-repo-*.zip")
+	zipFile, err := os.CreateTemp("", "azure-git-repo-*.zip")
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create temp file")
 	}

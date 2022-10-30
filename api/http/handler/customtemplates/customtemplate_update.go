@@ -86,12 +86,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
-	err := validateVariablesDefinitions(payload.Variables)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return validateVariablesDefinitions(payload.Variables)
 }
 
 // @id CustomTemplateUpdate

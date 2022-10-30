@@ -59,9 +59,6 @@ func (r K8sIngressInfo) Validate(request *http.Request) error {
 	if r.Namespace == "" {
 		return errors.New("missing ingress Namespace from the request payload")
 	}
-	if r.ClassName == "" {
-		return errors.New("missing ingress ClassName from the request payload")
-	}
 	return nil
 }
 

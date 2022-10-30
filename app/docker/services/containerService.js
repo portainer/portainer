@@ -10,11 +10,12 @@ import {
   stopContainer,
 } from '@/react/docker/containers/containers.service';
 import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel } from '../models/container';
+import { formatLogs } from '../helpers/logHelper';
 
 angular.module('portainer.docker').factory('ContainerService', ContainerServiceFactory);
 
 /* @ngInject */
-function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointProvider) {
+function ContainerServiceFactory($q, Container, $timeout, EndpointProvider) {
   const service = {
     killContainer: withEndpointId(killContainer),
     pauseContainer: withEndpointId(pauseContainer),
@@ -159,7 +160,7 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
 
     Container.logs(parameters)
       .$promise.then(function success(data) {
-        var logs = LogHelper.formatLogs(data.logs, { stripHeaders, withTimestamps: !!timestamps });
+        var logs = formatLogs(data.logs, { stripHeaders, withTimestamps: !!timestamps });
         deferred.resolve(logs);
       })
       .catch(function error(err) {

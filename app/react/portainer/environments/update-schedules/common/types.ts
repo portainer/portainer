@@ -1,4 +1,4 @@
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
 import { ScheduleType } from '../types';

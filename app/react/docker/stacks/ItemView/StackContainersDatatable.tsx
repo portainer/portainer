@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { DockerContainer } from '@/react/docker/containers/types';
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { createStore } from '@/react/docker/containers/ListView/ContainersDatatable/datatable-store';
 import { useColumns } from '@/react/docker/containers/ListView/ContainersDatatable/columns';
 import { ContainersDatatableActions } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableActions';

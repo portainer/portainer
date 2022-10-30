@@ -2,7 +2,7 @@ import {
   EnvironmentGroup,
   EnvironmentGroupId,
 } from '@/portainer/environment-groups/types';
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { Tag } from '@/portainer/tags/types';

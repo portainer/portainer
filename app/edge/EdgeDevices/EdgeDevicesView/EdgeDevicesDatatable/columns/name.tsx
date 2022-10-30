@@ -1,6 +1,6 @@
 import { CellProps, Column } from 'react-table';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
 import { Link } from '@@/Link';
 import { ExpandingCell } from '@@/datatables/ExpandingCell';

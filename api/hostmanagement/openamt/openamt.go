@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -83,11 +83,8 @@ func (service *Service) Configure(configuration portainer.OpenAMTConfiguration) 
 	}
 
 	_, err = service.createOrUpdateDomain(configuration)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (service *Service) executeSaveRequest(method string, url string, token string, payload []byte) ([]byte, error) {
@@ -102,7 +99,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 	if err != nil {
 		return nil, err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
@@ -131,7 +128,7 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
@@ -229,12 +226,7 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	}
 	configuration.MPSToken = token
 
-	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
 }
 
 func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) (string, error) {

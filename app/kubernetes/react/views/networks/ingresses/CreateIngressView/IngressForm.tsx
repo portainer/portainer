@@ -47,7 +47,7 @@ interface Props {
 
   addNewIngressHost: (noHost?: boolean) => void;
   addNewIngressRoute: (hostIndex: number) => void;
-  addNewAnnotation: (type?: 'rewrite' | 'regex') => void;
+  addNewAnnotation: (type?: 'rewrite' | 'regex' | 'ingressClass') => void;
 
   handleNamespaceChange: (val: string) => void;
   handleHostChange: (hostIndex: number, val: string) => void;
@@ -249,9 +249,10 @@ export function IngressForm({
                     onClick={() => addNewAnnotation('rewrite')}
                     icon={Plus}
                     title="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
+                    data-cy="add-rewrite-annotation"
                   >
                     {' '}
-                    add rewrite annotation
+                    Add rewrite annotation
                   </Button>
 
                   <Button
@@ -259,10 +260,22 @@ export function IngressForm({
                     onClick={() => addNewAnnotation('regex')}
                     icon={Plus}
                     title="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
+                    data-cy="add-regex-annotation"
                   >
-                    add regular expression annotation
+                    Add regular expression annotation
                   </Button>
                 </>
+              )}
+
+              {rule.IngressType === 'custom' && (
+                <Button
+                  className="btn btn-sm btn-light mb-2 ml-2"
+                  onClick={() => addNewAnnotation('ingressClass')}
+                  icon={Plus}
+                  data-cy="add-ingress-class-annotation"
+                >
+                  Add kubernetes.io/ingress.class annotation
+                </Button>
               )}
             </div>
 

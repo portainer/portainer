@@ -5,12 +5,14 @@ import { useReducer } from 'react';
 import { Icon } from '@/react/components/Icon';
 import { User } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Widget } from '@@/Widget';
 import { Input } from '@@/form-components/Input';
 import { UsersSelector } from '@@/UsersSelector';
 import { LoadingButton } from '@@/buttons/LoadingButton';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { createTeam } from '../../teams.service';
 import { Team } from '../../types';
@@ -26,6 +28,9 @@ interface Props {
 export function CreateTeamForm({ users, teams }: Props) {
   const addTeamMutation = useAddTeamMutation();
   const [formKey, incFormKey] = useReducer((state: number) => state + 1, 0);
+  const teamSyncQuery = usePublicSettings<boolean>({
+    select: (settings) => settings.TeamSync,
+  });
 
   const initialValues = {
     name: '',
@@ -95,8 +100,20 @@ export function CreateTeamForm({ users, teams }: Props) {
                         dataCy="team-teamLeaderSelect"
                         inputId="users-input"
                         placeholder="Select one or more team leaders"
+                        disabled={teamSyncQuery.data}
                       />
                     </FormControl>
+                  )}
+
+                  {teamSyncQuery.data && (
+                    <div className="form-group">
+                      <div className="col-sm-12">
+                        <TextTip color="orange">
+                          The team leader feature is disabled as external
+                          authentication is currently enabled with team sync.
+                        </TextTip>
+                      </div>
+                    </div>
                   )}
 
                   <div className="form-group">

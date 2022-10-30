@@ -1,4 +1,4 @@
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',

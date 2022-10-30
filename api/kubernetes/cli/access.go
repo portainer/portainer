@@ -117,9 +117,6 @@ func (kcl *KubeClient) UpdateNamespaceAccessPolicies(accessPolicies map[string]p
 
 	configMap.Data[portainerConfigMapAccessPoliciesKey] = string(data)
 	_, err = kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Update(context.TODO(), configMap, metav1.UpdateOptions{})
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }

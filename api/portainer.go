@@ -130,6 +130,7 @@ type (
 		MaxBatchDelay             *time.Duration
 		SecretKeyName             *string
 		LogLevel                  *string
+		LogMode                   *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -557,6 +558,7 @@ type (
 		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
 		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
 		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
+		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -1358,9 +1360,10 @@ type (
 		CreateNamespace(info models.K8sNamespaceDetails) error
 		UpdateNamespace(info models.K8sNamespaceDetails) error
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		GetNamespace(string) (K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
-		GetIngressControllers() models.K8sIngressControllers
+		GetIngressControllers() (models.K8sIngressControllers, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo) error
 		UpdateIngress(namespace string, info models.K8sIngressInfo) error
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)

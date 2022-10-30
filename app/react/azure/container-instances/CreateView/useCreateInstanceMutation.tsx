@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query';
 
 import { createContainerGroup } from '@/react/azure/services/container-groups.service';
 import { queryKeys } from '@/react/azure/queries/query-keys';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import {
   ContainerGroup,

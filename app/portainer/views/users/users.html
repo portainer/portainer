@@ -118,7 +118,18 @@
                 data-cy="'user-teamSelect'"
                 on-change="(onChangeTeamIds)"
                 input-id="'teams-selector'"
+                disabled="teamSync"
               ></teams-selector>
+            </div>
+          </div>
+          <div class="form-group" ng-if="teamSync">
+            <div class="col-sm-12">
+              <span class="small">
+                <p class="small text-muted vertical-center">
+                  <pr-icon icon="'alert-circle'" feather="true" class-name="'icon-warning =vertical-center'"></pr-icon>
+                  The team leader feature is disabled as external authentication is currently enabled with team sync.
+                </p>
+              </span>
             </div>
           </div>
           <!-- !teams -->

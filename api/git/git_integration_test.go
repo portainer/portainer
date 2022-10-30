@@ -274,7 +274,8 @@ func TestService_purgeCacheByTTL_Github(t *testing.T) {
 
 func TestService_canStopCacheCleanTimer_whenContextDone(t *testing.T) {
 	timeout := 10 * time.Millisecond
-	deadlineCtx, _ := context.WithDeadline(context.TODO(), time.Now().Add(10*timeout))
+	deadlineCtx, cancel := context.WithDeadline(context.TODO(), time.Now().Add(10*timeout))
+	defer cancel()
 
 	service := NewService(deadlineCtx)
 	assert.False(t, service.timerHasStopped(), "timer should not be stopped")

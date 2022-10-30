@@ -1,6 +1,6 @@
 import { Column } from 'react-table';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
 import { DefaultFilter } from '@@/datatables/Filter';
 

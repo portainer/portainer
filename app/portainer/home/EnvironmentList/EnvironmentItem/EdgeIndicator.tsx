@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { PublicSettingsViewModel } from '@/portainer/models/settings';
 

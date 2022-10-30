@@ -1,5 +1,8 @@
-import { getPlatformType } from '@/portainer/environments/utils';
-import { EnvironmentType, PlatformType } from '@/portainer/environments/types';
+import { getPlatformType } from '@/react/portainer/environments/utils';
+import {
+  EnvironmentType,
+  PlatformType,
+} from '@/react/portainer/environments/types';
 
 import Docker from './docker.svg?c';
 import Azure from './azure.svg?c';

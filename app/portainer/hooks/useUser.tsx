@@ -11,10 +11,10 @@ import {
 } from 'react';
 
 import { isAdmin } from '@/portainer/users/user.helpers';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getUser } from '../users/user.service';
 import { User, UserId } from '../users/types';
-import { EnvironmentId } from '../environments/types';
 
 import { useLocalStorage } from './useLocalStorage';
 
@@ -123,6 +123,7 @@ interface AuthorizedProps {
   authorizations: string | string[];
   environmentId?: EnvironmentId;
   adminOnlyCE?: boolean;
+  childrenUnauthorized?: ReactNode;
 }
 
 export function Authorized({
@@ -130,6 +131,7 @@ export function Authorized({
   environmentId,
   adminOnlyCE = false,
   children,
+  childrenUnauthorized = null,
 }: PropsWithChildren<AuthorizedProps>) {
   const isAllowed = useAuthorizations(
     authorizations,
@@ -137,7 +139,7 @@ export function Authorized({
     adminOnlyCE
   );
 
-  return isAllowed ? <>{children}</> : null;
+  return isAllowed ? <>{children}</> : <>{childrenUnauthorized}</>;
 }
 
 interface UserProviderProps {

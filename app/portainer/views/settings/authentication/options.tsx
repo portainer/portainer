@@ -5,7 +5,7 @@ import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Ldap from '@/assets/ico/ldap.svg?c';
 import OAuth from '@/assets/ico/oauth.svg?c';
 
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 export const options = [
   {

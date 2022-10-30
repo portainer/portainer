@@ -1,13 +1,10 @@
+import { formatLogs } from '../helpers/logHelper';
 import { ServiceViewModel } from '../models/service';
 
 angular.module('portainer.docker').factory('ServiceService', [
   '$q',
   'Service',
-  'ServiceHelper',
-  'TaskService',
-  'ResourceControlService',
-  'LogHelper',
-  function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService, LogHelper) {
+  function ServiceServiceFactory($q, Service) {
     'use strict';
     var service = {};
 
@@ -88,7 +85,7 @@ angular.module('portainer.docker').factory('ServiceService', [
 
       Service.logs(parameters)
         .$promise.then(function success(data) {
-          var logs = LogHelper.formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
+          var logs = formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
           deferred.resolve(logs);
         })
         .catch(function error(err) {

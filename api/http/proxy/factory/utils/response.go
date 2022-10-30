@@ -3,7 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -82,7 +82,7 @@ func RewriteResponse(response *http.Response, newResponseData interface{}, statu
 		return err
 	}
 
-	body := ioutil.NopCloser(bytes.NewReader(data))
+	body := io.NopCloser(bytes.NewReader(data))
 
 	response.StatusCode = statusCode
 	response.Body = body

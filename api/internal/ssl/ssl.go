@@ -166,10 +166,5 @@ func (service *Service) cacheInfo(certPath string, keyPath string, selfSigned bo
 	settings.KeyPath = keyPath
 	settings.SelfSigned = selfSigned
 
-	err = service.dataStore.SSLSettings().UpdateSettings(settings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return service.dataStore.SSLSettings().UpdateSettings(settings)
 }

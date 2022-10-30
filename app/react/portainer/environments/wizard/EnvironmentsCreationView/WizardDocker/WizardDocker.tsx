@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';

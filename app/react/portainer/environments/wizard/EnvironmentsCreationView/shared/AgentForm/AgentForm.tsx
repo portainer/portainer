@@ -1,10 +1,10 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { useCreateAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { useCreateAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { Environment } from '@/portainer/environments/types';
-import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
+import { Environment } from '@/react/portainer/environments/types';
+import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Icon } from '@@/Icon';

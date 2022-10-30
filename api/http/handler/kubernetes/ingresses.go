@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -49,12 +50,29 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		)
 	}
 
-	controllers := cli.GetIngressControllers()
+	controllers, err := cli.GetIngressControllers()
+	if err != nil {
+		return httperror.InternalServerError(
+			"Failed to fetch ingressclasses",
+			err,
+		)
+	}
+
+	// Add none controller if "AllowNone" is set for endpoint.
+	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
+		controllers = append(controllers, models.K8sIngressController{
+			Name:      "none",
+			ClassName: "none",
+			Type:      "custom",
+		})
+	}
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
 	var updatedClasses []portainer.KubernetesIngressClassConfig
 	for i := range controllers {
 		controllers[i].Availability = true
-		controllers[i].New = true
+		if controllers[i].ClassName != "none" {
+			controllers[i].New = true
+		}
 
 		var updatedClass portainer.KubernetesIngressClassConfig
 		updatedClass.Name = controllers[i].ClassName
@@ -129,8 +147,31 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		)
 	}
 
-	cli := handler.KubernetesClient
-	currentControllers := cli.GetIngressControllers()
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
+	currentControllers, err := cli.GetIngressControllers()
+	if err != nil {
+		return httperror.InternalServerError(
+			"Failed to fetch ingressclasses",
+			err,
+		)
+	}
+	// Add none controller if "AllowNone" is set for endpoint.
+	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
+		currentControllers = append(currentControllers, models.K8sIngressController{
+			Name:      "none",
+			ClassName: "none",
+			Type:      "custom",
+		})
+	}
 	kubernetesConfig := endpoint.Kubernetes.Configuration
 	existingClasses := kubernetesConfig.IngressClasses
 	ingressAvailabilityPerNamespace := kubernetesConfig.IngressAvailabilityPerNamespace
@@ -139,7 +180,9 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	for i := range currentControllers {
 		var globallyblocked bool
 		currentControllers[i].Availability = true
-		currentControllers[i].New = true
+		if currentControllers[i].ClassName != "none" {
+			currentControllers[i].New = true
+		}
 
 		var updatedClass portainer.KubernetesIngressClassConfig
 		updatedClass.Name = currentControllers[i].ClassName
@@ -229,7 +272,21 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	controllers := cli.GetIngressControllers()
+	controllers, err := cli.GetIngressControllers()
+	if err != nil {
+		return httperror.InternalServerError(
+			"Unable to get ingress controllers",
+			err,
+		)
+	}
+	// Add none controller if "AllowNone" is set for endpoint.
+	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
+		controllers = append(controllers, models.K8sIngressController{
+			Name:      "none",
+			ClassName: "none",
+			Type:      "custom",
+		})
+	}
 	var updatedClasses []portainer.KubernetesIngressClassConfig
 	for i := range controllers {
 		controllers[i].Availability = true
@@ -328,7 +385,7 @@ PayloadLoop:
 			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
 
 			// Handle "allow"
-			if p.Availability == true {
+			if p.Availability {
 				// remove the namespace from the list of blocked namespaces
 				// in the existingClass.
 				for _, blockedNS := range existingClass.BlockedNamespaces {
@@ -401,11 +458,28 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 		)
 	}
 
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
 	ingresses, err := cli.GetIngresses(namespace)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to retrieve ingresses",
 			err,
 		)
 	}
@@ -431,11 +505,28 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 		)
 	}
 
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
 	err = cli.CreateIngress(namespace, payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to retrieve the ingress",
 			err,
 		)
 	}
@@ -443,10 +534,26 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 }
 
 func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	var payload models.K8sIngressDeleteRequests
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
@@ -454,7 +561,7 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 	err = cli.DeleteIngresses(payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to delete ingresses",
 			err,
 		)
 	}
@@ -479,11 +586,28 @@ func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.R
 		)
 	}
 
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
 	err = cli.UpdateIngress(namespace, payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to update the ingress",
 			err,
 		)
 	}
