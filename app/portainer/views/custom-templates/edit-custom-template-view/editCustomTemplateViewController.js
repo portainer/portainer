@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { getFilePreview } from '@/react/portainer/gitops/gitops.service';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
@@ -23,19 +24,7 @@ class EditCustomTemplateViewController {
       RepositoryAuthentication: false,
       RepositoryUsername: '',
       RepositoryPassword: '',
-      SelectedGitCredential: null,
-      GitCredentials: [],
-      SaveCredential: true,
-      RepositoryGitCredentialID: 0,
-      NewCredentialName: '',
-      NewCredentialNameExist: false,
       ComposeFilePathInRepository: 'docker-compose.yml',
-      Description: '',
-      Note: '',
-      Logo: '',
-      Platform: 1,
-      Type: 1,
-      AccessControlData: new AccessControlFormData(),
       Variables: [],
     };
     this.state = {
@@ -43,6 +32,9 @@ class EditCustomTemplateViewController {
       isEditorDirty: false,
       isTemplateValid: true,
       isEditorReadOnly: false,
+      templateLoadFailed: false,
+      templatePreviewFailed: false,
+      templatePreviewError: '',
     };
     this.templates = [];
 
@@ -53,6 +45,7 @@ class EditCustomTemplateViewController {
     this.editorUpdate = this.editorUpdate.bind(this);
     this.onVariablesChange = this.onVariablesChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.previewFileFromGitRepository = this.previewFileFromGitRepository.bind(this);
   }
 
   getTemplate() {
@@ -60,16 +53,24 @@ class EditCustomTemplateViewController {
   }
   async getTemplateAsync() {
     try {
-      const [template, file] = await Promise.all([
-        this.CustomTemplateService.customTemplate(this.$state.params.id),
-        this.CustomTemplateService.customTemplateFile(this.$state.params.id),
-      ]);
-      // TODO: change this to only make repository based template readonly
-      this.state.isEditorReadOnly = false;
-      template.FileContent = file;
+      const template = await this.CustomTemplateService.customTemplate(this.$state.params.id);
+
+      if (template.GitConfig !== null) {
+        try {
+          this.formValues.FileContent = await this.CustomTemplateService.fetchFileFromGitRepository(this.$state.params.id);
+          this.state.isEditorReadOnly = true;
+        } catch (err) {
+          this.state.templateLoadFailed = true;
+        }
+      } else {
+        template.FileContent = await this.CustomTemplateService.customTemplateFile(this.$state.params.id);
+      }
       template.Variables = template.Variables || [];
+
       this.formValues = { ...this.formValues, ...template };
+
       this.parseTemplate(template.FileContent);
+      this.parseGitConfig(template.GitConfig);
 
       this.oldFileContent = this.formValues.FileContent;
       if (template.ResourceControl) {
@@ -170,6 +171,56 @@ class EditCustomTemplateViewController {
     if (isValid) {
       this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
     }
+  }
+
+  parseGitConfig(GitConfig) {
+    if (GitConfig === null) {
+      return;
+    }
+
+    let flatConfig = {
+      RepositoryURL: GitConfig.URL,
+      RepositoryReferenceName: GitConfig.ReferenceName,
+      ComposeFilePathInRepository: GitConfig.ConfigFilePath,
+      RepositoryAuthentication: GitConfig.Authentication !== null,
+    };
+
+    if (GitConfig.Authentication) {
+      flatConfig = {
+        ...flatConfig,
+        RepositoryUsername: GitConfig.Authentication.Username,
+        RepositoryPassword: GitConfig.Authentication.Password,
+      };
+    }
+
+    this.formValues = { ...this.formValues, ...flatConfig };
+  }
+
+  previewFileFromGitRepository() {
+    this.state.templatePreviewFailed = false;
+    this.state.templatePreviewError = '';
+
+    let creds = {};
+    if (this.formValues.RepositoryAuthentication) {
+      creds = {
+        username: this.formValues.RepositoryUsername,
+        password: this.formValues.RepositoryPassword,
+      };
+    }
+    const payload = {
+      repository: this.formValues.RepositoryURL,
+      targetFile: this.formValues.ComposeFilePathInRepository,
+      ...creds,
+    };
+
+    this.$async(async () => {
+      try {
+        this.formValues.FileContent = await getFilePreview(payload);
+      } catch (err) {
+        this.state.templatePreviewError = err.message;
+        this.state.templatePreviewFailed = true;
+      }
+    });
   }
 
   async uiCanExit() {

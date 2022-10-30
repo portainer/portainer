@@ -62,5 +62,14 @@ function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadServ
     }
   };
 
+  service.fetchFileFromGitRepository = async function fetchFileFromGitRepository(id) {
+    try {
+      const { FileContent } = await CustomTemplates.git_fetch({ id }).$promise;
+      return FileContent;
+    } catch (err) {
+      throw { msg: 'Unable to retrieve latest customTemplate content from git', err };
+    }
+  };
+
   return service;
 }

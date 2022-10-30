@@ -11,11 +11,24 @@ class KubeEditCustomTemplateViewController {
 
     this.isTemplateVariablesEnabled = isBE;
 
-    this.formValues = null;
+    this.formValues = {
+      RepositoryURL: '',
+      RepositoryURLValid: false,
+      RepositoryReferenceName: 'refs/heads/main',
+      RepositoryAuthentication: false,
+      RepositoryUsername: '',
+      RepositoryPassword: '',
+      ComposeFilePathInRepository: 'manifest.yml',
+      Variables: [],
+    };
     this.state = {
       formValidationError: '',
       isEditorDirty: false,
       isTemplateValid: true,
+      isEditorReadOnly: false,
+      templateLoadFailed: false,
+      templatePreviewFailed: false,
+      templatePreviewError: '',
     };
     this.templates = [];
 
@@ -25,6 +38,7 @@ class KubeEditCustomTemplateViewController {
     this.onBeforeUnload = this.onBeforeUnload.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.onVariablesChange = this.onVariablesChange.bind(this);
+    this.previewFileFromGitRepository = this.previewFileFromGitRepository.bind(this);
   }
 
   getTemplate() {
@@ -32,13 +46,26 @@ class KubeEditCustomTemplateViewController {
       try {
         const { id } = this.$state.params;
 
-        const [template, file] = await Promise.all([this.CustomTemplateService.customTemplate(id), this.CustomTemplateService.customTemplateFile(id)]);
-        template.FileContent = file;
+        const template = await this.CustomTemplateService.customTemplate(id);
+
+        if (template.GitConfig !== null) {
+          try {
+            this.formValues.FileContent = await this.CustomTemplateService.fetchFileFromGitRepository(id);
+
+            this.state.isEditorReadOnly = true;
+          } catch (err) {
+            this.state.templateLoadFailed = true;
+          }
+        } else {
+          template.FileContent = await this.CustomTemplateService.customTemplateFile(id);
+        }
+
         template.Variables = template.Variables || [];
 
-        this.formValues = template;
+        this.formValues = { ...this.formValues, ...template };
 
-        this.parseTemplate(file);
+        this.parseTemplate(template.FileContent);
+        this.parseGitConfig(template.GitConfig);
 
         this.oldFileContent = this.formValues.FileContent;
 
@@ -77,6 +104,56 @@ class KubeEditCustomTemplateViewController {
     if (isValid) {
       this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
     }
+  }
+
+  parseGitConfig(GitConfig) {
+    if (GitConfig === null) {
+      return;
+    }
+
+    let flatConfig = {
+      RepositoryURL: GitConfig.URL,
+      RepositoryReferenceName: GitConfig.ReferenceName,
+      ComposeFilePathInRepository: GitConfig.ConfigFilePath,
+      RepositoryAuthentication: GitConfig.Authentication !== null,
+    };
+
+    if (GitConfig.Authentication) {
+      flatConfig = {
+        ...flatConfig,
+        RepositoryUsername: GitConfig.Authentication.Username,
+        RepositoryPassword: GitConfig.Authentication.Password,
+      };
+    }
+
+    this.formValues = { ...this.formValues, ...flatConfig };
+  }
+
+  previewFileFromGitRepository() {
+    this.state.templatePreviewFailed = false;
+    this.state.templatePreviewError = '';
+
+    let creds = {};
+    if (this.formValues.RepositoryAuthentication) {
+      creds = {
+        username: this.formValues.RepositoryUsername,
+        password: this.formValues.RepositoryPassword,
+      };
+    }
+    const payload = {
+      repository: this.formValues.RepositoryURL,
+      targetFile: this.formValues.ComposeFilePathInRepository,
+      ...creds,
+    };
+
+    this.$async(async () => {
+      try {
+        this.formValues.FileContent = await getFilePreview(payload);
+      } catch (err) {
+        this.state.templatePreviewError = err.message;
+        this.state.templatePreviewFailed = true;
+      }
+    });
   }
 
   validateForm() {

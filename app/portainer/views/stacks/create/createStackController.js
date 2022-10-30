@@ -39,7 +39,6 @@ angular
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.buildMethods = [editor, upload, git, customTemplate];
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
-      $scope.isAdmin = Authentication.isAdmin();
 
       $scope.formValues = {
         Name: '',
@@ -72,6 +71,12 @@ angular
         selectedTemplateId: null,
         baseWebhookUrl: baseStackWebhookUrl(),
         webhookId: createWebhookId(),
+        templateLoadFailed: false,
+      };
+
+      $scope.currentUser = {
+        isAdmin: false,
+        id: null,
       };
 
       $window.onbeforeunload = () => {
@@ -296,7 +301,18 @@ angular
             $scope.state.selectedTemplateId = templateId;
             $scope.state.selectedTemplate = template;
 
-            const fileContent = await CustomTemplateService.customTemplateFile(templateId);
+            let fileContent;
+            if ($scope.state.selectedTemplate.GitConfig !== null) {
+              try {
+                fileContent = await CustomTemplateService.fetchFileFromGitRepository(templateId);
+              } catch (err) {
+                $scope.state.templateLoadFailed = true;
+                throw err;
+              }
+            } else {
+              fileContent = await CustomTemplateService.customTemplateFile(templateId);
+            }
+
             $scope.state.templateContent = fileContent;
             onChangeFileContent(fileContent);
 
@@ -321,6 +337,9 @@ angular
       }
 
       async function initView() {
+        $scope.currentUser.isAdmin = Authentication.isAdmin();
+        $scope.currentUser.id = Authentication.getUserDetails().ID;
+
         var endpointMode = $scope.applicationState.endpoint.mode;
         $scope.state.StackType = 2;
         $scope.isDockerStandalone = endpointMode.provider === 'DOCKER_STANDALONE';
