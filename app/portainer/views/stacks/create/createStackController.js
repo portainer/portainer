@@ -38,7 +38,6 @@ angular
       $scope.buildAnalyticsProperties = buildAnalyticsProperties;
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
-      $scope.isAdmin = Authentication.isAdmin();
 
       $scope.formValues = {
         Name: '',
@@ -70,6 +69,12 @@ angular
         isEditorDirty: false,
         selectedTemplate: null,
         selectedTemplateId: null,
+        templateLoadFailed: false,
+      };
+
+      $scope.currentUser = {
+        isAdmin: false,
+        id: null,
       };
 
       $window.onbeforeunload = () => {
@@ -312,7 +317,18 @@ angular
             $scope.state.selectedTemplateId = templateId;
             $scope.state.selectedTemplate = template;
 
-            const fileContent = await CustomTemplateService.customTemplateFile(templateId);
+            let fileContent;
+            if ($scope.state.selectedTemplate.GitConfig !== null) {
+              try {
+                fileContent = await CustomTemplateService.fetchFileFromGitRepository(templateId);
+              } catch (err) {
+                $scope.state.templateLoadFailed = true;
+                throw err;
+              }
+            } else {
+              fileContent = await CustomTemplateService.customTemplateFile(templateId);
+            }
+
             $scope.state.templateContent = fileContent;
             onChangeFileContent(fileContent);
 
@@ -337,6 +353,9 @@ angular
       }
 
       async function initView() {
+        $scope.currentUser.isAdmin = Authentication.isAdmin();
+        $scope.currentUser.id = Authentication.getUserDetails().ID;
+
         var endpointMode = $scope.applicationState.endpoint.mode;
         $scope.state.StackType = 2;
         if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {

@@ -48,6 +48,12 @@ class KubernetesDeployController {
       isEditorDirty: false,
       templateId: null,
       template: null,
+      templateLoadFailed: false,
+    };
+
+    this.currentUser = {
+      isAdmin: false,
+      id: null,
     };
 
     this.formValues = {
@@ -99,7 +105,7 @@ class KubernetesDeployController {
     const metadata = {
       type: buildLabel(this.state.BuildMethod),
       format: formatLabel(this.state.DeployType),
-      role: roleLabel(this.Authentication.isAdmin()),
+      role: roleLabel(this.currentUser.isAdmin),
       'automatic-updates': automaticUpdatesLabel(this.formValues.RepositoryAutomaticUpdates, this.formValues.RepositoryMechanism),
     };
 
@@ -190,7 +196,18 @@ class KubernetesDeployController {
       this.state.template = template;
 
       try {
-        const fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        let fileContent;
+        if (this.state.template.GitConfig !== null) {
+          try {
+            fileContent = await this.CustomTemplateService.fetchFileFromGitRepository(templateId);
+          } catch (err) {
+            this.state.templateLoadFailed = true;
+            throw err;
+          }
+        } else {
+          fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        }
+
         this.state.templateContent = fileContent;
         this.onChangeFileContent(fileContent);
 
@@ -330,6 +347,9 @@ class KubernetesDeployController {
 
   $onInit() {
     return this.$async(async () => {
+      this.currentUser.isAdmin = this.Authentication.isAdmin();
+      this.currentUser.id = this.Authentication.getUserDetails().ID;
+
       this.formValues.namespace_toggle = false;
       await this.getNamespaces();
 

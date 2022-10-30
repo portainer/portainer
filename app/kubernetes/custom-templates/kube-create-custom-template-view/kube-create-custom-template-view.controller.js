@@ -1,14 +1,14 @@
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/portainer/feature-flags/feature-flags.service';
-import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
+import { editor, upload, git } from '@@/BoxSelector/common-options/build-methods';
 
 class KubeCreateCustomTemplateViewController {
   /* @ngInject */
   constructor($async, $state, Authentication, CustomTemplateService, FormValidator, ModalService, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, ModalService, Notifications, ResourceControlService });
 
-    this.methodOptions = [editor, upload];
+    this.methodOptions = [editor, upload, git];
 
     this.templates = null;
     this.isTemplateVariablesEnabled = isBE;
@@ -30,6 +30,13 @@ class KubeCreateCustomTemplateViewController {
       Logo: '',
       AccessControlData: new AccessControlFormData(),
       Variables: [],
+      RepositoryURL: '',
+      RepositoryURLValid: false,
+      RepositoryReferenceName: 'refs/heads/main',
+      RepositoryAuthentication: false,
+      RepositoryUsername: '',
+      RepositoryPassword: '',
+      ComposeFilePathInRepository: 'manifest.yml',
     };
 
     this.onChangeFile = this.onChangeFile.bind(this);
@@ -120,6 +127,8 @@ class KubeCreateCustomTemplateViewController {
         return this.createCustomTemplateFromFileContent(template);
       case 'upload':
         return this.createCustomTemplateFromFileUpload(template);
+      case 'repository':
+        return this.createCustomTemplateFromGitRepository(template);
     }
   }
 
@@ -129,6 +138,10 @@ class KubeCreateCustomTemplateViewController {
 
   createCustomTemplateFromFileUpload(template) {
     return this.CustomTemplateService.createCustomTemplateFromFileUpload(template);
+  }
+
+  createCustomTemplateFromGitRepository(template) {
+    return this.CustomTemplateService.createCustomTemplateFromGitRepository(template);
   }
 
   validateForm(method) {
