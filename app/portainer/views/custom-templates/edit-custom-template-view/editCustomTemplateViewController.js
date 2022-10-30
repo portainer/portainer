@@ -14,16 +14,6 @@ class EditCustomTemplateViewController {
     this.isTemplateVariablesEnabled = isBE;
 
     this.formValues = {
-      Title: '',
-      FileContent: '',
-      File: null,
-      RepositoryURL: '',
-      RepositoryURLValid: false,
-      RepositoryReferenceName: 'refs/heads/main',
-      RepositoryAuthentication: false,
-      RepositoryUsername: '',
-      RepositoryPassword: '',
-      ComposeFilePathInRepository: 'docker-compose.yml',
       Variables: [],
     };
     this.state = {

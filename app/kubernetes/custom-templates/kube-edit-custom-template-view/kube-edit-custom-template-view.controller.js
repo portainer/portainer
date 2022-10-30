@@ -12,13 +12,6 @@ class KubeEditCustomTemplateViewController {
     this.isTemplateVariablesEnabled = isBE;
 
     this.formValues = {
-      RepositoryURL: '',
-      RepositoryURLValid: false,
-      RepositoryReferenceName: 'refs/heads/main',
-      RepositoryAuthentication: false,
-      RepositoryUsername: '',
-      RepositoryPassword: '',
-      ComposeFilePathInRepository: 'manifest.yml',
       Variables: [],
     };
     this.state = {
