@@ -1,8 +1,6 @@
 import { ChangeEvent, ReactNode } from 'react';
 import { Plus, RefreshCw, Trash2 } from 'react-feather';
 
-import { Annotations } from '@/kubernetes/react/views/networks/ingresses/components/annotations';
-
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
 import { Select, Option } from '@@/form-components/Input/Select';
@@ -11,6 +9,7 @@ import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
 
+import { Annotations } from './Annotations';
 import { Rule, ServicePorts } from './types';
 
 import '../style.css';
