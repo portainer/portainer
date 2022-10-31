@@ -317,6 +317,9 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	}
 
 	if !exists {
+		if payload.Type == portainer.KubernetesStack {
+			return nil, errors.New("Invalid Manifest file, ensure that the Manifest file path is correct")
+		}
 		return nil, errors.New("Invalid Compose file, ensure that the Compose file path is correct")
 	}
 
