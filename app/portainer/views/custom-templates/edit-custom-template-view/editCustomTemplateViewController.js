@@ -206,6 +206,7 @@ class EditCustomTemplateViewController {
     this.$async(async () => {
       try {
         this.formValues.FileContent = await getFilePreview(payload);
+        this.state.isEditorDirty = true;
       } catch (err) {
         this.state.templatePreviewError = err.message;
         this.state.templatePreviewFailed = true;
