@@ -76,9 +76,6 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
-	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
 		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
@@ -161,6 +158,10 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	customTemplate.IsComposeFormat = payload.IsComposeFormat
 
 	if payload.RepositoryURL != "" {
+		if !govalidator.IsURL(payload.RepositoryURL) {
+			return httperror.BadRequest("Invalid repository URL. Must correspond to a valid URL format", err)
+		}
+
 		gitConfig := &gittypes.RepoConfig{
 			URL:            payload.RepositoryURL,
 			ReferenceName:  payload.RepositoryReferenceName,
