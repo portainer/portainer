@@ -33,8 +33,14 @@ export function formatLogs(
   if (stripHeaders) {
     logs = stripHeadersFunc(logs);
   }
-  if (logs.includes('\\n')) {
-    logs = JSON.parse(logs);
+  // if JSON logs come serialized 2 times, parse them once to unwrap them
+  // for example when retrieving Edge Agent logs on Nomad
+  if (logs.startsWith('"{\\"')) {
+    try {
+      logs = JSON.parse(logs);
+    } catch (error) {
+      // noop, throw error away if logs cannot be parsed
+    }
   }
 
   const tokens: Token[][] = tokenize(logs);
