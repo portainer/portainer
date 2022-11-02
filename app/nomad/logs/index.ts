@@ -5,5 +5,5 @@ import { nomadLogViewer } from './nomad-log-viewer';
 
 export const logsModule = angular
   .module('portainer.app.nomad.logs', [])
-  .component('nomadLogsViewer', nomadLogViewer)
+  .component('nomadLogViewer', nomadLogViewer)
   .component('nomadLogsView', logsView).name;
