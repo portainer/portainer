@@ -1,10 +1,12 @@
-angular.module('portainer.nomad').component('nomadLogViewer', {
+import controller from './nomadLogViewerController';
+
+export const nomadLogViewer = {
   templateUrl: './nomadLogViewer.html',
-  controller: 'NomadLogViewerController',
+  controller,
   bindings: {
     stderrLog: '<',
     stdoutLog: '<',
     resourceName: '<',
     logCollectionChange: '<',
   },
-});
+};

@@ -1,7 +1,6 @@
 import moment from 'moment';
 
-import { NEW_LINE_BREAKER } from '@/constants';
-import { concatLogsToString } from '@/docker/helpers/logHelper';
+import { concatLogsToString, NEW_LINE_BREAKER } from '@/docker/helpers/logHelper';
 
 angular.module('portainer.docker').controller('LogViewerController', [
   '$scope',
