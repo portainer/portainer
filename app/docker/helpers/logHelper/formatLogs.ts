@@ -35,7 +35,7 @@ export function formatLogs(
   }
   // if JSON logs come serialized 2 times, parse them once to unwrap them
   // for example when retrieving Edge Agent logs on Nomad
-  if (logs.startsWith('"{\\"')) {
+  if (logs.startsWith('"')) {
     try {
       logs = JSON.parse(logs);
     } catch (error) {
@@ -89,16 +89,26 @@ export function formatLogs(
         }
 
         const text = stripEscapeCodes(tokenLine);
-        if (
-          (!withTimestamps && text.startsWith('{')) ||
-          (withTimestamps && text.substring(TIMESTAMP_LENGTH).startsWith('{'))
-        ) {
-          const lines = formatJSONLine(text, withTimestamps);
-          formattedLogs.push(...lines);
-        } else if (ZerologRegex.test(text)) {
-          const lines = formatZerologLogs(text, withTimestamps);
-          formattedLogs.push(...lines);
-        } else {
+        try {
+          if (
+            (!withTimestamps && text.startsWith('{')) ||
+            (withTimestamps && text.substring(TIMESTAMP_LENGTH).startsWith('{'))
+          ) {
+            const lines = formatJSONLine(text, withTimestamps);
+            formattedLogs.push(...lines);
+          } else if (
+            (!withTimestamps && ZerologRegex.test(text)) ||
+            (withTimestamps &&
+              ZerologRegex.test(text.substring(TIMESTAMP_LENGTH)))
+          ) {
+            const lines = formatZerologLogs(text, withTimestamps);
+            formattedLogs.push(...lines);
+          } else {
+            spans.push({ fgColor, bgColor, text, fontWeight });
+            line += text;
+          }
+        } catch (error) {
+          // in case parsing fails for whatever reason, push the raw logs and continue
           spans.push({ fgColor, bgColor, text, fontWeight });
           line += text;
         }

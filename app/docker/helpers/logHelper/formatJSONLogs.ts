@@ -31,7 +31,7 @@ export function formatJSONLine(
   if (withTimestamps) {
     const timestamp = rawText.substring(0, TIMESTAMP_LENGTH);
     spans.push({ text: timestamp });
-    line += `${timestamp}`;
+    line += `${timestamp} `;
   }
   line += formatTime(time, spans, line);
   line += formatLevel(level, spans, line);

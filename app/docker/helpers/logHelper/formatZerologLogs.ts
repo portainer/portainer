@@ -55,6 +55,12 @@ export function formatZerologLogs(rawText: string, withTimestamps?: boolean) {
 
   const text = withTimestamps ? rawText.substring(TIMESTAMP_LENGTH) : rawText;
 
+  if (withTimestamps) {
+    const timestamp = rawText.substring(0, TIMESTAMP_LENGTH);
+    spans.push({ text: timestamp });
+    line += `${timestamp} `;
+  }
+
   const [, date, level, caller, messageAndPairs] =
     text.match(ZerologRegex) || [];
 
