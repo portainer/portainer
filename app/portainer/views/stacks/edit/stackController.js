@@ -21,7 +21,6 @@ angular.module('portainer.app').controller('StackController', [
   'TaskHelper',
   'Notifications',
   'FormHelper',
-  'EndpointProvider',
   'GroupService',
   'ModalService',
   'StackHelper',
@@ -46,7 +45,6 @@ angular.module('portainer.app').controller('StackController', [
     TaskHelper,
     Notifications,
     FormHelper,
-    EndpointProvider,
     GroupService,
     ModalService,
     StackHelper,
@@ -112,16 +110,12 @@ angular.module('portainer.app').controller('StackController', [
     $scope.duplicateStack = function duplicateStack(name, targetEndpointId) {
       var stack = $scope.stack;
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      // sets the targetEndpointID as global for interceptors
-      EndpointProvider.setEndpointID(targetEndpointId);
 
       return StackService.duplicateStack(name, $scope.stackFileContent, env, targetEndpointId, stack.Type).then(onDuplicationSuccess).catch(notifyOnError);
 
       function onDuplicationSuccess() {
         Notifications.success('Success', 'Stack successfully duplicated');
         $state.go('docker.stacks', {}, { reload: true });
-        // sets back the original endpointID as global for interceptors
-        EndpointProvider.setEndpointID(stack.EndpointId);
       }
 
       function notifyOnError(err) {

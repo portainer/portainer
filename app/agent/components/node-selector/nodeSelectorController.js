@@ -6,7 +6,7 @@ export class NodeSelectorController {
 
   async $onInit() {
     try {
-      const agents = await this.AgentService.agents();
+      const agents = await this.AgentService.agents(this.endpointId);
       this.agents = agents;
       if (!this.model) {
         this.model = agents[0].NodeName;

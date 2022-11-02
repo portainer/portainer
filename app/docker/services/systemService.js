@@ -1,10 +1,10 @@
 import { EventViewModel } from '../models/event';
+import { ping } from './ping';
 
 angular.module('portainer.docker').factory('SystemService', [
   '$q',
   'System',
-  'SystemEndpoint',
-  function SystemServiceFactory($q, System, SystemEndpoint) {
+  function SystemServiceFactory($q, System) {
     'use strict';
     var service = {};
 
@@ -26,7 +26,7 @@ angular.module('portainer.docker').factory('SystemService', [
     };
 
     service.ping = function (endpointId) {
-      return SystemEndpoint.ping({ endpointId: endpointId }).$promise;
+      return ping(endpointId);
     };
 
     service.version = function () {

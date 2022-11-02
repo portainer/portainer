@@ -15,16 +15,16 @@ function AgentServiceFactory(Agent, AgentVersion1, HttpRequestHelper, Host, Stat
     return state.endpoint.agentApiVersion;
   }
 
-  function hostInfo(nodeName) {
+  function hostInfo(endpointId, nodeName) {
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-    return Host.info().$promise;
+    return Host.info({ endpointId }).$promise;
   }
 
-  async function agents() {
+  async function agents(endpointId) {
     const agentVersion = getAgentApiVersion();
     const service = agentVersion > 1 ? Agent : AgentVersion1;
     try {
-      const agents = await service.query({ version: agentVersion }).$promise;
+      const agents = await service.query({ version: agentVersion, endpointId }).$promise;
       return agents.map(function (item) {
         return new AgentViewModel(item);
       });

@@ -52,7 +52,7 @@ export class HostBrowserController {
   }
   async getFilesForPathAsync(path) {
     try {
-      const files = await this.HostBrowserService.ls(path);
+      const files = await this.HostBrowserService.ls(this.endpointId, path);
       this.state.path = path;
       this.files = files;
     } catch (err) {
@@ -67,9 +67,9 @@ export class HostBrowserController {
     const filePath = this.buildPath(this.state.path, name);
     const newFilePath = this.buildPath(this.state.path, newName);
     try {
-      await this.HostBrowserService.rename(filePath, newFilePath);
+      await this.HostBrowserService.rename(this.endpointId, filePath, newFilePath);
       this.Notifications.success('File successfully renamed', this.getRelativePath(newFilePath));
-      const files = await this.HostBrowserService.ls(this.state.path);
+      const files = await this.HostBrowserService.ls(this.endpointId, this.state.path);
       this.files = files;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to rename file');
@@ -82,7 +82,7 @@ export class HostBrowserController {
   async downloadFileAsync(fileName) {
     const filePath = this.buildPath(this.state.path, fileName);
     try {
-      const { file } = await this.HostBrowserService.get(filePath);
+      const { file } = await this.HostBrowserService.get(this.endpointId, filePath);
       const downloadData = new Blob([file], {
         type: 'text/plain;charset=utf-8',
       });
@@ -108,9 +108,9 @@ export class HostBrowserController {
   }
   async deleteFileAsync(path) {
     try {
-      await this.HostBrowserService.delete(path);
+      await this.HostBrowserService.delete(this.endpointId, path);
       this.Notifications.success('File successfully deleted', this.getRelativePath(path));
-      const files = await this.HostBrowserService.ls(this.state.path);
+      const files = await this.HostBrowserService.ls(this.endpointId, this.state.path);
       this.files = files;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to delete file');

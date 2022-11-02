@@ -2,7 +2,7 @@
 
 <div class="row" ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
   <div class="col-sm-12">
-    <dashboard-cluster-agent-info></dashboard-cluster-agent-info>
+    <dashboard-cluster-agent-info endpoint-id="endpoint.Id"></dashboard-cluster-agent-info>
   </div>
 </div>
 <information-panel-offline ng-if="offlineMode"></information-panel-offline>

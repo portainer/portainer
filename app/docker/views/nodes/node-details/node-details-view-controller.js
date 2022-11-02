@@ -42,7 +42,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
             return;
           }
 
-          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+          AgentService.hostInfo(ctrl.endpoint.Id, node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
             ctrl.devices = agentHostInfo.PCIDevices;
             ctrl.disks = agentHostInfo.PhysicalDisks;
           });

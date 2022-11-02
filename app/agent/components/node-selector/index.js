@@ -7,5 +7,6 @@ angular.module('portainer.agent').component('nodeSelector', {
   controller: NodeSelectorController,
   bindings: {
     model: '=',
+    endpointId: '<',
   },
 });
