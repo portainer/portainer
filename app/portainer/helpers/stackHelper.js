@@ -40,11 +40,7 @@ function validateYAML(yaml, containerNames, originalContainersNames = []) {
 
   const names = _.uniq(GenericHelper.findDeepAll(yamlObject, 'container_name'));
 
-  if (names.length === originalContainersNames.length && _.difference(names, originalContainersNames).length === 0) {
-    return '';
-  }
-
-  const duplicateContainers = _.intersection(containerNames, names);
+  const duplicateContainers = _.intersection(_.difference(containerNames, originalContainersNames), names);
 
   if (duplicateContainers.length === 0) {
     return '';
