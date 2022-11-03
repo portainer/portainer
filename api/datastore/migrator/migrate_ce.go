@@ -110,6 +110,9 @@ func (m *Migrator) Migrate() error {
 
 		// Portainer 2.16
 		newMigration(70, m.migrateDBVersionToDB70),
+
+		// Portainer 2.16.1
+		newMigration(71, m.migrateDBVersionToDB71),
 	}
 
 	var lastDbVersion int
