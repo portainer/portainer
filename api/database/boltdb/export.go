@@ -14,7 +14,6 @@ func backupMetadata(connection *bolt.DB) (map[string]interface{}, error) {
 	err := connection.View(func(tx *bolt.Tx) error {
 		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
-			bucket = tx.Bucket([]byte(bucketName))
 			seqId := bucket.Sequence()
 			buckets[bucketName] = int(seqId)
 			return nil
