@@ -37,6 +37,7 @@ export async function init(edition: Edition) {
     [FeatureId.POD_SECURITY_POLICY_CONSTRAINT]: Edition.BE,
     [FeatureId.HIDE_DOCKER_HUB_ANONYMOUS]: Edition.BE,
     [FeatureId.CUSTOM_LOGIN_BANNER]: Edition.BE,
+    [FeatureId.ENFORCE_DEPLOYMENT_OPTIONS]: Edition.BE,
   };
 
   state.currentEdition = currentEdition;
