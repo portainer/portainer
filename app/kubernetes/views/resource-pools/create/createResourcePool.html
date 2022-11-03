@@ -93,17 +93,18 @@
                 <div class="form-group flex flex-row !mb-0">
                   <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Memory limit (MB) </label>
                   <div class="col-xs-6">
-                    <slider
-                      model="$ctrl.formValues.MemoryLimit"
-                      floor="$ctrl.defaults.MemoryLimit"
-                      ceil="$ctrl.state.sliderMaxMemory"
+                    <por-slider
+                      min="$ctrl.defaults.MemoryLimit"
+                      max="$ctrl.state.sliderMaxMemory"
                       step="128"
                       ng-if="$ctrl.state.sliderMaxMemory"
+                      value="$ctrl.formValues.MemoryLimit"
+                      on-change="($ctrl.handleMemoryLimitChange)"
+                      visible-tooltip="true"
                       data-cy="k8sNamespaceCreate-memoryLimitSlider"
-                    >
-                    </slider>
+                    ></por-slider>
                   </div>
-                  <div class="col-sm-2 vertical-center">
+                  <div class="col-sm-2 vertical-center pt-6">
                     <input
                       name="memory_limit"
                       type="number"
@@ -138,16 +139,16 @@
                 <div class="form-group flex flex-row">
                   <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> CPU limit </label>
                   <div class="col-xs-8">
-                    <slider
-                      model="$ctrl.formValues.CpuLimit"
-                      floor="$ctrl.defaults.CpuLimit"
-                      ceil="$ctrl.state.sliderMaxCpu"
+                    <por-slider
+                      min="$ctrl.defaults.CpuLimit"
+                      max="$ctrl.state.sliderMaxCpu"
                       step="0.1"
-                      precision="2"
                       ng-if="$ctrl.state.sliderMaxCpu"
+                      value="$ctrl.formValues.CpuLimit"
+                      on-change="($ctrl.handleCpuLimitChange)"
                       data-cy="k8sNamespaceCreate-cpuLimitSlider"
-                    >
-                    </slider>
+                      visible-tooltip="true"
+                    ></por-slider>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->
