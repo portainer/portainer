@@ -7,26 +7,50 @@
 }
 
 .slider :global .rc-slider-handle {
-  width: 32px;
-  height: 32px;
-  margin-top: -14px;
+  @apply border-blue-8 border-2;
+  width: 24px;
+  height: 24px;
+  margin-top: -8px;
   border-radius: 16px;
   cursor: pointer;
-  background-color: #0db9f0;
+  background-color: #ffffff;
+}
+
+.slider :global .rc-slider-track {
+  @apply bg-blue-8;
 }
 
 .slider :global .rc-slider-handle:after {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 8px;
-  height: 8px;
+  top: 8px;
+  left: 8px;
+  width: 9px;
+  height: 9px;
   background: #ffffff;
-  border-radius: 4px;
+  border-radius: 5px;
   content: '';
 }
 
-.slider :global .rc-slider-mark-text,
+.slider :global .rc-slider-mark-text {
+  font-size: 14px;
+  color: var(--text-body-color);
+}
+
+.slider :global .rc-slider-tooltip-arrow {
+  bottom: 2px;
+  border-top-color: var(--bg-tooltip-color);
+}
+
+.slider :global .rc-slider-tooltip-placement-top {
+  padding: 6px 0px;
+}
+
 .slider :global .rc-slider-tooltip-inner {
-  font-family: Inter, serif;
+  font-size: 14px;
+  color: var(--text-tooltip-color);
+  height: fit-content;
+  background-color: var(--bg-tooltip-color);
+  box-shadow: 0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%);
+  padding: 8px 12px;
+  text-align: center;
 }

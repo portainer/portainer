@@ -33,6 +33,7 @@ import { FallbackImage } from '@@/FallbackImage';
 import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { Slider } from '@@/form-components/Slider';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -183,6 +184,18 @@ export const componentsModule = angular
       'options',
       'isMulti',
       'isClearable',
+    ])
+  )
+  .component(
+    'porSlider',
+    r2a(Slider, [
+      'min',
+      'max',
+      'step',
+      'value',
+      'onChange',
+      'visibleTooltip',
+      'dataCy',
     ])
   )
   .component(
