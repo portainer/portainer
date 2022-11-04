@@ -9,13 +9,25 @@ export interface Props {
   step: number;
   value: number;
   onChange: (value: number) => void;
+  // true if you want to always show the tooltip
+  dataCy: string;
+  visibleTooltip?: boolean;
 }
 
-export function Slider({ min, max, step, value, onChange }: Props) {
+export function Slider({
+  min,
+  max,
+  step,
+  value,
+  onChange,
+  dataCy,
+  visibleTooltip: visible,
+}: Props) {
   const SliderWithTooltip = RcSlider.createSliderWithTooltip(RcSlider);
+  // if the tooltip is always visible, hide the marks when tooltip value gets close to the edges
   const marks = {
-    [min]: translateMinValue(min),
-    [max]: max.toString(),
+    [min]: visible && value / max < 0.1 ? '' : translateMinValue(min),
+    [max]: visible && value / max > 0.9 ? '' : max.toString(),
   };
 
   return (
@@ -29,6 +41,11 @@ export function Slider({ min, max, step, value, onChange }: Props) {
         defaultValue={value}
         onAfterChange={onChange}
         className={styles.slider}
+        tipProps={{ visible }}
+        railStyle={{ height: 8 }}
+        trackStyle={{ height: 8 }}
+        dotStyle={{ visibility: 'hidden' }}
+        data-cy={dataCy}
       />
     </div>
   );

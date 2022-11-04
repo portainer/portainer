@@ -8,7 +8,14 @@ export default {
   title: 'Components/Form/Slider',
 } as Meta;
 
-function Template({ value, min, max, step }: JSX.IntrinsicAttributes & Props) {
+function Template({
+  value,
+  min,
+  max,
+  step,
+  dataCy,
+  visibleTooltip,
+}: JSX.IntrinsicAttributes & Props) {
   const [sliderValue, setSliderValue] = useState(min);
 
   useEffect(() => {
@@ -22,6 +29,8 @@ function Template({ value, min, max, step }: JSX.IntrinsicAttributes & Props) {
       step={step}
       value={sliderValue}
       onChange={setSliderValue}
+      dataCy={dataCy}
+      visibleTooltip={visibleTooltip}
     />
   );
 }
@@ -32,4 +41,6 @@ Primary.args = {
   max: 100,
   step: 1,
   value: 5,
+  visibleTooltip: true,
+  dataCy: 'someView-coolSlider',
 };

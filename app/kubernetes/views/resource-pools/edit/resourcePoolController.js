@@ -69,6 +69,8 @@ class KubernetesResourcePoolController {
     this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
     this.onChangeIngressControllerAvailability = this.onChangeIngressControllerAvailability.bind(this);
     this.onRegistriesChange = this.onRegistriesChange.bind(this);
+    this.handleMemoryLimitChange = this.handleMemoryLimitChange.bind(this);
+    this.handleCpuLimitChange = this.handleCpuLimitChange.bind(this);
   }
   /* #endregion */
 
@@ -120,6 +122,18 @@ class KubernetesResourcePoolController {
     if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(KubernetesResourceQuotaDefaults.MemoryLimit)) {
       this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(KubernetesResourceQuotaDefaults.MemoryLimit);
     }
+  }
+
+  handleMemoryLimitChange(memoryLimit) {
+    return this.$async(async () => {
+      this.formValues.MemoryLimit = memoryLimit;
+    });
+  }
+
+  handleCpuLimitChange(cpuLimit) {
+    return this.$async(async () => {
+      this.formValues.CpuLimit = cpuLimit;
+    });
   }
 
   showEditor() {
