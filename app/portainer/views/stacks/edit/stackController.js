@@ -3,6 +3,7 @@ import { AccessControlFormData } from 'Portainer/components/accessControlForm/po
 import { FeatureId } from 'Portainer/feature-flags/enums';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { StackStatus, StackType } from '@/react/docker/stacks/types';
+import { extractContainerNames } from '@/portainer/helpers/stackHelper';
 
 angular.module('portainer.app').controller('StackController', [
   '$async',
@@ -275,7 +276,7 @@ angular.module('portainer.app').controller('StackController', [
       if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
         $scope.state.isEditorDirty = true;
         $scope.stackFileContent = cm.getValue();
-        $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
+        $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames, $scope.state.originalContainerNames);
       }
     };
 
@@ -365,8 +366,9 @@ angular.module('portainer.app').controller('StackController', [
             if (isSwarm && $scope.stack.Status === StackStatus.Active) {
               assignSwarmStackResources(data.resources, agentProxy);
             }
+            $scope.state.originalContainerNames = extractContainerNames($scope.stackFileContent);
 
-            $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
+            $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames, $scope.state.originalContainerNames);
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to retrieve stack details');
