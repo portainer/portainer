@@ -140,7 +140,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
           $state.go('docker.volumes', {}, { reload: true });
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'An error occured during volume creation');
+          Notifications.error('Failure', err, 'An error occurred during volume creation');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;

@@ -67,7 +67,7 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.handleAttachRequest(w, r, params)
 	if err != nil {
-		return httperror.InternalServerError("An error occured during websocket attach operation", err)
+		return httperror.InternalServerError("An error occurred during websocket attach operation", err)
 	}
 
 	return nil
