@@ -11,7 +11,7 @@ interface DockerImage {
   Entrypoint: Array<string>;
   ExposedPorts: Array<number>;
   Volumes: Array<string>;
-  Env: Array<{ key: string; value: string }>;
+  Env: Array<string>;
 }
 
 interface Props {
@@ -66,7 +66,7 @@ export function DockerfileDetails({ image }: Props) {
                 <table className="table table-bordered table-condensed">
                   <tbody>
                     {image.Env.map((variable) => (
-                      <tr ng-repeat="var in image.Env">
+                      <tr key={variable}>
                         <td>{getPairKey(variable, '=')}</td>
                         <td>{getPairValue(variable, '=')}</td>
                       </tr>
