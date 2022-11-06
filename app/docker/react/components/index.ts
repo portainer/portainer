@@ -9,9 +9,11 @@ import { Gpu } from '@/react/docker/containers/CreateView/Gpu';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { DockerfileDetails } from '@/react/docker/images/ItemView/DockerfileDetails';
 
 export const componentsModule = angular
   .module('portainer.docker.react.components', [])
+  .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component(
     'containerQuickActions',
     r2a(withUIRouter(withCurrentUser(ContainerQuickActions)), [

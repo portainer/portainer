@@ -9,3 +9,11 @@ export function trimSHA(imageName: string) {
   }
   return _.split(imageName, '@sha256')[0];
 }
+
+export function joinCommand(command: null | Array<string> = []) {
+  if (!command) {
+    return '';
+  }
+
+  return command.join(' ');
+}
