@@ -15,18 +15,18 @@ func (m *Migrator) migrateDBVersionToDB71() error {
 	}
 
 	for _, s := range snapshots {
-		e, err := m.endpointService.Endpoint(s.EndpointID)
+		_, err := m.endpointService.Endpoint(s.EndpointID)
 		if err == nil {
-			log.Debug().Int("endpoint_id", int(e.ID)).Msg("keeping snapshot")
+			log.Debug().Int("endpoint_id", int(s.EndpointID)).Msg("keeping snapshot")
 			continue
 		} else if err != errors.ErrObjectNotFound {
-			log.Debug().Int("endpoint_id", int(e.ID)).Err(err).Msg("database error")
+			log.Debug().Int("endpoint_id", int(s.EndpointID)).Err(err).Msg("database error")
 			return err
 		}
 
-		log.Debug().Int("endpoint_id", int(e.ID)).Msg("removing snapshot")
+		log.Debug().Int("endpoint_id", int(s.EndpointID)).Msg("removing snapshot")
 
-		err = m.snapshotService.DeleteSnapshot(e.ID)
+		err = m.snapshotService.DeleteSnapshot(s.EndpointID)
 		if err != nil {
 			return err
 		}
