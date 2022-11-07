@@ -79,7 +79,8 @@ func (m *Migrator) Init() {
 			m.migrateDBVersionToDB60),
 		newMigration("2.16",
 			m.migrateDBVersionToDB70),
-		newMigration("2.16.1", m.migrateDBVersionToDB71),
+		newMigration("2.16.1",
+			m.migrateDBVersionToDB71),
 
 		// Add new migrations below...
 		// One function per migration, each versions migration funcs in the same file.
@@ -148,6 +149,7 @@ func (m *Migrator) Migrate() error {
 			newMigratorCount = len(migration.migrationFuncs)
 		}
 	}
+
 	if versionUpdateRequired || newMigratorCount != version.MigratorCount {
 		version.SchemaVersion = portainer.APIVersion
 		version.MigratorCount = newMigratorCount
