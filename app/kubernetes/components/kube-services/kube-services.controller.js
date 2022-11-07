@@ -1,7 +1,7 @@
-import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
-import { getServices } from 'Kubernetes/react/views/networks/services/service';
+import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from '@/kubernetes/models/service/models';
+import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models/constants';
 import { notifyError } from '@/portainer/services/notifications';
+import { getServices } from '@/react/kubernetes/networks/services/service';
 
 export default class KubeServicesViewController {
   /* @ngInject */

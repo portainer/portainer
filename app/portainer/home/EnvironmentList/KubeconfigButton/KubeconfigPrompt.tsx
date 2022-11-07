@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import { DialogOverlay } from '@reach/dialog';
 
-import * as kcService from '@/kubernetes/services/kubeconfig.service';
+import { downloadKubeconfigFile } from '@/react/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
@@ -144,9 +144,7 @@ export function KubeconfigPrompt({
       return;
     }
     try {
-      await kcService.downloadKubeconfigFile(
-        Object.keys(selection).map(Number)
-      );
+      await downloadKubeconfigFile(Object.keys(selection).map(Number));
       onClose();
     } catch (e) {
       notifications.error('Failed downloading kubeconfig file', e as Error);

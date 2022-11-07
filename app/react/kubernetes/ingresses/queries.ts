@@ -6,8 +6,7 @@ import {
   withError,
   withInvalidate,
 } from '@/react-tools/react-query';
-
-import { getServices } from '../services/service';
+import { getServices } from '@/react/kubernetes/networks/services/service';
 
 import {
   getIngresses,

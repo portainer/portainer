@@ -5,8 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
-import { Annotation } from '@/kubernetes/react/views/networks/ingresses/components/annotations/types';
-import { useServices } from '@/kubernetes/react/views/networks/services/queries';
+import { useServices } from '@/react/kubernetes/networks/services/queries';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { Link } from '@@/Link';
@@ -22,6 +21,7 @@ import {
   useIngressControllers,
 } from '../queries';
 
+import { Annotation } from './Annotations/types';
 import { Rule, Path, Host } from './types';
 import { IngressForm } from './IngressForm';
 import {
