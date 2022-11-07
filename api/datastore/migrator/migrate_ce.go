@@ -107,15 +107,6 @@ func GetFunctionName(i interface{}) string {
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) Migrate() error {
-
-	log.Info().Msg("migrating database")
-
-	// set DB to updating status
-	err := m.versionService.StoreIsUpdating(true)
-	if err != nil {
-		return migrationError(err, "StoreIsUpdating")
-	}
-
 	version, err := m.versionService.Version()
 	if err != nil {
 		return migrationError(err, "get version service")
@@ -126,47 +117,50 @@ func (m *Migrator) Migrate() error {
 		return migrationError(err, "invalid db schema version")
 	}
 
-	newMigrationCount := 0
-	versionUpdateRequired := false // dirty flag is used to indicate if any migrations have been updated
+	newMigratorCount := 0
+	versionUpdateRequired := false
+	if schemaVersion.Equal(semver.MustParse(portainer.APIVersion)) {
+		// detect and run migrations when the versions are the same.
+		// e.g. development builds
+		latestMigrations := migrations[len(migrations)-1]
+		if latestMigrations.version.Equal(schemaVersion) &&
+			version.MigratorCount != len(latestMigrations.migrationFuncs) {
 
-	for _, migration := range migrations {
-		if schemaVersion.LessThan(migration.version) {
 			versionUpdateRequired = true
-
-			log.Info().Msgf("migrating db to %s", migration.version.String())
-			err := runMigrations(migration.migrationFuncs)
+			err := runMigrations(latestMigrations.migrationFuncs)
 			if err != nil {
 				return err
 			}
-		} else if schemaVersion.Equal(semver.MustParse(portainer.APIVersion)) {
-			// If new migrations have been added for this version then we run them all again over
-			// the same data.
-			if newMigrationCount < len(migration.migrationFuncs) {
+			newMigratorCount = len(latestMigrations.migrationFuncs)
+		}
+	} else {
+		// regular path when major/minor/patch versions differ
+		for _, migration := range migrations {
+			if schemaVersion.LessThan(migration.version) {
 				versionUpdateRequired = true
+				log.Info().Msgf("migrating data to %s", migration.version.String())
 				err := runMigrations(migration.migrationFuncs)
 				if err != nil {
 					return err
 				}
-
-				newMigrationCount = len(migration.migrationFuncs)
 			}
+
+			newMigratorCount = len(migration.migrationFuncs)
 		}
 	}
-
-	if versionUpdateRequired {
+	if versionUpdateRequired || newMigratorCount != version.MigratorCount {
 		version.SchemaVersion = portainer.APIVersion
-		version.MigratorCount = newMigrationCount
+		version.MigratorCount = newMigratorCount
 
 		err = m.versionService.UpdateVersion(version)
 		if err != nil {
 			return migrationError(err, "StoreDBVersion")
 		}
 
-		log.Info().Msgf("migrating DB to %s", portainer.APIVersion)
+		log.Info().Msgf("db migrated to %s", portainer.APIVersion)
 	}
 
-	// reset DB updating status
-	return m.versionService.StoreIsUpdating(false)
+	return nil
 }
 
 func runMigrations(migrationFuncs []func() error) error {
