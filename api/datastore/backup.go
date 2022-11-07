@@ -175,7 +175,6 @@ func (store *Store) removeWithOptions(options *BackupOptions) error {
 
 	if os.IsNotExist(err) {
 		log.Error().Str("path", options.BackupPath).Err(err).Msg("backup file to remove does not exist")
-
 		return err
 	}
 
@@ -183,7 +182,6 @@ func (store *Store) removeWithOptions(options *BackupOptions) error {
 	err = os.Remove(options.BackupPath)
 	if err != nil {
 		log.Error().Err(err).Msg("failed")
-
 		return err
 	}
 

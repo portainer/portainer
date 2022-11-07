@@ -180,17 +180,33 @@ func runMigrations(migrationFuncs []func() error) error {
 }
 
 func (m *Migrator) NeedsMigration() bool {
-	if m.Edition() != portainer.PortainerCE {
+	// we need to migrate if anything changes with the version in the DB vs what our software version is.
+	// If the version matches, then it's all down to the number of migration funcs we have for the current version
+	// i.e. the MigratorCount
+
+	// In this particular instance we should log a fatal error
+	if m.CurrentDBEdition() != portainer.PortainerCE {
+		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://documentation.portainer.io/v2.0-be/downgrade/be-to-ce/")
+		return false
+	}
+
+	if m.CurrentSemanticDBVersion().LessThan(semver.MustParse(portainer.APIVersion)) {
 		return true
 	}
 
-	if m.SemanticVersion().LessThan(semver.MustParse(portainer.APIVersion)) {
-		return true
-	}
-
+	// Check if we have any migrations for the current version
 	latestMigrations := migrations[len(migrations)-1]
-	if latestMigrations.version.Equal(m.SemanticVersion()) && m.currentVersion.MigratorCount < len(latestMigrations.migrationFuncs) {
-		return true
+	if latestMigrations.version.Equal(semver.MustParse(portainer.APIVersion)) {
+		if m.currentDBVersion.MigratorCount != len(latestMigrations.migrationFuncs) {
+			return true
+		}
+	} else {
+		// One remaining possibility if we get here.  If our migrator count > 0 and we have no migration funcs
+		// for the current version (i.e. they were deleted during development).  Then we we need to migrate.
+		// This is to reset the migrator count back to 0
+		if m.currentDBVersion.MigratorCount > 0 {
+			return true
+		}
 	}
 
 	return false

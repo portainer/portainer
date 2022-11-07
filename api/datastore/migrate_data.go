@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	portainer "github.com/portainer/portainer/api"
 	portaineree "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/database/models"
@@ -19,6 +18,15 @@ import (
 const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 
 func (store *Store) MigrateData() error {
+	updating, err := store.VersionService.IsUpdating()
+	if err != nil {
+		return errors.Wrap(err, "while checking if the store is updating")
+	}
+
+	if updating {
+		return dserrors.ErrDatabaseIsUpdating
+	}
+
 	// migrate new version bucket if required (doesn't write anything to db yet)
 	version, err := store.getOrMigrateLegacyVersion()
 	if err != nil {
@@ -27,7 +35,6 @@ func (store *Store) MigrateData() error {
 
 	migratorParams := store.newMigratorParameters(version)
 	migrator := migrator.NewMigrator(migratorParams)
-	migrator.Init()
 
 	if !migrator.NeedsMigration() {
 		return nil
@@ -46,7 +53,7 @@ func (store *Store) MigrateData() error {
 			return errors.Wrap(err, "failed to restore database")
 		}
 
-		fmt.Println("Restored database to previous version")
+		log.Info().Msg("database restored to previous version")
 		return errors.Wrap(err, "failed to migrate database")
 	}
 
@@ -55,7 +62,7 @@ func (store *Store) MigrateData() error {
 
 func (store *Store) newMigratorParameters(version *models.Version) *migrator.MigratorParameters {
 	return &migrator.MigratorParameters{
-		CurrentVersion:          version,
+		CurrentDBVersion:        version,
 		EndpointGroupService:    store.EndpointGroupService,
 		EndpointService:         store.EndpointService,
 		EndpointRelationService: store.EndpointRelationService,
@@ -86,6 +93,11 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models
 		}
 	}()
 
+	err = store.VersionService.StoreIsUpdating(true)
+	if err != nil {
+		return errors.Wrap(err, "while updating the store")
+	}
+
 	// now update the version to the new struct (if required)
 	err = store.finishMigrateLegacyVersion(version)
 	if err != nil {
@@ -99,62 +111,9 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models
 		return err
 	}
 
-	return nil
-}
-
-// MigrateData automatically migrate the data based on the Version.
-// This process is only triggered on an existing database, not if the database was just created.
-// if force is true, then migrate regardless.
-func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParameters) error {
-	migrator := migrator.NewMigrator(migratorParams)
-
-	version, err := migratorParams.VersionService.Version()
+	err = store.VersionService.StoreIsUpdating(false)
 	if err != nil {
-		return err
-	}
-
-	// backup db file before upgrading DB to support rollback
-	isUpdating, err := migratorParams.VersionService.IsUpdating()
-	if err != nil && err != dserrors.ErrObjectNotFound {
-		return err
-	}
-
-	if !isUpdating && version.SchemaVersion != portainer.APIVersion {
-		err = store.backupVersion(migrator)
-		if err != nil {
-			return errors.Wrapf(err, "failed to backup database")
-		}
-	}
-
-	if version.SchemaVersion != portainer.APIVersion {
-		log.Info().Msgf("migrating database from version %s to %s ", version.SchemaVersion, portainer.APIVersion)
-	}
-
-	err = store.FailSafeMigrate(migrator, version)
-	if err != nil {
-		log.Error().Err(err).Msg("an error occurred during database migration")
-		return err
-	}
-
-	return nil
-}
-
-// backupVersion will backup the database or panic if any errors occur
-func (store *Store) backupVersion(migrator *migrator.Migrator) error {
-	log.Info().Msg("backing up database prior to version upgrade")
-
-	options := getBackupRestoreOptions(store.commonBackupDir())
-
-	_, err := store.backupWithOptions(options)
-	if err != nil {
-		log.Error().Err(err).Msg("an error occurred during database backup")
-
-		removalErr := store.removeWithOptions(options)
-		if removalErr != nil {
-			log.Error().Err(err).Msg("an error occurred during store removal prior to backup")
-		}
-
-		return err
+		return errors.Wrap(err, "failed to update the store")
 	}
 
 	return nil

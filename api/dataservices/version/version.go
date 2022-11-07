@@ -1,9 +1,12 @@
 package version
 
 import (
+	"errors"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 const (
@@ -62,6 +65,9 @@ func (service *Service) Edition() (portainer.SoftwareEdition, error) {
 func (service *Service) IsUpdating() (bool, error) {
 	var isUpdating bool
 	err := service.connection.GetObject(BucketName, []byte(updatingKey), &isUpdating)
+	if err != nil && errors.Is(err, dserrors.ErrObjectNotFound) {
+		return false, nil
+	}
 	return isUpdating, err
 }
 

@@ -29,7 +29,7 @@ import (
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
 	Migrator struct {
-		currentVersion          *models.Version
+		currentDBVersion        *models.Version
 		endpointGroupService    *endpointgroup.Service
 		endpointService         *endpoint.Service
 		endpointRelationService *endpointrelation.Service
@@ -53,7 +53,7 @@ type (
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
 	MigratorParameters struct {
-		CurrentVersion          *models.Version
+		CurrentDBVersion        *models.Version
 		EndpointGroupService    *endpointgroup.Service
 		EndpointService         *endpoint.Service
 		EndpointRelationService *endpointrelation.Service
@@ -78,8 +78,8 @@ type (
 
 // NewMigrator creates a new Migrator.
 func NewMigrator(parameters *MigratorParameters) *Migrator {
-	return &Migrator{
-		currentVersion:          parameters.CurrentVersion,
+	migrator := &Migrator{
+		currentDBVersion:        parameters.CurrentDBVersion,
 		endpointGroupService:    parameters.EndpointGroupService,
 		endpointService:         parameters.EndpointService,
 		endpointRelationService: parameters.EndpointRelationService,
@@ -100,18 +100,21 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		authorizationService:    parameters.AuthorizationService,
 		dockerhubService:        parameters.DockerhubService,
 	}
+
+	migrator.Init()
+	return migrator
 }
 
-func (m *Migrator) Version() string {
-	return m.currentVersion.SchemaVersion
+func (m *Migrator) CurrentDBVersion() string {
+	return m.currentDBVersion.SchemaVersion
 }
 
-func (m *Migrator) Edition() portainer.SoftwareEdition {
-	return portainer.SoftwareEdition(m.currentVersion.Edition)
+func (m *Migrator) CurrentDBEdition() portainer.SoftwareEdition {
+	return portainer.SoftwareEdition(m.currentDBVersion.Edition)
 }
 
-func (m *Migrator) SemanticVersion() *semver.Version {
-	v, err := semver.NewVersion(m.currentVersion.SchemaVersion)
+func (m *Migrator) CurrentSemanticDBVersion() *semver.Version {
+	v, err := semver.NewVersion(m.currentDBVersion.SchemaVersion)
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg("failed to parse current version")
 	}

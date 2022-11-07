@@ -69,6 +69,7 @@ func dbVersionToSemanticVersion(dbVersion int) string {
 
 // getOrMigrateLegacyVersion to new Version struct
 func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
+	// Very old versions of portainer did not have a version bucket, lets set some defaults
 	dbVersion := 24
 	edition := int(portaineree.PortainerCE)
 	instanceId := ""
@@ -94,19 +95,11 @@ func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
 		return nil, err
 	}
 
-	v = &models.Version{
+	return &models.Version{
 		SchemaVersion: dbVersionToSemanticVersion(dbVersion),
 		Edition:       edition,
 		InstanceID:    string(instanceId),
-	}
-
-	defer store.VersionService.StoreIsUpdating(false)
-	err = store.VersionService.StoreIsUpdating(true)
-	if err != nil {
-		return v, err
-	}
-
-	return v, nil
+	}, nil
 }
 
 // finishMigrateLegacyVersion writes the new version to the DB and removes the old version keys from the DB
@@ -117,6 +110,5 @@ func (store *Store) finishMigrateLegacyVersion(versionToWrite *models.Version) e
 	store.connection.DeleteObject(bucketName, []byte(legacyDBVersionKey))
 	store.connection.DeleteObject(bucketName, []byte(legacyEditionKey))
 	store.connection.DeleteObject(bucketName, []byte(legacyInstanceKey))
-
 	return err
 }

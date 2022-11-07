@@ -13,14 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (store *Store) edition() portainer.SoftwareEdition {
-	edition, err := store.VersionService.Edition()
-	if store.IsErrObjectNotFound(err) {
-		edition = portainer.PortainerCE
-	}
-	return edition
-}
-
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
 	return &Store{
@@ -83,9 +75,21 @@ func (store *Store) CheckCurrentEdition() error {
 	return nil
 }
 
+func (store *Store) edition() portainer.SoftwareEdition {
+	edition, err := store.VersionService.Edition()
+	if store.IsErrObjectNotFound(err) {
+		edition = portainer.PortainerCE
+	}
+	return edition
+}
+
 // TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
 	return e == portainerErrors.ErrObjectNotFound
+}
+
+func (store *Store) Connection() portainer.Connection {
+	return store.connection
 }
 
 func (store *Store) Rollback(force bool) error {
