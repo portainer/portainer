@@ -1,13 +1,13 @@
 import _ from 'lodash-es';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 export class EditEdgeStackViewController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, EdgeGroupService, EdgeStackService, Notifications) {
+  constructor($async, $state, $window, EdgeGroupService, EdgeStackService, Notifications) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
-    this.ModalService = ModalService;
     this.EdgeGroupService = EdgeGroupService;
     this.EdgeStackService = EdgeStackService;
     this.Notifications = Notifications;
@@ -64,7 +64,7 @@ export class EditEdgeStackViewController {
       this.formValues.StackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== this.oldFileContent.replace(/(\r\n|\n|\r)/gm, '') &&
       this.state.isEditorDirty
     ) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

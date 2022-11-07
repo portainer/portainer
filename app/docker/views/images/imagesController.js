@@ -1,5 +1,9 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { ModalType } from '@@/modals';
+import { confirmImageExport } from '@/react/docker/images/common/ConfirmExportModal';
+import { confirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.docker').controller('ImagesController', [
   '$scope',
@@ -7,12 +11,11 @@ angular.module('portainer.docker').controller('ImagesController', [
   'Authentication',
   'ImageService',
   'Notifications',
-  'ModalService',
   'HttpRequestHelper',
   'FileSaver',
   'Blob',
   'endpoint',
-  function ($scope, $state, Authentication, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, endpoint) {
+  function ($scope, $state, Authentication, ImageService, Notifications, HttpRequestHelper, FileSaver, Blob, endpoint) {
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
 
@@ -52,7 +55,7 @@ angular.module('portainer.docker').controller('ImagesController', [
     };
 
     $scope.confirmRemovalAction = function (selectedItems, force) {
-      ModalService.confirmImageForceRemoval(function (confirmed) {
+      confirmImageForceRemoval().then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -104,7 +107,7 @@ angular.module('portainer.docker').controller('ImagesController', [
         return;
       }
 
-      ModalService.confirmImageExport(function (confirmed) {
+      confirmImageExport(function (confirmed) {
         if (!confirmed) {
           return;
         }
@@ -158,3 +161,12 @@ angular.module('portainer.docker').controller('ImagesController', [
     initView();
   },
 ]);
+
+function confirmImageForceRemoval() {
+  return confirm({
+    title: 'Are you sure?',
+    modalType: ModalType.Destructive,
+    message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
+    confirmButton: buildConfirmButton('Remote the image', 'danger'),
+  });
+}

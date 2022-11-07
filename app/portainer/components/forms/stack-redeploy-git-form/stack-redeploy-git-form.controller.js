@@ -1,15 +1,16 @@
 import uuidv4 from 'uuid/v4';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { confirmStackUpdate } from '@/react/docker/stacks/common/confirm-stack-update';
+
 class StackRedeployGitFormController {
   /* @ngInject */
-  constructor($async, $state, $compile, $scope, StackService, ModalService, Notifications, WebhookHelper, FormHelper) {
+  constructor($async, $state, $compile, $scope, StackService, Notifications, WebhookHelper, FormHelper) {
     this.$async = $async;
     this.$state = $state;
     this.$compile = $compile;
     this.$scope = $scope;
     this.StackService = StackService;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.WebhookHelper = WebhookHelper;
     this.FormHelper = FormHelper;
@@ -105,33 +106,32 @@ class StackRedeployGitFormController {
   async submit() {
     const isSwarmStack = this.stack.Type === 1;
     const that = this;
-    this.ModalService.confirmStackUpdate(
+    confirmStackUpdate(
       'Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?',
-      isSwarmStack,
-      'btn-warning',
-      async function (result) {
-        if (!result) {
-          return;
-        }
-        try {
-          that.state.redeployInProgress = true;
-          await that.StackService.updateGit(
-            that.stack.Id,
-            that.stack.EndpointId,
-            that.FormHelper.removeInvalidEnvVars(that.formValues.Env),
-            that.formValues.Option.Prune,
-            that.formValues,
-            !!result[0]
-          );
-          that.Notifications.success('Success', 'Pulled and redeployed stack successfully');
-          that.$state.reload();
-        } catch (err) {
-          that.Notifications.error('Failure', err, 'Failed redeploying stack');
-        } finally {
-          that.state.redeployInProgress = false;
-        }
+      isSwarmStack
+    ).then(async function (result) {
+      if (!result) {
+        return;
       }
-    );
+      try {
+        that.state.redeployInProgress = true;
+        await that.StackService.updateGit(
+          that.stack.Id,
+          that.stack.EndpointId,
+          that.FormHelper.removeInvalidEnvVars(that.formValues.Env),
+          that.formValues.Option.Prune,
+          that.formValues,
+          result.pullImage
+        );
+
+        that.Notifications.success('Success', 'Pulled and redeployed stack successfully');
+        that.$state.reload();
+      } catch (err) {
+        that.Notifications.error('Failure', err, 'Failed redeploying stack');
+      } finally {
+        that.state.redeployInProgress = false;
+      }
+    });
   }
 
   async saveGitSettings() {

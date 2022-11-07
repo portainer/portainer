@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { confirmDeletionAsync } from 'Portainer/services/modal.service/confirm';
+import { confirmDelete } from '@@/modals/confirm';
 
 class ConfigsController {
   /* @ngInject */
@@ -33,7 +33,7 @@ class ConfigsController {
   }
 
   async removeAction(selectedItems) {
-    const confirmed = await confirmDeletionAsync('Do you want to remove the selected config(s)?');
+    const confirmed = await confirmDelete('Do you want to remove the selected config(s)?');
     if (!confirmed) {
       return null;
     }

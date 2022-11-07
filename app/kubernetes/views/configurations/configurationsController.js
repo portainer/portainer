@@ -1,16 +1,16 @@
 import angular from 'angular';
+import { confirmDelete } from '@@/modals/confirm';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesConfigurationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesApplicationService, ModalService) {
+  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesApplicationService = KubernetesApplicationService;
-    this.ModalService = ModalService;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurations = this.getConfigurations.bind(this);
@@ -58,7 +58,7 @@ class KubernetesConfigurationsController {
   }
 
   removeAction(selectedItems) {
-    this.ModalService.confirmDeletion('Do you want to remove the selected configuration(s)?', (confirmed) => {
+    confirmDelete('Do you want to remove the selected configuration(s)?').then((confirmed) => {
       if (confirmed) {
         return this.$async(this.removeActionAsync, selectedItems);
       }

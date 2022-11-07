@@ -1,9 +1,10 @@
 import { useField } from 'formik';
 
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
-
+import { confirm } from '@@/modals/confirm';
 import { FormControl } from '@@/form-components/FormControl';
 import { Switch } from '@@/form-components/SwitchField/Switch';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 
 export function EnabledWaitingRoomSwitch() {
   const [inputProps, meta, helpers] = useField<boolean>('TrustOnFirstConnect');
@@ -30,20 +31,12 @@ export function EnabledWaitingRoomSwitch() {
       return;
     }
 
-    const confirmed = await confirmAsync({
+    const confirmed = await confirm({
+      modalType: ModalType.Warn,
       title: 'Disable Edge Environment Waiting Room',
       message:
         'By disabling the waiting room feature, all devices requesting association will be automatically associated and could pose a security risk. Are you sure?',
-      buttons: {
-        cancel: {
-          label: 'Cancel',
-          className: 'btn-default',
-        },
-        confirm: {
-          label: 'Confirm',
-          className: 'btn-danger',
-        },
-      },
+      confirmButton: buildConfirmButton('Confirm', 'danger'),
     });
 
     helpers.setValue(!!confirmed);

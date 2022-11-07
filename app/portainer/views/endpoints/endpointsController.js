@@ -1,16 +1,16 @@
 import { map } from 'lodash';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { confirmDelete } from '@@/modals/confirm';
 
 export class EndpointsController {
   /* @ngInject */
-  constructor($state, $async, EndpointService, GroupService, ModalService, Notifications, EndpointProvider, StateManager) {
+  constructor($state, $async, EndpointService, GroupService, Notifications, EndpointProvider, StateManager) {
     Object.assign(this, {
       $state,
       $async,
       EndpointService,
       GroupService,
-      ModalService,
       Notifications,
       EndpointProvider,
       StateManager,
@@ -30,7 +30,7 @@ export class EndpointsController {
   }
 
   removeAction(endpoints) {
-    this.ModalService.confirmDeletion('This action will remove all configurations associated to your environment(s). Continue?', (confirmed) => {
+    confirmDelete('This action will remove all configurations associated to your environment(s). Continue?').then((confirmed) => {
       if (!confirmed) {
         return;
       }

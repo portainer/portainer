@@ -9,15 +9,15 @@ import { renderTemplate } from '@/react/portainer/custom-templates/components/ut
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, customTemplate, url } from '@@/BoxSelector/common-options/build-methods';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, Authentication, ModalService, Notifications, KubernetesResourcePoolService, StackService, WebhookHelper, CustomTemplateService) {
+  constructor($async, $state, $window, Authentication, Notifications, KubernetesResourcePoolService, StackService, WebhookHelper, CustomTemplateService) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
     this.Authentication = Authentication;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
@@ -321,7 +321,7 @@ class KubernetesDeployController {
 
   async uiCanExit() {
     if (this.formValues.EditorContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

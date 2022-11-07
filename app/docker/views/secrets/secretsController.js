@@ -1,4 +1,4 @@
-import { confirmDeletionAsync } from 'Portainer/services/modal.service/confirm';
+import { confirmDelete } from '@@/modals/confirm';
 angular.module('portainer.docker').controller('SecretsController', [
   '$scope',
   '$state',
@@ -6,7 +6,7 @@ angular.module('portainer.docker').controller('SecretsController', [
   'Notifications',
   function ($scope, $state, SecretService, Notifications) {
     $scope.removeAction = async function (selectedItems) {
-      const confirmed = await confirmDeletionAsync('Do you want to remove the selected secret(s)?');
+      const confirmed = await confirmDelete('Do you want to remove the selected secret(s)?');
       if (!confirmed) {
         return null;
       }

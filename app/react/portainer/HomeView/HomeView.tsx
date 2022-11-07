@@ -5,10 +5,10 @@ import { Environment } from '@/react/portainer/environments/types';
 import { snapshotEndpoints } from '@/react/portainer/environments/environment.service';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 import * as notifications from '@/portainer/services/notifications';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
-import { buildTitle } from '@/portainer/services/modal.service/utils';
 
+import { confirm } from '@@/modals/confirm';
 import { PageHeader } from '@@/PageHeader';
+import { ModalType } from '@@/modals';
 
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
@@ -72,15 +72,10 @@ export function HomeView() {
 }
 
 async function confirmEndpointSnapshot() {
-  return confirmAsync({
-    title: buildTitle('Are you sure?'),
+  return confirm({
+    title: 'Are you sure?',
+    modalType: ModalType.Warn,
     message:
       'Triggering a manual refresh will poll each environment to retrieve its information, this may take a few moments.',
-    buttons: {
-      confirm: {
-        label: 'Continue',
-        className: 'btn-primary',
-      },
-    },
   });
 }
