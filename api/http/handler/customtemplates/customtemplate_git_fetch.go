@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
 )
 
 // @id CustomTemplateGitFetch
@@ -66,6 +67,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		return customTemplate.ProjectPath
 	})
 	if err != nil {
+		log.Info().Msgf("failed to download git repository: %s", err.Error())
 		err = rollbackCustomTemplate(backupPath, customTemplate.ProjectPath)
 		if err != nil {
 			return httperror.InternalServerError("Failed to rollback the custom template folder", err)
@@ -110,7 +112,10 @@ func backupCustomTemplate(projectPath string) (string, error) {
 }
 
 func rollbackCustomTemplate(backupPath, projectPath string) error {
-	os.RemoveAll(projectPath)
+	err := os.RemoveAll(projectPath)
+	if err != nil {
+		return err
+	}
 	return os.Rename(backupPath, projectPath)
 }
 

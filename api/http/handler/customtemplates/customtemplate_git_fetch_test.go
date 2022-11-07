@@ -128,7 +128,7 @@ func Test_customTemplateGitFetch(t *testing.T) {
 
 	h := NewHandler(requestBouncer, store, fileService, gitService)
 
-	// generate standard and admin user tokens
+	// generate two standard users' tokens
 	jwt1, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user1.ID, Username: user1.Username, Role: user1.Role})
 	jwt2, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user2.ID, Username: user2.Username, Role: user2.Role})
 
