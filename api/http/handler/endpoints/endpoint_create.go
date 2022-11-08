@@ -385,7 +385,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, httperror.InternalServerError("An error occured while trying to create the environment", err)
+		return nil, httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
 
 	return endpoint, nil
@@ -515,7 +515,7 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("An error occured while trying to create the environment", err)
+		return httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
 
 	return nil
