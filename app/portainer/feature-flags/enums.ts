@@ -13,6 +13,7 @@ export enum FeatureId {
   K8S_RESOURCE_POOL_LB_QUOTA = 'k8s-resourcepool-Ibquota',
   K8S_RESOURCE_POOL_STORAGE_QUOTA = 'k8s-resourcepool-storagequota',
   K8S_CREATE_FROM_KUBECONFIG = 'k8s-create-from-kubeconfig',
+  K8S_EDIT_YAML = 'k8s-edit-yaml',
   KAAS_PROVISIONING = 'kaas-provisioning',
   NOMAD = 'nomad',
   RBAC_ROLES = 'rbac-roles',
