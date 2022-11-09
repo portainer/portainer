@@ -8,11 +8,15 @@ interface PreviewPayload {
   password?: string;
 }
 
+interface PreviewResponse {
+  FileContent: string;
+}
+
 export async function getFilePreview(payload: PreviewPayload) {
   try {
     const {
       data: { FileContent },
-    } = await axios.post('/gitops/repo/file/preview', payload);
+    } = await axios.post<PreviewResponse>('/gitops/repo/file/preview', payload);
     return FileContent;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to fetch file from git');

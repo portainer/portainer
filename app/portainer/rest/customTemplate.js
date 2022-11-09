@@ -13,7 +13,7 @@ function CustomTemplatesFactory($resource, API_ENDPOINT_CUSTOM_TEMPLATES) {
       update: { method: 'PUT', params: { id: '@id' } },
       remove: { method: 'DELETE', params: { id: '@id' } },
       file: { method: 'GET', params: { id: '@id', action: 'file' } },
-      git_fetch: { method: 'PUT', params: { id: '@id', action: 'git_fetch' } },
+      gitFetch: { method: 'PUT', params: { id: '@id', action: 'git_fetch' } },
     }
   );
 }

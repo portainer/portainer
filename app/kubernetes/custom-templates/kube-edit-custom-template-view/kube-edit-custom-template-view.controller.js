@@ -43,11 +43,12 @@ class KubeEditCustomTemplateViewController {
 
         if (template.GitConfig !== null) {
           try {
-            this.formValues.FileContent = await this.CustomTemplateService.fetchFileFromGitRepository(id);
+            template.FileContent = await this.CustomTemplateService.fetchFileFromGitRepository(id);
 
             this.state.isEditorReadOnly = true;
           } catch (err) {
             this.state.templateLoadFailed = true;
+            throw err;
           }
         } else {
           template.FileContent = await this.CustomTemplateService.customTemplateFile(id);
@@ -99,23 +100,23 @@ class KubeEditCustomTemplateViewController {
     }
   }
 
-  parseGitConfig(GitConfig) {
-    if (GitConfig === null) {
+  parseGitConfig(config) {
+    if (config === null) {
       return;
     }
 
     let flatConfig = {
-      RepositoryURL: GitConfig.URL,
-      RepositoryReferenceName: GitConfig.ReferenceName,
-      ComposeFilePathInRepository: GitConfig.ConfigFilePath,
-      RepositoryAuthentication: GitConfig.Authentication !== null,
+      RepositoryURL: config.URL,
+      RepositoryReferenceName: config.ReferenceName,
+      ComposeFilePathInRepository: config.ConfigFilePath,
+      RepositoryAuthentication: config.Authentication !== null,
     };
 
-    if (GitConfig.Authentication) {
+    if (config.Authentication) {
       flatConfig = {
         ...flatConfig,
-        RepositoryUsername: GitConfig.Authentication.Username,
-        RepositoryPassword: GitConfig.Authentication.Password,
+        RepositoryUsername: config.Authentication.Username,
+        RepositoryPassword: config.Authentication.Password,
       };
     }
 

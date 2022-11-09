@@ -205,15 +205,21 @@ class CustomTemplatesViewController {
     template.Selected = true;
 
     let file;
-    if (template.GitConfig !== null) {
-      try {
-        file = await this.CustomTemplateService.fetchFileFromGitRepository(template.Id);
-      } catch (err) {
-        this.state.templateLoadFailed = true;
+    try {
+      if (template.GitConfig !== null) {
+        try {
+          file = await this.CustomTemplateService.fetchFileFromGitRepository(template.Id);
+        } catch (err) {
+          this.state.templateLoadFailed = true;
+          throw err;
+        }
+      } else {
+        file = await this.CustomTemplateService.customTemplateFile(template.Id);
       }
-    } else {
-      file = await this.CustomTemplateService.customTemplateFile(template.Id);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
     }
+
     this.state.templateContent = file;
     this.formValues.fileContent = file;
 
