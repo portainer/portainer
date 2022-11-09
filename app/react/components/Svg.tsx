@@ -53,6 +53,7 @@ import upload from '@/assets/ico/upload.svg?c';
 import url from '@/assets/ico/url.svg?c';
 import usercircle from '@/assets/ico/user-circle.svg?c';
 import userlock from '@/assets/ico/user-lock.svg?c';
+import kubernetes2 from '@/assets/ico/kubernetes-2.svg?c';
 import Placeholder from '@/assets/ico/placeholder.svg?c'; // Placeholder is used when an icon name cant be matched
 // vendor icons
 import aws from '@/assets/ico/vendor/aws.svg?c';
@@ -152,6 +153,7 @@ export const SvgIcons = {
   proget,
   quay,
   internal,
+  kubernetes2,
 };
 
 interface SvgProps {

@@ -72,7 +72,6 @@
               <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.
             </div>
           </div>
-
           <!-- login screen banner -->
           <div class="form-group">
             <por-switch-field
@@ -86,20 +85,6 @@
             ></por-switch-field>
           </div>
           <!-- !login screen banner -->
-          <!-- deployment options -->
-          <div class="col-sm-12 form-section-title"> Deployment Options </div>
-          <div class="form-group">
-            <por-switch-field
-              label="'Prevent add/edit of resources via forms'"
-              name="'toggle_hideAddWithForm'"
-              feature-id="enforceDeploymentOptions"
-              disabled="true"
-              checked="false"
-              field-class="'col-sm-12'"
-              label-class="'col-sm-2'"
-            ></por-switch-field>
-          </div>
-          <!-- !deployment options -->
           <!-- templates -->
           <div class="col-sm-12 form-section-title"> App Templates </div>
           <div>
@@ -125,6 +110,35 @@
             </div>
           </div>
           <!-- !templates -->
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="saveApplicationSettings()"
+                ng-disabled="state.actionInProgress || !settings.TemplatesURL"
+                button-spinner="state.actionInProgress"
+                data-cy="settings-saveSettingsButton"
+              >
+                <span ng-hide="state.actionInProgress">Save settings</span>
+                <span ng-show="state.actionInProgress">Saving...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="svg-kubernetes2" feather-icon="true" title-text="Kubernetes settings"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
           <!-- helm charts -->
           <div class="col-sm-12 form-section-title"> Helm Repository </div>
           <div>
@@ -142,7 +156,6 @@
             </div>
           </div>
           <!-- !helm charts -->
-          <!-- host-filesystem -->
           <!-- kube -->
           <div class="col-sm-12 form-section-title"> Kubernetes </div>
           <div class="form-group">
@@ -157,6 +170,20 @@
             </div>
           </div>
           <!-- ! kube  -->
+          <!-- deployment options -->
+          <div class="col-sm-12 form-section-title"> Deployment Options </div>
+          <div class="form-group">
+            <por-switch-field
+              label="'Prevent add/edit of resources via forms'"
+              name="'toggle_hideAddWithForm'"
+              feature-id="enforceDeploymentOptions"
+              disabled="true"
+              checked="false"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+            ></por-switch-field>
+          </div>
+          <!-- !deployment options -->
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
