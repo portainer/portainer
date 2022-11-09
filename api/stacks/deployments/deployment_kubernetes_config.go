@@ -12,22 +12,22 @@ import (
 )
 
 type KubernetesStackDeploymentConfig struct {
-	stack             *portainer.Stack
-	kuberneteDeployer portainer.KubernetesDeployer
-	appLabels         k.KubeAppLabels
-	user              *portainer.User
-	endpoint          *portainer.Endpoint
-	output            string
+	stack              *portainer.Stack
+	kubernetesDeployer portainer.KubernetesDeployer
+	appLabels          k.KubeAppLabels
+	user               *portainer.User
+	endpoint           *portainer.Endpoint
+	output             string
 }
 
 func CreateKubernetesStackDeploymentConfig(stack *portainer.Stack, kubeDeployer portainer.KubernetesDeployer, appLabels k.KubeAppLabels, user *portainer.User, endpoint *portainer.Endpoint) (*KubernetesStackDeploymentConfig, error) {
 
 	return &KubernetesStackDeploymentConfig{
-		stack:             stack,
-		kuberneteDeployer: kubeDeployer,
-		appLabels:         appLabels,
-		user:              user,
-		endpoint:          endpoint,
+		stack:              stack,
+		kubernetesDeployer: kubeDeployer,
+		appLabels:          appLabels,
+		user:               user,
+		endpoint:           endpoint,
 	}, nil
 }
 
@@ -38,7 +38,7 @@ func (config *KubernetesStackDeploymentConfig) GetUsername() string {
 func (config *KubernetesStackDeploymentConfig) Deploy() error {
 	fileNames := stackutils.GetStackFilePaths(config.stack, false)
 
-	manifestFilePaths := make([]string, len(fileNames))
+	manifestFilePaths := make([]string, 0, len(fileNames))
 
 	tmpDir, err := os.MkdirTemp("", "kub_deployment")
 	if err != nil {
@@ -55,7 +55,7 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 		}
 
 		if config.stack.IsComposeFormat {
-			manifestContent, err = config.kuberneteDeployer.ConvertCompose(manifestContent)
+			manifestContent, err = config.kubernetesDeployer.ConvertCompose(manifestContent)
 			if err != nil {
 				return errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
 			}
@@ -74,7 +74,7 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 		manifestFilePaths = append(manifestFilePaths, manifestFilePath)
 	}
 
-	output, err := config.kuberneteDeployer.Deploy(config.user.ID, config.endpoint, manifestFilePaths, config.stack.Namespace)
+	output, err := config.kubernetesDeployer.Deploy(config.user.ID, config.endpoint, manifestFilePaths, config.stack.Namespace)
 	if err != nil {
 		return fmt.Errorf("failed to deploy kubernete stack: %w", err)
 	}
