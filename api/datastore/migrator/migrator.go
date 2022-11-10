@@ -1,6 +1,8 @@
 package migrator
 
 import (
+	"errors"
+
 	"github.com/Masterminds/semver"
 	"github.com/rs/zerolog/log"
 
@@ -29,7 +31,9 @@ import (
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
 	Migrator struct {
-		currentDBVersion        *models.Version
+		currentDBVersion *models.Version
+		migrations       []Migrations
+
 		endpointGroupService    *endpointgroup.Service
 		endpointService         *endpoint.Service
 		endpointRelationService *endpointrelation.Service
@@ -101,7 +105,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		dockerhubService:        parameters.DockerhubService,
 	}
 
-	migrator.Init()
+	migrator.init()
 	return migrator
 }
 
@@ -120,4 +124,93 @@ func (m *Migrator) CurrentSemanticDBVersion() *semver.Version {
 	}
 
 	return v
+}
+
+func (m *Migrator) addMigrations(v string, funcs ...func() error) {
+	m.migrations = append(m.migrations, Migrations{
+		version:        semver.MustParse(v),
+		migrationFuncs: funcs,
+	})
+}
+
+func addMigration(v string, funcs ...func() error) Migrations {
+	return Migrations{
+		version:        semver.MustParse(v),
+		migrationFuncs: funcs,
+	}
+}
+
+func dbTooOldError() error {
+	return errors.New("migrating from less than Portainer 1.21.0 is not supported, please contact Portainer support")
+}
+
+func (m *Migrator) latestMigrations() Migrations {
+	return m.migrations[len(m.migrations)-1]
+}
+
+// !NOTE: Migration funtions should ideally be idempotent.
+// !      Which simply means the function can run over the same data many times but only transform it once.
+// !      In practice this really just means an extra check or two to ensure we're not destroying valid data.
+// !      This is not a hard rule though.  Understand the limitations.  A migration function may only run over
+// !      the data more than once if a new migration function is added and the version of your database schema is
+// !      the same.  e.g. two developers working on the same version add two different functions for different things.
+// !      This increases the migration funcs count and so they all run again.
+
+type Migrations struct {
+	version        *semver.Version
+	migrationFuncs MigrationFuncs
+}
+
+type MigrationFuncs []func() error
+
+func (m *Migrator) init() {
+	// !IMPORTANT: Do not be tempted to alter the order of these migrations.
+	// !           Even though one of them looks out of order. Caused by history related
+	// !           to maintaining two versions and releasing at different times
+
+	m.addMigrations("1.0.0", dbTooOldError) // default version found after migration
+
+	m.addMigrations("1.21",
+		m.updateUsersToDBVersion18,
+		m.updateEndpointsToDBVersion18,
+		m.updateEndpointGroupsToDBVersion18,
+		m.updateRegistriesToDBVersion18)
+
+	m.addMigrations("1.22", m.updateSettingsToDBVersion19)
+
+	m.addMigrations("1.22.1",
+		m.updateUsersToDBVersion20,
+		m.updateSettingsToDBVersion20,
+		m.updateSchedulesToDBVersion20)
+
+	m.addMigrations("1.23",
+		m.updateResourceControlsToDBVersion22,
+		m.updateUsersAndRolesToDBVersion22)
+
+	m.addMigrations("1.24",
+		m.updateTagsToDBVersion23,
+		m.updateEndpointsAndEndpointGroupsToDBVersion23)
+
+	m.addMigrations("1.24.1", m.updateSettingsToDB24)
+
+	m.addMigrations("2.0",
+		m.updateSettingsToDB25,
+		m.updateStacksToDB24)
+
+	m.addMigrations("2.1", m.updateEndpointSettingsToDB25)
+	m.addMigrations("2.2", m.updateStackResourceControlToDB27)
+	m.addMigrations("2.6", m.migrateDBVersionToDB30)
+	m.addMigrations("2.9", m.migrateDBVersionToDB32)
+	m.addMigrations("2.9.2", m.migrateDBVersionToDB33)
+	m.addMigrations("2.10.0", m.migrateDBVersionToDB34)
+	m.addMigrations("2.9.3", m.migrateDBVersionToDB35)
+	m.addMigrations("2.12", m.migrateDBVersionToDB36)
+	m.addMigrations("2.13", m.migrateDBVersionToDB40)
+	m.addMigrations("2.14", m.migrateDBVersionToDB50)
+	m.addMigrations("2.15", m.migrateDBVersionToDB60)
+	m.addMigrations("2.16", m.migrateDBVersionToDB70)
+	m.addMigrations("2.16.1", m.migrateDBVersionToDB71)
+
+	// Add new migrations below...
+	// One function per migration, each versions migration funcs in the same file.
 }

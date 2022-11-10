@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"io/ioutil"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -36,11 +35,7 @@ func MustNewTestStore(t *testing.T, init, secure bool) (bool, *Store, func()) {
 
 func NewTestStore(t *testing.T, init, secure bool) (bool, *Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
-	//storePath := t.TempDir()
-	storePath, err := ioutil.TempDir("", "test-store")
-	if err != nil {
-		return false, nil, nil, errors.Wrap(errTempDir, err.Error())
-	}
+	storePath := t.TempDir()
 
 	fileService, err := filesystem.NewService(storePath, "")
 	if err != nil {
@@ -63,16 +58,12 @@ func NewTestStore(t *testing.T, init, secure bool) (bool, *Store, func(), error)
 		return newStore, nil, nil, err
 	}
 
-	log.Debug().Msg("opened")
-
 	if init {
 		err = store.Init()
 		if err != nil {
 			return newStore, nil, nil, err
 		}
 	}
-
-	log.Debug().Msg("initialised")
 
 	if newStore {
 		// from MigrateData
