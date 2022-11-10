@@ -105,7 +105,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		dockerhubService:        parameters.DockerhubService,
 	}
 
-	migrator.init()
+	migrator.initMigrations()
 	return migrator
 }
 
@@ -133,13 +133,6 @@ func (m *Migrator) addMigrations(v string, funcs ...func() error) {
 	})
 }
 
-func addMigration(v string, funcs ...func() error) Migrations {
-	return Migrations{
-		version:        semver.MustParse(v),
-		migrationFuncs: funcs,
-	}
-}
-
 func dbTooOldError() error {
 	return errors.New("migrating from less than Portainer 1.21.0 is not supported, please contact Portainer support")
 }
@@ -163,7 +156,7 @@ type Migrations struct {
 
 type MigrationFuncs []func() error
 
-func (m *Migrator) init() {
+func (m *Migrator) initMigrations() {
 	// !IMPORTANT: Do not be tempted to alter the order of these migrations.
 	// !           Even though one of them looks out of order. Caused by history related
 	// !           to maintaining two versions and releasing at different times
