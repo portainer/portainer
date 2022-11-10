@@ -133,10 +133,6 @@ func (m *Migrator) addMigrations(v string, funcs ...func() error) {
 	})
 }
 
-func dbTooOldError() error {
-	return errors.New("migrating from less than Portainer 1.21.0 is not supported, please contact Portainer support")
-}
-
 func (m *Migrator) latestMigrations() Migrations {
 	return m.migrations[len(m.migrations)-1]
 }
@@ -206,4 +202,14 @@ func (m *Migrator) initMigrations() {
 
 	// Add new migrations below...
 	// One function per migration, each versions migration funcs in the same file.
+}
+
+// Always is always run at the end of migrations
+func (m *Migrator) Always() error {
+	// currently nothing to be done in CE... yet
+	return nil
+}
+
+func dbTooOldError() error {
+	return errors.New("migrating from less than Portainer 1.21.0 is not supported, please contact Portainer support")
 }

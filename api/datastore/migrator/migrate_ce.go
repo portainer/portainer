@@ -64,6 +64,11 @@ func (m *Migrator) Migrate() error {
 	}
 
 	if versionUpdateRequired || newMigratorCount != version.MigratorCount {
+		err := m.Always()
+		if err != nil {
+			return migrationError(err, "Always migrations returned error")
+		}
+
 		version.SchemaVersion = portainer.APIVersion
 		version.MigratorCount = newMigratorCount
 
