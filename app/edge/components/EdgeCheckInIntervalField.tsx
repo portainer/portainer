@@ -4,7 +4,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { useSettings } from '@/react/portainer/settings/queries';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 
-import { FormControl } from '@@/form-components/FormControl';
+import { FormControl, Size } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
   label?: string;
   tooltip?: string;
   readonly?: boolean;
+  size?: Size;
 }
 
 export const checkinIntervalOptions = [
@@ -42,11 +43,17 @@ export function EdgeCheckinIntervalField({
   isDefaultHidden = false,
   label = 'Poll frequency',
   tooltip = 'Interval used by this Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features.',
+  size = 'small',
 }: Props) {
   const options = useOptions(isDefaultHidden);
 
   return (
-    <FormControl inputId="edge_checkin" label={label} tooltip={tooltip}>
+    <FormControl
+      inputId="edge_checkin"
+      label={label}
+      tooltip={tooltip}
+      size={size}
+    >
       <Select
         value={value}
         onChange={(e) => {
@@ -61,7 +68,15 @@ export function EdgeCheckinIntervalField({
 
 export const EdgeCheckinIntervalFieldAngular = r2a(
   withReactQuery(EdgeCheckinIntervalField),
-  ['value', 'onChange', 'isDefaultHidden', 'tooltip', 'label', 'readonly']
+  [
+    'value',
+    'onChange',
+    'isDefaultHidden',
+    'tooltip',
+    'label',
+    'readonly',
+    'size',
+  ]
 );
 
 function useOptions(isDefaultHidden: boolean) {

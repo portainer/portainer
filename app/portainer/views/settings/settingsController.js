@@ -83,6 +83,13 @@ angular.module('portainer.app').controller('SettingsController', [
       $scope.state.featureLimited = limited;
     };
 
+    $scope.onChangeCheckInInterval = function (interval) {
+      $scope.$evalAsync(() => {
+        var settings = $scope.settings;
+        settings.EdgeAgentCheckinInterval = interval;
+      });
+    };
+
     $scope.removeFilteredContainerLabel = function (index) {
       var settings = $scope.settings;
       settings.BlackListedLabels.splice(index, 1);
