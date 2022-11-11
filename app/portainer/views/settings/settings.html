@@ -164,7 +164,7 @@
               <select
                 id="kubeconfig_expiry"
                 class="form-control"
-                ng-model="settings.KubeconfigExpiry"
+                ng-model="formValues.KubeconfigExpiry"
                 ng-options="opt.value as opt.key for opt in state.availableKubeconfigExpiryOptions"
               ></select>
             </div>
@@ -174,13 +174,14 @@
           <div class="col-sm-12 form-section-title"> Deployment Options </div>
           <div class="form-group">
             <por-switch-field
-              label="'Prevent add/edit of resources via forms'"
+              label="'Enforce code-based deployment'"
               name="'toggle_hideAddWithForm'"
               feature-id="enforceDeploymentOptions"
               disabled="true"
               checked="false"
               field-class="'col-sm-12'"
               label-class="'col-sm-2'"
+              tooltip="'Hides the \'Add with form\' buttons and prevents adding/editing of resources via forms'"
             ></por-switch-field>
           </div>
           <!-- !deployment options -->
@@ -190,13 +191,13 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-click="saveApplicationSettings()"
-                ng-disabled="state.actionInProgress || !settings.TemplatesURL"
-                button-spinner="state.actionInProgress"
+                ng-click="saveKubernetesSettings()"
+                ng-disabled="state.kubeSettingsActionInProgress"
+                button-spinner="state.kubeSettingsActionInProgress"
                 data-cy="settings-saveSettingsButton"
               >
-                <span ng-hide="state.actionInProgress">Save settings</span>
-                <span ng-show="state.actionInProgress">Saving...</span>
+                <span ng-hide="state.kubeSettingsActionInProgress">Save settings</span>
+                <span ng-show="state.kubeSettingsActionInProgress">Saving...</span>
               </button>
             </div>
           </div>
@@ -242,7 +243,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="label in settings.BlackListedLabels">
+                  <tr ng-repeat="label in formValues.BlackListedLabels">
                     <td>{{ label.name }}</td>
                     <td>{{ label.value }}</td>
                     <td>
@@ -251,10 +252,10 @@
                       >
                     </td>
                   </tr>
-                  <tr ng-if="settings.BlackListedLabels.length === 0">
+                  <tr ng-if="formValues.BlackListedLabels.length === 0">
                     <td colspan="3" class="text-center text-muted">No filter available.</td>
                   </tr>
-                  <tr ng-if="!settings.BlackListedLabels">
+                  <tr ng-if="!formValues.BlackListedLabels">
                     <td colspan="3" class="text-center text-muted">Loading...</td>
                   </tr>
                 </tbody>
