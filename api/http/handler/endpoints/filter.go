@@ -153,38 +153,39 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 }
 
 func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs []portainer.EndpointGroupID) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if slices.Contains(endpointGroupIDs, endpoint.GroupID) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 }
 
 func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, tagsMap map[portainer.TagID]string, searchCriteria string) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		endpointTags := convertTagIDsToTags(tagsMap, endpoint.TagIDs)
 		if endpointMatchSearchCriteria(&endpoint, endpointTags, searchCriteria) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
+
 			continue
 		}
 
 		if endpointGroupMatchSearchCriteria(&endpoint, endpointGroups, tagsMap, searchCriteria) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 }
 
 func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []portainer.EndpointStatus, settings *portainer.Settings) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		status := endpoint.Status
 		if endpointutils.IsEdgeEndpoint(&endpoint) {
@@ -205,11 +206,12 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []portai
 		}
 
 		if slices.Contains(statuses, status) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 }
 
 func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, searchCriteria string) bool {
@@ -226,6 +228,7 @@ func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, se
 	} else if endpoint.Status == portainer.EndpointStatusDown && searchCriteria == "down" {
 		return true
 	}
+
 	for _, tag := range tags {
 		if strings.Contains(strings.ToLower(tag), searchCriteria) {
 			return true
@@ -241,6 +244,7 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 			if strings.Contains(strings.ToLower(group.Name), searchCriteria) {
 				return true
 			}
+
 			tags := convertTagIDsToTags(tagsMap, group.TagIDs)
 			for _, tag := range tags {
 				if strings.Contains(strings.ToLower(tag), searchCriteria) {
@@ -254,30 +258,32 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 }
 
 func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []portainer.EndpointType) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointType := range endpointTypes {
 		typeSet[portainer.EndpointType(endpointType)] = true
 	}
 
+	n := 0
 	for _, endpoint := range endpoints {
 		if typeSet[endpoint.Type] {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDevice bool, untrusted bool) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if shouldReturnEdgeDevice(endpoint, edgeDevice, untrusted) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func shouldReturnEdgeDevice(endpoint portainer.Endpoint, edgeDeviceParam bool, untrustedParam bool) bool {
@@ -293,19 +299,21 @@ func shouldReturnEdgeDevice(endpoint portainer.Endpoint, edgeDeviceParam bool, u
 }
 
 func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.TagID) []string {
-	tags := make([]string, 0)
+	tags := make([]string, 0, len(tagIDs))
+
 	for _, tagID := range tagIDs {
 		tags = append(tags, tagsMap[tagID])
 	}
+
 	return tags
 }
 
 func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup, partialMatch bool) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		endpointGroup := getEndpointGroup(endpoint.GroupID, endpointGroups)
 		endpointMatched := false
+
 		if partialMatch {
 			endpointMatched = endpointPartialMatchTags(endpoint, endpointGroup, tagIDs)
 		} else {
@@ -313,27 +321,33 @@ func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.
 		}
 
 		if endpointMatched {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func endpointPartialMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.EndpointGroup, tagIDs []portainer.TagID) bool {
-	tagSet := make(map[portainer.TagID]bool)
+	tagSet := make(map[portainer.TagID]bool, len(tagIDs))
+
 	for _, tagID := range tagIDs {
 		tagSet[tagID] = true
 	}
+
 	for _, tagID := range endpoint.TagIDs {
 		if tagSet[tagID] {
 			return true
 		}
 	}
+
 	for _, tagID := range endpointGroup.TagIDs {
 		if tagSet[tagID] {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -342,34 +356,37 @@ func endpointFullMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.
 	for _, tagID := range tagIDs {
 		missingTags[tagID] = true
 	}
+
 	for _, tagID := range endpoint.TagIDs {
 		if missingTags[tagID] {
 			delete(missingTags, tagID)
 		}
 	}
+
 	for _, tagID := range endpointGroup.TagIDs {
 		if missingTags[tagID] {
 			delete(missingTags, tagID)
 		}
 	}
+
 	return len(missingTags) == 0
 }
 
 func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.EndpointID) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
-	idsSet := make(map[portainer.EndpointID]bool)
+	idsSet := make(map[portainer.EndpointID]bool, len(ids))
 	for _, id := range ids {
 		idsSet[id] = true
 	}
 
+	n := 0
 	for _, endpoint := range endpoints {
 		if idsSet[endpoint.ID] {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 
 }
 
@@ -378,25 +395,27 @@ func filterEndpointsByName(endpoints []portainer.Endpoint, name string) []portai
 		return endpoints
 	}
 
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if endpoint.Name == name {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func filter(endpoints []portainer.Endpoint, predicate func(endpoint portainer.Endpoint) bool) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if predicate(endpoint) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func getArrayQueryParameter(r *http.Request, parameter string) []string {

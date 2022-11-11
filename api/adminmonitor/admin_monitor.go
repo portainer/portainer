@@ -21,7 +21,7 @@ type Monitor struct {
 	datastore         dataservices.DataStore
 	shutdownCtx       context.Context
 	cancellationFunc  context.CancelFunc
-	mu                sync.Mutex
+	mu                sync.RWMutex
 	adminInitDisabled bool
 }
 
@@ -82,6 +82,7 @@ func (m *Monitor) Stop() {
 	if m.cancellationFunc == nil {
 		return
 	}
+
 	m.cancellationFunc()
 	m.cancellationFunc = nil
 }
@@ -92,12 +93,14 @@ func (m *Monitor) WasInitialized() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	return len(users) > 0, nil
 }
 
 func (m *Monitor) WasInstanceDisabled() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
 	return m.adminInitDisabled
 }
 
