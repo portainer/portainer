@@ -1,9 +1,8 @@
 import { Search } from 'react-feather';
-import { useEffect, useMemo, useState } from 'react';
-import _ from 'lodash';
 
 import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { AutomationTestingProps } from '@/types';
+import { useDebounce } from '@/react/hooks/useDebounce';
 
 interface Props extends AutomationTestingProps {
   value: string;
@@ -32,26 +31,6 @@ export function SearchBar({
       />
     </div>
   );
-}
-
-function useDebounce(defaultValue: string, onChange: (value: string) => void) {
-  const [searchValue, setSearchValue] = useState(defaultValue);
-
-  useEffect(() => {
-    setSearchValue(defaultValue);
-  }, [defaultValue]);
-
-  const onChangeDebounces = useMemo(
-    () => _.debounce(onChange, 300),
-    [onChange]
-  );
-
-  return [searchValue, handleChange] as const;
-
-  function handleChange(value: string) {
-    setSearchValue(value);
-    onChangeDebounces(value);
-  }
 }
 
 export function useSearchBarState(

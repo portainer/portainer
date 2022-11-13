@@ -12,7 +12,7 @@ import {
   EdgeTypes,
 } from '@/react/portainer/environments/types';
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
-import { useDebounce } from '@/react/hooks/useDebounce';
+import { useDebouncedValue } from '@/react/hooks/useDebouncedValue';
 import {
   refetchIfAnyOffline,
   useEnvironmentList,
@@ -75,7 +75,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
   const [page, setPage] = useState(1);
-  const debouncedTextFilter = useDebounce(searchBarValue);
+  const debouncedTextFilter = useDebouncedValue(searchBarValue);
 
   const [connectionTypes, setConnectionTypes] = useHomePageFilter<
     Filter<ConnectionType>[]

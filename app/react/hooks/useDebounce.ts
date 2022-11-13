@@ -1,15 +1,18 @@
-import { useEffect, useState } from 'react';
+import _ from 'lodash';
+import { useState, useRef } from 'react';
 
-export function useDebounce<T>(value: T, delay = 500): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+export function useDebounce(
+  defaultValue: string,
+  onChange: (value: string) => void
+) {
+  const [searchValue, setSearchValue] = useState(defaultValue);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
+  const onChangeDebounces = useRef(_.debounce(onChange, 300));
 
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
+  return [searchValue, handleChange] as const;
 
-  return debouncedValue;
+  function handleChange(value: string) {
+    setSearchValue(value);
+    onChangeDebounces.current(value);
+  }
 }

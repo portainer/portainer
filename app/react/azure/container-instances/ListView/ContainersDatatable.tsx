@@ -8,7 +8,7 @@ import {
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import { Box, Plus, Trash2 } from 'react-feather';
 
-import { useDebounce } from '@/react/hooks/useDebounce';
+import { useDebouncedValue } from '@/react/hooks/useDebouncedValue';
 import { ContainerGroup } from '@/react/azure/types';
 import { Authorized } from '@/react/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
@@ -85,7 +85,7 @@ export function ContainersDatatable({
     useRowSelectColumn
   );
 
-  const debouncedSearchValue = useDebounce(searchBarValue);
+  const debouncedSearchValue = useDebouncedValue(searchBarValue);
 
   useEffect(() => {
     setGlobalFilter(debouncedSearchValue);
