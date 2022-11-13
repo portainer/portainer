@@ -7,8 +7,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
-	"github.com/portainer/portainer/api/database/models"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	v1 "k8s.io/api/core/v1"
 )
 

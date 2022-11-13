@@ -1,4 +1,4 @@
-package models
+package kubernetes
 
 type (
 	K8sConfigMapOrSecret struct {
