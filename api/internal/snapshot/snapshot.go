@@ -124,8 +124,12 @@ func (service *Service) Create(snapshot portainer.Snapshot) error {
 }
 
 func (service *Service) FillSnapshotData(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.dataStore.Snapshot().Snapshot(endpoint.ID)
-	if service.dataStore.IsErrObjectNotFound(err) {
+	return FillSnapshotData(service.dataStore, endpoint)
+}
+
+func FillSnapshotData(dataStore dataservices.DataStore, endpoint *portainer.Endpoint) error {
+	snapshot, err := dataStore.Snapshot().Snapshot(endpoint.ID)
+	if dataStore.IsErrObjectNotFound(err) {
 		endpoint.Snapshots = []portainer.DockerSnapshot{}
 		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
 
