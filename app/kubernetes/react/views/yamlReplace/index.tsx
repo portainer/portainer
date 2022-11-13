@@ -21,7 +21,7 @@ export function YAMLReplace({ featureId }: Props) {
         onClick={() => {}}
         disabled
       >
-        Apply
+        Apply changes
       </Button>
     </BeTeaserTooltip>
   );

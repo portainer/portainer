@@ -16,7 +16,7 @@ export interface Props {
   message: string;
   className?: string;
   children: React.ReactNode;
-  heading: string;
+  heading?: string;
   BEFeatureID?: FeatureId;
 }
 
@@ -37,7 +37,7 @@ export function BeTeaserTooltip({
   const messageHTML = (
     <div className={clsx(styles.tooltipContainer)}>
       <div className="w-full mb-3 inline-flex justify-between">
-        <span className="tooltip-heading">{heading}</span>
+        {heading && <span className="tooltip-heading">{heading}</span>}
         {BEFeatureID && limitedToBE && (
           <a
             href={url}
