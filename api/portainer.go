@@ -1499,10 +1499,12 @@ const (
 )
 
 const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+const FeatureFlagBEUpgrade = "beUpgrade"
 
 // List of supported features
 var SupportedFeatureFlags = []Feature{
 	FeatureFlagEdgeRemoteUpdate,
+	FeatureFlagBEUpgrade,
 }
 
 const (
