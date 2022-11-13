@@ -1,82 +1,58 @@
-import {
-  DockerSnapshot,
-  EnvironmentType,
-} from '@/react/portainer/environments/types';
 import { addPlural } from '@/portainer/helpers/strings';
+import { DockerSnapshot } from '@/react/docker/snapshots/types';
 
-import { AgentVersionTag } from './AgentVersionTag';
-import { Stat } from './EnvironmentStatsItem';
+import { EnvironmentStatsItem } from '@@/EnvironmentStatsItem';
 
 interface Props {
-  snapshots: DockerSnapshot[];
-  type: EnvironmentType;
-  agentVersion: string;
+  snapshot?: DockerSnapshot;
 }
 
-export function EnvironmentStatsDocker({
-  snapshots = [],
-  type,
-  agentVersion,
-}: Props) {
-  if (snapshots.length === 0) {
-    return (
-      <div className="blocklist-item-line endpoint-item">
-        <span className="blocklist-item-desc">No snapshot available</span>
-      </div>
-    );
+export function EnvironmentStatsDocker({ snapshot }: Props) {
+  if (!snapshot) {
+    return <>No snapshot available</>;
   }
 
-  const snapshot = snapshots[0];
-
   return (
-    <div className="blocklist-item-line endpoint-item">
-      <span className="blocklist-item-desc">
-        <Stat
-          value={addPlural(snapshot.StackCount, 'stack')}
-          icon="layers"
+    <>
+      <EnvironmentStatsItem
+        value={addPlural(snapshot.StackCount, 'stack')}
+        icon="layers"
+        featherIcon
+      />
+
+      {!!snapshot.Swarm && (
+        <EnvironmentStatsItem
+          value={addPlural(snapshot.ServiceCount, 'service')}
+          icon="shuffle"
           featherIcon
         />
+      )}
 
-        {!!snapshot.Swarm && (
-          <Stat
-            value={addPlural(snapshot.ServiceCount, 'service')}
-            icon="shuffle"
-            featherIcon
-          />
-        )}
+      <ContainerStats
+        running={snapshot.RunningContainerCount}
+        stopped={snapshot.StoppedContainerCount}
+        healthy={snapshot.HealthyContainerCount}
+        unhealthy={snapshot.UnhealthyContainerCount}
+      />
+      <EnvironmentStatsItem
+        value={addPlural(snapshot.VolumeCount, 'volume')}
+        icon="database"
+        featherIcon
+      />
+      <EnvironmentStatsItem
+        value={addPlural(snapshot.ImageCount, 'image')}
+        icon="list"
+        featherIcon
+      />
 
-        <ContainerStats
-          running={snapshot.RunningContainerCount}
-          stopped={snapshot.StoppedContainerCount}
-          healthy={snapshot.HealthyContainerCount}
-          unhealthy={snapshot.UnhealthyContainerCount}
-        />
-        <Stat
-          value={addPlural(snapshot.VolumeCount, 'volume')}
-          icon="database"
+      {snapshot.Swarm && (
+        <EnvironmentStatsItem
+          value={addPlural(snapshot.NodeCount, 'node')}
+          icon="hard-drive"
           featherIcon
         />
-        <Stat
-          value={addPlural(snapshot.ImageCount, 'image')}
-          icon="list"
-          featherIcon
-        />
-      </span>
-
-      <span className="small text-muted space-x-2 vertical-center">
-        <span>
-          {snapshot.Swarm ? 'Swarm' : 'Standalone'} {snapshot.DockerVersion}
-        </span>
-        {snapshot.Swarm && (
-          <Stat
-            value={addPlural(snapshot.NodeCount, 'node')}
-            icon="hard-drive"
-            featherIcon
-          />
-        )}
-        <AgentVersionTag version={agentVersion} type={type} />
-      </span>
-    </div>
+      )}
+    </>
   );
 }
 
@@ -96,39 +72,39 @@ function ContainerStats({
   const containersCount = running + stopped;
 
   return (
-    <Stat
+    <EnvironmentStatsItem
       value={addPlural(containersCount, 'container')}
       icon="box"
       featherIcon
     >
       {containersCount > 0 && (
-        <span className="space-x-2 space-right">
-          <Stat
+        <>
+          <EnvironmentStatsItem
             value={running}
             icon="power"
             featherIcon
             iconClass="icon-success"
           />
-          <Stat
+          <EnvironmentStatsItem
             value={stopped}
             icon="power"
             featherIcon
             iconClass="icon-danger"
           />
-          <Stat
+          <EnvironmentStatsItem
             value={healthy}
             icon="heart"
             featherIcon
             iconClass="icon-success"
           />
-          <Stat
+          <EnvironmentStatsItem
             value={unhealthy}
             icon="heart"
             featherIcon
             iconClass="icon-warning"
           />
-        </span>
+        </>
       )}
-    </Stat>
+    </EnvironmentStatsItem>
   );
 }

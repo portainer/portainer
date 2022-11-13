@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { RefreshCcw } from 'react-feather';
 import _ from 'lodash';
+import { useStore } from 'zustand';
 
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import {
@@ -23,6 +24,7 @@ import { useAgentVersionsList } from '@/react/portainer/environments/queries/use
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { useUser } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { environmentStore } from '@/react/hooks/current-environment-store';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -68,7 +70,7 @@ const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   const { isAdmin } = useUser();
-
+  const { environmentId: currentEnvironmentId } = useStore(environmentStore);
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
   >('platformType', []);
@@ -310,6 +312,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                       groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
                     }
                     onClick={onClickItem}
+                    isActive={env.Id === currentEnvironmentId}
                   />
                 ))
               )}

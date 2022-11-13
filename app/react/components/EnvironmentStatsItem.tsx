@@ -9,7 +9,7 @@ interface Props extends IconProps {
   iconClass?: string;
 }
 
-export function Stat({
+export function EnvironmentStatsItem({
   value,
   icon,
   children,
@@ -17,14 +17,16 @@ export function Stat({
   iconClass,
 }: PropsWithChildren<Props>) {
   return (
-    <span className="vertical-center space-right">
+    <span className="flex gap-1 items-center">
       <Icon
-        className={clsx('icon icon-sm space-right', iconClass)}
+        className={clsx('icon icon-sm', iconClass)}
         icon={icon}
         feather={featherIcon}
       />
       <span>{value}</span>
-      {children && <span className="space-left">{children}</span>}
+      {children && (
+        <span className="ml-1 flex gap-2 items-center">{children}</span>
+      )}
     </span>
   );
 }

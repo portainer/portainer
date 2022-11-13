@@ -51,11 +51,15 @@ export function isEdgeEnvironment(envType: EnvironmentType) {
   ].includes(envType);
 }
 
+export function isEdgeAsync(env?: Environment | null) {
+  return !!env && env.Edge.AsyncMode;
+}
+
 export function isUnassociatedEdgeEnvironment(env: Environment) {
   return isEdgeEnvironment(env.Type) && !env.EdgeID;
 }
 
-export function getRoute(environment: Environment) {
+export function getDashboardRoute(environment: Environment) {
   if (isEdgeEnvironment(environment.Type) && !environment.EdgeID) {
     return 'portainer.endpoints.endpoint';
   }

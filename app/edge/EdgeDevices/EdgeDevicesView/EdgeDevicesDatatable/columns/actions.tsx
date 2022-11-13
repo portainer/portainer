@@ -5,7 +5,7 @@ import { useRouter, useSref } from '@uirouter/react';
 import { Environment } from '@/react/portainer/environments/types';
 import { snapshotEndpoint } from '@/react/portainer/environments/environment.service';
 import * as notifications from '@/portainer/services/notifications';
-import { getRoute } from '@/react/portainer/environments/utils';
+import { getDashboardRoute } from '@/react/portainer/environments/utils';
 
 import { ActionsMenu } from '@@/datatables/ActionsMenu';
 
@@ -27,7 +27,7 @@ export function ActionsCell({
 }: CellProps<Environment>) {
   const router = useRouter();
 
-  const environmentRoute = getRoute(environment);
+  const environmentRoute = getDashboardRoute(environment);
   const browseLinkProps = useSref(environmentRoute, {
     id: environment.Id,
     endpointId: environment.Id,

@@ -1,5 +1,7 @@
 import { TagId } from '@/portainer/tags/types';
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
+import { DockerSnapshot } from '@/react/docker/snapshots/types';
+import { Job } from '@/react/nomad/types';
 
 export type EnvironmentId = number;
 
@@ -32,25 +34,6 @@ export enum EnvironmentStatus {
   Down,
 }
 
-export interface DockerSnapshot {
-  TotalCPU: number;
-  TotalMemory: number;
-  NodeCount: number;
-  ImageCount: number;
-  VolumeCount: number;
-  RunningContainerCount: number;
-  StoppedContainerCount: number;
-  HealthyContainerCount: number;
-  UnhealthyContainerCount: number;
-  Time: number;
-  StackCount: number;
-  ServiceCount: number;
-  Swarm: boolean;
-  DockerVersion: string;
-  GpuUseAll: boolean;
-  GpuUseList: string[];
-}
-
 export interface KubernetesSnapshot {
   KubernetesVersion: string;
   TotalCPU: number;
@@ -78,6 +61,16 @@ export interface KubernetesConfiguration {
 export interface KubernetesSettings {
   Snapshots?: KubernetesSnapshot[] | null;
   Configuration: KubernetesConfiguration;
+}
+
+export interface NomadSnapshot {
+  JobCount: number;
+  GroupCount: number;
+  TaskCount: number;
+  RunningTaskCount: number;
+  NodeCount: number;
+  Time: number;
+  Jobs: Job[];
 }
 
 export type EnvironmentEdge = {

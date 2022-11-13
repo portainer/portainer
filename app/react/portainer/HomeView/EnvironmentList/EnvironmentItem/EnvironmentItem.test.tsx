@@ -44,6 +44,7 @@ function renderComponent(
   return renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
       <EnvironmentItem
+        isActive={false}
         onClick={() => {}}
         environment={env}
         groupName={group.Name}

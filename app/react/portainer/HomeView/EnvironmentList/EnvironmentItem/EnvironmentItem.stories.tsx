@@ -19,7 +19,13 @@ interface Args {
 }
 
 function Template({ environment }: Args) {
-  return <EnvironmentItem environment={environment} onClick={() => {}} />;
+  return (
+    <EnvironmentItem
+      environment={environment}
+      onClick={() => {}}
+      isActive={false}
+    />
+  );
 }
 
 export const DockerEnvironment: Story<Args> = Template.bind({});

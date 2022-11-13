@@ -226,7 +226,6 @@ input[type='checkbox'] {
 .blocklist-item {
   padding: 10px;
   margin-bottom: 10px;
-  cursor: pointer;
   border: 1px solid var(--border-blocklist);
   border-radius: 8px;
   margin-right: 10px;
@@ -243,8 +242,9 @@ input[type='checkbox'] {
   color: var(--text-blocklist-item-selected-color);
 }
 
-.blocklist-item:hover {
+.blocklist-item:not(.blocklist-item-not-interactive):hover {
   @apply border border-blue-7;
+  cursor: pointer;
 
   background-color: var(--bg-blocklist-hover-color);
   color: var(--text-blocklist-hover-color);
@@ -252,10 +252,6 @@ input[type='checkbox'] {
 
 .blocklist-item-box {
   display: flex;
-}
-
-.blocklist-item-line.endpoint-item {
-  padding: 4px;
 }
 
 .blocklist-item-line {
@@ -269,21 +265,8 @@ input[type='checkbox'] {
   max-height: 60px;
 }
 
-.blocklist-item-logo.endpoint-item {
-  margin: 10px 4px 0 6px;
-}
-
-.blocklist-item-logo.endpoint-item.azure {
-  margin: 0 0 0 10px;
-}
-
 .blocklist-item-title {
   font-size: 1.8em;
-  font-weight: bold;
-}
-
-.blocklist-item-title.endpoint-item {
-  font-size: 1em;
   font-weight: bold;
 }
 
