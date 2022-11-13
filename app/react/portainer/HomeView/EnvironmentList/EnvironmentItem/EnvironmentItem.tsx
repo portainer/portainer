@@ -10,7 +10,6 @@ import {
   PlatformType,
 } from '@/react/portainer/environments/types';
 import {
-  getDashboardRoute,
   getPlatformType,
   isEdgeEnvironment,
 } from '@/react/portainer/environments/utils';
@@ -19,49 +18,54 @@ import { useTags } from '@/portainer/tags/queries';
 
 import { EdgeIndicator } from '@@/EdgeIndicator';
 import { EnvironmentStatusBadge } from '@@/EnvironmentStatusBadge';
-import { Link } from '@@/Link';
+import { Checkbox } from '@@/form-components/Checkbox';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EnvironmentStats } from './EnvironmentStats';
 import { EngineVersion } from './EngineVersion';
 import { AgentVersionTag } from './AgentVersionTag';
+import { EnvironmentBrowseButtons } from './EnvironmentBrowseButtons';
 import { EditButtons } from './EditButtons';
 
 interface Props {
   environment: Environment;
   groupName?: string;
-  onClick(environment: Environment): void;
+  onClickBrowse(): void;
+  onSelect(isSelected: boolean): void;
+  isSelected: boolean;
+  isActive: boolean;
 }
 
-export function EnvironmentItem({ environment, onClick, groupName }: Props) {
+export function EnvironmentItem({
+  environment,
+  onClickBrowse,
+  groupName,
+  isActive,
+  isSelected,
+  onSelect,
+}: Props) {
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
 
   const tags = useEnvironmentTagNames(environment.TagIds);
-  const route = getDashboardRoute(environment);
 
   return (
-    <button
-      type="button"
-      onClick={() => onClick(environment)}
-      className="bg-transparent border-0 !p-0 !m-0"
-    >
-      <Link
-        className="blocklist-item flex no-link overflow-hidden min-h-[100px]"
-        to={route}
-        params={{
-          endpointId: environment.Id,
-          id: environment.Id,
-        }}
-      >
+    <label className="relative">
+      <div className="absolute top-2 left-2">
+        <Checkbox
+          id={`environment-select-${environment.Id}`}
+          checked={isSelected}
+          onChange={() => onSelect(!isSelected)}
+        />
+      </div>
+      <div className="blocklist-item flex overflow-hidden min-h-[100px]">
         <div className="ml-2 self-center flex justify-center">
           <EnvironmentIcon type={environment.Type} />
         </div>
         <div className="ml-3 mr-auto flex justify-center gap-3 flex-col items-start">
           <div className="space-x-3 flex items-center">
             <span className="font-bold">{environment.Name}</span>
-
             {isEdge ? (
               <EdgeIndicator environment={environment} showLastCheckInDate />
             ) : (
@@ -81,16 +85,13 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                 )}
               </>
             )}
-
             <EngineVersion environment={environment} />
-
             {!isEdge && (
               <span className="text-muted small vertical-center">
                 {stripProtocol(environment.URL)}
               </span>
             )}
           </div>
-
           <div className="small text-muted space-x-2 vertical-center">
             {groupName && (
               <span className="font-semibold">
@@ -98,19 +99,16 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                 <span>{groupName}</span>
               </span>
             )}
-
             <span className="vertical-center">
               <Tag className="icon icon-sm space-right" aria-hidden="true" />
               {tags}
             </span>
-
             {isEdge && (
               <>
                 <AgentVersionTag
                   type={environment.Type}
                   version={environment.Agent.Version}
                 />
-
                 {environment.Edge.AsyncMode && (
                   <span className="vertical-center gap-1">
                     <Globe
@@ -123,13 +121,16 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
               </>
             )}
           </div>
-
           <EnvironmentStats environment={environment} />
         </div>
-
+        <EnvironmentBrowseButtons
+          environment={environment}
+          onClickBrowse={onClickBrowse}
+          isActive={isActive}
+        />
         <EditButtons environment={environment} />
-      </Link>
-    </button>
+      </div>
+    </label>
   );
 }
 

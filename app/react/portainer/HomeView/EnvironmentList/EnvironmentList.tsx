@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { HardDrive, RefreshCcw } from 'lucide-react';
 import _ from 'lodash';
+import { useStore } from 'zustand';
 
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import {
@@ -23,6 +24,8 @@ import { useAgentVersionsList } from '@/react/portainer/environments/queries/use
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { useUser } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { environmentStore } from '@/react/hooks/current-environment-store';
+import { useListSelection } from '@/react/hooks/useListSelection';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -43,7 +46,7 @@ import styles from './EnvironmentList.module.css';
 import { UpdateBadge } from './UpdateBadge';
 
 interface Props {
-  onClickItem(environment: Environment): void;
+  onClickBrowse(environment: Environment): void;
   onRefresh(): void;
 }
 
@@ -67,8 +70,14 @@ enum ConnectionType {
 
 const storageKey = 'home_endpoints';
 
-export function EnvironmentList({ onClickItem, onRefresh }: Props) {
+export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
+  const [selectedItems, handleChangeSelect] = useListSelection<Environment>(
+    [],
+    (a, b) => a.Id === b.Id
+  );
+
   const { isAdmin } = useUser();
+  const { environmentId: currentEnvironmentId } = useStore(environmentStore);
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
   >('platformType', []);
@@ -128,6 +137,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     status: statusFilter,
     tagIds: tagFilter?.length ? tagFilter : undefined,
     groupIds: groupFilter,
+    provisioned: true,
     edgeDevice: false,
     tagsPartialMatch: true,
     agentVersions: agentVersions.map((a) => a.value),
@@ -219,6 +229,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   sort: sortByFilter,
                   order: sortByDescending ? 'desc' : 'asc',
                 }}
+                selectedItems={selectedItems}
               />
             </div>
             <div className={clsx(styles.filterSearchbar, 'ml-3')}>
@@ -315,7 +326,12 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                 groupName={
                   groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
                 }
-                onClick={onClickItem}
+                onClickBrowse={() => onClickBrowse(env)}
+                isActive={env.Id === currentEnvironmentId}
+                isSelected={selectedItems.some(
+                  (selectedEnv) => selectedEnv.Id === env.Id
+                )}
+                onSelect={(selected) => handleChangeSelect(env, selected)}
               />
             ))
           )}

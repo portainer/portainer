@@ -99,7 +99,7 @@ overrides:
       '@typescript-eslint/explicit-module-boundary-types': off
       '@typescript-eslint/no-unused-vars': 'error'
       '@typescript-eslint/no-explicit-any': 'error'
-      'jsx-a11y/label-has-associated-control': ['error', { 'assert': 'either' }]
+      'jsx-a11y/label-has-associated-control': ['error', { 'assert': 'either', controlComponents: ['Input', 'Checkbox'] }]
       'react/function-component-definition': ['error', { 'namedComponents': 'function-declaration' }]
       'react/jsx-no-bind': off
       'no-await-in-loop': 'off'

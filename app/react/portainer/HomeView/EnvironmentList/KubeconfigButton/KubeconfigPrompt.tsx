@@ -5,31 +5,36 @@ import { DialogOverlay } from '@reach/dialog';
 
 import { downloadKubeconfigFile } from '@/react/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
-import { EnvironmentType } from '@/react/portainer/environments/types';
+import {
+  Environment,
+  EnvironmentType,
+} from '@/react/portainer/environments/types';
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   Query,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
+import { useListSelection } from '@/react/hooks/useListSelection';
 
 import { PaginationControls } from '@@/PaginationControls';
 import { Checkbox } from '@@/form-components/Checkbox';
 import { Button } from '@@/buttons';
 
-import { useSelection } from './KubeconfigSelection';
 import styles from './KubeconfigPrompt.module.css';
 import '@reach/dialog/styles.css';
 
 export interface KubeconfigPromptProps {
   envQueryParams: Query;
   onClose: () => void;
+  selectedItems: Array<Environment['Id']>;
 }
 const storageKey = 'home_endpoints';
 
 export function KubeconfigPrompt({
   envQueryParams,
   onClose,
+  selectedItems,
 }: KubeconfigPromptProps) {
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
@@ -38,8 +43,10 @@ export function KubeconfigPrompt({
     select: (settings) => expiryMessage(settings.KubeconfigExpiry),
   });
 
-  const { selection, toggle: toggleSelection, selectionSize } = useSelection();
-  const { environments, totalCount } = useEnvironmentList({
+  const [selection, toggleSelection] =
+    useListSelection<Environment['Id']>(selectedItems);
+
+  const { environments, totalCount, isLoading } = useEnvironmentList({
     ...envQueryParams,
     page,
     pageLimit,
@@ -49,13 +56,18 @@ export function KubeconfigPrompt({
       EnvironmentType.EdgeAgentOnKubernetes,
     ],
   });
-  const isAllPageSelected = environments.every((env) => selection[env.Id]);
+  const isAllPageSelected =
+    !isLoading &&
+    environments
+      .filter((env) => env.Status <= 2)
+      .every((env) => selection.includes(env.Id));
 
   return (
     <DialogOverlay
       className={styles.dialog}
       aria-label="Kubeconfig View"
       role="dialog"
+      onDismiss={onClose}
     >
       <div className="modal-dialog">
         <div className="modal-content">
@@ -86,24 +98,26 @@ export function KubeconfigPrompt({
             </div>
             <div className="datatable">
               <div className="bootbox-checkbox-list">
-                {environments.map((env) => (
-                  <div
-                    key={env.Id}
-                    className={clsx(
-                      styles.checkbox,
-                      'h-8 flex items-center pt-1'
-                    )}
-                  >
-                    <Checkbox
-                      id={`${env.Id}`}
-                      label={`${env.Name} (${env.URL})`}
-                      checked={!!selection[env.Id]}
-                      onChange={() =>
-                        toggleSelection(env.Id, !selection[env.Id])
-                      }
-                    />
-                  </div>
-                ))}
+                {environments
+                  .filter((env) => env.Status <= 2)
+                  .map((env) => (
+                    <div
+                      key={env.Id}
+                      className={clsx(
+                        styles.checkbox,
+                        'h-8 flex items-center pt-1'
+                      )}
+                    >
+                      <Checkbox
+                        id={`${env.Id}`}
+                        label={`${env.Name} (${env.URL})`}
+                        checked={selection.includes(env.Id)}
+                        onChange={() =>
+                          toggleSelection(env.Id, !selection.includes(env.Id))
+                        }
+                      />
+                    </div>
+                  ))}
               </div>
               <div className="pt-3 flex justify-end w-full">
                 <PaginationControls
@@ -121,7 +135,7 @@ export function KubeconfigPrompt({
             <Button onClick={onClose} color="default">
               Cancel
             </Button>
-            <Button onClick={handleDownload} disabled={selectionSize < 1}>
+            <Button onClick={handleDownload} disabled={selection.length === 0}>
               Download File
             </Button>
           </div>
@@ -139,12 +153,12 @@ export function KubeconfigPrompt({
   }
 
   async function confirmKubeconfigSelection() {
-    if (selectionSize === 0) {
+    if (selection.length === 0) {
       notifications.warning('No environment was selected', '');
       return;
     }
     try {
-      await downloadKubeconfigFile(Object.keys(selection).map(Number));
+      await downloadKubeconfigFile(selection);
       onClose();
     } catch (e) {
       notifications.error('Failed downloading kubeconfig file', e as Error);
