@@ -1,6 +1,6 @@
 import { CellProps, Column } from 'react-table';
 
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
 

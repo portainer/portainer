@@ -6,7 +6,7 @@ import { DialogOverlay } from '@reach/dialog';
 import { downloadKubeconfigFile } from '@/react/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/react/portainer/environments/types';
-import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
+import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   Query,

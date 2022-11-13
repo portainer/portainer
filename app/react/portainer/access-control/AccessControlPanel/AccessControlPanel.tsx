@@ -1,6 +1,6 @@
 import { useReducer } from 'react';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';

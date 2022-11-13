@@ -1,9 +1,9 @@
 import { Plus, Trash2 } from 'react-feather';
 import { useRouter } from '@uirouter/react';
 
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
-import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
+import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 import { Datatable } from '@@/datatables';

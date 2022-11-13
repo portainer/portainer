@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { options } from './options';
 
 angular.module('portainer.app').controller('SettingsController', [

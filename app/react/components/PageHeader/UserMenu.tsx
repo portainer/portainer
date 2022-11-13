@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { User, ChevronDown } from 'react-feather';
 
 import { AutomationTestingProps } from '@/types';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import styles from './HeaderTitle.module.css';
 

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { IAttributes, IDirective, IScope } from 'angular';
 
-import { FeatureState } from '@/portainer/feature-flags/enums';
+import { FeatureState } from '@/react/portainer/feature-flags/enums';
 
 import { selectShow } from './feature-flags.service';
 

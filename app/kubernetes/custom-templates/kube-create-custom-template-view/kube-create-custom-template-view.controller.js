@@ -1,6 +1,6 @@
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
 
 class KubeCreateCustomTemplateViewController {

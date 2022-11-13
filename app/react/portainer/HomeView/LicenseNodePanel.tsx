@@ -1,13 +1,12 @@
 import { useQuery } from 'react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
+import { LicenseType } from '@/portainer/license-management/types';
+import { useLicenseInfo } from '@/portainer/license-management/use-license.service';
+import { getNodesCount } from '@/portainer/services/api/status.service';
 
-import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
-
-import { LicenseType } from '../license-management/types';
-import { useLicenseInfo } from '../license-management/use-license.service';
-import { getNodesCount } from '../services/api/status.service';
+import { InformationPanel } from '@@/InformationPanel';
 
 export function LicenseNodePanel() {
   const nodesValid = useNodesValid();

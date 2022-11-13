@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 
 import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useSettings } from '@/react/portainer/settings/queries';
-import { useGroups } from '@/portainer/environment-groups/queries';
+import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 
 import { PageHeader } from '@@/PageHeader';
 import { ViewLoading } from '@@/ViewLoading';

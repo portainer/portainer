@@ -63,7 +63,7 @@ div.limited-be {
 }
 
 .overlay {
-  background-image: url(../../assets/ico/lock.svg);
+  background-image: url(~@/assets/ico/lock.svg);
   background-repeat: no-repeat;
   background-position: center;
 }

@@ -16,11 +16,7 @@ import {
   type EnvironmentId,
   EnvironmentStatus,
 } from '@/react/portainer/environments/types';
-import {
-  Authorized,
-  useUser,
-  isEnvironmentAdmin,
-} from '@/portainer/hooks/useUser';
+import { Authorized, useUser, isEnvironmentAdmin } from '@/react/hooks/useUser';
 import { useInfo, useVersion } from '@/docker/services/system.service';
 
 import { SidebarItem } from './SidebarItem';

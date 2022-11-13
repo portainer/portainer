@@ -1,6 +1,6 @@
 import { Edit } from 'react-feather';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Google from '@/assets/ico/vendor/google.svg?c';
 import Github from '@/assets/ico/vendor/github.svg?c';

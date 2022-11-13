@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { RefreshCcw } from 'react-feather';
 import _ from 'lodash';
 
-import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
+import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import {
   Environment,
   EnvironmentType,
@@ -11,26 +11,20 @@ import {
   PlatformType,
   EdgeTypes,
 } from '@/react/portainer/environments/types';
-import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import {
-  HomepageFilter,
-  useHomePageFilter,
-} from '@/portainer/home/HomepageFilter';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
+import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
+import { useDebounce } from '@/react/hooks/useDebounce';
 import {
   refetchIfAnyOffline,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
-import { useGroups } from '@/portainer/environment-groups/queries';
+import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
-import { Filter } from '@/portainer/home/types';
 import { useAgentVersionsList } from '@/react/portainer/environments/queries/useAgentVersionsList';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
-import { SortbySelector } from '@@/datatables/SortbySelector';
 import {
   FilterSearchBar,
   useSearchBarState,
@@ -38,6 +32,9 @@ import {
 import { Button } from '@@/buttons';
 import { PaginationControls } from '@@/PaginationControls';
 
+import { SortbySelector } from './SortbySelector';
+import { HomepageFilter, useHomePageFilter } from './HomepageFilter';
+import { Filter } from './types';
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
 import { NoEnvironmentsInfoPanel } from './NoEnvironmentsInfoPanel';

@@ -1,6 +1,6 @@
 import { baseHref } from '@/portainer/helpers/pathHelper';
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import providers, { getProviderByUrl } from './providers';
 
 const MS_TENANT_ID_PLACEHOLDER = 'TENANT_ID';

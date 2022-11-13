@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { Filter } from '@/portainer/home/types';
-
 import { Select } from '@@/form-components/ReactSelect';
 
+import { Filter } from './types';
 import styles from './SortbySelector.module.css';
 
 interface Props {

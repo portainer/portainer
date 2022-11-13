@@ -1,8 +1,8 @@
 import { CellProps, Column } from 'react-table';
 
-import { useAuthorizations } from '@/portainer/hooks/useUser';
+import { useAuthorizations } from '@/react/hooks/useUser';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
-import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
+import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
 import { DockerContainer } from '@/react/docker/containers/types';
 

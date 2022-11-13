@@ -1,9 +1,9 @@
 import {
   EnvironmentGroup,
   EnvironmentGroupId,
-} from '@/portainer/environment-groups/types';
+} from '@/react/portainer/environments/environment-groups/types';
 import { Environment } from '@/react/portainer/environments/types';
-import { UserContext } from '@/portainer/hooks/useUser';
+import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { Tag } from '@/portainer/tags/types';
 import { createMockEnvironment } from '@/react-tools/test-mocks';

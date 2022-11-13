@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 import _ from 'lodash';
 
-import { useUIState } from '@/portainer/hooks/useUIState';
+import { useUIState } from '@/react/hooks/useUIState';
 
 import { InformationPanel } from '@@/InformationPanel';
 
