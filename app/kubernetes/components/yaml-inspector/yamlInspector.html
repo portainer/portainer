@@ -22,12 +22,6 @@
       <pr-icon class="vertical-center" icon="'check'" size="'md'" mode="'success'" feather="true"></pr-icon> copied
     </span>
 
-    <span
-      class="float-right vertical-center"
-      title="Applies any changes that you make in the YAML editor by calling the Kubernetes API's replace functionality for each of the relevant resources."
-    >
-      <button class="btn btn-primary btn-sm" disabled> Apply changes </button>
-      <be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator>
-    </span>
+    <yaml-replace feature-id="$ctrl.limitedFeature"></yaml-replace>
   </div>
 </div>
