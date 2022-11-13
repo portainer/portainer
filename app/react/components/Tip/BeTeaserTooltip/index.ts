@@ -1,0 +1,1 @@
+export { BeTeaserTooltip } from './BeTeaserTooltip';

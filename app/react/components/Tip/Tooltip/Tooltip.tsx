@@ -31,6 +31,7 @@ export function Tooltip({ message, position = 'bottom', className }: Props) {
         effect="solid"
         className={clsx(styles.tooltip, className)}
         arrowColor="transparent"
+        delayHide={200}
       />
     </span>
   );
