@@ -1,5 +1,4 @@
-import { NEW_LINE_BREAKER } from '@/constants';
-
+import { NEW_LINE_BREAKER } from './constants';
 import { FormattedLine } from './types';
 
 type FormatFunc = (line: FormattedLine) => string;
