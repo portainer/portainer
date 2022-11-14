@@ -25,7 +25,11 @@
 }
 
 .tooltip-container {
-  line-height: 15px;
+  line-height: 18px;
+}
+
+.tooltip-heading {
+  font-weight: 500;
 }
 
 .tooltip-beteaser {

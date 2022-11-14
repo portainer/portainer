@@ -36,7 +36,12 @@ export function TooltipWithChildren({
 
   const messageHTML = (
     <div className={styles.tooltipContainer}>
-      <div className="w-full mb-3 inline-flex justify-between">
+      <div
+        className={clsx(
+          'w-full mb-3 inline-flex justify-between',
+          styles.tooltipHeading
+        )}
+      >
         {heading && <span>{heading}</span>}
         {BEFeatureID && limitedToBE && (
           <a
@@ -45,7 +50,7 @@ export function TooltipWithChildren({
             rel="noreferrer"
             className={styles.tooltipBeteaser}
           >
-            Business edition only
+            Business Edition Only
           </a>
         )}
       </div>
