@@ -11,6 +11,8 @@ import { useSystemInfo } from '@/react/portainer/status/useSystemInfo';
 
 import { useSidebarState } from './useSidebarState';
 
+import { useSidebarState } from './useSidebarState';
+
 export function UpgradeBEBanner() {
   const { data } = useFeatureFlag(FeatureFlag.BEUpgrade, { enabled: !isBE });
 
