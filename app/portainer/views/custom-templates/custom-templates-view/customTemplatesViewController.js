@@ -208,7 +208,7 @@ class CustomTemplatesViewController {
     try {
       if (template.GitConfig !== null) {
         try {
-          file = await this.CustomTemplateService.fetchFileFromGitRepository(template.Id);
+          file = await this.CustomTemplateService.customTemplateFile(template.Id, true);
         } catch (err) {
           this.state.templateLoadFailed = true;
           throw err;

@@ -43,7 +43,7 @@ class KubeEditCustomTemplateViewController {
 
         if (template.GitConfig !== null) {
           try {
-            template.FileContent = await this.CustomTemplateService.fetchFileFromGitRepository(id);
+            template.FileContent = await this.CustomTemplateService.customTemplateFile(id, true);
 
             this.state.isEditorReadOnly = true;
           } catch (err) {

@@ -192,7 +192,7 @@ class KubernetesDeployController {
         let fileContent;
         if (this.state.template.GitConfig !== null) {
           try {
-            fileContent = await this.CustomTemplateService.fetchFileFromGitRepository(templateId);
+            fileContent = await this.CustomTemplateService.customTemplateFile(templateId, true);
           } catch (err) {
             this.state.templateLoadFailed = true;
             throw err;

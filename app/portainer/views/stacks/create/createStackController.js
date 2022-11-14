@@ -304,7 +304,7 @@ angular
             let fileContent;
             if ($scope.state.selectedTemplate.GitConfig !== null) {
               try {
-                fileContent = await CustomTemplateService.fetchFileFromGitRepository(templateId);
+                fileContent = await CustomTemplateService.customTemplateFile(templateId, true);
               } catch (err) {
                 $scope.state.templateLoadFailed = true;
                 throw err;

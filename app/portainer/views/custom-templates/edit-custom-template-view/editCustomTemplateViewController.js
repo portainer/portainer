@@ -47,7 +47,7 @@ class EditCustomTemplateViewController {
 
       if (template.GitConfig !== null) {
         try {
-          this.formValues.FileContent = await this.CustomTemplateService.fetchFileFromGitRepository(this.$state.params.id);
+          this.formValues.FileContent = await this.CustomTemplateService.customTemplateFile(this.$state.params.id, true);
           this.state.isEditorReadOnly = true;
         } catch (err) {
           this.state.templateLoadFailed = true;
