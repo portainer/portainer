@@ -1,6 +1,6 @@
 import angular from 'angular';
 import YAML from 'yaml';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 class KubernetesYamlInspectorController {
   /* @ngInject */
