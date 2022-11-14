@@ -1,7 +1,7 @@
 import { Box, Edit, Layers, Lock, Server } from 'react-feather';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 import Helm from '@/assets/ico/vendor/helm.svg?c';
 import Route from '@/assets/ico/route.svg?c';
 

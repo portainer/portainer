@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { UserContext } from '@/portainer/hooks/useUser';
+import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 

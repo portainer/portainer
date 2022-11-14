@@ -254,7 +254,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
           }
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'An error occured during network creation');
+          Notifications.error('Failure', err, 'An error occurred during network creation');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;

@@ -2,7 +2,8 @@ import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
-import { getIngresses } from '@/kubernetes/react/views/networks/ingresses/service';
+
+import { getIngresses } from '../ingresses/service';
 
 import { getNamespaces, getNamespace } from './service';
 import { Namespaces } from './types';

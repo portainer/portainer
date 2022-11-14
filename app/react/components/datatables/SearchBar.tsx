@@ -2,7 +2,7 @@ import { Search } from 'react-feather';
 import { useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
 
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { AutomationTestingProps } from '@/types';
 
 interface Props extends AutomationTestingProps {

@@ -1,7 +1,8 @@
 import { CellProps, Column } from 'react-table';
 
 import { Environment } from '@/react/portainer/environments/types';
-import { EdgeIndicator } from '@/portainer/home/EnvironmentList/EnvironmentItem/EdgeIndicator';
+
+import { EdgeIndicator } from '@@/EdgeIndicator';
 
 export const heartbeat: Column<Environment> = {
   Header: 'Heartbeat',

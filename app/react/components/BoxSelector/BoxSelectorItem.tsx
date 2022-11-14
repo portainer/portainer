@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Icon } from '@/react/components/Icon';
 
 import './BoxSelectorItem.css';

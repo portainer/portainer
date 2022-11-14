@@ -18,7 +18,7 @@ angular.module('portainer.app').controller('InformationPanelOfflineController', 
           $state.reload();
         })
         .catch(function onError(err) {
-          Notifications.error('Failure', err, 'An error occured during environment snapshot');
+          Notifications.error('Failure', err, 'An error occurred during environment snapshot');
         });
     }
 

@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import _ from 'lodash';
 import ReactDOMServer from 'react-dom/server';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getFeatureDetails } from '@@/BEFeatureIndicator/utils';
 

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { BoxSelector } from '@@/BoxSelector';

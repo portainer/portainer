@@ -1,6 +1,6 @@
 import { Package } from 'react-feather';
 
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { PageHeader } from '@@/PageHeader';
 import { DashboardItem } from '@@/DashboardItem';

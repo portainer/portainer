@@ -1,9 +1,11 @@
 import _ from 'lodash-es';
 
+import featureFlagModule from '@/react/portainer/feature-flags';
+
 import './rbac';
+
 import componentsModule from './components';
 import settingsModule from './settings';
-import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
 import { reactModule } from './react';

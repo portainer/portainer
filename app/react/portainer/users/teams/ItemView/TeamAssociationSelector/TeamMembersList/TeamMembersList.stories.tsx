@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react';
 import { useMemo, useState } from 'react';
 
-import { UserContext } from '@/portainer/hooks/useUser';
+import { UserContext } from '@/react/hooks/useUser';
 import { createMockUsers } from '@/react-tools/test-mocks';
 import { UserViewModel } from '@/portainer/models/user';
 import { Role } from '@/portainer/users/types';

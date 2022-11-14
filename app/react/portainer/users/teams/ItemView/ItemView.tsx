@@ -1,7 +1,7 @@
 import { useRouter } from '@uirouter/react';
 
 import { useUsers } from '@/portainer/users/queries';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { TextTip } from '@@/Tip/TextTip';

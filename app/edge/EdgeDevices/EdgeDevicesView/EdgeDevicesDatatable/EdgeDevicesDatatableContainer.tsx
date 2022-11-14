@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
 import { EdgeTypes, Environment } from '@/react/portainer/environments/types';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
+import { useDebounce } from '@/react/hooks/useDebounce';
 
 import { useSearchBarState } from '@@/datatables/SearchBar';
 import {

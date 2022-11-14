@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { options } from './options';
 
 angular.module('portainer.app').controller('SettingsController', [
@@ -81,6 +81,13 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.onBackupOptionsChange = function (type, limited) {
       $scope.formValues.backupFormType = type;
       $scope.state.featureLimited = limited;
+    };
+
+    $scope.onChangeCheckInInterval = function (interval) {
+      $scope.$evalAsync(() => {
+        var settings = $scope.settings;
+        settings.EdgeAgentCheckinInterval = interval;
+      });
     };
 
     $scope.removeFilteredContainerLabel = function (index) {

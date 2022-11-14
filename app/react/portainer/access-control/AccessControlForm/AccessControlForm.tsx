@@ -1,6 +1,6 @@
 import { FormikErrors } from 'formik';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { SwitchField } from '@@/form-components/SwitchField';
