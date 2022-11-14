@@ -8,9 +8,9 @@ import {
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import { Box, Plus, Trash2 } from 'react-feather';
 
-import { useDebounce } from '@/portainer/hooks/useDebounce';
+import { useDebounce } from '@/react/hooks/useDebounce';
 import { ContainerGroup } from '@/react/azure/types';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 import { PaginationControls } from '@@/PaginationControls';

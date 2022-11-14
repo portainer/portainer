@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 interface TableSettingsContextInterface<T> {
   settings: T;

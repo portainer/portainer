@@ -3,7 +3,7 @@ import { Clock, Trash2 } from 'react-feather';
 import {
   FeatureFlag,
   useRedirectFeatureFlag,
-} from '@/portainer/feature-flags/useRedirectFeatureFlag';
+} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 

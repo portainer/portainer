@@ -23,28 +23,45 @@ angular.module('portainer.app').factory('StackHelper', [
       );
     }
 
-    helper.validateYAML = function (yaml, containerNames) {
-      let yamlObject;
-
-      try {
-        yamlObject = YAML.parse(yaml);
-      } catch (err) {
-        return 'There is an error in the yaml syntax: ' + err;
-      }
-
-      const names = _.uniq(GenericHelper.findDeepAll(yamlObject, 'container_name'));
-      const duplicateContainers = _.intersection(containerNames, names);
-
-      if (duplicateContainers.length === 0) return;
-
-      return (
-        (duplicateContainers.length === 1 ? 'This container name is' : 'These container names are') +
-        ' already used by another container running in this environment: ' +
-        _.join(duplicateContainers, ', ') +
-        '.'
-      );
-    };
+    helper.validateYAML = validateYAML;
 
     return helper;
   },
 ]);
+
+function validateYAML(yaml, containerNames, originalContainersNames = []) {
+  let yamlObject;
+
+  try {
+    yamlObject = YAML.parse(yaml);
+  } catch (err) {
+    return 'There is an error in the yaml syntax: ' + err;
+  }
+
+  const names = _.uniq(GenericHelper.findDeepAll(yamlObject, 'container_name'));
+
+  const duplicateContainers = _.intersection(_.difference(containerNames, originalContainersNames), names);
+
+  if (duplicateContainers.length === 0) {
+    return '';
+  }
+
+  return (
+    (duplicateContainers.length === 1 ? 'This container name is' : 'These container names are') +
+    ' already used by another container running in this environment: ' +
+    _.join(duplicateContainers, ', ') +
+    '.'
+  );
+}
+
+export function extractContainerNames(yaml = '') {
+  let yamlObject;
+
+  try {
+    yamlObject = YAML.parse(yaml);
+  } catch (err) {
+    return [];
+  }
+
+  return _.uniq(GenericHelper.findDeepAll(yamlObject, 'container_name'));
+}

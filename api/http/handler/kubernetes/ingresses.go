@@ -8,8 +8,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/models"
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 )
 
 func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -279,6 +279,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 			err,
 		)
 	}
+
 	// Add none controller if "AllowNone" is set for endpoint.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
 		controllers = append(controllers, models.K8sIngressController{
@@ -287,6 +288,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 			Type:      "custom",
 		})
 	}
+
 	var updatedClasses []portainer.KubernetesIngressClassConfig
 	for i := range controllers {
 		controllers[i].Availability = true

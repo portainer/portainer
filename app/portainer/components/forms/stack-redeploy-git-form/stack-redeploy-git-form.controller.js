@@ -1,6 +1,6 @@
 import uuidv4 from 'uuid/v4';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
-import { FeatureId } from 'Portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 class StackRedeployGitFormController {
   /* @ngInject */
   constructor($async, $state, $compile, $scope, StackService, ModalService, Notifications, WebhookHelper, FormHelper) {

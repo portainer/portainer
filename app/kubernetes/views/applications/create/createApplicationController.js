@@ -32,7 +32,7 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
-import { updateIngress, getIngresses } from '@/kubernetes/react/views/networks/ingresses/service';
+import { updateIngress, getIngresses } from '@/react/kubernetes/ingresses/service';
 import { confirmUpdateAppIngress } from '@/portainer/services/modal.service/prompt';
 
 class KubernetesCreateApplicationController {

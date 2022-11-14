@@ -267,13 +267,12 @@ func (connection *DbConnection) DeleteObject(bucketName string, key []byte) erro
 
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
-func (connection *DbConnection) DeleteAllObjects(bucketName string, matching func(o interface{}) (id int, ok bool)) error {
+func (connection *DbConnection) DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error {
 	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var obj interface{}
 			err := connection.UnmarshalObject(v, &obj)
 			if err != nil {
 				return err
@@ -422,7 +421,6 @@ func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error)
 	err := connection.View(func(tx *bolt.Tx) error {
 		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
-			bucket = tx.Bucket([]byte(bucketName))
 			seqId := bucket.Sequence()
 			buckets[bucketName] = int(seqId)
 			return nil

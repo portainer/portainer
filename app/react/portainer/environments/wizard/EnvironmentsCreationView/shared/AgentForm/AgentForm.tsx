@@ -14,7 +14,7 @@ import { MoreSettingsSection } from '../MoreSettingsSection';
 import { Hardware } from '../Hardware/Hardware';
 
 import { EnvironmentUrlField } from './EnvironmentUrlField';
-import { validation } from './AgentForm.validation';
+import { useValidation } from './AgentForm.validation';
 
 interface Props {
   onCreate(environment: Environment): void;
@@ -35,6 +35,7 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
   const mutation = useCreateAgentEnvironmentMutation();
+  const validation = useValidation();
 
   return (
     <Formik

@@ -60,6 +60,7 @@ func (m *Migrator) updateIngressFieldsForEnvDB70() error {
 	for _, endpoint := range endpoints {
 		endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace = true
 		endpoint.Kubernetes.Configuration.AllowNoneIngressClass = false
+		endpoint.PostInitMigrations.MigrateIngresses = true
 
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {

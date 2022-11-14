@@ -1,6 +1,6 @@
 import { Search } from 'react-feather';
 
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 interface Props {
   value: string;

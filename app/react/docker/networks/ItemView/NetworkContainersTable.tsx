@@ -1,4 +1,4 @@
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Icon } from '@/react/components/Icon';
 

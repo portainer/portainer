@@ -14,7 +14,7 @@ import { FormControl } from '@@/form-components/FormControl';
 import { BoxSelector } from '@@/BoxSelector';
 import { Icon } from '@@/Icon';
 
-import { NameField, nameValidation } from '../shared/NameField';
+import { NameField, useNameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
 import { metadataValidation } from '../shared/MetadataFieldset/validation';
 import { MoreSettingsSection } from '../shared/MoreSettingsSection';
@@ -49,6 +49,7 @@ export function WizardAzure({ onCreate }: Props) {
 
   const [creationType, setCreationType] = useState(options[0].id);
   const mutation = useCreateAzureEnvironmentMutation();
+  const validation = useValidation();
 
   return (
     <div className="form-horizontal">
@@ -64,7 +65,7 @@ export function WizardAzure({ onCreate }: Props) {
         onSubmit={handleSubmit}
         key={formKey}
         validateOnMount
-        validationSchema={validationSchema}
+        validationSchema={validation}
       >
         {({ errors, dirty, isValid }) => (
           <Form>
@@ -164,9 +165,9 @@ export function WizardAzure({ onCreate }: Props) {
   }
 }
 
-function validationSchema(): SchemaOf<FormValues> {
+function useValidation(): SchemaOf<FormValues> {
   return object({
-    name: nameValidation(),
+    name: useNameValidation(),
     applicationId: string().required('Application ID is required'),
     tenantId: string().required('Tenant ID is required'),
     authenticationKey: string().required('Authentication Key is required'),

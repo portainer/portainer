@@ -7,8 +7,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
-	"github.com/portainer/portainer/api/database/models"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -352,6 +352,9 @@ type (
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
+		// Whether we need to run any "post init migrations".
+		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
+
 		Edge struct {
 			// Whether the device has been started in edge async mode
 			AsyncMode bool
@@ -451,6 +454,11 @@ type (
 	EndpointRelation struct {
 		EndpointID EndpointID
 		EdgeStacks map[EdgeStackID]bool
+	}
+
+	// EndpointPostInitMigrations
+	EndpointPostInitMigrations struct {
+		MigrateIngresses bool `json:"MigrateIngresses"`
 	}
 
 	// Extension represents a deprecated Portainer extension
@@ -1357,6 +1365,7 @@ type (
 		CreateNamespace(info models.K8sNamespaceDetails) error
 		UpdateNamespace(info models.K8sNamespaceDetails) error
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		GetNamespace(string) (K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)

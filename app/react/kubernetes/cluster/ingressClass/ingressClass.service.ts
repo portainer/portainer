@@ -3,7 +3,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   KubernetesApiListResponse,
   V1IngressClass,
-} from '@/react/kubernetes/services/kubernetes/types';
+} from '@/react/kubernetes/services/types';
 
 export async function getAllIngressClasses(environmentId: EnvironmentId) {
   try {

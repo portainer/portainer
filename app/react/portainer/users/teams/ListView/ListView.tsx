@@ -1,5 +1,5 @@
 import { useUsers } from '@/portainer/users/queries';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import { PageHeader } from '@@/PageHeader';
 

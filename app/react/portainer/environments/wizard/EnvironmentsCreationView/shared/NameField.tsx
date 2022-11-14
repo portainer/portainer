@@ -1,6 +1,7 @@
 import { Field, useField } from 'formik';
 import { string } from 'yup';
-import { debounce } from 'lodash';
+import { useRef } from 'react';
+import _ from 'lodash';
 
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
@@ -30,7 +31,7 @@ export function NameField({ readonly }: Props) {
   );
 }
 
-export async function isNameUnique(name?: string) {
+export async function isNameUnique(name = '') {
   if (!name) {
     return true;
   }
@@ -46,14 +47,26 @@ export async function isNameUnique(name?: string) {
   return true;
 }
 
-const debouncedIsNameUnique = debounce(isNameUnique, 500);
+function cacheTest(
+  asyncValidate: (val?: string) => Promise<boolean> | undefined
+) {
+  let valid = false;
+  let value = '';
 
-export function nameValidation() {
+  return async (newValue = '') => {
+    if (newValue !== value) {
+      const response = await asyncValidate(newValue);
+      value = newValue;
+      valid = !!response;
+    }
+    return valid;
+  };
+}
+
+export function useNameValidation() {
+  const uniquenessTest = useRef(cacheTest(_.debounce(isNameUnique, 300)));
+
   return string()
     .required('Name is required')
-    .test(
-      'unique-name',
-      'Name should be unique',
-      (name) => debouncedIsNameUnique(name) || false
-    );
+    .test('unique-name', 'Name should be unique', uniquenessTest.current);
 }

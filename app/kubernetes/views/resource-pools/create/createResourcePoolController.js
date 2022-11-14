@@ -6,7 +6,7 @@ import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassHos
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
 class KubernetesCreateResourcePoolController {
@@ -33,6 +33,8 @@ class KubernetesCreateResourcePoolController {
     this.onToggleResourceQuota = this.onToggleResourceQuota.bind(this);
     this.onChangeIngressControllerAvailability = this.onChangeIngressControllerAvailability.bind(this);
     this.onRegistriesChange = this.onRegistriesChange.bind(this);
+    this.handleMemoryLimitChange = this.handleMemoryLimitChange.bind(this);
+    this.handleCpuLimitChange = this.handleCpuLimitChange.bind(this);
   }
   /* #endregion */
 
@@ -99,6 +101,18 @@ class KubernetesCreateResourcePoolController {
     if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit)) {
       this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit);
     }
+  }
+
+  handleMemoryLimitChange(memoryLimit) {
+    return this.$async(async () => {
+      this.formValues.MemoryLimit = memoryLimit;
+    });
+  }
+
+  handleCpuLimitChange(cpuLimit) {
+    return this.$async(async () => {
+      this.formValues.CpuLimit = cpuLimit;
+    });
   }
 
   /* #region  CREATE NAMESPACE */

@@ -279,6 +279,7 @@ type (
 		DeleteTeamMembershipByUserID(userID portainer.UserID) error
 		DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error
 		BucketName() string
+		DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.TeamID, userID portainer.UserID) error
 	}
 
 	// TunnelServerService represents a service for managing data associated to the tunnel server

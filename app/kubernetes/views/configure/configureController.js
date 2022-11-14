@@ -4,7 +4,7 @@ import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'Ku
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
@@ -155,8 +155,8 @@ class KubernetesConfigureController {
       return;
     }
     const promises = [];
-    const oldEndpointID = this.EndpointProvider.endpointID();
-    this.EndpointProvider.setEndpointID(this.endpoint.Id);
+    const oldEndpoint = this.EndpointProvider.currentEndpoint();
+    this.EndpointProvider.setCurrentEndpoint(this.endpoint);
 
     try {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
@@ -171,7 +171,7 @@ class KubernetesConfigureController {
         });
       });
     } finally {
-      this.EndpointProvider.setEndpointID(oldEndpointID);
+      this.EndpointProvider.setCurrentEndpoint(oldEndpoint);
     }
 
     const responses = await Promise.allSettled(promises);
@@ -223,13 +223,8 @@ class KubernetesConfigureController {
       });
       await Promise.all(storagePromises);
 
-      const endpoints = this.EndpointProvider.endpoints();
-      const modifiedEndpoint = _.find(endpoints, (item) => item.Id === this.endpoint.Id);
-      if (modifiedEndpoint) {
-        this.assignFormValuesToEndpoint(modifiedEndpoint, storageClasses, ingressClasses);
-        this.EndpointProvider.setEndpoints(endpoints);
-      }
       this.Notifications.success('Success', 'Configuration successfully applied');
+
       this.$state.go('portainer.home');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to apply configuration');

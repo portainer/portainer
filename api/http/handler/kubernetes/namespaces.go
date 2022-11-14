@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api/database/models"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 )
 
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -38,6 +38,43 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 	}
 
 	return response.JSON(w, namespaces)
+}
+
+func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
+	ns, err := request.RetrieveRouteVariableValue(r, "namespace")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid namespace identifier route variable",
+			err,
+		)
+	}
+	namespace, err := cli.GetNamespace(ns)
+	if err != nil {
+		return httperror.InternalServerError(
+			"Unable to retrieve namespace",
+			err,
+		)
+	}
+
+	return response.JSON(w, namespace)
 }
 
 func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

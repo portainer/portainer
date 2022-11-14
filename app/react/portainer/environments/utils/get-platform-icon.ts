@@ -7,6 +7,7 @@ import {
 import Docker from './docker.svg?c';
 import Azure from './azure.svg?c';
 import Kubernetes from './kubernetes.svg?c';
+import Nomad from './nomad.svg?c';
 
 const icons: {
   [key in PlatformType]: SvgrComponent;
@@ -14,6 +15,7 @@ const icons: {
   [PlatformType.Docker]: Docker,
   [PlatformType.Kubernetes]: Kubernetes,
   [PlatformType.Azure]: Azure,
+  [PlatformType.Nomad]: Nomad,
 };
 
 export function getPlatformIcon(type: EnvironmentType) {

@@ -13,7 +13,10 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
   'Notifications',
   'FormValidator',
   'HttpRequestHelper',
-  function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, HttpRequestHelper) {
+  'endpoint',
+  function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, HttpRequestHelper, endpoint) {
+    $scope.endpoint = endpoint;
+
     $scope.formValues = {
       Driver: 'local',
       DriverOptions: [],
@@ -137,7 +140,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
           $state.go('docker.volumes', {}, { reload: true });
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'An error occured during volume creation');
+          Notifications.error('Failure', err, 'An error occurred during volume creation');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
