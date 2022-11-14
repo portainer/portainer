@@ -134,13 +134,13 @@
 
               <div class="col-sm-12 mt-5">
                 <por-switch-field
-                  data-cy="'kubeSetup-restrictDefaultNsToggle'"
-                  label="'Allow standard users to deploy ingresses'"
-                  name="'k8s-std-user-ingress-deploy'"
-                  feature-id="ctrl.limitedFeatureIngressDeploy"
+                  name="'restrictStandardUserIngressW'"
+                  label="'Only allow deployment of ingresses by admins'"
+                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
                   label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                  switch-class="'col-sm-8'"
-                  checked="true"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
+                  feature-id="ctrl.limitedFeatureIngressDeploy"
                 ></por-switch-field>
               </div>
             </div>
