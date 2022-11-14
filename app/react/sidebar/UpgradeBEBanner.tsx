@@ -10,6 +10,8 @@ import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { useNodesCount } from '../portainer/status/useNodesCount';
 import { useSystemInfo } from '../portainer/status/useSystemInfo';
 
+import { useSidebarState } from './useSidebarState';
+
 export function UpgradeBEBanner() {
   const { data } = useFeatureFlag(FeatureFlag.BEUpgrade, { enabled: !isBE });
 
@@ -22,7 +24,7 @@ export function UpgradeBEBanner() {
 
 function Inner() {
   const { trackEvent } = useAnalytics();
-
+  const { isOpen } = useSidebarState();
   const nodesCountQuery = useNodesCount();
   const systemInfoQuery = useSystemInfo();
 
@@ -45,16 +47,15 @@ function Inner() {
   return (
     <button
       type="button"
-      className="border-0 bg-warning-5 text-warning-9 w-full h-12 font-semibold flex justify-center items-center gap-3"
+      className="border-0 bg-warning-5 text-warning-9 w-full min-h-[48px] h-12 font-semibold flex justify-center items-center gap-3"
       onClick={handleClick}
     >
-      Upgrade to Business Edition
+      {isOpen && <>Upgrade to Business Edition</>}
       <ArrowRight className="text-lg feather" />
     </button>
   );
 
   function handleClick() {
-    console.log({ metadata, systemInfo });
     trackEvent('portainer-upgrade-admin', {
       category: 'portainer',
       metadata,
