@@ -1,14 +1,13 @@
 import { ArrowRight } from 'react-feather';
 
+import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import {
   useFeatureFlag,
   FeatureFlag,
 } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-
-import { useNodesCount } from '../portainer/status/useNodesCount';
-import { useSystemInfo } from '../portainer/status/useSystemInfo';
+import { useNodesCount } from '@/react/portainer/status/useNodesCount';
+import { useSystemInfo } from '@/react/portainer/status/useSystemInfo';
 
 import { useSidebarState } from './useSidebarState';
 
