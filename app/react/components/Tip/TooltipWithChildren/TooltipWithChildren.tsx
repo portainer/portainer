@@ -35,21 +35,21 @@ export function TooltipWithChildren({
     : { url: '', limitedToBE: false };
 
   const messageHTML = (
-    <div className={clsx(styles.tooltipContainer)}>
+    <div className={styles.tooltipContainer}>
       <div className="w-full mb-3 inline-flex justify-between">
-        {heading && <span className="tooltip-heading">{heading}</span>}
+        {heading && <span>{heading}</span>}
         {BEFeatureID && limitedToBE && (
           <a
             href={url}
             target="_blank"
             rel="noreferrer"
-            className={clsx(styles.tooltipBeteaser)}
+            className={styles.tooltipBeteaser}
           >
             Business edition only
           </a>
         )}
       </div>
-      <div className="tooltip-message">{message}</div>
+      <div>{message}</div>
     </div>
   );
 
