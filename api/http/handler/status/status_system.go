@@ -39,7 +39,6 @@ func (handler *Handler) statusSystem(w http.ResponseWriter, r *http.Request) *ht
 	for _, environment := range environments {
 		if endpointutils.IsAgentEndpoint(&environment) {
 			agents++
-
 		}
 
 		if endpointutils.IsEdgeEndpoint(&environment) {
