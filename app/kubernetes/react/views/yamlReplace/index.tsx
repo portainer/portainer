@@ -1,18 +1,18 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
 import { Button } from '@@/buttons';
-import { BeTeaserTooltip } from '@@/Tip/BeTeaserTooltip';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 interface Props {
   featureId: FeatureId;
 }
 export function YAMLReplace({ featureId }: Props) {
   return (
-    <BeTeaserTooltip
+    <TooltipWithChildren
       className="float-right"
       heading="Apply YAML changes"
       BEFeatureID={featureId}
-      message="Applies any changes that you make in the YAML editor by calling the Kubernetes API to patch the relevant resources. Any unexpected resources that you add to the YAML will be ignored."
+      message="Applies any changes that you make in the YAML editor by calling the Kubernetes API to patch the relevant resources. Any unexpected resources that you add to the YAML will be ignored. Note that editing is disabled for resources in namespaces marked as system."
     >
       <Button
         type="button"
@@ -23,6 +23,6 @@ export function YAMLReplace({ featureId }: Props) {
       >
         Apply changes
       </Button>
-    </BeTeaserTooltip>
+    </TooltipWithChildren>
   );
 }

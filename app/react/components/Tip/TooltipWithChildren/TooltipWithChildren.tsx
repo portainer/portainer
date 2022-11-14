@@ -7,7 +7,7 @@ import { FeatureId } from '@/portainer/feature-flags/enums';
 
 import { getFeatureDetails } from '@@/BEFeatureIndicator/utils';
 
-import styles from './BeTeaserTooltip.module.css';
+import styles from './TooltipWithChildren.module.css';
 
 type Position = 'top' | 'right' | 'bottom' | 'left';
 
@@ -20,7 +20,7 @@ export interface Props {
   BEFeatureID?: FeatureId;
 }
 
-export function BeTeaserTooltip({
+export function TooltipWithChildren({
   message,
   position = 'bottom',
   className,
@@ -70,7 +70,7 @@ export function BeTeaserTooltip({
         effect="solid"
         className={clsx(styles.tooltip, className)}
         arrowColor="var(--bg-tooltip-color)"
-        delayHide={2000}
+        delayHide={400}
         clickable
       />
     </span>
