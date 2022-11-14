@@ -38,7 +38,7 @@ export function TooltipWithChildren({
     <div className={styles.tooltipContainer}>
       <div
         className={clsx(
-          'w-full mb-3 inline-flex justify-between',
+          'w-full mb-2 inline-flex justify-between',
           styles.tooltipHeading
         )}
       >
