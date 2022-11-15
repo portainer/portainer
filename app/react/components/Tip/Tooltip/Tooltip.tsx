@@ -1,9 +1,6 @@
-import ReactTooltip from 'react-tooltip';
 import { HelpCircle } from 'lucide-react';
-import clsx from 'clsx';
-import _ from 'lodash';
 
-import styles from './Tooltip.module.css';
+import { TooltipWithChildren } from '../TooltipWithChildren';
 
 type Position = 'top' | 'right' | 'bottom' | 'left';
 
@@ -14,24 +11,13 @@ export interface Props {
 }
 
 export function Tooltip({ message, position = 'bottom', className }: Props) {
-  const id = _.uniqueId('tooltip-');
-
   return (
-    <span
-      data-tip={message}
-      data-for={id}
-      className={clsx(styles.icon, 'inline-flex text-base')}
+    <TooltipWithChildren
+      message={message}
+      position={position}
+      className={className}
     >
-      <HelpCircle className="lucide" aria-hidden="true" />
-      <ReactTooltip
-        id={id}
-        multiline
-        type="info"
-        place={position}
-        effect="solid"
-        className={clsx(styles.tooltip, className)}
-        arrowColor="transparent"
-      />
-    </span>
+      <HelpCircle className="feather ml-1" aria-hidden="true" />
+    </TooltipWithChildren>
   );
 }

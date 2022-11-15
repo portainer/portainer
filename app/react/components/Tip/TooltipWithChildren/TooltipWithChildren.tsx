@@ -36,24 +36,26 @@ export function TooltipWithChildren({
 
   const messageHTML = (
     <div className={styles.tooltipContainer}>
-      <div
-        className={clsx(
-          'w-full mb-2 inline-flex justify-between',
-          styles.tooltipHeading
-        )}
-      >
-        {heading && <span>{heading}</span>}
-        {BEFeatureID && limitedToBE && (
-          <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.tooltipBeteaser}
-          >
-            Business Edition Only
-          </a>
-        )}
-      </div>
+      {(heading || (BEFeatureID && limitedToBE)) && (
+        <div
+          className={clsx(
+            'w-full mb-2 inline-flex justify-between',
+            styles.tooltipHeading
+          )}
+        >
+          {heading && <span>{heading}</span>}
+          {BEFeatureID && limitedToBE && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.tooltipBeteaser}
+            >
+              Business Edition Only
+            </a>
+          )}
+        </div>
+      )}
       <div>{message}</div>
     </div>
   );
