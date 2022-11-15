@@ -16,7 +16,7 @@ import {
 import { addPlural } from '@/portainer/helpers/strings';
 
 import { AgentVersionTag } from './AgentVersionTag';
-import { Stat } from './EnvironmentStatsItem';
+import { EnvironmentStatsItem } from './EnvironmentStatsItem';
 
 interface Props {
   snapshots: DockerSnapshot[];
@@ -42,10 +42,13 @@ export function EnvironmentStatsDocker({
   return (
     <div className="blocklist-item-line endpoint-item">
       <span className="blocklist-item-desc">
-        <Stat value={addPlural(snapshot.StackCount, 'stack')} icon={Layers} />
+        <EnvironmentStatsItem
+          value={addPlural(snapshot.StackCount, 'stack')}
+          icon={Layers}
+        />
 
         {!!snapshot.Swarm && (
-          <Stat
+          <EnvironmentStatsItem
             value={addPlural(snapshot.ServiceCount, 'service')}
             icon={Shuffle}
           />
@@ -57,11 +60,14 @@ export function EnvironmentStatsDocker({
           healthy={snapshot.HealthyContainerCount}
           unhealthy={snapshot.UnhealthyContainerCount}
         />
-        <Stat
+        <EnvironmentStatsItem
           value={addPlural(snapshot.VolumeCount, 'volume')}
           icon={Database}
         />
-        <Stat value={addPlural(snapshot.ImageCount, 'image')} icon={List} />
+        <EnvironmentStatsItem
+          value={addPlural(snapshot.ImageCount, 'image')}
+          icon={List}
+        />
       </span>
 
       <span className="small text-muted space-x-2 vertical-center">
@@ -69,7 +75,7 @@ export function EnvironmentStatsDocker({
           {snapshot.Swarm ? 'Swarm' : 'Standalone'} {snapshot.DockerVersion}
         </span>
         {snapshot.Swarm && (
-          <Stat
+          <EnvironmentStatsItem
             value={addPlural(snapshot.NodeCount, 'node')}
             icon={HardDrive}
           />
@@ -96,15 +102,34 @@ function ContainerStats({
   const containersCount = running + stopped;
 
   return (
-    <Stat value={addPlural(containersCount, 'container')} icon={Box}>
+    <EnvironmentStatsItem
+      value={addPlural(containersCount, 'container')}
+      icon={Box}
+    >
       {containersCount > 0 && (
         <span className="space-x-2 space-right">
-          <Stat value={running} icon={Power} iconClass="icon-success" />
-          <Stat value={stopped} icon={Power} iconClass="icon-danger" />
-          <Stat value={healthy} icon={Heart} iconClass="icon-success" />
-          <Stat value={unhealthy} icon={Heart} iconClass="icon-warning" />
+          <EnvironmentStatsItem
+            value={running}
+            icon={Power}
+            iconClass="icon-success"
+          />
+          <EnvironmentStatsItem
+            value={stopped}
+            icon={Power}
+            iconClass="icon-danger"
+          />
+          <EnvironmentStatsItem
+            value={healthy}
+            icon={Heart}
+            iconClass="icon-success"
+          />
+          <EnvironmentStatsItem
+            value={unhealthy}
+            icon={Heart}
+            iconClass="icon-warning"
+          />
         </span>
       )}
-    </Stat>
+    </EnvironmentStatsItem>
   );
 }

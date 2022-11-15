@@ -9,7 +9,7 @@ import { addPlural } from '@/portainer/helpers/strings';
 import Memory from '@/assets/ico/memory.svg?c';
 
 import { AgentVersionTag } from './AgentVersionTag';
-import { Stat } from './EnvironmentStatsItem';
+import { EnvironmentStatsItem } from './EnvironmentStatsItem';
 
 interface Props {
   snapshots?: KubernetesSnapshot[];
@@ -35,14 +35,20 @@ export function EnvironmentStatsKubernetes({
   return (
     <div className="blocklist-item-line endpoint-item">
       <span className="blocklist-item-desc space-x-1">
-        <Stat icon={Cpu} value={`${snapshot.TotalCPU} CPU`} />
+        <EnvironmentStatsItem icon={Cpu} value={`${snapshot.TotalCPU} CPU`} />
 
-        <Stat icon={Memory} value={`${humanize(snapshot.TotalMemory)} RAM`} />
+        <EnvironmentStatsItem
+          icon={Memory}
+          value={`${humanize(snapshot.TotalMemory)} RAM`}
+        />
       </span>
 
       <span className="small text-muted space-x-2 vertical-center">
         <span>Kubernetes {snapshot.KubernetesVersion}</span>
-        <Stat value={addPlural(snapshot.NodeCount, 'node')} icon={HardDrive} />
+        <EnvironmentStatsItem
+          value={addPlural(snapshot.NodeCount, 'node')}
+          icon={HardDrive}
+        />
         <AgentVersionTag type={type} version={agentVersion} />
       </span>
     </div>

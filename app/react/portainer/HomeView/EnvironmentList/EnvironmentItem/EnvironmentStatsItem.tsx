@@ -9,7 +9,7 @@ interface Props extends IconProps {
   iconClass?: string;
 }
 
-export function Stat({
+export function EnvironmentStatsItem({
   value,
   icon,
   children,
