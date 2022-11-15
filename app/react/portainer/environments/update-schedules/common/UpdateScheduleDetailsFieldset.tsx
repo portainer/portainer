@@ -10,6 +10,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { FormValues } from './types';
 import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
 import { VersionSelect } from './VersionSelect';
+import { ScheduledTimeField } from './ScheduledTimeField';
 
 export function UpdateScheduleDetailsFieldset() {
   const { values } = useFormikContext<FormValues>();
@@ -24,16 +25,34 @@ export function UpdateScheduleDetailsFieldset() {
     )
   );
 
+  // old version is version that doesn't support scheduling of updates
+  const hasNoTimeZone = environments.some((env) => !env.LocalTimeZone);
+  const hasTimeZone = environments.some((env) => env.LocalTimeZone);
+
   return (
     <>
-      {!!(edgeGroupsEnvironmentIds.length && values.version) && (
-        <TextTip color="blue">
-          {edgeGroupsEnvironmentIds.length} environment(s) will be updated to{' '}
-          {values.version}
+      {edgeGroupsEnvironmentIds.length > 0 ? (
+        !!values.version && (
+          <TextTip color="blue">
+            {edgeGroupsEnvironmentIds.length} environment(s) will be updated to{' '}
+            {values.version}
+          </TextTip>
+        )
+      ) : (
+        <TextTip color="orange">
+          No environments options for the selected edge groups
         </TextTip>
       )}
 
       <VersionSelect minVersion={minVersion} />
+
+      {hasTimeZone && <ScheduledTimeField />}
+      {hasNoTimeZone && (
+        <TextTip>
+          These edge groups have older versions of the edge agent that do not
+          support scheduling, these will happen immediately
+        </TextTip>
+      )}
     </>
   );
 }

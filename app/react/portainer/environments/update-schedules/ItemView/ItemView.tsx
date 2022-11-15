@@ -10,6 +10,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
+import { InformationPanel } from '@@/InformationPanel';
 
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
@@ -58,6 +59,7 @@ function ItemView() {
     groupIds: item.edgeGroupIds,
     type: item.type,
     version: item.version,
+    scheduledTime: item.scheduledTime,
   };
 
   const environmentsCount = Object.keys(
@@ -121,10 +123,13 @@ function ItemView() {
                     />
 
                     {isScheduleActive ? (
-                      <TextTip color="blue">
-                        {environmentsCount} environment(s) will be updated to
-                        version {item.version}
-                      </TextTip>
+                      <InformationPanel>
+                        <TextTip color="blue">
+                          {environmentsCount} environment(s) will be updated to
+                          version {item.version} on {item.scheduledTime} (local
+                          time)
+                        </TextTip>
+                      </InformationPanel>
                     ) : (
                       <ScheduleTypeSelector />
                     )}

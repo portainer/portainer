@@ -4,6 +4,7 @@ import { useRouter } from '@uirouter/react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
+import { isoDate } from '@/portainer/filters/filters';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -25,6 +26,7 @@ const initialValues: FormValues = {
   groupIds: [],
   type: ScheduleType.Update,
   version: '',
+  scheduledTime: isoDate(Date.now() + 24 * 60 * 60 * 1000),
 };
 
 export default withLimitToBE(CreateView);

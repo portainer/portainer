@@ -78,5 +78,6 @@ export function useEnvironmentList(
     environments: data ? data.value : [],
     totalCount: data ? data.totalCount : 0,
     totalAvailable: data ? data.totalAvailable : 0,
+    updateAvailable: data ? data.updateAvailable : false,
   };
 }

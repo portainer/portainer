@@ -7,4 +7,5 @@ export interface FormValues {
   groupIds: EdgeGroup['Id'][];
   type: ScheduleType;
   version: string;
+  scheduledTime: string;
 }

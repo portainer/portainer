@@ -8,7 +8,8 @@ export const queryKeys = {
     [...queryKeys.base(), { includeEdgeStacks }] as const,
   item: (id: EdgeUpdateSchedule['id']) => [...queryKeys.base(), id] as const,
   activeSchedules: (environmentIds: EnvironmentId[]) =>
-    [queryKeys.base(), 'active', { environmentIds }] as const,
-  supportedAgentVersions: () => [queryKeys.base(), 'agent_versions'] as const,
-  previousVersions: () => [queryKeys.base(), 'previous_versions'] as const,
+    [...queryKeys.base(), 'active', { environmentIds }] as const,
+  supportedAgentVersions: () =>
+    [...queryKeys.base(), 'agent_versions'] as const,
+  previousVersions: () => [...queryKeys.base(), 'previous_versions'] as const,
 };
