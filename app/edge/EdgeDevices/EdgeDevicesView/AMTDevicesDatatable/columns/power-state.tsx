@@ -4,6 +4,8 @@ import { Settings } from 'react-feather';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
+import { Icon } from '@@/Icon';
+
 import { useRowContext } from './RowContext';
 
 enum PowerState {
@@ -51,7 +53,7 @@ export function PowerStateCell({
       </span>
       <span>
         {isLoading && (
-          <Settings className="animate-spin-slow space-left feather" />
+          <Icon icon={Settings} className="animate-spin-slow !ml-1" />
         )}
       </span>
     </>

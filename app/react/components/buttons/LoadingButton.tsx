@@ -2,6 +2,8 @@ import { PropsWithChildren } from 'react';
 
 import CircleNotch from '@/assets/ico/circle-notch.svg?c';
 
+import { Icon } from '@@/Icon';
+
 import { type Props as ButtonProps, Button } from './Button';
 
 interface Props extends ButtonProps {
@@ -33,7 +35,11 @@ export function LoadingButton({
 function LoadingButtonIcon(isLoading: boolean) {
   if (isLoading) {
     return (
-      <CircleNotch className="animate-spin-slow mr-1" aria-label="loading" />
+      <Icon
+        icon={CircleNotch}
+        className="animate-spin-slow ml-1"
+        aria-label="loading"
+      />
     );
   }
   return null;

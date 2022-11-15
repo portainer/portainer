@@ -30,17 +30,9 @@ interface Props {
   size?: IconSize;
   mode?: IconMode;
   inline?: boolean;
-  ariaLabel?: string;
 }
 
-export function Icon({
-  icon,
-  className,
-  mode,
-  size,
-  inline,
-  ariaLabel,
-}: Props) {
+export function Icon({ icon, className, mode, size, inline }: Props) {
   const classes = clsx(
     className,
     'icon',
@@ -51,14 +43,13 @@ export function Icon({
   if (typeof icon !== 'string') {
     const Icon = isValidElementType(icon) ? icon : null;
 
+    if (Icon) {
+      return <Icon className={classes} aria-hidden="true" role="img" />;
+    }
+
     return (
-      <span
-        className={classes}
-        aria-hidden="true"
-        role="img"
-        aria-label={ariaLabel}
-      >
-        {Icon == null ? <>{icon}</> : <Icon />}
+      <span className={classes} aria-hidden="true" role="img">
+        {icon}
       </span>
     );
   }
@@ -69,7 +60,7 @@ export function Icon({
       <Svg
         icon={svgIcon as keyof typeof SvgIcons}
         className={clsx(classes, inline ? '!inline' : '!flex')}
-        aria-label={ariaLabel}
+        aria-hidden="true"
       />
     );
   }
@@ -86,5 +77,5 @@ export function Icon({
     return null;
   }
 
-  return <IconComponent className={classes} aria-label={ariaLabel} />;
+  return <IconComponent className={classes} aria-hidden="true" />;
 }

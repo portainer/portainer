@@ -70,7 +70,7 @@ export function NotificationsMenu() {
             'th-dark:text-gray-warm-7'
           )}
         >
-          <Bell className="feather" />
+          <Icon icon={Bell} className="feather" />
           <span className={badge ? notificationStyles.badge : ''} />
         </div>
       </MenuButton>

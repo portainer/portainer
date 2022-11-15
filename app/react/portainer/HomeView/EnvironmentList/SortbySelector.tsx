@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 
 import { Select } from '@@/form-components/ReactSelect';
+import { TableHeaderSortIcons } from '@@/datatables/TableHeaderSortIcons';
 
 import { Filter } from './types';
 import styles from './SortbySelector.module.css';
-import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
 interface Props {
   filterOptions: Filter[];

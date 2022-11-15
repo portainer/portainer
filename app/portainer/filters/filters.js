@@ -1,10 +1,11 @@
 import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
-import { Eye, EyeOff, Users, Grid, Cloud } from 'react-feather';
+import { Eye, EyeOff, Users, Cloud } from 'react-feather';
 
 import Kubernetes2 from '@/assets/ico/kubernetes-2.svg?c';
 import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
+import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
 import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
 
 export function truncateLeftRight(text, max, left, right) {
@@ -97,7 +98,7 @@ export function endpointTypeName(type) {
 
 export function environmentTypeIcon(type) {
   if (type === 3) {
-    return Grid;
+    return MicrosoftIcon;
   } else if (type === 4) {
     return Cloud;
   } else if (type === 5 || type === 6 || type === 7) {
