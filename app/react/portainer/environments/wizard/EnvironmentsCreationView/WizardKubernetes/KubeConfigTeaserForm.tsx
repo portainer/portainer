@@ -1,5 +1,7 @@
 import { Field, Form, Formik } from 'formik';
 
+import Plug from '@/assets/ico/plug.svg?c';
+
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
@@ -86,7 +88,7 @@ export function KubeConfigTeaserForm() {
                 isLoading={false}
                 disabled
               >
-                <Icon icon="svg-plug" />
+                <Icon icon={Plug} />
                 Connect
               </LoadingButton>
             </div>

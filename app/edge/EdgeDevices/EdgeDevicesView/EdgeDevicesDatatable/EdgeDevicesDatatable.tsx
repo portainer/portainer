@@ -1,6 +1,7 @@
 import { useTable, useExpanded, useSortBy, useFilters } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
+import { Box } from 'react-feather';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
@@ -123,7 +124,7 @@ export function EdgeDevicesDatatable({
     <div className="row">
       <div className="col-sm-12">
         <TableContainer>
-          <TableTitle icon="box" label="Edge Devices">
+          <TableTitle icon={Box} label="Edge Devices">
             <SearchBar value={search} onChange={handleSearchBarChange} />
             <TableActions>
               <EdgeDevicesDatatableActions

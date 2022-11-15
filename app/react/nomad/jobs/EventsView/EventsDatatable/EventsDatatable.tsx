@@ -9,6 +9,7 @@ import {
 
 import { NomadEvent } from '@/react/nomad/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
+import ClockRewind from '@/assets/ico/clock-rewind.svg?c';
 
 import { PaginationControls } from '@@/PaginationControls';
 import {
@@ -81,7 +82,7 @@ export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
 
   return (
     <TableContainer>
-      <TableTitle icon="fa-history" label="Events" />
+      <TableTitle icon={ClockRewind} label="Events" />
 
       <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 

@@ -11,6 +11,7 @@ import { useRowSelectColumn } from '@lineup-lite/hooks';
 
 import { Job } from '@/react/nomad/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
+import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { PaginationControls } from '@@/PaginationControls';
 import {
@@ -104,7 +105,7 @@ export function JobsDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon="fa-cubes" label="Nomad Jobs">
+      <TableTitle icon={Cubes} label="Nomad Jobs">
         <TableTitleActions>
           <TableSettingsMenu>
             <JobsDatatableSettings />
