@@ -97,7 +97,7 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.removeFilteredContainerLabel = function (index) {
       const filteredSettings = $scope.formValues.BlackListedLabels.filter((_, i) => i !== index);
       const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
-      updateSettings(filteredSettingsPayload);
+      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
     };
 
     $scope.addFilteredContainerLabel = function () {
@@ -108,7 +108,7 @@ angular.module('portainer.app').controller('SettingsController', [
 
       const filteredSettings = [...$scope.formValues.BlackListedLabels, label];
       const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
-      updateSettings(filteredSettingsPayload);
+      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
     };
 
     $scope.downloadBackup = function () {
