@@ -4,9 +4,9 @@ import _ from 'lodash';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
-import { EdgeUpdateSchedule } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
 
-export const groups: Column<EdgeUpdateSchedule> = {
+export const groups: Column<EdgeUpdateListItemResponse> = {
   Header: 'Groups',
   accessor: 'edgeGroupIds',
   Cell: GroupsCell,
@@ -18,7 +18,7 @@ export const groups: Column<EdgeUpdateSchedule> = {
 
 export function GroupsCell({
   value: groupsIds,
-}: CellProps<EdgeUpdateSchedule, Array<EdgeGroup['Id']>>) {
+}: CellProps<EdgeUpdateListItemResponse, Array<EdgeGroup['Id']>>) {
   const groupsQuery = useEdgeGroups();
 
   const groups = _.compact(

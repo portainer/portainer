@@ -1,8 +1,9 @@
 import { Column } from 'react-table';
 
-import { EdgeUpdateSchedule, ScheduleType } from '../../types';
+import { ScheduleType } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
 
-export const scheduleType: Column<EdgeUpdateSchedule> = {
+export const scheduleType: Column<EdgeUpdateListItemResponse> = {
   Header: 'Type',
   accessor: (row) => ScheduleType[row.type],
   disableFilters: true,

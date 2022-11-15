@@ -24,9 +24,10 @@ export type EdgeUpdateSchedule = {
   createdBy: UserId;
   version: string;
   environmentsPreviousVersions: Record<EnvironmentId, string>;
+};
 
+export type EdgeUpdateResponse = EdgeUpdateSchedule & {
   // from edge stack:
   edgeGroupIds: EdgeGroup['Id'][];
-  status: StatusType;
-  statusMessage: string;
+  scheduledTime: string;
 };

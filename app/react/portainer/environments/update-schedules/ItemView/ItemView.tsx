@@ -17,7 +17,7 @@ import { useUpdateMutation } from '../queries/useUpdateMutation';
 import { useList } from '../queries/list';
 import { NameField, nameValidation } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
-import { EdgeUpdateSchedule, StatusType } from '../types';
+import { EdgeUpdateSchedule } from '../types';
 import { FormValues } from '../common/types';
 import { ScheduleTypeSelector } from '../common/ScheduleTypeSelector';
 import { BetaAlert } from '../common/BetaAlert';
@@ -45,9 +45,13 @@ function ItemView() {
   }
 
   const item = itemQuery.data;
-  const isScheduleActive = item.status !== StatusType.Pending;
+  const isScheduleActive = item.isActive;
 
   const schedules = schedulesQuery.data;
+
+  const initialValuesActive: Partial<FormValues> = {
+    name: item.name,
+  };
 
   const initialValues: FormValues = {
     name: item.name,
@@ -78,7 +82,9 @@ function ItemView() {
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
               <Formik
-                initialValues={initialValues}
+                initialValues={
+                  !isScheduleActive ? initialValues : initialValuesActive
+                }
                 onSubmit={(values) => {
                   updateMutation.mutate(
                     { id, values },
@@ -98,11 +104,21 @@ function ItemView() {
                   updateValidation(item.id, schedules, isScheduleActive)
                 }
               >
-                {({ isValid }) => (
+                {({ isValid, setFieldValue, values, handleBlur, errors }) => (
                   <FormikForm className="form-horizontal">
                     <NameField />
 
-                    <EdgeGroupsField disabled={isScheduleActive} />
+                    <EdgeGroupsField
+                      disabled={isScheduleActive}
+                      onChange={(value) => setFieldValue('groupIds', value)}
+                      value={
+                        isScheduleActive
+                          ? item.edgeGroupIds
+                          : values.groupIds || []
+                      }
+                      onBlur={handleBlur}
+                      error={errors.groupIds}
+                    />
 
                     {isScheduleActive ? (
                       <TextTip color="blue">

@@ -2,14 +2,19 @@ import { useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateResponse, StatusType } from '../types';
 
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';
 
+export type EdgeUpdateListItemResponse = EdgeUpdateResponse & {
+  status: StatusType;
+  statusMessage: string;
+};
+
 async function getList(includeEdgeStacks?: boolean) {
   try {
-    const { data } = await axios.get<EdgeUpdateSchedule[]>(buildUrl(), {
+    const { data } = await axios.get<EdgeUpdateListItemResponse[]>(buildUrl(), {
       params: { includeEdgeStacks },
     });
     return data;

@@ -8,6 +8,7 @@ import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { ScheduleType } from '../types';
 import { useCreateMutation } from '../queries/create';
@@ -60,10 +61,23 @@ function CreateView() {
                 validateOnMount
                 validationSchema={() => validation(schedules)}
               >
-                {({ isValid }) => (
+                {({ isValid, setFieldValue, values, handleBlur, errors }) => (
                   <FormikForm className="form-horizontal">
                     <NameField />
-                    <EdgeGroupsField />
+                    <EdgeGroupsField
+                      onChange={(value) => setFieldValue('groupIds', value)}
+                      value={values.groupIds}
+                      onBlur={handleBlur}
+                      error={errors.groupIds}
+                    />
+
+                    <TextTip color="blue">
+                      You can upgrade from any agent version to 2.17 or later
+                      only. You can not upgrade to an agent version prior to
+                      2.17 . The ability to rollback to originating version is
+                      for 2.15.0+ only.
+                    </TextTip>
+
                     <ScheduleTypeSelector />
 
                     <div className="form-group">

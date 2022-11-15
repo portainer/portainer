@@ -1,8 +1,9 @@
 import { CellProps, Column } from 'react-table';
 
-import { EdgeUpdateSchedule, StatusType } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
+import { StatusType } from '../../types';
 
-export const scheduleStatus: Column<EdgeUpdateSchedule> = {
+export const scheduleStatus: Column<EdgeUpdateListItemResponse> = {
   Header: 'Status',
   accessor: (row) => row.status,
   disableFilters: true,
@@ -17,7 +18,10 @@ function StatusCell({
   row: {
     original: { statusMessage },
   },
-}: CellProps<EdgeUpdateSchedule, EdgeUpdateSchedule['status']>) {
+}: CellProps<
+  EdgeUpdateListItemResponse,
+  EdgeUpdateListItemResponse['status']
+>) {
   switch (status) {
     case StatusType.Failed:
       return statusMessage;

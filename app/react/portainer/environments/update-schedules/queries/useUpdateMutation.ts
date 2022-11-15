@@ -11,7 +11,7 @@ import { buildUrl } from './urls';
 
 interface Update {
   id: EdgeUpdateSchedule['id'];
-  values: FormValues;
+  values: Partial<FormValues>;
 }
 
 async function update({ id, values }: Update) {
