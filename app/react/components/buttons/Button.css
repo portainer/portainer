@@ -10,6 +10,7 @@
 }
 
 .btn-warninglight {
-  border-color: var(--ui-warning-5);
-  background-color: var(--ui-warning-2);
+  @apply border-warning-5 bg-warning-2 text-black;
+  @apply th-dark:bg-warning-5 th-dark:bg-opacity-10 th-dark:text-white;
+  @apply th-highcontrast:bg-warning-5 th-highcontrast:bg-opacity-10 th-highcontrast:text-white;
 }
