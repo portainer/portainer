@@ -6,6 +6,8 @@ import './BEFeatureIndicator.css';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
+import { Icon } from '@@/Icon';
+
 import { getFeatureDetails } from './utils';
 
 export interface Props {
@@ -33,8 +35,8 @@ export function BEFeatureIndicator({
       rel="noopener noreferrer"
     >
       {children}
-      {showIcon && <Briefcase className="icon icon-sm vertical-center" />}
-      <span className="be-indicator-label break-words space-left">
+      {showIcon && <Icon icon={Briefcase} className="mr-1 be-indicator-icon" />}
+      <span className="be-indicator-label break-words">
         Business Edition Feature
       </span>
     </a>

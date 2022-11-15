@@ -2,6 +2,7 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useState } from 'react';
 import _ from 'lodash';
 import clsx from 'clsx';
+import { ArrowLeft, ArrowRight } from 'react-feather';
 
 import { notifyError } from '@/portainer/services/notifications';
 import {
@@ -9,6 +10,7 @@ import {
   EnvironmentId,
 } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import Magic from '@/assets/ico/magic.svg?c';
 
 import { Stepper } from '@@/Stepper';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -71,7 +73,7 @@ export function EnvironmentCreationView() {
 
       <div className={styles.wizardWrapper}>
         <Widget>
-          <WidgetTitle icon="svg-magic" title="Environment Wizard" />
+          <WidgetTitle icon={Magic} title="Environment Wizard" />
           <WidgetBody>
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 
@@ -92,11 +94,11 @@ export function EnvironmentCreationView() {
                   )}
                 >
                   <Button disabled={isFirstStep} onClick={onPreviousClick}>
-                    <Icon icon="arrow-left" /> Previous
+                    <Icon icon={ArrowLeft} /> Previous
                   </Button>
                   <Button onClick={onNextClick}>
                     {isLastStep ? 'Close' : 'Next'}
-                    <Icon icon="arrow-right" />
+                    <Icon icon={ArrowRight} />
                   </Button>
                 </div>
               </FormSection>

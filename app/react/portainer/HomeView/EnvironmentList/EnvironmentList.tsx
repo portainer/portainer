@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { RefreshCcw } from 'react-feather';
+import { HardDrive, RefreshCcw } from 'react-feather';
 import _ from 'lodash';
 
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
@@ -178,7 +178,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
       <div className="row">
         <div className="col-sm-12">
           <TableContainer>
-            <TableTitle icon="hard-drive" label="Environments" />
+            <TableTitle icon={HardDrive} label="Environments" />
 
             <TableActions className={styles.actionBar}>
               <div className={styles.description}>

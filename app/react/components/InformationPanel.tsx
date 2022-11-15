@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react';
+import { X } from 'react-feather';
 
 import { Widget, WidgetBody } from './Widget';
 import { Button } from './buttons';
@@ -34,7 +35,7 @@ export function InformationPanel({
                       ng-if="dismissAction"
                     >
                       <Button color="link" onClick={() => onDismiss()}>
-                        <Icon icon="x" />
+                        <Icon icon={X} />
                         dismiss
                       </Button>
                     </span>

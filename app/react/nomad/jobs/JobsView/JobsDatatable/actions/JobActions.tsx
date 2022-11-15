@@ -1,10 +1,12 @@
 import { useMutation } from 'react-query';
+import { Trash2 } from 'react-feather';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Job } from '@/react/nomad/types';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
+import { Icon } from '@@/Icon';
 
 import { deleteJobs } from './delete';
 
@@ -26,7 +28,7 @@ export function JobActions({ selectedItems, refreshData }: Props) {
       color="danger"
       onClick={handleDeleteClicked}
     >
-      <i className="fa fa-trash-alt space-right" aria-hidden="true" />
+      <Icon icon={Trash2} />
       Remove
     </LoadingButton>
   );

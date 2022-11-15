@@ -12,6 +12,7 @@ import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { EdgeIndicator } from '@@/EdgeIndicator';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -43,7 +44,7 @@ export function WizardEndpointsList({ environmentIds }: Props) {
 
   return (
     <Widget>
-      <WidgetTitle icon="svg-plug" title="New Environments" />
+      <WidgetTitle icon={Plug} title="New Environments" />
       <WidgetBody>
         {environments.map((environment) => (
           <div className={styles.wizardListWrapper} key={environment.Id}>

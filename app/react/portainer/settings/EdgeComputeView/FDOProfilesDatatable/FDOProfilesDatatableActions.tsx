@@ -1,5 +1,6 @@
 import { useQueryClient } from 'react-query';
 import { useRouter } from '@uirouter/react';
+import { PlusCircle, Trash2 } from 'react-feather';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import {
@@ -30,7 +31,7 @@ export function FDOProfilesDatatableActions({
   return (
     <div className="actionBar">
       <Link to="portainer.endpoints.profile" className="space-left">
-        <Button disabled={!isFDOEnabled} icon="plus-circle">
+        <Button disabled={!isFDOEnabled} icon={PlusCircle}>
           Add Profile
         </Button>
       </Link>
@@ -38,7 +39,7 @@ export function FDOProfilesDatatableActions({
       <Button
         disabled={!isFDOEnabled || selectedItems.length !== 1}
         onClick={() => onDuplicateProfileClick()}
-        icon="plus-circle"
+        icon={PlusCircle}
       >
         Duplicate
       </Button>
@@ -47,7 +48,7 @@ export function FDOProfilesDatatableActions({
         disabled={!isFDOEnabled || selectedItems.length < 1}
         color="danger"
         onClick={() => onDeleteProfileClick()}
-        icon="trash-2"
+        icon={Trash2}
       >
         Remove
       </Button>

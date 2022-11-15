@@ -1,6 +1,7 @@
 import { Formik, Field, Form } from 'formik';
 import { useMutation, useQueryClient } from 'react-query';
 import { useReducer } from 'react';
+import { Plus } from 'react-feather';
 
 import { Icon } from '@/react/components/Icon';
 import { User } from '@/portainer/users/types';
@@ -42,7 +43,7 @@ export function CreateTeamForm({ users, teams }: Props) {
       <div className="col-lg-12 col-md-12 col-xs-12">
         <Widget>
           <Widget.Title
-            icon="plus"
+            icon={Plus}
             title="Add a new team"
             className="vertical-center"
           />
@@ -123,7 +124,7 @@ export function CreateTeamForm({ users, teams }: Props) {
                         isLoading={isSubmitting || addTeamMutation.isLoading}
                         loadingText="Creating team..."
                       >
-                        <Icon icon="plus" size="md" />
+                        <Icon icon={Plus} size="md" />
                         Create team
                       </LoadingButton>
                     </div>

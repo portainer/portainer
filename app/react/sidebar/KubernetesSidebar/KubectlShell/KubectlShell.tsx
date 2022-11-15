@@ -2,6 +2,7 @@ import { Terminal } from 'xterm';
 import { fit } from 'xterm/lib/addons/fit/fit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { RotateCw, X, Terminal as TerminalIcon } from 'react-feather';
 
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import {
@@ -127,7 +128,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     <div className={clsx(styles.root, { [styles.minimized]: shell.minimized })}>
       <div className={styles.header}>
         <div className={clsx(styles.title, 'vertical-center')}>
-          <Icon icon="terminal" />
+          <Icon icon={TerminalIcon} />
           kubectl shell
         </div>
         <div className={clsx(styles.actions, 'space-x-8')}>
@@ -136,7 +137,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
             onClick={clearScreen}
             data-cy="k8sShell-refreshButton"
           >
-            <Icon icon="rotate-cw" size="md" />
+            <Icon icon={RotateCw} size="md" />
           </Button>
           <Button
             color="link"
@@ -156,7 +157,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
             onClick={handleClose}
             data-cy="k8sShell-closeButton"
           >
-            <Icon icon="x" size="md" />
+            <Icon icon={X} size="md" />
           </Button>
         </div>
       </div>

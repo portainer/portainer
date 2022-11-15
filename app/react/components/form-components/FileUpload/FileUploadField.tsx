@@ -1,4 +1,5 @@
 import { ChangeEvent, createRef } from 'react';
+import { XCircle } from 'react-feather';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -46,7 +47,7 @@ export function FileUploadField({
       </Button>
 
       <span className="vertical-center">
-        {value ? value.name : <Icon icon="x-circle" mode="danger" />}
+        {value ? value.name : <Icon icon={XCircle} mode="danger" />}
       </span>
     </div>
   );

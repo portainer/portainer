@@ -1,4 +1,5 @@
 import { CellProps, Column } from 'react-table';
+import { ExternalLink } from 'react-feather';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { getPorts } from '@/react/azure/utils';
@@ -28,7 +29,7 @@ function PortsCell({
 
   return ports.map((port) => (
     <a className="image-tag" href={`http://${ip}:${port.host}`} key={port.host}>
-      <Icon icon="external-link" className="mr-1" />
+      <Icon icon={ExternalLink} className="mr-1" />
       {ip}:{port.host}
     </a>
   ));

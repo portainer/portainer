@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Menu, MenuList, MenuButton } from '@reach/menu-button';
+import { MoreVertical } from 'react-feather';
 
 import { Icon } from '@@/Icon';
 
@@ -21,7 +22,7 @@ export function ActionsMenu({ children }: Props) {
               isExpanded && styles.actionsActive
             )}
           >
-            <Icon icon="more-vertical" />
+            <Icon icon={MoreVertical} />
           </MenuButton>
           <MenuList>
             <div className={styles.tableActionsMenuList}>{children}</div>

@@ -1,7 +1,7 @@
 import { Package } from 'react-feather';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import SubscriptionSvg from '@/assets/ico/subscription.svg?c';
+import Subscription from '@/assets/ico/subscription.svg?c';
 
 import { PageHeader } from '@@/PageHeader';
 import { DashboardItem } from '@@/DashboardItem';
@@ -34,7 +34,7 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
-              icon={SubscriptionSvg}
+              icon={Subscription}
               type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (

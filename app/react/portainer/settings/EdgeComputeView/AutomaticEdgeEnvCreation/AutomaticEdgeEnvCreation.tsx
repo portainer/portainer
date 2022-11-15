@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { generateKey } from '@/react/portainer/environments/environment.service/edge';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
@@ -42,10 +43,7 @@ export function AutomaticEdgeEnvCreation() {
 
   return (
     <Widget>
-      <WidgetTitle
-        icon="svg-laptop"
-        title="Automatic Edge Environment Creation"
-      />
+      <WidgetTitle icon={Laptop} title="Automatic Edge Environment Creation" />
       <WidgetBody>
         <AutoEnvCreationSettingsForm settings={settingsQuery.data} />
 

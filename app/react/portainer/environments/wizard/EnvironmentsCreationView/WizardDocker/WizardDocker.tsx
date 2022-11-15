@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { Zap, Cloud } from 'react-feather';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+import Dataflow2 from '@/assets/ico/dataflow-2.svg?c';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
@@ -24,28 +27,28 @@ const defaultOptions: BoxSelectorOption<
 >[] = [
   {
     id: 'agent',
-    icon: <BadgeIcon icon="zap" size="3xl" />,
+    icon: <BadgeIcon icon={Zap} size="3xl" />,
     label: 'Agent',
     description: '',
     value: 'agent',
   },
   {
     id: 'api',
-    icon: <BadgeIcon icon="svg-dataflow2" size="3xl" />,
+    icon: <BadgeIcon icon={Dataflow2} size="3xl" />,
     label: 'API',
     description: '',
     value: 'api',
   },
   {
     id: 'socket',
-    icon: <BadgeIcon icon="svg-plug" size="3xl" />,
+    icon: <BadgeIcon icon={Plug} size="3xl" />,
     label: 'Socket',
     description: '',
     value: 'socket',
   },
   {
     id: 'edgeAgent',
-    icon: <BadgeIcon icon="cloud" size="3xl" />,
+    icon: <BadgeIcon icon={Cloud} size="3xl" />,
     label: 'Edge Agent',
     description: '',
     value: 'edgeAgent',

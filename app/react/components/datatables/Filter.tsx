@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useMemo } from 'react';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
+import { Check, Filter } from 'react-feather';
 
 import { Icon } from '@@/Icon';
 
@@ -27,10 +28,12 @@ export function MultipleSelectionFilter({
     <div>
       <Menu>
         <MenuButton
-          className={clsx('table-filter', { 'filter-active': enabled })}
+          className={clsx('table-filter flex items-center', {
+            'filter-active': enabled,
+          })}
         >
           Filter
-          <Icon icon={enabled ? 'check' : 'filter'} className="ml-1" />
+          <Icon icon={enabled ? Check : Filter} className="!ml-1" />
         </MenuButton>
         <MenuPopover className="dropdown-menu">
           <div className="tableMenu">

@@ -1,3 +1,5 @@
+import { AlertTriangle, Check } from 'react-feather';
+
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { Icon } from '@@/Icon';
@@ -17,12 +19,12 @@ export function PasswordCheckHint({
   return (
     <div>
       <p className="text-warning vertical-center">
-        <Icon icon="alert-triangle" className="icon-warning" />
+        <Icon icon={AlertTriangle} className="icon-warning" />
         {forceChangePassword &&
           'An administrator has changed your password requirements, '}
         The password must be at least {minPasswordLength} characters long.
         {passwordValid && (
-          <Icon icon="check" className="!ml-1" mode="success" />
+          <Icon icon={Check} className="!ml-1" mode="success" />
         )}
       </p>
     </div>

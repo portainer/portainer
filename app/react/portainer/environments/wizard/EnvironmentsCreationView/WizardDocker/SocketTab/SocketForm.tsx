@@ -5,6 +5,7 @@ import { useCreateLocalDockerEnvironmentMutation } from '@/react/portainer/envir
 import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -61,10 +62,7 @@ export function SocketForm({ onCreate }: Props) {
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
               >
-                <Icon
-                  icon="svg-plug"
-                  className="icon icon-sm vertical-center"
-                />{' '}
+                <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                 Connect
               </LoadingButton>
             </div>

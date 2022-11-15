@@ -1,3 +1,7 @@
+import { Grid } from 'react-feather';
+
+import Linux from '@/assets/ico/linux.svg?c';
+
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 import { Icon } from '@@/Icon';
 
@@ -21,7 +25,7 @@ export function OsSelector({ onChange, value }: Props) {
               value: 'linux',
               label: (
                 <>
-                  <Icon icon="svg-linux" className="mr-1" />
+                  <Icon icon={Linux} className="mr-1" />
                   Linux
                 </>
               ),
@@ -30,7 +34,7 @@ export function OsSelector({ onChange, value }: Props) {
               value: 'win',
               label: (
                 <>
-                  <Icon icon="grid" className="mr-1" />
+                  <Icon icon={Grid} className="mr-1" />
                   Windows
                 </>
               ),

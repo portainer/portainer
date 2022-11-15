@@ -1,8 +1,10 @@
 import { CellProps, Column } from 'react-table';
+import { Clock, FileText } from 'react-feather';
 
 import { Task } from '@/react/nomad/types';
 
 import { Link } from '@@/Link';
+import { Icon } from '@@/Icon';
 
 export const actions: Column<Task> = {
   Header: 'Task Actions',
@@ -33,12 +35,12 @@ export function ActionsCell({ row }: CellProps<Task>) {
         title="Events"
         className="space-right"
       >
-        <i className="fa fa-history space-right" aria-hidden="true" />
+        <Icon icon={Clock} className="space-right icon" />
       </Link>
 
       {/* logs */}
       <Link to="nomad.logs" params={params} title="Logs">
-        <i className="fa fa-file-alt space-right" aria-hidden="true" />
+        <Icon icon={FileText} className="space-right icon" />
       </Link>
     </div>
   );

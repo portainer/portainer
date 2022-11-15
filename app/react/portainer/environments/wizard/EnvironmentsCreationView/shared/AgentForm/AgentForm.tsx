@@ -5,6 +5,7 @@ import { useCreateAgentEnvironmentMutation } from '@/react/portainer/environment
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Icon } from '@@/Icon';
@@ -60,10 +61,7 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
               >
-                <Icon
-                  icon="svg-plug"
-                  className="icon icon-sm vertical-center"
-                />{' '}
+                <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                 Connect
               </LoadingButton>
             </div>

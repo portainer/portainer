@@ -5,6 +5,7 @@ import { useCreateEdgeAgentEnvironmentMutation } from '@/react/portainer/environ
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
 import { useCreateEdgeDeviceParam } from '@/react/portainer/environments/wizard/hooks/useCreateEdgeDeviceParam';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
@@ -62,10 +63,7 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
                   loadingText="Creating environment..."
                   disabled={!isValid}
                 >
-                  <Icon
-                    icon="svg-plug"
-                    className="icon icon-sm vertical-center"
-                  />
+                  <Icon icon={Plug} className="icon icon-sm vertical-center" />
                   Create
                 </LoadingButton>
               </div>

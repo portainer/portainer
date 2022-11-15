@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 
 import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
+import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -93,7 +94,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Intel OpenAMT" />
+        <WidgetTitle icon={Laptop} title="Intel OpenAMT" />
         <WidgetBody>
           <Formik
             initialValues={initialValues}

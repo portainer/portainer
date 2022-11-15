@@ -4,6 +4,7 @@ import { useReducer } from 'react';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
 import { EdgeAsyncIntervalsForm } from '@/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
+import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Switch } from '@@/form-components/SwitchField/Switch';
@@ -50,7 +51,7 @@ export function DeploymentSyncOptions() {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Deployment sync options" />
+        <WidgetTitle icon={Laptop} title="Deployment sync options" />
         <WidgetBody>
           <Formik<FormValues>
             initialValues={initialValues}

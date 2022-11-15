@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 import _ from 'lodash';
+import { Info } from 'react-feather';
 
 import { ownershipIcon, truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';
@@ -170,7 +171,7 @@ function InheritanceMessage({
   return (
     <tr>
       <td colSpan={2} aria-label="inheritance-message">
-        <Icon icon="info" mode="primary" className="mr-1" />
+        <Icon icon={Info} mode="primary" className="mr-1" />
         {children}
         <Tooltip message={tooltip} />
       </td>

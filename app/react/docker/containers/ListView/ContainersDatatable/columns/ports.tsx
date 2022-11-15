@@ -1,5 +1,6 @@
 import { Column } from 'react-table';
 import _ from 'lodash';
+import { ExternalLink } from 'react-feather';
 
 import type { DockerContainer, Port } from '@/react/docker/containers/types';
 
@@ -39,7 +40,7 @@ function PortsCell({ value: ports }: Props) {
       target="_blank"
       rel="noreferrer"
     >
-      <Icon icon="external-link" />
+      <Icon icon={ExternalLink} />
       {port.public}:{port.private}
     </a>
   ));

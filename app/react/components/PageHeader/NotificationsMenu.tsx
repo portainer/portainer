@@ -9,7 +9,7 @@ import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
-import { Bell, Trash2 } from 'react-feather';
+import { AlertCircle, Bell, CheckCircle, Trash2 } from 'react-feather';
 
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/react/hooks/useUser';
@@ -127,7 +127,7 @@ export function NotificationsMenu() {
           </>
         ) : (
           <div className="flex flex-col items-center">
-            <Icon icon="bell" size="xl" />
+            <Icon icon={Bell} size="xl" />
             <p className="my-5">You have no notifications yet.</p>
           </div>
         )}
@@ -161,9 +161,9 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
       <div className={notificationStyles.container}>
         <div className={notificationStyles.notificationIcon}>
           {notification.type === 'success' ? (
-            <Icon icon="check-circle" size="lg" mode="success" />
+            <Icon icon={CheckCircle} size="lg" mode="success" />
           ) : (
-            <Icon icon="alert-circle" size="lg" mode="danger" />
+            <Icon icon={AlertCircle} size="lg" mode="danger" />
           )}
         </div>
         <div className={notificationStyles.notificationBody}>

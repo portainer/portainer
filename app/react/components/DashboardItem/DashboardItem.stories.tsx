@@ -1,4 +1,5 @@
 import { Meta, Story } from '@storybook/react';
+import { List } from 'react-feather';
 
 import { Link } from '@@/Link';
 
@@ -30,14 +31,14 @@ Primary.args = {
 export function WithLink() {
   return (
     <Link to="example.page">
-      <DashboardItem value={1} icon="list" type="Example resource" />
+      <DashboardItem value={1} icon={List} type="Example resource" />
     </Link>
   );
 }
 
 export function WithChildren() {
   return (
-    <DashboardItem value={1} icon="list" type="Example resource">
+    <DashboardItem value={1} icon={List} type="Example resource">
       <div>Children</div>
     </DashboardItem>
   );

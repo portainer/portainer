@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useState } from 'react';
+import { Check } from 'react-feather';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 import { Icon } from '@@/Icon';
@@ -47,7 +48,7 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
             )}
             onTransitionEnd={() => setIsCheckVisible(false)}
           >
-            <Icon icon="check" className="!ml-1" mode="success" />
+            <Icon icon={Check} className="!ml-1" mode="success" />
           </span>
         </div>
       )}

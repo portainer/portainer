@@ -1,4 +1,15 @@
 import {
+  Layers,
+  Shuffle,
+  Database,
+  List,
+  HardDrive,
+  Box,
+  Power,
+  Heart,
+} from 'react-feather';
+
+import {
   DockerSnapshot,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
@@ -31,12 +42,12 @@ export function EnvironmentStatsDocker({
   return (
     <div className="blocklist-item-line endpoint-item">
       <span className="blocklist-item-desc">
-        <Stat value={addPlural(snapshot.StackCount, 'stack')} icon="layers" />
+        <Stat value={addPlural(snapshot.StackCount, 'stack')} icon={Layers} />
 
         {!!snapshot.Swarm && (
           <Stat
             value={addPlural(snapshot.ServiceCount, 'service')}
-            icon="shuffle"
+            icon={Shuffle}
           />
         )}
 
@@ -48,9 +59,9 @@ export function EnvironmentStatsDocker({
         />
         <Stat
           value={addPlural(snapshot.VolumeCount, 'volume')}
-          icon="database"
+          icon={Database}
         />
-        <Stat value={addPlural(snapshot.ImageCount, 'image')} icon="list" />
+        <Stat value={addPlural(snapshot.ImageCount, 'image')} icon={List} />
       </span>
 
       <span className="small text-muted space-x-2 vertical-center">
@@ -60,7 +71,7 @@ export function EnvironmentStatsDocker({
         {snapshot.Swarm && (
           <Stat
             value={addPlural(snapshot.NodeCount, 'node')}
-            icon="hard-drive"
+            icon={HardDrive}
           />
         )}
         <AgentVersionTag version={agentVersion} type={type} />
@@ -85,13 +96,13 @@ function ContainerStats({
   const containersCount = running + stopped;
 
   return (
-    <Stat value={addPlural(containersCount, 'container')} icon="box">
+    <Stat value={addPlural(containersCount, 'container')} icon={Box}>
       {containersCount > 0 && (
         <span className="space-x-2 space-right">
-          <Stat value={running} icon="power" iconClass="icon-success" />
-          <Stat value={stopped} icon="power" iconClass="icon-danger" />
-          <Stat value={healthy} icon="heart" iconClass="icon-success" />
-          <Stat value={unhealthy} icon="heart" iconClass="icon-warning" />
+          <Stat value={running} icon={Power} iconClass="icon-success" />
+          <Stat value={stopped} icon={Power} iconClass="icon-danger" />
+          <Stat value={healthy} icon={Heart} iconClass="icon-success" />
+          <Stat value={unhealthy} icon={Heart} iconClass="icon-warning" />
         </span>
       )}
     </Stat>

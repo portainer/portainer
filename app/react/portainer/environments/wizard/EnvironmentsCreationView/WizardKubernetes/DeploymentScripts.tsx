@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Info } from 'react-feather';
 
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
@@ -98,7 +99,7 @@ function DeployCode({
     <>
       {showAgentSecretMessage && agentSecret && (
         <p className="text-muted small my-6">
-          <Icon icon="info" mode="primary" className="mr-1" />
+          <Icon icon={Info} mode="primary" className="mr-1" />
           Note that the environment variable AGENT_SECRET will need to be set to
           <code>{agentSecret}</code>. Please update the manifest that will be
           downloaded from the following script.

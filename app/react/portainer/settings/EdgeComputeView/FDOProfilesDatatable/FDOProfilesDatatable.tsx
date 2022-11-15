@@ -1,5 +1,6 @@
 import { useTable, usePagination, useSortBy } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+import { List } from 'react-feather';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import PortainerError from '@/portainer/error';
@@ -77,7 +78,7 @@ export function FDOProfilesDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon="list" label="Device Profiles">
+      <TableTitle icon={List} label="Device Profiles">
         <FDOProfilesDatatableActions
           isFDOEnabled={isFDOEnabled}
           selectedItems={selectedFlatRows.map((row) => row.original)}

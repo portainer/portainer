@@ -8,6 +8,7 @@ import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -84,10 +85,7 @@ export function APIForm({ onCreate }: Props) {
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
               >
-                <Icon
-                  icon="svg-plug"
-                  className="icon icon-sm vertical-center"
-                />{' '}
+                <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                 Connect
               </LoadingButton>
             </div>

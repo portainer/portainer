@@ -1,3 +1,5 @@
+import { Share2 } from 'react-feather';
+
 import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 
@@ -18,7 +20,7 @@ export function NetworkOptionsTable({ options }: Props) {
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <TableContainer>
-          <TableTitle label="Network options" icon="share-2" />
+          <TableTitle label="Network options" icon={Share2} />
           <Table className="nopadding">
             <DetailsTable dataCy="networkDetails-networkOptionsTable">
               {networkEntries.map(([key, value]) => (

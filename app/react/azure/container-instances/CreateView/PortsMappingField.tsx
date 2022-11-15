@@ -1,5 +1,7 @@
 import { FormikErrors } from 'formik';
 
+import ArrowRightLong from '@/assets/ico/arrow-right-long.svg?c';
+
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 import { FormError } from '@@/form-components/FormError';
 import { InputGroup } from '@@/form-components/InputGroup';
@@ -83,7 +85,7 @@ function Item({
         </InputGroup>
 
         <span className="mx-3">
-          <Icon icon="svg-arrowrightlong" />
+          <Icon icon={ArrowRightLong} />
         </span>
 
         <InputGroup size="small">

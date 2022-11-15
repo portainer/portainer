@@ -1,3 +1,5 @@
+import { Heart, Power } from 'react-feather';
+
 import { Icon } from '@/react/components/Icon';
 
 import { DockerContainer } from '../containers/types';
@@ -15,21 +17,21 @@ export function ContainerStatus({ containers }: Props) {
     <div className="pull-right">
       <div>
         <div className="vertical-center space-right pr-5">
-          <Icon icon="power" className="icon icon-sm icon-success" />
+          <Icon icon={Power} mode="success" size="sm" />
           {runningContainersFilter(containers)} running
         </div>
         <div className="vertical-center space-right">
-          <Icon icon="power" className="icon icon-sm icon-danger" />
+          <Icon icon={Power} mode="danger" size="sm" />
           {stoppedContainersFilter(containers)} stopped
         </div>
       </div>
       <div>
         <div className="vertical-center space-right pr-5">
-          <Icon icon="heart" className="icon icon-sm icon-success" />
+          <Icon icon={Heart} mode="success" size="sm" />
           {healthyContainersFilter(containers)} healthy
         </div>
         <div className="vertical-center space-right">
-          <Icon icon="heart" className="icon icon-sm icon-danger" />
+          <Icon icon={Heart} mode="danger" size="sm" />
           {unhealthyContainersFilter(containers)} unhealthy
         </div>
       </div>

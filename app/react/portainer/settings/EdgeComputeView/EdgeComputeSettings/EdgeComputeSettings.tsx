@@ -1,6 +1,7 @@
 import { Formik, Form } from 'formik';
 
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
+import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -32,7 +33,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Edge Compute settings" />
+        <WidgetTitle icon={Laptop} title="Edge Compute settings" />
         <WidgetBody>
           <Formik
             initialValues={settings}

@@ -1,5 +1,7 @@
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import Magic from '@/assets/ico/magic.svg?c';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -23,7 +25,7 @@ export function HomeView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle title="Environment Wizard" icon="svg-magic" />
+            <WidgetTitle title="Environment Wizard" icon={Magic} />
             <WidgetBody>
               <div className="row">
                 <div className="col-sm-12 form-section-title">
@@ -73,7 +75,7 @@ export function HomeView() {
                   <Link to="portainer.wizard.endpoints" className={styles.link}>
                     <Option
                       title="Add Environments"
-                      icon="svg-plug"
+                      icon={Plug}
                       description="Connect to other environments"
                     />
                   </Link>

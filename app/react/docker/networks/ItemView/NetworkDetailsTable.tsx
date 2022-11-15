@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { Share2, Trash2 } from 'react-feather';
 
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
 import { Authorized } from '@/react/hooks/useUser';
@@ -32,7 +33,7 @@ export function NetworkDetailsTable({
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <TableContainer>
-          <TableTitle label="Network details" icon="share-2" />
+          <TableTitle label="Network details" icon={Share2} />
           <Table className="nopadding">
             <DetailsTable dataCy="networkDetails-detailsTable">
               {/* networkRowContent */}
@@ -48,7 +49,7 @@ export function NetworkDetailsTable({
                       onClick={() => onRemoveNetworkClicked()}
                     >
                       <Icon
-                        icon="trash-2"
+                        icon={Trash2}
                         className="space-right"
                         aria-hidden="true"
                       />

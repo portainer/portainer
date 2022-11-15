@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
+import { AlertCircle } from 'react-feather';
 
 import { Icon } from '@@/Icon';
 
@@ -30,7 +31,7 @@ export function TextTip({
     <p className="small vertical-center">
       <i className="icon-container">
         <Icon
-          icon="alert-circle"
+          icon={AlertCircle}
           className={clsx(`${iconClass}`, 'space-right')}
         />
       </i>

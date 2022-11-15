@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/react';
+import { Download } from 'react-feather';
 
 import { Icon } from '@@/Icon';
 
@@ -17,7 +18,7 @@ interface Args {
 function Template({ loadingText, isLoading }: Args) {
   return (
     <LoadingButton loadingText={loadingText} isLoading={isLoading}>
-      <Icon icon="download" />
+      <Icon icon={Download} />
       Download
     </LoadingButton>
   );
@@ -33,7 +34,7 @@ export const Example = Template.bind({});
 export function IsLoading() {
   return (
     <LoadingButton loadingText="loading" isLoading>
-      <Icon icon="download" />
+      <Icon icon={Download} />
       Download
     </LoadingButton>
   );

@@ -6,6 +6,8 @@ import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environment
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
 import { EnvironmentMetadata } from '@/react/portainer/environments/environment.service/create';
+import Dataflow2 from '@/assets/ico/dataflow-2.svg?c';
+import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
@@ -41,7 +43,7 @@ const initialValues: FormValues = {
 const options = [
   {
     description: '',
-    icon: <BadgeIcon icon="svg-dataflow2" size="3xl" />,
+    icon: <BadgeIcon icon={Dataflow2} size="3xl" />,
     id: 'api',
     label: 'API',
     value: 'api',
@@ -131,10 +133,7 @@ export function WizardAzure({ onCreate }: Props) {
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
                 >
-                  <Icon
-                    icon="svg-plug"
-                    className="icon icon-sm vertical-center"
-                  />{' '}
+                  <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                   Connect
                 </LoadingButton>
               </div>

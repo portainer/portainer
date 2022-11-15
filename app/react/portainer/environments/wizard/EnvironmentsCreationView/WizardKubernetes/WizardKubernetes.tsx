@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Zap, Cloud, UploadCloud } from 'react-feather';
 
 import {
   Environment,
@@ -26,14 +27,14 @@ interface Props {
 const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   {
     id: 'agent_endpoint',
-    icon: <BadgeIcon icon="zap" size="3xl" />,
+    icon: <BadgeIcon icon={Zap} size="3xl" />,
     label: 'Agent',
     value: EnvironmentCreationTypes.AgentEnvironment,
     description: '',
   },
   {
     id: 'edgeAgent',
-    icon: <BadgeIcon icon="cloud" size="3xl" />,
+    icon: <BadgeIcon icon={Cloud} size="3xl" />,
     label: 'Edge Agent',
     description: '',
     value: EnvironmentCreationTypes.EdgeAgentEnvironment,
@@ -41,7 +42,7 @@ const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   },
   {
     id: 'kubeconfig_endpoint',
-    icon: <BadgeIcon icon="upload-cloud" size="3xl" />,
+    icon: <BadgeIcon icon={UploadCloud} size="3xl" />,
     label: 'Import',
     value: EnvironmentCreationTypes.KubeConfigEnvironment,
     description: 'Import an existing Kubernetes config',

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AlertTriangle } from 'react-feather';
 
 import { confirmWarn } from '@/portainer/services/modal.service/confirm';
 
@@ -143,7 +144,7 @@ export function IngressClassDatatable({
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
             <span className="flex items-center text-warning mt-1">
-              <Icon icon="alert-triangle" className="!mr-1" />
+              <Icon icon={AlertTriangle} className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
             </span>
           )}

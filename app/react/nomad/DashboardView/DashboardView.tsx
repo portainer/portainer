@@ -1,9 +1,14 @@
+import { List, Settings } from 'react-feather';
+
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import Tachometer from '@/assets/ico/tachometer.svg?c';
+import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { DashboardItem } from '@@/DashboardItem';
 import { Widget, WidgetTitle, WidgetBody } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
 import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
+import { Icon } from '@@/Icon';
 
 import { useDashboard } from './useDashboard';
 import { RunningStatus } from './RunningStatus';
@@ -25,7 +30,7 @@ export function DashboardView() {
       {dashboardQuery.isLoading ? (
         <div className="text-center" style={{ marginTop: '30%' }}>
           Connecting to the Edge environment...
-          <i className="fa fa-cog fa-spin space-left" />
+          <Icon icon={Settings} className="animate-spin-slow !ml-1" />
         </div>
       ) : (
         <>
@@ -33,10 +38,7 @@ export function DashboardView() {
             <div className="col-sm-12">
               {/* cluster info */}
               <Widget>
-                <WidgetTitle
-                  icon="fa-tachometer-alt"
-                  title="Cluster information"
-                />
+                <WidgetTitle icon={Tachometer} title="Cluster information" />
                 <WidgetBody className="no-padding">
                   <table className="table">
                     <tbody>
@@ -56,19 +58,19 @@ export function DashboardView() {
               {/* jobs */}
               <DashboardItem
                 value={dashboardQuery.data?.JobCount}
-                icon="fa fa-th-list"
+                icon={List}
                 type="Nomad Job"
               />
               {/* groups */}
               <DashboardItem
                 value={dashboardQuery.data?.GroupCount}
-                icon="fa fa-list-alt"
+                icon={List}
                 type="Group"
               />
               {/* tasks */}
               <DashboardItem
                 value={dashboardQuery.data?.TaskCount}
-                icon="fa fa-cubes"
+                icon={Cubes}
                 type="Task"
               >
                 {/* running status of tasks */}
