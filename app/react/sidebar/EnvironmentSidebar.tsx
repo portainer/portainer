@@ -15,6 +15,8 @@ import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { EndpointProviderInterface } from '@/portainer/services/endpointProvider';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
+import { Icon } from '@@/Icon';
+
 import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
 
 import styles from './EnvironmentSidebar.module.css';
@@ -44,7 +46,7 @@ export function EnvironmentSidebar() {
         <SidebarSectionTitle>
           <div className="flex items-center gap-1">
             <span>Environment:</span>
-            <Slash size="1em" className="text-xl text-gray-6" />
+            <Icon icon={Slash} className="text-xl !text-gray-6" />
             <span className="text-gray-6 text-sm">None selected</span>
           </div>
         </SidebarSectionTitle>
