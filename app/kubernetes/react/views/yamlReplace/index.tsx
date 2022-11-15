@@ -12,7 +12,7 @@ export function YAMLReplace({ featureId }: Props) {
       className="float-right"
       heading="Apply YAML changes"
       BEFeatureID={featureId}
-      message="Applies any changes that you make in the YAML editor by calling the Kubernetes API to patch the relevant resources. Any unexpected resources that you add to the YAML will be ignored. Note that editing is disabled for resources in namespaces marked as system."
+      message="Applies any changes that you make in the YAML editor by calling the Kubernetes API to patch the relevant resources. Any resource removals or unexpected resource additions that you make in the YAML will be ignored. Note that editing is disabled for resources in namespaces marked as system."
     >
       <Button
         type="button"
