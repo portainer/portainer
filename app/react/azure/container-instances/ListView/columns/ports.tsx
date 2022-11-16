@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { ExternalLink } from 'react-feather';
+import { ExternalLink } from 'lucide-react';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { getPorts } from '@/react/azure/utils';

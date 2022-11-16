@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import { X } from 'react-feather';
+import { X } from 'lucide-react';
 
 import { Widget, WidgetBody } from './Widget';
 import { Button } from './buttons';

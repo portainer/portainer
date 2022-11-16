@@ -1,6 +1,6 @@
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
-import { Lock, XCircle, CheckCircle } from 'react-feather';
+import { Lock, XCircle, CheckCircle } from 'lucide-react';
 
 import 'rc-slider/assets/index.css';
 

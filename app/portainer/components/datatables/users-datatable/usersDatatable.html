@@ -88,7 +88,7 @@
               </td>
               <td>
                 <span class="vertical-center">
-                  <pr-icon icon="'svg-usercircle'" ng-if="item.Role === 1 && !item.isTeamLeader"></pr-icon>
+                  <pr-icon icon="'user'" ng-if="item.Role === 1 && !item.isTeamLeader"></pr-icon>
                   <pr-icon icon="'user'" ng-if="item.Role !== 1 && item.isTeamLeader"></pr-icon>
                   <pr-icon icon="'user-plus'" ng-if="item.Role !== 1 && !item.isTeamLeader"></pr-icon>
                   {{ item.RoleName ? item.RoleName : '-' }}

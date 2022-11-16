@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { Zap, Cloud } from 'react-feather';
+import { Zap, Cloud, Network, Plug2 } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
-import Dataflow2 from '@/assets/ico/dataflow-2.svg?c';
-import Plug from '@/assets/ico/plug.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
@@ -34,14 +32,14 @@ const defaultOptions: BoxSelectorOption<
   },
   {
     id: 'api',
-    icon: <BadgeIcon icon={Dataflow2} size="3xl" />,
+    icon: <BadgeIcon icon={Network} size="3xl" />,
     label: 'API',
     description: '',
     value: 'api',
   },
   {
     id: 'socket',
-    icon: <BadgeIcon icon={Plug} size="3xl" />,
+    icon: <BadgeIcon icon={Plug2} size="3xl" />,
     label: 'Socket',
     description: '',
     value: 'socket',

@@ -1,4 +1,4 @@
-import { ArrowDownCircle } from 'react-feather';
+import { ArrowDownCircle } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';

@@ -1,10 +1,10 @@
 import { useMutation } from 'react-query';
 import { useEffect } from 'react';
+import { Laptop } from 'lucide-react';
 
 import { generateKey } from '@/react/portainer/environments/environment.service/edge';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
-import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 

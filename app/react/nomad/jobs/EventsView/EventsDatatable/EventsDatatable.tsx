@@ -6,10 +6,10 @@ import {
   useSortBy,
   useTable,
 } from 'react-table';
+import { History } from 'lucide-react';
 
 import { NomadEvent } from '@/react/nomad/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
-import ClockRewind from '@/assets/ico/clock-rewind.svg?c';
 
 import { PaginationControls } from '@@/PaginationControls';
 import {
@@ -82,7 +82,7 @@ export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
 
   return (
     <TableContainer>
-      <TableTitle icon={ClockRewind} label="Events" />
+      <TableTitle icon={History} label="Events" />
 
       <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 

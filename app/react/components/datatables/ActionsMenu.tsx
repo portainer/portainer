@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Menu, MenuList, MenuButton } from '@reach/menu-button';
-import { MoreVertical } from 'react-feather';
+import { MoreVertical } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

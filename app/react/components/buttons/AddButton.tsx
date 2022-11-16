@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PlusCircle } from 'react-feather';
+import { PlusCircle } from 'lucide-react';
 
 import { Icon } from '@/react/components/Icon';
 

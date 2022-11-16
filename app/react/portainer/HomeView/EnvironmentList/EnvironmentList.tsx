@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { HardDrive, RefreshCcw } from 'react-feather';
+import { HardDrive, RefreshCcw } from 'lucide-react';
 import _ from 'lodash';
 
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
@@ -198,7 +198,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                       )}
                     >
                       <RefreshCcw
-                        className="feather icon-sm icon-white"
+                        className="lucide icon-sm icon-white"
                         aria-hidden="true"
                       />
                       Refresh

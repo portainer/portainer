@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Icon } from 'react-feather';
+import { Icon } from 'lucide-react';
 
 import { AutomationTestingProps } from '@/types';
 

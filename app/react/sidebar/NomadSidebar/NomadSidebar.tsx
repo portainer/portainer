@@ -1,4 +1,4 @@
-import { Clock } from 'react-feather';
+import { Clock } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 

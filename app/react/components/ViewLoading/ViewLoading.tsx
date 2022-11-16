@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Settings } from 'react-feather';
+import { Settings } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

@@ -1,5 +1,5 @@
 import { ChangeEvent, ReactNode } from 'react';
-import { Trash2 } from 'react-feather';
+import { Trash2 } from 'lucide-react';
 
 import { FormError } from '@@/form-components/FormError';
 import { Button } from '@@/buttons';

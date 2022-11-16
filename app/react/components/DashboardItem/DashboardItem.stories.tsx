@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { List } from 'react-feather';
+import { List } from 'lucide-react';
 
 import { Link } from '@@/Link';
 import { IconProps } from '@@/Icon';

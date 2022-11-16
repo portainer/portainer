@@ -1,4 +1,4 @@
-import { User } from 'react-feather';
+import { Rocket } from 'lucide-react';
 
 import { render, fireEvent } from '@/react-tools/test-utils';
 
@@ -25,14 +25,14 @@ test('should render with the initial value selected and call onChange when click
   const options: BoxSelectorOption<number>[] = [
     {
       description: 'description 1',
-      icon: User,
+      icon: Rocket,
       id: '1',
       value: 3,
       label: 'option 1',
     },
     {
       description: 'description 2',
-      icon: User,
+      icon: Rocket,
       id: '2',
       value: 4,
       label: 'option 2',

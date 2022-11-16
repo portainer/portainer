@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 import clsx from 'clsx';
-import { DownloadCloud } from 'react-feather';
+import { DownloadCloud } from 'lucide-react';
 
 import { getVersionStatus } from '@/portainer/services/api/status.service';
 import { useUIState } from '@/react/hooks/useUIState';

@@ -35,7 +35,7 @@ angular
     return function (value) {
       switch (value) {
         case KubernetesApplicationDataAccessPolicies.ISOLATED:
-          return 'svg-cubes';
+          return 'boxes';
         case KubernetesApplicationDataAccessPolicies.SHARED:
           return 'box';
       }

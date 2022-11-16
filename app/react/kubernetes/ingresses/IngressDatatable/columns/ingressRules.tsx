@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { AlertTriangle, ArrowRight } from 'react-feather';
+import { AlertTriangle, ArrowRight } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 import { Badge } from '@@/Badge';

@@ -6,7 +6,7 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { Box, Plus, Trash2 } from 'react-feather';
+import { Box, Plus, Trash2 } from 'lucide-react';
 
 import { useDebounce } from '@/react/hooks/useDebounce';
 import { ContainerGroup } from '@/react/azure/types';

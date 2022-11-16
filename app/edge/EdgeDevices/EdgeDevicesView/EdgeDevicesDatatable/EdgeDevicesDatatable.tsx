@@ -1,7 +1,7 @@
 import { useTable, useExpanded, useSortBy, useFilters } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
-import { Box } from 'react-feather';
+import { Box } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';

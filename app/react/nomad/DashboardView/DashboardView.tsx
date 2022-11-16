@@ -1,8 +1,6 @@
-import { List, Settings } from 'react-feather';
+import { List, Settings, Boxes, Gauge } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import Tachometer from '@/assets/ico/tachometer.svg?c';
-import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { DashboardItem } from '@@/DashboardItem';
 import { Widget, WidgetTitle, WidgetBody } from '@@/Widget';
@@ -38,7 +36,7 @@ export function DashboardView() {
             <div className="col-sm-12">
               {/* cluster info */}
               <Widget>
-                <WidgetTitle icon={Tachometer} title="Cluster information" />
+                <WidgetTitle icon={Gauge} title="Cluster information" />
                 <WidgetBody className="no-padding">
                   <table className="table">
                     <tbody>
@@ -70,7 +68,7 @@ export function DashboardView() {
               {/* tasks */}
               <DashboardItem
                 value={dashboardQuery.data?.TaskCount}
-                icon={Cubes}
+                icon={Boxes}
                 type="Task"
               >
                 {/* running status of tasks */}

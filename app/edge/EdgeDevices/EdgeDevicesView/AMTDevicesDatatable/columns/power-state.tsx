@@ -1,6 +1,6 @@
 import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
-import { Settings } from 'react-feather';
+import { Settings } from 'lucide-react';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 

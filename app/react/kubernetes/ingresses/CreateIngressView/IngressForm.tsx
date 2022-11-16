@@ -1,5 +1,5 @@
 import { ChangeEvent, ReactNode } from 'react';
-import { Info, Plus, RefreshCw, Trash2 } from 'react-feather';
+import { Info, Plus, RefreshCw, Trash2 } from 'lucide-react';
 
 import Route from '@/assets/ico/route.svg?c';
 

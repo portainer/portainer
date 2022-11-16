@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Hash, Server, Tag, Tool } from 'react-feather';
+import { Database, Hash, Server, Tag, Wrench } from 'lucide-react';
 import { DialogOverlay } from '@reach/dialog';
 
 import {
@@ -96,7 +96,7 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
             </div>
             <div className={styles.toolsList}>
               <span className="inline-flex items-center">
-                <Tool size="13" className="space-right" />
+                <Wrench size="13" className="space-right" />
                 Compilation tools:
               </span>
 

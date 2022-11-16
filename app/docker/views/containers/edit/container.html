@@ -18,7 +18,7 @@
             Stop
           </button>
           <button authorization="DockerContainerKill" class="btn btn-light btn-sm" ng-click="kill()" ng-disabled="!container.State.Running || container.IsPortainer">
-            <pr-icon icon="'svg-bomb'"></pr-icon>
+            <pr-icon icon="'bomb'"></pr-icon>
             Kill
           </button>
           <button authorization="DockerContainerRestart" class="btn btn-light btn-sm" ng-click="restart()" ng-disabled="!container.State.Running || container.IsPortainer">
@@ -105,8 +105,8 @@
             <tr>
               <td>Status</td>
               <td>
-                <pr-icon ng-if="container.State.Running" icon="'svg-heartbeat'" mode="'success'"></pr-icon>
-                <pr-icon ng-if="!container.State.Running && container.State.Status !== 'created'" icon="'svg-heartbeat'" mode="'danger'"></pr-icon>
+                <pr-icon ng-if="container.State.Running" icon="'heart-pulse'" mode="'success'"></pr-icon>
+                <pr-icon ng-if="!container.State.Running && container.State.Status !== 'created'" icon="'heart-pulse'" mode="'danger'"></pr-icon>
                 {{ container.State | getstatetext }} for {{ activityTime
                 }}<span ng-if="!container.State.Running && container.State.Status !== 'created'"> with exit code {{ container.State.ExitCode }}</span>
               </td>
@@ -186,9 +186,9 @@
             <tr>
               <td>Status</td>
               <td>
-                <pr-icon ng-if="container.State.Health.Status === 'starting'" icon="'svg-heartbeat'" mode="'warning'"></pr-icon>
-                <pr-icon ng-if="container.State.Health.Status === 'healthy'" icon="'svg-heartbeat'" mode="'success'"></pr-icon>
-                <pr-icon ng-if="container.State.Health.Status === 'unhealthy'" icon="'svg-heartbeat'" mode="'danger'"></pr-icon>
+                <pr-icon ng-if="container.State.Health.Status === 'starting'" icon="'heart-pulse'" mode="'warning'"></pr-icon>
+                <pr-icon ng-if="container.State.Health.Status === 'healthy'" icon="'heart-pulse'" mode="'success'"></pr-icon>
+                <pr-icon ng-if="container.State.Health.Status === 'unhealthy'" icon="'heart-pulse'" mode="'danger'"></pr-icon>
                 {{ container.State.Health.Status }}
               </td>
             </tr>
@@ -277,7 +277,7 @@
               <td>
                 <div ng-repeat="portMapping in portBindings">
                   {{ portMapping.host }}
-                  <pr-icon icon="'svg-arrowrightlong'"></pr-icon>
+                  <pr-icon icon="'arrow-right'"></pr-icon>
                   {{ portMapping.container }}
                 </div>
               </td>

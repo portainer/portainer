@@ -1,4 +1,4 @@
-import { Cpu, HardDrive } from 'react-feather';
+import { Cpu, HardDrive } from 'lucide-react';
 
 import {
   EnvironmentType,

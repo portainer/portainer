@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import { User } from 'react-feather';
+import { User } from 'lucide-react';
 
 import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';

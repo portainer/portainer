@@ -1,9 +1,9 @@
 import _ from 'lodash';
+import { Boxes } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
-import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { TableSettingsMenu, Datatable } from '@@/datatables';
 import {
@@ -58,7 +58,7 @@ export function ContainersDatatable({
     <RowProvider context={{ environment }}>
       <Datatable
         titleOptions={{
-          icon: Cubes,
+          icon: Boxes,
           title: 'Containers',
         }}
         settingsStore={settings}

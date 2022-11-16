@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PieChart } from 'react-feather';
+import { PieChart } from 'lucide-react';
 
 import { Icon } from '@/react/components/Icon';
 import { humanize } from '@/portainer/filters/filters';

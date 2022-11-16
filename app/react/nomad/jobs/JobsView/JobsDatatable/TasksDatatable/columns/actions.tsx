@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { Clock, FileText } from 'react-feather';
+import { Clock, FileText } from 'lucide-react';
 
 import { Task } from '@/react/nomad/types';
 

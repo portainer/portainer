@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 import _ from 'lodash';
-import { Info } from 'react-feather';
+import { Info } from 'lucide-react';
 
 import { ownershipIcon, truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';

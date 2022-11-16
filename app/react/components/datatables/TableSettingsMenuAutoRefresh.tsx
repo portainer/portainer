@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useState } from 'react';
-import { Check } from 'react-feather';
+import { Check } from 'lucide-react';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 import { Icon } from '@@/Icon';

@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import { PropsWithChildren } from 'react';
-import { Download } from 'react-feather';
+import { Download } from 'lucide-react';
 
 import { Button, Props } from './Button';
 

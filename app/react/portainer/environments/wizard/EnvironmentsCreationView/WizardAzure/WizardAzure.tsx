@@ -1,13 +1,12 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer, useState } from 'react';
 import { object, SchemaOf, string } from 'yup';
+import { Network, Plug2 } from 'lucide-react';
 
 import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
 import { EnvironmentMetadata } from '@/react/portainer/environments/environment.service/create';
-import Dataflow2 from '@/assets/ico/dataflow-2.svg?c';
-import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
@@ -42,7 +41,7 @@ const initialValues: FormValues = {
 const options: Array<BoxSelectorOption<'api'>> = [
   {
     description: '',
-    icon: <BadgeIcon icon={Dataflow2} size="3xl" />,
+    icon: <BadgeIcon icon={Network} size="3xl" />,
     id: 'api',
     label: 'API',
     value: 'api',
@@ -131,7 +130,7 @@ export function WizardAzure({ onCreate }: Props) {
                   loadingText="Connecting environment..."
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
-                  icon={Plug}
+                  icon={Plug2}
                 >
                   Connect
                 </LoadingButton>

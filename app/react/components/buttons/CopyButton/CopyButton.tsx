@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
-import { Check, Copy } from 'react-feather';
+import { Check, Copy } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

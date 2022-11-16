@@ -1,6 +1,6 @@
 import { useTable, usePagination, useSortBy } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { List } from 'react-feather';
+import { List } from 'lucide-react';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import PortainerError from '@/portainer/error';

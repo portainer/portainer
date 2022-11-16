@@ -1,11 +1,11 @@
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { useReducer } from 'react';
+import { Plug2 } from 'lucide-react';
 
 import { useCreateLocalDockerEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
-import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -60,7 +60,7 @@ export function SocketForm({ onCreate }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
-                icon={Plug}
+                icon={Plug2}
               >
                 Connect
               </LoadingButton>

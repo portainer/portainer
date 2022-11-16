@@ -1,4 +1,4 @@
-import { Settings } from 'react-feather';
+import { Settings } from 'lucide-react';
 import { Formik, Form as FormikForm } from 'formik';
 import { useRouter } from '@uirouter/react';
 

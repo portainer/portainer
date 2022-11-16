@@ -2,7 +2,7 @@ import { Terminal } from 'xterm';
 import { fit } from 'xterm/lib/addons/fit/fit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { RotateCw, X, Terminal as TerminalIcon } from 'react-feather';
+import { RotateCw, X, Terminal as TerminalIcon } from 'lucide-react';
 
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import {

@@ -1,10 +1,10 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
+import { Laptop } from 'lucide-react';
 
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
 import { EdgeAsyncIntervalsForm } from '@/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
-import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Switch } from '@@/form-components/SwitchField/Switch';

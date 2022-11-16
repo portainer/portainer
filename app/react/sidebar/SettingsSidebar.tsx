@@ -6,7 +6,7 @@ import {
   Radio,
   FileText,
   Bell,
-} from 'react-feather';
+} from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {

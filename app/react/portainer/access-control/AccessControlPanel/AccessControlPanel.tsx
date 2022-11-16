@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { Edit, Eye } from 'react-feather';
+import { Edit, Eye } from 'lucide-react';
 
 import { useUser } from '@/react/hooks/useUser';
 import { Icon } from '@/react/components/Icon';

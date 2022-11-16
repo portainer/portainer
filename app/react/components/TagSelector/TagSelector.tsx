@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import _ from 'lodash';
-import { Trash2 } from 'react-feather';
+import { Trash2 } from 'lucide-react';
 
 import { TagId } from '@/portainer/tags/types';
 import { Icon } from '@/react/components/Icon';

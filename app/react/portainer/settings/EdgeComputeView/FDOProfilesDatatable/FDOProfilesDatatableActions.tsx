@@ -1,6 +1,6 @@
 import { useQueryClient } from 'react-query';
 import { useRouter } from '@uirouter/react';
-import { PlusCircle, Trash2 } from 'react-feather';
+import { PlusCircle, Trash2 } from 'lucide-react';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import {

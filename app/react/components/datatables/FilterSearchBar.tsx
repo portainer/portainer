@@ -1,4 +1,4 @@
-import { Search } from 'react-feather';
+import { Search } from 'lucide-react';
 
 import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
@@ -15,7 +15,7 @@ export function FilterSearchBar({
 }: Props) {
   return (
     <div className="searchBar items-center flex h-[34px]">
-      <Search className="searchIcon feather" />
+      <Search className="searchIcon lucide" />
       <input
         type="text"
         className="searchInput"

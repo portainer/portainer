@@ -1,6 +1,6 @@
 import { useField } from 'formik';
 import DateTimePicker from 'react-datetime-picker';
-import { Calendar, X } from 'react-feather';
+import { Calendar, X } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
@@ -30,8 +30,8 @@ export function ScheduledTimeField({ disabled }: Props) {
           onChange={(date) => setValue(Math.floor(date.getTime() / 1000))}
           name={name}
           value={dateValue}
-          calendarIcon={<Calendar className="feather" />}
-          clearIcon={<X className="feather" />}
+          calendarIcon={<Calendar className="lucide" />}
+          clearIcon={<X className="lucide" />}
           disableClock
         />
       ) : (
