@@ -44,7 +44,7 @@ type (
 		// Status of the schedule (0 - pending, 1 - failed, 2 - success)
 		Status UpdateScheduleStatusType `json:"status" example:"1" enums:"1,2,3"`
 		// Error message if status is failed
-		Error string `json:"error" example:""`
+		Error string `json:"error" example:"error message"`
 		// Target version of the edge agent
 		TargetVersion string `json:"targetVersion" example:"1"`
 		// Current version of the edge agent
