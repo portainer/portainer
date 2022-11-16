@@ -10,12 +10,12 @@ interface Props {
   modalType?: ModalType;
 }
 
-export function ModalHeader<TResult>({ title, modalType }: Props) {
-  const { onSubmit } = useModalContext<TResult>();
+export function ModalHeader({ title, modalType }: Props) {
+  const { onDismiss } = useModalContext();
 
   return (
     <div className={styles.modalHeader}>
-      <CloseButton onClose={onSubmit} className={styles.close} />
+      <CloseButton onClose={onDismiss} className={styles.close} />
       {modalType && (
         <div
           className={clsx({

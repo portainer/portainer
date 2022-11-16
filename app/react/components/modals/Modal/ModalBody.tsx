@@ -8,15 +8,15 @@ interface Props {
   isCloseButtonVisible?: boolean;
 }
 
-export function ModalBody<TResult = unknown>({
+export function ModalBody({
   children,
   isCloseButtonVisible,
 }: PropsWithChildren<Props>) {
-  const { onSubmit } = useModalContext<TResult>();
+  const { onDismiss } = useModalContext();
 
   return (
     <div className={styles.modalBody}>
-      {isCloseButtonVisible && <CloseButton onClose={onSubmit} />}
+      {isCloseButtonVisible && <CloseButton onClose={onDismiss} />}
       <div className={styles.bootboxBody}>{children}</div>
     </div>
   );
