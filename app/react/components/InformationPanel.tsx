@@ -3,7 +3,6 @@ import { X } from 'react-feather';
 
 import { Widget, WidgetBody } from './Widget';
 import { Button } from './buttons';
-import { Icon } from './Icon';
 
 interface Props {
   title?: string;
@@ -34,8 +33,7 @@ export function InformationPanel({
                       style={{ float: 'right' }}
                       ng-if="dismissAction"
                     >
-                      <Button color="link" onClick={() => onDismiss()}>
-                        <Icon icon={X} />
+                      <Button color="link" icon={X} onClick={() => onDismiss()}>
                         dismiss
                       </Button>
                     </span>

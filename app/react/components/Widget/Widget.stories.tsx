@@ -51,7 +51,16 @@ function WidgetWithCustomImage({
 }: WidgetProps) {
   return (
     <Widget>
-      <WidgetTitle title={title} icon={icon} />
+      <WidgetTitle
+        title={title}
+        icon={
+          <img
+            className="custom-header-ico space-right"
+            src={icon as string}
+            alt="header-icon"
+          />
+        }
+      />
       <WidgetBody loading={loading}>{bodyText}</WidgetBody>
       <WidgetFooter>{footerText}</WidgetFooter>
     </Widget>

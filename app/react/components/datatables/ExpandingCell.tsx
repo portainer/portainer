@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { Row } from 'react-table';
+import { ChevronDown, ChevronRight } from 'react-feather';
 
 import { Icon } from '@@/Icon';
 
@@ -20,7 +21,7 @@ export function ExpandingCell<
           <Icon
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...row.getToggleRowExpandedProps()}
-            icon={row.isExpanded ? 'chevron-down' : 'chevron-right'}
+            icon={row.isExpanded ? ChevronDown : ChevronRight}
             className="mr-1"
           />
         </button>

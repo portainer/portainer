@@ -1,3 +1,5 @@
+import { User } from 'react-feather';
+
 import { render } from '@/react-tools/test-utils';
 
 import { DashboardItem } from './DashboardItem';
@@ -11,7 +13,7 @@ test('should show provided resource value', async () => {
 });
 
 test('should show provided resource type', async () => {
-  const { getByLabelText } = renderComponent(0, 'user', 'Test');
+  const { getByLabelText } = renderComponent(0, User, 'Test');
   const title = getByLabelText('resourceType');
 
   expect(title).toBeVisible();
@@ -19,11 +21,11 @@ test('should show provided resource type', async () => {
 });
 
 test('should have accessibility label created from the provided resource type', async () => {
-  const { getByLabelText } = renderComponent(0, 'user', 'testLabel');
+  const { getByLabelText } = renderComponent(0, User, 'testLabel');
 
   expect(getByLabelText('testLabel')).toBeTruthy();
 });
 
-function renderComponent(value = 0, icon = 'user', type = '') {
+function renderComponent(value = 0, icon = User, type = '') {
   return render(<DashboardItem value={value} icon={icon} type={type} />);
 }
