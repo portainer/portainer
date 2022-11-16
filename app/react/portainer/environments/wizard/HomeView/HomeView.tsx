@@ -2,6 +2,8 @@ import { EnvironmentType } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import Magic from '@/assets/ico/magic.svg?c';
 import Plug from '@/assets/ico/plug.svg?c';
+import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
+import Kubernetes2 from '@/assets/ico/kubernetes-2.svg?c';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -63,8 +65,8 @@ export function HomeView() {
                       <Option
                         icon={
                           localEnvironmentAdded.type === EnvironmentType.Docker
-                            ? 'svg-dockericon'
-                            : 'svg-kubernetes2'
+                            ? DockerIcon
+                            : Kubernetes2
                         }
                         title="Get Started"
                         description="Proceed using the local environment which Portainer is running in"

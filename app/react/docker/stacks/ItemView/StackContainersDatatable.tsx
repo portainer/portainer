@@ -7,6 +7,7 @@ import { useColumns } from '@/react/docker/containers/ListView/ContainersDatatab
 import { ContainersDatatableActions } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableActions';
 import { ContainersDatatableSettings } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableSettings';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
+import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
@@ -55,7 +56,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
     <RowProvider context={{ environment }}>
       <Datatable
         titleOptions={{
-          icon: 'svg-cubes',
+          icon: Cubes,
           title: 'Containers',
         }}
         settingsStore={settings}

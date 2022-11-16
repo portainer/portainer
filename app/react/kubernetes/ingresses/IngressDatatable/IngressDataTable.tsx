@@ -5,6 +5,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
+import Route from '@/assets/ico/route.svg?c';
 
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -50,7 +51,7 @@ export function IngressDataTable() {
       isLoading={ingressesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
       titleOptions={{
-        icon: 'svg-route',
+        icon: Route,
         title: 'Ingresses',
       }}
       getRowId={(row) => row.Name + row.Type + row.Namespace}

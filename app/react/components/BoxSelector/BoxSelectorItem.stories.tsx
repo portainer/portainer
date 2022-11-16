@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/react';
+import { User } from 'react-feather';
 
 import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';
@@ -11,7 +12,7 @@ const meta: Meta = {
   args: {
     selected: false,
     description: 'description',
-    icon: 'svg-rocket',
+    icon: User,
     label: 'label',
   },
 };

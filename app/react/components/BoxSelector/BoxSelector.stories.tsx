@@ -1,5 +1,6 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
+import { User } from 'react-feather';
 
 import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';
@@ -21,14 +22,14 @@ function Example() {
   const options: BoxSelectorOption<number>[] = [
     {
       description: 'description 1',
-      icon: 'svg-rocket',
+      icon: User,
       id: '1',
       value: 3,
       label: 'option 1',
     },
     {
       description: 'description 2',
-      icon: 'svg-rocket',
+      icon: User,
       id: '2',
       value: 4,
       label: 'option 2',
@@ -53,14 +54,14 @@ function LimitedFeature() {
   const options: BoxSelectorOption<number>[] = [
     {
       description: 'description 1',
-      icon: 'svg-rocket',
+      icon: User,
       id: '1',
       value: 3,
       label: 'option 1',
     },
     {
       description: 'description 2',
-      icon: 'svg-rocket',
+      icon: User,
       id: '2',
       value: 4,
       label: 'option 2',

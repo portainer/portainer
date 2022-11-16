@@ -49,13 +49,7 @@ export function Option({
         {IconComponent ? (
           <IconComponent selected={active} className={styles.iconComponent} />
         ) : (
-          <Icon
-            icon={icon}
-            className={clsx(
-              'block',
-              icon === 'svg-dockericon' ? styles.iconLarge : styles.icon
-            )}
-          />
+          <Icon icon={icon} className={clsx('block', styles.icon)} />
         )}
       </div>
 

@@ -1,4 +1,6 @@
+import { ReactNode } from 'react';
 import type { Meta } from '@storybook/react';
+import { User } from 'react-feather';
 
 import { Widget } from './Widget';
 import { WidgetBody } from './WidgetBody';
@@ -9,7 +11,7 @@ import { WidgetTaskbar } from './WidgetTaskbar';
 interface WidgetProps {
   loading: boolean;
   title: string;
-  icon: string;
+  icon: string | ReactNode;
   bodyText: string;
   footerText: string;
 }
@@ -20,7 +22,7 @@ const meta: Meta<WidgetProps> = {
   args: {
     loading: false,
     title: 'Title',
-    icon: 'svg-rocket',
+    icon: User,
     bodyText: 'Body',
     footerText: 'Footer',
   },
@@ -49,16 +51,7 @@ function WidgetWithCustomImage({
 }: WidgetProps) {
   return (
     <Widget>
-      <WidgetTitle
-        title={title}
-        icon={
-          <img
-            className="custom-header-ico space-right"
-            src={icon}
-            alt="header-icon"
-          />
-        }
-      />
+      <WidgetTitle title={title} icon={icon} />
       <WidgetBody loading={loading}>{bodyText}</WidgetBody>
       <WidgetFooter>{footerText}</WidgetFooter>
     </Widget>
