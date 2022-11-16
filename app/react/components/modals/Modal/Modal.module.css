@@ -1,0 +1,11 @@
+.modal-dialog {
+  width: 450px;
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.modal-content {
+  background-color: var(--bg-modal-content-color);
+  padding: 20px;
+}

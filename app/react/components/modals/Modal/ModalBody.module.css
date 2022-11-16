@@ -1,0 +1,15 @@
+.modal-body {
+  padding: 10px 0px;
+  border-bottom: none;
+}
+
+.modal-body .bootbox-body {
+  font-size: 12px;
+  color: var(--text-bootbox);
+}
+
+.modal-footer {
+  padding: 10px 0px;
+  border-top: none;
+  display: flex;
+}
