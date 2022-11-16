@@ -2,8 +2,3 @@
   padding: 10px 0px;
   border-bottom: none;
 }
-
-.modal-body .bootbox-body {
-  font-size: 12px;
-  color: var(--text-bootbox);
-}

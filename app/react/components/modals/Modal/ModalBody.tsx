@@ -17,7 +17,7 @@ export function ModalBody({
   return (
     <div className={styles.modalBody}>
       {isCloseButtonVisible && <CloseButton onClose={onDismiss} />}
-      <div className={styles.bootboxBody}>{children}</div>
+      {children}
     </div>
   );
 }
