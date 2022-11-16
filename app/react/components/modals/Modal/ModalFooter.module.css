@@ -1,3 +1,5 @@
 .modal-footer {
-  border-top: 1px solid var(--border-modal-header-color);
+  padding: 10px 0px;
+  border-top: none;
+  display: flex;
 }
