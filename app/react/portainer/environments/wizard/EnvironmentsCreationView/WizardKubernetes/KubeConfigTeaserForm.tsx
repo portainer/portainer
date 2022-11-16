@@ -8,7 +8,6 @@ import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
-import { Icon } from '@@/Icon';
 
 const initialValues = {
   kubeConfig: '',
@@ -87,8 +86,8 @@ export function KubeConfigTeaserForm() {
                 loadingText="Connecting environment..."
                 isLoading={false}
                 disabled
+                icon={Plug}
               >
-                <Icon icon={Plug} />
                 Connect
               </LoadingButton>
             </div>

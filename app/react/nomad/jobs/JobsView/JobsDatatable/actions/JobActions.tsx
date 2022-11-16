@@ -6,7 +6,6 @@ import { Job } from '@/react/nomad/types';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { Icon } from '@@/Icon';
 
 import { deleteJobs } from './delete';
 
@@ -27,8 +26,8 @@ export function JobActions({ selectedItems, refreshData }: Props) {
       disabled={selectedItems.length < 1 || mutation.isLoading}
       color="danger"
       onClick={handleDeleteClicked}
+      icon={Trash2}
     >
-      <Icon icon={Trash2} />
       Remove
     </LoadingButton>
   );

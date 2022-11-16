@@ -9,7 +9,6 @@ import Plug from '@/assets/ico/plug.svg?c';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { Icon } from '@@/Icon';
 
 import { MoreSettingsSection } from '../../MoreSettingsSection';
 import { Hardware } from '../../Hardware/Hardware';
@@ -62,8 +61,8 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
                   isLoading={createMutation.isLoading}
                   loadingText="Creating environment..."
                   disabled={!isValid}
+                  icon={Plug}
                 >
-                  <Icon icon={Plug} className="icon icon-sm vertical-center" />
                   Create
                 </LoadingButton>
               </div>

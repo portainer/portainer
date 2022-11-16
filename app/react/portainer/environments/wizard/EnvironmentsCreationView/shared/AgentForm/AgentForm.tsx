@@ -8,7 +8,6 @@ import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/env
 import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { Icon } from '@@/Icon';
 
 import { NameField } from '../NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';
@@ -60,8 +59,8 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
+                icon={Plug}
               >
-                <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                 Connect
               </LoadingButton>
             </div>

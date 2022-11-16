@@ -13,7 +13,6 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
 import { BoxSelector } from '@@/BoxSelector';
-import { Icon } from '@@/Icon';
 import { BadgeIcon } from '@@/BadgeIcon';
 
 import { NameField, useNameValidation } from '../shared/NameField';
@@ -132,8 +131,8 @@ export function WizardAzure({ onCreate }: Props) {
                   loadingText="Connecting environment..."
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
+                  icon={Plug}
                 >
-                  <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                   Connect
                 </LoadingButton>
               </div>

@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from 'react-query';
 import { useReducer } from 'react';
 import { Plus } from 'react-feather';
 
-import { Icon } from '@/react/components/Icon';
 import { User } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
@@ -123,8 +122,8 @@ export function CreateTeamForm({ users, teams }: Props) {
                         data-cy="team-createTeamButton"
                         isLoading={isSubmitting || addTeamMutation.isLoading}
                         loadingText="Creating team..."
+                        icon={Plus}
                       >
-                        <Icon icon={Plus} size="md" />
                         Create team
                       </LoadingButton>
                     </div>

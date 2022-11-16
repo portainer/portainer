@@ -12,7 +12,6 @@ import { FormControl } from '@@/form-components/FormControl';
 import { Input, Select } from '@@/form-components/Input';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { Icon } from '@@/Icon';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
 import { PortsMappingField } from './PortsMappingField';
@@ -196,8 +195,8 @@ export function CreateContainerInstanceForm() {
                 disabled={!isValid}
                 isLoading={isSubmitting}
                 loadingText="Deployment in progress..."
+                icon={Plus}
               >
-                <Icon icon={Plus} className="mr-1" />
                 Deploy the container
               </LoadingButton>
             </div>

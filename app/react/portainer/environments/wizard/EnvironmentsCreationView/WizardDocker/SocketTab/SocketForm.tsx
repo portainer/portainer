@@ -11,7 +11,6 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
-import { Icon } from '@@/Icon';
 
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
@@ -61,8 +60,8 @@ export function SocketForm({ onCreate }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
+                icon={Plug}
               >
-                <Icon icon={Plug} className="icon icon-sm vertical-center" />{' '}
                 Connect
               </LoadingButton>
             </div>
