@@ -11,11 +11,11 @@ export type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props {
   inputId?: string;
-  label: string | ReactNode;
+  label: ReactNode;
   size?: Size;
   tooltip?: string;
   children: ReactNode;
-  errors?: string | ReactNode;
+  errors?: ReactNode;
   required?: boolean;
 }
 

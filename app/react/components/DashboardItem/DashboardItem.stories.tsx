@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { Meta, Story } from '@storybook/react';
 import { List } from 'react-feather';
 
@@ -13,7 +14,7 @@ export default meta;
 
 interface StoryProps {
   value: number;
-  icon: string;
+  icon: ReactNode;
   type: string;
 }
 
@@ -24,7 +25,7 @@ function Template({ value, icon, type }: StoryProps) {
 export const Primary: Story<StoryProps> = Template.bind({});
 Primary.args = {
   value: 1,
-  icon: 'list',
+  icon: List,
   type: 'Example resource',
 };
 

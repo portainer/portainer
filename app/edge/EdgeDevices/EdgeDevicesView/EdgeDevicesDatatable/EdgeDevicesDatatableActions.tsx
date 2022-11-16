@@ -1,5 +1,5 @@
 import { useRouter } from '@uirouter/react';
-import { Plus, Trash2 } from 'react-feather';
+import { Plus, Trash2, Link as LinkIcon } from 'react-feather';
 
 import type { Environment } from '@/react/portainer/environments/types';
 import {
@@ -55,7 +55,7 @@ export function EdgeDevicesDatatableActions({
         <Button
           disabled={selectedItems.length !== 1}
           onClick={() => onAssociateOpenAMTClick(selectedItems)}
-          icon={Link}
+          icon={LinkIcon}
         >
           Associate with OpenAMT
         </Button>

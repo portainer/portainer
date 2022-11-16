@@ -11,7 +11,7 @@ import { WidgetTaskbar } from './WidgetTaskbar';
 interface WidgetProps {
   loading: boolean;
   title: string;
-  icon: string | ReactNode;
+  icon: ReactNode;
   bodyText: string;
   footerText: string;
 }

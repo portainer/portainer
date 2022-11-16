@@ -29,13 +29,12 @@ interface Props {
   className?: string;
   size?: IconSize;
   mode?: IconMode;
-  inline?: boolean;
 }
 
-export function Icon({ icon, className, mode, size, inline }: Props) {
+export function Icon({ icon, className, mode, size }: Props) {
   const classes = clsx(
     className,
-    'icon',
+    'icon inline-flex',
     { [`icon-${mode}`]: mode },
     { [`icon-${size}`]: size }
   );
@@ -59,7 +58,7 @@ export function Icon({ icon, className, mode, size, inline }: Props) {
     return (
       <Svg
         icon={svgIcon as keyof typeof SvgIcons}
-        className={clsx(classes, inline ? '!inline' : '!flex')}
+        className={classes}
         aria-hidden="true"
       />
     );

@@ -5,7 +5,7 @@ import { Icon, IconProps } from '@/react/components/Icon';
 
 interface Props extends IconProps {
   value: string | number;
-  icon: string | ReactNode;
+  icon: ReactNode;
   iconClass?: string;
 }
 
