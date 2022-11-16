@@ -1,4 +1,4 @@
-import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 import CircleNotch from '@/assets/ico/circle-notch.svg?c';
 
@@ -33,12 +33,9 @@ export function LoadingButton({
   );
 }
 
-function LoadingButtonIcon(
-  isLoading: boolean,
-  icon: ReactNode | ComponentType<unknown>
-) {
-  if (icon && !isLoading) {
-    return icon;
+function LoadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
+  if (defaultIcon && !isLoading) {
+    return defaultIcon;
   }
   if (isLoading) {
     return (
