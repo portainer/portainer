@@ -322,19 +322,19 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 			Name:               "Empty swarmStackFromFileContentPayload with string method",
 			Payload:            swarmStackFromFileContentPayload{},
 			QueryString:        "method=string",
-			ExpectedStatusCode: 500,
+			ExpectedStatusCode: 400,
 		},
 		{
 			Name:               "Empty swarmStackFromFileContentPayload with repository method",
 			Payload:            swarmStackFromFileContentPayload{},
 			QueryString:        "method=repository",
-			ExpectedStatusCode: 500,
+			ExpectedStatusCode: 400,
 		},
 		{
 			Name:               "Empty swarmStackFromFileContentPayload with file method",
 			Payload:            swarmStackFromFileContentPayload{},
 			QueryString:        "method=file",
-			ExpectedStatusCode: 500,
+			ExpectedStatusCode: 400,
 		},
 		{
 			Name: "Duplicated EdgeStack Name",
@@ -356,7 +356,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 				DeploymentType:   edgeStack.DeploymentType,
 			},
 			QueryString:        "method=string",
-			ExpectedStatusCode: 500,
+			ExpectedStatusCode: 400,
 		},
 		{
 			Name: "EdgeStackDeploymentKubernetes with Docker endpoint",
@@ -378,7 +378,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 				DeploymentType:   portainer.EdgeStackDeploymentCompose,
 			},
 			QueryString:        "method=string",
-			ExpectedStatusCode: 500,
+			ExpectedStatusCode: 400,
 		},
 		{
 			Name: "Clone Git respository error",
