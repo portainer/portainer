@@ -1,3 +1,5 @@
+import { Check, Copy } from 'react-feather';
+
 import { Button } from '@@/buttons';
 import { useCopy } from '@@/buttons/CopyButton/useCopy';
 import { Icon } from '@@/Icon';
@@ -19,7 +21,7 @@ export function Code({ children, showCopyButton }: Props) {
       {showCopyButton && (
         <Button color="link" className={styles.copyButton} onClick={handleCopy}>
           <Icon
-            icon={copiedSuccessfully ? 'check' : 'copy'}
+            icon={copiedSuccessfully ? Check : Copy}
             className="!ml-1"
             mode={copiedSuccessfully ? 'success' : undefined}
           />

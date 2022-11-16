@@ -1,11 +1,11 @@
 import clsx from 'clsx';
-import { PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { Icon, IconProps } from '@/react/components/Icon';
 
 interface Props extends IconProps {
   value: string | number;
-  icon: ReactNode;
+  icon: IconProps['icon'];
   iconClass?: string;
 }
 

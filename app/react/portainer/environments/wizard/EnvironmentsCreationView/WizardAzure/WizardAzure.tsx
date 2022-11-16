@@ -12,7 +12,7 @@ import Plug from '@/assets/ico/plug.svg?c';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
-import { BoxSelector } from '@@/BoxSelector';
+import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
 
 import { NameField, useNameValidation } from '../shared/NameField';
@@ -39,7 +39,7 @@ const initialValues: FormValues = {
   },
 };
 
-const options = [
+const options: Array<BoxSelectorOption<'api'>> = [
   {
     description: '',
     icon: <BadgeIcon icon={Dataflow2} size="3xl" />,

@@ -71,7 +71,9 @@ export function Annotations({
           </div>
           <div className="col-sm-3 !pl-0 !m-0">
             <Button
-              className="btn btn-sm btn-dangerlight btn-only-icon !ml-0"
+              size="small"
+              color="dangerlight"
+              className="btn-only-icon !ml-0"
               type="button"
               onClick={() => removeAnnotation(i)}
               icon={Trash2}

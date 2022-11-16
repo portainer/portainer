@@ -1,8 +1,8 @@
-import { ReactNode } from 'react';
 import { Meta, Story } from '@storybook/react';
 import { List } from 'react-feather';
 
 import { Link } from '@@/Link';
+import { IconProps } from '@@/Icon';
 
 import { DashboardItem } from './DashboardItem';
 
@@ -14,7 +14,7 @@ export default meta;
 
 interface StoryProps {
   value: number;
-  icon: ReactNode;
+  icon: IconProps['icon'];
   type: string;
 }
 

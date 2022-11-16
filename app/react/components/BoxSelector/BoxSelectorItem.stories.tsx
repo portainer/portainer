@@ -4,6 +4,8 @@ import { User } from 'react-feather';
 import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';
 
+import { IconProps } from '@@/Icon';
+
 import { BoxSelectorItem } from './BoxSelectorItem';
 import { BoxSelectorOption } from './types';
 
@@ -22,7 +24,7 @@ export default meta;
 interface ExampleProps {
   selected?: boolean;
   description?: string;
-  icon?: string;
+  icon?: IconProps['icon'];
   label?: string;
   feature?: FeatureId;
 }
@@ -36,7 +38,7 @@ function Template({
 }: ExampleProps) {
   const option: BoxSelectorOption<number> = {
     description,
-    icon: `fa ${icon}`,
+    icon,
     id: 'id',
     label,
     value: 1,
