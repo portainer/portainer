@@ -33,7 +33,10 @@ export function Sidebar() {
       <div className={clsx(styles.root, 'flex flex-col')}>
         <UpgradeBEBanner />
         <nav
-          className={clsx(styles.nav, 'p-5 flex flex-col overflow-y-auto')}
+          className={clsx(
+            styles.nav,
+            'p-5 flex flex-col flex-1 overflow-y-auto'
+          )}
           aria-label="Main"
         >
           <Header logo={LogoURL} />
