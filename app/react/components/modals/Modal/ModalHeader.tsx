@@ -1,11 +1,12 @@
 import clsx from 'clsx';
+import { ReactNode } from 'react';
 
 import { ModalType } from './types';
 import { useModalContext } from './Modal';
 import styles from './ModalHeader.module.css';
 
 interface Props {
-  title: string;
+  title: ReactNode;
   modalType?: ModalType;
 }
 
@@ -22,7 +23,11 @@ export function ModalHeader({ title, modalType }: Props) {
           })}
         />
       )}
-      <h5 className={styles.modalTitle}>{title}</h5>
+      {typeof title === 'string' ? (
+        <h5 className="font-bold">{title}</h5>
+      ) : (
+        title
+      )}
     </div>
   );
 }

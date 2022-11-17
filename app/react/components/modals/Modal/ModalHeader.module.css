@@ -4,14 +4,6 @@
   border-bottom: none;
 }
 
-.modal-header .close {
-  margin-top: 0px;
-}
-
-.modal-header .modal-title {
-  font-weight: bold;
-}
-
 .background-error {
   padding-top: 55px;
   background-image: url(~assets/images/icon-error.svg);
