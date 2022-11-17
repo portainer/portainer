@@ -19,7 +19,7 @@ function CEFooter() {
       <UpdateNotification />
 
       <FooterContent>
-        <Logo width="90px" height="" />
+        <Logo width="90px" height="100%" />
         <span>Community Edition</span>
 
         <BuildInfoModalButton />
