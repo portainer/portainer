@@ -28,14 +28,19 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status, demo
 		status:      status,
 	}
 
-	h.Handle("/system/status",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.systemStatus))).Methods(http.MethodGet)
-	h.Handle("/system/version",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.version))).Methods(http.MethodGet)
-	h.Handle("/system/nodes",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.systemNodesCount))).Methods(http.MethodGet)
-	h.Handle("/system/info",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.systemInfo))).Methods(http.MethodGet)
+	router := h.PathPrefix("/system").Subrouter()
+
+	authenticatedRouter := router.PathPrefix("/").Subrouter()
+	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
+
+	authenticatedRouter.Handle("/version", http.HandlerFunc(h.version)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/nodes", httperror.LoggerHandler(h.systemNodesCount)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/info", httperror.LoggerHandler(h.systemInfo)).Methods(http.MethodGet)
+
+	publicRouter := router.PathPrefix("/").Subrouter()
+	publicRouter.Use(bouncer.PublicAccess)
+
+	publicRouter.Handle("/status", httperror.LoggerHandler(h.systemStatus)).Methods(http.MethodGet)
 
 	h.Handle("/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspectDeprecated))).Methods(http.MethodGet)
