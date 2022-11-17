@@ -27,10 +27,15 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
         validationSchema={validation}
       >
         {({ errors }) => (
-          <Form className="form-horizontal" noValidate>
+          <Form noValidate>
             <Modal.Body>
               <p>Please enter your Portainer License Below</p>
-              <FormControl label="License" errors={errors.license} required>
+              <FormControl
+                label="License"
+                errors={errors.license}
+                required
+                size="vertical"
+              >
                 <Field name="license" as={Input} required />
               </FormControl>
             </Modal.Body>
