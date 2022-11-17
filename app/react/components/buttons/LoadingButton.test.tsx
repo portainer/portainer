@@ -26,7 +26,7 @@ test('should show children when false', async () => {
   const loadingText = 'loading';
   const children = 'visible';
 
-  const { queryByLabelText, queryByText } = render(
+  const { queryByText, getByRole } = render(
     <LoadingButton loadingText={loadingText} isLoading={false}>
       {children}
     </LoadingButton>
@@ -35,7 +35,7 @@ test('should show children when false', async () => {
   const buttonLabel = queryByText(children);
   expect(buttonLabel).toBeVisible();
 
-  const spinner = queryByLabelText('loading');
+  const spinner = getByRole('img', { hidden: true });
   expect(spinner).toBeNull();
 
   const loadingTextElem = queryByText(loadingText);
