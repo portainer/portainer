@@ -24,7 +24,7 @@ type composeStackFromFileContentPayload struct {
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment(endpoint) variables used during stack deployment
-	Env []portainer.Pair `example:""`
+	Env []portainer.Pair
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
 }

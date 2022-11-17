@@ -19,6 +19,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+type InvalidPayloadError struct {
+	msg string
+}
+
+func (e *InvalidPayloadError) Error() string {
+	return e.msg
+}
+
 // @id EdgeStackCreate
 // @summary Create an EdgeStack
 // @description **Access policy**: administrator
@@ -42,7 +50,13 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 
 	edgeStack, err := handler.createSwarmStack(method, r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to create Edge stack", err)
+		var payloadError *InvalidPayloadError
+		switch {
+		case errors.As(err, &payloadError):
+			return httperror.BadRequest("Invalid payload", err)
+		default:
+			return httperror.InternalServerError("Unable to create Edge stack", err)
+		}
 	}
 
 	return response.JSON(w, edgeStack)
@@ -76,13 +90,13 @@ type swarmStackFromFileContentPayload struct {
 
 func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid stack name")
+		return &InvalidPayloadError{msg: "Invalid stack name"}
 	}
 	if govalidator.IsNull(payload.StackFileContent) {
-		return errors.New("Invalid stack file content")
+		return &InvalidPayloadError{msg: "Invalid stack file content"}
 	}
 	if payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0 {
-		return errors.New("Edge Groups are mandatory for an Edge stack")
+		return &InvalidPayloadError{msg: "Edge Groups are mandatory for an Edge stack"}
 	}
 	return nil
 }
@@ -194,19 +208,19 @@ type swarmStackFromGitRepositoryPayload struct {
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid stack name")
+		return &InvalidPayloadError{msg: "Invalid stack name"}
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
+		return &InvalidPayloadError{msg: "Invalid repository URL. Must correspond to a valid URL format"}
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+		return &InvalidPayloadError{msg: "Invalid repository credentials. Password must be specified when authentication is enabled"}
 	}
 	if govalidator.IsNull(payload.FilePathInRepository) {
 		payload.FilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 	if payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0 {
-		return errors.New("Edge Groups are mandatory for an Edge stack")
+		return &InvalidPayloadError{msg: "Edge Groups are mandatory for an Edge stack"}
 	}
 	return nil
 }
@@ -293,26 +307,26 @@ type swarmStackFromFileUploadPayload struct {
 func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid stack name")
+		return &InvalidPayloadError{msg: "Invalid stack name"}
 	}
 	payload.Name = name
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return errors.New("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
+		return &InvalidPayloadError{msg: "Invalid Compose file. Ensure that the Compose file is uploaded correctly"}
 	}
 	payload.StackFileContent = composeFileContent
 
 	var edgeGroups []portainer.EdgeGroupID
 	err = request.RetrieveMultiPartFormJSONValue(r, "EdgeGroups", &edgeGroups, false)
 	if err != nil || len(edgeGroups) == 0 {
-		return errors.New("Edge Groups are mandatory for an Edge stack")
+		return &InvalidPayloadError{msg: "Edge Groups are mandatory for an Edge stack"}
 	}
 	payload.EdgeGroups = edgeGroups
 
 	deploymentType, err := request.RetrieveNumericMultiPartFormValue(r, "DeploymentType", true)
 	if err != nil {
-		return errors.New("Invalid deployment type")
+		return &InvalidPayloadError{msg: "Invalid deployment type"}
 	}
 	payload.DeploymentType = portainer.EdgeStackDeploymentType(deploymentType)
 
