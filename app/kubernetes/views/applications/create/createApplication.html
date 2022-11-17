@@ -98,7 +98,7 @@
                 <editor-description>
                   <span class="text-muted small" ng-show="ctrl.stack.IsComposeFormat">
                     <p class="vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                       <span>
                         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
                         not all the Compose format options are supported by Kompose at the moment.
@@ -493,7 +493,7 @@
 
                     <div class="col-sm-12" style="margin-top: 5px" ng-if="ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
                       <span class="small text-muted vertical-center">
-                        <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                         This namespace has exhausted its storage capacity. Contact your administrator to expand the capacity of the namespace.
                       </span>
                     </div>
@@ -1006,14 +1006,14 @@
 
                   <div class="form-group" ng-if="ctrl.state.storages.quotaExceeded">
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                       This application would exceed available storage. Please review the persisted folders or the instance count.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                       <div>
                         The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
                         >. You will not be able to scale that application.
@@ -1320,7 +1320,7 @@
               </div>
               <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-muted">
-                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                   You do not have access to any namespace. Contact your administrator to get access to a namespace.
                 </div>
               </div>

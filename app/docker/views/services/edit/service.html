@@ -78,10 +78,8 @@
               <td ng-if="webhookURL">
                 <span class="text-muted">{{ webhookURL | truncatelr }}</span>
                 <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="webhookURL" ng-click="copyWebhook()">
-                  <span>
-                    <pr-icon icon="'copy'" class-name="'mr-1'"></pr-icon>
-                    Copy link</span
-                  >
+                  <pr-icon icon="'copy'" class-name="'mr-1'"></pr-icon>
+                  Copy link
                 </button>
                 <span>
                   <pr-icon id="copyNotification" icon="'check'" mode="'success'" style="display: none"></pr-icon>

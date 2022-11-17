@@ -3,7 +3,7 @@
     <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0" ng-click="$ctrl.onSwitchModeClick()"> <pr-icon icon="'edit'"></pr-icon> Advanced mode </button>
   </div>
   <div class="col-sm-12 small text-muted">
-    <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
+    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
     Switch to advanced mode to copy & paste multiple variables
   </div>
   <div class="col-sm-12 environment-variables-simple-mode--actions">
@@ -34,7 +34,7 @@
     ></environment-variables-simple-mode-item>
   </div>
   <div class="col-sm-12 small text-muted" ng-if="$ctrl.ngModel.length > 0 && $ctrl.showHelpMessage">
-    <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
+    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
     Environment changes will not take effect until redeployment occurs manually or via webhook.
   </div>
 </div>

@@ -1,7 +1,7 @@
 <div class="form-group" ng-if="$ctrl.pullRateLimits">
   <div class="col-sm-12 small">
     <div ng-if="$ctrl.pullRateLimits.remaining > 0" class="text-muted vertical-center">
-      <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
       <span ng-if="$ctrl.isAuthenticated">
         You are currently using a free account to pull images from DockerHub and will be limited to 200 pulls every 6 hours. Remaining pulls:
         <span style="font-weight: bold">{{ $ctrl.pullRateLimits.remaining }}/{{ $ctrl.pullRateLimits.limit }}</span>
