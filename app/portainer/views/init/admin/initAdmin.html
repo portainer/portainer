@@ -68,7 +68,7 @@
                 <p class="vertical-center">
                   <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                   <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
-                  <pr-icon class="fa green-icon" icon="'check'" ng-if="form.password.$valid && formValues.Password"></pr-icon>
+                  <pr-icon mode="'success'" icon="'check'" ng-if="form.password.$valid && formValues.Password"></pr-icon>
                 </p>
               </div>
             </div>

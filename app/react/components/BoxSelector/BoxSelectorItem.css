@@ -13,8 +13,7 @@
   color: var(--text-boxselector-header);
 }
 
-.boxselector_header .fa,
-.fab {
+.boxselector_header {
   font-weight: normal;
 }
 

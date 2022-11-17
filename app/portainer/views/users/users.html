@@ -25,8 +25,8 @@
                   data-cy="user-usernameInput"
                 />
                 <span class="input-group-addon">
-                  <pr-icon class="fa green-icon" icon="'check'" aria-hidden="true" ng-if="state.validUsername"></pr-icon>
-                  <pr-icon class="fa red-icon" icon="'x'" aria-hidden="true" ng-if="!state.validUsername"></pr-icon>
+                  <pr-icon mode="'success'" icon="'check'" ng-if="state.validUsername"></pr-icon>
+                  <pr-icon mode="'danger'" icon="'x'" ng-if="!state.validUsername"></pr-icon>
                 </span>
               </div>
             </div>
@@ -62,13 +62,13 @@
                 />
                 <span class="input-group-addon">
                   <pr-icon
-                    class="fa green-icon"
+                    mode="'success'"
                     icon="'check'"
                     aria-hidden="true"
                     ng-if="form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword"
                   ></pr-icon>
                   <pr-icon
-                    class="fa red-icon"
+                    mode="'danger'"
                     icon="'x'"
                     aria-hidden="true"
                     ng-if="!(form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword)"
