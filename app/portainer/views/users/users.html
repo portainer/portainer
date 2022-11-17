@@ -124,7 +124,7 @@
             <div class="col-sm-12">
               <span class="small">
                 <p class="small text-muted vertical-center">
-                  <pr-icon icon="'alert-triangle" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-circle'" class-name="'icon-warning =vertical-center'"></pr-icon>
                   The team leader feature is disabled as external authentication is currently enabled with team sync.
                 </p>
               </span>
@@ -134,7 +134,7 @@
           <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
               <span class="small text-muted vertical-center">
-                <pr-icon class="vertical-center" icon="'info'" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon>
+                <pr-icon class="vertical-center" icon="'alert-circle'" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon>
                 <span
                   >Note: non-administrator users who aren't in a team don't have access to any environments by default. Head over to the
                   <a ui-sref="portainer.endpoints">Environments view</a> to manage their accesses.</span
@@ -156,7 +156,7 @@
                 <span ng-show="state.actionInProgress">Creating user...</span>
               </button>
               <span class="text-danger" ng-if="state.userCreationError">
-                <pr-icon icon="'info'" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon> {{ state.userCreationError }}
+                <pr-icon icon="'alert-circle'" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon> {{ state.userCreationError }}
               </span>
             </div>
           </div>

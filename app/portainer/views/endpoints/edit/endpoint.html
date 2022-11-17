@@ -5,7 +5,7 @@
     <information-panel ng-if="state.edgeAssociated" title-text="Edge information">
       <span class="small text-muted">
         <p class="vertical-center">
-          <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+          <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
           This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
         </p>
         <p>
@@ -37,7 +37,7 @@
           <div class="col-sm-12 form-section-title">Deploy an agent</div>
           <span class="small text-muted">
             <p class="vertical-center">
-              <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+              <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
               Refer to the platform related command below to deploy the Edge agent in your remote cluster.
             </p>
             <p>
@@ -56,7 +56,7 @@
           <span class="small text-muted">
             <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>
             <p class="vertical-center">
-              <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+              <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
               For those pre-staging the edge agent, use the following join token to associate the Edge agent with this environment.
             </p>
             <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
