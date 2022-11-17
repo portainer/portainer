@@ -11,5 +11,6 @@ export const gitForm = {
     autoUpdate: '<',
     showAuthExplanation: '<',
     showForcePullImage: '<',
+    hideRebuildInfo: '@',
   },
 };

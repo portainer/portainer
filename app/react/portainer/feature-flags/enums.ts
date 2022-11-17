@@ -32,5 +32,6 @@ export enum FeatureId {
   POD_SECURITY_POLICY_CONSTRAINT = 'pod-security-policy-constraint',
   HIDE_DOCKER_HUB_ANONYMOUS = 'hide-docker-hub-anonymous',
   CUSTOM_LOGIN_BANNER = 'custom-login-banner',
+  ENFORCE_DEPLOYMENT_OPTIONS = 'k8s-enforce-deployment-options',
   K8S_ADM_ONLY_USR_INGRESS_DEPLY = 'k8s-admin-only-ingress-deploy',
 }
