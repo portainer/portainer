@@ -1,4 +1,5 @@
 import { ArrowRight } from 'react-feather';
+import { useState } from 'react';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -9,7 +10,9 @@ import {
 import { useNodesCount } from '@/react/portainer/status/useNodesCount';
 import { useSystemInfo } from '@/react/portainer/status/useSystemInfo';
 
-import { useSidebarState } from './useSidebarState';
+import { useSidebarState } from '../useSidebarState';
+
+import { LicenseDialog } from './LicenseDialog';
 
 import { useSidebarState } from './useSidebarState';
 
@@ -25,9 +28,11 @@ export function UpgradeBEBanner() {
 
 function Inner() {
   const { trackEvent } = useAnalytics();
-  const { isOpen } = useSidebarState();
+  const { isOpen: isSidebarOpen } = useSidebarState();
   const nodesCountQuery = useNodesCount();
   const systemInfoQuery = useSystemInfo();
+
+  const [isOpen, setIsOpen] = useState(true);
 
   if (!nodesCountQuery.data || !systemInfoQuery.data) {
     return null;
@@ -46,14 +51,18 @@ function Inner() {
   };
 
   return (
-    <button
-      type="button"
-      className="border-0 bg-warning-5 text-warning-9 w-full min-h-[48px] h-12 font-semibold flex justify-center items-center gap-3"
-      onClick={handleClick}
-    >
-      {isOpen && <>Upgrade to Business Edition</>}
-      <ArrowRight className="text-lg feather" />
-    </button>
+    <>
+      <button
+        type="button"
+        className="border-0 bg-warning-5 text-warning-9 w-full min-h-[48px] h-12 font-semibold flex justify-center items-center gap-3"
+        onClick={handleClick}
+      >
+        {isSidebarOpen && <>Upgrade to Business Edition</>}
+        <ArrowRight className="text-lg feather" />
+      </button>
+
+      {isOpen && <LicenseDialog onDismiss={() => setIsOpen(false)} />}
+    </>
   );
 
   function handleClick() {
