@@ -1,14 +1,11 @@
 import { DialogContent, DialogOverlay } from '@reach/dialog';
 import clsx from 'clsx';
-import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
+import { createContext, PropsWithChildren, useContext } from 'react';
 
+import { CloseButton } from './CloseButton';
 import styles from './Modal.module.css';
 
-interface IContext {
-  onDismiss(): void;
-}
-
-const Context = createContext<IContext | null>(null);
+const Context = createContext<boolean | null>(null);
 Context.displayName = 'ModalContext';
 
 export function useModalContext() {
@@ -32,10 +29,8 @@ export function Modal({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: PropsWithChildren<Props>) {
-  const context = useMemo(() => ({ onDismiss }), [onDismiss]);
-
   return (
-    <Context.Provider value={context}>
+    <Context.Provider value>
       <DialogOverlay
         isOpen
         className="flex items-center justify-center z-50"
@@ -47,7 +42,10 @@ export function Modal({
           aria-labelledby={ariaLabelledBy}
           className={clsx(styles.modalDialog, 'p-0 bg-transparent')}
         >
-          <div className={styles.modalContent}>{children}</div>
+          <div className={clsx(styles.modalContent, 'relative')}>
+            {children}
+            <CloseButton onClose={onDismiss} />
+          </div>
         </DialogContent>
       </DialogOverlay>
     </Context.Provider>

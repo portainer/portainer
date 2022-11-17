@@ -12,7 +12,7 @@ export function CloseButton({
   return (
     <button
       type="button"
-      className={clsx(styles.close, className)}
+      className={clsx(styles.close, className, 'absolute top-2 right-2')}
       onClick={() => onClose()}
     >
       ×
