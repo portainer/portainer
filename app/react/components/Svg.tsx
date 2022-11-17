@@ -23,7 +23,7 @@ import flask from '@/assets/ico/flask.svg?c';
 import git from '@/assets/ico/git.svg?c';
 import hacker from '@/assets/ico/hacker.svg?c';
 import heartbeat from '@/assets/ico/heartbeat.svg?c';
-import kubernetes2 from '@/assets/ico/kubernetes-2.svg?c';
+import kube from '@/assets/ico/kube.svg?c';
 import laptop from '@/assets/ico/laptop.svg?c';
 import laptopcode from '@/assets/ico/laptop-code.svg?c';
 import ldap from '@/assets/ico/ldap.svg?c';
@@ -98,7 +98,6 @@ export const SvgIcons = {
   git,
   hacker,
   heartbeat,
-  kubernetes2,
   laptop,
   laptopcode,
   ldap,
@@ -143,6 +142,7 @@ export const SvgIcons = {
   openldap,
   proget,
   quay,
+  kube,
 };
 
 interface SvgProps {

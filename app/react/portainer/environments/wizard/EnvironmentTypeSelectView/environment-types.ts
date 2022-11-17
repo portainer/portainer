@@ -1,6 +1,6 @@
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
-import Kubernetes2 from '@/assets/ico/kubernetes-2.svg?c';
+import Kube from '@/assets/ico/kube.svg?c';
 import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
 import NomadIcon from '@/assets/ico/vendor/nomad-icon.svg?c';
 
@@ -24,7 +24,7 @@ export const environmentTypes = [
   {
     id: 'kubernetes',
     title: 'Kubernetes',
-    icon: Kubernetes2,
+    icon: Kube,
     description: 'Connect to a kubernetes environment via URL/IP',
     featureId: undefined,
   },
