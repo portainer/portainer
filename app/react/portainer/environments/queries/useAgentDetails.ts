@@ -1,10 +1,10 @@
-import { useStatus } from '@/portainer/services/api/status.service';
 import { useSettings } from '@/react/portainer/settings/queries';
+import { useSystemStatus } from '@/react/portainer/status/useSystemStatus';
 
 export function useAgentDetails() {
   const settingsQuery = useSettings();
 
-  const versionQuery = useStatus((status) => status.Version);
+  const versionQuery = useSystemStatus((status) => status.Version);
 
   if (!versionQuery.isSuccess || !settingsQuery.isSuccess) {
     return null;

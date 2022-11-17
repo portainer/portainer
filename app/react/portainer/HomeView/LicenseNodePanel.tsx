@@ -1,12 +1,10 @@
-import { useQuery } from 'react-query';
-
-import { error as notifyError } from '@/portainer/services/notifications';
 import { LicenseType } from '@/portainer/license-management/types';
 import { useLicenseInfo } from '@/portainer/license-management/use-license.service';
-import { getNodesCount } from '@/portainer/services/api/status.service';
 
 import { TextTip } from '@@/Tip/TextTip';
 import { InformationPanel } from '@@/InformationPanel';
+
+import { useNodesCount } from '../status/useNodesCount';
 
 export function LicenseNodePanel() {
   const nodesValid = useNodesValid();
@@ -26,7 +24,7 @@ export function LicenseNodePanel() {
 }
 
 function useNodesValid() {
-  const { isLoading: isLoadingNodes, nodesCount } = useNodesCounts();
+  const { isLoading: isLoadingNodes, data: nodesCount = 0 } = useNodesCount();
 
   const { isLoading: isLoadingLicense, info } = useLicenseInfo();
   if (
@@ -39,18 +37,4 @@ function useNodesValid() {
   }
 
   return nodesCount <= info.nodes;
-}
-
-function useNodesCounts() {
-  const { isLoading, data } = useQuery(
-    ['status', 'nodes'],
-    () => getNodesCount(),
-    {
-      onError(error) {
-        notifyError('Failure', error as Error, 'Failed to get nodes count');
-      },
-    }
-  );
-
-  return { nodesCount: data || 0, isLoading };
 }

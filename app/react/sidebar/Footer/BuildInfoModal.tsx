@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { Database, Hash, Server, Tag, Tool } from 'react-feather';
 import { DialogOverlay } from '@reach/dialog';
 
-import {
-  useStatus,
-  useVersionStatus,
-} from '@/portainer/services/api/status.service';
+import { useSystemStatus } from '@/react/portainer/status/useSystemStatus';
+import { useSystemVersion } from '@/react/portainer/status/useSystemVersion';
 
 import { Button } from '@@/buttons';
 
@@ -13,7 +11,7 @@ import styles from './Footer.module.css';
 
 export function BuildInfoModalButton() {
   const [isBuildInfoVisible, setIsBuildInfoVisible] = useState(false);
-  const statusQuery = useStatus();
+  const statusQuery = useSystemStatus();
 
   if (!statusQuery.data) {
     return null;
@@ -39,8 +37,8 @@ export function BuildInfoModalButton() {
 }
 
 function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
-  const versionQuery = useVersionStatus();
-  const statusQuery = useStatus();
+  const versionQuery = useSystemVersion();
+  const statusQuery = useSystemStatus();
 
   if (!statusQuery.data || !versionQuery.data) {
     return null;

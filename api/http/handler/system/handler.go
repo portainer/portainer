@@ -1,4 +1,4 @@
-package status
+package system
 
 import (
 	"net/http"
@@ -28,14 +28,21 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status, demo
 		status:      status,
 	}
 
-	h.Handle("/status",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspect))).Methods(http.MethodGet)
-	h.Handle("/status/version",
+	h.Handle("/system/status",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.systemStatus))).Methods(http.MethodGet)
+	h.Handle("/system/version",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.version))).Methods(http.MethodGet)
+	h.Handle("/system/nodes",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.systemNodesCount))).Methods(http.MethodGet)
+	h.Handle("/system/info",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.systemInfo))).Methods(http.MethodGet)
+
+	h.Handle("/status",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspectDeprecated))).Methods(http.MethodGet)
+	h.Handle("/status/version",
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.versionDeprecated))).Methods(http.MethodGet)
 	h.Handle("/status/nodes",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.statusNodesCount))).Methods(http.MethodGet)
-	h.Handle("/status/system",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.statusSystem))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.statusNodesCountDeprecated))).Methods(http.MethodGet)
 
 	return h
 }
