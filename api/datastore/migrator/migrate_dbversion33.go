@@ -12,7 +12,7 @@ func (m *Migrator) migrateDBVersionToDB34() error {
 	return MigrateStackEntryPoint(m.stackService)
 }
 
-// MigrateStackEntryPoint exported for testing (blah.)
+// MigrateStackEntryPoint exported for testing
 func MigrateStackEntryPoint(stackService dataservices.StackService) error {
 	stacks, err := stackService.Stacks()
 	if err != nil {

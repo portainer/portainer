@@ -54,7 +54,6 @@ func TestMigrateSettings(t *testing.T) {
 	}
 
 	m := migrator.NewMigrator(&migrator.MigratorParameters{
-		DatabaseVersion:         29,
 		EndpointGroupService:    store.EndpointGroupService,
 		EndpointService:         store.EndpointService,
 		EndpointRelationService: store.EndpointRelationService,
