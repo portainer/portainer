@@ -54,11 +54,15 @@ function WidgetWithCustomImage({
       <WidgetTitle
         title={title}
         icon={
-          <img
-            className="custom-header-ico space-right"
-            src={icon as string}
-            alt="header-icon"
-          />
+          typeof icon === 'string' ? (
+            <img
+              className="custom-header-ico space-right"
+              src={icon}
+              alt="header-icon"
+            />
+          ) : (
+            icon
+          )
         }
       />
       <WidgetBody loading={loading}>{bodyText}</WidgetBody>

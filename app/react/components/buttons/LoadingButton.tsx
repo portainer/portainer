@@ -26,25 +26,22 @@ export function LoadingButton({
       {...buttonProps}
       type={type}
       disabled={disabled || isLoading}
-      icon={LoadingButtonIcon(isLoading, icon)}
+      icon={loadingButtonIcon(isLoading, icon)}
     >
       {isLoading ? loadingText : children}
     </Button>
   );
 }
 
-function LoadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
-  if (defaultIcon && !isLoading) {
+function loadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
+  if (!isLoading) {
     return defaultIcon;
   }
-  if (isLoading) {
-    return (
-      <Icon
-        icon={CircleNotch}
-        className="animate-spin-slow ml-1"
-        aria-label="loading"
-      />
-    );
-  }
-  return null;
+  return (
+    <Icon
+      icon={CircleNotch}
+      className="animate-spin-slow ml-1"
+      aria-label="loading"
+    />
+  );
 }
