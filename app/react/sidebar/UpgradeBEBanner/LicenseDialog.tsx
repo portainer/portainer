@@ -1,5 +1,6 @@
 import { Field, Form, Formik } from 'formik';
 import { object, SchemaOf, string } from 'yup';
+import { ExternalLink } from 'react-feather';
 
 import { Button, LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
@@ -20,7 +21,9 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
       onDismiss={onDismiss}
       aria-label="Upgrade Portainer to Business Edition"
     >
-      <Modal.Header title="Upgrade Portainer" />
+      <Modal.Header
+        title={<h4 className="font-medium text-xl">Upgrade Portainer</h4>}
+      />
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -29,7 +32,9 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
         {({ errors }) => (
           <Form noValidate>
             <Modal.Body>
-              <p>Please enter your Portainer License Below</p>
+              <p className="font-semibold text-gray-7">
+                Please enter your Portainer License Below
+              </p>
               <FormControl
                 label="License"
                 errors={errors.license}
@@ -47,7 +52,12 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
                   rel="noreferrer"
                   className="no-link"
                 >
-                  <Button color="default" size="medium" className="w-full">
+                  <Button
+                    color="default"
+                    size="medium"
+                    className="w-full"
+                    icon={ExternalLink}
+                  >
                     Get a license
                   </Button>
                 </a>
@@ -74,7 +84,9 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
 
 function validation(): SchemaOf<FormValues> {
   return object().shape({
-    license: string().required('License is required'),
+    license: string()
+      .required('License is required')
+      .matches(/^\d-.+/, 'License is invalid'),
   });
 }
 
@@ -92,5 +104,7 @@ function validation(): SchemaOf<FormValues> {
     - return error
   - go to "loading" screen
   
+
+
  * 
  */
