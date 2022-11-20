@@ -105,22 +105,3 @@ function validation(): SchemaOf<FormValues> {
       .matches(/^\d-.+/, 'License is invalid'),
   });
 }
-
-/**
- * 
- todo:
-
- - validate license
- - send it to server:
-  - server will validate it
-  - if valid:
-    - start "upgrade" process
-    - return ok
-  - if invalid:
-    - return error
-  - go to "loading" screen
-  
-
-
- * 
- */
