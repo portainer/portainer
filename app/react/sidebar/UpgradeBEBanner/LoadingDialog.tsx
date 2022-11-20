@@ -6,8 +6,6 @@ import { Icon } from '@@/Icon';
 export function LoadingDialog() {
   return (
     <Modal aria-label="Upgrade Portainer to Business Edition">
-      <Modal.Header title={null} />
-
       <Modal.Body>
         <div className="flex flex-col items-center justify-center w-full">
           <Icon
