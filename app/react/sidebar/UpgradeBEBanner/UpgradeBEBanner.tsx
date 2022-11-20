@@ -14,8 +14,6 @@ import { useSidebarState } from '../useSidebarState';
 
 import { LicenseDialog } from './LicenseDialog';
 
-import { useSidebarState } from './useSidebarState';
-
 export function UpgradeBEBanner() {
   const { data } = useFeatureFlag(FeatureFlag.BEUpgrade, { enabled: !isBE });
 
