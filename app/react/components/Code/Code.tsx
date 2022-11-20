@@ -1,4 +1,4 @@
-import { Check, Copy } from 'react-feather';
+import { Check, Copy } from 'lucide-react';
 
 import { Button } from '@@/buttons';
 import { useCopy } from '@@/buttons/CopyButton/useCopy';

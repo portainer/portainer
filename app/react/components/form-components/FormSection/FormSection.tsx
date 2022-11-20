@@ -1,5 +1,5 @@
 import { PropsWithChildren, useState } from 'react';
-import { ChevronDown, ChevronRight } from 'react-feather';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 
