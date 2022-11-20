@@ -12,7 +12,7 @@ import { useSystemInfo } from '@/react/portainer/status/useSystemInfo';
 
 import { useSidebarState } from '../useSidebarState';
 
-import { LicenseDialog } from './LicenseDialog';
+import { UpgradeDialog } from './UpgradeDialog';
 
 export function UpgradeBEBanner() {
   const { data } = useFeatureFlag(FeatureFlag.BEUpgrade, { enabled: !isBE });
@@ -30,7 +30,7 @@ function Inner() {
   const nodesCountQuery = useNodesCount();
   const systemInfoQuery = useSystemInfo();
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!nodesCountQuery.data || !systemInfoQuery.data) {
     return null;
@@ -59,7 +59,7 @@ function Inner() {
         <ArrowRight className="text-lg feather" />
       </button>
 
-      {isOpen && <LicenseDialog onDismiss={() => setIsOpen(false)} />}
+      {isOpen && <UpgradeDialog onDismiss={() => setIsOpen(false)} />}
     </>
   );
 
@@ -68,5 +68,6 @@ function Inner() {
       category: 'portainer',
       metadata,
     });
+    setIsOpen(true);
   }
 }

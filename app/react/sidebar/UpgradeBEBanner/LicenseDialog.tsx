@@ -2,6 +2,9 @@ import { Field, Form, Formik } from 'formik';
 import { object, SchemaOf, string } from 'yup';
 import { ExternalLink } from 'react-feather';
 
+import { useUpgradeEditionMutation } from '@/react/portainer/status/useUpgradeEditionMutation';
+import { notifySuccess } from '@/portainer/services/notifications';
+
 import { Button, LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -15,7 +18,15 @@ const initialValues: FormValues = {
   license: '',
 };
 
-export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
+export function LicenseDialog({
+  onDismiss,
+  goToLoading,
+}: {
+  onDismiss: () => void;
+  goToLoading: () => void;
+}) {
+  const upgradeMutation = useUpgradeEditionMutation();
+
   return (
     <Modal
       onDismiss={onDismiss}
@@ -65,7 +76,7 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
                   color="primary"
                   size="medium"
                   loadingText="Validating License"
-                  isLoading={false}
+                  isLoading={upgradeMutation.isLoading}
                 >
                   Start upgrade
                 </LoadingButton>
@@ -78,7 +89,12 @@ export function LicenseDialog({ onDismiss }: { onDismiss: () => void }) {
   );
 
   function handleSubmit(values: FormValues) {
-    console.log(values);
+    upgradeMutation.mutate(values, {
+      onSuccess() {
+        notifySuccess('Starting upgrade', 'License validated successfully');
+        goToLoading();
+      },
+    });
   }
 }
 

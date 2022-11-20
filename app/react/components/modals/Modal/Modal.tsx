@@ -18,7 +18,7 @@ export function useModalContext() {
 }
 
 interface Props {
-  onDismiss(): void;
+  onDismiss?(): void;
   'aria-label'?: string;
   'aria-labelledby'?: string;
 }
@@ -34,7 +34,7 @@ export function Modal({
       <DialogOverlay
         isOpen
         className="flex items-center justify-center z-50"
-        onDismiss={() => onDismiss()}
+        onDismiss={onDismiss}
         role="dialog"
       >
         <DialogContent
@@ -44,7 +44,7 @@ export function Modal({
         >
           <div className={clsx(styles.modalContent, 'relative')}>
             {children}
-            <CloseButton onClose={onDismiss} />
+            {onDismiss && <CloseButton onClose={onDismiss} />}
           </div>
         </DialogContent>
       </DialogOverlay>
