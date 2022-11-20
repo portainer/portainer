@@ -7,7 +7,7 @@ import {
 } from '@/portainer/license-management/types';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 import { Tag } from '@/portainer/tags/types';
-import { StatusResponse } from '@/react/portainer/status/useSystemStatus';
+import { StatusResponse } from '@/react/portainer/system/useSystemStatus';
 import { createMockTeams } from '@/react-tools/test-mocks';
 import { PublicSettingsResponse } from '@/react/portainer/settings/types';
 import { UserId } from '@/portainer/users/types';

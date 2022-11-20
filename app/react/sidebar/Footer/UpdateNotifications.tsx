@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
 import { useUIState } from '@/react/hooks/useUIState';
-import { useSystemVersion } from '@/react/portainer/status/useSystemVersion';
+import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
 
 import { Icon } from '@@/Icon';
 

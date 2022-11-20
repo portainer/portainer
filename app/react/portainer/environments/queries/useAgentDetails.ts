@@ -1,5 +1,5 @@
 import { useSettings } from '@/react/portainer/settings/queries';
-import { useSystemStatus } from '@/react/portainer/status/useSystemStatus';
+import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 
 export function useAgentDetails() {
   const settingsQuery = useSettings();

@@ -1,4 +1,4 @@
-import { getSystemStatus } from '@/react/portainer/status/useSystemStatus';
+import { getSystemStatus } from '@/react/portainer/system/useSystemStatus';
 import { StatusViewModel } from '../../models/status';
 
 angular.module('portainer.app').factory('StatusService', StatusServiceFactory);

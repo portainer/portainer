@@ -7,8 +7,8 @@ import {
   useFeatureFlag,
   FeatureFlag,
 } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
-import { useNodesCount } from '@/react/portainer/status/useNodesCount';
-import { useSystemInfo } from '@/react/portainer/status/useSystemInfo';
+import { useNodesCount } from '@/react/portainer/system/useNodesCount';
+import { useSystemInfo } from '@/react/portainer/system/useSystemInfo';
 
 import { useSidebarState } from '../useSidebarState';
 

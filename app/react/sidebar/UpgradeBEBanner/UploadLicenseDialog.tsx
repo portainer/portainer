@@ -2,7 +2,7 @@ import { Field, Form, Formik } from 'formik';
 import { object, SchemaOf, string } from 'yup';
 import { ExternalLink } from 'react-feather';
 
-import { useUpgradeEditionMutation } from '@/react/portainer/status/useUpgradeEditionMutation';
+import { useUpgradeEditionMutation } from '@/react/portainer/system/useUpgradeEditionMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { Button, LoadingButton } from '@@/buttons';

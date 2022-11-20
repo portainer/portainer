@@ -4,7 +4,7 @@ import { useLicenseInfo } from '@/portainer/license-management/use-license.servi
 import { TextTip } from '@@/Tip/TextTip';
 import { InformationPanel } from '@@/InformationPanel';
 
-import { useNodesCount } from '../status/useNodesCount';
+import { useNodesCount } from '../system/useNodesCount';
 
 export function LicenseNodePanel() {
   const nodesValid = useNodesValid();

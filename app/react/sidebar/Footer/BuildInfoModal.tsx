@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Database, Hash, Server, Tag, Tool } from 'react-feather';
 import { DialogOverlay } from '@reach/dialog';
 
-import { useSystemStatus } from '@/react/portainer/status/useSystemStatus';
-import { useSystemVersion } from '@/react/portainer/status/useSystemVersion';
+import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
+import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
 
 import { Button } from '@@/buttons';
 
