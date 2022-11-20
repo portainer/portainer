@@ -20,6 +20,7 @@ export function SettingsViewModel(data) {
   this.EnforceEdgeID = data.EnforceEdgeID;
   this.AgentSecret = data.AgentSecret;
   this.EdgePortainerUrl = data.EdgePortainerUrl;
+  this.ShowKomposeBuildOption = data.ShowKomposeBuildOption;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -36,6 +37,7 @@ export function PublicSettingsViewModel(settings) {
   this.Features = settings.Features;
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
   this.DefaultRegistry = settings.DefaultRegistry;
+  this.ShowKomposeBuildOption = settings.ShowKomposeBuildOption;
 }
 
 export function InternalAuthSettingsViewModel(data) {
