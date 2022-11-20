@@ -18,7 +18,7 @@ const initialValues: FormValues = {
   license: '',
 };
 
-export function LicenseDialog({
+export function UploadLicenseDialog({
   onDismiss,
   goToLoading,
 }: {

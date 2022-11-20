@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { LicenseDialog } from './LicenseDialog';
+import { UploadLicenseDialog } from './UploadLicenseDialog';
 import { LoadingDialog } from './LoadingDialog';
 
 type Step = 'uploadLicense' | 'loading' | 'getLicense';
@@ -19,7 +19,7 @@ export function UpgradeDialog({ onDismiss }: { onDismiss: () => void }) {
       // return <GetLicense setCurrentStep={setCurrentStep} />;
       case 'uploadLicense':
         return (
-          <LicenseDialog
+          <UploadLicenseDialog
             goToLoading={() => setCurrentStep('loading')}
             onDismiss={onDismiss}
           />
