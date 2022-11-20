@@ -223,10 +223,8 @@ class KubernetesConfigureController {
         }
       });
       await Promise.all(storagePromises);
-
+      this.$state.reload();
       this.Notifications.success('Success', 'Configuration successfully applied');
-
-      this.$state.go('portainer.home');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to apply configuration');
     } finally {

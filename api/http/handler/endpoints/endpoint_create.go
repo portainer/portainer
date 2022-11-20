@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type endpointCreatePayload struct {
@@ -244,6 +245,22 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		for _, stackID := range relatedEdgeStacks {
 			relationObject.EdgeStacks[stackID] = true
 		}
+	} else if endpointutils.IsKubernetesEndpoint(endpoint) {
+		endpointutils.InitialIngressClassDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
+		endpointutils.InitialMetricsDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
+		endpointutils.InitialStorageDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
 	}
 
 	err = handler.DataStore.EndpointRelation().Create(relationObject)
