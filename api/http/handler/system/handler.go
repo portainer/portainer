@@ -30,6 +30,11 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status, demo
 
 	router := h.PathPrefix("/system").Subrouter()
 
+	adminRouter := router.PathPrefix("/").Subrouter()
+	adminRouter.Use(bouncer.AdminAccess)
+
+	adminRouter.Handle("/upgrade", httperror.LoggerHandler(h.systemUpgrade)).Methods(http.MethodPost)
+
 	authenticatedRouter := router.PathPrefix("/").Subrouter()
 	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
 
@@ -42,6 +47,7 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status, demo
 
 	publicRouter.Handle("/status", httperror.LoggerHandler(h.systemStatus)).Methods(http.MethodGet)
 
+	// Deprecated /status endpoint, will be removed in the future.
 	h.Handle("/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspectDeprecated))).Methods(http.MethodGet)
 	h.Handle("/status/version",
