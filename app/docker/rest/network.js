@@ -4,8 +4,7 @@ angular.module('portainer.docker').factory('Network', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  'NetworksInterceptor',
-  function NetworkFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, NetworksInterceptor) {
+  function NetworkFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return $resource(
       API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/networks/:id/:action',
@@ -17,7 +16,6 @@ angular.module('portainer.docker').factory('Network', [
         query: {
           method: 'GET',
           isArray: true,
-          interceptor: NetworksInterceptor,
         },
         get: {
           method: 'GET',
