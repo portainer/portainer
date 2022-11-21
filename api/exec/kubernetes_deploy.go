@@ -49,7 +49,7 @@ func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *
 		return "", err
 	}
 
-	tokenCache := deployer.kubernetesTokenCacheManager.GetOrCreateTokenCache(int(endpoint.ID))
+	tokenCache := deployer.kubernetesTokenCacheManager.GetOrCreateTokenCache(endpoint.ID)
 
 	tokenManager, err := kubernetes.NewTokenManager(kubeCLI, deployer.dataStore, tokenCache, setLocalAdminToken)
 	if err != nil {
