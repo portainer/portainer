@@ -6,8 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api/http/handler/utils"
 )
 
 type systemUpgradePayload struct {
@@ -37,7 +37,7 @@ func (payload *systemUpgradePayload) Validate(r *http.Request) error {
 // @success 200 {object} status "Success"
 // @router /system/upgrade [post]
 func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	payload, err := utils.GetPayload[systemUpgradePayload](r)
+	payload, err := request.GetPayload[systemUpgradePayload](r)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}

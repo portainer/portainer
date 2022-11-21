@@ -38,11 +38,11 @@ require (
 	github.com/portainer/docker-compose-wrapper v0.0.0-20220708023447-a69a4ebaa021
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
 	github.com/portainer/libhelm v0.0.0-20221018213433-5ad83b50dbc9
-	github.com/portainer/libhttp v0.0.0-20220916153711-5d61e12f4b0a
+	github.com/portainer/libhttp v0.0.0-20221121135534-76f46e09c9a9
 	github.com/rkl-/digest v0.0.0-20180419075440-8316caa4a777
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.28.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.1
 	github.com/viney-shih/go-lock v1.1.1
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
