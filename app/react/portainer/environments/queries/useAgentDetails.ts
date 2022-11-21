@@ -4,7 +4,7 @@ import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 export function useAgentDetails() {
   const settingsQuery = useSettings();
 
-  const versionQuery = useSystemStatus((status) => status.Version);
+  const versionQuery = useSystemStatus({ select: (status) => status.Version });
 
   if (!versionQuery.isSuccess || !settingsQuery.isSuccess) {
     return null;
