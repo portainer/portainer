@@ -40,7 +40,7 @@
   <div class="row">
     <div class="col-sm-12">
       <rd-widget ng-if="ctrl.availableUsersAndTeams">
-        <rd-widget-header icon="svg-userlock" title-text="Create access"></rd-widget-header>
+        <rd-widget-header icon="user-x" title-text="Create access"></rd-widget-header>
         <rd-widget-body>
           <form class="form-horizontal">
             <div class="form-group">
@@ -95,7 +95,7 @@
       <access-datatable
         ng-if="ctrl.authorizedUsersAndTeams"
         title-text="Namespace access"
-        title-icon="svg-userlock"
+        title-icon="user-x"
         table-key="kubernetes_resourcepool_access"
         order-by="Name"
         dataset="ctrl.authorizedUsersAndTeams"

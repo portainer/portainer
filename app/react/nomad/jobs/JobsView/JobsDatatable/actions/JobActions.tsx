@@ -1,5 +1,5 @@
 import { useMutation } from 'react-query';
-import { Trash2 } from 'react-feather';
+import { Trash2 } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Job } from '@/react/nomad/types';

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { BarChart, FileText, Info, Paperclip, Terminal } from 'react-feather';
+import { BarChart, FileText, Info, Paperclip, Terminal } from 'lucide-react';
 
 import { ContainerStatus } from '@/react/docker/containers/types';
 import { Authorized } from '@/react/hooks/useUser';

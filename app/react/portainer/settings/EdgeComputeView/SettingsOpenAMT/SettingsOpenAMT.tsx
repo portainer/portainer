@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
 import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
-import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';

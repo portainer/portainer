@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { Check, X } from 'react-feather';
+import { Check, X } from 'lucide-react';
 
 import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';

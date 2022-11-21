@@ -1,7 +1,7 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
 import { FormikErrors } from 'formik';
-import { ArrowDown, ArrowUp, Trash2 } from 'react-feather';
+import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 
 import { AddButton, Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';

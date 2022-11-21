@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { Boxes } from 'lucide-react';
 
 import { DockerContainer } from '@/react/docker/containers/types';
 import { Environment } from '@/react/portainer/environments/types';
@@ -7,7 +8,6 @@ import { useColumns } from '@/react/docker/containers/ListView/ContainersDatatab
 import { ContainersDatatableActions } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableActions';
 import { ContainersDatatableSettings } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableSettings';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
-import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
@@ -56,7 +56,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
     <RowProvider context={{ environment }}>
       <Datatable
         titleOptions={{
-          icon: Cubes,
+          icon: Boxes,
           title: 'Containers',
         }}
         settingsStore={settings}

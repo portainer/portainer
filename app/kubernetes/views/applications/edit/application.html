@@ -156,7 +156,7 @@
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading>
-                <pr-icon icon="'svg-compress'"></pr-icon> Placement
+                <pr-icon icon="'minimize-2'"></pr-icon> Placement
                 <div ng-if="ctrl.state.placementWarning" class="vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   warning
@@ -168,7 +168,7 @@
               </div>
               <kubernetes-application-placements-datatable
                 title-text="Placement constraints/preferences"
-                title-icon="svg-compress"
+                title-icon="minimize-2"
                 dataset="ctrl.placements"
                 table-key="kubernetes.application.placements"
                 order-by="Name"
@@ -180,7 +180,7 @@
 
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading>
-                <pr-icon icon="'svg-clockrewind'"></pr-icon> Events
+                <pr-icon icon="'history'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()" class="vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
@@ -188,7 +188,7 @@
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="svg-clockrewind"
+                title-icon="history"
                 dataset="ctrl.events"
                 table-key="kubernetes.application.events"
                 order-by="Date"
@@ -350,7 +350,7 @@
                 <td data-cy="k8sAppDetail-containerName">
                   {{ container.Name }}
                   <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT">
-                    <pr-icon icon="'svg-asterisk'"></pr-icon>
+                    <pr-icon icon="'asterisk'"></pr-icon>
                     {{ envvar.valueFrom.fieldRef.fieldPath }} (<a href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/" target="_blank">init container</a
                     >)</span
                   >
@@ -365,7 +365,7 @@
                     ><pr-icon icon="'key'" class="mr-1"></pr-icon>{{ envvar.valueFrom.secretKeyRef.key }}</span
                   >
                   <span ng-if="envvar.valueFrom.fieldRef" data-cy="k8sAppDetail-envVarValue"
-                    ><pr-icon icon="'svg-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                    ><pr-icon icon="'asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                       href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
                       target="_blank"
                       >downward API</a
@@ -402,7 +402,7 @@
                 <td>
                   {{ container.Name }}
                   <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
-                    ><pr-icon icon="'svg-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                    ><pr-icon icon="'asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                       href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
                       target="_blank"
                       >init container</a
@@ -482,7 +482,7 @@
                   <td>
                     {{ container.Name }}
                     <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
-                      ><pr-icon icon="'svg-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      ><pr-icon icon="'asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                         href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
                         target="_blank"
                         >init container</a

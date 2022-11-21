@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Terminal } from 'react-feather';
+import { Terminal } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';

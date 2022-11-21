@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import { Download } from 'react-feather';
+import { Download } from 'lucide-react';
 
 import { LoadingButton } from './LoadingButton';
 

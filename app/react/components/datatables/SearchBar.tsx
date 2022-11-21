@@ -1,4 +1,4 @@
-import { Search } from 'react-feather';
+import { Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
 
@@ -21,7 +21,7 @@ export function SearchBar({
 
   return (
     <div className="searchBar items-center flex min-w-[90px]">
-      <Search className="searchIcon feather shrink-0" />
+      <Search className="searchIcon lucide shrink-0" />
       <input
         type="text"
         className="searchInput"

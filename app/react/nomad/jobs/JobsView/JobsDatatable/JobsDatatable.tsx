@@ -8,10 +8,10 @@ import {
   useTable,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+import { Boxes } from 'lucide-react';
 
 import { Job } from '@/react/nomad/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
-import Cubes from '@/assets/ico/cubes.svg?c';
 
 import { PaginationControls } from '@@/PaginationControls';
 import {
@@ -105,7 +105,7 @@ export function JobsDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon={Cubes} label="Nomad Jobs">
+      <TableTitle icon={Boxes} label="Nomad Jobs">
         <TableTitleActions>
           <TableSettingsMenu>
             <JobsDatatableSettings />

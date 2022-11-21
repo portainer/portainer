@@ -1,4 +1,4 @@
-import { User } from 'react-feather';
+import { User } from 'lucide-react';
 
 import { render } from '@/react-tools/test-utils';
 

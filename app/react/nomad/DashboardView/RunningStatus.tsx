@@ -1,4 +1,4 @@
-import { Power } from 'react-feather';
+import { Power } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

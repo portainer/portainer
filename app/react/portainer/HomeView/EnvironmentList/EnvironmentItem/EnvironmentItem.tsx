@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import _ from 'lodash';
-import { Edit2, Tag, Cpu } from 'react-feather';
+import { Edit2, Tag, Cpu } from 'lucide-react';
 
 import {
   isoDateFromTimestamp,

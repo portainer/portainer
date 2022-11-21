@@ -1,7 +1,7 @@
 import { Formik, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';

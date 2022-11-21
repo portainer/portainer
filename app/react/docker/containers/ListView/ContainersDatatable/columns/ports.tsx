@@ -1,6 +1,6 @@
 import { Column } from 'react-table';
 import _ from 'lodash';
-import { ExternalLink } from 'react-feather';
+import { ExternalLink } from 'lucide-react';
 
 import type { DockerContainer, Port } from '@/react/docker/containers/types';
 

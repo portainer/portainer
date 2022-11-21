@@ -1,4 +1,4 @@
-import { Box, Clock, Grid, Layers } from 'react-feather';
+import { Box, Clock, LayoutGrid, Layers } from 'lucide-react';
 
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
@@ -15,7 +15,7 @@ export function EdgeComputeSidebar() {
       <SidebarItem
         to="edge.groups"
         label="Edge Groups"
-        icon={Grid}
+        icon={LayoutGrid}
         data-cy="portainerSidebar-edgeGroups"
       />
       <SidebarItem

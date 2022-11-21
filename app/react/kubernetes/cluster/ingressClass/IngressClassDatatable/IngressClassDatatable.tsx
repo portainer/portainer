@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle } from 'react-feather';
+import { AlertTriangle } from 'lucide-react';
 
 import { confirmWarn } from '@/portainer/services/modal.service/confirm';
 

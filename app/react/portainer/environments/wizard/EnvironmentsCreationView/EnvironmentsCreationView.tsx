@@ -2,7 +2,7 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useState } from 'react';
 import _ from 'lodash';
 import clsx from 'clsx';
-import { ArrowLeft, ArrowRight } from 'react-feather';
+import { ArrowLeft, ArrowRight, Wand2 } from 'lucide-react';
 
 import { notifyError } from '@/portainer/services/notifications';
 import {
@@ -10,7 +10,6 @@ import {
   EnvironmentId,
 } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import Magic from '@/assets/ico/magic.svg?c';
 
 import { Stepper } from '@@/Stepper';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -73,7 +72,7 @@ export function EnvironmentCreationView() {
 
       <div className={styles.wizardWrapper}>
         <Widget>
-          <WidgetTitle icon={Magic} title="Environment Wizard" />
+          <WidgetTitle icon={Wand2} title="Environment Wizard" />
           <WidgetBody>
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 

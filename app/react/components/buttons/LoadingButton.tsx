@@ -1,6 +1,5 @@
 import { PropsWithChildren, ReactNode } from 'react';
-
-import CircleNotch from '@/assets/ico/circle-notch.svg?c';
+import { Loader2 } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 
@@ -39,7 +38,7 @@ function loadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
   }
   return (
     <Icon
-      icon={CircleNotch}
+      icon={Loader2}
       className="animate-spin-slow ml-1"
       aria-label="loading"
     />

@@ -1,4 +1,4 @@
-import { Grid } from 'react-feather';
+import { LayoutGrid } from 'lucide-react';
 
 import Linux from '@/assets/ico/linux.svg?c';
 
@@ -34,7 +34,7 @@ export function OsSelector({ onChange, value }: Props) {
               value: 'win',
               label: (
                 <>
-                  <Icon icon={Grid} className="mr-1" />
+                  <Icon icon={LayoutGrid} className="mr-1" />
                   Windows
                 </>
               ),

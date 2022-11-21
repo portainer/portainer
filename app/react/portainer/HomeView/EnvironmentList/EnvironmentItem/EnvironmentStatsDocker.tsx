@@ -7,7 +7,7 @@ import {
   Box,
   Power,
   Heart,
-} from 'react-feather';
+} from 'lucide-react';
 
 import {
   DockerSnapshot,

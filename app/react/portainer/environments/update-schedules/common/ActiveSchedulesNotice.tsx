@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Clock } from 'react-feather';
+import { Clock } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
@@ -100,7 +100,7 @@ function ActiveSchedulesNoticeItem({
 }) {
   return (
     <div className="flex items-center gap-1 text-sm">
-      <Clock className="feather" />
+      <Clock className="lucide" />
       {scheduleCount} edge devices in {name} are scheduled for{' '}
       {scheduleType === ScheduleType.Rollback ? 'rollback' : 'update'} from{' '}
       {currentVersion} to {version}

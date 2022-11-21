@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useMemo } from 'react';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
-import { Check, Filter } from 'react-feather';
+import { Check, Filter } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

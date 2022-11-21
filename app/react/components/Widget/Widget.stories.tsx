@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import type { Meta } from '@storybook/react';
-import { User } from 'react-feather';
+import { User } from 'lucide-react';
 
 import { Widget } from './Widget';
 import { WidgetBody } from './WidgetBody';

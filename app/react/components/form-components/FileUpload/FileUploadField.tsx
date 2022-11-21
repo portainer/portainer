@@ -1,5 +1,5 @@
 import { ChangeEvent, createRef } from 'react';
-import { XCircle } from 'react-feather';
+import { XCircle } from 'lucide-react';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';

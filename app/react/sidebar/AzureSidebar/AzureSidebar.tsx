@@ -1,4 +1,4 @@
-import { Box } from 'react-feather';
+import { Box } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 

@@ -1,4 +1,4 @@
-import { AlertTriangle, Check } from 'react-feather';
+import { AlertTriangle, Check } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 

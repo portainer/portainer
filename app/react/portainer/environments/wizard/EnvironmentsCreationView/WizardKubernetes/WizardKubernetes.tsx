@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, Cloud, UploadCloud } from 'react-feather';
+import { Zap, Cloud, UploadCloud } from 'lucide-react';
 
 import {
   Environment,

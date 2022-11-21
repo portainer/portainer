@@ -7,7 +7,7 @@ import {
   useTable,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { Box } from 'react-feather';
+import { Box } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';

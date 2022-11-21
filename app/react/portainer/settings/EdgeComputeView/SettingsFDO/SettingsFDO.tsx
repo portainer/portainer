@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
-import Laptop from '@/assets/ico/laptop.svg?c';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';

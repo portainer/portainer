@@ -5,7 +5,7 @@ import {
   useTable,
 } from 'react-table';
 import { useMemo, useState } from 'react';
-import { UserPlus, Users } from 'react-feather';
+import { UserPlus, Users } from 'lucide-react';
 
 import { User, UserId } from '@/portainer/users/types';
 import { useUser } from '@/react/hooks/useUser';

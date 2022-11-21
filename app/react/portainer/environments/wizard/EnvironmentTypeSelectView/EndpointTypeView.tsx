@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useRouter } from '@uirouter/react';
 import _ from 'lodash';
+import { Wand2 } from 'lucide-react';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import Magic from '@/assets/ico/magic.svg?c';
 
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';
@@ -34,7 +34,7 @@ export function EnvironmentTypeSelectView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle icon={Magic} title="Environment Wizard" />
+            <WidgetTitle icon={Wand2} title="Environment Wizard" />
             <WidgetBody>
               <EnvironmentSelector
                 value={types}

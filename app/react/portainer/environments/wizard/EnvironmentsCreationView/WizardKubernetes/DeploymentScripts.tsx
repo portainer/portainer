@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Info } from 'react-feather';
+import { Info } from 'lucide-react';
 
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';

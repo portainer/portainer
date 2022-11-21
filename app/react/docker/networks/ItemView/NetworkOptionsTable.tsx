@@ -1,4 +1,4 @@
-import { Share2 } from 'react-feather';
+import { Share2 } from 'lucide-react';
 
 import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';

@@ -1,5 +1,6 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
+import { Plug2 } from 'lucide-react';
 
 import { useCreateRemoteEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
@@ -8,7 +9,6 @@ import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
-import Plug from '@/assets/ico/plug.svg?c';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -83,7 +83,7 @@ export function APIForm({ onCreate }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
-                icon={Plug}
+                icon={Plug2}
               >
                 Connect
               </LoadingButton>

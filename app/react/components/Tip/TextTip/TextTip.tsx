@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
-import { AlertCircle } from 'react-feather';
+import { AlertCircle } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

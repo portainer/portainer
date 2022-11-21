@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Share2, Trash2 } from 'react-feather';
+import { Share2, Trash2 } from 'lucide-react';
 
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
 import { Authorized } from '@/react/hooks/useUser';

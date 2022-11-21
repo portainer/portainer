@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import { PropsWithChildren } from 'react';
-import { Play, RefreshCw, Square, Trash2 } from 'react-feather';
+import { Play, RefreshCw, Square, Trash2 } from 'lucide-react';
 
 import { Button } from './Button';
 import { ButtonGroup, Props } from './ButtonGroup';

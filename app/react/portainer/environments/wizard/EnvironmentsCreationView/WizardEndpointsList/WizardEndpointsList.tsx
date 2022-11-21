@@ -1,3 +1,5 @@
+import { Plug2 } from 'lucide-react';
+
 import {
   environmentTypeIcon,
   endpointTypeName,
@@ -12,7 +14,6 @@ import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
-import Plug from '@/assets/ico/plug.svg?c';
 
 import { EdgeIndicator } from '@@/EdgeIndicator';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -44,7 +45,7 @@ export function WizardEndpointsList({ environmentIds }: Props) {
 
   return (
     <Widget>
-      <WidgetTitle icon={Plug} title="New Environments" />
+      <WidgetTitle icon={Plug2} title="New Environments" />
       <WidgetBody>
         {environments.map((environment) => (
           <div className={styles.wizardListWrapper} key={environment.Id}>

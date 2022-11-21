@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { Row } from 'react-table';
-import { ChevronDown, ChevronRight } from 'react-feather';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 

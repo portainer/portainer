@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { Clock } from 'react-feather';
+import { Clock } from 'lucide-react';
 
 import { Job } from '@/react/nomad/types';
 
@@ -19,7 +19,7 @@ export function ActionsCell({ row }: CellProps<Job>) {
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <div className="text-center" {...row.getToggleRowExpandedProps()}>
-      <Clock className="feather" />
+      <Clock className="lucide" />
     </div>
   );
 }

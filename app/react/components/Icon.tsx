@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { ComponentType, ReactNode } from 'react';
-import * as featherIcons from 'react-feather';
+import * as lucideIcons from 'lucide-react';
 import { isValidElementType } from 'react-is';
 
 import Svg, { SvgIcons } from './Svg';
@@ -67,8 +67,10 @@ export function Icon({ icon, className, mode, size }: Props) {
   const iconName = icon
     .split('-')
     .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
-    .join('') as keyof typeof featherIcons;
-  const IconComponent = featherIcons[iconName];
+    .join('') as keyof typeof lucideIcons;
+  const IconComponent = lucideIcons[iconName] as React.FC<
+    React.SVGProps<SVGSVGElement>
+  >;
   if (!IconComponent) {
     // console error so that the error is logged but no functionality is broken
     // eslint-disable-next-line no-console

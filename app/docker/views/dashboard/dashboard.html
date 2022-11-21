@@ -32,7 +32,7 @@
   <div class="row" ng-if="(!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') && info && endpoint">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="svg-tachometer" title-text="Environment info"></rd-widget-header>
+        <rd-widget-header icon="gauge" title-text="Environment info"></rd-widget-header>
         <rd-widget-body classes="!px-5 !py-0">
           <table class="table">
             <tbody>
@@ -46,8 +46,7 @@
                   </span>
                   <span class="small text-muted">
                     - {{ info.Swarm && info.Swarm.NodeID !== '' ? 'Swarm' : 'Standalone' }} {{ info.ServerVersion }}
-                    <span ng-if="endpoint.Type === 2"
-                      >+
+                    <span ng-if="endpoint.Type === 2">
                       <pr-icon icon="'zap'"></pr-icon>
                       Agent</span
                     ></span
