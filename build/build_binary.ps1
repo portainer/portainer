@@ -12,7 +12,6 @@ New-Item -Name dist -Path "$project_path" -ItemType Directory | Out-Null
 Set-Location -Path "$project_path\api\cmd\portainer"
 
 # copy templates
-cp -r "./mustache-templates" "./dist"
 Copy-Item -Path "./mustache-templates" -Destination "./dist" -Recurse
 
 
