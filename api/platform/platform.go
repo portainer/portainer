@@ -1,6 +1,12 @@
 package platform
 
-import "os"
+import (
+	"context"
+	"os"
+
+	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
+)
 
 const (
 	PodmanMode            = "PODMAN"
@@ -12,33 +18,63 @@ const (
 type ContainerPlatform string
 
 const (
-	// PlatformDocker represent the Docker platform (Standalone/Swarm)
-	PlatformDocker = ContainerPlatform("Docker")
+	// PlatformDockerStandalone represent the Docker platform (Standalone)
+	PlatformDockerStandalone = ContainerPlatform("Docker")
+	// PlatformDockerSwarm represent the Docker platform (Swarm)
+	PlatformDockerSwarm = ContainerPlatform("Docker Swarm")
 	// PlatformKubernetes represent the Kubernetes platform
 	PlatformKubernetes = ContainerPlatform("Kubernetes")
 	// PlatformPodman represent the Podman platform (Standalone)
 	PlatformPodman = ContainerPlatform("Podman")
 	// PlatformNomad represent the Nomad platform (Standalone)
 	PlatformNomad = ContainerPlatform("Nomad")
+	// PlatformNone represents that binary runs outside of any container
+	PlatformNone = ContainerPlatform("None")
 )
 
 // DetermineContainerPlatform will check for the existence of the PODMAN_MODE
 // or KUBERNETES_SERVICE_HOST environment variable to determine if
 // the container is running on Podman or inside the Kubernetes platform.
 // Defaults to Docker otherwise.
-func DetermineContainerPlatform() ContainerPlatform {
+func DetermineContainerPlatform() (ContainerPlatform, error) {
 	podmanModeEnvVar := os.Getenv(PodmanMode)
 	if podmanModeEnvVar == "1" {
-		return PlatformPodman
+		return PlatformPodman, nil
 	}
 	serviceHostKubernetesEnvVar := os.Getenv(KubernetesServiceHost)
 	if serviceHostKubernetesEnvVar != "" {
-		return PlatformKubernetes
+		return PlatformKubernetes, nil
 	}
 	nomadJobName := os.Getenv(NomadJobName)
 	if nomadJobName != "" {
-		return PlatformNomad
+		return PlatformNomad, nil
 	}
 
-	return PlatformDocker
+	dockerCli, err := client.NewClientWithOpts()
+	if err != nil {
+		return "", errors.WithMessage(err, "failed to create docker client")
+	}
+	defer dockerCli.Close()
+
+	if !isRunningInContainer() {
+		return PlatformNone, nil
+	}
+
+	info, err := dockerCli.Info(context.Background())
+	if err != nil {
+		return "", errors.WithMessage(err, "failed to retrieve docker info")
+	}
+
+	if info.Swarm.NodeID == "" {
+		return PlatformDockerStandalone, nil
+	}
+
+	return PlatformDockerSwarm, nil
+}
+
+// isRunningInContainer returns true if the process is running inside a container
+// this code is taken from https://github.com/moby/libnetwork/blob/master/drivers/bridge/setup_bridgenetfiltering.go
+func isRunningInContainer() bool {
+	_, err := os.Stat("/.dockerenv")
+	return !os.IsNotExist(err)
 }
