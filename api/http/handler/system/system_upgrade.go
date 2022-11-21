@@ -3,7 +3,6 @@ package system
 import (
 	"net/http"
 	"regexp"
-	"time"
 
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
@@ -38,13 +37,15 @@ func (payload *systemUpgradePayload) Validate(r *http.Request) error {
 // @success 200 {object} status "Success"
 // @router /system/upgrade [post]
 func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	_, err := utils.GetPayload[systemUpgradePayload](r)
+	payload, err := utils.GetPayload[systemUpgradePayload](r)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	// TODO: should be removed and replaced with actual update
-	time.Sleep(5 * time.Second)
+	err = handler.upgradeService.Upgrade(payload.License)
+	if err != nil {
+		return httperror.InternalServerError("Unable to upgrade Portainer", err)
+	}
 
 	return response.Empty(w)
 }

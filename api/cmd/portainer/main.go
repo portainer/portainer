@@ -730,6 +730,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Msg("failed to fetch SSL settings from DB")
 	}
 
+	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed initializing upgrade service")
+	}
+
 	// FIXME: In 2.16 we changed the way ingress controller permissions are
 	// stored. Instead of being stored as annotation on an ingress rule, we keep
 	// them in our database. However, in order to run the migration we need an
@@ -781,6 +786,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
 		DemoService:                 demoService,
+		UpgradeService:              upgradeService,
 	}
 }
 
