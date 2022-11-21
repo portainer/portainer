@@ -247,6 +247,15 @@
               <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Redeploy
             </button>
             <button
+              ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
+              type="button"
+              class="btn btn-sm btn-light"
+              style="margin-left: 0"
+              feature-id="$ctrl.limitedFeature"
+            >
+              <pr-icon icon="'recycle'" class="'mr-1'" feather="true"></pr-icon>Rolling Restart
+            </button>
+            <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
               class="btn btn-sm btn-light"

@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
+//import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import {
   KubernetesApplicationDataAccessPolicies,
