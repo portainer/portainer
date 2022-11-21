@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
-import DockerNetworkHelper from 'Docker/helpers/networkHelper';
-import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
-import { confirmDeletionAsync } from 'Portainer/services/modal.service/confirm';
+import DockerNetworkHelper from '@/docker/helpers/networkHelper';
+import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 angular.module('portainer.docker').controller('NetworksController', [
   '$q',
@@ -39,8 +38,6 @@ angular.module('portainer.docker').controller('NetworksController', [
       });
     };
 
-    $scope.offlineMode = false;
-
     $scope.getNetworks = getNetworks;
 
     function groupSwarmNetworksManagerNodesFirst(networks, agents) {
@@ -71,7 +68,6 @@ angular.module('portainer.docker').controller('NetworksController', [
 
       $q.all(req)
         .then((data) => {
-          $scope.offlineMode = isOfflineEndpoint(endpoint);
           const networks = _.forEach(data.networks, (item) => (item.Subs = []));
           if ($scope.applicationState.endpoint.mode.agentProxy && $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
             $scope.networks = groupSwarmNetworksManagerNodesFirst(data.networks, data.agents);

@@ -1,5 +1,5 @@
 <td ng-if="allowCheckbox">
-  <span class="md-checkbox" ng-if="!parentCtrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
+  <span class="md-checkbox" authorization="DockerNetworkDelete, DockerNetworkCreate">
     <input
       id="select_{{ $index }}"
       type="checkbox"
@@ -15,8 +15,7 @@
 </td>
 <td ng-if="!allowCheckbox"></td>
 <td>
-  <a ng-if="!parentCtrl.offlineMode" ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate: 40 }}</a>
-  <span ng-if="parentCtrl.offlineMode">{{ item.Name | truncate: 40 }}</span>
+  <a ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate: 40 }}</a>
   <span style="margin-left: 10px" class="label label-info image-tag space-left" ng-if="item.ResourceControl.System">System</span>
 </td>
 <td>{{ item.StackName ? item.StackName : '-' }}</td>

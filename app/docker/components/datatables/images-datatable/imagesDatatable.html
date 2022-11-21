@@ -21,7 +21,7 @@
             data-cy="image-searchInput"
           />
         </div>
-        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="DockerImageDelete, DockerImageBuild, DockerImageLoad, DockerImageGet">
+        <div class="actionBar !gap-3" authorization="DockerImageDelete, DockerImageBuild, DockerImageLoad, DockerImageGet">
           <div class="btn-group" authorization="DockerImageDelete">
             <button
               type="button"
@@ -128,7 +128,7 @@
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" popover-placement="bottom-left" is-open="$ctrl.filters.state.open">
                 <div class="flex gap-1 items-center">
-                  <span class="md-checkbox" ng-if="!$ctrl.offlineMode">
+                  <span class="md-checkbox">
                     <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                     <label for="select_all"></label>
                   </span>
@@ -208,14 +208,11 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode">
+                <span class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{
-                  item.Id | truncate: 40
-                }}</a>
-                <span ng-if="$ctrl.offlineMode">{{ item.Id | truncate: 40 }}</span>
+                <a ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate: 40 }}</a>
                 <span style="margin-left: 10px" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
               </td>
               <td>

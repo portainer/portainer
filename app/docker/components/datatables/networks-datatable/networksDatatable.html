@@ -21,7 +21,7 @@
             data-cy="network-searchInput"
           />
         </div>
-        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
+        <div class="actionBar !gap-3" authorization="DockerNetworkDelete, DockerNetworkCreate">
           <button
             type="button"
             class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
@@ -84,7 +84,7 @@
           <thead>
             <tr>
               <th style="width: 55px">
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
+                <span class="md-checkbox" authorization="DockerNetworkDelete, DockerNetworkCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>

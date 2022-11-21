@@ -14,7 +14,6 @@ import {
 import {
   type Environment,
   type EnvironmentId,
-  EnvironmentStatus,
 } from '@/react/portainer/environments/types';
 import { Authorized, useUser, isEnvironmentAdmin } from '@/react/hooks/useUser';
 import { useInfo, useVersion } from '@/docker/services/system.service';
@@ -46,8 +45,6 @@ export function DockerSidebar({ environmentId, environment }: Props) {
 
   const isSwarmManager = envInfoQuery.data;
   const apiVersion = envVersionQuery.data || 0;
-
-  const offlineMode = environment.Status === EnvironmentStatus.Down;
 
   const setupSubMenuProps = isSwarmManager
     ? {
@@ -163,7 +160,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         />
       )}
 
-      {!isSwarmManager && isAdmin && !offlineMode && (
+      {!isSwarmManager && isAdmin && (
         <SidebarItem
           to="docker.events"
           params={{ endpointId: environmentId }}

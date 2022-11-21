@@ -1,5 +1,3 @@
-import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
-
 angular.module('portainer.docker').controller('HostViewController', [
   '$q',
   'SystemService',
@@ -16,7 +14,6 @@ angular.module('portainer.docker').controller('HostViewController', [
     ctrl.state = {
       isAgent: false,
       isAdmin: false,
-      offlineMode: false,
     };
 
     this.engineDetails = {};
@@ -40,7 +37,6 @@ angular.module('portainer.docker').controller('HostViewController', [
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
-          ctrl.state.offlineMode = isOfflineEndpoint(ctrl.endpoint);
           ctrl.jobs = data.jobs;
 
           if (ctrl.state.isAgent && agentApiVersion > 1 && ctrl.state.enableHostManagementFeatures) {
