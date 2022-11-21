@@ -39,7 +39,3 @@ export default class EndpointHelper {
     }
   }
 }
-
-export function isOfflineEndpoint(endpoint) {
-  return endpoint.Status !== 1;
-}

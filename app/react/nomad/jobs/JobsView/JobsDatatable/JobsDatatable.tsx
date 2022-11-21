@@ -11,7 +11,7 @@ import { useRowSelectColumn } from '@lineup-lite/hooks';
 import { Boxes } from 'lucide-react';
 
 import { Job } from '@/react/nomad/types';
-import { useDebounce } from '@/react/hooks/useDebounce';
+import { useDebouncedValue } from '@/react/hooks/useDebouncedValue';
 
 import { PaginationControls } from '@@/PaginationControls';
 import {
@@ -52,7 +52,7 @@ export function JobsDatatable({
   const { settings, setTableSettings } = useTableSettings<JobsTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarState('jobs');
   const columns = useColumns();
-  const debouncedSearchValue = useDebounce(searchBarValue);
+  const debouncedSearchValue = useDebouncedValue(searchBarValue);
   useRepeater(settings.autoRefreshRate, refreshData);
 
   const {

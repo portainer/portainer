@@ -9,7 +9,7 @@ import {
 import { History } from 'lucide-react';
 
 import { NomadEvent } from '@/react/nomad/types';
-import { useDebounce } from '@/react/hooks/useDebounce';
+import { useDebouncedValue } from '@/react/hooks/useDebouncedValue';
 
 import { PaginationControls } from '@@/PaginationControls';
 import {
@@ -43,7 +43,7 @@ export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
     useTableSettings<EventsTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarState('events');
   const columns = useColumns();
-  const debouncedSearchValue = useDebounce(searchBarValue);
+  const debouncedSearchValue = useDebouncedValue(searchBarValue);
 
   const {
     getTableProps,

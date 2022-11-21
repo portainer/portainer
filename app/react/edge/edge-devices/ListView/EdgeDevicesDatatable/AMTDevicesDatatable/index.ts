@@ -1,0 +1,1 @@
+export { AMTDevicesDatatable } from './AMTDevicesDatatable';

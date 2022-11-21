@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
 import { EdgeTypes, Environment } from '@/react/portainer/environments/types';
-import { useDebounce } from '@/react/hooks/useDebounce';
+import { useDebouncedValue } from '@/react/hooks/useDebouncedValue';
 
 import { useSearchBarState } from '@@/datatables/SearchBar';
 import {
@@ -85,7 +85,7 @@ function Loader({ children, storageKey }: LoaderProps) {
   });
 
   const [search, setSearch] = useSearchBarState(storageKey);
-  const debouncedSearchValue = useDebounce(search);
+  const debouncedSearchValue = useDebouncedValue(search);
 
   const { environments, isLoading, totalCount } = useEnvironmentList(
     {

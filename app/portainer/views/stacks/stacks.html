@@ -1,6 +1,5 @@
 <page-header title="'Stacks list'" breadcrumbs="['Stacks']" reload="true"> </page-header>
 
-<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <stacks-datatable
@@ -10,7 +9,6 @@
       table-key="stacks"
       order-by="Name"
       remove-action="removeAction"
-      offline-mode="offlineMode"
       refresh-callback="getStacks"
       create-enabled="createEnabled"
     ></stacks-datatable>

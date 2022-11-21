@@ -8,7 +8,7 @@ import { ViewLoading } from '@@/ViewLoading';
 
 import { EdgeDevicesDatatableContainer } from './EdgeDevicesDatatable/EdgeDevicesDatatableContainer';
 
-export function EdgeDevicesView() {
+export function ListView() {
   const [loadingMessage, setLoadingMessage] = useState('');
 
   const settingsQuery = useSettings();

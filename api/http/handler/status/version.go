@@ -3,7 +3,6 @@ package status
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
@@ -45,9 +44,10 @@ type BuildInfo struct {
 // @success 200 {object} versionResponse "Success"
 // @router /status/version [get]
 func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
+
 	result := &versionResponse{
 		ServerVersion:   portainer.APIVersion,
-		DatabaseVersion: strconv.Itoa(portainer.DBVersion),
+		DatabaseVersion: portainer.APIVersion,
 		Build: BuildInfo{
 			BuildNumber:    build.BuildNumber,
 			ImageTag:       build.ImageTag,

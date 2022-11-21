@@ -4,7 +4,7 @@ import { Plug2 } from 'lucide-react';
 import { Environment } from '@/react/portainer/environments/types';
 import { useCreateEdgeAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { baseHref } from '@/portainer/helpers/pathHelper';
-import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
+import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { useCreateEdgeDeviceParam } from '@/react/portainer/environments/wizard/hooks/useCreateEdgeDeviceParam';
 
 import { FormSection } from '@@/form-components/FormSection';

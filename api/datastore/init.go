@@ -1,18 +1,12 @@
 package datastore
 
 import (
-	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
 )
 
 // Init creates the default data set.
 func (store *Store) Init() error {
-	err := store.checkOrCreateInstanceID()
-	if err != nil {
-		return err
-	}
-
-	err = store.checkOrCreateDefaultSettings()
+	err := store.checkOrCreateDefaultSettings()
 	if err != nil {
 		return err
 	}
@@ -23,21 +17,6 @@ func (store *Store) Init() error {
 	}
 
 	return store.checkOrCreateDefaultData()
-}
-
-func (store *Store) checkOrCreateInstanceID() error {
-	_, err := store.VersionService.InstanceID()
-	if store.IsErrObjectNotFound(err) {
-		uid, err := uuid.NewV4()
-		if err != nil {
-			return err
-		}
-
-		instanceID := uid.String()
-		return store.VersionService.StoreInstanceID(instanceID)
-	}
-
-	return err
 }
 
 func (store *Store) checkOrCreateDefaultSettings() error {
