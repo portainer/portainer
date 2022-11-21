@@ -1451,9 +1451,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.16.1"
+	APIVersion = "2.16.2"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 71
+	DBVersion = 72
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
