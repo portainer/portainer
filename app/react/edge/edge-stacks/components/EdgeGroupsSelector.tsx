@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
-import { Select } from '@@/form-components/ReactSelect';
+import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
-import { EdgeGroup } from '../edge-groups/types';
+import { Select } from '@@/form-components/ReactSelect';
 
 type SingleValue = EdgeGroup['Id'];
 

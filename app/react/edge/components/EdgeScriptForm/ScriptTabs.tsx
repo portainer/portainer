@@ -16,6 +16,7 @@ interface Props {
   commands: CommandTab[];
   platform?: Platform;
   onPlatformChange?(platform: Platform): void;
+  hideAsyncMode?: boolean;
 }
 
 export function ScriptTabs({
@@ -24,6 +25,7 @@ export function ScriptTabs({
   edgeId,
   commands,
   platform,
+  hideAsyncMode = false,
   onPlatformChange = () => {},
 }: Props) {
   const agentDetails = useAgentDetails();
@@ -38,10 +40,17 @@ export function ScriptTabs({
     return null;
   }
 
-  const { agentSecret, agentVersion } = agentDetails;
+  const { agentSecret, agentVersion, useEdgeAsyncMode } = agentDetails;
 
   const options = commands.map((c) => {
-    const cmd = c.command(agentVersion, edgeKey, values, edgeId, agentSecret);
+    const cmd = c.command(
+      agentVersion,
+      edgeKey,
+      values,
+      !hideAsyncMode && useEdgeAsyncMode,
+      edgeId,
+      agentSecret
+    );
 
     return {
       id: c.id,
