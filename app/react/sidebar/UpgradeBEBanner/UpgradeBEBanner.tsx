@@ -2,29 +2,24 @@ import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import {
-  useFeatureFlag,
-  FeatureFlag,
-} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
 import { useSystemInfo } from '@/react/portainer/system/useSystemInfo';
+import { useUser } from '@/react/hooks/useUser';
+import { withEdition } from '@/react/portainer/feature-flags/withEdition';
+import { withFeatureFlag } from '@/react/portainer/feature-flags/withFeatureFlag';
+import { FeatureFlag } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
+import { withHideOnExtension } from '@/react/hooks/withHideOnExtension';
 
 import { useSidebarState } from '../useSidebarState';
 
 import { UpgradeDialog } from './UpgradeDialog';
 
-export function UpgradeBEBanner() {
-  const { data } = useFeatureFlag(FeatureFlag.BEUpgrade, { enabled: !isBE });
+export const UpgradeBEBannerWrapper = withHideOnExtension(
+  withEdition(withFeatureFlag(UpgradeBEBanner, FeatureFlag.BEUpgrade), 'CE')
+);
 
-  if (isBE || !data) {
-    return null;
-  }
-
-  return <Inner />;
-}
-
-function Inner() {
+function UpgradeBEBanner() {
+  const { isAdmin } = useUser();
   const { trackEvent } = useAnalytics();
   const { isOpen: isSidebarOpen } = useSidebarState();
   const nodesCountQuery = useNodesCount();
@@ -68,10 +63,13 @@ function Inner() {
   );
 
   function handleClick() {
-    trackEvent('portainer-upgrade-admin', {
-      category: 'portainer',
-      metadata,
-    });
+    trackEvent(
+      isAdmin ? 'portainer-upgrade-admin' : 'portainer-upgrade-non-admin',
+      {
+        category: 'portainer',
+        metadata,
+      }
+    );
     setIsOpen(true);
   }
 }

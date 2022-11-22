@@ -1,1 +1,1 @@
-export { UpgradeBEBanner } from './UpgradeBEBanner';
+export { UpgradeBEBannerWrapper } from './UpgradeBEBanner';
