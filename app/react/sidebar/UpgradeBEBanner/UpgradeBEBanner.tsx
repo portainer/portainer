@@ -48,6 +48,10 @@ function Inner() {
     agents: systemInfo.agents,
   };
 
+  if (systemInfo.platform !== 'Docker Standalone') {
+    return null;
+  }
+
   return (
     <>
       <button

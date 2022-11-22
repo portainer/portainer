@@ -1,9 +1,14 @@
 import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 
 import { Modal } from '@@/modals/Modal';
 import { Icon } from '@@/Icon';
 
 export function LoadingDialog() {
+  useWaitForServerStatus();
+
   return (
     <Modal aria-label="Upgrade Portainer to Business Edition">
       <Modal.Body>
@@ -23,4 +28,25 @@ export function LoadingDialog() {
       </Modal.Body>
     </Modal>
   );
+}
+
+function useWaitForServerStatus() {
+  const [enabled, setEnabled] = useState(false);
+  useSystemStatus({
+    enabled,
+    retry: true,
+    onSuccess() {
+      window.location.reload();
+    },
+  });
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setEnabled(true);
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  });
 }

@@ -13,6 +13,8 @@ mkdir -p ${GOPATH}/src/github.com/portainer/portainer
 
 cp -R api ${GOPATH}/src/github.com/portainer/portainer/api
 
+cp -r "./mustache-templates" "./dist"
+
 cd 'api/cmd/portainer'
 
 go get -t -d -v ./...
@@ -29,3 +31,4 @@ if [ "${PLATFORM}" == 'windows' ]; then
 else
   mv "$BUILD_SOURCESDIRECTORY/api/cmd/portainer/$binary" "$BUILD_SOURCESDIRECTORY/dist/portainer"
 fi
+
