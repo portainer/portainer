@@ -8,17 +8,17 @@ import { useUser } from '@/react/hooks/useUser';
 import { withEdition } from '@/react/portainer/feature-flags/withEdition';
 import { withFeatureFlag } from '@/react/portainer/feature-flags/withFeatureFlag';
 import { FeatureFlag } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
+import { withHideOnExtension } from '@/react/hooks/withHideOnExtension';
 
 import { useSidebarState } from '../useSidebarState';
 
 import { UpgradeDialog } from './UpgradeDialog';
 
-export const UpgradeBEBanner = withEdition(
-  withFeatureFlag(UpgradeBEBannerInner, FeatureFlag.BEUpgrade),
-  'CE'
+export const UpgradeBEBannerWrapper = withHideOnExtension(
+  withEdition(withFeatureFlag(UpgradeBEBanner, FeatureFlag.BEUpgrade), 'CE')
 );
 
-function UpgradeBEBannerInner() {
+function UpgradeBEBanner() {
   const { isAdmin } = useUser();
   const { trackEvent } = useAnalytics();
   const { isOpen: isSidebarOpen } = useSidebarState();
