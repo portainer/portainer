@@ -5,14 +5,11 @@ import { EdgeTypes } from '@/react/portainer/environments/types';
 
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
-import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { PageHeader } from '@@/PageHeader';
 
-import { DataTable } from './Datatable/Datatable';
-import { TableSettings } from './Datatable/types';
+import { Datatable } from './Datatable';
 
 export function WaitingRoomView() {
-  const storageKey = 'edge-devices-waiting-room';
   const router = useRouter();
   const { environments, isLoading, totalCount } = useEnvironmentList({
     edgeDevice: true,
@@ -44,17 +41,11 @@ export function WaitingRoomView() {
         </TextTip>
       </InformationPanel>
 
-      <TableSettingsProvider<TableSettings>
-        defaults={{ pageSize: 10, sortBy: { desc: false, id: 'name' } }}
-        storageKey={storageKey}
-      >
-        <DataTable
-          devices={environments}
-          totalCount={totalCount}
-          isLoading={isLoading}
-          storageKey={storageKey}
-        />
-      </TableSettingsProvider>
+      <Datatable
+        devices={environments}
+        totalCount={totalCount}
+        isLoading={isLoading}
+      />
     </>
   );
 }

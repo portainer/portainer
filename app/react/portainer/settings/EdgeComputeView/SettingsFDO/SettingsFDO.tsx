@@ -11,7 +11,7 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
 import { Input } from '@@/form-components/Input';
 
-import { FDOProfilesDatatableContainer } from '../FDOProfilesDatatable/FDOProfilesDatatableContainer';
+import { FDOProfilesDatatable } from '../FDOProfilesDatatable';
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
@@ -165,7 +165,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                 Add, Edit and Manage the list of device profiles available
                 during FDO device setup
               </TextTip>
-              <FDOProfilesDatatableContainer isFDOEnabled={initialFDOEnabled} />
+              <FDOProfilesDatatable isFDOEnabled={initialFDOEnabled} />
             </div>
           )}
         </WidgetBody>

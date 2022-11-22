@@ -4,7 +4,7 @@ import { useAuthorizations } from '@/react/hooks/useUser';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
 import { DockerContainer } from '@/react/docker/containers/types';
 
-import { useTableSettings } from '@@/datatables/useZustandTableSettings';
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 import { TableSettings } from '../types';
 
@@ -22,7 +22,7 @@ export const quickActions: Column<DockerContainer> = {
 function QuickActionsCell({
   row: { original: container },
 }: CellProps<DockerContainer>) {
-  const { settings } = useTableSettings<TableSettings>();
+  const settings = useTableSettings<TableSettings>();
 
   const { hiddenQuickActions = [] } = settings;
 

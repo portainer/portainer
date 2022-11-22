@@ -175,159 +175,156 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   return (
     <>
       {totalAvailable === 0 && <NoEnvironmentsInfoPanel isAdmin={isAdmin} />}
-      <div className="row">
-        <div className="col-sm-12">
-          <TableContainer>
-            <TableTitle icon="hard-drive" featherIcon label="Environments" />
 
-            <TableActions className={styles.actionBar}>
-              <div className={styles.description}>
-                Click on an environment to manage
-              </div>
-              <div className={styles.actionButton}>
-                <div className={styles.refreshButton}>
-                  {isAdmin && (
-                    <Button
-                      onClick={onRefresh}
-                      data-cy="home-refreshEndpointsButton"
-                      size="medium"
-                      color="secondary"
-                      className={clsx(
-                        'vertical-center !ml-0',
-                        styles.refreshEnvironmentsButton
-                      )}
-                    >
-                      <RefreshCcw
-                        className="feather icon-sm icon-white"
-                        aria-hidden="true"
-                      />
-                      Refresh
-                    </Button>
+      <TableContainer>
+        <TableTitle icon="hard-drive" featherIcon label="Environments" />
+
+        <TableActions className={styles.actionBar}>
+          <div className={styles.description}>
+            Click on an environment to manage
+          </div>
+          <div className={styles.actionButton}>
+            <div className={styles.refreshButton}>
+              {isAdmin && (
+                <Button
+                  onClick={onRefresh}
+                  data-cy="home-refreshEndpointsButton"
+                  size="medium"
+                  color="secondary"
+                  className={clsx(
+                    'vertical-center !ml-0',
+                    styles.refreshEnvironmentsButton
                   )}
-                </div>
-                <div className={styles.kubeconfigButton}>
-                  <KubeconfigButton
-                    environments={environments}
-                    envQueryParams={{
-                      ...environmentsQueryParams,
-                      sort: sortByFilter,
-                      order: sortByDescending ? 'desc' : 'asc',
-                    }}
+                >
+                  <RefreshCcw
+                    className="feather icon-sm icon-white"
+                    aria-hidden="true"
                   />
-                </div>
-                <div className={clsx(styles.filterSearchbar, 'ml-3')}>
-                  <FilterSearchBar
-                    value={searchBarValue}
-                    onChange={setSearchBarValue}
-                    placeholder="Search by name, group, tag, status, URL..."
-                    data-cy="home-endpointsSearchInput"
-                  />
-                </div>
-              </div>
-            </TableActions>
-            <div className={styles.filterContainer}>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={platformTypeOptions}
-                  onChange={setPlatformTypes}
-                  placeHolder="Platform"
-                  value={platformTypes}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={connectionTypeOptions}
-                  onChange={setConnectionTypes}
-                  placeHolder="Connection Type"
-                  value={connectionTypes}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={status}
-                  onChange={statusOnChange}
-                  placeHolder="Status"
-                  value={statusState}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={uniqueTag}
-                  onChange={tagOnChange}
-                  placeHolder="Tags"
-                  value={tagState}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={uniqueGroup}
-                  onChange={groupOnChange}
-                  placeHolder="Groups"
-                  value={groupState}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter<string>
-                  filterOptions={
-                    agentVersionsQuery.data?.map((v) => ({
-                      label: v,
-                      value: v,
-                    })) || []
-                  }
-                  onChange={setAgentVersions}
-                  placeHolder="Agent Version"
-                  value={agentVersions}
-                />
-              </div>
-              <button
-                type="button"
-                className={styles.clearButton}
-                onClick={clearFilter}
-              >
-                Clear all
-              </button>
-              <div className={styles.filterRight}>
-                <SortbySelector
-                  filterOptions={sortByOptions}
-                  onChange={sortOnchange}
-                  onDescending={sortOnDescending}
-                  placeHolder="Sort By"
-                  sortByDescending={sortByDescending}
-                  sortByButton={sortByButton}
-                  value={sortByState}
-                />
-              </div>
-            </div>
-            <div className="blocklist" data-cy="home-endpointList">
-              {renderItems(
-                isLoading,
-                totalCount,
-                environments.map((env) => (
-                  <EnvironmentItem
-                    key={env.Id}
-                    environment={env}
-                    groupName={
-                      groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
-                    }
-                    onClick={onClickItem}
-                  />
-                ))
+                  Refresh
+                </Button>
               )}
             </div>
-
-            <TableFooter>
-              <PaginationControls
-                showAll={totalCount <= 100}
-                pageLimit={pageLimit}
-                page={page}
-                onPageChange={setPage}
-                totalCount={totalCount}
-                onPageLimitChange={setPageLimit}
+            <div className={styles.kubeconfigButton}>
+              <KubeconfigButton
+                environments={environments}
+                envQueryParams={{
+                  ...environmentsQueryParams,
+                  sort: sortByFilter,
+                  order: sortByDescending ? 'desc' : 'asc',
+                }}
               />
-            </TableFooter>
-          </TableContainer>
+            </div>
+            <div className={clsx(styles.filterSearchbar, 'ml-3')}>
+              <FilterSearchBar
+                value={searchBarValue}
+                onChange={setSearchBarValue}
+                placeholder="Search by name, group, tag, status, URL..."
+                data-cy="home-endpointsSearchInput"
+              />
+            </div>
+          </div>
+        </TableActions>
+        <div className={styles.filterContainer}>
+          <div className={styles.filterLeft}>
+            <HomepageFilter
+              filterOptions={platformTypeOptions}
+              onChange={setPlatformTypes}
+              placeHolder="Platform"
+              value={platformTypes}
+            />
+          </div>
+          <div className={styles.filterLeft}>
+            <HomepageFilter
+              filterOptions={connectionTypeOptions}
+              onChange={setConnectionTypes}
+              placeHolder="Connection Type"
+              value={connectionTypes}
+            />
+          </div>
+          <div className={styles.filterLeft}>
+            <HomepageFilter
+              filterOptions={status}
+              onChange={statusOnChange}
+              placeHolder="Status"
+              value={statusState}
+            />
+          </div>
+          <div className={styles.filterLeft}>
+            <HomepageFilter
+              filterOptions={uniqueTag}
+              onChange={tagOnChange}
+              placeHolder="Tags"
+              value={tagState}
+            />
+          </div>
+          <div className={styles.filterLeft}>
+            <HomepageFilter
+              filterOptions={uniqueGroup}
+              onChange={groupOnChange}
+              placeHolder="Groups"
+              value={groupState}
+            />
+          </div>
+          <div className={styles.filterLeft}>
+            <HomepageFilter<string>
+              filterOptions={
+                agentVersionsQuery.data?.map((v) => ({
+                  label: v,
+                  value: v,
+                })) || []
+              }
+              onChange={setAgentVersions}
+              placeHolder="Agent Version"
+              value={agentVersions}
+            />
+          </div>
+          <button
+            type="button"
+            className={styles.clearButton}
+            onClick={clearFilter}
+          >
+            Clear all
+          </button>
+          <div className={styles.filterRight}>
+            <SortbySelector
+              filterOptions={sortByOptions}
+              onChange={sortOnchange}
+              onDescending={sortOnDescending}
+              placeHolder="Sort By"
+              sortByDescending={sortByDescending}
+              sortByButton={sortByButton}
+              value={sortByState}
+            />
+          </div>
         </div>
-      </div>
+        <div className="blocklist" data-cy="home-endpointList">
+          {renderItems(
+            isLoading,
+            totalCount,
+            environments.map((env) => (
+              <EnvironmentItem
+                key={env.Id}
+                environment={env}
+                groupName={
+                  groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
+                }
+                onClick={onClickItem}
+              />
+            ))
+          )}
+        </div>
+
+        <TableFooter>
+          <PaginationControls
+            showAll={totalCount <= 100}
+            pageLimit={pageLimit}
+            page={page}
+            onPageChange={setPage}
+            totalCount={totalCount}
+            onPageLimitChange={setPageLimit}
+          />
+        </TableFooter>
+      </TableContainer>
     </>
   );
 

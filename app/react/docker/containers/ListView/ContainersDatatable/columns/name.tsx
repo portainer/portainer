@@ -4,7 +4,7 @@ import { useSref } from '@uirouter/react';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
 
-import { useTableSettings } from '@@/datatables/useZustandTableSettings';
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 import { TableSettings } from '../types';
 
@@ -31,7 +31,7 @@ export function NameCell({
     nodeName: container.NodeName,
   });
 
-  const { settings } = useTableSettings<TableSettings>();
+  const settings = useTableSettings<TableSettings>();
   const truncate = settings.truncateContainerName;
 
   let shortName = name;

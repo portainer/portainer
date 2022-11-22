@@ -1,206 +1,69 @@
-import {
-  Column,
-  useGlobalFilter,
-  usePagination,
-  useRowSelect,
-  useSortBy,
-  useTable,
-} from 'react-table';
-import { useRowSelectColumn } from '@lineup-lite/hooks';
+import { useStore } from 'zustand';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 
+import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
-import { Table } from '@@/datatables';
-import { SearchBar, useSearchBarState } from '@@/datatables/SearchBar';
-import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
-import { PaginationControls } from '@@/PaginationControls';
-import { useTableSettings } from '@@/datatables/useTableSettings';
+import { TextTip } from '@@/Tip/TextTip';
+import { createPersistedStore } from '@@/datatables/types';
+import { useSearchBarState } from '@@/datatables/SearchBar';
 
-import { useAssociateDeviceMutation } from '../queries';
+import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 
-import { TableSettings } from './types';
+import { columns } from './columns';
 
-const columns: readonly Column<Environment>[] = [
-  {
-    Header: 'Name',
-    accessor: (row) => row.Name,
-    id: 'name',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Edge ID',
-    accessor: (row) => row.EdgeID,
-    id: 'edge-id',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-] as const;
+const storageKey = 'edge-devices-waiting-room';
+
+const settingsStore = createPersistedStore(storageKey, 'Name');
 
 interface Props {
   devices: Environment[];
   isLoading: boolean;
   totalCount: number;
-  storageKey: string;
 }
 
-export function DataTable({
-  devices,
-  storageKey,
-  isLoading,
-  totalCount,
-}: Props) {
+export function Datatable({ devices, isLoading, totalCount }: Props) {
   const associateMutation = useAssociateDeviceMutation();
-
-  const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
-  const { settings, setTableSettings } = useTableSettings<TableSettings>();
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    selectedFlatRows,
-
-    gotoPage,
-    setPageSize,
-
-    setGlobalFilter,
-    state: { pageIndex, pageSize },
-  } = useTable<Environment>(
-    {
-      defaultCanFilter: false,
-      columns,
-      data: devices,
-
-      initialState: {
-        pageSize: settings.pageSize || 10,
-        sortBy: [settings.sortBy],
-        globalFilter: searchBarValue,
-      },
-      isRowSelectable() {
-        return true;
-      },
-      autoResetSelectedRows: false,
-      getRowId(originalRow: Environment) {
-        return originalRow.Id.toString();
-      },
-      selectColumnWidth: 5,
-    },
-    useGlobalFilter,
-    useSortBy,
-
-    usePagination,
-    useRowSelect,
-    useRowSelectColumn
-  );
-
-  const tableProps = getTableProps();
-  const tbodyProps = getTableBodyProps();
+  const licenseOverused = useLicenseOverused();
+  const settings = useStore(settingsStore);
+  const [search, setSearch] = useSearchBarState(storageKey);
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Table.Container>
-          <Table.Title label="Edge Devices Waiting Room" icon="">
-            <SearchBar
-              onChange={handleSearchBarChange}
-              value={searchBarValue}
-            />
-            <Table.Actions>
-              <Button
-                onClick={() =>
-                  handleAssociateDevice(selectedFlatRows.map((r) => r.original))
-                }
-                disabled={selectedFlatRows.length === 0}
-              >
-                Associate Device
-              </Button>
-            </Table.Actions>
-          </Table.Title>
-
-          <Table
-            className={tableProps.className}
-            role={tableProps.role}
-            style={tableProps.style}
+    <GenericDatatable
+      columns={columns}
+      dataset={devices}
+      initialPageSize={settings.pageSize}
+      onPageSizeChange={settings.setPageSize}
+      initialSortBy={settings.sortBy}
+      onSortByChange={settings.setSortBy}
+      searchValue={search}
+      onSearchChange={setSearch}
+      title="Edge Devices Waiting Room"
+      emptyContentLabel="No Edge Devices found"
+      renderTableActions={(selectedRows) => (
+        <>
+          <Button
+            onClick={() => handleAssociateDevice(selectedRows)}
+            disabled={selectedRows.length === 0}
           >
-            <thead>
-              {headerGroups.map((headerGroup) => {
-                const { key, className, role, style } =
-                  headerGroup.getHeaderGroupProps();
+            Associate Device
+          </Button>
 
-                return (
-                  <Table.HeaderRow<Environment>
-                    key={key}
-                    className={className}
-                    role={role}
-                    style={style}
-                    headers={headerGroup.headers}
-                    onSortChange={handleSortChange}
-                  />
-                );
-              })}
-            </thead>
-
-            <tbody
-              className={tbodyProps.className}
-              role={tbodyProps.role}
-              style={tbodyProps.style}
-            >
-              <Table.Content
-                emptyContent="No Edge Devices found"
-                prepareRow={prepareRow}
-                rows={page}
-                isLoading={isLoading}
-                renderRow={(row, { key, className, role, style }) => (
-                  <Table.Row
-                    cells={row.cells}
-                    key={key}
-                    className={className}
-                    role={role}
-                    style={style}
-                  />
-                )}
-              />
-            </tbody>
-          </Table>
-
-          <Table.Footer>
-            <SelectedRowsCount value={selectedFlatRows.length} />
-            <PaginationControls
-              showAll
-              pageLimit={pageSize}
-              page={pageIndex + 1}
-              onPageChange={(p) => gotoPage(p - 1)}
-              totalCount={totalCount}
-              onPageLimitChange={handlePageLimitChange}
-            />
-          </Table.Footer>
-        </Table.Container>
-      </div>
-    </div>
+          {licenseOverused ? (
+            <div className="ml-2 mt-2">
+              <TextTip color="orange">
+                Associating devices is disabled as your node count exceeds your
+                license limit
+              </TextTip>
+            </div>
+          ) : null}
+        </>
+      )}
+      isLoading={isLoading}
+      totalCount={totalCount}
+    />
   );
-
-  function handleSortChange(colId: string, desc: boolean) {
-    setTableSettings({ sortBy: { id: colId, desc } });
-  }
-
-  function handlePageLimitChange(pageSize: number) {
-    setPageSize(pageSize);
-    setTableSettings({ pageSize });
-  }
-
-  function handleSearchBarChange(value: string) {
-    setGlobalFilter(value);
-    setSearchBarValue(value);
-  }
 
   function handleAssociateDevice(devices: Environment[]) {
     associateMutation.mutate(

@@ -1,9 +1,8 @@
 import {
-  PaginationTableSettings,
+  BasicTableSettings,
   RefreshableTableSettings,
   SettableColumnsTableSettings,
-  SortableTableSettings,
-} from '@/react/components/datatables/types';
+} from '@@/datatables/types';
 
 export type QuickAction = 'attach' | 'exec' | 'inspect' | 'logs' | 'stats';
 
@@ -13,8 +12,7 @@ export interface SettableQuickActionsTableSettings<TAction> {
 }
 
 export interface TableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings,
+  extends BasicTableSettings,
     SettableColumnsTableSettings,
     SettableQuickActionsTableSettings<QuickAction>,
     RefreshableTableSettings {
