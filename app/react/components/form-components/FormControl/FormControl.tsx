@@ -5,9 +5,7 @@ import { Tooltip } from '@@/Tip/Tooltip';
 
 import { FormError } from '../FormError';
 
-import styles from './FormControl.module.css';
-
-export type Size = 'xsmall' | 'small' | 'medium' | 'large';
+export type Size = 'xsmall' | 'small' | 'medium' | 'large' | 'vertical';
 
 export interface Props {
   inputId?: string;
@@ -29,7 +27,12 @@ export function FormControl({
   required,
 }: PropsWithChildren<Props>) {
   return (
-    <div className={clsx('form-group', styles.container)}>
+    <div
+      className={clsx(
+        'form-group',
+        'after:content-[""] after:clear-both after:table' // to fix issues with float
+      )}
+    >
       <label
         htmlFor={inputId}
         className={clsx(sizeClassLabel(size), 'control-label', 'text-left')}
@@ -62,6 +65,8 @@ function sizeClassLabel(size?: Size) {
       return 'col-sm-4 col-lg-3';
     case 'xsmall':
       return 'col-sm-2';
+    case 'vertical':
+      return '';
     default:
       return 'col-sm-3 col-lg-2';
   }
@@ -75,6 +80,8 @@ function sizeClassChildren(size?: Size) {
       return 'col-sm-8 col-lg-9';
     case 'xsmall':
       return 'col-sm-8';
+    case 'vertical':
+      return '';
     default:
       return 'col-sm-9 col-lg-10';
   }

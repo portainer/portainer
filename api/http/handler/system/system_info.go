@@ -1,4 +1,4 @@
-package status
+package system
 
 import (
 	"net/http"
@@ -16,17 +16,17 @@ type systemInfoResponse struct {
 	Agents      int                        `json:"agents"`
 }
 
-// @id statusSystem
+// @id systemInfo
 // @summary Retrieve system info
 // @description **Access policy**: authenticated
 // @security ApiKeyAuth
 // @security jwt
-// @tags status
+// @tags system
 // @produce json
 // @success 200 {object} systemInfoResponse "Success"
 // @failure 500 "Server error"
-// @router /status/system [get]
-func (handler *Handler) statusSystem(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// @router /system/info [get]
+func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	environments, err := handler.dataStore.Endpoint().Endpoints()
 	if err != nil {
 		return httperror.InternalServerError("Failed to get environment list", err)

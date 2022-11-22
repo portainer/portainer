@@ -1,0 +1,1 @@
+export { UpgradeBEBanner } from './UpgradeBEBanner';
