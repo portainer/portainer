@@ -2,30 +2,23 @@ import { ArrowRight } from 'react-feather';
 import { useState } from 'react';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import {
-  useFeatureFlag,
-  FeatureFlag,
-} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
 import { useSystemInfo } from '@/react/portainer/system/useSystemInfo';
 import { useUser } from '@/react/hooks/useUser';
+import { withEdition } from '@/react/portainer/feature-flags/withEdition';
+import { withFeatureFlag } from '@/react/portainer/feature-flags/withFeatureFlag';
+import { FeatureFlag } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 
 import { useSidebarState } from '../useSidebarState';
 
 import { UpgradeDialog } from './UpgradeDialog';
 
-export function UpgradeBEBanner() {
-  const { data } = useFeatureFlag(FeatureFlag.BEUpgrade, { enabled: !isBE });
+export const UpgradeBEBanner = withEdition(
+  withFeatureFlag(UpgradeBEBannerInner, FeatureFlag.BEUpgrade),
+  'CE'
+);
 
-  if (isBE || !data) {
-    return null;
-  }
-
-  return <Inner />;
-}
-
-function Inner() {
+function UpgradeBEBannerInner() {
   const { isAdmin } = useUser();
   const { trackEvent } = useAnalytics();
   const { isOpen: isSidebarOpen } = useSidebarState();
