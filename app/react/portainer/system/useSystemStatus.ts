@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query';
+import { RetryValue } from 'react-query/types/core/retryer';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
@@ -25,8 +26,21 @@ export async function getSystemStatus() {
   }
 }
 
-export function useSystemStatus<T = StatusResponse>(
-  select?: (status: StatusResponse) => T
-) {
-  return useQuery(queryKey, () => getSystemStatus(), { select });
+export function useSystemStatus<T = StatusResponse>({
+  select,
+  enabled,
+  retry,
+  onSuccess,
+}: {
+  select?: (status: StatusResponse) => T;
+  enabled?: boolean;
+  retry?: RetryValue<unknown>;
+  onSuccess?: (data: T) => void;
+} = {}) {
+  return useQuery(queryKey, () => getSystemStatus(), {
+    select,
+    enabled,
+    retry,
+    onSuccess,
+  });
 }

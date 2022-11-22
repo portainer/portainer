@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/platform"
+	plf "github.com/portainer/portainer/api/platform"
 )
 
 type systemInfoResponse struct {
@@ -48,13 +49,17 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 		if environment.IsEdgeDevice {
 			edgeDevices++
 		}
+	}
 
+	platform, err := plf.DetermineContainerPlatform()
+	if err != nil {
+		return httperror.InternalServerError("Unable to determine container platform", err)
 	}
 
 	return response.JSON(w, &systemInfoResponse{
 		EdgeAgents:  edgeAgents,
 		EdgeDevices: edgeDevices,
 		Agents:      agents,
-		Platform:    platform.DetermineContainerPlatform(),
+		Platform:    platform,
 	})
 }

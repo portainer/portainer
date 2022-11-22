@@ -58,6 +58,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/ssl"
+	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
@@ -102,6 +103,7 @@ type Server struct {
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
 	DemoService                 *demo.Service
+	UpgradeService              upgrade.Service
 }
 
 // Start starts the HTTP server
@@ -252,7 +254,11 @@ func (server *Server) Start() error {
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
 
-	var statusHandler = system.NewHandler(requestBouncer, server.Status, server.DemoService, server.DataStore)
+	var systemHandler = system.NewHandler(requestBouncer,
+		server.Status,
+		server.DemoService,
+		server.DataStore,
+		server.UpgradeService)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
@@ -303,7 +309,7 @@ func (server *Server) Start() error {
 		ResourceControlHandler:    resourceControlHandler,
 		SettingsHandler:           settingsHandler,
 		SSLHandler:                sslHandler,
-		SystemHandler:             statusHandler,
+		SystemHandler:             systemHandler,
 		StackHandler:              stackHandler,
 		StorybookHandler:          storybookHandler,
 		TagHandler:                tagHandler,
