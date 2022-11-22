@@ -108,12 +108,11 @@ func (service *service) UpgradeDockerStandalone(licenseKey, version string) erro
 
 	err = service.composeDeployer.Deploy(
 		context.Background(),
-		"",
-		"",
-		"upgrade-portainer",
 		[]string{filePath},
-		"",
-		true,
+		libstack.DeployOptions{
+			ForceRecreate:        true,
+			AbortOnContainerExit: true,
+		},
 	)
 
 	if err != nil {
