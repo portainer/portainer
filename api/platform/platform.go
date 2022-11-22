@@ -19,7 +19,7 @@ type ContainerPlatform string
 
 const (
 	// PlatformDockerStandalone represent the Docker platform (Standalone)
-	PlatformDockerStandalone = ContainerPlatform("Docker")
+	PlatformDockerStandalone = ContainerPlatform("Docker Standalone")
 	// PlatformDockerSwarm represent the Docker platform (Swarm)
 	PlatformDockerSwarm = ContainerPlatform("Docker Swarm")
 	// PlatformKubernetes represent the Kubernetes platform
@@ -28,8 +28,6 @@ const (
 	PlatformPodman = ContainerPlatform("Podman")
 	// PlatformNomad represent the Nomad platform (Standalone)
 	PlatformNomad = ContainerPlatform("Nomad")
-	// PlatformNone represents that binary runs outside of any container
-	PlatformNone = ContainerPlatform("None")
 )
 
 // DetermineContainerPlatform will check for the existence of the PODMAN_MODE
@@ -57,7 +55,7 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 	defer dockerCli.Close()
 
 	if !isRunningInContainer() {
-		return PlatformNone, nil
+		return "", nil
 	}
 
 	info, err := dockerCli.Info(context.Background())
