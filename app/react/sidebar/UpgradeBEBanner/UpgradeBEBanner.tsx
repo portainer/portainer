@@ -9,6 +9,7 @@ import {
 } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
 import { useSystemInfo } from '@/react/portainer/system/useSystemInfo';
+import { useUser } from '@/react/hooks/useUser';
 
 import { useSidebarState } from '../useSidebarState';
 
@@ -25,6 +26,7 @@ export function UpgradeBEBanner() {
 }
 
 function Inner() {
+  const { isAdmin } = useUser();
   const { trackEvent } = useAnalytics();
   const { isOpen: isSidebarOpen } = useSidebarState();
   const nodesCountQuery = useNodesCount();
@@ -48,9 +50,9 @@ function Inner() {
     agents: systemInfo.agents,
   };
 
-  if (systemInfo.platform !== 'Docker Standalone') {
-    return null;
-  }
+  // if (systemInfo.platform !== 'Docker Standalone') {
+  //   return null;
+  // }
 
   return (
     <>
@@ -68,10 +70,13 @@ function Inner() {
   );
 
   function handleClick() {
-    trackEvent('portainer-upgrade-admin', {
-      category: 'portainer',
-      metadata,
-    });
+    trackEvent(
+      isAdmin ? 'portainer-upgrade-admin' : 'portainer-upgrade-non-admin',
+      {
+        category: 'portainer',
+        metadata,
+      }
+    );
     setIsOpen(true);
   }
 }
