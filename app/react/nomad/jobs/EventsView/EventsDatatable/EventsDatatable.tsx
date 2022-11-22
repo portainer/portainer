@@ -36,8 +36,8 @@ export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
       titleIcon="fa-history"
       title="Events"
       totalCount={data.length}
-      disableSelect
       getRowId={(row) => `${row.Date}-${row.Message}-${row.Type}`}
+      disableSelect
     />
   );
 }
