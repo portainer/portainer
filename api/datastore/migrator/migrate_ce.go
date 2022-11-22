@@ -32,7 +32,6 @@ func (m *Migrator) Migrate() error {
 	}
 
 	newMigratorCount := 0
-	versionUpdateRequired := false
 	apiVersion := semver.MustParse(portainer.APIVersion)
 	if schemaVersion.Equal(apiVersion) {
 		// detect and run migrations when the versions are the same.
@@ -40,7 +39,6 @@ func (m *Migrator) Migrate() error {
 		latestMigrations := m.latestMigrations()
 		if latestMigrations.version.Equal(schemaVersion) &&
 			version.MigratorCount != len(latestMigrations.migrationFuncs) {
-			versionUpdateRequired = true
 			err := runMigrations(latestMigrations.migrationFuncs)
 			if err != nil {
 				return err
@@ -49,7 +47,6 @@ func (m *Migrator) Migrate() error {
 		}
 	} else {
 		// regular path when major/minor/patch versions differ
-		versionUpdateRequired = true
 		for _, migration := range m.migrations {
 			if schemaVersion.LessThan(migration.version) {
 
@@ -66,22 +63,20 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	if versionUpdateRequired {
-		err := m.Always()
-		if err != nil {
-			return migrationError(err, "Always migrations returned error")
-		}
-
-		version.SchemaVersion = portainer.APIVersion
-		version.MigratorCount = newMigratorCount
-
-		err = m.versionService.UpdateVersion(version)
-		if err != nil {
-			return migrationError(err, "StoreDBVersion")
-		}
-
-		log.Info().Msgf("db migrated to %s", portainer.APIVersion)
+	err = m.Always()
+	if err != nil {
+		return migrationError(err, "Always migrations returned error")
 	}
+
+	version.SchemaVersion = portainer.APIVersion
+	version.MigratorCount = newMigratorCount
+
+	err = m.versionService.UpdateVersion(version)
+	if err != nil {
+		return migrationError(err, "StoreDBVersion")
+	}
+
+	log.Info().Msgf("db migrated to %s", portainer.APIVersion)
 
 	return nil
 }
