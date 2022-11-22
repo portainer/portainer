@@ -15,7 +15,6 @@ export const API_ENDPOINT_REGISTRIES = 'api/registries';
 export const API_ENDPOINT_RESOURCE_CONTROLS = 'api/resource_controls';
 export const API_ENDPOINT_SETTINGS = 'api/settings';
 export const API_ENDPOINT_STACKS = 'api/stacks';
-export const API_ENDPOINT_STATUS = 'api/status';
 export const API_ENDPOINT_SUPPORT = 'api/support';
 export const API_ENDPOINT_USERS = 'api/users';
 export const API_ENDPOINT_TAGS = 'api/tags';
@@ -53,7 +52,6 @@ angular
   .constant('API_ENDPOINT_RESOURCE_CONTROLS', API_ENDPOINT_RESOURCE_CONTROLS)
   .constant('API_ENDPOINT_SETTINGS', API_ENDPOINT_SETTINGS)
   .constant('API_ENDPOINT_STACKS', API_ENDPOINT_STACKS)
-  .constant('API_ENDPOINT_STATUS', API_ENDPOINT_STATUS)
   .constant('API_ENDPOINT_SUPPORT', API_ENDPOINT_SUPPORT)
   .constant('API_ENDPOINT_USERS', API_ENDPOINT_USERS)
   .constant('API_ENDPOINT_TAGS', API_ENDPOINT_TAGS)

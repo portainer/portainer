@@ -1,4 +1,4 @@
-package status
+package system
 
 import (
 	"encoding/json"
@@ -33,16 +33,16 @@ type BuildInfo struct {
 	GoVersion      string
 }
 
-// @id Version
+// @id systemVersion
 // @summary Check for portainer updates
 // @description Check if portainer has an update available
 // @description **Access policy**: authenticated
 // @security ApiKeyAuth
 // @security jwt
-// @tags status
+// @tags system
 // @produce json
 // @success 200 {object} versionResponse "Success"
-// @router /status/version [get]
+// @router /system/version [get]
 func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 
 	result := &versionResponse{
@@ -105,4 +105,22 @@ func HasNewerVersion(currentVersion, latestVersion string) bool {
 	}
 
 	return currentVersionSemver.LessThan(*latestVersionSemver)
+}
+
+// @id Version
+// @summary Check for portainer updates
+// @deprecated
+// @description Deprecated: use the `/system/version` endpoint instead.
+// @description Check if portainer has an update available
+// @description **Access policy**: authenticated
+// @security ApiKeyAuth
+// @security jwt
+// @tags status
+// @produce json
+// @success 200 {object} versionResponse "Success"
+// @router /status/version [get]
+func (handler *Handler) versionDeprecated(w http.ResponseWriter, r *http.Request) {
+	log.Warn().Msg("The /status/version endpoint is deprecated, please use the /system/version endpoint instead")
+
+	handler.version(w, r)
 }

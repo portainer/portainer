@@ -1,5 +1,5 @@
 export function buildUrl(action?: string) {
-  let url = '/status';
+  let url = '/system';
 
   if (action) {
     url += `/${action}`;
