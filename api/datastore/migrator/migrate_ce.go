@@ -33,13 +33,13 @@ func (m *Migrator) Migrate() error {
 
 	newMigratorCount := 0
 	versionUpdateRequired := false
-	if schemaVersion.Equal(semver.MustParse(portainer.APIVersion)) {
+	apiVersion := semver.MustParse(portainer.APIVersion)
+	if schemaVersion.Equal(apiVersion) {
 		// detect and run migrations when the versions are the same.
 		// e.g. development builds
 		latestMigrations := m.latestMigrations()
 		if latestMigrations.version.Equal(schemaVersion) &&
 			version.MigratorCount != len(latestMigrations.migrationFuncs) {
-
 			versionUpdateRequired = true
 			err := runMigrations(latestMigrations.migrationFuncs)
 			if err != nil {
@@ -49,9 +49,10 @@ func (m *Migrator) Migrate() error {
 		}
 	} else {
 		// regular path when major/minor/patch versions differ
+		versionUpdateRequired = true
 		for _, migration := range m.migrations {
 			if schemaVersion.LessThan(migration.version) {
-				versionUpdateRequired = true
+
 				log.Info().Msgf("migrating data to %s", migration.version.String())
 				err := runMigrations(migration.migrationFuncs)
 				if err != nil {
@@ -59,11 +60,13 @@ func (m *Migrator) Migrate() error {
 				}
 			}
 
-			newMigratorCount = len(migration.migrationFuncs)
+			if apiVersion.Equal(migration.version) {
+				newMigratorCount = len(migration.migrationFuncs)
+			}
 		}
 	}
 
-	if versionUpdateRequired || newMigratorCount != version.MigratorCount {
+	if versionUpdateRequired {
 		err := m.Always()
 		if err != nil {
 			return migrationError(err, "Always migrations returned error")
