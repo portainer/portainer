@@ -13,13 +13,10 @@ export function withEdition<T>(
       return null;
     }
 
-    return (
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      <WrappedComponent {...props} />
-    );
+    return <WrappedComponent {...props} />;
   }
 
-  WrapperComponent.displayName = `withEdition(${displayName})`;
+  WrapperComponent.displayName = `with${edition}Edition(${displayName})`;
 
   return WrapperComponent;
 }

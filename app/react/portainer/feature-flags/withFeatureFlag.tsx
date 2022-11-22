@@ -17,13 +17,10 @@ export function withFeatureFlag<T>(
       return null;
     }
 
-    return (
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      <WrappedComponent {...props} />
-    );
+    return <WrappedComponent {...props} />;
   }
 
-  WrapperComponent.displayName = `withFeatureFlag(${displayName})`;
+  WrapperComponent.displayName = `with${flag}FeatureFlag(${displayName})`;
 
   return WrapperComponent;
 }

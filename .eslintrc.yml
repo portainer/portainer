@@ -105,6 +105,11 @@ overrides:
       'no-await-in-loop': 'off'
       'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
       'regex/invalid': ['error', [{ 'regex': 'data-feather="(.*)"', 'message': 'Please use `react-feather` package instead' }]]
+    overrides: # allow props spreading for hoc files
+      - files:
+          - app/**/with*.ts{,x}
+        rules:
+          'react/jsx-props-no-spreading': off
   - files:
       - app/**/*.test.*
     extends:
