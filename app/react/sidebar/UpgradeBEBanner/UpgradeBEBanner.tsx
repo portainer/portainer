@@ -43,9 +43,9 @@ function UpgradeBEBanner() {
     agents: systemInfo.agents,
   };
 
-  // if (systemInfo.platform !== 'Docker Standalone') {
-  //   return null;
-  // }
+  if (systemInfo.platform !== 'Docker Standalone') {
+    return null;
+  }
 
   return (
     <>
