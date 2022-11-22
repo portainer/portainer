@@ -1,8 +1,10 @@
+import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
+
 import { createRowContext } from '@@/datatables/RowContext';
 
 interface RowContextState {
   isOpenAmtEnabled: boolean;
-  groupName?: string;
+  groups: EnvironmentGroup[];
 }
 
 const { RowProvider, useRowContext } = createRowContext<RowContextState>();

@@ -70,6 +70,12 @@ interface MountPoint {
   Propagation: MountPropagation;
 }
 
+export interface Health {
+  Status: 'healthy' | 'unhealthy' | 'starting';
+  FailingStreak: number;
+  Log: Array<{ Output: string }>;
+}
+
 export interface DockerContainerResponse {
   Id: string;
   Names: string[];
@@ -88,7 +94,6 @@ export interface DockerContainerResponse {
   };
   NetworkSettings?: SummaryNetworkSettings;
   Mounts: MountPoint[];
-
   Portainer: PortainerMetadata;
   IsPortainer: boolean;
 }

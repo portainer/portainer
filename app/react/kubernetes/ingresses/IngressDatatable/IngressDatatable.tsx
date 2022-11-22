@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useStore } from 'zustand';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
@@ -10,11 +11,12 @@ import Route from '@/assets/ico/route.svg?c';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
+import { createPersistedStore } from '@@/datatables/types';
+import { useSearchBarState } from '@@/datatables/SearchBar';
 
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
 
-import { createStore } from './datatable-store';
 import { useColumns } from './columns';
 
 import '../style.css';
@@ -23,10 +25,11 @@ interface SelectedIngress {
   Namespace: string;
   Name: string;
 }
+const storageKey = 'ingressClassesNameSpace';
 
-const useStore = createStore('ingresses');
+const settingsStore = createPersistedStore(storageKey);
 
-export function IngressDataTable() {
+export function IngressDatatable() {
   const environmentId = useEnvironmentId();
 
   const nsResult = useNamespaces(environmentId);
@@ -35,28 +38,30 @@ export function IngressDataTable() {
     Object.keys(nsResult?.data || {})
   );
 
-  const settings = useStore();
-
   const columns = useColumns();
   const deleteIngressesMutation = useDeleteIngresses();
+  const settings = useStore(settingsStore);
+  const [search, setSearch] = useSearchBarState(storageKey);
 
   const router = useRouter();
 
   return (
     <Datatable
       dataset={ingressesQuery.data || []}
-      storageKey="ingressClassesNameSpace"
       columns={columns}
-      settingsStore={settings}
       isLoading={ingressesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
-      titleOptions={{
-        icon: Route,
-        title: 'Ingresses',
-      }}
+      title="Ingresses"
+      titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
       renderTableActions={tableActions}
       disableSelect={useCheckboxes()}
+      initialPageSize={settings.pageSize}
+      onPageSizeChange={settings.setPageSize}
+      initialSortBy={settings.sortBy}
+      onSortByChange={settings.setSortBy}
+      searchValue={search}
+      onSearchChange={setSearch}
     />
   );
 
@@ -68,14 +73,7 @@ export function IngressDataTable() {
             className="btn-wrapper"
             color="dangerlight"
             disabled={selectedFlatRows.length === 0}
-            onClick={() =>
-              handleRemoveClick(
-                selectedFlatRows.map((row) => ({
-                  Name: row.Name,
-                  Namespace: row.Namespace,
-                }))
-              )
-            }
+            onClick={() => handleRemoveClick(selectedFlatRows)}
             icon={Trash2}
           >
             Remove

@@ -30,6 +30,8 @@ const licenseInfo: LicenseInfo = {
   expiresAt: Number.MAX_SAFE_INTEGER,
   productEdition: Edition.EE,
   valid: true,
+  enforcedAt: 0,
+  enforced: false,
 };
 
 export const handlers = [

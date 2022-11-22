@@ -3,7 +3,7 @@ import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/mo
 export default class {
   $onInit() {
     const secrets = (this.configurations || [])
-      .filter((config) => config.Data && config.Type === KubernetesConfigurationKinds.SECRET)
+      .filter((config) => config.Data && config.Kind === KubernetesConfigurationKinds.SECRET)
       .flatMap((config) => Object.entries(config.Data))
       .map(([key, value]) => ({ key, value }));
 

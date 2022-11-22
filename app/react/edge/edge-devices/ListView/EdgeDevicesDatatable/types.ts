@@ -1,17 +1,10 @@
 import {
-  PaginationTableSettings,
+  BasicTableSettings,
   RefreshableTableSettings,
   SettableColumnsTableSettings,
-  SortableTableSettings,
-} from '@@/datatables/types-old';
+} from '@@/datatables/types';
 
-export interface Pagination {
-  pageLimit: number;
-  page: number;
-}
-
-export interface EdgeDeviceTableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings,
+export interface TableSettings
+  extends BasicTableSettings,
     SettableColumnsTableSettings,
     RefreshableTableSettings {}

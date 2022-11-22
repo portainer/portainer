@@ -27,7 +27,7 @@ export function ActionsCell({ row }: CellProps<Task>) {
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center vertical-center">
       {/* events */}
       <Link
         to="nomad.events"
@@ -35,12 +35,12 @@ export function ActionsCell({ row }: CellProps<Task>) {
         title="Events"
         className="space-right"
       >
-        <Icon icon={Clock} className="space-right icon" />
+        <Icon icon={Clock} className="space-right" />
       </Link>
 
       {/* logs */}
       <Link to="nomad.logs" params={params} title="Logs">
-        <Icon icon={FileText} className="space-right icon" />
+        <Icon icon={FileText} className="space-right" />
       </Link>
     </div>
   );

@@ -112,7 +112,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.hasConfigurationSecrets = function (item) {
-      return item.Configurations && item.Configurations.some((config) => config.Data && config.Type === KubernetesConfigurationKinds.SECRET);
+      return item.Configurations && item.Configurations.some((config) => config.Data && config.Kind === KubernetesConfigurationKinds.SECRET);
     };
 
     /**

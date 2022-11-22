@@ -5,7 +5,7 @@ import { Icon } from '@@/Icon';
 interface Props {
   icon?: ReactNode | ComponentType<unknown>;
   label: string;
-  description?: JSX.Element;
+  description?: ReactNode;
 }
 
 export function TableTitle({
@@ -28,7 +28,7 @@ export function TableTitle({
         </div>
         {children}
       </div>
-      {description && description}
+      {description}
     </div>
   );
 }
