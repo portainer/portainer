@@ -91,11 +91,9 @@ func (service *Service) UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *p
 	id := service.connection.ConvertToKey(int(ID))
 	tag := &portainer.Tag{}
 
-	service.connection.UpdateObjectFunc(BucketName, id, tag, func() {
+	return service.connection.UpdateObjectFunc(BucketName, id, tag, func() {
 		updateFunc(tag)
 	})
-
-	return nil
 }
 
 // DeleteTag deletes a tag.
