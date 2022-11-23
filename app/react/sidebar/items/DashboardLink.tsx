@@ -1,6 +1,6 @@
 import { Layout } from 'react-feather';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';
 
 import { SidebarItem } from '../SidebarItem';

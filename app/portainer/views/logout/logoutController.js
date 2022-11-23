@@ -52,7 +52,7 @@ class LogoutController {
     try {
       await this.logout();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'An error occured during logout');
+      this.Notifications.error('Failure', err, 'An error occurred during logout');
     }
   }
 

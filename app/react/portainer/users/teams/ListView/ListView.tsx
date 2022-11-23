@@ -1,12 +1,12 @@
 import { useUsers } from '@/portainer/users/queries';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 
 import { PageHeader } from '@@/PageHeader';
 
 import { useTeams } from '../queries';
 
 import { CreateTeamForm } from './CreateTeamForm';
-import { TeamsDatatableContainer } from './TeamsDatatable/TeamsDatatable';
+import { TeamsDatatable } from './TeamsDatatable';
 
 export function ListView() {
   const { isAdmin } = useUser();
@@ -23,7 +23,7 @@ export function ListView() {
       )}
 
       {teamsQuery.data && (
-        <TeamsDatatableContainer teams={teamsQuery.data} isAdmin={isAdmin} />
+        <TeamsDatatable teams={teamsQuery.data} isAdmin={isAdmin} />
       )}
     </>
   );

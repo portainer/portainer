@@ -1,59 +1,100 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Database } from 'react-feather';
+import { useStore } from 'zustand';
 
 import { confirmWarn } from '@/portainer/services/modal.service/confirm';
 
 import { Datatable } from '@@/datatables';
 import { Button, ButtonGroup } from '@@/buttons';
 import { Icon } from '@@/Icon';
+import { useSearchBarState } from '@@/datatables/SearchBar';
+import { createPersistedStore } from '@@/datatables/types';
 
 import { IngressControllerClassMap } from '../types';
 
 import { useColumns } from './columns';
-import { createStore } from './datatable-store';
 
-const useStore = createStore('ingressClasses');
+const storageKey = 'ingressClasses';
+const settingsStore = createPersistedStore(storageKey);
 
 interface Props {
-  onChangeAvailability: (
+  onChangeControllers: (
     controllerClassMap: IngressControllerClassMap[]
   ) => void; // angular function to save the ingress class list
   description: string;
   ingressControllers: IngressControllerClassMap[] | undefined;
+  allowNoneIngressClass: boolean;
   isLoading: boolean;
   noIngressControllerLabel: string;
   view: string;
 }
 
 export function IngressClassDatatable({
-  onChangeAvailability,
+  onChangeControllers,
   description,
   ingressControllers,
+  allowNoneIngressClass,
   isLoading,
   noIngressControllerLabel,
   view,
 }: Props) {
-  const [ingControllerFormValues, setIngControllerFormValues] =
-    useState(ingressControllers);
-  const settings = useStore();
+  const settings = useStore(settingsStore);
+  const [search, setSearch] = useSearchBarState(storageKey);
+  const [ingControllerFormValues, setIngControllerFormValues] = useState(
+    ingressControllers || []
+  );
   const columns = useColumns();
+
+  useEffect(() => {
+    if (allowNoneIngressClass === undefined) {
+      return;
+    }
+
+    let newIngFormValues: IngressControllerClassMap[];
+    const isCustomTypeExist = ingControllerFormValues.some(
+      (ic) => ic.Type === 'custom'
+    );
+    if (allowNoneIngressClass) {
+      newIngFormValues = [...ingControllerFormValues];
+      // add the ingress controller type 'custom' with a 'none' ingress class name
+      if (!isCustomTypeExist) {
+        newIngFormValues.push({
+          Name: 'none',
+          ClassName: 'none',
+          Type: 'custom',
+          Availability: true,
+          New: false,
+          Used: false,
+        });
+      }
+    } else {
+      newIngFormValues = ingControllerFormValues.filter(
+        (ingController) => ingController.ClassName !== 'none'
+      );
+    }
+    setIngControllerFormValues(newIngFormValues);
+    onChangeControllers(newIngFormValues);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowNoneIngressClass, onChangeControllers]);
 
   return (
     <div className="-mx-[15px]">
       <Datatable
         dataset={ingControllerFormValues || []}
-        storageKey="ingressClasses"
         columns={columns}
-        settingsStore={settings}
         isLoading={isLoading}
         emptyContentLabel={noIngressControllerLabel}
-        titleOptions={{
-          icon: 'database',
-          title: 'Ingress controllers',
-          featherIcon: true,
-        }}
+        title="Ingress Controllers"
+        titleIcon={Database}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
+        initialPageSize={settings.pageSize}
+        onPageSizeChange={settings.setPageSize}
+        initialSortBy={settings.sortBy}
+        onSortByChange={settings.setSortBy}
+        searchValue={search}
+        onSearchChange={setSearch}
       />
     </div>
   );
@@ -134,7 +175,7 @@ export function IngressClassDatatable({
       );
       if (view === 'namespace') {
         setIngControllerFormValues(updatedIngressControllers);
-        onChangeAvailability(updatedIngressControllers);
+        onChangeControllers(updatedIngressControllers);
         return;
       }
 
@@ -180,14 +221,14 @@ export function IngressClassDatatable({
           callback: (confirmed) => {
             if (confirmed) {
               setIngControllerFormValues(updatedIngressControllers);
-              onChangeAvailability(updatedIngressControllers);
+              onChangeControllers(updatedIngressControllers);
             }
           },
         });
         return;
       }
       setIngControllerFormValues(updatedIngressControllers);
-      onChangeAvailability(updatedIngressControllers);
+      onChangeControllers(updatedIngressControllers);
     }
   }
 }
@@ -196,10 +237,13 @@ function isUnsavedChanges(
   oldIngressControllers: IngressControllerClassMap[],
   newIngressControllers: IngressControllerClassMap[]
 ) {
-  for (let i = 0; i < oldIngressControllers.length; i += 1) {
+  if (oldIngressControllers.length !== newIngressControllers.length) {
+    return true;
+  }
+  for (let i = 0; i < newIngressControllers.length; i += 1) {
     if (
-      oldIngressControllers[i].Availability !==
-      newIngressControllers[i].Availability
+      oldIngressControllers[i]?.Availability !==
+      newIngressControllers[i]?.Availability
     ) {
       return true;
     }

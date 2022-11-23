@@ -40,4 +40,6 @@ export interface LicenseInfo {
   nodes: number;
   type: LicenseType;
   valid: boolean;
+  enforcedAt: number;
+  enforced: boolean;
 }

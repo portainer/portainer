@@ -2,41 +2,20 @@ angular.module('portainer.app').factory('LocalStorage', [
   'localStorageService',
   function LocalStorageFactory(localStorageService) {
     return {
-      storeEndpointID: function (id) {
-        localStorageService.set('ENDPOINT_ID', id);
-      },
-      getEndpointID: function () {
-        return localStorageService.get('ENDPOINT_ID');
-      },
-      storeEndpointPublicURL: function (publicURL) {
-        localStorageService.set('ENDPOINT_PUBLIC_URL', publicURL);
-      },
-      getEndpointPublicURL: function () {
-        return localStorageService.get('ENDPOINT_PUBLIC_URL');
-      },
       storeLoginStateUUID: function (uuid) {
         localStorageService.set('LOGIN_STATE_UUID', uuid);
       },
       getLoginStateUUID: function () {
         return localStorageService.get('LOGIN_STATE_UUID');
       },
-      storeOfflineMode: function (isOffline) {
-        localStorageService.set('ENDPOINT_OFFLINE_MODE', isOffline);
-      },
-      getOfflineMode: function () {
-        return localStorageService.get('ENDPOINT_OFFLINE_MODE');
-      },
-      storeEndpoints: function (data) {
-        localStorageService.set('ENDPOINTS_DATA', data);
-      },
-      getEndpoints: function () {
-        return localStorageService.get('ENDPOINTS_DATA');
-      },
       storeEndpointState: function (state) {
         localStorageService.set('ENDPOINT_STATE', state);
       },
       getEndpointState: function () {
         return localStorageService.get('ENDPOINT_STATE');
+      },
+      cleanEndpointState() {
+        localStorageService.remove('ENDPOINT_STATE');
       },
       storeApplicationState: function (state) {
         localStorageService.set('APPLICATION_STATE', state);
@@ -134,9 +113,6 @@ angular.module('portainer.app').factory('LocalStorage', [
       },
       cleanAuthData() {
         localStorageService.remove('JWT', 'APPLICATION_STATE', 'LOGIN_STATE_UUID');
-      },
-      cleanEndpointData() {
-        localStorageService.remove('ENDPOINT_ID', 'ENDPOINT_PUBLIC_URL', 'ENDPOINT_OFFLINE_MODE', 'ENDPOINTS_DATA', 'ENDPOINT_STATE');
       },
       storeKubernetesSummaryToggle(value) {
         localStorageService.set('kubernetes_summary_expanded', value);

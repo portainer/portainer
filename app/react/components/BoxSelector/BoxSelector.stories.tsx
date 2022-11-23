@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
-import { init as initFeatureService } from '@/portainer/feature-flags/feature-flags.service';
-import { Edition, FeatureId } from '@/portainer/feature-flags/enums';
+import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
+import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { BoxSelector } from './BoxSelector';
 import { BoxSelectorOption } from './types';

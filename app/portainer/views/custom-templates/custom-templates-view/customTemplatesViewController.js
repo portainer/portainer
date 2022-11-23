@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 class CustomTemplatesViewController {
   /* @ngInject */

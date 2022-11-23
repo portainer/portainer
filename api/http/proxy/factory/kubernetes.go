@@ -33,7 +33,7 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenCache := factory.kubernetesTokenCacheManager.GetOrCreateTokenCache(endpoint.ID)
 	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, true)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 		return nil, err
 	}
 
-	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenCache := factory.kubernetesTokenCacheManager.GetOrCreateTokenCache(endpoint.ID)
 	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, false)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 		return nil, err
 	}
 
-	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenCache := factory.kubernetesTokenCacheManager.GetOrCreateTokenCache(endpoint.ID)
 	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, false)
 	if err != nil {
 		return nil, err

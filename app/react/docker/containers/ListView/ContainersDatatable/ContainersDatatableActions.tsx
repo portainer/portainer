@@ -10,7 +10,7 @@ import {
 } from 'react-feather';
 
 import * as notifications from '@/portainer/services/notifications';
-import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
+import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
 import { setPortainerAgentTargetHeader } from '@/portainer/services/http-request.helper';
 import {
@@ -27,7 +27,7 @@ import {
   startContainer,
   stopContainer,
 } from '@/react/docker/containers/containers.service';
-import type { EnvironmentId } from '@/portainer/environments/types';
+import type { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Link } from '@@/Link';
 import { ButtonGroup, Button } from '@@/buttons';

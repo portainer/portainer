@@ -7,7 +7,7 @@ import Proget from '@/assets/ico/vendor/proget.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
 import Gitlab from '@/assets/ico/vendor/gitlab.svg?c';
 
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 export const options = [
   {

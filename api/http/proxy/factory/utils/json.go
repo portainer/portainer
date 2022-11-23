@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 
 	"gopkg.in/yaml.v3"
@@ -50,7 +49,7 @@ func getBody(body io.ReadCloser, contentType string, isGzip bool) (interface{}, 
 
 	defer reader.Close()
 
-	bodyBytes, err := ioutil.ReadAll(reader)
+	bodyBytes, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}

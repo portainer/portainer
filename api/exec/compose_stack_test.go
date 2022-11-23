@@ -1,7 +1,7 @@
 package exec
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"testing"
@@ -55,7 +55,7 @@ func Test_createEnvFile(t *testing.T) {
 				assert.Equal(t, "stack.env", result)
 
 				f, _ := os.Open(path.Join(dir, "stack.env"))
-				content, _ := ioutil.ReadAll(f)
+				content, _ := io.ReadAll(f)
 
 				assert.Equal(t, tt.expected, string(content))
 			} else {
@@ -80,7 +80,7 @@ func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 	assert.NoError(t, err)
 	assert.FileExists(t, path.Join(dir, "stack.env"))
 	f, _ := os.Open(path.Join(dir, "stack.env"))
-	content, _ := ioutil.ReadAll(f)
+	content, _ := io.ReadAll(f)
 
 	assert.Equal(t, []byte("VAR1=VAL1\nVAR2=VAL2\n\nVAR1=NEW_VAL1\nVAR3=VAL3\n"), content)
 }

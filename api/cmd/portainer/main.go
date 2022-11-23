@@ -19,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/demo"
@@ -43,6 +44,7 @@ import (
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 
+	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -98,8 +100,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 
 		log.Info().Msg("exiting rollback")
 		os.Exit(0)
-
-		return nil
 	}
 
 	// Init sets some defaults - it's basically a migration
@@ -109,24 +109,27 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	}
 
 	if isNew {
-		// from MigrateData
-		store.VersionService.StoreDBVersion(portainer.DBVersion)
+		instanceId, err := uuid.NewV4()
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed generating instance id")
+		}
 
-		err := updateSettingsFromFlags(store, flags)
+		// from MigrateData
+		v := models.Version{
+			SchemaVersion: portainer.APIVersion,
+			Edition:       int(portainer.PortainerCE),
+			InstanceID:    instanceId.String(),
+		}
+		store.VersionService.UpdateVersion(&v)
+
+		err = updateSettingsFromFlags(store, flags)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed updating settings from flags")
 		}
 	} else {
-		storedVersion, err := store.VersionService.DBVersion()
+		err = store.MigrateData()
 		if err != nil {
-			log.Fatal().Err(err).Msg("failure during creation of new database")
-		}
-
-		if storedVersion != portainer.DBVersion {
-			err = store.MigrateData()
-			if err != nil {
-				log.Fatal().Err(err).Msg("failed migration")
-			}
+			log.Fatal().Err(err).Msg("failed migration")
 		}
 	}
 
@@ -239,8 +242,8 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore dataservices.DataStore) *kubecli.ClientFactory {
-	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, dataStore dataservices.DataStore, instanceID, addrHTTPS, userSessionTimeout string) (*kubecli.ClientFactory, error) {
+	return kubecli.NewClientFactory(signatureService, reverseTunnelService, dataStore, instanceID, addrHTTPS, userSessionTimeout)
 }
 
 func initSnapshotService(
@@ -612,7 +615,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
-	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID, dataStore)
+	kubernetesClientFactory, err := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, dataStore, instanceID, *flags.AddrHTTPS, settings.UserSessionTimeout)
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
@@ -719,6 +722,23 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Msg("failed to fetch SSL settings from DB")
 	}
 
+	// FIXME: In 2.16 we changed the way ingress controller permissions are
+	// stored. Instead of being stored as annotation on an ingress rule, we keep
+	// them in our database. However, in order to run the migration we need an
+	// admin kube client to run lookup the old ingress rules and compare them
+	// with the current existing ingress classes.
+	//
+	// Unfortunately, our migrations run as part of the database initialization
+	// and our kubeclients require an initialized database. So it is not
+	// possible to do this migration as part of our normal flow. We DO have a
+	// migration which toggles a boolean in kubernetes configuration that
+	// indicated that this "post init" migration should be run. If/when this is
+	// resolved we can remove this function.
+	err = kubernetesClientFactory.PostInitMigrateIngresses()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failure during creation of new database")
+	}
+
 	return &http.Server{
 		AuthorizationService:        authorizationService,
 		ReverseTunnelService:        reverseTunnelService,
@@ -758,10 +778,12 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 func main() {
 	configureLogger()
+	setLoggingMode("PRETTY")
 
 	flags := initCLI()
 
 	setLoggingLevel(*flags.LogLevel)
+	setLoggingMode(*flags.LogMode)
 
 	for {
 		server := buildServer(flags)

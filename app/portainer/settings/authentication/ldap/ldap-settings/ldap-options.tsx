@@ -1,9 +1,9 @@
 import { Edit } from 'react-feather';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Openldap from '@/assets/ico/vendor/openldap.svg?c';
 
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 const SERVER_TYPES = {
   CUSTOM: 0,

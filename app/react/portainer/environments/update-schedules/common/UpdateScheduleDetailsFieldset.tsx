@@ -1,8 +1,8 @@
 import { useFormikContext } from 'formik';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
-import { EdgeTypes, EnvironmentId } from '@/portainer/environments/types';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
+import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
 
 import { useActiveSchedules } from '../queries/useActiveSchedules';
 

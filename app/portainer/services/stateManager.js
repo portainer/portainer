@@ -66,13 +66,14 @@ function StateManagerFactory(
   };
 
   manager.clean = function () {
-    state.endpoint = {};
+    manager.cleanEndpoint();
     state.application = {};
   };
 
   manager.cleanEndpoint = function () {
     state.endpoint = {};
     EndpointProvider.clean();
+    LocalStorage.cleanEndpointState();
   };
 
   manager.updateLogo = function (logoURL) {
@@ -193,11 +194,9 @@ function StateManagerFactory(
       return deferred.promise;
     }
 
-    const reload = endpoint.Status === 1 || !endpoint.Snaphosts || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
-
     $q.all({
-      version: reload ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
-      info: reload ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
+      version: SystemService.version(),
+      info: SystemService.info(),
     })
       .then(function success(data) {
         var endpointMode = InfoHelper.determineEndpointMode(data.info, endpoint.Type);
@@ -208,7 +207,7 @@ function StateManagerFactory(
         state.endpoint.apiVersion = endpointAPIVersion;
 
         if (endpointMode.agentProxy && endpoint.Status === 1) {
-          return AgentPingService.ping().then(function onPingSuccess(data) {
+          return AgentPingService.ping(endpoint.Id).then(function onPingSuccess(data) {
             state.endpoint.agentApiVersion = data.version;
           });
         }

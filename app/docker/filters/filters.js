@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { trimSHA } from './utils';
+import { joinCommand, trimSHA } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -191,12 +191,7 @@ angular
     };
   })
   .filter('command', function () {
-    'use strict';
-    return function (command) {
-      if (command) {
-        return command.join(' ');
-      }
-    };
+    return joinCommand;
   })
   .filter('hideshasum', function () {
     'use strict';

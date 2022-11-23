@@ -1,16 +1,14 @@
 <page-header title="'Host overview'" breadcrumbs="['Docker']" reload="true"> </page-header>
 
-<information-panel-offline ng-if="$ctrl.offlineMode"></information-panel-offline>
-
 <host-details-panel
   host="$ctrl.hostDetails"
-  is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled"
+  is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && $ctrl.hostFeaturesEnabled"
   browse-url="{{ $ctrl.browseUrl }}"
 ></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
-<devices-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled" devices="$ctrl.devices"></devices-panel>
-<disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled" disks="$ctrl.disks"></disks-panel>
+<devices-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && $ctrl.hostFeaturesEnabled" devices="$ctrl.devices"></devices-panel>
+<disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && $ctrl.hostFeaturesEnabled" disks="$ctrl.disks"></disks-panel>
 
 <ng-transclude></ng-transclude>

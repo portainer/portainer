@@ -1,0 +1,95 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-file-alt" title-text="Nomad Log viewer settings"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label for="repository_mechanism" class="col-sm-1 control-label text-left"> Log type </label>
+            <div class="col-sm-11">
+              <div class="input-group col-sm-10 input-group-sm">
+                <div class="btn-group btn-group-sm">
+                  <label class="btn btn-primary" ng-click="$ctrl.onChangeLogType($ctrl.model.logType)" ng-model="$ctrl.model.logType" uib-btn-radio="'stderr'">stderr</label>
+                  <label class="btn btn-primary" ng-click="$ctrl.onChangeLogType($ctrl.model.logType)" ng-model="$ctrl.model.logType" uib-btn-radio="'stdout'">stdout</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-1">
+              <label for="tls" class="control-label text-left">
+                Auto-refresh
+                <portainer-tooltip message="'Disabling this option allows you to pause the log collection process and the auto-scrolling.'"></portainer-tooltip>
+              </label>
+            </div>
+            <div class="col-sm-11">
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  ng-model="$ctrl.state.logCollection"
+                  ng-change="$ctrl.state.autoScroll = $ctrl.state.logCollection; $ctrl.logCollectionChange($ctrl.state.logCollection)"
+                /><i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="logs_search" class="col-sm-1 control-label text-left"> Search </label>
+            <div class="col-sm-11">
+              <input class="form-control" type="text" name="logs_search" ng-model="$ctrl.state.search" ng-change="$ctrl.state.selectedLines.length = 0;" placeholder="Filter..." />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-1">
+              <label for="tls" class="control-label text-left"> Wrap lines </label>
+            </div>
+            <div class="col-sm-11">
+              <label class="switch"> <input type="checkbox" ng-model="$ctrl.state.wrapLines" /><i></i> </label>
+            </div>
+          </div>
+          <div class="form-group" ng-if="$ctrl.state.copySupported">
+            <label class="col-sm-1 control-label text-left"> Actions </label>
+            <div class="col-sm-11">
+              <button class="btn btn-primary btn-sm" type="button" ng-click="$ctrl.downloadLogs()" style="margin-left: 0"><i class="fa fa-download"></i> Download logs</button>
+              <button
+                class="btn btn-primary btn-sm"
+                ng-click="$ctrl.copy()"
+                ng-disabled="($ctrl.state[$ctrl.model.logType].filteredLogs.length === 1 && !$ctrl.state[$ctrl.model.logType].filteredLogs[0].line) || !$ctrl.state[$ctrl.model.logType].filteredLogs.length"
+                ><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</button
+              >
+              <button
+                class="btn btn-primary btn-sm"
+                ng-click="$ctrl.copySelection()"
+                ng-disabled="($ctrl.state[$ctrl.model.logType].filteredLogs.length === 1 && !$ctrl.state[$ctrl.model.logType].filteredLogs[0].line) || !$ctrl.state[$ctrl.model.logType].filteredLogs.length || !$ctrl.state[$ctrl.model.logType].selectedLines.length"
+                ><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy selected lines</button
+              >
+              <button class="btn btn-primary btn-sm" ng-click="$ctrl.clearSelection()" ng-disabled="$ctrl.state[$ctrl.model.logType].selectedLines.length === 0"
+                ><i class="fa fa-times space-right" aria-hidden="true"></i>Unselect</button
+              >
+              <span>
+                <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
+              </span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" style="height: 54%">
+  <div class="col-sm-12" style="height: 100%" ng-if="$ctrl.model.logType === $ctrl.NomadLogType.STDERR">
+    <pre ng-class="{ wrap_lines: $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
+      <div ng-if="$ctrl.stderrLog.length === 0 && $ctrl.state.stderr.filteredLogs.length === 0 && !$ctrl.state.logCollection" class="line"><p class="inner_line">No logs available</p></div>
+      <div ng-repeat="log in $ctrl.state.stderr.filteredLogs = ($ctrl.stderrLog | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.stderr.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor }">{{ span.text }}</span></p></div>
+      <div ng-if="$ctrl.stderrLog.length !== 0 && !$ctrl.state.stderr.filteredLogs.length && $ctrl.state.search" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
+    </pre>
+  </div>
+
+  <div class="col-sm-12" style="height: 100%" ng-if="$ctrl.model.logType === $ctrl.NomadLogType.STDOUT">
+    <pre ng-class="{ wrap_lines: $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
+      <div ng-if="$ctrl.stdoutLog.length === 0 && $ctrl.state.stdout.filteredLogs.length === 0 && !$ctrl.state.logCollection" class="line"><p class="inner_line">No logs available</p></div>
+      <div ng-repeat="log in $ctrl.state.stdout.filteredLogs = ($ctrl.stdoutLog | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.stdout.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor }">{{ span.text }}</span></p></div>
+      <div ng-if="$ctrl.stdoutLog.length !== 0 && !$ctrl.state.stdout.filteredLogs.length && $ctrl.state.search" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
+    </pre>
+  </div>
+</div>

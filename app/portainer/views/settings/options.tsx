@@ -1,8 +1,8 @@
 import { DownloadCloud, UploadCloud } from 'react-feather';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 export const options = [
   {

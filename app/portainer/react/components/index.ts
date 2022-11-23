@@ -30,9 +30,10 @@ import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { Slider } from '@@/form-components/Slider';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -88,8 +89,6 @@ export const componentsModule = angular
       'alt',
       'size',
       'className',
-      'fallbackMode',
-      'fallbackClassName',
       'feather',
     ])
   )
@@ -106,10 +105,10 @@ export const componentsModule = angular
     'datatableSearchbar',
     r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
   )
-  .component('boxSelectorBadgeIcon', r2a(BadgeIcon, ['featherIcon', 'icon']))
+  .component('badgeIcon', r2a(BadgeIcon, ['featherIcon', 'icon', 'size']))
   .component(
     'accessControlPanel',
-    r2a(withReactQuery(withCurrentUser(AccessControlPanel)), [
+    r2a(withUIRouter(withReactQuery(withCurrentUser(AccessControlPanel))), [
       'disableOwnershipChange',
       'onUpdateSuccess',
       'resourceControl',
@@ -149,6 +148,7 @@ export const componentsModule = angular
       'name',
       'placeholder',
       'teams',
+      'disabled',
     ])
   )
   .component(
@@ -183,6 +183,18 @@ export const componentsModule = angular
       'options',
       'isMulti',
       'isClearable',
+    ])
+  )
+  .component(
+    'porSlider',
+    r2a(Slider, [
+      'min',
+      'max',
+      'step',
+      'value',
+      'onChange',
+      'visibleTooltip',
+      'dataCy',
     ])
   )
   .component(

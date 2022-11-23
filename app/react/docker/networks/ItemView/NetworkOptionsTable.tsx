@@ -15,21 +15,17 @@ export function NetworkOptionsTable({ options }: Props) {
   }
 
   return (
-    <div className="row">
-      <div className="col-lg-12 col-md-12 col-xs-12">
-        <TableContainer>
-          <TableTitle label="Network options" icon="share-2" featherIcon />
-          <Table className="nopadding">
-            <DetailsTable dataCy="networkDetails-networkOptionsTable">
-              {networkEntries.map(([key, value]) => (
-                <DetailsTable.Row key={key} label={key}>
-                  {value}
-                </DetailsTable.Row>
-              ))}
-            </DetailsTable>
-          </Table>
-        </TableContainer>
-      </div>
-    </div>
+    <TableContainer>
+      <TableTitle label="Network options" icon="share-2" featherIcon />
+      <Table className="nopadding">
+        <DetailsTable dataCy="networkDetails-networkOptionsTable">
+          {networkEntries.map(([key, value]) => (
+            <DetailsTable.Row key={key} label={key}>
+              {value}
+            </DetailsTable.Row>
+          ))}
+        </DetailsTable>
+      </Table>
+    </TableContainer>
   );
 }

@@ -24,13 +24,7 @@
   <div class="col-sm-12" ng-if="$ctrl.state.chart">
     <rd-widget>
       <div class="toolBarTitle vertical-center pt-5 px-5 text-muted">
-        <fallback-image
-          src="$ctrl.state.chart.icon"
-          fallback-icon="'svg-helm'"
-          class-name="'h-8 w-8'"
-          fallback-class-name="'icon-nested-blue'"
-          fallback-mode="'primary'"
-        ></fallback-image>
+        <fallback-image src="$ctrl.state.chart.icon" fallback-icon="'svg-helm'" class-name="'h-8 w-8'" size="'lg'"></fallback-image>
         {{ $ctrl.state.chart.name }}
       </div>
       <rd-widget-body classes="padding">

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
 import { ContainerStatus } from '@/react/docker/containers/types';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';

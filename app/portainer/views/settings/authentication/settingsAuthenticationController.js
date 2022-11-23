@@ -166,6 +166,10 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     }
 
     settings.URLs = settings.URLs.map((url) => {
+      if (url === undefined || url === '') {
+        return;
+      }
+
       if (url.includes(':')) {
         return url;
       }

@@ -1,10 +1,10 @@
 import { useReducer } from 'react';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -46,39 +46,35 @@ export function AccessControlPanel({
     (!isAdmin && !isPartOfRestrictedUsers && !isLeaderOfAnyRestrictedTeams);
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <TableContainer>
-          <TableTitle label="Access control" icon="eye" featherIcon />
-          <AccessControlPanelDetails
-            resourceType={resourceType}
-            resourceControl={resourceControl}
-          />
+    <TableContainer>
+      <TableTitle label="Access control" icon="eye" featherIcon />
+      <AccessControlPanelDetails
+        resourceType={resourceType}
+        resourceControl={resourceControl}
+      />
 
-          {!isEditDisabled && !isEditMode && (
-            <div className="row">
-              <div>
-                <Button color="link" onClick={toggleEditMode}>
-                  <Icon icon="edit" className="space-right" feather />
-                  Change ownership
-                </Button>
-              </div>
-            </div>
-          )}
+      {!isEditDisabled && !isEditMode && (
+        <div className="row">
+          <div>
+            <Button color="link" onClick={toggleEditMode}>
+              <Icon icon="edit" className="space-right" feather />
+              Change ownership
+            </Button>
+          </div>
+        </div>
+      )}
 
-          {isEditMode && (
-            <AccessControlPanelForm
-              resourceControl={resourceControl}
-              onCancelClick={() => toggleEditMode()}
-              resourceId={resourceId}
-              resourceType={resourceType}
-              environmentId={environmentId}
-              onUpdateSuccess={handleUpdateSuccess}
-            />
-          )}
-        </TableContainer>
-      </div>
-    </div>
+      {isEditMode && (
+        <AccessControlPanelForm
+          resourceControl={resourceControl}
+          onCancelClick={() => toggleEditMode()}
+          resourceId={resourceId}
+          resourceType={resourceType}
+          environmentId={environmentId}
+          onUpdateSuccess={handleUpdateSuccess}
+        />
+      )}
+    </TableContainer>
   );
 
   async function handleUpdateSuccess() {

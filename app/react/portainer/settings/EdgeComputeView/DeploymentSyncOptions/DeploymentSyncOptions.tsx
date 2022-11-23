@@ -1,8 +1,8 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import { EdgeAsyncIntervalsForm } from '@/edge/components/EdgeAsyncIntervalsForm';
+import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
+import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -83,25 +83,27 @@ export function DeploymentSyncOptions() {
                 </TextTip>
 
                 <FormSection title="Check-in Intervals">
-                  {!values.Edge.AsyncMode ? (
-                    <EdgeCheckinIntervalField
-                      value={values.EdgeAgentCheckinInterval}
-                      onChange={(value) =>
-                        setFieldValue('EdgeAgentCheckinInterval', value)
-                      }
-                      isDefaultHidden
-                      label="Edge agent default poll frequency"
-                      tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
-                    />
-                  ) : (
+                  <EdgeCheckinIntervalField
+                    value={values.EdgeAgentCheckinInterval}
+                    onChange={(value) =>
+                      setFieldValue('EdgeAgentCheckinInterval', value)
+                    }
+                    isDefaultHidden
+                    label="Edge agent default poll frequency"
+                    tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
+                  />
+                </FormSection>
+
+                {values.Edge.AsyncMode && (
+                  <FormSection title="Async Check-in Intervals">
                     <EdgeAsyncIntervalsForm
                       values={values.Edge}
                       onChange={(value) => setFieldValue('Edge', value)}
                       isDefaultHidden
                       fieldSettings={asyncIntervalFieldSettings}
                     />
-                  )}
-                </FormSection>
+                  </FormSection>
+                )}
 
                 <FormSection title="Actions">
                   <div className="form-group mt-5">

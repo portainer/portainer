@@ -131,6 +131,17 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 			return errors.New("Invalid Azure authentication key")
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
+
+	case edgeAgentEnvironment:
+		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", false)
+		if err != nil || strings.EqualFold("", strings.Trim(endpointURL, " ")) {
+			return errors.New("URL cannot be empty")
+		}
+		payload.URL = endpointURL
+
+		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
+		payload.PublicURL = publicURL
+
 	default:
 		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
@@ -169,7 +180,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param Name formData string true "Name that will be used to identify this environment(endpoint) (example: my-environment)"
 // @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment" Enum(1,2,3,4,5)
-// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)"
+// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)". Cannot be empty if EndpointCreationType is set to 4 (Edge agent environment)
 // @param PublicURL formData string false "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)"
 // @param GroupID formData int false "Environment(Endpoint) group identifier. If not specified will default to 1 (unassigned)."
 // @param TLS formData bool false "Require TLS to connect against this environment(endpoint)"
@@ -374,7 +385,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, httperror.InternalServerError("An error occured while trying to create the environment", err)
+		return nil, httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
 
 	return endpoint, nil
@@ -504,7 +515,7 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("An error occured while trying to create the environment", err)
+		return httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
 
 	return nil

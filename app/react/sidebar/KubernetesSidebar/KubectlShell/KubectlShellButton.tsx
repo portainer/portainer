@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Button } from '@@/buttons';

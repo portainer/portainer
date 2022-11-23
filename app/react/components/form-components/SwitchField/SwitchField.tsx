@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { Tooltip } from '@@/Tip/Tooltip';
 

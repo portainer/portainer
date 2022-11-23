@@ -1,6 +1,7 @@
-import _ from 'lodash-es';
+import { filter, flatMap, map } from 'lodash';
 import angular from 'angular';
 import $allSettled from 'Portainer/services/allSettled';
+import { concatLogsToString, formatLogs } from '@/docker/helpers/logHelper';
 
 const colors = ['red', 'orange', 'lime', 'green', 'darkgreen', 'cyan', 'turquoise', 'teal', 'deepskyblue', 'blue', 'darkblue', 'slateblue', 'magenta', 'darkviolet'];
 
@@ -58,7 +59,7 @@ class KubernetesStackLogsController {
       Pods: [],
     };
 
-    const promises = _.flatMap(_.map(app.Pods, (pod) => _.map(pod.Containers, (container) => this.generateLogsPromise(pod, container))));
+    const promises = flatMap(map(app.Pods, (pod) => map(pod.Containers, (container) => this.generateLogsPromise(pod, container))));
     const result = await $allSettled(promises);
     res.Pods = result.fulfilled;
     return res;
@@ -67,21 +68,12 @@ class KubernetesStackLogsController {
   async getStackLogsAsync() {
     try {
       const applications = await this.KubernetesApplicationService.get(this.state.transition.namespace);
-      const filteredApplications = _.filter(applications, (app) => app.StackName === this.state.transition.name);
-      const logsPromises = _.map(filteredApplications, this.generateAppPromise);
+      const filteredApplications = filter(applications, (app) => app.StackName === this.state.transition.name);
+      const logsPromises = map(filteredApplications, this.generateAppPromise);
       const data = await Promise.all(logsPromises);
-      const logs = _.flatMap(data, (app, index) => {
-        return _.flatMap(app.Pods, (pod) => {
-          return _.map(pod.Logs, (line) => {
-            const res = {
-              Color: colors[index % colors.length],
-              Line: line,
-              AppName: pod.Pod.Name,
-            };
-            return res;
-          });
-        });
-      });
+      const logs = flatMap(data, (app, index) =>
+        flatMap(app.Pods, (pod) => formatLogs(pod.Logs).map((line) => ({ ...line, appColor: colors[index % colors.length], appName: pod.Pod.Name })))
+      );
       this.stackLogs = logs;
     } catch (err) {
       this.stopRepeater();
@@ -90,7 +82,8 @@ class KubernetesStackLogsController {
   }
 
   downloadLogs() {
-    const data = new this.Blob([(this.dataLogs = _.reduce(this.stackLogs, (acc, log) => acc + '\n' + log.AppName + ' ' + log.Line, ''))]);
+    const logsAsString = concatLogsToString(this.state.filteredLogs, (line) => `${line.appName} ${line.line}`);
+    const data = new this.Blob([logsAsString]);
     this.FileSaver.saveAs(data, this.state.transition.name + '_logs.txt');
   }
 

@@ -5,7 +5,7 @@ import {
   LicenseInfo,
   LicenseType,
 } from '@/portainer/license-management/types';
-import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 import { Tag } from '@/portainer/tags/types';
 import { StatusResponse } from '@/portainer/services/api/status.service';
 import { createMockTeams } from '@/react-tools/test-mocks';
@@ -30,6 +30,8 @@ const licenseInfo: LicenseInfo = {
   expiresAt: Number.MAX_SAFE_INTEGER,
   productEdition: Edition.EE,
   valid: true,
+  enforcedAt: 0,
+  enforced: false,
 };
 
 export const handlers = [

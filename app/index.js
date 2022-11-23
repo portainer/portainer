@@ -6,8 +6,11 @@ import angular from 'angular';
 import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 
 import './matomo-setup';
-import analyticsModule from './angulartics.matomo';
 
+import { Edition } from '@/react/portainer/feature-flags/enums';
+import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
+
+import analyticsModule from './angulartics.matomo';
 import './agent';
 import { azureModule } from './azure';
 import './docker/__module';
@@ -17,8 +20,6 @@ import './portainer/__module';
 import { onStartupAngular } from './app';
 import { configApp } from './config';
 
-import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
-import { Edition } from './portainer/feature-flags/enums';
 import { nomadModule } from './nomad';
 
 initFeatureService(Edition[process.env.PORTAINER_EDITION]);

@@ -26,7 +26,7 @@ type Connection interface {
 	UpdateObject(bucketName string, key []byte, object interface{}) error
 	UpdateObjectFunc(bucketName string, key []byte, object any, updateFn func()) error
 	DeleteObject(bucketName string, key []byte) error
-	DeleteAllObjects(bucketName string, matching func(o interface{}) (id int, ok bool)) error
+	DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error
 	GetNextIdentifier(bucketName string) int
 	CreateObject(bucketName string, fn func(uint64) (int, interface{})) error
 	CreateObjectWithId(bucketName string, id int, obj interface{}) error

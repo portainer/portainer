@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 export default class AdSettingsController {
   /* @ngInject */

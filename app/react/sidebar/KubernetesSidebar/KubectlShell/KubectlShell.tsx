@@ -8,9 +8,9 @@ import {
   terminalClose,
   terminalResize,
 } from '@/portainer/services/terminal-window';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';

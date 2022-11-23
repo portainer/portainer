@@ -12,7 +12,7 @@ import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   FeatureFlag,
   useFeatureFlag,
-} from '@/portainer/feature-flags/useRedirectFeatureFlag';
+} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';

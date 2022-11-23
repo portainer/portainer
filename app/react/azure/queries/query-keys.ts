@@ -1,4 +1,4 @@
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 export const queryKeys = {
   subscriptions: (environmentId: EnvironmentId) =>

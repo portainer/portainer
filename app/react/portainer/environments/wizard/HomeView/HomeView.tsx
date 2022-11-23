@@ -1,4 +1,4 @@
-import { EnvironmentType } from '@/portainer/environments/types';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { PageHeader } from '@@/PageHeader';

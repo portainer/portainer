@@ -5,17 +5,17 @@ import {
   endpointTypeName,
   stripProtocol,
 } from '@/portainer/filters/filters';
-import { EnvironmentId } from '@/portainer/environments/types';
-import { EdgeIndicator } from '@/portainer/home/EnvironmentList/EnvironmentItem';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   isEdgeEnvironment,
   isUnassociatedEdgeEnvironment,
-} from '@/portainer/environments/utils';
+} from '@/react/portainer/environments/utils';
 import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
-} from '@/portainer/environments/queries/useEnvironmentList';
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 
+import { EdgeIndicator } from '@@/EdgeIndicator';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import styles from './WizardEndpointsList.module.css';

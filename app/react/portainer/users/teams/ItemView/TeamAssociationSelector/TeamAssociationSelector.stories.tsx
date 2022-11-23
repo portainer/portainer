@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { createMockUsers } from '@/react-tools/test-mocks';
 import { Role, User } from '@/portainer/users/types';
 import { UserViewModel } from '@/portainer/models/user';
-import { UserContext } from '@/portainer/hooks/useUser';
+import { UserContext } from '@/react/hooks/useUser';
 
 import { TeamMembership, TeamRole } from '../../types';
 

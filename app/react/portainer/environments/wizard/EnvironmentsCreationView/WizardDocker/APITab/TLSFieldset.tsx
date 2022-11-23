@@ -1,7 +1,6 @@
 import { useFormikContext } from 'formik';
 
-import { file, withFileSize } from '@/portainer/helpers/yup-file-validation';
-
+import { file, withFileSize } from '@@/form-components/yup-file-validation';
 import { FileUploadField } from '@@/form-components/FileUpload';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { FormControl } from '@@/form-components/FormControl';

@@ -1,4 +1,4 @@
-import { Registry } from '@/portainer/environments/environment.service/registries';
+import { Registry } from '@/react/portainer/environments/environment.service/registries';
 
 import { Select } from '@@/form-components/ReactSelect';
 

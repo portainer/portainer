@@ -1,4 +1,4 @@
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios from '@/portainer/services/axios';
 import { genericHandler } from '@/docker/rest/response/handlers';
