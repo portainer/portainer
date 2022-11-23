@@ -30,7 +30,7 @@ function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadServ
       const { FileContent } = remote ? await CustomTemplates.gitFetch({ id }).$promise : await CustomTemplates.file({ id }).$promise;
       return FileContent;
     } catch (err) {
-      throw new PortainerError('Unable to retrieve customTemplate content', err);
+      throw new PortainerError('Unable to retrieve custom template content', err);
     }
   };
 
