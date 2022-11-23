@@ -34,6 +34,16 @@ func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []porta
 	return endpointIDs
 }
 
+func EdgeGroupSet(edgeGroupIDs []portainer.EdgeGroupID) map[portainer.EdgeGroupID]bool {
+	set := map[portainer.EdgeGroupID]bool{}
+
+	for _, edgeGroupID := range edgeGroupIDs {
+		set[edgeGroupID] = true
+	}
+
+	return set
+}
+
 // edgeGroupRelatedToEndpoint returns true is edgeGroup is associated with environment(endpoint)
 func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup) bool {
 	if !edgeGroup.Dynamic {

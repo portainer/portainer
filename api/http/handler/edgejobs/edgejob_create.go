@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/maps"
 )
 
 // @id EdgeJobCreate
@@ -41,7 +42,7 @@ func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *h
 	case "file":
 		return handler.createEdgeJobFromFile(w, r)
 	default:
-		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", errors.New(request.ErrInvalidQueryParameter))
+		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", errors.New(strings.ToLower(request.ErrInvalidQueryParameter)))
 	}
 }
 
@@ -50,28 +51,29 @@ type edgeJobCreateFromFileContentPayload struct {
 	CronExpression string
 	Recurring      bool
 	Endpoints      []portainer.EndpointID
+	EdgeGroups     []portainer.EdgeGroupID
 	FileContent    string
 }
 
 func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid Edge job name")
+		return errors.New("invalid Edge job name")
 	}
 
 	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`) {
-		return errors.New("Invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
+		return errors.New("invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 
 	if govalidator.IsNull(payload.CronExpression) {
-		return errors.New("Invalid cron expression")
+		return errors.New("invalid cron expression")
 	}
 
-	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
-		return errors.New("Invalid environment payload")
+	if (payload.Endpoints == nil || len(payload.Endpoints) == 0) && (payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0) {
+		return errors.New("no environments or groups have been provided")
 	}
 
 	if govalidator.IsNull(payload.FileContent) {
-		return errors.New("Invalid script file content")
+		return errors.New("invalid script file content")
 	}
 
 	return nil
@@ -86,7 +88,17 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 
 	edgeJob := handler.createEdgeJobObjectFromFileContentPayload(&payload)
 
-	err = handler.addAndPersistEdgeJob(edgeJob, []byte(payload.FileContent))
+	var endpoints []portainer.EndpointID
+	var httpErr *httperror.HandlerError
+	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
+		endpoints, httpErr = handler.getEndpointsFromEdgeGroups(payload.EdgeGroups)
+		if httpErr != nil {
+			return httpErr
+		}
+	}
+
+	err = handler.addAndPersistEdgeJob(edgeJob, []byte(payload.FileContent), endpoints)
+
 	if err != nil {
 		return httperror.InternalServerError("Unable to schedule Edge job", err)
 	}
@@ -99,36 +111,48 @@ type edgeJobCreateFromFilePayload struct {
 	CronExpression string
 	Recurring      bool
 	Endpoints      []portainer.EndpointID
+	EdgeGroups     []portainer.EdgeGroupID
 	File           []byte
 }
 
 func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid Edge job name")
+		return errors.New("invalid Edge job name")
 	}
 
 	if !govalidator.Matches(name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
-		return errors.New("Invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
+		return errors.New("invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 	payload.Name = name
 
 	cronExpression, err := request.RetrieveMultiPartFormValue(r, "CronExpression", false)
 	if err != nil {
-		return errors.New("Invalid cron expression")
+		return errors.New("invalid cron expression")
 	}
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, true)
 	if err != nil {
-		return errors.New("Invalid environments")
+		return errors.New("invalid environments")
 	}
 	payload.Endpoints = endpoints
 
+	var edgeGroups []portainer.EdgeGroupID
+	err = request.RetrieveMultiPartFormJSONValue(r, "EdgeGroups", &edgeGroups, true)
+	if err != nil {
+		return errors.New("invalid edge groups")
+	}
+	payload.EdgeGroups = edgeGroups
+
+	if (payload.Endpoints == nil || len(payload.Endpoints) == 0) && (payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0) {
+		return errors.New("no environments or groups have been provided")
+	}
+
 	file, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return errors.New("Invalid script file. Ensure that the file is uploaded correctly")
+		return errors.New("invalid script file. Ensure that the file is uploaded correctly")
 	}
 	payload.File = file
 
@@ -144,7 +168,17 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 
 	edgeJob := handler.createEdgeJobObjectFromFilePayload(payload)
 
-	err = handler.addAndPersistEdgeJob(edgeJob, payload.File)
+	var endpoints []portainer.EndpointID
+	var httpErr *httperror.HandlerError
+	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
+		endpoints, httpErr = handler.getEndpointsFromEdgeGroups(payload.EdgeGroups)
+		if httpErr != nil {
+			return httpErr
+		}
+	}
+
+	err = handler.addAndPersistEdgeJob(edgeJob, payload.File, endpoints)
+
 	if err != nil {
 		return httperror.InternalServerError("Unable to schedule Edge job", err)
 	}
@@ -155,7 +189,7 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *portainer.EdgeJob {
 	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
+	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
 		ID:             edgeJobIdentifier,
@@ -164,6 +198,7 @@ func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreat
 		Recurring:      payload.Recurring,
 		Created:        time.Now().Unix(),
 		Endpoints:      endpoints,
+		EdgeGroups:     payload.EdgeGroups,
 		Version:        1,
 	}
 
@@ -173,7 +208,7 @@ func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreat
 func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *portainer.EdgeJob {
 	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
+	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
 		ID:             edgeJobIdentifier,
@@ -182,13 +217,14 @@ func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJ
 		Recurring:      payload.Recurring,
 		Created:        time.Now().Unix(),
 		Endpoints:      endpoints,
+		EdgeGroups:     payload.EdgeGroups,
 		Version:        1,
 	}
 
 	return edgeJob
 }
 
-func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []byte) error {
+func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []byte, endpointsFromGroups []portainer.EndpointID) error {
 	edgeCronExpression := strings.Split(edgeJob.CronExpression, " ")
 	if len(edgeCronExpression) == 6 {
 		edgeCronExpression = edgeCronExpression[1:]
@@ -206,29 +242,39 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		}
 	}
 
-	if len(edgeJob.Endpoints) == 0 {
-		return errors.New("Environments are mandatory for an Edge job")
-	}
-
 	scriptPath, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), file)
 	if err != nil {
 		return err
 	}
 	edgeJob.ScriptPath = scriptPath
 
-	for endpointID := range edgeJob.Endpoints {
+	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
+	if len(endpointsFromGroups) > 0 {
+		endpointsMap = handler.convertEndpointsToMetaObject(endpointsFromGroups)
+
+		for ID := range endpointsMap {
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
+			if err != nil {
+				return err
+			}
+
+			if !endpointutils.IsEdgeEndpoint(endpoint) {
+				delete(endpointsMap, ID)
+			}
+		}
+
+		maps.Copy(endpointsMap, edgeJob.Endpoints)
+	} else {
+		endpointsMap = edgeJob.Endpoints
+	}
+
+	if len(endpointsMap) == 0 {
+		return errors.New("environments or edge groups are mandatory for an Edge job")
+	}
+
+	for endpointID := range endpointsMap {
 		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 
 	return handler.DataStore.EdgeJob().Create(edgeJob.ID, edgeJob)
-}
-
-func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {
-	endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
-
-	for _, endpointID := range endpoints {
-		endpointsMap[endpointID] = portainer.EdgeJobEndpointMeta{}
-	}
-
-	return endpointsMap
 }

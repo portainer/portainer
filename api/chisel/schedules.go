@@ -45,3 +45,20 @@ func (service *Service) RemoveEdgeJob(edgeJobID portainer.EdgeJobID) {
 
 	service.mu.Unlock()
 }
+
+func (service *Service) RemoveEdgeJobFromEndpoint(endpointID portainer.EndpointID, edgeJobID portainer.EdgeJobID) {
+	service.mu.Lock()
+	tunnel := service.getTunnelDetails(endpointID)
+
+	n := 0
+	for _, edgeJob := range tunnel.Jobs {
+		if edgeJob.ID != edgeJobID {
+			tunnel.Jobs[n] = edgeJob
+			n++
+		}
+	}
+
+	tunnel.Jobs = tunnel.Jobs[:n]
+
+	service.mu.Unlock()
+}

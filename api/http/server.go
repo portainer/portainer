@@ -147,6 +147,7 @@ func (server *Server) Start() error {
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
+	edgeGroupsHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var edgeJobsHandler = edgejobs.NewHandler(requestBouncer)
 	edgeJobsHandler.DataStore = server.DataStore

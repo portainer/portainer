@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/maps"
 )
 
 type taskContainer struct {
@@ -44,8 +45,19 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 
 	tasks := make([]taskContainer, 0)
 
-	for endpointID, meta := range edgeJob.Endpoints {
+	endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
+	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
+		endpoints, httpErr := handler.getEndpointsFromEdgeGroups(edgeJob.EdgeGroups)
+		if httpErr != nil {
+			return httpErr
+		}
 
+		endpointsMap = handler.convertEndpointsToMetaObject(endpoints)
+	}
+
+	maps.Copy(endpointsMap, edgeJob.Endpoints)
+
+	for endpointID, meta := range endpointsMap {
 		cronTask := taskContainer{
 			ID:         fmt.Sprintf("edgejob_task_%d_%d", edgeJob.ID, endpointID),
 			EndpointID: endpointID,
