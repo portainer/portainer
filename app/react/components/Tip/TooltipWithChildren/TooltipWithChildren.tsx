@@ -61,12 +61,14 @@ export function TooltipWithChildren({
   );
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <span
       data-html
       data-multiline
       data-tip={ReactDOMServer.renderToString(messageHTML)}
       data-for={id}
       className={clsx(styles.icon, 'inline-flex text-base')}
+      onClick={(e) => e.preventDefault()} // click is boucing to the element behind the tooltip so preventing it.
     >
       {children}
       <ReactTooltip
