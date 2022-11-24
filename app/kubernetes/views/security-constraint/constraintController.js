@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { FeatureId } from 'Portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 angular.module('portainer.kubernetes').controller('KubernetesSecurityConstraintController', [
   '$scope',

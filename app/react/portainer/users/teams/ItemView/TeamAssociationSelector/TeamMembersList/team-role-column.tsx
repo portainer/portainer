@@ -2,7 +2,7 @@ import { CellProps, Column } from 'react-table';
 import { User as UserIcon, UserPlus, UserX } from 'react-feather';
 
 import { User } from '@/portainer/users/types';
-import { useUser as useCurrentUser } from '@/portainer/hooks/useUser';
+import { useUser as useCurrentUser } from '@/react/hooks/useUser';
 import { TeamRole } from '@/react/portainer/users/teams/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {

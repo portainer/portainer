@@ -4,6 +4,7 @@ export type OS = 'win' | 'linux';
 export interface ScriptFormValues {
   nomadToken: string;
   authEnabled: boolean;
+  tlsEnabled: boolean;
 
   allowSelfSignedCertificates: boolean;
   envVars: string;

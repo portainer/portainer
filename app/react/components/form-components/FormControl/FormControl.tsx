@@ -7,7 +7,7 @@ import { FormError } from '../FormError';
 
 import styles from './FormControl.module.css';
 
-type Size = 'small' | 'medium' | 'large';
+export type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props {
   inputId?: string;
@@ -60,6 +60,8 @@ function sizeClassLabel(size?: Size) {
       return 'col-sm-5 col-lg-4';
     case 'medium':
       return 'col-sm-4 col-lg-3';
+    case 'xsmall':
+      return 'col-sm-2';
     default:
       return 'col-sm-3 col-lg-2';
   }
@@ -71,6 +73,8 @@ function sizeClassChildren(size?: Size) {
       return 'col-sm-7 col-lg-8';
     case 'medium':
       return 'col-sm-8 col-lg-9';
+    case 'xsmall':
+      return 'col-sm-8';
     default:
       return 'col-sm-9 col-lg-10';
   }

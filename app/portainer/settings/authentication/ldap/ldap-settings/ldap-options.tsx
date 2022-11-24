@@ -1,6 +1,6 @@
 import { Edit } from 'react-feather';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Openldap from '@/assets/ico/vendor/openldap.svg?c';
 
 import { BadgeIcon } from '@@/BadgeIcon';

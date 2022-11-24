@@ -12,8 +12,10 @@ export function getPlatformType(envType: EnvironmentType) {
       return PlatformType.Docker;
     case EnvironmentType.Azure:
       return PlatformType.Azure;
+    case EnvironmentType.EdgeAgentOnNomad:
+      return PlatformType.Nomad;
     default:
-      throw new Error(`${envType} is not a supported environment type`);
+      throw new Error(`Environment Type ${envType} is not supported`);
   }
 }
 
@@ -23,6 +25,14 @@ export function isDockerEnvironment(envType: EnvironmentType) {
 
 export function isKubernetesEnvironment(envType: EnvironmentType) {
   return getPlatformType(envType) === PlatformType.Kubernetes;
+}
+
+export function getPlatformTypeName(envType: EnvironmentType): string {
+  return PlatformType[getPlatformType(envType)];
+}
+
+export function isNomadEnvironment(envType: EnvironmentType) {
+  return getPlatformType(envType) === PlatformType.Nomad;
 }
 
 export function isAgentEnvironment(envType: EnvironmentType) {
@@ -45,7 +55,7 @@ export function isUnassociatedEdgeEnvironment(env: Environment) {
   return isEdgeEnvironment(env.Type) && !env.EdgeID;
 }
 
-export function getRoute(environment: Environment) {
+export function getDashboardRoute(environment: Environment) {
   if (isEdgeEnvironment(environment.Type) && !environment.EdgeID) {
     return 'portainer.endpoints.endpoint';
   }

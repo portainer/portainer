@@ -24,7 +24,7 @@ type status struct {
 // @router /status [get]
 func (handler *Handler) statusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	return response.JSON(w, &status{
-		Status:          handler.Status,
+		Status:          handler.status,
 		DemoEnvironment: handler.demoService.Details(),
 	})
 }

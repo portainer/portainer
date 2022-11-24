@@ -1,7 +1,7 @@
 import { useField } from 'formik';
 
-import { useGroups } from '@/portainer/environment-groups/queries';
-import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
+import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';

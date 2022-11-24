@@ -4,7 +4,7 @@ import { Briefcase } from 'react-feather';
 
 import './BEFeatureIndicator.css';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getFeatureDetails } from './utils';
 

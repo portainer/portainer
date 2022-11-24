@@ -1,6 +1,6 @@
 import { Gpu } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { type EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
 
 import { type Environment, EnvironmentCreationTypes } from '../types';

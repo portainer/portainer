@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useServices } from '@/react/kubernetes/networks/services/queries';

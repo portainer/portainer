@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/portainer/portainer/api/database/models"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/rs/zerolog/log"
 	netv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

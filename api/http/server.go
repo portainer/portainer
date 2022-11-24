@@ -252,7 +252,7 @@ func (server *Server) Start() error {
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
 
-	var statusHandler = status.NewHandler(requestBouncer, server.Status, server.DemoService)
+	var statusHandler = status.NewHandler(requestBouncer, server.Status, server.DemoService, server.DataStore)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore

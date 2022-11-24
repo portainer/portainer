@@ -1,91 +1,34 @@
-import {
-  Context,
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import { Context, createContext, ReactNode, useContext } from 'react';
+import { StoreApi, useStore } from 'zustand';
 
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
-
-interface TableSettingsContextInterface<T> {
-  settings: T;
-  setTableSettings(partialSettings: Partial<T>): void;
-  setTableSettings(mutation: (settings: T) => T): void;
-}
-
-const TableSettingsContext = createContext<TableSettingsContextInterface<
-  Record<string, unknown>
-> | null>(null);
+const TableSettingsContext = createContext<StoreApi<object> | null>(null);
 TableSettingsContext.displayName = 'TableSettingsContext';
 
-export function useTableSettings<T>() {
+export function useTableSettings<T extends object>() {
   const Context = getContextType<T>();
 
   const context = useContext(Context);
-
   if (context === null) {
     throw new Error('must be nested under TableSettingsProvider');
   }
 
-  return context;
+  return useStore(context);
 }
 
-interface ProviderProps<T> {
+interface ProviderProps<T extends object> {
   children: ReactNode;
-  defaults?: T;
-  storageKey: string;
+  settings: StoreApi<T>;
 }
 
-export function TableSettingsProvider<T>({
+export function TableSettingsProvider<T extends object>({
   children,
-  defaults,
-  storageKey,
+  settings,
 }: ProviderProps<T>) {
   const Context = getContextType<T>();
 
-  const [storage, setStorage] = useLocalStorage<T>(
-    keyBuilder(storageKey),
-    defaults as T
-  );
-
-  const [settings, setTableSettings] = useState(storage);
-
-  const handleChange = useCallback(
-    (mutation: Partial<T> | ((settings: T) => T)): void => {
-      setTableSettings((settings) => {
-        const newTableSettings =
-          mutation instanceof Function
-            ? mutation(settings)
-            : { ...settings, ...mutation };
-
-        setStorage(newTableSettings);
-
-        return newTableSettings;
-      });
-    },
-    [setStorage]
-  );
-
-  const contextValue = useMemo(
-    () => ({
-      settings,
-      setTableSettings: handleChange,
-    }),
-    [settings, handleChange]
-  );
-
-  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
-
-  function keyBuilder(key: string) {
-    return `datatable_TableSettings_${key}`;
-  }
+  return <Context.Provider value={settings}>{children}</Context.Provider>;
 }
 
-function getContextType<T>() {
-  return TableSettingsContext as unknown as Context<
-    TableSettingsContextInterface<T>
-  >;
+function getContextType<T extends object>() {
+  return TableSettingsContext as unknown as Context<StoreApi<T>>;
 }

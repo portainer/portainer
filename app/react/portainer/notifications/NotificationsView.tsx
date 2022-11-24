@@ -4,24 +4,27 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { react2angular } from '@/react-tools/react2angular';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { PageHeader } from '@@/PageHeader';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
+import { createPersistedStore } from '@@/datatables/types';
+import { useSearchBarState } from '@@/datatables/SearchBar';
 
 import { notificationsStore } from './notifications-store';
 import { ToastNotification } from './types';
 import { columns } from './columns';
-import { createStore } from './datatable-store';
 
 const storageKey = 'notifications-list';
-const useSettingsStore = createStore(storageKey, 'time', true);
+const settingsStore = createPersistedStore(storageKey, {
+  id: 'time',
+  desc: true,
+});
 
 export function NotificationsView() {
-  const settingsStore = useSettingsStore();
   const { user } = useUser();
 
   const userNotifications: ToastNotification[] =
@@ -29,9 +32,11 @@ export function NotificationsView() {
     [];
 
   const breadcrumbs = 'Notifications';
+  const settings = useStore(settingsStore);
+  const [search, setSearch] = useSearchBarState(storageKey);
 
   const {
-    params: { id },
+    params: { id: activeItemId },
   } = useCurrentStateAndParams();
 
   return (
@@ -39,19 +44,22 @@ export function NotificationsView() {
       <PageHeader title="Notifications" breadcrumbs={breadcrumbs} reload />
       <Datatable
         columns={columns}
-        titleOptions={{
-          title: 'Notifications',
-          icon: Bell,
-        }}
+        title="Notifications"
+        titleIcon={Bell}
         dataset={userNotifications}
-        settingsStore={settingsStore}
-        storageKey="notifications"
         emptyContentLabel="No notifications found"
         totalCount={userNotifications.length}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
-        initialActiveItem={id}
+        initialPageSize={settings.pageSize}
+        onPageSizeChange={settings.setPageSize}
+        initialSortBy={settings.sortBy}
+        onSortByChange={settings.setSortBy}
+        searchValue={search}
+        onSearchChange={setSearch}
+        getRowId={(row) => row.id}
+        highlightedItemId={activeItemId}
       />
     </>
   );

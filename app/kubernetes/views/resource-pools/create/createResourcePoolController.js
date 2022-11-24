@@ -6,7 +6,7 @@ import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassHos
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
 class KubernetesCreateResourcePoolController {
@@ -179,7 +179,7 @@ class KubernetesCreateResourcePoolController {
         this.defaults = KubernetesResourceQuotaDefaults;
         this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
         this.formValues.EndpointId = this.endpoint.Id;
-        this.formValues.HasQuota = true;
+        this.formValues.HasQuota = false;
 
         this.state = {
           actionInProgress: false,

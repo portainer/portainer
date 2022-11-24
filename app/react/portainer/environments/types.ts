@@ -1,5 +1,5 @@
 import { TagId } from '@/portainer/tags/types';
-import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 
 export type EnvironmentId = number;
 
@@ -18,6 +18,8 @@ export enum EnvironmentType {
   AgentOnKubernetes,
   // EdgeAgentOnKubernetes represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
   EdgeAgentOnKubernetes,
+  // EdgeAgentOnNomad represents an environment(endpoint) connected to an Edge agent deployed on a Nomad environment(endpoint)
+  EdgeAgentOnNomad,
 }
 
 export const EdgeTypes = [
@@ -147,4 +149,5 @@ export enum PlatformType {
   Docker,
   Kubernetes,
   Azure,
+  Nomad,
 }

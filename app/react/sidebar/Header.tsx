@@ -1,7 +1,7 @@
 import { ChevronsLeft, ChevronsRight } from 'react-feather';
 import clsx from 'clsx';
 
-import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import smallLogo from '@/assets/ico/logomark.svg';
 
 import { Link } from '@@/Link';

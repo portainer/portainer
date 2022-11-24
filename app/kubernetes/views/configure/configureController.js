@@ -4,7 +4,7 @@ import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'Ku
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
@@ -46,6 +46,7 @@ class KubernetesConfigureController {
     this.onBeforeOnload = this.onBeforeOnload.bind(this);
     this.limitedFeature = FeatureId.K8S_SETUP_DEFAULT;
     this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeatureIngressDeploy = FeatureId.K8S_ADM_ONLY_USR_INGRESS_DEPLY;
     this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
     this.onChangeControllers = this.onChangeControllers.bind(this);
     this.onChangeEnableResourceOverCommit = this.onChangeEnableResourceOverCommit.bind(this);

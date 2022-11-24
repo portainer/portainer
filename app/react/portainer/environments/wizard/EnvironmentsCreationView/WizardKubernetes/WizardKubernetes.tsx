@@ -5,7 +5,7 @@ import {
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BoxSelector } from '@@/BoxSelector';

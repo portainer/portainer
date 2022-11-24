@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/apikeyrepository"
 	"github.com/portainer/portainer/api/dataservices/customtemplate"
@@ -395,7 +395,7 @@ type storeExport struct {
 	Team               []portainer.Team               `json:"teams,omitempty"`
 	TunnelServer       portainer.TunnelServerInfo     `json:"tunnel_server,omitempty"`
 	User               []portainer.User               `json:"users,omitempty"`
-	Version            map[string]string              `json:"version,omitempty"`
+	Version            models.Version                 `json:"version,omitempty"`
 	Webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
 	Metadata           map[string]interface{}         `json:"metadata,omitempty"`
 }
@@ -588,14 +588,12 @@ func (store *Store) Export(filename string) (err error) {
 		backup.Webhook = webhooks
 	}
 
-	v, err := store.Version().DBVersion()
-	if err != nil && !store.IsErrObjectNotFound(err) {
-		log.Error().Err(err).Msg("exporting DB version")
-	}
-	instance, _ := store.Version().InstanceID()
-	backup.Version = map[string]string{
-		"DB_VERSION":  strconv.Itoa(v),
-		"INSTANCE_ID": instance,
+	if version, err := store.Version().Version(); err != nil {
+		if !store.IsErrObjectNotFound(err) {
+			log.Error().Err(err).Msg("exporting Version")
+		}
+	} else {
+		backup.Version = *version
 	}
 
 	backup.Metadata, err = store.connection.BackupMetadata()
@@ -622,19 +620,7 @@ func (store *Store) Import(filename string) (err error) {
 		return err
 	}
 
-	// TODO: yup, this is bad, and should be in a version struct...
-	if dbversion, ok := backup.Version["DB_VERSION"]; ok {
-		if v, err := strconv.Atoi(dbversion); err == nil {
-			if err := store.Version().StoreDBVersion(v); err != nil {
-				log.Error().Err(err).Msg("DB_VERSION import issue")
-			}
-		}
-	}
-	if instanceID, ok := backup.Version["INSTANCE_ID"]; ok {
-		if err := store.Version().StoreInstanceID(instanceID); err != nil {
-			log.Error().Err(err).Msg("INSTANCE_ID import issue")
-		}
-	}
+	store.Version().UpdateVersion(&backup.Version)
 
 	for _, v := range backup.CustomTemplate {
 		store.CustomTemplate().UpdateCustomTemplate(v.ID, &v)

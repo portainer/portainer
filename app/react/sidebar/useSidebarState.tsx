@@ -12,7 +12,7 @@ import {
 import angular, { IScope } from 'angular';
 import _ from 'lodash';
 
-import * as storage from '@/portainer/hooks/useLocalStorage';
+import * as storage from '@/react/hooks/useLocalStorage';
 
 // using bootstrap breakpoint - https://getbootstrap.com/docs/5.0/layout/breakpoints/#min-width
 const mobileWidth = 992;

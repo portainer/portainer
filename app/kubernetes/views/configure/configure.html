@@ -131,6 +131,18 @@
                   <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><span class="slider round" data-cy="kubeSetup-restrictDefaultNsToggle"></span>
                 </label>
               </div>
+
+              <div class="col-sm-12 mt-5">
+                <por-switch-field
+                  name="'restrictStandardUserIngressW'"
+                  label="'Only allow deployment of ingresses by admins'"
+                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
+                  feature-id="ctrl.limitedFeatureIngressDeploy"
+                ></por-switch-field>
+              </div>
             </div>
             <!-- #endregion -->
 

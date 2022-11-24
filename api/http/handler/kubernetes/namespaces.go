@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api/database/models"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 )
 
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import AccessViewerPolicyModel from '../../models/access';
@@ -34,7 +34,7 @@ export default class AccessViewerController {
         throw new Error('User not found');
       }
 
-      const userMemberships = _.filter(this.teamMemberships, { UserId: user.value });
+      const userMemberships = _.filter(this.teamMemberships, { UserId: user.Id });
 
       for (const [, endpoint] of _.entries(this.endpoints)) {
         let role = this.getRoleFromUserEndpointPolicy(user, endpoint);
