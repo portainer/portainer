@@ -69,6 +69,7 @@ type (
 		EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error)
 		Create(group *portainer.EdgeGroup) error
 		UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error
+		UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFunc func(group *portainer.EdgeGroup)) error
 		DeleteEdgeGroup(ID portainer.EdgeGroupID) error
 		BucketName() string
 	}
