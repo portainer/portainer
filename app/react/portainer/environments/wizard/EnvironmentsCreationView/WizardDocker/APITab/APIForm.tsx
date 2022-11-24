@@ -1,13 +1,13 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { useCreateRemoteEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { useCreateRemoteEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
   Environment,
   EnvironmentCreationTypes,
-} from '@/portainer/environments/types';
+} from '@/react/portainer/environments/types';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -17,7 +17,7 @@ import { Icon } from '@@/Icon';
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
-import { validation } from './APIForm.validation';
+import { useValidation } from './APIForm.validation';
 import { FormValues } from './types';
 import { TLSFieldset } from './TLSFieldset';
 
@@ -41,6 +41,8 @@ export function APIForm({ onCreate }: Props) {
   const mutation = useCreateRemoteEnvironmentMutation(
     EnvironmentCreationTypes.LocalDockerEnvironment
   );
+
+  const validation = useValidation();
 
   return (
     <Formik

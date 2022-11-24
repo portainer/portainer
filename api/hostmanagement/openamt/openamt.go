@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -103,7 +103,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 	if err != nil {
 		return nil, err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
@@ -132,7 +132,7 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
 	}

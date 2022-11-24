@@ -110,7 +110,7 @@
                   <pr-icon icon="'users'" feather="true"></pr-icon>Manage access
                 </button>
                 <be-feature-indicator feature="$ctrl.limitedFeature" ng-if="$ctrl.canBrowse(item)">
-                  <span class="text-muted space-left" style="padding-right: 5px"> <pr-icon icon="'search'" feather="true"></pr-icon> Browse </span>
+                  <span class="text-muted" style="padding-right: 5px"> <pr-icon icon="'search'" feather="true"></pr-icon> Browse </span>
                 </be-feature-indicator>
 
                 <span ng-if="!$ctrl.canBrowse(item) && !$ctrl.canManageAccess(item)"> - </span>

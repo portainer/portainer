@@ -1,4 +1,4 @@
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
 import { DeploymentScripts } from '../APITab/DeploymentScripts';
 

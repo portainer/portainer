@@ -7,8 +7,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
-	"github.com/portainer/portainer/api/database/models"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -130,6 +130,7 @@ type (
 		MaxBatchDelay             *time.Duration
 		SecretKeyName             *string
 		LogLevel                  *string
+		LogMode                   *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -317,25 +318,25 @@ type (
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
 		Gpus             []Pair           `json:"Gpus"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig"`
-		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
+		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty"`
 		// List of tag identifiers to which this environment(endpoint) is associated
 		TagIDs []TagID `json:"TagIds"`
 		// The status of the environment(endpoint) (1 - up, 2 - down)
 		Status EndpointStatus `json:"Status" example:"1"`
 		// List of snapshots
-		Snapshots []DockerSnapshot `json:"Snapshots" example:""`
+		Snapshots []DockerSnapshot `json:"Snapshots"`
 		// List of user identifiers authorized to connect to this environment(endpoint)
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		// List of team identifiers authorized to connect to this environment(endpoint)
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 		// The identifier of the edge agent associated with this environment(endpoint)
-		EdgeID string `json:"EdgeID,omitempty" example:""`
+		EdgeID string `json:"EdgeID,omitempty"`
 		// The key which is used to map the agent to Portainer
-		EdgeKey string `json:"EdgeKey" example:""`
+		EdgeKey string `json:"EdgeKey"`
 		// The check in interval for edge agent (in seconds)
 		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5"`
 		// Associated Kubernetes data
-		Kubernetes KubernetesData `json:"Kubernetes" example:""`
+		Kubernetes KubernetesData `json:"Kubernetes"`
 		// Maximum version of docker-compose
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
 		// Environment(Endpoint) specific security settings
@@ -350,6 +351,9 @@ type (
 		IsEdgeDevice bool
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
+
+		// Whether we need to run any "post init migrations".
+		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
 
 		Edge struct {
 			// Whether the device has been started in edge async mode
@@ -392,8 +396,8 @@ type (
 		Name string `json:"Name" example:"my-environment-group"`
 		// Description associated to the environment(endpoint) group
 		Description        string             `json:"Description" example:"Environment(Endpoint) group description"`
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" example:""`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 		// List of tags associated to this environment(endpoint) group
 		TagIDs []TagID `json:"TagIds"`
 
@@ -450,6 +454,11 @@ type (
 	EndpointRelation struct {
 		EndpointID EndpointID
 		EdgeStacks map[EdgeStackID]bool
+	}
+
+	// EndpointPostInitMigrations
+	EndpointPostInitMigrations struct {
+		MigrateIngresses bool `json:"MigrateIngresses"`
 	}
 
 	// Extension represents a deprecated Portainer extension
@@ -554,6 +563,7 @@ type (
 		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
 		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
 		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
+		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -747,13 +757,13 @@ type (
 		// Type of Docker resource. Valid values are: 1- container, 2 -service
 		// 3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template
 		Type         ResourceControlType  `json:"Type" example:"1"`
-		UserAccesses []UserResourceAccess `json:"UserAccesses" example:""`
-		TeamAccesses []TeamResourceAccess `json:"TeamAccesses" example:""`
+		UserAccesses []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses []TeamResourceAccess `json:"TeamAccesses"`
 		// Permit access to the associated resource to any user
 		Public bool `json:"Public" example:"true"`
 		// Permit access to resource only to admins
 		AdministratorsOnly bool `json:"AdministratorsOnly" example:"true"`
-		System             bool `json:"System" example:""`
+		System             bool `json:"System"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
@@ -835,12 +845,12 @@ type (
 		BlackListedLabels []Pair `json:"BlackListedLabels"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
-		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings" example:""`
-		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
-		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`
-		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration" example:""`
-		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
+		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings"`
+		LDAPSettings         LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings        OAuthSettings        `json:"OAuthSettings"`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration"`
+		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration"`
+		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -848,7 +858,7 @@ type (
 		// The default check in interval for edge agent (in seconds)
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
 		// Whether edge compute features are enabled
-		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
+		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures"`
 		// The duration of a user session
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
 		// The expiry of a Kubeconfig
@@ -923,9 +933,9 @@ type (
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
 		// A list of environment(endpoint) variables used during stack deployment
-		Env []Pair `json:"Env" example:""`
+		Env []Pair `json:"Env"`
 		//
-		ResourceControl *ResourceControl `json:"ResourceControl" example:""`
+		ResourceControl *ResourceControl `json:"ResourceControl"`
 		// Stack status (1 - active, 2 - inactive)
 		Status StackStatus `json:"Status" example:"1"`
 		// Path on disk to the repository hosting the Stack file
@@ -1090,7 +1100,7 @@ type (
 		// A list of ports exposed by the container
 		Ports []string `json:"ports,omitempty" example:"8080:80/tcp"`
 		// Container labels
-		Labels []Pair `json:"labels,omitempty" example:""`
+		Labels []Pair `json:"labels,omitempty"`
 		// Whether the container should be started in privileged mode
 		Privileged bool `json:"privileged,omitempty" example:"true"`
 		// Whether the container should be started in
@@ -1355,9 +1365,10 @@ type (
 		CreateNamespace(info models.K8sNamespaceDetails) error
 		UpdateNamespace(info models.K8sNamespaceDetails) error
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		GetNamespace(string) (K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
-		GetIngressControllers() models.K8sIngressControllers
+		GetIngressControllers() (models.K8sIngressControllers, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo) error
 		UpdateIngress(namespace string, info models.K8sIngressInfo) error
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
@@ -1442,8 +1453,8 @@ type (
 const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.17.0"
-	// DBVersion is the version number of the Portainer database
-	DBVersion = 80
+	// Edition is what this edition of Portainer is called
+	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -1488,10 +1499,12 @@ const (
 )
 
 const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+const FeatureFlagBEUpgrade = "beUpgrade"
 
 // List of supported features
 var SupportedFeatureFlags = []Feature{
 	FeatureFlagEdgeRemoteUpdate,
+	FeatureFlagBEUpgrade,
 }
 
 const (

@@ -4,8 +4,7 @@ angular.module('portainer.docker').factory('Volume', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  'VolumesInterceptor',
-  function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, VolumesInterceptor) {
+  function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
 
     function addVolumeNameToHeader(config) {
@@ -18,7 +17,7 @@ angular.module('portainer.docker').factory('Volume', [
         endpointId: EndpointProvider.endpointID,
       },
       {
-        query: { method: 'GET', interceptor: VolumesInterceptor },
+        query: { method: 'GET' },
         get: { method: 'GET', params: { id: '@id' } },
         create: {
           method: 'POST',

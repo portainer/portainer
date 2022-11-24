@@ -1,10 +1,10 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { useCreateAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { useCreateAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { Environment } from '@/portainer/environments/types';
-import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
+import { Environment } from '@/react/portainer/environments/types';
+import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Icon } from '@@/Icon';
@@ -14,7 +14,7 @@ import { MoreSettingsSection } from '../MoreSettingsSection';
 import { Hardware } from '../Hardware/Hardware';
 
 import { EnvironmentUrlField } from './EnvironmentUrlField';
-import { validation } from './AgentForm.validation';
+import { useValidation } from './AgentForm.validation';
 
 interface Props {
   onCreate(environment: Environment): void;
@@ -35,6 +35,7 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
   const mutation = useCreateAgentEnvironmentMutation();
+  const validation = useValidation();
 
   return (
     <Formik

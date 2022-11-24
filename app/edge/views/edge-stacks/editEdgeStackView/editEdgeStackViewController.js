@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 export class EditEdgeStackViewController {
   /* @ngInject */

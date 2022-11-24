@@ -1339,7 +1339,12 @@
                 </div>
               </div>
               <!-- kubernetes services options -->
-              <kube-services-view form-values="ctrl.formValues" is-edit="ctrl.state.isEdit" loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"></kube-services-view>
+              <kube-services-view
+                namespaces="ctrl.allNamespaces"
+                form-values="ctrl.formValues"
+                is-edit="ctrl.state.isEdit"
+                loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+              ></kube-services-view>
               <!-- kubernetes services options -->
             </div>
 

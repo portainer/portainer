@@ -3,7 +3,7 @@ package crypto
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 )
 
 // CreateTLSConfiguration creates a basic tls.Config with recommended TLS settings
@@ -63,7 +63,7 @@ func CreateTLSConfigurationFromDisk(caCertPath, certPath, keyPath string, skipSe
 	}
 
 	if !skipServerVerification && caCertPath != "" {
-		caCert, err := ioutil.ReadFile(caCertPath)
+		caCert, err := os.ReadFile(caCertPath)
 		if err != nil {
 			return nil, err
 		}

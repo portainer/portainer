@@ -4,7 +4,7 @@ import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'Ku
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
@@ -46,10 +46,12 @@ class KubernetesConfigureController {
     this.onBeforeOnload = this.onBeforeOnload.bind(this);
     this.limitedFeature = FeatureId.K8S_SETUP_DEFAULT;
     this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeatureIngressDeploy = FeatureId.K8S_ADM_ONLY_USR_INGRESS_DEPLY;
     this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
-    this.onChangeAvailability = this.onChangeAvailability.bind(this);
+    this.onChangeControllers = this.onChangeControllers.bind(this);
     this.onChangeEnableResourceOverCommit = this.onChangeEnableResourceOverCommit.bind(this);
     this.onToggleIngressAvailabilityPerNamespace = this.onToggleIngressAvailabilityPerNamespace.bind(this);
+    this.onToggleAllowNoneIngressClass = this.onToggleAllowNoneIngressClass.bind(this);
     this.onChangeStorageClassAccessMode = this.onChangeStorageClassAccessMode.bind(this);
   }
   /* #endregion */
@@ -71,12 +73,24 @@ class KubernetesConfigureController {
   /* #endregion */
 
   /* #region  INGRESS CLASSES UI MANAGEMENT */
-  onChangeAvailability(controllerClassMap) {
+  onChangeControllers(controllerClassMap) {
     this.ingressControllers = controllerClassMap;
   }
 
   hasTraefikIngress() {
     return _.find(this.formValues.IngressClasses, { Type: this.IngressClassTypes.TRAEFIK });
+  }
+
+  toggleAdvancedIngSettings() {
+    this.$scope.$evalAsync(() => {
+      this.state.isIngToggleSectionExpanded = !this.state.isIngToggleSectionExpanded;
+    });
+  }
+
+  onToggleAllowNoneIngressClass() {
+    this.$scope.$evalAsync(() => {
+      this.formValues.AllowNoneIngressClass = !this.formValues.AllowNoneIngressClass;
+    });
   }
 
   onToggleIngressAvailabilityPerNamespace() {
@@ -109,6 +123,7 @@ class KubernetesConfigureController {
     endpoint.Kubernetes.Configuration.IngressClasses = ingressClasses;
     endpoint.Kubernetes.Configuration.RestrictDefaultNamespace = this.formValues.RestrictDefaultNamespace;
     endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace = this.formValues.IngressAvailabilityPerNamespace;
+    endpoint.Kubernetes.Configuration.AllowNoneIngressClass = this.formValues.AllowNoneIngressClass;
     endpoint.ChangeWindow = this.state.autoUpdateSettings;
   }
 
@@ -140,8 +155,8 @@ class KubernetesConfigureController {
       return;
     }
     const promises = [];
-    const oldEndpointID = this.EndpointProvider.endpointID();
-    this.EndpointProvider.setEndpointID(this.endpoint.Id);
+    const oldEndpoint = this.EndpointProvider.currentEndpoint();
+    this.EndpointProvider.setCurrentEndpoint(this.endpoint);
 
     try {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
@@ -156,7 +171,7 @@ class KubernetesConfigureController {
         });
       });
     } finally {
-      this.EndpointProvider.setEndpointID(oldEndpointID);
+      this.EndpointProvider.setCurrentEndpoint(oldEndpoint);
     }
 
     const responses = await Promise.allSettled(promises);
@@ -208,13 +223,8 @@ class KubernetesConfigureController {
       });
       await Promise.all(storagePromises);
 
-      const endpoints = this.EndpointProvider.endpoints();
-      const modifiedEndpoint = _.find(endpoints, (item) => item.Id === this.endpoint.Id);
-      if (modifiedEndpoint) {
-        this.assignFormValuesToEndpoint(modifiedEndpoint, storageClasses, ingressClasses);
-        this.EndpointProvider.setEndpoints(endpoints);
-      }
       this.Notifications.success('Success', 'Configuration successfully applied');
+
       this.$state.go('portainer.home');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to apply configuration');
@@ -256,6 +266,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
+      isIngToggleSectionExpanded: false,
       endpointId: this.$state.params.endpointId,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
@@ -315,6 +326,7 @@ class KubernetesConfigureController {
         return ic;
       });
       this.formValues.IngressAvailabilityPerNamespace = this.endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace;
+      this.formValues.AllowNoneIngressClass = this.endpoint.Kubernetes.Configuration.AllowNoneIngressClass;
 
       this.oldFormValues = Object.assign({}, this.formValues);
     } catch (err) {

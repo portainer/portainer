@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { UpdateNotification } from './UpdateNotifications';
 import { BuildInfoModalButton } from './BuildInfoModal';
@@ -19,7 +19,7 @@ function CEFooter() {
       <UpdateNotification />
 
       <FooterContent>
-        <Logo width="90px" height="" />
+        <Logo width="90px" height="100%" />
         <span>Community Edition</span>
 
         <BuildInfoModalButton />

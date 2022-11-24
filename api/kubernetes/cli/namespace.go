@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/models"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -42,6 +42,21 @@ func (kcl *KubeClient) GetNamespaces() (map[string]portainer.K8sNamespaceInfo, e
 	}
 
 	return results, nil
+}
+
+// GetNamespace gets the namespace in the current k8s environment(endpoint).
+func (kcl *KubeClient) GetNamespace(name string) (portainer.K8sNamespaceInfo, error) {
+	namespace, err := kcl.cli.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil {
+		return portainer.K8sNamespaceInfo{}, err
+	}
+
+	result := portainer.K8sNamespaceInfo{
+		IsSystem:  isSystemNamespace(*namespace),
+		IsDefault: namespace.Name == defaultNamespace,
+	}
+
+	return result, nil
 }
 
 // CreateIngress creates a new ingress in a given namespace in a k8s endpoint.

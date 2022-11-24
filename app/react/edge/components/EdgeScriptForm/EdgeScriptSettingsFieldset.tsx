@@ -1,4 +1,4 @@
-import { Field, useFormikContext } from 'formik';
+import { useFormikContext, Field } from 'formik';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -47,7 +47,22 @@ export function EdgeScriptSettingsFieldset({
         </>
       )}
 
-      {isNomadTokenVisible && <NomadTokenField />}
+      {isNomadTokenVisible && (
+        <>
+          <NomadTokenField />
+
+          <div className="form-group">
+            <div className="col-sm-12">
+              <SwitchField
+                label="TLS"
+                labelClass="col-sm-3 col-lg-2"
+                checked={values.tlsEnabled}
+                onChange={(checked) => setFieldValue('tlsEnabled', checked)}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       <FormControl
         label="Environment variables"

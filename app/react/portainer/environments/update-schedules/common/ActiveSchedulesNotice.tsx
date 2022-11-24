@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Clock } from 'react-feather';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 

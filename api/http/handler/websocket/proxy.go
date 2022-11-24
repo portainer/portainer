@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gorilla/websocket"
-	"github.com/koding/websocketproxy"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+
+	"github.com/gorilla/websocket"
+	"github.com/koding/websocketproxy"
 )
 
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {

@@ -1,7 +1,7 @@
 package filesystem
 
 import (
-	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 
@@ -16,7 +16,7 @@ func Test_WriteFile_CanStoreContentInANewFile(t *testing.T) {
 	err := WriteToFile(tmpFilePath, content)
 	assert.NoError(t, err)
 
-	fileContent, _ := ioutil.ReadFile(tmpFilePath)
+	fileContent, _ := os.ReadFile(tmpFilePath)
 	assert.Equal(t, content, fileContent)
 }
 
@@ -31,7 +31,7 @@ func Test_WriteFile_CanOverwriteExistingFile(t *testing.T) {
 	err = WriteToFile(tmpFilePath, content)
 	assert.NoError(t, err)
 
-	fileContent, _ := ioutil.ReadFile(tmpFilePath)
+	fileContent, _ := os.ReadFile(tmpFilePath)
 	assert.Equal(t, content, fileContent)
 }
 
@@ -43,6 +43,6 @@ func Test_WriteFile_CanWriteANestedPath(t *testing.T) {
 	err := WriteToFile(tmpFilePath, content)
 	assert.NoError(t, err)
 
-	fileContent, _ := ioutil.ReadFile(tmpFilePath)
+	fileContent, _ := os.ReadFile(tmpFilePath)
 	assert.Equal(t, content, fileContent)
 }

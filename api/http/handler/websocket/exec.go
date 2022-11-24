@@ -73,7 +73,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 
 	err = handler.handleExecRequest(w, r, params)
 	if err != nil {
-		return httperror.InternalServerError("An error occured during websocket exec operation", err)
+		return httperror.InternalServerError("An error occurred during websocket exec operation", err)
 	}
 
 	return nil

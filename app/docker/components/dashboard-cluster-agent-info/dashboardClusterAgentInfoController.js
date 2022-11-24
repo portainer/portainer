@@ -5,7 +5,7 @@ angular.module('portainer.docker').controller('DashboardClusterAgentInfoControll
     var ctrl = this;
 
     this.$onInit = function () {
-      AgentService.agents()
+      AgentService.agents(ctrl.endpointId)
         .then(function success(data) {
           ctrl.agentCount = data.length;
         })

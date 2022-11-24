@@ -1,12 +1,12 @@
 package jwt
 
 import (
-	i "github.com/portainer/portainer/api/internal/testhelpers"
 	"testing"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	portainer "github.com/portainer/portainer/api"
+	i "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,9 +1,9 @@
 import angular from 'angular';
 import { StateRegistry, StateService } from '@uirouter/angularjs';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { notifyError } from '@/portainer/services/notifications';
-import { EndpointProvider, StateManager } from '@/portainer/services/types';
+import { StateManager } from '@/portainer/services/types';
 
 import { reactModule } from './react';
 
@@ -22,7 +22,6 @@ function config($stateRegistryProvider: StateRegistry) {
       $async: (fn: () => Promise<void>) => Promise<void>,
       $state: StateService,
       endpoint: Environment,
-      EndpointProvider: EndpointProvider,
       StateManager: StateManager
     ) {
       return $async(async () => {
@@ -31,9 +30,6 @@ function config($stateRegistryProvider: StateRegistry) {
           return;
         }
         try {
-          EndpointProvider.setEndpointID(endpoint.Id);
-          EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-          EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
           await StateManager.updateEndpointState(endpoint);
         } catch (e) {
           notifyError('Failed loading environment', e as Error);

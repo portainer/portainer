@@ -3,10 +3,10 @@ import clsx from 'clsx';
 import { useMutation } from 'react-query';
 import { object } from 'yup';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Button } from '@@/buttons';
 import { LoadingButton } from '@@/buttons/LoadingButton';

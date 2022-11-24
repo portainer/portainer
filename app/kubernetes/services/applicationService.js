@@ -210,7 +210,7 @@ class KubernetesApplicationService {
    */
   async createAsync(formValues) {
     // formValues -> Application
-    let [app, headlessService, services, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+    let [app, headlessService, services, , claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
     if (services) {
       services.forEach(async (service) => {

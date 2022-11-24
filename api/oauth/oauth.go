@@ -3,7 +3,7 @@ package oauth
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 	"net/url"
@@ -11,7 +11,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
@@ -127,7 +127,7 @@ func getResource(token string, configuration *portainer.OAuthSettings) (map[stri
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

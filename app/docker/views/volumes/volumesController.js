@@ -1,5 +1,3 @@
-import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
-
 angular.module('portainer.docker').controller('VolumesController', [
   '$q',
   '$scope',
@@ -39,8 +37,6 @@ angular.module('portainer.docker').controller('VolumesController', [
       });
     };
 
-    $scope.offlineMode = false;
-
     $scope.getVolumes = getVolumes;
     function getVolumes() {
       var endpointProvider = $scope.applicationState.endpoint.mode.provider;
@@ -53,7 +49,6 @@ angular.module('portainer.docker').controller('VolumesController', [
       })
         .then(function success(data) {
           var services = data.services;
-          $scope.offlineMode = isOfflineEndpoint(endpoint);
           $scope.volumes = data.attached
             .map(function (volume) {
               volume.dangling = false;

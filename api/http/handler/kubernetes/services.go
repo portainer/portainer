@@ -2,11 +2,12 @@ package kubernetes
 
 import (
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api/database/models"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 )
 
 func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -18,7 +19,24 @@ func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Req
 		)
 	}
 
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
 	services, err := cli.GetServices(namespace)
 	if err != nil {
 		return httperror.InternalServerError(
@@ -48,11 +66,28 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 		)
 	}
 
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
+
 	err = cli.CreateService(namespace, payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to create sercice",
 			err,
 		)
 	}
@@ -60,10 +95,26 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 }
 
 func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	var payload models.K8sServiceDeleteRequests
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest(
 			"Invalid request payload",
@@ -74,7 +125,7 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 	err = cli.DeleteServices(payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to delete service",
 			err,
 		)
 	}
@@ -99,11 +150,27 @@ func (handler *Handler) updateKubernetesService(w http.ResponseWriter, r *http.R
 		)
 	}
 
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 	err = cli.UpdateService(namespace, payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to update service",
 			err,
 		)
 	}

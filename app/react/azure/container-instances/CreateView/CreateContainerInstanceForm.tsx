@@ -3,9 +3,9 @@ import { useRouter } from '@uirouter/react';
 
 import { ContainerInstanceFormValues } from '@/react/azure/types';
 import * as notifications from '@/portainer/services/notifications';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { AccessControlForm } from '@/react/portainer/access-control/AccessControlForm';
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input, Select } from '@@/form-components/Input';

@@ -6,7 +6,7 @@ import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassHos
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
 class KubernetesCreateResourcePoolController {
@@ -33,6 +33,8 @@ class KubernetesCreateResourcePoolController {
     this.onToggleResourceQuota = this.onToggleResourceQuota.bind(this);
     this.onChangeIngressControllerAvailability = this.onChangeIngressControllerAvailability.bind(this);
     this.onRegistriesChange = this.onRegistriesChange.bind(this);
+    this.handleMemoryLimitChange = this.handleMemoryLimitChange.bind(this);
+    this.handleCpuLimitChange = this.handleCpuLimitChange.bind(this);
   }
   /* #endregion */
 
@@ -101,6 +103,18 @@ class KubernetesCreateResourcePoolController {
     }
   }
 
+  handleMemoryLimitChange(memoryLimit) {
+    return this.$async(async () => {
+      this.formValues.MemoryLimit = memoryLimit;
+    });
+  }
+
+  handleCpuLimitChange(cpuLimit) {
+    return this.$async(async () => {
+      this.formValues.CpuLimit = cpuLimit;
+    });
+  }
+
   /* #region  CREATE NAMESPACE */
   createResourcePool() {
     return this.$async(async () => {
@@ -165,7 +179,7 @@ class KubernetesCreateResourcePoolController {
         this.defaults = KubernetesResourceQuotaDefaults;
         this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
         this.formValues.EndpointId = this.endpoint.Id;
-        this.formValues.HasQuota = true;
+        this.formValues.HasQuota = false;
 
         this.state = {
           actionInProgress: false,

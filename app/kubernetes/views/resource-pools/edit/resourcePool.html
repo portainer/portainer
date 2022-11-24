@@ -80,15 +80,18 @@
                     <div class="form-group flex">
                       <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit (MB) </label>
                       <div class="col-sm-6">
-                        <slider
-                          model="ctrl.formValues.MemoryLimit"
-                          floor="ctrl.ResourceQuotaDefaults.MemoryLimit"
-                          ceil="ctrl.state.sliderMaxMemory"
+                        <por-slider
+                          min="ctrl.ResourceQuotaDefaults.MemoryLimit"
+                          max="ctrl.state.sliderMaxMemory"
                           step="128"
                           ng-if="ctrl.state.sliderMaxMemory"
-                        ></slider>
+                          value="ctrl.formValues.MemoryLimit"
+                          on-change="(ctrl.handleMemoryLimitChange)"
+                          visible-tooltip="true"
+                          data-cy="k8sNamespaceEdit-memoryLimitSlider"
+                        ></por-slider>
                       </div>
-                      <div class="col-sm-2 vertical-center">
+                      <div class="col-sm-2 vertical-center pt-6">
                         <input
                           name="memory_limit"
                           type="number"
@@ -97,6 +100,7 @@
                           class="form-control"
                           ng-model="ctrl.formValues.MemoryLimit"
                           id="memory-limit"
+                          data-cy="k8sNamespaceEdit-memoryLimitInput"
                           required
                         />
                       </div>
@@ -117,14 +121,16 @@
                     <div class="form-group">
                       <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
                       <div class="col-sm-8">
-                        <slider
-                          model="ctrl.formValues.CpuLimit"
-                          floor="ctrl.ResourceQuotaDefaults.CpuLimit"
-                          ceil="ctrl.state.sliderMaxCpu"
+                        <por-slider
+                          min="ctrl.ResourceQuotaDefaults.CpuLimit"
+                          max="ctrl.state.sliderMaxCpu"
                           step="0.1"
-                          precision="2"
                           ng-if="ctrl.state.sliderMaxCpu"
-                        ></slider>
+                          value="ctrl.formValues.CpuLimit"
+                          on-change="(ctrl.handleCpuLimitChange)"
+                          data-cy="k8sNamespaceEdit-cpuLimitSlider"
+                          visible-tooltip="true"
+                        ></por-slider>
                       </div>
                     </div>
                     <!-- !cpu-limit-input -->
@@ -161,7 +167,7 @@
                   <div class="col-sm-12 form-section-title"> Networking </div>
                   <ingress-class-datatable
                     ng-if="ctrl.state.ingressAvailabilityPerNamespace"
-                    on-change-availability="(ctrl.onChangeIngressControllerAvailability)"
+                    on-change-controllers="(ctrl.onChangeIngressControllerAvailability)"
                     ingress-controllers="ctrl.ingressControllers"
                     description="'Enable the ingress controllers that users can select when publishing applications in this namespace.'"
                     no-ingress-controller-label="'No ingress controllers found in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster.'"

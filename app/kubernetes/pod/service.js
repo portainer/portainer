@@ -67,7 +67,7 @@ class KubernetesPodService {
         params.container = containerName;
       }
       const data = await this.KubernetesPods(namespace).logs(params).$promise;
-      return data.logs.length === 0 ? [] : data.logs.split('\n');
+      return data.logs;
     } catch (err) {
       throw new PortainerError('Unable to retrieve pod logs', err);
     }

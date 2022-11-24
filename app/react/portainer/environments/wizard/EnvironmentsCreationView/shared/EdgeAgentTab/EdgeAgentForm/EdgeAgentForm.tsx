@@ -1,9 +1,9 @@
 import { Formik, Form } from 'formik';
 
-import { Environment } from '@/portainer/environments/types';
-import { useCreateEdgeAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { Environment } from '@/react/portainer/environments/types';
+import { useCreateEdgeAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { baseHref } from '@/portainer/helpers/pathHelper';
-import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
+import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { useCreateEdgeDeviceParam } from '@/react/portainer/environments/wizard/hooks/useCreateEdgeDeviceParam';
 
 import { FormSection } from '@@/form-components/FormSection';
@@ -14,7 +14,7 @@ import { MoreSettingsSection } from '../../MoreSettingsSection';
 import { Hardware } from '../../Hardware/Hardware';
 
 import { EdgeAgentFieldset } from './EdgeAgentFieldset';
-import { validationSchema } from './EdgeAgentForm.validation';
+import { useValidationSchema } from './EdgeAgentForm.validation';
 import { FormValues } from './types';
 
 interface Props {
@@ -29,13 +29,14 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
   const createEdgeDevice = useCreateEdgeDeviceParam();
 
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
+  const validation = useValidationSchema();
 
   return (
     <Formik<FormValues>
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validateOnMount
-      validationSchema={validationSchema}
+      validationSchema={validation}
     >
       {({ isValid, setFieldValue, values }) => (
         <Form>

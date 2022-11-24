@@ -4,9 +4,7 @@ angular.module('portainer.docker').factory('System', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  'InfoInterceptor',
-  'VersionInterceptor',
-  function SystemFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, InfoInterceptor, VersionInterceptor) {
+  function SystemFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return $resource(
       API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/:action/:subAction',
@@ -18,9 +16,8 @@ angular.module('portainer.docker').factory('System', [
         info: {
           method: 'GET',
           params: { action: 'info' },
-          interceptor: InfoInterceptor,
         },
-        version: { method: 'GET', params: { action: 'version' }, interceptor: VersionInterceptor },
+        version: { method: 'GET', params: { action: 'version' } },
         events: {
           method: 'GET',
           params: { action: 'events', since: '@since', until: '@until' },

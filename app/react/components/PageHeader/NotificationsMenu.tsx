@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 
 import { AutomationTestingProps } from '@/types';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { ToastNotification } from '@/react/portainer/notifications/types';
 
 import { Icon } from '@@/Icon';

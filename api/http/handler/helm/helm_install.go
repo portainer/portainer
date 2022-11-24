@@ -2,7 +2,6 @@ package helm
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -192,7 +191,7 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 	for _, resource := range yamlResources {
 		resource := resource // https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
-			tmpfile, err := ioutil.TempFile("", "helm-manifest-*")
+			tmpfile, err := os.CreateTemp("", "helm-manifest-*")
 			if err != nil {
 				return errors.Wrap(err, "failed to create a tmp helm manifest file")
 			}

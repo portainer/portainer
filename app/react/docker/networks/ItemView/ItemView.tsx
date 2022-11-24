@@ -3,7 +3,7 @@ import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from 'react-query';
 import _ from 'lodash';
 
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/react/portainer/access-control/types';

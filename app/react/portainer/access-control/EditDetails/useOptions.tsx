@@ -6,7 +6,7 @@ import { ownershipIcon } from '@/portainer/filters/filters';
 import { Team } from '@/react/portainer/users/teams/types';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 import { ResourceControlOwnership } from '../types';
 
@@ -61,7 +61,7 @@ function nonAdminOptions(teams?: Team[]) {
       'access_private',
       <BadgeIcon icon={ownershipIcon('private')} />,
       'Private',
-      'I want to this resource to be manageable by myself only',
+      'I want to restrict this resource to be manageable by myself only',
       ResourceControlOwnership.PRIVATE
     ),
     teams &&

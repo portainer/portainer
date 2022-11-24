@@ -1,6 +1,6 @@
 import moment from 'moment';
-import _ from 'lodash-es';
-import { NEW_LINE_BREAKER } from '@/constants';
+
+import { concatLogsToString, NEW_LINE_BREAKER } from '@/docker/helpers/logHelper';
 
 angular.module('portainer.docker').controller('LogViewerController', [
   '$scope',
@@ -74,9 +74,8 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.downloadLogs = function () {
-      // To make the feature of downloading container logs working both on Windows and Linux,
-      // we need to use correct new line breakers on corresponding OS.
-      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line + NEW_LINE_BREAKER, '')]);
+      const logsAsString = concatLogsToString(this.state.filteredLogs);
+      const data = new Blob([logsAsString]);
       FileSaver.saveAs(data, this.resourceName + '_logs.txt');
     };
   },

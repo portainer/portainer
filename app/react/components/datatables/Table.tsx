@@ -35,6 +35,8 @@ function MainComponent({
   );
 }
 
+MainComponent.displayName = 'Table';
+
 interface SubComponents {
   Container: typeof TableContainer;
   Actions: typeof TableActions;

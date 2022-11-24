@@ -2,7 +2,7 @@ import { useField } from 'formik';
 import _ from 'lodash';
 import { useState, ChangeEvent } from 'react';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Select } from '@@/form-components/Input';
 import { Checkbox } from '@@/form-components/Checkbox';
