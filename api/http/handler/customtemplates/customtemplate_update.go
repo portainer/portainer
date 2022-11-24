@@ -3,6 +3,7 @@ package customtemplates
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -184,6 +185,12 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 
 		gitConfig.ConfigHash = commitHash
 		customTemplate.GitConfig = gitConfig
+	} else {
+		templateFolder := strconv.Itoa(customTemplateID)
+		_, err = handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
+		if err != nil {
+			return httperror.InternalServerError("Unable to persist updated custom template file on disk", err)
+		}
 	}
 
 	err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)

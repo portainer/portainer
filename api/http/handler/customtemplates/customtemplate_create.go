@@ -374,7 +374,6 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 
 	typeNumeral, _ := request.RetrieveNumericMultiPartFormValue(r, "Type", true)
 	templateType := portainer.StackType(typeNumeral)
-	// Platform validation is only for docker related stack (docker standalone and docker swarm)
 	if templateType != portainer.KubernetesStack && templateType != portainer.DockerSwarmStack && templateType != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
@@ -382,6 +381,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 
 	platform, _ := request.RetrieveNumericMultiPartFormValue(r, "Platform", true)
 	templatePlatform := portainer.CustomTemplatePlatform(platform)
+	// Platform validation is only for docker related stack (docker standalone and docker swarm)
 	if templateType != portainer.KubernetesStack && templatePlatform != portainer.CustomTemplatePlatformLinux && templatePlatform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
