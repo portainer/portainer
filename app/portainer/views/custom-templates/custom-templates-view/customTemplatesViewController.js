@@ -204,24 +204,12 @@ class CustomTemplatesViewController {
 
     template.Selected = true;
 
-    let file;
     try {
-      if (template.GitConfig !== null) {
-        try {
-          file = await this.CustomTemplateService.customTemplateFile(template.Id, true);
-        } catch (err) {
-          this.state.templateLoadFailed = true;
-          throw err;
-        }
-      } else {
-        file = await this.CustomTemplateService.customTemplateFile(template.Id);
-      }
+      this.state.templateContent = this.formValues.fileContent = await this.CustomTemplateService.customTemplateFile(template.Id, template.GitConfig !== null);
     } catch (err) {
+      this.state.templateLoadFailed = true;
       this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
     }
-
-    this.state.templateContent = file;
-    this.formValues.fileContent = file;
 
     this.formValues.network = _.find(this.availableNetworks, function (o) {
       return o.Name === 'bridge';

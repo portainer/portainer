@@ -46,16 +46,16 @@ class EditCustomTemplateViewController {
       const template = await this.CustomTemplateService.customTemplate(this.$state.params.id);
 
       if (template.GitConfig !== null) {
-        try {
-          this.formValues.FileContent = await this.CustomTemplateService.customTemplateFile(this.$state.params.id, true);
-          this.state.isEditorReadOnly = true;
-        } catch (err) {
-          this.state.templateLoadFailed = true;
-          throw err;
-        }
-      } else {
-        template.FileContent = await this.CustomTemplateService.customTemplateFile(this.$state.params.id);
+        this.state.isEditorReadOnly = true;
       }
+
+      try {
+        template.FileContent = await this.CustomTemplateService.customTemplateFile(this.$state.params.id, template.GitConfig !== null);
+      } catch (err) {
+        this.state.templateLoadFailed = true;
+        throw err;
+      }
+
       template.Variables = template.Variables || [];
 
       this.formValues = { ...this.formValues, ...template };

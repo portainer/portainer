@@ -189,20 +189,13 @@ class KubernetesDeployController {
       this.state.template = template;
 
       try {
-        let fileContent;
-        if (this.state.template.GitConfig !== null) {
-          try {
-            fileContent = await this.CustomTemplateService.customTemplateFile(templateId, true);
-          } catch (err) {
-            this.state.templateLoadFailed = true;
-            throw err;
-          }
-        } else {
-          fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        try {
+          this.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
+          this.onChangeFileContent(this.state.templateContent);
+        } catch (err) {
+          this.state.templateLoadFailed = true;
+          throw err;
         }
-
-        this.state.templateContent = fileContent;
-        this.onChangeFileContent(fileContent);
 
         if (template.Variables && template.Variables.length > 0) {
           const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));

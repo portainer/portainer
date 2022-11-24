@@ -42,16 +42,14 @@ class KubeEditCustomTemplateViewController {
         const template = await this.CustomTemplateService.customTemplate(id);
 
         if (template.GitConfig !== null) {
-          try {
-            template.FileContent = await this.CustomTemplateService.customTemplateFile(id, true);
+          this.state.isEditorReadOnly = true;
+        }
 
-            this.state.isEditorReadOnly = true;
-          } catch (err) {
-            this.state.templateLoadFailed = true;
-            throw err;
-          }
-        } else {
-          template.FileContent = await this.CustomTemplateService.customTemplateFile(id);
+        try {
+          template.FileContent = await this.CustomTemplateService.customTemplateFile(id, template.GitConfig !== null);
+        } catch (err) {
+          this.state.templateLoadFailed = true;
+          throw err;
         }
 
         template.Variables = template.Variables || [];

@@ -32,7 +32,7 @@
       <span ng-if="$ctrl.state.selectedTemplate && $ctrl.state.templateLoadFailed">
         <p class="small vertical-center text-danger mb-5" ng-if="$ctrl.currentUser.isAdmin || $ctrl.currentUser.id === $ctrl.state.selectedTemplate.CreatedByUserId">
           <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
-          <a ui-sref="docker.templates.custom.edit({id: state.selectedTemplateId})">click here</a> for configuration.</p
+          <a ui-sref="docker.templates.custom.edit({id: $ctrl.state.selectedTemplate.Id})">click here</a> for configuration.</p
         >
         <p class="small vertical-center text-danger mb-5" ng-if="!($ctrl.currentUser.isAdmin || $ctrl.currentUser.id === $ctrl.state.selectedTemplate.CreatedByUserId)">
           <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p

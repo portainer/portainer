@@ -301,20 +301,13 @@ angular
             $scope.state.selectedTemplateId = templateId;
             $scope.state.selectedTemplate = template;
 
-            let fileContent;
-            if ($scope.state.selectedTemplate.GitConfig !== null) {
-              try {
-                fileContent = await CustomTemplateService.customTemplateFile(templateId, true);
-              } catch (err) {
-                $scope.state.templateLoadFailed = true;
-                throw err;
-              }
-            } else {
-              fileContent = await CustomTemplateService.customTemplateFile(templateId);
+            try {
+              $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
+              onChangeFileContent($scope.state.templateContent);
+            } catch (err) {
+              $scope.state.templateLoadFailed = true;
+              throw err;
             }
-
-            $scope.state.templateContent = fileContent;
-            onChangeFileContent(fileContent);
 
             if (template.Variables && template.Variables.length > 0) {
               const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
