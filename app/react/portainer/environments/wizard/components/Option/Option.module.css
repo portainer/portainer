@@ -44,4 +44,6 @@
 
 .icon-component {
   font-size: 80px;
+  height: 80px;
+  width: auto;
 }
