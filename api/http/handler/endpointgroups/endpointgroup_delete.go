@@ -66,7 +66,7 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 	}
 
 	for _, tagID := range endpointGroup.TagIDs {
-		handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
+		err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
 			delete(tag.EndpointGroups, endpointGroup.ID)
 		})
 

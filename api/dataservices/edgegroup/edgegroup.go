@@ -8,10 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "edgegroups"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "edgegroups"
 
 // Service represents a service for managing Edge group data.
 type Service struct {
@@ -68,10 +66,20 @@ func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGrou
 	return &group, nil
 }
 
-// UpdateEdgeGroup updates an Edge group.
+// Deprecated: Use UpdateEdgeGroupFunc instead.
 func (service *Service) UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, group)
+}
+
+// UpdateEdgeGroupFunc updates an edge group inside a transaction avoiding data races.
+func (service *Service) UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFunc func(edgeGroup *portainer.EdgeGroup)) error {
+	id := service.connection.ConvertToKey(int(ID))
+	edgeGroup := &portainer.EdgeGroup{}
+
+	return service.connection.UpdateObjectFunc(BucketName, id, edgeGroup, func() {
+		updateFunc(edgeGroup)
+	})
 }
 
 // DeleteEdgeGroup deletes an Edge group.

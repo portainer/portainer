@@ -66,7 +66,10 @@ func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Hand
 // is currently only called for edge connection clean up and when endpoint is updated
 func (manager *Manager) DeleteEndpointProxy(endpointID portainer.EndpointID) {
 	manager.endpointProxies.Remove(fmt.Sprint(endpointID))
-	manager.k8sClientFactory.RemoveKubeClient(endpointID)
+
+	if manager.k8sClientFactory != nil {
+		manager.k8sClientFactory.RemoveKubeClient(endpointID)
+	}
 }
 
 // CreateGitlabProxy creates a new HTTP reverse proxy that can be used to send requests to the Gitlab API
