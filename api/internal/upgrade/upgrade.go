@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
 	"time"
 
 	"github.com/cbroglie/mustache"
@@ -73,7 +72,7 @@ func (service *service) Upgrade(licenseKey string) error {
 }
 
 func (service *service) UpgradeDockerStandalone(licenseKey, version string) error {
-	templateName := path.Join(service.assetsPath, "mustache-templates", mustacheUpgradeStandaloneTemplateFile)
+	templateName := filesystem.JoinPaths(service.assetsPath, "mustache-templates", mustacheUpgradeStandaloneTemplateFile)
 
 	portainerImagePrefix := os.Getenv(portainerImagePrefixEnvVar)
 	if portainerImagePrefix == "" {
@@ -100,11 +99,14 @@ func (service *service) UpgradeDockerStandalone(licenseKey, version string) erro
 	}
 
 	tmpDir := os.TempDir()
-	filePath := path.Join(tmpDir, fmt.Sprintf("upgrade-%d.yml", time.Now().Unix()))
+	filePath := filesystem.JoinPaths(tmpDir, fmt.Sprintf("upgrade-%d.yml", time.Now().Unix()))
 
 	r := bytes.NewReader([]byte(composeFile))
 
-	filesystem.CreateFile(filePath, r)
+	err = filesystem.CreateFile(filePath, r)
+	if err != nil {
+		return errors.Wrap(err, "failed to create upgrade compose file")
+	}
 
 	err = service.composeDeployer.Deploy(
 		context.Background(),
