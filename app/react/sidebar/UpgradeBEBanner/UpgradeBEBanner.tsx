@@ -19,7 +19,10 @@ export const UpgradeBEBannerWrapper = withHideOnExtension(
   withEdition(UpgradeBEBanner, 'CE')
 );
 
-const enabledPlatforms: Array<ContainerPlatform> = ['Docker Standalone'];
+const enabledPlatforms: Array<ContainerPlatform> = [
+  'Docker Standalone',
+  'Docker Swarm',
+];
 
 function UpgradeBEBanner() {
   const { isAdmin } = useUser();
