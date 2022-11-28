@@ -1,4 +1,5 @@
 import { useRouter } from '@uirouter/react';
+import { Plus, Trash2, Link as LinkIcon } from 'lucide-react';
 
 import type { Environment } from '@/react/portainer/environments/types';
 import {
@@ -40,13 +41,12 @@ export function EdgeDevicesDatatableActions({
         disabled={selectedItems.length < 1}
         color="danger"
         onClick={() => onDeleteEdgeDeviceClick()}
-        icon="trash-2"
-        featherIcon
+        icon={Trash2}
       >
         Remove
       </Button>
 
-      <Button onClick={() => onAddNewDeviceClick()} icon="plus" featherIcon>
+      <Button onClick={() => onAddNewDeviceClick()} icon={Plus}>
         Add Device
       </Button>
 
@@ -54,8 +54,7 @@ export function EdgeDevicesDatatableActions({
         <Button
           disabled={selectedItems.length !== 1}
           onClick={() => onAssociateOpenAMTClick(selectedItems)}
-          icon="link"
-          featherIcon
+          icon={LinkIcon}
         >
           Associate with OpenAMT
         </Button>

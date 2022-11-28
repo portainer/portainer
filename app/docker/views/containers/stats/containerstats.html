@@ -2,9 +2,9 @@
   title="'Container statistics'"
   breadcrumbs="[
     { label:'Containers', link:'docker.containers' },
-    { 
+    {
       label:(container.Name | trimcontainername),
-      link: 'docker.containers.container', 
+      link: 'docker.containers.container',
       linkParams:container.Id
     }, 'Stats']"
 >
@@ -13,7 +13,7 @@
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="info" feather-icon="true" title-text="About statistics"> </rd-widget-header>
+      <rd-widget-header icon="info" title-text="About statistics"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -37,17 +37,23 @@
               </select>
             </div>
             <span>
-              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+              <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
             </span>
           </div>
           <div class="form-group" ng-if="state.networkStatsUnavailable">
             <div class="col-sm-12">
-              <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container. </span>
+              <span class="small text-muted">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                Network stats are unavailable for this container.
+              </span>
             </div>
           </div>
           <div class="form-group" ng-if="state.ioStatsUnavailable">
             <div class="col-sm-12">
-              <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> I/O stats are unavailable for this container. </span>
+              <span class="small text-muted">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                I/O stats are unavailable for this container.
+              </span>
             </div>
           </div>
         </form>
@@ -59,7 +65,7 @@
 <div class="row">
   <div class="col-lg-6 col-md-6 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="Memory usage"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" title-text="Memory usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="memoryChart" width="770" height="300"></canvas>
@@ -70,7 +76,7 @@
 
   <div class="col-lg-6 col-md-6 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="CPU usage"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" title-text="CPU usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="cpuChart" width="770" height="300"></canvas>
@@ -81,7 +87,7 @@
 
   <div class="col-lg-6 col-md-6 col-sm-12" ng-if="!state.networkStatsUnavailable">
     <rd-widget>
-      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="Network usage (aggregate)"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" title-text="Network usage (aggregate)"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="networkChart" width="770" height="300"></canvas>
@@ -92,7 +98,7 @@
 
   <div class="col-lg-6 col-md-6 col-sm-12" ng-if="!state.ioStatsUnavailable">
     <rd-widget>
-      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="I/O usage (aggregate)"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" title-text="I/O usage (aggregate)"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="ioChart" width="770" height="300"></canvas>

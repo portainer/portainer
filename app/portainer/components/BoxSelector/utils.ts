@@ -9,8 +9,7 @@ export function buildOption<T extends number | string>(
   label: string,
   description: string,
   value: T,
-  feature?: FeatureId,
-  featherIcon?: IconProps['featherIcon']
+  feature?: FeatureId
 ): BoxSelectorOption<T> {
-  return { id, icon, label, description, value, feature, featherIcon };
+  return { id, icon, label, description, value, feature };
 }

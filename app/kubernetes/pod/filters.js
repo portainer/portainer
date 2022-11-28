@@ -18,38 +18,6 @@ angular
       }
     };
   })
-  .filter('kubernetesPodConditionStatusBadge', function () {
-    'use strict';
-    return function (status, type) {
-      switch (type) {
-        case 'Unschedulable':
-          switch (status) {
-            case 'True':
-              return 'fa-exclamation-triangle red-icon';
-            case 'False':
-              return 'fa-check green-icon';
-            case 'Unknown':
-              return 'fa-exclamation-circle orange-icon';
-          }
-          break;
-        case 'PodScheduled':
-        case 'Ready':
-        case 'Initialized':
-        case 'ContainersReady':
-          switch (status) {
-            case 'True':
-              return 'fa-check green-icon';
-            case 'False':
-              return 'fa-exclamation-triangle red-icon';
-            case 'Unknown':
-              return 'fa-exclamation-circle orange-icon';
-          }
-          break;
-        default:
-          return 'fa-question-circle red-icon';
-      }
-    };
-  })
   .filter('kubernetesPodConditionStatusText', function () {
     'use strict';
     return function (status, type) {

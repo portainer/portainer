@@ -17,7 +17,7 @@
         <td ng-show="service.spec.type === 'LoadBalancer'">
           <div ng-show="service.status.loadBalancer.ingress">
             <a class="vertical-center hyperlink" target="_blank" ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
-              <pr-icon icon="'external-link'" feather="true"></pr-icon>
+              <pr-icon icon="'external-link'"></pr-icon>
               <span data-cy="k8sAppDetail-containerPort"> Access </span>
             </a>
           </div>
@@ -39,7 +39,7 @@
               target="_blank"
               style="margin-left: 5px"
             >
-              <pr-icon icon="'external-link'" feather="true"></pr-icon>
+              <pr-icon icon="'external-link'"></pr-icon>
               <span data-cy="k8sAppDetail-containerPort">
                 {{ port.port }}
               </span>

@@ -1,5 +1,5 @@
 import ReactTooltip from 'react-tooltip';
-import { HelpCircle } from 'react-feather';
+import { HelpCircle } from 'lucide-react';
 import clsx from 'clsx';
 import _ from 'lodash';
 
@@ -22,7 +22,7 @@ export function Tooltip({ message, position = 'bottom', className }: Props) {
       data-for={id}
       className={clsx(styles.icon, 'inline-flex text-base')}
     >
-      <HelpCircle className="feather" aria-hidden="true" />
+      <HelpCircle className="lucide" aria-hidden="true" />
       <ReactTooltip
         id={id}
         multiline

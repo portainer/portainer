@@ -1,4 +1,4 @@
-import { Clock, Trash2 } from 'react-feather';
+import { Clock, Trash2 } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import {

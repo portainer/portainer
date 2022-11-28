@@ -1,5 +1,6 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
+import { Plug2 } from 'lucide-react';
 
 import { useCreateAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -7,7 +8,6 @@ import { Environment } from '@/react/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { Icon } from '@@/Icon';
 
 import { NameField } from '../NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';
@@ -59,11 +59,8 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
+                icon={Plug2}
               >
-                <Icon
-                  icon="svg-plug"
-                  className="icon icon-sm vertical-center"
-                />{' '}
                 Connect
               </LoadingButton>
             </div>

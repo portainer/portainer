@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
 import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
 
@@ -93,7 +94,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Intel OpenAMT" />
+        <WidgetTitle icon={Laptop} title="Intel OpenAMT" />
         <WidgetBody>
           <Formik
             initialValues={initialValues}

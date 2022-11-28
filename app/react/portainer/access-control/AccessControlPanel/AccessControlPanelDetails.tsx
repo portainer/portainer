@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 import _ from 'lodash';
+import { Info } from 'lucide-react';
 
 import { ownershipIcon, truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';
@@ -10,6 +11,7 @@ import { useUsers } from '@/portainer/users/queries';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { Icon } from '@@/Icon';
 
 import {
   ResourceControlOwnership,
@@ -169,7 +171,7 @@ function InheritanceMessage({
   return (
     <tr>
       <td colSpan={2} aria-label="inheritance-message">
-        <i className="fa fa-info-circle space-right" aria-hidden="true" />
+        <Icon icon={Info} mode="primary" className="mr-1" />
         {children}
         <Tooltip message={tooltip} />
       </td>

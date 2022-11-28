@@ -3,7 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesEventsDatatable', {
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
-    titleIcon: '@',
     dataset: '<',
     tableKey: '@',
     orderBy: '@',

@@ -1,7 +1,10 @@
 import { Meta } from '@storybook/react';
+import { User } from 'lucide-react';
 
 import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';
+
+import { IconProps } from '@@/Icon';
 
 import { BoxSelectorItem } from './BoxSelectorItem';
 import { BoxSelectorOption } from './types';
@@ -11,7 +14,7 @@ const meta: Meta = {
   args: {
     selected: false,
     description: 'description',
-    icon: 'fa-rocket',
+    icon: User,
     label: 'label',
   },
 };
@@ -21,7 +24,7 @@ export default meta;
 interface ExampleProps {
   selected?: boolean;
   description?: string;
-  icon?: string;
+  icon?: IconProps['icon'];
   label?: string;
   feature?: FeatureId;
 }
@@ -35,7 +38,7 @@ function Template({
 }: ExampleProps) {
   const option: BoxSelectorOption<number> = {
     description,
-    icon: `fa ${icon}`,
+    icon,
     id: 'id',
     label,
     value: 1,

@@ -6,7 +6,6 @@ export const rolesDatatable = {
   controller,
   bindings: {
     titleText: '@',
-    titleIcon: '@',
     dataset: '<',
     tableKey: '@',
     orderBy: '@',

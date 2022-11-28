@@ -1,8 +1,8 @@
 import { Formik, Field, Form } from 'formik';
 import { useMutation, useQueryClient } from 'react-query';
 import { useReducer } from 'react';
+import { Plus } from 'lucide-react';
 
-import { Icon } from '@/react/components/Icon';
 import { User } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
@@ -42,9 +42,8 @@ export function CreateTeamForm({ users, teams }: Props) {
       <div className="col-lg-12 col-md-12 col-xs-12">
         <Widget>
           <Widget.Title
-            icon="plus"
+            icon={Plus}
             title="Add a new team"
-            featherIcon
             className="vertical-center"
           />
           <Widget.Body>
@@ -123,8 +122,8 @@ export function CreateTeamForm({ users, teams }: Props) {
                         data-cy="team-createTeamButton"
                         isLoading={isSubmitting || addTeamMutation.isLoading}
                         loadingText="Creating team..."
+                        icon={Plus}
                       >
-                        <Icon icon="plus" feather size="md" />
                         Create team
                       </LoadingButton>
                     </div>

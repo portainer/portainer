@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
 
@@ -49,7 +50,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="FDO" />
+        <WidgetTitle icon={Laptop} title="FDO" />
         <WidgetBody>
           <Formik
             initialValues={initialValues}

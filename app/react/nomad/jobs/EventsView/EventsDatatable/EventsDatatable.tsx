@@ -1,3 +1,4 @@
+import { History } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import { NomadEvent } from '@/react/nomad/types';
@@ -33,7 +34,7 @@ export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
       onSortByChange={settings.setSortBy}
       searchValue={search}
       onSearchChange={setSearch}
-      titleIcon="fa-history"
+      titleIcon={History}
       title="Events"
       totalCount={data.length}
       getRowId={(row) => `${row.Date}-${row.Message}-${row.Type}`}

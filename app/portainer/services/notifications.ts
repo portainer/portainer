@@ -15,7 +15,7 @@ toastr.options = {
   closeButton: true,
   progressBar: true,
   tapToDismiss: false,
-  // custom button, using the feather icon x.svg inside
+  // custom button, using the lucide icon x.svg inside
   closeHtml: `<button type="button"><svg
   xmlns="http://www.w3.org/2000/svg"
   width="18"

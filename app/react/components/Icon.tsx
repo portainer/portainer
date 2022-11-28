@@ -1,13 +1,12 @@
 import clsx from 'clsx';
 import { ComponentType, ReactNode } from 'react';
-import * as featherIcons from 'react-feather';
+import * as lucideIcons from 'lucide-react';
 import { isValidElementType } from 'react-is';
 
 import Svg, { SvgIcons } from './Svg';
 
 export interface IconProps {
   icon: ReactNode | ComponentType<unknown>;
-  featherIcon?: boolean;
 }
 
 export type IconMode =
@@ -27,16 +26,15 @@ export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface Props {
   icon: ReactNode | ComponentType<{ size?: string | number }>;
-  feather?: boolean;
   className?: string;
   size?: IconSize;
   mode?: IconMode;
 }
 
-export function Icon({ icon, feather, className, mode, size }: Props) {
+export function Icon({ icon, className, mode, size }: Props) {
   const classes = clsx(
     className,
-    'icon',
+    'icon inline-flex',
     { [`icon-${mode}`]: mode },
     { [`icon-${size}`]: size }
   );
@@ -44,9 +42,13 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
   if (typeof icon !== 'string') {
     const Icon = isValidElementType(icon) ? icon : null;
 
+    if (Icon) {
+      return <Icon className={classes} aria-hidden="true" role="img" />;
+    }
+
     return (
       <span className={classes} aria-hidden="true" role="img">
-        {Icon == null ? <>{icon}</> : <Icon size="1em" />}
+        {icon}
       </span>
     );
   }
@@ -56,28 +58,25 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
     return (
       <Svg
         icon={svgIcon as keyof typeof SvgIcons}
-        className={clsx(classes, '!flex')}
+        className={classes}
+        aria-hidden="true"
       />
     );
   }
 
-  if (feather) {
-    const iconName = icon
-      .split('-')
-      .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
-      .join('') as keyof typeof featherIcons;
-    const IconComponent = featherIcons[iconName];
-    if (!IconComponent) {
-      throw new Error(`Feather icon not found: ${iconName}`);
-    }
-    return <IconComponent className={classes} />;
+  const iconName = icon
+    .split('-')
+    .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
+    .join('') as keyof typeof lucideIcons;
+  const IconComponent = lucideIcons[iconName] as React.FC<
+    React.SVGProps<SVGSVGElement>
+  >;
+  if (!IconComponent) {
+    // console error so that the error is logged but no functionality is broken
+    // eslint-disable-next-line no-console
+    console.error(`Icon not found: '${icon}'`);
+    return null;
   }
 
-  return (
-    <i
-      className={clsx(icon.startsWith('fa-') ? `fa ${icon}` : icon, classes)}
-      aria-hidden="true"
-      role="img"
-    />
-  );
+  return <IconComponent className={classes} aria-hidden="true" />;
 }

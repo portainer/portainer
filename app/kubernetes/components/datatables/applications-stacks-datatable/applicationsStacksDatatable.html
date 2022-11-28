@@ -5,13 +5,13 @@
       <!-- title -->
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
-          <pr-icon icon="'list'" feather="true"></pr-icon>
+          <pr-icon icon="'list'"></pr-icon>
         </div>
         Stacks
       </div>
       <!-- actions -->
       <div class="searchBar vertical-center">
-        <pr-icon icon="'search'" feather="true" class-name="'!h-3'"></pr-icon>
+        <pr-icon icon="'search'" class-name="'!h-3'"></pr-icon>
         <input
           type="text"
           class="searchInput min-w-min self-start"
@@ -30,13 +30,13 @@
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
           data-cy="k8sApp-removeStackButton"
         >
-          <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+          <pr-icon icon="'trash-2'"></pr-icon>
           Remove
         </button>
         <div class="settings" data-cy="k8sApp-StackTableSettings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle>
-              <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
+              <pr-icon icon="'more-vertical'" class-name="'!mr-0 !h-4'"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -73,7 +73,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -90,7 +90,7 @@
     <!-- info text -->
     <div class="flex flex-row w-full">
       <span class="small text-muted mt-1 vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+        <pr-icon icon="'info'" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
     </div>
@@ -106,8 +106,8 @@
                 <label for="select_all"></label>
               </span>
               <div class="cursor-pointer" ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
-                <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true"></pr-icon>
-                <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true"></pr-icon>
+                <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
+                <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
               </div>
             </div>
           </th>
@@ -163,8 +163,8 @@
                 <label for="select_{{ $index }}"></label>
               </span>
               <div ng-if="$ctrl.itemCanExpand(item)" class="vertical-center">
-                <pr-icon ng-if="item.Expanded" icon="'chevron-down'" feather="true"></pr-icon>
-                <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" feather="true"></pr-icon>
+                <pr-icon ng-if="item.Expanded" icon="'chevron-down'"></pr-icon>
+                <pr-icon ng-if="!item.Expanded" icon="'chevron-right'"></pr-icon>
               </div>
             </div>
           </td>
@@ -178,7 +178,7 @@
           <td>{{ item.Applications.length }}</td>
           <td>
             <a class="vertical-center" ui-sref="kubernetes.stacks.stack.logs({ namespace: item.ResourcePool, name: item.Name })">
-              <pr-icon icon="'file-text'" size="'md'" title="Logs" feather="true"></pr-icon>
+              <pr-icon icon="'file-text'" size="'md'" title="Logs"></pr-icon>
               Logs
             </a>
           </td>

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
-import { Columns } from 'react-feather';
+import { Columns } from 'lucide-react';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 

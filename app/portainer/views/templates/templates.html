@@ -15,7 +15,7 @@
   <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 1">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"> </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal" name="selectedTemplateType1">
           <!-- description -->
@@ -65,10 +65,10 @@
           <!-- !access-control -->
           <div class="form-group col-sm-12">
             <a class="small interactive vertical-center" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
-              <pr-icon icon="'plus'" feather="true"></pr-icon> Show advanced options
+              <pr-icon icon="'plus'"></pr-icon> Show advanced options
             </a>
             <a class="small interactive vertical-center" ng-if="state.showAdvancedOptions" ng-click="state.showAdvancedOptions = false;">
-              <pr-icon icon="'minus'" feather="true"></pr-icon> Hide advanced options
+              <pr-icon icon="'minus'"></pr-icon> Hide advanced options
             </a>
           </div>
           <div ng-if="state.showAdvancedOptions">
@@ -85,7 +85,7 @@
                       <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
                     </div>
                     <!-- !host-port -->
-                    <pr-icon icon="'arrow-right'" feather="true"></pr-icon>
+                    <pr-icon icon="'arrow-right'"></pr-icon>
                     <!-- container-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">container</span>
@@ -99,7 +99,7 @@
                         <label class="btn btn-light" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                       </div>
                       <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
-                        <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                       </button>
                     </div>
                     <!-- !protocol-actions -->
@@ -107,7 +107,7 @@
                 </div>
                 <div class="col-sm-12">
                   <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addPortBinding()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add map additional port
+                    <pr-icon icon="'plus'"></pr-icon> Add map additional port
                   </span>
                 </div>
               </div>
@@ -136,7 +136,7 @@
                           <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.bind = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
                         </div>
                         <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                          <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                          <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -144,7 +144,7 @@
                     <!-- !volume-line1 -->
                     <!-- volume-line2 -->
                     <div class="form-inline mt-1" ng-if="volume.type !== 'auto'">
-                      <pr-icon icon="'arrow-right'" feather="true"></pr-icon>
+                      <pr-icon icon="'arrow-right'"></pr-icon>
                       <!-- volume -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                         <div class="col-sm-12 input-group">
@@ -177,7 +177,7 @@
                 </div>
                 <div class="col-sm-12">
                   <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addVolume()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add map additional volume
+                    <pr-icon icon="'plus'"></pr-icon> Add map additional volume
                   </span>
                 </div>
               </div>
@@ -195,13 +195,13 @@
                       <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
                 <div class="col-sm-12">
                   <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addExtraHost()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add additional entry
+                    <pr-icon icon="'plus'"></pr-icon> Add additional entry
                   </span>
                 </div>
               </div>
@@ -223,15 +223,13 @@
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
                 <!-- !labels-input-list -->
                 <div class="col-sm-12">
-                  <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addLabel()">
-                    <pr-icon icon="'plus'" feather="true"></pr-icon> Add label
-                  </span>
+                  <span class="form-group small interactive text-muted mt-2 vertical-center" ng-click="addLabel()"> <pr-icon icon="'plus'"></pr-icon> Add label </span>
                 </div>
               </div>
             </div>
@@ -282,6 +280,7 @@
       table-key="templates"
       select-action="selectTemplate"
       show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
-    ></template-list>
+    >
+    </template-list>
   </div>
 </div>

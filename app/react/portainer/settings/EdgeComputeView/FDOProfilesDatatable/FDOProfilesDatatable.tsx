@@ -1,4 +1,4 @@
-import { List } from 'react-feather';
+import { List } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import { Datatable } from '@@/datatables';

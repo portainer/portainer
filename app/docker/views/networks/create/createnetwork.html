@@ -45,14 +45,12 @@
                   <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. true" />
                   <span class="input-group-btn">
                     <button class="btn btn-dangerlight" type="button" ng-click="removeDriverOption($index)">
-                      <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                     </button>
                   </span>
                 </div>
               </div>
-              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()">
-                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add driver option
-              </div>
+              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> Add driver option </div>
             </div>
             <!-- !driver-options-input-list -->
           </div>
@@ -94,16 +92,16 @@
                 />
               </div>
               <button class="btn btn-dangerlight" type="button" ng-click="removeIPV4AuxAddress($index)">
-                <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-if="state.IPV4AuxiliaryAddressesError[$index]">
-                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Exclude ip cannot be the same as gateway.</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
               <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV4AuxAddress()">
-                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add excluded IP
+                <pr-icon icon="'plus'" size="'md'"></pr-icon> Add excluded IP
               </div>
             </div>
           </div>
@@ -141,16 +139,16 @@
                 />
               </div>
               <button class="btn btn-dangerlight" type="button" ng-click="removeIPV6AuxAddress($index)">
-                <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
-                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Exclude ip cannot be the same as gateway.</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
               <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV6AuxAddress()">
-                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add excluded IP
+                <pr-icon icon="'plus'" size="'md'"></pr-icon> Add excluded IP
               </div>
             </div>
           </div>
@@ -168,14 +166,12 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                   <span class="input-group-btn">
-                    <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)"> <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon> </button
+                    <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)"> <pr-icon icon="'trash-2'" size="'md'"></pr-icon> </button
                   ></span>
                 </div>
               </div>
               <div class="form-group">
-                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()">
-                  <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add label
-                </div>
+                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> Add label </div>
               </div>
             </div>
             <!-- !labels-input-list -->

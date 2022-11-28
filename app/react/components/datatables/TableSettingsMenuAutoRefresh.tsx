@@ -1,7 +1,9 @@
 import clsx from 'clsx';
 import { useState } from 'react';
+import { Check } from 'lucide-react';
 
 import { Checkbox } from '@@/form-components/Checkbox';
+import { Icon } from '@@/Icon';
 
 import styles from './TableSettingsMenuAutoRefresh.module.css';
 
@@ -46,12 +48,7 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
             )}
             onTransitionEnd={() => setIsCheckVisible(false)}
           >
-            <i
-              id="refreshRateChange"
-              className="fa fa-check green-icon"
-              aria-hidden="true"
-              style={{ marginTop: '7px' }}
-            />
+            <Icon icon={Check} className="!ml-1" mode="success" />
           </span>
         </div>
       )}

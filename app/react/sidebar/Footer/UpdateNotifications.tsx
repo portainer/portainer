@@ -1,5 +1,6 @@
 import { useQuery } from 'react-query';
 import clsx from 'clsx';
+import { DownloadCloud } from 'lucide-react';
 
 import { getVersionStatus } from '@/portainer/services/api/status.service';
 import { useUIState } from '@/react/hooks/useUIState';
@@ -36,7 +37,7 @@ export function UpdateNotification() {
       )}
     >
       <div className={clsx(styles.dismissTitle, 'vertical-center')}>
-        <Icon icon="download-cloud" mode="primary" feather size="md" />
+        <Icon icon={DownloadCloud} mode="primary" size="md" />
         <span className="space-left">
           New version available {LatestVersion}
         </span>

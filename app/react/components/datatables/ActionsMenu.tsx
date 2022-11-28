@@ -1,6 +1,9 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Menu, MenuList, MenuButton } from '@reach/menu-button';
+import { MoreVertical } from 'lucide-react';
+
+import { Icon } from '@@/Icon';
 
 import styles from './ActionsMenu.module.css';
 
@@ -19,7 +22,7 @@ export function ActionsMenu({ children }: Props) {
               isExpanded && styles.actionsActive
             )}
           >
-            <i className="fa fa-ellipsis-v" aria-hidden="true" />
+            <Icon icon={MoreVertical} />
           </MenuButton>
           <MenuList>
             <div className={styles.tableActionsMenuList}>{children}</div>

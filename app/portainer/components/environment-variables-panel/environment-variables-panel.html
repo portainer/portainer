@@ -16,18 +16,18 @@
     <div ng-if="$ctrl.mode == 'advanced'" class="environment-variables-panel--advanced">
       <div class="col-sm-12 text-clickable">
         <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center" ng-click="$ctrl.switchEnvMode()">
-          <pr-icon icon="'list'" feather="true"></pr-icon> Simple mode
+          <pr-icon icon="'list'"></pr-icon> Simple mode
         </button>
       </div>
       <div class="col-sm-12 small text-muted">
-        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+        <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
         Switch to simple mode to define variables line by line, or load from .env file
       </div>
       <div class="form-group" style="margin-left: 1px">
         <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
       </div>
       <div class="col-sm-12 small text-muted" ng-if="$ctrl.showHelpMessage">
-        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+        <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
         Environment changes will not take effect until redeployment occurs manually or via webhook.
       </div>
     </div>

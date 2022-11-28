@@ -1,4 +1,4 @@
-import { Edit, FileText, Globe, Upload } from 'react-feather';
+import { Edit, FileText, Globe, Upload } from 'lucide-react';
 
 import GitIcon from '@/assets/ico/git.svg?c';
 

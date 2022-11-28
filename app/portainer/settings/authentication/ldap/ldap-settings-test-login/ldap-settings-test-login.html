@@ -51,8 +51,8 @@
         <span ng-if="$ctrl.state.testStatus !== $ctrl.TEST_STATUS.LOADING">Test</span>
         <span ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING">Testing...</span>
       </button>
-      <pr-icon icon="'check'" feather="true" class="icon-success" ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.SUCCESS"></pr-icon>
-      <pr-icon icon="'x'" feather="true" class="icon-danger" ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.FAILURE"></pr-icon>
+      <pr-icon icon="'check'" class="icon-success" ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.SUCCESS"></pr-icon>
+      <pr-icon icon="'x'" class="icon-danger" ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.FAILURE"></pr-icon>
     </div>
   </div>
 </div>

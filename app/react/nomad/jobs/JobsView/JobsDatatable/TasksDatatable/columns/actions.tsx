@@ -1,4 +1,5 @@
 import { CellProps, Column } from 'react-table';
+import { Clock, FileText } from 'lucide-react';
 
 import { Task } from '@/react/nomad/types';
 
@@ -34,12 +35,12 @@ export function ActionsCell({ row }: CellProps<Task>) {
         title="Events"
         className="space-right"
       >
-        <Icon icon="clock" feather className="space-right icon" />
+        <Icon icon={Clock} className="space-right" />
       </Link>
 
       {/* logs */}
       <Link to="nomad.logs" params={params} title="Logs">
-        <Icon icon="file-text" feather className="space-right icon" />
+        <Icon icon={FileText} className="space-right" />
       </Link>
     </div>
   );

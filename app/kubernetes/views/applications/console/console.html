@@ -3,15 +3,15 @@
   title="'Application console'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.application.ResourcePool,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.application.ResourcePool }
     },
     { label:'Applications', link:'kubernetes.applications' },
-    { 
+    {
       label:ctrl.application.Name,
-      link: 'kubernetes.applications.application', 
+      link: 'kubernetes.applications.application',
       linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
     },
      'Pods',
@@ -38,7 +38,7 @@
               <label for="console_command" class="col-sm-3 col-lg-2 control-label text-left">Command</label>
               <div class="col-sm-8 input-group">
                 <span class="input-group-addon">
-                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon>
+                  <pr-icon icon="'terminal'" class="mr-1"></pr-icon>
                 </span>
                 <input
                   type="text"

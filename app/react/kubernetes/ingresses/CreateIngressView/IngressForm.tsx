@@ -1,5 +1,7 @@
 import { ChangeEvent, ReactNode } from 'react';
-import { Plus, RefreshCw, Trash2 } from 'react-feather';
+import { Info, Plus, RefreshCw, Trash2 } from 'lucide-react';
+
+import Route from '@/assets/ico/route.svg?c';
 
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
@@ -107,7 +109,7 @@ export function IngressForm({
 
   return (
     <Widget>
-      <WidgetTitle icon="svg-route" title="Ingress" />
+      <WidgetTitle icon={Route} title="Ingress" />
       <WidgetBody key={rule.Key + rule.Namespace}>
         <div className="row">
           <div className="form-horizontal">
@@ -199,7 +201,7 @@ export function IngressForm({
             <div className="col-sm-12 px-0 text-muted !mb-0">
               <div className="mb-2">Annotations</div>
               <p className="vertical-center text-muted small">
-                <Icon icon="info" mode="primary" feather />
+                <Icon icon={Info} mode="primary" />
                 <span>
                   You can specify{' '}
                   <a
@@ -355,7 +357,7 @@ export function IngressForm({
                     </div>
 
                     <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
-                      <Icon icon="info" mode="primary" size="md" feather />
+                      <Icon icon={Info} mode="primary" size="md" />
                       <span>
                         Add a secret via{' '}
                         <Link
@@ -375,10 +377,10 @@ export function IngressForm({
                 )}
                 {host.NoHost && (
                   <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
-                    <Icon icon="info" mode="primary" size="md" feather />A
-                    fallback rule has no host specified. This rule only applies
-                    when an inbound request has a hostname that does not match
-                    with any of your other rules.
+                    <Icon icon={Info} mode="primary" size="md" />A fallback rule
+                    has no host specified. This rule only applies when an
+                    inbound request has a hostname that does not match with any
+                    of your other rules.
                   </p>
                 )}
 

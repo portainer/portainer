@@ -2,16 +2,16 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle vertical-center"> <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle vertical-center"> <pr-icon icon="$ctrl.titleIcon"></pr-icon> {{ $ctrl.titleText }} </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class-name="'icon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'icon'"></pr-icon>
           <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
         </div>
         <div class="actionBar">
           <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+            <pr-icon icon="'trash-2'"></pr-icon>Remove
           </button>
-          <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.jobs.new"> <pr-icon icon="'plus'" feather="true"></pr-icon>Add Edge job </button>
+          <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.jobs.new"> <pr-icon icon="'plus'"></pr-icon>Add Edge job </button>
         </div>
       </div>
       <div class="table-responsive">

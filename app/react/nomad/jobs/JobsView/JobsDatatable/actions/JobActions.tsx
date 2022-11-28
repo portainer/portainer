@@ -1,4 +1,5 @@
 import { useMutation } from 'react-query';
+import { Trash2 } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Job } from '@/react/nomad/types';
@@ -25,8 +26,8 @@ export function JobActions({ selectedItems, refreshData }: Props) {
       disabled={selectedItems.length < 1 || mutation.isLoading}
       color="danger"
       onClick={handleDeleteClicked}
+      icon={Trash2}
     >
-      <i className="fa fa-trash-alt space-right" aria-hidden="true" />
       Remove
     </LoadingButton>
   );

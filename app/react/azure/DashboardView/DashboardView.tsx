@@ -1,6 +1,7 @@
-import { Package } from 'react-feather';
+import { Package } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import Subscription from '@/assets/ico/subscription.svg?c';
 
 import { PageHeader } from '@@/PageHeader';
 import { DashboardItem } from '@@/DashboardItem';
@@ -8,8 +9,6 @@ import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 
 import { useResourceGroups } from '../queries/useResourceGroups';
 import { useSubscriptions } from '../queries/useSubscriptions';
-
-import SubscriptionsIcon from './icon-subscription.svg?c';
 
 export function DashboardView() {
   const environmentId = useEnvironmentId();
@@ -35,7 +34,7 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
-              icon={SubscriptionsIcon}
+              icon={Subscription}
               type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (

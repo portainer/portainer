@@ -1,4 +1,4 @@
-import { Edit } from 'react-feather';
+import { Edit } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
@@ -11,7 +11,6 @@ export const options = [
   {
     id: 'microsoft',
     icon: Microsoft,
-    featherIcon: true,
     label: 'Microsoft',
     description: 'Microsoft OAuth provider',
     value: 'microsoft',

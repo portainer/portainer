@@ -1,6 +1,6 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-header icon="{{ $ctrl.titleIcon }}" feather-icon="true" title-text="{{ $ctrl.titleText }}"></rd-widget-header>
+    <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="{{ $ctrl.titleText }}"></rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="actionBar">
         <form class="form-horizontal">
@@ -35,7 +35,8 @@
               <th>
                 IP Address
                 <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
-                  <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+                  <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
+                  <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
                 </a>
               </th>
               <th>Gateway</th>
@@ -51,7 +52,8 @@
             >
               <td>
                 <button class="btn btn-none" ng-if="$ctrl.itemCanExpand(value)" type="button">
-                  <i ng-class="{ 'fas fa-angle-down': value.Expanded, 'fas fa-angle-right': !value.Expanded }" class="space-right" aria-hidden="true"></i>
+                  <pr-icon ng-if="value.Expanded" icon="'chevron-down'" class-name="'mr-1'"></pr-icon>
+                  <pr-icon ng-if="!value.Expanded" icon="'chevron-right'" class-name="'mr-1'"></pr-icon>
                 </button>
                 <a ui-sref="docker.networks.network({ id: key, nodeName: $ctrl.nodeName })">{{ key }}</a>
               </td>
@@ -66,7 +68,7 @@
                   button-spinner="$ctrl.leaveNetworkActionInProgress"
                   ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)"
                 >
-                  <span ng-if="!$ctrl.leaveNetworkActionInProgress" class="vertical-center !ml-0"> <pr-icon icon="'trash-2'" feather="true"></pr-icon> Leave network</span>
+                  <span ng-if="!$ctrl.leaveNetworkActionInProgress" class="vertical-center !ml-0"> <pr-icon icon="'trash-2'"></pr-icon> Leave network</span>
                   <span ng-if="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
                 </button>
               </td>

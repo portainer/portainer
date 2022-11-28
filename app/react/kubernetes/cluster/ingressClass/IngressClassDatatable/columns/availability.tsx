@@ -1,4 +1,5 @@
 import { CellProps, Column } from 'react-table';
+import { Check, X } from 'lucide-react';
 
 import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';
@@ -20,7 +21,7 @@ export const availability: Column<IngressControllerClassMap> = {
 function AvailailityCell({ value }: CellProps<IngressControllerClassMap>) {
   return (
     <Badge type={value ? 'success' : 'danger'}>
-      <Icon icon={value ? 'check' : 'x'} feather className="!mr-1" />
+      <Icon icon={value ? Check : X} className="!mr-1" />
       {value ? 'Allowed' : 'Disallowed'}
     </Badge>
   );

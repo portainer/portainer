@@ -4,14 +4,14 @@
       <div class="toolBar">
         <div class="toolBarTitle flex">
           <div class="widget-icon space-right">
-            <pr-icon icon="'server'" feather="true"></pr-icon>
+            <pr-icon icon="'server'"></pr-icon>
           </div>
           <span>
             {{ $ctrl.titleText }}
           </span>
         </div>
         <div class="searchBar">
-          <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+          <pr-icon icon="'search'" class="vertical-center" size="'sm'"></pr-icon>
           <input
             type="text"
             class="searchInput ml-1"
@@ -23,7 +23,7 @@
         </div>
         <div ng-if="$ctrl.refreshCallback" class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -43,7 +43,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
+                        <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -163,17 +163,17 @@
                   ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
                   class="vertical-center mr-1"
                 >
-                  <pr-icon icon="'bar-chart'" feather="true"></pr-icon>Stats
+                  <pr-icon icon="'bar-chart'"></pr-icon>Stats
                 </a>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })" class="vertical-center mr-1">
-                  <pr-icon icon="'file-text'" feather="true"></pr-icon>Logs
+                  <pr-icon icon="'file-text'"></pr-icon>Logs
                 </a>
                 <a
                   ng-if="item.Status === 'Running'"
                   ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })"
                   class="vertical-center mr-1"
                 >
-                  <pr-icon icon="'terminal'" feather="true"></pr-icon>Console
+                  <pr-icon icon="'terminal'"></pr-icon>Console
                 </a>
               </td>
             </tr>

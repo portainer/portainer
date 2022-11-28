@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import clsx from 'clsx';
 
 import { Select } from '@@/form-components/ReactSelect';
+import { TableHeaderSortIcons } from '@@/datatables/TableHeaderSortIcons';
 
 import { Filter } from './types';
 import styles from './SortbySelector.module.css';
@@ -24,18 +25,7 @@ export function SortbySelector({
   sortByButton,
   value,
 }: Props) {
-  const upIcon = 'fa fa-sort-alpha-up';
-  const downIcon = 'fa fa-sort-alpha-down';
-  const [iconStyle, setIconStyle] = useState(downIcon);
-
-  useEffect(() => {
-    if (sortByDescending) {
-      setIconStyle(upIcon);
-    } else {
-      setIconStyle(downIcon);
-    }
-  }, [sortByDescending]);
-
+  const sorted = sortByButton && !!value;
   return (
     <div className={styles.sortByContainer}>
       <div className={styles.sortByElement}>
@@ -49,15 +39,15 @@ export function SortbySelector({
       </div>
       <div className={styles.sortByElement}>
         <button
-          className={styles.sortButton}
+          className={clsx(styles.sortButton, 'h-[34px]')}
           type="button"
-          disabled={!sortByButton}
+          disabled={!sorted}
           onClick={(e) => {
             e.preventDefault();
             onDescending();
           }}
         >
-          <i className={iconStyle} />
+          <TableHeaderSortIcons sorted={sorted} descending={sortByDescending} />
         </button>
       </div>
     </div>

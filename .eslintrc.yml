@@ -104,7 +104,7 @@ overrides:
       'react/jsx-no-bind': off
       'no-await-in-loop': 'off'
       'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
-      'regex/invalid': ['error', [{ 'regex': 'data-feather="(.*)"', 'message': 'Please use `react-feather` package instead' }]]
+      'regex/invalid': ['error', [{ 'regex': '<Icon icon="(.*)"', 'message': 'Please directly import the `lucide-react` icon instead of using the string' }]]
   - files:
       - app/**/*.test.*
     extends:
