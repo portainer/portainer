@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	// mustacheUpgradeStandaloneTemplateFile represents the name of the template file for the standalone upgrade
-	mustacheUpgradeStandaloneTemplateFile = "upgrade-standalone.yml.mustache"
+	// mustacheUpgradeDockerTemplateFile represents the name of the template file for the docker upgrade
+	mustacheUpgradeDockerTemplateFile = "upgrade-docker.yml.mustache"
 
 	// portainerImagePrefixEnvVar represents the name of the environment variable used to define the image prefix for portainer-updater
 	// useful if there's a need to test PR images
@@ -60,19 +60,20 @@ func (service *service) Upgrade(licenseKey string) error {
 
 	switch service.platform {
 	case platform.PlatformDockerStandalone:
-		return service.UpgradeDockerStandalone(licenseKey, portainer.APIVersion)
-		// case platform.PlatformDockerSwarm:
+		return service.upgradeDocker(licenseKey, portainer.APIVersion, "standalone")
+	case platform.PlatformDockerSwarm:
+		return service.upgradeDocker(licenseKey, portainer.APIVersion, "swarm")
 		// case platform.PlatformKubernetes:
 		// case platform.PlatformPodman:
 		// case platform.PlatformNomad:
 		// 	default:
 	}
 
-	return errors.New("unsupported platform")
+	return fmt.Errorf("unsupported platform %s", service.platform)
 }
 
-func (service *service) UpgradeDockerStandalone(licenseKey, version string) error {
-	templateName := filesystem.JoinPaths(service.assetsPath, "mustache-templates", mustacheUpgradeStandaloneTemplateFile)
+func (service *service) upgradeDocker(licenseKey, version, envType string) error {
+	templateName := filesystem.JoinPaths(service.assetsPath, "mustache-templates", mustacheUpgradeDockerTemplateFile)
 
 	portainerImagePrefix := os.Getenv(portainerImagePrefixEnvVar)
 	if portainerImagePrefix == "" {
@@ -88,6 +89,7 @@ func (service *service) UpgradeDockerStandalone(licenseKey, version string) erro
 		"skip_pull_image": skipPullImage,
 		"updater_image":   os.Getenv(updaterImageEnvVar),
 		"license":         licenseKey,
+		"envType":         envType,
 	})
 
 	log.Debug().
@@ -99,7 +101,8 @@ func (service *service) UpgradeDockerStandalone(licenseKey, version string) erro
 	}
 
 	tmpDir := os.TempDir()
-	filePath := filesystem.JoinPaths(tmpDir, fmt.Sprintf("upgrade-%d.yml", time.Now().Unix()))
+	timeId := time.Now().Unix()
+	filePath := filesystem.JoinPaths(tmpDir, fmt.Sprintf("upgrade-%d.yml", timeId))
 
 	r := bytes.NewReader([]byte(composeFile))
 
@@ -114,6 +117,9 @@ func (service *service) UpgradeDockerStandalone(licenseKey, version string) erro
 		libstack.DeployOptions{
 			ForceRecreate:        true,
 			AbortOnContainerExit: true,
+			Options: libstack.Options{
+				ProjectName: fmt.Sprintf("portainer-upgrade-%d-%s", timeId, version),
+			},
 		},
 	)
 
