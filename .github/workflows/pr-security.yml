@@ -153,8 +153,11 @@ jobs:
         with:
           node-version: 18.x
 
-      - name: install packages and build binary
-        run: yarn install && yarn build
+      - name: Install packages
+        run: yarn --frozen-lockfile
+
+      - name: build
+        run: make build
 
       - name: set up docker buildx
         uses: docker/setup-buildx-action@v2
@@ -173,7 +176,7 @@ jobs:
 
       - name: scan vulnerabilities by Trivy
         uses: docker://docker.io/aquasec/trivy:latest
-        continue-on-error: true 
+        continue-on-error: true
         with:
           args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}
 
@@ -219,7 +222,7 @@ jobs:
       github.event.pull_request &&
       github.event.review.body == '/scan'
     strategy:
-      matrix: 
+      matrix:
         jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}
         godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
         imagediff: ${{fromJson(needs.image-vulnerability.outputs.imagediff)}}
@@ -228,7 +231,7 @@ jobs:
         if: >-
           matrix.jsdiff.status == 'failure' ||
           matrix.godiff.status == 'failure' ||
-          matrix.imagediff.status == 'failure' 
+          matrix.imagediff.status == 'failure'
         run: |
           echo "${{ matrix.jsdiff.status }}"
           echo "${{ matrix.godiff.status }}"
