@@ -235,6 +235,13 @@
             >
               <pr-icon icon="'code'" class-name="'mr-1'"></pr-icon>Edit External application
             </button>
+            <be-only-button
+              icon="'refresh-cw'"
+              feature-id="ctrl.limitedFeature"
+              message="'A rolling restart of the application is performed.'"
+              heading="'Rolling restart'"
+              button-text="'Rolling restart'"
+            ></be-only-button>
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
@@ -244,13 +251,6 @@
             >
               <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Redeploy
             </button>
-            <be-only-button
-              icon="'refresh-cw'"
-              feature-id="ctrl.limitedFeature"
-              message="'A rolling restart of the application is performed.'"
-              heading="'Rolling restart'"
-              button-text="'Rolling restart'"
-            ></be-only-button>
             <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
