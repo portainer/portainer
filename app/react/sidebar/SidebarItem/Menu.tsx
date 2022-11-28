@@ -33,6 +33,10 @@ export function Menu({
 
   const CollapseButtonIcon = isOpen ? ChevronUp : ChevronDown;
 
+  if (!isSidebarOpen) {
+    return head as JSX.Element;
+  }
+
   return (
     <div className="flex-1">
       <div className="flex w-full justify-between items-center relative ">

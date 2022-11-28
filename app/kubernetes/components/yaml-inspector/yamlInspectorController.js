@@ -39,6 +39,10 @@ class KubernetesYamlInspectorController {
     this.expanded = !this.expanded;
   }
 
+  onChange() {
+    // placeholder
+  }
+
   $onInit() {
     this.data = this.cleanYamlUnwantedFields(this.data);
     this.limitedFeature = FeatureId.K8S_EDIT_YAML;

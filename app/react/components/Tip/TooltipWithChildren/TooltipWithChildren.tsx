@@ -1,7 +1,9 @@
-import ReactTooltip from 'react-tooltip';
+import React, { MouseEvent } from 'react';
+import Tippy from '@tippyjs/react';
 import clsx from 'clsx';
 import _ from 'lodash';
-import ReactDOMServer from 'react-dom/server';
+
+import 'tippy.js/dist/tippy.css';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -9,13 +11,13 @@ import { getFeatureDetails } from '@@/BEFeatureIndicator/utils';
 
 import styles from './TooltipWithChildren.module.css';
 
-type Position = 'top' | 'right' | 'bottom' | 'left';
+export type Position = 'top' | 'right' | 'bottom' | 'left';
 
 export interface Props {
   position?: Position;
   message: string;
   className?: string;
-  children: React.ReactNode;
+  children: React.ReactElement;
   heading?: string;
   BEFeatureID?: FeatureId;
 }
@@ -35,15 +37,11 @@ export function TooltipWithChildren({
     : { url: '', limitedToBE: false };
 
   const messageHTML = (
-    <div className={styles.tooltipContainer}>
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    <div className={styles.tooltipContainer} onClick={onClickHandler}>
       {(heading || (BEFeatureID && limitedToBE)) && (
-        <div
-          className={clsx(
-            'w-full mb-2 inline-flex justify-between',
-            styles.tooltipHeading
-          )}
-        >
-          {heading && <span>{heading}</span>}
+        <div className="w-full mb-3 inline-flex justify-between">
+          <span>{heading}</span>
           {BEFeatureID && limitedToBE && (
             <a
               href={url}
@@ -61,27 +59,30 @@ export function TooltipWithChildren({
   );
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-    <span
-      data-html
-      data-multiline
-      data-tip={ReactDOMServer.renderToString(messageHTML)}
-      data-for={id}
-      className={clsx(styles.icon, 'inline-flex text-base')}
-      onClick={(e) => e.preventDefault()} // click is boucing to the element behind the tooltip so preventing it.
+    <Tippy
+      className={clsx(id, styles.tooltip, className)}
+      content={messageHTML}
+      delay={200}
+      zIndex={1000}
+      placement={position}
+      arrow
+      allowHTML
+      interactive
     >
       {children}
-      <ReactTooltip
-        id={id}
-        multiline
-        type="info"
-        place={position}
-        effect="solid"
-        className={clsx(styles.tooltip, className)}
-        arrowColor="var(--bg-tooltip-color)"
-        delayHide={400}
-        clickable
-      />
-    </span>
+    </Tippy>
   );
+}
+
+// Preventing click bubbling to the parent as it is affecting
+// mainly toggles when full row is clickable.
+function onClickHandler(e: MouseEvent) {
+  const target = e.target as HTMLInputElement;
+  if (target.tagName.toLowerCase() === 'a') {
+    const url = target.getAttribute('href');
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
+  e.preventDefault();
 }

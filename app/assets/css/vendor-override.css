@@ -398,3 +398,25 @@ input:-webkit-autofill {
   border-bottom-right-radius: 8px;
   padding: 5px;
 }
+
+/* Tippy */
+/* For triangle arrow (Sharp) */
+.tippy-box[data-placement^='top'] > .tippy-arrow:before {
+  border-top: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+}
+
+.tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+  border-bottom: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+}
+
+.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+}
+
+.tippy-box[data-placement^='left'] > .tippy-arrow:before {
+  border-left: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+}
+
+.tippy-content {
+  padding: 0;
+}
