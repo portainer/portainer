@@ -214,11 +214,11 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <div ng-if="!ctrl.isSystemNamespace()" style="margin-bottom: 15px">
+          <div ng-if="!ctrl.isSystemNamespace()" class="mb-4 flex items-center gap-1">
             <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-light vertical-center"
+              class="btn btn-sm btn-light vertical-center ml-2"
               ui-sref="kubernetes.applications.application.edit"
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
@@ -229,9 +229,8 @@
               authorization="K8sApplicationDetailsW"
               ng-if="ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-light"
+              class="btn btn-sm btn-light ml-2"
               ui-sref="kubernetes.applications.application.edit"
-              style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
               <pr-icon icon="'code'" class-name="'mr-1'"></pr-icon>Edit External application
@@ -239,27 +238,23 @@
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
-              class="btn btn-sm btn-light"
-              style="margin-left: 0"
+              class="btn btn-sm btn-light ml-2"
               ng-click="ctrl.redeployApplication()"
               data-cy="k8sAppDetail-redeployButton"
             >
               <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Redeploy
             </button>
-            <button
-              ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
-              type="button"
-              class="btn btn-sm btn-light"
-              style="margin-left: 0"
-              feature-id="$ctrl.limitedFeature"
-            >
-              <pr-icon icon="'recycle'" class="'mr-1'" feather="true"></pr-icon>Rolling Restart
-            </button>
+            <be-only-button
+              icon="'refresh-cw'"
+              feature-id="ctrl.limitedFeature"
+              message="'A rolling restart of the application is performed.'"
+              heading="'Rolling restart'"
+              button-text="'Rolling restart'"
+            ></be-only-button>
             <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
               class="btn btn-sm btn-light"
-              style="margin-left: 0"
               ng-click="ctrl.rollbackApplication()"
               ng-disabled="ctrl.application.Revisions.length < 2 || ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
               data-cy="k8sAppDetail-rollbackButton"

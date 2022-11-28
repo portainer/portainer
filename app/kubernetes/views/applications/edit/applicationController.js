@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
-//import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import {
   KubernetesApplicationDataAccessPolicies,
@@ -351,6 +351,8 @@ class KubernetesApplicationController {
   }
 
   async onInit() {
+    this.limitedFeature = FeatureId.K8S_ROLLING_RESTART;
+
     this.state = {
       activeTab: 0,
       currentName: this.$state.$current.name,
