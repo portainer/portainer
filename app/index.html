@@ -42,8 +42,8 @@
     <div
       id="page-wrapper"
       ng-class="{
-        open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
-        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint', 'portainer.logout'].indexOf($state.current.name) > -1 || applicationState.loading
+        open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin'].indexOf($state.current.name) === -1,
+        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.logout'].indexOf($state.current.name) > -1 || applicationState.loading
       }"
       ng-cloak
     >

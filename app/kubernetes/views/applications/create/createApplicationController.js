@@ -34,6 +34,7 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 import { updateIngress, getIngresses } from '@/react/kubernetes/ingresses/service';
 import { confirmUpdateAppIngress } from '@/portainer/services/modal.service/prompt';
+import { placementOptions } from './placementTypes';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -84,6 +85,8 @@ class KubernetesCreateApplicationController {
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
     this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
+
+    this.placementOptions = placementOptions;
 
     this.state = {
       appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
@@ -148,14 +151,37 @@ class KubernetesCreateApplicationController {
     this.onServicePublishChange = this.onServicePublishChange.bind(this);
     this.checkIngressesToUpdate = this.checkIngressesToUpdate.bind(this);
     this.confirmUpdateApplicationAsync = this.confirmUpdateApplicationAsync.bind(this);
+    this.onDataAccessPolicyChange = this.onDataAccessPolicyChange.bind(this);
+    this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
+    this.supportGlobalDeployment = this.supportGlobalDeployment.bind(this);
+    this.onChangePlacementType = this.onChangePlacementType.bind(this);
   }
   /* #endregion */
+
+  onChangePlacementType(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.PlacementType = value;
+    });
+  }
+
+  onChangeDeploymentType(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.DeploymentType = value;
+    });
+  }
 
   onChangeFileContent(value) {
     if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
       this.state.isEditorDirty = true;
       this.stackFileContent = value;
     }
+  }
+
+  onDataAccessPolicyChange(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.DataAccessPolicy = value;
+      this.resetDeploymentType();
+    });
   }
 
   async updateApplicationViaWebEditor() {
@@ -616,6 +642,7 @@ class KubernetesCreateApplicationController {
     if (hasFolders && (hasRWOOnly || isIsolated)) {
       return false;
     }
+
     return true;
   }
 

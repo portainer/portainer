@@ -8,10 +8,12 @@ import { BoxSelectorAngular } from './BoxSelectorAngular';
 
 export { buildOption } from './utils';
 const BoxSelectorReact = react2angular(BoxSelector, [
+  'isMulti',
   'value',
   'onChange',
   'options',
   'radioName',
+  'slim',
 ]);
 
 export const boxSelectorModule = angular

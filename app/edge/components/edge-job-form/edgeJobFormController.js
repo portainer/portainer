@@ -1,9 +1,20 @@
 import _ from 'lodash-es';
 import moment from 'moment';
+import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
+
+import { cronMethodOptions } from './cron-method-options';
 
 export class EdgeJobFormController {
   /* @ngInject */
   constructor($async, $scope, EdgeGroupService, Notifications) {
+    this.$scope = $scope;
+    this.$async = $async;
+    this.EdgeGroupService = EdgeGroupService;
+    this.Notifications = Notifications;
+
+    this.cronMethods = cronMethodOptions;
+    this.buildMethods = [editor, upload];
+
     this.state = {
       formValidationError: '',
     };
@@ -34,17 +45,31 @@ export class EdgeJobFormController {
     this.cronRegex =
       /(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ){4,6}((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*))/;
 
-    this.$async = $async;
-    this.$scope = $scope;
-
     this.action = this.action.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
     this.onChangeGroups = this.onChangeGroups.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onCronMethodChange = this.onCronMethodChange.bind(this);
+    this.onBuildMethodChange = this.onBuildMethodChange.bind(this);
+  }
 
-    this.EdgeGroupService = EdgeGroupService;
-    this.Notifications = Notifications;
+  onChange(values) {
+    this.$scope.$evalAsync(() => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+    });
+  }
+
+  onBuildMethodChange(value) {
+    this.onChange({ method: value });
+  }
+
+  onCronMethodChange(value) {
+    this.onChange({ cronMethod: value });
   }
 
   onChangeModel(model) {

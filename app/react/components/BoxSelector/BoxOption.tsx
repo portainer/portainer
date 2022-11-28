@@ -1,56 +1,73 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
+import type { Icon } from 'lucide-react';
 
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
-import './BoxSelectorItem.css';
+import styles from './BoxOption.module.css';
+import { BoxSelectorOption, Value } from './types';
 
-import { BoxSelectorOption } from './types';
-
-interface Props<T extends number | string> {
+interface Props<T extends Value> {
   radioName: string;
   option: BoxSelectorOption<T>;
-  onChange?(value: T): void;
-  selectedValue: T;
+  onSelect?(value: T): void;
+  isSelected(value: T): boolean;
   disabled?: boolean;
   tooltip?: string;
   className?: string;
   type?: 'radio' | 'checkbox';
+  checkIcon: Icon;
 }
 
-export function BoxOption<T extends number | string>({
+export function BoxOption<T extends Value>({
   radioName,
   option,
-  onChange = () => {},
-  selectedValue,
+  onSelect = () => {},
+  isSelected,
   disabled,
   tooltip,
   className,
   type = 'radio',
   children,
+  checkIcon: Check,
 }: PropsWithChildren<Props<T>>) {
-  const BoxOption = (
-    <div className={clsx('box-selector-item', className)}>
+  const selected = isSelected(option.value);
+
+  const item = (
+    <div className={clsx(styles.root, className)}>
       <input
         type={type}
         name={radioName}
         id={option.id}
-        checked={option.value === selectedValue}
-        value={option.value}
+        checked={selected}
+        value={option.value.toString()}
         disabled={disabled}
-        onChange={() => onChange(option.value)}
+        onChange={() => onSelect(option.value)}
       />
 
       <label htmlFor={option.id} data-cy={`${radioName}_${option.value}`}>
         {children}
+
+        {!disabled && (
+          <div
+            className={clsx(
+              'absolute top-4 right-4 h-4 w-4 rounded-full border border-solid border-blue-8 text-white font-bold flex items-center justify-center',
+              {
+                'bg-white': !selected,
+                'bg-blue-8': selected,
+              }
+            )}
+          >
+            {selected && <Check className="lucide" strokeWidth={3} />}
+          </div>
+        )}
       </label>
     </div>
   );
 
   if (tooltip) {
-    return (
-      <TooltipWithChildren message={tooltip}>{BoxOption}</TooltipWithChildren>
-    );
+    return <TooltipWithChildren message={tooltip}>{item}</TooltipWithChildren>;
   }
-  return BoxOption;
+
+  return item;
 }

@@ -7,6 +7,7 @@ import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { editor, upload, git, customTemplate } from '@@/BoxSelector/common-options/build-methods';
 
 angular
   .module('portainer.app')
@@ -37,6 +38,7 @@ angular
       $scope.isTemplateVariablesEnabled = isBE;
       $scope.buildAnalyticsProperties = buildAnalyticsProperties;
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
+      $scope.buildMethods = [editor, upload, git, customTemplate];
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
       $scope.isAdmin = Authentication.isAdmin();
 
@@ -83,6 +85,13 @@ angular
       });
 
       $scope.onChangeFormValues = onChangeFormValues;
+      $scope.onBuildMethodChange = onBuildMethodChange;
+
+      function onBuildMethodChange(value) {
+        $scope.$evalAsync(() => {
+          $scope.state.Method = value;
+        });
+      }
 
       $scope.onEnableWebhookChange = function (enable) {
         $scope.$evalAsync(() => {

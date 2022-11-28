@@ -131,37 +131,9 @@
                 </span>
               </div>
             </div>
-            <!-- !note -->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <div class="boxselector_wrapper">
-                  <div>
-                    <input type="radio" id="restore_file" checked="checked" />
-                    <label for="restore_file" data-cy="init-selectLocalFile">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'upload'"></pr-icon>
-                        Upload backup file
-                      </div>
-                      <p></p>
-                    </label>
-                  </div>
-                  <div>
-                    <input type="radio" id="restore_s3" disabled />
-                    <label for="restore_s3" class="boxselector_disabled">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'download'"></pr-icon>
-                        Retrieve from S3
-                      </div>
-                      <p
-                        >This feature is available in
-                        <a class="hyperlink" href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p
-                      >
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- note -->
+
+            <box-selector slim="true" options="restoreOptions" value="formValues.restoreFormType" on-change="(onChangeRestoreType)" radio-name="'restore-type'"></box-selector>
+
             <div class="form-group">
               <div class="col-sm-12">
                 <span class="small text-muted"> You can upload a backup file from your computer. </span>

@@ -29,6 +29,23 @@ module.exports = {
         extensions: config.resolve.extensions,
       }),
     ];
+
+    const svgRule = config.module.rules.find((rule) => rule.test && typeof rule.test.test === 'function' && rule.test.test('.svg'));
+    svgRule.test = new RegExp(svgRule.test.source.replace('svg|', ''));
+
+    config.module.rules.unshift({
+      test: /\.svg$/i,
+      type: 'asset',
+      resourceQuery: { not: [/c/] }, // exclude react component if *.svg?url
+    });
+
+    config.module.rules.unshift({
+      test: /\.svg$/i,
+      issuer: /\.(js|ts)(x)?$/,
+      resourceQuery: /c/, // *.svg?c
+      use: [{ loader: '@svgr/webpack', options: { icon: true } }],
+    });
+
     return config;
   },
   core: {
