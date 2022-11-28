@@ -8,7 +8,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
@@ -142,15 +141,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	go func() {
 		<-shutdownCtx.Done()
 		defer connection.Close()
-
-		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
-
-		err := store.Export(exportFilename)
-		if err != nil {
-			log.Error().Str("filename", exportFilename).Err(err).Msg("failed to export")
-		} else {
-			log.Debug().Str("filename", exportFilename).Msg("exported")
-		}
 	}()
 
 	return store
