@@ -8,13 +8,15 @@ import { queryKeys } from './query-keys';
 
 export const queryKey = [...queryKeys.base(), 'info'] as const;
 
+export type ContainerPlatform =
+  | 'Docker Standalone'
+  | 'Docker Swarm'
+  | 'Kubernetes'
+  | 'Podman'
+  | 'Nomad';
+
 export interface SystemInfoResponse {
-  platform:
-    | 'Docker Standalone'
-    | 'Docker Swarm'
-    | 'Kubernetes'
-    | 'Podman'
-    | 'Nomad';
+  platform: ContainerPlatform;
   agents: number;
   edgeAgents: number;
   edgeDevices: number;

@@ -3,7 +3,10 @@ import { useState } from 'react';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
-import { useSystemInfo } from '@/react/portainer/system/useSystemInfo';
+import {
+  ContainerPlatform,
+  useSystemInfo,
+} from '@/react/portainer/system/useSystemInfo';
 import { useUser } from '@/react/hooks/useUser';
 import { withEdition } from '@/react/portainer/feature-flags/withEdition';
 import { withHideOnExtension } from '@/react/hooks/withHideOnExtension';
@@ -15,6 +18,8 @@ import { UpgradeDialog } from './UpgradeDialog';
 export const UpgradeBEBannerWrapper = withHideOnExtension(
   withEdition(UpgradeBEBanner, 'CE')
 );
+
+const enabledPlatforms: Array<ContainerPlatform> = ['Docker Standalone'];
 
 function UpgradeBEBanner() {
   const { isAdmin } = useUser();
@@ -41,7 +46,7 @@ function UpgradeBEBanner() {
     agents: systemInfo.agents,
   };
 
-  if (systemInfo.platform !== 'Docker Standalone') {
+  if (!enabledPlatforms.includes(systemInfo.platform)) {
     return null;
   }
 
