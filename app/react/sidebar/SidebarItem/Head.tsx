@@ -48,7 +48,7 @@ export function Head({
         anchorProps.className,
         'text-inherit no-underline hover:no-underline hover:text-inherit focus:no-underline focus:text-inherit',
         'w-full flex-1 rounded-md flex items-center h-8 space-x-4 text-sm',
-        'hover:bg-blue-9 be:hover:bg-gray-9 th-dark:hover:bg-gray-true-9 transition-colors duration-200',
+        'hover:bg-blue-9 th-dark:hover:bg-gray-true-9 be:hover:bg-gray-9 transition-colors duration-200',
         {
           'px-3 justify-start w-full': isOpen,
           'justify-center w-8': !isOpen,
@@ -66,7 +66,7 @@ export function Head({
   return (
     <TooltipWithChildren
       position="right"
-      className={clsx('portainer-tooltip')}
+      className="!opacity-100 !bg-blue-9 !be:bg-gray-9 !rounded-md !py-1 !px-2"
       message={label}
     >
       {anchor}

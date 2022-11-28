@@ -2,11 +2,6 @@
   @apply inline-flex;
 }
 
-.tooltip-wrapper {
-  display: inline-block;
-  position: relative;
-}
-
 .tooltip {
   background-color: var(--bg-tooltip-color) !important;
   padding: 0.833em 1em !important;
