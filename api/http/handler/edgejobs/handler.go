@@ -8,7 +8,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/edge"
 )
 
 // Handler is the HTTP handler used to handle Edge job operations.
@@ -46,30 +45,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/edge_jobs/{id}/tasks/{taskID}/logs",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksClear)))).Methods(http.MethodDelete)
 	return h
-}
-
-func (handler *Handler) getEndpointsFromEdgeGroups(edgeGroupIDs []portainer.EdgeGroupID) ([]portainer.EndpointID, *httperror.HandlerError) {
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
-	if err != nil {
-		return nil, httperror.InternalServerError("Unable to retrieve environments from database", err)
-	}
-
-	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
-	if err != nil {
-		return nil, httperror.InternalServerError("Unable to retrieve environment groups from database", err)
-	}
-
-	var response []portainer.EndpointID
-	for _, edgeGroupID := range edgeGroupIDs {
-		edgeGroup, err := handler.DataStore.EdgeGroup().EdgeGroup(edgeGroupID)
-		if err != nil {
-			return nil, httperror.BadRequest("Invalid Edge Group provided", err)
-		}
-
-		response = append(response, edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)...)
-	}
-
-	return response, nil
 }
 
 func (handler *Handler) convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {

@@ -65,10 +65,17 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 		return httperror.InternalServerError("Unable to save task log to the filesystem", err)
 	}
 
-	meta := edgeJob.Endpoints[endpoint.ID]
-	meta.CollectLogs = false
-	meta.LogsStatus = portainer.EdgeJobLogsStatusCollected
-	edgeJob.Endpoints[endpoint.ID] = meta
+	if _, ok := edgeJob.GroupLogsCollection[endpoint.ID]; ok {
+		edgeJob.GroupLogsCollection[endpoint.ID] = portainer.EdgeJobEndpointMeta{
+			CollectLogs: false,
+			LogsStatus:  portainer.EdgeJobLogsStatusCollected,
+		}
+	} else {
+		edgeJob.Endpoints[endpoint.ID] = portainer.EdgeJobEndpointMeta{
+			CollectLogs: false,
+			LogsStatus:  portainer.EdgeJobLogsStatusCollected,
+		}
+	}
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 

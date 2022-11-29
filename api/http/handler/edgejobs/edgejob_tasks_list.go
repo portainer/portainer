@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/maps"
 )
 
@@ -47,12 +48,13 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 
 	endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
 	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
-		endpoints, httpErr := handler.getEndpointsFromEdgeGroups(edgeJob.EdgeGroups)
-		if httpErr != nil {
-			return httpErr
+		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
+		if err != nil {
+			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 
 		endpointsMap = handler.convertEndpointsToMetaObject(endpoints)
+		maps.Copy(endpointsMap, edgeJob.GroupLogsCollection)
 	}
 
 	maps.Copy(endpointsMap, edgeJob.Endpoints)

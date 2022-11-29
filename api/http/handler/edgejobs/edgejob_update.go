@@ -120,7 +120,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 	}
 
 	if payload.EdgeGroups == nil && edgeJob.EdgeGroups != nil {
-		endpoints, err := handler.getEndpointsFromEdgeGroups(edgeJob.EdgeGroups)
+		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
 		if err != nil {
 			return errors.New("unable to get endpoints from edge groups")
 		}
@@ -148,7 +148,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 			}
 		}
 
-		endpointsFromGroupsToAdd, err := handler.getEndpointsFromEdgeGroups(edgeGroupsToAdd)
+		endpointsFromGroupsToAdd, err := edge.GetEndpointsFromEdgeGroups(edgeGroupsToAdd, handler.DataStore)
 		if err != nil {
 			return errors.New("unable to get endpoints from edge groups")
 		}
@@ -165,7 +165,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 			}
 		}
 
-		endpointsFromGroupsToRemove, err := handler.getEndpointsFromEdgeGroups(edgeGroupsToRemove)
+		endpointsFromGroupsToRemove, err := edge.GetEndpointsFromEdgeGroups(edgeGroupsToRemove, handler.DataStore)
 		if err != nil {
 			return errors.New("unable to get endpoints from edge groups")
 		}

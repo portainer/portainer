@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/maps"
 )
@@ -89,11 +90,10 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 	edgeJob := handler.createEdgeJobObjectFromFileContentPayload(&payload)
 
 	var endpoints []portainer.EndpointID
-	var httpErr *httperror.HandlerError
 	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
-		endpoints, httpErr = handler.getEndpointsFromEdgeGroups(payload.EdgeGroups)
-		if httpErr != nil {
-			return httpErr
+		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, handler.DataStore)
+		if err != nil {
+			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 	}
 
@@ -169,11 +169,10 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	edgeJob := handler.createEdgeJobObjectFromFilePayload(payload)
 
 	var endpoints []portainer.EndpointID
-	var httpErr *httperror.HandlerError
 	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
-		endpoints, httpErr = handler.getEndpointsFromEdgeGroups(payload.EdgeGroups)
-		if httpErr != nil {
-			return httpErr
+		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, handler.DataStore)
+		if err != nil {
+			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 	}
 
@@ -192,14 +191,15 @@ func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreat
 	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
-		ID:             edgeJobIdentifier,
-		Name:           payload.Name,
-		CronExpression: payload.CronExpression,
-		Recurring:      payload.Recurring,
-		Created:        time.Now().Unix(),
-		Endpoints:      endpoints,
-		EdgeGroups:     payload.EdgeGroups,
-		Version:        1,
+		ID:                  edgeJobIdentifier,
+		Name:                payload.Name,
+		CronExpression:      payload.CronExpression,
+		Recurring:           payload.Recurring,
+		Created:             time.Now().Unix(),
+		Endpoints:           endpoints,
+		EdgeGroups:          payload.EdgeGroups,
+		Version:             1,
+		GroupLogsCollection: map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{},
 	}
 
 	return edgeJob
@@ -211,14 +211,15 @@ func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJ
 	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
-		ID:             edgeJobIdentifier,
-		Name:           payload.Name,
-		CronExpression: payload.CronExpression,
-		Recurring:      payload.Recurring,
-		Created:        time.Now().Unix(),
-		Endpoints:      endpoints,
-		EdgeGroups:     payload.EdgeGroups,
-		Version:        1,
+		ID:                  edgeJobIdentifier,
+		Name:                payload.Name,
+		CronExpression:      payload.CronExpression,
+		Recurring:           payload.Recurring,
+		Created:             time.Now().Unix(),
+		Endpoints:           endpoints,
+		EdgeGroups:          payload.EdgeGroups,
+		Version:             1,
+		GroupLogsCollection: map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{},
 	}
 
 	return edgeJob

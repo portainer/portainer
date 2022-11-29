@@ -243,6 +243,9 @@ type (
 		ScriptPath     string                             `json:"ScriptPath"`
 		Recurring      bool                               `json:"Recurring"`
 		Version        int                                `json:"Version"`
+
+		// Field used for log collection of Endpoints belonging to EdgeGroups
+		GroupLogsCollection map[EndpointID]EdgeJobEndpointMeta
 	}
 
 	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment(Endpoint) relation
