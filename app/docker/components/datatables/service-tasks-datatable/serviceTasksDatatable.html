@@ -12,8 +12,14 @@
               ng-click="$ctrl.changeOrderBy('Status.State')"
             ></table-column-header>
             <span class="space-left">
-              <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
-              <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
+              <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled"
+                >Filter
+                <pr-icon icon="'filter'"></pr-icon>
+              </span>
+              <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled"
+                >Filter
+                <pr-icon icon="'check'"></pr-icon>
+              </span>
             </span>
             <div class="dropdown-menu" uib-dropdown-menu>
               <div class="tableMenu">

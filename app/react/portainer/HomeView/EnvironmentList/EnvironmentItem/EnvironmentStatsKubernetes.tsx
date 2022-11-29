@@ -1,12 +1,15 @@
+import { Cpu, HardDrive } from 'lucide-react';
+
 import {
   EnvironmentType,
   KubernetesSnapshot,
 } from '@/react/portainer/environments/types';
 import { humanize } from '@/portainer/filters/filters';
 import { addPlural } from '@/portainer/helpers/strings';
+import Memory from '@/assets/ico/memory.svg?c';
 
 import { AgentVersionTag } from './AgentVersionTag';
-import { Stat } from './EnvironmentStatsItem';
+import { EnvironmentStatsItem } from './EnvironmentStatsItem';
 
 interface Props {
   snapshots?: KubernetesSnapshot[];
@@ -32,21 +35,19 @@ export function EnvironmentStatsKubernetes({
   return (
     <div className="blocklist-item-line endpoint-item">
       <span className="blocklist-item-desc space-x-1">
-        <Stat icon="cpu" featherIcon value={`${snapshot.TotalCPU} CPU`} />
+        <EnvironmentStatsItem icon={Cpu} value={`${snapshot.TotalCPU} CPU`} />
 
-        <Stat
-          icon="svg-memory"
-          featherIcon
+        <EnvironmentStatsItem
+          icon={Memory}
           value={`${humanize(snapshot.TotalMemory)} RAM`}
         />
       </span>
 
       <span className="small text-muted space-x-2 vertical-center">
         <span>Kubernetes {snapshot.KubernetesVersion}</span>
-        <Stat
+        <EnvironmentStatsItem
           value={addPlural(snapshot.NodeCount, 'node')}
-          icon="hard-drive"
-          featherIcon
+          icon={HardDrive}
         />
         <AgentVersionTag type={type} version={agentVersion} />
       </span>

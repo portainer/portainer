@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { PieChart } from 'lucide-react';
 
 import { Icon } from '@/react/components/Icon';
 import { humanize } from '@/portainer/filters/filters';
@@ -14,7 +15,7 @@ export function useImagesTotalSizeComponent(imagesTotalSize: number) {
 export function ImagesTotalSize({ imagesTotalSize }: Props) {
   return (
     <div className="vertical-center">
-      <Icon icon="pie-chart" className={clsx('space-right')} feather />
+      <Icon icon={PieChart} className={clsx('space-right')} />
       {humanize(imagesTotalSize)}
     </div>
   );

@@ -1,0 +1,10 @@
+<!--
+This exists because it has 'fill:currentColor' unlike the other microsoft icon asset
+and can directly replace fa-microsoft.
+-->
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0H11.406V11.406H0V0Z" fill="currentColor" />
+  <path d="M12.5984 0H24V11.406H12.5984V0Z" fill="currentColor" />
+  <path d="M0 12.594H11.406V24H0V12.594Z" fill="currentColor" />
+  <path d="M12.5984 12.594H24V24H12.5984V12.594Z" fill="currentColor" />
+</svg>

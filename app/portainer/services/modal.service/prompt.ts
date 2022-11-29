@@ -154,7 +154,7 @@ export function confirmContainerRecreation(
     checkbox.prop('disabled', true);
     const formCheck = box.find('.form-check');
     formCheck.prop('style', 'height: 45px;');
-    const cannotPullImageMessage = `<div class="fa fa-exclamation-triangle text-warning"/>
+    const cannotPullImageMessage = `<pr-icon icon="'alert-triangle'"  mode="'warning'"/>
                <div class="inline-text text-warning">
                    <span>Cannot pull latest as the image is inaccessible - either it no longer exists or the tag or name is no longer correct.
                    </span>

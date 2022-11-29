@@ -76,6 +76,7 @@ function SortWrapper({
         <TableHeaderSortIcons
           sorted={isSorted}
           descending={isSorted && !!isSortedDesc}
+          className="ml-1"
         />
       </div>
     </button>

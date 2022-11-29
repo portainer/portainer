@@ -6,7 +6,7 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { ChevronDown, ChevronUp } from 'react-feather';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useSidebarState } from '../useSidebarState';
 

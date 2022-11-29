@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useStore } from 'zustand';
-import { Box } from 'react-feather';
+import { Box } from 'lucide-react';
 import { useState } from 'react';
 
 import { EdgeTypes, Environment } from '@/react/portainer/environments/types';

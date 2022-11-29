@@ -1,7 +1,10 @@
 import { Column } from 'react-table';
 import _ from 'lodash';
+import { ExternalLink } from 'lucide-react';
 
 import type { DockerContainer, Port } from '@/react/docker/containers/types';
+
+import { Icon } from '@@/Icon';
 
 import { useRowContext } from '../RowContext';
 
@@ -37,7 +40,7 @@ function PortsCell({ value: ports }: Props) {
       target="_blank"
       rel="noreferrer"
     >
-      <i className="fa fa-external-link-alt" aria-hidden="true" />
+      <Icon icon={ExternalLink} />
       {port.public}:{port.private}
     </a>
   ));

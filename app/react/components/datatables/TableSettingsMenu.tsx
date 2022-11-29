@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { PropsWithChildren, ReactNode } from 'react';
-import { MoreVertical } from 'react-feather';
+import { MoreVertical } from 'lucide-react';
 
 interface Props {
   quickActions?: ReactNode;

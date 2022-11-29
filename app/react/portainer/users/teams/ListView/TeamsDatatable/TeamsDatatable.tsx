@@ -1,6 +1,6 @@
 import { Column } from 'react-table';
 import { useMutation, useQueryClient } from 'react-query';
-import { Trash2, Users } from 'react-feather';
+import { Trash2, Users } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import { notifySuccess } from '@/portainer/services/notifications';

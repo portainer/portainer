@@ -1,5 +1,5 @@
 import { useRouter } from '@uirouter/react';
-import { RefreshCw } from 'react-feather';
+import { RefreshCw } from 'lucide-react';
 
 import { Button } from '../buttons';
 

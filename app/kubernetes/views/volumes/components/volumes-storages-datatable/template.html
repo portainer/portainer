@@ -4,12 +4,12 @@
     <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
-          <pr-icon icon="'hard-drive'" feather="true"></pr-icon>
+          <pr-icon icon="'hard-drive'"></pr-icon>
         </div>
         Storage
       </div>
       <div class="searchBar vertical-center !mr-0">
-        <pr-icon icon="'search'" feather="true"></pr-icon>
+        <pr-icon icon="'search'"></pr-icon>
         <input
           type="text"
           class="searchInput"
@@ -23,7 +23,7 @@
       <div class="settings">
         <div class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
           <span uib-dropdown-toggle aria-label="Settings">
-            <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
+            <pr-icon icon="'more-vertical'" class-name="'!mr-0 !h-4'"></pr-icon>
           </span>
           <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
             <div class="tableMenu">
@@ -44,7 +44,7 @@
                       <option value="300">5min</option>
                     </select>
                     <span>
-                      <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                      <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                     </span>
                   </div>
                 </div>
@@ -64,8 +64,8 @@
         <tr>
           <th class="datatable-wide dropdown" ng-if="$ctrl.hasExpandableItems()">
             <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
-              <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true"></pr-icon>
-              <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true"></pr-icon>
+              <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
+              <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
             </div>
           </th>
           <th style="width: 60%">
@@ -97,8 +97,8 @@
         >
           <td ng-if="$ctrl.hasExpandableItems()">
             <div ng-if="$ctrl.itemCanExpand(item)" class="vertical-center">
-              <pr-icon ng-if="item.Expanded" icon="'chevron-down'" feather="true"></pr-icon>
-              <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" feather="true"></pr-icon>
+              <pr-icon ng-if="item.Expanded" icon="'chevron-down'"></pr-icon>
+              <pr-icon ng-if="!item.Expanded" icon="'chevron-right'"></pr-icon>
             </div>
           </td>
           <td>{{ item.Name }}</td>

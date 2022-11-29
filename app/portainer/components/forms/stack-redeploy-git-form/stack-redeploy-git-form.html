@@ -17,7 +17,8 @@
     <div class="col-sm-12">
       <p>
         <a class="small interactive" ng-click="$ctrl.state.showConfig = !$ctrl.state.showConfig">
-          <i ng-class="{ 'fa fa-minus space-right': $ctrl.state.showConfig, 'fa fa-plus space-right': !$ctrl.state.showConfig }" aria-hidden="true"></i>
+          <pr-icon ng-if="$ctrl.state.showConfig" icon="'minus'" class-name="'mr-1'"></pr-icon>
+          <pr-icon ng-if="!$ctrl.state.showConfig" icon="'plus'" class-name="'mr-1'"></pr-icon>
           {{ $ctrl.state.showConfig ? 'Hide' : 'Advanced' }} configuration
         </a>
       </p>
@@ -48,7 +49,10 @@
     analytics-event="docker-stack-pull-redeploy"
     analytics-category="docker"
   >
-    <span ng-hide="$ctrl.state.redeployInProgress"> <i class="fa fa-sync space-right" aria-hidden="true"></i> Pull and redeploy </span>
+    <span ng-hide="$ctrl.state.redeployInProgress">
+      <pr-icon icon="'refresh-cw'" class="!mr-1"></pr-icon>
+      Pull and redeploy
+    </span>
     <span ng-show="$ctrl.state.redeployInProgress">In progress...</span>
   </button>
 

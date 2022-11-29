@@ -67,17 +67,6 @@ export default class KubeServicesViewController {
     return this.Authentication.isAdmin();
   }
 
-  iconStyle(type) {
-    switch (type) {
-      case KubernetesApplicationPublishingTypes.CLUSTER_IP:
-        return 'fa fa-list-alt';
-      case KubernetesApplicationPublishingTypes.NODE_PORT:
-        return 'fa fa-list';
-      case KubernetesApplicationPublishingTypes.LOAD_BALANCER:
-        return 'fa fa-project-diagram';
-    }
-  }
-
   async asyncOnInit() {
     try {
       // get all nodeport services in the cluster, to validate unique nodeports in the form

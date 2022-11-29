@@ -1,4 +1,5 @@
 import { PropsWithChildren, useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 
@@ -27,9 +28,8 @@ export function FormSection({
             className="border-0 mx-2 !ml-0 bg-transparent inline-flex justify-center items-center w-2"
           >
             <Icon
-              icon={isExpanded ? 'chevron-down' : 'chevron-right'}
+              icon={isExpanded ? ChevronDown : ChevronRight}
               className="shrink-0"
-              feather
             />
           </button>
         )}

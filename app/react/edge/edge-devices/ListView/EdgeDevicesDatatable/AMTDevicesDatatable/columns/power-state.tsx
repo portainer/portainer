@@ -1,7 +1,10 @@
 import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
+import { Settings } from 'lucide-react';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
+
+import { Icon } from '@@/Icon';
 
 import { useRowContext } from './RowContext';
 
@@ -48,7 +51,11 @@ export function PowerStateCell({
       >
         {parsePowerState(device.powerState)}
       </span>
-      <span>{isLoading && <i className="fa fa-cog fa-spin space-left" />}</span>
+      <span>
+        {isLoading && (
+          <Icon icon={Settings} className="animate-spin-slow !ml-1" />
+        )}
+      </span>
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react';
+import { X } from 'lucide-react';
 
 import { Widget, WidgetBody } from './Widget';
 import { Button } from './buttons';
@@ -32,8 +33,8 @@ export function InformationPanel({
                       style={{ float: 'right' }}
                       ng-if="dismissAction"
                     >
-                      <Button color="link" onClick={() => onDismiss()}>
-                        <i className="fa fa-times" /> dismiss
+                      <Button color="link" icon={X} onClick={() => onDismiss()}>
+                        dismiss
                       </Button>
                     </span>
                   )}

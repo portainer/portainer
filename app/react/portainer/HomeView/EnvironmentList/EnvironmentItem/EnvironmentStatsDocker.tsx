@@ -1,11 +1,22 @@
 import {
+  Layers,
+  Shuffle,
+  Database,
+  List,
+  HardDrive,
+  Box,
+  Power,
+  Heart,
+} from 'lucide-react';
+
+import {
   DockerSnapshot,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
 import { addPlural } from '@/portainer/helpers/strings';
 
 import { AgentVersionTag } from './AgentVersionTag';
-import { Stat } from './EnvironmentStatsItem';
+import { EnvironmentStatsItem } from './EnvironmentStatsItem';
 
 interface Props {
   snapshots: DockerSnapshot[];
@@ -31,17 +42,15 @@ export function EnvironmentStatsDocker({
   return (
     <div className="blocklist-item-line endpoint-item">
       <span className="blocklist-item-desc">
-        <Stat
+        <EnvironmentStatsItem
           value={addPlural(snapshot.StackCount, 'stack')}
-          icon="layers"
-          featherIcon
+          icon={Layers}
         />
 
         {!!snapshot.Swarm && (
-          <Stat
+          <EnvironmentStatsItem
             value={addPlural(snapshot.ServiceCount, 'service')}
-            icon="shuffle"
-            featherIcon
+            icon={Shuffle}
           />
         )}
 
@@ -51,15 +60,13 @@ export function EnvironmentStatsDocker({
           healthy={snapshot.HealthyContainerCount}
           unhealthy={snapshot.UnhealthyContainerCount}
         />
-        <Stat
+        <EnvironmentStatsItem
           value={addPlural(snapshot.VolumeCount, 'volume')}
-          icon="database"
-          featherIcon
+          icon={Database}
         />
-        <Stat
+        <EnvironmentStatsItem
           value={addPlural(snapshot.ImageCount, 'image')}
-          icon="list"
-          featherIcon
+          icon={List}
         />
       </span>
 
@@ -68,10 +75,9 @@ export function EnvironmentStatsDocker({
           {snapshot.Swarm ? 'Swarm' : 'Standalone'} {snapshot.DockerVersion}
         </span>
         {snapshot.Swarm && (
-          <Stat
+          <EnvironmentStatsItem
             value={addPlural(snapshot.NodeCount, 'node')}
-            icon="hard-drive"
-            featherIcon
+            icon={HardDrive}
           />
         )}
         <AgentVersionTag version={agentVersion} type={type} />
@@ -96,39 +102,34 @@ function ContainerStats({
   const containersCount = running + stopped;
 
   return (
-    <Stat
+    <EnvironmentStatsItem
       value={addPlural(containersCount, 'container')}
-      icon="box"
-      featherIcon
+      icon={Box}
     >
       {containersCount > 0 && (
         <span className="space-x-2 space-right">
-          <Stat
+          <EnvironmentStatsItem
             value={running}
-            icon="power"
-            featherIcon
+            icon={Power}
             iconClass="icon-success"
           />
-          <Stat
+          <EnvironmentStatsItem
             value={stopped}
-            icon="power"
-            featherIcon
+            icon={Power}
             iconClass="icon-danger"
           />
-          <Stat
+          <EnvironmentStatsItem
             value={healthy}
-            icon="heart"
-            featherIcon
+            icon={Heart}
             iconClass="icon-success"
           />
-          <Stat
+          <EnvironmentStatsItem
             value={unhealthy}
-            icon="heart"
-            featherIcon
+            icon={Heart}
             iconClass="icon-warning"
           />
         </span>
       )}
-    </Stat>
+    </EnvironmentStatsItem>
   );
 }

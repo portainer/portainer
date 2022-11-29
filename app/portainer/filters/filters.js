@@ -1,9 +1,14 @@
 import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
+import { Eye, EyeOff, Users, Cloud } from 'lucide-react';
 
-import { Eye, EyeOff, Users } from 'react-feather';
+import Kube from '@/assets/ico/kube.svg?c';
+import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
+import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
+import NomadIcon from '@/assets/ico/vendor/nomad-icon.svg?c';
 import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 
 export function truncateLeftRight(text, max, left, right) {
   max = isNaN(max) ? 50 : max;
@@ -94,14 +99,23 @@ export function endpointTypeName(type) {
 }
 
 export function environmentTypeIcon(type) {
-  if (type === 3) {
-    return 'fab fa-microsoft';
-  } else if (type === 4) {
-    return 'fa fa-cloud';
-  } else if (type === 5 || type === 6 || type === 7) {
-    return 'fas fa-dharmachakra';
+  switch (type) {
+    case EnvironmentType.Azure:
+      return MicrosoftIcon;
+    case EnvironmentType.EdgeAgentOnDocker:
+      return Cloud;
+    case EnvironmentType.AgentOnKubernetes:
+    case EnvironmentType.EdgeAgentOnKubernetes:
+    case EnvironmentType.KubernetesLocal:
+      return Kube;
+    case EnvironmentType.AgentOnDocker:
+    case EnvironmentType.Docker:
+      return DockerIcon;
+    case EnvironmentType.EdgeAgentOnNomad:
+      return NomadIcon;
+    default:
+      throw new Error(`type ${type}-${EnvironmentType[type]} is not supported`);
   }
-  return 'fab fa-docker';
 }
 
 export function ownershipIcon(ownership) {

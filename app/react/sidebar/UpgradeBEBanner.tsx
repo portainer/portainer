@@ -1,4 +1,4 @@
-import { ArrowRight } from 'react-feather';
+import { ArrowRight } from 'lucide-react';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -50,7 +50,7 @@ function Inner() {
       onClick={handleClick}
     >
       {isOpen && <>Upgrade to Business Edition</>}
-      <ArrowRight className="text-lg feather" />
+      <ArrowRight className="text-lg lucide" />
     </button>
   );
 

@@ -9,7 +9,7 @@
       </span>
     </div>
     <div class="searchBar">
-      <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+      <pr-icon icon="'search'" class="vertical-center"></pr-icon>
       <input
         type="text"
         class="searchInput ml-1"
@@ -22,7 +22,7 @@
     </div>
     <div class="settings">
       <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'"></pr-icon></span>
         <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
           <div class="tableMenu">
             <div class="menuHeader"> Table settings </div>
@@ -42,7 +42,7 @@
                     <option value="300">5min</option>
                   </select>
                   <span>
-                    <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
+                    <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'"></pr-icon>
                   </span>
                 </div>
               </div>
@@ -61,8 +61,8 @@
         <tr>
           <th style="width: 2%">
             <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
-              <pr-icon icon="'chevron-down'" feather="true" ng-if="$ctrl.state.expandAll"></pr-icon>
-              <pr-icon icon="'chevron-up'" feather="true" ng-if="!$ctrl.state.expandAll"></pr-icon>
+              <pr-icon icon="'chevron-down'" ng-if="$ctrl.state.expandAll"></pr-icon>
+              <pr-icon icon="'chevron-up'" ng-if="!$ctrl.state.expandAll"></pr-icon>
             </a>
           </th>
           <th style="width: 98%">
@@ -85,11 +85,11 @@
         >
           <td>
             <a ng-if="$ctrl.itemCanExpand(item)">
-              <pr-icon icon="'chevron-down'" class="mr-1" feather="true" ng-if="item.Expanded"></pr-icon>
-              <pr-icon icon="'chevron-up'" class="mr-1" feather="true" ng-if="!item.Expanded"></pr-icon>
+              <pr-icon icon="'chevron-down'" class="mr-1" ng-if="item.Expanded"></pr-icon>
+              <pr-icon icon="'chevron-up'" class="mr-1" ng-if="!item.Expanded"></pr-icon>
             </a>
-            <pr-icon icon="'check'" ng-if="item.AcceptsApplication" mode="'success'" feather="true"></pr-icon>
-            <pr-icon icon="'x'" ng-if="!item.AcceptsApplication" mode="'error'" feather="true"></pr-icon>
+            <pr-icon icon="'check'" ng-if="item.AcceptsApplication" mode="'success'"></pr-icon>
+            <pr-icon icon="'x'" ng-if="!item.AcceptsApplication" mode="'error'"></pr-icon>
           </td>
           <td>
             {{ item.Name }}

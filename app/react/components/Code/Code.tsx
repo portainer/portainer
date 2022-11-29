@@ -1,7 +1,8 @@
-import clsx from 'clsx';
+import { Check, Copy } from 'lucide-react';
 
 import { Button } from '@@/buttons';
 import { useCopy } from '@@/buttons/CopyButton/useCopy';
+import { Icon } from '@@/Icon';
 
 import styles from './Code.module.css';
 
@@ -19,12 +20,10 @@ export function Code({ children, showCopyButton }: Props) {
 
       {showCopyButton && (
         <Button color="link" className={styles.copyButton} onClick={handleCopy}>
-          <i
-            className={clsx(
-              'fa',
-              copiedSuccessfully ? 'fa-check green-icon' : 'fa-copy '
-            )}
-            aria-hidden="true"
+          <Icon
+            icon={copiedSuccessfully ? Check : Copy}
+            className="!ml-1"
+            mode={copiedSuccessfully ? 'success' : undefined}
           />
         </Button>
       )}

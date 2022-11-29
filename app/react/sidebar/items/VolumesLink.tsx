@@ -1,4 +1,4 @@
-import { Database } from 'react-feather';
+import { Database } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';

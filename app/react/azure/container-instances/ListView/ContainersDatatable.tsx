@@ -1,4 +1,4 @@
-import { Box, Plus, Trash2 } from 'react-feather';
+import { Box, Plus, Trash2 } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import { ContainerGroup } from '@/react/azure/types';

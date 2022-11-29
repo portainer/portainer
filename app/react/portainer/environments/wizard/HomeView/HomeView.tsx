@@ -1,5 +1,9 @@
+import { Wand2, Plug2 } from 'lucide-react';
+
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
+import Kube from '@/assets/ico/kube.svg?c';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -23,7 +27,7 @@ export function HomeView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle title="Environment Wizard" icon="svg-magic" />
+            <WidgetTitle title="Environment Wizard" icon={Wand2} />
             <WidgetBody>
               <div className="row">
                 <div className="col-sm-12 form-section-title">
@@ -61,8 +65,8 @@ export function HomeView() {
                       <Option
                         icon={
                           localEnvironmentAdded.type === EnvironmentType.Docker
-                            ? 'fab fa-docker'
-                            : 'fas fa-dharmachakra'
+                            ? DockerIcon
+                            : Kube
                         }
                         title="Get Started"
                         description="Proceed using the local environment which Portainer is running in"
@@ -73,7 +77,7 @@ export function HomeView() {
                   <Link to="portainer.wizard.endpoints" className={styles.link}>
                     <Option
                       title="Add Environments"
-                      icon="fa fa-plug"
+                      icon={Plug2}
                       description="Connect to other environments"
                     />
                   </Link>

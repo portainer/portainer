@@ -1,4 +1,4 @@
-import { Layout } from 'react-feather';
+import { Layout } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';

@@ -10,7 +10,7 @@
 <div class="form-group">
   <div class="col-sm-12 small text-muted">
     <p class="vertical-center">
-      <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
       You can configure multiple LDAP Servers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use the
       same certificates).
     </p>
@@ -28,7 +28,7 @@
       limited-feature-disabled
       limited-feature-class="limited-be"
     >
-      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      <pr-icon icon="'plus-circle'"></pr-icon>
       Add additional server
     </button>
   </label>
@@ -36,7 +36,7 @@
     <div class="mb-3 flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
       <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
-        <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+        <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
       </button>
     </div>
   </div>

@@ -10,7 +10,7 @@ export const rdWidgetCustomHeader = {
       <div class="row">
         <span class="pull-left">
           <img class="custom-header-ico space-right" ng-src="{{$ctrl.icon}}" ng-if="$ctrl.icon" alt="header-icon"></img>
-          <i class="fa fa-rocket" aria-hidden="true" ng-if="!$ctrl.icon"></i>
+          <pr-icon ng-if="!$ctrl.icon" icon="'rocket'"></pr-icon>
           <span class="text-muted"> {{$ctrl.titleText}} </span>
         </span>
         <span class="pull-right col-xs-6 col-sm-4" ng-transclude></span>

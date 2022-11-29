@@ -8,7 +8,6 @@ import { useWidgetContext } from './Widget';
 interface Props {
   title: ReactNode;
   icon: ReactNode;
-  featherIcon?: boolean;
   className?: string;
 }
 
@@ -17,7 +16,6 @@ export function WidgetTitle({
   icon,
   className,
   children,
-  featherIcon,
 }: PropsWithChildren<Props>) {
   useWidgetContext();
 
@@ -26,11 +24,7 @@ export function WidgetTitle({
       <div className="row">
         <span className={clsx('pull-left vertical-center', className)}>
           <div className="widget-icon">
-            <Icon
-              icon={icon}
-              feather={featherIcon}
-              className="space-right feather"
-            />
+            <Icon icon={icon} className="space-right" />
           </div>
           <span>{title}</span>
         </span>

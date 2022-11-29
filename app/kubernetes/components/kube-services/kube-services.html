@@ -2,7 +2,7 @@
 <div class="col-sm-12 !p-0">
   <div class="small">
     <p class="text-muted vertical-center">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+      <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
       <span>Publish your application by creating a ClusterIP service for it, which you may then expose via <a target="_blank" ui-sref="kubernetes.ingresses">an ingress</a>.</span>
     </p>
   </div>
@@ -27,7 +27,7 @@
           NodePort exposes it (on a high port) across all nodes.
           LoadBalancer exposes it via an external load balancer."
         >
-          <pr-icon icon="'plus'" size="'sm'" feather="true"></pr-icon> Create service
+          <pr-icon icon="'plus'" size="'sm'"></pr-icon> Create service
         </span>
       </button>
     </div>
@@ -38,9 +38,9 @@
   <div class="col-sm-12 form-inline" style="margin-top: 20px" ng-repeat="service in $ctrl.formValues.Services">
     <div>
       <div class="text-muted vertical-center">
-        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'ClusterIP'" icon="'list'" feather="true"></pr-icon>
+        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'ClusterIP'" icon="'list'"></pr-icon>
         <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'LoadBalancer'" icon="'svg-dataflow'"></pr-icon>
-        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'NodePort'" icon="'list'" feather="true"></pr-icon>
+        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'NodePort'" icon="'list'"></pr-icon>
         {{ $ctrl.serviceType(service.Type) }}
       </div>
       <kube-services-item-view
@@ -57,7 +57,7 @@
         ng-click="$ctrl.deleteService( $index )"
         data-cy="k8sConfigCreate-removeButton"
       >
-        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
+        <pr-icon icon="'trash-2'" size="'md'"></pr-icon> Remove
       </button>
     </div>
 
@@ -68,14 +68,13 @@
       </div>
       <div ng-if="$ctrl.isAdmin()" class="small">
         <p class="text-warning pt-2 vertical-center">
-          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or click
+          <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Ingress is not configured in this namespace, select another namespace or click
           <a ui-sref="kubernetes.cluster.setup">here</a> to configure ingress.
         </p>
       </div>
       <div ng-if="!$ctrl.isAdmin()" class="small">
         <p class="text-warning pt-2 vertical-center">
-          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or contact your
-          administrator.
+          <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Ingress is not configured in this namespace, select another namespace or contact your administrator.
         </p>
       </div>
       <button
@@ -85,7 +84,7 @@
         ng-click="$ctrl.deleteService( $index )"
         data-cy="k8sConfigCreate-removeButton"
       >
-        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
+        <pr-icon icon="'trash-2'" size="'md'"></pr-icon> Remove
       </button>
     </div>
   </div>

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import _ from 'lodash';
-import { Edit2, Tag, Cpu } from 'react-feather';
+import { Edit2, Tag, Cpu } from 'lucide-react';
 
 import {
   isoDateFromTimestamp,
@@ -19,6 +19,7 @@ import {
 import type { TagId } from '@/portainer/tags/types';
 import { useTags } from '@/portainer/tags/queries';
 import { useUser } from '@/react/hooks/useUser';
+import Memory from '@/assets/ico/memory.svg?c';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
@@ -106,7 +107,7 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                           />
                           {environment.Snapshots[0].TotalCPU} CPU
                           <Icon
-                            icon="svg-memory"
+                            icon={Memory}
                             className="icon icon-sm space-right"
                           />
                           {humanize(environment.Snapshots[0].TotalMemory)} RAM

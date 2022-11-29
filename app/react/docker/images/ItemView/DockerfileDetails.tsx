@@ -1,4 +1,4 @@
-import { List } from 'react-feather';
+import { List } from 'lucide-react';
 
 import { joinCommand } from '@/docker/filters/utils';
 import { getPairKey, getPairValue } from '@/portainer/filters/filters';

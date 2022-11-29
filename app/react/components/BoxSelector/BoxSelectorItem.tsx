@@ -54,7 +54,6 @@ export function BoxSelectorItem<T extends number | string>({
             {!!option.icon && (
               <Icon
                 icon={option.icon}
-                feather={option.featherIcon}
                 className="boxselector_icon !flex items-center"
               />
             )}

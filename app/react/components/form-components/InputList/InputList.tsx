@@ -1,9 +1,9 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
 import { FormikErrors } from 'formik';
+import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 
 import { AddButton, Button } from '@@/buttons';
-import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -136,18 +136,16 @@ export function InputList<T = DefaultType>({
                       disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
                       className="vertical-center btn-only-icon"
-                    >
-                      <Icon icon="arrow-up" feather />
-                    </Button>
+                      icon={ArrowUp}
+                    />
                     <Button
                       size="medium"
                       type="button"
                       disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
                       className="vertical-center btn-only-icon"
-                    >
-                      <Icon icon="arrow-down" feather />
-                    </Button>
+                      icon={ArrowDown}
+                    />
                   </>
                 )}
                 {!readOnly && (
@@ -156,9 +154,8 @@ export function InputList<T = DefaultType>({
                     size="medium"
                     onClick={() => handleRemoveItem(key, item)}
                     className="vertical-center btn-only-icon"
-                  >
-                    <Icon icon="trash-2" feather size="md" />
-                  </Button>
+                    icon={Trash2}
+                  />
                 )}
               </div>
             </div>

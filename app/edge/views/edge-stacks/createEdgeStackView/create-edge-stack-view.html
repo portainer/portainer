@@ -23,7 +23,7 @@
               <div class="help-block" ng-show="$ctrl.form.$invalid">
                 <div class="small text-warning">
                   <div ng-messages="$ctrl.form.$error">
-                    <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Name is required. </p>
+                    <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Name is required. </p>
                   </div>
                 </div>
               </div>
@@ -50,7 +50,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <div class="small text-muted space-right" ng-if="$ctrl.formValues.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
-                <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                 Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all
                 the Compose format options are supported by Kompose at the moment.
               </div>

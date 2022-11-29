@@ -4,14 +4,14 @@
       <div class="toolBar">
         <div class="toolBarTitle flex">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
           <span class="vertical-center">
             {{ $ctrl.titleText }}
           </span>
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <pr-icon icon="'search'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -31,7 +31,7 @@
             auto-close="disabled"
             is-open="$ctrl.settings.open"
           >
-            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -51,7 +51,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none" feather="true"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -155,7 +155,7 @@
               <td>{{ item.Version }}</td>
               <td>{{ item.IPAddress }}</td>
               <td ng-if="$ctrl.useServerMetrics">
-                <a ui-sref="kubernetes.cluster.node.stats({ name: item.Name })" class="vertical-center"> <pr-icon icon="'bar-chart'" feather="true"></pr-icon> Stats </a>
+                <a ui-sref="kubernetes.cluster.node.stats({ name: item.Name })" class="vertical-center"> <pr-icon icon="'bar-chart'"></pr-icon> Stats </a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

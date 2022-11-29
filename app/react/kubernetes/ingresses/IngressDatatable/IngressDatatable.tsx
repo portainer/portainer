@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'react-feather';
+import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import { useStore } from 'zustand';
 
@@ -6,6 +6,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
+import Route from '@/assets/ico/route.svg?c';
 
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -51,7 +52,7 @@ export function IngressDatatable() {
       isLoading={ingressesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
       title="Ingresses"
-      titleIcon="svg-route"
+      titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
       renderTableActions={tableActions}
       disableSelect={useCheckboxes()}

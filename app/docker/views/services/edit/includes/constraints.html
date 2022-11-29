@@ -1,9 +1,9 @@
 <div ng-if="service.ServiceConstraints" id="service-placement-constraints">
   <rd-widget>
-    <rd-widget-header icon="list" feather-icon="true" title-text="Placement constraints">
+    <rd-widget-header icon="list" title-text="Placement constraints">
       <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addPlacementConstraint(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" feather="true"></pr-icon> placement constraint
+          <pr-icon icon="'plus'"></pr-icon> placement constraint
         </a>
       </div>
     </rd-widget-header>
@@ -62,7 +62,7 @@
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-dangerlight" type="button" ng-click="removePlacementConstraint(service, $index)" ng-disabled="isUpdating">
-                    <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                    <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                   </button>
                 </span>
               </div>

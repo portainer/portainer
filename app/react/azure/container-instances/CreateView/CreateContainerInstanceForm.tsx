@@ -1,5 +1,6 @@
 import { Field, Form, Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
+import { Plus } from 'lucide-react';
 
 import { ContainerInstanceFormValues } from '@/react/azure/types';
 import * as notifications from '@/portainer/services/notifications';
@@ -194,8 +195,8 @@ export function CreateContainerInstanceForm() {
                 disabled={!isValid}
                 isLoading={isSubmitting}
                 loadingText="Deployment in progress..."
+                icon={Plus}
               >
-                <i className="fa fa-plus space-right" aria-hidden="true" />
                 Deploy the container
               </LoadingButton>
             </div>

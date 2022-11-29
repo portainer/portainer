@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { Share2, Trash2 } from 'lucide-react';
 
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
 import { Authorized } from '@/react/hooks/useUser';
@@ -30,7 +31,7 @@ export function NetworkDetailsTable({
 
   return (
     <TableContainer>
-      <TableTitle label="Network details" icon="share-2" featherIcon />
+      <TableTitle label="Network details" icon={Share2} />
       <Table className="nopadding">
         <DetailsTable dataCy="networkDetails-detailsTable">
           {/* networkRowContent */}
@@ -46,8 +47,7 @@ export function NetworkDetailsTable({
                   onClick={() => onRemoveNetworkClicked()}
                 >
                   <Icon
-                    icon="trash-2"
-                    feather
+                    icon={Trash2}
                     className="space-right"
                     aria-hidden="true"
                   />

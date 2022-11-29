@@ -1,4 +1,4 @@
-import { User as UserIcon, Users as TeamIcon } from 'react-feather';
+import { User as UserIcon, Users as TeamIcon } from 'lucide-react';
 import { OptionProps, components, MultiValueGenericProps } from 'react-select';
 
 import { Select } from '@@/form-components/ReactSelect';

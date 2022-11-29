@@ -6,12 +6,12 @@
         <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !px-0 !py-1 w-full">
           <div class="toolBarTitle">
             <div class="widget-icon space-right">
-              <pr-icon icon="'lock'" feather="true"></pr-icon>
+              <pr-icon icon="'lock'"></pr-icon>
             </div>
             ConfigMaps & Secrets
           </div>
           <div class="searchBar vertical-center w-72 !mr-0">
-            <pr-icon icon="'search'" feather="true" class-name="'icon !h-3'"></pr-icon>
+            <pr-icon icon="'search'" class-name="'icon !h-3'"></pr-icon>
             <input
               type="text"
               class="searchInput"
@@ -32,19 +32,19 @@
               ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
               data-cy="k8sConfig-removeConfigButton"
             >
-              <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+              <pr-icon icon="'trash-2'"></pr-icon>Remove
             </button>
             <button type="button" class="btn btn-sm btn-secondary !ml-0 vertical-center" ui-sref="kubernetes.configurations.new" data-cy="k8sConfig-addConfigWithFormButton">
-              <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Add with form
+              <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Add with form
             </button>
             <button type="button" class="btn btn-sm btn-primary !ml-0 vertical-center" ui-sref="kubernetes.deploy" data-cy="k8sConfig-deployFromManifestButton">
-              <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Create from manifest
+              <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Create from manifest
             </button>
           </div>
           <div class="settings">
             <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
               <span uib-dropdown-toggle aria-label="Settings">
-                <pr-icon icon="'more-vertical'" feather="true" class-name="'icon !mr-0 !h-4'"></pr-icon>
+                <pr-icon icon="'more-vertical'" class-name="'icon !mr-0 !h-4'"></pr-icon>
               </span>
               <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
                 <div class="tableMenu">
@@ -75,7 +75,7 @@
                           <option value="300">5min</option>
                         </select>
                         <span>
-                          <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                          <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                         </span>
                       </div>
                     </div>
@@ -90,7 +90,7 @@
         </div>
         <div ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem" class="flex flex-row w-full">
           <span class="small text-muted mt-1 vertical-center">
-            <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="vertical-center"></pr-icon>
             <div> System resources are hidden, this can be changed in the table settings. </div>
           </span>
         </div>

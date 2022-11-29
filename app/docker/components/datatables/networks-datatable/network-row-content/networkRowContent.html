@@ -9,9 +9,10 @@
     />
     <label for="select_{{ $index }}"></label>
   </span>
-  <a ng-if="parentCtrl.itemCanExpand(item)"
-    ><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i
-  ></a>
+  <a ng-if="parentCtrl.itemCanExpand(item)">
+    <pr-icon ng-if="item.Expanded" icon="'chevron-down'" class-name="'mr-1'"></pr-icon>
+    <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" class-name="'mr-1'"></pr-icon>
+  </a>
 </td>
 <td ng-if="!allowCheckbox"></td>
 <td>

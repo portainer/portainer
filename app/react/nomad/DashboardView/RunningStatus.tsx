@@ -1,3 +1,7 @@
+import { Power } from 'lucide-react';
+
+import { Icon } from '@@/Icon';
+
 interface Props {
   running: number;
   stopped: number;
@@ -7,17 +11,11 @@ export function RunningStatus({ running, stopped }: Props) {
   return (
     <div>
       <div>
-        <i
-          className="fa fa-power-off green-icon space-right"
-          aria-hidden="true"
-        />
+        <Icon icon={Power} mode="success" />
         {`${running || '-'} running`}
       </div>
       <div>
-        <i
-          className="fa fa-power-off red-icon space-right"
-          aria-hidden="true"
-        />
+        <Icon icon={Power} mode="danger" />
         {`${stopped || '-'} stopped`}
       </div>
     </div>

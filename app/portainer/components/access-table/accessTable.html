@@ -1,7 +1,7 @@
 <div class="datatable">
   <table class="table table-hover">
     <div class="col-sm-12">
-      <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+      <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
       <input
         type="text"
         class="searchInput"
@@ -41,7 +41,8 @@
           <span ng-if="item.Inherited" class="text-muted small" style="margin-left: 2px"><code style="font-size: 85% !important">inherited</code></span>
         </td>
         <td>
-          <i class="fa" ng-class="item.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px"></i>
+          <pr-icon ng-if="item.Type === 'user'" icon="'user'" class-name="'mr-0.5'"></pr-icon>
+          <pr-icon ng-if="!item.Type === 'user'" icon="'users'" class-name="'mr-0.5'"></pr-icon>
           {{ item.Type }}
         </td>
       </tr>

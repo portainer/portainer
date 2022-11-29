@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { MinusCircle } from 'react-feather';
+import { MinusCircle } from 'lucide-react';
 
 import { User, UserId } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';

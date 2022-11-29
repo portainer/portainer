@@ -1,3 +1,5 @@
+import { Server, Trash2 } from 'lucide-react';
+
 import { Authorized } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Icon } from '@/react/components/Icon';
@@ -39,7 +41,7 @@ export function NetworkContainersTable({
 
   return (
     <TableContainer>
-      <TableTitle label="Containers in network" icon="server" featherIcon />
+      <TableTitle label="Containers in network" icon={Server} />
       <Table className="nopadding">
         <DetailsTable
           headers={tableHeaders}
@@ -78,11 +80,7 @@ export function NetworkContainersTable({
                       }
                     }}
                   >
-                    <Icon
-                      icon="trash-2"
-                      feather
-                      class-name="icon-secondary icon-md"
-                    />
+                    <Icon icon={Trash2} class-name="icon-secondary icon-md" />
                     Leave Network
                   </Button>
                 </Authorized>

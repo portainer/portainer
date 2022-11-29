@@ -1,5 +1,8 @@
 import { PropsWithChildren } from 'react';
 import { Row } from 'react-table';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+
+import { Icon } from '@@/Icon';
 
 import styles from './ExpandingCell.module.css';
 
@@ -15,22 +18,15 @@ export function ExpandingCell<
     <>
       {showExpandArrow && (
         <button type="button" className={styles.expandButton}>
-          <i
+          <Icon
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...row.getToggleRowExpandedProps()}
-            className={`fas ${arrowClass(row.isExpanded)} space-right`}
-            aria-hidden="true"
+            icon={row.isExpanded ? ChevronDown : ChevronRight}
+            className="mr-1"
           />
         </button>
       )}
       {children}
     </>
   );
-
-  function arrowClass(isExpanded: boolean) {
-    if (isExpanded) {
-      return 'fa-angle-down';
-    }
-    return 'fa-angle-right';
-  }
 }

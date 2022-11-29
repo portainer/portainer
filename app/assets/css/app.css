@@ -147,27 +147,6 @@ input[type='checkbox'] {
   background-color: var(--bg-item-highlighted-null-color);
 }
 
-.fa.green-icon {
-  color: #23ae89;
-}
-
-.fa.red-icon {
-  color: #f04438;
-}
-
-.fa.orange-icon {
-  color: #f0ad4e;
-}
-
-.fa.white-icon {
-  color: white;
-}
-
-.fa.blue-icon,
-.fab.blue-icon {
-  color: var(--blue-2);
-}
-
 .text-warning {
   @apply text-warning-9 th-dark:text-warning-7 th-highcontrast:text-warning-1;
 }

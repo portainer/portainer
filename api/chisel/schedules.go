@@ -31,7 +31,6 @@ func (service *Service) RemoveEdgeJob(edgeJobID portainer.EdgeJobID) {
 	service.mu.Lock()
 
 	for _, tunnel := range service.tunnelDetailsMap {
-		// Filter in-place
 		n := 0
 		for _, edgeJob := range tunnel.Jobs {
 			if edgeJob.ID != edgeJobID {

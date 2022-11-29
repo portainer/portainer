@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
+import { Check, Copy } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 
@@ -33,7 +34,7 @@ export function CopyButton({
         title="Copy Value"
         type="button"
       >
-        <Icon icon="copy" feather />
+        <Icon icon={Copy} />
         {children}
       </Button>
 
@@ -45,7 +46,7 @@ export function CopyButton({
           'vertical-center'
         )}
       >
-        <Icon icon="check" feather />
+        <Icon icon={Check} />
         {displayText && <span className="space-left">{displayText}</span>}
       </span>
     </div>

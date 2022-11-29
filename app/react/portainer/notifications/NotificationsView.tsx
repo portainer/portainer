@@ -1,4 +1,4 @@
-import { Bell, Trash2 } from 'react-feather';
+import { Bell, Trash2 } from 'lucide-react';
 import { useStore } from 'zustand';
 import { useCurrentStateAndParams } from '@uirouter/react';
 

@@ -66,7 +66,6 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^2.0.0",
-    "@fortawesome/fontawesome-free": "^5.15.4",
     "@lineup-lite/hooks": "^1.6.0",
     "@nxmix/tokenize-ansi": "^3.0.0",
     "@open-amt-cloud-toolkit/ui-toolkit-react": "2.0.0",
@@ -117,6 +116,7 @@
     "js-yaml": "^3.14.0",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.101.0",
     "moment": "^2.29.1",
     "msw": "^0.36.3",
     "mustache": "^4.2.0",
@@ -126,7 +126,6 @@
     "react": "^17.0.2",
     "react-datetime-picker": "^3.5.0",
     "react-dom": "^17.0.2",
-    "react-feather": "^2.0.9",
     "react-i18next": "^11.12.0",
     "react-is": "^18.2.0",
     "react-query": "^3.33.4",

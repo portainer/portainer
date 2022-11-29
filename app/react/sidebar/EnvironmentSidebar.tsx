@@ -1,6 +1,6 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
-import { X, Slash } from 'react-feather';
+import { X, Slash } from 'lucide-react';
 import clsx from 'clsx';
 import angular from 'angular';
 
@@ -14,6 +14,8 @@ import { useEnvironment } from '@/react/portainer/environments/queries/useEnviro
 import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { EndpointProviderInterface } from '@/portainer/services/endpointProvider';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+
+import { Icon } from '@@/Icon';
 
 import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
 
@@ -44,7 +46,7 @@ export function EnvironmentSidebar() {
         <SidebarSectionTitle>
           <div className="flex items-center gap-1">
             <span>Environment:</span>
-            <Slash size="1em" className="text-xl text-gray-6" />
+            <Icon icon={Slash} className="text-xl !text-gray-6" />
             <span className="text-gray-6 text-sm">None selected</span>
           </div>
         </SidebarSectionTitle>
