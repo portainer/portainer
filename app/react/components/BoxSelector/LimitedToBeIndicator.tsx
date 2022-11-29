@@ -26,10 +26,7 @@ export function LimitedToBeIndicator({ featureId, tooltipId }: Props) {
           heading="Business Edition feature."
           message="This feature is currently limited to Business Edition users only."
         >
-          <HelpCircle
-            className="feather ml-1 !text-warning-7"
-            aria-hidden="true"
-          />
+          <HelpCircle className="ml-1 !text-warning-7" aria-hidden="true" />
         </TooltipWithChildren>
       </div>
     </div>

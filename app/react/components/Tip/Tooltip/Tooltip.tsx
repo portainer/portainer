@@ -15,7 +15,7 @@ export function Tooltip({ message, position = 'bottom', className }: Props) {
       position={position}
       className={className}
     >
-      <HelpCircle className="feather ml-1" aria-hidden="true" />
+      <HelpCircle className="ml-1" aria-hidden="true" />
     </TooltipWithChildren>
   );
 }
