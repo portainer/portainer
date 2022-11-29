@@ -40,19 +40,18 @@
 //	if err != nil {
 //		return err
 //	}
-//
 package digest
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/rand"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
-	"io/ioutil"
-	"bytes"
 )
 
 var (
