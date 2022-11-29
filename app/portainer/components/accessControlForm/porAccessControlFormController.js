@@ -92,6 +92,9 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
       this.onChangeEnablement = function (enable) {
         $scope.$evalAsync(() => {
           ctrl.formData.AccessControlEnabled = enable;
+          if (enable) {
+            ctrl.formData.Ownership = isAdmin ? RCO.ADMINISTRATORS : RCO.PRIVATE;
+          }
         });
       };
     }
