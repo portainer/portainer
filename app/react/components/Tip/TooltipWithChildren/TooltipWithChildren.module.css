@@ -4,7 +4,6 @@
 
 .tooltip {
   background-color: var(--bg-tooltip-color) !important;
-  padding: 0.833em 1em !important;
   color: var(--text-tooltip-color) !important;
   border-radius: 10px !important;
   box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15) !important;
@@ -21,6 +20,7 @@
 
 .tooltip-container {
   line-height: 18px;
+  padding: 8px 10px !important;
 }
 
 .tooltip-heading {

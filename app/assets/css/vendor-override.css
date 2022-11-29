@@ -401,20 +401,35 @@ input:-webkit-autofill {
 
 /* Tippy */
 /* For triangle arrow (Sharp) */
+/* Tippy */
+/* For triangle arrow (Sharp) */
 .tippy-box[data-placement^='top'] > .tippy-arrow:before {
-  border-top: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+  border-top: 8px solid var(--bg-tooltip-color);
 }
 
 .tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
-  border-bottom: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+  border-bottom: 8px solid var(--bg-tooltip-color);
 }
 
 .tippy-box[data-placement^='right'] > .tippy-arrow:before {
-  border-right: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+  border-right: 8px solid var(--bg-tooltip-color);
 }
 
 .tippy-box[data-placement^='left'] > .tippy-arrow:before {
-  border-left: 7px solid var(--bg-tooltip-color) !important; /* set your color here and use the !important property */
+  border-left: 8px solid var(--bg-tooltip-color);
+}
+
+/* Sidebar */
+.sidebar .tippy-box {
+  font-size: 12px;
+}
+
+.sidebar .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-blue-9);
+}
+
+[theme='dark'] .sidebar .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-gray-true-9);
 }
 
 .tippy-content {

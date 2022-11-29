@@ -5,10 +5,11 @@ import {
 } from '@uirouter/react';
 import clsx from 'clsx';
 import { ComponentProps } from 'react';
+import Tippy from '@tippyjs/react';
 
 import { AutomationTestingProps } from '@/types';
 
-import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
+import 'tippy.js/dist/tippy.css';
 import { Link } from '@@/Link';
 import { IconProps, Icon } from '@@/Icon';
 
@@ -64,13 +65,18 @@ export function Head({
   if (isOpen) return anchor;
 
   return (
-    <TooltipWithChildren
-      position="right"
-      className="!opacity-100 !bg-blue-9 !be:bg-gray-9 !rounded-md !py-1 !px-2"
-      message={label}
+    <Tippy
+      className="!opacity-100 bg-blue-9 be:bg-gray-9 th-dark:bg-gray-true-9 !rounded-md !py-2 !px-3"
+      content={label}
+      delay={100}
+      zIndex={1000}
+      placement="right"
+      arrow
+      allowHTML
+      interactive
     >
       {anchor}
-    </TooltipWithChildren>
+    </Tippy>
   );
 }
 
