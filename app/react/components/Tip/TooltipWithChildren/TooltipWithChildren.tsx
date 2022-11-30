@@ -62,9 +62,10 @@ export function TooltipWithChildren({
     <Tippy
       className={clsx(id, styles.tooltip, className)}
       content={messageHTML}
-      delay={200}
+      delay={50}
       zIndex={1000}
       placement={position}
+      maxWidth={400}
       arrow
       allowHTML
       interactive

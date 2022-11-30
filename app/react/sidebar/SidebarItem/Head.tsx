@@ -68,7 +68,7 @@ export function Head({
     <Tippy
       className="!opacity-100 bg-blue-9 be:bg-gray-9 th-dark:bg-gray-true-9 !rounded-md !py-2 !px-3"
       content={label}
-      delay={100}
+      delay={50}
       zIndex={1000}
       placement="right"
       arrow
