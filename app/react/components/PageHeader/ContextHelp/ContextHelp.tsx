@@ -17,6 +17,7 @@ export function ContextHelp() {
       <div
         className={clsx(
           headerStyles.menuIcon,
+          'menu-icon',
           'icon-badge text-lg !p-2 mr-1',
           'text-gray-8',
           'th-dark:text-gray-warm-7'
