@@ -21,17 +21,17 @@ import { NameField } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { BetaAlert } from '../common/BetaAlert';
 
-const initialValues: FormValues = {
-  name: '',
-  groupIds: [],
-  type: ScheduleType.Update,
-  version: '',
-  scheduledTime: isoDate(Date.now() + 24 * 60 * 60 * 1000),
-};
-
 export default withLimitToBE(CreateView);
 
 function CreateView() {
+  const initialValues: FormValues = {
+    name: '',
+    groupIds: [],
+    type: ScheduleType.Update,
+    version: '',
+    scheduledTime: isoDate(Date.now() + 24 * 60 * 60 * 1000),
+  };
+
   const schedulesQuery = useList();
 
   const createMutation = useCreateMutation();
