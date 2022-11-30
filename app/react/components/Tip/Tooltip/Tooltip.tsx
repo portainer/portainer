@@ -15,7 +15,9 @@ export function Tooltip({ message, position = 'bottom', className }: Props) {
       position={position}
       className={className}
     >
-      <HelpCircle className="ml-1" aria-hidden="true" />
+      <span className="inline-flex text-base">
+        <HelpCircle className="lucide ml-1" aria-hidden="true" />
+      </span>
     </TooltipWithChildren>
   );
 }
