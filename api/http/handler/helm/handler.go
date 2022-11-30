@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/portainer/libhelm"
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
@@ -12,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/pkg/libhelm"
 )
 
 type requestBouncer interface {
