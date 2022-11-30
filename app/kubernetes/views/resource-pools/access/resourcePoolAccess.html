@@ -44,6 +44,22 @@
         <rd-widget-body>
           <form class="form-horizontal">
             <div class="form-group">
+              <div
+                ng-if="!ctrl.isRBACEnabled"
+                class="mb-1 mx-[15px] px-4 py-4 border border-solid bg-warning-2 border-warning-5 text-warning-8 th-dark:bg-yellow-11 th-dark:text-white th-highcontrast:bg-yellow-11 th-highcontrast:text-white small vertical-center rounded-lg"
+              >
+                <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
+                <span>
+                  You do not have role-based access control (RBAC) enabled in your cluster, which means Portainer RBAC functionality is limited. RBAC regulates access to
+                  environment resources based on a user's roles. To enable it, start the&nbsp;<a
+                    class="th-dark:text-blue-7 th-highcontrast:text-blue-4"
+                    href="https://kubernetes.io/docs/concepts/overview/components/#kube-apiserver"
+                    target="_blank"
+                    >API server</a
+                  >&nbsp;with the&nbsp;<code class="box-decoration-clone">--authorization-mode</code>&nbsp;flag set to a comma-separated list that includes&nbsp;<code>RBAC</code>,
+                  for example:&nbsp; <code class="box-decoration-clone">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
+                </span>
+              </div>
               <span class="col-sm-12 small text-warning">
                 <p class="vertical-center">
                   <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
