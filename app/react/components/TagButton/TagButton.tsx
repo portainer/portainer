@@ -13,11 +13,6 @@ interface Props {
 }
 
 export function TagButton({ value, label, title, onRemove }: Props) {
-  // Fast fail when the label is composed of space
-  if (!label.replace(/\s/g, '').length) {
-    return null;
-  }
-
   return (
     <button
       type="button"
