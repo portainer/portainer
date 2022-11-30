@@ -62,7 +62,7 @@ export function TooltipWithChildren({
     <Tippy
       className={clsx(id, styles.tooltip, className)}
       content={messageHTML}
-      delay={50}
+      delay={[50, 500]} // 50ms to open, 500ms to hide
       zIndex={1000}
       placement={position}
       maxWidth={400}
