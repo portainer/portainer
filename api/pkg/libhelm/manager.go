@@ -3,7 +3,7 @@ package libhelm
 import (
 	"errors"
 
-	"github.com/portainer/libhelm/binary"
+	"github.com/portainer/portainer/api/pkg/libhelm/binary"
 )
 
 // HelmConfig is a struct that holds the configuration for the Helm package manager

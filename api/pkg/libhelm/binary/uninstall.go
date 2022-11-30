@@ -2,7 +2,7 @@ package binary
 
 import (
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
+	"github.com/portainer/portainer/api/pkg/libhelm/options"
 )
 
 var errRequiredUninstallOptions = errors.New("release name is required")
