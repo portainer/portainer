@@ -100,6 +100,12 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
     if (!allowCreate) {
       return;
     }
+
+    // Prevent the new tag composed of space from being added
+    if (!inputValue.replace(/\s/g, '').length) {
+      return;
+    }
+
     createTagMutation.mutate(inputValue, {
       onSuccess(tag) {
         handleAdd({ label: tag.Name, value: tag.ID });

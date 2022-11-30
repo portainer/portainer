@@ -48,7 +48,7 @@ export const componentsModule = angular
   )
   .component(
     'tagButton',
-    r2a(withReactQuery(TagButton), ['value', 'label', 'title', 'onRemove'])
+    r2a(TagButton, ['value', 'label', 'title', 'onRemove'])
   )
   .component(
     'portainerTooltip',

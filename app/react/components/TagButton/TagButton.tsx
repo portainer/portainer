@@ -13,25 +13,26 @@ interface Props {
 }
 
 export function TagButton({ value, label, title, onRemove }: Props) {
+  // Fast fail when the label is composed of space
+  if (!label.replace(/\s/g, '').length) {
+    return null;
+  }
+
   return (
-    <>
-      {label && (
-        <button
-          type="button"
-          title={title}
-          className={clsx(
-            styles.removeTagBtn,
-            'space-left',
-            'tag',
-            'vertical-center'
-          )}
-          onClick={() => onRemove()}
-          key={value}
-        >
-          {label}
-          <Icon icon={Trash2} />
-        </button>
+    <button
+      type="button"
+      title={title}
+      className={clsx(
+        styles.removeTagBtn,
+        'space-left',
+        'tag',
+        'vertical-center'
       )}
-    </>
+      onClick={() => onRemove()}
+      key={value}
+    >
+      {label}
+      <Icon icon={Trash2} />
+    </button>
   );
 }
