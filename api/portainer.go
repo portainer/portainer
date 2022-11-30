@@ -281,6 +281,8 @@ type (
 		Version        int                            `json:"Version"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
+		// Uses the manifest's namespaces instead of the default one
+		UseManifestNamespaces bool
 
 		// Deprecated
 		Prune bool `json:"Prune"`

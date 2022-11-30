@@ -1,3 +1,14 @@
+<div class="form-group">
+  <div class="col-sm-12">
+    <por-switch-field
+      label="'Use namespace(s) specified from manifest'"
+      tooltip="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'"
+      checked="$ctrl.formValues.UseManifestNamespaces"
+      on-change="($ctrl.onChangeUseManifestNamespaces)"
+    ></por-switch-field>
+  </div>
+</div>
+
 <div class="col-sm-12 form-section-title"> Build method </div>
 <box-selector radio-name="'method'" value="$ctrl.state.Method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
