@@ -438,6 +438,10 @@ input:-webkit-autofill {
   border-right: 8px solid var(--ui-gray-true-9);
 }
 
+.sidebar .tippy-content {
+  white-space: nowrap;
+}
+
 .tippy-content {
   padding: 0;
 }
