@@ -46,7 +46,7 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 	handler.ReverseTunnelService.RemoveEdgeJob(edgeJob.ID)
 
 	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
-	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
+	if len(edgeJob.EdgeGroups) > 0 {
 		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
 		if err != nil {
 			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)

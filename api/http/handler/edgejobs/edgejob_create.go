@@ -90,7 +90,7 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 	edgeJob := handler.createEdgeJobObjectFromFileContentPayload(&payload)
 
 	var endpoints []portainer.EndpointID
-	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
+	if len(edgeJob.EdgeGroups) > 0 {
 		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, handler.DataStore)
 		if err != nil {
 			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
@@ -169,7 +169,7 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	edgeJob := handler.createEdgeJobObjectFromFilePayload(payload)
 
 	var endpoints []portainer.EndpointID
-	if edgeJob.EdgeGroups != nil && len(edgeJob.EdgeGroups) > 0 {
+	if len(edgeJob.EdgeGroups) > 0 {
 		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, handler.DataStore)
 		if err != nil {
 			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)

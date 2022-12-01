@@ -144,11 +144,13 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		operation := "skip"
+		var operation string
 		if slices.Contains(newRelatedEndpoints, endpointID) {
 			operation = "add"
 		} else if slices.Contains(oldRelatedEndpoints, endpointID) {
 			operation = "remove"
+		} else {
+			continue
 		}
 
 		err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpointID, edgeJobs, operation)
@@ -209,9 +211,6 @@ func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID
 			handler.ReverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
 		case "remove":
 			handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpointID, edgeJob.ID)
-		case "skip":
-		default:
-			continue
 		}
 	}
 
