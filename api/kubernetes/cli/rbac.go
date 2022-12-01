@@ -3,7 +3,8 @@ package cli
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
+	"github.com/portainer/portainer/api/internal/randomstring"
+
 	"github.com/rs/zerolog/log"
 	authv1 "k8s.io/api/authorization/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -21,7 +22,7 @@ func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
 	resource := "resourcequotas"
 
 	saClient := kcl.cli.CoreV1().ServiceAccounts(namespace)
-	uniqueString := randomString() // append a unique string to resource names, incase they already exist
+	uniqueString := randomstring.RandomString(4) // append a unique string to resource names, incase they already exist
 	saName := "portainer-rbac-test-sa-" + uniqueString
 	err := createServiceAccount(saClient, saName, namespace)
 	if err != nil {
@@ -82,9 +83,11 @@ func createServiceAccount(saClient corev1types.ServiceAccountInterface, name str
 	return err
 }
 
-func deleteServiceAccount(saClient corev1types.ServiceAccountInterface, name string) error {
+func deleteServiceAccount(saClient corev1types.ServiceAccountInterface, name string) {
 	err := saClient.Delete(context.Background(), name, metav1.DeleteOptions{})
-	return err
+	if err != nil {
+		log.Error().Err(err).Msg("Error deleting service account: " + name)
+	}
 }
 
 func createRole(roleClient rbacv1types.RoleInterface, name string, verb string, resource string, namespace string) error {
@@ -105,9 +108,11 @@ func createRole(roleClient rbacv1types.RoleInterface, name string, verb string, 
 	return err
 }
 
-func deleteRole(roleClient rbacv1types.RoleInterface, name string) error {
+func deleteRole(roleClient rbacv1types.RoleInterface, name string) {
 	err := roleClient.Delete(context.Background(), name, metav1.DeleteOptions{})
-	return err
+	if err != nil {
+		log.Error().Err(err).Msg("Error deleting role: " + name)
+	}
 }
 
 func createRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, clusterRoleBindingName string, roleName string, serviceAccountName string, namespace string) error {
@@ -132,9 +137,11 @@ func createRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, clust
 	return err
 }
 
-func deleteRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) error {
+func deleteRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) {
 	err := roleBindingClient.Delete(context.Background(), name, metav1.DeleteOptions{})
-	return err
+	if err != nil {
+		log.Error().Err(err).Msg("Error deleting role binding: " + name)
+	}
 }
 
 func checkServiceAccountAccess(accessReviewClient authv1types.LocalSubjectAccessReviewInterface, serviceAccountName string, verb string, resource string, namespace string) (bool, error) {
@@ -156,9 +163,4 @@ func checkServiceAccountAccess(accessReviewClient authv1types.LocalSubjectAccess
 		return false, err
 	}
 	return result.Status.Allowed, nil
-}
-
-func randomString() string {
-	s, _ := uuid.NewV4()
-	return s.String()[:5]
 }

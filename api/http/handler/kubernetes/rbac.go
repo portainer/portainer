@@ -41,9 +41,6 @@ func (handler *Handler) isRBACEnabled(w http.ResponseWriter, r *http.Request) *h
 		)
 	}
 
-	// to remove
-	//
-
 	// with the kube client instance, check if RBAC is enabled
 	isRBACEnabled, err := cli.IsRBACEnabled()
 	if err != nil {
