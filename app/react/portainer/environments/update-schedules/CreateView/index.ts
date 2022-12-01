@@ -1,1 +1,1 @@
-export { CreateView } from './CreateView';
+export { default as CreateView } from './CreateView';

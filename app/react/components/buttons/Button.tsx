@@ -61,9 +61,7 @@ export function Button({
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...ariaProps}
     >
-      {icon && (
-        <Icon icon={icon} size={getIconSize(size)} className="inline-flex" />
-      )}
+      {icon && <Icon icon={icon} size={getIconSize(size)} />}
       {children}
     </button>
   );

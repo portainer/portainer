@@ -32,6 +32,7 @@ import (
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/jwt"
@@ -587,6 +588,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	digitalSignatureService := initDigitalSignatureService()
 
+	edgeStacksService := edgestacks.NewService(dataStore)
+
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
@@ -738,6 +741,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		HTTPEnabled:                 sslDBSettings.HTTPEnabled,
 		AssetsPath:                  *flags.Assets,
 		DataStore:                   dataStore,
+		EdgeStacksService:           edgeStacksService,
 		SwarmStackManager:           swarmStackManager,
 		ComposeStackManager:         composeStackManager,
 		KubernetesDeployer:          kubernetesDeployer,

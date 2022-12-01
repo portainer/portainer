@@ -30,32 +30,3 @@ func hasEndpointPredicate(endpointService dataservices.EndpointService, endpoint
 
 	return false, nil
 }
-
-type endpointRelationsConfig struct {
-	endpoints      []portainer.Endpoint
-	endpointGroups []portainer.EndpointGroup
-	edgeGroups     []portainer.EdgeGroup
-}
-
-func fetchEndpointRelationsConfig(dataStore dataservices.DataStore) (*endpointRelationsConfig, error) {
-	endpoints, err := dataStore.Endpoint().Endpoints()
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve environments from database: %w", err)
-	}
-
-	endpointGroups, err := dataStore.EndpointGroup().EndpointGroups()
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve environment groups from database: %w", err)
-	}
-
-	edgeGroups, err := dataStore.EdgeGroup().EdgeGroups()
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve edge groups from database: %w", err)
-	}
-
-	return &endpointRelationsConfig{
-		endpoints:      endpoints,
-		endpointGroups: endpointGroups,
-		edgeGroups:     edgeGroups,
-	}, nil
-}
