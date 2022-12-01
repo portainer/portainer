@@ -16,21 +16,22 @@ import (
 
 // IsRBACEnabled checks if RBAC is enabled in the cluster by creating a service account, then checking it's access to a resourcequota before and after setting a cluster role and cluster role binding
 func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
-	saClient := kcl.cli.CoreV1().ServiceAccounts("default")
+	namespace := "default"
+	verb := "list"
+	resource := "resourcequotas"
+
+	saClient := kcl.cli.CoreV1().ServiceAccounts(namespace)
 	uniqueString := randomString() // append a unique string to resource names, incase they already exist
 	saName := "portainer-rbac-test-sa-" + uniqueString
-
-	err := createServiceAccount(saClient, saName)
+	err := createServiceAccount(saClient, saName, namespace)
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating service account")
 		return false, err
 	}
 	defer deleteServiceAccount(saClient, saName)
 
-	accessReviewClient := kcl.cli.AuthorizationV1().LocalSubjectAccessReviews("default")
-	verb := "list"
-	resource := "resourcequotas"
-	allowed, err := checkServiceAccountAccess(accessReviewClient, saName, verb, resource)
+	accessReviewClient := kcl.cli.AuthorizationV1().LocalSubjectAccessReviews(namespace)
+	allowed, err := checkServiceAccountAccess(accessReviewClient, saName, verb, resource, namespace)
 	if err != nil {
 		log.Error().Err(err).Msg("Error checking service account access")
 		return false, err
@@ -42,43 +43,39 @@ func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
 	}
 
 	// otherwise give the service account an rbac authorisation and check again
-	crClient := kcl.cli.RbacV1().ClusterRoles()
-	crName := "portainer-rbac-test-cluster-role-" + uniqueString
-	err = createClusterRole(crClient, crName, "list", "resourcequotas")
+	roleClient := kcl.cli.RbacV1().Roles(namespace)
+	roleName := "portainer-rbac-test-role-" + uniqueString
+	err = createRole(roleClient, roleName, verb, resource, namespace)
 	if err != nil {
-		log.Error().Err(err).Msg("Error creating cluster role")
+		log.Error().Err(err).Msg("Error creating role")
 		return false, err
 	}
-	defer deleteClusterRole(crClient, crName)
+	defer deleteRole(roleClient, roleName)
 
-	crbClient := kcl.cli.RbacV1().ClusterRoleBindings()
-	crbName := "portainer-rbac-test-cluster-role-binding-" + uniqueString
-	err = createClusterRoleBinding(crbClient, crbName, crName, saName)
+	roleBindingClient := kcl.cli.RbacV1().RoleBindings(namespace)
+	roleBindingName := "portainer-rbac-test-role-binding-" + uniqueString
+	err = createRoleBinding(roleBindingClient, roleBindingName, roleName, saName, namespace)
 	if err != nil {
-		log.Error().Err(err).Msg("Error creating cluster role binding")
+		log.Error().Err(err).Msg("Error creating role binding")
 		return false, err
 	}
-	defer deleteClusterRoleBinding(crbClient, crbName)
+	defer deleteRoleBinding(roleBindingClient, roleBindingName)
 
-	allowed, err = checkServiceAccountAccess(accessReviewClient, saName, verb, resource)
+	allowed, err = checkServiceAccountAccess(accessReviewClient, saName, verb, resource, namespace)
 	if err != nil {
 		log.Error().Err(err).Msg("Error checking service account access with authorizations added")
 		return false, err
 	}
 
-	// if the service account allowed to list resource quotas after given rbac cluster role, then RBAC is enabled
-	if allowed {
-		return true, nil
-	}
-
-	return false, nil
+	// if the service account allowed to list resource quotas after given rbac role, then RBAC is enabled
+	return allowed, nil
 }
 
-func createServiceAccount(saClient corev1types.ServiceAccountInterface, name string) error {
+func createServiceAccount(saClient corev1types.ServiceAccountInterface, name string, namespace string) error {
 	serviceAccount := &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: "default",
+			Namespace: namespace,
 		},
 	}
 	_, err := saClient.Create(context.Background(), serviceAccount, metav1.CreateOptions{})
@@ -90,10 +87,11 @@ func deleteServiceAccount(saClient corev1types.ServiceAccountInterface, name str
 	return err
 }
 
-func createClusterRole(crClient rbacv1types.ClusterRoleInterface, name string, verb string, resource string) error {
-	clusterRole := &rbacv1.ClusterRole{
+func createRole(roleClient rbacv1types.RoleInterface, name string, verb string, resource string, namespace string) error {
+	role := &rbacv1.Role{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name:      name,
+			Namespace: namespace,
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
@@ -103,17 +101,17 @@ func createClusterRole(crClient rbacv1types.ClusterRoleInterface, name string, v
 			},
 		},
 	}
-	_, err := crClient.Create(context.Background(), clusterRole, metav1.CreateOptions{})
+	_, err := roleClient.Create(context.Background(), role, metav1.CreateOptions{})
 	return err
 }
 
-func deleteClusterRole(crClient rbacv1types.ClusterRoleInterface, name string) error {
-	err := crClient.Delete(context.Background(), name, metav1.DeleteOptions{})
+func deleteRole(roleClient rbacv1types.RoleInterface, name string) error {
+	err := roleClient.Delete(context.Background(), name, metav1.DeleteOptions{})
 	return err
 }
 
-func createClusterRoleBinding(crbClient rbacv1types.ClusterRoleBindingInterface, clusterRoleBindingName string, clusterRoleName string, serviceAccountName string) error {
-	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
+func createRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, clusterRoleBindingName string, roleName string, serviceAccountName string, namespace string) error {
+	clusterRoleBinding := &rbacv1.RoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: clusterRoleBindingName,
 		},
@@ -121,32 +119,32 @@ func createClusterRoleBinding(crbClient rbacv1types.ClusterRoleBindingInterface,
 			{
 				Kind:      "ServiceAccount",
 				Name:      serviceAccountName,
-				Namespace: "default",
+				Namespace: namespace,
 			},
 		},
 		RoleRef: rbacv1.RoleRef{
-			Kind:     "ClusterRole",
-			Name:     clusterRoleName,
+			Kind:     "Role",
+			Name:     roleName,
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
-	_, err := crbClient.Create(context.Background(), clusterRoleBinding, metav1.CreateOptions{})
+	_, err := roleBindingClient.Create(context.Background(), clusterRoleBinding, metav1.CreateOptions{})
 	return err
 }
 
-func deleteClusterRoleBinding(crbClient rbacv1types.ClusterRoleBindingInterface, name string) error {
-	err := crbClient.Delete(context.Background(), name, metav1.DeleteOptions{})
+func deleteRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) error {
+	err := roleBindingClient.Delete(context.Background(), name, metav1.DeleteOptions{})
 	return err
 }
 
-func checkServiceAccountAccess(accessReviewClient authv1types.LocalSubjectAccessReviewInterface, serviceAccountName string, verb string, resource string) (bool, error) {
+func checkServiceAccountAccess(accessReviewClient authv1types.LocalSubjectAccessReviewInterface, serviceAccountName string, verb string, resource string, namespace string) (bool, error) {
 	subjectAccessReview := &authv1.LocalSubjectAccessReview{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
+			Namespace: namespace,
 		},
 		Spec: authv1.SubjectAccessReviewSpec{
 			ResourceAttributes: &authv1.ResourceAttributes{
-				Namespace: "default",
+				Namespace: namespace,
 				Verb:      verb,
 				Resource:  resource,
 			},
