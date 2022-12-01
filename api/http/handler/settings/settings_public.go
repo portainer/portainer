@@ -16,6 +16,8 @@ type publicSettingsResponse struct {
 	AuthenticationMethod portainer.AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 	// The minimum required length for a password of any user when using internal auth mode
 	RequiredPasswordLength int `json:"RequiredPasswordLength" example:"1"`
+	// Show the Kompose build option (discontinued in 2.18)
+	ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// Supported feature flags
@@ -70,6 +72,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		AuthenticationMethod:      appSettings.AuthenticationMethod,
 		RequiredPasswordLength:    appSettings.InternalAuthSettings.RequiredPasswordLength,
 		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
+		ShowKomposeBuildOption:    appSettings.ShowKomposeBuildOption,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  appSettings.FeatureFlagSettings,
