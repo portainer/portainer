@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
-	"github.com/portainer/portainer/api/pkg/libhelm/binary/test"
+	"github.com/portainer/portainer/pkg/libhelm/binary/test"
 	"github.com/stretchr/testify/assert"
 )
 

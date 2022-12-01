@@ -13,7 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/api/pkg/libhelm"
+	"github.com/portainer/portainer/pkg/libhelm"
 )
 
 type settingsUpdatePayload struct {

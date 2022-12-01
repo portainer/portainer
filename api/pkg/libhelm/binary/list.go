@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/pkg/libhelm/options"
-	"github.com/portainer/portainer/api/pkg/libhelm/release"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 )
 
 // List runs `helm list --output json --filter <filter> --selector <selector> --namespace <namespace>` with specified list options.

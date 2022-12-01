@@ -10,8 +10,8 @@ import (
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
-	"github.com/portainer/portainer/api/pkg/libhelm"
-	"github.com/portainer/portainer/api/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 )
 
 type requestBouncer interface {

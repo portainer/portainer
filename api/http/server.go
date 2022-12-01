@@ -59,9 +59,9 @@ import (
 	"github.com/portainer/portainer/api/internal/ssl"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
-	"github.com/portainer/portainer/api/pkg/libhelm"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/rs/zerolog/log"
 )

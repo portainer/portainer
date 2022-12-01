@@ -7,7 +7,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

@@ -1,6 +1,6 @@
 package release
 
-import "github.com/portainer/portainer/api/pkg/libhelm/time"
+import "github.com/portainer/portainer/pkg/libhelm/time"
 
 // Release is the struct that holds the information for a helm release.
 // The struct definitions have been copied from the offical Helm Golang client/library.

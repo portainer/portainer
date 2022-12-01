@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/pkg/libhelm/options"
-	"github.com/portainer/portainer/api/pkg/libhelm/release"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 )
 
 // Install runs `helm install` with specified install options.

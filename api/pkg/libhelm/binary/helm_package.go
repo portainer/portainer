@@ -7,7 +7,7 @@ import (
 	"runtime"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 )
 
 // helmBinaryPackageManager is a wrapper for the helm binary which implements HelmPackageManager

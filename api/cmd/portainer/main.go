@@ -40,9 +40,9 @@ import (
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/oauth"
-	"github.com/portainer/portainer/api/pkg/libhelm"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"

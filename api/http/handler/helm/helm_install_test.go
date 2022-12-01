@@ -16,9 +16,9 @@ import (
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
-	"github.com/portainer/portainer/api/pkg/libhelm/binary/test"
-	"github.com/portainer/portainer/api/pkg/libhelm/options"
-	"github.com/portainer/portainer/api/pkg/libhelm/release"
+	"github.com/portainer/portainer/pkg/libhelm/binary/test"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 	"github.com/stretchr/testify/assert"
 )
 
