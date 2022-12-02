@@ -119,13 +119,13 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 		edgeJob.Endpoints = endpointsMap
 	}
 
-	if payload.EdgeGroups == nil && len(edgeJob.EdgeGroups) > 0 {
+	if len(payload.EdgeGroups) == 0 && len(edgeJob.EdgeGroups) > 0 {
 		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
 		if err != nil {
 			return errors.New("unable to get endpoints from edge groups")
 		}
 
-		for endpointID := range endpoints {
+		for _, endpointID := range endpoints {
 			endpointsToRemove[portainer.EndpointID(endpointID)] = true
 		}
 
@@ -136,7 +136,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 	edgeGroupsToRemove := []portainer.EdgeGroupID{}
 	endpointsFromGroupsToAddMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
 
-	if len(edgeJob.EdgeGroups) > 0 {
+	if len(payload.EdgeGroups) > 0 {
 		for _, edgeGroupID := range payload.EdgeGroups {
 			_, err := handler.DataStore.EdgeGroup().EdgeGroup(edgeGroupID)
 			if err != nil {
