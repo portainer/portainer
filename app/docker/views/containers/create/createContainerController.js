@@ -742,13 +742,16 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       Container.get({ id: $transition$.params().from })
         .$promise.then(function success(d) {
           var fromContainer = new ContainerDetailsViewModel(d);
-          if (fromContainer.ResourceControl && fromContainer.ResourceControl.Public) {
-            $scope.formValues.AccessControlData.AccessControlEnabled = false;
+          if (fromContainer.ResourceControl) {
+            if (fromContainer.ResourceControl.Public) {
+              $scope.formValues.AccessControlData.AccessControlEnabled = false;
+            }
+
+            // When the container is create by duplicate/edit, the access permission
+            // shouldn't be copied
+            fromContainer.ResourceControl.UserAccesses = [];
+            fromContainer.ResourceControl.TeamAccesses = [];
           }
-          // When the container is create by duplicate/edit, the access permission
-          // shouldn't be copied
-          fromContainer.ResourceControl.UserAccesses = {};
-          fromContainer.ResourceControl.TeamAccesses = {};
 
           $scope.fromContainer = fromContainer;
           $scope.state.mode = 'duplicate';
