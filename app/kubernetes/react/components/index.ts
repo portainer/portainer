@@ -10,6 +10,8 @@ import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applicat
 import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { PlacementsDatatable } from '@/react/kubernetes/applications/ItemView/PlacementsDatatable';
+import { withUIRouter } from '@/react-tools/withUIRouter';
+import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 
 export const componentsModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -83,6 +85,14 @@ export const componentsModule = angular
       'value',
       'onChange',
       'supportGlobalDeployment',
+    ])
+  )
+  .component(
+    'kubernetesApplicationsStacksDatatable',
+    r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
+      'dataset',
+      'onRefresh',
+      'onRemove',
     ])
   )
   .component(

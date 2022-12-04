@@ -1,3 +1,5 @@
+import { useCurrentUser } from '@/react/hooks/useUser';
+
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { Checkbox } from '@@/form-components/Checkbox';
 import {
@@ -6,7 +8,7 @@ import {
   ZustandSetFunc,
 } from '@@/datatables/types';
 
-interface SystemResourcesTableSettings {
+export interface SystemResourcesTableSettings {
   showSystemResources: boolean;
   setShowSystemResources: (value: boolean) => void;
 }
@@ -31,23 +33,16 @@ export function systemResourcesSettings(
 
 interface Props {
   settings: TableSettings;
-  hideShowSystemResources?: boolean;
 }
 
-export function DefaultDatatableSettings({
-  settings,
-  hideShowSystemResources = false,
-}: Props) {
+export function DefaultDatatableSettings({ settings }: Props) {
   return (
     <>
-      {!hideShowSystemResources && (
-        <Checkbox
-          id="show-system-resources"
-          label="Show system resources"
-          checked={settings.showSystemResources}
-          onChange={(e) => settings.setShowSystemResources(e.target.checked)}
-        />
-      )}
+      <SystemResourcesSettings
+        value={settings.showSystemResources}
+        onChange={(value) => settings.setShowSystemResources(value)}
+      />
+
       <TableSettingsMenuAutoRefresh
         value={settings.autoRefreshRate}
         onChange={handleRefreshRateChange}
@@ -58,4 +53,26 @@ export function DefaultDatatableSettings({
   function handleRefreshRateChange(autoRefreshRate: number) {
     settings.setAutoRefreshRate(autoRefreshRate);
   }
+}
+
+export function SystemResourcesSettings({
+  value,
+  onChange,
+}: {
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  const { isAdmin } = useCurrentUser();
+  if (!isAdmin) {
+    return null;
+  }
+
+  return (
+    <Checkbox
+      id="show-system-resources"
+      label="Show system resources"
+      checked={value}
+      onChange={(e) => onChange(e.target.checked)}
+    />
+  );
 }

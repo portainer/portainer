@@ -21,10 +21,10 @@ import { useTableState } from '@@/datatables/useTableState';
 import { useMutationDeleteServices, useServices } from '../service';
 import { Service } from '../types';
 import { DefaultDatatableSettings } from '../../datatables/DefaultDatatableSettings';
+import { SystemResourcesAlert } from '../../datatables/SystemResourcesAlert';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
-import { ServicesDatatableDescription } from './ServicesDatatableDescription';
 
 const storageKey = 'k8sServicesDatatable';
 const settingsStore = createStore(storageKey);
@@ -62,14 +62,11 @@ export function ServicesDatatable() {
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings
-            settings={tableState}
-            hideShowSystemResources={!isAdmin}
-          />
+          <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
       description={
-        <ServicesDatatableDescription
+        <SystemResourcesAlert
           showSystemResources={tableState.showSystemResources || !isAdmin}
         />
       }

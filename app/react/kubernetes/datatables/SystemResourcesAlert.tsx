@@ -4,7 +4,7 @@ interface Props {
   showSystemResources: boolean;
 }
 
-export function ServicesDatatableDescription({ showSystemResources }: Props) {
+export function SystemResourcesAlert({ showSystemResources }: Props) {
   return (
     <div className="w-full">
       {!showSystemResources && (
