@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/portainer/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/stretchr/testify/assert"
 )
 

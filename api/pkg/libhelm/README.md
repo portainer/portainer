@@ -5,7 +5,7 @@ A helm abstraction for Portainer.
 ## Installation
 
 ```sh
-go get github.com/portainer/portainer/api/pkg/libhelm
+go get github.com/portainer/portainer/pkg/libhelm
 ```
 
 ## Tests

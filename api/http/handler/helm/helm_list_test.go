@@ -7,15 +7,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/portainer/libhelm/binary/test"
-	"github.com/portainer/libhelm/options"
-	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/pkg/libhelm/binary/test"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 	"github.com/stretchr/testify/assert"
 
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
