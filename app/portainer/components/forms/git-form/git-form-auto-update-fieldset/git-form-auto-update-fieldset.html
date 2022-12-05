@@ -1,4 +1,10 @@
-<ng-form name="autoUpdateForm">
+<ng-form name="autoUpdateForm form-group">
+  <div class="small vertical-center">
+    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+    <span class="text-muted">
+      When enabled, at each polling interval or webhook invocation, if the git repo differs from what was stored locally on last git pull, the changes are deployed.</span
+    >
+  </div>
   <div class="form-group">
     <div class="col-sm-12">
       <por-switch-field
@@ -13,8 +19,9 @@
   </div>
   <div class="small vertical-center" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-    <span class="text-warning"
-      >Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?</span
+    <span class="text-muted"
+      >Any changes to this stack or application that have been made locally via Portainer or directly in the cluster will be overwritten by the git repository content, which may
+      cause service interruption.</span
     >
   </div>
   <div class="form-group mt-2" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
@@ -34,7 +41,10 @@
   </div>
 
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates && $ctrl.model.RepositoryMechanism === 'Webhook'">
-    <label for="repository_mechanism" class="col-sm-3 col-lg-2 control-label text-left"> Webhook </label>
+    <label for="repository_mechanism" class="col-sm-3 col-lg-2 control-label text-left">
+      Webhook
+      <git-webhook-tooltip></git-webhook-tooltip>
+    </label>
     <div class="col-sm-8">
       <span class="text-muted"> {{ $ctrl.model.RepositoryWebhookURL | truncatelr }} </span>
       <button type="button" class="btn btn-sm btn-light btn-sm space-left vertical-center" ng-if="$ctrl.model.RepositoryWebhookURL" ng-click="$ctrl.copyWebhook()">
@@ -90,18 +100,11 @@
         name="'forceUpdate'"
         feature-id="$ctrl.limitedFeature"
         checked="$ctrl.model.RepositoryAutomaticUpdatesForce"
-        label="'Force Redeployment'"
+        label="$ctrl.environmentType === 'KUBERNETES' ? 'Always apply manifest' : 'Force Redeployment'"
+        tooltip="$ctrl.environmentType === 'KUBERNETES' ? 'If enabled, then when redeploy is triggered via the webhook or polling, kubectl apply is always performed, even if Portainer detects no difference between the git repo and what was stored locally on last git pull. This is useful if you want your git repo to be the source of truth and are fine with changes made directly to resources in the cluster being overwritten.' : ''"
         label-class="'col-sm-3 col-lg-2'"
         on-change="($ctrl.onChangeAutoUpdateForce)"
       ></por-switch-field>
     </div>
-  </div>
-  <div class="small vertical-center" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-    <span class="text-muted">When enabled, enforces automatic deployment at each interval or webhook invocation.</span>
-  </div>
-  <div class="small vertical-center" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-    <span class="text-muted">When enabled, updates from the git repository will occur automatically at an interval or webhook.</span>
   </div>
 </ng-form>
