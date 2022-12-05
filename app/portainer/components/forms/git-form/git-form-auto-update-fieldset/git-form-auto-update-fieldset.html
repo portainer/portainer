@@ -43,7 +43,10 @@
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates && $ctrl.model.RepositoryMechanism === 'Webhook'">
     <label for="repository_mechanism" class="col-sm-3 col-lg-2 control-label text-left">
       Webhook
-      <git-webhook-tooltip></git-webhook-tooltip>
+      <portainer-tooltip
+        message="'See &nbsp;<a href=\'https://docs.portainer.io/user/kubernetes/applications/manifest#automatic-updates\' target=\'_blank\' rel=\'noreferrer\'>Portainer documentation on webhook usage</a>.'"
+        set-html-message="true"
+      ></portainer-tooltip>
     </label>
     <div class="col-sm-8">
       <span class="text-muted"> {{ $ctrl.model.RepositoryWebhookURL | truncatelr }} </span>
@@ -101,7 +104,8 @@
         feature-id="$ctrl.limitedFeature"
         checked="$ctrl.model.RepositoryAutomaticUpdatesForce"
         label="$ctrl.environmentType === 'KUBERNETES' ? 'Always apply manifest' : 'Force Redeployment'"
-        tooltip="$ctrl.environmentType === 'KUBERNETES' ? 'If enabled, then when redeploy is triggered via the webhook or polling, kubectl apply is always performed, even if Portainer detects no difference between the git repo and what was stored locally on last git pull. This is useful if you want your git repo to be the source of truth and are fine with changes made directly to resources in the cluster being overwritten.' : ''"
+        tooltip="$ctrl.environmentType === 'KUBERNETES' ? '<p>If enabled, then when redeploy is triggered via the webhook or polling, kubectl apply is always performed, even if Portainer detects no difference between the git repo and what was stored locally on last git pull.</ p><p>This is useful if you want your git repo to be the source of truth and are fine with changes made directly to resources in the cluster being overwritten.</ p>' : ''"
+        set-tooltip-html-message="true"
         label-class="'col-sm-3 col-lg-2'"
         on-change="($ctrl.onChangeAutoUpdateForce)"
       ></por-switch-field>
