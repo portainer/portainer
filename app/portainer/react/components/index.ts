@@ -47,7 +47,7 @@ export const componentsModule = angular
   )
   .component(
     'portainerTooltip',
-    r2a(Tooltip, ['message', 'position', 'className'])
+    r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage'])
   )
   .component('badge', r2a(Badge, ['type', 'className']))
   .component('fileUploadField', fileUploadField)

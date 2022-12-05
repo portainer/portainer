@@ -1,4 +1,6 @@
 import { HelpCircle } from 'lucide-react';
+import { useMemo } from 'react';
+import sanitize from 'sanitize-html';
 
 import { TooltipWithChildren, Position } from '../TooltipWithChildren';
 
@@ -6,12 +8,27 @@ export interface Props {
   position?: Position;
   message: string;
   className?: string;
+  setHtmlMessage?: boolean;
 }
 
-export function Tooltip({ message, position = 'bottom', className }: Props) {
+export function Tooltip({
+  message,
+  position = 'bottom',
+  className,
+  setHtmlMessage,
+}: Props) {
+  // allow angular views to set html messages for the tooltip
+  const htmlMessage = useMemo(() => {
+    if (setHtmlMessage) {
+      // eslint-disable-next-line react/no-danger
+      return <div dangerouslySetInnerHTML={{ __html: sanitize(message) }} />;
+    }
+    return null;
+  }, [setHtmlMessage, message]);
+
   return (
     <TooltipWithChildren
-      message={message}
+      message={htmlMessage || message}
       position={position}
       className={className}
     >
