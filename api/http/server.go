@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/apikey"
@@ -24,7 +23,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
-	"github.com/portainer/portainer/api/http/handler/edgeupdateschedules"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
@@ -57,11 +55,13 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/ssl"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/rs/zerolog/log"
 )
@@ -77,6 +77,7 @@ type Server struct {
 	ReverseTunnelService        portainer.ReverseTunnelService
 	ComposeStackManager         portainer.ComposeStackManager
 	CryptoService               portainer.CryptoService
+	EdgeStacksService           *edgestackservice.Service
 	SignatureService            portainer.DigitalSignatureService
 	SnapshotService             portainer.SnapshotService
 	FileService                 portainer.FileService
@@ -154,9 +155,7 @@ func (server *Server) Start() error {
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	edgeUpdateScheduleHandler := edgeupdateschedules.NewHandler(requestBouncer, server.DataStore)
-
-	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore)
+	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore, server.EdgeStacksService)
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
 	edgeStacksHandler.KubernetesDeployer = server.KubernetesDeployer
@@ -278,43 +277,42 @@ func (server *Server) Start() error {
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
 	server.Handler = &handler.Handler{
-		RoleHandler:               roleHandler,
-		AuthHandler:               authHandler,
-		BackupHandler:             backupHandler,
-		CustomTemplatesHandler:    customTemplatesHandler,
-		DockerHandler:             dockerHandler,
-		EdgeGroupsHandler:         edgeGroupsHandler,
-		EdgeJobsHandler:           edgeJobsHandler,
-		EdgeUpdateScheduleHandler: edgeUpdateScheduleHandler,
-		EdgeStacksHandler:         edgeStacksHandler,
-		EdgeTemplatesHandler:      edgeTemplatesHandler,
-		EndpointGroupHandler:      endpointGroupHandler,
-		EndpointHandler:           endpointHandler,
-		EndpointHelmHandler:       endpointHelmHandler,
-		EndpointEdgeHandler:       endpointEdgeHandler,
-		EndpointProxyHandler:      endpointProxyHandler,
-		FileHandler:               fileHandler,
-		LDAPHandler:               ldapHandler,
-		HelmTemplatesHandler:      helmTemplatesHandler,
-		KubernetesHandler:         kubernetesHandler,
-		MOTDHandler:               motdHandler,
-		OpenAMTHandler:            openAMTHandler,
-		FDOHandler:                fdoHandler,
-		RegistryHandler:           registryHandler,
-		ResourceControlHandler:    resourceControlHandler,
-		SettingsHandler:           settingsHandler,
-		SSLHandler:                sslHandler,
-		StatusHandler:             statusHandler,
-		StackHandler:              stackHandler,
-		StorybookHandler:          storybookHandler,
-		TagHandler:                tagHandler,
-		TeamHandler:               teamHandler,
-		TeamMembershipHandler:     teamMembershipHandler,
-		TemplatesHandler:          templatesHandler,
-		UploadHandler:             uploadHandler,
-		UserHandler:               userHandler,
-		WebSocketHandler:          websocketHandler,
-		WebhookHandler:            webhookHandler,
+		RoleHandler:            roleHandler,
+		AuthHandler:            authHandler,
+		BackupHandler:          backupHandler,
+		CustomTemplatesHandler: customTemplatesHandler,
+		DockerHandler:          dockerHandler,
+		EdgeGroupsHandler:      edgeGroupsHandler,
+		EdgeJobsHandler:        edgeJobsHandler,
+		EdgeStacksHandler:      edgeStacksHandler,
+		EdgeTemplatesHandler:   edgeTemplatesHandler,
+		EndpointGroupHandler:   endpointGroupHandler,
+		EndpointHandler:        endpointHandler,
+		EndpointHelmHandler:    endpointHelmHandler,
+		EndpointEdgeHandler:    endpointEdgeHandler,
+		EndpointProxyHandler:   endpointProxyHandler,
+		FileHandler:            fileHandler,
+		LDAPHandler:            ldapHandler,
+		HelmTemplatesHandler:   helmTemplatesHandler,
+		KubernetesHandler:      kubernetesHandler,
+		MOTDHandler:            motdHandler,
+		OpenAMTHandler:         openAMTHandler,
+		FDOHandler:             fdoHandler,
+		RegistryHandler:        registryHandler,
+		ResourceControlHandler: resourceControlHandler,
+		SettingsHandler:        settingsHandler,
+		SSLHandler:             sslHandler,
+		StatusHandler:          statusHandler,
+		StackHandler:           stackHandler,
+		StorybookHandler:       storybookHandler,
+		TagHandler:             tagHandler,
+		TeamHandler:            teamHandler,
+		TeamMembershipHandler:  teamMembershipHandler,
+		TemplatesHandler:       templatesHandler,
+		UploadHandler:          uploadHandler,
+		UserHandler:            userHandler,
+		WebSocketHandler:       websocketHandler,
+		WebhookHandler:         webhookHandler,
 	}
 
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))

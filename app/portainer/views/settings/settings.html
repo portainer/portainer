@@ -157,7 +157,7 @@
           </div>
           <!-- !helm charts -->
           <!-- kube -->
-          <div class="col-sm-12 form-section-title"> Kubernetes </div>
+          <div class="col-sm-12 form-section-title"> Kubeconfig </div>
           <div class="form-group">
             <label for="kubeconfig_expiry" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
             <div class="col-sm-8">
@@ -184,6 +184,16 @@
               tooltip="'Hides the \'Add with form\' buttons and prevents adding/editing of resources via forms'"
             ></por-switch-field>
           </div>
+          <div class="form-group">
+            <por-switch-field
+              label="'Allow docker-compose format Kubernetes manifests'"
+              checked="formValues.ShowKomposeBuildOption"
+              name="'toggle_showKomposeBuildOption'"
+              on-change="(onToggleShowKompose)"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-3 col-lg-2'"
+            ></por-switch-field>
+          </div>
           <!-- !deployment options -->
           <!-- actions -->
           <div class="form-group">
@@ -194,7 +204,7 @@
                 ng-click="saveKubernetesSettings()"
                 ng-disabled="state.kubeSettingsActionInProgress"
                 button-spinner="state.kubeSettingsActionInProgress"
-                data-cy="settings-saveSettingsButton"
+                data-cy="settings-saveKubeSettingsButton"
               >
                 <span ng-hide="state.kubeSettingsActionInProgress">Save Kubernetes settings</span>
                 <span ng-show="state.kubeSettingsActionInProgress">Saving...</span>

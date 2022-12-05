@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/jwt"
 
 	"github.com/pkg/errors"
@@ -69,9 +70,12 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		t.Fatal(err)
 	}
 
+	edgeStacksService := edgestacks.NewService(store)
+
 	handler := NewHandler(
 		security.NewRequestBouncer(store, jwtService, apiKeyService),
 		store,
+		edgeStacksService,
 	)
 
 	tmpDir := t.TempDir()
@@ -779,7 +783,7 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 	payload := updateStatusPayload{
 		Error:      "test-error",
 		Status:     &newStatus,
-		EndpointID: &endpoint.ID,
+		EndpointID: endpoint.ID,
 	}
 
 	jsonPayload, err := json.Marshal(payload)
@@ -829,7 +833,7 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 		t.Fatalf(fmt.Sprintf("expected EdgeStackStatusError %s, found %s", payload.Error, data.Status[endpoint.ID].Error))
 	}
 
-	if data.Status[endpoint.ID].EndpointID != *payload.EndpointID {
+	if data.Status[endpoint.ID].EndpointID != payload.EndpointID {
 		t.Fatalf(fmt.Sprintf("expected EndpointID %d, found %d", payload.EndpointID, data.Status[endpoint.ID].EndpointID))
 	}
 }
@@ -854,7 +858,7 @@ func TestUpdateStatusWithInvalidPayload(t *testing.T) {
 			updateStatusPayload{
 				Error:      "test-error",
 				Status:     nil,
-				EndpointID: &endpoint.ID,
+				EndpointID: endpoint.ID,
 			},
 			"Invalid status",
 			400,
@@ -864,17 +868,17 @@ func TestUpdateStatusWithInvalidPayload(t *testing.T) {
 			updateStatusPayload{
 				Error:      "",
 				Status:     &statusError,
-				EndpointID: &endpoint.ID,
+				EndpointID: endpoint.ID,
 			},
 			"Error message is mandatory when status is error",
 			400,
 		},
 		{
-			"Update with nil EndpointID",
+			"Update with missing EndpointID",
 			updateStatusPayload{
 				Error:      "",
 				Status:     &statusOk,
-				EndpointID: nil,
+				EndpointID: 0,
 			},
 			"Invalid EnvironmentID",
 			400,

@@ -1,17 +1,32 @@
 import { useQuery } from 'react-query';
+import semverCompare from 'semver-compare';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { withError } from '@/react-tools/react-query';
 
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';
 
-export function useSupportedAgentVersions<T = string[]>({
-  select,
-}: { select?: (data: string[]) => T } = {}) {
+export function useSupportedAgentVersions(
+  minVersion?: string,
+  { onSuccess }: { onSuccess?(data: string[]): void } = {}
+) {
   return useQuery(
-    queryKeys.supportedAgentVersions(),
+    [...queryKeys.supportedAgentVersions(), { minVersion }],
     getSupportedAgentVersions,
-    { select }
+    {
+      select(versions) {
+        if (!minVersion) {
+          return versions;
+        }
+
+        return versions.filter(
+          (version) => semverCompare(version, minVersion) > 0
+        );
+      },
+      onSuccess,
+      ...withError('failed fetching available agent versions'),
+    }
   );
 }
 

@@ -8,7 +8,6 @@ import (
 
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/portainer/portainer/api/edgetypes"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -29,7 +28,6 @@ type (
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
-		EdgeUpdateSchedule() EdgeUpdateScheduleService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
@@ -82,17 +80,6 @@ type (
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
-		BucketName() string
-	}
-
-	EdgeUpdateScheduleService interface {
-		ActiveSchedule(environmentID portainer.EndpointID) *edgetypes.EndpointUpdateScheduleRelation
-		ActiveSchedules(environmentIDs []portainer.EndpointID) []edgetypes.EndpointUpdateScheduleRelation
-		List() ([]edgetypes.UpdateSchedule, error)
-		Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error)
-		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
-		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
-		Delete(ID edgetypes.UpdateScheduleID) error
 		BucketName() string
 	}
 

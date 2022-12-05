@@ -30,7 +30,7 @@ export function Sidebar() {
   return (
     /* in the future (when we remove r2a) this should wrap the whole app - to change root styles */
     <SidebarProvider>
-      <div className={clsx(styles.root, 'flex flex-col')}>
+      <div className={clsx(styles.root, 'sidebar flex flex-col')}>
         <UpgradeBEBanner />
         <nav
           className={clsx(

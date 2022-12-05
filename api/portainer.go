@@ -861,6 +861,8 @@ type (
 		TemplatesURL string `json:"TemplatesURL" example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
 		// The default check in interval for edge agent (in seconds)
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
+		// Show the Kompose build option (discontinued in 2.18)
+		ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
 		// Whether edge compute features are enabled
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures"`
 		// The duration of a user session
@@ -1503,12 +1505,10 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
 const FeatureFlagBEUpgrade = "beUpgrade"
 
 // List of supported features
 var SupportedFeatureFlags = []Feature{
-	FeatureFlagEdgeRemoteUpdate,
 	FeatureFlagBEUpgrade,
 }
 
