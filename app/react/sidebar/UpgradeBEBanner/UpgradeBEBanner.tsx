@@ -30,7 +30,7 @@ function UpgradeBEBanner() {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!nodesCountQuery.data || !systemInfoQuery.data) {
+  if (!nodesCountQuery.isSuccess || !systemInfoQuery.data) {
     return null;
   }
 
