@@ -7,6 +7,7 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
+import { getIsRBACEnabled } from '@/react/kubernetes/cluster/service';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
@@ -54,6 +55,7 @@ class KubernetesConfigureController {
     this.onToggleIngressAvailabilityPerNamespace = this.onToggleIngressAvailabilityPerNamespace.bind(this);
     this.onToggleAllowNoneIngressClass = this.onToggleAllowNoneIngressClass.bind(this);
     this.onChangeStorageClassAccessMode = this.onChangeStorageClassAccessMode.bind(this);
+    this.onToggleRestrictNs = this.onToggleRestrictNs.bind(this);
   }
   /* #endregion */
 
@@ -261,6 +263,12 @@ class KubernetesConfigureController {
     });
   }
 
+  onToggleRestrictNs() {
+    this.$scope.$evalAsync(() => {
+      this.formValues.RestrictDefaultNamespace = !this.formValues.RestrictDefaultNamespace;
+    });
+  }
+
   /* #region  ON INIT */
   async onInit() {
     this.state = {
@@ -292,11 +300,18 @@ class KubernetesConfigureController {
       IngressAvailabilityPerNamespace: false,
     };
 
+    // default to true if error is thrown
+    this.isRBACEnabled = true;
+
     this.isIngressControllersLoading = true;
     try {
       this.availableAccessModes = new KubernetesStorageClassAccessPolicies();
 
-      [this.StorageClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.get(this.state.endpointId), this.EndpointService.endpoint(this.state.endpointId)]);
+      [this.StorageClasses, this.endpoint, this.isRBACEnabled] = await Promise.all([
+        this.KubernetesStorageService.get(this.state.endpointId),
+        this.EndpointService.endpoint(this.state.endpointId),
+        getIsRBACEnabled(this.state.endpointId),
+      ]);
 
       this.ingressControllers = await getIngressControllerClassMap({ environmentId: this.state.endpointId });
       this.originalIngressControllers = structuredClone(this.ingressControllers) || [];
