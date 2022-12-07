@@ -23,7 +23,7 @@ export function EnvironmentBrowseButtons({
   const isEdgeAsync = checkEdgeAsync(environment);
   const browseStatus = getStatus(isActive, isEdgeAsync);
   return (
-    <div className="flex flex-col gap-1 ml-auto [&>*]:flex-1">
+    <div className="flex flex-col gap-1 justify-center [&>*]:h-1/3">
       {isBE && (
         <LinkButton
           icon={History}

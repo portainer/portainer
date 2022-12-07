@@ -1,5 +1,5 @@
-import EndpointHelper from 'Portainer/helpers/endpointHelper';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
+import { isLocalEnvironment } from '@/react/portainer/environments/utils';
 
 angular.module('portainer.app').factory('DockerHubService', DockerHubService);
 
@@ -10,7 +10,7 @@ function DockerHubService(Endpoints, AgentDockerhub) {
   };
 
   function checkRateLimits(endpoint, registryId) {
-    if (EndpointHelper.isLocalEndpoint(endpoint)) {
+    if (isLocalEnvironment(endpoint)) {
       return Endpoints.dockerhubLimits({ id: endpoint.Id, registryId }).$promise;
     }
 

@@ -59,6 +59,14 @@ export function isUnassociatedEdgeEnvironment(env: Environment) {
   return isEdgeEnvironment(env.Type) && !env.EdgeID;
 }
 
+export function isLocalEnvironment(environment: Environment) {
+  return (
+    environment.URL.includes('unix://') ||
+    environment.URL.includes('npipe://') ||
+    environment.Type === EnvironmentType.KubernetesLocal
+  );
+}
+
 export function getDashboardRoute(environment: Environment) {
   if (isEdgeEnvironment(environment.Type)) {
     if (!environment.EdgeID) {

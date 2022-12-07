@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 import { Laptop } from 'lucide-react';
 
-import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
+import { OpenAMTConfiguration } from '@/react/edge/edge-devices/open-amt/types';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';

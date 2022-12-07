@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Tag, Globe, Activity } from 'lucide-react';
+import { Tag, Activity } from 'lucide-react';
 
 import {
   isoDateFromTimestamp,
@@ -24,9 +24,10 @@ import { Link } from '@@/Link';
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EnvironmentStats } from './EnvironmentStats';
 import { EngineVersion } from './EngineVersion';
-import { AgentVersionTag } from './AgentVersionTag';
+import { EnvironmentTypeTag } from './EnvironmentTypeTag';
 import { EnvironmentBrowseButtons } from './EnvironmentBrowseButtons';
 import { EditButtons } from './EditButtons';
+import { AgentDetails } from './AgentDetails';
 
 interface Props {
   environment: Environment;
@@ -101,23 +102,14 @@ export function EnvironmentItem({
               <Tag className="icon icon-sm" aria-hidden="true" />
               {tags}
             </span>
-            {isEdge && (
-              <>
-                <AgentVersionTag
-                  type={environment.Type}
-                  version={environment.Agent.Version}
-                />
-                {environment.Edge.AsyncMode && (
-                  <span className="vertical-center gap-1">
-                    <Globe className="icon icon-sm" aria-hidden="true" />
-                    Async Environment
-                  </span>
-                )}
-              </>
-            )}
+            <EnvironmentTypeTag environment={environment} />
+            <AgentDetails environment={environment} />
           </div>
           <EnvironmentStats environment={environment} />
         </div>
+
+        <div className="ml-auto" />
+
         <EnvironmentBrowseButtons
           environment={environment}
           onClickBrowse={onClickBrowse}

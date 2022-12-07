@@ -8,8 +8,8 @@ export function LinkButton({
   to,
   params,
   disabled,
-  children,
   className,
+  children,
   ...props
 }: ComponentProps<typeof Button> & ComponentProps<typeof Link>) {
   const button = (
