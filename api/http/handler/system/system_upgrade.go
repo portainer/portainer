@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 type systemUpgradePayload struct {
@@ -42,10 +43,12 @@ func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	err = handler.upgradeService.Upgrade(payload.License)
-	if err != nil {
-		return httperror.InternalServerError("Unable to upgrade Portainer", err)
-	}
+	go func() {
+		err = handler.upgradeService.Upgrade(payload.License)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to upgrade Portainer")
+		}
+	}()
 
 	return response.Empty(w)
 }
