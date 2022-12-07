@@ -1,6 +1,5 @@
-import { Wifi, WifiOff } from 'lucide-react';
+import { History, Wifi, WifiOff } from 'lucide-react';
 
-import ClockRewind from '@/assets/ico/clock-rewind.svg?c';
 import { Environment } from '@/react/portainer/environments/types';
 import {
   getDashboardRoute,
@@ -27,7 +26,7 @@ export function EnvironmentBrowseButtons({
     <div className="flex flex-col gap-1 ml-auto [&>*]:flex-1">
       {isBE && (
         <LinkButton
-          icon={ClockRewind}
+          icon={History}
           disabled={!isEdgeAsync || browseStatus === 'snapshot'}
           to="edge.browse.dashboard"
           params={{
