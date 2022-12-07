@@ -9,20 +9,19 @@ interface Props extends IconProps {
   iconClass?: string;
 }
 
-export function EnvironmentStatsItem({
+export function StatsItem({
   value,
   icon,
   children,
   iconClass,
 }: PropsWithChildren<Props>) {
   return (
-    <span className="vertical-center space-right">
-      <Icon
-        className={clsx('icon icon-sm space-right', iconClass)}
-        icon={icon}
-      />
+    <span className="flex gap-1 items-center">
+      <Icon className={clsx('icon icon-sm', iconClass)} icon={icon} />
       <span>{value}</span>
-      {children && <span className="space-left">{children}</span>}
+      {children && (
+        <span className="ml-1 flex gap-2 items-center">{children}</span>
+      )}
     </span>
   );
 }

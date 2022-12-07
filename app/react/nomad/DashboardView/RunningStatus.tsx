@@ -1,6 +1,6 @@
 import { Power } from 'lucide-react';
 
-import { Icon } from '@@/Icon';
+import { StatsItem } from '@@/StatsItem';
 
 interface Props {
   running: number;
@@ -11,11 +11,19 @@ export function RunningStatus({ running, stopped }: Props) {
   return (
     <div>
       <div>
-        <Icon icon={Power} mode="success" />
+        <StatsItem
+          value={`${running || '-'} running`}
+          icon={Power}
+          iconClass="icon-success"
+        />
         {`${running || '-'} running`}
       </div>
       <div>
-        <Icon icon={Power} mode="danger" />
+        <StatsItem
+          value={`${stopped || '-'} stopped`}
+          icon={Power}
+          iconClass="icon-danger"
+        />
         {`${stopped || '-'} stopped`}
       </div>
     </div>

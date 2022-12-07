@@ -4,7 +4,7 @@
 
   border-radius: 8px;
   display: inline-flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   gap: 5px;
 }
