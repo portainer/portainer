@@ -643,7 +643,7 @@ input[type='checkbox'] {
   margin-right: -50%;
 }
 
-/*bootbox override*/
+/*bootbox override */
 .modal-open {
   padding-right: 0 !important;
 }
