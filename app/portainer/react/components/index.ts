@@ -34,6 +34,7 @@ import { BadgeIcon } from '@@/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 import { Slider } from '@@/form-components/Slider';
+import { TagButton } from '@@/TagButton';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -44,6 +45,10 @@ export const componentsModule = angular
   .component(
     'tagSelector',
     r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
+  )
+  .component(
+    'tagButton',
+    r2a(TagButton, ['value', 'label', 'title', 'onRemove'])
   )
   .component(
     'portainerTooltip',
