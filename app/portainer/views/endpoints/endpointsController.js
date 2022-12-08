@@ -46,8 +46,6 @@ export class EndpointsController {
         // If the current endpoint was deleted, then clean endpoint store
         if (endpoints.some((e) => e.Id === id)) {
           this.StateManager.cleanEndpoint();
-          // trigger sidebar rerender
-          this.applicationState.endpoint = {};
         }
 
         this.$state.reload();

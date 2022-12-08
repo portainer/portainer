@@ -33,6 +33,13 @@ export function EndpointProvider() {
     if (endpoint && endpoint.Type === EnvironmentType.EdgeAgentOnDocker) {
       state.pingInterval = setInterval(() => ping(endpoint.Id), 60 * 1000);
     }
+
+    if (endpoint === null) {
+      sessionStorage.setItem(
+        'portainer.environmentId',
+        JSON.stringify(undefined)
+      );
+    }
   }
 
   function currentEndpoint() {
