@@ -15,7 +15,7 @@ export type Position = 'top' | 'right' | 'bottom' | 'left';
 
 export interface Props {
   position?: Position;
-  message: string;
+  message: React.ReactNode;
   className?: string;
   children: React.ReactElement;
   heading?: string;
