@@ -59,6 +59,18 @@ export function DeploymentSyncOptions() {
           >
             {({ errors, setFieldValue, values, isValid, dirty }) => (
               <Form className="form-horizontal">
+                <FormSection title="Check-in Intervals">
+                  <EdgeCheckinIntervalField
+                    value={values.EdgeAgentCheckinInterval}
+                    onChange={(value) =>
+                      setFieldValue('EdgeAgentCheckinInterval', value)
+                    }
+                    isDefaultHidden
+                    label="Edge agent default poll frequency"
+                    tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
+                  />
+                </FormSection>
+
                 <FormControl
                   inputId="edge_async_mode"
                   label="Use Async mode by default"
@@ -81,18 +93,6 @@ export function DeploymentSyncOptions() {
                 <TextTip color="orange">
                   Enabling Async disables the tunnel function.
                 </TextTip>
-
-                <FormSection title="Check-in Intervals">
-                  <EdgeCheckinIntervalField
-                    value={values.EdgeAgentCheckinInterval}
-                    onChange={(value) =>
-                      setFieldValue('EdgeAgentCheckinInterval', value)
-                    }
-                    isDefaultHidden
-                    label="Edge agent default poll frequency"
-                    tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
-                  />
-                </FormSection>
 
                 {values.Edge.AsyncMode && (
                   <FormSection title="Async Check-in Intervals">
