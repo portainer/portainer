@@ -58,7 +58,7 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Deploy(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile, forceRereate)
 	return errors.Wrap(err, "failed to deploy a stack")
 }
@@ -78,7 +78,7 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 
 	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
 	return errors.Wrap(err, "failed to remove a stack")
@@ -100,7 +100,7 @@ func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.S
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Pull(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
 	return errors.Wrap(err, "failed to pull images of the stack")
 }
