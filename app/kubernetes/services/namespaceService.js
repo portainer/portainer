@@ -5,7 +5,6 @@ import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
 import { updateNamespaces } from 'Kubernetes/store/namespace';
-import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
@@ -65,10 +64,8 @@ class KubernetesNamespaceService {
 
   async getAllAsync() {
     try {
-      const data = await this.KubernetesNamespaces().get().$promise;
-      const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
-      const namespaces = await $allSettled(promises);
-      const allNamespaces = _.map(namespaces.fulfilled, (item) => {
+      const namespaces = await this.KubernetesNamespaces().get().$promise;
+      const allNamespaces = _.map(namespaces.items, (item) => {
         return KubernetesNamespaceConverter.apiToNamespace(item);
       });
       updateNamespaces(allNamespaces);

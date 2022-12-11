@@ -62,7 +62,7 @@ class KubernetesResourcePoolsController {
 
   async getResourcePoolsAsync() {
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
+      this.resourcePools = await this.KubernetesResourcePoolService.get('', { getQuota: true });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive namespaces');
     }
