@@ -2,9 +2,7 @@ import { useRouter } from '@uirouter/react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
-export enum FeatureFlag {
-  BEUpgrade = 'beUpgrade',
-}
+export enum FeatureFlag {}
 
 export function useFeatureFlag(
   flag: FeatureFlag,

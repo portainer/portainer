@@ -4,9 +4,19 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
 import { buildUrl } from './build-url';
+import { queryKeys } from './query-keys';
+
+export const queryKey = [...queryKeys.base(), 'info'] as const;
+
+export type ContainerPlatform =
+  | 'Docker Standalone'
+  | 'Docker Swarm'
+  | 'Kubernetes'
+  | 'Podman'
+  | 'Nomad';
 
 export interface SystemInfoResponse {
-  platform: string;
+  platform: ContainerPlatform;
   agents: number;
   edgeAgents: number;
   edgeDevices: number;
@@ -14,7 +24,7 @@ export interface SystemInfoResponse {
 
 async function getSystemInfo() {
   try {
-    const { data } = await axios.get<SystemInfoResponse>(buildUrl('system'));
+    const { data } = await axios.get<SystemInfoResponse>(buildUrl('info'));
     return data;
   } catch (error) {
     throw parseAxiosError(error as Error);
@@ -22,7 +32,7 @@ async function getSystemInfo() {
 }
 
 export function useSystemInfo() {
-  return useQuery(['status', 'system'], getSystemInfo, {
+  return useQuery(queryKey, getSystemInfo, {
     ...withError('Unable to retrieve system info'),
   });
 }

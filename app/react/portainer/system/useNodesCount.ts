@@ -4,6 +4,9 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
 import { buildUrl } from './build-url';
+import { queryKeys } from './query-keys';
+
+export const queryKey = [...queryKeys.base(), 'nodes'] as const;
 
 export interface NodesCountResponse {
   nodes: number;
@@ -19,7 +22,7 @@ async function getNodesCount() {
 }
 
 export function useNodesCount() {
-  return useQuery(['status', 'nodes'], getNodesCount, {
+  return useQuery(queryKey, getNodesCount, {
     ...withError('Unable to retrieve nodes count'),
   });
 }

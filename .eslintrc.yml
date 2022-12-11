@@ -105,6 +105,11 @@ overrides:
       'no-await-in-loop': 'off'
       'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
       'regex/invalid': ['error', [{ 'regex': '<Icon icon="(.*)"', 'message': 'Please directly import the `lucide-react` icon instead of using the string' }]]
+    overrides: # allow props spreading for hoc files
+      - files:
+          - app/**/with*.ts{,x}
+        rules:
+          'react/jsx-props-no-spreading': off
   - files:
       - app/**/*.test.*
     extends:

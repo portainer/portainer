@@ -1501,12 +1501,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-const FeatureFlagBEUpgrade = "beUpgrade"
-
 // List of supported features
-var SupportedFeatureFlags = []Feature{
-	FeatureFlagBEUpgrade,
-}
+var SupportedFeatureFlags = []Feature{}
 
 const (
 	_ AuthenticationMethod = iota

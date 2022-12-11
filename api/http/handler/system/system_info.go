@@ -1,4 +1,4 @@
-package status
+package system
 
 import (
 	"net/http"
@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/platform"
+	plf "github.com/portainer/portainer/api/platform"
 )
 
 type systemInfoResponse struct {
@@ -16,17 +17,17 @@ type systemInfoResponse struct {
 	Agents      int                        `json:"agents"`
 }
 
-// @id statusSystem
+// @id systemInfo
 // @summary Retrieve system info
 // @description **Access policy**: authenticated
 // @security ApiKeyAuth
 // @security jwt
-// @tags status
+// @tags system
 // @produce json
 // @success 200 {object} systemInfoResponse "Success"
 // @failure 500 "Server error"
-// @router /status/system [get]
-func (handler *Handler) statusSystem(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// @router /system/info [get]
+func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	environments, err := handler.dataStore.Endpoint().Endpoints()
 	if err != nil {
 		return httperror.InternalServerError("Failed to get environment list", err)
@@ -48,13 +49,17 @@ func (handler *Handler) statusSystem(w http.ResponseWriter, r *http.Request) *ht
 		if environment.IsEdgeDevice {
 			edgeDevices++
 		}
+	}
 
+	platform, err := plf.DetermineContainerPlatform()
+	if err != nil {
+		return httperror.InternalServerError("Unable to determine container platform", err)
 	}
 
 	return response.JSON(w, &systemInfoResponse{
 		EdgeAgents:  edgeAgents,
 		EdgeDevices: edgeDevices,
 		Agents:      agents,
-		Platform:    platform.DetermineContainerPlatform(),
+		Platform:    platform,
 	})
 }
