@@ -63,11 +63,6 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 		return nil, errors.Wrap(err, "aborting pod creation; error waiting for shell pod ready status")
 	}
 
-	if len(shellPod.Spec.Containers) != 1 {
-		kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
-		return nil, fmt.Errorf("incorrect shell pod state, expecting single container to be present")
-	}
-
 	podData := &portainer.KubernetesShellPod{
 		Namespace:        shellPod.Namespace,
 		PodName:          shellPod.Name,
