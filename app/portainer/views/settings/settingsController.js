@@ -174,6 +174,7 @@ angular.module('portainer.app').controller('SettingsController', [
         LogoURL: $scope.formValues.customLogo ? $scope.settings.LogoURL : '',
         EnableTelemetry: $scope.formValues.enableTelemetry,
         TemplatesURL: $scope.settings.TemplatesURL,
+        EdgeAgentCheckinInterval: $scope.settings.EdgeAgentCheckinInterval,
       };
 
       $scope.state.actionInProgress = true;
