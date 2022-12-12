@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge"
-	"golang.org/x/exp/slices"
+	"github.com/portainer/portainer/api/internal/slices"
 )
 
 // @id EdgeJobTasksClear

@@ -10,7 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"golang.org/x/exp/slices"
+	"github.com/portainer/portainer/api/internal/slices"
 
 	"github.com/asaskevich/govalidator"
 )
