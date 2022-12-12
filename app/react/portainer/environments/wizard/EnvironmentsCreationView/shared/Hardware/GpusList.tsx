@@ -1,6 +1,7 @@
 import { array, object, string } from 'yup';
 
 import { r2a } from '@/react-tools/react2angular';
+import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import { InputList } from '@@/form-components/InputList';
 import { ItemProps } from '@@/form-components/InputList/InputList';
@@ -65,4 +66,7 @@ export function gpusListValidation() {
   return array().of(gpuShape).default([]);
 }
 
-export const GpusListAngular = r2a(GpusList, ['value', 'onChange']);
+export const GpusListAngular = r2a(withControlledInput(GpusList), [
+  'value',
+  'onChange',
+]);
