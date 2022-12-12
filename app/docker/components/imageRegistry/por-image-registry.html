@@ -19,7 +19,7 @@
         <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
         <input
           type="text"
-          class="form-control"
+          class="form-control h-9"
           aria-describedby="registry-name"
           uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
           ng-model="$ctrl.model.Image"
