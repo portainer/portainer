@@ -14,6 +14,7 @@ import { useSearchBarState } from '@@/datatables/SearchBar';
 import { useList } from '../queries/list';
 import { EdgeUpdateSchedule, StatusType } from '../types';
 import { useRemoveMutation } from '../queries/useRemoveMutation';
+import { BetaAlert } from '../common/BetaAlert';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
@@ -40,6 +41,8 @@ export function ListView() {
         reload
         breadcrumbs="Update and rollback"
       />
+
+      <BetaAlert />
 
       <Datatable
         dataset={listQuery.data}
