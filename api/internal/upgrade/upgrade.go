@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/cbroglie/mustache"
@@ -111,6 +112,11 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 		return errors.Wrap(err, "failed to create upgrade compose file")
 	}
 
+	projectName := fmt.Sprintf(
+		"portainer-upgrade-%d-%s",
+		timeId,
+		strings.Replace(version, ".", "-", -1))
+
 	err = service.composeDeployer.Deploy(
 		context.Background(),
 		[]string{filePath},
@@ -118,7 +124,7 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 			ForceRecreate:        true,
 			AbortOnContainerExit: true,
 			Options: libstack.Options{
-				ProjectName: fmt.Sprintf("portainer-upgrade-%d-%s", timeId, version),
+				ProjectName: projectName,
 			},
 		},
 	)
