@@ -1,0 +1,7 @@
+go 1.19
+
+use (
+	./api
+	./pkg/libhelm
+	./third_party/digest
+)

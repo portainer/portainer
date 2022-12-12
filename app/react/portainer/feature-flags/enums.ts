@@ -35,4 +35,5 @@ export enum FeatureId {
   CUSTOM_LOGIN_BANNER = 'custom-login-banner',
   ENFORCE_DEPLOYMENT_OPTIONS = 'k8s-enforce-deployment-options',
   K8S_ADM_ONLY_USR_INGRESS_DEPLY = 'k8s-admin-only-ingress-deploy',
+  K8S_ROLLING_RESTART = 'k8s-rolling-restart',
 }

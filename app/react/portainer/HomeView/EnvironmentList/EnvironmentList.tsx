@@ -69,7 +69,6 @@ const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   const { isAdmin } = useUser();
-
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
   >('platformType', []);

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	libstack "github.com/portainer/docker-compose-wrapper"
-	"github.com/portainer/docker-compose-wrapper/compose"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
@@ -25,11 +24,7 @@ type ComposeStackManager struct {
 }
 
 // NewComposeStackManager returns a docker-compose wrapper if corresponding binary present, otherwise nil
-func NewComposeStackManager(binaryPath string, configPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
-	deployer, err := compose.NewComposeDeployer(binaryPath, configPath)
-	if err != nil {
-		return nil, err
-	}
+func NewComposeStackManager(deployer libstack.Deployer, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
 
 	return &ComposeStackManager{
 		deployer:     deployer,
@@ -43,7 +38,7 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 }
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
-func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, forceRereate bool) error {
+func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, forceRecreate bool) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch environment proxy")
@@ -53,13 +48,21 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 		defer proxy.Close()
 	}
 
-	envFile, err := createEnvFile(stack)
+	envFilePath, err := createEnvFile(stack)
 	if err != nil {
 		return errors.Wrap(err, "failed to create env file")
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack, false)
-	err = manager.deployer.Deploy(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile, forceRereate)
+	err = manager.deployer.Deploy(ctx, filePaths, libstack.DeployOptions{
+		Options: libstack.Options{
+			WorkingDir:  stack.ProjectPath,
+			EnvFilePath: envFilePath,
+			Host:        url,
+			ProjectName: stack.Name,
+		},
+		ForceRecreate: forceRecreate,
+	})
 	return errors.Wrap(err, "failed to deploy a stack")
 }
 
@@ -73,14 +76,19 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		defer proxy.Close()
 	}
 
-	envFile, err := createEnvFile(stack)
+	envFilePath, err := createEnvFile(stack)
 	if err != nil {
 		return errors.Wrap(err, "failed to create env file")
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack, false)
 
-	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
+	err = manager.deployer.Remove(ctx, filePaths, libstack.Options{
+		WorkingDir:  stack.ProjectPath,
+		EnvFilePath: envFilePath,
+		Host:        url,
+		ProjectName: stack.Name,
+	})
 	return errors.Wrap(err, "failed to remove a stack")
 }
 
@@ -95,13 +103,18 @@ func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.S
 		defer proxy.Close()
 	}
 
-	envFile, err := createEnvFile(stack)
+	envFilePath, err := createEnvFile(stack)
 	if err != nil {
 		return errors.Wrap(err, "failed to create env file")
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack, false)
-	err = manager.deployer.Pull(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
+	err = manager.deployer.Pull(ctx, filePaths, libstack.Options{
+		WorkingDir:  stack.ProjectPath,
+		EnvFilePath: envFilePath,
+		Host:        url,
+		ProjectName: stack.Name,
+	})
 	return errors.Wrap(err, "failed to pull images of the stack")
 }
 

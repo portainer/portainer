@@ -1,6 +1,8 @@
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-export type UserId = number;
+import { UserId } from './types/user-id';
+
+export { type UserId };
 
 export enum Role {
   Admin = 1,

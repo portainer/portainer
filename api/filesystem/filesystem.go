@@ -489,14 +489,7 @@ func (service *Service) createDirectoryInStore(name string) error {
 func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 	path := service.wrapFileStore(filePath)
 
-	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, r)
-	return err
+	return CreateFile(path, r)
 }
 
 // createBackupFileInStore makes a copy in the file store.
@@ -761,4 +754,16 @@ func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier string
 	}
 
 	return service.wrapFileStore(filePath), nil
+}
+
+func CreateFile(path string, r io.Reader) error {
+	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, r)
+	return err
 }

@@ -1,8 +1,7 @@
 import { useQuery } from 'react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
-
-import { getNodesCount } from '../services/api/status.service';
+import { useNodesCount } from '@/react/portainer/system/useNodesCount';
 
 import { getLicenseInfo } from './license.service';
 import { LicenseInfo, LicenseType } from './types';
@@ -21,22 +20,8 @@ export function useLicenseInfo() {
   return { isLoading, info };
 }
 
-function useNodesCounts() {
-  const { isLoading, data } = useQuery(
-    ['status', 'nodes'],
-    () => getNodesCount(),
-    {
-      onError(error) {
-        notifyError('Failure', error as Error, 'Failed to get nodes count');
-      },
-    }
-  );
-
-  return { nodesCount: data || 0, isLoading };
-}
-
 export function useIntegratedLicenseInfo() {
-  const { isLoading: isLoadingNodes, nodesCount } = useNodesCounts();
+  const { isLoading: isLoadingNodes, data: nodesCount = 0 } = useNodesCount();
 
   const { isLoading: isLoadingLicense, info } = useLicenseInfo();
   if (
