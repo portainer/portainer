@@ -14,8 +14,13 @@ class KubeManifestFormController {
     this.onChangeUseManifestNamespaces = this.onChangeUseManifestNamespaces.bind(this);
   }
 
-  onChangeFormValues(values) {
-    this.formValues = values;
+  onChangeFormValues(newValues) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...newValues,
+      };
+    });
   }
 
   onChangeUseManifestNamespaces(value) {
