@@ -5,7 +5,6 @@ import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/ReactSelect';
 import { TextTip } from '@@/Tip/TextTip';
-import { Link } from '@@/Link';
 
 import { FormValues } from './types';
 
@@ -57,9 +56,7 @@ export function EdgeGroupsField({
         />
       </FormControl>
       <TextTip color="blue">
-        Devices need to be allocated to an Edge group, visit the{' '}
-        <Link to="edge.groups">Edge Groups</Link> page to assign environments
-        and create groups.
+        Select groups of Edge environments to update
       </TextTip>
     </>
   );
