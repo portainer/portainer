@@ -42,11 +42,7 @@ export function SwitchField({
   return (
     <label className={clsx(styles.root, fieldClass)}>
       <span
-        className={clsx(
-          'text-left space-right control-label',
-          styles.label,
-          labelClass
-        )}
+        className={clsx('text-left space-right control-label !p-0', labelClass)}
       >
         {label}
         {tooltip && (
