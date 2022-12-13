@@ -1,6 +1,5 @@
-import { Wifi, WifiOff } from 'lucide-react';
+import { History, Wifi, WifiOff } from 'lucide-react';
 
-import ClockRewind from '@/assets/ico/clock-rewind.svg?c';
 import { Environment } from '@/react/portainer/environments/types';
 import {
   getDashboardRoute,
@@ -11,6 +10,7 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Icon } from '@@/Icon';
 import { LinkButton } from '@@/LinkButton';
 
+type BrowseStatus = 'snapshot' | 'connected' | 'disconnected';
 export function EnvironmentBrowseButtons({
   environment,
   onClickBrowse,
@@ -21,13 +21,13 @@ export function EnvironmentBrowseButtons({
   isActive: boolean;
 }) {
   const isEdgeAsync = checkEdgeAsync(environment);
-
+  const browseStatus = getStatus(isActive, isEdgeAsync);
   return (
     <div className="flex flex-col gap-1 ml-auto [&>*]:flex-1">
       {isBE && (
         <LinkButton
-          icon={ClockRewind}
-          disabled={!isEdgeAsync}
+          icon={History}
+          disabled={!isEdgeAsync || browseStatus === 'snapshot'}
           to="edge.browse.dashboard"
           params={{
             environmentId: environment.Id,
@@ -41,7 +41,7 @@ export function EnvironmentBrowseButtons({
 
       <LinkButton
         icon={Wifi}
-        disabled={isEdgeAsync}
+        disabled={isEdgeAsync || browseStatus === 'connected'}
         to={getDashboardRoute(environment)}
         params={{
           endpointId: environment.Id,
@@ -53,14 +53,59 @@ export function EnvironmentBrowseButtons({
         Live connect
       </LinkButton>
 
-      {!isActive ? (
-        <div className="min-h-[30px] vertical-center justify-center">
-          <Icon icon={WifiOff} />
-          Disconnected
-        </div>
-      ) : (
-        <div className="min-h-[30px]" />
-      )}
+      <BrowseStatusTag status={browseStatus} />
+    </div>
+  );
+}
+
+function getStatus(isActive: boolean, isEdgeAsync: boolean) {
+  if (!isActive) {
+    return 'disconnected';
+  }
+
+  if (isEdgeAsync) {
+    return 'snapshot';
+  }
+
+  return 'connected';
+}
+
+function BrowseStatusTag({ status }: { status: BrowseStatus }) {
+  switch (status) {
+    case 'snapshot':
+      return <Snapshot />;
+    case 'connected':
+      return <Connected />;
+    case 'disconnected':
+      return <Disconnected />;
+    default:
+      return null;
+  }
+}
+
+function Disconnected() {
+  return (
+    <div className="min-h-[30px] vertical-center justify-center opacity-50">
+      <Icon icon={WifiOff} />
+      Disconnected
+    </div>
+  );
+}
+
+function Connected() {
+  return (
+    <div className="min-h-[30px] vertical-center gap-2 justify-center text-green-8 bg-green-3 rounded-lg">
+      <div className="rounded-full h-2 w-2 bg-green-8" />
+      Connected
+    </div>
+  );
+}
+
+function Snapshot() {
+  return (
+    <div className="min-h-[30px] vertical-center gap-2 justify-center text-warning-7 bg-warning-3 rounded-lg">
+      <div className="rounded-full h-2 w-2 bg-warning-7" />
+      Browsing Snapshot
     </div>
   );
 }
