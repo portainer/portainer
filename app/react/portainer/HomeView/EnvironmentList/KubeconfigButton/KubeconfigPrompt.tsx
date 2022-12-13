@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import clsx from 'clsx';
 import { useState } from 'react';
-import { DialogOverlay } from '@reach/dialog';
+import { DialogContent, DialogOverlay } from '@reach/dialog';
 
 import { downloadKubeconfigFile } from '@/react/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
@@ -69,78 +69,83 @@ export function KubeconfigPrompt({
       role="dialog"
       onDismiss={onClose}
     >
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="close" onClick={onClose}>
-              <X />
-            </button>
-            <h5 className="modal-title">Download kubeconfig file</h5>
-          </div>
-          <div className="modal-body">
-            <form className="bootbox-form">
-              <div className="bootbox-prompt-message">
-                <span>
-                  Select the kubernetes environments to add to the kubeconfig
-                  file. You may select across multiple pages.
-                </span>
-                <span className="space-left">{expiryQuery.data}</span>
-              </div>
-            </form>
-            <br />
-            <div className="h-8 flex items-center">
-              <Checkbox
-                id="settings-container-truncate-name"
-                label="Select all (in this page)"
-                checked={isAllPageSelected}
-                onChange={handleSelectAll}
-              />
+      <DialogContent className="p-0 bg-transparent modal-dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button type="button" className="close" onClick={onClose}>
+                <X />
+              </button>
+              <h5 className="modal-title">Download kubeconfig file</h5>
             </div>
-            <div className="datatable">
-              <div className="bootbox-checkbox-list">
-                {environments
-                  .filter((env) => env.Status <= 2)
-                  .map((env) => (
-                    <div
-                      key={env.Id}
-                      className={clsx(
-                        styles.checkbox,
-                        'h-8 flex items-center pt-1'
-                      )}
-                    >
-                      <Checkbox
-                        id={`${env.Id}`}
-                        label={`${env.Name} (${env.URL})`}
-                        checked={selection.includes(env.Id)}
-                        onChange={() =>
-                          toggleSelection(env.Id, !selection.includes(env.Id))
-                        }
-                      />
-                    </div>
-                  ))}
-              </div>
-              <div className="pt-3 flex justify-end w-full">
-                <PaginationControls
-                  showAll={totalCount <= 100}
-                  page={page}
-                  onPageChange={setPage}
-                  pageLimit={pageLimit}
-                  onPageLimitChange={setPageLimit}
-                  totalCount={totalCount}
+            <div className="modal-body">
+              <form className="bootbox-form">
+                <div className="bootbox-prompt-message">
+                  <span>
+                    Select the kubernetes environments to add to the kubeconfig
+                    file. You may select across multiple pages.
+                  </span>
+                  <span className="space-left">{expiryQuery.data}</span>
+                </div>
+              </form>
+              <br />
+              <div className="h-8 flex items-center">
+                <Checkbox
+                  id="settings-container-truncate-name"
+                  label="Select all (in this page)"
+                  checked={isAllPageSelected}
+                  onChange={handleSelectAll}
                 />
               </div>
+              <div className="datatable">
+                <div className="bootbox-checkbox-list">
+                  {environments
+                    .filter((env) => env.Status <= 2)
+                    .map((env) => (
+                      <div
+                        key={env.Id}
+                        className={clsx(
+                          styles.checkbox,
+                          'h-8 flex items-center pt-1'
+                        )}
+                      >
+                        <Checkbox
+                          id={`${env.Id}`}
+                          label={`${env.Name} (${env.URL})`}
+                          checked={selection.includes(env.Id)}
+                          onChange={() =>
+                            toggleSelection(env.Id, !selection.includes(env.Id))
+                          }
+                        />
+                      </div>
+                    ))}
+                </div>
+                <div className="pt-3 flex justify-end w-full">
+                  <PaginationControls
+                    showAll={totalCount <= 100}
+                    page={page}
+                    onPageChange={setPage}
+                    pageLimit={pageLimit}
+                    onPageLimitChange={setPageLimit}
+                    totalCount={totalCount}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <Button onClick={onClose} color="default">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDownload}
+                disabled={selection.length === 0}
+              >
+                Download File
+              </Button>
             </div>
           </div>
-          <div className="modal-footer">
-            <Button onClick={onClose} color="default">
-              Cancel
-            </Button>
-            <Button onClick={handleDownload} disabled={selection.length === 0}>
-              Download File
-            </Button>
-          </div>
         </div>
-      </div>
+      </DialogContent>
     </DialogOverlay>
   );
 

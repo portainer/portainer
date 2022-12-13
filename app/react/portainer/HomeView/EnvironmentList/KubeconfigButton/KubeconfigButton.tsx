@@ -25,7 +25,7 @@ export function KubeconfigButton({
   const [isOpen, setIsOpen] = useState(false);
 
   if (!isKubeconfigButtonVisible(environments)) {
-    return null;
+    //  return null;
   }
 
   return (
