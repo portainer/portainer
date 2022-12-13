@@ -129,9 +129,11 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 		},
 	)
 
+	// optimally, server was restarted by the updater, so we should not reach this point
+
 	if err != nil {
 		return errors.Wrap(err, "failed to deploy upgrade stack")
 	}
 
-	return nil
+	return errors.New("upgrade failed: server should have been restarted by the updater")
 }

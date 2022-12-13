@@ -41,6 +41,7 @@ export function useSystemStatus<T = StatusResponse>({
     select,
     enabled,
     retry,
+    retryDelay: 1000,
     onSuccess,
   });
 }
