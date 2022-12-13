@@ -37,9 +37,15 @@ export function parseViewModel(
     )
   );
 
+  const names = response.Names.map((n) => {
+    const nameWithoutSlash = n[0] === '/' ? response.Names[0].slice(1) : n;
+    return nameWithoutSlash;
+  });
+
   return {
     ...response,
     ResourceControl: resourceControl,
+    Names: names,
     NodeName: nodeName,
     IP: ip,
     StackName: stackName,

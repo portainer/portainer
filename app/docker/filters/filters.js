@@ -110,15 +110,6 @@ angular
       return 'success';
     };
   })
-  .filter('trimcontainername', function () {
-    'use strict';
-    return function (name) {
-      if (name) {
-        return name.indexOf('/') === 0 ? name.replace('/', '') : name;
-      }
-      return '';
-    };
-  })
   .filter('getstatetext', function () {
     'use strict';
     return function (state) {
@@ -161,8 +152,7 @@ angular
   .filter('containername', function () {
     'use strict';
     return function (container) {
-      var name = container.Names[0];
-      return name.substring(1, name.length);
+      return container.Names[0];
     };
   })
   .filter('swarmversion', function () {
@@ -174,7 +164,7 @@ angular
   .filter('swarmhostname', function () {
     'use strict';
     return function (container) {
-      return _.split(container.Names[0], '/')[1];
+      return container.Names[0];
     };
   })
   .filter('repotags', function () {
