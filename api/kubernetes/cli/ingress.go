@@ -150,7 +150,7 @@ func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, 
 }
 
 // CreateIngress creates a new ingress in a given namespace in a k8s endpoint.
-func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInfo) error {
+func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInfo, owner string) error {
 	ingressClient := kcl.cli.NetworkingV1().Ingresses(namespace)
 	var ingress netv1.Ingress
 
@@ -160,6 +160,10 @@ func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInf
 		ingress.Spec.IngressClassName = &info.ClassName
 	}
 	ingress.Annotations = info.Annotations
+	if ingress.Labels == nil {
+		ingress.Labels = make(map[string]string)
+	}
+	ingress.Labels["io.portainer.kubernetes.application.owner"] = owner
 
 	// Store TLS information.
 	var tls []netv1.IngressTLS
