@@ -1,6 +1,9 @@
 import { useMutation } from 'react-query';
 
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  isAxiosError,
+  parseAxiosError,
+} from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
 import { buildUrl } from './build-url';
@@ -15,6 +18,15 @@ async function upgradeEdition({ license }: { license: string }) {
   try {
     await axios.post(buildUrl('upgrade'), { license });
   } catch (error) {
-    throw parseAxiosError(error as Error);
+    if (!isAxiosError(error)) {
+      throw error;
+    }
+
+    // if error is because the server disconnected, then everything went well
+    if (!error.response || !error.response.status) {
+      return;
+    }
+
+    throw parseAxiosError(error);
   }
 }
