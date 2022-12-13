@@ -393,6 +393,10 @@ input:checked + .slider:before {
   border: 1px solid var(--border-pagination-color);
 }
 
+.paginationControls > form {
+  @apply inline-flex items-center;
+}
+
 .pagination li button {
   color: var(--ui-gray-9) !important;
 }
