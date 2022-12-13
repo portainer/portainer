@@ -108,12 +108,13 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.TokenIssueAt = time.Now().Unix()
 	}
 
-	if payload.Role != 0 {
-		user.Role = portainer.UserRole(payload.Role)
-	}
-
 	if payload.UserTheme != "" {
 		user.UserTheme = payload.UserTheme
+	}
+
+	if payload.Role != 0 {
+		user.Role = portainer.UserRole(payload.Role)
+		user.TokenIssueAt = time.Now().Unix()
 	}
 
 	err = handler.DataStore.User().UpdateUser(user.ID, user)
