@@ -208,7 +208,7 @@ function shell_download_docker_compose_binary(platform, arch) {
   var binaryVersion = '<%= binaries.dockerComposePluginVersion %>';
 
   return `
-    if [ -f dist/docker-compose.plugin ] || [ -f dist/docker-compose.plugin.exe ]; then
+    if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ]; then
     echo "docker compose binary exists";
     else
       build/download_docker_compose_binary.sh ${platform} ${arch} ${binaryVersion};
