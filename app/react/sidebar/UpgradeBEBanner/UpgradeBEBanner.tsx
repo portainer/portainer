@@ -50,14 +50,14 @@ function UpgradeBEBanner() {
   };
 
   if (!enabledPlatforms.includes(systemInfo.platform)) {
-    return null;
+    // return null;
   }
 
   return (
     <>
       <button
         type="button"
-        className="border-0 bg-warning-5 text-warning-9 w-full min-h-[48px] h-12 font-semibold flex justify-center items-center gap-3"
+        className="border-0 bg-warning-5 text-warning-9 w-full py-2 font-semibold flex justify-center items-center gap-3"
         onClick={handleClick}
       >
         {isSidebarOpen && <>Upgrade to Business Edition</>}
