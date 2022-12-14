@@ -50,7 +50,7 @@ function UpgradeBEBanner() {
   };
 
   if (!enabledPlatforms.includes(systemInfo.platform)) {
-    // return null;
+    return null;
   }
 
   return (
