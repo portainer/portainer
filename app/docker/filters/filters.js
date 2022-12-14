@@ -110,6 +110,15 @@ angular
       return 'success';
     };
   })
+  .filter('trimcontainername', function () {
+    'use strict';
+    return function (name) {
+      if (name) {
+        return name.indexOf('/') === 0 ? name.slice(1) : name;
+      }
+      return '';
+    };
+  })
   .filter('getstatetext', function () {
     'use strict';
     return function (state) {
