@@ -2,6 +2,8 @@ import _ from 'lodash-es';
 import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
 import { EdgeTypes } from '@/react/portainer/environments/types';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { getTags } from '@/portainer/tags/tags.service';
+import { notifyError } from '@/portainer/services/notifications';
 
 export class EdgeGroupFormController {
   /* @ngInject */
@@ -18,6 +20,8 @@ export class EdgeGroupFormController {
       },
       value: null,
     };
+
+    this.tags = [];
 
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
@@ -87,5 +91,19 @@ export class EdgeGroupFormController {
     const totalCount = parseInt(response.totalCount, 10);
     this.endpoints.value = response.value;
     this.endpoints.state.totalCount = totalCount;
+  }
+
+  getTags() {
+    return this.$async(async () => {
+      try {
+        this.tags = await getTags();
+      } catch (err) {
+        notifyError('Failure', err, 'Unable to retrieve tags');
+      }
+    });
+  }
+
+  $onInit() {
+    this.getTags();
   }
 }
