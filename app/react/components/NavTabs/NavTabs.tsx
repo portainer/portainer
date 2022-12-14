@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import styles from './NavTabs.module.css';
 
 export interface Option<T extends string | number = string> {
-  label: string | ReactNode;
+  label: ReactNode;
   children?: ReactNode;
   id: T;
 }

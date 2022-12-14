@@ -1,5 +1,5 @@
 import { ComponentProps } from 'react';
-import { Server } from 'react-feather';
+import { HeartPulse, Server } from 'lucide-react';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
@@ -31,7 +31,7 @@ export function HealthStatus({ health }: Props) {
             <DetailsTable.Row label="Status">
               <div className="vertical-center">
                 <Icon
-                  icon="fa fa-heartbeat"
+                  icon={HeartPulse}
                   mode={StatusMode[health.Status]}
                   className="space-right"
                 />

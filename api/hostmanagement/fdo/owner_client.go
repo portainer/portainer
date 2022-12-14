@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rkl-/digest"
+	"github.com/portainer/portainer/third_party/digest"
 )
 
 type FDOOwnerClient struct {

@@ -1,4 +1,4 @@
-import { Box, Edit, Layers, Lock, Server } from 'react-feather';
+import { Box, Edit, Layers, Lock, Server } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Authorized } from '@/react/hooks/useUser';

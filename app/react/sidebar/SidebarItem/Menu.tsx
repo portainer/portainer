@@ -6,7 +6,7 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { ChevronDown, ChevronUp } from 'react-feather';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useSidebarState } from '../useSidebarState';
 
@@ -32,6 +32,10 @@ export function Menu({
   const { isOpen, toggleOpen } = useIsOpen(isSidebarOpen, paths);
 
   const CollapseButtonIcon = isOpen ? ChevronUp : ChevronDown;
+
+  if (!isSidebarOpen) {
+    return head as JSX.Element;
+  }
 
   return (
     <div className="flex-1">

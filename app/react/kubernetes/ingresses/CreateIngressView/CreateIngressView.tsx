@@ -6,7 +6,8 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useServices } from '@/react/kubernetes/networks/services/queries';
-import { notifySuccess } from '@/portainer/services/notifications';
+import { notifySuccess, notifyError } from '@/portainer/services/notifications';
+import { useAuthorizations } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
 import { PageHeader } from '@@/PageHeader';
@@ -35,9 +36,19 @@ import {
 export function CreateIngressView() {
   const environmentId = useEnvironmentId();
   const { params } = useCurrentStateAndParams();
+  const isAuthorisedToAddEdit = useAuthorizations(['K8sIngressesW']);
 
   const router = useRouter();
   const isEdit = !!params.namespace;
+
+  useEffect(() => {
+    if (!isAuthorisedToAddEdit) {
+      const message = `Not authorized to ${isEdit ? 'edit' : 'add'} ingresses`;
+      notifyError('Error', new Error(message));
+      router.stateService.go('kubernetes.ingresses');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthorisedToAddEdit, isEdit]);
 
   const [namespace, setNamespace] = useState<string>(params.namespace || '');
   const [ingressRule, setIngressRule] = useState<Rule>({} as Rule);

@@ -1,8 +1,8 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer, useState } from 'react';
 import { object, SchemaOf, string } from 'yup';
+import { Network, Plug2 } from 'lucide-react';
 
-import { buildOption } from '@/portainer/components/BoxSelector';
 import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
@@ -11,8 +11,8 @@ import { EnvironmentMetadata } from '@/react/portainer/environments/environment.
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
-import { BoxSelector } from '@@/BoxSelector';
-import { Icon } from '@@/Icon';
+import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 import { NameField, useNameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
@@ -38,7 +38,15 @@ const initialValues: FormValues = {
   },
 };
 
-const options = [buildOption('api', 'svg-api', 'API', '', 'api')];
+const options: Array<BoxSelectorOption<'api'>> = [
+  {
+    description: '',
+    icon: <BadgeIcon icon={Network} size="3xl" />,
+    id: 'api',
+    label: 'API',
+    value: 'api',
+  },
+];
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
@@ -122,11 +130,8 @@ export function WizardAzure({ onCreate }: Props) {
                   loadingText="Connecting environment..."
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
+                  icon={Plug2}
                 >
-                  <Icon
-                    icon="svg-plug"
-                    className="icon icon-sm vertical-center"
-                  />{' '}
                   Connect
                 </LoadingButton>
               </div>

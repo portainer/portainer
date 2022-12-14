@@ -1,42 +1,27 @@
-import { StatusVersionViewModel, StatusViewModel } from '../../models/status';
+import { getSystemStatus } from '@/react/portainer/system/useSystemStatus';
+import { StatusViewModel } from '../../models/status';
 
-angular.module('portainer.app').factory('StatusService', [
-  '$q',
-  'Status',
-  function StatusServiceFactory($q, Status) {
-    'use strict';
-    var service = {};
+angular.module('portainer.app').factory('StatusService', StatusServiceFactory);
 
-    service.status = function () {
-      var deferred = $q.defer();
+/* @ngInject */
+function StatusServiceFactory($q) {
+  'use strict';
+  var service = {};
 
-      Status.get()
-        .$promise.then(function success(data) {
-          var status = new StatusViewModel(data);
-          deferred.resolve(status);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve application status', err: err });
-        });
+  service.status = function () {
+    var deferred = $q.defer();
 
-      return deferred.promise;
-    };
+    getSystemStatus()
+      .then(function success(data) {
+        var status = new StatusViewModel(data);
+        deferred.resolve(status);
+      })
+      .catch(function error(err) {
+        deferred.reject({ msg: 'Unable to retrieve application status', err: err });
+      });
 
-    service.version = function () {
-      var deferred = $q.defer();
+    return deferred.promise;
+  };
 
-      Status.version()
-        .$promise.then(function success(data) {
-          var status = new StatusVersionViewModel(data);
-          deferred.resolve(status);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve application version info', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    return service;
-  },
-]);
+  return service;
+}

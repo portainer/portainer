@@ -4,12 +4,12 @@
       <div class="toolBar show-dropdown">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -31,7 +31,7 @@
               ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
               data-cy="image-removeImageButton"
             >
-              <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+              <pr-icon icon="'trash-2'"></pr-icon>Remove
             </button>
             <button
               type="button"
@@ -58,7 +58,7 @@
               ng-disabled="$ctrl.exportInProgress"
               data-cy="image-importImageButton"
             >
-              <pr-icon icon="'upload'" feather="true"></pr-icon>Import
+              <pr-icon icon="'upload'"></pr-icon>Import
             </button>
             <button
               type="button"
@@ -69,7 +69,7 @@
               authorization="DockerImageGet"
               data-cy="image-exportImageButton"
             >
-              <pr-icon icon="'download'" feather="true"></pr-icon>
+              <pr-icon icon="'download'"></pr-icon>
               <span ng-hide="$ctrl.exportInProgress">Export</span>
               <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
             </button>
@@ -82,13 +82,13 @@
             authorization="DockerImageBuild"
             data-cy="image-buildImageButton"
           >
-            <pr-icon icon="'plus'" feather="true"></pr-icon>Build a new image
+            <pr-icon icon="'plus'"></pr-icon>Build a new image
           </button>
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle aria-label="Settings">
-              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+              <pr-icon icon="'more-vertical'"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -109,7 +109,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -142,8 +142,14 @@
                 </div>
 
                 <div>
-                  <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
-                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
+                  <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled"
+                    >Filter
+                    <pr-icon icon="'filter'"></pr-icon>
+                  </span>
+                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled"
+                    >Filter
+                    <pr-icon icon="'check'"></pr-icon>
+                  </span>
                 </div>
                 <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">

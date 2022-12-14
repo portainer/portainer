@@ -44,7 +44,10 @@ function renderComponent(
   return renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
       <EnvironmentItem
-        onClick={() => {}}
+        onSelect={jest.fn()}
+        isSelected={false}
+        isActive={false}
+        onClickBrowse={() => {}}
         environment={env}
         groupName={group.Name}
       />

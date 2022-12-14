@@ -1,5 +1,5 @@
 import { CellProps, Column } from 'react-table';
-import { User as UserIcon, UserPlus, UserX } from 'react-feather';
+import { User as UserIcon, UserPlus, UserX } from 'lucide-react';
 
 import { User } from '@/portainer/users/types';
 import { useUser as useCurrentUser } from '@/react/hooks/useUser';
@@ -65,11 +65,7 @@ interface LeaderCellProps {
 function LeaderCell({ isAdmin, onClick, disabled }: LeaderCellProps) {
   return (
     <div className="flex items-center">
-      <Icon
-        className="space-right feather"
-        icon={UserPlus}
-        mode="secondary-alt"
-      />
+      <Icon className="space-right" icon={UserPlus} mode="secondary-alt" />
 
       {isAdmin && (
         <Button
@@ -94,11 +90,7 @@ interface MemberCellProps {
 function MemberCell({ onClick, disabled }: MemberCellProps) {
   return (
     <div className="flex items-center">
-      <Icon
-        className="space-right feather"
-        icon={UserIcon}
-        mode="secondary-alt"
-      />
+      <Icon className="space-right" icon={UserIcon} mode="secondary-alt" />
       <Button
         color="link"
         className="nopadding"

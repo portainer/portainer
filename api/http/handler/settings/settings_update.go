@@ -7,13 +7,13 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/pkg/libhelm"
 )
 
 type settingsUpdatePayload struct {
@@ -32,6 +32,8 @@ type settingsUpdatePayload struct {
 	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
 	// The default check in interval for edge agent (in seconds)
 	EdgeAgentCheckinInterval *int `example:"5"`
+	// Show the Kompose build option (discontinued in 2.18)
+	ShowKomposeBuildOption *bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures *bool `example:"true"`
 	// The duration of a user session
@@ -129,6 +131,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.TemplatesURL != nil {
 		settings.TemplatesURL = *payload.TemplatesURL
+	}
+
+	if payload.ShowKomposeBuildOption != nil {
+		settings.ShowKomposeBuildOption = *payload.ShowKomposeBuildOption
 	}
 
 	if payload.HelmRepositoryURL != nil {

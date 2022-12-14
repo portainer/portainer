@@ -25,7 +25,7 @@ async function create(schedule: FormValues) {
 export function useCreateMutation() {
   const queryClient = useQueryClient();
   return useMutation(create, {
-    ...withInvalidate(queryClient, [queryKeys.list()]),
+    ...withInvalidate(queryClient, [queryKeys.base()]),
     ...withError(),
   });
 }

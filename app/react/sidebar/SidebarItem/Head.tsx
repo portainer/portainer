@@ -5,10 +5,11 @@ import {
 } from '@uirouter/react';
 import clsx from 'clsx';
 import { ComponentProps } from 'react';
-import ReactTooltip from 'react-tooltip';
+import Tippy from '@tippyjs/react';
 
 import { AutomationTestingProps } from '@/types';
 
+import 'tippy.js/dist/tippy.css';
 import { Link } from '@@/Link';
 import { IconProps, Icon } from '@@/Icon';
 
@@ -40,7 +41,7 @@ export function Head({
     ignorePaths
   );
 
-  return (
+  const anchor = (
     <a
       href={anchorProps.href}
       onClick={anchorProps.onClick}
@@ -54,23 +55,29 @@ export function Head({
           'justify-center w-8': !isOpen,
         }
       )}
-      data-tip={label}
       data-cy={dataCy}
     >
-      {!!icon && (
-        <Icon icon={icon} feather className={clsx('flex [&>svg]:w-4')} />
-      )}
+      {!!icon && <Icon icon={icon} className={clsx('flex [&>svg]:w-4')} />}
       {isOpen && <span>{label}</span>}
-
-      <ReactTooltip
-        type="info"
-        place="right"
-        effect="solid"
-        className="!opacity-100 bg-blue-9 be:bg-gray-9 !rounded-md !py-1 !px-2"
-        arrowColor="transparent"
-        disable={isOpen}
-      />
     </a>
+  );
+
+  if (isOpen) return anchor;
+
+  return (
+    <Tippy
+      className="!opacity-100 bg-blue-9 be:bg-gray-9 th-dark:bg-gray-true-9 !rounded-md !py-2 !px-3"
+      content={label}
+      delay={[0, 0]}
+      duration={[0, 0]}
+      zIndex={1000}
+      placement="right"
+      arrow
+      allowHTML
+      interactive
+    >
+      {anchor}
+    </Tippy>
   );
 }
 

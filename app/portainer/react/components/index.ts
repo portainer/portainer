@@ -34,6 +34,7 @@ import { BadgeIcon } from '@@/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 import { Slider } from '@@/form-components/Slider';
+import { TagButton } from '@@/TagButton';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -46,8 +47,12 @@ export const componentsModule = angular
     r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
   )
   .component(
+    'tagButton',
+    r2a(TagButton, ['value', 'label', 'title', 'onRemove'])
+  )
+  .component(
     'portainerTooltip',
-    r2a(Tooltip, ['message', 'position', 'className'])
+    r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage'])
   )
   .component('badge', r2a(Badge, ['type', 'className']))
   .component('fileUploadField', fileUploadField)
@@ -83,29 +88,19 @@ export const componentsModule = angular
   )
   .component(
     'fallbackImage',
-    r2a(FallbackImage, [
-      'src',
-      'fallbackIcon',
-      'alt',
-      'size',
-      'className',
-      'feather',
-    ])
+    r2a(FallbackImage, ['src', 'fallbackIcon', 'alt', 'size', 'className'])
   )
-  .component(
-    'prIcon',
-    r2a(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
-  )
+  .component('prIcon', r2a(Icon, ['className', 'icon', 'mode', 'size']))
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
   .component(
     'dashboardItem',
-    r2a(DashboardItem, ['featherIcon', 'icon', 'type', 'value', 'children'])
+    r2a(DashboardItem, ['icon', 'type', 'value', 'children'])
   )
   .component(
     'datatableSearchbar',
     r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
   )
-  .component('badgeIcon', r2a(BadgeIcon, ['featherIcon', 'icon', 'size']))
+  .component('badgeIcon', r2a(BadgeIcon, ['icon', 'size']))
   .component(
     'accessControlPanel',
     r2a(withUIRouter(withReactQuery(withCurrentUser(AccessControlPanel))), [

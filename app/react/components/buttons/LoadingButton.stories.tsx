@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/react';
+import { Download } from 'lucide-react';
 
 import { LoadingButton } from './LoadingButton';
 
@@ -14,8 +15,12 @@ interface Args {
 
 function Template({ loadingText, isLoading }: Args) {
   return (
-    <LoadingButton loadingText={loadingText} isLoading={isLoading}>
-      <i className="fa fa-download" aria-hidden="true" /> Download
+    <LoadingButton
+      loadingText={loadingText}
+      isLoading={isLoading}
+      icon={Download}
+    >
+      Download
     </LoadingButton>
   );
 }
@@ -29,8 +34,8 @@ export const Example = Template.bind({});
 
 export function IsLoading() {
   return (
-    <LoadingButton loadingText="loading" isLoading>
-      <i className="fa fa-download" aria-hidden="true" /> Download
+    <LoadingButton loadingText="loading" isLoading icon={Download}>
+      Download
     </LoadingButton>
   );
 }

@@ -10,7 +10,7 @@
         Port mappings
       </div>
       <div class="searchBar vertical-center !mr-0 min-w-[300px]">
-        <pr-icon icon="'search'" feather="true" class-name="'icon !h-3'"></pr-icon>
+        <pr-icon icon="'search'" class-name="'icon !h-3'"></pr-icon>
         <input
           type="text"
           class="searchInput"
@@ -25,7 +25,7 @@
       <div data-cy="k8sApp-portTableSettings" class="settings">
         <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
           <span uib-dropdown-toggle aria-label="Settings">
-            <pr-icon icon="'more-vertical'" feather="true" class-name="'icon !mr-0 !h-4'"></pr-icon>
+            <pr-icon icon="'more-vertical'" class-name="'icon !mr-0 !h-4'"></pr-icon>
           </span>
           <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
             <div class="tableMenu">
@@ -62,7 +62,7 @@
                       <option value="300">5min</option>
                     </select>
                     <span>
-                      <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                      <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                     </span>
                   </div>
                 </div>
@@ -78,7 +78,7 @@
     <!-- info text -->
     <div class="flex flex-row w-full">
       <span class="small text-muted mt-1 vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+        <pr-icon icon="'info'" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
     </div>
@@ -90,8 +90,8 @@
         <tr>
           <th>
             <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()" class="flex no-wrap min-w-max">
-              <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
-              <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
+              <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" class-name="'icon'"></pr-icon>
+              <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" class-name="'icon'"></pr-icon>
             </div>
           </th>
           <th>
@@ -141,8 +141,8 @@
           <!-- expandable -->
           <td>
             <div ng-if="$ctrl.itemCanExpand(item)">
-              <pr-icon ng-if="item.Expanded" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
-              <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
+              <pr-icon ng-if="item.Expanded" icon="'chevron-down'" class-name="'icon'"></pr-icon>
+              <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" class-name="'icon'"></pr-icon>
             </div>
           </td>
           <!-- Application -->
@@ -155,23 +155,23 @@
           <td>
             <!-- LB -->
             <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.LOAD_BALANCER">
-              <span><pr-icon icon="'share-2'" feather="true" class-name="'icon'"></pr-icon> LoadBalancer </span>
+              <span><pr-icon icon="'share-2'" class-name="'icon'"></pr-icon> LoadBalancer </span>
               <span class="text-muted small ml-5">
                 <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
                 <span ng-if="!item.LoadBalancerIPAddress">pending</span>
               </span>
             </span>
             <!-- Internal -->
-            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP"> <pr-icon icon="'list'" feather="true"></pr-icon> ClusterIP </span>
+            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP"> <pr-icon icon="'list'"></pr-icon> ClusterIP </span>
             <!-- Cluster -->
-            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <pr-icon icon="'list'" feather="true" class-name="'icon'"></pr-icon> NodePort </span>
+            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <pr-icon icon="'list'" class-name="'icon'"></pr-icon> NodePort </span>
           </td>
           <!-- Exposed port -->
           <td>
             <span ng-if="!$ctrl.itemCanExpand(item)">
               {{ item.Ports[0].Port }}
               <a class="vertical-center" ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ item.Ports[0].Port }}" target="_blank" class="ml-1">
-                <pr-icon icon="'external-link'" feather="true" class-name="'icon'"></pr-icon> access
+                <pr-icon icon="'external-link'" class-name="'icon'"></pr-icon> access
               </a>
             </span>
           </td>
@@ -210,7 +210,7 @@
           <td ng-if="!$ctrl.portHasIngressRules(port)">
             {{ port.Port }}
             <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.Port }}" target="_blank" class="ml-1">
-              <pr-icon icon="'external-link'" feather="true"></pr-icon> access
+              <pr-icon icon="'external-link'"></pr-icon> access
             </a>
           </td>
           <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.TargetPort }}/{{ port.Protocol }}</td>
@@ -228,7 +228,7 @@
           <td>
             {{ port.Port }}
             <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.Port }}" target="_blank" class="ml-1">
-              <pr-icon icon="'external-link'" feather="true"></pr-icon>access
+              <pr-icon icon="'external-link'"></pr-icon>access
             </a>
           </td>
           <td>{{ port.TargetPort }}/{{ port.Protocol }}</td>

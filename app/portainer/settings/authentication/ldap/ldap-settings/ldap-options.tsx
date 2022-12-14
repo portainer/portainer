@@ -1,4 +1,4 @@
-import { Edit } from 'react-feather';
+import { Edit } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Openldap from '@/assets/ico/vendor/openldap.svg?c';

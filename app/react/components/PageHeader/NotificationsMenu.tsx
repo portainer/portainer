@@ -9,6 +9,7 @@ import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
+import { AlertCircle, Bell, CheckCircle, Trash2 } from 'lucide-react';
 
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/react/hooks/useUser';
@@ -69,7 +70,7 @@ export function NotificationsMenu() {
             'th-dark:text-gray-warm-7'
           )}
         >
-          <Icon icon="bell" feather />
+          <Icon icon={Bell} />
           <span className={badge ? notificationStyles.badge : ''} />
         </div>
       </MenuButton>
@@ -126,7 +127,7 @@ export function NotificationsMenu() {
           </>
         ) : (
           <div className="flex flex-col items-center">
-            <Icon icon="bell" feather size="xl" />
+            <Icon icon={Bell} size="xl" />
             <p className="my-5">You have no notifications yet.</p>
           </div>
         )}
@@ -160,9 +161,9 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
       <div className={notificationStyles.container}>
         <div className={notificationStyles.notificationIcon}>
           {notification.type === 'success' ? (
-            <Icon icon="check-circle" feather size="lg" mode="success" />
+            <Icon icon={CheckCircle} size="lg" mode="success" />
           ) : (
-            <Icon icon="alert-circle" feather size="lg" mode="danger" />
+            <Icon icon={AlertCircle} size="lg" mode="danger" />
           )}
         </div>
         <div className={notificationStyles.notificationBody}>
@@ -186,9 +187,8 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
             }}
             data-cy="notification-deleteButton"
             size="large"
-          >
-            <Icon icon="trash-2" feather />
-          </Button>
+            icon={Trash2}
+          />
         </div>
       </div>
     </ReachMenuLink>

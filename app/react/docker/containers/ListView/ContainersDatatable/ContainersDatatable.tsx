@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useStore } from 'zustand';
-import { Box } from 'react-feather';
+import { Box } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';

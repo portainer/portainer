@@ -44,13 +44,10 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 		}
 
-		tagIdx := findTagIndex(endpoint.TagIDs, tagID)
-		if tagIdx != -1 {
-			endpoint.TagIDs = removeElement(endpoint.TagIDs, tagIdx)
-			err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-			if err != nil {
-				return httperror.InternalServerError("Unable to update environment", err)
-			}
+		endpoint.TagIDs = removeElement(endpoint.TagIDs, tagID)
+		err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+		if err != nil {
+			return httperror.InternalServerError("Unable to update environment", err)
 		}
 	}
 
@@ -60,13 +57,10 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 			return httperror.InternalServerError("Unable to retrieve environment group from the database", err)
 		}
 
-		tagIdx := findTagIndex(endpointGroup.TagIDs, tagID)
-		if tagIdx != -1 {
-			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
-			err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
-			if err != nil {
-				return httperror.InternalServerError("Unable to update environment group", err)
-			}
+		endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagID)
+		err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+		if err != nil {
+			return httperror.InternalServerError("Unable to update environment group", err)
 		}
 	}
 
@@ -94,15 +88,12 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
-	for idx := range edgeGroups {
-		edgeGroup := &edgeGroups[idx]
-		tagIdx := findTagIndex(edgeGroup.TagIDs, tagID)
-		if tagIdx != -1 {
-			edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagIdx)
-			err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
-			if err != nil {
-				return httperror.InternalServerError("Unable to update environment group", err)
-			}
+	for _, edgeGroup := range edgeGroups {
+		err = handler.DataStore.EdgeGroup().UpdateEdgeGroupFunc(edgeGroup.ID, func(g *portainer.EdgeGroup) {
+			g.TagIDs = removeElement(g.TagIDs, tagID)
+		})
+		if err != nil {
+			return httperror.InternalServerError("Unable to update edge group", err)
 		}
 	}
 
@@ -135,20 +126,14 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
 }
 
-func findTagIndex(tags []portainer.TagID, searchTagID portainer.TagID) int {
-	for idx, tagID := range tags {
-		if searchTagID == tagID {
-			return idx
+func removeElement(slice []portainer.TagID, elem portainer.TagID) []portainer.TagID {
+	for i, id := range slice {
+		if id == elem {
+			slice[i] = slice[len(slice)-1]
+
+			return slice[:len(slice)-1]
 		}
 	}
-	return -1
-}
 
-func removeElement(arr []portainer.TagID, index int) []portainer.TagID {
-	if index < 0 {
-		return arr
-	}
-	lastTagIdx := len(arr) - 1
-	arr[index] = arr[lastTagIdx]
-	return arr[:lastTagIdx]
+	return slice
 }

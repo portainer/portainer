@@ -11,7 +11,7 @@
         <rd-widget-body>
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0">
-              <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> Deploy </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
               <div class="col-sm-12 form-section-title"> Namespace </div>
               <form class="form-horizontal mt-3" name="deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
@@ -42,7 +42,7 @@
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
                   <div class="col-sm-12 small text-warning">
-                    <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                     You do not have access to any namespace. Contact your administrator to get access to a namespace.
                   </div>
                 </div>
@@ -118,7 +118,7 @@
                     <editor-description>
                       <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
                         <p class="vertical-center">
-                          <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                          <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                           <span>
                             Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary
                             that not all the Compose format options are supported by Kompose at the moment.
@@ -131,7 +131,7 @@
                       </span>
                       <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
                         <p class="vertical-center">
-                          <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                          <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                           This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                         </p>
                         <p>
@@ -192,7 +192,7 @@
             </uib-tab>
 
             <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
-              <uib-tab-heading> <pr-icon icon="'file-text'" feather="true"></pr-icon> Logs </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'file-text'"></pr-icon> Logs </uib-tab-heading>
               <form class="form-horizontal mt-3">
                 <div class="form-group" ng-if="ctrl.state.activeTab === 1">
                   <div class="col-sm-12">

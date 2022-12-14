@@ -1,12 +1,10 @@
 import { Column } from 'react-table';
 
-import { isoDateFromTimestamp } from '@/portainer/filters/filters';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
 
-import { EdgeUpdateSchedule } from '../../types';
-
-export const scheduledTime: Column<EdgeUpdateSchedule> = {
+export const scheduledTime: Column<EdgeUpdateListItemResponse> = {
   Header: 'Scheduled Time & Date',
-  accessor: (row) => isoDateFromTimestamp(row.time),
+  accessor: (row) => row.scheduledTime,
   disableFilters: true,
   Filter: () => null,
   canHide: false,

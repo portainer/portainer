@@ -1,37 +1,40 @@
-import ReactTooltip from 'react-tooltip';
-import { HelpCircle } from 'react-feather';
-import clsx from 'clsx';
-import _ from 'lodash';
+import { HelpCircle } from 'lucide-react';
+import { useMemo } from 'react';
+import sanitize from 'sanitize-html';
 
-import styles from './Tooltip.module.css';
-
-type Position = 'top' | 'right' | 'bottom' | 'left';
+import { TooltipWithChildren, Position } from '../TooltipWithChildren';
 
 export interface Props {
   position?: Position;
   message: string;
   className?: string;
+  setHtmlMessage?: boolean;
 }
 
-export function Tooltip({ message, position = 'bottom', className }: Props) {
-  const id = _.uniqueId('tooltip-');
+export function Tooltip({
+  message,
+  position = 'bottom',
+  className,
+  setHtmlMessage,
+}: Props) {
+  // allow angular views to set html messages for the tooltip
+  const htmlMessage = useMemo(() => {
+    if (setHtmlMessage) {
+      // eslint-disable-next-line react/no-danger
+      return <div dangerouslySetInnerHTML={{ __html: sanitize(message) }} />;
+    }
+    return null;
+  }, [setHtmlMessage, message]);
 
   return (
-    <span
-      data-tip={message}
-      data-for={id}
-      className={clsx(styles.icon, 'inline-flex text-base')}
+    <TooltipWithChildren
+      message={htmlMessage || message}
+      position={position}
+      className={className}
     >
-      <HelpCircle className="feather" aria-hidden="true" />
-      <ReactTooltip
-        id={id}
-        multiline
-        type="info"
-        place={position}
-        effect="solid"
-        className={clsx(styles.tooltip, className)}
-        arrowColor="transparent"
-      />
-    </span>
+      <span className="inline-flex text-base">
+        <HelpCircle className="lucide ml-1" aria-hidden="true" />
+      </span>
+    </TooltipWithChildren>
   );
 }

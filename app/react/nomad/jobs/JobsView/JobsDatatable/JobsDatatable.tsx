@@ -1,5 +1,5 @@
 import { useStore } from 'zustand';
-import { Clock } from 'react-feather';
+import { Clock } from 'lucide-react';
 
 import { Job } from '@/react/nomad/types';
 

@@ -99,12 +99,17 @@ overrides:
       '@typescript-eslint/explicit-module-boundary-types': off
       '@typescript-eslint/no-unused-vars': 'error'
       '@typescript-eslint/no-explicit-any': 'error'
-      'jsx-a11y/label-has-associated-control': ['error', { 'assert': 'either' }]
+      'jsx-a11y/label-has-associated-control': ['error', { 'assert': 'either', controlComponents: ['Input', 'Checkbox'] }]
       'react/function-component-definition': ['error', { 'namedComponents': 'function-declaration' }]
       'react/jsx-no-bind': off
       'no-await-in-loop': 'off'
       'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
-      'regex/invalid': ['error', [{ 'regex': 'data-feather="(.*)"', 'message': 'Please use `react-feather` package instead' }]]
+      'regex/invalid': ['error', [{ 'regex': '<Icon icon="(.*)"', 'message': 'Please directly import the `lucide-react` icon instead of using the string' }]]
+    overrides: # allow props spreading for hoc files
+      - files:
+          - app/**/with*.ts{,x}
+        rules:
+          'react/jsx-props-no-spreading': off
   - files:
       - app/**/*.test.*
     extends:

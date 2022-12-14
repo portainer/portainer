@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'react-feather';
+import { Eye, EyeOff } from 'lucide-react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';

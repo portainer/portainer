@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Database } from 'react-feather';
+import { AlertTriangle, Database } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import { confirmWarn } from '@/portainer/services/modal.service/confirm';
@@ -150,7 +150,7 @@ export function IngressClassDatatable({
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
             <span className="flex items-center text-warning mt-1">
-              <Icon icon="alert-triangle" feather className="!mr-1" />
+              <Icon icon={AlertTriangle} className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
             </span>
           )}

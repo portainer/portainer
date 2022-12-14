@@ -1,3 +1,7 @@
+import { Power } from 'lucide-react';
+
+import { StatsItem } from '@@/StatsItem';
+
 interface Props {
   running: number;
   stopped: number;
@@ -7,16 +11,18 @@ export function RunningStatus({ running, stopped }: Props) {
   return (
     <div>
       <div>
-        <i
-          className="fa fa-power-off green-icon space-right"
-          aria-hidden="true"
+        <StatsItem
+          value={`${running || '-'} running`}
+          icon={Power}
+          iconClass="icon-success"
         />
         {`${running || '-'} running`}
       </div>
       <div>
-        <i
-          className="fa fa-power-off red-icon space-right"
-          aria-hidden="true"
+        <StatsItem
+          value={`${stopped || '-'} stopped`}
+          icon={Power}
+          iconClass="icon-danger"
         />
         {`${stopped || '-'} stopped`}
       </div>

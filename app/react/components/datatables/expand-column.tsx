@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from 'react-feather';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { CellProps, Column, HeaderProps } from 'react-table';
 
 import { Button } from '@@/buttons';

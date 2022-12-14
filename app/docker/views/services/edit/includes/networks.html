@@ -1,10 +1,8 @@
 <div id="service-network-specs">
   <rd-widget>
-    <rd-widget-header icon="list" feather-icon="true" title-text="Networks">
+    <rd-widget-header icon="list" title-text="Networks">
       <div class="nopadding" authorization="DockerServiceUpdate">
-        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addNetwork(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" feather="true"></pr-icon> network
-        </a>
+        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addNetwork(service)" ng-disabled="isUpdating"> <pr-icon icon="'plus'"></pr-icon> network </a>
       </div>
     </rd-widget-header>
     <rd-widget-body ng-if="!service.Networks || service.Networks.length === 0">
@@ -45,7 +43,7 @@
             <td ng-if="network.Editable" authorization="DockerServiceUpdate">
               <span class="input-group-btn">
                 <button class="btn btn-dangerlight" type="button" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
-                  <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                  <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                 </button>
               </span>
             </td>

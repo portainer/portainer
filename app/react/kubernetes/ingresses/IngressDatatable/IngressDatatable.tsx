@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'react-feather';
+import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import { useStore } from 'zustand';
 
@@ -6,6 +6,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
+import Route from '@/assets/ico/route.svg?c';
 
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -51,7 +52,7 @@ export function IngressDatatable() {
       isLoading={ingressesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
       title="Ingresses"
-      titleIcon="svg-route"
+      titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
       renderTableActions={tableActions}
       disableSelect={useCheckboxes()}
@@ -80,7 +81,10 @@ export function IngressDatatable() {
         </Authorized>
 
         <Authorized authorizations="K8sIngressesW">
-          <Link to="kubernetes.ingresses.create" className="space-left">
+          <Link
+            to="kubernetes.ingresses.create"
+            className="space-left no-decoration"
+          >
             <Button
               icon={Plus}
               className="btn-wrapper vertical-center"
@@ -91,7 +95,7 @@ export function IngressDatatable() {
           </Link>
         </Authorized>
         <Authorized authorizations="K8sIngressesW">
-          <Link to="kubernetes.deploy" className="space-left">
+          <Link to="kubernetes.deploy" className="space-left no-decoration">
             <Button icon={Plus} className="btn-wrapper">
               Create from manifest
             </Button>

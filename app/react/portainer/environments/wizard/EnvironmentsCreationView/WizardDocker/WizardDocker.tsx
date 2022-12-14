@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Zap, Cloud, Network, Plug2 } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -23,28 +25,28 @@ const defaultOptions: BoxSelectorOption<
 >[] = [
   {
     id: 'agent',
-    icon: 'svg-agent',
+    icon: <BadgeIcon icon={Zap} size="3xl" />,
     label: 'Agent',
     description: '',
     value: 'agent',
   },
   {
     id: 'api',
-    icon: 'svg-api',
+    icon: <BadgeIcon icon={Network} size="3xl" />,
     label: 'API',
     description: '',
     value: 'api',
   },
   {
     id: 'socket',
-    icon: 'svg-socket',
+    icon: <BadgeIcon icon={Plug2} size="3xl" />,
     label: 'Socket',
     description: '',
     value: 'socket',
   },
   {
     id: 'edgeAgent',
-    icon: 'svg-edgeagent',
+    icon: <BadgeIcon icon={Cloud} size="3xl" />,
     label: 'Edge Agent',
     description: '',
     value: 'edgeAgent',

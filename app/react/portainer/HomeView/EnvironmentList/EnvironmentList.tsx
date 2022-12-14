@@ -1,7 +1,8 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { RefreshCcw } from 'react-feather';
+import { HardDrive, RefreshCcw } from 'lucide-react';
 import _ from 'lodash';
+import { useStore } from 'zustand';
 
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
 import {
@@ -23,6 +24,8 @@ import { useAgentVersionsList } from '@/react/portainer/environments/queries/use
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { useUser } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { environmentStore } from '@/react/hooks/current-environment-store';
+import { useListSelection } from '@/react/hooks/useListSelection';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -40,9 +43,10 @@ import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
 import { NoEnvironmentsInfoPanel } from './NoEnvironmentsInfoPanel';
 import styles from './EnvironmentList.module.css';
+import { UpdateBadge } from './UpdateBadge';
 
 interface Props {
-  onClickItem(environment: Environment): void;
+  onClickBrowse(environment: Environment): void;
   onRefresh(): void;
 }
 
@@ -66,9 +70,14 @@ enum ConnectionType {
 
 const storageKey = 'home_endpoints';
 
-export function EnvironmentList({ onClickItem, onRefresh }: Props) {
-  const { isAdmin } = useUser();
+export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
+  const [selectedItems, handleChangeSelect] = useListSelection<Environment>(
+    [],
+    (a, b) => a.Id === b.Id
+  );
 
+  const { isAdmin } = useUser();
+  const { environmentId: currentEnvironmentId } = useStore(environmentStore);
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
   >('platformType', []);
@@ -128,24 +137,31 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     status: statusFilter,
     tagIds: tagFilter?.length ? tagFilter : undefined,
     groupIds: groupFilter,
+    provisioned: true,
     edgeDevice: false,
     tagsPartialMatch: true,
     agentVersions: agentVersions.map((a) => a.value),
+    updateInformation: isBE,
   };
 
   const tagsQuery = useTags();
 
-  const { isLoading, environments, totalCount, totalAvailable } =
-    useEnvironmentList(
-      {
-        page,
-        pageLimit,
-        sort: sortByFilter,
-        order: sortByDescending ? 'desc' : 'asc',
-        ...environmentsQueryParams,
-      },
-      refetchIfAnyOffline
-    );
+  const {
+    isLoading,
+    environments,
+    totalCount,
+    totalAvailable,
+    updateAvailable,
+  } = useEnvironmentList(
+    {
+      page,
+      pageLimit,
+      sort: sortByFilter,
+      order: sortByDescending ? 'desc' : 'asc',
+      ...environmentsQueryParams,
+    },
+    refetchIfAnyOffline
+  );
 
   const agentVersionsQuery = useAgentVersionsList();
 
@@ -175,9 +191,10 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   return (
     <>
       {totalAvailable === 0 && <NoEnvironmentsInfoPanel isAdmin={isAdmin} />}
-
       <TableContainer>
-        <TableTitle icon="hard-drive" featherIcon label="Environments" />
+        <TableTitle icon={HardDrive} label="Environments">
+          {isBE && updateAvailable && <UpdateBadge />}
+        </TableTitle>
 
         <TableActions className={styles.actionBar}>
           <div className={styles.description}>
@@ -197,7 +214,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   )}
                 >
                   <RefreshCcw
-                    className="feather icon-sm icon-white"
+                    className="lucide icon-sm icon-white"
                     aria-hidden="true"
                   />
                   Refresh
@@ -212,6 +229,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   sort: sortByFilter,
                   order: sortByDescending ? 'desc' : 'asc',
                 }}
+                selectedItems={selectedItems}
               />
             </div>
             <div className={clsx(styles.filterSearchbar, 'ml-3')}>
@@ -308,7 +326,12 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                 groupName={
                   groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
                 }
-                onClick={onClickItem}
+                onClickBrowse={() => onClickBrowse(env)}
+                isActive={env.Id === currentEnvironmentId}
+                isSelected={selectedItems.some(
+                  (selectedEnv) => selectedEnv.Id === env.Id
+                )}
+                onSelect={(selected) => handleChangeSelect(env, selected)}
               />
             ))
           )}

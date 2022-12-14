@@ -8,4 +8,7 @@ export const details: Column<ToastNotification> = {
   id: 'details',
   disableFilters: true,
   canHide: true,
+  Cell: ({ value }: { value: string }) => (
+    <div className="whitespace-normal">{value}</div>
+  ),
 };

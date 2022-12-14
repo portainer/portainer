@@ -19,6 +19,8 @@ type updateEdgeStackPayload struct {
 	Version          *int
 	EdgeGroups       []portainer.EdgeGroupID
 	DeploymentType   portainer.EdgeStackDeploymentType
+	// Uses the manifest's namespaces instead of the default one
+	UseManifestNamespaces bool
 }
 
 func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
@@ -65,18 +67,20 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
+	relationConfig, err := edge.FetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
 	}
 
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}
 
+	endpointsToAdd := map[portainer.EndpointID]bool{}
+
 	if payload.EdgeGroups != nil {
-		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 		}
@@ -105,7 +109,6 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			}
 		}
 
-		endpointsToAdd := map[portainer.EndpointID]bool{}
 		for endpointID := range newRelatedSet {
 			if !oldRelatedSet[endpointID] {
 				endpointsToAdd[endpointID] = true
@@ -143,25 +146,31 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
+
 	if payload.DeploymentType == portainer.EdgeStackDeploymentCompose {
 		if stack.EntryPoint == "" {
 			stack.EntryPoint = filesystem.ComposeFileDefaultName
 		}
 
-		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+		_, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
+		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stackFolder, stack.ProjectPath, stack.EntryPoint, relatedEndpointIds)
 		if err != nil {
 			return httperror.InternalServerError("Unable to convert and persist updated Kubernetes manifest file on disk", err)
 		}
 
-	} else {
+		stack.ManifestPath = manifestPath
+	}
+
+	if payload.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		if stack.ManifestPath == "" {
 			stack.ManifestPath = filesystem.ManifestFileDefaultName
 		}
+
+		stack.UseManifestNamespaces = payload.UseManifestNamespaces
 
 		hasDockerEndpoint, err := hasDockerEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 		if err != nil {
@@ -174,11 +183,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))
 		if err != nil {
-			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
+			return httperror.InternalServerError("Unable to persist updated Kubernetes manifest file on disk", err)
 		}
 	}
 
-	if payload.Version != nil && *payload.Version != stack.Version {
+	versionUpdated := payload.Version != nil && *payload.Version != stack.Version
+	if versionUpdated {
 		stack.Version = *payload.Version
 		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}

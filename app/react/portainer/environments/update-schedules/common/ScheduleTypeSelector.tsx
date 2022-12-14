@@ -1,4 +1,4 @@
-import { useField } from 'formik';
+import { useFormikContext } from 'formik';
 import { number } from 'yup';
 
 import { NavTabs } from '@@/NavTabs';
@@ -10,7 +10,7 @@ import { UpdateScheduleDetailsFieldset } from './UpdateScheduleDetailsFieldset';
 import { RollbackScheduleDetailsFieldset } from './RollbackScheduleDetailsFieldset';
 
 export function ScheduleTypeSelector() {
-  const [{ value }, , { setValue }] = useField<FormValues['type']>('type');
+  const { values, setFieldValue } = useFormikContext<FormValues>();
 
   return (
     <div className="form-group">
@@ -28,12 +28,17 @@ export function ScheduleTypeSelector() {
               children: <RollbackScheduleDetailsFieldset />,
             },
           ]}
-          selectedId={value}
-          onSelect={(value) => setValue(value)}
+          selectedId={values.type}
+          onSelect={handleChangeType}
         />
       </div>
     </div>
   );
+
+  function handleChangeType(scheduleType: ScheduleType) {
+    setFieldValue('type', scheduleType);
+    setFieldValue('version', '');
+  }
 }
 
 export function typeValidation() {

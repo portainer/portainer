@@ -1,9 +1,14 @@
-import { useField } from 'formik';
 import DateTimePicker from 'react-datetime-picker';
-import { Calendar, X } from 'react-feather';
+import { Calendar, X } from 'lucide-react';
 import { useMemo } from 'react';
+import { string } from 'yup';
+import { useField } from 'formik';
 
-import { isoDateFromTimestamp } from '@/portainer/filters/filters';
+import {
+  isoDate,
+  parseIsoDate,
+  TIME_FORMAT,
+} from '@/portainer/filters/filters';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -16,27 +21,49 @@ interface Props {
 
 export function ScheduledTimeField({ disabled }: Props) {
   const [{ name, value }, { error }, { setValue }] =
-    useField<FormValues['time']>('time');
+    useField<FormValues['scheduledTime']>('scheduledTime');
 
-  const dateValue = useMemo(() => new Date(value * 1000), [value]);
+  const dateValue = useMemo(() => parseIsoDate(value), [value]);
 
   return (
     <FormControl label="Schedule date & time" errors={error}>
       {!disabled ? (
         <DateTimePicker
           format="y-MM-dd HH:mm:ss"
-          minDate={new Date()}
           className="form-control [&>div]:border-0"
-          onChange={(date) => setValue(Math.floor(date.getTime() / 1000))}
+          onChange={(date) => setValue(isoDate(date.valueOf()))}
           name={name}
           value={dateValue}
-          calendarIcon={<Calendar className="feather" />}
-          clearIcon={<X className="feather" />}
+          calendarIcon={<Calendar className="lucide" />}
+          clearIcon={<X className="lucide" />}
           disableClock
+          minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
         />
       ) : (
-        <Input defaultValue={isoDateFromTimestamp(value)} disabled />
+        <Input defaultValue={value} disabled />
       )}
     </FormControl>
   );
+}
+
+export function timeValidation() {
+  return string()
+    .required('Scheduled time is required')
+    .test(
+      'validFormat',
+      `Scheduled time must be in the format ${TIME_FORMAT}`,
+      (value) => isValidDate(parseIsoDate(value))
+    )
+    .test(
+      'validDate',
+      `Scheduled time must be bigger then ${isoDate(
+        Date.now() - 24 * 60 * 60 * 1000
+      )}`,
+      (value) =>
+        parseIsoDate(value).valueOf() > Date.now() - 24 * 60 * 60 * 1000
+    );
+}
+
+function isValidDate(date: Date) {
+  return date instanceof Date && !Number.isNaN(date.valueOf());
 }

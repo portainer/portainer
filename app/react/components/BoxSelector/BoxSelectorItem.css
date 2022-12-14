@@ -13,11 +13,6 @@
   color: var(--text-boxselector-header);
 }
 
-.boxselector_header .fa,
-.fab {
-  font-weight: normal;
-}
-
 .boxselector_wrapper input[type='radio'],
 .box-selector-item input[type='radio'] {
   display: none;

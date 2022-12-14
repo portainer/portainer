@@ -28,7 +28,7 @@ export function Option({
   onClick = () => {},
   featureId,
 }: Props) {
-  const Icon = typeof icon !== 'string' ? icon : null;
+  const IconComponent = icon;
   const isLimited = isLimitedToBE(featureId);
   return (
     <button
@@ -44,12 +44,8 @@ export function Option({
       disabled={isLimited}
       onClick={onClick}
     >
-      <div className="text-center mt-2">
-        {Icon ? (
-          <Icon selected={active} className={styles.iconComponent} />
-        ) : (
-          <i className={clsx(icon, 'block', styles.icon)} />
-        )}
+      <div className="flex items-end justify-center text-center mt-2">
+        <IconComponent selected={active} className={styles.iconComponent} />
       </div>
 
       <div className="mt-3 text-center flex flex-col">

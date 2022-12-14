@@ -23,7 +23,7 @@ export function useRemoveMutation() {
       ),
 
     mutationOptions(
-      withInvalidate(queryClient, [queryKeys.list()]),
+      withInvalidate(queryClient, [queryKeys.base()]),
       withError()
     )
   );

@@ -5,34 +5,6 @@ import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kuber
 
 angular
   .module('portainer.kubernetes')
-  .filter('kubernetesApplicationServiceTypeIcon', function () {
-    'use strict';
-    return function (text) {
-      var status = _.toLower(text);
-      switch (status) {
-        case 'loadbalancer':
-          return 'fa-project-diagram';
-        case 'clusterip':
-          return 'fa-list-alt';
-        case 'nodeport':
-          return 'fa-list';
-      }
-    };
-  })
-  .filter('kubernetesApplicationServiceTypeText', function () {
-    'use strict';
-    return function (text) {
-      var status = _.toLower(text);
-      switch (status) {
-        case 'loadbalancer':
-          return 'LoadBalancer';
-        case 'clusterip':
-          return 'ClusterIP';
-        case 'nodeport':
-          return 'NodePort';
-      }
-    };
-  })
   .filter('kubernetesApplicationTypeText', function () {
     'use strict';
     return function (type) {
@@ -63,7 +35,7 @@ angular
     return function (value) {
       switch (value) {
         case KubernetesApplicationDataAccessPolicies.ISOLATED:
-          return 'svg-cubes';
+          return 'boxes';
         case KubernetesApplicationDataAccessPolicies.SHARED:
           return 'box';
       }

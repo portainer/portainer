@@ -1,3 +1,5 @@
+import { Share2 } from 'lucide-react';
+
 import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 
@@ -16,7 +18,7 @@ export function NetworkOptionsTable({ options }: Props) {
 
   return (
     <TableContainer>
-      <TableTitle label="Network options" icon="share-2" featherIcon />
+      <TableTitle label="Network options" icon={Share2} />
       <Table className="nopadding">
         <DetailsTable dataCy="networkDetails-networkOptionsTable">
           {networkEntries.map(([key, value]) => (

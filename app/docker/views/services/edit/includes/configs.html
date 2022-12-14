@@ -1,13 +1,13 @@
 <form ng-if="applicationState.endpoint.apiVersion >= 1.3" id="service-configs" ng-submit="updateService(service)">
   <rd-widget>
-    <rd-widget-header icon="list" feather-icon="true" title-text="Configs"> </rd-widget-header>
+    <rd-widget-header icon="list" title-text="Configs"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="form-inline" style="padding: 10px" authorization="DockerServiceUpdate">
         Add a config:
         <select class="form-control" ng-options="config.Name for config in configs | orderBy: 'Name'" ng-model="newConfig">
           <option selected disabled hidden value="">Select a config</option>
         </select>
-        <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)"> <pr-icon icon="'plus'" feather="true"></pr-icon> add config </a>
+        <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)"> <pr-icon icon="'plus'"></pr-icon> add config </a>
       </div>
       <table class="table" style="margin-top: 5px">
         <thead>
@@ -40,7 +40,7 @@
             <td>{{ config.Mode }}</td>
             <td authorization="DockerServiceUpdate">
               <button class="btn btn-dangerlight pull-right" type="button" ng-click="removeConfig(service, $index)" ng-disabled="isUpdating">
-                <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
               </button>
             </td>
           </tr>

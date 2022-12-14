@@ -1,15 +1,13 @@
-import clsx from 'clsx';
 import _ from 'lodash';
 
 import { TagId } from '@/portainer/tags/types';
-import { Icon } from '@/react/components/Icon';
 import { useCreateTagMutation, useTags } from '@/portainer/tags/queries';
 
 import { Creatable, Select } from '@@/form-components/ReactSelect';
 import { FormControl } from '@@/form-components/FormControl';
 import { Link } from '@@/Link';
 
-import styles from './TagSelector.module.css';
+import { TagButton } from '../TagButton';
 
 interface Props {
   value: TagId[];
@@ -61,21 +59,12 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
       {value.length > 0 && (
         <FormControl label="Selected tags">
           {selectedTags.map((tag) => (
-            <button
-              type="button"
+            <TagButton
               title="Remove tag"
-              className={clsx(
-                styles.removeTagBtn,
-                'space-left',
-                'tag',
-                'vertical-center'
-              )}
-              onClick={() => handleRemove(tag.value)}
-              key={tag.value}
-            >
-              {tag.label}
-              <Icon icon="trash-2" feather />
-            </button>
+              value={tag.value}
+              label={tag.label}
+              onRemove={() => handleRemove(tag.value)}
+            />
           ))}
         </FormControl>
       )}
@@ -111,6 +100,12 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
     if (!allowCreate) {
       return;
     }
+
+    // Prevent the new tag composed of space from being added
+    if (!inputValue.replace(/\s/g, '').length) {
+      return;
+    }
+
     createTagMutation.mutate(inputValue, {
       onSuccess(tag) {
         handleAdd({ label: tag.Name, value: tag.ID });

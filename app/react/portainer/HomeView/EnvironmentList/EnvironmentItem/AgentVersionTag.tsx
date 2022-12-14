@@ -1,4 +1,4 @@
-import { Zap } from 'react-feather';
+import { Zap } from 'lucide-react';
 
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import {
@@ -18,9 +18,8 @@ export function AgentVersionTag({ type, version }: Props) {
 
   return (
     <span className="space-x-1">
-      <span>
-        + <Zap className="icon icon-xs vertical-center" aria-hidden="true" />
-      </span>
+      <Zap className="icon icon-xs vertical-center" aria-hidden="true" />
+
       <span>{isEdgeEnvironment(type) ? 'Edge Agent' : 'Agent'}</span>
 
       <span>{version}</span>

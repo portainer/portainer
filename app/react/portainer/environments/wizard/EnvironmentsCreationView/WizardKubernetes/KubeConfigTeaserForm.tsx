@@ -1,4 +1,5 @@
 import { Field, Form, Formik } from 'formik';
+import { Plug2 } from 'lucide-react';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -84,8 +85,9 @@ export function KubeConfigTeaserForm() {
                 loadingText="Connecting environment..."
                 isLoading={false}
                 disabled
+                icon={Plug2}
               >
-                <i className="fa fa-plug" aria-hidden="true" /> Connect
+                Connect
               </LoadingButton>
             </div>
           </div>

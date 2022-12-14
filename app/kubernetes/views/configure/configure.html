@@ -28,7 +28,7 @@
               <div class="col-sm-12 text-muted small">
                 <p> Enabling the load balancer feature will allow users to expose application they deploy over an external IP address assigned by cloud provider. </p>
                 <p class="mt-1 vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
                 </p>
               </div>
@@ -58,8 +58,8 @@
                 class="border-0 mx-2 bg-transparent inline-flex justify-center items-center w-2 !ml-0"
                 ng-click="ctrl.toggleAdvancedIngSettings()"
               >
-                <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" feather="true" icon="'chevron-right'"></pr-icon>
-                <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" feather="true" icon="'chevron-down'"></pr-icon>
+                <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" icon="'chevron-right'"></pr-icon>
+                <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" icon="'chevron-down'"></pr-icon>
               </button>
               More settings
             </label>
@@ -118,6 +118,29 @@
             <!-- #region SECURITY -->
             <div class="col-sm-12 form-section-title"> Security </div>
 
+            <div
+              ng-if="!ctrl.isRBACEnabled"
+              class="mt-1 mb-6 p-4 w-full border border-solid bg-warning-2 border-warning-5 text-warning-8 th-dark:bg-yellow-11 th-dark:text-white th-highcontrast:bg-yellow-11 th-highcontrast:text-white small flex gap-1 rounded-lg"
+            >
+              <div class="mt-0.5">
+                <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
+              </div>
+              <div>
+                <p> Your cluster does not have Kubernetes role-based access control (RBAC) enabled. </p>
+                <p> This means you can't use Portainer RBAC functionality to regulate access to environment resources based on user roles. </p>
+                <p class="mb-0">
+                  To enable RBAC, start the&nbsp;<a
+                    class="th-dark:text-blue-7 th-highcontrast:text-blue-4"
+                    href="https://kubernetes.io/docs/concepts/overview/components/#kube-apiserver"
+                    target="_blank"
+                    >API server</a
+                  >&nbsp;with the&nbsp;<code class="box-decoration-clone bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">--authorization-mode</code>&nbsp;flag set to a
+                  comma-separated list that includes&nbsp;<code class="bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">RBAC</code>, for example:&nbsp;
+                  <code class="box-decoration-clone bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
+                </p>
+              </div>
+            </div>
+
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 By default, all the users have access to the default namespace. Enable this option to set accesses on the default namespace.
@@ -126,21 +149,29 @@
 
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Restrict access to the default namespace </label>
-                <label class="switch col-sm-8">
-                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><span class="slider round" data-cy="kubeSetup-restrictDefaultNsToggle"></span>
-                </label>
+                <por-switch-field
+                  checked="ctrl.formValues.RestrictDefaultNamespace"
+                  name="'restrictDefaultNs'"
+                  label="'Restrict access to the default namespace'"
+                  on-change="(ctrl.onToggleRestrictNs)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictDefaultNsToggle"
+                  disabled="!ctrl.isRBACEnabled"
+                >
+                </por-switch-field>
               </div>
 
               <div class="col-sm-12 mt-5">
                 <por-switch-field
                   name="'restrictStandardUserIngressW'"
-                  label="'Only allow deployment of ingresses by admins'"
+                  label="'Only allow admins to deploy ingresses'"
                   tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
                   label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
                   switch-class="'col-sm-8 text-muted'"
                   data-cy="kubeSetup-restrictStandardUserIngressWToggle"
                   feature-id="ctrl.limitedFeatureIngressDeploy"
+                  disabled="!ctrl.isRBACEnabled"
                 ></por-switch-field>
               </div>
             </div>
@@ -155,7 +186,7 @@
                   deployment failures if there is insufficient resource to service demand.
                 </p>
                 <p class="mt-1 vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
                   minus any system resource reservation.
                 </p>
@@ -179,7 +210,7 @@
               <div class="col-sm-12 text-muted small">
                 <p> Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage. </p>
                 <p class="vertical-center mt-1">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
                   <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
                 </p>
@@ -194,20 +225,20 @@
                 </label>
               </div>
               <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px">
-                Checking metrics API... <pr-icon icon="'loader'" feather="true" class-name="'ml-0.5'"></pr-icon>
+                Checking metrics API... <pr-icon icon="'loader'" class-name="'ml-0.5'"></pr-icon>
               </div>
               <div
                 ng-if="!ctrl.state.metrics.pending && ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
                 class="col-sm-12 small text-muted vertical-center"
                 style="margin-top: 5px"
               >
-                <pr-icon icon="'check'" mode="'success'" feather="true"></pr-icon> Successfully reached metrics API
+                <pr-icon icon="'check'" mode="'success'"></pr-icon> Successfully reached metrics API
               </div>
               <div
                 ng-if="!ctrl.state.metrics.pending && !ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
                 class="col-sm-12 small text-muted vertical-center mt-2"
               >
-                <pr-icon icon="'x'" mode="'danger'" feather="true"></pr-icon> Unable to reach metrics API, make sure metrics server is properly deployed inside that cluster.
+                <pr-icon icon="'x'" mode="'danger'"></pr-icon> Unable to reach metrics API, make sure metrics server is properly deployed inside that cluster.
               </div>
             </div>
 
@@ -215,7 +246,7 @@
 
             <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
               <div class="col-sm-12 small text-muted vertical-center">
-                <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                 Unable to detect any storage class available to persist data. Users won't be able to persist application data inside this cluster.
               </div>
             </div>
@@ -275,7 +306,7 @@
               </div>
               <div class="col-sm-12">
                 <span ng-if="!ctrl.hasValidStorageConfiguration()" class="text-muted small vertical-center mt-2">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Shared access policy configuration required
                 </span>
               </div>

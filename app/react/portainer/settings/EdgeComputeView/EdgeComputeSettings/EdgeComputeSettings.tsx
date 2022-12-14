@@ -1,4 +1,5 @@
 import { Formik, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 
@@ -32,7 +33,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Edge Compute settings" />
+        <WidgetTitle icon={Laptop} title="Edge Compute settings" />
         <WidgetBody>
           <Formik
             initialValues={settings}

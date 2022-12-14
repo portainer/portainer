@@ -27,7 +27,6 @@ type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props extends AriaAttributes, AutomationTestingProps {
   icon?: ReactNode | ComponentType<unknown>;
-  featherIcon?: boolean;
 
   color?: Color;
   size?: Size;
@@ -47,7 +46,6 @@ export function Button({
   onClick,
   title,
   icon,
-  featherIcon,
   children,
 
   ...ariaProps
@@ -63,14 +61,7 @@ export function Button({
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...ariaProps}
     >
-      {icon && (
-        <Icon
-          icon={icon}
-          size={getIconSize(size)}
-          className="inline-flex"
-          feather={featherIcon}
-        />
-      )}
+      {icon && <Icon icon={icon} size={getIconSize(size)} />}
       {children}
     </button>
   );

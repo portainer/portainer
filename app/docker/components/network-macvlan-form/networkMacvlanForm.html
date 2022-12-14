@@ -3,7 +3,7 @@
   <!-- selector -->
   <div class="form-group">
     <span class="col-sm-12 text-muted small vertical-center">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+      <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
       To create a MACVLAN network you need to create a configuration, then create the network from this configuration.
     </span>
   </div>
@@ -14,7 +14,7 @@
           <input type="radio" id="network_config" ng-model="$ctrl.data.Scope" value="local" />
           <label for="network_config">
             <div class="boxselector_header">
-              <pr-icon icon="'sliders'" feather="true"></pr-icon>
+              <pr-icon icon="'sliders'"></pr-icon>
               Configuration
             </div>
             <p>I want to configure a network before deploying it</p>
@@ -24,7 +24,7 @@
           <input type="radio" id="network_deploy" ng-model="$ctrl.data.Scope" value="swarm" ng-disabled="$ctrl.availableNetworks.length === 0" />
           <label for="network_deploy" ng-class="$ctrl.availableNetworks.length === 0 ? 'boxselector_disabled' : ''">
             <div class="boxselector_header">
-              <pr-icon icon="'share-2'" feather="true"></pr-icon>
+              <pr-icon icon="'share-2'"></pr-icon>
               Creation
             </div>
             <p>I want to create a network from a configuration</p>
@@ -55,7 +55,7 @@
       <div class="form-group" ng-show="macvlanConfigurationForm.network_card.$invalid">
         <div class="col-sm-12 small text-warning">
           <div ng-messages="macvlanConfigurationForm.network_card.$error">
-            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Parent network card must be specified.</p>
+            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Parent network card must be specified.</p>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@
           <div class="col-sm-12">
             <macvlan-nodes-datatable
               title-text="Select the nodes where you want to deploy the local configuration"
-              title-icon="fa-hdd"
+              title-icon="hard-drive"
               dataset="$ctrl.nodes"
               table-key="nodes"
               state="$ctrl.data.DatatableState"
@@ -82,7 +82,7 @@
         <div class="form-group" ng-show="macvlanConfigurationForm.node_selector.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="macvlanConfigurationForm.node_selector.$error">
-              <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> At least one node must be selected.</p>
+              <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> At least one node must be selected.</p>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@
       <div class="form-group" ng-show="macvlanConfigurationForm.config_network.$invalid">
         <div class="col-sm-12 small text-warning">
           <div ng-messages="macvlanConfigurationForm.config_network.$error">
-            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Select a configuration network.</p>
+            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Select a configuration network.</p>
           </div>
         </div>
       </div>

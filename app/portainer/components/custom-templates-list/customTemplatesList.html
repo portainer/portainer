@@ -3,11 +3,13 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
+          </div>
           Custom Templates
         </div>
         <div class="searchBar vertical-center !mr-0">
-          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -20,7 +22,7 @@
         </div>
         <div class="actionBar">
           <button type="button" class="btn btn-sm btn-primary" ui-state="$ctrl.createPath">
-            <pr-icon icon="'plus'" feather="true"></pr-icon>
+            <pr-icon icon="'plus'"></pr-icon>
             Add Custom Template
           </button>
         </div>
@@ -36,11 +38,11 @@
           <template-item-actions>
             <div ng-if="$ctrl.isEditAllowed(template)" class="vertical-center">
               <a ui-state="$ctrl.editPath" ui-state-params="{id: template.Id}" ng-click="$event.stopPropagation();" class="btn btn-secondary btn-sm vertical-center">
-                <pr-icon icon="'edit'" feather="true"></pr-icon>
+                <pr-icon icon="'edit'"></pr-icon>
                 Edit
               </a>
               <button class="btn btn-dangerlight btn-sm vertical-center" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">
-                <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                <pr-icon icon="'trash-2'"></pr-icon>
                 Delete
               </button>
             </div>

@@ -32,6 +32,10 @@
   padding: 0 8px;
 }
 
+.portainer-selector-root .portainer-selector__clear-indicator {
+  padding: 6px;
+}
+
 .portainer-selector-root .portainer-selector__multi-value__label {
   @apply text-black;
   @apply th-dark:text-white;
