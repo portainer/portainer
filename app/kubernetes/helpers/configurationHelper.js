@@ -8,7 +8,7 @@ class KubernetesConfigurationHelper {
     return _.filter(applications, (app) => {
       let envFind;
       let volumeFind;
-      if (config.Type === KubernetesConfigurationKinds.CONFIGMAP) {
+      if (config.Kind === KubernetesConfigurationKinds.CONFIGMAP) {
         envFind = _.find(app.Env, { valueFrom: { configMapKeyRef: { name: config.Name } } });
         volumeFind = _.find(app.Volumes, { configMap: { name: config.Name } });
       } else {
