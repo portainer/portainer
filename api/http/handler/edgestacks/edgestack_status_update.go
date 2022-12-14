@@ -4,11 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/asaskevich/govalidator"
+	httperror "github.com/portainer/libhttp/error"
 )
 
 type updateStatusPayload struct {
@@ -52,13 +53,6 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
-	}
-
 	var payload updateStatusPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -77,17 +71,22 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	stack.Status[payload.EndpointID] = portainer.EdgeStackStatus{
-		Type:       *payload.Status,
-		Error:      payload.Error,
-		EndpointID: payload.EndpointID,
-	}
+	var stack portainer.EdgeStack
 
-	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
-	if err != nil {
+	err = handler.DataStore.EdgeStack().UpdateEdgeStackFunc(portainer.EdgeStackID(stackID), func(edgeStack *portainer.EdgeStack) {
+		edgeStack.Status[payload.EndpointID] = portainer.EdgeStackStatus{
+			Type:       *payload.Status,
+			Error:      payload.Error,
+			EndpointID: payload.EndpointID,
+		}
+
+		stack = *edgeStack
+	})
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
+	} else if err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
 
 	return response.JSON(w, stack)
-
 }
