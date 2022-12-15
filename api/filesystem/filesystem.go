@@ -64,7 +64,7 @@ const (
 	SSLCACertFilename = "ca-cert.pem"
 
 	MTLSCertFilename   = "mtls-cert.pem"
-	MTLSCaCertFilename = "mtls-ca-cert.pem"
+	MTLSCACertFilename = "mtls-ca-cert.pem"
 	MTLSKeyFilename    = "mtls-key.pem"
 )
 
@@ -669,7 +669,7 @@ func (service *Service) GetDefaultSSLCertsPath() (string, string) {
 
 func defaultMTLSCertPathUnderFileStore() (string, string, string) {
 	certPath := JoinPaths(SSLCertPath, MTLSCertFilename)
-	caCertPath := JoinPaths(SSLCertPath, MTLSCaCertFilename)
+	caCertPath := JoinPaths(SSLCertPath, MTLSCACertFilename)
 	keyPath := JoinPaths(SSLCertPath, MTLSKeyFilename)
 
 	return certPath, caCertPath, keyPath
