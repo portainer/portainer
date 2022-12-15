@@ -109,6 +109,12 @@ export function EditDetails({
     if (ownership === ResourceControlOwnership.RESTRICTED) {
       authorizedUsers = [];
       authorizedTeams = [];
+      // Non admin team leaders/members under only one team can
+      // automatically grant the resource access to all members
+      // under the team
+      if (!isAdmin && teams && teams.length === 1) {
+        authorizedTeams = teams.map((team) => team.Id);
+      }
     }
 
     handleChange({ ownership, authorizedTeams, authorizedUsers });
