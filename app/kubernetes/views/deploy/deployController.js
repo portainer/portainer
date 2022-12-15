@@ -9,6 +9,7 @@ import { renderTemplate } from '@/react/portainer/custom-templates/components/ut
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { compose, kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, template, url } from '@@/BoxSelector/common-options/build-methods';
+import { getPublicSettings } from '@/react/portainer/settings/settings.service';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -27,10 +28,7 @@ class KubernetesDeployController {
 
     this.isTemplateVariablesEnabled = isBE;
 
-    this.deployOptions = [
-      { ...kubernetes, value: KubernetesDeployManifestTypes.KUBERNETES },
-      { ...compose, value: KubernetesDeployManifestTypes.COMPOSE },
-    ];
+    this.deployOptions = [{ ...kubernetes, value: KubernetesDeployManifestTypes.KUBERNETES }];
 
     this.methodOptions = [
       { ...git, value: KubernetesDeployBuildMethods.GIT },
@@ -339,6 +337,16 @@ class KubernetesDeployController {
           this.state.BuildMethod = KubernetesDeployBuildMethods.CUSTOM_TEMPLATE;
           this.state.templateId = templateId;
         }
+      }
+
+      try {
+        const publicSettings = await getPublicSettings();
+        this.showKomposeBuildOption = publicSettings.ShowKomposeBuildOption;
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to get public settings');
+      }
+      if (this.showKomposeBuildOption) {
+        this.deployOptions = [...this.deployOptions, { ...compose, value: KubernetesDeployManifestTypes.COMPOSE }];
       }
 
       this.state.viewReady = true;

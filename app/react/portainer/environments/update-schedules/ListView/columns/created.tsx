@@ -2,9 +2,9 @@ import { Column } from 'react-table';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 
-import { EdgeUpdateSchedule } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
 
-export const created: Column<EdgeUpdateSchedule> = {
+export const created: Column<EdgeUpdateListItemResponse> = {
   Header: 'Created',
   accessor: (row) => isoDateFromTimestamp(row.created),
   disableFilters: true,

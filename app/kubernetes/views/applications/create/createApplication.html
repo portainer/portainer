@@ -108,6 +108,14 @@
                       You can get more information about Compose file format in the
                       <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
                     </p>
+                    <p
+                      >In a forthcoming Portainer release, we plan to remove support for docker-compose format manifests for Kubernetes deployments, and the Kompose conversion tool
+                      which enables this. The reason for this is because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and Exposures (CVEs).</p
+                    >
+                    <p
+                      >Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and new
+                      pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.</p
+                    >
                   </span>
                   <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
                     <p class="vertical-center">
@@ -946,7 +954,7 @@
                               <pr-icon icon="'boxes'"></pr-icon>
                               Global
                             </div>
-                            <p>Application will be deployed as a DaemonSet with an instance on each node of the sdfh</p>
+                            <p>Application will be deployed as a DaemonSet with an instance on each node of the cluster</p>
                           </label>
                         </div>
                       </div>

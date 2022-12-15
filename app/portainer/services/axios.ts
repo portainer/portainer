@@ -74,3 +74,9 @@ function defaultErrorParser(axiosError: AxiosError) {
   const error = new Error(message);
   return { error, details };
 }
+
+export function isAxiosError<
+  ResponseType = { message: string; details: string }
+>(error: unknown): error is AxiosError<ResponseType> {
+  return axiosOrigin.isAxiosError(error);
+}

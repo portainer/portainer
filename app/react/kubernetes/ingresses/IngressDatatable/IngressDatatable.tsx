@@ -81,7 +81,10 @@ export function IngressDatatable() {
         </Authorized>
 
         <Authorized authorizations="K8sIngressesW">
-          <Link to="kubernetes.ingresses.create" className="space-left">
+          <Link
+            to="kubernetes.ingresses.create"
+            className="space-left no-decoration"
+          >
             <Button
               icon={Plus}
               className="btn-wrapper vertical-center"
@@ -92,7 +95,7 @@ export function IngressDatatable() {
           </Link>
         </Authorized>
         <Authorized authorizations="K8sIngressesW">
-          <Link to="kubernetes.deploy" className="space-left">
+          <Link to="kubernetes.deploy" className="space-left no-decoration">
             <Button icon={Plus} className="btn-wrapper">
               Create from manifest
             </Button>

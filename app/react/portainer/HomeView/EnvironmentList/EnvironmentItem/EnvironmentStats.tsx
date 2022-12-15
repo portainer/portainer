@@ -6,6 +6,7 @@ import { getPlatformType } from '@/react/portainer/environments/utils';
 
 import { EnvironmentStatsDocker } from './EnvironmentStatsDocker';
 import { EnvironmentStatsKubernetes } from './EnvironmentStatsKubernetes';
+import { EnvironmentStatsNomad } from './EnvironmentStatsNomad';
 
 interface Props {
   environment: Environment;
@@ -13,28 +14,31 @@ interface Props {
 
 export function EnvironmentStats({ environment }: Props) {
   const platform = getPlatformType(environment.Type);
+
+  const component = getComponent(platform, environment);
+
+  return (
+    <span className="blocklist-item-desc flex items-center gap-10">
+      {component}
+    </span>
+  );
+}
+
+function getComponent(platform: PlatformType, environment: Environment) {
   switch (platform) {
     case PlatformType.Kubernetes:
       return (
         <EnvironmentStatsKubernetes
-          snapshots={environment.Kubernetes.Snapshots || []}
-          type={environment.Type}
-          agentVersion={environment.Agent.Version}
+          snapshot={environment.Kubernetes.Snapshots?.[0]}
         />
       );
     case PlatformType.Docker:
+      return <EnvironmentStatsDocker snapshot={environment.Snapshots?.[0]} />;
+    case PlatformType.Nomad:
       return (
-        <EnvironmentStatsDocker
-          snapshots={environment.Snapshots}
-          type={environment.Type}
-          agentVersion={environment.Agent.Version}
-        />
+        <EnvironmentStatsNomad snapshot={environment.Nomad.Snapshots?.[0]} />
       );
     default:
-      return (
-        <div className="blocklist-item-line endpoint-item">
-          <span className="blocklist-item-desc">-</span>
-        </div>
-      );
+      return null;
   }
 }

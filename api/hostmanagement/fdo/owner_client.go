@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer/api/third_party/digest"
+	"github.com/portainer/portainer/third_party/digest"
 )
 
 type FDOOwnerClient struct {

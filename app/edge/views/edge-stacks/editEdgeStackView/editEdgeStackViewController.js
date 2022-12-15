@@ -39,6 +39,7 @@ export class EditEdgeStackViewController {
       this.formValues = {
         StackFileContent: file,
         EdgeGroups: this.stack.EdgeGroups,
+        UseManifestNamespaces: this.stack.UseManifestNamespaces,
         DeploymentType: this.stack.DeploymentType,
       };
       this.oldFileContent = this.formValues.StackFileContent;
@@ -79,7 +80,7 @@ export class EditEdgeStackViewController {
   async deployStackAsync() {
     this.state.actionInProgress = true;
     try {
-      if (this.originalFileContent != this.formValues.StackFileContent) {
+      if (this.originalFileContent != this.formValues.StackFileContent || this.formValues.UseManifestNamespaces !== this.stack.UseManifestNamespaces) {
         this.formValues.Version = this.stack.Version + 1;
       }
       await this.EdgeStackService.updateStack(this.stack.Id, this.formValues);

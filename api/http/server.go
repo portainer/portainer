@@ -23,7 +23,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
-	"github.com/portainer/portainer/api/http/handler/edgeupdateschedules"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
@@ -41,8 +40,8 @@ import (
 	"github.com/portainer/portainer/api/http/handler/settings"
 	sslhandler "github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
-	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/storybook"
+	"github.com/portainer/portainer/api/http/handler/system"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -56,12 +55,14 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/ssl"
+	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
-	"github.com/portainer/portainer/api/pkg/libhelm"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/rs/zerolog/log"
 )
@@ -77,6 +78,7 @@ type Server struct {
 	ReverseTunnelService        portainer.ReverseTunnelService
 	ComposeStackManager         portainer.ComposeStackManager
 	CryptoService               portainer.CryptoService
+	EdgeStacksService           *edgestackservice.Service
 	SignatureService            portainer.DigitalSignatureService
 	SnapshotService             portainer.SnapshotService
 	FileService                 portainer.FileService
@@ -102,6 +104,7 @@ type Server struct {
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
 	DemoService                 *demo.Service
+	UpgradeService              upgrade.Service
 }
 
 // Start starts the HTTP server
@@ -153,9 +156,7 @@ func (server *Server) Start() error {
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	edgeUpdateScheduleHandler := edgeupdateschedules.NewHandler(requestBouncer, server.DataStore)
-
-	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore)
+	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore, server.EdgeStacksService)
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
 	edgeStacksHandler.KubernetesDeployer = server.KubernetesDeployer
@@ -252,7 +253,11 @@ func (server *Server) Start() error {
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
 
-	var statusHandler = status.NewHandler(requestBouncer, server.Status, server.DemoService, server.DataStore)
+	var systemHandler = system.NewHandler(requestBouncer,
+		server.Status,
+		server.DemoService,
+		server.DataStore,
+		server.UpgradeService)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
@@ -277,43 +282,42 @@ func (server *Server) Start() error {
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
 	server.Handler = &handler.Handler{
-		RoleHandler:               roleHandler,
-		AuthHandler:               authHandler,
-		BackupHandler:             backupHandler,
-		CustomTemplatesHandler:    customTemplatesHandler,
-		DockerHandler:             dockerHandler,
-		EdgeGroupsHandler:         edgeGroupsHandler,
-		EdgeJobsHandler:           edgeJobsHandler,
-		EdgeUpdateScheduleHandler: edgeUpdateScheduleHandler,
-		EdgeStacksHandler:         edgeStacksHandler,
-		EdgeTemplatesHandler:      edgeTemplatesHandler,
-		EndpointGroupHandler:      endpointGroupHandler,
-		EndpointHandler:           endpointHandler,
-		EndpointHelmHandler:       endpointHelmHandler,
-		EndpointEdgeHandler:       endpointEdgeHandler,
-		EndpointProxyHandler:      endpointProxyHandler,
-		FileHandler:               fileHandler,
-		LDAPHandler:               ldapHandler,
-		HelmTemplatesHandler:      helmTemplatesHandler,
-		KubernetesHandler:         kubernetesHandler,
-		MOTDHandler:               motdHandler,
-		OpenAMTHandler:            openAMTHandler,
-		FDOHandler:                fdoHandler,
-		RegistryHandler:           registryHandler,
-		ResourceControlHandler:    resourceControlHandler,
-		SettingsHandler:           settingsHandler,
-		SSLHandler:                sslHandler,
-		StatusHandler:             statusHandler,
-		StackHandler:              stackHandler,
-		StorybookHandler:          storybookHandler,
-		TagHandler:                tagHandler,
-		TeamHandler:               teamHandler,
-		TeamMembershipHandler:     teamMembershipHandler,
-		TemplatesHandler:          templatesHandler,
-		UploadHandler:             uploadHandler,
-		UserHandler:               userHandler,
-		WebSocketHandler:          websocketHandler,
-		WebhookHandler:            webhookHandler,
+		RoleHandler:            roleHandler,
+		AuthHandler:            authHandler,
+		BackupHandler:          backupHandler,
+		CustomTemplatesHandler: customTemplatesHandler,
+		DockerHandler:          dockerHandler,
+		EdgeGroupsHandler:      edgeGroupsHandler,
+		EdgeJobsHandler:        edgeJobsHandler,
+		EdgeStacksHandler:      edgeStacksHandler,
+		EdgeTemplatesHandler:   edgeTemplatesHandler,
+		EndpointGroupHandler:   endpointGroupHandler,
+		EndpointHandler:        endpointHandler,
+		EndpointHelmHandler:    endpointHelmHandler,
+		EndpointEdgeHandler:    endpointEdgeHandler,
+		EndpointProxyHandler:   endpointProxyHandler,
+		FileHandler:            fileHandler,
+		LDAPHandler:            ldapHandler,
+		HelmTemplatesHandler:   helmTemplatesHandler,
+		KubernetesHandler:      kubernetesHandler,
+		MOTDHandler:            motdHandler,
+		OpenAMTHandler:         openAMTHandler,
+		FDOHandler:             fdoHandler,
+		RegistryHandler:        registryHandler,
+		ResourceControlHandler: resourceControlHandler,
+		SettingsHandler:        settingsHandler,
+		SSLHandler:             sslHandler,
+		StackHandler:           stackHandler,
+		StorybookHandler:       storybookHandler,
+		SystemHandler:          systemHandler,
+		TagHandler:             tagHandler,
+		TeamHandler:            teamHandler,
+		TeamMembershipHandler:  teamMembershipHandler,
+		TemplatesHandler:       templatesHandler,
+		UploadHandler:          uploadHandler,
+		UserHandler:            userHandler,
+		WebSocketHandler:       websocketHandler,
+		WebhookHandler:         webhookHandler,
 	}
 
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))

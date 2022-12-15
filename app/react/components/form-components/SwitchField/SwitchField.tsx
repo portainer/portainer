@@ -20,6 +20,7 @@ export interface Props {
   dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
+  setTooltipHtmlMessage?: boolean;
 }
 
 export function SwitchField({
@@ -34,20 +35,19 @@ export function SwitchField({
   onChange,
   featureId,
   switchClass,
+  setTooltipHtmlMessage,
 }: Props) {
   const toggleName = name ? `toggle_${name}` : '';
 
   return (
     <label className={clsx(styles.root, fieldClass)}>
       <span
-        className={clsx(
-          'text-left space-right control-label',
-          styles.label,
-          labelClass
-        )}
+        className={clsx('text-left space-right control-label !p-0', labelClass)}
       >
         {label}
-        {tooltip && <Tooltip message={tooltip} />}
+        {tooltip && (
+          <Tooltip message={tooltip} setHtmlMessage={setTooltipHtmlMessage} />
+        )}
       </span>
       <Switch
         className={clsx('space-right', switchClass)}

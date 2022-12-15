@@ -2,9 +2,9 @@ import { CellProps, Column } from 'react-table';
 
 import { Link } from '@@/Link';
 
-import { EdgeUpdateSchedule } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
 
-export const name: Column<EdgeUpdateSchedule> = {
+export const name: Column<EdgeUpdateListItemResponse> = {
   Header: 'Name',
   accessor: 'name',
   id: 'name',
@@ -15,7 +15,10 @@ export const name: Column<EdgeUpdateSchedule> = {
   sortType: 'string',
 };
 
-export function NameCell({ value: name, row }: CellProps<EdgeUpdateSchedule>) {
+export function NameCell({
+  value: name,
+  row,
+}: CellProps<EdgeUpdateListItemResponse>) {
   return (
     <Link to=".item" params={{ id: row.original.id }}>
       {name}

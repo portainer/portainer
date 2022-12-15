@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
-	"github.com/portainer/portainer/api/http/handler/edgeupdateschedules"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
@@ -30,8 +29,8 @@ import (
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
-	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/storybook"
+	"github.com/portainer/portainer/api/http/handler/system"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -44,43 +43,42 @@ import (
 
 // Handler is a collection of all the service handlers.
 type Handler struct {
-	AuthHandler               *auth.Handler
-	BackupHandler             *backup.Handler
-	CustomTemplatesHandler    *customtemplates.Handler
-	DockerHandler             *docker.Handler
-	EdgeGroupsHandler         *edgegroups.Handler
-	EdgeJobsHandler           *edgejobs.Handler
-	EdgeUpdateScheduleHandler *edgeupdateschedules.Handler
-	EdgeStacksHandler         *edgestacks.Handler
-	EdgeTemplatesHandler      *edgetemplates.Handler
-	EndpointEdgeHandler       *endpointedge.Handler
-	EndpointGroupHandler      *endpointgroups.Handler
-	EndpointHandler           *endpoints.Handler
-	EndpointHelmHandler       *helm.Handler
-	EndpointProxyHandler      *endpointproxy.Handler
-	HelmTemplatesHandler      *helm.Handler
-	KubernetesHandler         *kubernetes.Handler
-	FileHandler               *file.Handler
-	LDAPHandler               *ldap.Handler
-	MOTDHandler               *motd.Handler
-	RegistryHandler           *registries.Handler
-	ResourceControlHandler    *resourcecontrols.Handler
-	RoleHandler               *roles.Handler
-	SettingsHandler           *settings.Handler
-	SSLHandler                *ssl.Handler
-	OpenAMTHandler            *openamt.Handler
-	FDOHandler                *fdo.Handler
-	StackHandler              *stacks.Handler
-	StatusHandler             *status.Handler
-	StorybookHandler          *storybook.Handler
-	TagHandler                *tags.Handler
-	TeamMembershipHandler     *teammemberships.Handler
-	TeamHandler               *teams.Handler
-	TemplatesHandler          *templates.Handler
-	UploadHandler             *upload.Handler
-	UserHandler               *users.Handler
-	WebSocketHandler          *websocket.Handler
-	WebhookHandler            *webhooks.Handler
+	AuthHandler            *auth.Handler
+	BackupHandler          *backup.Handler
+	CustomTemplatesHandler *customtemplates.Handler
+	DockerHandler          *docker.Handler
+	EdgeGroupsHandler      *edgegroups.Handler
+	EdgeJobsHandler        *edgejobs.Handler
+	EdgeStacksHandler      *edgestacks.Handler
+	EdgeTemplatesHandler   *edgetemplates.Handler
+	EndpointEdgeHandler    *endpointedge.Handler
+	EndpointGroupHandler   *endpointgroups.Handler
+	EndpointHandler        *endpoints.Handler
+	EndpointHelmHandler    *helm.Handler
+	EndpointProxyHandler   *endpointproxy.Handler
+	HelmTemplatesHandler   *helm.Handler
+	KubernetesHandler      *kubernetes.Handler
+	FileHandler            *file.Handler
+	LDAPHandler            *ldap.Handler
+	MOTDHandler            *motd.Handler
+	RegistryHandler        *registries.Handler
+	ResourceControlHandler *resourcecontrols.Handler
+	RoleHandler            *roles.Handler
+	SettingsHandler        *settings.Handler
+	SSLHandler             *ssl.Handler
+	OpenAMTHandler         *openamt.Handler
+	FDOHandler             *fdo.Handler
+	StackHandler           *stacks.Handler
+	StorybookHandler       *storybook.Handler
+	SystemHandler          *system.Handler
+	TagHandler             *tags.Handler
+	TeamMembershipHandler  *teammemberships.Handler
+	TeamHandler            *teams.Handler
+	TemplatesHandler       *templates.Handler
+	UploadHandler          *upload.Handler
+	UserHandler            *users.Handler
+	WebSocketHandler       *websocket.Handler
+	WebhookHandler         *webhooks.Handler
 }
 
 // @title PortainerCE API
@@ -135,8 +133,6 @@ type Handler struct {
 // @tag.description Manage roles
 // @tag.name settings
 // @tag.description Manage Portainer settings
-// @tag.name status
-// @tag.description Information about the Portainer instance
 // @tag.name users
 // @tag.description Manage users
 // @tag.name tags
@@ -157,6 +153,10 @@ type Handler struct {
 // @tag.description Manage webhooks
 // @tag.name websocket
 // @tag.description Create exec sessions using websockets
+// @tag.name status
+// @tag.description Information about the Portainer instance
+// @tag.name system
+// @tag.description Manage Portainer system
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -169,8 +169,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):
 		http.StripPrefix("/api", h.CustomTemplatesHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/edge_update_schedules"):
-		http.StripPrefix("/api", h.EdgeUpdateScheduleHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
 		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_groups"):
@@ -222,7 +220,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/stacks"):
 		http.StripPrefix("/api", h.StackHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/status"):
-		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
+		http.StripPrefix("/api", h.SystemHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/system"):
+		http.StripPrefix("/api", h.SystemHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/tags"):
 		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates/helm"):

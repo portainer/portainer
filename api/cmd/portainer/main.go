@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	libstack "github.com/portainer/docker-compose-wrapper"
+	"github.com/portainer/docker-compose-wrapper/compose"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/build"
@@ -32,16 +34,18 @@ import (
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
+	"github.com/portainer/portainer/api/internal/upgrade"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/oauth"
-	"github.com/portainer/portainer/api/pkg/libhelm"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
@@ -146,8 +150,8 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	return store
 }
 
-func initComposeStackManager(assetsPath string, configPath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper, err := exec.NewComposeStackManager(assetsPath, configPath, proxyManager)
+func initComposeStackManager(composeDeployer libstack.Deployer, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
+	composeWrapper, err := exec.NewComposeStackManager(composeDeployer, proxyManager)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed creating compose manager")
 	}
@@ -587,6 +591,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	digitalSignatureService := initDigitalSignatureService()
 
+	edgeStacksService := edgestacks.NewService(dataStore)
+
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
@@ -626,7 +632,12 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	dockerConfigPath := fileService.GetDockerConfigPath()
 
-	composeStackManager := initComposeStackManager(*flags.Assets, dockerConfigPath, reverseTunnelService, proxyManager)
+	composeDeployer, err := compose.NewComposeDeployer(*flags.Assets, dockerConfigPath)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed initializing compose deployer")
+	}
+
+	composeStackManager := initComposeStackManager(composeDeployer, reverseTunnelService, proxyManager)
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService, dataStore)
 	if err != nil {
@@ -712,6 +723,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Msg("failed to fetch SSL settings from DB")
 	}
 
+	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed initializing upgrade service")
+	}
+
 	// FIXME: In 2.16 we changed the way ingress controller permissions are
 	// stored. Instead of being stored as annotation on an ingress rule, we keep
 	// them in our database. However, in order to run the migration we need an
@@ -738,6 +754,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		HTTPEnabled:                 sslDBSettings.HTTPEnabled,
 		AssetsPath:                  *flags.Assets,
 		DataStore:                   dataStore,
+		EdgeStacksService:           edgeStacksService,
 		SwarmStackManager:           swarmStackManager,
 		ComposeStackManager:         composeStackManager,
 		KubernetesDeployer:          kubernetesDeployer,
@@ -763,6 +780,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
 		DemoService:                 demoService,
+		UpgradeService:              upgradeService,
 	}
 }
 

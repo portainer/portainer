@@ -39,7 +39,7 @@ export function SidebarItem({
   );
 
   return (
-    <Wrapper label={label}>
+    <Wrapper label={label} className="sidebar">
       {children ? (
         <Menu head={head} openOnPaths={[...openOnPaths, ...childrenPath]}>
           {children}

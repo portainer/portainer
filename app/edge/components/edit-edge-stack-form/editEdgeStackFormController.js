@@ -22,6 +22,13 @@ export class EditEdgeStackFormController {
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
     this.removeLineBreaks = this.removeLineBreaks.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
+    this.onChangeUseManifestNamespaces = this.onChangeUseManifestNamespaces.bind(this);
+  }
+
+  onChangeUseManifestNamespaces(value) {
+    this.$scope.$evalAsync(() => {
+      this.model.UseManifestNamespaces = value;
+    });
   }
 
   hasKubeEndpoint() {

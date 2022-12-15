@@ -78,6 +78,7 @@ export function createMockEnvironment(): Environment {
         AllowNoneIngressClass: false,
       },
     },
+    Nomad: { Snapshots: [] },
     EdgeKey: '',
     Id: 3,
     UserTrusted: false,

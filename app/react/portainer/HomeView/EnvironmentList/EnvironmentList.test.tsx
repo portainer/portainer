@@ -48,7 +48,7 @@ async function renderComponent(
 
   const queries = renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
-      <EnvironmentList onClickItem={jest.fn()} onRefresh={jest.fn()} />
+      <EnvironmentList onClickBrowse={jest.fn()} onRefresh={jest.fn()} />
     </UserContext.Provider>
   );
 

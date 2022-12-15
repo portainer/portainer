@@ -1,9 +1,8 @@
-import { useQuery } from 'react-query';
 import clsx from 'clsx';
 import { DownloadCloud } from 'lucide-react';
 
-import { getVersionStatus } from '@/portainer/services/api/status.service';
 import { useUIState } from '@/react/hooks/useUIState';
+import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
 
 import { Icon } from '@@/Icon';
 
@@ -11,7 +10,7 @@ import styles from './UpdateNotifications.module.css';
 
 export function UpdateNotification() {
   const uiStateStore = useUIState();
-  const query = useUpdateNotification();
+  const query = useSystemVersion();
 
   if (!query.data || !query.data.UpdateAvailable) {
     return null;
@@ -66,8 +65,4 @@ export function UpdateNotification() {
   function onDismiss(version: string) {
     uiStateStore.dismissUpdateVersion(version);
   }
-}
-
-function useUpdateNotification() {
-  return useQuery(['status', 'version'], () => getVersionStatus());
 }
