@@ -1338,6 +1338,7 @@ type (
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
+		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
 	}
 
 	// GitService represents a service for managing Git
