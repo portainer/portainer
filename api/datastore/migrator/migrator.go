@@ -2,6 +2,7 @@ package migrator
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/dataservices/edgestack"
 
 	"github.com/Masterminds/semver"
 	"github.com/rs/zerolog/log"
@@ -53,6 +54,7 @@ type (
 		fileService             portainer.FileService
 		authorizationService    *authorization.Service
 		dockerhubService        *dockerhub.Service
+		edgeStackService        *edgestack.Service
 	}
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
@@ -77,6 +79,7 @@ type (
 		FileService             portainer.FileService
 		AuthorizationService    *authorization.Service
 		DockerhubService        *dockerhub.Service
+		EdgeStackService        *edgestack.Service
 	}
 )
 
@@ -103,6 +106,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		fileService:             parameters.FileService,
 		authorizationService:    parameters.AuthorizationService,
 		dockerhubService:        parameters.DockerhubService,
+		edgeStackService:        parameters.EdgeStackService,
 	}
 
 	migrator.initMigrations()
@@ -199,6 +203,7 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.15", m.migrateDBVersionToDB60)
 	m.addMigrations("2.16", m.migrateDBVersionToDB70)
 	m.addMigrations("2.16.1", m.migrateDBVersionToDB71)
+	m.addMigrations("2.17", m.migrateDBVersionToDB80)
 
 	// Add new migrations below...
 	// One function per migration, each versions migration funcs in the same file.

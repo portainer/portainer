@@ -27,7 +27,7 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 		return errors.New("Invalid EnvironmentID")
 	}
 
-	if *payload.Status == portainer.StatusError && govalidator.IsNull(payload.Error) {
+	if *payload.Status == portainer.EdgeStackStatusError && govalidator.IsNull(payload.Error) {
 		return errors.New("Error message is mandatory when status is error")
 	}
 
@@ -74,8 +74,24 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	var stack portainer.EdgeStack
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStackFunc(portainer.EdgeStackID(stackID), func(edgeStack *portainer.EdgeStack) {
+		details := edgeStack.Status[payload.EndpointID].Details
+		details.Pending = false
+
+		switch *payload.Status {
+		case portainer.EdgeStackStatusOk:
+			details.Ok = true
+		case portainer.EdgeStackStatusError:
+			details.Error = true
+		case portainer.EdgeStackStatusAcknowledged:
+			details.Acknowledged = true
+		case portainer.EdgeStackStatusRemove:
+			details.Remove = true
+		case portainer.EdgeStackStatusImagesPulled:
+			details.ImagesPulled = true
+		}
+
 		edgeStack.Status[payload.EndpointID] = portainer.EdgeStackStatus{
-			Type:       *payload.Status,
+			Details:    details,
 			Error:      payload.Error,
 			EndpointID: payload.EndpointID,
 		}
