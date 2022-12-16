@@ -62,6 +62,10 @@ const (
 	SSLKeyFilename = "key.pem"
 	// SSLCACertFilename represents the CA ssl certificate file name for mTLS
 	SSLCACertFilename = "ca-cert.pem"
+
+	MTLSCertFilename   = "mtls-cert.pem"
+	MTLSCACertFilename = "mtls-ca-cert.pem"
+	MTLSKeyFilename    = "mtls-key.pem"
 )
 
 // ErrUndefinedTLSFileType represents an error returned on undefined TLS file type
@@ -489,14 +493,7 @@ func (service *Service) createDirectoryInStore(name string) error {
 func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 	path := service.wrapFileStore(filePath)
 
-	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, r)
-	return err
+	return CreateFile(path, r)
 }
 
 // createBackupFileInStore makes a copy in the file store.
@@ -670,6 +667,14 @@ func (service *Service) GetDefaultSSLCertsPath() (string, string) {
 	return service.wrapFileStore(certPath), service.wrapFileStore(keyPath)
 }
 
+func defaultMTLSCertPathUnderFileStore() (string, string, string) {
+	certPath := JoinPaths(SSLCertPath, MTLSCertFilename)
+	caCertPath := JoinPaths(SSLCertPath, MTLSCACertFilename)
+	keyPath := JoinPaths(SSLCertPath, MTLSKeyFilename)
+
+	return certPath, caCertPath, keyPath
+}
+
 // StoreSSLCertPair stores a ssl certificate pair
 func (service *Service) StoreSSLCertPair(cert, key []byte) (string, string, error) {
 	certPath, keyPath := defaultCertPathUnderFileStore()
@@ -761,4 +766,40 @@ func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier string
 	}
 
 	return service.wrapFileStore(filePath), nil
+}
+
+func CreateFile(path string, r io.Reader) error {
+	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, r)
+	return err
+}
+
+func (service *Service) StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error) {
+	certPath, caCertPath, keyPath := defaultMTLSCertPathUnderFileStore()
+
+	r := bytes.NewReader(cert)
+	err := service.createFileInStore(certPath, r)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	r = bytes.NewReader(caCert)
+	err = service.createFileInStore(caCertPath, r)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	r = bytes.NewReader(key)
+	err = service.createFileInStore(keyPath, r)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	return service.wrapFileStore(certPath), service.wrapFileStore(caCertPath), service.wrapFileStore(keyPath), nil
 }

@@ -2,7 +2,7 @@ package binary
 
 import (
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 )
 
 var errRequiredShowOptions = errors.New("chart, repo and output format are required")

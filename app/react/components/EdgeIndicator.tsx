@@ -1,9 +1,10 @@
-import clsx from 'clsx';
+import { Activity } from 'lucide-react';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
+import { useHasHeartbeat } from '@/react/edge/hooks/useHasHeartbeat';
 import { Environment } from '@/react/portainer/environments/types';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
-import { PublicSettingsViewModel } from '@/portainer/models/settings';
+
+import { EnvironmentStatusBadgeItem } from './EnvironmentStatusBadgeItem';
 
 interface Props {
   showLastCheckInDate?: boolean;
@@ -15,100 +16,46 @@ export function EdgeIndicator({
 
   showLastCheckInDate = false,
 }: Props) {
-  const associated = !!environment.EdgeID;
-
-  const isValid = useHasHeartbeat(environment, associated);
+  const isValid = useHasHeartbeat(environment);
 
   if (isValid === null) {
     return null;
   }
 
+  const associated = !!environment.EdgeID;
   if (!associated) {
     return (
       <span role="status" aria-label="edge-status">
-        <span className="label label-default" aria-label="unassociated">
+        <EnvironmentStatusBadgeItem aria-label="unassociated">
           <s>associated</s>
-        </span>
+        </EnvironmentStatusBadgeItem>
       </span>
     );
   }
 
   return (
-    <span role="status" aria-label="edge-status">
-      <span
-        className={clsx('label', {
-          'label-danger': !isValid,
-          'label-success': isValid,
-        })}
+    <span
+      role="status"
+      aria-label="edge-status"
+      className="flex items-center gap-1"
+    >
+      <EnvironmentStatusBadgeItem
+        color={isValid ? 'success' : 'danger'}
         aria-label="edge-heartbeat"
       >
         heartbeat
-      </span>
+      </EnvironmentStatusBadgeItem>
 
       {showLastCheckInDate && !!environment.LastCheckInDate && (
         <span
-          className="space-left small text-muted"
+          className="small text-muted vertical-center"
           aria-label="edge-last-checkin"
+          title="Last edge check-in"
         >
+          <Activity className="icon icon-sm space-right" aria-hidden="true" />
           {isoDateFromTimestamp(environment.LastCheckInDate)}
         </span>
       )}
     </span>
   );
-}
-
-function useHasHeartbeat(environment: Environment, associated: boolean) {
-  const settingsQuery = usePublicSettings({ enabled: associated });
-
-  if (!associated) {
-    return false;
-  }
-
-  const { LastCheckInDate, QueryDate } = environment;
-
-  const settings = settingsQuery.data;
-
-  if (!settings) {
-    return null;
-  }
-
-  const checkInInterval = getCheckinInterval(environment, settings);
-
-  if (checkInInterval && QueryDate && LastCheckInDate) {
-    return QueryDate - LastCheckInDate <= checkInInterval * 2 + 20;
-  }
-
-  return false;
-}
-
-function getCheckinInterval(
-  environment: Environment,
-  settings: PublicSettingsViewModel
-) {
-  const asyncMode = environment.Edge.AsyncMode;
-
-  if (asyncMode) {
-    const intervals = [
-      environment.Edge.PingInterval > 0
-        ? environment.Edge.PingInterval
-        : settings.Edge.PingInterval,
-      environment.Edge.SnapshotInterval > 0
-        ? environment.Edge.SnapshotInterval
-        : settings.Edge.SnapshotInterval,
-      environment.Edge.CommandInterval > 0
-        ? environment.Edge.CommandInterval
-        : settings.Edge.CommandInterval,
-    ].filter((n) => n > 0);
-
-    return intervals.length > 0 ? Math.min(...intervals) : 60;
-  }
-
-  if (
-    !environment.EdgeCheckinInterval ||
-    environment.EdgeCheckinInterval === 0
-  ) {
-    return settings.Edge.CheckinInterval;
-  }
-
-  return environment.EdgeCheckinInterval;
 }

@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 	"gopkg.in/yaml.v3"
 )
 

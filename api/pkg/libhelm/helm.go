@@ -1,8 +1,8 @@
 package libhelm
 
 import (
-	"github.com/portainer/libhelm/options"
-	"github.com/portainer/libhelm/release"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 )
 
 // HelmPackageManager represents a service that interfaces with Helm

@@ -71,6 +71,10 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 	if payload.ComposeFile == "" {
 		repoConfig.ConfigFilePath = filesystem.ComposeFileDefaultName
 	}
+	// If a manifest file is specified (for kube git apps), then use it instead of the default compose file name
+	if payload.ManifestFile != "" {
+		repoConfig.ConfigFilePath = payload.ManifestFile
+	}
 
 	stackFolder := strconv.Itoa(int(b.stack.ID))
 	// Set the project path on the disk

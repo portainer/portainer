@@ -30,7 +30,9 @@ func NewService(dataStore dataservices.DataStore) *Service {
 func (service *Service) BuildEdgeStack(name string,
 	deploymentType portainer.EdgeStackDeploymentType,
 	edgeGroups []portainer.EdgeGroupID,
-	registries []portainer.RegistryID) (*portainer.EdgeStack, error) {
+	registries []portainer.RegistryID,
+	useManifestNamespaces bool,
+) (*portainer.EdgeStack, error) {
 	edgeStacksService := service.dataStore.EdgeStack()
 
 	err := validateUniqueName(edgeStacksService.EdgeStacks, name)
@@ -40,13 +42,14 @@ func (service *Service) BuildEdgeStack(name string,
 
 	stackID := edgeStacksService.GetNextIdentifier()
 	return &portainer.EdgeStack{
-		ID:             portainer.EdgeStackID(stackID),
-		Name:           name,
-		DeploymentType: deploymentType,
-		CreationDate:   time.Now().Unix(),
-		EdgeGroups:     edgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
-		Version:        1,
+		ID:                    portainer.EdgeStackID(stackID),
+		Name:                  name,
+		DeploymentType:        deploymentType,
+		CreationDate:          time.Now().Unix(),
+		EdgeGroups:            edgeGroups,
+		Status:                make(map[portainer.EndpointID]portainer.EdgeStackStatus),
+		Version:               1,
+		UseManifestNamespaces: useManifestNamespaces,
 	}, nil
 }
 

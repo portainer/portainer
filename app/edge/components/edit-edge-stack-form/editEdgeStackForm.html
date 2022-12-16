@@ -48,21 +48,33 @@
     </editor-description>
   </web-editor-form>
 
-  <web-editor-form
-    ng-if="$ctrl.model.DeploymentType === 1"
-    value="$ctrl.model.StackFileContent"
-    yml="true"
-    identifier="kube-manifest-editor"
-    placeholder="# Define or paste the content of your manifest here"
-    on-change="($ctrl.onChangeKubeManifest)"
-  >
-    <editor-description>
-      <p>
-        You can get more information about Kubernetes file format in the
-        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-      </p>
-    </editor-description>
-  </web-editor-form>
+  <div ng-if="$ctrl.model.DeploymentType === 1">
+    <div class="form-group">
+      <div class="col-sm-12">
+        <por-switch-field
+          label="'Use namespace(s) specified from manifest'"
+          tooltip="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'"
+          checked="$ctrl.formValues.UseManifestNamespaces"
+          on-change="($ctrl.onChangeUseManifestNamespaces)"
+        ></por-switch-field>
+      </div>
+    </div>
+
+    <web-editor-form
+      value="$ctrl.model.StackFileContent"
+      yml="true"
+      identifier="kube-manifest-editor"
+      placeholder="# Define or paste the content of your manifest here"
+      on-change="($ctrl.onChangeKubeManifest)"
+    >
+      <editor-description>
+        <p>
+          You can get more information about Kubernetes file format in the
+          <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+        </p>
+      </editor-description>
+    </web-editor-form>
+  </div>
 
   <!-- actions -->
   <div class="col-sm-12 form-section-title"> Actions </div>

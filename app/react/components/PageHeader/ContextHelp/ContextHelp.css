@@ -3,14 +3,3 @@
   cursor: pointer;
   flex-shrink: 0;
 }
-
-.menu-icon::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 6px;
-  height: 6px;
-  background: red;
-  border-radius: 50%;
-}

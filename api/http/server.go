@@ -40,8 +40,8 @@ import (
 	"github.com/portainer/portainer/api/http/handler/settings"
 	sslhandler "github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
-	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/storybook"
+	"github.com/portainer/portainer/api/http/handler/system"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -57,11 +57,12 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/ssl"
+	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
-	"github.com/portainer/portainer/api/pkg/libhelm"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/rs/zerolog/log"
 )
@@ -103,6 +104,7 @@ type Server struct {
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
 	DemoService                 *demo.Service
+	UpgradeService              upgrade.Service
 }
 
 // Start starts the HTTP server
@@ -251,7 +253,11 @@ func (server *Server) Start() error {
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
 
-	var statusHandler = status.NewHandler(requestBouncer, server.Status, server.DemoService, server.DataStore)
+	var systemHandler = system.NewHandler(requestBouncer,
+		server.Status,
+		server.DemoService,
+		server.DataStore,
+		server.UpgradeService)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
@@ -301,9 +307,9 @@ func (server *Server) Start() error {
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
 		SSLHandler:             sslHandler,
-		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
 		StorybookHandler:       storybookHandler,
+		SystemHandler:          systemHandler,
 		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,

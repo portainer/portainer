@@ -12,15 +12,31 @@ export default {
 interface TextFieldProps {
   label: string;
   tooltip?: string;
+  vertical?: boolean;
+  required?: boolean;
+  error?: string;
 }
 
 export { TextField, SelectField };
 
-function TextField({ label, tooltip = '' }: TextFieldProps) {
+function TextField({
+  label,
+  tooltip = '',
+  required,
+  error,
+  vertical,
+}: TextFieldProps) {
   const [value, setValue] = useState('');
   const inputId = 'input';
   return (
-    <FormControl inputId={inputId} label={label} tooltip={tooltip}>
+    <FormControl
+      inputId={inputId}
+      label={label}
+      tooltip={tooltip}
+      required={required}
+      errors={error}
+      size={vertical ? 'vertical' : undefined}
+    >
       <Input
         id={inputId}
         type="text"
@@ -34,9 +50,18 @@ function TextField({ label, tooltip = '' }: TextFieldProps) {
 TextField.args = {
   label: 'label',
   tooltip: '',
+  vertical: false,
+  required: false,
+  error: '',
 };
 
-function SelectField({ label, tooltip = '' }: TextFieldProps) {
+function SelectField({
+  label,
+  tooltip = '',
+  vertical,
+  required,
+  error,
+}: TextFieldProps) {
   const options = [
     { value: 1, label: 'one' },
     { value: 2, label: 'two' },
@@ -44,7 +69,14 @@ function SelectField({ label, tooltip = '' }: TextFieldProps) {
   const [value, setValue] = useState(0);
   const inputId = 'input';
   return (
-    <FormControl inputId={inputId} label={label} tooltip={tooltip}>
+    <FormControl
+      inputId={inputId}
+      label={label}
+      tooltip={tooltip}
+      size={vertical ? 'vertical' : undefined}
+      required={required}
+      errors={error}
+    >
       <Select
         className="form-control"
         value={value}
@@ -58,4 +90,7 @@ function SelectField({ label, tooltip = '' }: TextFieldProps) {
 SelectField.args = {
   label: 'select',
   tooltip: '',
+  vertical: false,
+  required: false,
+  error: '',
 };

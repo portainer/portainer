@@ -7,8 +7,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
-	"github.com/portainer/libhelm/release"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -16,6 +14,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/validation"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 	"golang.org/x/sync/errgroup"
 )
 

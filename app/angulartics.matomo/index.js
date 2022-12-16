@@ -2,6 +2,8 @@ import angular from 'angular';
 import { setPortainerStatus, setUserRole, clearUserRole, setUserEndpointRole, clearUserEndpointRole, push, trackEvent } from './analytics-services';
 const basePath = 'http://portainer-ce.app';
 
+const excludedPaths = ['/auth'];
+
 // forked from https://github.com/angulartics/angulartics-piwik/blob/master/src/angulartics-piwik.js
 
 /**
@@ -72,6 +74,10 @@ function config($analyticsProvider, $windowProvider) {
 
   // locationObj is the angular $location object
   $analyticsProvider.registerPageTrack(function (path) {
+    if (excludedPaths.includes(path)) {
+      return;
+    }
+
     push('setDocumentTitle', $window.document.title);
     push('setReferrerUrl', '');
     push('setCustomUrl', basePath + path);

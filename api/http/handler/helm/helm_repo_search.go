@@ -6,8 +6,8 @@ import (
 	"net/url"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 )
 
 // @id HelmRepoSearch

@@ -39,7 +39,7 @@ export function HomeView() {
         <EdgeLoadingSpinner />
       ) : (
         <EnvironmentList
-          onClickItem={handleClickItem}
+          onClickBrowse={handleBrowseClick}
           onRefresh={confirmTriggerSnapshot}
         />
       )}
@@ -64,7 +64,7 @@ export function HomeView() {
     }
   }
 
-  function handleClickItem(environment: Environment) {
+  function handleBrowseClick(environment: Environment) {
     if (isEdgeEnvironment(environment.Type)) {
       setConnectingToEdgeEndpoint(true);
     }

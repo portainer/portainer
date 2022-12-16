@@ -281,6 +281,8 @@ type (
 		Version        int                            `json:"Version"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
+		// Uses the manifest's namespaces instead of the default one
+		UseManifestNamespaces bool
 
 		// Deprecated
 		Prune bool `json:"Prune"`
@@ -1336,6 +1338,7 @@ type (
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
+		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
 	}
 
 	// GitService represents a service for managing Git
@@ -1357,6 +1360,7 @@ type (
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
+		IsRBACEnabled() (bool, error)
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
@@ -1500,12 +1504,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-const FeatureFlagBEUpgrade = "beUpgrade"
-
 // List of supported features
-var SupportedFeatureFlags = []Feature{
-	FeatureFlagBEUpgrade,
-}
+var SupportedFeatureFlags = []Feature{}
 
 const (
 	_ AuthenticationMethod = iota

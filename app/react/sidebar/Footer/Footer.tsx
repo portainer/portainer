@@ -23,15 +23,6 @@ function CEFooter() {
         <span>Community Edition</span>
 
         <BuildInfoModalButton />
-
-        <a
-          href="https://www.portainer.io/install-BE-now"
-          className="text-blue-6 font-medium"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Upgrade
-        </a>
       </FooterContent>
     </div>
   );
