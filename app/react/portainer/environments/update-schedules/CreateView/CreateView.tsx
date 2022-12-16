@@ -10,6 +10,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
+import { Link } from '@@/Link';
 
 import { ScheduleType } from '../types';
 import { useCreateMutation } from '../queries/create';
@@ -57,6 +58,12 @@ function CreateView() {
           <Widget>
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
+              <TextTip color="blue">
+                Devices need to be allocated to an Edge group, visit the{' '}
+                <Link to="edge.groups">Edge Groups</Link> page to assign
+                environments and create groups.
+              </TextTip>
+
               <Formik
                 initialValues={initialValues}
                 onSubmit={handleSubmit}

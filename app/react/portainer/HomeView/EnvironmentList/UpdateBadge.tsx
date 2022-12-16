@@ -11,7 +11,7 @@ export function UpdateBadge() {
   return (
     <span
       className={clsx(
-        'badge inline-flex items-center px-3 py-2 font-normal border-solid border border-transparent',
+        'badge inline-flex items-center px-[2px] font-normal border-solid border border-transparent rounded-xl',
         'bg-blue-3 text-blue-8',
         'th-dark:bg-blue-8 th-dark:text-white',
         'th-highcontrast:bg-transparent th-highcontrast:text-white th-highcontrast:border-white'

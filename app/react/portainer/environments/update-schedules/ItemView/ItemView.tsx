@@ -11,6 +11,7 @@ import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
 import { InformationPanel } from '@@/InformationPanel';
+import { Link } from '@@/Link';
 
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
@@ -83,6 +84,12 @@ function ItemView() {
           <Widget>
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
+              <TextTip color="blue">
+                Devices need to be allocated to an Edge group, visit the{' '}
+                <Link to="edge.groups">Edge Groups</Link> page to assign
+                environments and create groups.
+              </TextTip>
+
               <Formik
                 initialValues={
                   !isScheduleActive ? initialValues : initialValuesActive
