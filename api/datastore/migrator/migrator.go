@@ -2,6 +2,7 @@ package migrator
 
 import (
 	"errors"
+
 	"github.com/portainer/portainer/api/dataservices/edgestack"
 
 	"github.com/Masterminds/semver"
@@ -132,12 +133,12 @@ func (m *Migrator) CurrentSemanticDBVersion() *semver.Version {
 
 func (m *Migrator) addMigrations(v string, funcs ...func() error) {
 	m.migrations = append(m.migrations, Migrations{
-		version:        semver.MustParse(v),
-		migrationFuncs: funcs,
+		Version:        semver.MustParse(v),
+		MigrationFuncs: funcs,
 	})
 }
 
-func (m *Migrator) latestMigrations() Migrations {
+func (m *Migrator) LatestMigrations() Migrations {
 	return m.migrations[len(m.migrations)-1]
 }
 
@@ -150,8 +151,8 @@ func (m *Migrator) latestMigrations() Migrations {
 // !      This increases the migration funcs count and so they all run again.
 
 type Migrations struct {
-	version        *semver.Version
-	migrationFuncs MigrationFuncs
+	Version        *semver.Version
+	MigrationFuncs MigrationFuncs
 }
 
 type MigrationFuncs []func() error
