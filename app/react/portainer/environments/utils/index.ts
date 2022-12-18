@@ -60,8 +60,14 @@ export function isUnassociatedEdgeEnvironment(env: Environment) {
 }
 
 export function getDashboardRoute(environment: Environment) {
-  if (isEdgeEnvironment(environment.Type) && !environment.EdgeID) {
-    return 'portainer.endpoints.endpoint';
+  if (isEdgeEnvironment(environment.Type)) {
+    if (!environment.EdgeID) {
+      return 'portainer.endpoints.endpoint';
+    }
+
+    if (isEdgeAsync(environment)) {
+      return 'edge.browse.dashboard';
+    }
   }
 
   const platform = getPlatformType(environment.Type);
