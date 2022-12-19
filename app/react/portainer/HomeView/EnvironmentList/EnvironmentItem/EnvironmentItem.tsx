@@ -64,7 +64,7 @@ export function EnvironmentItem({
           <EnvironmentIcon type={environment.Type} />
         </div>
         <div className="ml-3 mr-auto flex justify-center gap-3 flex-col items-start">
-          <div className="space-x-3 flex items-center">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="font-bold">{environment.Name}</span>
             {isEdge ? (
               <EdgeIndicator environment={environment} showLastCheckInDate />
@@ -73,13 +73,10 @@ export function EnvironmentItem({
                 <EnvironmentStatusBadge status={environment.Status} />
                 {snapshotTime && (
                   <span
-                    className="space-left small text-muted vertical-center"
+                    className="small text-muted vertical-center gap-1"
                     title="Last snapshot time"
                   >
-                    <Activity
-                      className="icon icon-sm space-right"
-                      aria-hidden="true"
-                    />
+                    <Activity className="icon icon-sm" aria-hidden="true" />
                     {snapshotTime}
                   </span>
                 )}
@@ -92,15 +89,15 @@ export function EnvironmentItem({
               </span>
             )}
           </div>
-          <div className="small text-muted space-x-2 vertical-center">
+          <div className="small text-muted flex items-center gap-x-4 gap-y-2">
             {groupName && (
               <span className="font-semibold">
                 <span>Group: </span>
                 <span>{groupName}</span>
               </span>
             )}
-            <span className="vertical-center">
-              <Tag className="icon icon-sm space-right" aria-hidden="true" />
+            <span className="vertical-center gap-1">
+              <Tag className="icon icon-sm" aria-hidden="true" />
               {tags}
             </span>
             {isEdge && (
@@ -111,10 +108,7 @@ export function EnvironmentItem({
                 />
                 {environment.Edge.AsyncMode && (
                   <span className="vertical-center gap-1">
-                    <Globe
-                      className="icon icon-sm space-right"
-                      aria-hidden="true"
-                    />
+                    <Globe className="icon icon-sm" aria-hidden="true" />
                     Async Environment
                   </span>
                 )}
