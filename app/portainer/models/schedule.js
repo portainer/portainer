@@ -5,6 +5,7 @@ export function ScheduleCreateRequest(model) {
   this.Endpoints = model.Endpoints;
   this.FileContent = model.FileContent;
   this.File = model.File;
+  this.EdgeGroups = model.EdgeGroups;
 }
 
 export function ScheduleUpdateRequest(model) {
@@ -14,4 +15,5 @@ export function ScheduleUpdateRequest(model) {
   this.CronExpression = model.CronExpression;
   this.Endpoints = model.Endpoints;
   this.FileContent = model.FileContent;
+  this.EdgeGroups = model.EdgeGroups;
 }

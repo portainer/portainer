@@ -3,7 +3,7 @@ import moment from 'moment';
 
 export class EdgeJobFormController {
   /* @ngInject */
-  constructor() {
+  constructor($async, $scope, EdgeGroupService, Notifications) {
     this.state = {
       formValidationError: '',
     };
@@ -34,10 +34,17 @@ export class EdgeJobFormController {
     this.cronRegex =
       /(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ){4,6}((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*))/;
 
+    this.$async = $async;
+    this.$scope = $scope;
+
     this.action = this.action.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
+    this.onChangeGroups = this.onChangeGroups.bind(this);
+
+    this.EdgeGroupService = EdgeGroupService;
+    this.Notifications = Notifications;
   }
 
   onChangeModel(model) {
@@ -48,6 +55,12 @@ export class EdgeJobFormController {
       cronMethod: model.Recurring ? 'advanced' : 'basic',
       method: this.formValues.method,
     };
+  }
+
+  onChangeGroups(groups) {
+    return this.$scope.$evalAsync(() => {
+      this.model.EdgeGroups = groups ? groups : [];
+    });
   }
 
   action() {
@@ -89,8 +102,18 @@ export class EdgeJobFormController {
     this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
   }
 
+  async getEdgeGroups() {
+    try {
+      this.edgeGroups = await this.EdgeGroupService.groups();
+      this.noGroups = this.edgeGroups.length === 0;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
+    }
+  }
+
   $onInit() {
     this.onChangeModel(this.model);
+    this.getEdgeGroups();
   }
 }
 

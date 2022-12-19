@@ -153,6 +153,8 @@ export class EdgeJobController {
       this.groups = groups;
       this.tags = tags;
 
+      this.edgeJob.EdgeGroups = this.edgeJob.EdgeGroups ? this.edgeJob.EdgeGroups : [];
+
       if (results.length > 0) {
         const endpointIds = _.map(results, (result) => result.EndpointId);
         const endpoints = await getEnvironments({ query: { endpointIds } });

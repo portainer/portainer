@@ -238,10 +238,14 @@ type (
 		Created        int64                              `json:"Created"`
 		CronExpression string                             `json:"CronExpression"`
 		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
+		EdgeGroups     []EdgeGroupID                      `json:"EdgeGroups"`
 		Name           string                             `json:"Name"`
 		ScriptPath     string                             `json:"ScriptPath"`
 		Recurring      bool                               `json:"Recurring"`
 		Version        int                                `json:"Version"`
+
+		// Field used for log collection of Endpoints belonging to EdgeGroups
+		GroupLogsCollection map[EndpointID]EdgeJobEndpointMeta
 	}
 
 	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment(Endpoint) relation
@@ -1433,6 +1437,7 @@ type (
 		GetActiveTunnel(endpoint *Endpoint) (TunnelDetails, error)
 		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
+		RemoveEdgeJobFromEndpoint(endpointID EndpointID, edgeJobID EdgeJobID)
 	}
 
 	// Server defines the interface to serve the API

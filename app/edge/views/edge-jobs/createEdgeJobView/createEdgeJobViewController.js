@@ -13,6 +13,7 @@ export class CreateEdgeJobViewController {
       Endpoints: [],
       FileContent: '',
       File: null,
+      EdgeGroups: [],
     };
 
     this.$async = $async;
