@@ -137,8 +137,10 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	for idx := range edgeJobs {
 		edgeJob := &edgeJobs[idx]
 		if _, ok := edgeJob.Endpoints[endpoint.ID]; ok {
-			delete(edgeJob.Endpoints, endpoint.ID)
-			err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
+			err = handler.DataStore.EdgeJob().UpdateEdgeJobFunc(edgeJob.ID, func(j *portainer.EdgeJob) {
+				delete(j.Endpoints, endpoint.ID)
+			})
+
 			if err != nil {
 				return httperror.InternalServerError("Unable to update edge job", err)
 			}
