@@ -2,7 +2,6 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
 import { X, Slash } from 'lucide-react';
 import clsx from 'clsx';
-import angular from 'angular';
 import { useStore } from 'zustand';
 
 import {
@@ -13,7 +12,6 @@ import {
 import { getPlatformType } from '@/react/portainer/environments/utils';
 import { useEnvironment } from '@/react/portainer/environments/queries/useEnvironment';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import { EndpointProviderInterface } from '@/portainer/services/endpointProvider';
 import { environmentStore } from '@/react/hooks/current-environment-store';
 
 import { Icon } from '@@/Icon';
@@ -112,16 +110,6 @@ function useCurrentEnvironment() {
   return { query: useEnvironment(envStore.environmentId), clearEnvironment };
 
   function clearEnvironment() {
-    const $injector = angular.element(document).injector();
-    $injector.invoke(
-      /* @ngInject */ (EndpointProvider: EndpointProviderInterface) => {
-        EndpointProvider.setCurrentEndpoint(null);
-        if (!params.endpointId && !params.environmentId) {
-          document.title = 'Portainer';
-        }
-      }
-    );
-
     if (params.endpointId || params.environmentId) {
       router.stateService.go('portainer.home');
     }
