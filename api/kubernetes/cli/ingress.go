@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/rs/zerolog/log"
 	netv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -163,7 +164,7 @@ func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInf
 	if ingress.Labels == nil {
 		ingress.Labels = make(map[string]string)
 	}
-	ingress.Labels["io.portainer.kubernetes.application.owner"] = owner
+	ingress.Labels["io.portainer.kubernetes.application.owner"] = stackutils.SanitizeLabel(owner)
 
 	// Store TLS information.
 	var tls []netv1.IngressTLS
