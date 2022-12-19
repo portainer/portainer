@@ -89,7 +89,7 @@ export function EnvironmentItem({
               </span>
             )}
           </div>
-          <div className="small text-muted flex items-center gap-x-4 gap-y-2">
+          <div className="small text-muted flex flex-wrap items-center gap-x-4 gap-y-2">
             {groupName && (
               <span className="font-semibold">
                 <span>Group: </span>
