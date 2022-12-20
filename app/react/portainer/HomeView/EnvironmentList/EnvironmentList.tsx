@@ -25,7 +25,6 @@ import { EnvironmentsQueryParams } from '@/react/portainer/environments/environm
 import { useUser } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { environmentStore } from '@/react/hooks/current-environment-store';
-import { useListSelection } from '@/react/hooks/useListSelection';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -71,11 +70,6 @@ enum ConnectionType {
 const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
-  const [selectedItems, handleChangeSelect] = useListSelection<Environment>(
-    [],
-    (a, b) => a.Id === b.Id
-  );
-
   const { isAdmin } = useUser();
   const { environmentId: currentEnvironmentId } = useStore(environmentStore);
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
@@ -229,7 +223,6 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
                   sort: sortByFilter,
                   order: sortByDescending ? 'desc' : 'asc',
                 }}
-                selectedItems={selectedItems}
               />
             </div>
             <div className={clsx(styles.filterSearchbar, 'ml-3')}>
@@ -328,10 +321,6 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
                 }
                 onClickBrowse={() => onClickBrowse(env)}
                 isActive={env.Id === currentEnvironmentId}
-                isSelected={selectedItems.some(
-                  (selectedEnv) => selectedEnv.Id === env.Id
-                )}
-                onSelect={(selected) => handleChangeSelect(env, selected)}
               />
             ))
           )}

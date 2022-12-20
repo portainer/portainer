@@ -10,6 +10,7 @@ import {
   PlatformType,
 } from '@/react/portainer/environments/types';
 import {
+  getDashboardRoute,
   getPlatformType,
   isEdgeEnvironment,
 } from '@/react/portainer/environments/utils';
@@ -18,7 +19,7 @@ import { useTags } from '@/portainer/tags/queries';
 
 import { EdgeIndicator } from '@@/EdgeIndicator';
 import { EnvironmentStatusBadge } from '@@/EnvironmentStatusBadge';
-import { Checkbox } from '@@/form-components/Checkbox';
+import { Link } from '@@/Link';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EnvironmentStats } from './EnvironmentStats';
@@ -31,8 +32,6 @@ interface Props {
   environment: Environment;
   groupName?: string;
   onClickBrowse(): void;
-  onSelect(isSelected: boolean): void;
-  isSelected: boolean;
   isActive: boolean;
 }
 
@@ -41,8 +40,6 @@ export function EnvironmentItem({
   onClickBrowse,
   groupName,
   isActive,
-  isSelected,
-  onSelect,
 }: Props) {
   const isEdge = isEdgeEnvironment(environment.Type);
 
@@ -51,15 +48,19 @@ export function EnvironmentItem({
   const tags = useEnvironmentTagNames(environment.TagIds);
 
   return (
-    <label className="relative">
-      <div className="absolute top-2 left-2">
-        <Checkbox
-          id={`environment-select-${environment.Id}`}
-          checked={isSelected}
-          onChange={() => onSelect(!isSelected)}
-        />
-      </div>
-      <div className="blocklist-item flex overflow-hidden min-h-[100px]">
+    <Link
+      to={getDashboardRoute(environment)}
+      params={{
+        endpointId: environment.Id,
+        environmentId: environment.Id,
+      }}
+      className="no-link"
+    >
+      <button
+        className="blocklist-item flex items-stretch overflow-hidden min-h-[100px] bg-transparent w-full"
+        onClick={onClickBrowse}
+        type="button"
+      >
         <div className="ml-2 self-center flex justify-center">
           <EnvironmentIcon type={environment.Type} />
         </div>
@@ -129,8 +130,8 @@ export function EnvironmentItem({
           isActive={isActive}
         />
         <EditButtons environment={environment} />
-      </div>
-    </label>
+      </button>
+    </Link>
   );
 }
 
