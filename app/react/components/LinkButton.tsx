@@ -10,10 +10,12 @@ export function LinkButton({
   disabled,
   className,
   children,
+  title = '',
   ...props
 }: ComponentProps<typeof Button> & ComponentProps<typeof Link>) {
   return (
     <Button
+      title={title}
       size="medium"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}

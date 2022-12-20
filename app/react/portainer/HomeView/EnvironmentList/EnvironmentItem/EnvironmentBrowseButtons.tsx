@@ -41,6 +41,7 @@ export function EnvironmentBrowseButtons({
       )}
 
       <LinkButton
+        title="Live connection is not available for async environments"
         icon={Wifi}
         disabled={isEdgeAsync || browseStatus === 'connected'}
         to={getDashboardRoute(environment)}
