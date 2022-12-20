@@ -21,7 +21,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
 
   const configRoute = getConfigRoute(environment);
   return (
-    <ButtonsGrid className="w-11 -m-[11px] ml-3">
+    <ButtonsGrid className="w-11 ml-3">
       <LinkButton
         disabled={!isAdmin}
         to="portainer.endpoints.endpoint"
