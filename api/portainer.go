@@ -1381,7 +1381,7 @@ type (
 		GetIngressControllers() (models.K8sIngressControllers, error)
 		GetMetrics() (models.K8sMetrics, error)
 		GetStorage() ([]KubernetesStorageClassConfig, error)
-		CreateIngress(namespace string, info models.K8sIngressInfo) error
+		CreateIngress(namespace string, info models.K8sIngressInfo, owner string) error
 		UpdateIngress(namespace string, info models.K8sIngressInfo) error
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
 		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
