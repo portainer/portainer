@@ -1,13 +1,11 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-
 import {
   OpenAMTConfiguration,
   AMTInformation,
   AuthorizationResponse,
-  Device,
   DeviceFeatures,
-} from './model';
+} from '@/react/edge/edge-devices/open-amt/types';
 
 const BASE_URL = '/open_amt';
 
@@ -31,42 +29,6 @@ export async function getAMTInfo(environmentId: EnvironmentId) {
       e as Error,
       'Unable to retrieve environment information'
     );
-  }
-}
-
-export async function activateDevice(environmentId: EnvironmentId) {
-  try {
-    await axios.post(`${BASE_URL}/${environmentId}/activate`);
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to activate device');
-  }
-}
-
-export async function getDevices(environmentId: EnvironmentId) {
-  try {
-    const { data: devices } = await axios.get<Device[]>(
-      `${BASE_URL}/${environmentId}/devices`
-    );
-
-    return devices;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve device information');
-  }
-}
-
-export async function executeDeviceAction(
-  environmentId: EnvironmentId,
-  deviceGUID: string,
-  action: string
-) {
-  try {
-    const actionPayload = { action };
-    await axios.post(
-      `${BASE_URL}/${environmentId}/devices/${deviceGUID}/action`,
-      actionPayload
-    );
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to execute device action');
   }
 }
 

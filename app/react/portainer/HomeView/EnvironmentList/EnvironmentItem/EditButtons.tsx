@@ -21,11 +21,11 @@ export function EditButtons({ environment }: { environment: Environment }) {
 
   const configRoute = getConfigRoute(environment);
   return (
-    <ButtonsGrid className="w-11 -m-[11px] ml-3">
+    <ButtonsGrid className="w-11 ml-3">
       <LinkButton
         disabled={!isAdmin}
         to="portainer.endpoints.endpoint"
-        params={{ id: environment.Id }}
+        params={{ id: environment.Id, redirectTo: 'portainer.home' }}
         color="none"
         icon={Edit2}
         size="medium"
@@ -79,15 +79,21 @@ function ButtonsGrid({
   return (
     <div
       className={clsx(
-        'grid grid-rows-3 border border-solid border-gray-5 rounded-r-lg',
+        'grid border border-solid border-gray-5 rounded-r-lg',
         className
       )}
     >
-      <div>{children[0] || null}</div>
-      <div className="border-x-0 border-y border-gray-5 border-solid">
-        {children[1] || null}
-      </div>
-      <div>{children[2] || null}</div>
+      {children.map((child, index) => (
+        <div
+          key={index}
+          className={clsx({
+            'border-0 border-b border-solid border-b-gray-5':
+              index < children.length - 1,
+          })}
+        >
+          {child}
+        </div>
+      ))}
     </div>
   );
 }

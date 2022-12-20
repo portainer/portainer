@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Tag, Globe, Activity } from 'lucide-react';
+import { Tag, Activity } from 'lucide-react';
 
 import {
   isoDateFromTimestamp,
@@ -24,9 +24,10 @@ import { Link } from '@@/Link';
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EnvironmentStats } from './EnvironmentStats';
 import { EngineVersion } from './EngineVersion';
-import { AgentVersionTag } from './AgentVersionTag';
+import { EnvironmentTypeTag } from './EnvironmentTypeTag';
 import { EnvironmentBrowseButtons } from './EnvironmentBrowseButtons';
 import { EditButtons } from './EditButtons';
+import { AgentDetails } from './AgentDetails';
 
 interface Props {
   environment: Environment;
@@ -48,84 +49,82 @@ export function EnvironmentItem({
   const tags = useEnvironmentTagNames(environment.TagIds);
 
   return (
-    <Link
-      to={getDashboardRoute(environment)}
-      params={{
-        endpointId: environment.Id,
-        environmentId: environment.Id,
-      }}
-      className="no-link"
-    >
-      <button
-        className="blocklist-item flex items-stretch overflow-hidden min-h-[100px] bg-transparent w-full"
-        onClick={onClickBrowse}
-        type="button"
+    <div className="relative">
+      <Link
+        to={getDashboardRoute(environment)}
+        params={{
+          endpointId: environment.Id,
+          environmentId: environment.Id,
+        }}
+        className="no-link"
       >
-        <div className="ml-2 self-center flex justify-center">
-          <EnvironmentIcon type={environment.Type} />
-        </div>
-        <div className="ml-3 mr-auto flex justify-center gap-3 flex-col items-start">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="font-bold">{environment.Name}</span>
-            {isEdge ? (
-              <EdgeIndicator environment={environment} showLastCheckInDate />
-            ) : (
-              <>
-                <EnvironmentStatusBadge status={environment.Status} />
-                {snapshotTime && (
-                  <span
-                    className="small text-muted vertical-center gap-1"
-                    title="Last snapshot time"
-                  >
-                    <Activity className="icon icon-sm" aria-hidden="true" />
-                    {snapshotTime}
-                  </span>
-                )}
-              </>
-            )}
-            <EngineVersion environment={environment} />
-            {!isEdge && (
-              <span className="text-muted small vertical-center">
-                {stripProtocol(environment.URL)}
-              </span>
-            )}
+        <button
+          className="blocklist-item flex items-stretch overflow-hidden min-h-[110px] bg-transparent w-full !m-0 !pr-56"
+          onClick={onClickBrowse}
+          type="button"
+        >
+          <div className="ml-2 self-center flex justify-center">
+            <EnvironmentIcon type={environment.Type} />
           </div>
-          <div className="small text-muted flex flex-wrap items-center gap-x-4 gap-y-2">
-            {groupName && (
-              <span className="font-semibold">
-                <span>Group: </span>
-                <span>{groupName}</span>
+          <div className="ml-3 mr-auto flex justify-center gap-3 flex-col items-start">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span className="font-bold">{environment.Name}</span>
+              {isEdge ? (
+                <EdgeIndicator environment={environment} showLastCheckInDate />
+              ) : (
+                <>
+                  <EnvironmentStatusBadge status={environment.Status} />
+                  {snapshotTime && (
+                    <span
+                      className="small text-muted vertical-center gap-1"
+                      title="Last snapshot time"
+                    >
+                      <Activity className="icon icon-sm" aria-hidden="true" />
+                      {snapshotTime}
+                    </span>
+                  )}
+                </>
+              )}
+              <EngineVersion environment={environment} />
+              {!isEdge && (
+                <span className="text-muted small vertical-center">
+                  {stripProtocol(environment.URL)}
+                </span>
+              )}
+            </div>
+            <div className="small text-muted flex flex-wrap items-center gap-x-4 gap-y-2">
+              {groupName && (
+                <span className="font-semibold">
+                  <span>Group: </span>
+                  <span>{groupName}</span>
+                </span>
+              )}
+              <span className="vertical-center gap-1">
+                <Tag className="icon icon-sm" aria-hidden="true" />
+                {tags}
               </span>
-            )}
-            <span className="vertical-center gap-1">
-              <Tag className="icon icon-sm" aria-hidden="true" />
-              {tags}
-            </span>
-            {isEdge && (
-              <>
-                <AgentVersionTag
-                  type={environment.Type}
-                  version={environment.Agent.Version}
-                />
-                {environment.Edge.AsyncMode && (
-                  <span className="vertical-center gap-1">
-                    <Globe className="icon icon-sm" aria-hidden="true" />
-                    Async Environment
-                  </span>
-                )}
-              </>
-            )}
+              <EnvironmentTypeTag environment={environment} />
+              <AgentDetails environment={environment} />
+            </div>
+            <EnvironmentStats environment={environment} />
           </div>
-          <EnvironmentStats environment={environment} />
+        </button>
+      </Link>
+      {/* 
+      Buttons are extracted out of the main button because it causes errors with react and accessibility issues
+      see https://stackoverflow.com/questions/66409964/warning-validatedomnesting-a-cannot-appear-as-a-descendant-of-a
+      */}
+      <div className="absolute inset-y-0 right-0 flex justify-end w-56">
+        <div className="py-3 flex items-center">
+          <EnvironmentBrowseButtons
+            environment={environment}
+            onClickBrowse={onClickBrowse}
+            isActive={isActive}
+          />
         </div>
-        <EnvironmentBrowseButtons
-          environment={environment}
-          onClickBrowse={onClickBrowse}
-          isActive={isActive}
-        />
         <EditButtons environment={environment} />
-      </button>
-    </Link>
+      </div>
+    </div>
   );
 }
 

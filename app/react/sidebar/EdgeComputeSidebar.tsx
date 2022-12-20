@@ -1,17 +1,13 @@
 import { Box, Clock, LayoutGrid, Layers } from 'lucide-react';
 
+import { isBE } from '../portainer/feature-flags/feature-flags.service';
+
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
 
 export function EdgeComputeSidebar() {
   return (
     <SidebarSection title="Edge compute">
-      <SidebarItem
-        to="edge.devices"
-        label="Edge Devices"
-        icon={Box}
-        data-cy="portainerSidebar-edgeDevices"
-      />
       <SidebarItem
         to="edge.groups"
         label="Edge Groups"
@@ -30,6 +26,14 @@ export function EdgeComputeSidebar() {
         icon={Clock}
         data-cy="portainerSidebar-edgeJobs"
       />
+      {isBE && (
+        <SidebarItem
+          to="edge.devices.waiting-room"
+          label="Waiting Room"
+          icon={Box}
+          data-cy="portainerSidebar-edgeDevicesWaitingRoom"
+        />
+      )}
     </SidebarSection>
   );
 }

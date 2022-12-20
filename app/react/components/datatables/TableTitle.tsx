@@ -1,4 +1,5 @@
 import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import clsx from 'clsx';
 
 import { Icon } from '@@/Icon';
 
@@ -6,6 +7,7 @@ interface Props {
   icon?: ReactNode | ComponentType<unknown>;
   label: string;
   description?: ReactNode;
+  className?: string;
 }
 
 export function TableTitle({
@@ -13,9 +15,10 @@ export function TableTitle({
   label,
   children,
   description,
+  className,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="toolBar flex-col">
+    <div className={clsx('toolBar flex-col', className)}>
       <div className="flex gap-1 p-0 w-full items-center">
         <div className="toolBarTitle">
           {icon && (

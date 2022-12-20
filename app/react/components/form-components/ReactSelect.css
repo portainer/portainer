@@ -13,6 +13,16 @@
   --single-value-option-text-color: var(--white-color);
 }
 
+.portainer-selector__placeholder {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.portainer-selector__indicator-separator {
+  display: none;
+}
+
 /* input style */
 .portainer-selector-root .portainer-selector__control {
   border-color: var(--border-form-control-color);

@@ -28,11 +28,12 @@ export function KubeconfigButton({ environments, envQueryParams }: Props) {
       <Button
         onClick={handleClick}
         size="medium"
-        className="!ml-3"
+        className="!m-0"
         disabled={environments.some(
           (env) => !isKubernetesEnvironment(env.Type)
         )}
         icon={Download}
+        color="light"
       >
         Kubeconfig
       </Button>

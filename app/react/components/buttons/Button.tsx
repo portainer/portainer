@@ -25,7 +25,9 @@ type Color =
   | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
-export interface Props extends AriaAttributes, AutomationTestingProps {
+export interface Props<TasProps = unknown>
+  extends AriaAttributes,
+    AutomationTestingProps {
   icon?: ReactNode | ComponentType<unknown>;
 
   color?: Color;
@@ -34,10 +36,12 @@ export interface Props extends AriaAttributes, AutomationTestingProps {
   title?: string;
   className?: string;
   type?: Type;
+  as?: ComponentType<TasProps> | string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  props?: TasProps;
 }
 
-export function Button({
+export function Button<TasProps = unknown>({
   type = 'button',
   color = 'primary',
   size = 'small',
@@ -47,11 +51,13 @@ export function Button({
   title,
   icon,
   children,
-
+  as = 'button',
+  props,
   ...ariaProps
-}: PropsWithChildren<Props>) {
+}: PropsWithChildren<Props<TasProps>>) {
+  const Component = as as 'button';
   return (
-    <button
+    <Component
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
@@ -60,10 +66,12 @@ export function Button({
       title={title}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...ariaProps}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
     >
       {icon && <Icon icon={icon} size={getIconSize(size)} />}
       {children}
-    </button>
+    </Component>
   );
 }
 
