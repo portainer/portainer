@@ -1,5 +1,4 @@
-import EndpointHelper from '@/portainer/helpers/endpointHelper';
-import { isLocalEnvironment } from '@/react/portainer/environments/utils';
+import { isAgentEnvironment, isLocalEnvironment } from '@/react/portainer/environments/utils';
 
 export default class porImageRegistryContainerController {
   /* @ngInject */
@@ -26,7 +25,7 @@ export default class porImageRegistryContainerController {
 
   async fetchRateLimits() {
     this.pullRateLimits = null;
-    if (!EndpointHelper.isAgentEndpoint(this.endpoint) && !isLocalEnvironment(this.endpoint)) {
+    if (!isAgentEnvironment(this.endpoint.Type) && !isLocalEnvironment(this.endpoint)) {
       this.setValidity(true);
       return;
     }
