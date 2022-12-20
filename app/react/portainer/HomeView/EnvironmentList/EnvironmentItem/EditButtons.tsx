@@ -94,11 +94,6 @@ function ButtonsGrid({
           {child}
         </div>
       ))}
-      {/* <div>{children[0] || null}</div>
-      <div className="border-x-0 border-y border-gray-5 border-solid">
-        {children[1] || null}
-      </div>
-      <div>{children[2] || null}</div> */}
     </div>
   );
 }
