@@ -34,11 +34,12 @@ import (
 // Feature represents a feature that can be enabled or disabled via feature flags
 type Feature string
 
+var featureFlags map[Feature]bool
+
+// String returns the string representation of a feature flag
 func (f Feature) String() string {
 	return string(f)
 }
-
-var featureFlags map[Feature]bool
 
 // IsEnabled returns true if the feature flag is enabled
 func IsEnabled(feat Feature) bool {
