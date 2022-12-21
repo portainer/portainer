@@ -508,8 +508,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
 	if flags.FeatureFlags != nil {
-		featureflags.Init(portainer.SupportedFeatureFlags)
-		featureflags.Parse(*flags.FeatureFlags)
+		featureflags.Parse(*flags.FeatureFlags, portainer.SupportedFeatureFlags)
 	}
 
 	fileService := initFileService(*flags.Data)

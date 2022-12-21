@@ -29,7 +29,7 @@ func FeatureFlags() map[Feature]bool {
 	return featureFlags
 }
 
-func Init(supportedFeatures []Feature) {
+func initSupportedFeatures(supportedFeatures []Feature) {
 	featureFlags = make(map[Feature]bool)
 	for _, feat := range supportedFeatures {
 		featureFlags[feat] = false
@@ -39,7 +39,9 @@ func Init(supportedFeatures []Feature) {
 // Parse turns on or off feature flags
 // e.g.  portainer ... --feat open-amt --feat fdo ...
 // or from env PORTAINER_FEATURE_FLAGS=open-amt,fdo
-func Parse(features []string) {
+func Parse(features []string, supportedFeatures []Feature) {
+	initSupportedFeatures(supportedFeatures)
+
 	env := os.Getenv("PORTAINER_FEATURE_FLAGS")
 	envFeatures := []string{}
 	if env != "" {
