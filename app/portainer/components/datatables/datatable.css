@@ -111,15 +111,11 @@
 
 .datatable .footer .paginationControls {
   float: right;
-  margin: 10px 0 5px 0;
+  margin: 10px 10px 5px 0;
 }
 
 .datatable .footer .paginationControls .limitSelector {
   font-size: 12px;
-}
-
-.datatable .footer .paginationControls .limitSelector:not(:last-child) {
-  margin-right: 10px;
 }
 
 .datatable .footer .paginationControls .pagination {
