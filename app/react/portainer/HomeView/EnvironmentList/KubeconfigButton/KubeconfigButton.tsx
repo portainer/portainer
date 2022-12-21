@@ -19,7 +19,11 @@ export interface Props {
 export function KubeconfigButton({ environments, envQueryParams }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!isKubeconfigButtonVisible(environments)) {
+  const kubeEnvs = environments.filter((env) =>
+    isKubernetesEnvironment(env.Type)
+  );
+
+  if (!isKubeconfigButtonVisible()) {
     return null;
   }
 
@@ -29,10 +33,8 @@ export function KubeconfigButton({ environments, envQueryParams }: Props) {
         onClick={handleClick}
         size="medium"
         className="!m-0"
-        disabled={environments.some(
-          (env) => !isKubernetesEnvironment(env.Type)
-        )}
         icon={Download}
+        disabled={kubeEnvs.length === 0}
         color="light"
       >
         Kubeconfig
@@ -57,11 +59,8 @@ export function KubeconfigButton({ environments, envQueryParams }: Props) {
     setIsOpen(false);
   }
 
-  function isKubeconfigButtonVisible(environments: Environment[]) {
-    if (window.location.protocol !== 'https:') {
-      return false;
-    }
-    return environments.some((env) => isKubernetesEnvironment(env.Type));
+  function isKubeconfigButtonVisible() {
+    return window.location.protocol === 'https:';
   }
 
   function prompt() {
@@ -70,7 +69,7 @@ export function KubeconfigButton({ environments, envQueryParams }: Props) {
         <KubeconfigPrompt
           envQueryParams={envQueryParams}
           onClose={handleClose}
-          selectedItems={environments.map((env) => env.Id)}
+          selectedItems={kubeEnvs.map((env) => env.Id)}
         />
       )
     );
