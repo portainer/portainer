@@ -1,4 +1,5 @@
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
+import { EditorType } from '@/react/edge/edge-stacks/types';
 
 export class EditEdgeStackFormController {
   /* @ngInject */
@@ -12,6 +13,8 @@ export class EditEdgeStackFormController {
       0: '',
       1: '',
     };
+
+    this.EditorType = EditorType;
 
     this.onChangeGroups = this.onChangeGroups.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);

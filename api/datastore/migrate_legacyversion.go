@@ -40,6 +40,7 @@ var dbVerToSemVerMap = map[int]string{
 	60: "2.15",
 	61: "2.15.1",
 	70: "2.16",
+	80: "2.17",
 }
 
 func dbVersionToSemanticVersion(dbVersion int) string {

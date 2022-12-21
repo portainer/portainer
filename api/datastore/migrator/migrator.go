@@ -3,6 +3,8 @@ package migrator
 import (
 	"errors"
 
+	"github.com/portainer/portainer/api/dataservices/edgestack"
+
 	"github.com/Masterminds/semver"
 	"github.com/rs/zerolog/log"
 
@@ -53,6 +55,7 @@ type (
 		fileService             portainer.FileService
 		authorizationService    *authorization.Service
 		dockerhubService        *dockerhub.Service
+		edgeStackService        *edgestack.Service
 	}
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
@@ -77,6 +80,7 @@ type (
 		FileService             portainer.FileService
 		AuthorizationService    *authorization.Service
 		DockerhubService        *dockerhub.Service
+		EdgeStackService        *edgestack.Service
 	}
 )
 
@@ -103,6 +107,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		fileService:             parameters.FileService,
 		authorizationService:    parameters.AuthorizationService,
 		dockerhubService:        parameters.DockerhubService,
+		edgeStackService:        parameters.EdgeStackService,
 	}
 
 	migrator.initMigrations()
@@ -128,12 +133,12 @@ func (m *Migrator) CurrentSemanticDBVersion() *semver.Version {
 
 func (m *Migrator) addMigrations(v string, funcs ...func() error) {
 	m.migrations = append(m.migrations, Migrations{
-		version:        semver.MustParse(v),
-		migrationFuncs: funcs,
+		Version:        semver.MustParse(v),
+		MigrationFuncs: funcs,
 	})
 }
 
-func (m *Migrator) latestMigrations() Migrations {
+func (m *Migrator) LatestMigrations() Migrations {
 	return m.migrations[len(m.migrations)-1]
 }
 
@@ -146,8 +151,8 @@ func (m *Migrator) latestMigrations() Migrations {
 // !      This increases the migration funcs count and so they all run again.
 
 type Migrations struct {
-	version        *semver.Version
-	migrationFuncs MigrationFuncs
+	Version        *semver.Version
+	MigrationFuncs MigrationFuncs
 }
 
 type MigrationFuncs []func() error
@@ -199,6 +204,7 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.15", m.migrateDBVersionToDB60)
 	m.addMigrations("2.16", m.migrateDBVersionToDB70)
 	m.addMigrations("2.16.1", m.migrateDBVersionToDB71)
+	m.addMigrations("2.17", m.migrateDBVersionToDB80)
 
 	// Add new migrations below...
 	// One function per migration, each versions migration funcs in the same file.

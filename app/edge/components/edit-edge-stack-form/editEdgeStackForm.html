@@ -32,7 +32,7 @@
   </div>
 
   <web-editor-form
-    ng-if="$ctrl.model.DeploymentType === 0"
+    ng-if="$ctrl.model.DeploymentType === $ctrl.EditorType.Compose"
     value="$ctrl.model.StackFileContent"
     yml="true"
     identifier="compose-editor"
@@ -48,7 +48,7 @@
     </editor-description>
   </web-editor-form>
 
-  <div ng-if="$ctrl.model.DeploymentType === 1">
+  <div ng-if="$ctrl.model.DeploymentType === $ctrl.EditorType.Kubernetes">
     <div class="form-group">
       <div class="col-sm-12">
         <por-switch-field

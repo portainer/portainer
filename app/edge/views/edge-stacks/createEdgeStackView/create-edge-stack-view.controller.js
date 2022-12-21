@@ -1,3 +1,5 @@
+import { EditorType } from '@/react/edge/edge-stacks/types';
+
 export default class CreateEdgeStackViewController {
   /* @ngInject */
   constructor($state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope) {
@@ -18,6 +20,8 @@ export default class CreateEdgeStackViewController {
       DeploymentType: 0,
       UseManifestNamespaces: false,
     };
+
+    this.EditorType = EditorType;
 
     this.state = {
       Method: 'editor',
