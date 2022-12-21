@@ -16,15 +16,18 @@ func (f Feature) String() string {
 
 var featureFlags map[Feature]bool
 
+// IsEnabled returns true if the feature flag is enabled
 func IsEnabled(feat Feature) bool {
 	return featureFlags[feat]
 }
 
+// IsSupported returns true if the feature is supported
 func IsSupported(feat Feature) bool {
 	_, ok := featureFlags[feat]
 	return ok
 }
 
+// FeatureFlags returns a map of all feature flags
 func FeatureFlags() map[Feature]bool {
 	return featureFlags
 }
@@ -36,9 +39,13 @@ func initSupportedFeatures(supportedFeatures []Feature) {
 	}
 }
 
-// Parse turns on or off feature flags
-// e.g.  portainer ... --feat open-amt --feat fdo ...
-// or from env PORTAINER_FEATURE_FLAGS=open-amt,fdo
+// Parse turns on feature flags
+// It accepts a list of feature flags as strings and a list of supported features.
+// It will also check for feature flags in the PORTAINER_FEATURE_FLAGS environment variable.
+// Multiple feature flags can be specified with the PORTAINER_FEATURE_FLAGS environment.
+// variable using a comma separated list. e.g. "PORTAINER_FEATURE_FLAGS=feature1,feature2".
+// If a feature flag is not supported, it will be logged and ignored.
+// If a feature flag is supported, it will be logged and enabled.
 func Parse(features []string, supportedFeatures []Feature) {
 	initSupportedFeatures(supportedFeatures)
 
