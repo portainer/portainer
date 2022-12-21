@@ -127,9 +127,11 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		}
 	}
 
-	err = handler.addUserIntoTeams(user, ldapSettings)
-	if err != nil {
-		log.Warn().Err(err).Msg("unable to automatically add user into teams")
+	if len(ldapSettings.GroupSearchSettings) > 0 {
+		err = handler.addUserIntoTeams(user, ldapSettings)
+		if err != nil {
+			log.Warn().Err(err).Msg("unable to automatically add user into teams")
+		}
 	}
 
 	return handler.writeToken(w, user, false)
