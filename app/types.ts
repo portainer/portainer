@@ -7,6 +7,8 @@ export interface AutomationTestingProps {
   'data-cy'?: string;
 }
 
+export type PropsWithClassName<TProps> = TProps & { className?: string };
+
 declare module 'react' {
   interface HTMLAttributes<T>
     extends AriaAttributes,
