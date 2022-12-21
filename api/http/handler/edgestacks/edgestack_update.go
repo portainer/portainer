@@ -193,6 +193,9 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}
 
+	stack.NumDeployments = len(relatedEndpointIds)
+	stack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)

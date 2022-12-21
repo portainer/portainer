@@ -3,6 +3,8 @@ import { ModalHeader } from './ModalHeader';
 import { ModalBody } from './ModalBody';
 import { ModalFooter } from './ModalFooter';
 
+export { ModalType, type OnSubmit } from './types';
+
 interface WithSubComponents {
   Header: typeof ModalHeader;
   Body: typeof ModalBody;

@@ -175,7 +175,10 @@ angular
 
       var endpoint = {
         name: 'portainer.endpoints.endpoint',
-        url: '/:id',
+        url: '/:id?redirectTo',
+        params: {
+          redirectTo: '',
+        },
         views: {
           'content@': {
             templateUrl: './views/endpoints/edit/endpoint.html',

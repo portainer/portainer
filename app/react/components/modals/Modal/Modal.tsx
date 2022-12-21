@@ -33,7 +33,10 @@ export function Modal({
     <Context.Provider value>
       <DialogOverlay
         isOpen
-        className="flex items-center justify-center z-50"
+        className={clsx(
+          styles.overlay,
+          'flex items-center justify-center z-50'
+        )}
         onDismiss={onDismiss}
         role="dialog"
       >

@@ -11,6 +11,7 @@ import { Icon } from '@@/Icon';
 import { LinkButton } from '@@/LinkButton';
 
 type BrowseStatus = 'snapshot' | 'connected' | 'disconnected';
+
 export function EnvironmentBrowseButtons({
   environment,
   onClickBrowse,
@@ -23,7 +24,7 @@ export function EnvironmentBrowseButtons({
   const isEdgeAsync = checkEdgeAsync(environment);
   const browseStatus = getStatus(isActive, isEdgeAsync);
   return (
-    <div className="flex flex-col gap-1 ml-auto [&>*]:flex-1">
+    <div className="flex flex-col gap-1 justify-center [&>*]:h-1/3 h-24">
       {isBE && (
         <LinkButton
           icon={History}
@@ -33,13 +34,14 @@ export function EnvironmentBrowseButtons({
             environmentId: environment.Id,
           }}
           color="light"
-          className="w-full py-1"
+          className="w-full !py-0 !m-0"
         >
           Browse snapshot
         </LinkButton>
       )}
 
       <LinkButton
+        title="Live connection is not available for async environments"
         icon={Wifi}
         disabled={isEdgeAsync || browseStatus === 'connected'}
         to={getDashboardRoute(environment)}
@@ -48,7 +50,7 @@ export function EnvironmentBrowseButtons({
         }}
         onClick={onClickBrowse}
         color="primary"
-        className="w-full py-1"
+        className="w-full !py-0 !m-0"
       >
         Live connect
       </LinkButton>
@@ -85,7 +87,7 @@ function BrowseStatusTag({ status }: { status: BrowseStatus }) {
 
 function Disconnected() {
   return (
-    <div className="min-h-[30px] vertical-center justify-center opacity-50">
+    <div className="vertical-center justify-center opacity-50">
       <Icon icon={WifiOff} />
       Disconnected
     </div>
@@ -94,7 +96,7 @@ function Disconnected() {
 
 function Connected() {
   return (
-    <div className="min-h-[30px] vertical-center gap-2 justify-center text-green-8 bg-green-3 rounded-lg">
+    <div className="vertical-center gap-2 justify-center text-green-8 bg-green-3 rounded-lg">
       <div className="rounded-full h-2 w-2 bg-green-8" />
       Connected
     </div>
@@ -103,7 +105,7 @@ function Connected() {
 
 function Snapshot() {
   return (
-    <div className="min-h-[30px] vertical-center gap-2 justify-center text-warning-7 bg-warning-3 rounded-lg">
+    <div className="vertical-center gap-2 justify-center text-warning-7 bg-warning-3 rounded-lg">
       <div className="rounded-full h-2 w-2 bg-warning-7" />
       Browsing Snapshot
     </div>

@@ -18,7 +18,7 @@ export function EnvironmentStats({ environment }: Props) {
   const component = getComponent(platform, environment);
 
   return (
-    <span className="blocklist-item-desc flex items-center gap-10">
+    <span className="blocklist-item-desc flex items-center gap-x-10 gap-y-2 flex-wrap">
       {component}
     </span>
   );

@@ -24,8 +24,6 @@ function Template({ environment }: Args) {
       environment={environment}
       onClickBrowse={() => {}}
       isActive={false}
-      onSelect={() => {}}
-      isSelected={false}
     />
   );
 }

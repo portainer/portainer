@@ -20,12 +20,6 @@ export class EdgeStackEndpointsDatatableController {
     this.onPageChange = this.onPageChange.bind(this);
     this.paginationChanged = this.paginationChanged.bind(this);
     this.paginationChangedAsync = this.paginationChangedAsync.bind(this);
-
-    this.statusMap = {
-      1: 'OK',
-      2: 'Error',
-      3: 'Acknowledged',
-    };
   }
 
   extendGenericController($controller, $scope) {
@@ -45,8 +39,9 @@ export class EdgeStackEndpointsDatatableController {
 
   endpointStatusLabel(endpointId) {
     const status = this.getEndpointStatus(endpointId);
+    const details = (status && status.Details) || {};
 
-    return status ? this.statusMap[status.Type] : 'Pending';
+    return (details.Error && 'Error') || (details.Ok && 'Ok') || (details.ImagesPulled && 'Images pre-pulled') || (details.Acknowledged && 'Acknowledged') || 'Pending';
   }
 
   endpointStatusError(endpointId) {

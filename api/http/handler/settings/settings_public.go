@@ -33,6 +33,11 @@ type publicSettingsResponse struct {
 	// Whether team sync is enabled
 	TeamSync bool `json:"TeamSync" example:"true"`
 
+	// Whether FDO is enabled
+	IsFDOEnabled bool
+	// Whether AMT is enabled
+	IsAMTEnabled bool
+
 	Edge struct {
 		// Whether the device has been started in edge async mode
 		AsyncMode bool
@@ -76,6 +81,8 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  appSettings.FeatureFlagSettings,
+		IsFDOEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.FDOConfiguration.Enabled,
+		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
 
 	publicSettings.Edge.AsyncMode = appSettings.Edge.AsyncMode
