@@ -29,12 +29,9 @@ const (
 	skipPullImageEnvVar = "UPGRADE_SKIP_PULL_PORTAINER_IMAGE"
 	// updaterImageEnvVar represents the name of the environment variable used to define the updater image
 	// useful if there's a need to test a different updater
-	updaterImageEnvVar = "UPGRADE_UPDATER_IMAGE"
-)
-
-var (
-	errUpdateFailure    = errors.New("update failure")
-	errPullImageFailure = errors.New("pull image failure")
+	updaterImageEnvVar         = "UPGRADE_UPDATER_IMAGE"
+	errMessageUpdateFailure    = "update failure"
+	errMessagePullImageFailure = "pull image failure"
 )
 
 type Service interface {
@@ -131,8 +128,8 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 			Options: libstack.Options{
 				ProjectName: projectName,
 				PotentialErrors: []string{
-					errUpdateFailure.Error(),
-					errPullImageFailure.Error(),
+					errMessageUpdateFailure,
+					errMessagePullImageFailure,
 				},
 			},
 		},
