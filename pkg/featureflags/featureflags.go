@@ -1,3 +1,27 @@
+/*
+	 Package featureflags implements feature flags for Portainer projects
+
+	 Feature flags are used to turn on features that are not production ready.
+	 Use the Parse function to enable feature flags and also the pass a list of
+	 available flags
+
+	   e.g.
+	    var SupportedFeatureFlags = []featureflags.Feature{
+			"my-feature",
+		}
+
+		func main() {
+			// parse cli flags
+
+			// pass cli flags and supported feature flags to featureflags.Parse
+			featureflags.Parse([]string{"my-feature"}, SupportedFeatureFlags)
+		}
+
+		...
+		if featureflags.IsEnabled("my-feature") {
+			// do something
+		}
+*/
 package featureflags
 
 import (
@@ -27,7 +51,9 @@ func IsSupported(feat Feature) bool {
 	return ok
 }
 
-// FeatureFlags returns a map of all feature flags
+// FeatureFlags returns a map of all feature flags.
+// this is useful in situations where you need to pass all feature flags to a REST handler
+// function
 func FeatureFlags() map[Feature]bool {
 	return featureFlags
 }
