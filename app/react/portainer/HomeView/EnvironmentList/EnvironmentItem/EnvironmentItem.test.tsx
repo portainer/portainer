@@ -46,6 +46,7 @@ function renderComponent(
       <EnvironmentItem
         isActive={false}
         onClickBrowse={() => {}}
+        onClickDisconnect={() => {}}
         environment={env}
         groupName={group.Name}
       />

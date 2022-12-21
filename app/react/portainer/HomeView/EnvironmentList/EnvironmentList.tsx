@@ -46,7 +46,7 @@ const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
   const { isAdmin } = useUser();
-  const { environmentId: currentEnvironmentId } = useStore(environmentStore);
+  const currentEnvStore = useStore(environmentStore);
 
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
@@ -223,7 +223,12 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
                     groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
                   }
                   onClickBrowse={() => onClickBrowse(env)}
-                  isActive={env.Id === currentEnvironmentId}
+                  onClickDisconnect={() =>
+                    env.Id === currentEnvStore.environmentId
+                      ? currentEnvStore.clear()
+                      : null
+                  }
+                  isActive={env.Id === currentEnvStore.environmentId}
                 />
               ))
             )}

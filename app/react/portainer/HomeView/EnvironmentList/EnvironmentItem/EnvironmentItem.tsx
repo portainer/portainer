@@ -33,12 +33,14 @@ interface Props {
   environment: Environment;
   groupName?: string;
   onClickBrowse(): void;
+  onClickDisconnect(): void;
   isActive: boolean;
 }
 
 export function EnvironmentItem({
   environment,
   onClickBrowse,
+  onClickDisconnect,
   groupName,
   isActive,
 }: Props) {
@@ -113,10 +115,11 @@ export function EnvironmentItem({
       see https://stackoverflow.com/questions/66409964/warning-validatedomnesting-a-cannot-appear-as-a-descendant-of-a
       */}
       <div className="absolute inset-y-0 right-0 flex justify-end w-56">
-        <div className="py-3 flex items-center">
+        <div className="py-3 flex items-center flex-1">
           <EnvironmentBrowseButtons
             environment={environment}
             onClickBrowse={onClickBrowse}
+            onClickDisconnect={onClickDisconnect}
             isActive={isActive}
           />
         </div>

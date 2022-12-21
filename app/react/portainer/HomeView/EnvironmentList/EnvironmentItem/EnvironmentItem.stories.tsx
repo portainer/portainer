@@ -23,6 +23,7 @@ function Template({ environment }: Args) {
     <EnvironmentItem
       environment={environment}
       onClickBrowse={() => {}}
+      onClickDisconnect={() => {}}
       isActive={false}
     />
   );
