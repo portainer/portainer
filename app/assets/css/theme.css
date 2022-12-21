@@ -222,7 +222,6 @@
   --border-table-color: var(--grey-19);
   --border-table-top-color: var(--grey-19);
   --border-datatable-top-color: var(--grey-10);
-  --border-blocklist-color: var(--grey-44);
   --border-input-group-addon-color: var(--grey-44);
   --border-btn-default-color: var(--grey-44);
   --border-boxselector-color: var(--grey-6);
@@ -231,7 +230,6 @@
   --border-navtabs-color: var(--ui-white);
   --border-codemirror-cursor-color: var(--black-color);
   --border-pre-color: var(--grey-43);
-  --border-blocklist-item-selected-color: var(--grey-46);
   --border-pagination-span-color: var(--ui-white);
   --border-pagination-hover-color: var(--ui-white);
   --border-panel-color: var(--white-color);
@@ -245,6 +243,7 @@
   --border-sortbutton: var(--grey-8);
   --border-bootbox: var(--ui-gray-5);
   --border-blocklist: var(--ui-gray-5);
+  --border-blocklist-item-selected-color: var(--grey-46);
   --border-widget: var(--ui-gray-5);
   --border-nav-container-color: var(--ui-gray-5);
   --border-stepper-color: var(--ui-gray-4);
@@ -408,7 +407,6 @@
   --border-table-color: var(--grey-3);
   --border-table-top-color: var(--grey-3);
   --border-datatable-top-color: var(--grey-3);
-  --border-blocklist-color: var(--grey-3);
   --border-input-group-addon-color: var(--grey-38);
   --border-btn-default-color: var(--grey-38);
   --border-boxselector-color: var(--grey-1);
@@ -417,6 +415,7 @@
   --border-navtabs-color: var(--grey-38);
   --border-codemirror-cursor-color: var(--white-color);
   --border-pre-color: var(--grey-3);
+  --border-blocklist: var(--ui-gray-9);
   --border-blocklist-item-selected-color: var(--grey-38);
   --border-pagination-span-color: var(--grey-1);
   --border-pagination-hover-color: var(--grey-3);
@@ -430,7 +429,6 @@
   --border-modal: 0px;
   --border-sortbutton: var(--grey-3);
   --border-bootbox: var(--ui-gray-9);
-  --border-blocklist: var(--ui-gray-9);
   --border-widget: var(--grey-3);
   --border-pagination-color: var(--grey-1);
   --border-nav-container-color: var(--ui-gray-neutral-8);
@@ -600,7 +598,6 @@
   --border-pre-color: var(--grey-3);
   --border-codemirror-cursor-color: var(--white-color);
   --border-modal: 1px solid var(--white-color);
-  --border-blocklist-color: var(--white-color);
   --border-sortbutton: var(--black-color);
   --border-bootbox: var(--black-color);
   --border-blocklist: var(--white-color);

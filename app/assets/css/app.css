@@ -210,23 +210,10 @@ input[type='checkbox'] {
   margin-right: 10px;
 }
 
-.blocklist-item--disabled {
-  cursor: auto;
-  background-color: var(--grey-12);
-}
-
 .blocklist-item--selected {
   background-color: var(--bg-blocklist-item-selected-color);
   border: 2px solid var(--border-blocklist-item-selected-color);
   color: var(--text-blocklist-item-selected-color);
-}
-
-.blocklist-item:not(.blocklist-item-not-interactive):hover {
-  @apply border border-blue-7;
-  cursor: pointer;
-
-  background-color: var(--bg-blocklist-hover-color);
-  color: var(--text-blocklist-hover-color);
 }
 
 .blocklist-item-box {

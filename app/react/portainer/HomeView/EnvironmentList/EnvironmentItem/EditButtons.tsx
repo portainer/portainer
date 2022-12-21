@@ -20,6 +20,12 @@ export function EditButtons({ environment }: { environment: Environment }) {
   const isEdgeAsync = checkEdgeAsync(environment);
 
   const configRoute = getConfigRoute(environment);
+
+  const buttonsClasses = clsx(
+    'w-full h-full !ml-0 !rounded-none',
+    'hover:bg-gray-3 th-dark:hover:bg-gray-9 th-highcontrast:hover:bg-white'
+  );
+
   return (
     <ButtonsGrid className="w-11 ml-3">
       <LinkButton
@@ -29,7 +35,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
         color="none"
         icon={Edit2}
         size="medium"
-        className="w-full h-full !ml-0 hover:bg-gray-3 !rounded-none"
+        className={buttonsClasses}
         title="Edit"
       />
 
@@ -40,7 +46,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
         color="none"
         icon={Settings}
         size="medium"
-        className="w-full h-full !ml-0 hover:bg-gray-3 !rounded-none"
+        className={buttonsClasses}
         title="Configuration"
       />
     </ButtonsGrid>
@@ -79,7 +85,9 @@ function ButtonsGrid({
   return (
     <div
       className={clsx(
-        'grid border border-solid border-gray-5 rounded-r-lg',
+        'grid border border-solid rounded-r-lg',
+        'border-gray-5 th-dark:border-gray-9 th-highcontrast:border-white',
+        'overflow-hidden',
         className
       )}
     >
@@ -87,7 +95,7 @@ function ButtonsGrid({
         <div
           key={index}
           className={clsx({
-            'border-0 border-b border-solid border-b-gray-5':
+            'border-0 border-b border-solid border-b-inherit':
               index < children.length - 1,
           })}
         >
