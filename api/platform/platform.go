@@ -6,6 +6,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -48,18 +49,25 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 		return PlatformNomad, nil
 	}
 
+	if !isRunningInContainer() {
+		return "", nil
+	}
+
 	dockerCli, err := client.NewClientWithOpts()
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create docker client")
 	}
 	defer dockerCli.Close()
 
-	if !isRunningInContainer() {
-		return "", nil
-	}
-
 	info, err := dockerCli.Info(context.Background())
 	if err != nil {
+		if client.IsErrConnectionFailed(err) {
+			log.Warn().
+				Err(err).
+				Msg("failed to retrieve docker info")
+			return "", nil
+		}
+
 		return "", errors.WithMessage(err, "failed to retrieve docker info")
 	}
 
