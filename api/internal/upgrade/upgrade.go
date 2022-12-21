@@ -32,6 +32,11 @@ const (
 	updaterImageEnvVar = "UPGRADE_UPDATER_IMAGE"
 )
 
+var (
+	errUpdateFailure    = errors.New("update failure")
+	errPullImageFailure = errors.New("pull image failure")
+)
+
 type Service interface {
 	Upgrade(licenseKey string) error
 }
@@ -125,6 +130,10 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 			AbortOnContainerExit: true,
 			Options: libstack.Options{
 				ProjectName: projectName,
+				PotentialErrors: []string{
+					errUpdateFailure.Error(),
+					errPullImageFailure.Error(),
+				},
 			},
 		},
 	)
