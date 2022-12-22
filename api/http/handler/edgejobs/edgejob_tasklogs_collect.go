@@ -49,19 +49,20 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 		return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 	}
 
-	if slices.Contains(endpointsFromGroups, endpointID) {
-		edgeJob.GroupLogsCollection[endpointID] = portainer.EdgeJobEndpointMeta{
-			CollectLogs: true,
-			LogsStatus:  portainer.EdgeJobLogsStatusPending,
+	err = handler.DataStore.EdgeJob().UpdateEdgeJobFunc(edgeJob.ID, func(edgeJob *portainer.EdgeJob) {
+		if slices.Contains(endpointsFromGroups, endpointID) {
+			edgeJob.GroupLogsCollection[endpointID] = portainer.EdgeJobEndpointMeta{
+				CollectLogs: true,
+				LogsStatus:  portainer.EdgeJobLogsStatusPending,
+			}
+		} else {
+			meta := edgeJob.Endpoints[endpointID]
+			meta.CollectLogs = true
+			meta.LogsStatus = portainer.EdgeJobLogsStatusPending
+			edgeJob.Endpoints[endpointID] = meta
 		}
-	} else {
-		meta := edgeJob.Endpoints[endpointID]
-		meta.CollectLogs = true
-		meta.LogsStatus = portainer.EdgeJobLogsStatusPending
-		edgeJob.Endpoints[endpointID] = meta
-	}
+	})
 
-	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist Edge job changes in the database", err)
 	}
