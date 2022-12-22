@@ -223,7 +223,7 @@
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'code'" class="mr-1"></pr-icon>Edit this application
+              <pr-icon icon="'edit'" class="mr-1"></pr-icon>Edit this application
             </button>
             <button
               authorization="K8sApplicationDetailsW"
@@ -233,7 +233,7 @@
               ui-sref="kubernetes.applications.application.edit"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'code'" class-name="'mr-1'"></pr-icon>Edit External application
+              <pr-icon icon="'edit'" class-name="'mr-1'"></pr-icon>Edit External application
             </button>
             <be-only-button
               icon="'refresh-cw'"
@@ -249,7 +249,7 @@
               ng-click="ctrl.redeployApplication()"
               data-cy="k8sAppDetail-redeployButton"
             >
-              <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Redeploy
+              <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Terminate and restart
             </button>
             <button
               ng-if="!ctrl.isExternalApplication()"

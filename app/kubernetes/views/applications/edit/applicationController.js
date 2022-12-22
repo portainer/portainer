@@ -245,7 +245,7 @@ class KubernetesApplicationController {
   }
 
   redeployApplication() {
-    this.ModalService.confirmUpdate('Redeploying the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
+    this.ModalService.confirmUpdate('Terminating and restarting the application will cause service interruption. Do you wish to continue?', (confirmed) => {
       if (confirmed) {
         return this.$async(this.redeployApplicationAsync);
       }
