@@ -224,7 +224,7 @@ class KubernetesApplicationController {
   }
 
   rollbackApplication() {
-    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause a service interruption. Do you wish to continue?', (confirmed) => {
+    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause service interruption. Do you wish to continue?', (confirmed) => {
       if (confirmed) {
         return this.$async(this.rollbackApplicationAsync);
       }
