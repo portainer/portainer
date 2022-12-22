@@ -8,11 +8,13 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/slices"
 )
 
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
 	HasEdgeStack  bool `json:"HasEdgeStack"`
+	HasEdgeGroup  bool `json:"HasEdgeGroup"`
 	EndpointTypes []portainer.EndpointType
 }
 
@@ -46,8 +48,21 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 		}
 	}
 
+	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
+	}
+
 	decoratedEdgeGroups := []decoratedEdgeGroup{}
 	for _, orgEdgeGroup := range edgeGroups {
+		usedByEdgeJob := false
+		for _, edgeJob := range edgeJobs {
+			if slices.Contains(edgeJob.EdgeGroups, portainer.EdgeGroupID(orgEdgeGroup.ID)) {
+				usedByEdgeJob = true
+				break
+			}
+		}
+
 		edgeGroup := decoratedEdgeGroup{
 			EdgeGroup:     orgEdgeGroup,
 			EndpointTypes: []portainer.EndpointType{},
@@ -63,12 +78,14 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 
 		endpointTypes, err := getEndpointTypes(handler.DataStore.Endpoint(), edgeGroup.Endpoints)
 		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve endpoint types for Edge group", err)
+			return httperror.InternalServerError("Unable to retrieve environment types for Edge group", err)
 		}
 
 		edgeGroup.EndpointTypes = endpointTypes
 
 		edgeGroup.HasEdgeStack = usedEdgeGroups[edgeGroup.ID]
+
+		edgeGroup.HasEdgeGroup = usedByEdgeJob
 
 		decoratedEdgeGroups = append(decoratedEdgeGroups, edgeGroup)
 	}

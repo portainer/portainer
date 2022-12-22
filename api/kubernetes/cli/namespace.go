@@ -59,7 +59,7 @@ func (kcl *KubeClient) GetNamespace(name string) (portainer.K8sNamespaceInfo, er
 	return result, nil
 }
 
-// CreateIngress creates a new ingress in a given namespace in a k8s endpoint.
+// CreateNamespace creates a new ingress in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) error {
 	client := kcl.cli.CoreV1().Namespaces()
 

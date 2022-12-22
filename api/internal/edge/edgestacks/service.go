@@ -92,6 +92,7 @@ func (service *Service) PersistEdgeStack(
 	stack.ManifestPath = manifestPath
 	stack.ProjectPath = projectPath
 	stack.EntryPoint = composePath
+	stack.NumDeployments = len(relatedEndpointIds)
 
 	err = service.updateEndpointRelations(stack.ID, relatedEndpointIds)
 	if err != nil {

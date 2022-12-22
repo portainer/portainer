@@ -10,6 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -515,6 +516,12 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 		)
 	}
 
+	owner := "admin"
+	tokenData, err := security.RetrieveTokenData(r)
+	if err == nil && tokenData != nil {
+		owner = tokenData.Username
+	}
+
 	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
 		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
 	)
@@ -525,7 +532,7 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 		)
 	}
 
-	err = cli.CreateIngress(namespace, payload)
+	err = cli.CreateIngress(namespace, payload, owner)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to retrieve the ingress",

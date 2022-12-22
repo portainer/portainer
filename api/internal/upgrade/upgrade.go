@@ -9,6 +9,9 @@ import (
 	"time"
 
 	"github.com/cbroglie/mustache"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 	libstack "github.com/portainer/docker-compose-wrapper"
 	portainer "github.com/portainer/portainer/api"
@@ -43,7 +46,10 @@ type service struct {
 	assetsPath      string
 }
 
-func NewService(assetsPath string, composeDeployer libstack.Deployer) (Service, error) {
+func NewService(
+	assetsPath string,
+	composeDeployer libstack.Deployer,
+) (Service, error) {
 	platform, err := platform.DetermineContainerPlatform()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to determine container platform")
@@ -74,6 +80,7 @@ func (service *service) Upgrade(licenseKey string) error {
 }
 
 func (service *service) upgradeDocker(licenseKey, version, envType string) error {
+	ctx := context.TODO()
 	templateName := filesystem.JoinPaths(service.assetsPath, "mustache-templates", mustacheUpgradeDockerTemplateFile)
 
 	portainerImagePrefix := os.Getenv(portainerImagePrefixEnvVar)
@@ -84,6 +91,10 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 	image := fmt.Sprintf("%s:%s", portainerImagePrefix, version)
 
 	skipPullImage := os.Getenv(skipPullImageEnvVar)
+
+	if err := service.checkImage(ctx, image, skipPullImage != ""); err != nil {
+		return err
+	}
 
 	composeFile, err := mustache.RenderFile(templateName, map[string]string{
 		"image":           image,
@@ -118,7 +129,7 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 		strings.Replace(version, ".", "-", -1))
 
 	err = service.composeDeployer.Deploy(
-		context.Background(),
+		ctx,
 		[]string{filePath},
 		libstack.DeployOptions{
 			ForceRecreate:        true,
@@ -136,4 +147,36 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 	}
 
 	return errors.New("upgrade failed: server should have been restarted by the updater")
+}
+
+func (service *service) checkImage(ctx context.Context, image string, skipPullImage bool) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return errors.Wrap(err, "failed to create docker client")
+	}
+
+	if skipPullImage {
+		filters := filters.NewArgs()
+		filters.Add("reference", image)
+		images, err := cli.ImageList(ctx, types.ImageListOptions{
+			Filters: filters,
+		})
+		if err != nil {
+			return errors.Wrap(err, "failed to list images")
+		}
+
+		if len(images) == 0 {
+			return errors.Errorf("image %s not found locally", image)
+		}
+
+		return nil
+	} else {
+		// check if available on registry
+		_, err := cli.DistributionInspect(ctx, image, "")
+		if err != nil {
+			return errors.Errorf("image %s not found on registry", image)
+		}
+
+		return nil
+	}
 }

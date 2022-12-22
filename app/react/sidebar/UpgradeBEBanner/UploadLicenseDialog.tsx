@@ -44,7 +44,7 @@ export function UploadLicenseDialog({
           <Form noValidate>
             <Modal.Body>
               <p className="font-semibold text-gray-7">
-                Please enter your Portainer License Below
+                Please enter your Portainer License below
               </p>
               <FormControl
                 label="License"
@@ -58,7 +58,7 @@ export function UploadLicenseDialog({
             <Modal.Footer>
               <div className="flex gap-2 [&>*]:w-1/2 w-full">
                 <a
-                  href="https://www.portainer.io/take-5"
+                  href="https://www.portainer.io/pricing"
                   target="_blank"
                   rel="noreferrer"
                   className="no-link"

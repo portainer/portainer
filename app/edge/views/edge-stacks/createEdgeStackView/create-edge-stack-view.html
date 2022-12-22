@@ -57,9 +57,17 @@
             </div>
           </div>
 
-          <edge-stacks-docker-compose-form ng-if="$ctrl.formValues.DeploymentType == 0" form-values="$ctrl.formValues" state="$ctrl.state"></edge-stacks-docker-compose-form>
+          <edge-stacks-docker-compose-form
+            ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Compose"
+            form-values="$ctrl.formValues"
+            state="$ctrl.state"
+          ></edge-stacks-docker-compose-form>
 
-          <edge-stacks-kube-manifest-form ng-if="$ctrl.formValues.DeploymentType == 1" form-values="$ctrl.formValues" state="$ctrl.state"></edge-stacks-kube-manifest-form>
+          <edge-stacks-kube-manifest-form
+            ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Kubernetes"
+            form-values="$ctrl.formValues"
+            state="$ctrl.state"
+          ></edge-stacks-kube-manifest-form>
 
           <!-- actions -->
           <div class="col-sm-12 form-section-title"> Actions </div>

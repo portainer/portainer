@@ -113,11 +113,7 @@ angular
     $stateRegistryProvider.register({
       name: 'edge.devices',
       url: '/devices',
-      views: {
-        'content@': {
-          component: 'edgeDevicesView',
-        },
-      },
+      abstract: true,
     });
 
     if (process.env.PORTAINER_EDITION === 'BE') {

@@ -1,3 +1,7 @@
+.overlay[data-reach-dialog-overlay] {
+  background: hsla(0, 0%, 0%, 0.8);
+}
+
 .modal-dialog {
   width: 450px;
   display: inline-block;
