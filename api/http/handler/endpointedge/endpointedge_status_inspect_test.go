@@ -324,7 +324,7 @@ func TestEdgeStackStatus(t *testing.T) {
 		ID:   edgeStackID,
 		Name: "test-edge-stack-17",
 		Status: map[portainer.EndpointID]portainer.EdgeStackStatus{
-			endpointID: {Type: portainer.StatusOk, Error: "", EndpointID: endpoint.ID},
+			endpointID: {Details: portainer.EdgeStackStatusDetails{Ok: true}, Error: "", EndpointID: endpoint.ID},
 		},
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     []portainer.EdgeGroupID{1, 2},

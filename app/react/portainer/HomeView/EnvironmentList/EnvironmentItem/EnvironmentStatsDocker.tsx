@@ -1,16 +1,19 @@
 import {
-  Layers,
-  Shuffle,
-  Database,
-  List,
-  HardDrive,
   Box,
-  Power,
+  Cpu,
+  Database,
+  HardDrive,
   Heart,
+  Layers,
+  List,
+  Power,
+  Shuffle,
 } from 'lucide-react';
 
+import Memory from '@/assets/ico/memory.svg?c';
 import { addPlural } from '@/portainer/helpers/strings';
 import { DockerSnapshot } from '@/react/docker/snapshots/types';
+import { humanize } from '@/portainer/filters/filters';
 
 import { StatsItem } from '@@/StatsItem';
 
@@ -48,6 +51,13 @@ export function EnvironmentStatsDocker({ snapshot }: Props) {
         icon={Database}
       />
       <StatsItem value={addPlural(snapshot.ImageCount, 'image')} icon={List} />
+
+      <StatsItem icon={Cpu} value={`${snapshot.TotalCPU} CPU`} />
+
+      <StatsItem
+        icon={Memory}
+        value={`${humanize(snapshot.TotalMemory)} RAM`}
+      />
 
       {snapshot.Swarm && (
         <StatsItem

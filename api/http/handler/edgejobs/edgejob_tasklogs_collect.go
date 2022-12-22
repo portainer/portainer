@@ -7,6 +7,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/slices"
 )
 
 // @id EdgeJobTasksCollect
@@ -42,13 +44,22 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 	}
 
 	endpointID := portainer.EndpointID(taskID)
+	endpointsFromGroups, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
+	if err != nil {
+		return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
+	}
 
-	meta := edgeJob.Endpoints[endpointID]
-	meta.CollectLogs = true
-	meta.LogsStatus = portainer.EdgeJobLogsStatusPending
-	edgeJob.Endpoints[endpointID] = meta
-
-	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+	if slices.Contains(endpointsFromGroups, endpointID) {
+		edgeJob.GroupLogsCollection[endpointID] = portainer.EdgeJobEndpointMeta{
+			CollectLogs: true,
+			LogsStatus:  portainer.EdgeJobLogsStatusPending,
+		}
+	} else {
+		meta := edgeJob.Endpoints[endpointID]
+		meta.CollectLogs = true
+		meta.LogsStatus = portainer.EdgeJobLogsStatusPending
+		edgeJob.Endpoints[endpointID] = meta
+	}
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 	if err != nil {

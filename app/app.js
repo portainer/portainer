@@ -1,14 +1,8 @@
 import $ from 'jquery';
 
 /* @ngInject */
-export function onStartupAngular($rootScope, $state, LocalStorage, cfpLoadingBar, $transitions, HttpRequestHelper, EndpointProvider) {
+export function onStartupAngular($rootScope, $state, LocalStorage, cfpLoadingBar, $transitions, HttpRequestHelper) {
   $rootScope.$state = $state;
-  const defaultTitle = document.title;
-
-  $transitions.onEnter({}, () => {
-    const endpoint = EndpointProvider.currentEndpoint();
-    document.title = endpoint ? `${defaultTitle} | ${endpoint.Name}` : `${defaultTitle}`;
-  });
 
   // Workaround to prevent the loading bar from going backward
   // https://github.com/chieffancypants/angular-loading-bar/issues/273

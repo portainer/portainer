@@ -5,7 +5,7 @@ import { AutomationTestingProps } from '@/types';
 
 import { Select as ReactSelect } from '@@/form-components/ReactSelect';
 
-interface Option<TValue> {
+export interface Option<TValue> {
   value: TValue;
   label: string;
 }

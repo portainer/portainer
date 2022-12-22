@@ -27,29 +27,26 @@ export function SortbySelector({
 }: Props) {
   const sorted = sortByButton && !!value;
   return (
-    <div className={styles.sortByContainer}>
-      <div className={styles.sortByElement}>
-        <Select
-          placeholder={placeHolder}
-          options={filterOptions}
-          onChange={(option) => onChange(option as Filter)}
-          isClearable
-          value={value}
-        />
-      </div>
-      <div className={styles.sortByElement}>
-        <button
-          className={clsx(styles.sortButton, 'h-[34px]')}
-          type="button"
-          disabled={!sorted}
-          onClick={(e) => {
-            e.preventDefault();
-            onDescending();
-          }}
-        >
-          <TableHeaderSortIcons sorted={sorted} descending={sortByDescending} />
-        </button>
-      </div>
+    <div className="flex items-center gap-1 justify-end">
+      <Select
+        placeholder={placeHolder}
+        options={filterOptions}
+        onChange={(option) => onChange(option as Filter)}
+        isClearable
+        value={value}
+      />
+
+      <button
+        className={clsx(styles.sortButton, 'h-[34px] !m-0')}
+        type="button"
+        disabled={!sorted}
+        onClick={(e) => {
+          e.preventDefault();
+          onDescending();
+        }}
+      >
+        <TableHeaderSortIcons sorted={sorted} descending={sortByDescending} />
+      </button>
     </div>
   );
 }

@@ -81,6 +81,7 @@ func (store *Store) newMigratorParameters(version *models.Version) *migrator.Mig
 		FileService:             store.fileService,
 		DockerhubService:        store.DockerHubService,
 		AuthorizationService:    authorization.NewService(store),
+		EdgeStackService:        store.EdgeStackService,
 	}
 }
 

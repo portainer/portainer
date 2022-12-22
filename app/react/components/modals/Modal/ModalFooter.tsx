@@ -1,15 +1,11 @@
-import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
 import { useModalContext } from './Modal';
-import styles from './ModalFooter.module.css';
 
 export function ModalFooter({ children }: PropsWithChildren<unknown>) {
   useModalContext();
 
   return (
-    <div className={clsx(styles.modalFooter, 'flex justify-end')}>
-      {children}
-    </div>
+    <div className="flex justify-end gap-3 [&>*]:flex-1 pt-3">{children}</div>
   );
 }

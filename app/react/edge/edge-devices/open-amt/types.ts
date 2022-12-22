@@ -31,10 +31,21 @@ export interface DeviceFeatures {
   userConsent: string;
 }
 
+export enum PowerStateCode {
+  On = 2,
+  SleepLight = 3,
+  SleepDeep = 4,
+  OffHard = 6,
+  Hibernate = 7,
+  OffSoft = 8,
+  PowerCycle = 9,
+  OffHardGraceful = 13,
+}
+
 export type Device = {
   guid: string;
   hostname: string;
-  powerState: number;
+  powerState: PowerStateCode;
   connectionStatus: boolean;
   features?: DeviceFeatures;
 };

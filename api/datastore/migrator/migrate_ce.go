@@ -36,29 +36,29 @@ func (m *Migrator) Migrate() error {
 	if schemaVersion.Equal(apiVersion) {
 		// detect and run migrations when the versions are the same.
 		// e.g. development builds
-		latestMigrations := m.latestMigrations()
-		if latestMigrations.version.Equal(schemaVersion) &&
-			version.MigratorCount != len(latestMigrations.migrationFuncs) {
-			err := runMigrations(latestMigrations.migrationFuncs)
+		latestMigrations := m.LatestMigrations()
+		if latestMigrations.Version.Equal(schemaVersion) &&
+			version.MigratorCount != len(latestMigrations.MigrationFuncs) {
+			err := runMigrations(latestMigrations.MigrationFuncs)
 			if err != nil {
 				return err
 			}
-			newMigratorCount = len(latestMigrations.migrationFuncs)
+			newMigratorCount = len(latestMigrations.MigrationFuncs)
 		}
 	} else {
 		// regular path when major/minor/patch versions differ
 		for _, migration := range m.migrations {
-			if schemaVersion.LessThan(migration.version) {
+			if schemaVersion.LessThan(migration.Version) {
 
-				log.Info().Msgf("migrating data to %s", migration.version.String())
-				err := runMigrations(migration.migrationFuncs)
+				log.Info().Msgf("migrating data to %s", migration.Version.String())
+				err := runMigrations(migration.MigrationFuncs)
 				if err != nil {
 					return err
 				}
 			}
 
-			if apiVersion.Equal(migration.version) {
-				newMigratorCount = len(migration.migrationFuncs)
+			if apiVersion.Equal(migration.Version) {
+				newMigratorCount = len(migration.MigrationFuncs)
 			}
 		}
 	}
@@ -107,9 +107,9 @@ func (m *Migrator) NeedsMigration() bool {
 	}
 
 	// Check if we have any migrations for the current version
-	latestMigrations := m.latestMigrations()
-	if latestMigrations.version.Equal(semver.MustParse(portainer.APIVersion)) {
-		if m.currentDBVersion.MigratorCount != len(latestMigrations.migrationFuncs) {
+	latestMigrations := m.LatestMigrations()
+	if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
+		if m.currentDBVersion.MigratorCount != len(latestMigrations.MigrationFuncs) {
 			return true
 		}
 	} else {
