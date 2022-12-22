@@ -1,4 +1,4 @@
-import { History, Wifi, WifiOff } from 'lucide-react';
+import { History, Wifi, WifiOff, X } from 'lucide-react';
 import clsx from 'clsx';
 
 import { Environment } from '@/react/portainer/environments/types';
@@ -31,21 +31,32 @@ export function EnvironmentBrowseButtons({
   const dashboardRoute = getDashboardRoute(environment);
   return (
     <div className="flex flex-col gap-2 justify-center [&>*]:h-1/3 h-24 w-full">
-      {isBE && (
-        <LinkButton
-          icon={History}
-          disabled={!isEdgeAsync || browseStatus === 'snapshot'}
-          to="edge.browse.dashboard"
-          params={{
-            environmentId: environment.Id,
-          }}
-          size="medium"
-          color="light"
-          className="w-full !py-0 !m-0"
-        >
-          Browse snapshot
-        </LinkButton>
-      )}
+      {isBE &&
+        (browseStatus !== 'snapshot' ? (
+          <LinkButton
+            icon={History}
+            disabled={!isEdgeAsync}
+            to="edge.browse.dashboard"
+            params={{
+              environmentId: environment.Id,
+            }}
+            size="medium"
+            color="light"
+            className="w-full !py-0 !m-0"
+          >
+            Browse snapshot
+          </LinkButton>
+        ) : (
+          <Button
+            icon={X}
+            onClick={onClickDisconnect}
+            className="w-full !py-0 !m-0 opacity-60"
+            size="medium"
+            color="light"
+          >
+            Close snapshot
+          </Button>
+        ))}
 
       {browseStatus !== 'connected' ? (
         <LinkButton
@@ -62,7 +73,15 @@ export function EnvironmentBrowseButtons({
           Live connect
         </LinkButton>
       ) : (
-        <DisconnectButton onClick={onClickDisconnect} color="primary" />
+        <Button
+          icon={WifiOff}
+          onClick={onClickDisconnect}
+          className="w-full !py-0 !m-0 opacity-60"
+          size="medium"
+          color="primary"
+        >
+          Disconnect
+        </Button>
       )}
 
       <BrowseStatusTag status={browseStatus} />
@@ -131,25 +150,5 @@ function Snapshot() {
       <div className="rounded-full h-2 w-2 bg-warning-7" />
       Browsing Snapshot
     </div>
-  );
-}
-
-function DisconnectButton({
-  onClick,
-  color,
-}: {
-  onClick(): void;
-  color: 'light' | 'primary';
-}) {
-  return (
-    <Button
-      icon={WifiOff}
-      onClick={onClick}
-      className="w-full !py-0 !m-0 opacity-60"
-      size="medium"
-      color={color}
-    >
-      Disconnect
-    </Button>
   );
 }
