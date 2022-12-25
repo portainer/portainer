@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/pkg/libhelm/options"
+	_ "github.com/portainer/portainer/pkg/libhelm/release"
 )
 
 // @id HelmList

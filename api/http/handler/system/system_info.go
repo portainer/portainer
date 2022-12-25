@@ -6,15 +6,14 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/platform"
 	plf "github.com/portainer/portainer/api/platform"
 )
 
 type systemInfoResponse struct {
-	Platform    platform.ContainerPlatform `json:"platform"`
-	EdgeAgents  int                        `json:"edgeAgents"`
-	EdgeDevices int                        `json:"edgeDevices"`
-	Agents      int                        `json:"agents"`
+	Platform    plf.ContainerPlatform `json:"platform"`
+	EdgeAgents  int                   `json:"edgeAgents"`
+	EdgeDevices int                   `json:"edgeDevices"`
+	Agents      int                   `json:"agents"`
 }
 
 // @id systemInfo
