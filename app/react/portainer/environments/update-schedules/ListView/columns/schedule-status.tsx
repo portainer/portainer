@@ -5,16 +5,6 @@ import { StatusType } from '../../types';
 
 import { columnHelper } from './helper';
 
-// export const scheduleStatus: Column<EdgeUpdateListItemResponse> = {
-//   Header: 'Status',
-//   accessor: (row) => row.status,
-//   disableFilters: true,
-//   Filter: () => null,
-//   canHide: false,
-//   Cell: StatusCell,
-//   disableSortBy: true,
-// };
-
 export const scheduleStatus = columnHelper.accessor('status', {
   header: 'Status',
   cell: StatusCell,

@@ -6,5 +6,4 @@ export const created = columnHelper.accessor('Created', {
   header: 'Created',
   id: 'created',
   cell: ({ getValue }) => isoDateFromTimestamp(getValue()),
-  filterFn: 'equals', // TODO for some reason this is not filtering by number
 });

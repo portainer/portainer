@@ -88,16 +88,34 @@ export function filterHOC<TData extends Record<string, unknown>>(
       return Array.from(options);
     }, [flatRows, id]);
 
-    const value = getFilterValue() as string[];
+    const value = getFilterValue();
+
+    const valueAsArray = getValueAsArrayOfStrings(value);
 
     return (
       <MultipleSelectionFilter
         options={options}
         filterKey={id}
-        value={value}
+        value={valueAsArray}
         onChange={setFilterValue}
         menuTitle={menuTitle}
       />
     );
   };
+}
+
+function getValueAsArrayOfStrings(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (!value || (typeof value !== 'string' && typeof value !== 'number')) {
+    return [];
+  }
+
+  if (typeof value === 'number') {
+    return [value.toString()];
+  }
+
+  return [value];
 }
