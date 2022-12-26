@@ -6,7 +6,7 @@ import {
 } from '../../datatables/DefaultDatatableSettings';
 
 export function createStore(storageKey: string) {
-  return createPersistedStore<TableSettings>(storageKey, 'Name', (set) => ({
+  return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
     ...refreshableSettings(set),
     ...systemResourcesSettings(set),
   }));

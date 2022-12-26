@@ -7,7 +7,7 @@ import { TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 
 interface DockerImage {
-  Command: Array<string>;
+  Command: null | Array<string>;
   Entrypoint: Array<string>;
   ExposedPorts: Array<number>;
   Volumes: Array<string>;
@@ -24,7 +24,7 @@ export function DockerfileDetails({ image }: Props) {
       <TableTitle label="Dockerfile details" icon={List} />
       <DetailsTable>
         <DetailsTable.Row label="CMD">
-          <code>{joinCommand(image.Command)}</code>
+          <code>{image.Command ? joinCommand(image.Command) : '-'}</code>
         </DetailsTable.Row>
 
         {image.Entrypoint && (

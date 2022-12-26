@@ -1,11 +1,6 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Task } from '@/react/nomad/types';
-
-export const taskName: Column<Task> = {
-  Header: 'Task Name',
-  accessor: (row) => row.TaskName || '-',
+export const taskName = columnHelper.accessor('TaskName', {
+  header: 'Task Name',
   id: 'taskName',
-  disableFilters: true,
-  canHide: true,
-};
+});

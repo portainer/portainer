@@ -1,8 +1,7 @@
-import { Row, TableRowProps } from 'react-table';
 import { Shuffle, Trash2 } from 'lucide-react';
-import { useStore } from 'zustand';
 import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
+import { Row } from '@tanstack/react-table';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import {
@@ -15,15 +14,15 @@ import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
 import { confirmDelete } from '@@/modals/confirm';
-import { useSearchBarState } from '@@/datatables/SearchBar';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { useMutationDeleteServices, useServices } from '../service';
 import { Service } from '../types';
 import { DefaultDatatableSettings } from '../../datatables/DefaultDatatableSettings';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 import { createStore } from './datatable-store';
 import { ServicesDatatableDescription } from './ServicesDatatableDescription';
 
@@ -31,19 +30,16 @@ const storageKey = 'k8sServicesDatatable';
 const settingsStore = createStore(storageKey);
 
 export function ServicesDatatable() {
+  const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
   const servicesQuery = useServices(environmentId);
 
-  const settings = useStore(settingsStore);
-
-  const [search, setSearch] = useSearchBarState(storageKey);
-  const columns = useColumns();
   const readOnly = !useAuthorizations(['K8sServiceW']);
   const { isAdmin } = useCurrentUser();
 
   const filteredServices = servicesQuery.data?.filter(
     (service) =>
-      (isAdmin && settings.showSystemResources) ||
+      (isAdmin && tableState.showSystemResources) ||
       !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
   );
 
@@ -51,35 +47,30 @@ export function ServicesDatatable() {
     <Datatable
       dataset={filteredServices || []}
       columns={columns}
+      settingsManager={tableState}
       isLoading={servicesQuery.isLoading}
       emptyContentLabel="No services found"
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}
       isRowSelectable={(row) =>
-        !KubernetesNamespaceHelper.isSystemNamespace(row.values.namespace)
+        !KubernetesNamespaceHelper.isSystemNamespace(row.original.Namespace)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}
-      initialPageSize={settings.pageSize}
-      onPageSizeChange={settings.setPageSize}
-      initialSortBy={settings.sortBy}
-      onSortByChange={settings.setSortBy}
-      searchValue={search}
-      onSearchChange={setSearch}
       renderTableSettings={() => (
         <TableSettingsMenu>
           <DefaultDatatableSettings
-            settings={settings}
+            settings={tableState}
             hideShowSystemResources={!isAdmin}
           />
         </TableSettingsMenu>
       )}
       description={
         <ServicesDatatableDescription
-          showSystemResources={settings.showSystemResources || !isAdmin}
+          showSystemResources={tableState.showSystemResources || !isAdmin}
         />
       }
       renderRow={servicesRenderRow}
@@ -89,20 +80,13 @@ export function ServicesDatatable() {
 
 // needed to apply custom styling to the row cells and not globally.
 // required in the AC's for this ticket.
-function servicesRenderRow<D extends Record<string, unknown>>(
-  row: Row<D>,
-  rowProps: TableRowProps,
-  highlightedItemId?: string
-) {
+function servicesRenderRow(row: Row<Service>, highlightedItemId?: string) {
   return (
-    <Table.Row<D>
-      key={rowProps.key}
-      cells={row.cells}
-      className={clsx('[&>td]:!py-4 [&>td]:!align-top', rowProps.className, {
+    <Table.Row<Service>
+      cells={row.getVisibleCells()}
+      className={clsx('[&>td]:!py-4 [&>td]:!align-top', {
         active: highlightedItemId === row.id,
       })}
-      role={rowProps.role}
-      style={rowProps.style}
     />
   );
 }

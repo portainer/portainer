@@ -7,6 +7,8 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getNamespaces } from '../namespaces/service';
 
+import { Service } from './types';
+
 export const queryKeys = {
   list: (environmentId: EnvironmentId) =>
     ['environments', environmentId, 'kubernetes', 'services'] as const,
@@ -18,7 +20,7 @@ async function getServices(
   lookupApps: boolean
 ) {
   try {
-    const { data: services } = await axios.get(
+    const { data: services } = await axios.get<Array<Service>>(
       `kubernetes/${environmentId}/namespaces/${namespace}/services`,
       {
         params: {

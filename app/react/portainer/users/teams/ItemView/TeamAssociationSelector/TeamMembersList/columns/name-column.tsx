@@ -1,5 +1,5 @@
-import { CellProps, Column } from 'react-table';
 import { MinusCircle } from 'lucide-react';
+import { CellContext } from '@tanstack/react-table';
 
 import { User, UserId } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -10,23 +10,21 @@ import {
 
 import { Button } from '@@/buttons';
 
-import { useRowContext } from './RowContext';
+import { useRowContext } from '../RowContext';
 
-export const name: Column<User> = {
-  Header: 'Name',
-  accessor: (row) => row.Username,
+import { columnHelper } from './helper';
+
+export const name = columnHelper.accessor('Username', {
+  header: 'Name',
   id: 'name',
-  Cell: NameCell,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  sortType: 'string',
-};
+  cell: NameCell,
+});
 
 export function NameCell({
-  value: name,
+  getValue,
   row: { original: user },
-}: CellProps<User, string>) {
+}: CellContext<User, string>) {
+  const name = getValue();
   const { disabled, teamId } = useRowContext();
 
   const membershipsQuery = useTeamMemberships(teamId);
@@ -42,7 +40,7 @@ export function NameCell({
 
       <Button
         color="link"
-        className="space-left nopadding"
+        className="space-left !p-0"
         onClick={() => handleRemoveMember(user.Id)}
         disabled={disabled}
         icon={MinusCircle}

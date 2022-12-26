@@ -1,15 +1,13 @@
-import { CellProps, Column } from 'react-table';
-
 import { Authorized } from '@/react/hooks/useUser';
 import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 
-import { Service } from '../../types';
+import { columnHelper } from './helper';
 
-export const name: Column<Service> = {
-  Header: 'Name',
-  id: 'Name',
-  accessor: (row) => row.Name,
-  Cell: ({ row }: CellProps<Service>) => {
+export const name = columnHelper.accessor('Name', {
+  header: 'Name',
+  id: 'name',
+  cell: ({ row, getValue }) => {
+    const name = getValue();
     const isSystem = KubernetesNamespaceHelper.isSystemNamespace(
       row.original.Namespace
     );
@@ -19,11 +17,8 @@ export const name: Column<Service> = {
       !row.original.Labels['io.portainer.kubernetes.application.owner'];
 
     return (
-      <Authorized
-        authorizations="K8sServiceW"
-        childrenUnauthorized={row.original.Name}
-      >
-        {row.original.Name}
+      <Authorized authorizations="K8sServiceW" childrenUnauthorized={name}>
+        {name}
 
         {isSystem && (
           <span className="label label-info image-tag label-margins">
@@ -39,7 +34,4 @@ export const name: Column<Service> = {
       </Authorized>
     );
   },
-
-  disableFilters: true,
-  canHide: true,
-};
+});

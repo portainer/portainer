@@ -1,5 +1,5 @@
-import { CellProps, Column } from 'react-table';
 import { User as UserIcon, UserPlus, UserX } from 'lucide-react';
+import { CellContext } from '@tanstack/react-table';
 
 import { User } from '@/portainer/users/types';
 import { useUser as useCurrentUser } from '@/react/hooks/useUser';
@@ -13,20 +13,22 @@ import {
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 
-import { useRowContext } from './RowContext';
+import { useRowContext } from '../RowContext';
 
-export const teamRole: Column<User> = {
-  Header: 'Team Role',
-  accessor: 'Id',
+import { columnHelper } from './helper';
+
+export const teamRole = columnHelper.accessor('Id', {
+  header: 'Team Role',
   id: 'role',
-  Cell: RoleCell,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  sortType: 'string',
-};
+  cell: RoleCell,
+});
 
-export function RoleCell({ row: { original: user } }: CellProps<User>) {
+export function RoleCell({
+  row: { original: user },
+  getValue,
+}: CellContext<User, User['Id']>) {
+  const id = getValue();
+
   const { getRole, disabled, teamId } = useRowContext();
   const membershipsQuery = useTeamMemberships(teamId);
   const updateRoleMutation = useUpdateRoleMutation(
@@ -34,7 +36,7 @@ export function RoleCell({ row: { original: user } }: CellProps<User>) {
     membershipsQuery.data
   );
 
-  const role = getRole(user.Id);
+  const role = getRole(id);
 
   const { isAdmin } = useCurrentUser();
 

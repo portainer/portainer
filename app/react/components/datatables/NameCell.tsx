@@ -1,30 +1,36 @@
-import { CellProps, Column } from 'react-table';
+import { ColumnDef, CellContext } from '@tanstack/react-table';
 
 import { Link } from '@@/Link';
 
 export function buildNameColumn<T extends Record<string, unknown>>(
-  nameKey: string,
+  nameKey: keyof T,
   idKey: string,
   path: string
-) {
-  const name: Column<T> = {
-    Header: 'Name',
-    accessor: (row) => row[nameKey],
+): ColumnDef<T> {
+  const cell = createCell<T>();
+
+  return {
+    header: 'Name',
+    accessorKey: nameKey,
     id: 'name',
-    Cell: NameCell,
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
+    cell,
+    enableSorting: true,
+    sortingFn: 'text',
   };
 
-  return name;
+  function createCell<T extends Record<string, unknown>>() {
+    return function NameCell({ renderValue, row }: CellContext<T, unknown>) {
+      const name = renderValue() || '';
 
-  function NameCell({ value: name, row }: CellProps<T, string>) {
-    return (
-      <Link to={path} params={{ id: row.original[idKey] }} title={name}>
-        {name}
-      </Link>
-    );
+      if (typeof name !== 'string') {
+        return null;
+      }
+
+      return (
+        <Link to={path} params={{ id: row.original[idKey] }} title={name}>
+          {name}
+        </Link>
+      );
+    };
   }
 }

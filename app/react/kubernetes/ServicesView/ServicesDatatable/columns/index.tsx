@@ -8,16 +8,14 @@ import { targetPorts } from './targetPorts';
 import { application } from './application';
 import { created } from './created';
 
-export function useColumns() {
-  return [
-    name,
-    application,
-    namespace,
-    type,
-    ports,
-    targetPorts,
-    clusterIP,
-    externalIP,
-    created,
-  ];
-}
+export const columns = [
+  name,
+  application,
+  namespace,
+  type,
+  ports,
+  targetPorts,
+  clusterIP,
+  externalIP,
+  created,
+];

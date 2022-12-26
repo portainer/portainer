@@ -1,76 +1,37 @@
 import moment from 'moment';
-import { CellProps, Column } from 'react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 
 import { WaitingRoomEnvironment } from '../types';
 
-export const columns: readonly Column<WaitingRoomEnvironment>[] = [
-  {
-    Header: 'Name',
-    accessor: (row) => row.Name,
+const columnHelper = createColumnHelper<WaitingRoomEnvironment>();
+
+export const columns = [
+  columnHelper.accessor('Name', {
+    header: 'Name',
     id: 'name',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Edge ID',
-    accessor: (row) => row.EdgeID,
+  }),
+  columnHelper.accessor('EdgeID', {
+    header: 'Edge ID',
     id: 'edge-id',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Edge Groups',
-    accessor: (row) => row.EdgeGroups || [],
-    Cell: ({ value }: CellProps<WaitingRoomEnvironment, string[]>) =>
-      value.join(', ') || '-',
+  }),
+  columnHelper.accessor((row) => row.EdgeGroups.join(', ') || '-', {
+    header: 'Edge Groups',
     id: 'edge-groups',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Group',
-    accessor: (row) => row.Group || '-',
+  }),
+  columnHelper.accessor((row) => row.Group || '-', {
+    header: 'Group',
     id: 'group',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Tags',
-    accessor: (row) => row.Tags || [],
-    Cell: ({ value }: CellProps<WaitingRoomEnvironment, string[]>) =>
-      value.join(', ') || '-',
+  }),
+  columnHelper.accessor((row) => row.Tags.join(', ') || '-', {
+    header: 'Tags',
     id: 'tags',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Last Check-in',
-    accessor: 'LastCheckInDate',
-    Cell: LastCheckinDateCell,
+  }),
+  columnHelper.accessor((row) => row.LastCheckInDate, {
+    header: 'Last Check-in',
     id: 'last-check-in',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-] as const;
-
-function LastCheckinDateCell({
-  value,
-}: CellProps<WaitingRoomEnvironment, number>) {
-  if (!value) {
-    return '-';
-  }
-
-  return moment(value * 1000).fromNow();
-}
+    cell: ({ getValue }) => {
+      const value = getValue();
+      return value ? moment(value * 1000).fromNow() : '-';
+    },
+  }),
+];

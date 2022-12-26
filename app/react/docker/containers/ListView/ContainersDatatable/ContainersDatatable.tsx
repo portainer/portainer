@@ -1,19 +1,17 @@
-import _ from 'lodash';
-import { useStore } from 'zustand';
 import { Box } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
 
-import { TableSettingsMenu, Datatable } from '@@/datatables';
+import { Table, Datatable } from '@@/datatables';
 import {
   buildAction,
   QuickActionsSettings,
 } from '@@/datatables/QuickActionsSettings';
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
-import { useSearchBarState } from '@@/datatables/SearchBar';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { useContainers } from '../../queries/containers';
 
@@ -43,20 +41,15 @@ export function ContainersDatatable({
   isHostColumnVisible,
   environment,
 }: Props) {
-  const settings = useStore(settingsStore);
   const isGPUsColumnVisible = useShowGPUsColumn(environment.Id);
   const columns = useColumns(isHostColumnVisible, isGPUsColumnVisible);
-  const hidableColumns = _.compact(
-    columns.filter((col) => col.canHide).map((col) => col.id)
-  );
-
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
 
   const containersQuery = useContainers(
     environment.Id,
     true,
     undefined,
-    settings.autoRefreshRate * 1000
+    tableState.autoRefreshRate * 1000
   );
 
   return (
@@ -65,12 +58,7 @@ export function ContainersDatatable({
         <Datatable
           titleIcon={Box}
           title="Containers"
-          initialPageSize={settings.pageSize}
-          onPageSizeChange={settings.setPageSize}
-          initialSortBy={settings.sortBy}
-          onSortByChange={settings.setSortBy}
-          searchValue={search}
-          onSearchChange={setSearch}
+          settingsManager={tableState}
           columns={columns}
           renderTableActions={(selectedRows) => (
             <ContainersDatatableActions
@@ -81,30 +69,38 @@ export function ContainersDatatable({
           )}
           isLoading={containersQuery.isLoading}
           isRowSelectable={(row) => !row.original.IsPortainer}
-          initialTableState={{ hiddenColumns: settings.hiddenColumns }}
+          initialTableState={{
+            columnVisibility: Object.fromEntries(
+              tableState.hiddenColumns.map((col) => [col, false])
+            ),
+          }}
           renderTableSettings={(tableInstance) => {
-            const columnsToHide = tableInstance.allColumns.filter(
-              (colInstance) => hidableColumns?.includes(colInstance.id)
-            );
+            const columnsToHide = tableInstance
+              .getAllColumns()
+              .filter((col) => col.getCanHide());
 
             return (
               <>
                 <ColumnVisibilityMenu<DockerContainer>
                   columns={columnsToHide}
                   onChange={(hiddenColumns) => {
-                    settings.setHiddenColumns(hiddenColumns);
-                    tableInstance.setHiddenColumns(hiddenColumns);
+                    tableState.setHiddenColumns(hiddenColumns);
+                    tableInstance.setColumnVisibility(
+                      Object.fromEntries(
+                        hiddenColumns.map((col) => [col, false])
+                      )
+                    );
                   }}
-                  value={settings.hiddenColumns}
+                  value={tableState.hiddenColumns}
                 />
-                <TableSettingsMenu
+                <Table.SettingsMenu
                   quickActions={<QuickActionsSettings actions={actions} />}
                 >
                   <ContainersDatatableSettings
                     isRefreshVisible
-                    settings={settings}
+                    settings={tableState}
                   />
-                </TableSettingsMenu>
+                </Table.SettingsMenu>
               </>
             );
           }}
