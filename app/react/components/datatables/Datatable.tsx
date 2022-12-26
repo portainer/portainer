@@ -14,7 +14,6 @@ import {
   getExpandedRowModel,
 } from '@tanstack/react-table';
 import { ReactNode, useMemo } from 'react';
-// import { useRowSelectColumn } from '@lineup-lite/hooks';
 import clsx from 'clsx';
 import _ from 'lodash';
 
@@ -46,16 +45,14 @@ export interface Props<D extends Record<string, unknown>> {
   totalCount?: number;
   description?: ReactNode;
   pageCount?: number;
+  highlightedItemId?: string;
   initialSortBy?: BasicTableSettings['sortBy'];
   initialPageSize?: BasicTableSettings['pageSize'];
-  highlightedItemId?: string;
 
   searchValue: string;
   onSearchChange(search: string): void;
   onSortByChange(colId: string, desc: boolean): void;
   onPageSizeChange(pageSize: number): void;
-
-  // send state up
   onPageChange?(page: number): void;
 
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
