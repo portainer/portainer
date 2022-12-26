@@ -5,7 +5,7 @@ import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useSearchBarState } from '@@/datatables/SearchBar';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 import { FDOProfilesDatatableActions } from './FDOProfilesDatatableActions';
 import { useFDOProfiles } from './useFDOProfiles';
 
@@ -20,7 +20,6 @@ export interface FDOProfilesDatatableProps {
 export function FDOProfilesDatatable({
   isFDOEnabled,
 }: FDOProfilesDatatableProps) {
-  const columns = useColumns();
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
   const { isLoading, profiles } = useFDOProfiles();

@@ -1,34 +1,34 @@
 import clsx from 'clsx';
-import { PropsWithChildren, ReactNode } from 'react';
-import { TableHeaderProps } from 'react-table';
+import { CSSProperties, PropsWithChildren, ReactNode } from 'react';
 
-import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 import styles from './TableHeaderCell.module.css';
+import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
 interface Props {
-  canFilter: boolean;
   canSort: boolean;
-  headerProps: TableHeaderProps;
   isSorted: boolean;
   isSortedDesc?: boolean;
   onSortClick: (desc: boolean) => void;
   render: () => ReactNode;
-  renderFilter: () => ReactNode;
+  renderFilter?: () => ReactNode;
+  className?: string;
+  style?: CSSProperties;
 }
 
 export function TableHeaderCell({
-  headerProps: { className, role, style },
   canSort,
   render,
   onSortClick,
   isSorted,
   isSortedDesc = true,
-  canFilter,
+
   renderFilter,
+  className,
+  style,
 }: Props) {
   return (
-    <th role={role} style={style} className={className}>
-      <div className="flex h-full flex-row flex-nowrap items-center gap-1">
+    <th style={style} className={className}>
+      <div className="flex flex-row items-center h-full gap-1 flex-nowrap">
         <SortWrapper
           canSort={canSort}
           onClick={onSortClick}
@@ -37,7 +37,7 @@ export function TableHeaderCell({
         >
           {render()}
         </SortWrapper>
-        {canFilter ? renderFilter() : null}
+        {renderFilter ? renderFilter() : null}
       </div>
     </th>
   );
@@ -71,12 +71,11 @@ function SortWrapper({
         isSorted && styles.sortingActive
       )}
     >
-      <div className="flex h-full w-full flex-row items-center justify-start">
+      <div className="flex flex-row items-center justify-start w-full h-full">
         {children}
         <TableHeaderSortIcons
           sorted={isSorted}
           descending={isSorted && !!isSortedDesc}
-          className="ml-1"
         />
       </div>
     </button>
@@ -97,7 +96,7 @@ export function TableColumnHeaderAngular({
   isSortedDesc = true,
 }: TableColumnHeaderAngularProps) {
   return (
-    <div className="flex h-full flex-row flex-nowrap">
+    <div className="flex flex-row h-full flex-nowrap">
       <SortWrapper
         canSort={canSort}
         isSorted={!!isSorted}

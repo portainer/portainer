@@ -1,32 +1,35 @@
 import _ from 'lodash';
 import clsx from 'clsx';
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 
 import { Task } from '@/react/nomad/types';
 
-import { DefaultFilter } from '@@/datatables/Filter';
+import { filterHOC } from '@@/datatables/Filter';
 
-export const taskStatus: Column<Task> = {
-  Header: 'Task Status',
-  accessor: 'State',
+import { columnHelper } from './helper';
+
+export const taskStatus = columnHelper.accessor('State', {
+  header: 'Task Status',
   id: 'status',
-  Filter: DefaultFilter,
-  canHide: true,
-  sortType: 'string',
-  Cell: StateCell,
-};
+  meta: {
+    filter: filterHOC('Filter by state'),
+  },
+  cell: StateCell,
+  enableColumnFilter: true,
+});
 
-function StateCell({ value }: CellProps<Task, string>) {
+function StateCell({ getValue }: CellContext<Task, string>) {
+  const state = getValue();
   const className = getClassName();
 
-  return <span className={clsx('label', className)}>{value}</span>;
+  return <span className={clsx('label', className)}>{state}</span>;
 
   function getClassName() {
-    if (['dead'].includes(_.toLower(value))) {
+    if (['dead'].includes(_.toLower(state))) {
       return 'label-danger';
     }
 
-    if (['pending'].includes(_.toLower(value))) {
+    if (['pending'].includes(_.toLower(state))) {
       return 'label-warning';
     }
 

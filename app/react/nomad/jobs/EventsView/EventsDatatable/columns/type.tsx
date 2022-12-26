@@ -1,11 +1,6 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { NomadEvent } from '@/react/nomad/types';
-
-export const type: Column<NomadEvent> = {
-  Header: 'Type',
-  accessor: 'Type',
+export const type = columnHelper.accessor('Type', {
+  header: 'Type',
   id: 'type',
-  disableFilters: true,
-  canHide: true,
-};
+});

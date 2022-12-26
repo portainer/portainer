@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+
+import { NomadEvent } from '@/react/nomad/types';
 
 import { date } from './date';
 import { type } from './type';
 import { message } from './message';
 
-export function useColumns() {
-  return useMemo(() => [date, type, message], []);
-}
+export const columns = [date, type, message] as Array<ColumnDef<NomadEvent>>;

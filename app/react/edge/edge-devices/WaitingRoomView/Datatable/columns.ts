@@ -1,24 +1,16 @@
-import { Column } from 'react-table';
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 
 import { Environment } from '@/react/portainer/environments/types';
 
-export const columns: readonly Column<Environment>[] = [
-  {
-    Header: 'Name',
-    accessor: (row) => row.Name,
+const columnHelper = createColumnHelper<Environment>();
+
+export const columns = [
+  columnHelper.accessor('Name', {
+    header: 'Name',
     id: 'name',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Edge ID',
-    accessor: (row) => row.EdgeID,
+  }),
+  columnHelper.accessor('EdgeID', {
+    header: 'Edge ID',
     id: 'edge-id',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-] as const;
+  }),
+] as Array<ColumnDef<Environment>>;

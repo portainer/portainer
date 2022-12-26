@@ -1,27 +1,27 @@
-import { Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 import clsx from 'clsx';
 
 import { ownershipIcon } from '@/portainer/filters/filters';
 import type { DockerContainer } from '@/react/docker/containers/types';
 import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
 
-export const ownership: Column<DockerContainer> = {
-  Header: 'Ownership',
-  id: 'ownership',
-  accessor: (row) =>
+import { columnHelper } from './helper';
+
+export const ownership = columnHelper.accessor(
+  (row) =>
     row.ResourceControl?.Ownership || ResourceControlOwnership.ADMINISTRATORS,
-  Cell: OwnershipCell,
-  disableFilters: true,
-  canHide: true,
-  sortType: 'string',
-  Filter: () => null,
-};
+  {
+    header: 'Ownership',
+    id: 'ownership',
+    cell: OwnershipCell,
+  }
+);
 
-interface Props {
-  value: 'public' | 'private' | 'restricted' | 'administrators';
-}
+function OwnershipCell({
+  getValue,
+}: CellContext<DockerContainer, ResourceControlOwnership>) {
+  const value = getValue();
 
-function OwnershipCell({ value }: Props) {
   return (
     <>
       <i

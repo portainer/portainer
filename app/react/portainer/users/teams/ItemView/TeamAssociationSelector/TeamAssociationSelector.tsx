@@ -31,11 +31,11 @@ export function TeamAssociationSelector({
   );
 
   return (
-    <div className="row">
-      <div className="col-sm-6">
+    <div className="flex">
+      <div className="w-1/2">
         <UsersList users={usersNotInTeam} disabled={disabled} teamId={teamId} />
       </div>
-      <div className="col-sm-6">
+      <div className="w-1/2">
         <TeamMembersList
           teamId={teamId}
           disabled={disabled}

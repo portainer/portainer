@@ -1,37 +1,33 @@
-import { CSSProperties, ReactNode } from 'react';
-import { Row } from 'react-table';
+import { ReactNode } from 'react';
+import { Row } from '@tanstack/react-table';
 
 import { TableRow } from './TableRow';
 
 interface Props<D extends Record<string, unknown>> {
   row: Row<D>;
-  className?: string;
-  role?: string;
-  style?: CSSProperties;
   disableSelect?: boolean;
   renderSubRow(row: Row<D>): ReactNode;
+  expandOnClick?: boolean;
 }
 
 export function ExpandableDatatableTableRow<D extends Record<string, unknown>>({
   row,
-  className,
-  role,
-  style,
   disableSelect,
   renderSubRow,
+  expandOnClick,
 }: Props<D>) {
+  const cells = row.getVisibleCells();
+
   return (
     <>
       <TableRow<D>
-        cells={row.cells}
-        className={className}
-        role={role}
-        style={style}
+        cells={cells}
+        onClick={expandOnClick ? () => row.toggleExpanded() : undefined}
       />
-      {row.isExpanded && (
+      {row.getIsExpanded() && (
         <tr>
           {!disableSelect && <td />}
-          <td colSpan={disableSelect ? row.cells.length : row.cells.length - 1}>
+          <td colSpan={disableSelect ? cells.length : cells.length - 1}>
             {renderSubRow(row)}
           </td>
         </tr>

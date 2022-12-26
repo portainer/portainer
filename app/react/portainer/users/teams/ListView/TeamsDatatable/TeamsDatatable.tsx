@@ -1,7 +1,7 @@
-import { Column } from 'react-table';
 import { useMutation, useQueryClient } from 'react-query';
 import { Trash2, Users } from 'lucide-react';
 import { useStore } from 'zustand';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
@@ -17,9 +17,9 @@ import { useSearchBarState } from '@@/datatables/SearchBar';
 
 const storageKey = 'teams';
 
-const columns: readonly Column<Team>[] = [
-  buildNameColumn('Name', 'Id', 'portainer.teams.team'),
-] as const;
+const columns: ColumnDef<Team>[] = [
+  buildNameColumn<Team>('Name', 'Id', 'portainer.teams.team'),
+];
 
 interface Props {
   teams: Team[];
@@ -34,7 +34,7 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
   const [search, setSearch] = useSearchBarState(storageKey);
 
   return (
-    <Datatable
+    <Datatable<Team>
       dataset={teams}
       columns={columns}
       initialPageSize={settings.pageSize}

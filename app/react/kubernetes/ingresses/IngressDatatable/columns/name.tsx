@@ -1,4 +1,4 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 
 import { Authorized } from '@/react/hooks/useUser';
 
@@ -6,28 +6,30 @@ import { Link } from '@@/Link';
 
 import { Ingress } from '../../types';
 
-export const name: Column<Ingress> = {
-  Header: 'Name',
-  accessor: 'Name',
-  Cell: ({ row }: CellProps<Ingress>) => (
-    <Authorized
-      authorizations="K8sIngressesW"
-      childrenUnauthorized={row.original.Name}
-    >
+import { columnHelper } from './helper';
+
+export const name = columnHelper.accessor('Name', {
+  header: 'Name',
+  cell: Cell,
+  id: 'name',
+});
+
+function Cell({ row, getValue }: CellContext<Ingress, string>) {
+  const name = getValue();
+
+  return (
+    <Authorized authorizations="K8sIngressesW" childrenUnauthorized={name}>
       <Link
         to="kubernetes.ingresses.edit"
         params={{
           uid: row.original.UID,
           namespace: row.original.Namespace,
-          name: row.original.Name,
+          name,
         }}
-        title={row.original.Name}
+        title={name}
       >
-        {row.original.Name}
+        {name}
       </Link>
     </Authorized>
-  ),
-  id: 'name',
-  disableFilters: true,
-  canHide: true,
-};
+  );
+}

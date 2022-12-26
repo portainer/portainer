@@ -13,7 +13,7 @@ import { buildConfirmButton } from '@@/modals/utils';
 
 import { IngressControllerClassMap } from '../types';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 
 const storageKey = 'ingressClasses';
 const settingsStore = createPersistedStore(storageKey);
@@ -44,7 +44,6 @@ export function IngressClassDatatable({
   const [ingControllerFormValues, setIngControllerFormValues] = useState(
     ingressControllers || []
   );
-  const columns = useColumns();
 
   useEffect(() => {
     if (allowNoneIngressClass === undefined) {

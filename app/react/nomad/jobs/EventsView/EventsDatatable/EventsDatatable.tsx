@@ -7,19 +7,18 @@ import { Datatable } from '@@/datatables';
 import { useSearchBarState } from '@@/datatables/SearchBar';
 import { createPersistedStore } from '@@/datatables/types';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 
 export interface EventsDatatableProps {
   data: NomadEvent[];
   isLoading: boolean;
 }
 
-const storageKey = 'events';
+const storageKey = 'nomad_events';
 
-const settingsStore = createPersistedStore(storageKey, 'Date');
+const settingsStore = createPersistedStore(storageKey, 'date');
 
 export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
-  const columns = useColumns();
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
 

@@ -5,7 +5,7 @@ import { Job } from '@/react/nomad/types';
 
 import { useRepeater } from '@@/datatables/useRepeater';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
-import { TableSettingsMenu } from '@@/datatables';
+import { TableSettingsMenu } from '@@/datatables/TableSettingsMenu';
 import { useSearchBarState } from '@@/datatables/SearchBar';
 
 import { TasksDatatable } from './TasksDatatable';
@@ -19,7 +19,7 @@ export interface JobsDatatableProps {
   isLoading?: boolean;
 }
 
-const storageKey = 'jobs';
+const storageKey = 'nomad_jobs';
 const settingsStore = createStore(storageKey);
 
 export function JobsDatatable({
@@ -52,6 +52,7 @@ export function JobsDatatable({
           <JobsDatatableSettings settings={settings} />
         </TableSettingsMenu>
       )}
+      expandOnRowClick
     />
   );
 }

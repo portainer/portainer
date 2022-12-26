@@ -2997,21 +2997,6 @@
   dependencies:
     "@lezer/common" "^1.0.0"
 
-"@lineup-lite/components@~1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@lineup-lite/components/-/components-1.6.0.tgz#e1a9d368e1c3851f312a3e667e8f3eda52d9f0fc"
-  integrity sha512-DVif6MrAYBYLok5pUGtWBoVRxyCvb6ZOmGrLm3B4wxdo1lh2Gw8Io7cCsXfat2BdUsbtCJwUh9e+NbaqDWGNGA==
-  dependencies:
-    "@sgratzl/boxplots" "^1.2.2"
-
-"@lineup-lite/hooks@^1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@lineup-lite/hooks/-/hooks-1.6.0.tgz#d4e7fbb6912b88e5bd31d98c52f183f11424f48d"
-  integrity sha512-PWWN9/va4TaCwx6wcE98swaCk385YQr7Bjgl7mnRvYNfP7m3JlHk7gASBQXNl6FLJrs98uyTOW032+OZwBYu5A==
-  dependencies:
-    "@lineup-lite/components" "~1.6.0"
-    date-fns "^2.21.3"
-
 "@mdx-js/mdx@^1.6.22":
   version "1.6.22"
   resolved "https://registry.yarnpkg.com/@mdx-js/mdx/-/mdx-1.6.22.tgz#8a723157bf90e78f17dc0f27995398e6c731f1ba"
@@ -3355,11 +3340,6 @@
   version "0.18.0"
   resolved "https://registry.yarnpkg.com/@reach/utils/-/utils-0.18.0.tgz#4f3cebe093dd436eeaff633809bf0f68f4f9d2ee"
   integrity sha512-KdVMdpTgDyK8FzdKO9SCpiibuy/kbv3pwgfXshTI6tEcQT1OOwj7BAksnzGC0rPz0UholwC+AgkqEl3EJX3M1A==
-
-"@sgratzl/boxplots@^1.2.2":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@sgratzl/boxplots/-/boxplots-1.3.0.tgz#c9063d98e33a15f880cf4bd3531be71497e2a94e"
-  integrity sha512-2BRWv+WOH58pwzSgP50buoXgxQic+4auz3BF0wiIUXS8D3QGkdBNgsNdQO1754Tm/0uEwly0R3WaCiGnoYWcmA==
 
 "@simbathesailor/use-what-changed@^2.0.0":
   version "2.0.0"
@@ -4513,6 +4493,18 @@
     "@svgr/core" "^6.2.1"
     "@svgr/plugin-jsx" "^6.2.1"
     "@svgr/plugin-svgo" "^6.2.0"
+
+"@tanstack/react-table@^8.7.4":
+  version "8.7.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.7.4.tgz#cca662c738cd23f8f7522907a9612e08640ed4e0"
+  integrity sha512-4Q1OV3kUSxbtekclS3sqjCyCDowqCPruUCfHm1nGoPSmVLRCHoQ1E2rmzTVGeocEKgV9TDnj39tOgGwcADPuPA==
+  dependencies:
+    "@tanstack/table-core" "8.7.4"
+
+"@tanstack/table-core@8.7.4":
+  version "8.7.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.7.4.tgz#e6eb718db7fc45c95e8e64e1c66e08a78fa78bf7"
+  integrity sha512-OPhzca7e83KGukxLpZ+4F9OBp9CZXi9b/OGJBH8dlC3wpffcSSDczYGUGJKG7wirXQ6cUVYL+9G6UrrdnblKNQ==
 
 "@testing-library/dom@^8.0.0":
   version "8.11.3"
@@ -8246,11 +8238,6 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
-
-date-fns@^2.21.3:
-  version "2.28.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.28.0.tgz#9570d656f5fc13143e50c975a3b6bbeb46cd08b2"
-  integrity sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==
 
 date-fns@^2.29.3:
   version "2.29.3"
@@ -15981,11 +15968,6 @@ react-style-singleton@^2.2.0:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^2.0.0"
-
-react-table@^7.7.0:
-  version "7.7.0"
-  resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.7.0.tgz#e2ce14d7fe3a559f7444e9ecfe8231ea8373f912"
-  integrity sha512-jBlj70iBwOTvvImsU9t01LjFjy4sXEtclBovl3mTiqjz23Reu0DKnRza4zlLtOPACx6j2/7MrQIthIK1Wi+LIA==
 
 react-test-renderer@^17.0.2:
   version "17.0.2"

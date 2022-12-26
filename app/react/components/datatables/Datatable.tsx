@@ -1,36 +1,38 @@
 import {
-  useTable,
-  useFilters,
-  useGlobalFilter,
-  useSortBy,
-  usePagination,
-  Column,
-  Row,
-  TableInstance,
+  Table as TableInstance,
   TableState,
-  TableRowProps,
-  useExpanded,
-} from 'react-table';
-import { ReactNode } from 'react';
-import { useRowSelectColumn } from '@lineup-lite/hooks';
+  ColumnDef,
+  useReactTable,
+  Row,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFacetedMinMaxValues,
+  getExpandedRowModel,
+} from '@tanstack/react-table';
+import { ReactNode, useMemo } from 'react';
+// import { useRowSelectColumn } from '@lineup-lite/hooks';
 import clsx from 'clsx';
+import _ from 'lodash';
 
 import { IconProps } from '@@/Icon';
 
-import { Table } from './Table';
-import { multiple } from './filter-types';
-import { useRowSelect } from './useRowSelect';
-import { BasicTableSettings } from './types';
 import { DatatableHeader } from './DatatableHeader';
 import { DatatableFooter } from './DatatableFooter';
-import { DatatableContent } from './DatatableContent';
 import { defaultGetRowId } from './defaultGetRowId';
-import { emptyPlugin } from './emptyReactTablePlugin';
+import { Table } from './Table';
 import { useGoToHighlightedRow } from './useGoToHighlightedRow';
+import { BasicTableSettings } from './types';
+import { DatatableContent } from './DatatableContent';
+import { createSelectColumn } from './select-column';
+import { TableRow } from './TableRow';
 
 export interface Props<D extends Record<string, unknown>> {
   dataset: D[];
-  columns: readonly Column<D>[];
+  columns: ColumnDef<D>[];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
   renderTableActions?(selectedRows: D[]): ReactNode;
   disableSelect?: boolean;
@@ -39,7 +41,7 @@ export interface Props<D extends Record<string, unknown>> {
   emptyContentLabel?: string;
   title?: string;
   titleIcon?: IconProps['icon'];
-  initialTableState?: Partial<TableState<D>>;
+  initialTableState?: Partial<TableState>;
   isLoading?: boolean;
   totalCount?: number;
   description?: ReactNode;
@@ -56,12 +58,8 @@ export interface Props<D extends Record<string, unknown>> {
   // send state up
   onPageChange?(page: number): void;
 
-  renderRow?(
-    row: Row<D>,
-    rowProps: TableRowProps,
-    highlightedItemId?: string
-  ): ReactNode;
-  expandable?: boolean;
+  renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
+  getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
 }
 
@@ -92,50 +90,65 @@ export function Datatable<D extends Record<string, unknown>>({
   onSearchChange,
 
   renderRow = defaultRenderRow,
-  expandable = false,
   highlightedItemId,
   noWidget,
+  getRowCanExpand,
 }: Props<D>) {
   const isServerSidePagination = typeof pageCount !== 'undefined';
-
-  const tableInstance = useTable<D>(
-    {
-      defaultCanFilter: false,
-      columns,
-      data: dataset,
-      filterTypes: { multiple },
-      initialState: {
-        pageSize: initialPageSize,
-        sortBy: initialSortBy ? [initialSortBy] : [],
-        globalFilter: searchValue,
-        ...initialTableState,
-      },
-      isRowSelectable,
-      autoResetExpanded: false,
-      autoResetSelectedRows: false,
-      getRowId,
-      ...(isServerSidePagination ? { manualPagination: true, pageCount } : {}),
-    },
-    useFilters,
-    useGlobalFilter,
-    useSortBy,
-    expandable ? useExpanded : emptyPlugin,
-    usePagination,
-    useRowSelect,
-    !disableSelect ? useRowSelectColumn : emptyPlugin
+  const enableRowSelection = getIsSelectionEnabled(
+    disableSelect,
+    isRowSelectable
   );
+
+  const allColumns = useMemo(
+    () => _.compact([!disableSelect && createSelectColumn<D>(), ...columns]),
+    [disableSelect, columns]
+  );
+
+  const tableInstance = useReactTable<D>({
+    columns: allColumns,
+    data: dataset,
+    initialState: {
+      pagination: {
+        pageSize: initialPageSize,
+      },
+      sorting: initialSortBy ? [initialSortBy] : [],
+      globalFilter: searchValue,
+
+      ...initialTableState,
+    },
+    defaultColumn: {
+      enableColumnFilter: false,
+      enableHiding: true,
+    },
+    enableRowSelection,
+    autoResetExpanded: false,
+    globalFilterFn,
+    getRowId,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand,
+    ...(isServerSidePagination ? { manualPagination: true, pageCount } : {}),
+  });
+
+  const tableState = tableInstance.getState();
 
   useGoToHighlightedRow(
     isServerSidePagination,
-    tableInstance.state.pageSize,
-    tableInstance.rows,
+    tableState.pagination.pageSize,
+    tableInstance.getCoreRowModel().rows,
     handlePageChange,
     highlightedItemId
   );
 
-  const selectedItems = tableInstance.selectedFlatRows.map(
-    (row) => row.original
-  );
+  const selectedRowModel = tableInstance.getSelectedRowModel();
+  const selectedItems = selectedRowModel.rows.map((row) => row.original);
 
   return (
     <Table.Container noWidget={noWidget}>
@@ -144,15 +157,13 @@ export function Datatable<D extends Record<string, unknown>>({
         searchValue={searchValue}
         title={title}
         titleIcon={titleIcon}
+        description={description}
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
-        description={description}
       />
       <DatatableContent<D>
         tableInstance={tableInstance}
-        renderRow={(row, rowProps) =>
-          renderRow(row, rowProps, highlightedItemId)
-        }
+        renderRow={(row) => renderRow(row, highlightedItemId)}
         emptyContentLabel={emptyContentLabel}
         isLoading={isLoading}
         onSortChange={handleSortChange}
@@ -161,8 +172,8 @@ export function Datatable<D extends Record<string, unknown>>({
       <DatatableFooter
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
-        page={tableInstance.state.pageIndex}
-        pageSize={tableInstance.state.pageSize}
+        page={tableState.pagination.pageIndex}
+        pageSize={tableState.pagination.pageSize}
         totalCount={totalCount}
         totalSelected={selectedItems.length}
       />
@@ -175,7 +186,7 @@ export function Datatable<D extends Record<string, unknown>>({
   }
 
   function handlePageChange(page: number) {
-    tableInstance.gotoPage(page);
+    tableInstance.setPageIndex(page);
     onPageChange(page);
   }
 
@@ -191,18 +202,56 @@ export function Datatable<D extends Record<string, unknown>>({
 
 function defaultRenderRow<D extends Record<string, unknown>>(
   row: Row<D>,
-  rowProps: TableRowProps,
   highlightedItemId?: string
 ) {
   return (
-    <Table.Row<D>
-      key={rowProps.key}
-      cells={row.cells}
-      className={clsx(rowProps.className, {
+    <TableRow<D>
+      cells={row.getVisibleCells()}
+      className={clsx({
         active: highlightedItemId === row.id,
       })}
-      role={rowProps.role}
-      style={rowProps.style}
     />
   );
+}
+
+function getIsSelectionEnabled<D extends Record<string, unknown>>(
+  disabledSelect?: boolean,
+  isRowSelectable?: Props<D>['isRowSelectable']
+) {
+  if (disabledSelect) {
+    return false;
+  }
+
+  if (isRowSelectable) {
+    return isRowSelectable;
+  }
+
+  return true;
+}
+
+function globalFilterFn<D>(
+  row: Row<D>,
+  columnId: string,
+  filterValue: null | string
+): boolean {
+  const value = row.getValue(columnId);
+
+  if (filterValue === null || filterValue === '') {
+    return true;
+  }
+  if (value == null) {
+    return false;
+  }
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return value.toString().toLowerCase().includes(filterValue);
+  }
+  if (Array.isArray(value)) {
+    return value.some((item) => item.toLowerCase().includes(filterValue));
+  }
+
+  return false;
 }
