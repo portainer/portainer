@@ -236,18 +236,23 @@ function globalFilterFn<D>(
   if (filterValue === null || filterValue === '') {
     return true;
   }
+
   if (value == null) {
     return false;
   }
+
+  const filterValueLower = filterValue.toLowerCase();
+
   if (
     typeof value === 'string' ||
     typeof value === 'number' ||
     typeof value === 'boolean'
   ) {
-    return value.toString().toLowerCase().includes(filterValue);
+    return value.toString().toLowerCase().includes(filterValueLower);
   }
+
   if (Array.isArray(value)) {
-    return value.some((item) => item.toLowerCase().includes(filterValue));
+    return value.some((item) => item.toLowerCase().includes(filterValueLower));
   }
 
   return false;
