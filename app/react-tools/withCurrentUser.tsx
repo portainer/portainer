@@ -11,7 +11,7 @@ export function withCurrentUser<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     return (
       <UserProvider>
         <WrappedComponent {...props} />

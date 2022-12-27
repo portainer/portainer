@@ -7,7 +7,7 @@ export function withI18nSuspense<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     return (
       <Suspense fallback="Loading translations...">
         <WrappedComponent {...props} />

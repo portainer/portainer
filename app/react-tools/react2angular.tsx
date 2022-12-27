@@ -61,7 +61,7 @@ export function react2angular<T, U extends PropNames<T>[]>(
         ReactDOM.render(
           <StrictMode>
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            <Component {...(props as T)} />
+            <Component {...(props as T & JSX.IntrinsicAttributes)} />
           </StrictMode>,
 
           el
