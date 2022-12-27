@@ -4,6 +4,11 @@ import { useStore } from 'zustand';
 import { useSearchBarState } from './SearchBar';
 import { BasicTableSettings, CreatePersistedStoreReturn } from './types';
 
+export type TableState<TSettings extends BasicTableSettings> = TSettings & {
+  setSearch: (search: string) => void;
+  search: string;
+};
+
 export function useTableState<
   TSettings extends BasicTableSettings = BasicTableSettings
 >(store: CreatePersistedStoreReturn<TSettings>, storageKey: string) {
