@@ -1,6 +1,6 @@
 import { Environment } from '@/react/portainer/environments/types';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
-import { PublicSettingsViewModel } from '@/portainer/models/settings';
+import { PublicSettingsResponse } from '@/react/portainer/settings/types';
 
 export function useHasHeartbeat(environment: Environment) {
   const associated = !!environment.EdgeID;
@@ -30,7 +30,7 @@ export function useHasHeartbeat(environment: Environment) {
 
 function getCheckinInterval(
   environment: Environment,
-  settings: PublicSettingsViewModel
+  settings: PublicSettingsResponse
 ) {
   const asyncMode = environment.Edge.AsyncMode;
 
