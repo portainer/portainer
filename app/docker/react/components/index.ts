@@ -20,6 +20,7 @@ import { ImagesDatatable } from '@/react/docker/images/ListView/ImagesDatatable/
 import { EventsDatatable } from '@/react/docker/events/EventsDatatables';
 import { ConfigsDatatable } from '@/react/docker/configs/ListView/ConfigsDatatable';
 import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowser';
+import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
 
 const ngModule = angular
   .module('portainer.docker.react.components', [])
@@ -97,6 +98,21 @@ const ngModule = angular
     r2a(withUIRouter(withCurrentUser(AgentHostBrowser)), [
       'dataset',
       'isRoot',
+      'onBrowse',
+      'onDelete',
+      'onDownload',
+      'onFileSelectedForUpload',
+      'onGoToParent',
+      'onRename',
+      'relativePath',
+    ])
+  )
+  .component(
+    'agentVolumeBrowserReact',
+    r2a(withUIRouter(withCurrentUser(AgentVolumeBrowser)), [
+      'dataset',
+      'isRoot',
+      'isUploadAllowed',
       'onBrowse',
       'onDelete',
       'onDownload',
