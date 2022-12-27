@@ -137,23 +137,65 @@ export interface Settings {
   };
 }
 
+interface GlobalDeploymentOptions {
+  /** Hide manual deploy forms in portainer */
+  hideAddWithForm: boolean;
+  /** Configure this per environment or globally */
+  perEnvOverride: boolean;
+  /** Hide the web editor in the remaining visible forms */
+  hideWebEditor: boolean;
+  /** Hide the file upload option in the remaining visible forms */
+  hideFileUpload: boolean;
+}
+
 export interface PublicSettingsResponse {
-  // URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
+  /** URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string  */
   LogoURL: string;
-  // Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
+  /** The content in plaintext used to display in the login page. Will hide when value is empty string (only on BE) */
+  CustomLoginBanner: string;
+  /** Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth */
   AuthenticationMethod: AuthenticationMethod;
-  // Whether edge compute features are enabled
+  /** The minimum required length for a password of any user when using internal auth mode */
+  RequiredPasswordLength: number;
+  /** Deployment options for encouraging deployment as code (only on BE) */
+  GlobalDeploymentOptions: GlobalDeploymentOptions;
+  /** Show the Kompose build option (discontinued in 2.18) */
+  ShowKomposeBuildOption: boolean;
+  /** Whether edge compute features are enabled */
   EnableEdgeComputeFeatures: boolean;
-  // Supported feature flags
-  Features: Record<string, boolean>;
-  // The URL used for oauth login
+  /** Supported feature flags */
+  Features: { [key: Feature]: boolean };
+  /** The URL used for oauth login */
   OAuthLoginURI: string;
-  // The URL used for oauth logout
+  /** The URL used for oauth logout */
   OAuthLogoutURI: string;
-  // Whether portainer internal auth view will be hidden
+  /** Whether portainer internal auth view will be hidden (only on BE) */
   OAuthHideInternalAuth: boolean;
-  // Whether telemetry is enabled
+  /** Whether telemetry is enabled */
   EnableTelemetry: boolean;
-  // The expiry of a Kubeconfig
+  /** The expiry of a Kubeconfig */
   KubeconfigExpiry: string;
+  /** Whether team sync is enabled */
+  TeamSync: boolean;
+  /** Whether FDO is enabled */
+  IsFDOEnabled: boolean;
+  /** Whether AMT is enabled */
+  IsAMTEnabled: boolean;
+
+  /** Whether to hide default registry (only on BE) */
+  DefaultRegistry: {
+    Hide: boolean;
+  };
+  Edge: {
+    /** Whether the device has been started in edge async mode */
+    AsyncMode: boolean;
+    /** The ping interval for edge agent - used in edge async mode [seconds] */
+    PingInterval: number;
+    /** The snapshot interval for edge agent - used in edge async mode [seconds] */
+    SnapshotInterval: number;
+    /** The command list interval for edge agent - used in edge async mode [seconds] */
+    CommandInterval: number;
+    /** The check in interval for edge agent (in seconds) - used in non async mode [seconds] */
+    CheckinInterval: number;
+  };
 }
