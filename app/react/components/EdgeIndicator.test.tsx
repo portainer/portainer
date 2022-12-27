@@ -1,6 +1,5 @@
 import { createMockEnvironment } from '@/react-tools/test-mocks';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { rest, server } from '@/setup-tests/server';
 
 import { EdgeIndicator } from './EdgeIndicator';
 
@@ -25,8 +24,6 @@ async function renderComponent(
   checkInInterval = 0,
   queryDate = 0
 ) {
-  server.use(rest.get('/api/settings', (req, res, ctx) => res(ctx.json({}))));
-
   const environment = createMockEnvironment();
 
   environment.EdgeID = edgeId;

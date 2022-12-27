@@ -74,7 +74,18 @@ export const handlers = [
   }),
   rest.get<DefaultRequestBody, PathParams, Partial<PublicSettingsResponse>>(
     '/api/settings/public',
-    (req, res, ctx) => res(ctx.json({}))
+    (req, res, ctx) =>
+      res(
+        ctx.json({
+          Edge: {
+            AsyncMode: false,
+            CheckinInterval: 60,
+            CommandInterval: 60,
+            PingInterval: 60,
+            SnapshotInterval: 60,
+          },
+        })
+      )
   ),
   rest.get<DefaultRequestBody, PathParams, Partial<StatusResponse>>(
     '/api/status',
