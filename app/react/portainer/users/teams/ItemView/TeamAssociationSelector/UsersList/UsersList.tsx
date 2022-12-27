@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { UserPlus, Users } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
 
 import { User, UserId } from '@/portainer/users/types';
 import { useUser } from '@/react/hooks/useUser';
@@ -14,7 +13,7 @@ import { Datatable } from '@@/datatables';
 import { name } from './name-column';
 import { RowProvider } from './RowContext';
 
-const columns = [name] as Array<ColumnDef<User>>;
+const columns = [name];
 
 interface Props {
   users: User[];

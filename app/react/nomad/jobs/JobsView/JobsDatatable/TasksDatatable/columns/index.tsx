@@ -1,7 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
-
-import { Task } from '@/react/nomad/types';
-
 import { taskStatus } from './taskStatus';
 import { taskName } from './taskName';
 import { taskGroup } from './taskGroup';
@@ -16,4 +12,4 @@ export const columns = [
   allocationID,
   actions,
   started,
-] as Array<ColumnDef<Task>>;
+];

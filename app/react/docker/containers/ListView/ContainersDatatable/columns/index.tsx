@@ -1,8 +1,5 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-
-import { DockerContainer } from '@/react/docker/containers/types';
 
 import { created } from './created';
 import { host } from './host';
@@ -19,7 +16,7 @@ import { gpus } from './gpus';
 export function useColumns(
   isHostColumnVisible: boolean,
   isGPUsColumnVisible: boolean | undefined
-): Array<ColumnDef<DockerContainer, unknown>> {
+) {
   return useMemo(
     () =>
       _.compact([
@@ -36,5 +33,5 @@ export function useColumns(
         ownership,
       ]),
     [isHostColumnVisible, isGPUsColumnVisible]
-  ) as Array<ColumnDef<DockerContainer, unknown>>;
+  );
 }

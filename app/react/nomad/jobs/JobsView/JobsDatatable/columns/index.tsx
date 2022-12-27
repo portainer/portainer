@@ -1,5 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
-
 import { Job } from '@/react/nomad/types';
 
 import { buildExpandColumn } from '@@/datatables/expand-column';
@@ -12,11 +10,4 @@ import { namespace } from './namespace';
 
 const expand = buildExpandColumn<Job>();
 
-export const columns = [
-  expand,
-  name,
-  status,
-  namespace,
-  actions,
-  created,
-] as Array<ColumnDef<Job>>;
+export const columns = [expand, name, status, namespace, actions, created];

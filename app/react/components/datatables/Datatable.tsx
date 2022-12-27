@@ -1,7 +1,6 @@
 import {
   Table as TableInstance,
   TableState,
-  ColumnDef,
   useReactTable,
   Row,
   getCoreRowModel,
@@ -12,6 +11,7 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   getExpandedRowModel,
+  TableOptions,
 } from '@tanstack/react-table';
 import { ReactNode, useMemo } from 'react';
 import clsx from 'clsx';
@@ -31,7 +31,7 @@ import { TableRow } from './TableRow';
 
 export interface Props<D extends Record<string, unknown>> {
   dataset: D[];
-  columns: ColumnDef<D>[];
+  columns: TableOptions<D>['columns'];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
   renderTableActions?(selectedRows: D[]): ReactNode;
   disableSelect?: boolean;

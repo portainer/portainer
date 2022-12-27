@@ -1,5 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
-
 import { buildNameColumn } from '@@/datatables/NameCell';
 
 import { EdgeUpdateListItemResponse } from '../../queries/list';
@@ -17,4 +15,4 @@ export const columns = [
   scheduleType,
   scheduleStatus,
   created,
-] as Array<ColumnDef<EdgeUpdateListItemResponse>>;
+];

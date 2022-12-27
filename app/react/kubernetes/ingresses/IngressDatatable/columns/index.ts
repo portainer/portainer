@@ -1,7 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
-
-import { Ingress } from '../../types';
-
 import { name } from './name';
 import { type } from './type';
 import { namespace } from './namespace';
@@ -16,4 +12,4 @@ export const columns = [
   type,
   ingressRules,
   created,
-] as Array<ColumnDef<Ingress>>;
+];

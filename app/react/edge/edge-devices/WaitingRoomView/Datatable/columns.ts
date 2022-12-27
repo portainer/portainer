@@ -1,4 +1,4 @@
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 
 import { Environment } from '@/react/portainer/environments/types';
 
@@ -13,4 +13,4 @@ export const columns = [
     header: 'Edge ID',
     id: 'edge-id',
   }),
-] as Array<ColumnDef<Environment>>;
+];
