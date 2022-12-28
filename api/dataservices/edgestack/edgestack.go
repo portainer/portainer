@@ -111,6 +111,10 @@ func (service *Service) Create(id portainer.EdgeStackID, edgeStack *portainer.Ed
 	service.idxVersion[id] = edgeStack.Version
 	service.mu.Unlock()
 
+	for endpointID := range edgeStack.Status {
+		cache.Del(endpointID)
+	}
+
 	return nil
 }
 
@@ -155,8 +159,34 @@ func (service *Service) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc
 	id := service.connection.ConvertToKey(int(ID))
 	edgeStack := &portainer.EdgeStack{}
 
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
 	return service.connection.UpdateObjectFunc(BucketName, id, edgeStack, func() {
+		prevEndpoints := make(map[portainer.EndpointID]struct{}, len(edgeStack.Status))
+		for endpointID := range edgeStack.Status {
+			if _, ok := edgeStack.Status[endpointID]; !ok {
+				prevEndpoints[endpointID] = struct{}{}
+			}
+		}
+
 		updateFunc(edgeStack)
+
+		service.idxVersion[ID] = edgeStack.Version
+
+		// Invalidate cache for removed environments
+		for endpointID := range prevEndpoints {
+			if _, ok := edgeStack.Status[endpointID]; !ok {
+				cache.Del(endpointID)
+			}
+		}
+
+		// Invalidate cache for added environments
+		for endpointID := range edgeStack.Status {
+			if _, ok := prevEndpoints[endpointID]; !ok {
+				cache.Del(endpointID)
+			}
+		}
 	})
 }
 
