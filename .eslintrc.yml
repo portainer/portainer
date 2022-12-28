@@ -83,6 +83,7 @@ overrides:
             'newlines-between': 'always',
           },
         ]
+      no-plusplus: off
       func-style: [error, 'declaration']
       import/prefer-default-export: off
       no-use-before-define: ['error', { functions: false }]
