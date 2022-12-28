@@ -131,6 +131,10 @@ interface EndpointChangeWindow {
   StartTime: string;
   EndTime: string;
 }
+interface EndpointStatusMessage {
+  Summary: string;
+  Detail: string;
+}
 
 export type Environment = {
   Agent: { Version: string };
@@ -163,6 +167,10 @@ export type Environment = {
 
   /** Automatic update change window restriction for stacks and apps */
   ChangeWindow: EndpointChangeWindow;
+  /**
+   *  A message that describes the status. Should be included for Status Provisioning or Error.
+   */
+  StatusMessage?: EndpointStatusMessage;
 };
 
 /**

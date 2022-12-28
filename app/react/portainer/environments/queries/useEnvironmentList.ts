@@ -39,12 +39,18 @@ export function refetchIfAnyOffline(data?: GetEndpointsResponse) {
 
 export function useEnvironmentList(
   { page = 1, pageLimit = 100, sort, order, ...query }: Query = {},
-  refetchInterval?:
-    | number
-    | false
-    | ((data?: GetEndpointsResponse) => false | number),
-  staleTime = 0,
-  enabled = true
+  {
+    enabled,
+    refetchInterval,
+    staleTime,
+  }: {
+    refetchInterval?:
+      | number
+      | false
+      | ((data?: GetEndpointsResponse) => false | number);
+    staleTime?: number;
+    enabled?: boolean;
+  } = {}
 ) {
   const { isLoading, data } = useQuery(
     [
