@@ -29,7 +29,10 @@ import { DatatableContent } from './DatatableContent';
 import { createSelectColumn } from './select-column';
 import { TableRow } from './TableRow';
 
-export interface Props<D extends Record<string, unknown>> {
+export interface Props<
+  D extends Record<string, unknown>,
+  TSettings extends BasicTableSettings = BasicTableSettings
+> {
   dataset: D[];
   columns: TableOptions<D>['columns'];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
@@ -46,15 +49,12 @@ export interface Props<D extends Record<string, unknown>> {
   description?: ReactNode;
   pageCount?: number;
   highlightedItemId?: string;
-  initialSortBy?: BasicTableSettings['sortBy'];
-  initialPageSize?: BasicTableSettings['pageSize'];
-
-  searchValue: string;
-  onSearchChange(search: string): void;
-  onSortByChange(colId: string, desc: boolean): void;
-  onPageSizeChange(pageSize: number): void;
   onPageChange?(page: number): void;
 
+  settingsManager: TSettings & {
+    search: string;
+    setSearch: (value: string) => void;
+  };
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
@@ -76,16 +76,8 @@ export function Datatable<D extends Record<string, unknown>>({
   totalCount = dataset.length,
   description,
   pageCount,
-
-  initialSortBy,
-  initialPageSize = 10,
-  onPageChange = () => {},
-
-  onPageSizeChange,
-  onSortByChange,
-  searchValue,
-  onSearchChange,
-
+  onPageChange = () => null,
+  settingsManager: settings,
   renderRow = defaultRenderRow,
   highlightedItemId,
   noWidget,
@@ -107,10 +99,10 @@ export function Datatable<D extends Record<string, unknown>>({
     data: dataset,
     initialState: {
       pagination: {
-        pageSize: initialPageSize,
+        pageSize: settings.pageSize,
       },
-      sorting: initialSortBy ? [initialSortBy] : [],
-      globalFilter: searchValue,
+      sorting: settings.sortBy ? [settings.sortBy] : [],
+      globalFilter: settings.search,
 
       ...initialTableState,
     },
@@ -151,7 +143,7 @@ export function Datatable<D extends Record<string, unknown>>({
     <Table.Container noWidget={noWidget}>
       <DatatableHeader
         onSearchChange={handleSearchBarChange}
-        searchValue={searchValue}
+        searchValue={settings.search}
         title={title}
         titleIcon={titleIcon}
         description={description}
@@ -179,7 +171,7 @@ export function Datatable<D extends Record<string, unknown>>({
 
   function handleSearchBarChange(value: string) {
     tableInstance.setGlobalFilter(value);
-    onSearchChange(value);
+    settings.setSearch(value);
   }
 
   function handlePageChange(page: number) {
@@ -188,12 +180,12 @@ export function Datatable<D extends Record<string, unknown>>({
   }
 
   function handleSortChange(colId: string, desc: boolean) {
-    onSortByChange(colId, desc);
+    settings.setSortBy(colId, desc);
   }
 
   function handlePageSizeChange(pageSize: number) {
     tableInstance.setPageSize(pageSize);
-    onPageSizeChange(pageSize);
+    settings.setPageSize(pageSize);
   }
 }
 

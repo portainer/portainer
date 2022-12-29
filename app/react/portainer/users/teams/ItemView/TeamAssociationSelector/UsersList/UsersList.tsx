@@ -50,15 +50,21 @@ export function UsersList({ users, disabled, teamId }: Props) {
           )
         }
         disableSelect
-        initialPageSize={pageSize}
-        onPageSizeChange={setPageSize}
-        initialSortBy={sortBy}
-        onSortByChange={(colID, desc) => setSortBy({ id: colID, desc })}
-        searchValue={search}
-        onSearchChange={setSearch}
+        settingsManager={{
+          pageSize,
+          setPageSize,
+          sortBy,
+          setSortBy: handleSetSort,
+          search,
+          setSearch,
+        }}
       />
     </RowProvider>
   );
+
+  function handleSetSort(colId: string, desc: boolean) {
+    setSortBy({ id: colId, desc });
+  }
 
   function handleAddAllMembers(userIds: UserId[]) {
     addMemberMutation.mutate(userIds, {

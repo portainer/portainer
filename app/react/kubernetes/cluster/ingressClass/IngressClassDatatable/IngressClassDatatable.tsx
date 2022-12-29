@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Database } from 'lucide-react';
-import { useStore } from 'zustand';
+import { Database, AlertTriangle } from 'lucide-react';
 
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { Datatable } from '@@/datatables';
 import { Button, ButtonGroup } from '@@/buttons';
 import { Icon } from '@@/Icon';
-import { useSearchBarState } from '@@/datatables/SearchBar';
 import { createPersistedStore } from '@@/datatables/types';
 import { buildConfirmButton } from '@@/modals/utils';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { IngressControllerClassMap } from '../types';
 
@@ -39,8 +38,8 @@ export function IngressClassDatatable({
   noIngressControllerLabel,
   view,
 }: Props) {
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
+
   const [ingControllerFormValues, setIngControllerFormValues] = useState(
     ingressControllers || []
   );
@@ -80,6 +79,7 @@ export function IngressClassDatatable({
   return (
     <div className="-mx-[15px]">
       <Datatable
+        settingsManager={tableState}
         dataset={ingControllerFormValues || []}
         columns={columns}
         isLoading={isLoading}
@@ -89,12 +89,6 @@ export function IngressClassDatatable({
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
-        initialPageSize={settings.pageSize}
-        onPageSizeChange={settings.setPageSize}
-        initialSortBy={settings.sortBy}
-        onSortByChange={settings.setSortBy}
-        searchValue={search}
-        onSearchChange={setSearch}
       />
     </div>
   );
@@ -149,7 +143,7 @@ export function IngressClassDatatable({
         {ingressControllers &&
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
-            <span className="text-warning mt-1 flex items-center">
+            <span className="flex items-center mt-1 text-warning">
               <Icon icon={AlertTriangle} className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
             </span>
