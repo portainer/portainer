@@ -1,9 +1,9 @@
 import {
-  ColumnDef,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  TableOptions,
   TableState,
   useReactTable,
 } from '@tanstack/react-table';
@@ -16,7 +16,7 @@ import { BasicTableSettings } from './types';
 
 interface Props<D extends Record<string, unknown>> {
   dataset: D[];
-  columns: ColumnDef<D>[];
+  columns: TableOptions<D>['columns'];
 
   getRowId?(row: D): string;
   emptyContentLabel?: string;
