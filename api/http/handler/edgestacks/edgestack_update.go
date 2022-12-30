@@ -27,7 +27,7 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	if payload.StackFileContent == "" {
 		return errors.New("Invalid stack file content")
 	}
-	if payload.EdgeGroups != nil && len(payload.EdgeGroups) == 0 {
+	if len(payload.EdgeGroups) == 0 {
 		return errors.New("Edge Groups are mandatory for an Edge stack")
 	}
 	return nil

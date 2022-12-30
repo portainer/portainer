@@ -69,7 +69,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 		return errors.New("invalid cron expression")
 	}
 
-	if (payload.Endpoints == nil || len(payload.Endpoints) == 0) && (payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0) {
+	if len(payload.Endpoints) == 0 && len(payload.EdgeGroups) == 0 {
 		return errors.New("no environments or groups have been provided")
 	}
 
@@ -146,7 +146,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.EdgeGroups = edgeGroups
 
-	if (payload.Endpoints == nil || len(payload.Endpoints) == 0) && (payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0) {
+	if len(payload.Endpoints) == 0 && len(payload.EdgeGroups) == 0 {
 		return errors.New("no environments or groups have been provided")
 	}
 
