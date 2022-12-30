@@ -81,9 +81,9 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 // TeamLeaderAccess defines a security check for APIs require team leader privilege
 //
 // Bouncer operations are applied backwards:
-//  - Parse the JWT from the request and stored in context, user has to be authenticated
-//  - Upgrade to the restricted request
-//  - User is admin or team leader
+//   - Parse the JWT from the request and stored in context, user has to be authenticated
+//   - Upgrade to the restricted request
+//   - User is admin or team leader
 func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 	h = bouncer.mwIsTeamLeader(h)
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
@@ -199,7 +199,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
+		if bouncer.dataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {

@@ -139,7 +139,7 @@ func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpo
 // createEnvFile creates a file that would hold both "in-place" and default environment variables.
 // It will return the name of the file if the stack has "in-place" env vars, otherwise empty string.
 func createEnvFile(stack *portainer.Stack) (string, error) {
-	if stack.Env == nil || len(stack.Env) == 0 {
+	if len(stack.Env) == 0 {
 		return "", nil
 	}
 

@@ -27,10 +27,10 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return errors.New("invalid Edge group name")
 	}
-	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
+	if payload.Dynamic && len(payload.TagIDs) == 0 {
 		return errors.New("tagIDs is mandatory for a dynamic Edge group")
 	}
-	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
+	if !payload.Dynamic && len(payload.Endpoints) == 0 {
 		return errors.New("environments is mandatory for a static Edge group")
 	}
 	return nil
