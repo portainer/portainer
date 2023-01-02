@@ -1,8 +1,3 @@
-// theme icons
-import automode from '@/assets/ico/theme/auto.svg?c';
-import darkmode from '@/assets/ico/theme/darkmode.svg?c';
-import lightmode from '@/assets/ico/theme/lightmode.svg?c';
-import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
 // general icons
 import heartbeatup from '@/assets/ico/heartbeat-up.svg?c';
 import heartbeatdown from '@/assets/ico/heartbeat-down.svg?c';
@@ -47,10 +42,6 @@ const placeholder = Placeholder;
 export const SvgIcons = {
   heartbeatup,
   heartbeatdown,
-  automode,
-  darkmode,
-  lightmode,
-  highcontrastmode,
   dataflow,
   dockericon,
   git,

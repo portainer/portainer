@@ -1,7 +1,5 @@
 import { KVM } from '@open-amt-cloud-toolkit/ui-toolkit-react/reactjs/src/kvm.bundle';
 
-import { react2angular } from '@/react-tools/react2angular';
-
 import './KVMControl.css';
 
 export interface KVMControlProps {
@@ -24,9 +22,3 @@ export function KVMControl({ deviceId, server, token }: KVMControlProps) {
     />
   );
 }
-
-export const KVMControlAngular = react2angular(KVMControl, [
-  'deviceId',
-  'server',
-  'token',
-]);

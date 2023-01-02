@@ -1,7 +1,7 @@
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { queryKeys } from '@/portainer/users/queries/queryKeys';
 import { queryClient } from '@/react-tools/react-query';
-import { options } from './options';
+import { options } from '@/react/portainer/account/AccountView/theme-options';
 
 export default class ThemeSettingsController {
   /* @ngInject */

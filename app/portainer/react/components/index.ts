@@ -20,6 +20,7 @@ import { PorAccessControlFormUserSelector } from '@/react/portainer/access-contr
 import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
 import { AccessTypeSelector } from '@/react/portainer/access-control/EditDetails/AccessTypeSelector';
 import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeKeyDisplay';
+import { KVMControl } from '@/react/portainer/environments/KvmView/KVMControl';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -254,4 +255,8 @@ export const componentsModule = angular
       'value',
       'height',
     ])
+  )
+  .component(
+    'kvmControl',
+    r2a(KVMControl, ['deviceId', 'server', 'token'])
   ).name;

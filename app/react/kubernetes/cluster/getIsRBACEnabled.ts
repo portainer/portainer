@@ -4,7 +4,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 export async function getIsRBACEnabled(environmentId: EnvironmentId) {
   try {
-    const { data } = await axios.get(
+    const { data } = await axios.get<boolean>(
       `kubernetes/${environmentId}/rbac_enabled`
     );
     return data;
