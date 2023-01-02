@@ -39,6 +39,7 @@ import { Slider } from '@@/form-components/Slider';
 import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
 import { TimeWindowDisplay } from '@@/TimeWindowDisplay';
+import { CodeEditor } from '@@/CodeEditor';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -241,4 +242,16 @@ export const componentsModule = angular
   .component(
     'timeWindowDisplay',
     r2a(withReactQuery(withUIRouter(TimeWindowDisplay)), [])
+  )
+  .component(
+    'reactCodeEditor',
+    r2a(CodeEditor, [
+      'id',
+      'placeholder',
+      'yaml',
+      'readonly',
+      'onChange',
+      'value',
+      'height',
+    ])
   ).name;
