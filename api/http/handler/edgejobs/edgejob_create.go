@@ -188,7 +188,7 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *portainer.EdgeJob {
 	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
+	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
 		ID:                  edgeJobIdentifier,
@@ -208,7 +208,7 @@ func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreat
 func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *portainer.EdgeJob {
 	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
+	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
 		ID:                  edgeJobIdentifier,
@@ -251,7 +251,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 
 	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
 	if len(endpointsFromGroups) > 0 {
-		endpointsMap = handler.convertEndpointsToMetaObject(endpointsFromGroups)
+		endpointsMap = convertEndpointsToMetaObject(endpointsFromGroups)
 
 		for ID := range endpointsMap {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)

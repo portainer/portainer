@@ -53,20 +53,18 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 
-		endpointsMap = handler.convertEndpointsToMetaObject(endpoints)
+		endpointsMap = convertEndpointsToMetaObject(endpoints)
 		maps.Copy(endpointsMap, edgeJob.GroupLogsCollection)
 	}
 
 	maps.Copy(endpointsMap, edgeJob.Endpoints)
 
 	for endpointID, meta := range endpointsMap {
-		cronTask := taskContainer{
+		tasks = append(tasks, taskContainer{
 			ID:         fmt.Sprintf("edgejob_task_%d_%d", edgeJob.ID, endpointID),
 			EndpointID: endpointID,
 			LogsStatus: meta.LogsStatus,
-		}
-
-		tasks = append(tasks, cronTask)
+		})
 	}
 
 	return response.JSON(w, tasks)
