@@ -96,10 +96,8 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 
 		stack = *edgeStack
 	})
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
+	if err != nil {
+		return handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
 	}
 
 	return response.JSON(w, stack)
