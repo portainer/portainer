@@ -340,11 +340,9 @@ func (handler *Handler) storeManifestFromGitRepository(stackFolder string, relat
 	projectPath = handler.FileService.GetEdgeStackProjectPath(stackFolder)
 	repositoryUsername := ""
 	repositoryPassword := ""
-	if repositoryConfig.Authentication != nil {
-		if repositoryConfig.Authentication.Password != "" {
-			repositoryUsername = repositoryConfig.Authentication.Username
-			repositoryPassword = repositoryConfig.Authentication.Password
-		}
+	if repositoryConfig.Authentication != nil && repositoryConfig.Authentication.Password != "" {
+		repositoryUsername = repositoryConfig.Authentication.Username
+		repositoryPassword = repositoryConfig.Authentication.Password
 	}
 
 	err = handler.GitService.CloneRepository(projectPath, repositoryConfig.URL, repositoryConfig.ReferenceName, repositoryUsername, repositoryPassword)
