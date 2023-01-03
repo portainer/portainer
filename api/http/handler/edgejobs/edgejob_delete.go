@@ -52,7 +52,7 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 
-		endpointsMap = handler.convertEndpointsToMetaObject(endpoints)
+		endpointsMap = convertEndpointsToMetaObject(endpoints)
 		maps.Copy(endpointsMap, edgeJob.Endpoints)
 	} else {
 		endpointsMap = edgeJob.Endpoints

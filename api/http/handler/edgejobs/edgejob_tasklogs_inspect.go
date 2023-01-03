@@ -45,5 +45,3 @@ func (handler *Handler) edgeJobTaskLogsInspect(w http.ResponseWriter, r *http.Re
 
 	return response.JSON(w, &fileResponse{FileContent: string(logFileContent)})
 }
-
-// fmt.Sprintf("/tmp/edge_jobs/%s/logs_%s", edgeJobID, taskID)
