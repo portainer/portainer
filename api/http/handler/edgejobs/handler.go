@@ -46,3 +46,13 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksClear)))).Methods(http.MethodDelete)
 	return h
 }
+
+func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {
+	endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
+
+	for _, endpointID := range endpoints {
+		endpointsMap[endpointID] = portainer.EdgeJobEndpointMeta{}
+	}
+
+	return endpointsMap
+}

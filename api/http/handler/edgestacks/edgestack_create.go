@@ -103,7 +103,7 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 	if govalidator.IsNull(payload.StackFileContent) {
 		return &InvalidPayloadError{msg: "Invalid stack file content"}
 	}
-	if payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0 {
+	if len(payload.EdgeGroups) == 0 {
 		return &InvalidPayloadError{msg: "Edge Groups are mandatory for an Edge stack"}
 	}
 	return nil
@@ -221,7 +221,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 			payload.FilePathInRepository = filesystem.ManifestFileDefaultName
 		}
 	}
-	if payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0 {
+	if len(payload.EdgeGroups) == 0 {
 		return &InvalidPayloadError{msg: "Edge Groups are mandatory for an Edge stack"}
 	}
 	return nil
@@ -340,11 +340,9 @@ func (handler *Handler) storeManifestFromGitRepository(stackFolder string, relat
 	projectPath = handler.FileService.GetEdgeStackProjectPath(stackFolder)
 	repositoryUsername := ""
 	repositoryPassword := ""
-	if repositoryConfig.Authentication != nil {
-		if repositoryConfig.Authentication.Password != "" {
-			repositoryUsername = repositoryConfig.Authentication.Username
-			repositoryPassword = repositoryConfig.Authentication.Password
-		}
+	if repositoryConfig.Authentication != nil && repositoryConfig.Authentication.Password != "" {
+		repositoryUsername = repositoryConfig.Authentication.Username
+		repositoryPassword = repositoryConfig.Authentication.Password
 	}
 
 	err = handler.GitService.CloneRepository(projectPath, repositoryConfig.URL, repositoryConfig.ReferenceName, repositoryUsername, repositoryPassword)

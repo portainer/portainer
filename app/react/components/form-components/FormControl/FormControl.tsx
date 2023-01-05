@@ -83,7 +83,7 @@ function sizeClassChildren(size?: Size) {
     case 'medium':
       return 'col-sm-8 col-lg-9';
     case 'xsmall':
-      return 'col-sm-8';
+      return 'col-sm-10';
     case 'vertical':
       return '';
     default:

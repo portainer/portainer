@@ -4,10 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"math/rand"
 	"os"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/docker-compose-wrapper/compose"
@@ -785,6 +787,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	configureLogger()
 	setLoggingMode("PRETTY")
 

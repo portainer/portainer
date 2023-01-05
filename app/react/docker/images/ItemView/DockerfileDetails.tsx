@@ -20,64 +20,60 @@ interface Props {
 
 export function DockerfileDetails({ image }: Props) {
   return (
-    <div className="row">
-      <div className="col-lg-12 col-md-12 col-xs-12">
-        <TableContainer>
-          <TableTitle label="Dockerfile details" icon={List} />
-          <DetailsTable>
-            <DetailsTable.Row label="CMD">
-              <code>{joinCommand(image.Command)}</code>
-            </DetailsTable.Row>
+    <TableContainer>
+      <TableTitle label="Dockerfile details" icon={List} />
+      <DetailsTable>
+        <DetailsTable.Row label="CMD">
+          <code>{joinCommand(image.Command)}</code>
+        </DetailsTable.Row>
 
-            {image.Entrypoint && (
-              <DetailsTable.Row label="ENTRYPOINT">
-                <code>{joinCommand(image.Entrypoint)}</code>
-              </DetailsTable.Row>
-            )}
+        {image.Entrypoint && (
+          <DetailsTable.Row label="ENTRYPOINT">
+            <code>{joinCommand(image.Entrypoint)}</code>
+          </DetailsTable.Row>
+        )}
 
-            {image.ExposedPorts.length > 0 && (
-              <DetailsTable.Row label="EXPOSE">
-                {image.ExposedPorts.map((port, index) => (
-                  <span className="label label-default space-right" key={index}>
-                    {port}
-                  </span>
+        {image.ExposedPorts.length > 0 && (
+          <DetailsTable.Row label="EXPOSE">
+            {image.ExposedPorts.map((port, index) => (
+              <span className="label label-default space-right" key={index}>
+                {port}
+              </span>
+            ))}
+          </DetailsTable.Row>
+        )}
+
+        {image.Volumes.length > 0 && (
+          <DetailsTable.Row label="VOLUME">
+            <div className="flex flex-wrap gap-1">
+              {image.Volumes.map((volume, index) => (
+                <span
+                  key={index}
+                  className="label label-default space-right"
+                  ng-repeat="volume in image.Volumes"
+                >
+                  {volume}
+                </span>
+              ))}
+            </div>
+          </DetailsTable.Row>
+        )}
+
+        {image.Env.length > 0 && (
+          <DetailsTable.Row label="ENV">
+            <table className="table table-bordered table-condensed">
+              <tbody>
+                {image.Env.map((variable) => (
+                  <tr key={variable}>
+                    <td>{getPairKey(variable, '=')}</td>
+                    <td>{getPairValue(variable, '=')}</td>
+                  </tr>
                 ))}
-              </DetailsTable.Row>
-            )}
-
-            {image.Volumes.length > 0 && (
-              <DetailsTable.Row label="VOLUME">
-                <div className="flex flex-wrap gap-1">
-                  {image.Volumes.map((volume, index) => (
-                    <span
-                      key={index}
-                      className="label label-default space-right"
-                      ng-repeat="volume in image.Volumes"
-                    >
-                      {volume}
-                    </span>
-                  ))}
-                </div>
-              </DetailsTable.Row>
-            )}
-
-            {image.Env.length > 0 && (
-              <DetailsTable.Row label="ENV">
-                <table className="table table-bordered table-condensed">
-                  <tbody>
-                    {image.Env.map((variable) => (
-                      <tr key={variable}>
-                        <td>{getPairKey(variable, '=')}</td>
-                        <td>{getPairValue(variable, '=')}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </DetailsTable.Row>
-            )}
-          </DetailsTable>
-        </TableContainer>
-      </div>
-    </div>
+              </tbody>
+            </table>
+          </DetailsTable.Row>
+        )}
+      </DetailsTable>
+    </TableContainer>
   );
 }

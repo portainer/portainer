@@ -10,6 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/slices"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -24,13 +25,13 @@ type edgeGroupUpdatePayload struct {
 
 func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid Edge group name")
+		return errors.New("invalid Edge group name")
 	}
-	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
-		return errors.New("TagIDs is mandatory for a dynamic Edge group")
+	if payload.Dynamic && len(payload.TagIDs) == 0 {
+		return errors.New("tagIDs is mandatory for a dynamic Edge group")
 	}
-	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return errors.New("Environments is mandatory for a static Edge group")
+	if !payload.Dynamic && len(payload.Endpoints) == 0 {
+		return errors.New("environments is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -75,7 +76,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 		for _, edgeGroup := range edgeGroups {
 			if edgeGroup.Name == payload.Name && edgeGroup.ID != portainer.EdgeGroupID(edgeGroupID) {
-				return httperror.BadRequest("Edge group name must be unique", errors.New("Edge group name must be unique"))
+				return httperror.BadRequest("Edge group name must be unique", errors.New("edge group name must be unique"))
 			}
 		}
 
@@ -123,17 +124,45 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
 	endpointsToUpdate := append(newRelatedEndpoints, oldRelatedEndpoints...)
 
+	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
+	if err != nil {
+		return httperror.InternalServerError("Unable to fetch Edge jobs", err)
+	}
+
 	for _, endpointID := range endpointsToUpdate {
-		err = handler.updateEndpoint(endpointID)
+		err = handler.updateEndpointStacks(endpointID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist Environment relation changes inside the database", err)
+		}
+
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to get Environment from database", err)
+		}
+
+		if !endpointutils.IsEdgeEndpoint(endpoint) {
+			continue
+		}
+
+		var operation string
+		if slices.Contains(newRelatedEndpoints, endpointID) {
+			operation = "add"
+		} else if slices.Contains(oldRelatedEndpoints, endpointID) {
+			operation = "remove"
+		} else {
+			continue
+		}
+
+		err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpointID, edgeJobs, operation)
+		if err != nil {
+			return httperror.InternalServerError("Unable to persist Environment Edge Jobs changes inside the database", err)
 		}
 	}
 
 	return response.JSON(w, edgeGroup)
 }
 
-func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
+func (handler *Handler) updateEndpointStacks(endpointID portainer.EndpointID) error {
 	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
 		return err
@@ -169,4 +198,21 @@ func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
 	relation.EdgeStacks = edgeStackSet
 
 	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
+}
+
+func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID, endpointID portainer.EndpointID, edgeJobs []portainer.EdgeJob, operation string) error {
+	for _, edgeJob := range edgeJobs {
+		if !slices.Contains(edgeJob.EdgeGroups, edgeGroupID) {
+			continue
+		}
+
+		switch operation {
+		case "add":
+			handler.ReverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
+		case "remove":
+			handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpointID, edgeJob.ID)
+		}
+	}
+
+	return nil
 }

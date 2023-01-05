@@ -8,6 +8,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/maps"
 )
 
 // @id EdgeJobDelete
@@ -42,6 +44,23 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	handler.ReverseTunnelService.RemoveEdgeJob(edgeJob.ID)
+
+	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
+	if len(edgeJob.EdgeGroups) > 0 {
+		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
+		if err != nil {
+			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
+		}
+
+		endpointsMap = convertEndpointsToMetaObject(endpoints)
+		maps.Copy(endpointsMap, edgeJob.Endpoints)
+	} else {
+		endpointsMap = edgeJob.Endpoints
+	}
+
+	for endpointID := range endpointsMap {
+		handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpointID, edgeJob.ID)
+	}
 
 	err = handler.DataStore.EdgeJob().DeleteEdgeJob(edgeJob.ID)
 	if err != nil {

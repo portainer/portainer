@@ -15,17 +15,12 @@ import '@reach/dialog/styles.css';
 export interface Props {
   environments: Environment[];
   envQueryParams: Query;
-  selectedItems: Array<Environment>;
 }
-export function KubeconfigButton({
-  environments,
-  envQueryParams,
-  selectedItems,
-}: Props) {
+export function KubeconfigButton({ environments, envQueryParams }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!isKubeconfigButtonVisible(environments)) {
-    //  return null;
+    return null;
   }
 
   return (
@@ -33,11 +28,12 @@ export function KubeconfigButton({
       <Button
         onClick={handleClick}
         size="medium"
-        className="!ml-3"
-        disabled={selectedItems.some(
+        className="!m-0"
+        disabled={environments.some(
           (env) => !isKubernetesEnvironment(env.Type)
         )}
         icon={Download}
+        color="light"
       >
         Kubeconfig
       </Button>
@@ -74,11 +70,7 @@ export function KubeconfigButton({
         <KubeconfigPrompt
           envQueryParams={envQueryParams}
           onClose={handleClose}
-          selectedItems={
-            selectedItems.length
-              ? selectedItems.map((env) => env.Id)
-              : environments.map((env) => env.Id)
-          }
+          selectedItems={environments.map((env) => env.Id)}
         />
       )
     );

@@ -23,13 +23,13 @@ type edgeGroupCreatePayload struct {
 
 func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid Edge group name")
+		return errors.New("invalid Edge group name")
 	}
-	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
-		return errors.New("TagIDs is mandatory for a dynamic Edge group")
+	if payload.Dynamic && len(payload.TagIDs) == 0 {
+		return errors.New("tagIDs is mandatory for a dynamic Edge group")
 	}
-	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return errors.New("Environment is mandatory for a static Edge group")
+	if !payload.Dynamic && len(payload.Endpoints) == 0 {
+		return errors.New("environment is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -61,7 +61,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 
 	for _, edgeGroup := range edgeGroups {
 		if edgeGroup.Name == payload.Name {
-			return httperror.BadRequest("Edge group name must be unique", errors.New("Edge group name must be unique"))
+			return httperror.BadRequest("Edge group name must be unique", errors.New("edge group name must be unique"))
 		}
 	}
 

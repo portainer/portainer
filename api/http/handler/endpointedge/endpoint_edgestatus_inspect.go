@@ -182,10 +182,17 @@ func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel portainer.TunnelDetails) ([]edgeJobResponse, *httperror.HandlerError) {
 	schedules := []edgeJobResponse{}
 	for _, job := range tunnel.Jobs {
+		var collectLogs bool
+		if _, ok := job.GroupLogsCollection[endpointID]; ok {
+			collectLogs = job.GroupLogsCollection[endpointID].CollectLogs
+		} else {
+			collectLogs = job.Endpoints[endpointID].CollectLogs
+		}
+
 		schedule := edgeJobResponse{
 			ID:             job.ID,
 			CronExpression: job.CronExpression,
-			CollectLogs:    job.Endpoints[endpointID].CollectLogs,
+			CollectLogs:    collectLogs,
 			Version:        job.Version,
 		}
 

@@ -10,16 +10,6 @@ import (
 	"github.com/portainer/portainer/api/http/middlewares"
 )
 
-func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerError {
-	httpErr := httperror.InternalServerError(msg, err)
-
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		httpErr.StatusCode = http.StatusNotFound
-	}
-
-	return httpErr
-}
-
 // @id EdgeStackStatusDelete
 // @summary Delete an EdgeStack status
 // @description Authorized only if the request is done by an Edge Environment(Endpoint)

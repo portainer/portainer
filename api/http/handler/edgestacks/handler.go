@@ -85,3 +85,13 @@ func (handler *Handler) convertAndStoreKubeManifestIfNeeded(stackFolder string, 
 
 	return komposeFileName, nil
 }
+
+func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerError {
+	httpErr := httperror.InternalServerError(msg, err)
+
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		httpErr.StatusCode = http.StatusNotFound
+	}
+
+	return httpErr
+}
