@@ -144,11 +144,15 @@ func (service *Service) UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *por
 		}
 	}
 
-	// Invalidate cache for added environments
+	// Invalidate cache when version changes and for added environments
 	for endpointID := range edgeStack.Status {
-		if _, ok := prevEdgeStack.Status[endpointID]; !ok {
-			cache.Del(endpointID)
+		if prevEdgeStack.Version == edgeStack.Version {
+			if _, ok := prevEdgeStack.Status[endpointID]; ok {
+				continue
+			}
 		}
+
+		cache.Del(endpointID)
 	}
 
 	return nil
@@ -172,6 +176,7 @@ func (service *Service) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc
 
 		updateFunc(edgeStack)
 
+		prevVersion := service.idxVersion[ID]
 		service.idxVersion[ID] = edgeStack.Version
 
 		// Invalidate cache for removed environments
@@ -181,11 +186,15 @@ func (service *Service) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc
 			}
 		}
 
-		// Invalidate cache for added environments
+		// Invalidate cache when version changes and for added environments
 		for endpointID := range edgeStack.Status {
-			if _, ok := prevEndpoints[endpointID]; !ok {
-				cache.Del(endpointID)
+			if prevVersion == edgeStack.Version {
+				if _, ok := prevEndpoints[endpointID]; ok {
+					continue
+				}
 			}
+
+			cache.Del(endpointID)
 		}
 	})
 }
