@@ -158,7 +158,7 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/%d/edge/status", endpointID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpointID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
@@ -185,7 +185,7 @@ func TestWithEndpoints(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/%d/edge/status", test.endpoint.ID), nil)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", test.endpoint.ID), nil)
 		if err != nil {
 			t.Fatal("request error:", err)
 		}
@@ -231,7 +231,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/%d/edge/status", endpoint.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
@@ -279,7 +279,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/%d/edge/status", endpoint.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
@@ -348,7 +348,7 @@ func TestEdgeStackStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/%d/edge/status", endpoint.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
@@ -418,7 +418,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 
 	handler.ReverseTunnelService.AddEdgeJob(endpoint.ID, &edgeJob)
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/%d/edge/status", endpoint.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
 	}

@@ -31,14 +31,16 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		ReverseTunnelService: reverseTunnelService,
 	}
 
-	endpointRouter := h.PathPrefix("/{id}").Subrouter()
+	h.Handle("/api/endpoints/{id}/edge/status", bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStatusInspect))).Methods(http.MethodGet)
+
+	endpointRouter := h.PathPrefix("/api/endpoints/{id}").Subrouter()
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 
-	endpointRouter.PathPrefix("/edge/status").Handler(
-		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStatusInspect))).Methods(http.MethodGet)
 	endpointRouter.PathPrefix("/edge/stacks/{stackId}").Handler(
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStackInspect))).Methods(http.MethodGet)
+
 	endpointRouter.PathPrefix("/edge/jobs/{jobID}/logs").Handler(
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeJobsLogs))).Methods(http.MethodPost)
+
 	return h
 }

@@ -206,15 +206,23 @@ func (service *Service) checkTunnels() {
 
 	service.mu.Lock()
 	for key, tunnel := range service.tunnelDetailsMap {
+		if tunnel.LastActivity.IsZero() || tunnel.Status == portainer.EdgeAgentIdle {
+			continue
+		}
+
+		if tunnel.Status == portainer.EdgeAgentManagementRequired && time.Since(tunnel.LastActivity) < requiredTimeout {
+			continue
+		}
+
+		if tunnel.Status == portainer.EdgeAgentActive && time.Since(tunnel.LastActivity) < activeTimeout {
+			continue
+		}
+
 		tunnels[key] = *tunnel
 	}
 	service.mu.Unlock()
 
 	for endpointID, tunnel := range tunnels {
-		if tunnel.LastActivity.IsZero() || tunnel.Status == portainer.EdgeAgentIdle {
-			continue
-		}
-
 		elapsed := time.Since(tunnel.LastActivity)
 		log.Debug().
 			Int("endpoint_id", int(endpointID)).
@@ -222,9 +230,7 @@ func (service *Service) checkTunnels() {
 			Float64("status_time_seconds", elapsed.Seconds()).
 			Msg("environment tunnel monitoring")
 
-		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
-			continue
-		} else if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
+		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed > requiredTimeout {
 			log.Debug().
 				Int("endpoint_id", int(endpointID)).
 				Str("status", tunnel.Status).
@@ -233,9 +239,7 @@ func (service *Service) checkTunnels() {
 				Msg("REQUIRED state timeout exceeded")
 		}
 
-		if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
-			continue
-		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
+		if tunnel.Status == portainer.EdgeAgentActive && elapsed > activeTimeout {
 			log.Debug().
 				Int("endpoint_id", int(endpointID)).
 				Str("status", tunnel.Status).

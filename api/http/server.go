@@ -341,8 +341,9 @@ func (server *Server) Start() error {
 
 	log.Info().Str("bind_address", server.BindAddressHTTPS).Msg("starting HTTPS server")
 	httpsServer := &http.Server{
-		Addr:    server.BindAddressHTTPS,
-		Handler: handler,
+		Addr:         server.BindAddressHTTPS,
+		Handler:      handler,
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)), // Disable HTTP/2
 	}
 
 	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
