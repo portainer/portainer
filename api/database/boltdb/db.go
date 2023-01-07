@@ -1,7 +1,6 @@
 package boltdb
 
 import (
-	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -10,6 +9,7 @@ import (
 	"path"
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
@@ -132,9 +132,11 @@ func (connection *DbConnection) Open() error {
 	if err != nil {
 		return err
 	}
+
 	db.MaxBatchSize = connection.MaxBatchSize
 	db.MaxBatchDelay = connection.MaxBatchDelay
 	connection.DB = db
+
 	return nil
 }
 
@@ -144,7 +146,28 @@ func (connection *DbConnection) Close() error {
 	if connection.DB != nil {
 		return connection.DB.Close()
 	}
+
 	return nil
+}
+
+func (connection *DbConnection) txFn(fn func(portainer.Transaction) error) func(*bolt.Tx) error {
+	return func(tx *bolt.Tx) error {
+		return fn(&DbTransaction{conn: connection, tx: tx})
+	}
+}
+
+// UpdateTx executes the given function inside a read-write transaction
+func (connection *DbConnection) UpdateTx(fn func(portainer.Transaction) error) error {
+	if connection.MaxBatchDelay > 0 && connection.MaxBatchSize > 1 {
+		return connection.Batch(connection.txFn(fn))
+	}
+
+	return connection.Update(connection.txFn(fn))
+}
+
+// ViewTx executes the given function inside a read-only transaction
+func (connection *DbConnection) ViewTx(fn func(portainer.Transaction) error) error {
+	return connection.View(connection.txFn(fn))
 }
 
 // BackupTo backs up db to a provided writer.
@@ -180,34 +203,16 @@ func (connection *DbConnection) ConvertToKey(v int) []byte {
 
 // CreateBucket is a generic function used to create a bucket inside a database.
 func (connection *DbConnection) SetServiceName(bucketName string) error {
-	return connection.Batch(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
-		return err
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.SetServiceName(bucketName)
 	})
 }
 
 // GetObject is a generic function used to retrieve an unmarshalled object from a database.
 func (connection *DbConnection) GetObject(bucketName string, key []byte, object interface{}) error {
-	var data []byte
-
-	err := connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-
-		value := bucket.Get(key)
-		if value == nil {
-			return dserrors.ErrObjectNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-
-		return nil
+	return connection.ViewTx(func(tx portainer.Transaction) error {
+		return tx.GetObject(bucketName, key, object)
 	})
-	if err != nil {
-		return err
-	}
-
-	return connection.UnmarshalObjectWithJsoniter(data, object)
 }
 
 func (connection *DbConnection) getEncryptionKey() []byte {
@@ -220,14 +225,8 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 
 // UpdateObject is a generic function used to update an object inside a database.
 func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
-	data, err := connection.MarshalObject(object)
-	if err != nil {
-		return err
-	}
-
-	return connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-		return bucket.Put(key, data)
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.UpdateObject(bucketName, key, object)
 	})
 }
 
@@ -259,34 +258,16 @@ func (connection *DbConnection) UpdateObjectFunc(bucketName string, key []byte, 
 
 // DeleteObject is a generic function used to delete an object inside a database.
 func (connection *DbConnection) DeleteObject(bucketName string, key []byte) error {
-	return connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-		return bucket.Delete(key)
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.DeleteObject(bucketName, key)
 	})
 }
 
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
 func (connection *DbConnection) DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error {
-	return connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := connection.UnmarshalObject(v, &obj)
-			if err != nil {
-				return err
-			}
-
-			if id, ok := matching(obj); ok {
-				err := bucket.Delete(connection.ConvertToKey(id))
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		return nil
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.DeleteAllObjects(bucketName, obj, matching)
 	})
 }
 
@@ -294,13 +275,8 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, obj interfac
 func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 	var identifier int
 
-	connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-		id, err := bucket.NextSequence()
-		if err != nil {
-			return err
-		}
-		identifier = int(id)
+	_ = connection.UpdateTx(func(tx portainer.Transaction) error {
+		identifier = tx.GetNextIdentifier(bucketName)
 		return nil
 	})
 
@@ -309,108 +285,41 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
 func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
-	return connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-
-		seqId, _ := bucket.NextSequence()
-		id, obj := fn(seqId)
-
-		data, err := connection.MarshalObject(obj)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(connection.ConvertToKey(int(id)), data)
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.CreateObject(bucketName, fn)
 	})
 }
 
 // CreateObjectWithId creates a new object in the bucket, using the specified id
 func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
-	return connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-		data, err := connection.MarshalObject(obj)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(connection.ConvertToKey(id), data)
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.CreateObjectWithId(bucketName, id, obj)
 	})
 }
 
 // CreateObjectWithStringId creates a new object in the bucket, using the specified id
 func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error {
-	return connection.Batch(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-		data, err := connection.MarshalObject(obj)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(id, data)
+	return connection.UpdateTx(func(tx portainer.Transaction) error {
+		return tx.CreateObjectWithStringId(bucketName, id, obj)
 	})
 }
 
 func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
-	err := connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := connection.UnmarshalObject(v, obj)
-			if err != nil {
-				return err
-			}
-			obj, err = append(obj)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
+	return connection.ViewTx(func(tx portainer.Transaction) error {
+		return tx.GetAll(bucketName, obj, append)
 	})
-
-	return err
 }
 
 // TODO: decide which Unmarshal to use, and use one...
 func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
-	err := connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := connection.UnmarshalObjectWithJsoniter(v, obj)
-			if err != nil {
-				return err
-			}
-			obj, err = append(obj)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
+	return connection.ViewTx(func(tx portainer.Transaction) error {
+		return tx.GetAllWithJsoniter(bucketName, obj, append)
 	})
-	return err
 }
 
 func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error {
-	return connection.View(func(tx *bolt.Tx) error {
-		cursor := tx.Bucket([]byte(bucketName)).Cursor()
-
-		for k, v := cursor.Seek(keyPrefix); k != nil && bytes.HasPrefix(k, keyPrefix); k, v = cursor.Next() {
-			err := connection.UnmarshalObjectWithJsoniter(v, obj)
-			if err != nil {
-				return err
-			}
-
-			obj, err = append(obj)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
+	return connection.ViewTx(func(tx portainer.Transaction) error {
+		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, append)
 	})
 }
 
