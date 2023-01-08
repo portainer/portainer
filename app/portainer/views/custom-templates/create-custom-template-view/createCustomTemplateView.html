@@ -62,7 +62,12 @@
           </div>
           <!-- !upload -->
           <!-- repository -->
-          <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.handleChange)"></git-form>
+          <git-form
+            ng-if="$ctrl.state.Method === 'repository'"
+            value="$ctrl.formValues"
+            on-change="($ctrl.handleChange)"
+            is-docker-standalone="$ctrl.isDockerStandalone"
+          ></git-form>
 
           <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
             <div class="col-sm-12">

@@ -16,8 +16,13 @@ class DockerComposeFormController {
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
   }
 
-  onChangeFormValues(values) {
-    this.formValues = values;
+  onChangeFormValues(newValues) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...newValues,
+      };
+    });
   }
 
   onChangeMethod(method) {

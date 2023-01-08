@@ -5,7 +5,14 @@
       <p> Pull the latest manifest from git and redeploy the application. </p>
     </div>
   </div>
-  <git-form-auto-update-fieldset model="$ctrl.formValues.AutoUpdate" on-change="($ctrl.onChangeAutoUpdate)"></git-form-auto-update-fieldset>
+  <git-form-auto-update-fieldset
+    value="$ctrl.formValues.AutoUpdate"
+    on-change="($ctrl.onChangeAutoUpdate)"
+    environment-type="KUBERNETES"
+    base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+  ></git-form-auto-update-fieldset>
+  <time-window-display></time-window-display>
+
   <div class="form-group">
     <div class="col-sm-12">
       <p>
@@ -17,14 +24,14 @@
       </p>
     </div>
   </div>
-  <git-form-ref-field ng-if="$ctrl.state.showConfig" value="$ctrl.formValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
-  <git-form-auth-fieldset
+
+  <git-form-ref-field
     ng-if="$ctrl.state.showConfig"
+    value="$ctrl.formValues.RefName"
+    on-change="($ctrl.onChangeRef)"
     model="$ctrl.formValues"
-    is-edit="$ctrl.state.isEdit"
-    on-change="($ctrl.onChange)"
-    show-auth-explanation="true"
-  ></git-form-auth-fieldset>
+    is-url-valid="true"
+  ></git-form-ref-field>
 
   <div class="col-sm-12 form-section-title"> Actions </div>
   <!-- #Git buttons -->

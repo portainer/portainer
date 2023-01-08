@@ -63,11 +63,11 @@
             <div ng-if="!ctrl.isExternalApplication()">
               <git-form-info-panel
                 ng-if="ctrl.state.appType == ctrl.KubernetesDeploymentTypes.GIT"
-                class-name="text-muted"
+                class-name="'text-muted'"
                 url="ctrl.stack.GitConfig.URL"
                 config-file-path="ctrl.stack.GitConfig.ConfigFilePath"
                 additional-files="ctrl.stack.AdditionalFiles"
-                type="application"
+                type="'application'"
               ></git-form-info-panel>
               <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"> Namespace </div>
               <!-- #region NAMESPACE -->

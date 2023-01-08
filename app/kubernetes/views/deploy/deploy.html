@@ -13,7 +13,7 @@
             <uib-tab index="0">
               <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
               <div class="col-sm-12 form-section-title"> Namespace </div>
-              <form class="form-horizontal mt-3" name="deploymentForm">
+              <form class="form-horizontal mt-3" name="ctrl.deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
                   <div class="col-sm-8">
@@ -78,14 +78,12 @@
                 <!-- repository -->
                 <git-form
                   ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT"
-                  model="ctrl.formValues"
+                  value="ctrl.formValues"
                   on-change="(ctrl.onChangeFormValues)"
-                  additional-file="true"
-                  auto-update="true"
-                  show-auth-explanation="true"
-                  path-text-title="Manifest path"
-                  path-placeholder="deployment.yml"
-                  deploy-method="{{ ctrl.DeployMethod }}"
+                  is-additional-files-field-visible="true"
+                  is-auth-explanation-visible="true"
+                  deploy-method="{{ ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ? 'compose' : 'manifest' }}"
+                  base-webhook-url="{{ ctrl.state.baseWebhookUrl }}"
                 ></git-form>
                 <!-- !repository -->
 
@@ -161,7 +159,7 @@
                     <button
                       type="button"
                       class="btn btn-primary btn-sm !ml-0"
-                      ng-disabled="!deploymentForm.$valid ||ctrl.disableDeploy()"
+                      ng-disabled="!ctrl.deploymentForm.$valid || ctrl.disableDeploy()"
                       ng-click="ctrl.deploy()"
                       button-spinner="ctrl.state.actionInProgress"
                       data-cy="k8sAppDeploy-deployButton"

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
+import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
@@ -278,17 +278,8 @@ angular.module('portainer.app').factory('StackService', [
           StackFileContent: stackFile,
         };
       } else {
-        const autoUpdate = {};
-        if (gitConfig.AutoUpdate && gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
-          if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
-            autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
-          } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
-            autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
-          }
-        }
-
         payload = {
-          AutoUpdate: autoUpdate,
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate),
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
@@ -465,21 +456,10 @@ angular.module('portainer.app').factory('StackService', [
     }
 
     service.updateGitStackSettings = function (id, endpointId, env, gitConfig) {
-      // prepare auto update
-      const autoUpdate = {};
-
-      if (gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
-        if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
-          autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
-        } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
-          autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
-        }
-      }
-
       return Stack.updateGitStackSettings(
         { endpointId, id },
         {
-          AutoUpdate: autoUpdate,
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate),
           Env: env,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,

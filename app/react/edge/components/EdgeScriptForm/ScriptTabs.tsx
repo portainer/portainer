@@ -58,7 +58,9 @@ export function ScriptTabs({
       children: (
         <>
           <Code>{cmd}</Code>
-          <CopyButton copyText={cmd}>Copy</CopyButton>
+          <div className="mt-2">
+            <CopyButton copyText={cmd}>Copy</CopyButton>
+          </div>
         </>
       ),
     };

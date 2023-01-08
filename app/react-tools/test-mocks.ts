@@ -102,7 +102,19 @@ export function createMockEnvironment(): Environment {
       allowVolumeBrowserForRegularUsers: false,
       enableHostManagementFeatures: false,
     },
+    DeploymentOptions: {
+      overrideGlobalOptions: false,
+      hideAddWithForm: true,
+      hideWebEditor: false,
+      hideFileUpload: false,
+    },
     Gpus: [],
     Agent: { Version: '1.0.0' },
+    EnableImageNotification: false,
+    ChangeWindow: {
+      Enabled: false,
+      EndTime: '',
+      StartTime: '',
+    },
   };
 }

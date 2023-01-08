@@ -1,17 +1,19 @@
 <form name="$ctrl.redeployGitForm" class="form-horizontal my-8">
   <div class="col-sm-12 form-section-title"> Redeploy from git repository </div>
   <git-form-info-panel
-    class-name="text-muted small"
+    class-name="'text-muted small'"
     url="$ctrl.model.URL"
-    type="stack"
+    type="'stack'"
     config-file-path="$ctrl.model.ConfigFilePath"
     additional-files="$ctrl.stack.AdditionalFiles"
   ></git-form-info-panel>
 
   <git-form-auto-update-fieldset
-    model="$ctrl.formValues.AutoUpdate"
+    value="$ctrl.formValues.AutoUpdate"
     on-change="($ctrl.onChangeAutoUpdate)"
-    show-force-pull-image="$ctrl.stack.Type !== 3"
+    environment-type="DOCKER"
+    is-force-pull-visible="$ctrl.stack.Type !== 3"
+    base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
   ></git-form-auto-update-fieldset>
   <div class="form-group">
     <div class="col-sm-12">
@@ -24,14 +26,17 @@
       </p>
     </div>
   </div>
-  <git-form-ref-field ng-if="$ctrl.state.showConfig" value="$ctrl.formValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
-  <git-form-auth-fieldset
+
+  <git-form-ref-field
     ng-if="$ctrl.state.showConfig"
-    is-edit="$ctrl.state.isEdit"
+    value="$ctrl.formValues.RefName"
+    on-change="($ctrl.onChangeRef)"
     model="$ctrl.formValues"
-    on-change="($ctrl.onChange)"
-    show-auth-explanation="true"
-  ></git-form-auth-fieldset>
+    is-url-valid="true"
+    stack-id="$ctrl.gitStackId"
+  ></git-form-ref-field>
+  <git-form-auth-fieldset ng-if="$ctrl.state.showConfig" value="$ctrl.formValues" on-change="($ctrl.onChangeGitAuth)" is-auth-explanation-visible="true"></git-form-auth-fieldset>
+
   <environment-variables-panel
     ng-model="$ctrl.formValues.Env"
     explanation="These values will be used as substitutions in the stack file"
@@ -39,6 +44,9 @@
     show-help-message="true"
   ></environment-variables-panel>
   <option-panel ng-if="$ctrl.stack.Type === 1 && $ctrl.endpoint.apiVersion >= 1.27" ng-model="$ctrl.formValues.Option" on-change="($ctrl.onChangeOption)"></option-panel>
+
+  <div class="col-sm-12 form-section-title"> Actions </div>
+
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.submit()"

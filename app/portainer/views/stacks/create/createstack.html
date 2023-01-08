@@ -79,14 +79,14 @@
           <!-- !upload -->
           <git-form
             ng-if="state.Method === 'repository'"
-            model="formValues"
+            value="formValues"
             on-change="(onChangeFormValues)"
-            additional-file="true"
-            auto-update="true"
-            show-force-pull-image="true"
-            show-auth-explanation="true"
-            path-text-title="Compose path"
-            path-placeholder="docker-compose.yml"
+            is-docker-standalone="isDockerStandalone"
+            is-additional-files-field-visible="true"
+            is-auto-update-visible="true"
+            is-auth-explanation-visible="true"
+            is-force-pull-visible="true"
+            base-webhook-url="{{ state.baseWebhookUrl }}"
           ></git-form>
 
           <div ng-show="state.Method === 'template'">

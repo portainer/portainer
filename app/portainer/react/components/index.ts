@@ -38,13 +38,18 @@ import { PortainerSelect } from '@@/form-components/PortainerSelect';
 import { Slider } from '@@/form-components/Slider';
 import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
+import { TimeWindowDisplay } from '@@/TimeWindowDisplay';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
 import { customTemplatesModule } from './custom-templates';
+import { gitFormModule } from './git-form';
 
 export const componentsModule = angular
-  .module('portainer.app.react.components', [customTemplatesModule])
+  .module('portainer.app.react.components', [
+    customTemplatesModule,
+    gitFormModule,
+  ])
   .component(
     'tagSelector',
     r2a(withUIRouter(withReactQuery(TagSelector)), [
@@ -232,4 +237,8 @@ export const componentsModule = angular
     'porAccessManagementUsersSelector',
     r2a(PorAccessManagementUsersSelector, ['onChange', 'options', 'value'])
   )
-  .component('edgeKeyDisplay', r2a(EdgeKeyDisplay, ['edgeKey'])).name;
+  .component('edgeKeyDisplay', r2a(EdgeKeyDisplay, ['edgeKey']))
+  .component(
+    'timeWindowDisplay',
+    r2a(withReactQuery(withUIRouter(TimeWindowDisplay)), [])
+  ).name;

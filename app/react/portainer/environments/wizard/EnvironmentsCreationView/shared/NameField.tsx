@@ -1,12 +1,12 @@
 import { useField } from 'formik';
 import { string } from 'yup';
-import { useRef, useEffect } from 'react';
 
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { useDebounce } from '@/react/hooks/useDebounce';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+import { useCachedValidation } from '@@/form-components/useCachedTest';
 
 interface Props {
   readonly?: boolean;
@@ -24,10 +24,6 @@ export function NameField({
   const id = 'name-input';
 
   const [debouncedValue, setDebouncedValue] = useDebounce(value, setValue);
-
-  useEffect(() => {
-    setDebouncedValue(value);
-  }, [setDebouncedValue, value]);
 
   return (
     <FormControl
@@ -69,27 +65,10 @@ export async function isNameUnique(name = '') {
   }
 }
 
-function cacheTest(
-  asyncValidate: (val?: string) => Promise<boolean> | undefined
-) {
-  let valid = true;
-  let value = '';
-
-  return async (newValue = '') => {
-    if (newValue !== value) {
-      value = newValue;
-
-      const response = await asyncValidate(newValue);
-      valid = !!response;
-    }
-    return valid;
-  };
-}
-
 export function useNameValidation() {
-  const uniquenessTest = useRef(cacheTest(isNameUnique));
+  const uniquenessTest = useCachedValidation(isNameUnique);
 
   return string()
     .required('Name is required')
-    .test('unique-name', 'Name should be unique', uniquenessTest.current);
+    .test('unique-name', 'Name should be unique', uniquenessTest);
 }
