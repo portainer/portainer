@@ -233,7 +233,7 @@
               ui-sref="kubernetes.applications.application.edit"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'edit'" class-name="'mr-1'"></pr-icon>Edit external application
+              <pr-icon icon="'pencil'" class-name="'mr-1'"></pr-icon>Edit external application
             </button>
             <be-only-button
               icon="'refresh-cw'"
@@ -241,6 +241,8 @@
               message="'A rolling restart of the application is performed.'"
               heading="'Rolling restart'"
               button-text="'Rolling restart'"
+              class-name="'be-tooltip-teaser'"
+              className="'be-tooltip-teaser'"
             ></be-only-button>
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
