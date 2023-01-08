@@ -8,10 +8,8 @@ services:
       "--env-type", "{{envType}}{{^envType}}standalone{{/envType}}",
       "--license", "{{license}}"
     ]
-    {{#skip_pull_image}}
     environment:
-      - SKIP_PULL=1
-    {{/skip_pull_image}}
+      - SKIP_PULL={{skip_pull_image}}{{^skip_pull_image}}0{{/skip_pull_image}}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       {{! - \\.\pipe\docker_engine:\\.\pipe\docker_engine }}
