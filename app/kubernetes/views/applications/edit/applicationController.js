@@ -224,7 +224,7 @@ class KubernetesApplicationController {
   }
 
   rollbackApplication() {
-    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause a service interruption. Do you wish to continue?', (confirmed) => {
+    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause service interruption. Do you wish to continue?', (confirmed) => {
       if (confirmed) {
         return this.$async(this.rollbackApplicationAsync);
       }
@@ -234,6 +234,15 @@ class KubernetesApplicationController {
    * REDEPLOY
    */
   async redeployApplicationAsync() {
+    const confirmed = await this.ModalService.confirmAsync({
+      title: 'Are you sure?',
+      message: 'Terminating and restarting the application will cause service interruption. Do you wish to continue?',
+      buttons: { confirm: { label: 'Terminate and restart', className: 'btn-primary' } },
+    });
+    if (!confirmed) {
+      return;
+    }
+
     try {
       const promises = _.map(this.application.Pods, (item) => this.KubernetesPodService.delete(item));
       await Promise.all(promises);
@@ -245,11 +254,7 @@ class KubernetesApplicationController {
   }
 
   redeployApplication() {
-    this.ModalService.confirmUpdate('Redeploying the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
-      if (confirmed) {
-        return this.$async(this.redeployApplicationAsync);
-      }
-    });
+    return this.$async(this.redeployApplicationAsync);
   }
 
   /**
