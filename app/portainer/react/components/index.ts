@@ -35,7 +35,7 @@ import { TeamsSelector } from '@@/TeamsSelector';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 import { Slider } from '@@/form-components/Slider';
 import { TagButton } from '@@/TagButton';
-import { BEOnlyButton } from '@@/BEOnlyButton';
+import { BETeaserButton } from '@@/BETeaserButton';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -48,8 +48,8 @@ export const componentsModule = angular
     r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
   )
   .component(
-    'beOnlyButton',
-    r2a(BEOnlyButton, [
+    'beTeaserButton',
+    r2a(BETeaserButton, [
       'featureId',
       'heading',
       'message',
