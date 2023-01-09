@@ -223,7 +223,7 @@
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'code'" class="mr-1"></pr-icon>Edit this application
+              <pr-icon icon="'pencil'" class="mr-1"></pr-icon>Edit this application
             </button>
             <button
               authorization="K8sApplicationDetailsW"
@@ -233,15 +233,17 @@
               ui-sref="kubernetes.applications.application.edit"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'code'" class-name="'mr-1'"></pr-icon>Edit External application
+              <pr-icon icon="'pencil'" class-name="'mr-1'"></pr-icon>Edit external application
             </button>
-            <be-only-button
+            <be-teaser-button
               icon="'refresh-cw'"
               feature-id="ctrl.limitedFeature"
               message="'A rolling restart of the application is performed.'"
               heading="'Rolling restart'"
               button-text="'Rolling restart'"
-            ></be-only-button>
+              class-name="'be-tooltip-teaser'"
+              className="'be-tooltip-teaser'"
+            ></be-teaser-button>
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
@@ -249,7 +251,7 @@
               ng-click="ctrl.redeployApplication()"
               data-cy="k8sAppDetail-redeployButton"
             >
-              <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Redeploy
+              <pr-icon icon="'rotate-cw'" class="'mr-1'"></pr-icon>Terminate and restart
             </button>
             <button
               ng-if="!ctrl.isExternalApplication()"
