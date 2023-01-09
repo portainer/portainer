@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"time"
 
 	"github.com/portainer/portainer/api/internal/randomstring"
 
@@ -133,8 +134,32 @@ func createRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, clust
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
-	_, err := roleBindingClient.Create(context.Background(), clusterRoleBinding, metav1.CreateOptions{})
+	roleBinding, err := roleBindingClient.Create(context.Background(), clusterRoleBinding, metav1.CreateOptions{})
+	if err != nil {
+		log.Error().Err(err).Msg("Error creating role binding: " + clusterRoleBindingName)
+		return err
+	}
+
+	// Retry checkRoleBinding a maximum of 5 times with a 100ms wait after each attempt
+	maxRetries := 5
+	for i := 0; i < maxRetries; i++ {
+		err = checkRoleBinding(roleBindingClient, roleBinding.Name)
+		time.Sleep(100 * time.Millisecond) // Wait for 100ms, even if the check passes
+		if err == nil {
+			break
+		}
+	}
+
 	return err
+}
+
+func checkRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) error {
+	_, err := roleBindingClient.Get(context.Background(), name, metav1.GetOptions{})
+	if err != nil {
+		log.Error().Err(err).Msg("Error finding rolebinding: " + name)
+		return err
+	}
+	return nil
 }
 
 func deleteRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) {
