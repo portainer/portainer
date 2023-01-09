@@ -744,7 +744,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	// resolved we can remove this function.
 	err = kubernetesClientFactory.PostInitMigrateIngresses()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failure during creation of new database")
+		log.Fatal().Err(err).Msg("failure during post init migrations")
 	}
 
 	return &http.Server{

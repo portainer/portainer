@@ -54,7 +54,8 @@ func (m *Monitor) Start() {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
 			if err != nil {
-				log.Fatal().Err(err).Msg("")
+				log.Error().Err(err).Msg("")
+				return
 			}
 
 			if !initialized {
