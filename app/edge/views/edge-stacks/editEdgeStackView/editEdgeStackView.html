@@ -12,11 +12,14 @@
 
             <div style="padding: 20px">
               <edit-edge-stack-form
+                ng-if="$ctrl.edgeGroups && $ctrl.stack && $ctrl.formValues.content"
                 edge-groups="$ctrl.edgeGroups"
-                model="$ctrl.formValues"
-                action-in-progress="$ctrl.state.actionInProgress"
-                submit-action="$ctrl.deployStack"
-                is-editor-dirty="$ctrl.state.isEditorDirty"
+                edge-stack="$ctrl.stack"
+                is-submitting="$ctrl.state.actionInProgress"
+                on-submit="($ctrl.deployStack)"
+                on-editor-change="($ctrl.onEditorChange)"
+                file-content="$ctrl.formValues.content"
+                allow-kube-to-select-compose="$ctrl.allowKubeToSelectCompose"
               ></edit-edge-stack-form>
             </div>
           </uib-tab>

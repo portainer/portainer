@@ -63,7 +63,7 @@ func validateUniqueName(edgeStacksGetter func() ([]portainer.EdgeStack, error), 
 
 	for _, stack := range edgeStacks {
 		if strings.EqualFold(stack.Name, name) {
-			return errors.New("Edge stack name must be unique")
+			return httperrors.NewConflictError("Edge stack name must be unique")
 		}
 	}
 

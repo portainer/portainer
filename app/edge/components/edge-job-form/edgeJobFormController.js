@@ -6,11 +6,9 @@ import { cronMethodOptions } from '@/react/edge/edge-jobs/CreateView/cron-method
 
 export class EdgeJobFormController {
   /* @ngInject */
-  constructor($async, $scope, EdgeGroupService, Notifications) {
+  constructor($async, $scope) {
     this.$scope = $scope;
     this.$async = $async;
-    this.EdgeGroupService = EdgeGroupService;
-    this.Notifications = Notifications;
 
     this.cronMethods = cronMethodOptions;
     this.buildMethods = [editor, upload];
@@ -127,18 +125,8 @@ export class EdgeJobFormController {
     this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
   }
 
-  async getEdgeGroups() {
-    try {
-      this.edgeGroups = await this.EdgeGroupService.groups();
-      this.noGroups = this.edgeGroups.length === 0;
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
-    }
-  }
-
   $onInit() {
     this.onChangeModel(this.model);
-    this.getEdgeGroups();
   }
 }
 

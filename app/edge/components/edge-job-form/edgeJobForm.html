@@ -169,15 +169,7 @@
   </div>
   <!-- !upload -->
 
-  <div class="col-sm-12 form-section-title"> Edge Groups </div>
-  <div class="form-group" ng-if="$ctrl.edgeGroups">
-    <div class="col-sm-12">
-      <edge-groups-selector ng-if="!$ctrl.noGroups" value="$ctrl.model.EdgeGroups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
-    </div>
-    <div ng-if="$ctrl.noGroups" class="col-sm-12 small text-muted">
-      No Edge groups are available. Head over to the <a ui-sref="edge.groups">Edge groups view</a> to create one.
-    </div>
-  </div>
+  <edge-groups-selector ng-if="$ctrl.model.EdgeGroups" value="$ctrl.model.EdgeGroups" on-change="($ctrl.onChangeGroups)"></edge-groups-selector>
 
   <div class="col-sm-12 form-section-title"> Target environments </div>
   <!-- node-selection -->

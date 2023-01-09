@@ -105,7 +105,6 @@ func (handler *Handler) storeFileContent(tx dataservices.DataStoreTx, stackFolde
 		}
 
 		return composePath, "", projectPath, nil
-
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentKubernetes {

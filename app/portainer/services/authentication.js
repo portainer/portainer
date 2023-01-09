@@ -130,6 +130,10 @@ angular.module('portainer.app').factory('Authentication', [
       return !!user && user.role === 1;
     }
 
+    if (process.env.NODE_ENV === 'development') {
+      window.login = loginAsync;
+    }
+
     return service;
   },
 ]);
