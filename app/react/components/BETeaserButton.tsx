@@ -14,7 +14,7 @@ interface Props {
   icon?: ReactNode;
 }
 
-export function BEOnlyButton({
+export function BETeaserButton({
   featureId,
   heading,
   message,
@@ -29,16 +29,18 @@ export function BEOnlyButton({
       BEFeatureID={featureId}
       message={message}
     >
-      <Button
-        icon={icon}
-        type="button"
-        color="warninglight"
-        size="small"
-        onClick={() => {}}
-        disabled
-      >
-        {buttonText}
-      </Button>
+      <span>
+        <Button
+          icon={icon}
+          type="button"
+          color="warninglight"
+          size="small"
+          onClick={() => {}}
+          disabled
+        >
+          {buttonText}
+        </Button>
+      </span>
     </TooltipWithChildren>
   );
 }
