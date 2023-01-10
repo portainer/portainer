@@ -230,6 +230,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
           </div>
           <TableFooter>
             <PaginationControls
+              className="!mr-0"
               showAll={totalCount <= 100}
               pageLimit={pageLimit}
               page={page}
