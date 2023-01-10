@@ -39,6 +39,7 @@ export function UploadLicenseDialog({
         initialValues={initialValues}
         onSubmit={handleSubmit}
         validationSchema={validation}
+        validateOnMount
       >
         {({ errors }) => (
           <Form noValidate>
