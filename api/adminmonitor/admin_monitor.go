@@ -54,7 +54,7 @@ func (m *Monitor) Start() {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
 			if err != nil {
-				log.Error().Err(err).Msg("")
+				log.Error().Err(err).Msg("AdminMonitor failed to determine if Portainer is Initialized")
 				return
 			}
 
