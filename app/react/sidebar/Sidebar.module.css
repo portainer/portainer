@@ -30,7 +30,7 @@
   position: fixed;
   left: 0;
 
-  z-index: 999;
+  z-index: 10;
   transition: all 0.4s ease 0s;
 }
 
