@@ -32,8 +32,8 @@ export const viewsModule = angular
   )
   .component(
     'settingsEdgeCompute',
-    r2a(withReactQuery(withCurrentUser(EdgeComputeSettingsView)), [
-      'onSubmit',
-      'settings',
-    ])
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(EdgeComputeSettingsView))),
+      ['onSubmit', 'settings']
+    )
   ).name;
