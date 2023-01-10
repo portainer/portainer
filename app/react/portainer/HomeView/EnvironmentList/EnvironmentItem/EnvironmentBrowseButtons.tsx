@@ -43,6 +43,11 @@ export function EnvironmentBrowseButtons({
             size="medium"
             color="light"
             className="w-full !py-0 !m-0"
+            title={
+              !isEdgeAsync
+                ? 'Browse snapshot is only available for async environments'
+                : ''
+            }
           >
             Browse snapshot
           </LinkButton>
@@ -60,7 +65,11 @@ export function EnvironmentBrowseButtons({
 
       {browseStatus !== 'connected' ? (
         <LinkButton
-          title="Live connection is not available for async environments"
+          title={
+            isEdgeAsync
+              ? 'Live connection is not available for async environments'
+              : ''
+          }
           icon={Wifi}
           disabled={isEdgeAsync}
           to={dashboardRoute.to}
