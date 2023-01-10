@@ -5,7 +5,6 @@ import {
   withError,
   withInvalidate,
 } from '@/react-tools/react-query';
-import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
 import {
   getSettings,
@@ -13,18 +12,18 @@ import {
   getPublicSettings,
   updateDefaultRegistry,
 } from './settings.service';
-import { DefaultRegistry, Settings } from './types';
+import { DefaultRegistry, PublicSettingsResponse, Settings } from './types';
 
-export function usePublicSettings<T = PublicSettingsViewModel>({
+export function usePublicSettings<T = PublicSettingsResponse>({
   enabled,
   select,
   onSuccess,
 }: {
-  select?: (settings: PublicSettingsViewModel) => T;
+  select?: (settings: PublicSettingsResponse) => T;
   enabled?: boolean;
   onSuccess?: (data: T) => void;
 } = {}) {
-  return useQuery(['settings', 'public'], () => getPublicSettings(), {
+  return useQuery(['settings', 'public'], getPublicSettings, {
     select,
     ...withError('Unable to retrieve public settings'),
     enabled,

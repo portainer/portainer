@@ -13,12 +13,8 @@ import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Settings } from '../types';
 
 import { validationSchema } from './EdgeComputeSettings.validation';
-
-export interface FormValues {
-  EdgeAgentCheckinInterval: number;
-  EnableEdgeComputeFeatures: boolean;
-  EnforceEdgeID: boolean;
-}
+import { FormValues } from './types';
+import { AddDeviceButton } from './AddDeviceButton';
 
 interface Props {
   settings?: Settings;
@@ -33,7 +29,16 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon={Laptop} title="Edge Compute settings" />
+        <WidgetTitle
+          icon={Laptop}
+          title={
+            <>
+              <span className="mr-3">Edge Compute settings</span>
+              {settings.EnableEdgeComputeFeatures && <AddDeviceButton />}
+            </>
+          }
+        />
+
         <WidgetBody>
           <Formik
             initialValues={settings}
