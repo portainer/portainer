@@ -23,6 +23,8 @@ export function EnvironmentBrowseButtons({
 }) {
   const isEdgeAsync = checkEdgeAsync(environment);
   const browseStatus = getStatus(isActive, isEdgeAsync);
+
+  const dashboardRoute = getDashboardRoute(environment);
   return (
     <div className="flex flex-col gap-1 justify-center [&>*]:h-1/3 h-24">
       {isBE && (
@@ -44,10 +46,8 @@ export function EnvironmentBrowseButtons({
         title="Live connection is not available for async environments"
         icon={Wifi}
         disabled={isEdgeAsync || browseStatus === 'connected'}
-        to={getDashboardRoute(environment)}
-        params={{
-          endpointId: environment.Id,
-        }}
+        to={dashboardRoute.to}
+        params={dashboardRoute.params}
         onClick={onClickBrowse}
         color="primary"
         className="w-full !py-0 !m-0"
