@@ -1,4 +1,4 @@
-import { useRouter } from '@uirouter/react';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useState } from 'react';
 
 import { Environment } from '@/react/portainer/environments/types';
@@ -17,6 +17,7 @@ import { LicenseNodePanel } from './LicenseNodePanel';
 import { BackupFailedPanel } from './BackupFailedPanel';
 
 export function HomeView() {
+  const { params } = useCurrentStateAndParams();
   const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] =
     useState(false);
 
