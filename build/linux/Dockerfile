@@ -35,4 +35,4 @@ ENTRYPOINT ["/portainer"]
 
 # For CI we can add storybook if present
 FROM production as storybook
-COPY dist/storybook* /storybook
+COPY dist/storybook* /storybook/
