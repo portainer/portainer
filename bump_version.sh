@@ -135,5 +135,5 @@ filename="api/http/handler/handler.go"
 sed -E "s|// @version .*|// @version $NEW_VERSION|" "$filename" > "$tmp" && mv "$tmp" "$filename"
 echo "Updated $filename."
 echo
-echo "IMPORTANT! Before committing, please ensure the files have updated correctly with `git diff`"
+echo "IMPORTANT! Before committing, please ensure the files have updated correctly with 'git diff'"
 
