@@ -1,4 +1,4 @@
-<ng-form name="autoUpdateForm form-group">
+<ng-form name="autoUpdateForm" class="form-group">
   <div class="small vertical-center mb-2">
     <pr-icon icon="'info'" mode="'primary'"></pr-icon>
     <span class="text-muted">
@@ -44,7 +44,7 @@
     <label for="repository_mechanism" class="col-sm-3 col-lg-2 control-label text-left">
       Webhook
       <portainer-tooltip
-        message="$ctrl.environmentType === 'KUBERNETES' ? 
+        message="$ctrl.environmentType === 'KUBERNETES' ?
           'See&nbsp;<a href=\'https://docs.portainer.io/user/kubernetes/applications/manifest#automatic-updates\' target=\'_blank\' rel=\'noreferrer\'>Portainer documentation on webhook usage</a>.' :
           'See&nbsp;<a href=\'https://docs.portainer.io/user/docker/stacks/webhooks\' target=\'_blank\' rel=\'noreferrer\'>Portainer documentation on webhook usage</a>.'"
         set-html-message="true"
