@@ -52,7 +52,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             let params = {};
 
             if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
-              params = { redirect: true, environmentId: endpoint.Id, route: 'kubernetes.dashboard' };
+              params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'kubernetes.dashboard' };
             } else {
               Notifications.error('Failed loading environment', e);
             }

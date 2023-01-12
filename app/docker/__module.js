@@ -42,7 +42,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             let params = {};
 
             if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
-              params = { redirect: true, environmentId: endpoint.Id, route: 'docker.dashboard' };
+              params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'docker.dashboard' };
             } else {
               Notifications.error('Failed loading environment', e);
             }

@@ -18,8 +18,9 @@ import { BackupFailedPanel } from './BackupFailedPanel';
 
 export function HomeView() {
   const { params } = useCurrentStateAndParams();
-  const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] =
-    useState(false);
+  const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] = useState(
+    !!params.redirect
+  );
 
   const router = useRouter();
   return (
