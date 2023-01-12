@@ -69,7 +69,7 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environment from the database", err)
+		return httperror.NotFound("Unable to retrieve environment from the database", err)
 	}
 
 	handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
