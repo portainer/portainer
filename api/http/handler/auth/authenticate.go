@@ -127,11 +127,9 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		}
 	}
 
-	if len(ldapSettings.GroupSearchSettings) > 0 {
-		err = handler.addUserIntoTeams(user, ldapSettings)
-		if err != nil {
-			log.Warn().Err(err).Msg("unable to automatically add user into teams")
-		}
+	err = handler.syncUserTeamsWithLDAPGroups(user, ldapSettings)
+	if err != nil {
+		log.Warn().Err(err).Msg("unable to automatically sync user teams with ldap")
 	}
 
 	return handler.writeToken(w, user, false)
@@ -152,7 +150,12 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 	return response.JSON(w, &authenticateResponse{JWT: token})
 }
 
-func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portainer.LDAPSettings) error {
+func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {
+	// only sync if there is a group base DN
+	if len(settings.GroupSearchSettings) == 0 || len(settings.GroupSearchSettings[0].GroupBaseDN) == 0 {
+		return nil
+	}
+
 	teams, err := handler.DataStore.Team().Teams()
 	if err != nil {
 		return err
