@@ -47,15 +47,13 @@ export function EnvironmentItem({
   const snapshotTime = getSnapshotTime(environment);
 
   const tags = useEnvironmentTagNames(environment.TagIds);
+  const dashboardRoute = getDashboardRoute(environment);
 
   return (
     <div className="relative">
       <Link
-        to={getDashboardRoute(environment)}
-        params={{
-          endpointId: environment.Id,
-          environmentId: environment.Id,
-        }}
+        to={dashboardRoute.to}
+        params={dashboardRoute.params}
         className="no-link"
       >
         <button
