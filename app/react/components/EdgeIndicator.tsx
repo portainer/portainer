@@ -41,6 +41,7 @@ export function EdgeIndicator({
     >
       <EnvironmentStatusBadgeItem
         color={isValid ? 'success' : 'danger'}
+        icon={isValid ? 'svg-heartbeatup' : 'svg-heartbeatdown'}
         aria-label="edge-heartbeat"
       >
         heartbeat
