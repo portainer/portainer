@@ -497,7 +497,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       deviceRequest.Capabilities = [gpuOptions.capabilities];
 
-      config.HostConfig.DeviceRequests.push(deviceRequest);
+      if (config.HostConfig.DeviceRequests) {
+        config.HostConfig.DeviceRequests.push(deviceRequest);
+      } else {
+        config.HostConfig.DeviceRequests = [deviceRequest];
+      }
     }
 
     function prepareConfiguration() {
