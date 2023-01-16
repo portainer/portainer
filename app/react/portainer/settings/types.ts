@@ -134,6 +134,7 @@ export interface Settings {
     SnapshotInterval: number;
     CommandInterval: number;
     AsyncMode: boolean;
+    TunnelServerAddress: string;
   };
 }
 
