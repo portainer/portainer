@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
@@ -246,8 +247,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
 		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/storybook"):
-		http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
+		if h.storybookEnabled() {
+			http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
+		} else {
+			http.NotFound(w, r)
+		}
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}
+}
+
+func (h *Handler) storybookEnabled() bool {
+	settings, _ := h.SettingsHandler.DataStore.Settings().Settings()
+	return settings.FeatureFlagSettings[portainer.Storybook]
 }

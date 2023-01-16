@@ -9,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/pkg/featureflags"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -1532,10 +1531,13 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-// SupportFeatureFlags is a list of supported features. They should all be lower case
-// e.g. "microk8s","kaas"
-var SupportedFeatureFlags = []featureflags.Feature{
-	"microk8s",
+const (
+	Storybook = "storybook"
+)
+
+// List of supported features
+var SupportedFeatureFlags = []Feature{
+	Storybook,
 }
 
 const (
