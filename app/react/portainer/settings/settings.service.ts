@@ -28,7 +28,11 @@ export async function getSettings() {
   }
 }
 
-export async function updateSettings(settings: Partial<Settings>) {
+type OptionalSettings = Omit<Partial<Settings>, 'Edge'> & {
+  Edge?: Partial<Settings['Edge']>;
+};
+
+export async function updateSettings(settings: OptionalSettings) {
   try {
     await axios.put(buildUrl(), settings);
   } catch (e) {
