@@ -8,23 +8,27 @@ export function GetLicenseDialog({
   onDismiss: () => void;
   goToUploadLicense: (isSubmitted: boolean) => void;
 }) {
+  // form is loaded from hubspot, so it won't have the same styling as the rest of the app
+  // since it won't support darkmode, we enforce a white background and black text for the components we use
+  // (Modal, CloseButton, loading text)
+
   return (
     <Modal
       onDismiss={onDismiss}
       aria-label="Upgrade Portainer to Business Edition"
       size="lg"
+      className="!bg-white [&>.close-button]:!text-black"
     >
-      <Modal.Header
-        title={<h4 className="font-medium text-xl">Upgrade Portainer</h4>}
-      />
       <Modal.Body>
-        <HubspotForm
-          region="na1"
-          portalId="4731999"
-          formId="1ef8ea88-3e03-46c5-8aef-c1d9f48fd06b"
-          onSubmitted={() => goToUploadLicense(true)}
-          loading={<div>Loading...</div>}
-        />
+        <div className="max-h-[90vh] overflow-auto">
+          <HubspotForm
+            region="na1"
+            portalId="4731999"
+            formId="1ef8ea88-3e03-46c5-8aef-c1d9f48fd06b"
+            onSubmitted={() => goToUploadLicense(true)}
+            loading={<div className="text-black">Loading...</div>}
+          />
+        </div>
       </Modal.Body>
     </Modal>
   );
