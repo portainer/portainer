@@ -73,9 +73,9 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 
 	if endpoint.Edge.AsyncMode {
 		return httperror.BadRequest("Async Edge Endpoints are not supported in Portainer CE", nil)
-	} else {
-		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
+
+	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 
 	return response.Empty(w)
 }
