@@ -1,6 +1,13 @@
 FROM alpine:latest
 
-COPY dist /
+COPY dist/docker /
+COPY dist/docker-compose /
+COPY dist/helm /
+COPY dist/kompose /
+COPY dist/kubectl /
+COPY dist/mustache-templates /mustache-templates/
+COPY dist/portainer /
+COPY dist/public /public/
 
 VOLUME /data
 WORKDIR /
