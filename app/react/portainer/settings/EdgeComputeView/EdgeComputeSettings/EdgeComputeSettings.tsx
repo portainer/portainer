@@ -26,6 +26,16 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
     return null;
   }
 
+  const initialValues: FormValues = {
+    EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
+    EdgePortainerUrl: settings.EdgePortainerUrl,
+    Edge: {
+      TunnelServerAddress: settings.Edge.TunnelServerAddress,
+    },
+    EdgeAgentCheckinInterval: settings.EdgeAgentCheckinInterval,
+    EnforceEdgeID: settings.EnforceEdgeID,
+  };
+
   return (
     <div className="row">
       <Widget>
@@ -41,7 +51,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
 
         <WidgetBody>
           <Formik
-            initialValues={settings}
+            initialValues={initialValues}
             enableReinitialize
             validationSchema={() => validationSchema()}
             onSubmit={onSubmit}
