@@ -78,6 +78,7 @@ type (
 		EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error)
 		Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
+		UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
 		BucketName() string

@@ -80,10 +80,20 @@ func (service *Service) Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJo
 	)
 }
 
-// UpdateEdgeJob updates an Edge job by ID
+// Deprecated: use UpdateEdgeJobFunc instead
 func (service *Service) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, edgeJob)
+}
+
+// UpdateEdgeJobFunc updates an edge job inside a transaction avoiding data races.
+func (service *Service) UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error {
+	id := service.connection.ConvertToKey(int(ID))
+	edgeJob := &portainer.EdgeJob{}
+
+	return service.connection.UpdateObjectFunc(BucketName, id, edgeJob, func() {
+		updateFunc(edgeJob)
+	})
 }
 
 // DeleteEdgeJob deletes an Edge job

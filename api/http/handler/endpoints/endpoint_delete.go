@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 // @id EndpointDelete
@@ -120,6 +121,28 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 			err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
 			if err != nil {
 				return httperror.InternalServerError("Unable to update registry accesses", err)
+			}
+		}
+	}
+
+	if !endpointutils.IsEdgeEndpoint(endpoint) {
+		return response.Empty(w)
+	}
+
+	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve edge jobs from the database", err)
+	}
+
+	for idx := range edgeJobs {
+		edgeJob := &edgeJobs[idx]
+		if _, ok := edgeJob.Endpoints[endpoint.ID]; ok {
+			err = handler.DataStore.EdgeJob().UpdateEdgeJobFunc(edgeJob.ID, func(j *portainer.EdgeJob) {
+				delete(j.Endpoints, endpoint.ID)
+			})
+
+			if err != nil {
+				return httperror.InternalServerError("Unable to update edge job", err)
 			}
 		}
 	}
