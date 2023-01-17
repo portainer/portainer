@@ -51,13 +51,20 @@ interface HubSpotCreateFormOptions {
    *
    * Note: Performing a browser redirect in this callback is not recommended and could prevent the form submission
    */
-  onFormSubmit?: (form: HTMLFormElement) => void;
+  onFormSubmit?: (form: JQuery<HTMLFormElement>) => void;
   /**
    * Callback when the data is actually sent.
    * This allows you to perform an action when the submission is fully complete,
    * such as displaying a confirmation or thank you message.
    */
-  onFormSubmitted?: (form: HTMLFormElement) => void;
+  onFormSubmitted?: (form: JQuery<HTMLFormElement>) => void;
+  /**
+   * Callback that executes after form is built, placed in the DOM, and validation has been initialized.
+   * This is perfect for any logic that needs to execute when the form is on the page.
+   *
+   * Takes the jQuery form object as the argument: onFormReady($form)
+   */
+  onFormReady?: (form: JQuery<HTMLFormElement>) => void;
 }
 
 interface Window {

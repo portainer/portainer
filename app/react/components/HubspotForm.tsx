@@ -1,4 +1,5 @@
-import { useEffect, useState, ReactNode, useRef, useCallback } from 'react';
+import { ReactNode, useRef } from 'react';
+import { useQuery } from 'react-query';
 
 let globalId = 0;
 
@@ -9,7 +10,6 @@ interface Props {
 
   onSubmitted: () => void;
 
-  onReady?: (form: HTMLIFrameElement) => void;
   loading?: ReactNode;
 }
 
@@ -18,86 +18,94 @@ export function HubspotForm({
   portalId,
   region,
   formId,
-  onReady,
   onSubmitted,
 }: Props) {
-  const id = useRef(globalId++);
-  const el = useRef<HTMLDivElement>(null);
+  const elRef = useRef<HTMLDivElement>(null);
+  const id = useRef(`reactHubspotForm${globalId++}`);
+  const { isLoading } = useHubspotForm({
+    elId: id.current,
+    formId,
+    portalId,
+    region,
+    onSubmitted,
+  });
 
-  const [loaded, setLoaded] = useState(false);
+  return (
+    <>
+      <div
+        ref={elRef}
+        id={id.current}
+        style={{ display: isLoading ? 'none' : 'block' }}
+      />
+      {isLoading && loading}
+    </>
+  );
+}
 
-  const createForm = useCallback(
-    function createForm() {
-      if (!window.hbspt) {
-        setTimeout(createForm, 100);
-        return;
-      }
+function useHubspotForm({
+  elId,
+  formId,
+  portalId,
+  region,
+  onSubmitted,
+}: {
+  elId: string;
+  portalId: HubSpotCreateFormOptions['portalId'];
+  formId: HubSpotCreateFormOptions['formId'];
+  region: HubSpotCreateFormOptions['region'];
 
-      // protect against component unmounting before window.hbspt is available
-      if (el.current === null) {
-        return;
-      }
-
-      const options: HubSpotCreateFormOptions = {
-        portalId,
+  onSubmitted: () => void;
+}) {
+  return useQuery(
+    ['hubspot', { elId, formId, portalId, region }],
+    async () => {
+      await loadHubspot();
+      await createForm(`#${elId}`, {
         formId,
+        portalId,
         region,
-        target: `#${el.current.getAttribute(`id`)}`,
-
-        onFormSubmitted: onSubmitted,
-      };
-      window.hbspt.forms.create(options);
+        onFormSubmit: onSubmitted,
+      });
     },
-    [formId, onSubmitted, portalId, region]
+    {
+      refetchOnWindowFocus: false,
+    }
   );
+}
 
-  const findFormElement = useCallback(
-    function findFormElement() {
-      // protect against component unmounting before form is added
-      if (el.current === null) {
-        return;
-      }
+async function loadHubspot() {
+  return new Promise<void>((resolve) => {
+    if (window.hbspt) {
+      return;
+    }
 
-      const iframe = el.current.querySelector(`iframe`);
-      if (!iframe) {
-        setTimeout(() => findFormElement(), 1);
-        return;
-      }
-
-      setLoaded(true);
-      if (onReady) {
-        onReady(iframe);
-      }
-    },
-    [onReady]
-  );
-
-  const loadScript = useCallback(() => {
     const script = document.createElement(`script`);
 
     script.defer = true;
     script.onload = () => {
-      createForm();
-      findFormElement();
+      resolve();
     };
     script.src = `//js.hsforms.net/forms/v2.js`;
     document.head.appendChild(script);
-  }, [createForm, findFormElement]);
+  });
+}
 
-  useEffect(() => {
+async function createForm(
+  target: string,
+  options: Omit<HubSpotCreateFormOptions, 'target'>
+) {
+  return new Promise<void>((resolve) => {
     if (!window.hbspt) {
-      loadScript();
+      throw new Error('hbspt object is missing');
     }
-  }, [loadScript]);
 
-  return (
-    <div>
-      <div
-        ref={el}
-        id={`reactHubspotForm${id.current}`}
-        style={{ display: loaded ? 'block' : 'none' }}
-      />
-      {!loaded && loading}
-    </div>
-  );
+    window.hbspt.forms.create({
+      ...options,
+      target,
+      onFormReady(...rest) {
+        options.onFormReady?.(...rest);
+        resolve();
+      },
+    });
+  });
 }

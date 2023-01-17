@@ -20,7 +20,7 @@ export function GetLicenseDialog({
       className="!bg-white [&>.close-button]:!text-black"
     >
       <Modal.Body>
-        <div className="max-h-[90vh] overflow-auto">
+        <div className="max-h-[80vh] overflow-auto">
           <HubspotForm
             region="na1"
             portalId="4731999"
