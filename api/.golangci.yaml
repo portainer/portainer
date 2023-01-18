@@ -1,0 +1,26 @@
+linters:
+  # Disable all linters.
+  disable-all: true
+  enable:
+    - depguard
+linters-settings:
+  depguard:
+    list-type: denylist
+    include-go-root: true
+    packages:
+      - github.com/sirupsen/logrus
+      - golang.org/x/exp
+    packages-with-error-message:
+      - github.com/sirupsen/logrus: 'logging is allowed only by github.com/rs/zerolog'
+    ignore-file-rules:
+      - "**/*_test.go"
+    # Create additional guards that follow the same configuration pattern.
+    # Results from all guards are aggregated together.
+    # additional-guards:
+    #   - list-type: allowlist
+    #     include-go-root: false
+    #     packages:
+    #       - github.com/sirupsen/logrus
+    #     # Specify rules by which the linter ignores certain files for consideration.
+    #     ignore-file-rules:
+    #       - "!**/*_test.go"
