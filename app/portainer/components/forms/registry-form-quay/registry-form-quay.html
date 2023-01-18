@@ -63,7 +63,7 @@
   <div class="form-group">
     <div class="col-sm-12">
       <por-switch-field
-        label="'Use organisation registry'"
+        label="'Use organization registry'"
         checked="$ctrl.model.Quay.useOrganisation"
         on-change="($ctrl.toggleOrganisation)"
         label-class="'col-sm-2'"
@@ -74,7 +74,7 @@
   <div ng-if="$ctrl.model.Quay.useOrganisation">
     <!-- organisation_name -->
     <div class="form-group">
-      <label for="organisation_name" class="col-sm-3 col-lg-2 control-label required text-left">Organisation name</label>
+      <label for="organisation_name" class="col-sm-3 col-lg-2 control-label required text-left">Organization name</label>
       <div class="col-sm-9 col-lg-10">
         <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="$ctrl.model.Quay.organisationName" required />
         <div class="help-block" ng-show="$ctrl.registryFormQuay.organisation_name.$invalid">
