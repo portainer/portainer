@@ -79,7 +79,7 @@ export function getDashboardRoute(environment: Environment) {
     if (isEdgeAsync(environment)) {
       return {
         to: 'edge.browse.dashboard',
-        params: { environmentId: environment.EdgeID },
+        params: { environmentId: environment.Id },
       };
     }
   }
