@@ -16,7 +16,6 @@ export function LinkButton({
   return (
     <Button
       title={title}
-      size="medium"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       className={clsx(className, '!m-0 no-link')}

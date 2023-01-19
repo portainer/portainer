@@ -1,4 +1,5 @@
-import { History, Wifi, WifiOff } from 'lucide-react';
+import { History, Wifi, WifiOff, X } from 'lucide-react';
+import clsx from 'clsx';
 
 import { Environment } from '@/react/portainer/environments/types';
 import {
@@ -9,16 +10,19 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Icon } from '@@/Icon';
 import { LinkButton } from '@@/LinkButton';
+import { Button } from '@@/buttons';
 
 type BrowseStatus = 'snapshot' | 'connected' | 'disconnected';
 
 export function EnvironmentBrowseButtons({
   environment,
   onClickBrowse,
+  onClickDisconnect,
   isActive,
 }: {
   environment: Environment;
   onClickBrowse(): void;
+  onClickDisconnect(): void;
   isActive: boolean;
 }) {
   const isEdgeAsync = checkEdgeAsync(environment);
@@ -26,34 +30,59 @@ export function EnvironmentBrowseButtons({
 
   const dashboardRoute = getDashboardRoute(environment);
   return (
-    <div className="flex flex-col gap-1 justify-center [&>*]:h-1/3 h-24">
-      {isBE && (
+    <div className="flex flex-col gap-2 justify-center [&>*]:h-1/3 h-24 w-full">
+      {isBE &&
+        (browseStatus !== 'snapshot' ? (
+          <LinkButton
+            icon={History}
+            disabled={!isEdgeAsync}
+            to="edge.browse.dashboard"
+            params={{
+              environmentId: environment.Id,
+            }}
+            size="medium"
+            color="light"
+            className="w-full !py-0 !m-0"
+          >
+            Browse snapshot
+          </LinkButton>
+        ) : (
+          <Button
+            icon={X}
+            onClick={onClickDisconnect}
+            className="w-full !py-0 !m-0 opacity-60"
+            size="medium"
+            color="light"
+          >
+            Close snapshot
+          </Button>
+        ))}
+
+      {browseStatus !== 'connected' ? (
         <LinkButton
-          icon={History}
-          disabled={!isEdgeAsync || browseStatus === 'snapshot'}
-          to="edge.browse.dashboard"
-          params={{
-            environmentId: environment.Id,
-          }}
-          color="light"
+          title="Live connection is not available for async environments"
+          icon={Wifi}
+          disabled={isEdgeAsync}
+          to={dashboardRoute.to}
+          params={dashboardRoute.params}
+          size="medium"
+          onClick={onClickBrowse}
+          color="primary"
           className="w-full !py-0 !m-0"
         >
-          Browse snapshot
+          Live connect
         </LinkButton>
+      ) : (
+        <Button
+          icon={WifiOff}
+          onClick={onClickDisconnect}
+          className="w-full !py-0 !m-0 opacity-60"
+          size="medium"
+          color="primary"
+        >
+          Disconnect
+        </Button>
       )}
-
-      <LinkButton
-        title="Live connection is not available for async environments"
-        icon={Wifi}
-        disabled={isEdgeAsync || browseStatus === 'connected'}
-        to={dashboardRoute.to}
-        params={dashboardRoute.params}
-        onClick={onClickBrowse}
-        color="primary"
-        className="w-full !py-0 !m-0"
-      >
-        Live connect
-      </LinkButton>
 
       <BrowseStatusTag status={browseStatus} />
     </div>
@@ -87,7 +116,7 @@ function BrowseStatusTag({ status }: { status: BrowseStatus }) {
 
 function Disconnected() {
   return (
-    <div className="vertical-center justify-center opacity-50">
+    <div className="flex items-center gap-2 justify-center opacity-50">
       <Icon icon={WifiOff} />
       Disconnected
     </div>
@@ -96,8 +125,14 @@ function Disconnected() {
 
 function Connected() {
   return (
-    <div className="vertical-center gap-2 justify-center text-green-8 bg-green-3 rounded-lg">
-      <div className="rounded-full h-2 w-2 bg-green-8" />
+    <div
+      className={clsx(
+        'flex items-center gap-2 justify-center rounded-lg',
+        'text-green-8 th-dark:text-green-4',
+        'bg-green-3 th-dark:bg-green-3/30'
+      )}
+    >
+      <div className="rounded-full h-2 w-2 bg-green-8 th-dark:bg-green-4" />
       Connected
     </div>
   );
@@ -105,7 +140,13 @@ function Connected() {
 
 function Snapshot() {
   return (
-    <div className="vertical-center gap-2 justify-center text-warning-7 bg-warning-3 rounded-lg">
+    <div
+      className={clsx(
+        'flex items-center gap-2 justify-center rounded-lg',
+        'text-warning-7 th-dark:text-warning-4',
+        'bg-warning-3 th-dark:bg-warning-3/10 th-highcontrast:bg-warning-3/30'
+      )}
+    >
       <div className="rounded-full h-2 w-2 bg-warning-7" />
       Browsing Snapshot
     </div>
