@@ -45,7 +45,11 @@ export const componentsModule = angular
   .module('portainer.app.react.components', [customTemplatesModule])
   .component(
     'tagSelector',
-    r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
+    r2a(withUIRouter(withReactQuery(TagSelector)), [
+      'allowCreate',
+      'onChange',
+      'value',
+    ])
   )
   .component(
     'beTeaserButton',
