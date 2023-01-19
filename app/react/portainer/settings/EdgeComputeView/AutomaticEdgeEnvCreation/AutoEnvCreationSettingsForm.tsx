@@ -12,7 +12,6 @@ import { FormControl } from '@@/form-components/FormControl';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
 
-
 import { EnabledWaitingRoomSwitch } from './EnableWaitingRoomSwitch';
 
 interface FormValues {
