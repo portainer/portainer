@@ -11,7 +11,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { FormValues } from './types';
 import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
 import { VersionSelect } from './VersionSelect';
-import { ScheduledTimeField } from './ScheduledTimeField';
+import { defaultValue, ScheduledTimeField } from './ScheduledTimeField';
 
 export function UpdateScheduleDetailsFieldset() {
   const { values, setFieldValue } = useFormikContext<FormValues>();
@@ -33,8 +33,10 @@ export function UpdateScheduleDetailsFieldset() {
   useEffect(() => {
     if (!hasTimeZone) {
       setFieldValue('scheduledTime', '');
+    } else if (!values.scheduledTime) {
+      setFieldValue('scheduledTime', defaultValue());
     }
-  }, [setFieldValue, hasTimeZone]);
+  }, [setFieldValue, hasTimeZone, values.scheduledTime]);
 
   return (
     <>
