@@ -13,7 +13,6 @@ LABEL org.opencontainers.image.title="Portainer" \
 COPY dist/docker /
 COPY dist/docker-compose /
 COPY dist/helm /
-COPY dist/kompose /
 COPY dist/kubectl /
 COPY dist/mustache-templates /mustache-templates/
 COPY dist/portainer /
@@ -32,7 +31,8 @@ LABEL io.portainer.server true
 
 ENTRYPOINT ["/portainer"]
 
-
-# For CI we can add storybook if present
+# storybook is for portainerci builds only
 FROM production as storybook
+ENV PORTAINER_FEATURE_FLAGS="storybook"
+
 COPY dist/storybook* /storybook/

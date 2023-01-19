@@ -19,7 +19,6 @@ USER ContainerAdministrator
 COPY dist/docker.exe /
 COPY dist/docker-compose.exe /
 COPY dist/helm.exe /
-COPY dist/kompose.exe /
 COPY dist/kubectl.exe /
 COPY dist/mustache-templates /mustache-templates/
 COPY dist/portainer.exe /
@@ -33,6 +32,8 @@ LABEL io.portainer.server true
 
 ENTRYPOINT ["/portainer.exe"]
 
-# For CI we can add storybook if present
+# storybook is for portainerci builds only
 FROM production as storybook
+ENV PORTAINER_FEATURE_FLAGS="storybook"
+
 COPY dist/storybook* /storybook/
