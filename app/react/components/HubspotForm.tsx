@@ -76,6 +76,7 @@ function useHubspotForm({
 async function loadHubspot() {
   return new Promise<void>((resolve) => {
     if (window.hbspt) {
+      resolve();
       return;
     }
 
