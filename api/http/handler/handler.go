@@ -258,6 +258,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) storybookEnabled() bool {
+	// TODO: update this later after the new FF package is merged to develop . i.e.
+	// return featureflags.IsEnabled(portainer.Storybook)
 	settings, _ := h.SettingsHandler.DataStore.Settings().Settings()
 	return settings.FeatureFlagSettings[portainer.Storybook]
 }
