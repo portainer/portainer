@@ -21,6 +21,8 @@ interface Props {
   onDismiss?(): void;
   'aria-label'?: string;
   'aria-labelledby'?: string;
+  size?: 'md' | 'lg';
+  className?: string;
 }
 
 export function Modal({
@@ -28,6 +30,8 @@ export function Modal({
   onDismiss,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
+  size = 'md',
+  className,
 }: PropsWithChildren<Props>) {
   return (
     <Context.Provider value>
@@ -43,9 +47,12 @@ export function Modal({
         <DialogContent
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
-          className={clsx(styles.modalDialog, 'p-0 bg-transparent')}
+          className={clsx(styles.modalDialog, 'p-0 bg-transparent', {
+            'w-[450px]': size === 'md',
+            'w-[700px]': size === 'lg',
+          })}
         >
-          <div className={clsx(styles.modalContent, 'relative')}>
+          <div className={clsx(styles.modalContent, 'relative', className)}>
             {children}
             {onDismiss && <CloseButton onClose={onDismiss} />}
           </div>
