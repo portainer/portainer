@@ -116,7 +116,7 @@ function BrowseStatusTag({ status }: { status: BrowseStatus }) {
 
 function Disconnected() {
   return (
-    <div className="flex items-center gap-2 justify-center opacity-50">
+    <div className="flex items-center gap-2 justify-center">
       <Icon icon={WifiOff} />
       Disconnected
     </div>
