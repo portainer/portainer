@@ -223,7 +223,7 @@
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'pencil'" class="mr-1"></pr-icon>Edit this application
+              <pr-icon icon="'pencil'" class="mr-1"></pr-icon>{{ ctrl.stack.IsComposeFormat ? 'View this application' : 'Edit this application' }}
             </button>
             <button
               authorization="K8sApplicationDetailsW"

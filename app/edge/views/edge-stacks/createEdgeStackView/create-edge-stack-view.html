@@ -39,23 +39,18 @@
             <div ng-if="$ctrl.noGroups" class="col-sm-12 small text-muted">
               No Edge groups are available. Head over to the <a ui-sref="edge.groups">Edge groups view</a> to create one.
             </div>
+            <p class="col-sm-12 vertical-center help-block small text-warning" ng-if="$ctrl.formValues.DeploymentType === undefined">
+              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no available deployment types when there is more than one type of environment in your edge
+              group selection (e.g. Kubernetes and Docker environments). Please select edge groups that have environments of the same type.
+            </p>
           </div>
 
           <edge-stack-deployment-type-selector
             value="$ctrl.formValues.DeploymentType"
-            has-docker-endpoint="$ctrl.hasDockerEndpoint"
+            has-docker-endpoint="$ctrl.hasDockerEndpoint()"
+            has-kube-endpoint="$ctrl.hasKubeEndpoint()"
             on-change="($ctrl.onChangeDeploymentType)"
           ></edge-stack-deployment-type-selector>
-
-          <div class="form-group">
-            <div class="col-sm-12">
-              <div class="small text-muted space-right" ng-if="$ctrl.formValues.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
-                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all
-                the Compose format options are supported by Kompose at the moment.
-              </div>
-            </div>
-          </div>
 
           <edge-stacks-docker-compose-form
             ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Compose"

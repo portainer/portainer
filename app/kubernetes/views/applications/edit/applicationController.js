@@ -323,6 +323,9 @@ class KubernetesApplicationController {
         this.KubernetesNodeService.get(),
       ]);
       this.application = application;
+      if (this.application.StackId) {
+        this.stack = await this.StackService.stack(application.StackId);
+      }
       this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
       this.formValues.Note = this.application.Note;
       this.formValues.Services = this.application.Services;

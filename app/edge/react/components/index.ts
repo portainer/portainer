@@ -6,6 +6,7 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
+import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/components/EdgeStackDeploymentTypeSelector';
 
 export const componentsModule = angular
   .module('portainer.edge.react.components', [])
@@ -42,5 +43,14 @@ export const componentsModule = angular
       'isDefaultHidden',
       'readonly',
       'fieldSettings',
+    ])
+  )
+  .component(
+    'edgeStackDeploymentTypeSelector',
+    r2a(withReactQuery(EdgeStackDeploymentTypeSelector), [
+      'value',
+      'onChange',
+      'hasDockerEndpoint',
+      'hasKubeEndpoint',
     ])
   ).name;
