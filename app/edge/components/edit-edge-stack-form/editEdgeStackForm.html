@@ -44,7 +44,7 @@
     identifier="compose-editor"
     placeholder="# Define or paste the content of your docker compose file here"
     on-change="($ctrl.onChangeComposeConfig)"
-    read-only="!$ctrl.model.DeploymentType"
+    read-only="$ctrl.hasKubeEndpoint()"
   >
     <editor-description>
       <div>
