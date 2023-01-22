@@ -1,14 +1,10 @@
 import angular from 'angular';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-// import trackEvent directly because the event only fires once with $analytics.trackEvent
-import { trackEvent } from '@/angulartics.matomo/analytics-services';
 import { options } from './options';
 
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',
-  '$analytics',
-  '$state',
   'Notifications',
   'SettingsService',
   'ModalService',
@@ -16,7 +12,7 @@ angular.module('portainer.app').controller('SettingsController', [
   'BackupService',
   'FileSaver',
   'Blob',
-  function ($scope, $analytics, $state, Notifications, SettingsService, ModalService, StateManager, BackupService, FileSaver) {
+  function ($scope, Notifications, SettingsService, ModalService, StateManager, BackupService, FileSaver) {
     $scope.customBannerFeatureId = FeatureId.CUSTOM_LOGIN_BANNER;
     $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
     $scope.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;
@@ -57,7 +53,6 @@ angular.module('portainer.app').controller('SettingsController', [
 
     $scope.formValues = {
       customLogo: false,
-      ShowKomposeBuildOption: false,
       KubeconfigExpiry: undefined,
       HelmRepositoryURL: undefined,
       BlackListedLabels: [],
@@ -80,33 +75,6 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.onToggleCustomLogo = function onToggleCustomLogo(checked) {
       $scope.$evalAsync(() => {
         $scope.formValues.customLogo = checked;
-      });
-    };
-
-    $scope.onToggleShowKompose = async function onToggleShowKompose(checked) {
-      if (checked) {
-        ModalService.confirmWarn({
-          title: 'Are you sure?',
-          message: `<p>In a forthcoming Portainer release, we plan to remove support for docker-compose format manifests for Kubernetes deployments, and the Kompose conversion tool which enables this. The reason for this is because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and Exposures (CVEs).</p>
-              <p>Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and new pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.</p>`,
-          buttons: {
-            confirm: {
-              label: 'Ok',
-              className: 'btn-warning',
-            },
-          },
-          callback: function (confirmed) {
-            $scope.setShowCompose(confirmed);
-          },
-        });
-        return;
-      }
-      $scope.setShowCompose(checked);
-    };
-
-    $scope.setShowCompose = function setShowCompose(checked) {
-      return $scope.$evalAsync(() => {
-        $scope.formValues.ShowKomposeBuildOption = checked;
       });
     };
 
@@ -187,12 +155,7 @@ angular.module('portainer.app').controller('SettingsController', [
         KubeconfigExpiry: $scope.formValues.KubeconfigExpiry,
         HelmRepositoryURL: $scope.formValues.HelmRepositoryURL,
         GlobalDeploymentOptions: $scope.formValues.GlobalDeploymentOptions,
-        ShowKomposeBuildOption: $scope.formValues.ShowKomposeBuildOption,
       };
-
-      if (kubeSettingsPayload.ShowKomposeBuildOption !== $scope.initialFormValues.ShowKomposeBuildOption && $scope.initialFormValues.enableTelemetry) {
-        trackEvent('kubernetes-allow-compose', { category: 'kubernetes', metadata: { 'kubernetes-allow-compose': kubeSettingsPayload.ShowKomposeBuildOption } });
-      }
 
       $scope.state.kubeSettingsActionInProgress = true;
       updateSettings(kubeSettingsPayload, 'Kubernetes settings updated');
@@ -205,7 +168,6 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateLogo(settings.LogoURL);
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);
-          $scope.initialFormValues.ShowKomposeBuildOption = response.ShowKomposeBuildOption;
           $scope.initialFormValues.enableTelemetry = response.EnableTelemetry;
           $scope.formValues.BlackListedLabels = response.BlackListedLabels;
         })
@@ -235,11 +197,6 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.KubeconfigExpiry = settings.KubeconfigExpiry;
           $scope.formValues.HelmRepositoryURL = settings.HelmRepositoryURL;
           $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
-          if (settings.ShowKomposeBuildOption) {
-            $scope.formValues.ShowKomposeBuildOption = settings.ShowKomposeBuildOption;
-          }
-
-          $scope.initialFormValues.ShowKomposeBuildOption = settings.ShowKomposeBuildOption;
           $scope.initialFormValues.enableTelemetry = settings.EnableTelemetry;
         })
         .catch(function error(err) {

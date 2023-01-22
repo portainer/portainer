@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
-import { Tooltip } from '@@/Tip/Tooltip';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import './BoxSelectorItem.css';
 
@@ -29,7 +29,7 @@ export function BoxOption<T extends number | string>({
   type = 'radio',
   children,
 }: PropsWithChildren<Props<T>>) {
-  return (
+  const BoxOption = (
     <div className={clsx('box-selector-item', className)}>
       <input
         type={type}
@@ -44,13 +44,13 @@ export function BoxOption<T extends number | string>({
       <label htmlFor={option.id} data-cy={`${radioName}_${option.value}`}>
         {children}
       </label>
-      {tooltip && (
-        <Tooltip
-          position="bottom"
-          className="portainer-tooltip"
-          message={tooltip}
-        />
-      )}
     </div>
   );
+
+  if (tooltip) {
+    return (
+      <TooltipWithChildren message={tooltip}>{BoxOption}</TooltipWithChildren>
+    );
+  }
+  return BoxOption;
 }

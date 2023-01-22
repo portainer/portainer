@@ -1,5 +1,5 @@
 <page-header
-  ng-if="!ctrl.state.isEdit"
+  ng-if="!ctrl.state.isEdit && !ctrl.stack.IsComposeFormat && ctrl.state.viewReady"
   title="'Create application'"
   breadcrumbs="[
     { label:'Applications', link:'kubernetes.applications' },
@@ -10,7 +10,7 @@
 </page-header>
 
 <page-header
-  ng-if="ctrl.state.isEdit"
+  ng-if="ctrl.state.isEdit && !ctrl.stack.IsComposeFormat && ctrl.state.viewReady"
   title="'Edit application'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
@@ -26,6 +26,17 @@
       linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
     },
      'Edit',
+     ]"
+  reload="true"
+>
+</page-header>
+
+<page-header
+  ng-if="ctrl.stack.IsComposeFormat"
+  title="'View application'"
+  breadcrumbs="[
+    { label:'Applications', link:'kubernetes.applications' },
+     'View application'
      ]"
   reload="true"
 >
@@ -88,6 +99,7 @@
 
               <!-- #region web editor -->
               <web-editor-form
+                read-only="ctrl.stack.IsComposeFormat"
                 ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT"
                 value="ctrl.stackFileContent"
                 yml="true"
@@ -96,27 +108,24 @@
                 on-change="(ctrl.onChangeFileContent)"
               >
                 <editor-description>
-                  <span class="text-muted small" ng-show="ctrl.stack.IsComposeFormat">
-                    <p class="vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                      <span>
-                        Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
-                        not all the Compose format options are supported by Kompose at the moment.
-                      </span>
-                    </p>
-                    <p>
-                      You can get more information about Compose file format in the
-                      <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-                    </p>
-                    <p
-                      >In a forthcoming Portainer release, we plan to remove support for docker-compose format manifests for Kubernetes deployments, and the Kompose conversion tool
-                      which enables this. The reason for this is because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and Exposures (CVEs).</p
-                    >
-                    <p
-                      >Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and new
-                      pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.</p
-                    >
-                  </span>
+                  <div class="flex gap-1 text-muted small" ng-show="ctrl.stack.IsComposeFormat">
+                    <pr-icon icon="'alert-circle'" mode="'warning'" class-name="'!mt-1'"></pr-icon>
+                    <div>
+                      <p>
+                        Portainer no longer supports <a href="https://docs.docker.com/compose/compose-file/" target="_blank">docker-compose</a> format manifests for Kubernetes
+                        deployments, and we have removed the <a href="https://kompose.io/" target="_blank">Kompose</a> conversion tool which enables this. The reason for this is
+                        because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and Exposures (CVEs).
+                      </p>
+                      <p
+                        >Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and
+                        new pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.</p
+                      >
+                      <p>
+                        We advise installing your own instance of Kompose in a sandbox environment, performing conversions of your Docker Compose files to Kubernetes manifests and
+                        using those manifests to set up applications.
+                      </p>
+                    </div>
+                  </div>
                   <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
                     <p class="vertical-center">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
@@ -1345,9 +1354,9 @@
             <!-- kubernetes summary for external application -->
             <kubernetes-summary-view ng-if="ctrl.isExternalApplication()" form-values="ctrl.formValues" old-form-values="ctrl.savedFormValues"></kubernetes-summary-view>
             <!-- kubernetes summary for external application -->
-            <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT"> Actions </div>
+            <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
             <!-- #region ACTIONS -->
-            <div class="form-group">
+            <div class="form-group" ng-hide="ctrl.stack.IsComposeFormat">
               <div class="col-sm-12">
                 <button
                   ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"

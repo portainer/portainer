@@ -1,4 +1,6 @@
 import { EditorType } from '@/react/edge/edge-stacks/types';
+import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
+import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -43,6 +45,7 @@ export default class CreateEdgeStackViewController {
     this.createStackFromGitRepository = this.createStackFromGitRepository.bind(this);
     this.onChangeGroups = this.onChangeGroups.bind(this);
     this.hasDockerEndpoint = this.hasDockerEndpoint.bind(this);
+    this.hasKubeEndpoint = this.hasKubeEndpoint.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
   }
 
@@ -134,18 +137,23 @@ export default class CreateEdgeStackViewController {
   checkIfEndpointTypes(groups) {
     const edgeGroups = groups.map((id) => this.edgeGroups.find((e) => e.Id === id));
     this.state.endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
+    this.selectValidDeploymentType();
+  }
 
-    if (this.hasDockerEndpoint() && this.formValues.DeploymentType == 1) {
-      this.onChangeDeploymentType(0);
+  selectValidDeploymentType() {
+    const validTypes = getValidEditorTypes(this.state.endpointTypes);
+
+    if (!validTypes.includes(this.formValues.DeploymentType)) {
+      this.onChangeDeploymentType(validTypes[0]);
     }
   }
 
   hasKubeEndpoint() {
-    return this.state.endpointTypes.includes(7);
+    return this.state.endpointTypes.includes(PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment);
   }
 
   hasDockerEndpoint() {
-    return this.state.endpointTypes.includes(4);
+    return this.state.endpointTypes.includes(PortainerEndpointTypes.EdgeAgentOnDockerEnvironment);
   }
 
   validateForm(method) {
@@ -217,9 +225,11 @@ export default class CreateEdgeStackViewController {
   }
 
   onChangeDeploymentType(deploymentType) {
-    this.formValues.DeploymentType = deploymentType;
-    this.state.Method = 'editor';
-    this.formValues.StackFileContent = '';
+    return this.$scope.$evalAsync(() => {
+      this.formValues.DeploymentType = deploymentType;
+      this.state.Method = 'editor';
+      this.formValues.StackFileContent = '';
+    });
   }
 
   formIsInvalid() {
