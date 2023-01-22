@@ -27,7 +27,7 @@ export function EdgeIndicator({
     return (
       <span role="status" aria-label="edge-status">
         <EnvironmentStatusBadgeItem aria-label="unassociated">
-          <s>associated</s>
+          <span className="whitespace-nowrap">Not associated</span>
         </EnvironmentStatusBadgeItem>
       </span>
     );
@@ -41,6 +41,7 @@ export function EdgeIndicator({
     >
       <EnvironmentStatusBadgeItem
         color={isValid ? 'success' : 'danger'}
+        icon={isValid ? 'svg-heartbeatup' : 'svg-heartbeatdown'}
         aria-label="edge-heartbeat"
       >
         heartbeat

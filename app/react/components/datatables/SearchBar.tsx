@@ -32,7 +32,7 @@ export function SearchBar({
 
   return (
     <div
-      className={clsx('searchBar items-center flex min-w-[90px]', className)}
+      className={clsx('searchBar items-center flex min-w-[350px]', className)}
     >
       <Search className="searchIcon lucide shrink-0" />
       <input
