@@ -2,6 +2,7 @@ import { Formik, Form } from 'formik';
 import { Laptop } from 'lucide-react';
 
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -9,8 +10,6 @@ import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
-
-import { Settings } from '../types';
 
 import { validationSchema } from './EdgeComputeSettings.validation';
 import { FormValues } from './types';
@@ -25,6 +24,16 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   if (!settings) {
     return null;
   }
+
+  const initialValues: FormValues = {
+    EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
+    EdgePortainerUrl: settings.EdgePortainerUrl,
+    Edge: {
+      TunnelServerAddress: settings.Edge.TunnelServerAddress,
+    },
+    EdgeAgentCheckinInterval: settings.EdgeAgentCheckinInterval,
+    EnforceEdgeID: settings.EnforceEdgeID,
+  };
 
   return (
     <div className="row">
@@ -41,7 +50,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
 
         <WidgetBody>
           <Formik
-            initialValues={settings}
+            initialValues={initialValues}
             enableReinitialize
             validationSchema={() => validationSchema()}
             onSubmit={onSubmit}

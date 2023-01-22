@@ -5,13 +5,12 @@ import { useCallback, useEffect } from 'react';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useUpdateSettingsMutation } from '@/react/portainer/settings/queries';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
-
-import { Settings } from '../types';
 
 import { EnabledWaitingRoomSwitch } from './EnableWaitingRoomSwitch';
 

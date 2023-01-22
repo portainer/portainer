@@ -43,8 +43,13 @@ export function DeploymentSyncOptions() {
     return null;
   }
 
-  const initialValues = {
-    Edge: settingsQuery.data.Edge,
+  const initialValues: FormValues = {
+    Edge: {
+      AsyncMode: settingsQuery.data.Edge.AsyncMode,
+      CommandInterval: settingsQuery.data.Edge.CommandInterval,
+      PingInterval: settingsQuery.data.Edge.PingInterval,
+      SnapshotInterval: settingsQuery.data.Edge.SnapshotInterval,
+    },
     EdgeAgentCheckinInterval: settingsQuery.data.EdgeAgentCheckinInterval,
   };
 
