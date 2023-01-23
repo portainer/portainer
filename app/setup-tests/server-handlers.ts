@@ -1,4 +1,4 @@
-import { DefaultRequestBody, PathParams, rest } from 'msw';
+import { DefaultBodyType, PathParams, rest } from 'msw';
 
 import {
   Edition,
@@ -72,7 +72,7 @@ export const handlers = [
     tags.push(tag);
     return res(ctx.json(tag));
   }),
-  rest.get<DefaultRequestBody, PathParams, Partial<PublicSettingsResponse>>(
+  rest.get<DefaultBodyType, PathParams, Partial<PublicSettingsResponse>>(
     '/api/settings/public',
     (req, res, ctx) =>
       res(
@@ -87,7 +87,7 @@ export const handlers = [
         })
       )
   ),
-  rest.get<DefaultRequestBody, PathParams, Partial<StatusResponse>>(
+  rest.get<DefaultBodyType, PathParams, Partial<StatusResponse>>(
     '/api/status',
     (req, res, ctx) => res(ctx.json({}))
   ),
