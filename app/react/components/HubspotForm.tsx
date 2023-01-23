@@ -64,7 +64,7 @@ function useHubspotForm({
         formId,
         portalId,
         region,
-        onFormSubmit: onSubmitted,
+        onFormSubmitted: onSubmitted,
       });
     },
     {
