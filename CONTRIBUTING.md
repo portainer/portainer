@@ -25,7 +25,7 @@ Each commit message should include a **type**, a **scope** and a **subject**:
  <type>(<scope>): <subject>
 ```
 
-Lines should not exceed 100 characters. This allows the message to be easier to read on github as well as in various git tools and produces a nice, neat commit log ie:
+Lines should not exceed 100 characters. This allows the message to be easier to read on GitHub as well as in various git tools and produces a nice, neat commit log ie:
 
 ```
  #271 feat(containers): add exposed ports in the containers view
