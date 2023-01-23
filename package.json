@@ -125,7 +125,7 @@
     "parse-duration": "^1.0.2",
     "rc-slider": "^9.7.5",
     "react": "^17.0.2",
-    "react-datetime-picker": "^3.5.0",
+    "react-datetime-picker": "^4.2.0",
     "react-dom": "^17.0.2",
     "react-i18next": "^11.12.0",
     "react-is": "^18.2.0",

@@ -445,3 +445,12 @@ input:-webkit-autofill {
 .tippy-content {
   padding: 0;
 }
+
+/* react-datetime-picker */
+/* default css is overriden by
+  .widget .widget-body button
+  so we have to enforce this margin
+*/
+.react-calendar button {
+  margin: 0 !important;
+}
