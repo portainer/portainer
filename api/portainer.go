@@ -562,6 +562,11 @@ type (
 	KubernetesData struct {
 		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
 		Configuration KubernetesConfiguration `json:"Configuration"`
+		Flags         KubernetesFlags         `json:"Flags"`
+	}
+
+	KubernetesFlags struct {
+		IsServerMetricsDetected bool `json:"IsServerMetricsDetected"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
