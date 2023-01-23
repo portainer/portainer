@@ -776,3 +776,7 @@ input[style*='background-image: url("data:image/png'] {
 .web-editor .trancluded-item:empty {
   display: none;
 }
+
+input:-webkit-autofill {
+  @apply caret-[--grey-25] th-dark:caret-white th-highcontrast:caret-white;
+}
