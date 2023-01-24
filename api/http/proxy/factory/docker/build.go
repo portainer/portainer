@@ -2,7 +2,6 @@ package docker
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"io"
 	"mime"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/portainer/portainer/api/archive"
 
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 )
 

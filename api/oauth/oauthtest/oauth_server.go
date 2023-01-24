@@ -1,7 +1,6 @@
 package oauthtest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -9,6 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/goccy/go-json"
 )
 
 const (

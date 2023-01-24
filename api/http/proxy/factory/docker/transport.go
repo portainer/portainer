@@ -3,7 +3,6 @@ package docker
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -21,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 )
 

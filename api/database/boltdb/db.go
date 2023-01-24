@@ -207,7 +207,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return connection.UnmarshalObjectWithJsoniter(data, object)
+	return connection.UnmarshalObject(data, object)
 }
 
 func (connection *DbConnection) getEncryptionKey() []byte {
@@ -241,7 +241,7 @@ func (connection *DbConnection) UpdateObjectFunc(bucketName string, key []byte, 
 			return dserrors.ErrObjectNotFound
 		}
 
-		err := connection.UnmarshalObjectWithJsoniter(data, object)
+		err := connection.UnmarshalObject(data, object)
 		if err != nil {
 			return err
 		}
@@ -372,34 +372,12 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 	return err
 }
 
-// TODO: decide which Unmarshal to use, and use one...
-func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
-	err := connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := connection.UnmarshalObjectWithJsoniter(v, obj)
-			if err != nil {
-				return err
-			}
-			obj, err = append(obj)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-	return err
-}
-
 func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	return connection.View(func(tx *bolt.Tx) error {
 		cursor := tx.Bucket([]byte(bucketName)).Cursor()
 
 		for k, v := cursor.Seek(keyPrefix); k != nil && bytes.HasPrefix(k, keyPrefix); k, v = cursor.Next() {
-			err := connection.UnmarshalObjectWithJsoniter(v, obj)
+			err := connection.UnmarshalObject(v, obj)
 			if err != nil {
 				return err
 			}

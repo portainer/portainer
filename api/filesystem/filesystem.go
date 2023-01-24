@@ -2,18 +2,18 @@ package filesystem
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
 
-	"io"
-	"os"
+	"github.com/goccy/go-json"
 )
 
 const (

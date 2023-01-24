@@ -3,7 +3,6 @@ package openamt
 import (
 	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +11,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/goccy/go-json"
 )
 
 const (

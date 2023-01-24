@@ -1,11 +1,11 @@
 package binary
 
 import (
-	"encoding/json"
-
-	"github.com/pkg/errors"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/release"
+
+	"github.com/goccy/go-json"
+	"github.com/pkg/errors"
 )
 
 // Install runs `helm install` with specified install options.

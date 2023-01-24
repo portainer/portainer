@@ -3,7 +3,6 @@ package git
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -17,6 +16,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	gittypes "github.com/portainer/portainer/api/git/types"
+
+	"github.com/goccy/go-json"
 )
 
 const (

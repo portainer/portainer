@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -20,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/jwt"
 
+	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 )
 

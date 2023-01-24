@@ -2,12 +2,12 @@ package utils
 
 import (
 	"compress/gzip"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"mime"
 
+	"github.com/goccy/go-json"
 	"gopkg.in/yaml.v3"
 )
 

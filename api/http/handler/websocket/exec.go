@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"bytes"
-	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -13,6 +12,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 )
 

@@ -4,11 +4,10 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/json"
 	"fmt"
 	"io"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 )
 
@@ -52,31 +51,6 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 		*s = string(data)
 	}
 	return err
-}
-
-// UnmarshalObjectWithJsoniter decodes an object from binary data
-// using the jsoniter library. It is mainly used to accelerate environment(endpoint)
-// decoding at the moment.
-func (connection *DbConnection) UnmarshalObjectWithJsoniter(data []byte, object interface{}) error {
-	if connection.getEncryptionKey() != nil {
-		var err error
-		data, err = decrypt(data, connection.getEncryptionKey())
-		if err != nil {
-			return err
-		}
-	}
-	var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
-	err := jsoni.Unmarshal(data, &object)
-	if err != nil {
-		if s, ok := object.(*string); ok {
-			*s = string(data)
-			return nil
-		}
-
-		return err
-	}
-
-	return nil
 }
 
 // mmm, don't have a KMS .... aes GCM seems the most likely from

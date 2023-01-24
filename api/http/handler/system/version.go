@@ -1,7 +1,6 @@
 package system
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/portainer/libhttp/response"
@@ -11,6 +10,8 @@ import (
 
 	"github.com/coreos/go-semver/semver"
 	"github.com/rs/zerolog/log"
+
+	"github.com/goccy/go-json"
 )
 
 type versionResponse struct {

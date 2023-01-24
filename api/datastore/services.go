@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -36,6 +35,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/dataservices/webhook"
 
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 )
 

@@ -120,7 +120,7 @@ func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	err := service.connection.GetAllWithJsoniter(
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Endpoint{},
 		func(obj interface{}) (interface{}, error) {

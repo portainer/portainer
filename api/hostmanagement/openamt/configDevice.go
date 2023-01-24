@@ -1,11 +1,12 @@
 package openamt
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/goccy/go-json"
 )
 
 type Device struct {

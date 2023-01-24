@@ -1,9 +1,9 @@
 package boltdb
 
 import (
-	"encoding/json"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )

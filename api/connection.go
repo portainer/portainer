@@ -32,7 +32,6 @@ type Connection interface {
 	CreateObjectWithId(bucketName string, id int, obj interface{}) error
 	CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
-	GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	ConvertToKey(v int) []byte
 
 	BackupMetadata() (map[string]interface{}, error)

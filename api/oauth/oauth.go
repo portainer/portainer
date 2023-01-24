@@ -2,7 +2,6 @@ package oauth
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"mime"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 
+	"github.com/goccy/go-json"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

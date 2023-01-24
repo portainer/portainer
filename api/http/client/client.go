@@ -2,7 +2,6 @@ package client
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +12,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 )
 

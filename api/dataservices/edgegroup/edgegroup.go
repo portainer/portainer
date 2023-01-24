@@ -36,7 +36,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	var groups = make([]portainer.EdgeGroup, 0)
 
-	err := service.connection.GetAllWithJsoniter(
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.EdgeGroup{},
 		func(obj interface{}) (interface{}, error) {

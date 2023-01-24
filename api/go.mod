@@ -21,6 +21,7 @@ require (
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/go-ldap/ldap/v3 v3.1.8
 	github.com/go-playground/validator/v10 v10.10.1
+	github.com/goccy/go-json v0.10.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/google/go-cmp v0.5.8

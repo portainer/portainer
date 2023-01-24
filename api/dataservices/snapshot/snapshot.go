@@ -46,7 +46,7 @@ func (service *Service) Snapshot(endpointID portainer.EndpointID) (*portainer.Sn
 func (service *Service) Snapshots() ([]portainer.Snapshot, error) {
 	var snapshots = make([]portainer.Snapshot, 0)
 
-	err := service.connection.GetAllWithJsoniter(
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Snapshot{},
 		func(obj interface{}) (interface{}, error) {

@@ -2,8 +2,8 @@ package registryutils
 
 import (
 	"encoding/base64"
-	"encoding/json"
 
+	"github.com/goccy/go-json"
 	portainer "github.com/portainer/portainer/api"
 )
 

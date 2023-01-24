@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,6 +13,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+
+	"github.com/goccy/go-json"
 )
 
 type dockerhubStatusResponse struct {

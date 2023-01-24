@@ -2,7 +2,6 @@ package users
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
+
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 )
 

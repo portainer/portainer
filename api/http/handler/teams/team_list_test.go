@@ -1,7 +1,6 @@
 package teams
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,6 +15,8 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/goccy/go-json"
 )
 
 func Test_teamList(t *testing.T) {

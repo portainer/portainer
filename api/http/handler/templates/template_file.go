@@ -1,7 +1,6 @@
 package templates
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 )
 
