@@ -2,6 +2,8 @@ import { ComponentType } from 'react';
 
 import { UserProvider } from '@/react/hooks/useUser';
 
+import { withReactQuery } from './withReactQuery';
+
 export function withCurrentUser<T>(
   WrappedComponent: ComponentType<T>
 ): ComponentType<T> {
@@ -12,13 +14,14 @@ export function withCurrentUser<T>(
   function WrapperComponent(props: T) {
     return (
       <UserProvider>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <WrappedComponent {...props} />
       </UserProvider>
     );
   }
 
-  WrapperComponent.displayName = displayName;
+  WrapperComponent.displayName = `withCurrentUser(${displayName})`;
 
-  return WrapperComponent;
+  // User provider makes a call to the API to get the current user.
+  // We need to wrap it with React Query to make that call.
+  return withReactQuery(WrapperComponent);
 }
