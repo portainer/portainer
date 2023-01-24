@@ -1,6 +1,7 @@
 import { useFormikContext } from 'formik';
 import semverCompare from 'semver-compare';
 import _ from 'lodash';
+import { useEffect } from 'react';
 
 import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
@@ -10,10 +11,10 @@ import { TextTip } from '@@/Tip/TextTip';
 import { FormValues } from './types';
 import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
 import { VersionSelect } from './VersionSelect';
-import { ScheduledTimeField } from './ScheduledTimeField';
+import { defaultValue, ScheduledTimeField } from './ScheduledTimeField';
 
 export function UpdateScheduleDetailsFieldset() {
-  const { values } = useFormikContext<FormValues>();
+  const { values, setFieldValue } = useFormikContext<FormValues>();
 
   const environmentIdsQuery = useEdgeGroupsEnvironmentIds(values.groupIds);
 
@@ -28,6 +29,14 @@ export function UpdateScheduleDetailsFieldset() {
   // old version is version that doesn't support scheduling of updates
   const hasNoTimeZone = environments.some((env) => !env.LocalTimeZone);
   const hasTimeZone = environments.some((env) => env.LocalTimeZone);
+
+  useEffect(() => {
+    if (!hasTimeZone) {
+      setFieldValue('scheduledTime', '');
+    } else if (!values.scheduledTime) {
+      setFieldValue('scheduledTime', defaultValue());
+    }
+  }, [setFieldValue, hasTimeZone, values.scheduledTime]);
 
   return (
     <>
