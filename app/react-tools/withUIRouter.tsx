@@ -11,13 +11,12 @@ export function withUIRouter<T>(
   function WrapperComponent(props: T) {
     return (
       <UIRouterContextComponent>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <WrappedComponent {...props} />
       </UIRouterContextComponent>
     );
   }
 
-  WrapperComponent.displayName = displayName;
+  WrapperComponent.displayName = `withUIRouter(${displayName})`;
 
   return WrapperComponent;
 }
