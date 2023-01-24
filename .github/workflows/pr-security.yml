@@ -136,15 +136,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
-      - name: Use golang 1.18
+      - name: Use golang 1.19.4
         uses: actions/setup-go@v3
         with:
-          go-version: '1.18'
+          go-version: '1.19.4'
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 18.x
 
       - name: Install packages and build
         run: yarn install && yarn build
