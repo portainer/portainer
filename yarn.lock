@@ -7373,10 +7373,10 @@ code-point-at@^1.0.0:
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-codemirror@~5.64.0:
-  version "5.64.0"
-  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.64.0.tgz#182eec65b62178e3cd1de8f9d88ab819cfe5f625"
-  integrity sha512-fqr6CtDQdJ6iNMbD8NX2gH2G876nNDk+TO1rrYkgWnqQdO3O1Xa9tK6q+psqhJJgE5SpbaDcgdfLmukoUVE8pg==
+codemirror@~5.65.11:
+  version "5.65.11"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.65.11.tgz#c818edc3274788c008f636520c5490a1f7009b4f"
+  integrity sha512-Gp62g2eKSCHYt10axmGhKq3WoJSvVpvhXmowNq7pZdRVowwtvBR/hi2LSP5srtctKkRT33T6/n8Kv1UGp7JW4A==
 
 coffee-script@^1.10.0:
   version "1.12.7"
