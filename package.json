@@ -101,7 +101,7 @@
     "chardet": "^1.4.0",
     "chart.js": "^2.7.0",
     "clsx": "^1.1.1",
-    "codemirror": "~5.64.0",
+    "codemirror": "~5.65.11",
     "core-js": "^3.19.3",
     "date-fns": "^2.29.3",
     "fast-json-patch": "^3.1.0",
