@@ -53,7 +53,7 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 	}
 
 	isServerMetricsDetected := endpoint.Kubernetes.Flags.IsServerMetricsDetected
-	if !isServerMetricsDetected && handler.K8sClientFactory != nil {
+	if endpointutils.IsKubernetesEndpoint(endpoint) && !isServerMetricsDetected && handler.K8sClientFactory != nil {
 		endpointutils.InitialMetricsDetection(
 			endpoint,
 			handler.DataStore.Endpoint(),
