@@ -15,6 +15,7 @@ import { Input } from '@@/form-components/Input';
 import { TextTip } from '@@/Tip/TextTip';
 
 import { FormValues } from './types';
+import './ScheduledTimeField.module.css';
 
 interface Props {
   disabled?: boolean;
@@ -38,12 +39,8 @@ export function ScheduledTimeField({ disabled }: Props) {
             format="y-MM-dd HH:mm:ss"
             className="form-control [&>div]:border-0"
             onChange={(date) => {
-              let dateToSave = date;
-              // handle clear button
-              if (!date) {
-                dateToSave = new Date(Date.now() + 24 * 60 * 60 * 1000);
-              }
-
+              const dateToSave =
+                date || new Date(Date.now() + 24 * 60 * 60 * 1000);
               setValue(isoDate(dateToSave.valueOf()));
             }}
             name={name}
