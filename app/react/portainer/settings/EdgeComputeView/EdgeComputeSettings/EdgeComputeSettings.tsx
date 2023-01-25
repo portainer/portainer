@@ -28,9 +28,6 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   const initialValues: FormValues = {
     EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
     EdgePortainerUrl: settings.EdgePortainerUrl,
-    Edge: {
-      TunnelServerAddress: settings.Edge.TunnelServerAddress,
-    },
     EdgeAgentCheckinInterval: settings.EdgeAgentCheckinInterval,
     EnforceEdgeID: settings.EnforceEdgeID,
   };
