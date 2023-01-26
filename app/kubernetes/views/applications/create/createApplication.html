@@ -35,8 +35,19 @@
   ng-if="ctrl.stack.IsComposeFormat"
   title="'View application'"
   breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    {
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool',
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
     { label:'Applications', link:'kubernetes.applications' },
-     'View application'
+    {
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application',
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'View',
      ]"
   reload="true"
 >

@@ -9,13 +9,19 @@
       <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no available deployment types when there is more than one type of environment in your edge group
       selection (e.g. Kubernetes and Docker environments). Please select edge groups that have environments of the same type.
     </p>
+    <p class="col-sm-12 vertical-center help-block small text-warning" ng-if="$ctrl.model.DeploymentType === $ctrl.EditorType.Compose && $ctrl.hasKubeEndpoint()">
+      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Edge groups with kubernetes environments no longer support compose deployment types in Portainer. Please select
+      edge groups that only have docker environments when using compose deployment types.
+    </p>
   </div>
 
   <edge-stack-deployment-type-selector
+    allow-kube-to-select-compose="$ctrl.allowKubeToSelectCompose"
     value="$ctrl.model.DeploymentType"
     has-docker-endpoint="$ctrl.hasDockerEndpoint()"
     has-kube-endpoint="$ctrl.hasKubeEndpoint()"
     on-change="($ctrl.onChangeDeploymentType)"
+    read-only="$ctrl.state.readOnlyCompose"
   ></edge-stack-deployment-type-selector>
 
   <div class="flex gap-1 text-muted small" ng-show="!$ctrl.model.DeploymentType && $ctrl.hasKubeEndpoint()">
@@ -89,8 +95,8 @@
     <div class="col-sm-12">
       <button
         type="button"
-        class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !$ctrl.isFormValid()"
+        class="btn btn-primary btn-sm !ml-0"
+        ng-disabled="$ctrl.actionInProgress || !$ctrl.isFormValid() || (!$ctrl.model.DeploymentType && $ctrl.hasKubeEndpoint())"
         ng-click="$ctrl.submitAction()"
         button-spinner="$ctrl.actionInProgress"
       >
