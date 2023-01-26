@@ -155,7 +155,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
           >
             <div className="flex gap-4">
               <SearchBar
-                className="!bg-transparent !m-0"
+                className="!bg-transparent !m-0 !min-w-[350px]"
                 value={searchBarValue}
                 onChange={setSearchBarValue}
                 placeholder="Search by name, group, tag, status, URL..."
