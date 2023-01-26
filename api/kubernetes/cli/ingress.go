@@ -164,7 +164,7 @@ func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInf
 	if ingress.Labels == nil {
 		ingress.Labels = make(map[string]string)
 	}
-	ingress.Labels["io.portainer.kubernetes.application.owner"] = stackutils.SanitizeLabel(owner)
+	ingress.Labels["io.portainer.kubernetes.ingress.owner"] = stackutils.SanitizeLabel(owner)
 
 	// Store TLS information.
 	var tls []netv1.IngressTLS

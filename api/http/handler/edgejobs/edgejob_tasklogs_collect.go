@@ -66,5 +66,16 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 		return httperror.InternalServerError("Unable to persist Edge job changes in the database", err)
 	}
 
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve environment from the database", err)
+	}
+
+	if endpoint.Edge.AsyncMode {
+		return httperror.BadRequest("Async Edge Endpoints are not supported in Portainer CE", nil)
+	}
+
+	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+
 	return response.Empty(w)
 }

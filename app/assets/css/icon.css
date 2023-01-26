@@ -121,11 +121,6 @@ pr-icon {
   width: 20px;
 }
 
-.icon-container {
-  display: flex;
-  align-items: center;
-}
-
 .btn-only-icon {
   padding: 6px;
 }

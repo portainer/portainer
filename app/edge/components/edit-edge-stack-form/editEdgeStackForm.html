@@ -4,30 +4,36 @@
     <div class="col-sm-12">
       <edge-groups-selector value="$ctrl.model.EdgeGroups" items="$ctrl.edgeGroups" on-change="($ctrl.onChangeGroups)"></edge-groups-selector>
     </div>
-  </div>
 
-  <div class="form-group" ng-if="!$ctrl.validateEndpointsForDeployment()">
-    <div class="col-sm-12">
-      <div class="small text-muted space-right text-warning">
-        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-        One or more of the selected Edge group contains Edge Docker endpoints that cannot be used with a Kubernetes Edge stack.
-      </div>
-    </div>
+    <p class="col-sm-12 vertical-center help-block small text-warning" ng-if="$ctrl.model.DeploymentType === undefined">
+      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no available deployment types when there is more than one type of environment in your edge group
+      selection (e.g. Kubernetes and Docker environments). Please select edge groups that have environments of the same type.
+    </p>
   </div>
 
   <edge-stack-deployment-type-selector
     value="$ctrl.model.DeploymentType"
-    has-docker-endpoint="$ctrl.hasDockerEndpoint"
+    has-docker-endpoint="$ctrl.hasDockerEndpoint()"
+    has-kube-endpoint="$ctrl.hasKubeEndpoint()"
     on-change="($ctrl.onChangeDeploymentType)"
   ></edge-stack-deployment-type-selector>
 
-  <div class="form-group" ng-if="$ctrl.model.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
-    <div class="col-sm-12">
-      <div class="small text-muted space-right">
-        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-        Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all the
-        Compose format options are supported by Kompose at the moment.
-      </div>
+  <div class="flex gap-1 text-muted small" ng-show="!$ctrl.model.DeploymentType && $ctrl.hasKubeEndpoint()">
+    <pr-icon icon="'alert-circle'" mode="'warning'" class-name="'!mt-1'"></pr-icon>
+    <div>
+      <p>
+        Portainer no longer supports <a href="https://docs.docker.com/compose/compose-file/" target="_blank">docker-compose</a> format manifests for Kubernetes deployments, and we
+        have removed the <a href="https://kompose.io/" target="_blank">Kompose</a> conversion tool which enables this. The reason for this is because Kompose now poses a security
+        risk, since it has a number of Common Vulnerabilities and Exposures (CVEs).
+      </p>
+      <p
+        >Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and new pull requests
+        to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.</p
+      >
+      <p>
+        We advise installing your own instance of Kompose in a sandbox environment, performing conversions of your Docker Compose files to Kubernetes manifests and using those
+        manifests to set up applications.
+      </p>
     </div>
   </div>
 
@@ -38,6 +44,7 @@
     identifier="compose-editor"
     placeholder="# Define or paste the content of your docker compose file here"
     on-change="($ctrl.onChangeComposeConfig)"
+    read-only="$ctrl.hasKubeEndpoint()"
   >
     <editor-description>
       <div>

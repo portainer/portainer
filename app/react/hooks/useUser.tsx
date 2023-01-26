@@ -4,16 +4,14 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
-  useState,
   useMemo,
   PropsWithChildren,
 } from 'react';
 
 import { isAdmin } from '@/portainer/users/user.helpers';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { getUser } from '@/portainer/users/user.service';
-import { User, UserId } from '@/portainer/users/types';
+import { User } from '@/portainer/users/types';
+import { useUser as useLoadUser } from '@/portainer/users/queries/useUser';
 
 import { useLocalStorage } from './useLocalStorage';
 
@@ -24,7 +22,12 @@ interface State {
 export const UserContext = createContext<State | null>(null);
 UserContext.displayName = 'UserContext';
 
-export function useUser() {
+/**
+ * @deprecated use `useCurrentUser` instead
+ */
+export const useUser = useCurrentUser;
+
+export function useCurrentUser() {
   const context = useContext(UserContext);
 
   if (context === null) {
@@ -147,23 +150,19 @@ interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps) {
   const [jwt] = useLocalStorage('JWT', '');
-  const [user, setUser] = useState<User>();
 
-  useEffect(() => {
-    if (jwt !== '') {
-      const tokenPayload = jwtDecode(jwt) as { id: number };
+  const tokenPayload = useMemo(() => jwtDecode(jwt) as { id: number }, [jwt]);
 
-      loadUser(tokenPayload.id);
-    }
-  }, [jwt]);
+  const userQuery = useLoadUser(tokenPayload.id, {
+    staleTime: Infinity, // should reload te user details only on page load
+  });
 
-  const providerState = useMemo(() => ({ user }), [user]);
+  const providerState = useMemo(
+    () => ({ user: userQuery.data }),
+    [userQuery.data]
+  );
 
-  if (jwt === '') {
-    return null;
-  }
-
-  if (!providerState.user) {
+  if (jwt === '' || !providerState.user) {
     return null;
   }
 
@@ -172,9 +171,4 @@ export function UserProvider({ children }: UserProviderProps) {
       {children}
     </UserContext.Provider>
   );
-
-  async function loadUser(id: UserId) {
-    const user = await getUser(id);
-    setUser(user);
-  }
 }

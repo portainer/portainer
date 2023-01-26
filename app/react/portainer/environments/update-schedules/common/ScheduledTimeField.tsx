@@ -25,6 +25,10 @@ export function ScheduledTimeField({ disabled }: Props) {
 
   const dateValue = useMemo(() => parseIsoDate(value), [value]);
 
+  if (!value) {
+    return null;
+  }
+
   return (
     <FormControl label="Schedule date & time" errors={error}>
       {!disabled ? (
@@ -62,6 +66,10 @@ export function timeValidation() {
       (value) =>
         parseIsoDate(value).valueOf() > Date.now() - 24 * 60 * 60 * 1000
     );
+}
+
+export function defaultValue() {
+  return isoDate(Date.now() + 24 * 60 * 60 * 1000);
 }
 
 function isValidDate(date: Date) {

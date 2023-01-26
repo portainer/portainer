@@ -46,7 +46,7 @@ const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
   const { isAdmin } = useUser();
-  const { environmentId: currentEnvironmentId } = useStore(environmentStore);
+  const currentEnvStore = useStore(environmentStore);
 
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
@@ -140,110 +140,112 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
   return (
     <>
       {totalAvailable === 0 && <NoEnvironmentsInfoPanel isAdmin={isAdmin} />}
-      <div className="row">
-        <div className="col-sm-12">
-          <TableContainer>
-            <div className="px-4">
-              <TableTitle
-                className="!px-0"
-                icon={HardDrive}
-                label="Environments"
-                description={
-                  <div className="w-full text-sm text-gray-7">
-                    Click on an environment to manage
-                  </div>
-                }
-              >
-                <div className="flex gap-4">
-                  <SearchBar
-                    className="!bg-transparent !m-0"
-                    value={searchBarValue}
-                    onChange={setSearchBarValue}
-                    placeholder="Search by name, group, tag, status, URL..."
-                    data-cy="home-endpointsSearchInput"
-                  />
-                  {isAdmin && (
-                    <Button
-                      onClick={onRefresh}
-                      data-cy="home-refreshEndpointsButton"
-                      size="medium"
-                      color="light"
-                      icon={RefreshCcw}
-                      className="!m-0"
-                    >
-                      Refresh
-                    </Button>
-                  )}
-                  <KubeconfigButton
-                    environments={environments}
-                    envQueryParams={queryWithSort}
-                  />
 
-                  <AMTButton
-                    environments={environments}
-                    envQueryParams={queryWithSort}
-                  />
+      <TableContainer>
+        <div className="px-4">
+          <TableTitle
+            className="!px-0"
+            icon={HardDrive}
+            label="Environments"
+            description={
+              <div className="w-full text-sm text-gray-7">
+                Click on an environment to manage
+              </div>
+            }
+          >
+            <div className="flex gap-4">
+              <SearchBar
+                className="!bg-transparent !m-0 !min-w-[350px]"
+                value={searchBarValue}
+                onChange={setSearchBarValue}
+                placeholder="Search by name, group, tag, status, URL..."
+                data-cy="home-endpointsSearchInput"
+              />
+              {isAdmin && (
+                <Button
+                  onClick={onRefresh}
+                  data-cy="home-refreshEndpointsButton"
+                  size="medium"
+                  color="light"
+                  icon={RefreshCcw}
+                  className="!m-0"
+                >
+                  Refresh
+                </Button>
+              )}
+              <KubeconfigButton
+                environments={environments}
+                envQueryParams={queryWithSort}
+              />
 
-                  {updateAvailable && <UpdateBadge />}
-                </div>
-              </TableTitle>
-              <div className="-mt-3">
-                <EnvironmentListFilters
-                  setPlatformTypes={setPlatformTypes}
-                  platformTypes={platformTypes}
-                  setConnectionTypes={setConnectionTypes}
-                  connectionTypes={connectionTypes}
-                  statusOnChange={statusOnChange}
-                  statusState={statusState}
-                  tagOnChange={tagOnChange}
-                  tagState={tagState}
-                  groupOnChange={groupOnChange}
-                  groupState={groupState}
-                  setAgentVersions={setAgentVersions}
-                  agentVersions={agentVersions}
-                  clearFilter={clearFilter}
-                  sortOnchange={sortOnchange}
-                  sortOnDescending={sortOnDescending}
-                  sortByDescending={sortByDescending}
-                  sortByButton={sortByButton}
-                  sortByState={sortByState}
-                />
-              </div>
-              <div
-                className="blocklist !p-0 mt-5 !space-y-2"
-                data-cy="home-endpointList"
-              >
-                {renderItems(
-                  isLoading,
-                  totalCount,
-                  environments.map((env) => (
-                    <EnvironmentItem
-                      key={env.Id}
-                      environment={env}
-                      groupName={
-                        groupsQuery.data?.find((g) => g.Id === env.GroupId)
-                          ?.Name
-                      }
-                      onClickBrowse={() => onClickBrowse(env)}
-                      isActive={env.Id === currentEnvironmentId}
-                    />
-                  ))
-                )}
-              </div>
-              <TableFooter>
-                <PaginationControls
-                  showAll={totalCount <= 100}
-                  pageLimit={pageLimit}
-                  page={page}
-                  onPageChange={setPage}
-                  totalCount={totalCount}
-                  onPageLimitChange={setPageLimit}
-                />
-              </TableFooter>
+              <AMTButton
+                environments={environments}
+                envQueryParams={queryWithSort}
+              />
+
+              {updateAvailable && <UpdateBadge />}
             </div>
-          </TableContainer>
+          </TableTitle>
+          <div className="-mt-3">
+            <EnvironmentListFilters
+              setPlatformTypes={setPlatformTypes}
+              platformTypes={platformTypes}
+              setConnectionTypes={setConnectionTypes}
+              connectionTypes={connectionTypes}
+              statusOnChange={statusOnChange}
+              statusState={statusState}
+              tagOnChange={tagOnChange}
+              tagState={tagState}
+              groupOnChange={groupOnChange}
+              groupState={groupState}
+              setAgentVersions={setAgentVersions}
+              agentVersions={agentVersions}
+              clearFilter={clearFilter}
+              sortOnchange={sortOnchange}
+              sortOnDescending={sortOnDescending}
+              sortByDescending={sortByDescending}
+              sortByButton={sortByButton}
+              sortByState={sortByState}
+            />
+          </div>
+          <div
+            className="blocklist !p-0 mt-5 !space-y-2"
+            data-cy="home-endpointList"
+          >
+            {renderItems(
+              isLoading,
+              totalCount,
+              environments.map((env) => (
+                <EnvironmentItem
+                  key={env.Id}
+                  environment={env}
+                  groupName={
+                    groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
+                  }
+                  onClickBrowse={() => onClickBrowse(env)}
+                  onClickDisconnect={() =>
+                    env.Id === currentEnvStore.environmentId
+                      ? currentEnvStore.clear()
+                      : null
+                  }
+                  isActive={env.Id === currentEnvStore.environmentId}
+                />
+              ))
+            )}
+          </div>
+          <TableFooter>
+            <PaginationControls
+              className="!mr-0"
+              showAll={totalCount <= 100}
+              pageLimit={pageLimit}
+              page={page}
+              onPageChange={setPage}
+              totalCount={totalCount}
+              onPageLimitChange={setPageLimit}
+            />
+          </TableFooter>
         </div>
-      </div>
+      </TableContainer>
     </>
   );
 

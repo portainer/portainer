@@ -1,16 +1,23 @@
 .wizard-list-wrapper {
   display: grid;
-  grid-template-columns: 50px 1fr;
+  grid-template-columns: 50px 1fr 70px;
   grid-template-areas:
-    'image title'
-    'image subtitle'
-    'image type';
+    'image title title'
+    'image subtitle edgeStatus'
+    'image type type';
   border: 1px solid rgb(221, 221, 221);
   border-radius: 5px;
   margin-bottom: 10px;
   margin-top: 3px;
   padding: 10px;
   box-shadow: 0 3px 10px -2px rgb(161 170 166 / 20%);
+}
+
+.wizard-list-edge-status {
+  grid-area: edgeStatus;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .wizard-list-image {

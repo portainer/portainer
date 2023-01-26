@@ -25,14 +25,10 @@ export function InformationPanel({
           <WidgetBody className={bodyClassName}>
             <div style={wrapperStyle}>
               {title && (
-                <div className="col-sm-12 form-section-title">
-                  <span style={{ float: 'left' }}>{title}</span>
+                <div className="form-section-title">
+                  <span>{title}</span>
                   {!!onDismiss && (
-                    <span
-                      className="small"
-                      style={{ float: 'right' }}
-                      ng-if="dismissAction"
-                    >
+                    <span className="small" style={{ float: 'right' }}>
                       <Button color="link" icon={X} onClick={() => onDismiss()}>
                         dismiss
                       </Button>

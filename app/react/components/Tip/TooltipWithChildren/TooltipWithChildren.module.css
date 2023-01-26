@@ -25,6 +25,10 @@
   font-size: 12px !important;
 }
 
+.tooltip-message a {
+  color: var(--blue-15) !important;
+}
+
 .tooltip-heading {
   font-weight: 500;
 }
