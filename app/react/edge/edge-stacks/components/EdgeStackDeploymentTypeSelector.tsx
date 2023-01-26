@@ -12,6 +12,7 @@ interface Props {
   onChange(value: number): void;
   hasDockerEndpoint: boolean;
   hasKubeEndpoint: boolean;
+  allowKubeToSelectCompose?: boolean;
 }
 
 export function EdgeStackDeploymentTypeSelector({
@@ -19,12 +20,13 @@ export function EdgeStackDeploymentTypeSelector({
   onChange,
   hasDockerEndpoint,
   hasKubeEndpoint,
+  allowKubeToSelectCompose,
 }: Props) {
   const deploymentOptions: BoxSelectorOption<number>[] = [
     {
       ...compose,
       value: EditorType.Compose,
-      disabled: () => hasKubeEndpoint,
+      disabled: () => (allowKubeToSelectCompose ? false : hasKubeEndpoint),
       tooltip: () =>
         hasKubeEndpoint
           ? 'Cannot use this option with Edge Kubernetes environments'

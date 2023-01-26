@@ -4,10 +4,15 @@ import { EnvironmentType } from '@/react/portainer/environments/types';
 
 import { EditorType } from './types';
 
-export function getValidEditorTypes(endpointTypes: EnvironmentType[]) {
+export function getValidEditorTypes(
+  endpointTypes: EnvironmentType[],
+  allowKubeToSelectCompose?: boolean
+) {
   const right: Partial<Record<EnvironmentType, EditorType[]>> = {
     [EnvironmentType.EdgeAgentOnDocker]: [EditorType.Compose],
-    [EnvironmentType.EdgeAgentOnKubernetes]: [EditorType.Kubernetes],
+    [EnvironmentType.EdgeAgentOnKubernetes]: allowKubeToSelectCompose
+      ? [EditorType.Kubernetes, EditorType.Compose]
+      : [EditorType.Kubernetes],
   };
 
   return endpointTypes.length
