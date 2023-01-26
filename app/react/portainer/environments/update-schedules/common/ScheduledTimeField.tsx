@@ -15,7 +15,6 @@ import { Input } from '@@/form-components/Input';
 import { TextTip } from '@@/Tip/TextTip';
 
 import { FormValues } from './types';
-import './ScheduledTimeField.module.css';
 
 interface Props {
   disabled?: boolean;
