@@ -416,7 +416,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 		Version:        57,
 	}
 
-	handler.ReverseTunnelService.AddEdgeJob(endpoint.ID, &edgeJob)
+	handler.ReverseTunnelService.AddEdgeJob(&endpoint, &edgeJob)
 
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
 	if err != nil {

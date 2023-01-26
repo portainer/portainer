@@ -160,8 +160,6 @@ export interface PublicSettingsResponse {
   RequiredPasswordLength: number;
   /** Deployment options for encouraging deployment as code (only on BE) */
   GlobalDeploymentOptions: GlobalDeploymentOptions;
-  /** Show the Kompose build option (discontinued in 2.18) */
-  ShowKomposeBuildOption: boolean;
   /** Whether edge compute features are enabled */
   EnableEdgeComputeFeatures: boolean;
   /** Supported feature flags */

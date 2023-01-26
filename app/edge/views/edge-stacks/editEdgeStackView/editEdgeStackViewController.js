@@ -59,7 +59,11 @@ export class EditEdgeStackViewController {
   }
 
   async uiCanExit() {
-    if (this.formValues.StackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== this.oldFileContent.replace(/(\r\n|\n|\r)/gm, '') && this.state.isEditorDirty) {
+    if (
+      this.formValues.StackFileContent &&
+      this.formValues.StackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== this.oldFileContent.replace(/(\r\n|\n|\r)/gm, '') &&
+      this.state.isEditorDirty
+    ) {
       return this.ModalService.confirmWebEditorDiscard();
     }
   }

@@ -1,6 +1,8 @@
 import _ from 'lodash-es';
+
 import { UserTokenModel, UserViewModel } from '@/portainer/models/user';
-import { getUser, getUsers } from '@/portainer/users/user.service';
+import { getUsers } from '@/portainer/users/user.service';
+import { getUser } from '@/portainer/users/queries/useUser';
 
 import { TeamMembershipModel } from '../../models/teamMembership';
 
@@ -15,8 +17,8 @@ export function UserService($q, Users, TeamService, TeamMembershipService) {
     return users.map((u) => new UserViewModel(u));
   };
 
-  service.user = async function (includeAdministrators) {
-    const user = await getUser(includeAdministrators);
+  service.user = async function (userId) {
+    const user = await getUser(userId);
 
     return new UserViewModel(user);
   };
