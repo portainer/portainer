@@ -147,13 +147,6 @@ func (service *Service) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc
 	defer service.mu.Unlock()
 
 	return service.connection.UpdateObjectFunc(BucketName, id, edgeStack, func() {
-		prevEndpoints := make(map[portainer.EndpointID]struct{}, len(edgeStack.Status))
-		for endpointID := range edgeStack.Status {
-			if _, ok := edgeStack.Status[endpointID]; !ok {
-				prevEndpoints[endpointID] = struct{}{}
-			}
-		}
-
 		updateFunc(edgeStack)
 
 		service.idxVersion[ID] = edgeStack.Version
