@@ -14,13 +14,12 @@ export function withReactQuery<T>(
   function WrapperComponent(props: T) {
     return (
       <QueryClientProvider client={queryClient}>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <WrappedComponent {...props} />
       </QueryClientProvider>
     );
   }
 
-  WrapperComponent.displayName = displayName;
+  WrapperComponent.displayName = `withReactQuery(${displayName})`;
 
   return WrapperComponent;
 }
