@@ -1,6 +1,6 @@
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EditorType } from '@/react/edge/edge-stacks/types';
-
+import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
 export class EditEdgeStackFormController {
   /* @ngInject */
   constructor($scope) {
@@ -57,6 +57,15 @@ export class EditEdgeStackFormController {
   checkEndpointTypes(groups) {
     const edgeGroups = groups.map((id) => this.edgeGroups.find((e) => e.Id === id));
     this.state.endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
+    this.selectValidDeploymentType();
+  }
+
+  selectValidDeploymentType() {
+    const validTypes = getValidEditorTypes(this.state.endpointTypes);
+
+    if (!validTypes.includes(this.model.DeploymentType)) {
+      this.onChangeDeploymentType(validTypes[0]);
+    }
   }
 
   removeLineBreaks(value) {
@@ -81,9 +90,10 @@ export class EditEdgeStackFormController {
   }
 
   onChangeDeploymentType(deploymentType) {
-    this.model.DeploymentType = deploymentType;
-
-    this.model.StackFileContent = this.fileContents[deploymentType];
+    return this.$scope.$evalAsync(() => {
+      this.model.DeploymentType = deploymentType;
+      this.model.StackFileContent = this.fileContents[deploymentType];
+    });
   }
 
   validateEndpointsForDeployment() {
@@ -92,5 +102,6 @@ export class EditEdgeStackFormController {
 
   $onInit() {
     this.checkEndpointTypes(this.model.EdgeGroups);
+    this.fileContents[this.model.DeploymentType] = this.model.StackFileContent;
   }
 }

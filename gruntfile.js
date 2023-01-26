@@ -29,7 +29,6 @@ module.exports = function (grunt) {
       dockerVersion: 'v20.10.21',
       dockerComposePluginVersion: 'v2.13.0',
       helmVersion: 'v3.9.3',
-      komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.24.1',
     },
     env: gruntConfig.env,
@@ -78,7 +77,6 @@ module.exports = function (grunt) {
       `shell:download_docker_binary:${platform}:${a}`,
       `shell:download_docker_compose_binary:${platform}:${a}`,
       `shell:download_helm_binary:${platform}:${a}`,
-      `shell:download_kompose_binary:${platform}:${a}`,
       `shell:download_kubectl_binary:${platform}:${a}`,
     ]);
   });
@@ -117,7 +115,6 @@ gruntConfig.shell = {
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
   download_docker_binary: { command: shell_download_docker_binary },
   download_helm_binary: { command: shell_download_helm_binary },
-  download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
   download_docker_compose_binary: { command: shell_download_docker_compose_binary },
   run_container: { command: shell_run_container },
@@ -224,18 +221,6 @@ function shell_download_helm_binary(platform, arch) {
     echo "helm binary exists";
     else
       build/download_helm_binary.sh ${platform} ${arch} ${binaryVersion};
-    fi
-  `;
-}
-
-function shell_download_kompose_binary(platform, arch) {
-  const binaryVersion = '<%= binaries.komposeVersion %>';
-
-  return `
-    if [ -f dist/kompose ] || [ -f dist/kompose.exe ]; then
-      echo "kompose binary exists";
-    else
-      build/download_kompose_binary.sh ${platform} ${arch} ${binaryVersion};
     fi
   `;
 }
