@@ -67,7 +67,12 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		return httperror.InternalServerError("Unable to clear log file from disk", err)
 	}
 
-	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+	if err != nil {
+		return httperror.NotFound("Unable to retrieve environment from the database", err)
+	}
+
+	handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 	if err != nil {

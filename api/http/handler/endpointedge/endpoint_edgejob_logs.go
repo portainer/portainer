@@ -74,7 +74,7 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 
-	handler.ReverseTunnelService.AddEdgeJob(endpoint.ID, edgeJob)
+	handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist edge job changes to the database", err)

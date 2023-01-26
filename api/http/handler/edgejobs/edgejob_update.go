@@ -212,7 +212,12 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 	maps.Copy(endpointsFromGroupsToAddMap, edgeJob.Endpoints)
 
 	for endpointID := range endpointsFromGroupsToAddMap {
-		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return err
+		}
+
+		handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 	}
 
 	for endpointID := range endpointsToRemove {

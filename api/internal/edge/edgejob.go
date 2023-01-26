@@ -14,7 +14,12 @@ func LoadEdgeJobs(dataStore dataservices.DataStore, reverseTunnelService portain
 
 	for _, edgeJob := range edgeJobs {
 		for endpointID := range edgeJob.Endpoints {
-			reverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
+			endpoint, err := dataStore.Endpoint().Endpoint(endpointID)
+			if err != nil {
+				return err
+			}
+
+			reverseTunnelService.AddEdgeJob(endpoint, &edgeJob)
 		}
 	}
 
