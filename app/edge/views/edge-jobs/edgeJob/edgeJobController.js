@@ -154,6 +154,7 @@ export class EdgeJobController {
       this.tags = tags;
 
       this.edgeJob.EdgeGroups = this.edgeJob.EdgeGroups ? this.edgeJob.EdgeGroups : [];
+      this.edgeJob.Endpoints = this.edgeJob.Endpoints ? this.edgeJob.Endpoints : [];
 
       if (results.length > 0) {
         const endpointIds = _.map(results, (result) => result.EndpointId);
