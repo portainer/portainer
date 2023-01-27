@@ -192,7 +192,10 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stack.NumDeployments = len(relatedEndpointIds)
-	stack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+
+	if versionUpdated {
+		stack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+	}
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
