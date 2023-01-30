@@ -52,5 +52,6 @@ export const componentsModule = angular
       'onChange',
       'hasDockerEndpoint',
       'hasKubeEndpoint',
+      'allowKubeToSelectCompose',
     ])
   ).name;
