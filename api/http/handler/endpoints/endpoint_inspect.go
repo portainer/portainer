@@ -61,6 +61,15 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 		)
 	}
 
+	isServerStorageDetected := endpoint.Kubernetes.Flags.IsServerStorageDetected
+	if !isServerStorageDetected && handler.K8sClientFactory != nil {
+		endpointutils.InitialStorageDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
+	}
+
 	return response.JSON(w, endpoint)
 }
 
