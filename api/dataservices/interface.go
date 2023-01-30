@@ -126,6 +126,7 @@ type (
 		EndpointRelation(EndpointID portainer.EndpointID) (*portainer.EndpointRelation, error)
 		Create(endpointRelation *portainer.EndpointRelation) error
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
+		UpdateEndpointRelationFunc(EndpointID portainer.EndpointID, updateFunc func(*portainer.EndpointRelation)) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
 		BucketName() string
 	}

@@ -94,15 +94,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		for endpointID := range endpointsToRemove {
-			relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
-			if err != nil {
+			err = handler.DataStore.EndpointRelation().UpdateEndpointRelationFunc(endpointID, func(relation *portainer.EndpointRelation) {
+				delete(relation.EdgeStacks, stack.ID)
+			})
+			if handler.DataStore.IsErrObjectNotFound(err) {
 				return httperror.InternalServerError("Unable to find environment relation in database", err)
-			}
-
-			delete(relation.EdgeStacks, stack.ID)
-
-			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
-			if err != nil {
+			} else if err != nil {
 				return httperror.InternalServerError("Unable to persist environment relation in database", err)
 			}
 		}
@@ -114,15 +111,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		for endpointID := range endpointsToAdd {
-			relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
-			if err != nil {
+			err = handler.DataStore.EndpointRelation().UpdateEndpointRelationFunc(endpointID, func(relation *portainer.EndpointRelation) {
+				relation.EdgeStacks[stack.ID] = true
+			})
+			if handler.DataStore.IsErrObjectNotFound(err) {
 				return httperror.InternalServerError("Unable to find environment relation in database", err)
-			}
-
-			relation.EdgeStacks[stack.ID] = true
-
-			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
-			if err != nil {
+			} else if err != nil {
 				return httperror.InternalServerError("Unable to persist environment relation in database", err)
 			}
 		}

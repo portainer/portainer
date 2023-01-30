@@ -78,13 +78,25 @@ func (service *Service) Create(endpointRelation *portainer.EndpointRelation) err
 	return err
 }
 
-// UpdateEndpointRelation updates an Environment(Endpoint) relation object
+// Deprecated: Use UpdateEndpointRelationFunc instead.
 func (service *Service) UpdateEndpointRelation(endpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	identifier := service.connection.ConvertToKey(int(endpointID))
 	err := service.connection.UpdateObject(BucketName, identifier, endpointRelation)
 	cache.Del(endpointID)
 
 	return err
+}
+
+// UpdateEndpointRelationFunc updates an Environment(Endpoint) relation object
+func (service *Service) UpdateEndpointRelationFunc(endpointID portainer.EndpointID, updateFunc func(endpointRelation *portainer.EndpointRelation)) error {
+	id := service.connection.ConvertToKey(int(endpointID))
+	endpointRelation := &portainer.EndpointRelation{}
+
+	return service.connection.UpdateObjectFunc(BucketName, id, endpointRelation, func() {
+		updateFunc(endpointRelation)
+
+		cache.Del(endpointID)
+	})
 }
 
 // DeleteEndpointRelation deletes an Environment(Endpoint) relation object

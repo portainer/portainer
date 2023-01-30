@@ -38,17 +38,14 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	var edgeStack *portainer.EdgeStack
+	err = handler.DataStore.EdgeStack().UpdateEdgeStackFunc(portainer.EdgeStackID(stackID), func(stack *portainer.EdgeStack) {
+		delete(stack.Status, endpoint.ID)
+		edgeStack = stack
+	})
 	if err != nil {
-		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
+		return handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
 	}
 
-	delete(stack.Status, endpoint.ID)
-
-	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
-	if err != nil {
-		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
-	}
-
-	return response.JSON(w, stack)
+	return response.JSON(w, edgeStack)
 }
