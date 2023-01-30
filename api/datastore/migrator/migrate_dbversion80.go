@@ -16,6 +16,10 @@ func (m *Migrator) migrateDBVersionToDB80() error {
 		return err
 	}
 
+	if err := m.updateExistingEndpointsToNotDetectStorageAPIForDB80(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -30,6 +34,27 @@ func (m *Migrator) updateExistingEndpointsToNotDetectMetricsAPIForDB80() error {
 	for _, endpoint := range endpoints {
 		if endpointutils.IsKubernetesEndpoint(&endpoint) {
 			endpoint.Kubernetes.Flags.IsServerMetricsDetected = true
+			err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (m *Migrator) updateExistingEndpointsToNotDetectStorageAPIForDB80() error {
+	log.Info().Msg("updating existing endpoints to not detect metrics API for existing endpoints (k8s)")
+
+	endpoints, err := m.endpointService.Endpoints()
+	if err != nil {
+		return err
+	}
+
+	for _, endpoint := range endpoints {
+		if endpointutils.IsKubernetesEndpoint(&endpoint) {
+			endpoint.Kubernetes.Flags.IsServerStorageDetected = true
 			err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 			if err != nil {
 				return err
