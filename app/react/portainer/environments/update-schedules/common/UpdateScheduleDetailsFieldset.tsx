@@ -3,11 +3,9 @@ import semverCompare from 'semver-compare';
 import _ from 'lodash';
 import { useEffect } from 'react';
 
-import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
-import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
-
 import { TextTip } from '@@/Tip/TextTip';
 
+import { useEnvironments } from './useEnvironments';
 import { FormValues } from './types';
 import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
 import { VersionSelect } from './VersionSelect';
@@ -29,14 +27,15 @@ export function UpdateScheduleDetailsFieldset() {
   // old version is version that doesn't support scheduling of updates
   const hasNoTimeZone = environments.some((env) => !env.LocalTimeZone);
   const hasTimeZone = environments.some((env) => env.LocalTimeZone);
+  const hasGroupSelected = values.groupIds.length > 0;
 
   useEffect(() => {
-    if (!hasTimeZone) {
+    if (!hasTimeZone || !hasGroupSelected) {
       setFieldValue('scheduledTime', '');
     } else if (!values.scheduledTime) {
       setFieldValue('scheduledTime', defaultValue());
     }
-  }, [setFieldValue, hasTimeZone, values.scheduledTime]);
+  }, [setFieldValue, hasTimeZone, values.scheduledTime, hasGroupSelected]);
 
   return (
     <>
@@ -55,7 +54,7 @@ export function UpdateScheduleDetailsFieldset() {
 
       <VersionSelect minVersion={minVersion} />
 
-      {hasTimeZone && <ScheduledTimeField />}
+      {hasTimeZone && hasGroupSelected && <ScheduledTimeField />}
       {hasNoTimeZone && (
         <TextTip>
           These edge groups have older versions of the edge agent that do not
@@ -64,15 +63,4 @@ export function UpdateScheduleDetailsFieldset() {
       )}
     </>
   );
-}
-
-function useEnvironments(environmentsIds: Array<EnvironmentId>) {
-  const environmentsQuery = useEnvironmentList(
-    { endpointIds: environmentsIds, types: EdgeTypes },
-    undefined,
-    undefined,
-    environmentsIds.length > 0
-  );
-
-  return environmentsQuery.environments;
 }
