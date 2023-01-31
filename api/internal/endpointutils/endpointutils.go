@@ -1,7 +1,9 @@
 package endpointutils
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -127,17 +129,21 @@ func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService datas
 	}
 }
 
-func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
+func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) error {
 	cli, err := factory.GetKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create Kubernetes client for initial storage detection")
-		return
+		return err
 	}
 
 	storage, err := cli.GetStorage()
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to fetch storage classes: leaving storage classes disabled")
-		return
+		return err
+	}
+	if len(storage) == 0 {
+		log.Info().Err(err).Msg("zero storage classes found: they may be still building, retrying in 30 seconds")
+		return fmt.Errorf("zero storage classes found: they may be still building, retrying in 30 seconds")
 	}
 	endpoint.Kubernetes.Configuration.StorageClasses = storage
 	err = endpointService.UpdateEndpoint(
@@ -146,6 +152,23 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 	)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to enable storage class inside the database")
+		return err
+	}
+	return nil
+}
+
+func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
+	log.Info().Msg("attempting to detect storage classes in the cluster")
+	err := storageDetect(endpoint, endpointService, factory)
+	if err == nil {
 		return
 	}
+	log.Err(err).Msg("error while detecting storage classes")
+	go func() {
+		// Retry after 30 seconds if the initial detection failed.
+		log.Info().Msg("retrying storage detection in 30 seconds")
+		time.Sleep(30 * time.Second)
+		err := storageDetect(endpoint, endpointService, factory)
+		log.Err(err).Msg("final error while detecting storage classes")
+	}()
 }
