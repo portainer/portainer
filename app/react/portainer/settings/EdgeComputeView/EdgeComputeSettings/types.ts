@@ -3,7 +3,4 @@ export interface FormValues {
   EdgePortainerUrl: string;
   EnforceEdgeID: boolean;
   EdgeAgentCheckinInterval: number;
-  Edge: {
-    TunnelServerAddress: string;
-  };
 }
