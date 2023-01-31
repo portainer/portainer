@@ -622,7 +622,7 @@ func TestUpdateAndInspect(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(data.EdgeGroups, payload.EdgeGroups) {
-		t.Fatalf("expected EdgeGroups to be equal")
+		t.Fatal("expected EdgeGroups to be equal")
 	}
 }
 
