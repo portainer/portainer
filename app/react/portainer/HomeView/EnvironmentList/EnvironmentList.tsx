@@ -153,7 +153,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
               </div>
             }
           >
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <SearchBar
                 className="!bg-transparent !m-0 !min-w-[350px]"
                 value={searchBarValue}
