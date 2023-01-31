@@ -55,13 +55,13 @@ const (
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid environment name")
+		return errors.New("invalid environment name")
 	}
 	payload.Name = name
 
 	endpointCreationType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointCreationType", false)
 	if err != nil || endpointCreationType == 0 {
-		return errors.New("Invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
+		return errors.New("invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
 	}
 	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
 
@@ -74,7 +74,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	var tagIDs []portainer.TagID
 	err = request.RetrieveMultiPartFormJSONValue(r, "TagIds", &tagIDs, true)
 	if err != nil {
-		return errors.New("Invalid TagIds parameter")
+		return errors.New("invalid TagIds parameter")
 	}
 	payload.TagIDs = tagIDs
 	if payload.TagIDs == nil {
@@ -93,7 +93,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		if !payload.TLSSkipVerify {
 			caCert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
 			if err != nil {
-				return errors.New("Invalid CA certificate file. Ensure that the file is uploaded correctly")
+				return errors.New("invalid CA certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCACertFile = caCert
 		}
@@ -101,13 +101,13 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		if !payload.TLSSkipClientVerify {
 			cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 			if err != nil {
-				return errors.New("Invalid certificate file. Ensure that the file is uploaded correctly")
+				return errors.New("invalid certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCertFile = cert
 
 			key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
 			if err != nil {
-				return errors.New("Invalid key file. Ensure that the file is uploaded correctly")
+				return errors.New("invalid key file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSKeyFile = key
 		}
@@ -117,19 +117,19 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	case azureEnvironment:
 		azureApplicationID, err := request.RetrieveMultiPartFormValue(r, "AzureApplicationID", false)
 		if err != nil {
-			return errors.New("Invalid Azure application ID")
+			return errors.New("invalid Azure application ID")
 		}
 		payload.AzureApplicationID = azureApplicationID
 
 		azureTenantID, err := request.RetrieveMultiPartFormValue(r, "AzureTenantID", false)
 		if err != nil {
-			return errors.New("Invalid Azure tenant ID")
+			return errors.New("invalid Azure tenant ID")
 		}
 		payload.AzureTenantID = azureTenantID
 
 		azureAuthenticationKey, err := request.RetrieveMultiPartFormValue(r, "AzureAuthenticationKey", false)
 		if err != nil {
-			return errors.New("Invalid Azure authentication key")
+			return errors.New("invalid Azure authentication key")
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
 
@@ -146,7 +146,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	default:
 		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
-			return errors.New("Invalid environment URL")
+			return errors.New("invalid environment URL")
 		}
 		payload.URL = endpointURL
 
@@ -157,7 +157,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	gpus := make([]portainer.Pair, 0)
 	err = request.RetrieveMultiPartFormJSONValue(r, "Gpus", &gpus, true)
 	if err != nil {
-		return errors.New("Invalid Gpus parameter")
+		return errors.New("invalid Gpus parameter")
 	}
 	payload.Gpus = gpus
 
@@ -195,6 +195,9 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @param AzureAuthenticationKey formData string false "Azure authentication key. Required if environment(endpoint) type is set to 3"
 // @param TagIDs formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
 // @param EdgeCheckinInterval formData int false "The check in interval for edge agent (in seconds)"
+// @param EdgeTunnelServerAddress formData string true "URL or IP address that will be used to establish a reverse tunnel"
+// @param IsEdgeDevice formData bool false "Is Edge Device"
+// @param Gpus formData array false "List of GPUs"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
