@@ -134,7 +134,7 @@
       <button
         type="submit"
         class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid || (!$ctrl.model.Dynamic && !$ctrl.model.Endpoints.length) || ($ctrl.model.Dynamic && !$ctrl.model.TagIds.length)"
+        ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid"
         button-spinner="$ctrl.actionInProgress"
         data-cy="edgeGroupCreate-addGroupButton"
       >
