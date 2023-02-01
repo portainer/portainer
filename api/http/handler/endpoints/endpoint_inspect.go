@@ -52,22 +52,24 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	isServerMetricsDetected := endpoint.Kubernetes.Flags.IsServerMetricsDetected
-	if endpointutils.IsKubernetesEndpoint(endpoint) && !isServerMetricsDetected && handler.K8sClientFactory != nil {
-		endpointutils.InitialMetricsDetection(
-			endpoint,
-			handler.DataStore.Endpoint(),
-			handler.K8sClientFactory,
-		)
-	}
+	if endpointutils.IsKubernetesEndpoint(endpoint) {
+		isServerMetricsDetected := endpoint.Kubernetes.Flags.IsServerMetricsDetected
+		if !isServerMetricsDetected && handler.K8sClientFactory != nil {
+			endpointutils.InitialMetricsDetection(
+				endpoint,
+				handler.DataStore.Endpoint(),
+				handler.K8sClientFactory,
+			)
+		}
 
-	isServerStorageDetected := endpoint.Kubernetes.Flags.IsServerStorageDetected
-	if !isServerStorageDetected && handler.K8sClientFactory != nil {
-		endpointutils.InitialStorageDetection(
-			endpoint,
-			handler.DataStore.Endpoint(),
-			handler.K8sClientFactory,
-		)
+		isServerStorageDetected := endpoint.Kubernetes.Flags.IsServerStorageDetected
+		if !isServerStorageDetected && handler.K8sClientFactory != nil {
+			endpointutils.InitialStorageDetection(
+				endpoint,
+				handler.DataStore.Endpoint(),
+				handler.K8sClientFactory,
+			)
+		}
 	}
 
 	return response.JSON(w, endpoint)
