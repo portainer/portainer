@@ -16,8 +16,8 @@ export function TextTip({
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <p className="small flex items-center gap-1">
-      <Icon icon={icon} mode={getMode(color)} />
+    <p className="small inline-flex items-center gap-1">
+      <Icon icon={icon} mode={getMode(color)} className="shrink-0" />
 
       <span className="text-muted">{children}</span>
     </p>
