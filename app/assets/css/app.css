@@ -175,7 +175,7 @@ input[type='checkbox'] {
 
 .widget .widget-body table tbody td {
   white-space: normal;
-  word-break: break-word;
+  word-break: normal;
 }
 
 .widget .widget-body table.container-details-table > tbody > tr > td:first-child {
