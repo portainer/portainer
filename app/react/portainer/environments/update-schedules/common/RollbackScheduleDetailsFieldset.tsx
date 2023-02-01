@@ -1,11 +1,19 @@
 import { RollbackOptions } from './RollbackOptions';
 import { ScheduledTimeField } from './ScheduledTimeField';
 
-export function RollbackScheduleDetailsFieldset() {
+interface Props {
+  hasTimeZone: boolean;
+  hasGroupSelected: boolean;
+}
+
+export function RollbackScheduleDetailsFieldset({
+  hasTimeZone,
+  hasGroupSelected,
+}: Props) {
   return (
     <div className="mt-3">
       <RollbackOptions />
-      <ScheduledTimeField />
+      {hasTimeZone && hasGroupSelected && <ScheduledTimeField />}
     </div>
   );
 }
