@@ -26,7 +26,7 @@ func (m *Migrator) migrateDBVersionToDB70() error {
 			snapshot.Docker = &endpoint.Snapshots[len(endpoint.Snapshots)-1]
 		}
 
-		if len(endpoint.Kubernetes.Snapshots) > 0 {
+		if endpoint.Kubernetes != nil && len(endpoint.Kubernetes.Snapshots) > 0 {
 			snapshot.Kubernetes = &endpoint.Kubernetes.Snapshots[len(endpoint.Kubernetes.Snapshots)-1]
 		}
 
@@ -39,7 +39,10 @@ func (m *Migrator) migrateDBVersionToDB70() error {
 		// set to nil old fields
 		log.Info().Msg("deleting snapshot from endpoint")
 		endpoint.Snapshots = []portainer.DockerSnapshot{}
-		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+
+		if endpoint.Kubernetes != nil {
+			endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+		}
 
 		// update endpoint
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)

@@ -208,11 +208,17 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.15", m.migrateDBVersionToDB60)
 	m.addMigrations("2.16", m.migrateDBVersionToDB70)
 	m.addMigrations("2.16.1", m.migrateDBVersionToDB71)
-	m.addMigrations("2.17", m.migrateDBVersionToDB80)
-	m.addMigrations("2.18", m.migrateDBVersionToDB81)
 
-	// Add new migrations below...
-	// One function per migration, each versions migration funcs in the same file.
+	m.addMigrations("2.17",
+		m.updateEdgeStackStatusForDB80,
+		m.updateExistingEndpointsToNotDetectMetricsAPIForDB80,
+		m.updateExistingEndpointsToNotDetectStorageAPIForDB80,
+	)
+
+	m.addMigrations("2.18", m.updateEdgeStackStatusForDB81)
+
+	// Add new migrations above...
+	// One function per migration, each versions migration funcs in the same file, but called like above.
 }
 
 // Always is always run at the end of migrations

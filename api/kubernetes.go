@@ -1,7 +1,7 @@
 package portainer
 
-func KubernetesDefault() KubernetesData {
-	return KubernetesData{
+func KubernetesDefault() *KubernetesData {
+	return &KubernetesData{
 		Configuration: KubernetesConfiguration{
 			UseLoadBalancer:  false,
 			UseServerMetrics: false,

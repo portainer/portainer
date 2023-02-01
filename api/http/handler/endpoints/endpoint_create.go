@@ -319,14 +319,14 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 }
 
 func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	credentials := portainer.AzureCredentials{
+	credentials := &portainer.AzureCredentials{
 		ApplicationID:     payload.AzureApplicationID,
 		TenantID:          payload.AzureTenantID,
 		AuthenticationKey: payload.AzureAuthenticationKey,
 	}
 
 	httpClient := client.NewHTTPClient()
-	_, err := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
+	_, err := httpClient.ExecuteAzureAuthenticationRequest(credentials)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to authenticate against Azure", err)
 	}

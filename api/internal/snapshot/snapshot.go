@@ -133,6 +133,10 @@ func FillSnapshotData(dataStore dataservices.DataStore, endpoint *portainer.Endp
 		endpoint.Snapshots = []portainer.DockerSnapshot{}
 		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
 
+		if endpoint.Kubernetes != nil {
+			endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+		}
+
 		return nil
 	}
 
