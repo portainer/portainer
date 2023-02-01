@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Settings } from 'lucide-react';
 import { Formik, Form as FormikForm } from 'formik';
 import { useRouter } from '@uirouter/react';
@@ -25,13 +26,16 @@ import { defaultValue } from '../common/ScheduledTimeField';
 export default withLimitToBE(CreateView);
 
 function CreateView() {
-  const initialValues: FormValues = {
-    name: '',
-    groupIds: [],
-    type: ScheduleType.Update,
-    version: '',
-    scheduledTime: defaultValue(),
-  };
+  const initialValues = useMemo<FormValues>(
+    () => ({
+      name: '',
+      groupIds: [],
+      type: ScheduleType.Update,
+      version: '',
+      scheduledTime: defaultValue(),
+    }),
+    []
+  );
 
   const schedulesQuery = useList();
 
