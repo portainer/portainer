@@ -6,11 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	edgetypes "github.com/portainer/portainer/api/internal/edge/types"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // Service represents a service for managing edge stacks.
@@ -112,15 +114,12 @@ func (service *Service) updateEndpointRelations(edgeStackID portainer.EdgeStackI
 	endpointRelationService := service.dataStore.EndpointRelation()
 
 	for _, endpointID := range relatedEndpointIds {
-		relation, err := endpointRelationService.EndpointRelation(endpointID)
-		if err != nil {
+		err := endpointRelationService.UpdateEndpointRelationFunc(endpointID, func(relation *portainer.EndpointRelation) {
+			relation.EdgeStacks[edgeStackID] = true
+		})
+		if service.dataStore.IsErrObjectNotFound(err) {
 			return fmt.Errorf("unable to find endpoint relation in database: %w", err)
-		}
-
-		relation.EdgeStacks[edgeStackID] = true
-
-		err = endpointRelationService.UpdateEndpointRelation(endpointID, relation)
-		if err != nil {
+		} else if err != nil {
 			return fmt.Errorf("unable to persist endpoint relation in database: %w", err)
 		}
 	}
@@ -142,15 +141,15 @@ func (service *Service) DeleteEdgeStack(edgeStackID portainer.EdgeStackID, relat
 	}
 
 	for _, endpointID := range relatedEndpointIds {
-		relation, err := service.dataStore.EndpointRelation().EndpointRelation(endpointID)
-		if err != nil {
-			return errors.WithMessage(err, "Unable to find environment relation in database")
-		}
-
-		delete(relation.EdgeStacks, edgeStackID)
-
-		err = service.dataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
-		if err != nil {
+		service.dataStore.EndpointRelation().UpdateEndpointRelationFunc(endpointID, func(relation *portainer.EndpointRelation) {
+			delete(relation.EdgeStacks, edgeStackID)
+		})
+		if service.dataStore.IsErrObjectNotFound(err) {
+			log.Warn().
+				Int("endpoint_id", int(endpointID)).
+				Msg("Unable to find endpoint relation in database, skipping")
+			continue
+		} else if err != nil {
 			return errors.WithMessage(err, "Unable to persist environment relation in database")
 		}
 	}

@@ -277,6 +277,16 @@ func (s *stubEndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint *
 	return nil
 }
 
+func (s *stubEndpointRelationService) UpdateEndpointRelationFunc(ID portainer.EndpointID, updateFunc func(relation *portainer.EndpointRelation)) error {
+	for i, r := range s.relations {
+		if r.EndpointID == ID {
+			updateFunc(&s.relations[i])
+		}
+	}
+
+	return nil
+}
+
 func (s *stubEndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 	endpoints := []portainer.Endpoint{}
 

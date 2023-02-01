@@ -163,11 +163,6 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) updateEndpointStacks(endpointID portainer.EndpointID) error {
-	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
-	if err != nil {
-		return err
-	}
-
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return err
@@ -195,9 +190,9 @@ func (handler *Handler) updateEndpointStacks(endpointID portainer.EndpointID) er
 		edgeStackSet[edgeStackID] = true
 	}
 
-	relation.EdgeStacks = edgeStackSet
-
-	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
+	return handler.DataStore.EndpointRelation().UpdateEndpointRelationFunc(endpoint.ID, func(relation *portainer.EndpointRelation) {
+		relation.EdgeStacks = edgeStackSet
+	})
 }
 
 func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID, endpointID portainer.EndpointID, edgeJobs []portainer.EdgeJob, operation string) error {

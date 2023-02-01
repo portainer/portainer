@@ -106,11 +106,6 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 }
 
 func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) error {
-	endpointRelation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
-	if err != nil {
-		return err
-	}
-
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return err
@@ -121,9 +116,10 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 	for _, edgeStackID := range endpointStacks {
 		stacksSet[edgeStackID] = true
 	}
-	endpointRelation.EdgeStacks = stacksSet
 
-	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
+	return handler.DataStore.EndpointRelation().UpdateEndpointRelationFunc(endpoint.ID, func(relation *portainer.EndpointRelation) {
+		relation.EdgeStacks = stacksSet
+	})
 }
 
 func removeElement(slice []portainer.TagID, elem portainer.TagID) []portainer.TagID {

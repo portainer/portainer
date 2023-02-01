@@ -19,11 +19,6 @@ func (handler *Handler) updateEndpointRelations(endpoint *portainer.Endpoint, en
 		endpointGroup = unassignedGroup
 	}
 
-	endpointRelation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
-	if err != nil {
-		return err
-	}
-
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return err
@@ -39,7 +34,8 @@ func (handler *Handler) updateEndpointRelations(endpoint *portainer.Endpoint, en
 	for _, edgeStackID := range endpointStacks {
 		stacksSet[edgeStackID] = true
 	}
-	endpointRelation.EdgeStacks = stacksSet
 
-	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
+	return handler.DataStore.EndpointRelation().UpdateEndpointRelationFunc(endpoint.ID, func(relation *portainer.EndpointRelation) {
+		relation.EdgeStacks = stacksSet
+	})
 }
