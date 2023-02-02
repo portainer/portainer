@@ -7363,6 +7363,11 @@ clsx@^1.1.1:
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.1.1.tgz#98b3134f9abbdf23b2663491ace13c5c03a73188"
   integrity sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==
 
+clsx@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.2.1.tgz#0ddc4a20a549b59c93a4116bb26f5294ca17dc12"
+  integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
+
 co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
@@ -13267,20 +13272,10 @@ meow@^3.1.0:
     redent "^1.0.0"
     trim-newlines "^1.0.0"
 
-merge-class-names@^1.1.1:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/merge-class-names/-/merge-class-names-1.4.2.tgz#78d6d95ab259e7e647252a7988fd25a27d5a8835"
-  integrity sha512-bOl98VzwCGi25Gcn3xKxnR5p/WrhWFQB59MS/aGENcmUc6iSm96yrFDF0XSNurX9qN4LbJm0R9kfvsQ17i8zCw==
-
 merge-descriptors@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
   integrity sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=
-
-merge-refs@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/merge-refs/-/merge-refs-1.0.0.tgz#388348bce22e623782c6df9d3c4fc55888276120"
-  integrity sha512-WZ4S5wqD9FCR9hxkLgvcHJCBxzXzy3VVE6p8W2OzxRzB+hLRlcadGE2bW9xp2KSzk10rvp4y+pwwKO6JQVguMg==
 
 merge-stream@^2.0.0:
   version "2.0.0"
@@ -15497,14 +15492,14 @@ rc-util@^5.16.1, rc-util@^5.2.1, rc-util@^5.3.0, rc-util@^5.5.0:
     react-is "^16.12.0"
     shallowequal "^1.1.0"
 
-react-calendar@^3.3.1:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-3.7.0.tgz#951d56e91afb33b1c1e019cb790349fbffcc6894"
-  integrity sha512-zkK95zWLWLC6w3O7p3SHx/FJXEyyD2UMd4jr3CrKD+G73N+G5vEwrXxYQCNivIPoFNBjqoyYYGlkHA+TBDPLCw==
+react-calendar@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-4.0.0.tgz#99ad73dd0c7c5b25aa535a5fdeee3d71bfe45faa"
+  integrity sha512-y9Q5Oo3Mq869KExbOCP3aJ3hEnRZKZ0TqUa9QU1wJGgDZFrW1qTaWp5v52oZpmxTTrpAMTUcUGaC0QJcO1f8Nw==
   dependencies:
     "@wojtekmaj/date-utils" "^1.0.2"
+    clsx "^1.2.1"
     get-user-locale "^1.2.0"
-    merge-class-names "^1.1.1"
     prop-types "^15.6.0"
 
 react-clientside-effect@^1.2.6:
@@ -15514,47 +15509,46 @@ react-clientside-effect@^1.2.6:
   dependencies:
     "@babel/runtime" "^7.12.13"
 
-react-clock@^3.0.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/react-clock/-/react-clock-3.1.0.tgz#6fd9579e63597b85e50c22eb893eeb565d650d0e"
-  integrity sha512-KLV3pDBcETc7lHPPqK6EpRaPS8NA3STAes+zIdfr7IY67vYgYc3brOAnGC9IcgA4X4xNPnLZwwaLJXmHrQ/MnQ==
+react-clock@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-clock/-/react-clock-4.0.0.tgz#29d087159154d789c6c93048ae47534b7a7b3fbb"
+  integrity sha512-CBevN5B40TDUegSWzXk6bSwXhYzyerL9JGTme8GMAY0zO4FiEhVTGN1uzgC0rn/oSAMJw3M5wSf/OJpp9vcN2Q==
   dependencies:
     "@wojtekmaj/date-utils" "^1.0.0"
+    clsx "^1.2.1"
     get-user-locale "^1.4.0"
-    merge-class-names "^1.1.1"
     prop-types "^15.6.0"
 
-react-date-picker@^8.4.0:
-  version "8.4.0"
-  resolved "https://registry.yarnpkg.com/react-date-picker/-/react-date-picker-8.4.0.tgz#2d166bbaa59b08ec8686f671fde553458d19f8c8"
-  integrity sha512-zocntugDUyiHmV2Nq1qnsk4kDQuhBLUsDTz7akfIEJ0jVX925w0K5Ai5oZzWFNQOzXL/ITxafmDMuSbzlpBt/A==
+react-date-picker@^9.2.0:
+  version "9.2.0"
+  resolved "https://registry.yarnpkg.com/react-date-picker/-/react-date-picker-9.2.0.tgz#ee194a694fa9891d93e4d40e76fbcdae7eafbe86"
+  integrity sha512-kAE7HFLq1ic4pS0Pk9SyPTjejIfjTyPov04a2eZzLxfZh8ss8EPaaaX7bBUP4RUCkbxHpR0P4UHloD0/fFDCZw==
   dependencies:
     "@types/react-calendar" "^3.0.0"
     "@wojtekmaj/date-utils" "^1.0.3"
+    clsx "^1.2.1"
     get-user-locale "^1.2.0"
     make-event-props "^1.1.0"
-    merge-class-names "^1.1.1"
-    merge-refs "^1.0.0"
     prop-types "^15.6.0"
-    react-calendar "^3.3.1"
+    react-calendar "^4.0.0"
     react-fit "^1.4.0"
     update-input-width "^1.2.2"
 
-react-datetime-picker@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/react-datetime-picker/-/react-datetime-picker-3.5.0.tgz#36518703439d98eed87e4174dbd1809afc407170"
-  integrity sha512-Df5HQbzUmT+a8IlH4veVZylDgHLbUxjTS+Tv1YoWsJ7La/7K/mAycaSC++bV7myVlfMUrMUPPULavakAsiIFAQ==
+react-datetime-picker@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/react-datetime-picker/-/react-datetime-picker-4.2.0.tgz#747b86013fa59ce6f9d201317f0df486a343769a"
+  integrity sha512-5K7s4yVpG7e/Y3HspF2iHdaa2OYymqnoV2aUho5J6fQOtVfkOEkMJOwSG4PbSHisq0Xz3CXgOjn88X0GscZoAw==
   dependencies:
     "@wojtekmaj/date-utils" "^1.0.3"
+    clsx "^1.2.1"
     get-user-locale "^1.2.0"
     make-event-props "^1.1.0"
-    merge-class-names "^1.1.1"
     prop-types "^15.6.0"
-    react-calendar "^3.3.1"
-    react-clock "^3.0.0"
-    react-date-picker "^8.4.0"
+    react-calendar "^4.0.0"
+    react-clock "^4.0.0"
+    react-date-picker "^9.2.0"
     react-fit "^1.4.0"
-    react-time-picker "^4.5.0"
+    react-time-picker "^5.2.0"
 
 react-docgen-typescript@^2.1.1:
   version "2.2.2"
@@ -15756,18 +15750,17 @@ react-test-renderer@^17.0.2:
     react-shallow-renderer "^16.13.1"
     scheduler "^0.20.2"
 
-react-time-picker@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/react-time-picker/-/react-time-picker-4.5.0.tgz#661624ce8e0fde583e143f4b30fb9f8a3f78036b"
-  integrity sha512-06ViW8t3hGmkrwGvUtaoZ5ud/uSlQwMexn86eL3uoTV6FnIeRhKq0H944L4bA1ne4xIndO4Fro5tGUMmWUA9gw==
+react-time-picker@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/react-time-picker/-/react-time-picker-5.2.0.tgz#e2c49a2b852b63009627084d674705d262f1b7f8"
+  integrity sha512-lM3gISzmPWsG3pZ+D2P/QNF0lrRW9qwpv9mejvwOAlVCuwX7O3nXDHE7gShi/aAd6i9YdU53r3gtDdYg2k+IRQ==
   dependencies:
     "@wojtekmaj/date-utils" "^1.0.0"
+    clsx "^1.2.1"
     get-user-locale "^1.2.0"
     make-event-props "^1.1.0"
-    merge-class-names "^1.1.1"
-    merge-refs "^1.0.0"
     prop-types "^15.6.0"
-    react-clock "^3.0.0"
+    react-clock "^4.0.0"
     react-fit "^1.4.0"
     update-input-width "^1.2.2"
 
