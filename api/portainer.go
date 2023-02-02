@@ -345,11 +345,11 @@ type (
 		// The status of the environment(endpoint) (1 - up, 2 - down)
 		Status EndpointStatus `json:"Status" example:"1"`
 		// List of snapshots
-		Snapshots []DockerSnapshot `json:"Snapshots,omitempty"`
+		Snapshots []DockerSnapshot `json:"Snapshots"`
 		// List of user identifiers authorized to connect to this environment(endpoint)
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies,omitempty"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		// List of team identifiers authorized to connect to this environment(endpoint)
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies,omitempty"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 		// The identifier of the edge agent associated with this environment(endpoint)
 		EdgeID string `json:"EdgeID,omitempty"`
 		// The key which is used to map the agent to Portainer
