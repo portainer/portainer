@@ -12,6 +12,7 @@ import {
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { FormValues } from './types';
 
@@ -30,23 +31,34 @@ export function ScheduledTimeField({ disabled }: Props) {
   }
 
   return (
-    <FormControl label="Schedule date & time" errors={error}>
-      {!disabled ? (
-        <DateTimePicker
-          format="y-MM-dd HH:mm:ss"
-          className="form-control [&>div]:border-0"
-          onChange={(date) => setValue(isoDate(date.valueOf()))}
-          name={name}
-          value={dateValue}
-          calendarIcon={<Calendar className="lucide" />}
-          clearIcon={<X className="lucide" />}
-          disableClock
-          minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
-        />
-      ) : (
-        <Input defaultValue={value} disabled />
+    <>
+      <FormControl label="Schedule date & time" errors={error}>
+        {!disabled ? (
+          <DateTimePicker
+            format="y-MM-dd HH:mm:ss"
+            className="form-control [&>div]:border-0"
+            onChange={(date) => {
+              const dateToSave =
+                date || new Date(Date.now() + 24 * 60 * 60 * 1000);
+              setValue(isoDate(dateToSave.valueOf()));
+            }}
+            name={name}
+            value={dateValue}
+            calendarIcon={<Calendar className="lucide" />}
+            clearIcon={<X className="lucide" />}
+            disableClock
+            minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
+          />
+        ) : (
+          <Input defaultValue={value} disabled />
+        )}
+      </FormControl>
+      {!disabled && value && (
+        <TextTip color="blue">
+          If time zone is not set on edge agent then UTC+0 will be used.
+        </TextTip>
       )}
-    </FormControl>
+    </>
   );
 }
 
