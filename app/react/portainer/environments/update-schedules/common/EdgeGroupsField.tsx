@@ -30,7 +30,7 @@ export function EdgeGroupsField({
   );
 
   return (
-    <>
+    <div>
       <FormControl
         label="Groups"
         required
@@ -58,6 +58,6 @@ export function EdgeGroupsField({
       <TextTip color="blue">
         Select groups of Edge environments to update
       </TextTip>
-    </>
+    </div>
   );
 }
