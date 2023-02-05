@@ -23,6 +23,8 @@ import (
 const (
 	// mustacheUpgradeDockerTemplateFile represents the name of the template file for the docker upgrade
 	mustacheUpgradeDockerTemplateFile = "upgrade-docker.yml.mustache"
+	// mustacheUpgradeKubernetesTemplateFile represents the name of the template file for the kubernetes upgrade
+	mustacheUpgradeKubernetesTemplateFile = "upgrade-kubernetes.yml.mustache"
 
 	// portainerImagePrefixEnvVar represents the name of the environment variable used to define the image prefix for portainer-updater
 	// useful if there's a need to test PR images
@@ -36,11 +38,12 @@ const (
 )
 
 type Service interface {
-	Upgrade(licenseKey string) error
+	Upgrade(userID portainer.UserID, environment *portainer.Endpoint, licenseKey string) error
 }
 
 type service struct {
 	composeDeployer libstack.Deployer
+	kubeDeployer    portainer.KubernetesDeployer
 	isUpdating      bool
 	platform        platform.ContainerPlatform
 	assetsPath      string
@@ -62,7 +65,7 @@ func NewService(
 	}, nil
 }
 
-func (service *service) Upgrade(licenseKey string) error {
+func (service *service) Upgrade(userID portainer.UserID, environment *portainer.Endpoint, licenseKey string) error {
 	service.isUpdating = true
 
 	switch service.platform {
@@ -70,13 +73,77 @@ func (service *service) Upgrade(licenseKey string) error {
 		return service.upgradeDocker(licenseKey, portainer.APIVersion, "standalone")
 	case platform.PlatformDockerSwarm:
 		return service.upgradeDocker(licenseKey, portainer.APIVersion, "swarm")
-		// case platform.PlatformKubernetes:
+	case platform.PlatformKubernetes:
+		return service.upgradeKubernetes(userID, environment, licenseKey, portainer.APIVersion)
 		// case platform.PlatformPodman:
 		// case platform.PlatformNomad:
 		// 	default:
 	}
 
 	return fmt.Errorf("unsupported platform %s", service.platform)
+}
+
+func (service *service) upgradeKubernetes(userID portainer.UserID, environment *portainer.Endpoint, licenseKey, version string) error {
+	ctx := context.TODO()
+	templateName := filesystem.JoinPaths(service.assetsPath, "mustache-templates", mustacheUpgradeKubernetesTemplateFile)
+
+	portainerImagePrefix := os.Getenv(portainerImagePrefixEnvVar)
+	if portainerImagePrefix == "" {
+		portainerImagePrefix = "portainer/portainer-ee"
+	}
+
+	image := fmt.Sprintf("%s:%s", portainerImagePrefix, version)
+
+	skipPullImage := os.Getenv(skipPullImageEnvVar)
+
+	if err := service.checkImage(ctx, image, skipPullImage != ""); err != nil {
+		return err
+	}
+
+	manifest, err := mustache.RenderFile(templateName, map[string]string{
+		"image":           image,
+		"skip_pull_image": skipPullImage,
+		"updater_image":   os.Getenv(updaterImageEnvVar),
+		"license":         licenseKey,
+		"envType":         "kubernetes",
+	})
+
+	log.Debug().
+		Str("composeFile", manifest).
+		Msg("Compose file for upgrade")
+
+	if err != nil {
+		return errors.Wrap(err, "failed to render upgrade template")
+	}
+
+	tmpDir := os.TempDir()
+	timeId := time.Now().Unix()
+	filePath := filesystem.JoinPaths(tmpDir, fmt.Sprintf("upgrade-%d.yml", timeId))
+
+	r := bytes.NewReader([]byte(manifest))
+
+	err = filesystem.CreateFile(filePath, r)
+	if err != nil {
+		return errors.Wrap(err, "failed to create upgrade compose file")
+	}
+
+	output, err := service.kubeDeployer.Deploy(
+		userID, environment,
+		[]string{filePath},
+		"portainer",
+	)
+
+	log.Debug().
+		Str("output", output).
+		Msg("Upgrade output")
+
+	// optimally, server was restarted by the updater, so we should not reach this point
+
+	if err != nil {
+		return errors.Wrap(err, "failed to deploy upgrade stack")
+	}
+
+	return errors.New("upgrade failed: server should have been restarted by the updater")
 }
 
 func (service *service) upgradeDocker(licenseKey, version, envType string) error {
