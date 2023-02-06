@@ -48,9 +48,11 @@ func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licen
 		},
 
 		Spec: batchv1.JobSpec{
-			BackoffLimit: int32Ptr(0),
+			TTLSecondsAfterFinished: int32Ptr(5 * 60), // cleanup after 5 minutes
+			BackoffLimit:            int32Ptr(0),
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
+
 					RestartPolicy:      "Never",
 					ServiceAccountName: "portainer-sa-clusteradmin",
 					Containers: []corev1.Container{
@@ -89,14 +91,18 @@ func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licen
 			continue
 		}
 
-		if job.Status.Succeeded > 0 {
-			break
-		}
+		for _, c := range job.Status.Conditions {
+			if c.Type == batchv1.JobComplete {
+				log.Debug().
+					Str("job", job.Name).
+					Msg("Upgrade job completed")
+				return nil
+			}
 
-		if job.Status.Failed > 0 {
-			return errors.New("upgrade failed")
+			if c.Type == batchv1.JobFailed {
+				return fmt.Errorf("upgrade failed: %s", c.Message)
+			}
 		}
-
 	}
 
 	log.Debug().
