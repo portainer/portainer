@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/platform"
 )
 
@@ -56,12 +55,7 @@ func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError("Failed to guess local endpoint", err)
 	}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
-	}
-
-	err = handler.upgradeService.Upgrade(securityContext.UserID, environment, payload.License)
+	err = handler.upgradeService.Upgrade(environment, payload.License)
 	if err != nil {
 		return httperror.InternalServerError("Failed to upgrade Portainer", err)
 	}
