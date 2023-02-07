@@ -5,9 +5,9 @@ import { useMemo } from 'react';
 
 interface Props {
   id: string;
-  placeholder: string;
-  yaml: boolean;
-  readonly: boolean;
+  placeholder?: string;
+  yaml?: boolean;
+  readonly?: boolean;
   onChange: (value: string) => void;
   value: string;
   height?: string;
