@@ -1,5 +1,5 @@
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
-import { restoreOptions } from './restore-options';
+import { restoreOptions } from '@/react/portainer/init/InitAdminView/restore-options';
 
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',

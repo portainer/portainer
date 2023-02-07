@@ -5,8 +5,8 @@ import { getEnvironments } from '@/react/portainer/environments/environment.serv
 import { getTags } from '@/portainer/tags/tags.service';
 import { notifyError } from '@/portainer/services/notifications';
 import { buildConfirmButton } from '@@/modals/utils';
-import { groupTypeOptions } from './group-type-options';
-import { tagOptions } from './tag-options';
+import { tagOptions } from '@/react/edge/edge-groups/CreateView/tag-options';
+import { groupTypeOptions } from '@/react/edge/edge-groups/CreateView/group-type-options';
 
 export class EdgeGroupFormController {
   /* @ngInject */

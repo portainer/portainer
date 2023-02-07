@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import moment from 'moment';
 import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
 
-import { cronMethodOptions } from './cron-method-options';
+import { cronMethodOptions } from '@/react/edge/edge-jobs/CreateView/cron-method-options';
 
 export class EdgeJobFormController {
   /* @ngInject */
