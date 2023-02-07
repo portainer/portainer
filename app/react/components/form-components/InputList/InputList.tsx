@@ -13,12 +13,25 @@ import { FormError } from '../FormError';
 import styles from './InputList.module.css';
 import { arrayMove } from './utils';
 
+type ArrElement<ArrType> = ArrType extends readonly (infer ElementType)[]
+  ? ElementType
+  : never;
+
+export type ArrayError<T> =
+  | FormikErrors<ArrElement<T>>[]
+  | string
+  | string[]
+  | undefined;
+export type ItemError<T> = FormikErrors<T> | string | undefined;
+
 export interface ItemProps<T> {
   item: T;
   onChange(value: T): void;
-  error?: string | FormikErrors<T>;
+  error?: ItemError<T>;
   disabled?: boolean;
   readOnly?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
+  index: number;
 }
 type Key = string | number;
 type ChangeType = 'delete' | 'create' | 'update';
@@ -38,11 +51,12 @@ type OnChangeEvent<T> =
 type RenderItemFunction<T> = (
   item: T,
   onChange: (value: T) => void,
-  error?: string | FormikErrors<T>
+  index: number,
+  error?: ItemError<T>
 ) => React.ReactNode;
 
 interface Props<T> {
-  label: string;
+  label?: string;
   value: T[];
   onChange(value: T[], e: OnChangeEvent<T>): void;
   itemBuilder?(): T;
@@ -52,11 +66,12 @@ interface Props<T> {
   addLabel?: string;
   itemKeyGetter?(item: T, index: number): Key;
   movable?: boolean;
-  errors?: FormikErrors<T>[] | string | string[];
+  errors?: ArrayError<T[]>;
   textTip?: string;
   isAddButtonHidden?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
+  'aria-label'?: string;
 }
 
 export function InputList<T = DefaultType>({
@@ -75,15 +90,22 @@ export function InputList<T = DefaultType>({
   isAddButtonHidden = false,
   disabled,
   readOnly,
+  'aria-label': ariaLabel,
 }: Props<T>) {
+  const isAddButtonVisible = !(isAddButtonHidden || readOnly);
   return (
-    <div className={clsx('form-group', styles.root)}>
-      <div className={clsx('col-sm-12', styles.header)}>
-        <span className="control-label space-right pt-2 text-left !font-bold">
-          {label}
-          {tooltip && <Tooltip message={tooltip} />}
-        </span>
-      </div>
+    <div
+      className={clsx('form-group', styles.root)}
+      aria-label={ariaLabel || label}
+    >
+      {label && (
+        <div className={clsx('col-sm-12', styles.header)}>
+          <span className="control-label space-right pt-2 text-left !font-bold">
+            {label}
+            {tooltip && <Tooltip message={tooltip} />}
+          </span>
+        </div>
+      )}
 
       {textTip && (
         <div className="col-sm-12 mt-5">
@@ -114,11 +136,13 @@ export function InputList<T = DefaultType>({
                     error={error}
                     disabled={disabled}
                     readOnly={readOnly}
+                    index={index}
                   />
                 ) : (
                   renderItem(
                     item,
                     (value: T) => handleChangeItem(key, value),
+                    index,
                     error
                   )
                 )}
@@ -157,8 +181,9 @@ export function InputList<T = DefaultType>({
           })}
         </div>
       )}
-      <div className="col-sm-12 mt-5">
-        {!(isAddButtonHidden || readOnly) && (
+
+      {isAddButtonVisible && (
+        <div className="col-sm-12 mt-5">
           <Button
             onClick={handleAdd}
             disabled={disabled}
@@ -170,8 +195,8 @@ export function InputList<T = DefaultType>({
           >
             {addLabel}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 
@@ -259,7 +284,10 @@ function DefaultItem({
 function renderDefaultItem(
   item: DefaultType,
   onChange: (value: DefaultType) => void,
-  error?: FormikErrors<DefaultType>
+  index: number,
+  error?: ItemError<DefaultType>
 ) {
-  return <DefaultItem item={item} onChange={onChange} error={error} />;
+  return (
+    <DefaultItem item={item} onChange={onChange} error={error} index={index} />
+  );
 }

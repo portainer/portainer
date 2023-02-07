@@ -30,11 +30,12 @@ export function CustomTemplatesVariablesDefinitionField({
       label="Variables definition"
       onChange={onChange}
       value={value}
-      renderItem={(item, onChange, error) => (
+      renderItem={(item, onChange, index, error) => (
         <Item
           item={item}
           onChange={onChange}
           error={error}
+          index={index}
           isNameReadonly={isVariablesNamesFromParent}
         />
       )}

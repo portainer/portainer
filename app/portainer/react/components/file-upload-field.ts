@@ -9,4 +9,5 @@ export const fileUploadField = r2a(FileUploadField, [
   'required',
   'accept',
   'inputId',
+  'color',
 ]);
