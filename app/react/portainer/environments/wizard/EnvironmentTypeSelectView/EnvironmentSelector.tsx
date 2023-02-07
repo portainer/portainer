@@ -7,6 +7,7 @@ interface Props {
   onChange(value: EnvironmentOptionValue[]): void;
   options: EnvironmentOption[];
   createEdgeDevice?: boolean;
+  hiddenSpacingCount?: number;
 }
 
 const hasEdge: EnvironmentOptionValue[] = [
@@ -20,6 +21,7 @@ export function EnvironmentSelector({
   onChange,
   createEdgeDevice,
   options,
+  hiddenSpacingCount,
 }: Props) {
   const filteredOptions = filterEdgeDevicesIfNeed(options, createEdgeDevice);
 
@@ -30,6 +32,7 @@ export function EnvironmentSelector({
       value={value}
       onChange={onChange}
       radioName="type-selector"
+      hiddenSpacingCount={hiddenSpacingCount}
     />
   );
 }

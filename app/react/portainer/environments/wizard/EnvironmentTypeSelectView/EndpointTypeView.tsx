@@ -59,6 +59,10 @@ export function EnvironmentTypeSelectView() {
                     onChange={setTypes}
                     createEdgeDevice={createEdgeDevice}
                     options={newEnvironmentTypes}
+                    hiddenSpacingCount={
+                      existingEnvironmentTypes.length -
+                      newEnvironmentTypes.length
+                    }
                   />
                 </FormSection>
               </div>
