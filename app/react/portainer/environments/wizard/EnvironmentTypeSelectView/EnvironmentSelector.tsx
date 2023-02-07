@@ -1,17 +1,15 @@
 import { BoxSelector } from '@@/BoxSelector';
-import { FormSection } from '@@/form-components/FormSection';
 
-import { environmentTypes } from './environment-types';
-
-export type EnvironmentSelectorValue = typeof environmentTypes[number]['id'];
+import { EnvironmentOption, EnvironmentOptionValue } from './environment-types';
 
 interface Props {
-  value: EnvironmentSelectorValue[];
-  onChange(value: EnvironmentSelectorValue[]): void;
+  value: EnvironmentOptionValue[];
+  onChange(value: EnvironmentOptionValue[]): void;
+  options: EnvironmentOption[];
   createEdgeDevice?: boolean;
 }
 
-const hasEdge: EnvironmentSelectorValue[] = [
+const hasEdge: EnvironmentOptionValue[] = [
   'dockerStandalone',
   'dockerSwarm',
   'kubernetes',
@@ -21,31 +19,23 @@ export function EnvironmentSelector({
   value,
   onChange,
   createEdgeDevice,
+  options,
 }: Props) {
-  const options = filterEdgeDevicesIfNeed(environmentTypes, createEdgeDevice);
+  const filteredOptions = filterEdgeDevicesIfNeed(options, createEdgeDevice);
 
   return (
-    <div className="form-horizontal">
-      <FormSection title="Select your environment(s)">
-        <p className="text-muted small">
-          You can onboard different types of environments, select all that
-          apply.
-        </p>
-
-        <BoxSelector
-          options={options}
-          isMulti
-          value={value}
-          onChange={onChange}
-          radioName="type-selector"
-        />
-      </FormSection>
-    </div>
+    <BoxSelector
+      options={filteredOptions}
+      isMulti
+      value={value}
+      onChange={onChange}
+      radioName="type-selector"
+    />
   );
 }
 
 function filterEdgeDevicesIfNeed(
-  types: typeof environmentTypes,
+  types: EnvironmentOption[],
   createEdgeDevice?: boolean
 ) {
   if (!createEdgeDevice) {
