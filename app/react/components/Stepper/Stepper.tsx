@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import styles from './Stepper.module.css';
 
 export interface Step {
-  title: string;
+  label: string;
 }
 
 interface Props {
@@ -16,7 +16,7 @@ export function Stepper({ currentStep, steps }: Props) {
     <div className={styles.stepperWrapper}>
       {steps.map((step, index) => (
         <div
-          key={step.title}
+          key={step.label}
           className={clsx(styles.stepWrapper, {
             [styles.active]: index + 1 === currentStep,
             [styles.completed]: index + 1 < currentStep,
@@ -24,7 +24,7 @@ export function Stepper({ currentStep, steps }: Props) {
         >
           <div className={styles.step}>
             <div className={styles.stepCounter}>{index + 1}</div>
-            <div className={styles.stepName}>{step.title}</div>
+            <div className={styles.stepName}>{step.label}</div>
           </div>
         </div>
       ))}

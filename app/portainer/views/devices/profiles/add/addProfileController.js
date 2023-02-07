@@ -1,10 +1,13 @@
 import angular from 'angular';
+import { editor } from '@@/BoxSelector/common-options/build-methods';
 
 import { createProfile } from 'Portainer/hostmanagement/fdo/fdo.service';
 
 angular.module('portainer.app').controller('AddProfileController', AddProfileController);
 
 export default function AddProfileController($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
+  $scope.buildMethods = [editor];
+
   $scope.formValues = {
     name: '',
     profileFileContent: '',

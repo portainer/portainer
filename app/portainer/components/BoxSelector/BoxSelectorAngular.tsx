@@ -35,12 +35,14 @@ export const BoxSelectorAngular: IComponentOptions = {
     on-change="$ctrl.handleChange"
     options="$ctrl.options"
     radio-name="$ctrl.radioName"
+    slim="$ctrl.slim"
   ></box-selector-react>`,
   bindings: {
     value: '<',
     onChange: '<',
     options: '<',
     radioName: '<',
+    slim: '<',
   },
   require: {
     formCtrl: '^form',

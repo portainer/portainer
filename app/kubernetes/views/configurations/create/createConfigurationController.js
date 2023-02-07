@@ -7,12 +7,14 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { getServiceAccounts } from 'Kubernetes/rest/serviceAccount';
 
 import { isConfigurationFormValid } from '../validation';
+import { typeOptions } from './options';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, EndpointProvider) {
+  constructor($async, $state, $scope, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
+    this.$scope = $scope;
     this.$window = $window;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
@@ -23,11 +25,14 @@ class KubernetesCreateConfigurationController {
     this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
     this.KubernetesSecretTypeOptions = KubernetesSecretTypeOptions;
 
+    this.typeOptions = typeOptions;
+
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
     this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
     this.onResourcePoolSelectionChangeAsync = this.onResourcePoolSelectionChangeAsync.bind(this);
     this.onSecretTypeChange = this.onSecretTypeChange.bind(this);
+    this.onChangeKind = this.onChangeKind.bind(this);
   }
 
   onChangeName() {
@@ -38,18 +43,21 @@ class KubernetesCreateConfigurationController {
     this.state.alreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
   }
 
-  onChangeKind() {
-    this.onChangeName();
-    // if there is no data field, add one
-    if (this.formValues.Data.length === 0) {
-      this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
-    }
-    // if changing back to a secret, that is a service account token, remove the data field
-    if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
-      this.onSecretTypeChange();
-    } else {
-      this.isDockerConfig = false;
-    }
+  onChangeKind(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.Kind = value;
+      this.onChangeName();
+      // if there is no data field, add one
+      if (this.formValues.Data.length === 0) {
+        this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
+      }
+      // if changing back to a secret, that is a service account token, remove the data field
+      if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
+        this.onSecretTypeChange();
+      } else {
+        this.isDockerConfig = false;
+      }
+    });
   }
 
   async onResourcePoolSelectionChangeAsync() {

@@ -18,6 +18,7 @@ import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/Inte
 import { PorAccessControlFormTeamSelector } from '@/react/portainer/access-control/PorAccessControlForm/TeamsSelector';
 import { PorAccessControlFormUserSelector } from '@/react/portainer/access-control/PorAccessControlForm/UsersSelector';
 import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
+import { AccessTypeSelector } from '@/react/portainer/access-control/EditDetails/AccessTypeSelector';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -65,6 +66,17 @@ export const componentsModule = angular
   .component(
     'tagButton',
     r2a(TagButton, ['value', 'label', 'title', 'onRemove'])
+  )
+  .component(
+    'accessTypeSelector',
+    r2a(AccessTypeSelector, [
+      'isAdmin',
+      'isPublicVisible',
+      'name',
+      'onChange',
+      'value',
+      'teams',
+    ])
   )
   .component(
     'portainerTooltip',

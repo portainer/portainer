@@ -3,14 +3,29 @@ import { AccessControlFormData } from 'Portainer/components/accessControlForm/po
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { editor, upload, git } from '@@/BoxSelector/common-options/build-methods';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, $window, Authentication, ModalService, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
+  constructor(
+    $async,
+    $state,
+    $scope,
+    $window,
+    Authentication,
+    ModalService,
+    CustomTemplateService,
+    FormValidator,
+    Notifications,
+    ResourceControlService,
+    StackService,
+    StateManager
+  ) {
     Object.assign(this, {
       $async,
       $state,
       $window,
+      $scope,
       Authentication,
       ModalService,
       CustomTemplateService,
@@ -20,6 +35,8 @@ class CreateCustomTemplateViewController {
       StackService,
       StateManager,
     });
+
+    this.buildMethods = [editor, upload, git];
 
     this.isTemplateVariablesEnabled = isBE;
 
@@ -85,10 +102,13 @@ class CreateCustomTemplateViewController {
     return this.$async(this.createCustomTemplateAsync);
   }
 
-  onChangeMethod() {
-    this.formValues.FileContent = '';
-    this.formValues.Variables = [];
-    this.selectedTemplate = null;
+  onChangeMethod(method) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.FileContent = '';
+      this.formValues.Variables = [];
+      this.selectedTemplate = null;
+      this.state.Method = method;
+    });
   }
 
   async createCustomTemplateAsync() {

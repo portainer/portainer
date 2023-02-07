@@ -8,7 +8,7 @@ import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, Kubernetes
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
-import { editor, git, template, url } from '@@/BoxSelector/common-options/build-methods';
+import { editor, git, customTemplate, url } from '@@/BoxSelector/common-options/build-methods';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -33,7 +33,7 @@ class KubernetesDeployController {
       { ...git, value: KubernetesDeployBuildMethods.GIT },
       { ...editor, value: KubernetesDeployBuildMethods.WEB_EDITOR },
       { ...url, value: KubernetesDeployBuildMethods.URL },
-      { ...template, description: 'Use custom template', value: KubernetesDeployBuildMethods.CUSTOM_TEMPLATE },
+      { ...customTemplate, value: KubernetesDeployBuildMethods.CUSTOM_TEMPLATE },
     ];
 
     this.state = {

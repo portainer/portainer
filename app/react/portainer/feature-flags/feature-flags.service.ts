@@ -28,6 +28,7 @@ export async function init(edition: Edition) {
     [FeatureId.RBAC_ROLES]: Edition.BE,
     [FeatureId.REGISTRY_MANAGEMENT]: Edition.BE,
     [FeatureId.S3_BACKUP_SETTING]: Edition.BE,
+    [FeatureId.S3_RESTORE]: Edition.BE,
     [FeatureId.TEAM_MEMBERSHIP]: Edition.BE,
     [FeatureId.FORCE_REDEPLOYMENT]: Edition.BE,
     [FeatureId.HIDE_AUTO_UPDATE_WINDOW]: Edition.BE,
