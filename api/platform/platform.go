@@ -6,6 +6,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -53,7 +54,7 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 		return "", nil
 	}
 
-	dockerCli, err := client.NewClientWithOpts()
+	dockerCli, err := docker.CreateSimpleClient()
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create docker client")
 	}
