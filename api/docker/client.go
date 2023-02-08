@@ -59,6 +59,19 @@ func createLocalClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 	)
 }
 
+func CreateClientFromEnv() (*client.Client, error) {
+	return client.NewClientWithOpts(
+		client.FromEnv,
+		client.WithVersion(dockerClientVersion),
+	)
+}
+
+func CreateSimpleClient() (*client.Client, error) {
+	return client.NewClientWithOpts(
+		client.WithVersion(dockerClientVersion),
+	)
+}
+
 func createTCPClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*client.Client, error) {
 	httpCli, err := httpClient(endpoint, timeout)
 	if err != nil {

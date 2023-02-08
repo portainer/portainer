@@ -11,10 +11,10 @@ import (
 	"github.com/cbroglie/mustache"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 	libstack "github.com/portainer/docker-compose-wrapper"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/platform"
 	"github.com/rs/zerolog/log"
@@ -150,7 +150,7 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 }
 
 func (service *service) checkImage(ctx context.Context, image string, skipPullImage bool) error {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := docker.CreateClientFromEnv()
 	if err != nil {
 		return errors.Wrap(err, "failed to create docker client")
 	}
