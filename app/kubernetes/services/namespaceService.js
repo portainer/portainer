@@ -1,10 +1,9 @@
-import _ from 'lodash-es';
-
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
 import { updateNamespaces } from 'Kubernetes/store/namespace';
+import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
@@ -64,8 +63,13 @@ class KubernetesNamespaceService {
 
   async getAllAsync() {
     try {
-      const namespaces = await this.KubernetesNamespaces().get().$promise;
-      const allNamespaces = _.map(namespaces.items, (item) => {
+      // get the list of all namespaces (RBAC allows users to see the list of namespaces)
+      const data = await this.KubernetesNamespaces().get().$promise;
+      // get the status of each namespace (RBAC will give permission denied for status of unauthorised namespaces)
+      const promises = data.items.map((item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
+      const namespaces = await $allSettled(promises);
+      // only return namespaces if the user has access to namespaces
+      const allNamespaces = namespaces.fulfilled.map((item) => {
         return KubernetesNamespaceConverter.apiToNamespace(item);
       });
       updateNamespaces(allNamespaces);
