@@ -67,7 +67,7 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table-hover nowrap-cells table">
           <thead>
             <tr>
               <th style="width: 55px">
@@ -161,7 +161,7 @@
                 <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" class-name="'mr-1'"></pr-icon>
               </td>
               <td>
-                <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{
+                <button type="button" class="btn btn-link !ml-0 p-0 hover:no-underline" ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{
                   item.Name
                 }}</button>
               </td>
@@ -169,7 +169,7 @@
               <td ng-show="$ctrl.columnVisibility.columns.image.display">{{ item.Image | hideshasum }}</td>
               <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
-                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
+                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount : item) }}</code>
                 <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
                   <a class="interactive vertical-center" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
                     <pr-icon icon="'minimize-2'"></pr-icon>
@@ -233,10 +233,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="8" class="text-center text-muted">Loading...</td>
+              <td colspan="8" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="8" class="text-center text-muted">No service available.</td>
+              <td colspan="8" class="text-muted text-center">No service available.</td>
             </tr>
           </tbody>
         </table>

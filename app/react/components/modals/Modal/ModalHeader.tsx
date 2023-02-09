@@ -24,7 +24,7 @@ export function ModalHeader({ title, modalType }: Props) {
         />
       )}
       {typeof title === 'string' ? (
-        <h5 className="font-bold m-0">{title}</h5>
+        <h5 className="m-0 font-bold">{title}</h5>
       ) : (
         title
       )}

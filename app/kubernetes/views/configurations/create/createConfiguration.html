@@ -15,7 +15,7 @@
           <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
             <!-- name -->
             <div class="form-group mb-0">
-              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
               <div class="col-sm-8 col-lg-9 mb-0">
                 <input
                   type="text"
@@ -143,7 +143,7 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypeOptions.CUSTOM.value">
-                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label text-left required">Custom Type</label>
+                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label required text-left">Custom Type</label>
                   <div class="col-sm-8 col-lg-9">
                     <input
                       type="text"
@@ -168,7 +168,7 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypeOptions.SERVICEACCOUNTTOKEN.value">
-                  <label for="service_account" class="col-sm-3 col-lg-2 control-label text-left required">Service Account</label>
+                  <label for="service_account" class="col-sm-3 col-lg-2 control-label required text-left">Service Account</label>
                   <div class="col-sm-8 col-lg-9">
                     <select
                       class="form-control"

@@ -1,12 +1,12 @@
 <ng-form name="serviceForm">
   <div ng-if="$ctrl.isAdmin()" class="small" ng-show="$ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
-    <p class="text-warning pt-2 vertical-center">
+    <p class="text-warning vertical-center pt-2">
       <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> No Load balancer is available in this cluster, click
       <a class="hyperlink" ui-sref="kubernetes.cluster.setup">here</a> to configure load balancer.
     </p>
   </div>
   <div ng-if="!$ctrl.isAdmin()" class="small" ng-show="$ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
-    <p class="text-warning pt-2 vertical-center">
+    <p class="text-warning vertical-center pt-2">
       <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> No Load balancer is available in this cluster, contact your administrator.
     </p>
   </div>
@@ -18,14 +18,14 @@
       $ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.NODE_PORT
     "
   >
-    <div ng-show="!$ctrl.multiItemDisable" class="mt-5 mb-5 vertical-center">
-      <label class="control-label text-left !pt-0">Published ports</label>
-      <span class="label label-default interactive ml-2.5 vertical-center" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
+    <div ng-show="!$ctrl.multiItemDisable" class="vertical-center mt-5 mb-5">
+      <label class="control-label !pt-0 text-left">Published ports</label>
+      <span class="label label-default interactive vertical-center ml-2.5" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
         <pr-icon icon="'plus'" mode="'alt'" size="'sm'"></pr-icon> publish a new port
       </span>
     </div>
-    <div ng-repeat="servicePort in $ctrl.service.Ports" class="mt-5 service-form row">
-      <div class="form-group !mx-0 !pl-0 col-sm-3">
+    <div ng-repeat="servicePort in $ctrl.service.Ports" class="service-form row mt-5">
+      <div class="form-group col-sm-3 !mx-0 !pl-0">
         <div class="input-group input-group-sm">
           <span class="input-group-addon required">Container port</span>
           <input
@@ -46,10 +46,10 @@
           />
         </div>
         <span>
-          <div class="small mt-1 text-warning" ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
+          <div class="small text-warning mt-1" ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
             <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This container port is already used.
           </div>
-          <div class="small mt-1 text-warning" ng-messages="serviceForm['container_port_'+$index].$error">
+          <div class="small text-warning mt-1" ng-messages="serviceForm['container_port_'+$index].$error">
             <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Container port number is required.</p>
             <p class="vertical-center" ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Container port number must be inside the range 1-65535.</p>
             <p class="vertical-center" ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Container port number must be inside the range 1-65535.</p>
@@ -57,7 +57,7 @@
         </span>
       </div>
 
-      <div class="form-group !mx-0 !pl-0 col-sm-3">
+      <div class="form-group col-sm-3 !mx-0 !pl-0">
         <div class="input-group input-group-sm">
           <span class="input-group-addon required">Service port</span>
           <input
@@ -77,10 +77,10 @@
           />
         </div>
         <span>
-          <div class="small mt-1 text-warning" ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
+          <div class="small text-warning mt-1" ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
             <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This service port is already used.
           </div>
-          <div class="small mt-1 text-warning">
+          <div class="small text-warning mt-1">
             <div ng-messages="serviceForm['service_port_'+$index].$error">
               <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Service port number is required.</p>
               <p class="vertical-center" ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Service port number must be inside the range 1-65535.</p>
@@ -90,7 +90,7 @@
         </span>
       </div>
 
-      <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.NODE_PORT">
+      <div class="form-group col-sm-3 !mx-0 !pl-0" ng-if="$ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.NODE_PORT">
         <div class="input-group input-group-sm">
           <span class="input-group-addon required">Nodeport</span>
           <input
@@ -110,7 +110,7 @@
         </div>
         <div class="w-full">
           <span>
-            <div class="small mt-1 text-warning">
+            <div class="small text-warning mt-1">
               <div ng-messages="serviceForm['node_port_'+$index].$error">
                 <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Nodeport is required.</p>
                 <p class="vertical-center" ng-message="min"
@@ -119,7 +119,7 @@
                 <p class="vertical-center" ng-message="max"
                   ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Nodeport number must be inside the range 30000-32767 or blank for system allocated.</p
                 >
-                <div class="mt-1 text-warning" ng-if="$ctrl.state.duplicates.nodePort.refs[$index] !== undefined">
+                <div class="text-warning mt-1" ng-if="$ctrl.state.duplicates.nodePort.refs[$index] !== undefined">
                   <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This node port is already used.
                 </div>
               </div>
@@ -127,7 +127,7 @@
           </span>
         </div>
       </div>
-      <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER">
+      <div class="form-group col-sm-3 !mx-0 !pl-0" ng-if="$ctrl.service.Type === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER">
         <div class="input-group input-group-sm">
           <span class="input-group-addon">Loadbalancer port</span>
           <input
@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <div class="form-group !mx-0 !pl-0 col-sm-3">
+      <div class="form-group col-sm-3 !mx-0 !pl-0">
         <div class="input-group input-group-sm">
           <div class="btn-group btn-group-sm">
             <label

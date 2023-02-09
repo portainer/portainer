@@ -119,7 +119,7 @@
                 on-change="(ctrl.onChangeFileContent)"
               >
                 <editor-description>
-                  <div class="flex gap-1 text-muted small" ng-show="ctrl.stack.IsComposeFormat">
+                  <div class="text-muted small flex gap-1" ng-show="ctrl.stack.IsComposeFormat">
                     <pr-icon icon="'alert-circle'" mode="'warning'" class-name="'!mt-1'"></pr-icon>
                     <div>
                       <p>
@@ -154,7 +154,7 @@
                 <div class="col-sm-12 form-section-title"> Application </div>
                 <!-- #region NAME FIELD -->
                 <div class="form-group">
-                  <label for="application_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+                  <label for="application_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
                   <div class="col-sm-8">
                     <input
                       type="text"
@@ -245,7 +245,7 @@
                   <!-- #region ENVIRONMENT VARIABLES -->
                   <div class="form-group">
                     <div class="col-sm-12 vertical-center pt-2.5">
-                      <label class="control-label text-left !pt-0">Environment variables</label>
+                      <label class="control-label !pt-0 text-left">Environment variables</label>
                       <span
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         class="label label-default interactive vertical-center"
@@ -350,7 +350,7 @@
                   <!-- #region CONFIGURATIONS -->
                   <div class="form-group">
                     <div class="col-sm-12 vertical-center pt-2.5">
-                      <label class="control-label text-left !pt-0">Configurations</label>
+                      <label class="control-label !pt-0 text-left">Configurations</label>
                       <span
                         class="label label-default interactive vertical-center"
                         style="margin-left: 10px"
@@ -507,7 +507,7 @@
 
                   <div class="form-group" ng-if="ctrl.storageClassAvailable()">
                     <div class="col-sm-12 vertical-center pt-2.5" style="margin-top: 5px" ng-if="!ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
-                      <label class="control-label text-left !pt-0">Persisted folders</label>
+                      <label class="control-label !pt-0 text-left">Persisted folders</label>
                       <span
                         class="label label-default interactive vertical-center"
                         style="margin-left: 10px"
@@ -585,9 +585,9 @@
                             ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                             ng-change="ctrl.onChangeVolumeRequestedSize()"
                           />
-                          <span class="input-group-addon !p-0 !rounded-r-[5px]">
+                          <span class="input-group-addon !rounded-r-[5px] !p-0">
                             <select
-                              class="form-control w-12 !h-[28px] !border-none !rounded-r-[5px] text-xs"
+                              class="form-control !h-[28px] w-12 !rounded-r-[5px] !border-none text-xs"
                               ng-model="persistedFolder.SizeUnit"
                               ng-style="{ height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
                               ng-options="unit for unit in ctrl.state.availableSizeUnits"
@@ -775,7 +775,7 @@
                       (!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1
                     "
                   >
-                    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left flex flex-row items-center">
+                    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label flex flex-row items-center text-left">
                       Memory limit (MB)
                       <portainer-tooltip
                         message="'An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.'"
@@ -818,7 +818,7 @@
                       (!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1
                     "
                   >
-                    <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left flex flex-row items-center">
+                    <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label flex flex-row items-center text-left">
                       CPU limit
                       <portainer-tooltip
                         message="'An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.'"
@@ -956,7 +956,7 @@
                   <div class="form-inline" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && ctrl.formValues.AutoScaler.IsUsed">
                     <div class="row">
                       <div class="col-sm-4 pl-0">
-                        <label class="control-label text-left pb-2" for="auto_scaler_min">Minimum instances</label>
+                        <label class="control-label pb-2 text-left" for="auto_scaler_min">Minimum instances</label>
                         <div class="input-group input-group-sm" style="width: 100%">
                           <input
                             type="number"
@@ -984,7 +984,7 @@
                         </span>
                       </div>
                       <div class="col-sm-4 pl-0">
-                        <label class="control-label text-left pb-2" for="auto_scaler_max">Maximum instances</label>
+                        <label class="control-label pb-2 text-left" for="auto_scaler_max">Maximum instances</label>
                         <div class="input-group input-group-sm" style="width: 100%">
                           <input
                             type="number"
@@ -1006,7 +1006,7 @@
                         </span>
                       </div>
                       <div class="col-sm-4 pl-0">
-                        <label class="control-label text-left pb-2" for="auto_scaler_cpu">
+                        <label class="control-label pb-2 text-left" for="auto_scaler_cpu">
                           Target CPU usage (<b>%</b>)
                           <portainer-tooltip message="'The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.'">
                           </portainer-tooltip>
@@ -1054,7 +1054,7 @@
                     <!-- #region PLACEMENTS -->
                     <div class="form-group">
                       <div class="col-sm-12 vertical-center pt-2.5">
-                        <label class="control-label text-left !pt-0">Placement rules</label>
+                        <label class="control-label !pt-0 text-left">Placement rules</label>
                         <span class="label label-default interactive vertical-center" style="margin-left: 10px" ng-click="ctrl.addPlacement()">
                           <pr-icon icon="'plus'" mode="'alt'" size="'sm'"></pr-icon> add rule
                         </span>

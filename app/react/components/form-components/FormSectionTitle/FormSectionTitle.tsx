@@ -12,7 +12,7 @@ export function FormSectionTitle({
     return (
       <label
         htmlFor={htmlFor}
-        className="col-sm-12 form-section-title cursor-pointer flex items-center"
+        className="col-sm-12 form-section-title flex cursor-pointer items-center"
       >
         {children}
       </label>

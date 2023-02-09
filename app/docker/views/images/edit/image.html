@@ -143,7 +143,7 @@
             <tr ng-if="!(image.Labels | emptyobject)">
               <td>Labels</td>
               <td>
-                <table class="table table-bordered table-condensed">
+                <table class="table-bordered table-condensed table">
                   <tr ng-repeat="(k, v) in image.Labels">
                     <td>{{ k }}</td>
                     <td>{{ v }}</td>
@@ -213,7 +213,7 @@
                     {{ layer.CreatedBy | imagelayercommand }}
                   </span>
                   <span id="layer-command-{{ $index }}-short">
-                    {{ layer.CreatedBy | imagelayercommand | truncate: 130 }}
+                    {{ layer.CreatedBy | imagelayercommand | truncate : 130 }}
                     <span ng-if="layer.CreatedBy.length > 130" class="ml-1">
                       <a id="layer-command-expander{{ $index }}" class="btn" ng-click="toggleLayerCommand($index)">
                         <pr-icon icon="'plus'" mode="'alt'"></pr-icon>

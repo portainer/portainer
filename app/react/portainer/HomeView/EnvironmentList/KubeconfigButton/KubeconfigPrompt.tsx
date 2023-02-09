@@ -69,7 +69,7 @@ export function KubeconfigPrompt({
       role="dialog"
       onDismiss={onClose}
     >
-      <DialogContent className="p-0 bg-transparent modal-dialog">
+      <DialogContent className="modal-dialog bg-transparent p-0">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -89,7 +89,7 @@ export function KubeconfigPrompt({
                 </div>
               </form>
               <br />
-              <div className="h-8 flex items-center">
+              <div className="flex h-8 items-center">
                 <Checkbox
                   id="settings-container-truncate-name"
                   label="Select all (in this page)"
@@ -106,7 +106,7 @@ export function KubeconfigPrompt({
                         key={env.Id}
                         className={clsx(
                           styles.checkbox,
-                          'h-8 flex items-center pt-1'
+                          'flex h-8 items-center pt-1'
                         )}
                       >
                         <Checkbox
@@ -120,7 +120,7 @@ export function KubeconfigPrompt({
                       </div>
                     ))}
                 </div>
-                <div className="pt-3 flex justify-end w-full">
+                <div className="flex w-full justify-end pt-3">
                   <PaginationControls
                     showAll={totalCount <= 100}
                     page={page}

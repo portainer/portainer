@@ -32,17 +32,17 @@
 
 .CodeMirror-dialog button {
   /* apply styles from btn-default */
-  @apply bg-white border-gray-5 text-gray-9;
-  @apply hover:bg-gray-3 hover:border-gray-5 hover:text-gray-10;
+  @apply border-gray-5 bg-white text-gray-9;
+  @apply hover:border-gray-5 hover:bg-gray-3 hover:text-gray-10;
   /* dark mode */
-  @apply th-dark:bg-gray-warm-10 th-dark:border-gray-warm-7 th-dark:text-gray-warm-4;
-  @apply th-dark:hover:bg-gray-warm-9 th-dark:hover:border-gray-6 th-dark:hover:text-gray-warm-4;
+  @apply th-dark:border-gray-warm-7 th-dark:bg-gray-warm-10 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:border-gray-6 th-dark:hover:bg-gray-warm-9 th-dark:hover:text-gray-warm-4;
   /* highcontrast mode */
-  @apply th-highcontrast:bg-gray-warm-10 th-highcontrast:border-gray-warm-7 th-highcontrast:text-white;
-  @apply th-highcontrast:hover:bg-gray-warm-9 th-highcontrast:hover:border-gray-6 th-highcontrast:hover:text-white;
+  @apply th-highcontrast:border-gray-warm-7 th-highcontrast:bg-gray-warm-10 th-highcontrast:text-white;
+  @apply th-highcontrast:hover:border-gray-6 th-highcontrast:hover:bg-gray-warm-9 th-highcontrast:hover:text-white;
 
   @apply font-sans;
-  @apply border-solid	border;
+  @apply border	border-solid;
   font-size: 85%;
   padding: 0px 8px;
   border-radius: 8px;

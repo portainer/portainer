@@ -20,7 +20,7 @@
         </span>
       </rd-widget-header>
       <rd-widget-body>
-        <pre ng-show="state.DisplayTextView">{{ containerInfo | json: 4 }}</pre>
+        <pre ng-show="state.DisplayTextView">{{ containerInfo | json : 4 }}</pre>
         <json-tree ng-hide="state.DisplayTextView" object="containerInfo" root-name="containerInfo.Id" start-expanded="true"></json-tree>
       </rd-widget-body>
     </rd-widget>

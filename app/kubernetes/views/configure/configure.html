@@ -27,14 +27,14 @@
             <div class="form-group">
               <div class="col-sm-12 text-muted small">
                 <p> Enabling the load balancer feature will allow users to expose application they deploy over an external IP address assigned by cloud provider. </p>
-                <p class="mt-1 vertical-center">
+                <p class="vertical-center mt-1">
                   <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
                 </p>
               </div>
 
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Allow users to use external load balancer </label>
+                <label class="control-label col-sm-5 col-lg-4 px-0 text-left"> Allow users to use external load balancer </label>
                 <label class="switch col-sm-8 mb-0">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
@@ -51,11 +51,11 @@
               view="'cluster'"
             ></ingress-class-datatable>
 
-            <label htmlFor="foldingButtonIngControllerSettings" class="col-sm-12 form-section-title cursor-pointer flex items-center">
+            <label htmlFor="foldingButtonIngControllerSettings" class="col-sm-12 form-section-title flex cursor-pointer items-center">
               <button
                 id="foldingButtonIngControllerSettings"
                 type="button"
-                class="border-0 mx-2 bg-transparent inline-flex justify-center items-center w-2 !ml-0"
+                class="mx-2 !ml-0 inline-flex w-2 items-center justify-center border-0 bg-transparent"
                 ng-click="ctrl.toggleAdvancedIngSettings()"
               >
                 <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" icon="'chevron-right'"></pr-icon>
@@ -120,7 +120,7 @@
 
             <div
               ng-if="!ctrl.isRBACEnabled"
-              class="mt-1 mb-6 p-4 w-full border border-solid bg-warning-2 border-warning-5 text-warning-8 th-dark:bg-yellow-11 th-dark:text-white th-highcontrast:bg-yellow-11 th-highcontrast:text-white small flex gap-1 rounded-lg"
+              class="small mt-1 mb-6 flex w-full gap-1 rounded-lg border border-solid border-warning-5 bg-warning-2 p-4 text-warning-8 th-highcontrast:bg-yellow-11 th-highcontrast:text-white th-dark:bg-yellow-11 th-dark:text-white"
             >
               <div class="mt-0.5">
                 <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
@@ -130,13 +130,13 @@
                 <p> This means you can't use Portainer RBAC functionality to regulate access to environment resources based on user roles. </p>
                 <p class="mb-0">
                   To enable RBAC, start the&nbsp;<a
-                    class="th-dark:text-blue-7 th-highcontrast:text-blue-4"
+                    class="th-highcontrast:text-blue-4 th-dark:text-blue-7"
                     href="https://kubernetes.io/docs/concepts/overview/components/#kube-apiserver"
                     target="_blank"
                     >API server</a
-                  >&nbsp;with the&nbsp;<code class="box-decoration-clone bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">--authorization-mode</code>&nbsp;flag set to a
-                  comma-separated list that includes&nbsp;<code class="bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">RBAC</code>, for example:&nbsp;
-                  <code class="box-decoration-clone bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
+                  >&nbsp;with the&nbsp;<code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">--authorization-mode</code>&nbsp;flag set to a
+                  comma-separated list that includes&nbsp;<code class="bg-gray-4 th-highcontrast:bg-black th-dark:bg-black">RBAC</code>, for example:&nbsp;
+                  <code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
                 </p>
               </div>
             </div>
@@ -185,7 +185,7 @@
                   By ENABLING resource over-commit, you are able to assign more resources to namespaces than is physically available in the cluster. This may lead to unexpected
                   deployment failures if there is insufficient resource to service demand.
                 </p>
-                <p class="mt-1 vertical-center">
+                <p class="vertical-center mt-1">
                   <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
                   minus any system resource reservation.
@@ -218,7 +218,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Enable features using the metrics API </label>
+                <label class="control-label col-sm-5 col-lg-4 px-0 text-left"> Enable features using the metrics API </label>
                 <label class="switch col-sm-8">
                   <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" />
                   <span class="slider round" data-cy="kubeSetup-metricsToggle"></span>
@@ -275,7 +275,7 @@
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
-                        <div class="flex flex-row items-center h-full">
+                        <div class="flex h-full flex-row items-center">
                           <label class="switch mr-2 mb-0">
                             <input type="checkbox" ng-model="class.selected" /><span class="slider round" data-cy="kubeSetup-storageToggle{{ class.Name }}"></span>
                           </label>
@@ -291,7 +291,7 @@
                         ></storage-access-mode-selector>
                       </td>
                       <td>
-                        <div class="flex flex-row items-center h-full">
+                        <div class="flex h-full flex-row items-center">
                           <label class="switch mr-2 mb-0"
                             ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><span
                               class="slider round"

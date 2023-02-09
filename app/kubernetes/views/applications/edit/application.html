@@ -79,7 +79,7 @@
                     <tr>
                       <td>Creation</td>
                       <td>
-                        <span ng-if="ctrl.application.ApplicationOwner" class="mr-1 vertical-center" data-cy="k8sAppDetail-owner">
+                        <span ng-if="ctrl.application.ApplicationOwner" class="vertical-center mr-1" data-cy="k8sAppDetail-owner">
                           <pr-icon icon="'user'"></pr-icon> {{ ctrl.application.ApplicationOwner }}
                         </span>
                         <span class="vertical-center"> <pr-icon icon="'clock'" mode="'alt'"></pr-icon> {{ ctrl.application.CreationDate | getisodate }} </span>

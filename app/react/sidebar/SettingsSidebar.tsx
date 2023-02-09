@@ -151,7 +151,7 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
               }
               target="_blank"
               rel="noreferrer"
-              className="px-3 rounded flex h-8 items-center"
+              className="flex h-8 items-center rounded px-3"
             >
               Help / About
             </a>

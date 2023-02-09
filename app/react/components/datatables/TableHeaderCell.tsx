@@ -28,7 +28,7 @@ export function TableHeaderCell({
 }: Props) {
   return (
     <th role={role} style={style} className={className}>
-      <div className="flex flex-row flex-nowrap h-full items-center gap-1">
+      <div className="flex h-full flex-row flex-nowrap items-center gap-1">
         <SortWrapper
           canSort={canSort}
           onClick={onSortClick}
@@ -66,12 +66,12 @@ function SortWrapper({
       type="button"
       onClick={() => onClick(!isSortedDesc)}
       className={clsx(
-        '!bg-transparent w-full h-full !ml-0 !px-0 border-none focus:border-none',
+        '!ml-0 h-full w-full border-none !bg-transparent !px-0 focus:border-none',
         styles.sortable,
         isSorted && styles.sortingActive
       )}
     >
-      <div className="flex flex-row justify-start items-center w-full h-full">
+      <div className="flex h-full w-full flex-row items-center justify-start">
         {children}
         <TableHeaderSortIcons
           sorted={isSorted}
@@ -97,7 +97,7 @@ export function TableColumnHeaderAngular({
   isSortedDesc = true,
 }: TableColumnHeaderAngularProps) {
   return (
-    <div className="flex flex-row flex-nowrap h-full">
+    <div className="flex h-full flex-row flex-nowrap">
       <SortWrapper
         canSort={canSort}
         isSorted={!!isSorted}

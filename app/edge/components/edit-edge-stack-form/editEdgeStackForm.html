@@ -24,7 +24,7 @@
     read-only="$ctrl.state.readOnlyCompose"
   ></edge-stack-deployment-type-selector>
 
-  <div class="flex gap-1 text-muted small" ng-show="!$ctrl.model.DeploymentType && $ctrl.hasKubeEndpoint()">
+  <div class="text-muted small flex gap-1" ng-show="!$ctrl.model.DeploymentType && $ctrl.hasKubeEndpoint()">
     <pr-icon icon="'alert-circle'" mode="'warning'" class-name="'!mt-1'"></pr-icon>
     <div>
       <p>

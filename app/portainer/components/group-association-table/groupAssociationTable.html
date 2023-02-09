@@ -13,7 +13,7 @@
       />
     </div>
   </div>
-  <table class="table table-hover" data-cy="{{ $ctrl.cyValue }}">
+  <table class="table-hover table" data-cy="{{ $ctrl.cyValue }}">
     <thead>
       <tr>
         <th> Name </th>
@@ -30,13 +30,13 @@
         pagination-id="$ctrl.tableType"
       >
         <td>
-          {{ item.Name | truncate: 64 }}
+          {{ item.Name | truncate : 64 }}
         </td>
         <td ng-if="$ctrl.showGroups">
-          {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate: 64 }}
+          {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate : 64 }}
         </td>
         <td ng-if="$ctrl.showTags">
-          {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr | truncate: 64 }}
+          {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr | truncate : 64 }}
         </td>
       </tr>
       <tr
@@ -48,21 +48,21 @@
         total-items="$ctrl.paginationState.totalCount"
       >
         <td>
-          {{ item.Name | truncate: 64 }}
+          {{ item.Name | truncate : 64 }}
         </td>
         <td ng-if="$ctrl.showGroups">
-          {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate: 64 }}
+          {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate : 64 }}
         </td>
         <td ng-if="$ctrl.showTags">
-          {{ $ctrl.tagIdsToTagNames(item.TagIds) | truncate: 64 }}
+          {{ $ctrl.tagIdsToTagNames(item.TagIds) | truncate : 64 }}
         </td>
       </tr>
 
       <tr ng-if="!$ctrl.dataset">
-        <td colspan="3" class="text-center text-muted">Loading...</td>
+        <td colspan="3" class="text-muted text-center">Loading...</td>
       </tr>
       <tr ng-if="$ctrl.dataset.length === 0">
-        <td colspan="3" class="text-center text-muted">{{ $ctrl.emptyDatasetMessage }}</td>
+        <td colspan="3" class="text-muted text-center">{{ $ctrl.emptyDatasetMessage }}</td>
       </tr>
     </tbody>
   </table>

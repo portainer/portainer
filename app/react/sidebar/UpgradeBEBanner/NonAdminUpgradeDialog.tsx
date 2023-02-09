@@ -20,7 +20,7 @@ export function NonAdminUpgradeDialog({
         Edition.
       </Modal.Body>
       <Modal.Footer>
-        <div className="flex gap-2 w-full">
+        <div className="flex w-full gap-2">
           <Button
             color="default"
             size="medium"
