@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 export function useDebounce(
   defaultValue: string,
@@ -9,10 +9,13 @@ export function useDebounce(
 
   const onChangeDebounces = useRef(_.debounce(onChange, 300));
 
-  return [searchValue, handleChange] as const;
+  const handleChange = useCallback(
+    (value: string) => {
+      setSearchValue(value);
+      onChangeDebounces.current(value);
+    },
+    [onChangeDebounces, setSearchValue]
+  );
 
-  function handleChange(value: string) {
-    setSearchValue(value);
-    onChangeDebounces.current(value);
-  }
+  return [searchValue, handleChange] as const;
 }
