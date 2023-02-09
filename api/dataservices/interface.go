@@ -205,7 +205,6 @@ type (
 	SettingsService interface {
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
-		IsFeatureFlagEnabled(feature portainer.Feature) bool
 		BucketName() string
 	}
 

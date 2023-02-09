@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/featureflags"
 )
 
 type publicSettingsResponse struct {
@@ -21,7 +22,7 @@ type publicSettingsResponse struct {
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// Supported feature flags
-	Features map[portainer.Feature]bool `json:"Features"`
+	Features map[featureflags.Feature]bool `json:"Features"`
 	// The URL used for oauth login
 	OAuthLoginURI string `json:"OAuthLoginURI" example:"https://gitlab.com/oauth"`
 	// The URL used for oauth logout
@@ -80,7 +81,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		ShowKomposeBuildOption:    appSettings.ShowKomposeBuildOption,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
-		Features:                  appSettings.FeatureFlagSettings,
+		Features:                  featureflags.FeatureFlags(),
 		IsFDOEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.FDOConfiguration.Enabled,
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
