@@ -247,12 +247,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
 		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/storybook"):
-		if h.storybookEnabled() {
-			http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
-		} else {
-			http.NotFound(w, r)
-		}
+	case strings.HasPrefix(r.URL.Path, "/storybook") && h.storybookEnabled():
+		http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}
