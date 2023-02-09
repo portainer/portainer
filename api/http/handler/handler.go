@@ -40,6 +40,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
+	"github.com/portainer/portainer/pkg/featureflags"
 )
 
 // Handler is a collection of all the service handlers.
@@ -258,8 +259,5 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) storybookEnabled() bool {
-	// TODO: update this later after the new FF package is merged to develop . i.e.
-	// return featureflags.IsEnabled(portainer.Storybook)
-	settings, _ := h.SettingsHandler.DataStore.Settings().Settings()
-	return settings.FeatureFlagSettings[portainer.Storybook]
+	return featureflags.IsEnabled(portainer.Storybook)
 }
