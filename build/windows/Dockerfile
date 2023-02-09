@@ -24,6 +24,9 @@ COPY dist/mustache-templates /mustache-templates/
 COPY dist/portainer.exe /
 COPY dist/public /public/
 
+# storybook exists only in portainerci builds
+COPY dist/storybook* /storybook/
+
 EXPOSE 9000
 EXPOSE 9443
 EXPOSE 8000
@@ -31,9 +34,3 @@ EXPOSE 8000
 LABEL io.portainer.server true
 
 ENTRYPOINT ["/portainer.exe"]
-
-# storybook is for portainerci builds only
-FROM production as storybook
-ENV PORTAINER_FEATURE_FLAGS="storybook"
-
-COPY dist/storybook* /storybook/

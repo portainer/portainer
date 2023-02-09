@@ -20,6 +20,9 @@ COPY dist/public /public/
 
 COPY build/docker-extension /
 
+# storybook exists only in portainerci builds
+COPY dist/storybook* /storybook/
+
 VOLUME /data
 WORKDIR /
 
@@ -31,8 +34,3 @@ LABEL io.portainer.server true
 
 ENTRYPOINT ["/portainer"]
 
-# storybook is for portainerci builds only
-FROM production as storybook
-ENV PORTAINER_FEATURE_FLAGS="storybook"
-
-COPY dist/storybook* /storybook/

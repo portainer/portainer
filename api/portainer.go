@@ -1529,14 +1529,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-const (
-	Storybook = "storybook"
-)
-
 // List of supported features
-var SupportedFeatureFlags = []featureflags.Feature{
-	Storybook,
-}
+var SupportedFeatureFlags = []featureflags.Feature{}
 
 const (
 	_ AuthenticationMethod = iota
