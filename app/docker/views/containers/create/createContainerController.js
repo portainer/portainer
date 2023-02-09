@@ -338,7 +338,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       var container = $scope.formValues.NetworkContainer;
       var containerName = container;
       if (container && typeof container === 'object') {
-        containerName = $filter('trimcontainername')(container.Names[0]);
+        containerName = container.Names[0];
       }
       var networkMode = mode;
       if (containerName) {
@@ -987,7 +987,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         if (!oldContainer) {
           return;
         }
-        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1));
+        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0]);
       }
 
       function confirmCreateContainer(container) {
@@ -1033,7 +1033,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
 
       function renameContainer() {
-        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1) + '-old');
+        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0] + '-old');
       }
 
       function pullImageIfNeeded() {
