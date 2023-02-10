@@ -872,8 +872,8 @@ class KubernetesCreateApplicationController {
   /* #endregion */
 
   /* #region  DATA AUTO REFRESH */
-  updateSliders() {
-    const quota = this.formValues.ResourcePool.Quota;
+  updateSliders(namespaceWithQuota) {
+    const quota = namespaceWithQuota.Quota;
     let minCpu = 0,
       minMemory = 0,
       maxCpu = this.state.namespaceLimits.cpu,
@@ -906,33 +906,36 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  updateNamespaceLimits() {
-    let maxCpu = this.state.nodes.cpu;
-    let maxMemory = this.state.nodes.memory;
-    const quota = this.formValues.ResourcePool.Quota;
+  updateNamespaceLimits(namespaceWithQuota) {
+    return this.$async(async () => {
+      let maxCpu = this.state.nodes.cpu;
+      let maxMemory = this.state.nodes.memory;
 
-    this.state.resourcePoolHasQuota = false;
+      const quota = namespaceWithQuota.Quota;
 
-    if (quota) {
-      if (quota.CpuLimit) {
-        this.state.resourcePoolHasQuota = true;
-        maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
-        if (this.state.isEdit && this.savedFormValues.CpuLimit) {
-          maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstances();
+      this.state.resourcePoolHasQuota = false;
+
+      if (quota) {
+        if (quota.CpuLimit) {
+          this.state.resourcePoolHasQuota = true;
+          maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
+          if (this.state.isEdit && this.savedFormValues.CpuLimit) {
+            maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstances();
+          }
+        }
+
+        if (quota.MemoryLimit) {
+          this.state.resourcePoolHasQuota = true;
+          maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
+          if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
+            maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstances();
+          }
         }
       }
 
-      if (quota.MemoryLimit) {
-        this.state.resourcePoolHasQuota = true;
-        maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
-        if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
-          maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstances();
-        }
-      }
-    }
-
-    this.state.namespaceLimits.cpu = maxCpu;
-    this.state.namespaceLimits.memory = maxMemory;
+      this.state.namespaceLimits.cpu = maxCpu;
+      this.state.namespaceLimits.memory = maxMemory;
+    });
   }
 
   refreshStacks(namespace) {
@@ -1026,9 +1029,10 @@ class KubernetesCreateApplicationController {
 
   onResourcePoolSelectionChange() {
     return this.$async(async () => {
+      const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.formValues.ResourcePool.Namespace.Name);
       const namespace = this.formValues.ResourcePool.Namespace.Name;
-      this.updateNamespaceLimits();
-      this.updateSliders();
+      this.updateNamespaceLimits(namespaceWithQuota);
+      this.updateSliders(namespaceWithQuota);
       await this.refreshNamespaceData(namespace);
       this.resetFormValues();
     });
@@ -1222,7 +1226,9 @@ class KubernetesCreateApplicationController {
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
 
+        const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
         this.formValues.ResourcePool = this.resourcePools[0];
+        this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
         if (!this.formValues.ResourcePool) {
           return;
         }
@@ -1289,8 +1295,8 @@ class KubernetesCreateApplicationController {
 
         this.oldFormValues = angular.copy(this.formValues);
 
-        this.updateNamespaceLimits();
-        this.updateSliders();
+        this.updateNamespaceLimits(namespaceWithQuota);
+        this.updateSliders(namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

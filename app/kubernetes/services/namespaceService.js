@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
@@ -65,10 +63,13 @@ class KubernetesNamespaceService {
 
   async getAllAsync() {
     try {
+      // get the list of all namespaces (RBAC allows users to see the list of namespaces)
       const data = await this.KubernetesNamespaces().get().$promise;
-      const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
+      // get the status of each namespace (RBAC will give permission denied for status of unauthorised namespaces)
+      const promises = data.items.map((item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
       const namespaces = await $allSettled(promises);
-      const allNamespaces = _.map(namespaces.fulfilled, (item) => {
+      // only return namespaces if the user has access to namespaces
+      const allNamespaces = namespaces.fulfilled.map((item) => {
         return KubernetesNamespaceConverter.apiToNamespace(item);
       });
       updateNamespaces(allNamespaces);
