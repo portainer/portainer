@@ -125,5 +125,8 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	// remove all of the users persisted API keys
 	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
 
+	// hide the password field in the response payload
+	user.Password = ""
+
 	return response.JSON(w, user)
 }
