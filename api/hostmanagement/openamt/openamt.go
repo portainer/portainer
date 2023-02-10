@@ -2,7 +2,6 @@ package openamt
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +10,8 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
+
 	"golang.org/x/sync/errgroup"
 )
 
@@ -32,11 +33,14 @@ type Service struct {
 
 // NewService initializes a new service.
 func NewService() *Service {
+	tlsConfig := crypto.CreateTLSConfiguration()
+	tlsConfig.InsecureSkipVerify = true
+
 	return &Service{
 		httpsClient: &http.Client{
 			Timeout: httpClientTimeout,
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				TLSClientConfig: tlsConfig,
 			},
 		},
 	}

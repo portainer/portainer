@@ -346,7 +346,7 @@ func (server *Server) Start() error {
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)), // Disable HTTP/2
 	}
 
-	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
+	httpsServer.TLSConfig = crypto.CreateTLSConfiguration()
 	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		return server.SSLService.GetRawCertificate(), nil
 	}

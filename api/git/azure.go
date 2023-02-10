@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,11 +11,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/portainer/portainer/api/archive"
+	"github.com/portainer/portainer/api/crypto"
+	gittypes "github.com/portainer/portainer/api/git/types"
+
 	"github.com/go-git/go-git/v5/plumbing/transport/client"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/archive"
-	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 const (
@@ -63,9 +64,12 @@ func NewAzureClient() *azureClient {
 }
 
 func newHttpClientForAzure() *http.Client {
+	tlsConfig := crypto.CreateTLSConfiguration()
+	tlsConfig.InsecureSkipVerify = true
+
 	httpsCli := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: tlsConfig,
 			Proxy:           http.ProxyFromEnvironment,
 		},
 		Timeout: 300 * time.Second,

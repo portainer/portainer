@@ -21,27 +21,33 @@ export function KubernetesResourcePoolService(
     toggleSystem,
   };
 
-  async function getOne(name) {
+  // getting quota isn't a costly operation for one namespace, so we can get it by default
+  async function getOne(name, { getQuota = true }) {
     const namespace = await KubernetesNamespaceService.get(name);
-    const [quotaAttempt] = await Promise.allSettled([KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name))]);
     const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
-    if (quotaAttempt.status === 'fulfilled') {
-      pool.Quota = quotaAttempt.value;
-      pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+    if (getQuota) {
+      const [quotaAttempt] = await Promise.allSettled([KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name))]);
+      if (quotaAttempt.status === 'fulfilled') {
+        pool.Quota = quotaAttempt.value;
+        pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+      }
     }
     return pool;
   }
 
-  async function getAll() {
+  // getting the quota for all namespaces is costly by default, so disable getting it by default
+  async function getAll({ getQuota = false }) {
     const namespaces = await KubernetesNamespaceService.get();
     const pools = await Promise.all(
       _.map(namespaces, async (namespace) => {
         const name = namespace.Name;
-        const [quotaAttempt] = await Promise.allSettled([KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name))]);
         const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
-        if (quotaAttempt.status === 'fulfilled') {
-          pool.Quota = quotaAttempt.value;
-          pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+        if (getQuota) {
+          const [quotaAttempt] = await Promise.allSettled([KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name))]);
+          if (quotaAttempt.status === 'fulfilled') {
+            pool.Quota = quotaAttempt.value;
+            pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+          }
         }
         return pool;
       })
@@ -49,11 +55,11 @@ export function KubernetesResourcePoolService(
     return pools;
   }
 
-  function get(name) {
+  function get(name, options = {}) {
     if (name) {
-      return $async(getOne, name);
+      return $async(getOne, name, options);
     }
-    return $async(getAll);
+    return $async(getAll, options);
   }
 
   function create(formValues) {
