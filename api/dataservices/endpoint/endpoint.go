@@ -66,6 +66,9 @@ func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, 
 		endpoint, err = service.Tx(tx).Endpoint(ID)
 		return err
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	endpoint.LastCheckInDate, _ = service.Heartbeat(ID)
 
