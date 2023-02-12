@@ -31,7 +31,7 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 
 	skipPullImage := os.Getenv(skipPullImageEnvVar)
 
-	if err := service.checkImage(ctx, image, skipPullImage != ""); err != nil {
+	if err := service.checkImageForDocker(ctx, image, skipPullImage != ""); err != nil {
 		return err
 	}
 
@@ -88,7 +88,7 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 	return errors.New("upgrade failed: server should have been restarted by the updater")
 }
 
-func (service *service) checkImage(ctx context.Context, image string, skipPullImage bool) error {
+func (service *service) checkImageForDocker(ctx context.Context, image string, skipPullImage bool) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return errors.Wrap(err, "failed to create docker client")

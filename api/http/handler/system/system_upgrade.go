@@ -42,7 +42,7 @@ var platformToEndpointType = map[platform.ContainerPlatform]portainer.EndpointTy
 // @description **Access policy**: administrator
 // @tags system
 // @produce json
-// @success 200 {object} status "Success"
+// @success 204 {object} status "Success"
 // @router /system/upgrade [post]
 func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload, err := request.GetPayload[systemUpgradePayload](r)
