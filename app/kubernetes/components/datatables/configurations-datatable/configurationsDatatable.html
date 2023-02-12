@@ -3,14 +3,14 @@
     <rd-widget-body classes="no-padding">
       <!-- table title and action menu -->
       <div class="toolBar !flex-col gap-1">
-        <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !px-0 !py-1 w-full">
+        <div class="toolBar vertical-center w-full flex-wrap !gap-x-5 !gap-y-1 !px-0 !py-1">
           <div class="toolBarTitle">
             <div class="widget-icon space-right">
               <pr-icon icon="'lock'"></pr-icon>
             </div>
             ConfigMaps & Secrets
           </div>
-          <div class="searchBar vertical-center w-72 !mr-0">
+          <div class="searchBar vertical-center !mr-0 w-72">
             <pr-icon icon="'search'" class-name="'icon !h-3'"></pr-icon>
             <input
               type="text"
@@ -24,20 +24,20 @@
             />
           </div>
           <!-- actions -->
-          <div class="actionBar !gap-3 !mr-0">
+          <div class="actionBar !mr-0 !gap-3">
             <button
               type="button"
-              class="btn btn-sm btn-dangerlight !ml-0 vertical-center"
+              class="btn btn-sm btn-dangerlight vertical-center !ml-0"
               ng-disabled="$ctrl.state.selectedItemCount === 0"
               ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
               data-cy="k8sConfig-removeConfigButton"
             >
               <pr-icon icon="'trash-2'"></pr-icon>Remove
             </button>
-            <button type="button" class="btn btn-sm btn-secondary !ml-0 vertical-center" ui-sref="kubernetes.configurations.new" data-cy="k8sConfig-addConfigWithFormButton">
+            <button type="button" class="btn btn-sm btn-secondary vertical-center !ml-0" ui-sref="kubernetes.configurations.new" data-cy="k8sConfig-addConfigWithFormButton">
               <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Add with form
             </button>
-            <button type="button" class="btn btn-sm btn-primary !ml-0 vertical-center" ui-sref="kubernetes.deploy" data-cy="k8sConfig-deployFromManifestButton">
+            <button type="button" class="btn btn-sm btn-primary vertical-center !ml-0" ui-sref="kubernetes.deploy" data-cy="k8sConfig-deployFromManifestButton">
               <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Create from manifest
             </button>
           </div>
@@ -88,15 +88,15 @@
             </span>
           </div>
         </div>
-        <div ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem" class="flex flex-row w-full">
-          <span class="small text-muted mt-1 vertical-center">
+        <div ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem" class="flex w-full flex-row">
+          <span class="small text-muted vertical-center mt-1">
             <pr-icon icon="'info'" mode="'primary'" class="vertical-center"></pr-icon>
             <div> System resources are hidden, this can be changed in the table settings. </div>
           </span>
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="k8sConfig-tableSettingsButtonconfigsTable">
+        <table class="table-hover nowrap-cells table" data-cy="k8sConfig-tableSettingsButtonconfigsTable">
           <thead>
             <tr>
               <th>
@@ -164,10 +164,10 @@
               <td>{{ item.CreationDate | getisodate }} {{ item.ConfigurationOwner ? 'by ' + item.ConfigurationOwner : '' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+              <td colspan="4" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted">No configuration available.</td>
+              <td colspan="4" class="text-muted text-center">No configuration available.</td>
             </tr>
           </tbody>
         </table>

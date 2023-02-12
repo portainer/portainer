@@ -11,7 +11,7 @@
 
   <!-- name-input -->
   <div class="form-group">
-    <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+    <label for="registry_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-ecr-registry" required auto-focus />
       <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_name.$invalid">
@@ -81,7 +81,7 @@
   <div ng-if="$ctrl.model.Authentication">
     <!-- aws-access-key -->
     <div class="form-group">
-      <label for="registry_access_key" class="col-sm-3 col-lg-2 control-label text-left required">AWS Access Key</label>
+      <label for="registry_access_key" class="col-sm-3 col-lg-2 control-label required text-left">AWS Access Key</label>
       <div class="col-sm-9 col-lg-10">
         <input type="text" class="form-control" id="registry_access_key" name="registry_access_key" ng-model="$ctrl.model.Username" required />
         <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_access_key.$invalid">
@@ -100,7 +100,7 @@
 
     <!-- aws-secret-access-key -->
     <div class="form-group">
-      <label for="registry_secret_access_key" class="col-sm-3 col-lg-2 control-label text-left required">AWS Secret Access Key</label>
+      <label for="registry_secret_access_key" class="col-sm-3 col-lg-2 control-label required text-left">AWS Secret Access Key</label>
       <div class="col-sm-9 col-lg-10">
         <input type="password" class="form-control" id="registry_secret_access_key" name="registry_secret_access_key" ng-model="$ctrl.model.Password" required />
         <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_secret_access_key.$invalid">
@@ -119,7 +119,7 @@
 
     <!-- region -->
     <div class="form-group">
-      <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
+      <label for="registry_region" class="col-sm-3 col-lg-2 control-label required text-left">Region</label>
       <div class="col-sm-9 col-lg-10">
         <input type="text" class="form-control" id="registry_region" name="registry_region" placeholder="us-west-1" ng-model="$ctrl.model.Ecr.Region" required />
         <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_region.$invalid">

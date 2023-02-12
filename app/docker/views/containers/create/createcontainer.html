@@ -403,7 +403,7 @@
                         <span class="input-group-addon">volume</span>
                         <select class="form-control" ng-model="volume.name">
                           <option selected disabled hidden value="">Select a volume</option>
-                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
+                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate : 30 }} - {{ vol.Driver | truncate : 30 }}</option>
                         </select>
                       </div>
                       <!-- !volume -->
@@ -718,7 +718,7 @@
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->
                 <div class="form-group flex">
-                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory reservation (MB) </label>
+                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory reservation (MB) </label>
                   <div class="col-sm-6">
                     <slider
                       on-change="(handleResourceChange)"
@@ -755,7 +755,7 @@
                 <!-- !memory-reservation-input -->
                 <!-- memory-limit-input -->
                 <div class="form-group flex">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit (MB) </label>
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory limit (MB) </label>
                   <div class="col-sm-6">
                     <slider
                       on-change="(handleResourceChange)"
@@ -792,7 +792,7 @@
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
                 <div class="form-group flex">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Maximum CPU usage </label>
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Maximum CPU usage </label>
                   <div class="col-sm-8">
                     <slider
                       on-change="(handleResourceChange)"

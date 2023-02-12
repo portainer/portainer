@@ -33,7 +33,7 @@ export const ingressRules: Column<Ingress> = {
       const isHttp = isHTTP(row.original.TLS || [], path.Host);
       return (
         <div key={`${path.Host}${path.Path}${path.ServiceName}:${path.Port}`}>
-          <span className="flex px-2 flex-nowrap items-center gap-1">
+          <span className="flex flex-nowrap items-center gap-1 px-2">
             {link(path.Host, path.Path, isHttp)}
             <Icon icon={ArrowRight} />
             {`${path.ServiceName}:${path.Port}`}

@@ -11,7 +11,7 @@
   <div class="col-sm-12 form-section-title"> Gitlab registry connection details </div>
   <!-- credentials-user -->
   <div class="form-group">
-    <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left required">Username</label>
+    <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">Username</label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
       <div class="help-block" ng-show="registryFormGitlab.registry_username.$invalid">
@@ -29,7 +29,7 @@
   <!-- !credentials-user -->
   <!-- credentials-pat -->
   <div class="form-group">
-    <label for="registry_perso_acc_token" class="col-sm-3 col-lg-2 control-label text-left required">Personal Access Token </label>
+    <label for="registry_perso_acc_token" class="col-sm-3 col-lg-2 control-label required text-left">Personal Access Token </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required />
       <div class="help-block" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
@@ -50,7 +50,7 @@
     <div class="col-sm-12">
       <button
         type="button"
-        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0"
+        class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline"
         ng-if="!$ctrl.state.overrideConfiguration"
         ng-click="$ctrl.state.overrideConfiguration = true;"
       >
@@ -59,7 +59,7 @@
       </button>
       <button
         type="button"
-        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0"
+        class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline"
         ng-if="$ctrl.state.overrideConfiguration"
         ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()"
       >
@@ -71,7 +71,7 @@
 
   <!-- url-input -->
   <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
-    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left required">
+    <label for="instance_url" class="col-sm-3 col-lg-2 control-label required text-left">
       Instance URL
       <portainer-tooltip message="'URL of Gitlab instance.'"></portainer-tooltip>
     </label>
@@ -92,7 +92,7 @@
   <!-- !url-input -->
   <!-- url-input -->
   <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
-    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left required">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label required text-left">
       Registry URL
       <portainer-tooltip message="'URL of Gitlab registry instance.'"></portainer-tooltip>
     </label>

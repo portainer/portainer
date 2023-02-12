@@ -30,7 +30,7 @@ export function EnvironmentBrowseButtons({
 
   const dashboardRoute = getDashboardRoute(environment);
   return (
-    <div className="flex flex-col gap-2 justify-center [&>*]:h-1/3 h-24 w-full">
+    <div className="flex h-24 w-full flex-col justify-center gap-2 [&>*]:h-1/3">
       {isBE &&
         (browseStatus !== 'snapshot' ? (
           <LinkButton
@@ -42,7 +42,7 @@ export function EnvironmentBrowseButtons({
             }}
             size="medium"
             color="light"
-            className="w-full !py-0 !m-0"
+            className="!m-0 w-full !py-0"
             title={
               !isEdgeAsync
                 ? 'Browse snapshot is only available for async environments'
@@ -55,7 +55,7 @@ export function EnvironmentBrowseButtons({
           <Button
             icon={X}
             onClick={onClickDisconnect}
-            className="w-full !py-0 !m-0 opacity-60"
+            className="!m-0 w-full !py-0 opacity-60"
             size="medium"
             color="light"
           >
@@ -77,7 +77,7 @@ export function EnvironmentBrowseButtons({
           size="medium"
           onClick={onClickBrowse}
           color="primary"
-          className="w-full !py-0 !m-0"
+          className="!m-0 w-full !py-0"
         >
           Live connect
         </LinkButton>
@@ -85,7 +85,7 @@ export function EnvironmentBrowseButtons({
         <Button
           icon={WifiOff}
           onClick={onClickDisconnect}
-          className="w-full !py-0 !m-0 opacity-60"
+          className="!m-0 w-full !py-0 opacity-60"
           size="medium"
           color="primary"
         >
@@ -125,7 +125,7 @@ function BrowseStatusTag({ status }: { status: BrowseStatus }) {
 
 function Disconnected() {
   return (
-    <div className="flex items-center gap-2 justify-center">
+    <div className="flex items-center justify-center gap-2">
       <Icon icon={WifiOff} />
       Disconnected
     </div>
@@ -136,12 +136,12 @@ function Connected() {
   return (
     <div
       className={clsx(
-        'flex items-center gap-2 justify-center rounded-lg',
+        'flex items-center justify-center gap-2 rounded-lg',
         'text-green-8 th-dark:text-green-4',
         'bg-green-3 th-dark:bg-green-3/30'
       )}
     >
-      <div className="rounded-full h-2 w-2 bg-green-8 th-dark:bg-green-4" />
+      <div className="h-2 w-2 rounded-full bg-green-8 th-dark:bg-green-4" />
       Connected
     </div>
   );
@@ -151,12 +151,12 @@ function Snapshot() {
   return (
     <div
       className={clsx(
-        'flex items-center gap-2 justify-center rounded-lg',
+        'flex items-center justify-center gap-2 rounded-lg',
         'text-warning-7 th-dark:text-warning-4',
-        'bg-warning-3 th-dark:bg-warning-3/10 th-highcontrast:bg-warning-3/30'
+        'bg-warning-3 th-highcontrast:bg-warning-3/30 th-dark:bg-warning-3/10'
       )}
     >
-      <div className="rounded-full h-2 w-2 bg-warning-7" />
+      <div className="h-2 w-2 rounded-full bg-warning-7" />
       Browsing Snapshot
     </div>
   );

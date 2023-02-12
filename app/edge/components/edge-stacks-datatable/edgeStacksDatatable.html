@@ -69,7 +69,7 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="edgeStack-stackTable">
+        <table class="table-hover nowrap-cells table" data-cy="edgeStack-stackTable">
           <thead>
             <tr>
               <th>
@@ -142,10 +142,10 @@
               <td>{{ item.CreationDate | getisodatefromtimestamp }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset" data-cy="edgeStack-loadingRow">
-              <td colspan="6" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0" data-cy="edgeStack-noStackRow">
-              <td colspan="6" class="text-center text-muted"> No stack available. </td>
+              <td colspan="6" class="text-muted text-center"> No stack available. </td>
             </tr>
           </tbody>
         </table>

@@ -15,7 +15,7 @@
 
           <!-- name-input -->
           <div class="form-group">
-            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+            <label for="registry_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
               <input
                 type="text"
@@ -137,7 +137,7 @@
           <div ng-if="$ctrl.registry.Authentication">
             <!-- credentials-user -->
             <div class="form-group">
-              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left required">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label required text-left">
                 {{ $ctrl.registry.Type === $ctrl.RegistryTypes.ECR ? 'AWS Access Key' : 'Username' }}
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -185,7 +185,7 @@
             <!-- region -->
             <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.ECR">
               <div class="form-group">
-                <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
+                <label for="registry_region" class="col-sm-3 col-lg-2 control-label required text-left">Region</label>
                 <div class="col-sm-9 col-lg-10">
                   <input type="text" class="form-control" id="registry_region" name="registry_region" ng-model="$ctrl.registry.Ecr.Region" placeholder="us-west-1" required />
                 </div>
@@ -222,7 +222,7 @@
             <div ng-if="$ctrl.registry.Quay.UseOrganisation">
               <!-- organisation_name -->
               <div class="form-group">
-                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left required">Organisation name</label>
+                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label required text-left">Organisation name</label>
                 <div class="col-sm-9 col-lg-10">
                   <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="$ctrl.registry.Quay.OrganisationName" required />
                 </div>

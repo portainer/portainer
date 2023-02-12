@@ -90,7 +90,7 @@
               </div>
               <div>{{ node.Role }}</div>
               <div>CPU: {{ node.CPUs / 1000000000 }}</div>
-              <div>Memory: {{ node.Memory | humansize: 2 }}</div>
+              <div>Memory: {{ node.Memory | humansize : 2 }}</div>
               <div
                 ><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div
               >
@@ -114,7 +114,7 @@
                 <div>Image: {{ task.Spec.ContainerSpec.Image | hideshasum }}</div>
                 <div>Status: {{ task.Status.State }}</div>
                 <div>Update: {{ task.Updated | getisodate }}</div>
-                <div ng-if="task.Spec.Resources.Limits.MemoryBytes">Memory limit: {{ task.Spec.Resources.Limits.MemoryBytes | humansize: 2:2 }}</div>
+                <div ng-if="task.Spec.Resources.Limits.MemoryBytes">Memory limit: {{ task.Spec.Resources.Limits.MemoryBytes | humansize : 2 : 2 }}</div>
                 <div ng-if="task.Spec.Resources.Limits.NanoCPUs">CPU limit: {{ task.Spec.Resources.Limits.NanoCPUs / 1000000000 }}</div>
               </div>
             </div>

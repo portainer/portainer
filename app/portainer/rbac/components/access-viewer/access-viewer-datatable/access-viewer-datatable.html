@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-hover nowrap-cells">
+    <table class="table-hover nowrap-cells table">
       <thead>
         <tr>
           <th>
@@ -60,10 +60,10 @@
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">
-          <td colspan="3" class="text-center text-muted">Select a user to show associated access and role</td>
+          <td colspan="3" class="text-muted text-center">Select a user to show associated access and role</td>
         </tr>
         <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-          <td colspan="3" class="text-center text-muted">The selected user does not have access to any environment(s)</td>
+          <td colspan="3" class="text-muted text-center">The selected user does not have access to any environment(s)</td>
         </tr>
       </tbody>
     </table>

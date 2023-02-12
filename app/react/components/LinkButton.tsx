@@ -18,7 +18,7 @@ export function LinkButton({
       title={title}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
-      className={clsx(className, '!m-0 no-link')}
+      className={clsx(className, 'no-link !m-0')}
       disabled={disabled}
       as={disabled ? 'span' : Link}
       props={{

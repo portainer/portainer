@@ -50,7 +50,7 @@ export function AssociateAMTDialog({
           Select the environments to add to associate to OpenAMT. You may select
           across multiple pages.
         </span>
-        <div className="h-8 flex items-center">
+        <div className="flex h-8 items-center">
           <Checkbox
             id="settings-container-truncate-name"
             label="Select all (in this page)"
@@ -63,7 +63,7 @@ export function AssociateAMTDialog({
             {environments.map((env) => (
               <div
                 key={env.Id}
-                className={clsx('h-8 flex items-center pt-1 pl-2')}
+                className={clsx('flex h-8 items-center pt-1 pl-2')}
               >
                 <Checkbox
                   id={`${env.Id}`}
@@ -76,7 +76,7 @@ export function AssociateAMTDialog({
               </div>
             ))}
           </div>
-          <div className="pt-3 flex justify-end w-full">
+          <div className="flex w-full justify-end pt-3">
             <PaginationControls
               showAll={totalCount <= 100}
               page={page}

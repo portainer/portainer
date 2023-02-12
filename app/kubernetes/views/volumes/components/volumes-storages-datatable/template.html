@@ -1,7 +1,7 @@
 <div class="datatable">
   <!-- toolbar header actions and settings -->
   <div class="toolBar !flex-col gap-1">
-    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+    <div class="toolBar vertical-center w-full flex-wrap !gap-x-5 !gap-y-1 !p-0">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
           <pr-icon icon="'hard-drive'"></pr-icon>
@@ -59,11 +59,11 @@
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-hover nowrap-cells">
+    <table class="table-hover nowrap-cells table">
       <thead>
         <tr>
           <th class="datatable-wide dropdown" ng-if="$ctrl.hasExpandableItems()">
-            <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
+            <div class="vertical-center cursor-pointer" ng-click="$ctrl.expandAll()">
               <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
               <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
             </div>
@@ -121,10 +121,10 @@
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">
-          <td colspan="5" class="text-center text-muted">Loading...</td>
+          <td colspan="5" class="text-muted text-center">Loading...</td>
         </tr>
         <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-          <td colspan="5" class="text-center text-muted">No storage available.</td>
+          <td colspan="5" class="text-muted text-center">No storage available.</td>
         </tr>
       </tbody>
     </table>

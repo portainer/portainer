@@ -4,8 +4,8 @@
 
 .root label {
   @apply border border-solid;
-  @apply bg-gray-2 border-gray-5 text-black;
-  @apply th-dark:bg-gray-iron-10 th-dark:border-gray-neutral-8 th-dark:text-white;
+  @apply border-gray-5 bg-gray-2 text-black;
+  @apply th-dark:border-gray-neutral-8 th-dark:bg-gray-iron-10 th-dark:text-white;
   @apply th-highcontrast:text-white;
 
   font-weight: normal;
@@ -42,9 +42,9 @@
 }
 
 .root input:checked + label {
-  @apply bg-blue-2 border-blue-6;
-  @apply th-dark:bg-blue-10 th-dark:border-blue-7;
-  @apply th-highcontrast:bg-blue-10 th-highcontrast:border-blue-7;
+  @apply border-blue-6 bg-blue-2;
+  @apply th-dark:border-blue-7 th-dark:bg-blue-10;
+  @apply th-highcontrast:border-blue-7 th-highcontrast:bg-blue-10;
 
   border-radius: 8px;
   padding: 15px;

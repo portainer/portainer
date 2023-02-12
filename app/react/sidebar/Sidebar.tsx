@@ -35,13 +35,13 @@ export function Sidebar() {
         <nav
           className={clsx(
             styles.nav,
-            'p-5 flex flex-col flex-1 overflow-y-auto'
+            'flex flex-1 flex-col overflow-y-auto p-5'
           )}
           aria-label="Main"
         >
           <Header logo={LogoURL} />
           {/* negative margin + padding -> scrollbar won't hide the content */}
-          <div className="mt-6 overflow-y-auto flex-1 -mr-4 pr-4">
+          <div className="mt-6 -mr-4 flex-1 overflow-y-auto pr-4">
             <ul className="space-y-9">
               <SidebarItem
                 to="portainer.home"

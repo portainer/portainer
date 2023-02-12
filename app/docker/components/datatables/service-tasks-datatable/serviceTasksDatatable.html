@@ -1,5 +1,5 @@
 <div class="inner-datatable">
-  <table class="table table-condensed table-hover nowrap-cells">
+  <table class="table-condensed table-hover nowrap-cells table">
     <thead>
       <tr>
         <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" class="w-[10%]">
@@ -98,11 +98,11 @@
           ></container-quick-actions>
         </td>
         <td>{{ item.Slot ? item.Slot : '-' }}</td>
-        <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
+        <td>{{ item.NodeId | tasknodename : $ctrl.nodes }}</td>
         <td>{{ item.Updated | getisodate }}</td>
       </tr>
       <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-        <td colspan="5" class="text-center text-muted">No task matching filter.</td>
+        <td colspan="5" class="text-muted text-center">No task matching filter.</td>
       </tr>
     </tbody>
   </table>

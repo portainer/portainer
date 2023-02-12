@@ -16,7 +16,7 @@ export function DetailsRow({
 }: Props) {
   return (
     <tr className={className}>
-      <td className={clsx(colClassName, '!break-normal min-w-[150px]')}>
+      <td className={clsx(colClassName, 'min-w-[150px] !break-normal')}>
         {label}
       </td>
       {children && (

@@ -1,7 +1,7 @@
 <div class="datatable">
   <!-- table title and action menu -->
   <div class="toolBar !flex-col gap-1">
-    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+    <div class="toolBar vertical-center w-full flex-wrap !gap-x-5 !gap-y-1 !p-0">
       <!-- title -->
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
@@ -22,10 +22,10 @@
           ng-model-options="{ debounce: 300 }"
         />
       </div>
-      <div class="actionBar !gap-3 !mr-0">
+      <div class="actionBar !mr-0 !gap-3">
         <button
           type="button"
-          class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+          class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
           ng-disabled="$ctrl.state.selectedItemCount === 0"
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
           data-cy="k8sApp-removeStackButton"
@@ -88,19 +88,19 @@
       </div>
     </div>
     <!-- info text -->
-    <div class="flex flex-row w-full">
-      <span class="small text-muted mt-1 vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+    <div class="flex w-full flex-row">
+      <span class="small text-muted vertical-center mt-1" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
         <pr-icon icon="'info'" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-hover nowrap-cells">
+    <table class="table-hover nowrap-cells table">
       <thead>
         <tr>
-          <th class="w-20 dropdown">
-            <div class="flex no-wrap h-full items-center">
+          <th class="dropdown w-20">
+            <div class="no-wrap flex h-full items-center">
               <span class="md-checkbox">
                 <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                 <label for="select_all"></label>
@@ -151,7 +151,7 @@
           pagination-id="$ctrl.tableKey"
         >
           <td>
-            <div class="flex no-wrap items-center">
+            <div class="no-wrap flex items-center">
               <span class="md-checkbox">
                 <input
                   id="select_{{ $index }}"
@@ -198,10 +198,10 @@
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">
-          <td colspan="5" class="text-center text-muted">Loading...</td>
+          <td colspan="5" class="text-muted text-center">Loading...</td>
         </tr>
         <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-          <td colspan="5" class="text-center text-muted">No stack available.</td>
+          <td colspan="5" class="text-muted text-center">No stack available.</td>
         </tr>
       </tbody>
     </table>

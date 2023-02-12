@@ -25,20 +25,20 @@
           <button
             ng-if="!$ctrl.endpointType"
             type="button"
-            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="registry-removeRegistryButton"
           >
             <pr-icon icon="'trash-2'"></pr-icon>Remove
           </button>
-          <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="portainer.registries.new" data-cy="registry-addRegistryButton">
+          <button type="button" class="btn btn-sm btn-primary vertical-center !ml-0 h-fit" ui-sref="portainer.registries.new" data-cy="registry-addRegistryButton">
             <pr-icon icon="'plus'"></pr-icon>Add registry
           </button>
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table-hover nowrap-cells table">
           <thead>
             <tr>
               <th>
@@ -103,7 +103,7 @@
               <td>
                 <button
                   type="button"
-                  class="btn btn-link hover:no-underline !ml-0 px-0 vertical-center"
+                  class="btn btn-link vertical-center !ml-0 px-0 hover:no-underline"
                   ng-if="$ctrl.canManageAccess(item)"
                   ng-click="$ctrl.redirectToManageAccess(item)"
                 >
@@ -117,7 +117,7 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="3" class="text-center text-muted">Loading...</td>
+              <td colspan="3" class="text-muted text-center">Loading...</td>
             </tr>
           </tbody>
         </table>

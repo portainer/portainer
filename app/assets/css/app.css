@@ -148,7 +148,7 @@ input[type='checkbox'] {
 }
 
 .text-warning {
-  @apply text-warning-9 th-dark:text-warning-7 th-highcontrast:text-warning-1;
+  @apply text-warning-9 th-highcontrast:text-warning-1 th-dark:text-warning-7;
 }
 
 .widget .widget-body table tbody .image-tag {
@@ -778,5 +778,5 @@ input[style*='background-image: url("data:image/png'] {
 }
 
 input:-webkit-autofill {
-  @apply caret-[--grey-25] th-dark:caret-white th-highcontrast:caret-white;
+  @apply caret-[--grey-25] th-highcontrast:caret-white th-dark:caret-white;
 }

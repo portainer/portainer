@@ -18,13 +18,13 @@
           <table class="table">
             <tbody>
               <tr>
-                <td class="!pl-0 !border-none">Environment</td>
+                <td class="!border-none !pl-0">Environment</td>
                 <td class="!border-none">
                   {{ ctrl.endpoint.Name }}
                 </td>
               </tr>
               <tr ng-if="ctrl.showEnvUrl">
-                <td class="!pl-0 !border-t">URL</td>
+                <td class="!border-t !pl-0">URL</td>
                 <td class="!border-t">{{ ctrl.endpoint.URL | stripprotocol }}</td>
               </tr>
               <tr>

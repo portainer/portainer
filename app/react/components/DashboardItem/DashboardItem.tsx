@@ -14,16 +14,16 @@ export function DashboardItem({ value, icon, type, children }: Props) {
   return (
     <div
       className={clsx(
-        'border-solid rounded-lg border p-3',
-        'bg-gray-2 hover:bg-blue-2 border-gray-5 hover:border-blue-7',
-        'th-dark:bg-gray-iron-10 th-dark:hover:bg-gray-10 th-dark:border-gray-neutral-8 th-dark:hover:border-blue-8',
-        'th-highcontrast:bg-black th-highcontrast:hover:bg-gray-11 th-highcontrast:border-white th-highcontrast:hover:border-blue-8'
+        'rounded-lg border border-solid p-3',
+        'border-gray-5 bg-gray-2 hover:border-blue-7 hover:bg-blue-2',
+        'th-dark:border-gray-neutral-8 th-dark:bg-gray-iron-10 th-dark:hover:border-blue-8 th-dark:hover:bg-gray-10',
+        'th-highcontrast:border-white th-highcontrast:bg-black th-highcontrast:hover:border-blue-8 th-highcontrast:hover:bg-gray-11'
       )}
     >
       <div className="flex items-center" aria-label={type}>
         <div
           className={clsx(
-            'icon-badge text-2xl mr-4 !p-2',
+            'icon-badge mr-4 !p-2 text-2xl',
             'bg-blue-3 text-blue-8',
             'th-dark:bg-blue-3 th-dark:text-blue-8',
             'th-highcontrast:bg-blue-3 th-highcontrast:text-blue-8'
@@ -35,7 +35,7 @@ export function DashboardItem({ value, icon, type, children }: Props) {
         <div className="flex flex-col justify-around">
           <div
             className={clsx(
-              'font-medium text-2xl',
+              'text-2xl font-medium',
               'text-gray-9',
               'th-dark:text-white',
               'th-highcontrast:text-white'

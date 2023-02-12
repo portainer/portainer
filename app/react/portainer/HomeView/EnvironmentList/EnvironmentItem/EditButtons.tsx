@@ -27,7 +27,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
   );
 
   return (
-    <ButtonsGrid className="w-11 ml-3">
+    <ButtonsGrid className="ml-3 w-11">
       <LinkButton
         disabled={!isAdmin}
         to="portainer.endpoints.endpoint"
@@ -85,8 +85,8 @@ function ButtonsGrid({
   return (
     <div
       className={clsx(
-        'grid border border-solid rounded-r-lg',
-        'border-gray-5 th-dark:border-gray-9 th-highcontrast:border-white',
+        'grid rounded-r-lg border border-solid',
+        'border-gray-5 th-highcontrast:border-white th-dark:border-gray-9',
         'overflow-hidden',
         className
       )}

@@ -25,7 +25,7 @@
           <div class="btn-group" authorization="DockerImageDelete">
             <button
               type="button"
-              class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+              class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
               authorization="DockerImageDelete"
               ng-disabled="$ctrl.state.selectedItemCount === 0"
               ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
@@ -77,7 +77,7 @@
 
           <button
             type="button"
-            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
             ui-sref="docker.images.build"
             authorization="DockerImageBuild"
             data-cy="image-buildImageButton"
@@ -123,11 +123,11 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover table-filters nowrap-cells">
+        <table class="table-hover table-filters nowrap-cells table">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" popover-placement="bottom-left" is-open="$ctrl.filters.state.open">
-                <div class="flex gap-1 items-center">
+                <div class="flex items-center gap-1">
                   <span class="md-checkbox">
                     <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                     <label for="select_all"></label>
@@ -218,7 +218,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate: 40 }}</a>
+                <a ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate : 40 }}</a>
                 <span style="margin-left: 10px" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
               </td>
               <td>
@@ -229,10 +229,10 @@
               <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No image available.</td>
+              <td colspan="5" class="text-muted text-center">No image available.</td>
             </tr>
           </tbody>
         </table>

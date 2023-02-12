@@ -59,7 +59,7 @@
           <tbody>
             <tr ng-if="!$ctrl.isRoot">
               <td colspan="4">
-                <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ng-click="$ctrl.goToParent()"
+                <button type="button" class="btn btn-link !ml-0 p-0 hover:no-underline" ng-click="$ctrl.goToParent()"
                   ><pr-icon icon="'corner-left-up'"></pr-icon>Go to parent</button
                 >
               </td>
@@ -78,7 +78,7 @@
                   <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"><pr-icon icon="'check'"></pr-icon></a>
                 </span>
                 <span ng-if="!item.edit && item.Dir">
-                  <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ng-click="$ctrl.browse({name: item.Name})" class="vertical-center"
+                  <button type="button" class="btn btn-link !ml-0 p-0 hover:no-underline" ng-click="$ctrl.browse({name: item.Name})" class="vertical-center"
                     ><pr-icon icon="'folder'"></pr-icon>{{ item.Name }}</button
                   >
                 </span>
@@ -101,10 +101,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No files found.</td>
+              <td colspan="5" class="text-muted text-center">No files found.</td>
             </tr>
           </tbody>
         </table>

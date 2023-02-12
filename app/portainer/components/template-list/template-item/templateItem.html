@@ -1,8 +1,8 @@
 <!-- template -->
-<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item !mr-0 !my-0" ng-click="$ctrl.onSelect($ctrl.model)">
+<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item !my-0 !mr-0" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <!-- template-image -->
-    <div class="vertical-center justify-center min-w-[56px]">
+    <div class="vertical-center min-w-[56px] justify-center">
       <fallback-image src="$ctrl.model.Logo" fallback-icon="'rocket'" class-name="'blocklist-item-logo'" size="'3xl'"></fallback-image>
     </div>
     <!-- !template-image -->
@@ -13,7 +13,7 @@
         <span class="blocklist-item-title">
           {{ $ctrl.model.Title }}
         </span>
-        <div class="inline-flex items-center space-left blocklist-item-subtitle">
+        <div class="space-left blocklist-item-subtitle inline-flex items-center">
           <div ng-if="$ctrl.model.Type != 3" class="vertical-center">
             <pr-icon ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform" icon="'svg-linux'" class="mr-1"></pr-icon>
             <span ng-if="!$ctrl.model.Platform"> &amp; </span>

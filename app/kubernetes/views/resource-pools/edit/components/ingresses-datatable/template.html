@@ -57,11 +57,11 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table-hover nowrap-cells table">
           <thead>
             <tr>
               <th ng-if="$ctrl.hasExpandableItems()" class="datatable-wide dropdown">
-                <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
+                <div class="vertical-center cursor-pointer" ng-click="$ctrl.expandAll()">
                   <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
                   <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
                 </div>
@@ -111,10 +111,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+              <td colspan="4" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted">No ingresses available.</td>
+              <td colspan="4" class="text-muted text-center">No ingresses available.</td>
             </tr>
           </tbody>
         </table>

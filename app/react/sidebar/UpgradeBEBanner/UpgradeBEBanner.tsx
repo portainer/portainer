@@ -57,11 +57,11 @@ function UpgradeBEBanner() {
     <>
       <button
         type="button"
-        className="border-0 bg-warning-5 text-warning-9 w-full py-2 font-semibold flex justify-center items-center gap-3"
+        className="flex w-full items-center justify-center gap-3 border-0 bg-warning-5 py-2 font-semibold text-warning-9"
         onClick={handleClick}
       >
         {isSidebarOpen && <>Upgrade to Business Edition</>}
-        <ArrowRight className="text-lg lucide" />
+        <ArrowRight className="lucide text-lg" />
       </button>
 
       {isOpen && <UpgradeDialog onDismiss={() => setIsOpen(false)} />}

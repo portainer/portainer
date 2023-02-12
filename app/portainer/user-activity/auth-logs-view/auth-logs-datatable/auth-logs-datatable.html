@@ -1,7 +1,7 @@
 <div class="datatable datatable-empty">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
+      <div class="toolBar vertical-center flex-wrap !gap-x-5 !gap-y-1">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
             <pr-icon icon="'history'"></pr-icon>
@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table-hover nowrap-cells table">
           <thead>
             <tr>
               <th>
@@ -85,10 +85,10 @@
               <td></td>
             </tr>
             <tr ng-if="!$ctrl.logs">
-              <td class="text-center text-muted" colspan="5">Loading...</td>
+              <td class="text-muted text-center" colspan="5">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.logs.length === 0">
-              <td class="text-center text-muted" colspan="8"> No logs available. </td>
+              <td class="text-muted text-center" colspan="8"> No logs available. </td>
             </tr>
           </tbody>
         </table>

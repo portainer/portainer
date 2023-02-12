@@ -46,7 +46,7 @@
             <div class="form-group">
               <div
                 ng-if="!ctrl.isRBACEnabled"
-                class="mb-6 mx-[15px] p-4 border border-solid bg-warning-2 border-warning-5 text-warning-8 th-dark:bg-yellow-11 th-dark:text-white th-highcontrast:bg-yellow-11 th-highcontrast:text-white small flex gap-1 rounded-lg"
+                class="small mx-[15px] mb-6 flex gap-1 rounded-lg border border-solid border-warning-5 bg-warning-2 p-4 text-warning-8 th-highcontrast:bg-yellow-11 th-highcontrast:text-white th-dark:bg-yellow-11 th-dark:text-white"
               >
                 <div class="mt-0.5">
                   <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
@@ -56,13 +56,13 @@
                   <p> This means you can't use Portainer RBAC functionality to regulate access to environment resources based on user roles. </p>
                   <p class="mb-0">
                     To enable RBAC, start the&nbsp;<a
-                      class="th-dark:text-blue-7 th-highcontrast:text-blue-4"
+                      class="th-highcontrast:text-blue-4 th-dark:text-blue-7"
                       href="https://kubernetes.io/docs/concepts/overview/components/#kube-apiserver"
                       target="_blank"
                       >API server</a
-                    >&nbsp;with the&nbsp;<code class="box-decoration-clone bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">--authorization-mode</code>&nbsp;flag set to a
-                    comma-separated list that includes&nbsp;<code class="bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">RBAC</code>, for example:&nbsp;
-                    <code class="box-decoration-clone bg-gray-4 th-dark:bg-black th-highcontrast:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
+                    >&nbsp;with the&nbsp;<code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">--authorization-mode</code>&nbsp;flag set to a
+                    comma-separated list that includes&nbsp;<code class="bg-gray-4 th-highcontrast:bg-black th-dark:bg-black">RBAC</code>, for example:&nbsp;
+                    <code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
                   </p>
                 </div>
               </div>
@@ -95,7 +95,7 @@
               <div class="col-sm-12">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-sm !ml-0 vertical-center"
+                  class="btn btn-primary btn-sm vertical-center !ml-0"
                   ng-disabled="ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
                   ng-click="ctrl.authorizeAccess()"
                   button-spinner="ctrl.actionInProgress"

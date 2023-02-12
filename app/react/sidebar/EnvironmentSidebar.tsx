@@ -46,7 +46,7 @@ export function EnvironmentSidebar() {
           <div className="flex items-center gap-1">
             <span>Environment:</span>
             <Icon icon={Slash} className="text-xl !text-gray-6" />
-            <span className="text-gray-6 text-sm">None selected</span>
+            <span className="text-sm text-gray-6">None selected</span>
           </div>
         </SidebarSectionTitle>
       )}
@@ -130,7 +130,7 @@ function Title({ environment, onClear }: TitleProps) {
 
   if (!isOpen) {
     return (
-      <div className="w-8 flex justify-center -ml-3" title={environment.Name}>
+      <div className="-ml-3 flex w-8 justify-center" title={environment.Name}>
         <EnvironmentIcon className="text-2xl" />
       </div>
     );
@@ -138,8 +138,8 @@ function Title({ environment, onClear }: TitleProps) {
 
   return (
     <div className="flex items-center">
-      <EnvironmentIcon className="text-2xl mr-3" />
-      <span className="text-white text-ellipsis overflow-hidden whitespace-nowrap">
+      <EnvironmentIcon className="mr-3 text-2xl" />
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-white">
         {environment.Name}
       </span>
 
@@ -149,7 +149,7 @@ function Title({ environment, onClear }: TitleProps) {
         onClick={onClear}
         className={clsx(
           styles.closeBtn,
-          'flex items-center justify-center transition-colors duration-200 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white be:hover:text-white'
+          'ml-auto mr-2 flex h-5 w-5 items-center justify-center rounded border-0 p-1 text-sm text-gray-5 transition-colors duration-200 hover:text-white be:text-gray-6 be:hover:text-white'
         )}
       >
         <X />
