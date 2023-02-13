@@ -12,12 +12,15 @@ export function createMockUsers(
     Id: value,
     Username: `user${value}`,
     Role: getRoles(roles, value),
-    UserTheme: '',
     RoleName: '',
     AuthenticationMethod: '',
     Checked: false,
     EndpointAuthorizations: {},
     PortainerAuthorizations: {},
+    ThemeSettings: {
+      color: 'auto',
+      subtleUpgradeButton: false,
+    },
   }));
 }
 
