@@ -1243,11 +1243,11 @@ type (
 		// Deprecated fields
 
 		// Deprecated
-		UserTheme string `example:"dark" json:"-"`
+		UserTheme string `example:"dark"`
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations `json:"-"`
+		PortainerAuthorizations Authorizations
 		// Deprecated in DBVersion == 25
-		EndpointAuthorizations EndpointAuthorizations `json:"-"`
+		EndpointAuthorizations EndpointAuthorizations
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user

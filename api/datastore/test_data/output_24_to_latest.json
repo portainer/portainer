@@ -902,6 +902,10 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": "",
+        "subtleUpgradeButton": false
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "admin"
@@ -929,6 +933,10 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": "",
+        "subtleUpgradeButton": false
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "prabhat"
