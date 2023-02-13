@@ -1,3 +1,4 @@
+import { ModalType } from '@@/modals';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 
@@ -45,6 +46,7 @@ class KubernetesAppGitFormController {
           title: 'Are you sure?',
           message: 'Any changes to this application will be overridden by the definition in git and may cause a service interruption. Do you wish to continue?',
           confirmButton: buildConfirmButton('Update', 'warning'),
+          modalType: ModalType.Warn,
         });
         if (!confirmed) {
           return;
