@@ -1245,11 +1245,11 @@ type (
 		// Deprecated fields
 
 		// Deprecated
-		UserTheme string `example:"dark" json:"-"`
+		UserTheme string `example:"dark"`
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations `json:"-"`
+		PortainerAuthorizations Authorizations
 		// Deprecated in DBVersion == 25
-		EndpointAuthorizations EndpointAuthorizations `json:"-"`
+		EndpointAuthorizations EndpointAuthorizations
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user
@@ -1496,7 +1496,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.17.0"
+	APIVersion = "2.17.1"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
