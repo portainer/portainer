@@ -58,7 +58,7 @@ function UpgradeBEBanner() {
   };
 
   if (!enabledPlatforms.includes(systemInfo.platform)) {
-    // return null;
+    return null;
   }
 
   const subtleButton = userQuery.data.ThemeSettings.subtleUpgradeButton;
