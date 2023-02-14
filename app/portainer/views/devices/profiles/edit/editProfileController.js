@@ -4,7 +4,8 @@ import { getProfile, updateProfile } from 'Portainer/hostmanagement/fdo/fdo.serv
 
 angular.module('portainer.app').controller('EditProfileController', EditProfileController);
 
-export default function EditProfileController($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
+/* @ngInject */
+export default function EditProfileController($scope, $async, $state, $window, Notifications) {
   $scope.buildMethods = [editor];
 
   $scope.formValues = {

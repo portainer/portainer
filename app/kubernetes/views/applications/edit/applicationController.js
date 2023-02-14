@@ -15,6 +15,9 @@ import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { confirmUpdate, confirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -108,7 +111,6 @@ class KubernetesApplicationController {
     clipboard,
     Notifications,
     LocalStorage,
-    ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
     KubernetesEventService,
@@ -122,7 +124,6 @@ class KubernetesApplicationController {
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
-    this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
 
@@ -224,7 +225,7 @@ class KubernetesApplicationController {
   }
 
   rollbackApplication() {
-    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause service interruption. Do you wish to continue?', (confirmed) => {
+    confirmUpdate('Rolling back the application to a previous configuration may cause service interruption. Do you wish to continue?', (confirmed) => {
       if (confirmed) {
         return this.$async(this.rollbackApplicationAsync);
       }
@@ -234,10 +235,11 @@ class KubernetesApplicationController {
    * REDEPLOY
    */
   async redeployApplicationAsync() {
-    const confirmed = await this.ModalService.confirmAsync({
+    const confirmed = await confirm({
+      modalType: ModalType.Warn,
       title: 'Are you sure?',
       message: 'Redeploying the application may cause a service interruption. Do you wish to continue?',
-      buttons: { confirm: { label: 'Redeploy', className: 'btn-primary' } },
+      confirmButton: buildConfirmButton('Redeploy'),
     });
     if (!confirmed) {
       return;

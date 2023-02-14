@@ -1,12 +1,14 @@
 import angular from 'angular';
+import { confirm } from '@@/modals/confirm';
+import { ModalType } from '@@/modals';
+import { buildConfirmButton } from '@@/modals/utils';
 
 class KubernetesResourcePoolsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, ModalService, KubernetesResourcePoolService, KubernetesNamespaceService) {
+  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesNamespaceService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
-    this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
 
@@ -53,7 +55,13 @@ class KubernetesResourcePoolsController {
     const message = isTerminatingNS
       ? 'At least one namespace is in a terminating state. For terminating state namespaces, you may continue and force removal, but doing so without having properly cleaned up may lead to unstable and unpredictable behavior. Are you sure you wish to proceed?'
       : 'Do you want to remove the selected namespace(s)? All the resources associated to the selected namespace(s) will be removed too. Are you sure you wish to proceed?';
-    this.ModalService.confirmWithTitle(isTerminatingNS ? 'Force namespace removal' : 'Are you sure?', message, (confirmed) => {
+    confirm({
+      title: isTerminatingNS ? 'Force namespace removal' : 'Are you sure?',
+      message,
+      confirmButton: buildConfirmButton('Remove', 'danger'),
+
+      modalType: ModalType.Destructive,
+    }).then((confirmed) => {
       if (confirmed) {
         return this.$async(this.removeActionAsync, selectedItems);
       }

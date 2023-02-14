@@ -4,13 +4,13 @@ import { useQueryClient } from 'react-query';
 import _ from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { DockerContainer } from '@/react/docker/containers/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { useContainers } from '@/react/docker/containers/queries/containers';
 
+import { confirmDelete } from '@@/modals/confirm';
 import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
@@ -103,7 +103,7 @@ export function ItemView() {
 
   async function onRemoveNetworkClicked() {
     const message = 'Do you want to delete the network?';
-    const confirmed = await confirmDeletionAsync(message);
+    const confirmed = await confirmDelete(message);
 
     if (confirmed) {
       deleteNetworkMutation.mutate(

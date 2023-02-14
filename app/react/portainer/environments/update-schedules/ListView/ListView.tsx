@@ -2,9 +2,9 @@ import { Clock, Trash2 } from 'lucide-react';
 import { useStore } from 'zustand';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
+import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
@@ -91,7 +91,7 @@ function TableActions({
   );
 
   async function handleRemove() {
-    const confirmed = await confirmDeletionAsync(
+    const confirmed = await confirmDelete(
       'Are you sure you want to remove these?'
     );
     if (!confirmed) {

@@ -33,7 +33,10 @@ import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 import { updateIngress, getIngresses } from '@/react/kubernetes/ingresses/service';
-import { confirmUpdateAppIngress } from '@/portainer/services/modal.service/prompt';
+import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateView/UpdateIngressPrompt';
+import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 import { placementOptions } from './placementTypes';
 
 class KubernetesCreateApplicationController {
@@ -46,7 +49,6 @@ class KubernetesCreateApplicationController {
     $state,
     Notifications,
     Authentication,
-    ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
     KubernetesStackService,
@@ -64,7 +66,6 @@ class KubernetesCreateApplicationController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
-    this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesStackService = KubernetesStackService;
@@ -187,19 +188,16 @@ class KubernetesCreateApplicationController {
   async updateApplicationViaWebEditor() {
     return this.$async(async () => {
       try {
-        const confirmed = await this.ModalService.confirmAsync({
+        const confirmed = await confirm({
           title: 'Are you sure?',
-          message: 'Any changes to this application will be overriden and may cause a service interruption. Do you wish to continue?',
-          buttons: {
-            confirm: {
-              label: 'Update',
-              className: 'btn-warning',
-            },
-          },
+          message: 'Any changes to this application will be overridden and may cause a service interruption. Do you wish to continue?',
+          confirmButton: buildConfirmButton('Update', 'warning'),
+          modalType: ModalType.Warn,
         });
         if (!confirmed) {
           return;
         }
+
         this.state.updateWebEditorInProgress = true;
         await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
         this.state.isEditorDirty = false;
@@ -214,7 +212,7 @@ class KubernetesCreateApplicationController {
 
   async uiCanExit() {
     if (this.stackFileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 
@@ -1055,11 +1053,11 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  async updateApplicationAsync(ingressesToUpdate, rulePlural) {
+  async updateApplicationAsync(ingressesToUpdate) {
     if (ingressesToUpdate.length) {
       try {
         await Promise.all(ingressesToUpdate.map((ing) => updateIngress(this.endpoint.Id, ing)));
-        this.Notifications.success('Success', `Ingress ${rulePlural} successfully updated`);
+        this.Notifications.success('Success', `Ingress ${ingressesToUpdate.length > 1 ? 'rules' : 'rule'} successfully updated`);
       } catch (error) {
         this.Notifications.error('Failure', error, 'Unable to update ingress');
       }
@@ -1081,33 +1079,22 @@ class KubernetesCreateApplicationController {
     const [ingressesToUpdate, servicePortsToUpdate] = await this.checkIngressesToUpdate();
     // if there is an ingressesToUpdate, then show a warning modal with asking if they want to update the ingresses
     if (ingressesToUpdate.length) {
-      const rulePlural = ingressesToUpdate.length > 1 ? 'rules' : 'rule';
-      const noMatchSentence =
-        servicePortsToUpdate.length > 1
-          ? `Service ports in this application no longer match the ingress ${rulePlural}.`
-          : `A service port in this application no longer matches the ingress ${rulePlural} which may break ingress rule paths.`;
-      const message = `
-        <ul class="ml-3">
-          <li>Updating the application may cause a service interruption.</li>
-          <li>${noMatchSentence}</li>
-        </ul>
-      `;
-      const inputLabel = `Update ingress ${rulePlural} to match the service port changes`;
-      confirmUpdateAppIngress(`Are you sure?`, message, inputLabel, (value) => {
-        if (value === null) {
-          return;
-        }
-        if (value.length === 0) {
-          return this.$async(this.updateApplicationAsync, [], '');
-        }
-        if (value[0] === '1') {
-          return this.$async(this.updateApplicationAsync, ingressesToUpdate, rulePlural);
-        }
-      });
+      const result = await confirmUpdateAppIngress(ingressesToUpdate, servicePortsToUpdate);
+      if (!result) {
+        return;
+      }
+
+      const { noMatch } = result;
+      if (!noMatch) {
+        return this.$async(this.updateApplicationAsync, []);
+      }
+      if (noMatch) {
+        return this.$async(this.updateApplicationAsync, ingressesToUpdate);
+      }
     } else {
-      this.ModalService.confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
+      confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
         if (confirmed) {
-          return this.$async(this.updateApplicationAsync, [], '');
+          return this.$async(this.updateApplicationAsync, []);
         }
       });
     }

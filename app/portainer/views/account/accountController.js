@@ -1,3 +1,7 @@
+import { confirmChangePassword, confirmDelete } from '@@/modals/confirm';
+import { openDialog } from '@@/modals/Dialog';
+import { buildConfirmButton } from '@@/modals/utils';
+
 angular.module('portainer.app').controller('AccountController', [
   '$scope',
   '$state',
@@ -7,8 +11,7 @@ angular.module('portainer.app').controller('AccountController', [
   'SettingsService',
   'StateManager',
   'ThemeManager',
-  'ModalService',
-  function ($scope, $state, Authentication, UserService, Notifications, SettingsService, StateManager, ThemeManager, ModalService) {
+  function ($scope, $state, Authentication, UserService, Notifications, SettingsService, StateManager, ThemeManager) {
     $scope.formValues = {
       currentPassword: '',
       newPassword: '',
@@ -17,7 +20,7 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     $scope.updatePassword = async function () {
-      const confirmed = await ModalService.confirmChangePassword();
+      const confirmed = await confirmChangePassword();
       if (confirmed) {
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
@@ -56,8 +59,9 @@ angular.module('portainer.app').controller('AccountController', [
           return true;
         }
       }
+
       if ($scope.forceChangePassword) {
-        ModalService.confirmForceChangePassword();
+        confirmForceChangePassword();
       }
       return !$scope.forceChangePassword;
     };
@@ -69,7 +73,7 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.removeAction = (selectedTokens) => {
       const msg = 'Do you want to remove the selected access token(s)? Any script or application using these tokens will no longer be able to invoke the Portainer API.';
 
-      ModalService.confirmDeletion(msg, function (confirmed) {
+      confirmDelete(msg).then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -160,3 +164,10 @@ angular.module('portainer.app').controller('AccountController', [
     initView();
   },
 ]);
+
+function confirmForceChangePassword() {
+  return openDialog({
+    message: 'Please update your password to a stronger password to continue using Portainer',
+    buttons: [buildConfirmButton('OK')],
+  });
+}

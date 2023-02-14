@@ -7,12 +7,10 @@ angular.module('portainer.app').controller('SettingsController', [
   '$scope',
   'Notifications',
   'SettingsService',
-  'ModalService',
   'StateManager',
   'BackupService',
   'FileSaver',
-  'Blob',
-  function ($scope, Notifications, SettingsService, ModalService, StateManager, BackupService, FileSaver) {
+  function ($scope, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
     $scope.customBannerFeatureId = FeatureId.CUSTOM_LOGIN_BANNER;
     $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
     $scope.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;

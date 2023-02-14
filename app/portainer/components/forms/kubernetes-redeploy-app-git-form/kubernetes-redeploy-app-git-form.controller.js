@@ -1,12 +1,14 @@
 import uuidv4 from 'uuid/v4';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
+import { confirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
-  constructor($async, $state, StackService, ModalService, Notifications, WebhookHelper) {
+  constructor($async, $state, StackService, Notifications, WebhookHelper) {
     this.$async = $async;
     this.$state = $state;
     this.StackService = StackService;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.WebhookHelper = WebhookHelper;
 
@@ -80,19 +82,16 @@ class KubernetesRedeployAppGitFormController {
   async pullAndRedeployApplication() {
     return this.$async(async () => {
       try {
-        const confirmed = await this.ModalService.confirmAsync({
+        const confirmed = await confirm({
           title: 'Are you sure?',
           message: 'Any changes to this application will be overridden by the definition in git and may cause a service interruption. Do you wish to continue?',
-          buttons: {
-            confirm: {
-              label: 'Update',
-              className: 'btn-warning',
-            },
-          },
+          confirmButton: buildConfirmButton('Update', 'warning'),
+          modalType: ModalType.Warn,
         });
         if (!confirmed) {
           return;
         }
+
         this.state.redeployInProgress = true;
         await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.formValues);
         this.Notifications.success('Success', 'Pulled and redeployed stack successfully');

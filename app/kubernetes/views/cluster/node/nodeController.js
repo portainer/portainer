@@ -8,6 +8,7 @@ import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'Ku
 import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubernetes/node/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
+import { confirmUpdate } from '@@/modals/confirm';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -16,7 +17,6 @@ class KubernetesNodeController {
     $state,
     Notifications,
     LocalStorage,
-    ModalService,
     KubernetesNodeService,
     KubernetesEventService,
     KubernetesPodService,
@@ -29,7 +29,6 @@ class KubernetesNodeController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
-    this.ModalService = ModalService;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
@@ -266,7 +265,7 @@ class KubernetesNodeController {
     const drainWarning = this.computeDrainWarning();
 
     if (taintsWarning && !labelsWarning) {
-      this.ModalService.confirmUpdate(
+      confirmUpdate(
         'Changes to taints will immediately deschedule applications running on this node without the corresponding tolerations. Do you wish to continue?',
         (confirmed) => {
           if (confirmed) {
@@ -275,7 +274,7 @@ class KubernetesNodeController {
         }
       );
     } else if (!taintsWarning && labelsWarning) {
-      this.ModalService.confirmUpdate(
+      confirmUpdate(
         'Removing or changing a label that is used might prevent applications from being scheduled on this node in the future. Do you wish to continue?',
         (confirmed) => {
           if (confirmed) {
@@ -284,7 +283,7 @@ class KubernetesNodeController {
         }
       );
     } else if (taintsWarning && labelsWarning) {
-      this.ModalService.confirmUpdate(
+      confirmUpdate(
         'Changes to taints will immediately deschedule applications running on this node without the corresponding tolerations.<br/></br/>Removing or changing a label that is used might prevent applications from scheduling on this node in the future.\n\nDo you wish to continue?',
         (confirmed) => {
           if (confirmed) {
@@ -293,7 +292,7 @@ class KubernetesNodeController {
         }
       );
     } else if (cordonWarning) {
-      this.ModalService.confirmUpdate(
+      confirmUpdate(
         'Marking this node as unschedulable will effectively cordon the node and prevent any new workload from being scheduled on that node. Are you sure?',
         (confirmed) => {
           if (confirmed) {
@@ -302,14 +301,11 @@ class KubernetesNodeController {
         }
       );
     } else if (drainWarning) {
-      this.ModalService.confirmUpdate(
-        'Draining this node will cause all workloads to be evicted from that node. This might lead to some service interruption. Are you sure?',
-        (confirmed) => {
-          if (confirmed) {
-            return this.$async(this.updateNodeAsync);
-          }
+      confirmUpdate('Draining this node will cause all workloads to be evicted from that node. This might lead to some service interruption. Are you sure?', (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.updateNodeAsync);
         }
-      );
+      });
     } else {
       return this.$async(this.updateNodeAsync);
     }

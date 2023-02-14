@@ -1,11 +1,12 @@
 import { useRouter } from '@uirouter/react';
 import { Plus } from 'lucide-react';
 
-import { promptAsync } from '@/portainer/services/modal.service/prompt';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { Button } from '@@/buttons';
+import { openModal } from '@@/modals';
 
-import { usePublicSettings } from '../../queries';
+import { DeployTypePrompt } from './DeployTypePrompt';
 
 enum DeployType {
   FDO = 'FDO',
@@ -42,30 +43,15 @@ export function AddDeviceButton() {
     }
   }
 
-  function getDeployType(): Promise<DeployType> {
+  function getDeployType() {
     if (!isFDOEnabled) {
       return Promise.resolve(DeployType.MANUAL);
     }
 
-    return promptAsync({
-      title: 'How would you like to add an Edge Device?',
-      inputType: 'radio',
-      inputOptions: [
-        {
-          text: 'Provision bare-metal using Intel FDO',
-          value: DeployType.FDO,
-        },
-        {
-          text: 'Deploy agent manually',
-          value: DeployType.MANUAL,
-        },
-      ],
-      buttons: {
-        confirm: {
-          label: 'Confirm',
-          className: 'btn-primary',
-        },
-      },
-    }) as Promise<DeployType>;
+    return askForDeployType();
   }
+}
+
+function askForDeployType() {
+  return openModal(DeployTypePrompt, {});
 }

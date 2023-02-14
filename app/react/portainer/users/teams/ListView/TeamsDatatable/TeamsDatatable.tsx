@@ -7,8 +7,8 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { Team, TeamId } from '@/react/portainer/users/teams/types';
 import { deleteTeam } from '@/react/portainer/users/teams/teams.service';
-import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
+import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { buildNameColumn } from '@@/datatables/NameCell';
@@ -86,7 +86,7 @@ function useRemoveMutation() {
   return { handleRemove };
 
   async function handleRemove(teams: TeamId[]) {
-    const confirmed = await confirmDeletionAsync(
+    const confirmed = await confirmDelete(
       'Are you sure you want to remove the selected teams?'
     );
 

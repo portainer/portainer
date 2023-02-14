@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { confirmDelete } from '@@/modals/confirm';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
 
 angular.module('portainer.app').controller('RegistriesController', [
@@ -6,9 +7,8 @@ angular.module('portainer.app').controller('RegistriesController', [
   '$scope',
   '$state',
   'RegistryService',
-  'ModalService',
   'Notifications',
-  function ($q, $scope, $state, RegistryService, ModalService, Notifications) {
+  function ($q, $scope, $state, RegistryService, Notifications) {
     $scope.state = {
       actionInProgress: false,
     };
@@ -24,7 +24,7 @@ angular.module('portainer.app').controller('RegistriesController', [
       const registriesMsg = selectedItems.length > 1 ? 'registries' : 'registry';
       const msg = `T${regAttrMsg} ${registriesMsg} might be used by applications inside one or more environments. Removing the ${registriesMsg} could lead to a service interruption for the applications using t${regAttrMsg} ${registriesMsg}. Do you want to remove the selected ${registriesMsg}?`;
 
-      ModalService.confirmDeletion(msg, function onConfirm(confirmed) {
+      confirmDelete(msg).then((confirmed) => {
         if (!confirmed) {
           return;
         }

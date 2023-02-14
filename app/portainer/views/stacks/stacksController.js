@@ -1,9 +1,11 @@
+import { confirmDelete } from '@@/modals/confirm';
+
 angular.module('portainer.app').controller('StacksController', StacksController);
 
 /* @ngInject */
-function StacksController($scope, $state, Notifications, StackService, ModalService, Authentication, endpoint) {
+function StacksController($scope, $state, Notifications, StackService, Authentication, endpoint) {
   $scope.removeAction = function (selectedItems) {
-    ModalService.confirmDeletion('Do you want to remove the selected stack(s)? Associated services will be removed as well.', function onConfirm(confirmed) {
+    confirmDelete('Do you want to remove the selected stack(s)? Associated services will be removed as well.').then((confirmed) => {
       if (!confirmed) {
         return;
       }
