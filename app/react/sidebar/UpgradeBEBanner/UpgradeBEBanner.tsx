@@ -68,14 +68,14 @@ function UpgradeBEBanner() {
       <button
         type="button"
         className={clsx('flex w-full items-center justify-center gap-2 py-2', {
-          'bg-warning-5 text-warning-9 border-0 font-semibold': !subtleButton,
-          'bg-[#023959] border-blue-9 th-dark:bg-black th-dark:border-[#343434] border border-solid text-white font-medium hover:underline':
+          'border-0 bg-warning-5 font-semibold text-warning-9': !subtleButton,
+          'border border-solid border-blue-9 bg-[#023959] font-medium text-white hover:underline th-dark:border-[#343434] th-dark:bg-black':
             subtleButton,
         })}
         onClick={handleClick}
       >
         <ArrowUpCircle
-          className={clsx('text-lg lucide', {
+          className={clsx('lucide text-lg', {
             'fill-warning-9 stroke-warning-5': !subtleButton,
             'fill-warning-6 stroke-[#023959] th-dark:stroke-black':
               subtleButton,
