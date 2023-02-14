@@ -10,6 +10,7 @@ import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, customTemplate, url } from '@@/BoxSelector/common-options/build-methods';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class KubernetesDeployController {
   /* @ngInject */
