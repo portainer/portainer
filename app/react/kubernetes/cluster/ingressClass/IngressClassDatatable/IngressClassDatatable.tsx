@@ -143,7 +143,7 @@ export function IngressClassDatatable({
         {ingressControllers &&
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
-            <span className="flex items-center mt-1 text-warning">
+            <span className="text-warning mt-1 flex items-center">
               <Icon icon={AlertTriangle} className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
             </span>

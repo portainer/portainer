@@ -28,7 +28,7 @@ export function TableHeaderCell({
 }: Props) {
   return (
     <th style={style} className={className}>
-      <div className="flex flex-row items-center h-full gap-1 flex-nowrap">
+      <div className="flex h-full flex-row flex-nowrap items-center gap-1">
         <SortWrapper
           canSort={canSort}
           onClick={onSortClick}
@@ -71,7 +71,7 @@ function SortWrapper({
         isSorted && styles.sortingActive
       )}
     >
-      <div className="flex flex-row items-center justify-start w-full h-full">
+      <div className="flex h-full w-full flex-row items-center justify-start">
         {children}
         <TableHeaderSortIcons
           sorted={isSorted}
@@ -96,7 +96,7 @@ export function TableColumnHeaderAngular({
   isSortedDesc = true,
 }: TableColumnHeaderAngularProps) {
   return (
-    <div className="flex flex-row h-full flex-nowrap">
+    <div className="flex h-full flex-row flex-nowrap">
       <SortWrapper
         canSort={canSort}
         isSorted={!!isSorted}
