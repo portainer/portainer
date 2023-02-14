@@ -35,7 +35,7 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
           disabled={cannotPullImage}
         />
         {cannotPullImage && (
-          <div className="text-sm mt-1">
+          <div className="mt-1 text-sm">
             <TextTip color="orange">
               Cannot re-pull as the image is inaccessible - either it no longer
               exists or the tag or name is no longer correct.
