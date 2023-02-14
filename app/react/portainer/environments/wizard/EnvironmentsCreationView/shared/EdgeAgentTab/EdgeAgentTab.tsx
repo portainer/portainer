@@ -5,6 +5,7 @@ import { Environment } from '@/react/portainer/environments/types';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { CommandTab } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { OS, EdgeInfo } from '@/react/edge/components/EdgeScriptForm/types';
+import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeKeyDisplay';
 
 import { Button } from '@@/buttons';
 
@@ -38,6 +39,14 @@ export function EdgeAgentTab({
 
       {edgeInfo && (
         <>
+          <div className="clear-both" />
+
+          <hr />
+
+          <EdgeKeyDisplay edgeKey={edgeInfo.key} />
+
+          <hr />
+
           <EdgeScriptForm
             edgeInfo={edgeInfo}
             commands={commands}

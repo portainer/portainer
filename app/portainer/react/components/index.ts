@@ -19,7 +19,7 @@ import { PorAccessControlFormTeamSelector } from '@/react/portainer/access-contr
 import { PorAccessControlFormUserSelector } from '@/react/portainer/access-control/PorAccessControlForm/UsersSelector';
 import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
 import { AccessTypeSelector } from '@/react/portainer/access-control/EditDetails/AccessTypeSelector';
-import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeTokenDisplay';
+import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeKeyDisplay';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
