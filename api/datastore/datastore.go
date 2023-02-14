@@ -8,6 +8,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
@@ -59,6 +60,24 @@ func (store *Store) Open() (newStore bool, err error) {
 
 func (store *Store) Close() error {
 	return store.connection.Close()
+}
+
+func (store *Store) UpdateTx(fn func(dataservices.DataStoreTx) error) error {
+	return store.connection.UpdateTx(func(tx portainer.Transaction) error {
+		return fn(&StoreTx{
+			store: store,
+			tx:    tx,
+		})
+	})
+}
+
+func (store *Store) ViewTx(fn func(dataservices.DataStoreTx) error) error {
+	return store.connection.ViewTx(func(tx portainer.Transaction) error {
+		return fn(&StoreTx{
+			store: store,
+			tx:    tx,
+		})
+	})
 }
 
 // BackupTo backs up db to a provided writer.
