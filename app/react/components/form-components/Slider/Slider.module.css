@@ -7,7 +7,7 @@
 }
 
 .slider :global .rc-slider-handle {
-  @apply border-blue-8 border-2;
+  @apply border-2 border-blue-8;
   width: 24px;
   height: 24px;
   margin-top: -8px;

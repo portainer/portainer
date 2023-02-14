@@ -19,7 +19,7 @@ interface Props {
 
 function Item({ item, onChange }: ItemProps<Gpu>) {
   return (
-    <div className="flex gap-2 flex-grow">
+    <div className="flex flex-grow gap-2">
       <InputGroup size="small" className="flex-grow">
         <InputGroup.Addon>GPU Name</InputGroup.Addon>
         <InputGroup.Input

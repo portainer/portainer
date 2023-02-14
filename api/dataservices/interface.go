@@ -13,16 +13,7 @@ import (
 )
 
 type (
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() (newStore bool, err error)
-		Init() error
-		Close() error
-		MigrateData() error
-		Rollback(force bool) error
-		CheckCurrentEdition() error
-		BackupTo(w io.Writer) error
-		Export(filename string) (err error)
+	DataStoreTx interface {
 		IsErrObjectNotFound(err error) bool
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
@@ -48,6 +39,22 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+	}
+
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() (newStore bool, err error)
+		Init() error
+		Close() error
+		UpdateTx(func(DataStoreTx) error) error
+		ViewTx(func(DataStoreTx) error) error
+		MigrateData() error
+		Rollback(force bool) error
+		CheckCurrentEdition() error
+		BackupTo(w io.Writer) error
+		Export(filename string) (err error)
+
+		DataStoreTx
 	}
 
 	// CustomTemplateService represents a service to manage custom templates

@@ -40,7 +40,7 @@ export function TooltipWithChildren({
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className={styles.tooltipContainer} onClick={onClickHandler}>
       {(heading || (BEFeatureID && limitedToBE)) && (
-        <div className="w-full mb-3 inline-flex justify-between">
+        <div className="mb-3 inline-flex w-full justify-between">
           <span>{heading}</span>
           {BEFeatureID && limitedToBE && (
             <a

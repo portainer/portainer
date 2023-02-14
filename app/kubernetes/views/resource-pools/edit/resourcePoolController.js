@@ -14,6 +14,7 @@ import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuot
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { updateIngressControllerClassMap, getIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
+import { confirmUpdate } from '@@/modals/confirm';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -26,7 +27,6 @@ class KubernetesResourcePoolController {
     Notifications,
     LocalStorage,
     EndpointService,
-    ModalService,
     KubernetesNodeService,
     KubernetesMetricsService,
     KubernetesResourceQuotaService,
@@ -45,7 +45,6 @@ class KubernetesResourcePoolController {
       Notifications,
       LocalStorage,
       EndpointService,
-      ModalService,
       KubernetesNodeService,
       KubernetesMetricsService,
       KubernetesResourceQuotaService,
@@ -189,7 +188,7 @@ class KubernetesResourcePoolController {
       ${warnings.ingress ? messages.ingress + '<br/><br/>' : ''}
       ${warnings.registries ? messages.registries + '<br/><br/>' : ''}
       Do you wish to continue?`;
-      this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
+      confirmUpdate(displayedMessage, (confirmed) => {
         if (confirmed) {
           return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }
@@ -205,7 +204,7 @@ class KubernetesResourcePoolController {
       : 'Marking this namespace as a system namespace will prevent non administrator users from managing it and the resources it contains. Are you sure?';
 
     return new Promise((resolve) => {
-      this.ModalService.confirmUpdate(message, resolve);
+      confirmUpdate(message, resolve);
     });
   }
 

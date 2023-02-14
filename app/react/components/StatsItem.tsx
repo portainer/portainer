@@ -16,11 +16,11 @@ export function StatsItem({
   iconClass,
 }: PropsWithChildren<Props>) {
   return (
-    <span className="flex gap-1 items-center">
+    <span className="flex items-center gap-1">
       <Icon className={clsx('icon icon-sm', iconClass)} icon={icon} />
       <span>{value}</span>
       {children && (
-        <span className="ml-1 flex gap-2 items-center">{children}</span>
+        <span className="ml-1 flex items-center gap-2">{children}</span>
       )}
     </span>
   );

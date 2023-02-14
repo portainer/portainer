@@ -61,7 +61,7 @@ export function DockerfileDetails({ image }: Props) {
 
         {image.Env.length > 0 && (
           <DetailsTable.Row label="ENV">
-            <table className="table table-bordered table-condensed">
+            <table className="table-bordered table-condensed table">
               <tbody>
                 {image.Env.map((variable) => (
                   <tr key={variable}>

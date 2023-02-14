@@ -63,8 +63,8 @@ export function BoxSelectorItem<T extends Value>({
         <div
           className={clsx('flex gap-2', {
             'opacity-30': limitedToBE,
-            'flex-col justify-between h-full': !slim,
-            'items-center slim': slim,
+            'h-full flex-col justify-between': !slim,
+            'slim items-center': slim,
           })}
         >
           <div

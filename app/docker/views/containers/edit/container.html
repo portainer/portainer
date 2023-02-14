@@ -235,7 +235,7 @@
     <rd-widget>
       <rd-widget-header icon="list" title-text="Container details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table container-details-table">
+        <table class="container-details-table table">
           <tbody>
             <tr>
               <td>Image</td>
@@ -268,7 +268,7 @@
             <tr>
               <td>ENV</td>
               <td>
-                <table class="table table-bordered table-condensed">
+                <table class="table-bordered table-condensed table">
                   <tr ng-repeat="var in container.Config.Env track by $index">
                     <td>{{ var|key: '=' }}</td>
                     <td>{{ var|value: '=' }}</td>
@@ -279,7 +279,7 @@
             <tr ng-if="!(container.Config.Labels | emptyobject)">
               <td>Labels</td>
               <td>
-                <table class="table table-bordered table-condensed">
+                <table class="table-bordered table-condensed table">
                   <tr ng-repeat="(k, v) in container.Config.Labels">
                     <td>{{ k }}</td>
                     <td>{{ v }}</td>
@@ -302,7 +302,7 @@
             <tr ng-if="!(container.HostConfig.Sysctls | emptyobject)">
               <td>Sysctls</td>
               <td>
-                <table class="table table-bordered table-condensed">
+                <table class="table-bordered table-condensed table">
                   <tr ng-repeat="(k, v) in container.HostConfig.Sysctls">
                     <td>{{ k }}</td>
                     <td>{{ v }}</td>

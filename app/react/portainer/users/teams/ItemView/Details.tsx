@@ -2,7 +2,6 @@ import { useRouter } from '@uirouter/react';
 import { useMutation, useQueryClient } from 'react-query';
 import { Trash2, Users } from 'lucide-react';
 
-import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   mutationOptions,
@@ -10,6 +9,7 @@ import {
   withInvalidate,
 } from '@/react-tools/react-query';
 
+import { confirmDelete } from '@@/modals/confirm';
 import { Button } from '@@/buttons';
 import { Widget } from '@@/Widget';
 
@@ -75,7 +75,7 @@ export function Details({ team, memberships, isAdmin }: Props) {
   );
 
   async function handleDeleteClick() {
-    const confirmed = await confirmDeletionAsync(
+    const confirmed = await confirmDelete(
       `Do you want to delete this team? Users in this team will not be deleted.`
     );
     if (!confirmed) {

@@ -56,7 +56,7 @@ function AlertContainer({
   children,
 }: PropsWithChildren<{ className?: string }>) {
   return (
-    <div className={clsx('border-2 border-solid rounded-md', 'p-3', className)}>
+    <div className={clsx('rounded-md border-2 border-solid', 'p-3', className)}>
       {children}
     </div>
   );
@@ -68,7 +68,7 @@ function AlertHeader({
 }: PropsWithChildren<{ className?: string }>) {
   return (
     <h4
-      className={clsx('text-base', 'flex gap-2 items-center !m-0', className)}
+      className={clsx('text-base', '!m-0 flex items-center gap-2', className)}
     >
       {children}
     </h4>

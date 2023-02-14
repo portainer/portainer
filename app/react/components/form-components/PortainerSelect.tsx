@@ -67,9 +67,10 @@ export function SingleSelect<TValue = string>({
   isClearable,
   bindToBody,
 }: SingleProps<TValue>) {
-  const selectedValue = value
-    ? _.first(findSelectedOptions<TValue>(options, value))
-    : null;
+  const selectedValue =
+    value || (typeof value === 'number' && value === 0)
+      ? _.first(findSelectedOptions<TValue>(options, value))
+      : null;
 
   return (
     <ReactSelect<Option<TValue>>
@@ -94,7 +95,8 @@ function findSelectedOptions<TValue>(
   value: TValue | readonly TValue[]
 ) {
   const valueArr = Array.isArray(value) ? value : [value];
-  return _.compact(
+
+  const values = _.compact(
     options.flatMap((option) => {
       if (isGroup(option)) {
         return option.options.find((option) => valueArr.includes(option.value));
@@ -107,6 +109,8 @@ function findSelectedOptions<TValue>(
       return null;
     })
   );
+
+  return values;
 }
 
 export function MultiSelect<TValue = string>({

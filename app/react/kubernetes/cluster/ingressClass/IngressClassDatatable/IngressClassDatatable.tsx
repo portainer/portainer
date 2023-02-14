@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, Database } from 'lucide-react';
 import { useStore } from 'zustand';
 
-import { confirmWarn } from '@/portainer/services/modal.service/confirm';
-
+import { confirm } from '@@/modals/confirm';
+import { ModalType } from '@@/modals';
 import { Datatable } from '@@/datatables';
 import { Button, ButtonGroup } from '@@/buttons';
 import { Icon } from '@@/Icon';
 import { useSearchBarState } from '@@/datatables/SearchBar';
 import { createPersistedStore } from '@@/datatables/types';
+import { buildConfirmButton } from '@@/modals/utils';
 
 import { IngressControllerClassMap } from '../types';
 
@@ -144,12 +145,12 @@ export function IngressClassDatatable({
 
   function renderIngressClassDescription() {
     return (
-      <div className="flex flex-col !text-xs text-muted w-full">
+      <div className="text-muted flex w-full flex-col !text-xs">
         <div className="mt-1">{description}</div>
         {ingressControllers &&
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
-            <span className="flex items-center text-warning mt-1">
+            <span className="text-warning mt-1 flex items-center">
               <Icon icon={AlertTriangle} className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
             </span>
@@ -158,7 +159,7 @@ export function IngressClassDatatable({
     );
   }
 
-  function updateIngressControllers(
+  async function updateIngressControllers(
     selectedRows: IngressControllerClassMap[],
     ingControllerFormValues: IngressControllerClassMap[],
     availability: boolean
@@ -194,38 +195,32 @@ export function IngressClassDatatable({
       );
 
       if (usedControllersToDisallow.length > 0) {
-        const usedControllerHtmlListItems = usedControllersToDisallow.map(
-          (controller) => `<li>${controller.ClassName}</li>`
-        );
-        const usedControllerHtmlList = `<ul class="ml-6">${usedControllerHtmlListItems.join(
-          ''
-        )}</ul>`;
-        confirmWarn({
+        const confirmed = await confirm({
           title: 'Disallow in-use ingress controllers?',
-          message: `
+          modalType: ModalType.Warn,
+          message: (
             <div>
-              <p>There are ingress controllers you want to disallow that are in use:</p>
-              ${usedControllerHtmlList}
-              <p>No new ingress rules can be created for the disallowed controllers.</p>
-            </div>`,
-          buttons: {
-            cancel: {
-              label: 'Cancel',
-              className: 'btn-default',
-            },
-            confirm: {
-              label: 'Disallow',
-              className: 'btn-warning',
-            },
-          },
-          callback: (confirmed) => {
-            if (confirmed) {
-              setIngControllerFormValues(updatedIngressControllers);
-              onChangeControllers(updatedIngressControllers);
-            }
-          },
+              <p>
+                There are ingress controllers you want to disallow that are in
+                use:
+              </p>
+              <ul className="ml-6">
+                {usedControllersToDisallow.map((controller) => (
+                  <li key={controller.ClassName}>${controller.ClassName}</li>
+                ))}
+              </ul>
+              <p>
+                No new ingress rules can be created for the disallowed
+                controllers.
+              </p>
+            </div>
+          ),
+          confirmButton: buildConfirmButton('Disallow', 'warning'),
         });
-        return;
+
+        if (!confirmed) {
+          return;
+        }
       }
       setIngControllerFormValues(updatedIngressControllers);
       onChangeControllers(updatedIngressControllers);

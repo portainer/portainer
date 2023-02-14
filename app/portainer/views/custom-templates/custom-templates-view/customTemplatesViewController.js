@@ -3,6 +3,7 @@ import { AccessControlFormData } from 'Portainer/components/accessControlForm/po
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { confirmDelete } from '@@/modals/confirm';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -14,7 +15,6 @@ class CustomTemplatesViewController {
     Authentication,
     CustomTemplateService,
     FormValidator,
-    ModalService,
     NetworkService,
     Notifications,
     ResourceControlService,
@@ -28,7 +28,6 @@ class CustomTemplatesViewController {
     this.Authentication = Authentication;
     this.CustomTemplateService = CustomTemplateService;
     this.FormValidator = FormValidator;
-    this.ModalService = ModalService;
     this.NetworkService = NetworkService;
     this.Notifications = Notifications;
     this.ResourceControlService = ResourceControlService;
@@ -244,7 +243,7 @@ class CustomTemplatesViewController {
     return this.$async(this.confirmDeleteAsync, templateId);
   }
   async confirmDeleteAsync(templateId) {
-    const confirmed = await this.ModalService.confirmDeletionAsync('Are you sure that you want to delete this template?');
+    const confirmed = await confirmDelete('Are you sure that you want to delete this template?');
     if (!confirmed) {
       return;
     }

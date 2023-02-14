@@ -36,10 +36,13 @@ type testDatastore struct {
 	webhook                 dataservices.WebhookService
 }
 
-func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
-func (d *testDatastore) Open() (bool, error)                                { return false, nil }
-func (d *testDatastore) Init() error                                        { return nil }
-func (d *testDatastore) Close() error                                       { return nil }
+func (d *testDatastore) BackupTo(io.Writer) error                            { return nil }
+func (d *testDatastore) Open() (bool, error)                                 { return false, nil }
+func (d *testDatastore) Init() error                                         { return nil }
+func (d *testDatastore) Close() error                                        { return nil }
+func (d *testDatastore) UpdateTx(func(dataservices.DataStoreTx) error) error { return nil }
+func (d *testDatastore) ViewTx(func(dataservices.DataStoreTx) error) error   { return nil }
+
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
 func (d *testDatastore) MigrateData() error                                 { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }

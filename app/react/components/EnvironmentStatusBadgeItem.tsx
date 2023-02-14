@@ -20,7 +20,7 @@ export function EnvironmentStatusBadgeItem({
     <span
       className={clsx(
         'flex items-center gap-1',
-        'border-2 border-solid rounded',
+        'rounded border-2 border-solid',
         'w-fit py-px px-1',
         'text-xs font-semibold text-gray-7',
         {

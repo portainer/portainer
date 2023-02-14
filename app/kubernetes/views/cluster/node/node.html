@@ -135,7 +135,7 @@
                         <span class="label label-info image-tag" ng-if="ctrl.isSystemLabel($index)" style="margin-left: 5px">system</span>
                       </div>
                     </div>
-                    <div class="small mt-2 text-warning" ng-show="kubernetesNodeUpdateForm['label_key_' + $index].$invalid || ctrl.state.duplicateLabelKeys[$index] !== undefined">
+                    <div class="small text-warning mt-2" ng-show="kubernetesNodeUpdateForm['label_key_' + $index].$invalid || ctrl.state.duplicateLabelKeys[$index] !== undefined">
                       <ng-messages for="kubernetesNodeUpdateForm['label_key_' + $index].$error">
                         <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Label key is required. </p>
                       </ng-messages>

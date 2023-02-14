@@ -1,7 +1,7 @@
 <!-- use registry -->
 <div class="row">
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_registry" class="control-label text-left col-sm-3 col-lg-2" ng-class="$ctrl.labelClass"> Registry </label>
+    <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> Registry </label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <select
         ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
@@ -13,7 +13,7 @@
     </div>
   </div>
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2 required">Image</label>
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image</label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <div class="input-group">
         <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
@@ -49,7 +49,7 @@
       <span class="small">
         <p class="text-muted ml-4"> When using advanced mode, image and repository <b>must be</b> publicly available. </p>
       </span>
-      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2 required">Image </label>
+      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image </label>
       <div ng-class="$ctrl.inputClass" class="col-sm-8">
         <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" required />
       </div>
@@ -71,10 +71,10 @@
   <!-- ! info message -->
   <div class="form-group">
     <div class="col-sm-12">
-      <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
+      <button type="button" class="btn btn-link btn-sm vertical-center !ml-0 p-0 hover:no-underline" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
         <pr-icon icon="'database'"> </pr-icon> Simple mode
       </button>
-      <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
+      <button type="button" class="btn btn-link btn-sm vertical-center !ml-0 p-0 hover:no-underline" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
         <pr-icon icon="'globe'"> </pr-icon> Advanced mode
       </button>
     </div>

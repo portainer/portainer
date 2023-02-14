@@ -16,7 +16,7 @@ export function LimitedToBeIndicator({ featureId, tooltipId }: Props) {
 
   return (
     <div className="absolute left-0 top-0 w-full">
-      <div className="mx-auto max-w-fit bg-warning-4 rounded-b-lg py-1 px-3 flex gap-1 text-sm items-center">
+      <div className="mx-auto flex max-w-fit items-center gap-1 rounded-b-lg bg-warning-4 py-1 px-3 text-sm">
         <a href={url} target="_blank" rel="noopener noreferrer">
           <span className="text-warning-9">BE Feature</span>
         </a>

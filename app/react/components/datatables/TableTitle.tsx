@@ -19,7 +19,7 @@ export function TableTitle({
 }: PropsWithChildren<Props>) {
   return (
     <div className={clsx('toolBar flex-col', className)}>
-      <div className="flex gap-1 p-0 w-full items-center">
+      <div className="flex w-full items-center gap-1 p-0">
         <div className="toolBarTitle">
           {icon && (
             <div className="widget-icon">

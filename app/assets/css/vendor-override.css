@@ -17,8 +17,7 @@
   background-color: var(--bg-hover-table-color);
 }
 
-.switch i,
-.bootbox-form .checkbox i {
+.switch i {
   background: var(--bg-switch-box-color);
 }
 
@@ -75,25 +74,6 @@ fieldset[disabled] .form-control {
 
 .modal-content {
   background-color: var(--bg-modal-content-color);
-}
-
-.modal-header {
-  border-bottom: 1px solid var(--border-modal-header-color);
-}
-
-.modal-footer {
-  border-top: 1px solid var(--border-modal-header-color);
-}
-
-.close {
-  color: var(--button-close-color);
-  opacity: var(--button-opacity);
-}
-
-.close:hover,
-.close:focus {
-  color: var(--button-close-color);
-  opacity: var(--button-opacity-hover);
 }
 
 code {

@@ -44,11 +44,11 @@ export function Option({
       disabled={isLimited}
       onClick={onClick}
     >
-      <div className="flex items-end justify-center text-center mt-2">
+      <div className="mt-2 flex items-end justify-center text-center">
         <IconComponent selected={active} className={styles.iconComponent} />
       </div>
 
-      <div className="mt-3 text-center flex flex-col">
+      <div className="mt-3 flex flex-col text-center">
         <h3>{title}</h3>
         <h5>{description}</h5>
         {isLimited && (

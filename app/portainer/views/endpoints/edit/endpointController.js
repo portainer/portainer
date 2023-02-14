@@ -5,11 +5,13 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
-import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructive } from '@@/modals/confirm';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { GpusListAngular } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
+import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
+import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.app').component('gpusList', GpusListAngular).controller('EndpointController', EndpointController);
 
@@ -26,8 +28,7 @@ function EndpointController(
 
   Notifications,
   Authentication,
-  SettingsService,
-  ModalService
+  SettingsService
 ) {
   $scope.onChangeCheckInInterval = onChangeCheckInInterval;
   $scope.setFieldValue = setFieldValue;
@@ -114,7 +115,7 @@ function EndpointController(
   };
 
   $scope.onDisassociateEndpoint = async function () {
-    ModalService.confirmDisassociate((confirmed) => {
+    confirmDisassociate().then((confirmed) => {
       if (confirmed) {
         disassociateEndpoint();
       }
@@ -192,19 +193,10 @@ function EndpointController(
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
     if (isEdgeEnvironment(endpoint.Type) && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
-      let confirmed = await confirmDestructiveAsync({
+      let confirmed = await confirmDestructive({
         title: 'Confirm action',
         message: 'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
-        buttons: {
-          cancel: {
-            label: 'Cancel',
-            className: 'btn-default',
-          },
-          confirm: {
-            label: 'Confirm',
-            className: 'btn-primary',
-          },
-        },
+        confirmButton: buildConfirmButton(),
       });
 
       if (!confirmed) {

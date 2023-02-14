@@ -1,9 +1,10 @@
 import _ from 'lodash-es';
-import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructive } from '@@/modals/confirm';
 import { EdgeTypes } from '@/react/portainer/environments/types';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { getTags } from '@/portainer/tags/tags.service';
 import { notifyError } from '@/portainer/services/notifications';
+import { buildConfirmButton } from '@@/modals/utils';
 import { groupTypeOptions } from './group-type-options';
 import { tagOptions } from './tag-options';
 
@@ -77,19 +78,10 @@ export class EdgeGroupFormController {
 
   dissociateEndpoint(endpoint) {
     return this.$async(async () => {
-      const confirmed = await confirmDestructiveAsync({
+      const confirmed = await confirmDestructive({
         title: 'Confirm action',
         message: 'Removing the environment from this group will remove its corresponding edge stacks',
-        buttons: {
-          cancel: {
-            label: 'Cancel',
-            className: 'btn-default',
-          },
-          confirm: {
-            label: 'Confirm',
-            className: 'btn-primary',
-          },
-        },
+        confirmButton: buildConfirmButton('Confirm'),
       });
 
       if (!confirmed) {

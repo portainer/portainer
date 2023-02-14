@@ -1,9 +1,10 @@
 import moment from 'moment';
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
-import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
+import { confirmContainerDeletion } from '@/react/docker/containers/common/confirm-container-delete-modal';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
+import { confirmContainerRecreation } from '@/react/docker/containers/ItemView/ConfirmRecreationModal';
 
 angular.module('portainer.docker').controller('ContainerController', [
   '$q',
@@ -18,7 +19,6 @@ angular.module('portainer.docker').controller('ContainerController', [
   'ImageHelper',
   'NetworkService',
   'Notifications',
-  'ModalService',
   'ResourceControlService',
   'RegistryService',
   'ImageService',
@@ -38,7 +38,6 @@ angular.module('portainer.docker').controller('ContainerController', [
     ImageHelper,
     NetworkService,
     Notifications,
-    ModalService,
     ResourceControlService,
     RegistryService,
     ImageService,
@@ -275,20 +274,20 @@ angular.module('portainer.docker').controller('ContainerController', [
     };
 
     $scope.confirmRemove = function () {
-      var title = 'You are about to remove a container.';
-      if ($scope.container.State.Running) {
-        title = 'You are about to remove a running container.';
-      }
+      return $async(async () => {
+        var title = 'You are about to remove a container.';
+        if ($scope.container.State.Running) {
+          title = 'You are about to remove a running container.';
+        }
 
-      confirmContainerDeletion(title, function (result) {
+        const result = await confirmContainerDeletion(title);
+
         if (!result) {
           return;
         }
-        var cleanAssociatedVolumes = false;
-        if (result[0]) {
-          cleanAssociatedVolumes = true;
-        }
-        removeContainer(cleanAssociatedVolumes);
+        const { removeVolumes } = result;
+
+        removeContainer(removeVolumes);
       });
     };
 
@@ -397,15 +396,12 @@ angular.module('portainer.docker').controller('ContainerController', [
 
     $scope.recreate = function () {
       const cannotPullImage = !$scope.container.Config.Image || $scope.container.Config.Image.toLowerCase().startsWith('sha256');
-      ModalService.confirmContainerRecreation(cannotPullImage, function (result) {
+      confirmContainerRecreation(cannotPullImage).then(function (result) {
         if (!result) {
           return;
         }
-        var pullImage = false;
-        if (result[0]) {
-          pullImage = true;
-        }
-        recreateContainer(pullImage);
+
+        recreateContainer(result.pullLatest);
       });
     };
 

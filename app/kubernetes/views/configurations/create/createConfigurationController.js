@@ -6,18 +6,18 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { getServiceAccounts } from 'Kubernetes/rest/serviceAccount';
 
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { isConfigurationFormValid } from '../validation';
 import { typeOptions } from './options';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, $scope, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, EndpointProvider) {
+  constructor($async, $state, $scope, $window, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
     this.$scope = $scope;
     this.$window = $window;
     this.EndpointProvider = EndpointProvider;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
@@ -176,7 +176,7 @@ class KubernetesCreateConfigurationController {
 
   async uiCanExit() {
     if (!this.formValues.IsSimple && this.formValues.DataYaml && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

@@ -42,7 +42,7 @@
 /* today's date tile */
 .react-datetime-picker .react-calendar__tile--now {
   /* use background color to avoid white on yellow in dark/high contrast modes */
-  @apply th-dark:text-[color:var(--bg-calendar-color)] th-highcontrast:text-[color:var(--bg-calendar-color)];
+  @apply th-highcontrast:text-[color:var(--bg-calendar-color)] th-dark:text-[color:var(--bg-calendar-color)];
 }
 .react-datetime-picker .react-calendar__tile--now:enabled:hover,
 .react-datetime-picker .react-calendar__tile--now:enabled:focus {

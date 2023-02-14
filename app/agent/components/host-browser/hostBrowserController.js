@@ -1,11 +1,12 @@
 import _ from 'lodash-es';
+import { confirmDelete } from '@@/modals/confirm';
 
 const ROOT_PATH = '/host';
 
 export class HostBrowserController {
   /* @ngInject */
-  constructor($async, HostBrowserService, Notifications, FileSaver, ModalService) {
-    Object.assign(this, { $async, HostBrowserService, Notifications, FileSaver, ModalService });
+  constructor($async, HostBrowserService, Notifications, FileSaver) {
+    Object.assign(this, { $async, HostBrowserService, Notifications, FileSaver });
 
     this.state = {
       path: ROOT_PATH,
@@ -95,7 +96,7 @@ export class HostBrowserController {
   confirmDeleteFile(name) {
     const filePath = this.buildPath(this.state.path, name);
 
-    this.ModalService.confirmDeletion(`Are you sure that you want to delete ${this.getRelativePath(filePath)} ?`, (confirmed) => {
+    confirmDelete(`Are you sure that you want to delete ${this.getRelativePath(filePath)}?`).then((confirmed) => {
       if (!confirmed) {
         return;
       }

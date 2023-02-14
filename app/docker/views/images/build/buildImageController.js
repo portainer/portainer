@@ -1,9 +1,10 @@
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { options } from './options';
 
 angular.module('portainer.docker').controller('BuildImageController', BuildImageController);
 
 /* @ngInject */
-function BuildImageController($scope, $async, $window, ModalService, BuildService, Notifications, HttpRequestHelper, endpoint) {
+function BuildImageController($scope, $async, $window, BuildService, Notifications, HttpRequestHelper, endpoint) {
   $scope.endpoint = endpoint;
   $scope.options = options;
 
@@ -154,7 +155,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
 
   this.uiCanExit = async function () {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
-      return ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   };
 

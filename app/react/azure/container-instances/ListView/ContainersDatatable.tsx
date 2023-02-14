@@ -3,8 +3,8 @@ import { useStore } from 'zustand';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { Authorized } from '@/react/hooks/useUser';
-import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
+import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -63,7 +63,7 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
   );
 
   async function handleRemoveClick(containerIds: string[]) {
-    const confirmed = await confirmDeletionAsync(
+    const confirmed = await confirmDelete(
       'Are you sure you want to delete the selected containers?'
     );
     if (!confirmed) {

@@ -37,7 +37,7 @@ export function UploadLicenseDialog({
       aria-label="Upgrade Portainer to Business Edition"
     >
       <Modal.Header
-        title={<h4 className="font-medium text-xl">Upgrade Portainer</h4>}
+        title={<h4 className="text-xl font-medium">Upgrade Portainer</h4>}
       />
       <Formik
         initialValues={initialValues}
@@ -71,7 +71,7 @@ export function UploadLicenseDialog({
               </FormControl>
             </Modal.Body>
             <Modal.Footer>
-              <div className="flex gap-2 [&>*]:w-1/2 w-full">
+              <div className="flex w-full gap-2 [&>*]:w-1/2">
                 <Button
                   color="default"
                   size="medium"

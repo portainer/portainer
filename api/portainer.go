@@ -506,9 +506,6 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
-	// Feature represents a feature that can be enabled or disabled via feature flags
-	Feature string
-
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
@@ -871,13 +868,13 @@ type (
 		// A list of label name & value that will be used to hide containers when querying containers
 		BlackListedLabels []Pair `json:"BlackListedLabels"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
-		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
-		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings"`
-		LDAPSettings         LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings        OAuthSettings        `json:"OAuthSettings"`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration"`
-		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration"`
-		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings"`
+		AuthenticationMethod AuthenticationMethod          `json:"AuthenticationMethod" example:"1"`
+		InternalAuthSettings InternalAuthSettings          `json:"InternalAuthSettings"`
+		LDAPSettings         LDAPSettings                  `json:"LDAPSettings"`
+		OAuthSettings        OAuthSettings                 `json:"OAuthSettings"`
+		OpenAMTConfiguration OpenAMTConfiguration          `json:"openAMTConfiguration"`
+		FDOConfiguration     FDOConfiguration              `json:"fdoConfiguration"`
+		FeatureFlagSettings  map[featureflags.Feature]bool `json:"FeatureFlagSettings"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -1532,11 +1529,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-// SupportFeatureFlags is a list of supported features. They should all be lower case
-// e.g. "microk8s","kaas"
-var SupportedFeatureFlags = []featureflags.Feature{
-	"microk8s",
-}
+// List of supported features
+var SupportedFeatureFlags = []featureflags.Feature{}
 
 const (
 	_ AuthenticationMethod = iota

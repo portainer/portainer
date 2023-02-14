@@ -32,7 +32,7 @@ export function FormControl({
     <div
       className={clsx(
         'form-group',
-        'after:content-[""] after:clear-both after:table' // to fix issues with float
+        'after:clear-both after:table after:content-[""]' // to fix issues with float
       )}
     >
       <label

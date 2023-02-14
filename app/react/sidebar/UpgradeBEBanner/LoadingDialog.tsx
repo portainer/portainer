@@ -12,7 +12,7 @@ export function LoadingDialog() {
   return (
     <Modal aria-label="Upgrade Portainer to Business Edition">
       <Modal.Body>
-        <div className="flex flex-col items-center justify-center w-full">
+        <div className="flex w-full flex-col items-center justify-center">
           <Icon
             icon={Loader2}
             className="animate-spin-slow !text-8xl !text-blue-8"
@@ -21,7 +21,7 @@ export function LoadingDialog() {
 
           <h1 className="!text-2xl">Upgrading Portainer...</h1>
 
-          <p className="text-center text-gray-6 text-xl">
+          <p className="text-center text-xl text-gray-6">
             Please wait while we upgrade your Portainer to Business Edition.
           </p>
         </div>

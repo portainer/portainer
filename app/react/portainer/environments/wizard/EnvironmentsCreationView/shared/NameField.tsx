@@ -1,6 +1,6 @@
 import { useField } from 'formik';
 import { string } from 'yup';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { useDebounce } from '@/react/hooks/useDebounce';
@@ -24,6 +24,10 @@ export function NameField({
   const id = 'name-input';
 
   const [debouncedValue, setDebouncedValue] = useDebounce(value, setValue);
+
+  useEffect(() => {
+    setDebouncedValue(value);
+  }, [setDebouncedValue, value]);
 
   return (
     <FormControl

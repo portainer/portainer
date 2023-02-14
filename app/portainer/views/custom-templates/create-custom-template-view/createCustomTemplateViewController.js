@@ -4,30 +4,17 @@ import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { editor, upload, git } from '@@/BoxSelector/common-options/build-methods';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
-  constructor(
-    $async,
-    $state,
-    $scope,
-    $window,
-    Authentication,
-    ModalService,
-    CustomTemplateService,
-    FormValidator,
-    Notifications,
-    ResourceControlService,
-    StackService,
-    StateManager
-  ) {
+  constructor($async, $state, $scope, $window, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
     Object.assign(this, {
       $async,
       $state,
       $window,
       $scope,
       Authentication,
-      ModalService,
       CustomTemplateService,
       FormValidator,
       Notifications,
@@ -253,7 +240,7 @@ class CreateCustomTemplateViewController {
 
   async uiCanExit() {
     if (this.state.Method === 'editor' && this.formValues.FileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 }
