@@ -103,17 +103,6 @@ function EndpointController(
     SecurityFormData: new EndpointSecurityFormData(),
   };
 
-  $scope.copyEdgeAgentKey = function () {
-    clipboard.copyText($scope.endpoint.EdgeKey);
-    $('#copyNotificationEdgeKey').show().fadeOut(2500);
-  };
-
-  $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
-    return $scope.$evalAsync(() => {
-      $scope.state.allowSelfSignedCerts = checked;
-    });
-  };
-
   $scope.onDisassociateEndpoint = async function () {
     confirmDisassociate().then((confirmed) => {
       if (confirmed) {
