@@ -20,6 +20,7 @@ import { PorAccessControlFormUserSelector } from '@/react/portainer/access-contr
 import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
 import { AccessTypeSelector } from '@/react/portainer/access-control/EditDetails/AccessTypeSelector';
 import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeKeyDisplay';
+import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -62,6 +63,7 @@ export const componentsModule = angular
       'buttonText',
       'className',
       'icon',
+      'buttonClassName',
     ])
   )
   .component(
@@ -232,4 +234,5 @@ export const componentsModule = angular
     'porAccessManagementUsersSelector',
     r2a(PorAccessManagementUsersSelector, ['onChange', 'options', 'value'])
   )
-  .component('edgeKeyDisplay', r2a(EdgeKeyDisplay, ['edgeKey'])).name;
+  .component('edgeKeyDisplay', r2a(EdgeKeyDisplay, ['edgeKey']))
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, [])).name;

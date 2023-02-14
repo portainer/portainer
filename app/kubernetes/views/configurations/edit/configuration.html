@@ -102,6 +102,10 @@
       <rd-widget>
         <rd-widget-body>
           <form ng-if="!ctrl.isSystemConfig()" class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <div class="col-sm-12 !p-0">
+              <annotations-be-teaser></annotations-be-teaser>
+            </div>
+
             <kubernetes-configuration-data
               ng-if="ctrl.formValues"
               form-values="ctrl.formValues"
