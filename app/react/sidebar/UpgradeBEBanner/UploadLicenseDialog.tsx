@@ -3,6 +3,7 @@ import { object, SchemaOf, string } from 'yup';
 
 import { useUpgradeEditionMutation } from '@/react/portainer/system/useUpgradeEditionMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Button, LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
@@ -30,6 +31,7 @@ export function UploadLicenseDialog({
   isGetLicenseSubmitted: boolean;
 }) {
   const upgradeMutation = useUpgradeEditionMutation();
+  const { trackEvent } = useAnalytics();
 
   return (
     <Modal
@@ -99,6 +101,13 @@ export function UploadLicenseDialog({
   function handleSubmit(values: FormValues) {
     upgradeMutation.mutate(values, {
       onSuccess() {
+        trackEvent('portainer-upgrade-license-key-provided', {
+          category: 'portainer',
+          metadata: {
+            Upgrade: 'true',
+          },
+        });
+
         notifySuccess('Starting upgrade', 'License validated successfully');
         goToLoading();
       },
