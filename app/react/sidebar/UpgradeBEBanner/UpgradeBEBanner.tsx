@@ -68,7 +68,7 @@ function UpgradeBEBanner() {
       <button
         type="button"
         className={clsx(
-          'flex w-full items-center justify-center gap-2 py-2 hover:underline',
+          'flex w-full items-center justify-center gap-2 py-2 hover:underline pr-2',
           {
             'bg-warning-5 text-warning-9 border-0 font-semibold': !subtleButton,
             'bg-[#023959] border-blue-9 th-dark:bg-black th-dark:border-[#343434] border border-solid text-white font-medium':
