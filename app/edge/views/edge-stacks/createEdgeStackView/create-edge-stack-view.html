@@ -15,16 +15,25 @@
                 ng-model="$ctrl.formValues.Name"
                 id="stack_name"
                 name="nameField"
+                ng-pattern="$ctrl.formValues.DeploymentType === $ctrl.EditorType.Compose ? STACK_NAME_VALIDATION_REGEX : ''"
                 placeholder="e.g. mystack"
                 auto-focus
                 required
                 data-cy="edgeStackCreate-nameInput"
               />
-              <div class="help-block" ng-show="$ctrl.form.$invalid">
+              <div class="help-block" ng-show="$ctrl.form.nameField.$error.required">
                 <div class="small text-warning">
                   <div ng-messages="$ctrl.form.$error">
                     <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Name is required. </p>
                   </div>
+                </div>
+              </div>
+              <div class="help-block" ng-show="$ctrl.form.nameField.$error.pattern">
+                <div class="small text-warning">
+                  <p class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
+                  </p>
                 </div>
               </div>
             </div>
