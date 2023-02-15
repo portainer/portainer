@@ -51,10 +51,10 @@ export function BoxOption<T extends Value>({
         {!disabled && (
           <div
             className={clsx(
-              'absolute top-4 right-4 flex h-4 w-4 items-center justify-center border border-solid border-blue-8 font-bold text-white',
+              'absolute top-4 right-4 flex h-4 w-4 items-center justify-center border border-solid  font-bold text-white',
               {
-                'bg-white': !selected,
-                'bg-blue-8': selected,
+                'bg-white border-gray-6': !selected,
+                'bg-blue-8 border-blue-8': selected,
               },
               {
                 'rounded-full': type === 'radio',

@@ -48,6 +48,5 @@
   @apply th-dark:border-blue-7 th-dark:bg-blue-10;
   @apply th-highcontrast:border-blue-7 th-highcontrast:bg-blue-10;
 
-  padding: 15px;
   box-shadow: none;
 }
