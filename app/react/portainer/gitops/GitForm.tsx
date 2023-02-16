@@ -6,9 +6,9 @@ import { RefField } from '@/react/portainer/gitops/RefField';
 import { GitFormUrlField } from '@/react/portainer/gitops/GitFormUrlField';
 import { GitFormModel } from '@/react/portainer/gitops/types';
 import { GitCredential } from '@/portainer/views/account/git-credential/types';
+import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
 
 import { FormSection } from '@@/form-components/FormSection';
-import { TimeWindowDisplay } from '@@/TimeWindowDisplay';
 import { validateForm } from '@@/form-components/validate-form';
 
 import { AdditionalFileField } from './AdditionalFilesField';
