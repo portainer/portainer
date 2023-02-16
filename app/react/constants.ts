@@ -1,3 +1,5 @@
+export const STACK_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
+
 export const BROWSER_OS_PLATFORM = getOs();
 
 function getOs() {

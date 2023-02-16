@@ -1,7 +1,7 @@
 import { EditorType } from '@/react/edge/edge-stacks/types';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
-import { STACK_NAME_VALIDATION_REGEX } from '@/constants_es6';
+import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 export default class CreateEdgeStackViewController {
