@@ -19,6 +19,7 @@ import { PorAccessControlFormTeamSelector } from '@/react/portainer/access-contr
 import { PorAccessControlFormUserSelector } from '@/react/portainer/access-control/PorAccessControlForm/UsersSelector';
 import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
 import { AccessTypeSelector } from '@/react/portainer/access-control/EditDetails/AccessTypeSelector';
+import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeKeyDisplay';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -230,4 +231,5 @@ export const componentsModule = angular
   .component(
     'porAccessManagementUsersSelector',
     r2a(PorAccessManagementUsersSelector, ['onChange', 'options', 'value'])
-  ).name;
+  )
+  .component('edgeKeyDisplay', r2a(EdgeKeyDisplay, ['edgeKey'])).name;
