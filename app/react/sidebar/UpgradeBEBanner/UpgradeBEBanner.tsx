@@ -57,8 +57,11 @@ function UpgradeBEBanner() {
     agents: systemInfo.agents,
   };
 
-  if (!enabledPlatforms.includes(systemInfo.platform)) {
-    // return null;
+  if (
+    !enabledPlatforms.includes(systemInfo.platform) &&
+    process.env.NODE_ENV !== 'development'
+  ) {
+    return null;
   }
 
   const subtleButton = userQuery.data.ThemeSettings.subtleUpgradeButton;
