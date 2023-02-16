@@ -68,21 +68,26 @@ function UpgradeBEBanner() {
       <button
         type="button"
         className={clsx(
-          'flex w-full items-center justify-center gap-1 py-2 hover:underline pr-2',
+          'flex w-full items-center justify-center gap-1 py-2 pr-2 hover:underline',
           {
-            'bg-warning-5 text-warning-9 border-0 font-semibold': !subtleButton,
-            'bg-[#023959] border-blue-9 th-dark:bg-black th-dark:border-[#343434] border border-solid text-white font-medium':
+            'border-0 bg-warning-5 font-semibold text-warning-9': !subtleButton,
+            'border border-solid border-blue-9 bg-[#023959] font-medium text-white th-dark:border-[#343434] th-dark:bg-black':
               subtleButton,
-          }
+          },
+          'th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white th-highcontrast:bg-black th-highcontrast:font-medium th-highcontrast:text-white'
         )}
         onClick={handleClick}
       >
         <ArrowUpCircle
-          className={clsx('lucide text-lg', {
-            'fill-warning-9 stroke-warning-5': !subtleButton,
-            'fill-warning-6 stroke-[#023959] th-dark:stroke-black':
-              subtleButton,
-          })}
+          className={clsx(
+            'lucide text-lg',
+            {
+              'fill-warning-9 stroke-warning-5': !subtleButton,
+              'fill-warning-6 stroke-[#023959] th-dark:stroke-black':
+                subtleButton,
+            },
+            'th-highcontrast:fill-warning-6  th-highcontrast:stroke-black'
+          )}
         />
         {isSidebarOpen && <>Upgrade to Business Edition</>}
       </button>
