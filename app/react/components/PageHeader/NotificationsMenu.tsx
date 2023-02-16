@@ -7,7 +7,6 @@ import {
 } from '@reach/menu-button';
 import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
-import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import { AlertCircle, Bell, CheckCircle, Trash2 } from 'lucide-react';
 
@@ -35,23 +34,6 @@ export function NotificationsMenu() {
     (state) => state.userNotifications[user.Id]
   );
 
-  if (userNotifications && userNotifications.length > 1) {
-    userNotifications.sort(
-      (a, b) =>
-        new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime()
-    );
-  }
-
-  const [badge, setBadge] = useState(false);
-
-  useEffect(() => {
-    if (userNotifications?.length > 0) {
-      setBadge(true);
-    } else {
-      setBadge(false);
-    }
-  }, [userNotifications]);
-
   return (
     <Menu>
       <MenuButton
@@ -71,7 +53,11 @@ export function NotificationsMenu() {
           )}
         >
           <Icon icon={Bell} />
-          <span className={badge ? notificationStyles.badge : ''} />
+          <span
+            className={
+              userNotifications?.length > 0 ? notificationStyles.badge : ''
+            }
+          />
         </div>
       </MenuButton>
 
