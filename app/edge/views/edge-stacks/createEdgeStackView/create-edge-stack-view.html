@@ -39,19 +39,7 @@
           </div>
           <!-- !name-input -->
 
-          <div class="col-sm-12 form-section-title"> Edge Groups </div>
-          <div class="form-group" ng-if="$ctrl.edgeGroups">
-            <div class="col-sm-12">
-              <edge-groups-selector ng-if="!$ctrl.noGroups" value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
-            </div>
-            <div ng-if="$ctrl.noGroups" class="col-sm-12 small text-muted">
-              No Edge groups are available. Head over to the <a ui-sref="edge.groups">Edge groups view</a> to create one.
-            </div>
-            <p class="col-sm-12 vertical-center help-block small text-warning" ng-if="$ctrl.formValues.DeploymentType === undefined">
-              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no available deployment types when there is more than one type of environment in your edge
-              group selection (e.g. Kubernetes and Docker environments). Please select edge groups that have environments of the same type.
-            </p>
-          </div>
+          <edge-groups-selector ng-if="!$ctrl.noGroups" value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
 
           <edge-stack-deployment-type-selector
             value="$ctrl.formValues.DeploymentType"
