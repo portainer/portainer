@@ -131,7 +131,10 @@ func FillSnapshotData(dataStore dataservices.DataStore, endpoint *portainer.Endp
 	snapshot, err := dataStore.Snapshot().Snapshot(endpoint.ID)
 	if dataStore.IsErrObjectNotFound(err) {
 		endpoint.Snapshots = []portainer.DockerSnapshot{}
-		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+
+		if endpoint.Kubernetes != nil {
+			endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+		}
 
 		return nil
 	}

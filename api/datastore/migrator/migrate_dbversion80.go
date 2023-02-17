@@ -7,22 +7,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (m *Migrator) migrateDBVersionToDB80() error {
-	if err := m.updateEdgeStackStatusForDB80(); err != nil {
-		return err
-	}
-
-	if err := m.updateExistingEndpointsToNotDetectMetricsAPIForDB80(); err != nil {
-		return err
-	}
-
-	if err := m.updateExistingEndpointsToNotDetectStorageAPIForDB80(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *Migrator) updateExistingEndpointsToNotDetectMetricsAPIForDB80() error {
 	log.Info().Msg("updating existing endpoints to not detect metrics API for existing endpoints (k8s)")
 

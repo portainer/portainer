@@ -173,7 +173,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			updateAuthorizations = true
 		}
 
-		endpoint.Kubernetes = *payload.Kubernetes
+		endpoint.Kubernetes = payload.Kubernetes
 	}
 
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpoint.UserAccessPolicies) {
@@ -208,7 +208,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 
 		httpClient := client.NewHTTPClient()
-		_, authErr := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
+		_, authErr := httpClient.ExecuteAzureAuthenticationRequest(credentials)
 		if authErr != nil {
 			return httperror.InternalServerError("Unable to authenticate against Azure", authErr)
 		}

@@ -6,10 +6,6 @@ import (
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
-func (m *Migrator) migrateDBVersionToDB81() error {
-	return m.updateEdgeStackStatusForDB81()
-}
-
 func (m *Migrator) updateEdgeStackStatusForDB81() error {
 	log.Info().Msg("clean up deleted endpoints from edge jobs")
 

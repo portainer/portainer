@@ -336,10 +336,10 @@ type (
 		// Environment(Endpoint) group identifier
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
-		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
-		Gpus             []Pair           `json:"Gpus"`
-		TLSConfig        TLSConfiguration `json:"TLSConfig"`
-		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty"`
+		PublicURL        string            `json:"PublicURL.omitempty" example:"docker.mydomain.tld:2375"`
+		Gpus             []Pair            `json:"Gpus"`
+		TLSConfig        TLSConfiguration  `json:"TLSConfig"`
+		AzureCredentials *AzureCredentials `json:"AzureCredentials,omitempty"`
 		// List of tag identifiers to which this environment(endpoint) is associated
 		TagIDs []TagID `json:"TagIds"`
 		// The status of the environment(endpoint) (1 - up, 2 - down)
@@ -357,35 +357,26 @@ type (
 		// The check in interval for edge agent (in seconds)
 		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5"`
 		// Associated Kubernetes data
-		Kubernetes KubernetesData `json:"Kubernetes"`
+		Kubernetes *KubernetesData `json:"Kubernetes,omitempty"`
 		// Maximum version of docker-compose
-		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
+		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion,omitempty" example:"3.8"`
 		// Environment(Endpoint) specific security settings
 		SecuritySettings EndpointSecuritySettings
 		// The identifier of the AMT Device associated with this environment(endpoint)
 		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
-		LastCheckInDate int64
+		LastCheckInDate int64 `json:",omitempty"`
 		// QueryDate of each query with the endpoints list
-		QueryDate int64
+		QueryDate int64 `json:",omitempty"`
 		// IsEdgeDevice marks if the environment was created as an EdgeDevice
-		IsEdgeDevice bool
+		IsEdgeDevice bool `json:",omitempty"`
 		// Whether the device has been trusted or not by the user
-		UserTrusted bool
+		UserTrusted bool `json:",omitempty"`
 
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
 
-		Edge struct {
-			// Whether the device has been started in edge async mode
-			AsyncMode bool
-			// The ping interval for edge agent - used in edge async mode [seconds]
-			PingInterval int `json:"PingInterval" example:"60"`
-			// The snapshot interval for edge agent - used in edge async mode [seconds]
-			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
-			// The command list interval for edge agent - used in edge async mode [seconds]
-			CommandInterval int `json:"CommandInterval" example:"60"`
-		}
+		Edge EdgeSettings
 
 		Agent struct {
 			Version string `example:"1.0.0"`
@@ -399,11 +390,22 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers,omitempty"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams,omitempty"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags"`
+		Tags []string `json:"Tags,omitempty"`
+	}
+
+	EdgeSettings struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool `json:"AsyncMode,omitempty" example:"false"`
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -579,15 +581,15 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
 	KubernetesConfiguration struct {
-		UseLoadBalancer                 bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics                bool                           `json:"UseServerMetrics"`
-		EnableResourceOverCommit        bool                           `json:"EnableResourceOverCommit"`
-		ResourceOverCommitPercentage    int                            `json:"ResourceOverCommitPercentage"`
+		UseLoadBalancer                 bool                           `json:"UseLoadBalancer,omitempty"`
+		UseServerMetrics                bool                           `json:"UseServerMetrics,omitempty"`
+		EnableResourceOverCommit        bool                           `json:"EnableResourceOverCommit,omitempty"`
+		ResourceOverCommitPercentage    int                            `json:"ResourceOverCommitPercentage,omitempty"`
 		StorageClasses                  []KubernetesStorageClassConfig `json:"StorageClasses"`
 		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
-		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
-		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
-		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass"`
+		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace,omitempty"`
+		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace,omitempty"`
+		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass,omitempty"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration

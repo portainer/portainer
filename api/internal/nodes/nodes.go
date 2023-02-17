@@ -19,7 +19,7 @@ func countNodes(endpoint *portainer.Endpoint) int {
 		return max(endpoint.Snapshots[0].NodeCount, 1)
 	}
 
-	if len(endpoint.Kubernetes.Snapshots) == 1 {
+	if endpoint.Kubernetes != nil && len(endpoint.Kubernetes.Snapshots) == 1 {
 		return max(endpoint.Kubernetes.Snapshots[0].NodeCount, 1)
 	}
 
