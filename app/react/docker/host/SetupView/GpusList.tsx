@@ -48,11 +48,11 @@ function Item({ item, onChange }: ItemProps<Gpu>) {
 export function GpusList({ value, onChange }: Props) {
   return (
     <InputList<Gpu>
-      label="GPU"
+      label="GPUs"
       value={value}
       onChange={onChange}
       itemBuilder={() => ({ value: '', name: '' })}
-      addLabel="add"
+      addLabel="Add GPU"
       item={Item}
     />
   );

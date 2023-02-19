@@ -106,7 +106,12 @@
     </a>
 
     <div>
-      <dashboard-item icon="'cpu'" type="'GPU'" value="endpoint.Gpus.length"></dashboard-item>
+      <dashboard-item
+        ng-if="endpoint.EnableGPUManagement && applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"
+        icon="'cpu'"
+        type="'GPU'"
+        value="endpoint.Gpus.length"
+      ></dashboard-item>
     </div>
   </div>
 </div>

@@ -15,7 +15,7 @@ import { gpus } from './gpus';
 
 export function useColumns(
   isHostColumnVisible: boolean,
-  isGPUsColumnVisible: boolean
+  isGPUsColumnVisible?: boolean
 ) {
   return useMemo(
     () =>

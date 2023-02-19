@@ -2,9 +2,10 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 export default class DockerFeaturesConfigurationController {
   /* @ngInject */
-  constructor($async, $scope, EndpointService, Notifications, StateManager) {
+  constructor($async, $scope, $state, EndpointService, Notifications, StateManager) {
     this.$async = $async;
     this.$scope = $scope;
+    this.$state = $state;
     this.EndpointService = EndpointService;
     this.Notifications = Notifications;
     this.StateManager = StateManager;
@@ -34,6 +35,8 @@ export default class DockerFeaturesConfigurationController {
     this.save = this.save.bind(this);
     this.onChangeField = this.onChangeField.bind(this);
     this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
+    this.onToggleGPUManagement = this.onToggleGPUManagement.bind(this);
+    this.onGpusChange = this.onGpusChange.bind(this);
     this.onChangeEnableHostManagementFeatures = this.onChangeField('enableHostManagementFeatures');
     this.onChangeAllowVolumeBrowserForRegularUsers = this.onChangeField('allowVolumeBrowserForRegularUsers');
     this.onChangeDisableBindMountsForRegularUsers = this.onChangeField('disableBindMountsForRegularUsers');
@@ -48,6 +51,12 @@ export default class DockerFeaturesConfigurationController {
   onToggleAutoUpdate(value) {
     return this.$scope.$evalAsync(() => {
       this.state.autoUpdateSettings.Enabled = value;
+    });
+  }
+
+  onToggleGPUManagement(checked) {
+    this.$scope.$evalAsync(() => {
+      this.state.enableGPUManagement = checked;
     });
   }
 
@@ -66,6 +75,12 @@ export default class DockerFeaturesConfigurationController {
         [field]: value,
       });
     };
+  }
+
+  onGpusChange(value) {
+    return this.$async(async () => {
+      this.endpoint.Gpus = value;
+    });
   }
 
   isContainerEditDisabled() {
@@ -91,7 +106,11 @@ export default class DockerFeaturesConfigurationController {
     return this.$async(async () => {
       try {
         this.state.actionInProgress = true;
-        const securitySettings = {
+
+        const validGpus = this.endpoint.Gpus.filter((gpu) => gpu.name && gpu.value);
+        const gpus = this.state.enableGPUManagement ? validGpus : [];
+
+        const settings = {
           enableHostManagementFeatures: this.formValues.enableHostManagementFeatures,
           allowBindMountsForRegularUsers: !this.formValues.disableBindMountsForRegularUsers,
           allowPrivilegedModeForRegularUsers: !this.formValues.disablePrivilegedModeForRegularUsers,
@@ -101,33 +120,33 @@ export default class DockerFeaturesConfigurationController {
           allowStackManagementForRegularUsers: !this.formValues.disableStackManagementForRegularUsers,
           allowContainerCapabilitiesForRegularUsers: !this.formValues.disableContainerCapabilitiesForRegularUsers,
           allowSysctlSettingForRegularUsers: !this.formValues.disableSysctlSettingForRegularUsers,
+          enableGPUManagement: this.state.enableGPUManagement,
+          gpus,
         };
 
-        await this.EndpointService.updateSecuritySettings(this.endpoint.Id, securitySettings);
+        await this.EndpointService.updateSecuritySettings(this.endpoint.Id, settings);
 
-        this.endpoint.SecuritySettings = securitySettings;
+        this.endpoint.SecuritySettings = settings;
         this.Notifications.success('Success', 'Saved settings successfully');
       } catch (e) {
         this.Notifications.error('Failure', e, 'Failed saving settings');
       }
       this.state.actionInProgress = false;
+      this.$state.reload();
     });
-  }
-
-  checkAgent() {
-    const applicationState = this.StateManager.getState();
-    return applicationState.endpoint.mode.agentProxy;
   }
 
   $onInit() {
     const securitySettings = this.endpoint.SecuritySettings;
 
-    const isAgent = this.checkAgent();
-    this.isAgent = isAgent;
+    const applicationState = this.StateManager.getState();
+    this.isAgent = applicationState.endpoint.mode.agentProxy;
+
+    this.isDockerStandaloneEnv = applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE';
 
     this.formValues = {
-      enableHostManagementFeatures: isAgent && securitySettings.enableHostManagementFeatures,
-      allowVolumeBrowserForRegularUsers: isAgent && securitySettings.allowVolumeBrowserForRegularUsers,
+      enableHostManagementFeatures: this.isAgent && securitySettings.enableHostManagementFeatures,
+      allowVolumeBrowserForRegularUsers: this.isAgent && securitySettings.allowVolumeBrowserForRegularUsers,
       disableBindMountsForRegularUsers: !securitySettings.allowBindMountsForRegularUsers,
       disablePrivilegedModeForRegularUsers: !securitySettings.allowPrivilegedModeForRegularUsers,
       disableHostNamespaceForRegularUsers: !securitySettings.allowHostNamespaceForRegularUsers,
@@ -136,5 +155,7 @@ export default class DockerFeaturesConfigurationController {
       disableContainerCapabilitiesForRegularUsers: !securitySettings.allowContainerCapabilitiesForRegularUsers,
       disableSysctlSettingForRegularUsers: !securitySettings.allowSysctlSettingForRegularUsers,
     };
+
+    this.state.enableGPUManagement = this.isDockerStandaloneEnv && (this.endpoint.EnableGPUManagement || this.endpoint.Gpus.length > 0);
   }
 }

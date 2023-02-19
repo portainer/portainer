@@ -1,9 +1,9 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
 import { FormikErrors } from 'formik';
-import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 
-import { AddButton, Button } from '@@/buttons';
+import { Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -83,13 +83,20 @@ export function InputList<T = DefaultType>({
           {label}
           {tooltip && <Tooltip message={tooltip} />}
         </div>
+      </div>
+      <div className="col-sm-12 mt-2">
         {!(isAddButtonHidden || readOnly) && (
-          <AddButton
-            label={addLabel}
-            className="space-left"
+          <Button
             onClick={handleAdd}
             disabled={disabled}
-          />
+            type="button"
+            color="default"
+            className="!ml-0"
+            size="small"
+            icon={Plus}
+          >
+            {addLabel}
+          </Button>
         )}
       </div>
 

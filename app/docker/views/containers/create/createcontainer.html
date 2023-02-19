@@ -701,17 +701,20 @@
               </div>
               <!-- !shm-size-input -->
               <!-- #region GPU -->
-              <div class="col-sm-12 form-section-title"> GPU </div>
+              <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
+                <div class="col-sm-12 form-section-title"> GPU </div>
 
-              <gpu
-                ng-if="applicationState.endpoint.apiVersion >= 1.4"
-                values="formValues.GPU"
-                on-change="(onGpuChange)"
-                gpus="endpoint.Gpus"
-                used-gpus="gpuUseList"
-                used-all-gpus="gpuUseAll"
-              >
-              </gpu>
+                <gpu
+                  ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                  values="formValues.GPU"
+                  on-change="(onGpuChange)"
+                  gpus="endpoint.Gpus"
+                  used-gpus="gpuUseList"
+                  used-all-gpus="gpuUseAll"
+                  enable-gpu-management="endpoint.EnableGPUManagement"
+                >
+                </gpu>
+              </div>
 
               <!-- #endregion GPU -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">

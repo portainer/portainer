@@ -83,6 +83,7 @@ export function createMockEnvironment(): Environment {
     },
     Nomad: { Snapshots: [] },
     EdgeKey: '',
+    EnableGPUManagement: false,
     Id: 3,
     UserTrusted: false,
     Edge: {

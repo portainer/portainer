@@ -3,7 +3,6 @@ import { useReducer } from 'react';
 import { Plug2 } from 'lucide-react';
 
 import { useCreateLocalDockerEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
-import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
 
@@ -29,7 +28,6 @@ export function SocketForm({ onCreate }: Props) {
     socketPath: '',
     overridePath: false,
     meta: { groupId: 1, tagIds: [] },
-    gpus: [],
   };
 
   const mutation = useCreateLocalDockerEnvironmentMutation();
@@ -49,9 +47,7 @@ export function SocketForm({ onCreate }: Props) {
 
           <OverrideSocketFieldset />
 
-          <MoreSettingsSection>
-            <Hardware />
-          </MoreSettingsSection>
+          <MoreSettingsSection />
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -76,7 +72,6 @@ export function SocketForm({ onCreate }: Props) {
       {
         name: values.name,
         socketPath: values.overridePath ? values.socketPath : '',
-        gpus: values.gpus,
         meta: values.meta,
       },
       {
