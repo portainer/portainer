@@ -10,6 +10,8 @@ import { useSettings } from '@/react/portainer/settings/queries';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { TextTip } from '@@/Tip/TextTip';
 import { BoxSelector } from '@@/BoxSelector';
+import { FormSection } from '@@/form-components/FormSection';
+import { CopyButton } from '@@/buttons';
 
 const commands = {
   linux: [
@@ -88,6 +90,17 @@ export function AutomaticEdgeEnvCreation() {
           edgeKey && (
             <>
               <hr />
+
+              <FormSection title="Edge key">
+                <div className="break-words">
+                  <code>{edgeKey}</code>
+                </div>
+
+                <CopyButton copyText={edgeKey}>Copy token</CopyButton>
+              </FormSection>
+
+              <hr />
+
               <EdgeScriptForm
                 edgeInfo={{ key: edgeKey }}
                 commands={commands}
