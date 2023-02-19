@@ -17,6 +17,7 @@ export const componentsModule = angular
       'value',
       'error',
       'horizontal',
+      'isGroupVisible',
     ])
   )
   .component(

@@ -17,6 +17,7 @@ interface Props {
   onChange: (value: SingleValue[]) => void;
   error?: string | string[];
   horizontal?: boolean;
+  isGroupVisible?(group: EdgeGroup): boolean;
 }
 
 export function EdgeGroupsSelector({
@@ -24,8 +25,15 @@ export function EdgeGroupsSelector({
   onChange,
   error,
   horizontal,
+  isGroupVisible = () => true,
 }: Props) {
-  const selector = <InnerSelector value={value} onChange={onChange} />;
+  const selector = (
+    <InnerSelector
+      value={value}
+      onChange={onChange}
+      isGroupVisible={isGroupVisible}
+    />
+  );
 
   return horizontal ? (
     <FormControl errors={error} label="Edge Groups">
@@ -48,18 +56,25 @@ export function EdgeGroupsSelector({
 function InnerSelector({
   value,
   onChange,
+  isGroupVisible,
 }: {
+  isGroupVisible(group: EdgeGroup): boolean;
   value: SingleValue[];
   onChange: (value: SingleValue[]) => void;
 }) {
   const edgeGroupsQuery = useEdgeGroups();
 
-  const items = edgeGroupsQuery.data;
+  if (!edgeGroupsQuery.data) {
+    return null;
+  }
 
-  const valueGroups =
-    items && _.compact(value.map((id) => items.find((item) => item.Id === id)));
+  const items = edgeGroupsQuery.data.filter(isGroupVisible);
 
-  return items ? (
+  const valueGroups = _.compact(
+    value.map((id) => items.find((item) => item.Id === id))
+  );
+
+  return items.length ? (
     <Select
       aria-label="Edge groups"
       options={items}

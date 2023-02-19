@@ -292,8 +292,10 @@ function buildDefaultDockerEnvVars(
   ]);
 }
 
+const ENV_VAR_SEPARATOR = ',';
+const VAR_LIST_SEPARATOR = ':';
 function buildEnvVars(envVars: string, moreVars: string[]) {
-  return [envVars.trim(), ...moreVars].join(',');
+  return _.compact([envVars.trim(), ...moreVars]).join(ENV_VAR_SEPARATOR);
 }
 
 function metaEnvVars({
@@ -302,8 +304,9 @@ function metaEnvVars({
   tagsIds,
 }: Pick<ScriptFormValues, 'edgeGroupsIds' | 'tagsIds' | 'group'>) {
   return _.compact([
-    edgeGroupsIds.length && `PORTAINER_EDGE_GROUPS=${edgeGroupsIds.join(',')}`,
+    edgeGroupsIds.length &&
+      `EDGE_GROUPS=${edgeGroupsIds.join(VAR_LIST_SEPARATOR)}`,
     group && `PORTAINER_GROUP=${group}`,
-    tagsIds.length && `PORTAINER_TAGS=${tagsIds.join(',')}`,
+    tagsIds.length && `PORTAINER_TAGS=${tagsIds.join(VAR_LIST_SEPARATOR)}`,
   ]);
 }

@@ -35,6 +35,7 @@ export function EdgeScriptSettingsFieldset({
           <EdgeGroupsSelector
             value={values.edgeGroupsIds}
             onChange={(value) => setFieldValue('edgeGroupsIds', value)}
+            isGroupVisible={(group) => !group.Dynamic}
             horizontal
           />
 
