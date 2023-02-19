@@ -67,8 +67,8 @@ export function UserService($q, Users, TeamService, TeamMembershipService) {
     return Users.updatePassword({ id: id }, payload).$promise;
   };
 
-  service.updateUserTheme = function (id, userTheme) {
-    return Users.updateTheme({ id }, { userTheme }).$promise;
+  service.updateUserTheme = function (id, theme) {
+    return Users.updateTheme({ id }, { theme }).$promise;
   };
 
   service.userMemberships = function (id) {
