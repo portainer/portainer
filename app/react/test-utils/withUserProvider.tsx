@@ -8,6 +8,10 @@ const mockUser: User = {
   Id: 1,
   Role: 1,
   Username: 'mock',
+  ThemeSettings: {
+    color: 'auto',
+    subtleUpgradeButton: false,
+  },
 };
 
 export function withUserProvider<T>(
