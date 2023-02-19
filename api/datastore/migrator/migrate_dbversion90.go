@@ -6,11 +6,15 @@ import (
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
-func (m *Migrator) migrateDBVersionToDB81() error {
-	return m.updateEdgeStackStatusForDB81()
+func (m *Migrator) migrateDBVersionToDB90() error {
+	if err := m.updateUserThemForDB90(); err != nil {
+		return err
+	}
+
+	return m.updateEdgeStackStatusForDB90()
 }
 
-func (m *Migrator) updateEdgeStackStatusForDB81() error {
+func (m *Migrator) updateEdgeStackStatusForDB90() error {
 	log.Info().Msg("clean up deleted endpoints from edge jobs")
 
 	edgeJobs, err := m.edgeJobService.EdgeJobs()
@@ -29,6 +33,28 @@ func (m *Migrator) updateEdgeStackStatusForDB81() error {
 					return err
 				}
 			}
+		}
+	}
+
+	return nil
+}
+
+func (m *Migrator) updateUserThemForDB90() error {
+	log.Info().Msg("updating existing user theme settings")
+
+	users, err := m.userService.Users()
+	if err != nil {
+		return err
+	}
+
+	for i := range users {
+		user := &users[i]
+		if user.UserTheme != "" {
+			user.ThemeSettings.Color = user.UserTheme
+		}
+
+		if err := m.userService.UpdateUser(user.ID, user); err != nil {
+			return err
 		}
 	}
 

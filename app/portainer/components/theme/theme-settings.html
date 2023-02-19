@@ -3,12 +3,23 @@
     <rd-widget-header icon="sliders" title-text="User theme"></rd-widget-header>
     <rd-widget-body>
       <form class="form-horizontal">
-        <box-selector radio-name="'theme'" value="$ctrl.state.userTheme" options="$ctrl.state.availableThemes" on-change="($ctrl.setTheme)"></box-selector>
+        <box-selector radio-name="'theme'" value="$ctrl.state.themeColor" options="$ctrl.state.availableThemes" on-change="($ctrl.setThemeColor)"></box-selector>
+
+        <p class="vertical-center mt-2">
+          <pr-icon icon="'alert-circle'" class-name="'icon-primary'"></pr-icon>
+          <span class="small">Dark and High-contrast theme are experimental. Some UI components might not display properly.</span>
+        </p>
+
+        <div class="mt-3">
+          <por-switch-field
+            tooltip="'This setting toggles a more subtle UI for the upgrade button located at the top of the sidebar'"
+            label-class="'col-sm-2'"
+            label="'Subtle upgrade button'"
+            checked="$ctrl.state.subtleUpgradeButton"
+            on-change="($ctrl.setSubtleUpgradeButton)"
+          ></por-switch-field>
+        </div>
       </form>
-      <p class="vertical-center mt-2">
-        <pr-icon icon="'alert-circle'" class-name="'icon-primary'"></pr-icon>
-        Dark and High-contrast theme are experimental. Some UI components might not display properly.
-      </p>
     </rd-widget-body>
   </rd-widget>
 </div>

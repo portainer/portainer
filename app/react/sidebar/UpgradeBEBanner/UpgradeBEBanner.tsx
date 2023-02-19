@@ -1,5 +1,6 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowUpCircle } from 'lucide-react';
 import { useState } from 'react';
+import clsx from 'clsx';
 
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
@@ -7,9 +8,10 @@ import {
   ContainerPlatform,
   useSystemInfo,
 } from '@/react/portainer/system/useSystemInfo';
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { withEdition } from '@/react/portainer/feature-flags/withEdition';
 import { withHideOnExtension } from '@/react/hooks/withHideOnExtension';
+import { useUser } from '@/portainer/users/queries/useUser';
 
 import { useSidebarState } from '../useSidebarState';
 
@@ -25,15 +27,21 @@ const enabledPlatforms: Array<ContainerPlatform> = [
 ];
 
 function UpgradeBEBanner() {
-  const { isAdmin } = useUser();
+  const {
+    isAdmin,
+    user: { Id },
+  } = useCurrentUser();
+
   const { trackEvent } = useAnalytics();
   const { isOpen: isSidebarOpen } = useSidebarState();
+
   const nodesCountQuery = useNodesCount();
   const systemInfoQuery = useSystemInfo();
+  const userQuery = useUser(Id);
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!nodesCountQuery.isSuccess || !systemInfoQuery.data) {
+  if (!nodesCountQuery.isSuccess || !systemInfoQuery.data || !userQuery.data) {
     return null;
   }
 
@@ -49,19 +57,42 @@ function UpgradeBEBanner() {
     agents: systemInfo.agents,
   };
 
-  if (!enabledPlatforms.includes(systemInfo.platform)) {
+  if (
+    !enabledPlatforms.includes(systemInfo.platform) &&
+    process.env.NODE_ENV !== 'development'
+  ) {
     return null;
   }
+
+  const subtleButton = userQuery.data.ThemeSettings.subtleUpgradeButton;
 
   return (
     <>
       <button
         type="button"
-        className="flex w-full items-center justify-center gap-3 border-0 bg-warning-5 py-2 font-semibold text-warning-9"
+        className={clsx(
+          'flex w-full items-center justify-center gap-1 py-2 pr-2 hover:underline',
+          {
+            'border-0 bg-warning-5 font-semibold text-warning-9': !subtleButton,
+            'border border-solid border-blue-9 bg-[#023959] font-medium text-white th-dark:border-[#343434] th-dark:bg-black':
+              subtleButton,
+          },
+          'th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white th-highcontrast:bg-black th-highcontrast:font-medium th-highcontrast:text-white'
+        )}
         onClick={handleClick}
       >
+        <ArrowUpCircle
+          className={clsx(
+            'lucide text-lg',
+            {
+              'fill-warning-9 stroke-warning-5': !subtleButton,
+              'fill-warning-6 stroke-[#023959] th-dark:stroke-black':
+                subtleButton,
+            },
+            'th-highcontrast:fill-warning-6  th-highcontrast:stroke-black'
+          )}
+        />
         {isSidebarOpen && <>Upgrade to Business Edition</>}
-        <ArrowRight className="lucide text-lg" />
       </button>
 
       {isOpen && <UpgradeDialog onDismiss={() => setIsOpen(false)} />}

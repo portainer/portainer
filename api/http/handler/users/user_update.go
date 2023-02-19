@@ -15,10 +15,18 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
+type themePayload struct {
+	// Color represents the color theme of the UI
+	Color *string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
+	// SubtleUpgradeButton indicates if the upgrade banner should be displayed in a subtle way
+	SubtleUpgradeButton *bool `json:"subtleUpgradeButton" example:"false"`
+}
+
 type userUpdatePayload struct {
-	Username  string `validate:"required" example:"bob"`
-	Password  string `validate:"required" example:"cg9Wgky3"`
-	UserTheme string `example:"dark"`
+	Username string `validate:"required" example:"bob"`
+	Password string `validate:"required" example:"cg9Wgky3"`
+	Theme    *themePayload
+
 	// User role (1 for administrator account and 2 for regular account)
 	Role int `validate:"required" enums:"1,2" example:"2"`
 }
@@ -108,8 +116,14 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.TokenIssueAt = time.Now().Unix()
 	}
 
-	if payload.UserTheme != "" {
-		user.UserTheme = payload.UserTheme
+	if payload.Theme != nil {
+		if payload.Theme.Color != nil {
+			user.ThemeSettings.Color = *payload.Theme.Color
+		}
+
+		if payload.Theme.SubtleUpgradeButton != nil {
+			user.ThemeSettings.SubtleUpgradeButton = *payload.Theme.SubtleUpgradeButton
+		}
 	}
 
 	if payload.Role != 0 {
