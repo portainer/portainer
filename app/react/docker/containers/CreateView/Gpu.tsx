@@ -201,7 +201,7 @@ export function Gpu({
             disabled={enableGpuManagement === false}
           />
         </div>
-        {enableGpuManagement && (
+        {enableGpuManagement && values.enabled && (
           <div className="col-sm-9 col-lg-10 text-left">
             <Select<GpuOption, true>
               isMulti

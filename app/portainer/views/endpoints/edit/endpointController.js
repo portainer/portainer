@@ -25,6 +25,7 @@ function EndpointController(
   clipboard,
   EndpointService,
   GroupService,
+  StateManager,
 
   Notifications,
   Authentication,
@@ -271,6 +272,9 @@ function EndpointController(
     return $async(async () => {
       try {
         const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
+
+        const applicationState = StateManager.getState();
+        $scope.isDockerStandaloneEnv = applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE';
 
         if (endpoint.URL.indexOf('unix://') === 0 || endpoint.URL.indexOf('npipe://') === 0) {
           $scope.endpointType = 'local';

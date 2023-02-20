@@ -482,6 +482,7 @@ type (
 	// EndpointPostInitMigrations
 	EndpointPostInitMigrations struct {
 		MigrateIngresses bool `json:"MigrateIngresses"`
+		MigrateGPUs      bool `json:"MigrateGPUs"`
 	}
 
 	// Extension represents a deprecated Portainer extension
