@@ -91,20 +91,19 @@ export function DeploymentSyncOptions() {
                   </FormSection>
                 )}
 
-                <FormSection title="Actions">
-                  <div className="form-group mt-5">
-                    <div className="col-sm-12">
-                      <LoadingButton
-                        disabled={!isValid || !dirty}
-                        data-cy="settings-deploySyncOptionsButton"
-                        isLoading={settingsMutation.isLoading}
-                        loadingText="Saving settings..."
-                      >
-                        Save settings
-                      </LoadingButton>
-                    </div>
+                <div className="form-group mt-5">
+                  <div className="col-sm-12">
+                    <LoadingButton
+                      disabled={!isValid || !dirty}
+                      className="!ml-0"
+                      data-cy="settings-deploySyncOptionsButton"
+                      isLoading={settingsMutation.isLoading}
+                      loadingText="Saving settings..."
+                    >
+                      Save settings
+                    </LoadingButton>
                   </div>
-                </FormSection>
+                </div>
               </Form>
             )}
           </Formik>
