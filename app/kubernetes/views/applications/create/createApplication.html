@@ -378,16 +378,6 @@
                       <div class="input-group btn-group btn-group-sm">
                         <label
                           class="btn btn-md btn-light vertical-center !ml-0"
-                          ng-click="ctrl.overrideConfiguration(index)"
-                          ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
-                          data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
-                          uib-btn-radio="true"
-                          ng-model="config.Overriden"
-                        >
-                          <pr-icon icon="'list'" size="'md'"></pr-icon> Override
-                        </label>
-                        <label
-                          class="btn btn-md btn-light vertical-center !ml-0"
                           type="button"
                           ng-click="ctrl.resetConfiguration(index)"
                           ng-disabled="ctrl.formValues.Containers.length > 1"
@@ -396,6 +386,16 @@
                           ng-model="config.Overriden"
                         >
                           <pr-icon icon="'rotate-cw'" size="'md'"></pr-icon> Auto
+                        </label>
+                        <label
+                          class="btn btn-md btn-light vertical-center !ml-0"
+                          ng-click="ctrl.overrideConfiguration(index)"
+                          ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
+                          uib-btn-radio="true"
+                          ng-model="config.Overriden"
+                        >
+                          <pr-icon icon="'list'" size="'md'"></pr-icon> Override
                         </label>
                       </div>
 
