@@ -9,54 +9,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// BucketName represents the name of the bucket where this service stores data.
-const BucketName = "endpoint_relations"
-
-// Service represents a service for managing environment(endpoint) relation data.
-type Service struct {
-	connection    portainer.Connection
-	updateStackFn func(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
+type ServiceTx struct {
+	service *Service
+	tx      portainer.Transaction
 }
 
-func (service *Service) BucketName() string {
+func (service ServiceTx) BucketName() string {
 	return BucketName
 }
 
-func (service *Service) RegisterUpdateStackFunction(updateFunc func(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error) {
-	service.updateStackFn = updateFunc
-}
-
-// NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Service{
-		connection: connection,
-	}, nil
-}
-
-func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
-	return ServiceTx{
-		service: service,
-		tx:      tx,
-	}
-}
-
 // EndpointRelations returns an array of all EndpointRelations
-func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error) {
+func (service ServiceTx) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	var all = make([]portainer.EndpointRelation, 0)
 
-	err := service.connection.GetAll(
+	err := service.tx.GetAll(
 		BucketName,
 		&portainer.EndpointRelation{},
 		func(obj interface{}) (interface{}, error) {
 			r, ok := obj.(*portainer.EndpointRelation)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
-				return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
+				return nil, fmt.Errorf("failed to convert to EndpointRelation object: %s", obj)
 			}
 
 			all = append(all, *r)
@@ -67,12 +40,12 @@ func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error
 	return all, err
 }
 
-// EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
-func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
+// EndpointRelation returns an Environment(Endpoint) relation object by EndpointID
+func (service ServiceTx) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
 	var endpointRelation portainer.EndpointRelation
-	identifier := service.connection.ConvertToKey(int(endpointID))
+	identifier := service.service.connection.ConvertToKey(int(endpointID))
 
-	err := service.connection.GetObject(BucketName, identifier, &endpointRelation)
+	err := service.tx.GetObject(BucketName, identifier, &endpointRelation)
 	if err != nil {
 		return nil, err
 	}
@@ -81,19 +54,19 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 }
 
 // CreateEndpointRelation saves endpointRelation
-func (service *Service) Create(endpointRelation *portainer.EndpointRelation) error {
-	err := service.connection.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
+func (service ServiceTx) Create(endpointRelation *portainer.EndpointRelation) error {
+	err := service.tx.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
 	cache.Del(endpointRelation.EndpointID)
 
 	return err
 }
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object
-func (service *Service) UpdateEndpointRelation(endpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
+func (service ServiceTx) UpdateEndpointRelation(endpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	previousRelationState, _ := service.EndpointRelation(endpointID)
 
-	identifier := service.connection.ConvertToKey(int(endpointID))
-	err := service.connection.UpdateObject(BucketName, identifier, endpointRelation)
+	identifier := service.service.connection.ConvertToKey(int(endpointID))
+	err := service.tx.UpdateObject(BucketName, identifier, endpointRelation)
 	cache.Del(endpointID)
 	if err != nil {
 		return err
@@ -107,11 +80,11 @@ func (service *Service) UpdateEndpointRelation(endpointID portainer.EndpointID, 
 }
 
 // DeleteEndpointRelation deletes an Environment(Endpoint) relation object
-func (service *Service) DeleteEndpointRelation(endpointID portainer.EndpointID) error {
+func (service ServiceTx) DeleteEndpointRelation(endpointID portainer.EndpointID) error {
 	deletedRelation, _ := service.EndpointRelation(endpointID)
 
-	identifier := service.connection.ConvertToKey(int(endpointID))
-	err := service.connection.DeleteObject(BucketName, identifier)
+	identifier := service.service.connection.ConvertToKey(int(endpointID))
+	err := service.tx.DeleteObject(BucketName, identifier)
 	cache.Del(endpointID)
 	if err != nil {
 		return err
@@ -122,7 +95,7 @@ func (service *Service) DeleteEndpointRelation(endpointID portainer.EndpointID) 
 	return nil
 }
 
-func (service *Service) InvalidateEdgeCacheForEdgeStack(edgeStackID portainer.EdgeStackID) {
+func (service ServiceTx) InvalidateEdgeCacheForEdgeStack(edgeStackID portainer.EdgeStackID) {
 	rels, err := service.EndpointRelations()
 	if err != nil {
 		log.Error().Err(err).Msg("cannot retrieve endpoint relations")
@@ -138,7 +111,7 @@ func (service *Service) InvalidateEdgeCacheForEdgeStack(edgeStackID portainer.Ed
 	}
 }
 
-func (service *Service) updateEdgeStacksAfterRelationChange(previousRelationState *portainer.EndpointRelation, updatedRelationState *portainer.EndpointRelation) {
+func (service ServiceTx) updateEdgeStacksAfterRelationChange(previousRelationState *portainer.EndpointRelation, updatedRelationState *portainer.EndpointRelation) {
 	relations, _ := service.EndpointRelations()
 
 	stacksToUpdate := map[portainer.EdgeStackID]bool{}
@@ -178,7 +151,7 @@ func (service *Service) updateEdgeStacksAfterRelationChange(previousRelationStat
 				}
 			}
 
-			service.updateStackFn(refStackId, func(edgeStack *portainer.EdgeStack) {
+			service.service.updateStackFn(refStackId, func(edgeStack *portainer.EdgeStack) {
 				edgeStack.NumDeployments = numDeployments
 			})
 		}
