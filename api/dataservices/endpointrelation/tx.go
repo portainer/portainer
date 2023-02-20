@@ -110,3 +110,50 @@ func (service ServiceTx) InvalidateEdgeCacheForEdgeStack(edgeStackID portainer.E
 		}
 	}
 }
+
+func (service ServiceTx) updateEdgeStacksAfterRelationChange(previousRelationState *portainer.EndpointRelation, updatedRelationState *portainer.EndpointRelation) {
+	relations, _ := service.EndpointRelations()
+
+	stacksToUpdate := map[portainer.EdgeStackID]bool{}
+
+	if previousRelationState != nil {
+		for stackId, enabled := range previousRelationState.EdgeStacks {
+			// flag stack for update if stack is not in the updated relation state
+			// = stack has been removed for this relation
+			// or this relation has been deleted
+			if enabled && (updatedRelationState == nil || !updatedRelationState.EdgeStacks[stackId]) {
+				stacksToUpdate[stackId] = true
+			}
+		}
+	}
+
+	if updatedRelationState != nil {
+		for stackId, enabled := range updatedRelationState.EdgeStacks {
+			// flag stack for update if stack is not in the previous relation state
+			// = stack has been added for this relation
+			if enabled && (previousRelationState == nil || !previousRelationState.EdgeStacks[stackId]) {
+				stacksToUpdate[stackId] = true
+			}
+		}
+	}
+
+	// for each stack referenced by the updated relation
+	// list how many time this stack is referenced in all relations
+	// in order to update the stack deployments count
+	for refStackId, refStackEnabled := range stacksToUpdate {
+		if refStackEnabled {
+			numDeployments := 0
+			for _, r := range relations {
+				for sId, enabled := range r.EdgeStacks {
+					if enabled && sId == refStackId {
+						numDeployments += 1
+					}
+				}
+			}
+
+			service.service.updateStackFn(refStackId, func(edgeStack *portainer.EdgeStack) {
+				edgeStack.NumDeployments = numDeployments
+			})
+		}
+	}
+}
