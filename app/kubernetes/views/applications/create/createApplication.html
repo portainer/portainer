@@ -123,8 +123,9 @@
                     <div>
                       <p>
                         Portainer no longer supports <a href="https://docs.docker.com/compose/compose-file/" target="_blank">docker-compose</a> format manifests for Kubernetes
-                        deployments, and we have removed the <a href="https://kompose.io/" target="_blank">Kompose</a> conversion tool which enables this. The reason for this is
-                        because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and Exposures (CVEs).
+                        deployments, and we have removed the <a href="https://kompose.io/" target="_blank">Kompose</a>
+                        conversion tool which enables this. The reason for this is because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and
+                        Exposures (CVEs).
                       </p>
                       <p
                         >Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and
@@ -251,7 +252,7 @@
                     <div class="col-sm-12 form-inline mt-2">
                       <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables | orderBy: 'NameIndex'" class="mt-2">
                         <div style="margin-top: 2px">
-                          <div class="col-sm-4 input-group input-group-sm">
+                          <div class="col-sm-4 input-group input-group-sm mr-2">
                             <div class="input-group col-sm-12 input-group-sm" ng-class="{ striked: envVar.NeedsDeletion }">
                               <span class="input-group-addon required">name</span>
                               <input
@@ -269,7 +270,7 @@
                             </div>
                           </div>
 
-                          <div class="col-sm-4 input-group input-group-sm" ng-class="{ striked: envVar.NeedsDeletion }">
+                          <div class="col-sm-4 input-group input-group-sm mr-2" ng-class="{ striked: envVar.NeedsDeletion }">
                             <span class="input-group-addon">value</span>
                             <input
                               type="text"
@@ -335,7 +336,7 @@
                       </div>
                     </div>
 
-                    <div class="col-sm-12 mt-2">
+                    <div class="col-sm-12 mt-4">
                       <span
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
@@ -412,7 +413,8 @@
                     <!-- no-override -->
                     <div class="row clearfix" ng-if="config.SelectedConfiguration && !config.Overriden">
                       <div class="col-sm-9 small text-muted !mt-2 !p-0">
-                        The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
+                        The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code>
+                        configuration as environment variables:
                         <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
                           <code>{{ key }}</code
                           >{{ $last ? '' : ', ' }}
@@ -469,9 +471,9 @@
                               <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
                                 <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
                               </ng-messages>
-                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
-                                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.</p
-                              >
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined">
+                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -911,7 +913,8 @@
                     <div class="col-sm-12 small text-muted vertical-center">
                       <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                       <div>
-                        The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
+                        The following storage option(s) do not support concurrent access from multiples instances:
+                        <code>{{ ctrl.getNonScalableStorage() }}</code
                         >. You will not be able to scale that application.
                       </div>
                     </div>
@@ -1056,106 +1059,105 @@
 
                       <div class="col-sm-12 form-inline">
                         <div ng-repeat-start="placement in ctrl.formValues.Placements" class="!mb-2">
-                          <div class="col-sm-5 input-group" ng-class="{ striked: placement.NeedsDeletion }">
-                            <select
-                              class="form-control !rounded"
-                              ng-model="placement.Label"
-                              ng-options="label as (label.Key | kubernetesNodeLabelHumanReadbleText) for label in ctrl.nodesLabels"
-                              ng-change="ctrl.onChangePlacementLabel($index)"
-                              ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
-                              data-cy="k8sAppCreate-placementLabel_{{ $index }}"
-                            >
-                            </select>
-                          </div>
-                          <div class="col-sm-5 input-group" ng-class="{ striked: placement.NeedsDeletion }">
-                            <select
-                              class="form-control !rounded"
-                              ng-model="placement.Value"
-                              ng-options="value for value in placement.Label.Values"
-                              ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
-                              data-cy="k8sAppCreate-placementName_{{ $index }}"
-                            >
-                            </select>
-                          </div>
-
-                          <div class="col-sm-1 input-group">
-                            <button
-                              ng-if="!placement.NeedsDeletion"
-                              class="btn btn-md btn-dangerlight btn-only-icon !ml-0"
-                              type="button"
-                              ng-click="ctrl.removePlacement($index)"
-                              data-cy="k8sAppCreate-deletePlacementButton"
-                            >
-                              <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
-                            </button>
-                            <button
-                              ng-if="placement.NeedsDeletion"
-                              class="btn btn-sm btn-light btn-only-icon !ml-0"
-                              type="button"
-                              ng-click="ctrl.restorePlacement($index)"
-                              data-cy="k8sAppCreate-restorePlacementButton"
-                            >
-                              <pr-icon icon="'rotate-cw'" size="'md'"></pr-icon>
-                            </button>
-                          </div>
+                          <div class="col-sm-5 input-group mr-2 ng-class=" { striked: placement.NeedsDeletion }">
+                          <select
+                            class="form-control !rounded"
+                            ng-model="placement.Label"
+                            ng-options="label as (label.Key | kubernetesNodeLabelHumanReadbleText) for label in ctrl.nodesLabels"
+                            ng-change="ctrl.onChangePlacementLabel($index)"
+                            ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
+                            data-cy="k8sAppCreate-placementLabel_{{ $index }}"
+                          >
+                          </select>
                         </div>
-                        <div ng-repeat-end ng-show="ctrl.state.duplicates.placements.refs[$index] !== undefined">
-                          <div class="col-sm-5 input-group">
-                            <div class="small text-warning" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
-                              <p class="vertical-center" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
-                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This label is already defined.
-                              </p>
-                            </div>
-                          </div>
+                        <div class="col-sm-5 input-group mr-2" ng-class="{ striked: placement.NeedsDeletion }">
+                          <select
+                            class="form-control !rounded"
+                            ng-model="placement.Value"
+                            ng-options="value for value in placement.Label.Values"
+                            ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
+                            data-cy="k8sAppCreate-placementName_{{ $index }}"
+                          >
+                          </select>
+                        </div>
+
+                        <div class="col-sm-1 input-group">
+                          <button
+                            ng-if="!placement.NeedsDeletion"
+                            class="btn btn-md btn-dangerlight btn-only-icon !ml-0"
+                            type="button"
+                            ng-click="ctrl.removePlacement($index)"
+                            data-cy="k8sAppCreate-deletePlacementButton"
+                          >
+                            <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+                          </button>
+                          <button
+                            ng-if="placement.NeedsDeletion"
+                            class="btn btn-sm btn-light btn-only-icon !ml-0"
+                            type="button"
+                            ng-click="ctrl.restorePlacement($index)"
+                            data-cy="k8sAppCreate-restorePlacementButton"
+                          >
+                            <pr-icon icon="'rotate-cw'" size="'md'"></pr-icon>
+                          </button>
                         </div>
                       </div>
-
-                      <div class="col-sm-12">
-                        <span class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0 mt-2" ng-click="ctrl.addPlacement()">
-                          <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add rule
-                        </span>
+                      <div ng-repeat-end ng-show="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                        <div class="col-sm-5 input-group">
+                          <div class="small text-warning" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                            <p class="vertical-center" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This label is already defined.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div ng-if="ctrl.showPlacementPolicySection()">
-                      <div class="form-group">
-                        <div class="col-sm-12">
-                          <label class="control-label text-left">Placement policy</label>
-                        </div>
-                      </div>
 
-                      <div class="form-group">
-                        <div class="col-sm-12 small text-muted"> Specify the policy associated to the placement rules. </div>
-                      </div>
-
-                      <box-selector
-                        ng-if="ctrl.formValues.Placements.length"
-                        options="ctrl.placementOptions"
-                        slim="true"
-                        value="ctrl.formValues.PlacementType"
-                        on-change="(ctrl.onChangePlacementType)"
-                        radio-name="'placementType'"
-                      ></box-selector>
+                    <div class="col-sm-12">
+                      <span class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0 mt-2" ng-click="ctrl.addPlacement()">
+                        <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add rule
+                      </span>
                     </div>
-                    <!-- #endregion -->
                   </div>
+                  <div ng-if="ctrl.showPlacementPolicySection()">
+                    <div class="form-group">
+                      <div class="col-sm-12">
+                        <label class="control-label text-left">Placement policy</label>
+                      </div>
+                    </div>
 
-                  <!-- kubernetes services options -->
-                  <kube-services-view
-                    form-values="ctrl.formValues"
-                    is-edit="ctrl.state.isEdit"
-                    namespaces="ctrl.allNamespaces"
-                    configurations="ctrl.configurations"
-                    loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
-                  ></kube-services-view>
-                  <!-- kubernetes services options -->
+                    <div class="form-group">
+                      <div class="col-sm-12 small text-muted"> Specify the policy associated to the placement rules. </div>
+                    </div>
 
-                  <!-- summary -->
-                  <kubernetes-summary-view
-                    ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
-                    form-values="ctrl.formValues"
-                    old-form-values="ctrl.savedFormValues"
-                  ></kubernetes-summary-view>
+                    <box-selector
+                      ng-if="ctrl.formValues.Placements.length"
+                      options="ctrl.placementOptions"
+                      slim="true"
+                      value="ctrl.formValues.PlacementType"
+                      on-change="(ctrl.onChangePlacementType)"
+                      radio-name="'placementType'"
+                    ></box-selector>
+                  </div>
+                  <!-- #endregion -->
                 </div>
+
+                <!-- kubernetes services options -->
+                <kube-services-view
+                  form-values="ctrl.formValues"
+                  is-edit="ctrl.state.isEdit"
+                  namespaces="ctrl.allNamespaces"
+                  configurations="ctrl.configurations"
+                  loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+                ></kube-services-view>
+                <!-- kubernetes services options -->
+
+                <!-- summary -->
+                <kubernetes-summary-view
+                  ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                ></kubernetes-summary-view>
               </div>
             </div>
             <div ng-if="ctrl.isExternalApplication()">

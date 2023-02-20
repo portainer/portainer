@@ -12,7 +12,7 @@ export function AnnotationsBeTeaser() {
         Annotations
         <Tooltip
           message={
-            <p className="vertical-center text-muted small">
+            <div className="vertical-center">
               <span>
                 You can specify{' '}
                 <a
@@ -30,7 +30,7 @@ export function AnnotationsBeTeaser() {
                 </a>
                 .
               </span>
-            </p>
+            </div>
           }
           setHtmlMessage
         />
