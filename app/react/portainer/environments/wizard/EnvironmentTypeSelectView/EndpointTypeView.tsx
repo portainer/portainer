@@ -10,8 +10,6 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
 
-import { useCreateEdgeDeviceParam } from '../hooks/useCreateEdgeDeviceParam';
-
 import { EnvironmentSelector } from './EnvironmentSelector';
 import {
   EnvironmentOptionValue,
@@ -20,8 +18,6 @@ import {
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
-  const createEdgeDevice = useCreateEdgeDeviceParam();
-
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
@@ -50,14 +46,12 @@ export function EnvironmentTypeSelectView() {
                   <EnvironmentSelector
                     value={types}
                     onChange={setTypes}
-                    createEdgeDevice={createEdgeDevice}
                     options={existingEnvironmentTypes}
                   />
                   <p className="control-label !mb-2">Set up new environments</p>
                   <EnvironmentSelector
                     value={types}
                     onChange={setTypes}
-                    createEdgeDevice={createEdgeDevice}
                     options={newEnvironmentTypes}
                     hiddenSpacingCount={
                       existingEnvironmentTypes.length -
@@ -102,7 +96,6 @@ export function EnvironmentTypeSelectView() {
 
     router.stateService.go('portainer.wizard.endpoints.create', {
       envType: types,
-      ...(createEdgeDevice ? { edgeDevice: createEdgeDevice } : {}),
     });
   }
 }
