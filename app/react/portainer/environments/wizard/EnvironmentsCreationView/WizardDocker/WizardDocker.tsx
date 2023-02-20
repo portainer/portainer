@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Zap, Cloud, Network, Plug2 } from 'lucide-react';
+import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
@@ -22,7 +24,7 @@ interface Props {
 
 const defaultOptions: BoxSelectorOption<
   'agent' | 'api' | 'socket' | 'edgeAgentStandard' | 'edgeAgentAsync'
->[] = [
+>[] = _.compact([
   {
     id: 'agent',
     icon: <BadgeIcon icon={Zap} size="3xl" />,
@@ -52,7 +54,7 @@ const defaultOptions: BoxSelectorOption<
     description: '',
     value: 'edgeAgentStandard',
   },
-  {
+  isBE && {
     id: 'edgeAgentAsync',
     icon: Cloud,
     iconType: 'badge',
@@ -60,7 +62,7 @@ const defaultOptions: BoxSelectorOption<
     description: '',
     value: 'edgeAgentAsync',
   },
-];
+]);
 
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
   const options = useFilterEdgeOptionsIfNeeded(

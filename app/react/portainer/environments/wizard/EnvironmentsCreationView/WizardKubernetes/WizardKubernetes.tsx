@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Zap, Cloud, UploadCloud } from 'lucide-react';
+import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BoxSelector } from '@@/BoxSelector';
@@ -27,7 +29,7 @@ type CreationType =
   | 'edgeAgentAsync'
   | 'kubeconfig';
 
-const defaultOptions: BoxSelectorOption<CreationType>[] = [
+const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
   {
     id: 'agent_endpoint',
     icon: <BadgeIcon icon={Zap} size="3xl" />,
@@ -43,7 +45,7 @@ const defaultOptions: BoxSelectorOption<CreationType>[] = [
     description: '',
     value: 'edgeAgentStandard',
   },
-  {
+  isBE && {
     id: 'edgeAgentAsync',
     icon: Cloud,
     iconType: 'badge',
@@ -59,7 +61,7 @@ const defaultOptions: BoxSelectorOption<CreationType>[] = [
     description: 'Import an existing Kubernetes config',
     feature: FeatureId.K8S_CREATE_FROM_KUBECONFIG,
   },
-];
+]);
 
 export function WizardKubernetes({ onCreate }: Props) {
   const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'agent');
