@@ -1,0 +1,112 @@
+package endpointrelation
+
+import (
+	"fmt"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge/cache"
+
+	"github.com/rs/zerolog/log"
+)
+
+type ServiceTx struct {
+	service *Service
+	tx      portainer.Transaction
+}
+
+func (service ServiceTx) BucketName() string {
+	return BucketName
+}
+
+// EndpointRelations returns an array of all EndpointRelations
+func (service ServiceTx) EndpointRelations() ([]portainer.EndpointRelation, error) {
+	var all = make([]portainer.EndpointRelation, 0)
+
+	err := service.tx.GetAll(
+		BucketName,
+		&portainer.EndpointRelation{},
+		func(obj interface{}) (interface{}, error) {
+			r, ok := obj.(*portainer.EndpointRelation)
+			if !ok {
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
+				return nil, fmt.Errorf("failed to convert to EndpointRelation object: %s", obj)
+			}
+
+			all = append(all, *r)
+
+			return &portainer.EndpointRelation{}, nil
+		})
+
+	return all, err
+}
+
+// EndpointRelation returns an Environment(Endpoint) relation object by EndpointID
+func (service ServiceTx) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
+	var endpointRelation portainer.EndpointRelation
+	identifier := service.service.connection.ConvertToKey(int(endpointID))
+
+	err := service.tx.GetObject(BucketName, identifier, &endpointRelation)
+	if err != nil {
+		return nil, err
+	}
+
+	return &endpointRelation, nil
+}
+
+// CreateEndpointRelation saves endpointRelation
+func (service ServiceTx) Create(endpointRelation *portainer.EndpointRelation) error {
+	err := service.tx.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
+	cache.Del(endpointRelation.EndpointID)
+
+	return err
+}
+
+// UpdateEndpointRelation updates an Environment(Endpoint) relation object
+func (service ServiceTx) UpdateEndpointRelation(endpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
+	previousRelationState, _ := service.EndpointRelation(endpointID)
+
+	identifier := service.service.connection.ConvertToKey(int(endpointID))
+	err := service.tx.UpdateObject(BucketName, identifier, endpointRelation)
+	cache.Del(endpointID)
+	if err != nil {
+		return err
+	}
+
+	updatedRelationState, _ := service.EndpointRelation(endpointID)
+
+	service.updateEdgeStacksAfterRelationChange(previousRelationState, updatedRelationState)
+
+	return nil
+}
+
+// DeleteEndpointRelation deletes an Environment(Endpoint) relation object
+func (service ServiceTx) DeleteEndpointRelation(endpointID portainer.EndpointID) error {
+	deletedRelation, _ := service.EndpointRelation(endpointID)
+
+	identifier := service.service.connection.ConvertToKey(int(endpointID))
+	err := service.tx.DeleteObject(BucketName, identifier)
+	cache.Del(endpointID)
+	if err != nil {
+		return err
+	}
+
+	service.updateEdgeStacksAfterRelationChange(deletedRelation, nil)
+
+	return nil
+}
+
+func (service ServiceTx) InvalidateEdgeCacheForEdgeStack(edgeStackID portainer.EdgeStackID) {
+	rels, err := service.EndpointRelations()
+	if err != nil {
+		log.Error().Err(err).Msg("cannot retrieve endpoint relations")
+		return
+	}
+
+	for _, rel := range rels {
+		for id := range rel.EdgeStacks {
+			if edgeStackID == id {
+				cache.Del(rel.EndpointID)
+			}
+		}
+	}
+}
