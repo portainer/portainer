@@ -268,7 +268,7 @@ export function IngressForm({
                     </span>
                   </TooltipWithChildren>
 
-                  <TooltipWithChildren message="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to.">
+                  <TooltipWithChildren message="Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account.">
                     <span>
                       <Button
                         className="btn btn-sm btn-light mb-2 ml-2"
