@@ -76,7 +76,7 @@ angular
         },
       };
 
-      var endpointRoot = {
+      const endpointRoot = {
         name: 'endpoint',
         url: '/:endpointId',
         parent: 'root',
@@ -106,13 +106,13 @@ angular
         },
       };
 
-      var portainer = {
+      const portainer = {
         name: 'portainer',
         parent: 'root',
         abstract: true,
       };
 
-      var account = {
+      const account = {
         name: 'portainer.account',
         url: '/account',
         views: {
@@ -133,7 +133,7 @@ angular
         },
       };
 
-      var authentication = {
+      const authentication = {
         name: 'portainer.auth',
         url: '/auth',
         params: {
@@ -148,6 +148,7 @@ angular
           'sidebar@': {},
         },
       };
+
       const logout = {
         name: 'portainer.logout',
         url: '/logout',
@@ -165,7 +166,7 @@ angular
         },
       };
 
-      var endpoints = {
+      const endpoints = {
         name: 'portainer.endpoints',
         url: '/endpoints',
         views: {
@@ -175,7 +176,7 @@ angular
         },
       };
 
-      var endpoint = {
+      const endpoint = {
         name: 'portainer.endpoints.endpoint',
         url: '/:id?redirectTo',
         params: {
@@ -189,7 +190,7 @@ angular
         },
       };
 
-      var deviceImport = {
+      const deviceImport = {
         name: 'portainer.endpoints.importDevice',
         url: '/device',
         views: {
@@ -200,7 +201,17 @@ angular
         },
       };
 
-      var addFDOProfile = {
+      const edgeAutoCreateScript = {
+        name: 'portainer.endpoints.edgeAutoCreateScript',
+        url: '/aeec',
+        views: {
+          'content@': {
+            component: 'edgeAutoCreateScriptView',
+          },
+        },
+      };
+
+      const addFDOProfile = {
         name: 'portainer.endpoints.profile',
         url: '/profile',
         views: {
@@ -210,7 +221,7 @@ angular
         },
       };
 
-      var editFDOProfile = {
+      const editFDOProfile = {
         name: 'portainer.endpoints.profile.edit',
         url: '/:id',
         views: {
@@ -220,7 +231,7 @@ angular
         },
       };
 
-      var endpointAccess = {
+      const endpointAccess = {
         name: 'portainer.endpoints.endpoint.access',
         url: '/access',
         views: {
@@ -232,7 +243,7 @@ angular
         },
       };
 
-      var endpointKVM = {
+      const endpointKVM = {
         name: 'portainer.endpoints.endpoint.kvm',
         url: '/kvm?deviceId&deviceName',
         views: {
@@ -243,7 +254,7 @@ angular
         },
       };
 
-      var groups = {
+      const groups = {
         name: 'portainer.groups',
         url: '/groups',
         views: {
@@ -254,7 +265,7 @@ angular
         },
       };
 
-      var group = {
+      const group = {
         name: 'portainer.groups.group',
         url: '/:id',
         views: {
@@ -265,7 +276,7 @@ angular
         },
       };
 
-      var groupCreation = {
+      const groupCreation = {
         name: 'portainer.groups.new',
         url: '/new',
         views: {
@@ -276,7 +287,7 @@ angular
         },
       };
 
-      var groupAccess = {
+      const groupAccess = {
         name: 'portainer.groups.group.access',
         url: '/access',
         views: {
@@ -287,7 +298,7 @@ angular
         },
       };
 
-      var home = {
+      const home = {
         name: 'portainer.home',
         url: '/home',
         views: {
@@ -297,7 +308,7 @@ angular
         },
       };
 
-      var init = {
+      const init = {
         name: 'portainer.init',
         abstract: true,
         url: '/init',
@@ -306,7 +317,7 @@ angular
         },
       };
 
-      var initAdmin = {
+      const initAdmin = {
         name: 'portainer.init.admin',
         url: '/admin',
         views: {
@@ -328,7 +339,7 @@ angular
         },
       };
 
-      var registry = {
+      const registry = {
         name: 'portainer.registries.registry',
         url: '/:id',
         views: {
@@ -348,7 +359,7 @@ angular
         },
       };
 
-      var settings = {
+      const settings = {
         name: 'portainer.settings',
         url: '/settings',
         views: {
@@ -359,7 +370,7 @@ angular
         },
       };
 
-      var settingsAuthentication = {
+      const settingsAuthentication = {
         name: 'portainer.settings.authentication',
         url: '/auth',
         views: {
@@ -380,7 +391,7 @@ angular
         },
       };
 
-      var tags = {
+      const tags = {
         name: 'portainer.tags',
         url: '/tags',
         views: {
@@ -391,7 +402,7 @@ angular
         },
       };
 
-      var users = {
+      const users = {
         name: 'portainer.users',
         url: '/users',
         views: {
@@ -402,7 +413,7 @@ angular
         },
       };
 
-      var user = {
+      const user = {
         name: 'portainer.users.user',
         url: '/:id',
         views: {
@@ -424,6 +435,7 @@ angular
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
+      $stateRegistryProvider.register(edgeAutoCreateScript);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);

@@ -67,14 +67,10 @@ export function ScriptTabs({
   });
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <NavTabs
-          selectedId={platform}
-          options={options}
-          onSelect={(id: Platform) => onPlatformChange(id)}
-        />
-      </div>
-    </div>
+    <NavTabs
+      selectedId={platform}
+      options={options}
+      onSelect={(id: Platform) => onPlatformChange(id)}
+    />
   );
 }

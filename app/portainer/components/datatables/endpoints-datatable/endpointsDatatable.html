@@ -39,6 +39,11 @@
             <span>Import FDO device</span>
           </button>
 
+          <button ng-if="$ctrl.isBE" type="button" class="btn btn-sm btn-secondary vertical-center" ui-sref="portainer.endpoints.edgeAutoCreateScript">
+            <pr-icon icon="'plus'"></pr-icon>
+            <span>Generate AEEC script</span>
+          </button>
+
           <button
             type="button"
             class="btn btn-sm btn-primary vertical-center"
