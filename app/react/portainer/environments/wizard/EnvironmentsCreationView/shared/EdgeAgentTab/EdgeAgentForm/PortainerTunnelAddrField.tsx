@@ -8,22 +8,20 @@ interface Props {
   fieldName: string;
   readonly?: boolean;
   required?: boolean;
-  tooltip?: string;
 }
 
-export function PortainerUrlField({
+export function PortainerTunnelAddrField({
   fieldName,
   readonly,
   required,
-  tooltip = 'URL of the Portainer instance that the agent will use to initiate the communications.',
 }: Props) {
   const [, metaProps] = useField(fieldName);
   const id = `${fieldName}-input`;
 
   return (
     <FormControl
-      label="Portainer API server URL"
-      tooltip={tooltip}
+      label="Portainer tunnel server address"
+      tooltip="Address of this Portainer instance that will be used by Edge agents to establish a reverse tunnel."
       required
       errors={metaProps.error}
       inputId={id}
@@ -32,9 +30,8 @@ export function PortainerUrlField({
         id={id}
         name={fieldName}
         as={Input}
-        placeholder="https://portainer.mydomain.tld"
+        placeholder="portainer.mydomain.tld"
         required={required}
-        data-cy="endpointCreate-portainerServerUrlInput"
         readOnly={readonly}
       />
     </FormControl>
@@ -43,31 +40,26 @@ export function PortainerUrlField({
 
 export function validation() {
   return string()
-    .required('API server URL is required')
+    .required('Tunnel server address is required')
     .test(
-      'valid API server URL',
-      'The API server URL must be a valid URL (localhost cannot be used)',
+      'valid tunnel server URL',
+      'The tunnel server address must be a valid address (localhost cannot be used)',
       (value) => {
         if (!value) {
           return false;
         }
 
-        try {
-          const url = new URL(value);
-          return !!url.hostname && url.hostname !== 'localhost';
-        } catch {
-          return false;
-        }
+        return !value.startsWith('localhost');
       }
     );
 }
 
 /**
- * Returns a URL that can be used as a default value for the Portainer server API URL
+ * Returns an address that can be used as a default value for the Portainer tunnel server address
  * based on the current window location.
  * Used for Edge Compute.
  *
  */
 export function buildDefaultValue() {
-  return `${window.location.protocol}//${window.location.host}`;
+  return `${window.location.hostname}:8000`;
 }

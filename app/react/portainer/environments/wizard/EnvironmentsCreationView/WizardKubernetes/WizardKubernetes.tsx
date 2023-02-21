@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { Zap, Cloud, UploadCloud } from 'lucide-react';
 
-import {
-  Environment,
-  EnvironmentCreationTypes,
-} from '@/react/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -24,37 +21,48 @@ interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
 }
 
-const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
+type CreationType =
+  | 'agent'
+  | 'edgeAgentStandard'
+  | 'edgeAgentAsync'
+  | 'kubeconfig';
+
+const defaultOptions: BoxSelectorOption<CreationType>[] = [
   {
     id: 'agent_endpoint',
     icon: <BadgeIcon icon={Zap} size="3xl" />,
     label: 'Agent',
-    value: EnvironmentCreationTypes.AgentEnvironment,
+    value: 'agent',
     description: '',
   },
   {
-    id: 'edgeAgent',
-    icon: <BadgeIcon icon={Cloud} size="3xl" />,
-    label: 'Edge Agent',
+    id: 'edgeAgentStandard',
+    icon: Cloud,
+    iconType: 'badge',
+    label: 'Edge Agent Standard',
     description: '',
-    value: EnvironmentCreationTypes.EdgeAgentEnvironment,
-    hide: window.ddExtension,
+    value: 'edgeAgentStandard',
+  },
+  {
+    id: 'edgeAgentAsync',
+    icon: Cloud,
+    iconType: 'badge',
+    label: 'Edge Agent Async',
+    description: '',
+    value: 'edgeAgentAsync',
   },
   {
     id: 'kubeconfig_endpoint',
     icon: <BadgeIcon icon={UploadCloud} size="3xl" />,
     label: 'Import',
-    value: EnvironmentCreationTypes.KubeConfigEnvironment,
+    value: 'kubeconfig',
     description: 'Import an existing Kubernetes config',
     feature: FeatureId.K8S_CREATE_FROM_KUBECONFIG,
   },
 ];
 
 export function WizardKubernetes({ onCreate }: Props) {
-  const options = useFilterEdgeOptionsIfNeeded(
-    defaultOptions,
-    EnvironmentCreationTypes.EdgeAgentEnvironment
-  );
+  const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'agent');
 
   const [creationType, setCreationType] = useState(options[0].value);
 
@@ -73,24 +81,34 @@ export function WizardKubernetes({ onCreate }: Props) {
     </div>
   );
 
-  function getTab(type: typeof options[number]['value']) {
+  function getTab(type: CreationType) {
     switch (type) {
-      case EnvironmentCreationTypes.AgentEnvironment:
+      case 'agent':
         return (
           <AgentPanel
             onCreate={(environment) => onCreate(environment, 'kubernetesAgent')}
           />
         );
-      case EnvironmentCreationTypes.EdgeAgentEnvironment:
+      case 'edgeAgentStandard':
         return (
           <EdgeAgentTab
             onCreate={(environment) =>
-              onCreate(environment, 'kubernetesEdgeAgent')
+              onCreate(environment, 'kubernetesEdgeAgentStandard')
             }
             commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
           />
         );
-      case EnvironmentCreationTypes.KubeConfigEnvironment:
+      case 'edgeAgentAsync':
+        return (
+          <EdgeAgentTab
+            asyncMode
+            onCreate={(environment) =>
+              onCreate(environment, 'kubernetesEdgeAgentStandard')
+            }
+            commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
+          />
+        );
+      case 'kubeconfig':
         return (
           <div className="border border-solid border-orange-1 px-1 py-5">
             <BEFeatureIndicator

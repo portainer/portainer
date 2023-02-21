@@ -21,7 +21,7 @@ interface Props {
 }
 
 const defaultOptions: BoxSelectorOption<
-  'agent' | 'api' | 'socket' | 'edgeAgent'
+  'agent' | 'api' | 'socket' | 'edgeAgentStandard' | 'edgeAgentAsync'
 >[] = [
   {
     id: 'agent',
@@ -45,17 +45,28 @@ const defaultOptions: BoxSelectorOption<
     value: 'socket',
   },
   {
-    id: 'edgeAgent',
-    icon: <BadgeIcon icon={Cloud} size="3xl" />,
-    label: 'Edge Agent',
+    id: 'edgeAgentStandard',
+    icon: Cloud,
+    iconType: 'badge',
+    label: 'Edge Agent Standard',
     description: '',
-    value: 'edgeAgent',
-    hide: window.ddExtension,
+    value: 'edgeAgentStandard',
+  },
+  {
+    id: 'edgeAgentAsync',
+    icon: Cloud,
+    iconType: 'badge',
+    label: 'Edge Agent Async',
+    description: '',
+    value: 'edgeAgentAsync',
   },
 ];
 
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
-  const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'edgeAgent');
+  const options = useFilterEdgeOptionsIfNeeded(
+    defaultOptions,
+    'edgeAgentStandard'
+  );
 
   const [creationType, setCreationType] = useState(options[0].value);
 
@@ -74,7 +85,14 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
     </div>
   );
 
-  function getTab(creationType: 'agent' | 'api' | 'socket' | 'edgeAgent') {
+  function getTab(
+    creationType:
+      | 'agent'
+      | 'api'
+      | 'socket'
+      | 'edgeAgentStandard'
+      | 'edgeAgentAsync'
+  ) {
     switch (creationType) {
       case 'agent':
         return (
@@ -95,10 +113,29 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
             onCreate={(environment) => onCreate(environment, 'localEndpoint')}
           />
         );
-      case 'edgeAgent':
+      case 'edgeAgentStandard':
         return (
           <EdgeAgentTab
-            onCreate={(environment) => onCreate(environment, 'dockerEdgeAgent')}
+            onCreate={(environment) =>
+              onCreate(environment, 'dockerEdgeAgentStandard')
+            }
+            commands={{
+              linux: isDockerStandalone
+                ? [commandsTabs.standaloneLinux]
+                : [commandsTabs.swarmLinux],
+              win: isDockerStandalone
+                ? [commandsTabs.standaloneWindow]
+                : [commandsTabs.swarmWindows],
+            }}
+          />
+        );
+      case 'edgeAgentAsync':
+        return (
+          <EdgeAgentTab
+            asyncMode
+            onCreate={(environment) =>
+              onCreate(environment, 'dockerEdgeAgentAsync')
+            }
             commands={{
               linux: isDockerStandalone
                 ? [commandsTabs.standaloneLinux]

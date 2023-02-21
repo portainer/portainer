@@ -2,6 +2,7 @@ import { Gpu } from '@/react/portainer/environments/wizard/EnvironmentsCreationV
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
+import { EdgeAsyncIntervalsValues } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 
 import { type Environment, EnvironmentCreationTypes } from '../types';
 
@@ -101,6 +102,10 @@ interface TLSSettings {
   keyFile?: File;
 }
 
+interface EdgeSettings extends EdgeAsyncIntervalsValues {
+  asyncMode: boolean;
+}
+
 export interface EnvironmentOptions {
   url?: string;
   publicUrl?: string;
@@ -110,6 +115,8 @@ export interface EnvironmentOptions {
   isEdgeDevice?: boolean;
   gpus?: Gpu[];
   pollFrequency?: number;
+  edge?: EdgeSettings;
+  tunnelServerAddr?: string;
 }
 
 interface CreateRemoteEnvironment {
@@ -163,10 +170,12 @@ export function createAgentEnvironment({
 interface CreateEdgeAgentEnvironment {
   name: string;
   portainerUrl: string;
+  tunnelServerAddr?: string;
   meta?: EnvironmentMetadata;
   pollFrequency: number;
   gpus?: Gpu[];
   isEdgeDevice?: boolean;
+  edge: EdgeSettings;
 }
 
 export function createEdgeAgentEnvironment({
@@ -176,6 +185,7 @@ export function createEdgeAgentEnvironment({
   gpus = [],
   isEdgeDevice,
   pollFrequency,
+  edge,
 }: CreateEdgeAgentEnvironment) {
   return createEnvironment(
     name,
@@ -189,6 +199,7 @@ export function createEdgeAgentEnvironment({
       gpus,
       isEdgeDevice,
       pollFrequency,
+      edge,
       meta,
     }
   );
@@ -238,6 +249,16 @@ async function createEnvironment(
         AzureApplicationID: azure.applicationId,
         AzureTenantID: azure.tenantId,
         AzureAuthenticationKey: azure.authenticationKey,
+      };
+    }
+
+    if (options.edge?.asyncMode) {
+      payload = {
+        ...payload,
+        EdgeAsyncMode: true,
+        EdgePingInterval: options.edge?.PingInterval,
+        EdgeSnapshotInterval: options.edge?.SnapshotInterval,
+        EdgeCommandInterval: options.edge?.CommandInterval,
       };
     }
   }
