@@ -11,8 +11,6 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getNamespaces } from '../namespaces/service';
 
-import { Service } from './types';
-
 const serviceKeys = {
   all: ['environments', 'kubernetes', 'namespace', 'service'] as const,
   namespace: (
@@ -28,12 +26,14 @@ async function getServices(
   lookupApps: boolean
 ) {
   try {
-    let url = `kubernetes/${environmentId}/namespaces/${namespace}/services`;
-    if (lookupApps) {
-      url += '?lookupapplications=true';
-    }
-
-    const { data: services } = await axios.get<Service[]>(url);
+    const { data: services } = await axios.get(
+      `kubernetes/${environmentId}/namespaces/${namespace}/services`,
+      {
+        params: {
+          lookupapplications: lookupApps,
+        },
+      }
+    );
     return services;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to retrieve services');

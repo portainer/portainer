@@ -13,7 +13,7 @@ export const type: Column<Service> = {
   Cell: ({ row }: CellProps<Service>) => {
     const icon = getIcon(row.original.Type);
     return (
-      <span className="flex items-center space-x-1">
+      <span className="flex items-center gap-1">
         <Icon icon={icon} aria-hidden="true" />
         <div>{row.original.Type}</div>
       </span>

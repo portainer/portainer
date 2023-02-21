@@ -162,7 +162,6 @@ function TableActions({ selectedItems }: TableActionsProps) {
       { environmentId, data: payload },
       {
         onSuccess: () => {
-          console.log(services);
           notifySuccess(
             'Services successfully removed',
             services.map((s) => `${s.Namespace}/${s.Name}`).join(', ')

@@ -9,12 +9,14 @@ interface Props {
 
 export function ExternalIPLink({ to, text }: Props) {
   return (
-    <div>
-      <a href={to} target="_blank" rel="noreferrer">
-        <Icon icon={ExternalLink} />
-        &nbsp;
-        <span>{text}</span>
-      </a>
-    </div>
+    <a
+      href={to}
+      target="_blank"
+      rel="noreferrer"
+      className="flex items-center gap-1"
+    >
+      <Icon icon={ExternalLink} />
+      <span>{text}</span>
+    </a>
   );
 }

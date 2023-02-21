@@ -23,7 +23,7 @@ export type Service = {
   Namespace: string;
   Annotations?: Record<string, string>;
   Labels?: Record<string, string>;
-  Type: string;
+  Type: 'ClusterIP' | 'ExternalName' | 'NodePort' | 'LoadBalancer' | string;
   Ports: Array<ServicePort>;
   Selector?: Record<string, string>;
   ClusterIPs?: Array<string>;
