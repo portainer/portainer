@@ -6,7 +6,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/internal/testhelpers"
-	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -74,19 +73,19 @@ func Test_Filter_AgentVersion(t *testing.T) {
 	runTests(tests, t, handler, endpoints)
 }
 
-func Test_Filter_edgeDeviceFilter(t *testing.T) {
+func Test_Filter_edgeFilter(t *testing.T) {
 
-	trustedEdgeDevice := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	untrustedEdgeDevice := portainer.Endpoint{ID: 2, UserTrusted: false, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	regularUntrustedEdgeEndpoint := portainer.Endpoint{ID: 3, UserTrusted: false, IsEdgeDevice: false, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	regularTrustedEdgeEndpoint := portainer.Endpoint{ID: 4, UserTrusted: true, IsEdgeDevice: false, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	trustedEdgeAsync := portainer.Endpoint{ID: 1, UserTrusted: true, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: true}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	untrustedEdgeAsync := portainer.Endpoint{ID: 2, UserTrusted: false, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: true}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	regularUntrustedEdgeStandard := portainer.Endpoint{ID: 3, UserTrusted: false, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: false}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	regularTrustedEdgeStandard := portainer.Endpoint{ID: 4, UserTrusted: true, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: false}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
 	regularEndpoint := portainer.Endpoint{ID: 5, GroupID: 1, Type: portainer.DockerEnvironment}
 
 	endpoints := []portainer.Endpoint{
-		trustedEdgeDevice,
-		untrustedEdgeDevice,
-		regularUntrustedEdgeEndpoint,
-		regularTrustedEdgeEndpoint,
+		trustedEdgeAsync,
+		untrustedEdgeAsync,
+		regularUntrustedEdgeStandard,
+		regularTrustedEdgeStandard,
 		regularEndpoint,
 	}
 
@@ -96,32 +95,32 @@ func Test_Filter_edgeDeviceFilter(t *testing.T) {
 
 	tests := []filterTest{
 		{
-			"should show all edge endpoints except of the untrusted devices",
-			[]portainer.EndpointID{trustedEdgeDevice.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
+			"should show all edge endpoints except of the untrusted edge",
+			[]portainer.EndpointID{trustedEdgeAsync.ID, regularTrustedEdgeStandard.ID},
 			EnvironmentsQuery{
 				types: []portainer.EndpointType{portainer.EdgeAgentOnDockerEnvironment, portainer.EdgeAgentOnKubernetesEnvironment},
 			},
 		},
 		{
 			"should show only trusted edge devices and other regular endpoints",
-			[]portainer.EndpointID{trustedEdgeDevice.ID, regularEndpoint.ID},
+			[]portainer.EndpointID{trustedEdgeAsync.ID, regularEndpoint.ID},
 			EnvironmentsQuery{
-				edgeDevice: BoolAddr(true),
+				edgeAsync: BoolAddr(true),
 			},
 		},
 		{
 			"should show only untrusted edge devices and other regular endpoints",
-			[]portainer.EndpointID{untrustedEdgeDevice.ID, regularEndpoint.ID},
+			[]portainer.EndpointID{untrustedEdgeAsync.ID, regularEndpoint.ID},
 			EnvironmentsQuery{
-				edgeDevice:          BoolAddr(true),
+				edgeAsync:           BoolAddr(true),
 				edgeDeviceUntrusted: true,
 			},
 		},
 		{
 			"should show no edge devices",
-			[]portainer.EndpointID{regularEndpoint.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
+			[]portainer.EndpointID{regularEndpoint.ID, regularTrustedEdgeStandard.ID},
 			EnvironmentsQuery{
-				edgeDevice: BoolAddr(false),
+				edgeAsync: BoolAddr(false),
 			},
 		},
 	}
@@ -168,7 +167,7 @@ func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Han
 	err := store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "error creating a user")
 
-	bouncer := helper.NewTestRequestBouncer()
+	bouncer := testhelpers.NewTestRequestBouncer()
 	handler = NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
