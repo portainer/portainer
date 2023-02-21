@@ -2,8 +2,8 @@ import { Formik, Form } from 'formik';
 import { Laptop } from 'lucide-react';
 
 import { Settings } from '@/react/portainer/settings/types';
-import { PortainerUrlField } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/EdgeAgentTab/EdgeAgentForm/PortainerUrlField';
-import { PortainerTunnelAddrField } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/EdgeAgentTab/EdgeAgentForm/PortainerTunnelAddrField';
+import { PortainerUrlField } from '@/react/portainer/common/PortainerUrlField';
+import { PortainerTunnelAddrField } from '@/react/portainer/common/PortainerTunnelAddrField';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';

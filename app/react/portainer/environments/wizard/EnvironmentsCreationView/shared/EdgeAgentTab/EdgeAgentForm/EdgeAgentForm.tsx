@@ -10,8 +10,8 @@ import {
   EDGE_ASYNC_INTERVAL_USE_DEFAULT,
 } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { useSettings } from '@/react/portainer/settings/queries';
-import { buildDefaultValue as buildTunnelDefaultValue } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/EdgeAgentTab/EdgeAgentForm/PortainerTunnelAddrField';
-import { buildDefaultValue as buildApiUrlDefaultValue } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/EdgeAgentTab/EdgeAgentForm/PortainerUrlField';
+import { buildDefaultValue as buildTunnelDefaultValue } from '@/react/portainer/common/PortainerTunnelAddrField';
+import { buildDefaultValue as buildApiUrlDefaultValue } from '@/react/portainer/common/PortainerUrlField';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';

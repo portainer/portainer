@@ -5,8 +5,8 @@ import {
   EdgeAsyncIntervalsValues,
 } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { gpusListValidation } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
-import { validation as urlValidation } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/EdgeAgentTab/EdgeAgentForm/PortainerTunnelAddrField';
-import { validation as addressValidation } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/EdgeAgentTab/EdgeAgentForm/PortainerUrlField';
+import { validation as urlValidation } from '@/react/portainer/common/PortainerTunnelAddrField';
+import { validation as addressValidation } from '@/react/portainer/common/PortainerUrlField';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { metadataValidation } from '../../MetadataFieldset/validation';
