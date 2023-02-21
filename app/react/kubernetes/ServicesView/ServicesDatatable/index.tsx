@@ -15,7 +15,7 @@ import { useSearchBarState } from '@@/datatables/SearchBar';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
-import { useDeleteServices, useServices } from '../service';
+import { useMutationDeleteServices, useServices } from '../service';
 import { Service } from '../types';
 import { DefaultDatatableSettings } from '../../datatables/DefaultDatatableSettings';
 
@@ -109,7 +109,7 @@ type TableActionsProps = {
 };
 
 function TableActions({ selectedItems }: TableActionsProps) {
-  const deleteServicesMutation = useDeleteServices();
+  const deleteServicesMutation = useMutationDeleteServices();
   const environmentId = useEnvironmentId();
   const router = useRouter();
 

@@ -16,10 +16,6 @@ export interface TableSettings
     RefreshableTableSettings,
     SystemResourcesTableSettings {}
 
-interface Props {
-  settings: TableSettings;
-}
-
 export function systemResourcesSettings(
   set: ZustandSetFunc<SystemResourcesTableSettings>
 ): SystemResourcesTableSettings {
@@ -31,6 +27,10 @@ export function systemResourcesSettings(
       });
     },
   };
+}
+
+interface Props {
+  settings: TableSettings;
 }
 
 export function DefaultDatatableSettings({ settings }: Props) {

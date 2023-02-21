@@ -64,7 +64,7 @@ function isFulfilled<T>(
   return input.status === 'fulfilled';
 }
 
-export function useDeleteServices() {
+export function useMutationDeleteServices() {
   const queryClient = useQueryClient();
   return useMutation(
     ({
