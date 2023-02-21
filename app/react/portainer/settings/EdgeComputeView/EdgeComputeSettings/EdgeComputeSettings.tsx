@@ -83,16 +83,14 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                   capabilities.
                 </TextTip>
 
-                {values.EnableEdgeComputeFeatures && (
+                {isBE && values.EnableEdgeComputeFeatures && (
                   <>
                     <PortainerUrlField
                       fieldName="EdgePortainerUrl"
                       tooltip="URL of this Portainer instance that will be used by Edge agents to initiate the communications."
                     />
 
-                    {isBE && (
-                      <PortainerTunnelAddrField fieldName="Edge.TunnelServerAddress" />
-                    )}
+                    <PortainerTunnelAddrField fieldName="Edge.TunnelServerAddress" />
                   </>
                 )}
 
