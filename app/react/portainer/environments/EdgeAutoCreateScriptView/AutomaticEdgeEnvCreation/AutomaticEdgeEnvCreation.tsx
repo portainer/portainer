@@ -12,6 +12,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { BoxSelector } from '@@/BoxSelector';
 import { FormSection } from '@@/form-components/FormSection';
 import { CopyButton } from '@@/buttons';
+import { Link } from '@@/Link';
 
 const commands = {
   linux: [
@@ -50,7 +51,7 @@ export function AutomaticEdgeEnvCreation() {
 
   const settings = settingsQuery.data;
   const edgeKey = edgeKeyMutation.data;
-  const edgeComputeConfigurationOK = validateConfiguration(asyncMode);
+  const edgeComputeConfigurationOK = validateConfiguration();
 
   useEffect(() => {
     if (edgeComputeConfigurationOK) {
@@ -68,47 +69,30 @@ export function AutomaticEdgeEnvCreation() {
     <Widget>
       <WidgetTitle icon={Laptop} title="Automatic Edge Environment Creation" />
       <WidgetBody className="form-horizontal">
-        <BoxSelector
-          slim
-          radioName="async-mode-selector"
-          value={asyncMode}
-          onChange={handleChangeAsyncMode}
-          options={asyncModeOptions}
-        />
-        {!edgeComputeConfigurationOK && (
+        {!edgeComputeConfigurationOK ? (
           <TextTip color="orange">
-            In order to use this feature, please make sure that Edge Compute
-            features are turned on and that you have properly configured the
-            Portainer API server URL{' '}
-            {asyncMode ? '' : 'and tunnel server address'}.
+            In order to use this feature, please turn on Edge Compute features{' '}
+            <Link to="portainer.settings.edgeCompute">here</Link> and have
+            Portainer API server URL and tunnel server address properly
+            configured.
           </TextTip>
-        )}
-
-        {edgeKeyMutation.isLoading ? (
-          <div>Generating key for {url} ... </div>
         ) : (
-          edgeKey && (
-            <>
-              <hr />
+          <>
+            <BoxSelector
+              slim
+              radioName="async-mode-selector"
+              value={asyncMode}
+              onChange={handleChangeAsyncMode}
+              options={asyncModeOptions}
+            />
 
-              <FormSection title="Edge key">
-                <div className="break-words">
-                  <code>{edgeKey}</code>
-                </div>
-
-                <CopyButton copyText={edgeKey}>Copy token</CopyButton>
-              </FormSection>
-
-              <hr />
-
-              <EdgeScriptForm
-                edgeInfo={{ key: edgeKey }}
-                commands={commands}
-                isNomadTokenVisible
-                asyncMode={asyncMode}
-              />
-            </>
-          )
+            <EdgeKeyInfo
+              asyncMode={asyncMode}
+              edgeKey={edgeKey}
+              isLoading={edgeKeyMutation.isLoading}
+              url={url}
+            />
+          </>
         )}
       </WidgetBody>
     </Widget>
@@ -118,12 +102,12 @@ export function AutomaticEdgeEnvCreation() {
     setAsyncMode(asyncMode);
   }
 
-  function validateConfiguration(asyncMode: boolean) {
+  function validateConfiguration() {
     return !!(
       settings &&
       settings.EnableEdgeComputeFeatures &&
       settings.EdgePortainerUrl &&
-      (asyncMode || settings.Edge.TunnelServerAddress)
+      settings.Edge.TunnelServerAddress
     );
   }
 }
@@ -131,4 +115,43 @@ export function AutomaticEdgeEnvCreation() {
 // using mutation because we want this action to run only when required
 function useGenerateKeyMutation() {
   return useMutation(generateKey);
+}
+
+function EdgeKeyInfo({
+  isLoading,
+  edgeKey,
+  url,
+  asyncMode,
+}: {
+  isLoading: boolean;
+  edgeKey?: string;
+  url?: string;
+  asyncMode: boolean;
+}) {
+  if (isLoading || !edgeKey) {
+    return <div>Generating key for {url} ... </div>;
+  }
+
+  return (
+    <>
+      <hr />
+
+      <FormSection title="Edge key">
+        <div className="break-words">
+          <code>{edgeKey}</code>
+        </div>
+
+        <CopyButton copyText={edgeKey}>Copy token</CopyButton>
+      </FormSection>
+
+      <hr />
+
+      <EdgeScriptForm
+        edgeInfo={{ key: edgeKey }}
+        commands={commands}
+        isNomadTokenVisible
+        asyncMode={asyncMode}
+      />
+    </>
+  );
 }
