@@ -66,6 +66,16 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const services = {
+      name: 'kubernetes.services',
+      url: '/services',
+      views: {
+        'content@': {
+          component: 'kubernetesServicesView',
+        },
+      },
+    };
+
     const ingresses = {
       name: 'kubernetes.ingresses',
       url: '/ingresses',
@@ -406,6 +416,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(endpointKubernetesConfiguration);
     $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
 
+    $stateRegistryProvider.register(services);
     $stateRegistryProvider.register(ingresses);
     $stateRegistryProvider.register(ingressesCreate);
     $stateRegistryProvider.register(ingressesEdit);

@@ -20,7 +20,7 @@ export function TextTip({
 }: PropsWithChildren<Props>) {
   return (
     <p className={clsx('small inline-flex items-center gap-1', className)}>
-      <Icon icon={icon} mode={getMode(color)} />
+      <Icon icon={icon} mode={getMode(color)} className="shrink-0" />
       <span className="text-muted">{children}</span>
     </p>
   );
