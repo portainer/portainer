@@ -911,7 +911,8 @@ type (
 			PingInterval int `json:"PingInterval" example:"5"`
 			// The snapshot interval for edge agent - used in edge async mode (in seconds)
 			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-			// EdgeAsyncMode enables edge async mode by default
+
+			// Deprecated 2.18
 			AsyncMode bool
 		}
 
