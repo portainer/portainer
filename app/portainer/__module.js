@@ -76,7 +76,7 @@ angular
         },
       };
 
-      const endpointRoot = {
+      var endpointRoot = {
         name: 'endpoint',
         url: '/:endpointId',
         parent: 'root',
@@ -106,13 +106,13 @@ angular
         },
       };
 
-      const portainer = {
+      var portainer = {
         name: 'portainer',
         parent: 'root',
         abstract: true,
       };
 
-      const account = {
+      var account = {
         name: 'portainer.account',
         url: '/account',
         views: {
@@ -133,7 +133,7 @@ angular
         },
       };
 
-      const authentication = {
+      var authentication = {
         name: 'portainer.auth',
         url: '/auth',
         params: {
@@ -166,7 +166,7 @@ angular
         },
       };
 
-      const endpoints = {
+      var endpoints = {
         name: 'portainer.endpoints',
         url: '/endpoints',
         views: {
@@ -176,7 +176,7 @@ angular
         },
       };
 
-      const endpoint = {
+      var endpoint = {
         name: 'portainer.endpoints.endpoint',
         url: '/:id?redirectTo',
         params: {
@@ -190,7 +190,7 @@ angular
         },
       };
 
-      const deviceImport = {
+      var deviceImport = {
         name: 'portainer.endpoints.importDevice',
         url: '/device',
         views: {
@@ -211,7 +211,7 @@ angular
         },
       };
 
-      const addFDOProfile = {
+      var addFDOProfile = {
         name: 'portainer.endpoints.profile',
         url: '/profile',
         views: {
@@ -221,7 +221,7 @@ angular
         },
       };
 
-      const editFDOProfile = {
+      var editFDOProfile = {
         name: 'portainer.endpoints.profile.edit',
         url: '/:id',
         views: {
@@ -231,7 +231,7 @@ angular
         },
       };
 
-      const endpointAccess = {
+      var endpointAccess = {
         name: 'portainer.endpoints.endpoint.access',
         url: '/access',
         views: {
@@ -243,7 +243,7 @@ angular
         },
       };
 
-      const endpointKVM = {
+      var endpointKVM = {
         name: 'portainer.endpoints.endpoint.kvm',
         url: '/kvm?deviceId&deviceName',
         views: {
@@ -254,7 +254,7 @@ angular
         },
       };
 
-      const groups = {
+      var groups = {
         name: 'portainer.groups',
         url: '/groups',
         views: {
@@ -265,7 +265,7 @@ angular
         },
       };
 
-      const group = {
+      var group = {
         name: 'portainer.groups.group',
         url: '/:id',
         views: {
@@ -276,7 +276,7 @@ angular
         },
       };
 
-      const groupCreation = {
+      var groupCreation = {
         name: 'portainer.groups.new',
         url: '/new',
         views: {
@@ -287,7 +287,7 @@ angular
         },
       };
 
-      const groupAccess = {
+      var groupAccess = {
         name: 'portainer.groups.group.access',
         url: '/access',
         views: {
@@ -298,7 +298,7 @@ angular
         },
       };
 
-      const home = {
+      var home = {
         name: 'portainer.home',
         url: '/home',
         views: {
@@ -308,7 +308,7 @@ angular
         },
       };
 
-      const init = {
+      var init = {
         name: 'portainer.init',
         abstract: true,
         url: '/init',
@@ -317,7 +317,7 @@ angular
         },
       };
 
-      const initAdmin = {
+      var initAdmin = {
         name: 'portainer.init.admin',
         url: '/admin',
         views: {
@@ -339,7 +339,7 @@ angular
         },
       };
 
-      const registry = {
+      var registry = {
         name: 'portainer.registries.registry',
         url: '/:id',
         views: {
@@ -359,7 +359,7 @@ angular
         },
       };
 
-      const settings = {
+      var settings = {
         name: 'portainer.settings',
         url: '/settings',
         views: {
@@ -370,7 +370,7 @@ angular
         },
       };
 
-      const settingsAuthentication = {
+      var settingsAuthentication = {
         name: 'portainer.settings.authentication',
         url: '/auth',
         views: {
@@ -391,7 +391,7 @@ angular
         },
       };
 
-      const tags = {
+      var tags = {
         name: 'portainer.tags',
         url: '/tags',
         views: {
@@ -402,7 +402,7 @@ angular
         },
       };
 
-      const users = {
+      var users = {
         name: 'portainer.users',
         url: '/users',
         views: {
@@ -413,7 +413,7 @@ angular
         },
       };
 
-      const user = {
+      var user = {
         name: 'portainer.users.user',
         url: '/:id',
         views: {
