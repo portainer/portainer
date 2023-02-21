@@ -6,35 +6,28 @@ import { ExternalIPLink } from './externalIPLink';
 
 // calculate the scheme based on the ports of the service
 // favour https over http
-function getSchemeAndPort(svc: Service): [string, string] {
+function getSchemeAndPort(svc: Service): [string, number] {
   let scheme = '';
-  let targetPort = '';
+  let servicePort = 0;
 
   svc.Ports?.forEach((port) => {
-    if (port.TargetPort === 'https') {
-      scheme = 'https';
-      targetPort = port.TargetPort;
-    }
-
-    if (port.TargetPort === 'http' && targetPort !== 'https') {
-      scheme = 'http';
-      targetPort = port.TargetPort;
-    }
-
-    if (port.TargetPort !== 'https' && port.TargetPort !== 'http') {
-      if (port.TargetPort.endsWith('443')) {
+    if (port.Protocol === 'TCP') {
+      if (port.TargetPort === 'https' || port.TargetPort === '443') {
         scheme = 'https';
-        targetPort = port.TargetPort;
+        servicePort = port.Port;
       }
 
-      if (targetPort !== '443' && port.TargetPort.endsWith('80')) {
+      if (
+        (port.TargetPort === 'http' || port.TargetPort === '80') &&
+        scheme !== 'https'
+      ) {
         scheme = 'http';
-        targetPort = port.TargetPort;
+        servicePort = port.Port;
       }
     }
   });
 
-  return [scheme, targetPort];
+  return [scheme, servicePort];
 }
 
 export const externalIP: Column<Service> = {
@@ -61,7 +54,7 @@ export const externalIP: Column<Service> = {
     return status.map((status, index) => {
       if (scheme) {
         let linkto = `${scheme}://${status.IP}`;
-        if (port !== 'http' && port !== 'https') {
+        if (port !== 80 && port !== 443) {
           linkto = `${linkto}:${port}`;
         }
 
