@@ -1,4 +1,5 @@
 import { Formik } from 'formik';
+import { PropsWithChildren } from 'react';
 
 import { OsSelector } from './OsSelector';
 import { CommandTab } from './scripts';
@@ -29,7 +30,8 @@ export function EdgeScriptForm({
   commands,
   isNomadTokenVisible,
   asyncMode,
-}: Props) {
+  children,
+}: PropsWithChildren<Props>) {
   const showOsSelector = !(commands instanceof Array);
 
   return (
@@ -41,6 +43,8 @@ export function EdgeScriptForm({
       >
         {({ values, setFieldValue }) => (
           <>
+            {children}
+
             <EdgeScriptSettingsFieldset
               isNomadTokenVisible={
                 isNomadTokenVisible && values.platform === 'nomad'

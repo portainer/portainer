@@ -13,6 +13,8 @@ import { BoxSelector } from '@@/BoxSelector';
 import { FormSection } from '@@/form-components/FormSection';
 import { CopyButton } from '@@/buttons';
 import { Link } from '@@/Link';
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
 
 const commands = {
   linux: [
@@ -91,6 +93,7 @@ export function AutomaticEdgeEnvCreation() {
               edgeKey={edgeKey}
               isLoading={edgeKeyMutation.isLoading}
               url={url}
+              tunnelUrl={settings?.Edge.TunnelServerAddress}
             />
           </>
         )}
@@ -121,11 +124,13 @@ function EdgeKeyInfo({
   isLoading,
   edgeKey,
   url,
+  tunnelUrl,
   asyncMode,
 }: {
   isLoading: boolean;
   edgeKey?: string;
   url?: string;
+  tunnelUrl?: string;
   asyncMode: boolean;
 }) {
   if (isLoading || !edgeKey) {
@@ -151,7 +156,23 @@ function EdgeKeyInfo({
         commands={commands}
         isNomadTokenVisible
         asyncMode={asyncMode}
-      />
+      >
+        <FormControl label="Portainer API server URL">
+          <Input value={url} readOnly />
+        </FormControl>
+
+        {!asyncMode && (
+          <FormControl label="Portainer tunnel server address">
+            <Input value={tunnelUrl} readOnly />
+          </FormControl>
+        )}
+
+        <TextTip color="blue">
+          Portainer Server URL{' '}
+          {!asyncMode ? 'and tunnel server address are' : 'is'} set{' '}
+          <Link to="portainer.settings.edgeCompute">here</Link>
+        </TextTip>
+      </EdgeScriptForm>
     </>
   );
 }
