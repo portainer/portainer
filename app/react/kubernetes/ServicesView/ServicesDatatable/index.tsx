@@ -109,8 +109,8 @@ type TableActionsProps = {
 };
 
 function TableActions({ selectedItems }: TableActionsProps) {
-  const deleteServicesMutation = useMutationDeleteServices();
   const environmentId = useEnvironmentId();
+  const deleteServicesMutation = useMutationDeleteServices(environmentId);
   const router = useRouter();
 
   return (

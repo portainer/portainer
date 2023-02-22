@@ -1,24 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { compact } from 'lodash';
 
-import {
-  mutationOptions,
-  withError,
-  withInvalidate,
-} from '@/react-tools/react-query';
+import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getNamespaces } from '../namespaces/service';
-
-const serviceKeys = {
-  all: ['environments', 'kubernetes', 'namespace', 'service'] as const,
-  namespace: (
-    environmentId: EnvironmentId,
-    namespace: string,
-    service: string
-  ) => [...serviceKeys.all, String(environmentId), namespace, service] as const,
-};
 
 async function getServices(
   environmentId: EnvironmentId,
@@ -64,7 +51,7 @@ function isFulfilled<T>(
   return input.status === 'fulfilled';
 }
 
-export function useMutationDeleteServices() {
+export function useMutationDeleteServices(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -74,10 +61,17 @@ export function useMutationDeleteServices() {
       environmentId: EnvironmentId;
       data: Record<string, string[]>;
     }) => deleteServices(environmentId, data),
-    mutationOptions(
-      withError('Unable to delete service(s)'),
-      withInvalidate(queryClient, [serviceKeys.all])
-    )
+    {
+      onSuccess: () =>
+        // use the exact same query keys as the useServices hook to invalidate the services list
+        queryClient.invalidateQueries([
+          'environments',
+          environmentId,
+          'kubernetes',
+          'services',
+        ]),
+      ...withError('Unable to delete service(s)'),
+    }
   );
 }
 
