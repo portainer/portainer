@@ -105,7 +105,7 @@ export function WizardKubernetes({ onCreate }: Props) {
           <EdgeAgentTab
             asyncMode
             onCreate={(environment) =>
-              onCreate(environment, 'kubernetesEdgeAgentStandard')
+              onCreate(environment, 'kubernetesEdgeAgentAsync')
             }
             commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
           />
