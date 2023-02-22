@@ -7,6 +7,10 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getNamespaces } from '../namespaces/service';
 
+function getServicesListQueryKey(environmentId: EnvironmentId) {
+  return ['environments', environmentId, 'kubernetes', 'services'];
+}
+
 async function getServices(
   environmentId: EnvironmentId,
   namespace: string,
@@ -29,7 +33,7 @@ async function getServices(
 
 export function useServices(environmentId: EnvironmentId) {
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'services'],
+    getServicesListQueryKey(environmentId),
     async () => {
       const namespaces = await getNamespaces(environmentId);
       const settledServicesPromise = await Promise.allSettled(
@@ -56,12 +60,7 @@ export function useMutationDeleteServices(environmentId: EnvironmentId) {
   return useMutation(deleteServices, {
     onSuccess: () =>
       // use the exact same query keys as the useServices hook to invalidate the services list
-      queryClient.invalidateQueries([
-        'environments',
-        environmentId,
-        'kubernetes',
-        'services',
-      ]),
+      queryClient.invalidateQueries(getServicesListQueryKey(environmentId)),
     ...withError('Unable to delete service(s)'),
   });
 }

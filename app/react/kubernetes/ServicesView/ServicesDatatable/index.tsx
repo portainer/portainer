@@ -33,35 +33,20 @@ export function ServicesDatatable() {
   const settings = useStore(settingsStore);
 
   const [search, setSearch] = useSearchBarState(storageKey);
+  const columns = useColumns();
+  const isSelectEnabled = useAuthorizations(['K8sServiceW']);
 
-  const filteredServices = servicesQuery.data?.filter(
-    (service) =>
-      settings.showSystemResources ||
-      !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
-  );
-
-  function servicesRenderRow<D extends Record<string, unknown>>(
-    row: Row<D>,
-    rowProps: TableRowProps,
-    highlightedItemId?: string
-  ) {
-    return (
-      <Table.Row<D>
-        key={rowProps.key}
-        cells={row.cells}
-        className={clsx('[&>td]:!py-4 [&>td]:!align-top', rowProps.className, {
-          active: highlightedItemId === row.id,
-        })}
-        role={rowProps.role}
-        style={rowProps.style}
-      />
-    );
-  }
+  const filteredServices =
+    servicesQuery.data?.filter(
+      (service) =>
+        settings.showSystemResources ||
+        !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
+    ) || [];
 
   return (
     <Datatable
-      dataset={filteredServices || []}
-      columns={useColumns()}
+      dataset={filteredServices}
+      columns={columns}
       isLoading={servicesQuery.isLoading}
       emptyContentLabel="No services found"
       title="Services"
@@ -70,7 +55,7 @@ export function ServicesDatatable() {
       isRowSelectable={(row) =>
         !KubernetesNamespaceHelper.isSystemNamespace(row.values.namespace)
       }
-      disableSelect={!useAuthorizations(['K8sServiceW'])}
+      disableSelect={!isSelectEnabled}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}
@@ -95,6 +80,26 @@ export function ServicesDatatable() {
   );
 }
 
+// needed to apply custom styling to the row cells and not globally.
+// required in the AC's for this ticket.
+function servicesRenderRow<D extends Record<string, unknown>>(
+  row: Row<D>,
+  rowProps: TableRowProps,
+  highlightedItemId?: string
+) {
+  return (
+    <Table.Row<D>
+      key={rowProps.key}
+      cells={row.cells}
+      className={clsx('[&>td]:!py-4 [&>td]:!align-top', rowProps.className, {
+        active: highlightedItemId === row.id,
+      })}
+      role={rowProps.role}
+      style={rowProps.style}
+    />
+  );
+}
+
 interface SelectedService {
   Namespace: string;
   Name: string;
@@ -108,28 +113,6 @@ function TableActions({ selectedItems }: TableActionsProps) {
   const environmentId = useEnvironmentId();
   const deleteServicesMutation = useMutationDeleteServices(environmentId);
   const router = useRouter();
-
-  return (
-    <div className="servicesDatatable-actions">
-      <Authorized authorizations="K8sServiceW">
-        <Button
-          className="btn-wrapper"
-          color="dangerlight"
-          disabled={selectedItems.length === 0}
-          onClick={() => handleRemoveClick(selectedItems)}
-          icon={Trash2}
-        >
-          Remove
-        </Button>
-
-        <Link to="kubernetes.deploy" className="space-left">
-          <Button className="btn-wrapper" color="primary" icon="plus">
-            Create from manifest
-          </Button>
-        </Link>
-      </Authorized>
-    </div>
-  );
 
   async function handleRemoveClick(services: SelectedService[]) {
     const confirmed = await confirmDelete(
@@ -175,4 +158,26 @@ function TableActions({ selectedItems }: TableActionsProps) {
     );
     return services;
   }
+
+  return (
+    <div className="servicesDatatable-actions">
+      <Authorized authorizations="K8sServiceW">
+        <Button
+          className="btn-wrapper"
+          color="dangerlight"
+          disabled={selectedItems.length === 0}
+          onClick={() => handleRemoveClick(selectedItems)}
+          icon={Trash2}
+        >
+          Remove
+        </Button>
+
+        <Link to="kubernetes.deploy" className="space-left">
+          <Button className="btn-wrapper" color="primary" icon="plus">
+            Create from manifest
+          </Button>
+        </Link>
+      </Authorized>
+    </div>
+  );
 }
