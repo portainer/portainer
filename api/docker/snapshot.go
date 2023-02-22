@@ -220,7 +220,9 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	snapshot.HealthyContainerCount = healthyContainers
 	snapshot.UnhealthyContainerCount = unhealthyContainers
 	snapshot.StackCount += len(stacks)
-	snapshot.SnapshotRaw.Containers = containers
+	for _, container := range containers {
+		snapshot.SnapshotRaw.Containers = append(snapshot.SnapshotRaw.Containers, portainer.DockerContainerSnapshot{Container: container})
+	}
 	return nil
 }
 
