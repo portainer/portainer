@@ -108,12 +108,29 @@ export interface EnvironmentSecuritySettings {
   enableHostManagementFeatures: boolean;
 }
 
+export type DeploymentOptions = {
+  overrideGlobalOptions: boolean;
+  hideAddWithForm: boolean;
+  hideWebEditor: boolean;
+  hideFileUpload: boolean;
+};
+
+/**
+ *  EndpointChangeWindow determine when automatic stack/app updates may occur
+ */
+interface EndpointChangeWindow {
+  Enabled: boolean;
+  StartTime: string;
+  EndTime: string;
+}
+
 export type Environment = {
   Agent: { Version: string };
   Id: EnvironmentId;
   Type: EnvironmentType;
   TagIds: TagId[];
   GroupId: EnvironmentGroupId;
+  DeploymentOptions: DeploymentOptions | null;
   EdgeID?: string;
   EdgeKey: string;
   EdgeCheckinInterval?: number;
@@ -132,7 +149,11 @@ export type Environment = {
   Edge: EnvironmentEdge;
   SecuritySettings: EnvironmentSecuritySettings;
   Gpus: { name: string; value: string }[];
+  EnableImageNotification: boolean;
   LocalTimeZone?: string;
+
+  /** Automatic update change window restriction for stacks and apps */
+  ChangeWindow: EndpointChangeWindow;
 };
 
 /**

@@ -3,6 +3,8 @@ export function UserViewModel(data) {
   this.Username = data.Username;
   this.Role = data.Role;
   this.ThemeSettings = data.ThemeSettings;
+  this.EndpointAuthorizations = data.EndpointAuthorizations;
+  this.PortainerAuthorizations = data.PortainerAuthorizations;
   if (data.Role === 1) {
     this.RoleName = 'administrator';
   } else {
@@ -10,8 +12,6 @@ export function UserViewModel(data) {
   }
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.Checked = false;
-  this.EndpointAuthorizations = null;
-  this.PortainerAuthorizations = null;
 }
 
 export function UserTokenModel(data) {

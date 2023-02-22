@@ -1,7 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
-import uuidv4 from 'uuid/v4';
 
 import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
@@ -9,11 +8,13 @@ import { renderTemplate } from '@/react/portainer/custom-templates/components/ut
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, customTemplate, url } from '@@/BoxSelector/common-options/build-methods';
+import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
+import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, Authentication, Notifications, KubernetesResourcePoolService, StackService, WebhookHelper, CustomTemplateService) {
+  constructor($async, $state, $window, Authentication, Notifications, KubernetesResourcePoolService, StackService, CustomTemplateService) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
@@ -21,9 +22,7 @@ class KubernetesDeployController {
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
-    this.WebhookHelper = WebhookHelper;
     this.CustomTemplateService = CustomTemplateService;
-    this.DeployMethod = 'manifest';
 
     this.isTemplateVariablesEnabled = isBE;
 
@@ -45,6 +44,7 @@ class KubernetesDeployController {
       isEditorDirty: false,
       templateId: null,
       template: null,
+      baseWebhookUrl: baseStackWebhookUrl(),
     };
 
     this.formValues = {
@@ -56,11 +56,8 @@ class KubernetesDeployController {
       RepositoryPassword: '',
       AdditionalFiles: [],
       ComposeFilePathInRepository: '',
-      RepositoryAutomaticUpdates: false,
-      RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
-      RepositoryFetchInterval: '5m',
-      RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
       Variables: {},
+      AutoUpdate: parseAutoUpdateResponse(),
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
@@ -145,36 +142,33 @@ class KubernetesDeployController {
   }
 
   onChangeMethod(method) {
-    this.state.BuildMethod = method;
+    return this.$async(async () => {
+      this.state.BuildMethod = method;
+    });
   }
 
   onChangeDeployType(type) {
-    this.state.DeployType = type;
-    if (type == this.ManifestDeployTypes.COMPOSE) {
-      this.DeployMethod = 'compose';
-    } else {
-      this.DeployMethod = 'manifest';
-    }
+    return this.$async(async () => {
+      this.state.DeployType = type;
+    });
   }
 
   disableDeploy() {
-    const isGitFormInvalid =
-      this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
-      (!this.formValues.RepositoryURL || !this.formValues.FilePathInRepository || (this.formValues.RepositoryAuthentication && !this.formValues.RepositoryPassword)) &&
-      _.isEmpty(this.formValues.Namespace);
     const isWebEditorInvalid =
       this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
     const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
 
     const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
-    return !this.formValues.StackName || isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress || isNamespaceInvalid;
+    return !this.formValues.StackName || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress || isNamespaceInvalid;
   }
 
-  onChangeFormValues(values) {
-    this.formValues = {
-      ...this.formValues,
-      ...values,
-    };
+  onChangeFormValues(newValues) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...newValues,
+      };
+    });
   }
 
   onChangeTemplateId(templateId, template) {
@@ -262,14 +256,7 @@ class KubernetesDeployController {
         }
         payload.ManifestFile = this.formValues.ComposeFilePathInRepository;
         payload.AdditionalFiles = this.formValues.AdditionalFiles;
-        if (this.formValues.RepositoryAutomaticUpdates) {
-          payload.AutoUpdate = {};
-          if (this.formValues.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
-            payload.AutoUpdate.Interval = this.formValues.RepositoryFetchInterval;
-          } else if (this.formValues.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
-            payload.AutoUpdate.Webhook = this.formValues.RepositoryWebhookURL.split('/').reverse()[0];
-          }
-        }
+        payload.AutoUpdate = transformAutoUpdateViewModel(this.formValues.AutoUpdate);
       } else if (method === KubernetesDeployRequestMethods.STRING) {
         payload.StackFileContent = this.formValues.EditorContent;
       } else {
