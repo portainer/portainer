@@ -1,7 +1,8 @@
 import { useStore } from 'zustand';
 
-import { Environment } from '@/react/portainer/environments/types';
+import { EdgeTypes, Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useEnvironmentList } from '@/react/portainer/environments/queries';
 
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -17,13 +18,13 @@ const storageKey = 'edge-devices-waiting-room';
 
 const settingsStore = createPersistedStore(storageKey, 'Name');
 
-interface Props {
-  devices: Environment[];
-  isLoading: boolean;
-  totalCount: number;
-}
+export function Datatable() {
+  const { environments, isLoading, totalCount } = useEnvironmentList({
+    edgeDeviceUntrusted: true,
+    excludeSnapshots: true,
+    types: EdgeTypes,
+  });
 
-export function Datatable({ devices, isLoading, totalCount }: Props) {
   const associateMutation = useAssociateDeviceMutation();
   const licenseOverused = useLicenseOverused();
   const settings = useStore(settingsStore);
@@ -32,7 +33,7 @@ export function Datatable({ devices, isLoading, totalCount }: Props) {
   return (
     <GenericDatatable
       columns={columns}
-      dataset={devices}
+      dataset={environments}
       initialPageSize={settings.pageSize}
       onPageSizeChange={settings.setPageSize}
       initialSortBy={settings.sortBy}
