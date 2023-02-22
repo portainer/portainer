@@ -4,7 +4,7 @@ import { List, Share2 } from 'lucide-react';
 import { Icon } from '@@/Icon';
 import { filterHOC } from '@@/datatables/Filter';
 
-import { Service } from '../../types';
+import { Service, ServiceType } from '../../types';
 
 export const type: Column<Service> = {
   Header: 'Type',
@@ -31,7 +31,7 @@ export const type: Column<Service> = {
   },
 };
 
-function getIcon(type?: string) {
+function getIcon(type?: ServiceType) {
   switch (type) {
     case 'ClusterIP':
       return List;

@@ -53,32 +53,26 @@ function isFulfilled<T>(
 
 export function useMutationDeleteServices(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
-  return useMutation(
-    ({
-      environmentId,
-      data,
-    }: {
-      environmentId: EnvironmentId;
-      data: Record<string, string[]>;
-    }) => deleteServices(environmentId, data),
-    {
-      onSuccess: () =>
-        // use the exact same query keys as the useServices hook to invalidate the services list
-        queryClient.invalidateQueries([
-          'environments',
-          environmentId,
-          'kubernetes',
-          'services',
-        ]),
-      ...withError('Unable to delete service(s)'),
-    }
-  );
+  return useMutation(deleteServices, {
+    onSuccess: () =>
+      // use the exact same query keys as the useServices hook to invalidate the services list
+      queryClient.invalidateQueries([
+        'environments',
+        environmentId,
+        'kubernetes',
+        'services',
+      ]),
+    ...withError('Unable to delete service(s)'),
+  });
 }
 
-export async function deleteServices(
-  environmentId: EnvironmentId,
-  data: Record<string, string[]>
-) {
+export async function deleteServices({
+  environmentId,
+  data,
+}: {
+  environmentId: EnvironmentId;
+  data: Record<string, string[]>;
+}) {
   try {
     return await axios.post(
       `kubernetes/${environmentId}/services/delete`,

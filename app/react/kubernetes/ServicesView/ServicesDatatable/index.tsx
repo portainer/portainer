@@ -40,10 +40,6 @@ export function ServicesDatatable() {
       !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
   );
 
-  function useCheckboxes() {
-    return !useAuthorizations(['K8sServiceW']);
-  }
-
   function servicesRenderRow<D extends Record<string, unknown>>(
     row: Row<D>,
     rowProps: TableRowProps,
@@ -66,7 +62,7 @@ export function ServicesDatatable() {
     <Datatable
       dataset={filteredServices || []}
       columns={useColumns()}
-      isLoading={false}
+      isLoading={servicesQuery.isLoading}
       emptyContentLabel="No services found"
       title="Services"
       titleIcon={Shuffle}
@@ -74,7 +70,7 @@ export function ServicesDatatable() {
       isRowSelectable={(row) =>
         !KubernetesNamespaceHelper.isSystemNamespace(row.values.namespace)
       }
-      disableSelect={useCheckboxes()}
+      disableSelect={!useAuthorizations(['K8sServiceW'])}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}

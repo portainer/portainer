@@ -17,13 +17,19 @@ type Application = {
   Type: string;
 };
 
+export type ServiceType =
+  | 'ClusterIP'
+  | 'ExternalName'
+  | 'NodePort'
+  | 'LoadBalancer';
+
 export type Service = {
   Name: string;
   UID: string;
   Namespace: string;
   Annotations?: Record<string, string>;
   Labels?: Record<string, string>;
-  Type: 'ClusterIP' | 'ExternalName' | 'NodePort' | 'LoadBalancer' | string;
+  Type: ServiceType;
   Ports: Array<ServicePort>;
   Selector?: Record<string, string>;
   ClusterIPs?: Array<string>;
