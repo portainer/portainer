@@ -14,14 +14,14 @@ const tagKeys = {
   tag: (id: TagId) => [...tagKeys.all, id] as const,
 };
 
-export function useTags<T = Tag>(select?: (tags: Tag[]) => T[]) {
-  const { data, isLoading } = useQuery(tagKeys.all, () => getTags(), {
+export function useTags<T = Tag[]>({
+  select,
+}: { select?: (tags: Tag[]) => T } = {}) {
+  return useQuery(tagKeys.all, () => getTags(), {
     staleTime: 50,
     select,
     ...withError('Failed to retrieve tags'),
   });
-
-  return { tags: data, isLoading };
 }
 
 export function useCreateTagMutation() {

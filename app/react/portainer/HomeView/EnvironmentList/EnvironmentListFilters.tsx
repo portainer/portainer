@@ -85,7 +85,7 @@ export function EnvironmentListFilters({
   }));
 
   const tagsQuery = useTags();
-  const tagOptions = [...(tagsQuery.tags || [])];
+  const tagOptions = [...(tagsQuery.data || [])];
   const uniqueTag = [
     ...new Map(tagOptions.map((item) => [item.ID, item])).values(),
   ].map(({ ID: value, Name: label }) => ({
