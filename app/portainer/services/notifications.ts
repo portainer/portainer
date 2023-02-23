@@ -15,6 +15,7 @@ toastr.options = {
   closeButton: true,
   progressBar: true,
   tapToDismiss: false,
+  escapeHtml: true,
   // custom button, using the lucide icon x.svg inside
   closeHtml: `<button type="button"><svg
   xmlns="http://www.w3.org/2000/svg"

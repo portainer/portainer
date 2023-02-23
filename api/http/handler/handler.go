@@ -82,7 +82,7 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.17.0
+// @version 2.18.0
 // @description.markdown api-description.md
 // @termsOfService
 
@@ -161,6 +161,8 @@ type Handler struct {
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
+	case strings.HasPrefix(r.URL.Path, "/api/endpoints") && strings.Contains(r.URL.Path, "/edge/"):
+		h.EndpointEdgeHandler.ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/backup"):
@@ -175,8 +177,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.EdgeGroupsHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_jobs"):
 		http.StripPrefix("/api", h.EdgeJobsHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
-		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_templates"):
 		http.StripPrefix("/api", h.EdgeTemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoint_groups"):
@@ -200,8 +200,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/agent/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
-		case strings.Contains(r.URL.Path, "/edge/"):
-			http.StripPrefix("/api/endpoints", h.EndpointEdgeHandler).ServeHTTP(w, r)
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}

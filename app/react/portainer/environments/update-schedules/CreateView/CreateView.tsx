@@ -1,10 +1,10 @@
+import { useMemo } from 'react';
 import { Settings } from 'lucide-react';
 import { Formik, Form as FormikForm } from 'formik';
 import { useRouter } from '@uirouter/react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
-import { isoDate } from '@/portainer/filters/filters';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -21,17 +21,21 @@ import { useList } from '../queries/list';
 import { NameField } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { BetaAlert } from '../common/BetaAlert';
+import { defaultValue } from '../common/ScheduledTimeField';
 
 export default withLimitToBE(CreateView);
 
 function CreateView() {
-  const initialValues: FormValues = {
-    name: '',
-    groupIds: [],
-    type: ScheduleType.Update,
-    version: '',
-    scheduledTime: isoDate(Date.now() + 24 * 60 * 60 * 1000),
-  };
+  const initialValues = useMemo<FormValues>(
+    () => ({
+      name: '',
+      groupIds: [],
+      type: ScheduleType.Update,
+      version: '',
+      scheduledTime: defaultValue(),
+    }),
+    []
+  );
 
   const schedulesQuery = useList();
 

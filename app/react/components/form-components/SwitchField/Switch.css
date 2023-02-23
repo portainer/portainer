@@ -1,7 +1,6 @@
 /* switch box */
 
-.switch,
-.bootbox-checkbox-list > .checkbox > label {
+.switch {
   --switch-size: 24px;
 }
 
@@ -13,8 +12,7 @@
   display: none;
 }
 
-.switch i,
-.bootbox-form .checkbox i {
+.switch i {
   display: inline-block;
   vertical-align: middle;
   cursor: pointer;
@@ -27,8 +25,7 @@
   box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
-.switch i:before,
-.bootbox-form .checkbox i:before {
+.switch i:before {
   display: block;
   content: '';
   width: var(--switch-size);
@@ -38,8 +35,7 @@
   box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
-.switch :checked + i,
-.bootbox-form .checkbox :checked ~ i {
+.switch :checked + i {
   padding-right: 0;
   padding-left: var(--switch-size);
   -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;

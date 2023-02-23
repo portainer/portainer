@@ -1,14 +1,15 @@
 import { Field, Form, Formik } from 'formik';
 import { object, SchemaOf, string } from 'yup';
-import { ExternalLink } from 'lucide-react';
 
 import { useUpgradeEditionMutation } from '@/react/portainer/system/useUpgradeEditionMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Button, LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { Modal } from '@@/modals/Modal';
+import { Alert } from '@@/Alert';
 
 interface FormValues {
   license: string;
@@ -21,11 +22,16 @@ const initialValues: FormValues = {
 export function UploadLicenseDialog({
   onDismiss,
   goToLoading,
+  goToGetLicense,
+  isGetLicenseSubmitted,
 }: {
   onDismiss: () => void;
   goToLoading: () => void;
+  goToGetLicense: () => void;
+  isGetLicenseSubmitted: boolean;
 }) {
   const upgradeMutation = useUpgradeEditionMutation();
+  const { trackEvent } = useAnalytics();
 
   return (
     <Modal
@@ -33,19 +39,30 @@ export function UploadLicenseDialog({
       aria-label="Upgrade Portainer to Business Edition"
     >
       <Modal.Header
-        title={<h4 className="font-medium text-xl">Upgrade Portainer</h4>}
+        title={<h4 className="text-xl font-medium">Upgrade Portainer</h4>}
       />
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmit}
         validationSchema={validation}
+        validateOnMount
       >
         {({ errors }) => (
           <Form noValidate>
             <Modal.Body>
-              <p className="font-semibold text-gray-7">
-                Please enter your Portainer License below
-              </p>
+              {!isGetLicenseSubmitted ? (
+                <p className="font-semibold text-gray-7">
+                  Please enter your Portainer License below
+                </p>
+              ) : (
+                <div className="mb-4">
+                  <Alert color="success" title="License successfully sent">
+                    Please check your email and copy your license into the field
+                    below to upgrade Portainer.
+                  </Alert>
+                </div>
+              )}
+
               <FormControl
                 label="License"
                 errors={errors.license}
@@ -56,22 +73,15 @@ export function UploadLicenseDialog({
               </FormControl>
             </Modal.Body>
             <Modal.Footer>
-              <div className="flex gap-2 [&>*]:w-1/2 w-full">
-                <a
-                  href="https://www.portainer.io/pricing"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="no-link"
+              <div className="flex w-full gap-2 [&>*]:w-1/2">
+                <Button
+                  color="default"
+                  size="medium"
+                  className="w-full"
+                  onClick={goToGetLicense}
                 >
-                  <Button
-                    color="default"
-                    size="medium"
-                    className="w-full"
-                    icon={ExternalLink}
-                  >
-                    Get a license
-                  </Button>
-                </a>
+                  Get a license
+                </Button>
                 <LoadingButton
                   color="primary"
                   size="medium"
@@ -91,6 +101,13 @@ export function UploadLicenseDialog({
   function handleSubmit(values: FormValues) {
     upgradeMutation.mutate(values, {
       onSuccess() {
+        trackEvent('portainer-upgrade-license-key-provided', {
+          category: 'portainer',
+          metadata: {
+            Upgrade: 'true',
+          },
+        });
+
         notifySuccess('Starting upgrade', 'License validated successfully');
         goToLoading();
       },

@@ -1,14 +1,15 @@
 package websocket
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"net/url"
 
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
+
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
-	portainer "github.com/portainer/portainer/api"
 )
 
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
@@ -62,10 +63,12 @@ func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *htt
 
 	if params.endpoint.TLSConfig.TLS || params.endpoint.TLSConfig.TLSSkipVerify {
 		agentURL.Scheme = "wss"
+
+		tlsConfig := crypto.CreateTLSConfiguration()
+		tlsConfig.InsecureSkipVerify = params.endpoint.TLSConfig.TLSSkipVerify
+
 		proxy.Dialer = &websocket.Dialer{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: params.endpoint.TLSConfig.TLSSkipVerify,
-			},
+			TLSClientConfig: tlsConfig,
 		}
 	}
 

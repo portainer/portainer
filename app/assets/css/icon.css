@@ -67,7 +67,7 @@ pr-icon {
 
 .icon-warning,
 .icon-orange {
-  @apply text-warning-9 th-dark:text-warning-7 th-highcontrast:text-warning-1;
+  @apply text-warning-9 th-highcontrast:text-warning-1 th-dark:text-warning-7;
 }
 
 .icon.icon-warning-alt {
@@ -119,11 +119,6 @@ pr-icon {
 .icon-nested-blue > svg {
   height: 20px;
   width: 20px;
-}
-
-.icon-container {
-  display: flex;
-  align-items: center;
 }
 
 .btn-only-icon {

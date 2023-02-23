@@ -69,7 +69,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 		return errors.New("invalid cron expression")
 	}
 
-	if (payload.Endpoints == nil || len(payload.Endpoints) == 0) && (payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0) {
+	if len(payload.Endpoints) == 0 && len(payload.EdgeGroups) == 0 {
 		return errors.New("no environments or groups have been provided")
 	}
 
@@ -146,7 +146,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.EdgeGroups = edgeGroups
 
-	if (payload.Endpoints == nil || len(payload.Endpoints) == 0) && (payload.EdgeGroups == nil || len(payload.EdgeGroups) == 0) {
+	if len(payload.Endpoints) == 0 && len(payload.EdgeGroups) == 0 {
 		return errors.New("no environments or groups have been provided")
 	}
 
@@ -188,7 +188,7 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *portainer.EdgeJob {
 	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
+	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
 		ID:                  edgeJobIdentifier,
@@ -208,7 +208,7 @@ func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreat
 func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *portainer.EdgeJob {
 	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	endpoints := handler.convertEndpointsToMetaObject(payload.Endpoints)
+	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
 
 	edgeJob := &portainer.EdgeJob{
 		ID:                  edgeJobIdentifier,
@@ -251,7 +251,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 
 	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
 	if len(endpointsFromGroups) > 0 {
-		endpointsMap = handler.convertEndpointsToMetaObject(endpointsFromGroups)
+		endpointsMap = convertEndpointsToMetaObject(endpointsFromGroups)
 
 		for ID := range endpointsMap {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
@@ -274,7 +274,12 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 	}
 
 	for endpointID := range endpointsMap {
-		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return err
+		}
+
+		handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 	}
 
 	return handler.DataStore.EdgeJob().Create(edgeJob.ID, edgeJob)

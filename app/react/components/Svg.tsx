@@ -4,7 +4,8 @@ import darkmode from '@/assets/ico/theme/darkmode.svg?c';
 import lightmode from '@/assets/ico/theme/lightmode.svg?c';
 import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
 // general icons
-import checked from '@/assets/ico/checked.svg?c';
+import heartbeatup from '@/assets/ico/heartbeat-up.svg?c';
+import heartbeatdown from '@/assets/ico/heartbeat-down.svg?c';
 import dataflow from '@/assets/ico/dataflow-1.svg?c';
 import git from '@/assets/ico/git.svg?c';
 import kube from '@/assets/ico/kube.svg?c';
@@ -44,12 +45,13 @@ import quay from '@/assets/ico/vendor/quay.svg?c';
 const placeholder = Placeholder;
 
 export const SvgIcons = {
+  heartbeatup,
+  heartbeatdown,
   automode,
   darkmode,
   lightmode,
   highcontrastmode,
   dataflow,
-  checked,
   dockericon,
   git,
   laptopcode,

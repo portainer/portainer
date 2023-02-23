@@ -13,16 +13,7 @@ import (
 )
 
 type (
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() (newStore bool, err error)
-		Init() error
-		Close() error
-		MigrateData() error
-		Rollback(force bool) error
-		CheckCurrentEdition() error
-		BackupTo(w io.Writer) error
-		Export(filename string) (err error)
+	DataStoreTx interface {
 		IsErrObjectNotFound(err error) bool
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
@@ -48,6 +39,22 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+	}
+
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() (newStore bool, err error)
+		Init() error
+		Close() error
+		UpdateTx(func(DataStoreTx) error) error
+		ViewTx(func(DataStoreTx) error) error
+		MigrateData() error
+		Rollback(force bool) error
+		CheckCurrentEdition() error
+		BackupTo(w io.Writer) error
+		Export(filename string) (err error)
+
+		DataStoreTx
 	}
 
 	// CustomTemplateService represents a service to manage custom templates
@@ -88,6 +95,7 @@ type (
 	EdgeStackService interface {
 		EdgeStacks() ([]portainer.EdgeStack, error)
 		EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStack, error)
+		EdgeStackVersion(ID portainer.EdgeStackID) (int, bool)
 		Create(id portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
@@ -99,6 +107,9 @@ type (
 	// EndpointService represents a service for managing environment(endpoint) data
 	EndpointService interface {
 		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
+		EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool)
+		Heartbeat(endpointID portainer.EndpointID) (int64, bool)
+		UpdateHeartbeat(endpointID portainer.EndpointID)
 		Endpoints() ([]portainer.Endpoint, error)
 		Create(endpoint *portainer.Endpoint) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
@@ -201,7 +212,6 @@ type (
 	SettingsService interface {
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
-		IsFeatureFlagEnabled(feature portainer.Feature) bool
 		BucketName() string
 	}
 

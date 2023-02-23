@@ -93,11 +93,18 @@ func (store *Store) initServices() error {
 	}
 	store.DockerHubService = dockerhubService
 
-	edgeStackService, err := edgestack.NewService(store.connection)
+	endpointRelationService, err := endpointrelation.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.EndpointRelationService = endpointRelationService
+
+	edgeStackService, err := edgestack.NewService(store.connection, endpointRelationService.InvalidateEdgeCacheForEdgeStack)
 	if err != nil {
 		return err
 	}
 	store.EdgeStackService = edgeStackService
+	endpointRelationService.RegisterUpdateStackFunction(edgeStackService.UpdateEdgeStackFunc)
 
 	edgeGroupService, err := edgegroup.NewService(store.connection)
 	if err != nil {
@@ -122,12 +129,6 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.EndpointService = endpointService
-
-	endpointRelationService, err := endpointrelation.NewService(store.connection)
-	if err != nil {
-		return err
-	}
-	store.EndpointRelationService = endpointRelationService
 
 	extensionService, err := extension.NewService(store.connection)
 	if err != nil {

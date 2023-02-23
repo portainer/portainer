@@ -8,6 +8,7 @@ import KubernetesConfigurationConverter from 'Kubernetes/converters/configuratio
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
+import { confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { isConfigurationFormValid } from '../validation';
 
 class KubernetesConfigurationController {
@@ -23,7 +24,6 @@ class KubernetesConfigurationController {
     KubernetesConfigMapService,
     KubernetesSecretService,
     KubernetesResourcePoolService,
-    ModalService,
     KubernetesApplicationService,
     KubernetesEventService
   ) {
@@ -33,7 +33,6 @@ class KubernetesConfigurationController {
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
-    this.ModalService = ModalService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -121,7 +120,7 @@ class KubernetesConfigurationController {
   updateConfiguration() {
     if (this.configuration.Used) {
       const plural = this.configuration.Applications.length > 1 ? 's' : '';
-      this.ModalService.confirmUpdate(
+      confirmUpdate(
         `The changes will be propagated to ${this.configuration.Applications.length} running application${plural}. Are you sure you want to update this configuration?`,
         (confirmed) => {
           if (confirmed) {
@@ -240,7 +239,7 @@ class KubernetesConfigurationController {
 
   async uiCanExit() {
     if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

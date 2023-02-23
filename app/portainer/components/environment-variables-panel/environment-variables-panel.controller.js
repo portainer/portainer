@@ -27,8 +27,8 @@ export default class EnvironmentVariablesPanelController {
     this.onChange(value);
   }
 
-  editorUpdate(cm) {
-    this.editorText = cm.getValue();
+  editorUpdate(value) {
+    this.editorText = value;
     this.onChange(parseDotEnvFile(this.editorText));
   }
 }

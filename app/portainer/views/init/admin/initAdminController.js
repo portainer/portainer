@@ -1,4 +1,5 @@
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { restoreOptions } from './restore-options';
 
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',
@@ -11,6 +12,8 @@ angular.module('portainer.app').controller('InitAdminController', [
   'BackupService',
   'StatusService',
   function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, BackupService, StatusService) {
+    $scope.restoreOptions = restoreOptions;
+
     $scope.uploadBackup = uploadBackup;
 
     $scope.logo = StateManager.getState().application.logo;
@@ -34,6 +37,13 @@ angular.module('portainer.app').controller('InitAdminController', [
       $scope.state.showInitPassword = !$scope.state.showInitPassword;
       $scope.state.showRestorePortainer = !$scope.state.showRestorePortainer;
     };
+
+    $scope.onChangeRestoreType = onChangeRestoreType;
+    function onChangeRestoreType(value) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.restoreFormType = value;
+      });
+    }
 
     $scope.createAdminUser = function () {
       var username = $scope.formValues.Username;

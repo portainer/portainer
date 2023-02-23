@@ -2,21 +2,26 @@ import { Rocket } from 'lucide-react';
 
 import { render, fireEvent } from '@/react-tools/test-utils';
 
-import { BoxSelector, Props } from './BoxSelector';
-import { BoxSelectorOption } from './types';
+import { BoxSelector } from './BoxSelector';
+import { BoxSelectorOption, Value } from './types';
 
-function renderDefault<T extends string | number>({
+function renderDefault<T extends Value>({
   options = [],
   onChange = () => {},
   radioName = 'radio',
   value,
-}: Partial<Props<T>> = {}) {
+}: {
+  options?: BoxSelectorOption<T>[];
+  onChange?: (value: T) => void;
+  radioName?: string;
+  value: T;
+}) {
   return render(
     <BoxSelector
       options={options}
       onChange={onChange}
       radioName={radioName}
-      value={value || 0}
+      value={value}
     />
   );
 }

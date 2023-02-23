@@ -1,6 +1,5 @@
 export const KubernetesDeployManifestTypes = Object.freeze({
   KUBERNETES: 1,
-  COMPOSE: 2,
 });
 
 export const KubernetesDeployBuildMethods = Object.freeze({

@@ -6,6 +6,6 @@ export function ModalFooter({ children }: PropsWithChildren<unknown>) {
   useModalContext();
 
   return (
-    <div className="flex justify-end gap-3 [&>*]:flex-1 pt-3">{children}</div>
+    <div className="flex justify-end gap-3 pt-3 [&>*]:flex-1">{children}</div>
   );
 }

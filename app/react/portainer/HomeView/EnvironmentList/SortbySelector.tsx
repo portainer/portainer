@@ -27,7 +27,7 @@ export function SortbySelector({
 }: Props) {
   const sorted = sortByButton && !!value;
   return (
-    <div className="flex items-center gap-1 justify-end">
+    <div className="flex items-center justify-end gap-1">
       <Select
         placeholder={placeHolder}
         options={filterOptions}
@@ -37,7 +37,7 @@ export function SortbySelector({
       />
 
       <button
-        className={clsx(styles.sortButton, 'h-[34px] !m-0')}
+        className={clsx(styles.sortButton, '!m-0 h-[34px]')}
         type="button"
         disabled={!sorted}
         onClick={(e) => {

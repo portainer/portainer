@@ -1,7 +1,7 @@
 <div class="datatable">
   <!-- toolbar header actions and settings -->
   <div ng-if="$ctrl.isPrimary" class="toolBar !flex-col gap-1">
-    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+    <div class="toolBar vertical-center w-full flex-wrap !gap-x-5 !gap-y-1 !p-0">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
           <pr-icon icon="'box'"></pr-icon>
@@ -21,11 +21,11 @@
           data-cy="k8sApp-searchApplicationsInput"
         />
       </div>
-      <div class="actionBar !gap-3 !mr-0">
+      <div class="actionBar !mr-0 !gap-3">
         <button
           ng-if="$ctrl.isPrimary"
           type="button"
-          class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+          class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
           ng-disabled="$ctrl.state.selectedItemCount === 0"
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
           data-cy="k8sApp-removeAppButton"
@@ -36,7 +36,7 @@
         <button
           ng-if="$ctrl.isPrimary"
           type="button"
-          class="btn btn-sm btn-secondary h-fit vertical-center !ml-0"
+          class="btn btn-sm btn-secondary vertical-center !ml-0 h-fit"
           ui-sref="kubernetes.applications.new"
           data-cy="k8sApp-addApplicationButton"
         >
@@ -45,7 +45,7 @@
         <button
           ng-if="$ctrl.isPrimary"
           type="button"
-          class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+          class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
           ui-sref="kubernetes.deploy"
           data-cy="k8sApp-deployFromManifestButton"
         >
@@ -105,8 +105,8 @@
         </span>
       </div>
     </div>
-    <div class="flex flex-row w-full" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-      <span class="small text-muted mt-1 vertical-center">
+    <div class="flex w-full flex-row" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+      <span class="small text-muted vertical-center mt-1">
         <pr-icon icon="'info'" mode="'primary'" class="vertical-center"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
@@ -114,16 +114,16 @@
   </div>
   <!-- data table content -->
   <div ng-class="{ 'table-responsive': $ctrl.isPrimary, 'inner-datatable': !$ctrl.isPrimary }">
-    <table class="table table-hover table-filters nowrap-cells" data-cy="k8sApp-appTable">
+    <table class="table-hover table-filters nowrap-cells table" data-cy="k8sApp-appTable">
       <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
         <tr role="row">
           <th role="columnheader" class="datatable-wide dropdown">
-            <div ng-if="$ctrl.isPrimary" class="flex no-wrap min-w-max">
+            <div ng-if="$ctrl.isPrimary" class="no-wrap flex min-w-max">
               <span class="md-checkbox vertical-center">
                 <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
                 <label for="select_all"></label>
               </span>
-              <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
+              <div class="vertical-center cursor-pointer" ng-click="$ctrl.expandAll()">
                 <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'"></pr-icon>
                 <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'"></pr-icon>
               </div>
@@ -166,7 +166,7 @@
             ></table-column-header>
           </th>
           <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
-            <div class="flex flex-row no-wrap gap-2">
+            <div class="no-wrap flex flex-row gap-2">
               <table-column-header
                 col-title="'Application Type'"
                 can-sort="true"
@@ -174,7 +174,7 @@
                 is-sorted-desc="$ctrl.state.orderBy === 'ApplicationType' && $ctrl.state.reverseOrder"
                 ng-click="$ctrl.changeOrderBy('ApplicationType')"
               ></table-column-header>
-              <div class="flex flex-row no-wrap gap-1 items-center" uib-dropdown-toggle>
+              <div class="no-wrap flex flex-row items-center gap-1" uib-dropdown-toggle>
                 <span class="table-filter">Filters</span>
                 <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'"></pr-icon>
                 <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'"></pr-icon>
@@ -260,7 +260,7 @@
             <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
           </td>
           <td title="{{ item.Image }}"
-            >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+            >{{ item.Image | truncate : 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
           >
           <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
           <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
@@ -308,10 +308,10 @@
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">
-          <td colspan="8" class="text-center text-muted">Loading...</td>
+          <td colspan="8" class="text-muted text-center">Loading...</td>
         </tr>
         <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-          <td colspan="8" class="text-center text-muted">No application available.</td>
+          <td colspan="8" class="text-muted text-center">No application available.</td>
         </tr>
       </tbody>
     </table>

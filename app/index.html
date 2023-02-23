@@ -42,8 +42,8 @@
     <div
       id="page-wrapper"
       ng-class="{
-        open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
-        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint', 'portainer.logout'].indexOf($state.current.name) > -1 || applicationState.loading
+        open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin'].indexOf($state.current.name) === -1,
+        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.logout'].indexOf($state.current.name) > -1 || applicationState.loading
       }"
       ng-cloak
     >
@@ -53,7 +53,7 @@
         <div class="page-content">
           <div class="page-wrapper" ng-if="applicationState.loading">
             <!-- loading box -->
-            <div class="container simple-box">
+            <div class="simple-box container">
               <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
                 <!-- loading box logo -->
                 <div class="row">
@@ -75,7 +75,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="inline animate-spin-slow !ml-1"
+                    class="!ml-1 inline animate-spin-slow"
                   >
                     <circle cx="12" cy="12" r="3"></circle>
                     <path

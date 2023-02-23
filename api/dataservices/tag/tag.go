@@ -34,6 +34,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
 // Tags return an array containing all the tags.
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)

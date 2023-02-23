@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { confirmImageExport } from '@/react/docker/images/common/ConfirmExportModal';
 
 angular.module('portainer.docker').controller('ImageController', [
   '$async',
@@ -13,11 +14,9 @@ angular.module('portainer.docker').controller('ImageController', [
   'RegistryService',
   'Notifications',
   'HttpRequestHelper',
-  'ModalService',
   'FileSaver',
   'Blob',
   'endpoint',
-  'EndpointService',
   'RegistryModalService',
   function (
     $async,
@@ -31,11 +30,9 @@ angular.module('portainer.docker').controller('ImageController', [
     RegistryService,
     Notifications,
     HttpRequestHelper,
-    ModalService,
     FileSaver,
     Blob,
     endpoint,
-    EndpointService,
     RegistryModalService
   ) {
     $scope.endpoint = endpoint;
@@ -90,6 +87,7 @@ angular.module('portainer.docker').controller('ImageController', [
       return $async(async () => {
         try {
           const registryModel = await RegistryModalService.registryModal(repository, $scope.registries);
+
           if (registryModel) {
             $('#uploadResourceHint').show();
             await ImageService.pushImage(registryModel);
@@ -171,7 +169,7 @@ angular.module('portainer.docker').controller('ImageController', [
         return;
       }
 
-      ModalService.confirmImageExport(function (confirmed) {
+      confirmImageExport(function (confirmed) {
         if (!confirmed) {
           return;
         }

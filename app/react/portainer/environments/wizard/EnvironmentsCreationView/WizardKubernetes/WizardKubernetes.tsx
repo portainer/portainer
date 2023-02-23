@@ -92,7 +92,7 @@ export function WizardKubernetes({ onCreate }: Props) {
         );
       case EnvironmentCreationTypes.KubeConfigEnvironment:
         return (
-          <div className="px-1 py-5 border border-solid border-orange-1">
+          <div className="border border-solid border-orange-1 px-1 py-5">
             <BEFeatureIndicator
               featureId={options.find((o) => o.value === type)?.feature}
             />

@@ -1,0 +1,86 @@
+/* react-datetime-picker */
+/* https://github.com/wojtekmaj/react-datetime-picker#custom-styling */
+
+/*
+  library css for buttons is overriden by `.widget .widget-body button`
+  so we have to force margin: 0
+*/
+.react-datetime-picker .react-calendar button {
+  margin: 0 !important;
+}
+
+/*
+  Extending Calendar.css from react-datetime-picker
+*/
+.react-datetime-picker .react-calendar {
+  background: var(--bg-calendar-color);
+  color: var(--text-main-color);
+}
+
+/* calendar nav buttons */
+.react-datetime-picker .react-calendar__navigation button:disabled {
+  background-color: var(--bg-calendar-color);
+  @apply opacity-60;
+  @apply brightness-95 th-dark:brightness-110;
+}
+.react-datetime-picker .react-calendar__navigation button:enabled:hover,
+.react-datetime-picker .react-calendar__navigation button:enabled:focus {
+  background-color: var(--bg-daterangepicker-color);
+}
+
+/* date tile */
+.react-datetime-picker .react-calendar__tile:disabled {
+  background-color: var(--bg-calendar-color);
+  @apply opacity-60;
+  @apply brightness-95 th-dark:brightness-110;
+}
+.react-datetime-picker .react-calendar__tile:enabled:hover,
+.react-datetime-picker .react-calendar__tile:enabled:focus {
+  background-color: var(--bg-daterangepicker-hover);
+}
+
+/* today's date tile */
+.react-datetime-picker .react-calendar__tile--now {
+  /* use background color to avoid white on yellow in dark/high contrast modes */
+  @apply th-highcontrast:text-[color:var(--bg-calendar-color)] th-dark:text-[color:var(--bg-calendar-color)];
+}
+.react-datetime-picker .react-calendar__tile--now:enabled:hover,
+.react-datetime-picker .react-calendar__tile--now:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  color: var(--text-daterangepicker-hover);
+}
+
+/* probably date tile in range */
+.react-datetime-picker .react-calendar__tile--hasActive {
+  background: var(--bg-daterangepicker-end-date);
+  color: var(--text-daterangepicker-end-date);
+}
+.react-datetime-picker .react-calendar__tile--hasActive:enabled:hover,
+.react-datetime-picker .react-calendar__tile--hasActive:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  color: var(--text-daterangepicker-hover);
+}
+
+/* selected date tile */
+.react-datetime-picker .react-calendar__tile--active {
+  background: var(--bg-daterangepicker-active);
+  color: var(--text-daterangepicker-active);
+}
+.react-datetime-picker .react-calendar__tile--active:enabled:hover,
+.react-datetime-picker .react-calendar__tile--active:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  color: var(--text-daterangepicker-hover);
+}
+
+/* on range select hover */
+.react-datetime-picker .react-calendar--selectRange .react-calendar__tile--hover {
+  background-color: var(--bg-daterangepicker-in-range);
+  color: var(--text-daterangepicker-in-range);
+}
+
+/*
+  Extending DateTimePicker.css from react-datetime-picker
+*/
+.react-datetime-picker .react-datetime-picker--disabled {
+  @apply opacity-40;
+}

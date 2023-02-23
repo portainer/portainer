@@ -10,10 +10,7 @@ import { TableSettings } from '../types';
 
 export const name: Column<DockerContainer> = {
   Header: 'Name',
-  accessor: (row) => {
-    const name = row.Names[0];
-    return name.substring(1, name.length);
-  },
+  accessor: (row) => row.Names[0],
   id: 'name',
   Cell: NameCell,
   disableFilters: true,

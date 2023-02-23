@@ -33,12 +33,14 @@ interface Props {
   environment: Environment;
   groupName?: string;
   onClickBrowse(): void;
+  onClickDisconnect(): void;
   isActive: boolean;
 }
 
 export function EnvironmentItem({
   environment,
   onClickBrowse,
+  onClickDisconnect,
   groupName,
   isActive,
 }: Props) {
@@ -47,26 +49,24 @@ export function EnvironmentItem({
   const snapshotTime = getSnapshotTime(environment);
 
   const tags = useEnvironmentTagNames(environment.TagIds);
+  const dashboardRoute = getDashboardRoute(environment);
 
   return (
     <div className="relative">
       <Link
-        to={getDashboardRoute(environment)}
-        params={{
-          endpointId: environment.Id,
-          environmentId: environment.Id,
-        }}
+        to={dashboardRoute.to}
+        params={dashboardRoute.params}
         className="no-link"
       >
         <button
-          className="blocklist-item flex items-stretch overflow-hidden min-h-[110px] bg-transparent w-full !m-0 !pr-56"
+          className="blocklist-item !m-0 flex min-h-[110px] w-full items-stretch overflow-hidden bg-transparent !pr-56"
           onClick={onClickBrowse}
           type="button"
         >
-          <div className="ml-2 self-center flex justify-center">
+          <div className="ml-2 flex justify-center self-center">
             <EnvironmentIcon type={environment.Type} />
           </div>
-          <div className="ml-3 mr-auto flex justify-center gap-3 flex-col items-start">
+          <div className="ml-3 mr-auto flex flex-col items-start justify-center gap-3">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <span className="font-bold">{environment.Name}</span>
               {isEdge ? (
@@ -114,11 +114,12 @@ export function EnvironmentItem({
       Buttons are extracted out of the main button because it causes errors with react and accessibility issues
       see https://stackoverflow.com/questions/66409964/warning-validatedomnesting-a-cannot-appear-as-a-descendant-of-a
       */}
-      <div className="absolute inset-y-0 right-0 flex justify-end w-56">
-        <div className="py-3 flex items-center">
+      <div className="absolute inset-y-0 right-0 flex w-56 justify-end">
+        <div className="flex flex-1 items-center py-3">
           <EnvironmentBrowseButtons
             environment={environment}
             onClickBrowse={onClickBrowse}
+            onClickDisconnect={onClickDisconnect}
             isActive={isActive}
           />
         </div>

@@ -27,7 +27,7 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	if payload.StackFileContent == "" {
 		return errors.New("Invalid stack file content")
 	}
-	if payload.EdgeGroups != nil && len(payload.EdgeGroups) == 0 {
+	if len(payload.EdgeGroups) == 0 {
 		return errors.New("Edge Groups are mandatory for an Edge stack")
 	}
 	return nil
@@ -55,10 +55,8 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
+	if err != nil {
+		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
 	var payload updateEdgeStackPayload
@@ -194,7 +192,10 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stack.NumDeployments = len(relatedEndpointIds)
-	stack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+
+	if versionUpdated {
+		stack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+	}
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {

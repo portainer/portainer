@@ -19,16 +19,6 @@ export async function getUsers(
   }
 }
 
-export async function getUser(id: UserId) {
-  try {
-    const { data: user } = await axios.get<User>(buildUrl(id));
-
-    return user;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve user details');
-  }
-}
-
 export async function getUserMemberships(id: UserId) {
   try {
     const { data } = await axios.get<TeamMembership[]>(
@@ -40,7 +30,7 @@ export async function getUserMemberships(id: UserId) {
   }
 }
 
-function buildUrl(id?: UserId, entity?: string) {
+export function buildUrl(id?: UserId, entity?: string) {
   let url = '/users';
 
   if (id) {

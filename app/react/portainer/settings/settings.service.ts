@@ -1,14 +1,13 @@
-import { PublicSettingsViewModel } from '@/portainer/models/settings';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { DefaultRegistry, PublicSettingsResponse, Settings } from './types';
+import { PublicSettingsResponse, DefaultRegistry, Settings } from './types';
 
 export async function getPublicSettings() {
   try {
     const { data } = await axios.get<PublicSettingsResponse>(
       buildUrl('public')
     );
-    return new PublicSettingsViewModel(data);
+    return data;
   } catch (e) {
     throw parseAxiosError(
       e as Error,
@@ -29,7 +28,11 @@ export async function getSettings() {
   }
 }
 
-export async function updateSettings(settings: Partial<Settings>) {
+type OptionalSettings = Omit<Partial<Settings>, 'Edge'> & {
+  Edge?: Partial<Settings['Edge']>;
+};
+
+export async function updateSettings(settings: OptionalSettings) {
   try {
     await axios.put(buildUrl(), settings);
   } catch (e) {

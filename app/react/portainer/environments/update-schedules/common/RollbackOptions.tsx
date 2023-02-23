@@ -23,7 +23,7 @@ export function RollbackOptions() {
   if (!count) {
     return (
       <TextTip>
-        The are no rollback options available for yor selected groups(s)
+        There are no rollback options available for your selected groups(s)
       </TextTip>
     );
   }
@@ -73,6 +73,7 @@ function useSelectVersionOnMount() {
   useEffect(() => {
     switch (previousVersions.length) {
       case 0:
+        setFieldValue('version', '');
         setFieldError('version', 'No rollback options available');
         break;
       case 1:

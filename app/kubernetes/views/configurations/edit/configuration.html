@@ -32,7 +32,7 @@
                 <table class="table" data-cy="k8sConfigDetail-configTable">
                   <tbody>
                     <tr>
-                      <td class="!pl-0 !border-none w-[40%]">Name</td>
+                      <td class="w-[40%] !border-none !pl-0">Name</td>
                       <td class="!border-none">
                         {{ ctrl.configuration.Name }}
                         <span style="margin-left: 5px" class="label label-info image-tag" ng-if="ctrl.configuration.IsRegistrySecret">system</span>
@@ -87,7 +87,7 @@
                 <pr-icon icon="'code'"></pr-icon>
                 YAML
               </uib-tab-heading>
-              <div class="!pt-5 px-5" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5 !pt-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml"> </kubernetes-yaml-inspector>
               </div>
             </uib-tab>

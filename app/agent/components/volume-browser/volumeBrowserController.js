@@ -1,9 +1,10 @@
 import _ from 'lodash-es';
+import { confirmDelete } from '@@/modals/confirm';
 
 export class VolumeBrowserController {
   /* @ngInject */
-  constructor($async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {
-    Object.assign(this, { $async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications });
+  constructor($async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, Notifications) {
+    Object.assign(this, { $async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, Notifications });
     this.state = {
       path: '/',
     };
@@ -47,7 +48,7 @@ export class VolumeBrowserController {
   confirmDelete(file) {
     const filePath = this.state.path === '/' ? file : `${this.state.path}/${file}`;
 
-    this.ModalService.confirmDeletion(`Are you sure that you want to delete ${filePath} ?`, (confirmed) => {
+    confirmDelete(`Are you sure that you want to delete ${filePath} ?`).then((confirmed) => {
       if (!confirmed) {
         return;
       }

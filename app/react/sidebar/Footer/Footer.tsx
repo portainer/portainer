@@ -43,7 +43,7 @@ function BEFooter() {
 
 function FooterContent({ children }: PropsWithChildren<unknown>) {
   return (
-    <div className="text-[10px] space-x-1 text-gray-5 be:text-gray-6 flex items-center mx-auto justify-center">
+    <div className="mx-auto flex items-center justify-center space-x-1 text-[10px] text-gray-5 be:text-gray-6">
       {children}
     </div>
   );

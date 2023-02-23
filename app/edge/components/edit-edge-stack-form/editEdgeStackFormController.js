@@ -1,12 +1,13 @@
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EditorType } from '@/react/edge/edge-stacks/types';
-
+import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
 export class EditEdgeStackFormController {
   /* @ngInject */
   constructor($scope) {
     this.$scope = $scope;
     this.state = {
       endpointTypes: [],
+      readOnlyCompose: false,
     };
 
     this.fileContents = {
@@ -26,6 +27,7 @@ export class EditEdgeStackFormController {
     this.removeLineBreaks = this.removeLineBreaks.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.onChangeUseManifestNamespaces = this.onChangeUseManifestNamespaces.bind(this);
+    this.selectValidDeploymentType = this.selectValidDeploymentType.bind(this);
   }
 
   onChangeUseManifestNamespaces(value) {
@@ -45,8 +47,9 @@ export class EditEdgeStackFormController {
   onChangeGroups(groups) {
     return this.$scope.$evalAsync(() => {
       this.model.EdgeGroups = groups;
-
-      this.checkEndpointTypes(groups);
+      this.setEnvironmentTypesInSelection(groups);
+      this.selectValidDeploymentType();
+      this.state.readOnlyCompose = this.hasKubeEndpoint();
     });
   }
 
@@ -54,9 +57,17 @@ export class EditEdgeStackFormController {
     return this.model.EdgeGroups.length && this.model.StackFileContent && this.validateEndpointsForDeployment();
   }
 
-  checkEndpointTypes(groups) {
+  setEnvironmentTypesInSelection(groups) {
     const edgeGroups = groups.map((id) => this.edgeGroups.find((e) => e.Id === id));
     this.state.endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
+  }
+
+  selectValidDeploymentType() {
+    const validTypes = getValidEditorTypes(this.state.endpointTypes, this.allowKubeToSelectCompose);
+
+    if (!validTypes.includes(this.model.DeploymentType)) {
+      this.onChangeDeploymentType(validTypes[0]);
+    }
   }
 
   removeLineBreaks(value) {
@@ -81,9 +92,10 @@ export class EditEdgeStackFormController {
   }
 
   onChangeDeploymentType(deploymentType) {
-    this.model.DeploymentType = deploymentType;
-
-    this.model.StackFileContent = this.fileContents[deploymentType];
+    return this.$scope.$evalAsync(() => {
+      this.model.DeploymentType = deploymentType;
+      this.model.StackFileContent = this.fileContents[deploymentType];
+    });
   }
 
   validateEndpointsForDeployment() {
@@ -91,6 +103,14 @@ export class EditEdgeStackFormController {
   }
 
   $onInit() {
-    this.checkEndpointTypes(this.model.EdgeGroups);
+    this.setEnvironmentTypesInSelection(this.model.EdgeGroups);
+    this.fileContents[this.model.DeploymentType] = this.model.StackFileContent;
+
+    // allow kube to view compose if it's an existing kube compose stack
+    const initiallyContainsKubeEnv = this.hasKubeEndpoint();
+    const isComposeStack = this.model.DeploymentType === 0;
+    this.allowKubeToSelectCompose = initiallyContainsKubeEnv && isComposeStack;
+    this.state.readOnlyCompose = this.allowKubeToSelectCompose;
+    this.selectValidDeploymentType();
   }
 }

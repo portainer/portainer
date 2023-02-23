@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/portainer/portainer/pkg/featureflags"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -104,7 +105,7 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
-		FeatureFlags              *[]Pair
+		FeatureFlags              *[]string
 		DemoEnvironment           *bool
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
@@ -505,9 +506,6 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
-	// Feature represents a feature that can be enabled or disabled via feature flags
-	Feature string
-
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
@@ -562,6 +560,12 @@ type (
 	KubernetesData struct {
 		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
 		Configuration KubernetesConfiguration `json:"Configuration"`
+		Flags         KubernetesFlags         `json:"Flags"`
+	}
+
+	KubernetesFlags struct {
+		IsServerMetricsDetected bool `json:"IsServerMetricsDetected"`
+		IsServerStorageDetected bool `json:"IsServerStorageDetected"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
@@ -864,13 +868,13 @@ type (
 		// A list of label name & value that will be used to hide containers when querying containers
 		BlackListedLabels []Pair `json:"BlackListedLabels"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
-		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
-		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings"`
-		LDAPSettings         LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings        OAuthSettings        `json:"OAuthSettings"`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration"`
-		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration"`
-		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings"`
+		AuthenticationMethod AuthenticationMethod          `json:"AuthenticationMethod" example:"1"`
+		InternalAuthSettings InternalAuthSettings          `json:"InternalAuthSettings"`
+		LDAPSettings         LDAPSettings                  `json:"LDAPSettings"`
+		OAuthSettings        OAuthSettings                 `json:"OAuthSettings"`
+		OpenAMTConfiguration OpenAMTConfiguration          `json:"openAMTConfiguration"`
+		FDOConfiguration     FDOConfiguration              `json:"fdoConfiguration"`
+		FeatureFlagSettings  map[featureflags.Feature]bool `json:"FeatureFlagSettings"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -1231,16 +1235,19 @@ type (
 		ID       UserID `json:"Id" example:"1"`
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" swaggerignore:"true"`
-		// User Theme
-		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role         UserRole `json:"Role" example:"1"`
-		TokenIssueAt int64    `json:"TokenIssueAt" example:"1"`
+		Role          UserRole `json:"Role" example:"1"`
+		TokenIssueAt  int64    `json:"TokenIssueAt" example:"1"`
+		ThemeSettings UserThemeSettings
 
 		// Deprecated fields
+
+		// Deprecated
+		UserTheme string `example:"dark"`
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
-		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
+		PortainerAuthorizations Authorizations
+		// Deprecated in DBVersion == 25
+		EndpointAuthorizations EndpointAuthorizations
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user
@@ -1258,6 +1265,14 @@ type (
 	// UserRole represents the role of a user. It can be either an administrator
 	// or a regular user
 	UserRole int
+
+	// UserThemeSettings represents the theme settings for a user
+	UserThemeSettings struct {
+		// Color represents the color theme of the UI
+		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
+		// SubtleUpgradeButton indicates if the upgrade banner should be displayed in a subtle way
+		SubtleUpgradeButton bool `json:"subtleUpgradeButton"`
+	}
 
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
@@ -1449,7 +1464,7 @@ type (
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
 		GetTunnelDetails(endpointID EndpointID) TunnelDetails
 		GetActiveTunnel(endpoint *Endpoint) (TunnelDetails, error)
-		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
+		AddEdgeJob(endpoint *Endpoint, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
 		RemoveEdgeJobFromEndpoint(endpointID EndpointID, edgeJobID EdgeJobID)
 	}
@@ -1479,7 +1494,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.17.0"
+	APIVersion = "2.18.0"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1526,7 +1541,7 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []Feature{}
+var SupportedFeatureFlags = []featureflags.Feature{}
 
 const (
 	_ AuthenticationMethod = iota

@@ -1,7 +1,7 @@
 <div class="datatable">
   <!-- toolbar header actions and settings -->
   <div class="toolBar !flex-col gap-1">
-    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+    <div class="toolBar vertical-center w-full flex-wrap !gap-x-5 !gap-y-1 !p-0">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
           <pr-icon icon="'database'"></pr-icon>
@@ -20,7 +20,7 @@
           ng-model-options="{ debounce: 300 }"
         />
       </div>
-      <div class="actionBar !gap-3 !mr-0">
+      <div class="actionBar !mr-0 !gap-3">
         <button
           type="button"
           class="btn btn-sm btn-dangerlight vertical-center !ml-0"
@@ -84,19 +84,19 @@
         </span>
       </div>
     </div>
-    <div class="flex flex-row w-full" ng-if="!ctrl.isAdmin && !$ctrl.settings.showSystem">
-      <span class="small text-muted mt-1 vertical-center">
+    <div class="flex w-full flex-row" ng-if="!ctrl.isAdmin && !$ctrl.settings.showSystem">
+      <span class="small text-muted vertical-center mt-1">
         <pr-icon icon="'info'" mode="'primary'"></pr-icon>
         <span> System resources are hidden, this can be changed in the table settings. </span>
       </span>
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-hover nowrap-cells">
+    <table class="table-hover nowrap-cells table">
       <thead>
         <tr>
           <th>
-            <div class="flex flex-no-wrap items-center">
+            <div class="flex-no-wrap flex items-center">
               <span class="md-checkbox vertical-center">
                 <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                 <label for="select_all"></label>
@@ -194,10 +194,10 @@
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">
-          <td colspan="6" class="text-center text-muted">Loading...</td>
+          <td colspan="6" class="text-muted text-center">Loading...</td>
         </tr>
         <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-          <td colspan="6" class="text-center text-muted">No volume available.</td>
+          <td colspan="6" class="text-muted text-center">No volume available.</td>
         </tr>
       </tbody>
     </table>

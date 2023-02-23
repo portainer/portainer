@@ -24,7 +24,7 @@
         <div class="actionBar !gap-3" authorization="DockerVolumeDelete, DockerVolumeCreate">
           <button
             type="button"
-            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
             authorization="DockerVolumeDelete"
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
@@ -34,7 +34,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
             ui-sref="docker.volumes.new"
             authorization="DockerVolumeCreate"
             data-cy="volume-addVolumeButton"
@@ -80,7 +80,7 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover table-filters nowrap-cells">
+        <table class="table-hover table-filters nowrap-cells table">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" class="flex gap-1">
@@ -184,7 +184,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate: 40 }}</a>
+                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate : 40 }}</a>
 
                 <button
                   ng-if="$ctrl.showBrowseAction"
@@ -211,10 +211,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="6" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="6" class="text-center text-muted">No volume available.</td>
+              <td colspan="6" class="text-muted text-center">No volume available.</td>
             </tr>
           </tbody>
         </table>

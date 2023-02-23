@@ -20,6 +20,7 @@ export enum FeatureId {
   REGISTRY_MANAGEMENT = 'registry-management',
   K8S_SETUP_DEFAULT = 'k8s-setup-default',
   S3_BACKUP_SETTING = 's3-backup-setting',
+  S3_RESTORE = 'restore-s3-form',
   HIDE_INTERNAL_AUTHENTICATION_PROMPT = 'hide-internal-authentication-prompt',
   TEAM_MEMBERSHIP = 'team-membership',
   HIDE_INTERNAL_AUTH = 'hide-internal-auth',

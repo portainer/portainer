@@ -23,7 +23,7 @@ function MainComponent({
     <div className="table-responsive">
       <table
         className={clsx(
-          'table table-hover table-filters nowrap-cells',
+          'table-hover table-filters nowrap-cells table',
           className
         )}
         role={role}

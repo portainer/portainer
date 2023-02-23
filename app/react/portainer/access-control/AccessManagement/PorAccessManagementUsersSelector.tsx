@@ -76,7 +76,7 @@ function Label({ option }: { option: Option }) {
   const Icon = option.Type === 'user' ? UserIcon : TeamIcon;
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className="flex items-center gap-1">
       <Icon />
       <span>{option.Name}</span>
     </div>

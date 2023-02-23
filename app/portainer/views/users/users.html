@@ -8,7 +8,7 @@
         <form name="form" class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="username" class="col-sm-3 col-lg-2 control-label text-left required">
+            <label for="username" class="col-sm-3 col-lg-2 control-label required text-left">
               Username
               <portainer-tooltip ng-if="AuthenticationMethod === 2" message="'Username must exactly match username defined in external LDAP source.'"></portainer-tooltip>
             </label>
@@ -34,7 +34,7 @@
           <!-- !name-input -->
           <!-- new-password-input -->
           <div class="form-group" ng-if="AuthenticationMethod === 1">
-            <label for="password" class="col-sm-3 col-lg-2 control-label text-left required">Password</label>
+            <label for="password" class="col-sm-3 col-lg-2 control-label required text-left">Password</label>
             <div class="col-sm-8">
               <input
                 type="password"
@@ -50,7 +50,7 @@
           <!-- !new-password-input -->
           <!-- confirm-password-input -->
           <div class="form-group" ng-if="AuthenticationMethod === 1">
-            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label text-left required">Confirm password</label>
+            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label required text-left">Confirm password</label>
             <div class="col-sm-8">
               <div class="input-group">
                 <input

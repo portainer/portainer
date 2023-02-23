@@ -15,10 +15,10 @@ export function BadgeIcon({ icon, size = '3xl' }: Props) {
       className={clsx(
         sizeClasses,
         `badge-icon
-      bg-blue-3 text-blue-8
-      th-dark:bg-gray-9 th-dark:text-blue-3
-      rounded-full
-      inline-flex items-center justify-center
+      inline-flex items-center
+      justify-center rounded-full
+      bg-blue-3
+      text-blue-8 th-dark:bg-gray-9 th-dark:text-blue-3
    `
       )}
     >

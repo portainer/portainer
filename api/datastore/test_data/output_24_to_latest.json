@@ -62,6 +62,10 @@
           "UseLoadBalancer": false,
           "UseServerMetrics": false
         },
+        "Flags": {
+          "IsServerMetricsDetected": false,
+          "IsServerStorageDetected": false
+        },
         "Snapshots": []
       },
       "LastCheckInDate": 0,
@@ -898,6 +902,10 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": "",
+        "subtleUpgradeButton": false
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "admin"
@@ -925,12 +933,16 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": "",
+        "subtleUpgradeButton": false
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "prabhat"
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.17.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.18.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

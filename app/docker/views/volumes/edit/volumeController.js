@@ -1,16 +1,15 @@
 import { ResourceControlType } from '@/react/portainer/access-control/types';
+import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.docker').controller('VolumeController', [
   '$scope',
   '$state',
   '$transition$',
-  '$q',
-  'ModalService',
   'VolumeService',
   'ContainerService',
   'Notifications',
   'HttpRequestHelper',
-  function ($scope, $state, $transition$, $q, ModalService, VolumeService, ContainerService, Notifications, HttpRequestHelper) {
+  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper) {
     $scope.resourceType = ResourceControlType.Volume;
 
     $scope.onUpdateResourceControlSuccess = function () {
@@ -18,7 +17,7 @@ angular.module('portainer.docker').controller('VolumeController', [
     };
 
     $scope.removeVolume = function removeVolume() {
-      ModalService.confirmDeletion('Do you want to remove this volume?', (confirmed) => {
+      confirmDelete('Do you want to remove this volume?').then((confirmed) => {
         if (confirmed) {
           VolumeService.remove($scope.volume)
             .then(function success() {

@@ -3,10 +3,10 @@
 
   <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
-      <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
+      <button type="button" class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
         <pr-icon icon="'list'"></pr-icon> Advanced mode
       </button>
-      <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
+      <button type="button" class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
         <pr-icon icon="'edit'"></pr-icon> Simple mode
       </button>
     </div>
@@ -61,7 +61,7 @@
 
   <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
     <div class="form-group">
-      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required"
+      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label required text-left"
         >Key
         <portainer-tooltip message="'The key must consist of alphanumeric characters, \'-\', \'_\' or \'.\' and be up to 253 characters in length.'"></portainer-tooltip>
       </label>
@@ -103,7 +103,7 @@
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
-      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required">Value</label>
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label required text-left">Value</label>
       <div class="col-sm-8 col-lg-9">
         <textarea
           class="form-control"
@@ -123,7 +123,7 @@
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && entry.IsBinary">
-      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required">Value</label>
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label required text-left">Value</label>
       <div class="col-sm-8 control-label small text-muted text-left"
         >Binary data <portainer-tooltip message="'This key holds binary data and cannot be displayed.'"></portainer-tooltip
       ></div>

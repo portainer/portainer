@@ -20,15 +20,8 @@ export type User = {
   EndpointAuthorizations: {
     [endpointId: EnvironmentId]: AuthorizationMap;
   };
-  // UserTheme: string;
-  // this.EndpointAuthorizations = data.EndpointAuthorizations;
-  // this.PortainerAuthorizations = data.PortainerAuthorizations;
-  // if (data.Role === 1) {
-  //   this.RoleName = 'administrator';
-  // } else {
-  //   this.RoleName = 'user';
-  // }
-  // this.AuthenticationMethod = data.AuthenticationMethod;
-  // this.Checked = false;
-  // this.EndpointAuthorizations = data.EndpointAuthorizations;
+  ThemeSettings: {
+    color: 'dark' | 'light' | 'highcontrast' | 'auto';
+    subtleUpgradeButton: boolean;
+  };
 };

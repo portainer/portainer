@@ -2,11 +2,12 @@ import create from 'zustand/vanilla';
 import { persist } from 'zustand/middleware';
 
 import { keyBuilder } from '@/react/hooks/useLocalStorage';
+import { UserId } from '@/portainer/users/types';
 
 import { ToastNotification } from './types';
 
 interface NotificationsState {
-  userNotifications: Record<string, ToastNotification[]>;
+  userNotifications: Record<UserId, ToastNotification[]>;
   addNotification: (userId: number, notification: ToastNotification) => void;
   removeNotification: (userId: number, notificationId: string) => void;
   removeNotifications: (userId: number, notifications: string[]) => void;
@@ -18,15 +19,26 @@ export const notificationsStore = create<NotificationsState>()(
     (set) => ({
       userNotifications: {},
       addNotification: (userId: number, notification: ToastNotification) => {
-        set((state) => ({
-          userNotifications: {
-            ...state.userNotifications,
-            [userId]: [
-              ...(state.userNotifications[userId] || []),
-              notification,
-            ],
-          },
-        }));
+        set((state) => {
+          const currentUserNotifications =
+            state.userNotifications[userId] || [];
+          // keep the new notification at the start of the list, so sorting by newest time isn't required
+          const newUserNotifications = [
+            notification,
+            ...currentUserNotifications,
+          ];
+          const maxNotifications = 50;
+          const reducedNotifications = newUserNotifications.slice(
+            0,
+            maxNotifications
+          );
+          return {
+            userNotifications: {
+              ...state.userNotifications,
+              [userId]: reducedNotifications,
+            },
+          };
+        });
       },
       removeNotification: (userId: number, notificationId: string) => {
         set((state) => ({

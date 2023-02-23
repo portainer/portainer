@@ -1,12 +1,12 @@
 import _ from 'lodash-es';
+import { confirmDelete } from '@@/modals/confirm';
 
 export class EdgeJobsViewController {
   /* @ngInject */
-  constructor($async, $state, EdgeJobService, ModalService, Notifications) {
+  constructor($async, $state, EdgeJobService, Notifications) {
     this.$async = $async;
     this.$state = $state;
     this.EdgeJobService = EdgeJobService;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
 
     this.removeAction = this.removeAction.bind(this);
@@ -15,7 +15,7 @@ export class EdgeJobsViewController {
   }
 
   removeAction(selectedItems) {
-    this.ModalService.confirmDeletion('Do you want to remove the selected edge job(s) ?', (confirmed) => {
+    confirmDelete('Do you want to remove the selected edge job(s)?').then((confirmed) => {
       if (!confirmed) {
         return;
       }

@@ -27,7 +27,7 @@ export function ActionsCell({ row }: CellProps<Task>) {
   };
 
   return (
-    <div className="text-center vertical-center">
+    <div className="vertical-center text-center">
       {/* events */}
       <Link
         to="nomad.events"

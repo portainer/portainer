@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"crypto/sha256"
-	"fmt"
+	"math/rand"
 	"os"
 	"path"
-	"strconv"
 	"strings"
+	"time"
 
 	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/docker-compose-wrapper/compose"
@@ -45,6 +45,7 @@ import (
 	"github.com/portainer/portainer/api/oauth"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/gofrs/uuid"
@@ -316,45 +317,6 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	return dataStore.SSLSettings().UpdateSettings(sslSettings)
 }
 
-// enableFeaturesFromFlags turns on or off feature flags
-// e.g.  portainer --feat open-amt --feat fdo=true ... (defaults to true)
-// note, settings are persisted to the DB. To turn off `--feat open-amt=false`
-func enableFeaturesFromFlags(dataStore dataservices.DataStore, flags *portainer.CLIFlags) error {
-	settings, err := dataStore.Settings().Settings()
-	if err != nil {
-		return err
-	}
-
-	if settings.FeatureFlagSettings == nil {
-		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
-	}
-
-	// loop through feature flags to check if they are supported
-	for _, feat := range *flags.FeatureFlags {
-		var correspondingFeature *portainer.Feature
-		for i, supportedFeat := range portainer.SupportedFeatureFlags {
-			if strings.EqualFold(feat.Name, string(supportedFeat)) {
-				correspondingFeature = &portainer.SupportedFeatureFlags[i]
-			}
-		}
-
-		if correspondingFeature == nil {
-			return fmt.Errorf("unknown feature flag '%s'", feat.Name)
-		}
-
-		featureState, err := strconv.ParseBool(feat.Value)
-		if err != nil {
-			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
-		}
-
-		log.Info().Str("feature", string(*correspondingFeature)).Bool("state", featureState).Msg("")
-
-		settings.FeatureFlagSettings[*correspondingFeature] = featureState
-	}
-
-	return dataStore.Settings().UpdateSettings(settings)
-}
-
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
 	private, public, err := fileService.LoadKeyPair()
 	if err != nil {
@@ -545,6 +507,10 @@ func loadEncryptionSecretKey(keyfilename string) []byte {
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
+	if flags.FeatureFlags != nil {
+		featureflags.Parse(*flags.FeatureFlags, portainer.SupportedFeatureFlags)
+	}
+
 	fileService := initFileService(*flags.Data)
 	encryptionKey := loadEncryptionSecretKey(*flags.SecretKeyName)
 	if encryptionKey == nil {
@@ -572,11 +538,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	jwtService, err := initJWTService(settings.UserSessionTimeout, dataStore)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing JWT service")
-	}
-
-	err = enableFeaturesFromFlags(dataStore, flags)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed enabling feature flag")
 	}
 
 	ldapService := initLDAPService()
@@ -742,7 +703,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	// resolved we can remove this function.
 	err = kubernetesClientFactory.PostInitMigrateIngresses()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failure during creation of new database")
+		log.Fatal().Err(err).Msg("failure during post init migrations")
 	}
 
 	return &http.Server{
@@ -785,6 +746,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	configureLogger()
 	setLoggingMode("PRETTY")
 

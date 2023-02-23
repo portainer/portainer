@@ -15,7 +15,7 @@
           <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
             <!-- name -->
             <div class="form-group mb-0">
-              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
               <div class="col-sm-8 col-lg-9 mb-0">
                 <input
                   type="text"
@@ -85,32 +85,7 @@
                 <div class="col-sm-12 small text-muted"> Select the kind of data that you want to save in the configuration. </div>
               </div>
 
-              <!-- type options -->
-              <div class="form-group px-[15px] mb-0">
-                <div class="boxselector_wrapper">
-                  <div>
-                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationKinds.CONFIGMAP" ng-model="ctrl.formValues.Kind" ng-change="ctrl.onChangeKind()" />
-                    <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'file-code'"></pr-icon>
-                        ConfigMap
-                      </div>
-                      <p>This configuration holds non-sensitive information</p>
-                    </label>
-                  </div>
-                  <div>
-                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationKinds.SECRET" ng-model="ctrl.formValues.Kind" ng-change="ctrl.onChangeKind()" />
-                    <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'lock'"></pr-icon>
-                        Secret
-                      </div>
-                      <p>This configuration holds sensitive information</p>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <!-- !type options -->
+              <box-selector options="ctrl.typeOptions" value="ctrl.formValues.Kind" on-change="(ctrl.onChangeKind)" radio-name="'Kind'" slim="true"> </box-selector>
 
               <div ng-if="ctrl.formValues.Kind === ctrl.KubernetesConfigurationKinds.SECRET">
                 <div class="col-sm-12 form-section-title"> Information </div>
@@ -168,7 +143,7 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypeOptions.CUSTOM.value">
-                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label text-left required">Custom Type</label>
+                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label required text-left">Custom Type</label>
                   <div class="col-sm-8 col-lg-9">
                     <input
                       type="text"
@@ -193,7 +168,7 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypeOptions.SERVICEACCOUNTTOKEN.value">
-                  <label for="service_account" class="col-sm-3 col-lg-2 control-label text-left required">Service Account</label>
+                  <label for="service_account" class="col-sm-3 col-lg-2 control-label required text-left">Service Account</label>
                   <div class="col-sm-8 col-lg-9">
                     <select
                       class="form-control"

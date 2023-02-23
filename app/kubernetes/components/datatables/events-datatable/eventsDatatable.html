@@ -55,7 +55,7 @@
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-hover nowrap-cells" data-cy="k8sConfigDetail-eventsTable">
+    <table class="table-hover nowrap-cells table" data-cy="k8sConfigDetail-eventsTable">
       <thead>
         <tr>
           <th>
@@ -109,10 +109,10 @@
           <td>{{ item.Message }}</td>
         </tr>
         <tr ng-if="$ctrl.loading">
-          <td colspan="4" class="text-center text-muted">Loading...</td>
+          <td colspan="4" class="text-muted text-center">Loading...</td>
         </tr>
         <tr ng-if="!$ctrl.loading && (!$ctrl.dataset || $ctrl.state.filteredDataSet.length === 0)">
-          <td colspan="4" class="text-center text-muted">No event available.</td>
+          <td colspan="4" class="text-muted text-center">No event available.</td>
         </tr>
       </tbody>
     </table>

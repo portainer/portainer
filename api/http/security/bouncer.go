@@ -49,8 +49,7 @@ func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices
 // PublicAccess defines a security check for public API environments(endpoints).
 // No authentication is required to access these environments(endpoints).
 func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
-	h = mwSecureHeaders(h)
-	return h
+	return mwSecureHeaders(h)
 }
 
 // AdminAccess defines a security check for API environments(endpoints) that require an authorization check.
@@ -81,9 +80,9 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 // TeamLeaderAccess defines a security check for APIs require team leader privilege
 //
 // Bouncer operations are applied backwards:
-//  - Parse the JWT from the request and stored in context, user has to be authenticated
-//  - Upgrade to the restricted request
-//  - User is admin or team leader
+//   - Parse the JWT from the request and stored in context, user has to be authenticated
+//   - Upgrade to the restricted request
+//   - User is admin or team leader
 func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 	h = bouncer.mwIsTeamLeader(h)
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
@@ -199,7 +198,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
+		if bouncer.dataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
@@ -375,8 +374,8 @@ func extractAPIKey(r *http.Request) (apikey string, ok bool) {
 // mwSecureHeaders provides secure headers middleware for handlers.
 func mwSecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("X-XSS-Protection", "1; mode=block")
-		w.Header().Add("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, r)
 	})
 }

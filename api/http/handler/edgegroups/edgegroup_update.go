@@ -27,10 +27,10 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return errors.New("invalid Edge group name")
 	}
-	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
+	if payload.Dynamic && len(payload.TagIDs) == 0 {
 		return errors.New("tagIDs is mandatory for a dynamic Edge group")
 	}
-	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
+	if !payload.Dynamic && len(payload.Endpoints) == 0 {
 		return errors.New("environments is mandatory for a static Edge group")
 	}
 	return nil
@@ -153,7 +153,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpointID, edgeJobs, operation)
+		err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpoint, edgeJobs, operation)
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist Environment Edge Jobs changes inside the database", err)
 		}
@@ -200,7 +200,7 @@ func (handler *Handler) updateEndpointStacks(endpointID portainer.EndpointID) er
 	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 }
 
-func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID, endpointID portainer.EndpointID, edgeJobs []portainer.EdgeJob, operation string) error {
+func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID, endpoint *portainer.Endpoint, edgeJobs []portainer.EdgeJob, operation string) error {
 	for _, edgeJob := range edgeJobs {
 		if !slices.Contains(edgeJob.EdgeGroups, edgeGroupID) {
 			continue
@@ -208,9 +208,9 @@ func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID
 
 		switch operation {
 		case "add":
-			handler.ReverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
+			handler.ReverseTunnelService.AddEdgeJob(endpoint, &edgeJob)
 		case "remove":
-			handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpointID, edgeJob.ID)
+			handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpoint.ID, edgeJob.ID)
 		}
 	}
 

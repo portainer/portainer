@@ -17,7 +17,7 @@ export function Breadcrumbs({ breadcrumbs }: Props) {
     : [breadcrumbs];
 
   return (
-    <div className="text-xs font-medium text-gray-7 th-dark:text-gray-5 th-highcontrast:text-white space-x-2">
+    <div className="space-x-2 text-xs font-medium text-gray-7 th-highcontrast:text-white th-dark:text-gray-5">
       {breadcrumbsArray.map((crumb, index) => (
         <Fragment key={index}>
           <span>{renderCrumb(crumb)}</span>
@@ -42,7 +42,7 @@ function renderCrumb(crumb: Crumb | string) {
       <Link
         to={crumb.link}
         params={crumb.linkParams}
-        className="text-blue-9 hover:underline hover:text-blue-11 th-dark:text-blue-7 th-dark:hover:text-blue-9 th-highcontrast:text-blue-5"
+        className="text-blue-9 hover:text-blue-11 hover:underline th-highcontrast:text-blue-5 th-dark:text-blue-7 th-dark:hover:text-blue-9"
       >
         {crumb.label}
       </Link>

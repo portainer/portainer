@@ -2,20 +2,22 @@ package edgestack
 
 import (
 	"fmt"
+	"sync"
 
 	portainer "github.com/portainer/portainer/api"
 
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "edge_stack"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "edge_stack"
 
 // Service represents a service for managing Edge stack data.
 type Service struct {
-	connection portainer.Connection
+	connection          portainer.Connection
+	idxVersion          map[portainer.EdgeStackID]int
+	mu                  sync.RWMutex
+	cacheInvalidationFn func(portainer.EdgeStackID)
 }
 
 func (service *Service) BucketName() string {
@@ -23,15 +25,39 @@ func (service *Service) BucketName() string {
 }
 
 // NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
+func NewService(connection portainer.Connection, cacheInvalidationFn func(portainer.EdgeStackID)) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Service{
-		connection: connection,
-	}, nil
+	s := &Service{
+		connection:          connection,
+		idxVersion:          make(map[portainer.EdgeStackID]int),
+		cacheInvalidationFn: cacheInvalidationFn,
+	}
+
+	if s.cacheInvalidationFn == nil {
+		s.cacheInvalidationFn = func(portainer.EdgeStackID) {}
+	}
+
+	es, err := s.EdgeStacks()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, e := range es {
+		s.idxVersion[e.ID] = e.Version
+	}
+
+	return s, nil
+}
+
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
 }
 
 // EdgeStacks returns an array containing all edge stacks
@@ -42,7 +68,6 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 		BucketName,
 		&portainer.EdgeStack{},
 		func(obj interface{}) (interface{}, error) {
-			//var tag portainer.Tag
 			stack, ok := obj.(*portainer.EdgeStack)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")
@@ -70,22 +95,52 @@ func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStac
 	return &stack, nil
 }
 
+// EdgeStackVersion returns the version of the given edge stack ID directly from an in-memory index
+func (service *Service) EdgeStackVersion(ID portainer.EdgeStackID) (int, bool) {
+	service.mu.RLock()
+	v, ok := service.idxVersion[ID]
+	service.mu.RUnlock()
+
+	return v, ok
+}
+
 // CreateEdgeStack saves an Edge stack object to db.
 func (service *Service) Create(id portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error {
-
 	edgeStack.ID = id
 
-	return service.connection.CreateObjectWithId(
+	err := service.connection.CreateObjectWithId(
 		BucketName,
 		int(edgeStack.ID),
 		edgeStack,
 	)
+	if err != nil {
+		return err
+	}
+
+	service.mu.Lock()
+	service.idxVersion[id] = edgeStack.Version
+	service.cacheInvalidationFn(id)
+	service.mu.Unlock()
+
+	return nil
 }
 
 // Deprecated: Use UpdateEdgeStackFunc instead.
 func (service *Service) UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error {
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
 	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, edgeStack)
+
+	err := service.connection.UpdateObject(BucketName, identifier, edgeStack)
+	if err != nil {
+		return err
+	}
+
+	service.idxVersion[ID] = edgeStack.Version
+	service.cacheInvalidationFn(ID)
+
+	return nil
 }
 
 // UpdateEdgeStackFunc updates an Edge stack inside a transaction avoiding data races.
@@ -93,15 +148,34 @@ func (service *Service) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc
 	id := service.connection.ConvertToKey(int(ID))
 	edgeStack := &portainer.EdgeStack{}
 
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
 	return service.connection.UpdateObjectFunc(BucketName, id, edgeStack, func() {
 		updateFunc(edgeStack)
+
+		service.idxVersion[ID] = edgeStack.Version
+		service.cacheInvalidationFn(ID)
 	})
 }
 
 // DeleteEdgeStack deletes an Edge stack.
 func (service *Service) DeleteEdgeStack(ID portainer.EdgeStackID) error {
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
 	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+
+	err := service.connection.DeleteObject(BucketName, identifier)
+	if err != nil {
+		return err
+	}
+
+	delete(service.idxVersion, ID)
+
+	service.cacheInvalidationFn(ID)
+
+	return nil
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).

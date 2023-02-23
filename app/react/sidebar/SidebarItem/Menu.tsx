@@ -39,16 +39,16 @@ export function Menu({
 
   return (
     <div className="flex-1">
-      <div className="flex w-full justify-between items-center relative ">
+      <div className="relative flex w-full items-center justify-between ">
         {head}
         {isSidebarOpen && Children.count(children) > 0 && (
           <button
-            className="bg-transparent border-0 w-6 h-6 flex items-center justify-center absolute right-2 text-gray-5"
+            className="absolute right-2 flex h-6 w-6 items-center justify-center border-0 bg-transparent text-gray-5"
             onClick={handleClickArrow}
             type="button"
             aria-label="Collapse button"
           >
-            <CollapseButtonIcon className="w-4 h-4" />
+            <CollapseButtonIcon className="h-4 w-4" />
           </button>
         )}
       </div>

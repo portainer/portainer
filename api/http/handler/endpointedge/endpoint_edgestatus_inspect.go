@@ -1,17 +1,23 @@
 package endpointedge
 
 import (
+	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"hash/fnv"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
+	"strings"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/internal/edge/cache"
 )
 
 type stackStatusResponse struct {
@@ -64,9 +70,27 @@ type endpointEdgeStatusInspectResponse struct {
 // @failure 500 "Server error"
 // @router /endpoints/{id}/edge/status [get]
 func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, err := middlewares.FetchEndpoint(r)
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest("Unable to find an environment on request context", err)
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
+	}
+
+	cachedResp := handler.respondFromCache(w, r, portainer.EndpointID(endpointID))
+	if cachedResp {
+		return nil
+	}
+
+	if _, ok := handler.DataStore.Endpoint().Heartbeat(portainer.EndpointID(endpointID)); !ok {
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", nil)
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		if handler.DataStore.IsErrObjectNotFound(err) {
+			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
+		}
+
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
@@ -129,7 +153,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 	statusResponse.Stacks = edgeStacksStatus
 
-	return response.JSON(w, statusResponse)
+	return cacheResponse(w, endpoint.ID, statusResponse)
 }
 
 func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
@@ -191,17 +215,75 @@ func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stac
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
-		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
-		if err != nil {
+		version, ok := handler.DataStore.EdgeStack().EdgeStackVersion(stackID)
+		if !ok {
 			return nil, httperror.InternalServerError("Unable to retrieve edge stack from the database", err)
 		}
 
 		stackStatus := stackStatusResponse{
-			ID:      stack.ID,
-			Version: stack.Version,
+			ID:      stackID,
+			Version: version,
 		}
 
 		edgeStacksStatus = append(edgeStacksStatus, stackStatus)
 	}
+
 	return edgeStacksStatus, nil
+}
+
+func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statusResponse endpointEdgeStatusInspectResponse) *httperror.HandlerError {
+	rr := httptest.NewRecorder()
+
+	httpErr := response.JSON(rr, statusResponse)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	h := fnv.New32a()
+	h.Write(rr.Body.Bytes())
+	etag := strconv.FormatUint(uint64(h.Sum32()), 16)
+
+	cache.Set(endpointID, []byte(etag))
+
+	resp := rr.Result()
+
+	for k, vs := range resp.Header {
+		for _, v := range vs {
+			w.Header().Add(k, v)
+		}
+	}
+
+	w.Header().Set("ETag", etag)
+	io.Copy(w, resp.Body)
+
+	return nil
+}
+
+func (handler *Handler) respondFromCache(w http.ResponseWriter, r *http.Request, endpointID portainer.EndpointID) bool {
+	inmHeader := r.Header.Get("If-None-Match")
+	etags := strings.Split(inmHeader, ",")
+
+	if len(inmHeader) == 0 || etags[0] == "" {
+		return false
+	}
+
+	cachedETag, ok := cache.Get(endpointID)
+	if !ok {
+		return false
+	}
+
+	for _, etag := range etags {
+		if !bytes.Equal([]byte(etag), cachedETag) {
+			continue
+		}
+
+		handler.DataStore.Endpoint().UpdateHeartbeat(endpointID)
+
+		w.Header().Set("ETag", etag)
+		w.WriteHeader(http.StatusNotModified)
+
+		return true
+	}
+
+	return false
 }
