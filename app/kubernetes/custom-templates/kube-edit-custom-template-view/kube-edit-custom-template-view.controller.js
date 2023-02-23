@@ -142,6 +142,9 @@ class KubeEditCustomTemplateViewController {
       try {
         this.formValues.FileContent = await getFilePreview(payload);
         this.state.isEditorDirty = true;
+
+        // check if the template contains mustache template symbol
+        this.parseTemplate(this.formValues.FileContent);
       } catch (err) {
         this.state.templatePreviewError = err.message;
         this.state.templatePreviewFailed = true;
