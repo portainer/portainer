@@ -27,8 +27,8 @@ module.exports = function (grunt) {
     distdir: 'dist/public',
     binaries: {
       dockerVersion: 'v20.10.21',
-      dockerComposePluginVersion: 'v2.13.0',
-      helmVersion: 'v3.9.3',
+      dockerComposePluginVersion: 'v2.16.0',
+      helmVersion: 'v3.11.0',
       kubectlVersion: 'v1.24.1',
     },
     env: gruntConfig.env,
