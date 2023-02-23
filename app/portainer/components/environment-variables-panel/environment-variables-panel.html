@@ -23,7 +23,7 @@
         <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
         Switch to simple mode to define variables line by line, or load from .env file
       </div>
-      <div class="form-group" style="margin-left: 1px">
+      <div class="col-sm-12">
         <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
       </div>
       <div class="col-sm-12 small text-muted" ng-if="$ctrl.showHelpMessage">

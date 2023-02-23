@@ -112,8 +112,8 @@ export class EdgeJobFormController {
     this.formAction(this.formValues.method);
   }
 
-  editorUpdate(cm) {
-    this.model.FileContent = cm.getValue();
+  editorUpdate(value) {
+    this.model.FileContent = value;
     this.isEditorDirty = true;
   }
 

@@ -2,8 +2,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'toastr/build/toastr.css';
 import 'xterm/dist/xterm.css';
 import 'angularjs-slider/dist/rzslider.css';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/addon/lint/lint.css';
 import 'angular-json-tree/dist/angular-json-tree.css';
 import 'angular-loading-bar/build/loading-bar.css';
 import 'angular-moment-picker/dist/angular-moment-picker.min.css';
