@@ -53,7 +53,6 @@ function UpgradeBEBanner() {
     nodeCount: nodesCount,
     platform: systemInfo.platform,
     edgeAgents: systemInfo.edgeAgents,
-    edgeDevices: systemInfo.edgeDevices,
     agents: systemInfo.agents,
   };
 
