@@ -81,7 +81,7 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
 	}
 	if !canManage {
-		errMsg := "Stack management is disabled for non-admin users"
+		errMsg := "stack management is disabled for non-admin users"
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
@@ -117,9 +117,14 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 func (handler *Handler) stopStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
+		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
+
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	case portainer.DockerSwarmStack:
+		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
+
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
+
 	return nil
 }
