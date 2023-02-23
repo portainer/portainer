@@ -7,6 +7,7 @@ import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 import { useTags } from '@/portainer/tags/queries';
+import { HomepageFilter } from '@/react/portainer/HomeView/EnvironmentList/HomepageFilter';
 
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -18,23 +19,39 @@ import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 import { WaitingRoomEnvironment } from '../types';
 
 import { columns } from './columns';
+import { useFilterStore } from './filter-store';
 
 const storageKey = 'edge-devices-waiting-room';
 
 const settingsStore = createPersistedStore(storageKey, 'Name');
 
 export function Datatable() {
+  const filterStore = useFilterStore();
+  const edgeGroupsQuery = useEdgeGroups();
+
+  const filterByEnvironmentsIds = filterStore.edgeGroups.length
+    ? _.compact(
+        filterStore.edgeGroups.flatMap(
+          (groupId) =>
+            edgeGroupsQuery.data?.find((g) => g.Id === groupId)?.Endpoints
+        )
+      )
+    : undefined;
+
   const { environments, isLoading, totalCount } = useEnvironmentList({
     edgeDeviceUntrusted: true,
     excludeSnapshots: true,
     types: EdgeTypes,
+    tagIds: filterStore.tags.length ? filterStore.tags : undefined,
+    groupIds: filterStore.groups.length ? filterStore.groups : undefined,
+    endpointIds: filterByEnvironmentsIds,
   });
 
   const groupsQuery = useGroups({
     select: (groups) =>
       Object.fromEntries(groups.map((g) => [g.Id, g.Name] as const)),
   });
-  const edgeGroupsQuery = useEdgeGroups({
+  const environmentEdgeGroupsQuery = useEdgeGroups({
     select: (groups) =>
       _.groupBy(
         groups.flatMap((group) => {
@@ -58,7 +75,9 @@ export function Datatable() {
     environments.map((env) => ({
       ...env,
       Group: groupsQuery.data?.[env.GroupId] || '',
-      EdgeGroups: edgeGroupsQuery.data?.[env.Id]?.map((env) => env.group) || [],
+      EdgeGroups:
+        environmentEdgeGroupsQuery.data?.[env.Id]?.map((env) => env.group) ||
+        [],
       Tags:
         _.compact(env.TagIds?.map((tagId) => tagsQuery.data?.[tagId])) || [],
     }));
@@ -97,10 +116,11 @@ export function Datatable() {
       isLoading={
         isLoading ||
         groupsQuery.isLoading ||
-        edgeGroupsQuery.isLoading ||
+        environmentEdgeGroupsQuery.isLoading ||
         tagsQuery.isLoading
       }
       totalCount={totalCount}
+      description={<Filter />}
     />
   );
 
@@ -114,4 +134,48 @@ export function Datatable() {
       }
     );
   }
+}
+
+function Filter() {
+  const edgeGroupsQuery = useEdgeGroups();
+  const groupsQuery = useGroups();
+  const tagsQuery = useTags();
+
+  const filterStore = useFilterStore();
+
+  if (!edgeGroupsQuery.data || !groupsQuery.data || !tagsQuery.data) {
+    return null;
+  }
+
+  return (
+    <div className="flex w-full gap-5 [&>*]:w-1/5">
+      <HomepageFilter
+        onChange={(f) => filterStore.setEdgeGroups(f)}
+        placeHolder="Edge groups"
+        value={filterStore.edgeGroups}
+        filterOptions={edgeGroupsQuery.data.map((g) => ({
+          label: g.Name,
+          value: g.Id,
+        }))}
+      />
+      <HomepageFilter
+        onChange={(f) => filterStore.setGroups(f)}
+        placeHolder="Group"
+        value={filterStore.groups}
+        filterOptions={groupsQuery.data.map((g) => ({
+          label: g.Name,
+          value: g.Id,
+        }))}
+      />
+      <HomepageFilter
+        onChange={(f) => filterStore.setTags(f)}
+        placeHolder="Tags"
+        value={filterStore.tags}
+        filterOptions={tagsQuery.data.map((g) => ({
+          label: g.Name,
+          value: g.ID,
+        }))}
+      />
+    </div>
+  );
 }
