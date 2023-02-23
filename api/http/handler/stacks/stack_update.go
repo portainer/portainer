@@ -166,8 +166,12 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 
 func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	if stack.Type == portainer.DockerSwarmStack {
+		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
+
 		return handler.updateSwarmStack(r, stack, endpoint)
 	} else if stack.Type == portainer.DockerComposeStack {
+		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
+
 		return handler.updateComposeStack(r, stack, endpoint)
 	} else if stack.Type == portainer.KubernetesStack {
 		return handler.updateKubernetesStack(r, stack, endpoint)
