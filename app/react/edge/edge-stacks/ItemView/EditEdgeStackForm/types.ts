@@ -9,4 +9,5 @@ export interface FormValues {
   useManifestNamespaces: boolean;
   prePullImage: boolean;
   retryDeploy: boolean;
+  webhookEnabled: boolean;
 }

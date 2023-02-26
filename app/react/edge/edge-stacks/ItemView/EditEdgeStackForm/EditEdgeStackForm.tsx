@@ -6,6 +6,9 @@ import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGrou
 import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/components/EdgeStackDeploymentTypeSelector';
 import { DeploymentType, EdgeStack } from '@/react/edge/edge-stacks/types';
 import { EnvironmentType } from '@/react/portainer/environments/types';
+import { WebhookSettings } from '@/react/portainer/gitops/AutoUpdateFieldset/WebhookSettings';
+import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
@@ -57,6 +60,7 @@ export function EditEdgeStackForm({
     useManifestNamespaces: edgeStack.UseManifestNamespaces,
     prePullImage: edgeStack.PrePullImage,
     retryDeploy: edgeStack.RetryDeploy,
+    webhookEnabled: !!edgeStack.Webhook,
   };
 
   return (
@@ -145,35 +149,58 @@ function InnerForm({
         handleContentChange={handleContentChange}
       />
 
-      <PrivateRegistryFieldsetWrapper
-        value={values.privateRegistryId}
-        onChange={(value) => setFieldValue('privateRegistryId', value)}
-        isValid={isValid}
-        values={values}
-        stackName={edgeStack.Name}
-        onFieldError={(error) => setFieldError('privateRegistryId', error)}
-        error={errors.privateRegistryId}
-      />
-
-      {values.deploymentType === DeploymentType.Compose && (
+      {isBE && (
         <>
-          <SwitchField
-            checked={values.prePullImage}
-            name="prePullImage"
-            label="Pre-pull images"
-            tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"
-            label-Class="col-sm-3 col-lg-2"
-            onChange={(value) => setFieldValue('prePullImage', value)}
-          />
+          <FormSection title="Webhooks">
+            <div className="form-group">
+              <div className="col-sm-12">
+                <SwitchField
+                  label="Create an Edge stack webhook"
+                  checked={values.webhookEnabled}
+                  onChange={(value) => setFieldValue('webhookEnabled', value)}
+                  tooltip="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
+                />
+              </div>
+            </div>
 
-          <SwitchField
-            checked={values.retryDeploy}
-            name="retryDeploy"
-            label="Retry deployment"
-            tooltip="When enabled, this will allow edge agent keep retrying deployment if failure occur"
-            label-Class="col-sm-3 col-lg-2"
-            onChange={(value) => setFieldValue('retryDeploy', value)}
+            {edgeStack.Webhook && (
+              <WebhookSettings
+                baseUrl={baseEdgeStackWebhookUrl()}
+                value={edgeStack.Webhook}
+                docsLink="todo"
+              />
+            )}
+          </FormSection>
+          <PrivateRegistryFieldsetWrapper
+            value={values.privateRegistryId}
+            onChange={(value) => setFieldValue('privateRegistryId', value)}
+            isValid={isValid}
+            values={values}
+            stackName={edgeStack.Name}
+            onFieldError={(error) => setFieldError('privateRegistryId', error)}
+            error={errors.privateRegistryId}
           />
+          {values.deploymentType === DeploymentType.Compose && (
+            <>
+              <SwitchField
+                checked={values.prePullImage}
+                name="prePullImage"
+                label="Pre-pull images"
+                tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"
+                label-Class="col-sm-3 col-lg-2"
+                onChange={(value) => setFieldValue('prePullImage', value)}
+              />
+
+              <SwitchField
+                checked={values.retryDeploy}
+                name="retryDeploy"
+                label="Retry deployment"
+                tooltip="When enabled, this will allow edge agent keep retrying deployment if failure occur"
+                label-Class="col-sm-3 col-lg-2"
+                onChange={(value) => setFieldValue('retryDeploy', value)}
+              />
+            </>
+          )}
         </>
       )}
 
@@ -234,5 +261,6 @@ function formValidation(): SchemaOf<FormValues> {
       .of(number().required())
       .required()
       .min(1, 'At least one edge group is required'),
+    webhookEnabled: boolean().default(false),
   });
 }

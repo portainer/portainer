@@ -54,6 +54,7 @@ export type EdgeStack = {
   GitConfig?: RepoConfigResponse;
   Prune: boolean;
   RetryDeploy: boolean;
+  Webhook?: string;
 };
 
 export enum EditorType {
