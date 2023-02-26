@@ -81,9 +81,10 @@ func (m *Migrator) updateEnableGpuManagementFeatures() error {
 			gpuList := environment.Gpus
 			if len(gpuList) > 0 {
 				environment.EnableGPUManagement = true
-				if err := m.endpointService.UpdateEndpoint(environment.ID, &environment); err != nil {
-					return err
-				}
+			}
+			// update the environment
+			if err := m.endpointService.UpdateEndpoint(environment.ID, &environment); err != nil {
+				return err
 			}
 		}
 	}
