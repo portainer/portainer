@@ -17,7 +17,7 @@ func ValidateRepoConfig(repoConfig *gittypes.RepoConfig) error {
 }
 
 func ValidateRepoAuthentication(auth *gittypes.GitAuthentication) error {
-	if auth != nil && govalidator.IsNull(auth.Password) && auth.GitCredentialID == 0 {
+	if auth != nil && govalidator.IsNull(auth.Password) {
 		return httperrors.NewInvalidPayloadError("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
 

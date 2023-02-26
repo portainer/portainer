@@ -153,8 +153,6 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		repositoryUsername = payload.RepositoryUsername
 	}
 
-	// If relative path feature is enabled, the git clone operation will be executed in portainer-unpacker
-
 	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, git.CloneOptions{ProjectPath: stack.ProjectPath, URL: stack.GitConfig.URL, ReferenceName: stack.GitConfig.ReferenceName, Username: repositoryUsername, Password: repositoryPassword})
 	if err != nil {
 		return httperror.InternalServerError("Unable to clone git repository directory", err)
