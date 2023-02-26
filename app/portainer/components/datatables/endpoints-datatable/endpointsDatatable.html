@@ -34,10 +34,7 @@
             <span>Remove</span>
           </button>
 
-          <button type="button" class="btn btn-sm btn-secondary vertical-center" ui-sref="portainer.endpoints.importDevice">
-            <pr-icon icon="'plus'"></pr-icon>
-            <span>Import FDO device</span>
-          </button>
+          <import-fdo-device-button></import-fdo-device-button>
 
           <button ng-if="$ctrl.isBE" type="button" class="btn btn-sm btn-secondary vertical-center" ui-sref="portainer.endpoints.edgeAutoCreateScript">
             <pr-icon icon="'plus'"></pr-icon>
