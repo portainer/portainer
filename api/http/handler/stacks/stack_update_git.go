@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/git/update"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -17,7 +18,7 @@ import (
 )
 
 type stackGitUpdatePayload struct {
-	AutoUpdate               *portainer.StackAutoUpdate
+	AutoUpdate               *portainer.AutoUpdateSettings
 	Env                      []portainer.Pair
 	Prune                    bool
 	RepositoryReferenceName  string
@@ -27,7 +28,7 @@ type stackGitUpdatePayload struct {
 }
 
 func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
-	if err := stackutils.ValidateStackAutoUpdate(payload.AutoUpdate); err != nil {
+	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
 	return nil
