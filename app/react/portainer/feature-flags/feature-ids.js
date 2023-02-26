@@ -10,6 +10,7 @@ export const HIDE_INTERNAL_AUTH = 'hide-internal-auth';
 export const EXTERNAL_AUTH_LDAP = 'external-auth-ldap';
 export const ACTIVITY_AUDIT = 'activity-audit';
 export const HIDE_AUTO_UPDATE_WINDOW = 'hide-auto-update-window';
+export const IMAGE_UP_TO_DATE_INDICATOR = 'image-up-to-date-indicator';
 export const FORCE_REDEPLOYMENT = 'force-redeployment';
 export const STACK_PULL_IMAGE = 'stack-pull-image';
 export const STACK_WEBHOOK = 'stack-webhook';

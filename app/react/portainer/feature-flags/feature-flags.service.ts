@@ -32,6 +32,7 @@ export async function init(edition: Edition) {
     [FeatureId.TEAM_MEMBERSHIP]: Edition.BE,
     [FeatureId.FORCE_REDEPLOYMENT]: Edition.BE,
     [FeatureId.HIDE_AUTO_UPDATE_WINDOW]: Edition.BE,
+    [FeatureId.IMAGE_UP_TO_DATE_INDICATOR]: Edition.BE,
     [FeatureId.STACK_PULL_IMAGE]: Edition.BE,
     [FeatureId.STACK_WEBHOOK]: Edition.BE,
     [FeatureId.CONTAINER_WEBHOOK]: Edition.BE,
