@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Zap, Cloud, Network, Plug2 } from 'lucide-react';
+import { Zap, Network, Plug2 } from 'lucide-react';
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
+import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
@@ -48,7 +50,7 @@ const defaultOptions: BoxSelectorOption<
   },
   {
     id: 'edgeAgentStandard',
-    icon: Cloud,
+    icon: EdgeAgentStandardIcon,
     iconType: 'badge',
     label: 'Edge Agent Standard',
     description: '',
@@ -56,7 +58,7 @@ const defaultOptions: BoxSelectorOption<
   },
   isBE && {
     id: 'edgeAgentAsync',
-    icon: Cloud,
+    icon: EdgeAgentAsyncIcon,
     iconType: 'badge',
     label: 'Edge Agent Async',
     description: '',

@@ -1,11 +1,13 @@
 import { useMutation } from 'react-query';
 import { useEffect, useState } from 'react';
-import { Laptop, CloudLightning, Cloud } from 'lucide-react';
+import { Laptop } from 'lucide-react';
 
 import { generateKey } from '@/react/portainer/environments/environment.service/edge';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { useSettings } from '@/react/portainer/settings/queries';
+import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
+import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { TextTip } from '@@/Tip/TextTip';
@@ -28,14 +30,14 @@ const commands = {
 
 const asyncModeOptions = [
   {
-    icon: CloudLightning,
+    icon: EdgeAgentStandardIcon,
     id: 'standard',
     label: 'Edge Agent Standard',
     value: false,
     iconType: 'badge',
   },
   {
-    icon: Cloud,
+    icon: EdgeAgentAsyncIcon,
     id: 'async',
     label: 'Edge Agent Async',
     value: true,

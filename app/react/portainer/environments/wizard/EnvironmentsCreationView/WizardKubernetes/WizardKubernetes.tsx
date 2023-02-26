@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { Zap, Cloud, UploadCloud } from 'lucide-react';
+import { Zap, UploadCloud } from 'lucide-react';
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
+import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BoxSelector } from '@@/BoxSelector';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
-import { BadgeIcon } from '@@/BadgeIcon';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -32,14 +33,15 @@ type CreationType =
 const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
   {
     id: 'agent_endpoint',
-    icon: <BadgeIcon icon={Zap} size="3xl" />,
+    icon: Zap,
+    iconType: 'badge',
     label: 'Agent',
     value: 'agent',
     description: '',
   },
   {
     id: 'edgeAgentStandard',
-    icon: Cloud,
+    icon: EdgeAgentStandardIcon,
     iconType: 'badge',
     label: 'Edge Agent Standard',
     description: '',
@@ -47,7 +49,7 @@ const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
   },
   isBE && {
     id: 'edgeAgentAsync',
-    icon: Cloud,
+    icon: EdgeAgentAsyncIcon,
     iconType: 'badge',
     label: 'Edge Agent Async',
     description: '',
@@ -55,7 +57,8 @@ const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
   },
   {
     id: 'kubeconfig_endpoint',
-    icon: <BadgeIcon icon={UploadCloud} size="3xl" />,
+    icon: UploadCloud,
+    iconType: 'badge',
     label: 'Import',
     value: 'kubeconfig',
     description: 'Import an existing Kubernetes config',
