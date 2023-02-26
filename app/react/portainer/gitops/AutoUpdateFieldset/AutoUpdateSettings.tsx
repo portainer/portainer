@@ -19,6 +19,8 @@ export function AutoUpdateSettings({
   showForcePullImage,
   errors,
   baseWebhookUrl,
+  webhookId,
+  webhookDocs,
 }: {
   value: AutoUpdateModel;
   onChange: (value: Partial<AutoUpdateModel>) => void;
@@ -26,6 +28,8 @@ export function AutoUpdateSettings({
   showForcePullImage: boolean;
   errors?: FormikErrors<AutoUpdateModel>;
   baseWebhookUrl: string;
+  webhookId: string;
+  webhookDocs?: string;
 }) {
   return (
     <>
@@ -50,12 +54,8 @@ export function AutoUpdateSettings({
       {value.RepositoryMechanism === 'Webhook' && (
         <WebhookSettings
           baseUrl={baseWebhookUrl}
-          value={value.RepositoryWebhookId || ''}
-          docsLink={
-            environmentType === 'KUBERNETES'
-              ? 'https://docs.portainer.io/user/kubernetes/applications/webhooks'
-              : 'https://docs.portainer.io/user/docker/stacks/webhooks'
-          }
+          value={webhookId}
+          docsLink={webhookDocs}
         />
       )}
 

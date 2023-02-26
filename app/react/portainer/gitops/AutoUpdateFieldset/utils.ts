@@ -1,5 +1,3 @@
-import { v4 as uuid } from 'uuid';
-
 import { AutoUpdateResponse, AutoUpdateModel } from '../types';
 
 export function parseAutoUpdateResponse(
@@ -11,7 +9,6 @@ export function parseAutoUpdateResponse(
       RepositoryAutomaticUpdatesForce: false,
       RepositoryMechanism: 'Interval',
       RepositoryFetchInterval: '5m',
-      RepositoryWebhookId: uuid(),
       ForcePullImage: false,
     };
   }
@@ -20,17 +17,21 @@ export function parseAutoUpdateResponse(
     RepositoryAutomaticUpdates: true,
     RepositoryMechanism: response.Interval ? 'Interval' : 'Webhook',
     RepositoryFetchInterval: response.Interval || '',
-    RepositoryWebhookId: response.Webhook || uuid(),
     RepositoryAutomaticUpdatesForce: response.ForceUpdate,
     ForcePullImage: response.ForcePullImage,
   };
 }
 
 export function transformAutoUpdateViewModel(
-  viewModel?: AutoUpdateModel
+  viewModel?: AutoUpdateModel,
+  webhookId?: string
 ): AutoUpdateResponse | null {
   if (!viewModel || !viewModel.RepositoryAutomaticUpdates) {
     return null;
+  }
+
+  if (viewModel.RepositoryMechanism === 'Webhook' && !webhookId) {
+    throw new Error('Webhook ID is required');
   }
 
   return {
@@ -39,9 +40,7 @@ export function transformAutoUpdateViewModel(
         ? viewModel.RepositoryFetchInterval
         : '',
     Webhook:
-      viewModel.RepositoryMechanism === 'Webhook'
-        ? viewModel.RepositoryWebhookId
-        : '',
+      viewModel.RepositoryMechanism === 'Webhook' && webhookId ? webhookId : '',
     ForceUpdate: viewModel.RepositoryAutomaticUpdatesForce,
     ForcePullImage: viewModel.ForcePullImage,
   };
