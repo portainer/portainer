@@ -49,7 +49,7 @@ export class EditEdgeStackViewController {
           content: file,
         };
 
-        const stackEdgeGroups = edgeGroups.map((id) => this.edgeGroups.find((e) => e.Id === id));
+        const stackEdgeGroups = model.EdgeGroups.map((id) => this.edgeGroups.find((e) => e.Id === id));
         const endpointTypes = stackEdgeGroups.flatMap((group) => group.EndpointTypes);
         const initiallyContainsKubeEnv = endpointTypes.includes(EnvironmentType.EdgeAgentOnKubernetes);
         const isComposeStack = this.stack.DeploymentType === 0;
