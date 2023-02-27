@@ -9,7 +9,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
   function ($scope, $controller, DatatableService, PaginationService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
-    $scope.isBE = isBE;
+    this.isBE = isBE;
 
     this.state = Object.assign(this.state, {
       orderBy: this.orderBy,
