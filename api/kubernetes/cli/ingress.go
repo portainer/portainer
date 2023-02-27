@@ -103,7 +103,7 @@ func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, 
 		info.Type = classes[info.ClassName]
 		info.Annotations = ingress.Annotations
 		info.Labels = ingress.Labels
-		info.CreationTimestamp = ingress.CreationTimestamp.GoString()
+		info.CreationTimestamp = ingress.CreationTimestamp.String()
 
 		// Gather TLS information.
 		for _, v := range ingress.Spec.TLS {
