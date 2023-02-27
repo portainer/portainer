@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { Icon as ReactFeatherComponentType, Check } from 'lucide-react';
+import { Fragment } from 'react';
 
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Icon } from '@/react/components/Icon';
@@ -38,6 +39,9 @@ export function BoxSelectorItem<T extends Value>({
   const limitedToBE = isLimitedToBE(option.feature);
 
   const beIndicatorTooltipId = `box-selector-item-${radioName}-${option.id}-limited`;
+
+  const ContentBox = slim ? 'div' : Fragment;
+
   return (
     <BoxOption
       className={clsx(styles.boxSelectorItem, {
@@ -53,33 +57,22 @@ export function BoxSelectorItem<T extends Value>({
       type={type}
       checkIcon={checkIcon}
     >
-      <>
-        {limitedToBE && (
-          <LimitedToBeIndicator
-            tooltipId={beIndicatorTooltipId}
-            featureId={option.feature}
-          />
-        )}
-        <div
-          className={clsx('flex gap-2', {
-            'opacity-30': limitedToBE,
-            'h-full flex-col justify-between': !slim,
-            'slim items-center': slim,
-          })}
-        >
-          <div
-            className={clsx(styles.imageContainer, 'flex items-center', {
-              'flex-1': !slim,
-            })}
-          >
-            {renderIcon()}
-          </div>
-          <div>
-            <div className={styles.header}>{option.label}</div>
-            <p>{option.description}</p>
-          </div>
+      {limitedToBE && <LimitedToBeIndicator tooltipId={beIndicatorTooltipId} />}
+      <div
+        className={clsx('flex gap-2', {
+          'opacity-30': limitedToBE,
+          'h-full flex-col justify-start': !slim,
+          'slim items-center': slim,
+        })}
+      >
+        <div className={clsx(styles.imageContainer, 'flex items-start')}>
+          {renderIcon()}
         </div>
-      </>
+        <ContentBox>
+          <div className={styles.header}>{option.label}</div>
+          <p className="mb-0">{option.description}</p>
+        </ContentBox>
+      </div>
     </BoxOption>
   );
 
