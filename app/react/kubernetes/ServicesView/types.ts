@@ -35,6 +35,7 @@ export type Service = {
   ClusterIPs?: Array<string>;
   IngressStatus?: Array<IngressStatus>;
   ExternalName?: string;
+  ExternalIPs?: Array<string>;
   CreationTimestamp: string;
   Applications?: Application[];
 };

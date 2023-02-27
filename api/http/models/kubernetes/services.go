@@ -22,6 +22,7 @@ type (
 		// serviceList screen
 		ClusterIPs   []string         `json:",omitempty"`
 		ExternalName string           `json:",omitempty"`
+		ExternalIPs  []string         `json:",omitempty"`
 		Applications []K8sApplication `json:",omitempty"`
 	}
 

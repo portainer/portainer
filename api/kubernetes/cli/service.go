@@ -59,6 +59,7 @@ func (kcl *KubeClient) GetServices(namespace string, lookupApplications bool) ([
 			Annotations:                   service.GetAnnotations(),
 			ClusterIPs:                    service.Spec.ClusterIPs,
 			ExternalName:                  service.Spec.ExternalName,
+			ExternalIPs:                   service.Spec.ExternalIPs,
 			Applications:                  applications,
 		})
 	}

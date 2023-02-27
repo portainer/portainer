@@ -41,57 +41,74 @@ function getSchemeAndPort(svc: Service): [string, number] {
 export const externalIP: Column<Service> = {
   Header: 'External IP',
   id: 'externalIP',
-  accessor: (row) => row.IngressStatus?.slice(0),
-  Cell: ({ row }: CellProps<Service>) => {
-    const isExternalName = row.original.Type === 'ExternalName';
-    if (isExternalName) {
-      if (!row.original.ExternalName) {
-        return '-';
-      }
-
-      const linkto = `http://${row.original.ExternalName}`;
-      return <ExternalIPLink to={linkto} text={row.original.ExternalName} />;
+  accessor: (row) => {
+    if (row.Type === 'ExternalName') {
+      return row.ExternalName;
     }
 
-    const status = row.original.IngressStatus;
-    if (!status?.length) {
+    if (row.ExternalIPs?.length) {
+      return row.ExternalIPs?.slice(0);
+    }
+
+    return row.IngressStatus?.slice(0);
+  },
+  Cell: ({ row }: CellProps<Service>) => {
+    if (row.original.Type === 'ExternalName') {
+      if (row.original.ExternalName) {
+        const linkto = `http://${row.original.ExternalName}`;
+        return <ExternalIPLink to={linkto} text={row.original.ExternalName} />;
+      }
       return '-';
     }
 
     const [scheme, port] = getSchemeAndPort(row.original);
-    return status.map((status, index) => {
-      if (scheme) {
-        let linkto = `${scheme}://${status.IP}`;
-        if (port !== 80 && port !== 443) {
-          linkto = `${linkto}:${port}`;
+    if (row.original.ExternalIPs?.length) {
+      return row.original.ExternalIPs?.map((ip, index) => {
+        if (scheme) {
+          let linkto = `${scheme}://${ip}`;
+          if (port !== 80 && port !== 443) {
+            linkto = `${linkto}:${port}`;
+          }
+          return (
+            <div key={index}>
+              <ExternalIPLink to={linkto} text={ip} />
+            </div>
+          );
         }
+        return <div key={index}>{ip}</div>;
+      });
+    }
 
-        return (
-          <div key={index}>
-            <ExternalIPLink to={linkto} text={status.IP} />
-          </div>
-        );
-      }
+    const status = row.original.IngressStatus;
+    if (status) {
+      return status?.map((status, index) => {
+        if (scheme) {
+          let linkto = `${scheme}://${status.IP}`;
+          if (port !== 80 && port !== 443) {
+            linkto = `${linkto}:${port}`;
+          }
+          return (
+            <div key={index}>
+              <ExternalIPLink to={linkto} text={status.IP} />
+            </div>
+          );
+        }
+        return <div key={index}>{status.IP}</div>;
+      });
+    }
 
-      return <div key={index}>{status.IP}</div>;
-    });
+    return '-';
   },
   disableFilters: true,
   canHide: true,
   sortType: (rowA, rowB) => {
     const a = rowA.original.IngressStatus;
     const b = rowB.original.IngressStatus;
+    const aExternal = rowA.original.ExternalIPs;
+    const bExternal = rowB.original.ExternalIPs;
 
-    let ipA = a?.[0].IP;
-    let ipB = b?.[0].IP;
-
-    if (!ipA && rowA.original.Type === 'ExternalName') {
-      ipA = rowA.original.ExternalName;
-    }
-
-    if (!ipB && rowB.original.Type === 'ExternalName') {
-      ipB = rowB.original.ExternalName;
-    }
+    const ipA = a?.[0].IP || aExternal?.[0] || rowA.original.ExternalName;
+    const ipB = b?.[0].IP || bExternal?.[0] || rowA.original.ExternalName;
 
     if (!ipA) return 1;
     if (!ipB) return -1;
