@@ -15,8 +15,8 @@ export const name: Column<Service> = {
     );
 
     const isExternal =
-      row.original.Labels &&
-      !('io.portainer.kubernetes.application.owner' in row.original.Labels);
+      !row.original.Labels ||
+      !row.original.Labels['io.portainer.kubernetes.application.owner'];
 
     return (
       <Authorized
