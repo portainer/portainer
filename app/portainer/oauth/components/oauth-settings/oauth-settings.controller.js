@@ -1,7 +1,9 @@
 import { baseHref } from '@/portainer/helpers/pathHelper';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { ModalType } from '@@/modals';
+import { confirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
 
 import providers, { getProviderByUrl } from './providers';
 
@@ -82,22 +84,14 @@ export default class OAuthSettingsController {
       }
 
       if (checked) {
-        const confirm = await confirmAsync({
+        const confirmed = await confirm({
           title: 'Hide internal authentication prompt',
           message: 'By hiding internal authentication prompt, you will only be able to login via SSO. Are you sure?',
-          buttons: {
-            confirm: {
-              label: 'Confirm',
-              className: 'btn-warning',
-            },
-            cancel: {
-              label: 'Cancel',
-              className: 'btn-secondary',
-            },
-          },
+          confirmButton: buildConfirmButton('Confirm', 'btn-warning'),
+          modalType: ModalType.Warn,
         });
 
-        if (!confirm) {
+        if (!confirmed) {
           return;
         }
       }
