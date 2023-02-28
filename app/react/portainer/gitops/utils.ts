@@ -9,13 +9,6 @@ export function getAuthentication(
     | 'RepositoryGitCredentialID'
   >
 ) {
-  if (model.RepositoryAuthentication) {
-    return {
-      username: model.RepositoryUsername,
-      password: model.RepositoryPassword,
-    };
-  }
-
   if (model.RepositoryGitCredentialID) {
     return { gitCredentialId: model.RepositoryGitCredentialID };
   }
