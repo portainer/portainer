@@ -21,6 +21,8 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     this.state = Object.assign(this.state, {
       expandAll: false,
       expandedItems: [],
+      namespace: '',
+      namespaces: [],
     });
 
     this.filters = {
@@ -70,6 +72,8 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.onSettingsShowSystemChange = function () {
+      this.updateNamespace();
+      this.setSystemResources(this.settings.showSystem);
       DatatableService.setDataTableSettings(this.tableKey, this.settings);
     };
 
@@ -135,6 +139,36 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       this.filters.state.values = _.uniqBy(availableTypeFilters, 'type');
     };
 
+    this.onChangeNamespace = function () {
+      this.onChangeNamespaceDropdown(this.state.namespace);
+    };
+
+    this.updateNamespace = function () {
+      if (this.namespaces) {
+        const namespaces = [];
+        this.namespaces.find((ns) => {
+          if (!this.settings.showSystem && ns.IsSystem) {
+            return false;
+          }
+          namespaces.push(ns);
+        });
+        this.state.namespaces = namespaces;
+
+        if (!this.state.namespaces.find((ns) => ns.Name === this.state.namespace)) {
+          this.state.namespace = this.state.namespaces[0].Name;
+          this.onChangeNamespaceDropdown(this.state.namespace);
+        }
+      }
+    };
+
+    this.$onChanges = function () {
+      this.settings.showSystem = this.isSystemResources;
+      this.state.namespace = this.namespace;
+      DatatableService.setDataTableSettings(this.tableKey, this.settings);
+      this.updateNamespace();
+      this.prepareTableFromDataset();
+    };
+
     this.$onInit = function () {
       this.isAdmin = Authentication.isAdmin();
       this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
@@ -173,6 +207,15 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
         this.settings = storedSettings;
         this.settings.open = false;
       }
+
+      this.setSystemResources(this.settings.showSystem);
+
+      // Set the default selected namespace
+      if (!this.state.namespace) {
+        this.state.namespace = this.namespace;
+      }
+
+      this.updateNamespace();
       this.onSettingsRepeaterChange();
     };
   },
