@@ -1,5 +1,3 @@
-import { Check, Minus } from 'lucide-react';
-
 import styles from './BoxSelector.module.css';
 import { BoxSelectorItem } from './BoxSelectorItem';
 import { BoxSelectorOption, Value } from './types';
@@ -47,7 +45,6 @@ export function BoxSelector<T extends Value>({
                 type={props.isMulti ? 'checkbox' : 'radio'}
                 isSelected={isSelected}
                 slim={slim}
-                checkIcon={props.isMulti ? Minus : Check}
               />
             ))}
         </div>

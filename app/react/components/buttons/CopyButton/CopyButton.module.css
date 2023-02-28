@@ -6,12 +6,10 @@
 .container {
   display: flex;
   align-items: baseline;
-  margin-top: 10px;
 }
 
-.display-text {
+.copy-button {
   opacity: 0;
-  margin-left: 7px;
   color: #23ae89;
 }
 

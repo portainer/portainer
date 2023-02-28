@@ -1,8 +1,9 @@
 import { useQuery } from 'react-query';
-import semverCompare from 'semver-compare';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
+
+import { semverCompare } from '../common/utils';
 
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';

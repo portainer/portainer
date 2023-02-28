@@ -37,7 +37,7 @@ import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateV
 import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
-import { placementOptions } from './placementTypes';
+import { placementOptions } from '@/react/kubernetes/applications/CreateView/placementTypes';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */

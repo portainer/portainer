@@ -1,7 +1,7 @@
 import angular from 'angular';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { options } from './options';
+import { options } from '@/react/portainer/settings/SettingsView/backup-options';
 
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',

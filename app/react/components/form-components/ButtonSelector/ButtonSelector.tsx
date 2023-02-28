@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 
 import { ButtonGroup, Size } from '@@/buttons/ButtonGroup';
+import { Button } from '@@/buttons';
 
 import styles from './ButtonSelector.module.css';
 
@@ -59,10 +60,12 @@ function OptionItem({
   readOnly,
 }: PropsWithChildren<OptionItemProps>) {
   return (
-    <label
-      className={clsx('btn btn-primary', {
+    <Button
+      color="light"
+      as="label"
+      disabled={disabled || readOnly}
+      className={clsx({
         active: selected,
-        disabled: readOnly || disabled,
       })}
     >
       {children}
@@ -73,6 +76,6 @@ function OptionItem({
         disabled={disabled}
         readOnly={readOnly}
       />
-    </label>
+    </Button>
   );
 }

@@ -1,16 +1,17 @@
-import uuidv4 from 'uuid/v4';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
+import { parseAutoUpdateResponse } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
+import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
-  constructor($async, $state, StackService, Notifications, WebhookHelper) {
+  constructor($async, $state, StackService, Notifications) {
     this.$async = $async;
     this.$state = $state;
     this.StackService = StackService;
     this.Notifications = Notifications;
-    this.WebhookHelper = WebhookHelper;
 
     this.state = {
       saveGitSettingsInProgress: false,
@@ -18,6 +19,7 @@ class KubernetesRedeployAppGitFormController {
       showConfig: false,
       isEdit: false,
       hasUnsavedChanges: false,
+      baseWebhookUrl: baseStackWebhookUrl(),
     };
 
     this.formValues = {
@@ -26,37 +28,44 @@ class KubernetesRedeployAppGitFormController {
       RepositoryUsername: '',
       RepositoryPassword: '',
       // auto update
-      AutoUpdate: {
-        RepositoryAutomaticUpdates: false,
-        RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
-        RepositoryFetchInterval: '5m',
-        RepositoryWebhookURL: '',
-      },
+      AutoUpdate: parseAutoUpdateResponse(),
     };
 
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
     this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
+    this.onChangeGitAuth = this.onChangeGitAuth.bind(this);
   }
 
   onChangeRef(value) {
     this.onChange({ RefName: value });
   }
 
-  onChange(values) {
-    this.formValues = {
-      ...this.formValues,
-      ...values,
-    };
-    this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
+  async onChange(values) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+
+      this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
+    });
   }
 
-  onChangeAutoUpdate(values) {
-    this.onChange({
-      AutoUpdate: {
-        ...this.formValues.AutoUpdate,
-        ...values,
-      },
+  onChangeGitAuth(values) {
+    return this.$async(async () => {
+      this.onChange(values);
+    });
+  }
+
+  async onChangeAutoUpdate(values) {
+    return this.$async(async () => {
+      await this.onChange({
+        AutoUpdate: {
+          ...this.formValues.AutoUpdate,
+          ...values,
+        },
+      });
     });
   }
 
@@ -126,22 +135,8 @@ class KubernetesRedeployAppGitFormController {
 
   $onInit() {
     this.formValues.RefName = this.stack.GitConfig.ReferenceName;
-    // Init auto update
-    if (this.stack.AutoUpdate && (this.stack.AutoUpdate.Interval || this.stack.AutoUpdate.Webhook)) {
-      this.formValues.AutoUpdate.RepositoryAutomaticUpdates = true;
 
-      if (this.stack.AutoUpdate.Interval) {
-        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.INTERVAL;
-        this.formValues.AutoUpdate.RepositoryFetchInterval = this.stack.AutoUpdate.Interval;
-      } else if (this.stack.AutoUpdate.Webhook) {
-        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.WEBHOOK;
-        this.formValues.AutoUpdate.RepositoryWebhookURL = this.WebhookHelper.returnStackWebhookUrl(this.stack.AutoUpdate.Webhook);
-      }
-    }
-
-    if (!this.formValues.AutoUpdate.RepositoryWebhookURL) {
-      this.formValues.AutoUpdate.RepositoryWebhookURL = this.WebhookHelper.returnStackWebhookUrl(uuidv4());
-    }
+    this.formValues.AutoUpdate = parseAutoUpdateResponse(this.stack.AutoUpdate);
 
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;

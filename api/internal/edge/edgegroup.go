@@ -45,7 +45,7 @@ func EdgeGroupSet(edgeGroupIDs []portainer.EdgeGroupID) map[portainer.EdgeGroupI
 	return set
 }
 
-func GetEndpointsFromEdgeGroups(edgeGroupIDs []portainer.EdgeGroupID, datastore dataservices.DataStore) ([]portainer.EndpointID, error) {
+func GetEndpointsFromEdgeGroups(edgeGroupIDs []portainer.EdgeGroupID, datastore dataservices.DataStoreTx) ([]portainer.EndpointID, error) {
 	endpoints, err := datastore.Endpoint().Endpoints()
 	if err != nil {
 		return nil, err

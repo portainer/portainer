@@ -1,4 +1,4 @@
-import { getOptions } from './options';
+import { getOptions } from '@/react/docker/networks/CreateView/macvlanOptions';
 
 angular.module('portainer.docker').controller('NetworkMacvlanFormController', [
   '$q',

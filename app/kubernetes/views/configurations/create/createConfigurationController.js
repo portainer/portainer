@@ -5,10 +5,10 @@ import { KubernetesConfigurationKinds, KubernetesSecretTypeOptions } from 'Kuber
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { getServiceAccounts } from 'Kubernetes/rest/serviceAccount';
+import { typeOptions } from '@/react/kubernetes/configs/CreateView/options';
 
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { isConfigurationFormValid } from '../validation';
-import { typeOptions } from './options';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */

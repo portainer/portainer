@@ -1,6 +1,8 @@
+import controller from './code-editor.controller';
+
 angular.module('portainer.app').component('codeEditor', {
-  templateUrl: './codeEditor.html',
-  controller: 'CodeEditorController',
+  templateUrl: './code-editor.html',
+  controller,
   bindings: {
     identifier: '@',
     placeholder: '@',

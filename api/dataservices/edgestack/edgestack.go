@@ -9,10 +9,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "edge_stack"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "edge_stack"
 
 // Service represents a service for managing Edge stack data.
 type Service struct {
@@ -53,6 +51,13 @@ func NewService(connection portainer.Connection, cacheInvalidationFn func(portai
 	}
 
 	return s, nil
+}
+
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
 }
 
 // EdgeStacks returns an array containing all edge stacks

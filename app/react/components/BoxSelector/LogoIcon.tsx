@@ -7,7 +7,7 @@ export function LogoIcon({ icon }: Props) {
     <div
       className={`
    inline-flex h-14 w-14
-   items-center justify-center text-6xl
+   items-center justify-center text-7xl
 `}
     >
       <Icon icon={icon} className="!flex" />

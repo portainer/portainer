@@ -268,10 +268,10 @@ angular.module('portainer.app').controller('StackController', [
       });
     };
 
-    $scope.editorUpdate = function (cm) {
-      if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
+    $scope.editorUpdate = function (value) {
+      if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
         $scope.state.isEditorDirty = true;
-        $scope.stackFileContent = cm.getValue();
+        $scope.stackFileContent = value;
         $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames, $scope.state.originalContainerNames);
       }
     };

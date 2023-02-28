@@ -78,17 +78,20 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19.4'
+
       - name: Download go modules
         run: cd ./api && go get -t -v -d ./...
 
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/golang@master
         continue-on-error: true # To make sure that artifact upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=./api/go.mod
-          json: true
+        run: |
+          yarn global add snyk
+          snyk test --file=./api/go.mod --json-file-output=snyk.json 2>/dev/null || :
 
       - name: Upload go security scan result as artifact
         uses: actions/upload-artifact@v3

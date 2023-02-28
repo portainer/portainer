@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import moment from 'moment';
 import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
 
-import { cronMethodOptions } from './cron-method-options';
+import { cronMethodOptions } from '@/react/edge/edge-jobs/CreateView/cron-method-options';
 
 export class EdgeJobFormController {
   /* @ngInject */
@@ -112,8 +112,8 @@ export class EdgeJobFormController {
     this.formAction(this.formValues.method);
   }
 
-  editorUpdate(cm) {
-    this.model.FileContent = cm.getValue();
+  editorUpdate(value) {
+    this.model.FileContent = value;
     this.isEditorDirty = true;
   }
 

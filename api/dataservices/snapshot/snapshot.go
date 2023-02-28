@@ -31,6 +31,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
 func (service *Service) Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error) {
 	var snapshot portainer.Snapshot
 	identifier := service.connection.ConvertToKey(int(endpointID))
