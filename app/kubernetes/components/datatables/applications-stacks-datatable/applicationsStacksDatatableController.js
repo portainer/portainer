@@ -95,7 +95,7 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsStacksD
         });
         this.state.namespaces = namespaces;
 
-        if (!this.state.namespaces.find((ns) => ns.Name === this.state.namespace)) {
+        if (this.state.namespace && !this.state.namespaces.find((ns) => ns.Name === this.state.namespace)) {
           this.state.namespace = this.state.namespaces[0].Name;
           this.onChangeNamespaceDropdown(this.state.namespace);
         }
