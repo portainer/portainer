@@ -64,6 +64,11 @@ export const externalIP: Column<Service> = {
     const [scheme, port] = getSchemeAndPort(row.original);
     if (row.original.ExternalIPs?.length) {
       return row.original.ExternalIPs?.map((ip, index) => {
+        // some ips come through blank
+        if (ip.length === 0) {
+          return '-';
+        }
+
         if (scheme) {
           let linkto = `${scheme}://${ip}`;
           if (port !== 80 && port !== 443) {
@@ -82,6 +87,11 @@ export const externalIP: Column<Service> = {
     const status = row.original.IngressStatus;
     if (status) {
       return status?.map((status, index) => {
+        // some ips come through blank
+        if (status.IP.length === 0) {
+          return '-';
+        }
+
         if (scheme) {
           let linkto = `${scheme}://${status.IP}`;
           if (port !== 80 && port !== 443) {

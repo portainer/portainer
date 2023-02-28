@@ -51,7 +51,7 @@ export function ServicesDatatable() {
       emptyContentLabel="No services found"
       title="Services"
       titleIcon={Shuffle}
-      getRowId={(row) => row.Name + row.Type + row.Namespace}
+      getRowId={(row) => row.UID}
       isRowSelectable={(row) =>
         !KubernetesNamespaceHelper.isSystemNamespace(row.values.namespace)
       }

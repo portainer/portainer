@@ -7,7 +7,7 @@ import { Service } from '../../types';
 
 export const name: Column<Service> = {
   Header: 'Name',
-  id: 'name',
+  id: 'Name',
   accessor: (row) => row.Name,
   Cell: ({ row }: CellProps<Service>) => {
     const isSystem = KubernetesNamespaceHelper.isSystemNamespace(
