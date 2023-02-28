@@ -5,7 +5,7 @@ import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 
 import { TextTip } from '@@/Tip/TextTip';
 
-import { withEdition } from '../portainer/feature-flags/withEdition';
+import { withEdition } from '../feature-flags/withEdition';
 
 const TimeWindowDisplayWrapper = withEdition(TimeWindowDisplay, 'BE');
 

@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { rest } from 'msw';
 
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
-import { GitCredential } from '@/portainer/views/account/git-credential/types';
+import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 
 import { GitForm, buildGitValidationSchema } from './GitForm';
 import { GitFormModel } from './types';

@@ -1,4 +1,4 @@
-import { tlsOptions } from './tls-options';
+import { tlsOptions } from '@/react/portainer/environments/ItemView/tls-options';
 
 angular.module('portainer.app').controller('porEndpointSecurityController', [
   '$scope',

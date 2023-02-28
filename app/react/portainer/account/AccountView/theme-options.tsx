@@ -1,33 +1,32 @@
-import Lightmode from '@/assets/ico/theme/lightmode.svg?c';
-import Darkmode from '@/assets/ico/theme/darkmode.svg?c';
-import Highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
-import Automode from '@/assets/ico/theme/auto.svg?c';
+import { Eye, Moon, Sun, RefreshCw } from 'lucide-react';
+
+import { BadgeIcon } from '@@/BadgeIcon';
 
 export const options = [
   {
     id: 'light',
-    icon: Lightmode,
+    icon: <BadgeIcon icon={Sun} />,
     label: 'Light Theme',
     description: 'Default color mode',
     value: 'light',
   },
   {
     id: 'dark',
-    icon: Darkmode,
+    icon: <BadgeIcon icon={Moon} />,
     label: 'Dark Theme',
     description: 'Dark color mode',
     value: 'dark',
   },
   {
     id: 'highcontrast',
-    icon: Highcontrastmode,
+    icon: <BadgeIcon icon={Eye} />,
     label: 'High Contrast',
     description: 'High contrast color mode',
     value: 'highcontrast',
   },
   {
     id: 'auto',
-    icon: Automode,
+    icon: <BadgeIcon icon={RefreshCw} />,
     label: 'Auto',
     description: 'Sync with system theme',
     value: 'auto',
