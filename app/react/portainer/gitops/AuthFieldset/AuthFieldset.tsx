@@ -3,7 +3,7 @@ import { boolean, number, object, SchemaOf, string } from 'yup';
 
 import { GitAuthModel } from '@/react/portainer/gitops/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
-import { GitCredential } from '@/portainer/views/account/git-credential/types';
+import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 import { Input } from '@@/form-components/Input';

@@ -1,5 +1,5 @@
-import { useGitCredentials } from '@/portainer/views/account/git-credential/gitCredential.service';
-import { GitCredential } from '@/portainer/views/account/git-credential/types';
+import { GitCredential } from '@/react/portainer/account/git-credentials/types';
+import { useGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
 import { useUser } from '@/react/hooks/useUser';
 
 import { FormControl } from '@@/form-components/FormControl';

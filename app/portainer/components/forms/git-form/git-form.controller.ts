@@ -5,8 +5,8 @@ import { GitFormModel } from '@/react/portainer/gitops/types';
 import { validateGitForm } from '@/react/portainer/gitops/GitForm';
 import { notifyError } from '@/portainer/services/notifications';
 import { IAuthenticationService } from '@/portainer/services/types';
-import { getGitCredentials } from '@/portainer/views/account/git-credential/gitCredential.service';
-import { GitCredential } from '@/portainer/views/account/git-credential/types';
+import { getGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
+import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 export default class GitFormController {
