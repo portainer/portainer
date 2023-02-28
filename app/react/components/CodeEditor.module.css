@@ -1,0 +1,12 @@
+.root :global(.cm-editor .cm-gutters) {
+  border-right: 0px;
+}
+
+.root :global(.cm-editor .cm-gutters .cm-lineNumbers .cm-gutterElement) {
+  text-align: left;
+}
+
+.root :global(.cm-editor),
+.root :global(.cm-editor .cm-scroller) {
+  border-radius: 8px;
+}
