@@ -72,7 +72,7 @@ export const newEnvironmentTypes: EnvironmentOption[] = [
   {
     id: 'kaas',
     value: 'kaas',
-    label: 'KaaS',
+    label: 'Provision KaaS Cluster',
     description: 'Provision a Kubernetes environment with a cloud provider',
     icon: KaaS,
     iconType: 'logo',
