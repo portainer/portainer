@@ -207,15 +207,21 @@ type (
 		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
-	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	// DockerContainerSnapshot is an extent of Docker's Container struct
+	// It contains some information of Docker's ContainerJSON struct
+	DockerContainerSnapshot struct {
+		types.Container
+		Env []string `json:"Env"`
+	}
 
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
-		Containers []types.Container       `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody `json:"Volumes" swaggerignore:"true"`
-		Networks   []types.NetworkResource `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary    `json:"Images" swaggerignore:"true"`
-		Info       types.Info              `json:"Info" swaggerignore:"true"`
-		Version    types.Version           `json:"Version" swaggerignore:"true"`
+		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
+		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
+		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
+		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 
 	// EdgeGroup represents an Edge group
