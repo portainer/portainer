@@ -1,25 +1,51 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
+import { Loader2 } from 'lucide-react';
 
 import { Icon, IconProps } from '@/react/components/Icon';
 import { pluralize } from '@/portainer/helpers/strings';
 
+import { Link } from '@@/Link';
+
 interface Props extends IconProps {
-  value?: number;
   type: string;
+  pluralType?: string; // in case the pluralise function isn't suitable
+  isLoading?: boolean;
+  isRefetching?: boolean;
+  value?: number;
+  to?: string;
   children?: ReactNode;
 }
 
-export function DashboardItem({ value, icon, type, children }: Props) {
-  return (
+export function DashboardItem({
+  icon,
+  type,
+  pluralType,
+  isLoading,
+  isRefetching,
+  value,
+  to,
+  children,
+}: Props) {
+  const Item = (
     <div
       className={clsx(
-        'rounded-lg border border-solid p-3',
+        'relative rounded-lg border border-solid p-3',
         'border-gray-5 bg-gray-2 hover:border-blue-7 hover:bg-blue-2',
         'th-dark:border-gray-neutral-8 th-dark:bg-gray-iron-10 th-dark:hover:border-blue-8 th-dark:hover:bg-gray-10',
         'th-highcontrast:border-white th-highcontrast:bg-black th-highcontrast:hover:border-blue-8 th-highcontrast:hover:bg-gray-11'
       )}
     >
+      <div
+        className={clsx(
+          'text-muted absolute top-2 right-2 flex items-center transition-opacity',
+          isRefetching || isLoading ? 'opacity-100' : 'opacity-0'
+        )}
+      >
+        {isRefetching && 'Refreshing total'}
+        {isLoading && 'Loading total'}
+        <Loader2 className="h-4 animate-spin-slow" />
+      </div>
       <div className="flex items-center" aria-label={type}>
         <div
           className={clsx(
@@ -42,7 +68,7 @@ export function DashboardItem({ value, icon, type, children }: Props) {
             )}
             aria-label="value"
           >
-            {typeof value !== 'undefined' ? value : '-'}
+            {typeof value === 'undefined' ? '-' : value}
           </div>
           <div
             className={clsx(
@@ -53,7 +79,7 @@ export function DashboardItem({ value, icon, type, children }: Props) {
             )}
             aria-label="resourceType"
           >
-            {pluralize(value || 0, type)}
+            {pluralize(value || 0, type, pluralType)}
           </div>
         </div>
 
@@ -61,4 +87,13 @@ export function DashboardItem({ value, icon, type, children }: Props) {
       </div>
     </div>
   );
+
+  if (to) {
+    return (
+      <Link to={to} className="!no-underline">
+        {Item}
+      </Link>
+    );
+  }
+  return Item;
 }

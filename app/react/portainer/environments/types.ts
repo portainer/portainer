@@ -50,8 +50,16 @@ export type IngressClass = {
   Type: string;
 };
 
+interface StorageClass {
+  Name: string;
+  AccessModes: string[];
+  AllowVolumeExpansion: boolean;
+  Provisioner: string;
+}
+
 export interface KubernetesConfiguration {
   UseLoadBalancer?: boolean;
+  StorageClasses?: StorageClass[];
   UseServerMetrics?: boolean;
   EnableResourceOverCommit?: boolean;
   ResourceOverCommitPercentage?: number;

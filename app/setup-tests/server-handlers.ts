@@ -17,8 +17,8 @@ import { dockerHandlers } from './setup-handlers/docker';
 import { userHandlers } from './setup-handlers/users';
 
 const tags: Tag[] = [
-  { ID: 1, Name: 'tag1' },
-  { ID: 2, Name: 'tag2' },
+  { ID: 1, Name: 'tag1', Endpoints: {} },
+  { ID: 2, Name: 'tag2', Endpoints: {} },
 ];
 
 const licenseInfo: LicenseInfo = {
@@ -68,7 +68,7 @@ export const handlers = [
   rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags))),
   rest.post<{ name: string }>('/api/tags', (req, res, ctx) => {
     const tagName = req.body.name;
-    const tag = { ID: tags.length + 1, Name: tagName };
+    const tag = { ID: tags.length + 1, Name: tagName, Endpoints: {} };
     tags.push(tag);
     return res(ctx.json(tag));
   }),

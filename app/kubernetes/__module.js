@@ -36,8 +36,6 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             if (endpoint.Type === 7 && endpoint.Status === 2) {
               throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
             }
-
-            await KubernetesNamespaceService.get();
           } catch (e) {
             Notifications.error('Failed loading environment', e);
             $state.go('portainer.home', {}, { reload: true });
