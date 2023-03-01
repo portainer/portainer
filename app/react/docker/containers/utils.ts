@@ -37,7 +37,7 @@ export function parseViewModel(
     )
   );
 
-  const names = response.Names.map((n) => {
+  const names = response.Names?.map((n) => {
     const nameWithoutSlash = n[0] === '/' ? n.slice(1) : n;
     return nameWithoutSlash;
   });
