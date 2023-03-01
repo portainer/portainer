@@ -33,6 +33,7 @@ import { customTemplatesModule } from './custom-templates';
 import { gitFormModule } from './git-form';
 import { settingsModule } from './settings';
 import { accessControlModule } from './access-control';
+import { environmentsModule } from './envronments';
 
 export const componentsModule = angular
   .module('portainer.app.react.components', [
@@ -40,6 +41,7 @@ export const componentsModule = angular
     gitFormModule,
     settingsModule,
     accessControlModule,
+    environmentsModule,
   ])
   .component(
     'tagSelector',
