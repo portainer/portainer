@@ -17,7 +17,7 @@ import { useSearchBarState } from '@@/datatables/SearchBar';
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 
 import '../style.css';
 
@@ -38,7 +38,6 @@ export function IngressDatatable() {
     Object.keys(nsResult?.data || {})
   );
 
-  const columns = useColumns();
   const deleteIngressesMutation = useDeleteIngresses();
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);

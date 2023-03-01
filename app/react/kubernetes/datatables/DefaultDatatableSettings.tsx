@@ -31,17 +31,23 @@ export function systemResourcesSettings(
 
 interface Props {
   settings: TableSettings;
+  hideShowSystemResources?: boolean;
 }
 
-export function DefaultDatatableSettings({ settings }: Props) {
+export function DefaultDatatableSettings({
+  settings,
+  hideShowSystemResources = false,
+}: Props) {
   return (
     <>
-      <Checkbox
-        id="show-system-resources"
-        label="Show system resources"
-        checked={settings.showSystemResources}
-        onChange={(e) => settings.setShowSystemResources(e.target.checked)}
-      />
+      {!hideShowSystemResources && (
+        <Checkbox
+          id="show-system-resources"
+          label="Show system resources"
+          checked={settings.showSystemResources}
+          onChange={(e) => settings.setShowSystemResources(e.target.checked)}
+        />
+      )}
       <TableSettingsMenuAutoRefresh
         value={settings.autoRefreshRate}
         onChange={handleRefreshRateChange}

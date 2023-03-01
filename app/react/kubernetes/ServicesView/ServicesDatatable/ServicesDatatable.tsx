@@ -34,7 +34,10 @@ export function ServicesDatatable() {
 
   const [search, setSearch] = useSearchBarState(storageKey);
   const columns = useColumns();
-  const isSelectEnabled = useAuthorizations(['K8sServiceW']);
+  const serviceWriteable = useAuthorizations(['K8sServiceW']);
+  const accessSystemNamespaces = useAuthorizations([
+    'K8sAccessSystemNamespaces',
+  ]);
 
   const filteredServices =
     servicesQuery.data?.filter(
@@ -55,7 +58,7 @@ export function ServicesDatatable() {
       isRowSelectable={(row) =>
         !KubernetesNamespaceHelper.isSystemNamespace(row.values.namespace)
       }
-      disableSelect={!isSelectEnabled}
+      disableSelect={!serviceWriteable}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}
@@ -67,12 +70,17 @@ export function ServicesDatatable() {
       onSearchChange={setSearch}
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings settings={settings} />
+          <DefaultDatatableSettings
+            settings={settings}
+            hideShowSystemResources={!accessSystemNamespaces}
+          />
         </TableSettingsMenu>
       )}
       description={
         <ServicesDatatableDescription
-          showSystemResources={settings.showSystemResources}
+          showSystemResources={
+            settings.showSystemResources || !accessSystemNamespaces
+          }
         />
       }
       renderRow={servicesRenderRow}
