@@ -72,7 +72,7 @@
       "LastCheckInDate": 0,
       "Name": "local",
       "PostInitMigrations": {
-        "MigrateGPUs": false,
+        "MigrateGPUs": true,
         "MigrateIngresses": true
       },
       "PublicURL": "",
