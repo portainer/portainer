@@ -96,13 +96,13 @@ function createStatus(statusText = ''): ContainerStatus {
 }
 
 export function useShowGPUsColumn(environmentID: EnvironmentId) {
-  const isDockerQuery = useInfo(
+  const isDockerStandaloneQuery = useInfo(
     environmentID,
-    (info) => !(!!info.Swarm?.NodeID && !!info.Swarm?.ControlAvailable) // is not a swarm environment, therefore docker
+    (info) => !(!!info.Swarm?.NodeID && !!info.Swarm?.ControlAvailable) // is not a swarm environment, therefore docker standalone
   );
   const enableGPUManagementQuery = useEnvironment(
     environmentID,
     (env) => env?.EnableGPUManagement
   );
-  return isDockerQuery.data && enableGPUManagementQuery.data;
+  return isDockerStandaloneQuery.data && enableGPUManagementQuery.data;
 }

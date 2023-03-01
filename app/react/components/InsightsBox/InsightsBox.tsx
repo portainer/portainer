@@ -22,13 +22,8 @@ export function InsightsBox({
   insightCloseId,
 }: Props) {
   // allow to close the box and not show it again in local storage with zustand
-  const { insightIDsClosed, addInsightIDClosed } = useStore(insightStore);
-  const isInsightClosed = useMemo(() => {
-    if (insightCloseId) {
-      return insightIDsClosed.includes(insightCloseId);
-    }
-    return false;
-  }, [insightCloseId, insightIDsClosed]);
+  const { addInsightIDClosed, isClosed } = useStore(insightStore);
+  const isInsightClosed = isClosed(insightCloseId);
 
   // allow angular views to set html messages for the insights box
   const htmlContent = useMemo(() => {
