@@ -10,6 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/rs/zerolog/log"
 )
 
 // @id CustomTemplateDelete
@@ -61,7 +62,7 @@ func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Requ
 
 	err = handler.FileService.RemoveDirectory(customTemplate.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to remove custom template files from disk", err)
+		log.Warn().Err(err).Msg("Unable to remove custom template files from disk")
 	}
 
 	if resourceControl != nil {
