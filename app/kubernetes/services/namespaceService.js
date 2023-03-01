@@ -94,13 +94,6 @@ class KubernetesNamespaceService {
     }
   }
 
-  async refreshCacheAsync() {
-    this.LocalStorage.deleteAllowedNamespaces();
-    const allowedNamespaces = await this.getAllAsync();
-    this.LocalStorage.storeAllowedNamespaces(allowedNamespaces);
-    return allowedNamespaces;
-  }
-
   /**
    * CREATE
    */
