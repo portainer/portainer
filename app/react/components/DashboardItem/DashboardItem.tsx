@@ -39,11 +39,19 @@ export function DashboardItem({
       <div
         className={clsx(
           'text-muted absolute top-2 right-2 flex items-center transition-opacity',
-          isRefetching || isLoading ? 'opacity-100' : 'opacity-0'
+          isRefetching ? 'opacity-100' : 'opacity-0'
         )}
       >
-        {isRefetching && 'Refreshing total'}
-        {isLoading && 'Loading total'}
+        Refreshing total
+        <Loader2 className="h-4 animate-spin-slow" />
+      </div>
+      <div
+        className={clsx(
+          'text-muted absolute top-2 right-2 flex items-center transition-opacity',
+          isLoading ? 'opacity-100' : 'opacity-0'
+        )}
+      >
+        Loading total
         <Loader2 className="h-4 animate-spin-slow" />
       </div>
       <div className="flex items-center" aria-label={type}>
