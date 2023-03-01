@@ -7,6 +7,7 @@ import {
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
 import { ChangeEvent } from 'react';
+import clsx from 'clsx';
 
 import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
 import { useDebounce } from '@/react/hooks/useDebounce';
@@ -65,7 +66,10 @@ export function PathSelector({
               <ComboboxOption
                 key={index}
                 value={result}
-                className={`[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`}
+                className={clsx(
+                  `[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`,
+                  'th-highcontrast:bg-gray-10 th-dark:bg-gray-10'
+                )}
               />
             ))}
           </ComboboxList>

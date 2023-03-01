@@ -16,6 +16,8 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
 import { useCachedValidation } from '@@/form-components/useCachedTest';
 
+import { isBE } from '../feature-flags/feature-flags.service';
+
 import { GitFormModel } from './types';
 import { getAuthentication } from './utils';
 
@@ -43,6 +45,8 @@ export function GitFormUrlField({
       onChangeRepositoryValid(!!isValid);
       setForce(false);
     },
+    // disabled check on CE since it's not supported
+    enabled: isBE,
   });
 
   const [debouncedValue, debouncedOnChange] = useDebounce(value, onChange);
