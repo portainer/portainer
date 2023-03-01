@@ -60,7 +60,7 @@ function getConfigRoute(environment: Environment) {
     case PlatformType.Docker:
       return getDockerConfigRoute(environment);
     case PlatformType.Kubernetes:
-      return 'kubernetes.cluster';
+      return 'kubernetes.cluster.setup';
     default:
       return '';
   }

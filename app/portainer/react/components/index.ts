@@ -57,6 +57,7 @@ export const componentsModule = angular
       'buttonText',
       'className',
       'icon',
+      'buttonClassName',
     ])
   )
   .component(

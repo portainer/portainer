@@ -1,7 +1,7 @@
 <!-- use registry -->
 <div class="row">
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> Registry </label>
+    <label for="image_registry" class="control-label col-sm-3 col-lg-2 required text-left" ng-class="$ctrl.labelClass"> Registry </label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <select
         ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
