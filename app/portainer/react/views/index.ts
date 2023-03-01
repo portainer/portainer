@@ -8,6 +8,7 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { CreateAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
 import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeView/EdgeComputeSettingsView';
 import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
+import { EdgeAutoCreateScriptView } from '@/react/portainer/environments/EdgeAutoCreateScriptView';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -22,6 +23,13 @@ export const viewsModule = angular
   .component(
     'homeView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(HomeView))), [])
+  )
+  .component(
+    'edgeAutoCreateScriptView',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(EdgeAutoCreateScriptView))),
+      []
+    )
   )
   .component(
     'createAccessToken',

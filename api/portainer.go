@@ -382,16 +382,7 @@ type (
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
 
-		Edge struct {
-			// Whether the device has been started in edge async mode
-			AsyncMode bool
-			// The ping interval for edge agent - used in edge async mode [seconds]
-			PingInterval int `json:"PingInterval" example:"60"`
-			// The snapshot interval for edge agent - used in edge async mode [seconds]
-			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
-			// The command list interval for edge agent - used in edge async mode [seconds]
-			CommandInterval int `json:"CommandInterval" example:"60"`
-		}
+		Edge EnvironmentEdgeSettings
 
 		Agent struct {
 			Version string `example:"1.0.0"`
@@ -410,6 +401,17 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+	}
+
+	EnvironmentEdgeSettings struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -917,7 +919,8 @@ type (
 			PingInterval int `json:"PingInterval" example:"5"`
 			// The snapshot interval for edge agent - used in edge async mode (in seconds)
 			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-			// EdgeAsyncMode enables edge async mode by default
+
+			// Deprecated 2.18
 			AsyncMode bool
 		}
 

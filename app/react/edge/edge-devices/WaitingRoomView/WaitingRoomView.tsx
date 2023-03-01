@@ -12,7 +12,6 @@ export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
   const { environments, isLoading, totalCount } = useEnvironmentList({
-    edgeDevice: true,
     edgeDeviceUntrusted: true,
     excludeSnapshots: true,
     types: EdgeTypes,

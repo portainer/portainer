@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { Zap, Cloud, UploadCloud } from 'lucide-react';
+import { Zap, UploadCloud } from 'lucide-react';
+import _ from 'lodash';
 
-import {
-  Environment,
-  EnvironmentCreationTypes,
-} from '@/react/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
+import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BoxSelector } from '@@/BoxSelector';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
-import { BadgeIcon } from '@@/BadgeIcon';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -24,37 +24,50 @@ interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
 }
 
-const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
+type CreationType =
+  | 'agent'
+  | 'edgeAgentStandard'
+  | 'edgeAgentAsync'
+  | 'kubeconfig';
+
+const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
   {
     id: 'agent_endpoint',
-    icon: <BadgeIcon icon={Zap} size="3xl" />,
+    icon: Zap,
+    iconType: 'badge',
     label: 'Agent',
-    value: EnvironmentCreationTypes.AgentEnvironment,
+    value: 'agent',
     description: '',
   },
   {
-    id: 'edgeAgent',
-    icon: <BadgeIcon icon={Cloud} size="3xl" />,
-    label: 'Edge Agent',
+    id: 'edgeAgentStandard',
+    icon: EdgeAgentStandardIcon,
+    iconType: 'badge',
+    label: 'Edge Agent Standard',
     description: '',
-    value: EnvironmentCreationTypes.EdgeAgentEnvironment,
-    hide: window.ddExtension,
+    value: 'edgeAgentStandard',
+  },
+  isBE && {
+    id: 'edgeAgentAsync',
+    icon: EdgeAgentAsyncIcon,
+    iconType: 'badge',
+    label: 'Edge Agent Async',
+    description: '',
+    value: 'edgeAgentAsync',
   },
   {
     id: 'kubeconfig_endpoint',
-    icon: <BadgeIcon icon={UploadCloud} size="3xl" />,
+    icon: UploadCloud,
+    iconType: 'badge',
     label: 'Import',
-    value: EnvironmentCreationTypes.KubeConfigEnvironment,
+    value: 'kubeconfig',
     description: 'Import an existing Kubernetes config',
     feature: FeatureId.K8S_CREATE_FROM_KUBECONFIG,
   },
-];
+]);
 
 export function WizardKubernetes({ onCreate }: Props) {
-  const options = useFilterEdgeOptionsIfNeeded(
-    defaultOptions,
-    EnvironmentCreationTypes.EdgeAgentEnvironment
-  );
+  const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'agent');
 
   const [creationType, setCreationType] = useState(options[0].value);
 
@@ -73,24 +86,34 @@ export function WizardKubernetes({ onCreate }: Props) {
     </div>
   );
 
-  function getTab(type: typeof options[number]['value']) {
+  function getTab(type: CreationType) {
     switch (type) {
-      case EnvironmentCreationTypes.AgentEnvironment:
+      case 'agent':
         return (
           <AgentPanel
             onCreate={(environment) => onCreate(environment, 'kubernetesAgent')}
           />
         );
-      case EnvironmentCreationTypes.EdgeAgentEnvironment:
+      case 'edgeAgentStandard':
         return (
           <EdgeAgentTab
             onCreate={(environment) =>
-              onCreate(environment, 'kubernetesEdgeAgent')
+              onCreate(environment, 'kubernetesEdgeAgentStandard')
             }
             commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
           />
         );
-      case EnvironmentCreationTypes.KubeConfigEnvironment:
+      case 'edgeAgentAsync':
+        return (
+          <EdgeAgentTab
+            asyncMode
+            onCreate={(environment) =>
+              onCreate(environment, 'kubernetesEdgeAgentAsync')
+            }
+            commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
+          />
+        );
+      case 'kubeconfig':
         return (
           <div className="border border-solid border-orange-1 px-1 py-5">
             <BEFeatureIndicator
