@@ -65,7 +65,6 @@ func NewAzureClient() *azureClient {
 
 func newHttpClientForAzure() *http.Client {
 	tlsConfig := crypto.CreateTLSConfiguration()
-	tlsConfig.InsecureSkipVerify = true
 
 	httpsCli := &http.Client{
 		Transport: &http.Transport{
