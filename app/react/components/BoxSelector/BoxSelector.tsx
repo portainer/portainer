@@ -29,7 +29,7 @@ export function BoxSelector<T extends Value>({
   ...props
 }: Props<T>) {
   return (
-    <div className="form-group">
+    <div className='form-group after:clear-both after:table after:content-[""]'>
       <div className="col-sm-12">
         <div className={styles.root} role="radiogroup">
           {options

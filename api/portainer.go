@@ -207,15 +207,21 @@ type (
 		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
-	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	// DockerContainerSnapshot is an extent of Docker's Container struct
+	// It contains some information of Docker's ContainerJSON struct
+	DockerContainerSnapshot struct {
+		types.Container
+		Env []string `json:"Env"`
+	}
 
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
-		Containers []types.Container       `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody `json:"Volumes" swaggerignore:"true"`
-		Networks   []types.NetworkResource `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary    `json:"Images" swaggerignore:"true"`
-		Info       types.Info              `json:"Info" swaggerignore:"true"`
-		Version    types.Version           `json:"Version" swaggerignore:"true"`
+		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
+		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
+		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
+		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -376,16 +382,7 @@ type (
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
 
-		Edge struct {
-			// Whether the device has been started in edge async mode
-			AsyncMode bool
-			// The ping interval for edge agent - used in edge async mode [seconds]
-			PingInterval int `json:"PingInterval" example:"60"`
-			// The snapshot interval for edge agent - used in edge async mode [seconds]
-			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
-			// The command list interval for edge agent - used in edge async mode [seconds]
-			CommandInterval int `json:"CommandInterval" example:"60"`
-		}
+		Edge EnvironmentEdgeSettings
 
 		Agent struct {
 			Version string `example:"1.0.0"`
@@ -406,6 +403,17 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+	}
+
+	EnvironmentEdgeSettings struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -914,7 +922,8 @@ type (
 			PingInterval int `json:"PingInterval" example:"5"`
 			// The snapshot interval for edge agent - used in edge async mode (in seconds)
 			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-			// EdgeAsyncMode enables edge async mode by default
+
+			// Deprecated 2.18
 			AsyncMode bool
 		}
 

@@ -60,6 +60,7 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
         <FormControl label="Selected tags">
           {selectedTags.map((tag) => (
             <TagButton
+              key={tag.value}
               title="Remove tag"
               value={tag.value}
               label={tag.label}

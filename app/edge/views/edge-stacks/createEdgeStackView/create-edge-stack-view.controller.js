@@ -1,6 +1,7 @@
 import { EditorType } from '@/react/edge/edge-stacks/types';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
+import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 export default class CreateEdgeStackViewController {
@@ -37,6 +38,8 @@ export default class CreateEdgeStackViewController {
     };
 
     this.edgeGroups = null;
+
+    $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
 
     this.createStack = this.createStack.bind(this);
     this.validateForm = this.validateForm.bind(this);

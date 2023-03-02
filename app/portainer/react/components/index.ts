@@ -34,6 +34,7 @@ import { gitFormModule } from './git-form';
 import { settingsModule } from './settings';
 import { accessControlModule } from './access-control';
 import { environmentsModule } from './envronments';
+import { envListModule } from './enviroments-list-view-components';
 
 export const componentsModule = angular
   .module('portainer.app.react.components', [
@@ -42,6 +43,7 @@ export const componentsModule = angular
     settingsModule,
     accessControlModule,
     environmentsModule,
+    envListModule,
   ])
   .component(
     'tagSelector',

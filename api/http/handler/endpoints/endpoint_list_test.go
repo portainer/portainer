@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/testhelpers"
-	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -104,59 +103,58 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 	}
 }
 
-func Test_endpointList_edgeDeviceFilter(t *testing.T) {
+func Test_endpointList_edgeFilter(t *testing.T) {
 
-	trustedEdgeDevice := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	untrustedEdgeDevice := portainer.Endpoint{ID: 2, UserTrusted: false, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	regularUntrustedEdgeEndpoint := portainer.Endpoint{ID: 3, UserTrusted: false, IsEdgeDevice: false, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	regularTrustedEdgeEndpoint := portainer.Endpoint{ID: 4, UserTrusted: true, IsEdgeDevice: false, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	regularEndpoint := portainer.Endpoint{ID: 5, UserTrusted: false, IsEdgeDevice: false, GroupID: 1, Type: portainer.DockerEnvironment}
+	trustedEdgeAsync := portainer.Endpoint{ID: 1, UserTrusted: true, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: true}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	untrustedEdgeAsync := portainer.Endpoint{ID: 2, UserTrusted: false, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: true}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	regularUntrustedEdgeStandard := portainer.Endpoint{ID: 3, UserTrusted: false, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: false}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	regularTrustedEdgeStandard := portainer.Endpoint{ID: 4, UserTrusted: true, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: false}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	regularEndpoint := portainer.Endpoint{ID: 5, GroupID: 1, Type: portainer.DockerEnvironment}
 
 	handler, teardown := setup(t, []portainer.Endpoint{
-		trustedEdgeDevice,
-		untrustedEdgeDevice,
-		regularUntrustedEdgeEndpoint,
-		regularTrustedEdgeEndpoint,
+		trustedEdgeAsync,
+		untrustedEdgeAsync,
+		regularUntrustedEdgeStandard,
+		regularTrustedEdgeStandard,
 		regularEndpoint,
 	})
 
 	defer teardown()
 
-	type endpointListEdgeDeviceTest struct {
+	type endpointListEdgeTest struct {
 		endpointListTest
-		edgeDevice          *bool
+		edgeAsync           *bool
 		edgeDeviceUntrusted bool
 	}
 
-	tests := []endpointListEdgeDeviceTest{
+	tests := []endpointListEdgeTest{
 		{
 			endpointListTest: endpointListTest{
-				"should show all endpoints except of the untrusted devices",
-				[]portainer.EndpointID{trustedEdgeDevice.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID, regularEndpoint.ID},
+				"should show all endpoints expect of the untrusted devices",
+				[]portainer.EndpointID{trustedEdgeAsync.ID, regularTrustedEdgeStandard.ID, regularEndpoint.ID},
 			},
-			edgeDevice: nil,
 		},
 		{
 			endpointListTest: endpointListTest{
-				"should show only trusted edge devices and regular endpoints",
-				[]portainer.EndpointID{trustedEdgeDevice.ID, regularEndpoint.ID},
+				"should show only trusted edge async agents and regular endpoints",
+				[]portainer.EndpointID{trustedEdgeAsync.ID, regularEndpoint.ID},
 			},
-			edgeDevice: BoolAddr(true),
+			edgeAsync: BoolAddr(true),
 		},
 		{
 			endpointListTest: endpointListTest{
 				"should show only untrusted edge devices and regular endpoints",
-				[]portainer.EndpointID{untrustedEdgeDevice.ID, regularEndpoint.ID},
+				[]portainer.EndpointID{untrustedEdgeAsync.ID, regularEndpoint.ID},
 			},
-			edgeDevice:          BoolAddr(true),
+			edgeAsync:           BoolAddr(true),
 			edgeDeviceUntrusted: true,
 		},
 		{
 			endpointListTest: endpointListTest{
 				"should show no edge devices",
-				[]portainer.EndpointID{regularEndpoint.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
+				[]portainer.EndpointID{regularEndpoint.ID, regularTrustedEdgeStandard.ID},
 			},
-			edgeDevice: BoolAddr(false),
+			edgeAsync: BoolAddr(false),
 		},
 	}
 
@@ -165,8 +163,8 @@ func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 			is := assert.New(t)
 
 			query := fmt.Sprintf("edgeDeviceUntrusted=%v&", test.edgeDeviceUntrusted)
-			if test.edgeDevice != nil {
-				query += fmt.Sprintf("edgeDevice=%v&", *test.edgeDevice)
+			if test.edgeAsync != nil {
+				query += fmt.Sprintf("edgeAsync=%v&", *test.edgeAsync)
 			}
 
 			req := buildEndpointListRequest(query)
@@ -198,7 +196,7 @@ func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, tear
 	err := store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "error creating a user")
 
-	bouncer := helper.NewTestRequestBouncer()
+	bouncer := testhelpers.NewTestRequestBouncer()
 	handler = NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()

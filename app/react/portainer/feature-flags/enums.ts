@@ -28,6 +28,7 @@ export enum FeatureId {
   ACTIVITY_AUDIT = 'activity-audit',
   FORCE_REDEPLOYMENT = 'force-redeployment',
   HIDE_AUTO_UPDATE_WINDOW = 'hide-auto-update-window',
+  IMAGE_UP_TO_DATE_INDICATOR = 'image-up-to-date-indicator',
   STACK_PULL_IMAGE = 'stack-pull-image',
   STACK_WEBHOOK = 'stack-webhook',
   CONTAINER_WEBHOOK = 'container-webhook',
