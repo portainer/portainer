@@ -29,7 +29,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
     EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
     EdgePortainerUrl: settings.EdgePortainerUrl,
     Edge: {
-      TunnelServerAddress: settings.Edge.TunnelServerAddress,
+      TunnelServerAddress: settings.Edge?.TunnelServerAddress,
     },
     EnforceEdgeID: settings.EnforceEdgeID,
   };
