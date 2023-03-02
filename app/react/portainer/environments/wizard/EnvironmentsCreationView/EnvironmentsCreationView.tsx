@@ -19,10 +19,10 @@ import { FormSection } from '@@/form-components/FormSection';
 import { Icon } from '@@/Icon';
 
 import {
+  EnvironmentOptionValue,
   environmentTypes,
   formTitles,
 } from '../EnvironmentTypeSelectView/environment-types';
-import { EnvironmentSelectorValue } from '../EnvironmentTypeSelectView/EnvironmentSelector';
 
 import { WizardDocker } from './WizardDocker';
 import { WizardAzure } from './WizardAzure';
@@ -138,7 +138,7 @@ export function EnvironmentCreationView() {
   }
 }
 
-function useParamEnvironmentTypes(): EnvironmentSelectorValue[] {
+function useParamEnvironmentTypes(): EnvironmentOptionValue[] {
   const {
     params: { envType },
   } = useCurrentStateAndParams();
@@ -185,7 +185,7 @@ function useStepper(
     setCurrentStepIndex(currentStepIndex - 1);
   }
 
-  function getComponent(id: EnvironmentSelectorValue) {
+  function getComponent(id: EnvironmentOptionValue) {
     switch (id) {
       case 'dockerStandalone':
       case 'dockerSwarm':

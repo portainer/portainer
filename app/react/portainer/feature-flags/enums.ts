@@ -38,5 +38,6 @@ export enum FeatureId {
   ENFORCE_DEPLOYMENT_OPTIONS = 'k8s-enforce-deployment-options',
   K8S_ADM_ONLY_USR_INGRESS_DEPLY = 'k8s-admin-only-ingress-deploy',
   K8S_ROLLING_RESTART = 'k8s-rolling-restart',
+  K8SINSTALL = 'k8s-install',
   K8S_ANNOTATIONS = 'k8s-annotations',
 }

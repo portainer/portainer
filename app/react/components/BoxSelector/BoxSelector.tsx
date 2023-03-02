@@ -20,12 +20,14 @@ export type Props<T extends Value> = Union<T> & {
   radioName: string;
   options: ReadonlyArray<BoxSelectorOption<T>> | Array<BoxSelectorOption<T>>;
   slim?: boolean;
+  hiddenSpacingCount?: number;
 };
 
 export function BoxSelector<T extends Value>({
   radioName,
   options,
   slim = false,
+  hiddenSpacingCount,
   ...props
 }: Props<T>) {
   return (
@@ -46,6 +48,10 @@ export function BoxSelector<T extends Value>({
                 isSelected={isSelected}
                 slim={slim}
               />
+            ))}
+          {hiddenSpacingCount &&
+            Array.from(Array(hiddenSpacingCount)).map((_, index) => (
+              <div key={index} className="flex-1" />
             ))}
         </div>
       </div>

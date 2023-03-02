@@ -19,6 +19,7 @@ export async function init(edition: Edition) {
     [FeatureId.K8S_RESOURCE_POOL_STORAGE_QUOTA]: Edition.BE,
     [FeatureId.K8S_CREATE_FROM_KUBECONFIG]: Edition.BE,
     [FeatureId.KAAS_PROVISIONING]: Edition.BE,
+    [FeatureId.K8SINSTALL]: Edition.BE,
     [FeatureId.NOMAD]: Edition.BE,
     [FeatureId.ACTIVITY_AUDIT]: Edition.BE,
     [FeatureId.EXTERNAL_AUTH_LDAP]: Edition.BE,
