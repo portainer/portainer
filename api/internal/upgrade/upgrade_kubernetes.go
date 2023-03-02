@@ -12,7 +12,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/client-go/kubernetes/typed/batch/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 func ptr[T any](i T) *T { return &i }
@@ -42,7 +42,7 @@ func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licen
 
 	image := fmt.Sprintf("%s:%s", portainerImagePrefix, version)
 
-	if err := service.checkImageForKubernetes(ctx, jobsCli, image); err != nil {
+	if err := service.checkImageForKubernetes(ctx, kubeCLI, namespace, image); err != nil {
 		return err
 	}
 
@@ -119,60 +119,83 @@ func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licen
 
 }
 
-func (service *service) checkImageForKubernetes(ctx context.Context, jobsCli v1.JobInterface, image string) error {
-	job, err := jobsCli.Create(ctx, &batchv1.Job{
+func (service *service) checkImageForKubernetes(ctx context.Context, kubeCLI *kubernetes.Clientset, namespace, image string) error {
+	podsCli := kubeCLI.CoreV1().Pods(namespace)
+
+	log.Debug().
+		Str("image", image).
+		Msg("Checking image")
+
+	podName := fmt.Sprintf("portainer-image-check-%d", time.Now().Unix())
+	_, err := podsCli.Create(ctx, &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "portainer-upgrade-image-check",
+			Name: podName,
 		},
-		Spec: batchv1.JobSpec{
-			TTLSecondsAfterFinished: ptr[int32](5 * 60), // cleanup after 5 minutes
-			BackoffLimit:            ptr[int32](0),
-			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{
-					RestartPolicy: "Never",
-					Containers: []corev1.Container{
-						{
-							Name:  "portainer-upgrade-image-check",
-							Image: image,
-						},
-					},
+		Spec: corev1.PodSpec{
+			RestartPolicy: "Never",
+
+			Containers: []corev1.Container{
+				{
+					Name:  fmt.Sprint(podName, "-container"),
+					Image: image,
 				},
 			},
 		},
 	}, metav1.CreateOptions{})
+
 	if err != nil {
-		return errors.WithMessage(err, "failed to create image check job")
+		log.Warn().Err(err).Msg("failed to create image check pod")
+		return errors.WithMessage(err, "failed to create image check pod")
 	}
 
-	watcher, err := jobsCli.Watch(ctx, metav1.ListOptions{
-		FieldSelector:  "metadata.name=" + job.Name,
-		TimeoutSeconds: ptr[int64](60),
-	})
-	if err != nil {
-		return errors.WithMessage(err, "failed to watch image check job")
-	}
+	defer func() {
+		log.Debug().
+			Str("pod", podName).
+			Msg("Deleting image check pod")
 
-	for event := range watcher.ResultChan() {
-		job, ok := event.Object.(*batchv1.Job)
-		if !ok {
-			continue
+		if err := podsCli.Delete(ctx, podName, metav1.DeleteOptions{}); err != nil {
+			log.Warn().Err(err).Msg("failed to delete image check pod")
+		}
+	}()
+
+	i := 0
+	for {
+		time.Sleep(2 * time.Second)
+
+		log.Debug().
+			Str("image", image).
+			Int("try", i).
+			Msg("Checking image")
+
+		i++
+
+		pod, err := podsCli.Get(ctx, podName, metav1.GetOptions{})
+		if err != nil {
+			return errors.WithMessage(err, "failed to get image check pod")
 		}
 
-		for _, c := range job.Status.Conditions {
-			if c.Type == batchv1.JobComplete {
+		for _, containerStatus := range pod.Status.ContainerStatuses {
+			if containerStatus.Ready {
 				log.Debug().
-					Str("job", job.Name).
-					Msg("image check completed")
+					Str("image", image).
+					Str("pod", podName).
+					Msg("Image check container ready, assuming image is available")
 
 				return nil
 			}
 
-			if c.Type == batchv1.JobFailed {
-				return fmt.Errorf("image check failed: %s", c.Message)
+			if containerStatus.State.Waiting != nil {
+				if containerStatus.State.Waiting.Reason == "ErrImagePull" || containerStatus.State.Waiting.Reason == "ImagePullBackOff" {
+					log.Debug().
+						Str("image", image).
+						Str("pod", podName).
+						Str("reason", containerStatus.State.Waiting.Reason).
+						Str("message", containerStatus.State.Waiting.Message).
+						Str("container", containerStatus.Name).
+						Msg("Image check container failed because of missing image")
+					return fmt.Errorf("image %s not found", image)
+				}
 			}
 		}
 	}
-
-	return errors.New("image check failed")
-
 }
