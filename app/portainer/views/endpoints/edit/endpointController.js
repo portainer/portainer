@@ -9,11 +9,10 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
-import { GpusListAngular } from '@/react/docker/host/SetupView/GpusList';
 import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
 import { buildConfirmButton } from '@@/modals/utils';
 
-angular.module('portainer.app').component('gpusList', GpusListAngular).controller('EndpointController', EndpointController);
+angular.module('portainer.app').controller('EndpointController', EndpointController);
 
 /* @ngInject */
 function EndpointController(

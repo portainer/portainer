@@ -79,10 +79,10 @@ export function InputList<T = DefaultType>({
   return (
     <div className={clsx('form-group', styles.root)}>
       <div className={clsx('col-sm-12', styles.header)}>
-        <div className={clsx('control-label text-left', styles.label)}>
+        <span className="control-label space-right pt-2 text-left !font-bold">
           {label}
           {tooltip && <Tooltip message={tooltip} />}
-        </div>
+        </span>
       </div>
 
       {textTip && (
