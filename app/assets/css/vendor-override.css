@@ -36,6 +36,10 @@
   border: 1px solid var(--border-input-group-addon-color);
 }
 
+.input-group .form-control {
+  z-index: unset;
+}
+
 .text-danger {
   color: var(--ui-error-9);
 }
