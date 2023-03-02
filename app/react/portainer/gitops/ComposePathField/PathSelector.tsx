@@ -59,8 +59,8 @@ export function PathSelector({
         placeholder={placeholder}
         value={value}
       />
-      {searchResult && searchResult.length > 0 && searchTerm !== '' && (
-        <ComboboxPopover>
+      <ComboboxPopover>
+        {searchResult && searchResult.length > 0 && (
           <ComboboxList>
             {searchResult.map((result: string, index: number) => (
               <ComboboxOption
@@ -68,13 +68,14 @@ export function PathSelector({
                 value={result}
                 className={clsx(
                   `[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`,
-                  'th-highcontrast:bg-gray-10 th-dark:bg-gray-10'
+                  `hover:th-highcontrast:!bg-black hover:th-dark:!bg-black`,
+                  'th-highcontrast:bg-gray-10 th-dark:bg-gray-10 '
                 )}
               />
             ))}
           </ComboboxList>
-        </ComboboxPopover>
-      )}
+        )}
+      </ComboboxPopover>
     </Combobox>
   );
 
