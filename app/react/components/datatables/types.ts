@@ -8,7 +8,7 @@ export interface PaginationTableSettings {
   setPageSize: (pageSize: number) => void;
 }
 
-type ZustandSetFunc<T> = (
+export type ZustandSetFunc<T> = (
   partial: T | Partial<T> | ((state: T) => T | Partial<T>),
   replace?: boolean | undefined
 ) => void;

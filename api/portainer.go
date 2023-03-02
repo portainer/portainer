@@ -1429,7 +1429,7 @@ type (
 		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
 		CreateService(namespace string, service models.K8sServiceInfo) error
 		UpdateService(namespace string, service models.K8sServiceInfo) error
-		GetServices(namespace string) ([]models.K8sServiceInfo, error)
+		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
