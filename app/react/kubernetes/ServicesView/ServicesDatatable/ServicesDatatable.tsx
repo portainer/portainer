@@ -5,7 +5,11 @@ import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
+import {
+  Authorized,
+  useAuthorizations,
+  useCurrentUser,
+} from '@/react/hooks/useUser';
 import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 
@@ -34,21 +38,18 @@ export function ServicesDatatable() {
 
   const [search, setSearch] = useSearchBarState(storageKey);
   const columns = useColumns();
-  const serviceWriteable = useAuthorizations(['K8sServiceW']);
-  const accessSystemNamespaces = useAuthorizations([
-    'K8sAccessSystemNamespaces',
-  ]);
+  const readOnly = !useAuthorizations(['K8sServiceW']);
+  const { isAdmin } = useCurrentUser();
 
-  const filteredServices =
-    servicesQuery.data?.filter(
-      (service) =>
-        settings.showSystemResources ||
-        !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
-    ) || [];
+  const filteredServices = servicesQuery.data?.filter(
+    (service) =>
+      (isAdmin && settings.showSystemResources) ||
+      !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
+  );
 
   return (
     <Datatable
-      dataset={filteredServices}
+      dataset={filteredServices || []}
       columns={columns}
       isLoading={servicesQuery.isLoading}
       emptyContentLabel="No services found"
@@ -58,7 +59,7 @@ export function ServicesDatatable() {
       isRowSelectable={(row) =>
         !KubernetesNamespaceHelper.isSystemNamespace(row.values.namespace)
       }
-      disableSelect={!serviceWriteable}
+      disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}
@@ -72,15 +73,13 @@ export function ServicesDatatable() {
         <TableSettingsMenu>
           <DefaultDatatableSettings
             settings={settings}
-            hideShowSystemResources={!accessSystemNamespaces}
+            hideShowSystemResources={!isAdmin}
           />
         </TableSettingsMenu>
       )}
       description={
         <ServicesDatatableDescription
-          showSystemResources={
-            settings.showSystemResources || !accessSystemNamespaces
-          }
+          showSystemResources={settings.showSystemResources || !isAdmin}
         />
       }
       renderRow={servicesRenderRow}
