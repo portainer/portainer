@@ -7,6 +7,7 @@ export interface ButtonOptions<TValue = undefined> {
   className?: string;
   color?: ComponentProps<typeof Button>['color'];
   value?: TValue;
+  timeout?: number;
 }
 
 export interface ButtonsOptions<T> {
