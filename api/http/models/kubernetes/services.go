@@ -20,10 +20,10 @@ type (
 		IngressStatus                 []K8sServiceIngress `json:",omitempty"`
 
 		// serviceList screen
+		Applications []K8sApplication `json:",omitempty"`
 		ClusterIPs   []string         `json:",omitempty"`
 		ExternalName string           `json:",omitempty"`
 		ExternalIPs  []string         `json:",omitempty"`
-		Applications []K8sApplication `json:",omitempty"`
 	}
 
 	K8sServicePort struct {
