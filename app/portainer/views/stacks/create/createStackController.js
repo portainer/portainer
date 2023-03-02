@@ -9,7 +9,7 @@ import { renderTemplate } from '@/react/portainer/custom-templates/components/ut
 import { editor, upload, git, customTemplate } from '@@/BoxSelector/common-options/build-methods';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 
 angular
   .module('portainer.app')
@@ -70,6 +70,7 @@ angular
         selectedTemplate: null,
         selectedTemplateId: null,
         baseWebhookUrl: baseStackWebhookUrl(),
+        webhookId: createWebhookId(),
       };
 
       $window.onbeforeunload = () => {
@@ -153,6 +154,7 @@ angular
       function createSwarmStack(name, method) {
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         const endpointId = +$state.params.endpointId;
+
         if (method === 'template' || method === 'editor') {
           var stackFileContent = $scope.formValues.StackFileContent;
           return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
@@ -172,7 +174,7 @@ angular
             RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
             RepositoryUsername: $scope.formValues.RepositoryUsername,
             RepositoryPassword: $scope.formValues.RepositoryPassword,
-            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate),
+            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate, $scope.state.webhookId),
           };
 
           return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
@@ -198,7 +200,7 @@ angular
             RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
             RepositoryUsername: $scope.formValues.RepositoryUsername,
             RepositoryPassword: $scope.formValues.RepositoryPassword,
-            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate),
+            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate, $scope.state.webhookId),
           };
 
           return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);

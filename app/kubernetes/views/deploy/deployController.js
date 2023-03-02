@@ -9,7 +9,7 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, customTemplate, url } from '@@/BoxSelector/common-options/build-methods';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class KubernetesDeployController {
@@ -45,6 +45,7 @@ class KubernetesDeployController {
       templateId: null,
       template: null,
       baseWebhookUrl: baseStackWebhookUrl(),
+      webhookId: createWebhookId(),
     };
 
     this.formValues = {
@@ -256,7 +257,7 @@ class KubernetesDeployController {
         }
         payload.ManifestFile = this.formValues.ComposeFilePathInRepository;
         payload.AdditionalFiles = this.formValues.AdditionalFiles;
-        payload.AutoUpdate = transformAutoUpdateViewModel(this.formValues.AutoUpdate);
+        payload.AutoUpdate = transformAutoUpdateViewModel(this.formValues.AutoUpdate, this.state.webhookId);
       } else if (method === KubernetesDeployRequestMethods.STRING) {
         payload.StackFileContent = this.formValues.EditorContent;
       } else {

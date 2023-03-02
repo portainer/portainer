@@ -11,10 +11,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
-	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -30,7 +30,7 @@ type kubernetesGitStackUpdatePayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
-	AutoUpdate               *portainer.StackAutoUpdate
+	AutoUpdate               *portainer.AutoUpdateSettings
 }
 
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
@@ -41,7 +41,7 @@ func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error
 }
 
 func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error {
-	if err := stackutils.ValidateStackAutoUpdate(payload.AutoUpdate); err != nil {
+	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
 	return nil
