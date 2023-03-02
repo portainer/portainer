@@ -22,33 +22,29 @@ interface Props {
 
 export function HealthStatus({ health }: Props) {
   return (
-    <div className="row">
-      <div className="col-lg-12 col-md-12 col-xs-12">
-        <TableContainer>
-          <TableTitle label="Container health" icon={Server} />
+    <TableContainer>
+      <TableTitle label="Container health" icon={Server} />
 
-          <DetailsTable>
-            <DetailsTable.Row label="Status">
-              <div className="vertical-center">
-                <Icon
-                  icon={HeartPulse}
-                  mode={StatusMode[health.Status]}
-                  className="space-right"
-                />
-                {health.Status}
-              </div>
-            </DetailsTable.Row>
+      <DetailsTable>
+        <DetailsTable.Row label="Status">
+          <div className="vertical-center">
+            <Icon
+              icon={HeartPulse}
+              mode={StatusMode[health.Status]}
+              className="space-right"
+            />
+            {health.Status}
+          </div>
+        </DetailsTable.Row>
 
-            <DetailsTable.Row label="Failure count">
-              {health.FailingStreak}
-            </DetailsTable.Row>
+        <DetailsTable.Row label="Failure count">
+          {health.FailingStreak}
+        </DetailsTable.Row>
 
-            <DetailsTable.Row label="Last output">
-              {health.Log[health.Log.length - 1].Output}
-            </DetailsTable.Row>
-          </DetailsTable>
-        </TableContainer>
-      </div>
-    </div>
+        <DetailsTable.Row label="Last output">
+          {health.Log[health.Log.length - 1].Output}
+        </DetailsTable.Row>
+      </DetailsTable>
+    </TableContainer>
   );
 }

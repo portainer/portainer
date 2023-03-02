@@ -8,7 +8,7 @@ export function WebhookSettings({
   baseUrl,
   docsLink,
 }: {
-  docsLink: string;
+  docsLink?: string;
   value: string;
   baseUrl: string;
 }) {
@@ -18,13 +18,15 @@ export function WebhookSettings({
     <FormControl
       label="Webhook"
       tooltip={
-        <>
-          See{' '}
-          <a href={docsLink} target="_blank" rel="noreferrer">
-            Portainer documentation on webhook usage
-          </a>
-          .
-        </>
+        !!docsLink && (
+          <>
+            See{' '}
+            <a href={docsLink} target="_blank" rel="noreferrer">
+              Portainer documentation on webhook usage
+            </a>
+            .
+          </>
+        )
       }
     >
       <div className="flex items-center gap-2">

@@ -61,10 +61,12 @@ func adminAccess(next http.Handler) http.Handler {
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user info from request context", err)
+			return
 		}
 
 		if !securityContext.IsAdmin {
 			httperror.WriteError(w, http.StatusUnauthorized, "User is not authorized to perform the action", nil)
+			return
 		}
 
 		next.ServeHTTP(w, r)

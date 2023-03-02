@@ -148,6 +148,7 @@ angular
           'sidebar@': {},
         },
       };
+
       const logout = {
         name: 'portainer.logout',
         url: '/logout',
@@ -196,6 +197,16 @@ angular
           'content@': {
             templateUrl: './views/devices/import/importDevice.html',
             controller: 'ImportDeviceController',
+          },
+        },
+      };
+
+      const edgeAutoCreateScript = {
+        name: 'portainer.endpoints.edgeAutoCreateScript',
+        url: '/aeec',
+        views: {
+          'content@': {
+            component: 'edgeAutoCreateScriptView',
           },
         },
       };
@@ -424,6 +435,7 @@ angular
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
+      $stateRegistryProvider.register(edgeAutoCreateScript);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);

@@ -205,12 +205,14 @@ function useAnalyticsState() {
     dockerAgent: 0,
     dockerApi: 0,
     kubernetesAgent: 0,
-    kubernetesEdgeAgent: 0,
+    kubernetesEdgeAgentAsync: 0,
+    kubernetesEdgeAgentStandard: 0,
     kaasAgent: 0,
     aciApi: 0,
     localEndpoint: 0,
-    nomadEdgeAgent: 0,
-    dockerEdgeAgent: 0,
+    nomadEdgeAgentStandard: 0,
+    dockerEdgeAgentAsync: 0,
+    dockerEdgeAgentStandard: 0,
   });
 
   return { analytics, setAnalytics };

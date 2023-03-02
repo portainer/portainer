@@ -15,6 +15,5 @@ export function useAgentDetails() {
   return {
     agentVersion,
     agentSecret: settingsQuery.data.AgentSecret,
-    useEdgeAsyncMode: settingsQuery.data.Edge.AsyncMode,
   };
 }

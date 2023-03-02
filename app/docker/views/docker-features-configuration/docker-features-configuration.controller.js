@@ -9,7 +9,8 @@ export default class DockerFeaturesConfigurationController {
     this.Notifications = Notifications;
     this.StateManager = StateManager;
 
-    this.limitedFeature = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeatureAutoUpdate = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeatureUpToDateImage = FeatureId.IMAGE_UP_TO_DATE_INDICATOR;
 
     this.formValues = {
       enableHostManagementFeatures: false,

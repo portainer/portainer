@@ -12,6 +12,7 @@ interface Props {
   buttonText: string;
   className?: string;
   icon?: ReactNode;
+  buttonClassName?: string;
 }
 
 export function BETeaserButton({
@@ -21,6 +22,7 @@ export function BETeaserButton({
   buttonText,
   className,
   icon,
+  buttonClassName,
 }: Props) {
   return (
     <TooltipWithChildren
@@ -31,6 +33,7 @@ export function BETeaserButton({
     >
       <span>
         <Button
+          className={buttonClassName}
           icon={icon}
           type="button"
           color="warninglight"

@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
 )
 
 // @id StackDelete
@@ -136,7 +137,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to remove stack files from disk", err)
+		log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 	}
 
 	return response.Empty(w)

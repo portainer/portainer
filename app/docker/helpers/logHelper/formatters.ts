@@ -119,15 +119,17 @@ export function formatKeyValuePair(
 ) {
   let nl = line;
 
+  const strValue = typeof value !== 'string' ? JSON.stringify(value) : value;
+
   spans.push(
     { fgColor: Colors.Blue, text: `${key}=` },
     {
       fgColor: key === 'error' || key === 'ERR' ? Colors.Red : Colors.Magenta,
-      text: value as string,
+      text: strValue,
     }
   );
   if (!isLastKey) spans.push(spaceSpan);
-  nl += `${key}=${value}${!isLastKey ? ' ' : ''}`;
+  nl += `${key}=${strValue}${!isLastKey ? ' ' : ''}`;
 
   return nl;
 }

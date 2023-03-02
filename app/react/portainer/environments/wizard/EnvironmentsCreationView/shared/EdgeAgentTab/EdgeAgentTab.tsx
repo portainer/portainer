@@ -16,6 +16,7 @@ interface Props {
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
   isNomadTokenVisible?: boolean;
   showGpus?: boolean;
+  asyncMode?: boolean;
 }
 
 export function EdgeAgentTab({
@@ -23,9 +24,9 @@ export function EdgeAgentTab({
   commands,
   isNomadTokenVisible,
   showGpus = false,
+  asyncMode = false,
 }: Props) {
   const [edgeInfo, setEdgeInfo] = useState<EdgeInfo>();
-
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
   return (
@@ -35,6 +36,7 @@ export function EdgeAgentTab({
         readonly={!!edgeInfo}
         key={formKey}
         showGpus={showGpus}
+        asyncMode={asyncMode}
       />
 
       {edgeInfo && (
@@ -51,6 +53,7 @@ export function EdgeAgentTab({
             edgeInfo={edgeInfo}
             commands={commands}
             isNomadTokenVisible={isNomadTokenVisible}
+            asyncMode={asyncMode}
           />
 
           <hr />

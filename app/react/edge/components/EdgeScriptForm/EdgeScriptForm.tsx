@@ -1,4 +1,5 @@
 import { Formik } from 'formik';
+import { PropsWithChildren } from 'react';
 
 import { OsSelector } from './OsSelector';
 import { CommandTab } from './scripts';
@@ -21,15 +22,16 @@ interface Props {
   edgeInfo: EdgeInfo;
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
   isNomadTokenVisible?: boolean;
-  hideAsyncMode?: boolean;
+  asyncMode?: boolean;
 }
 
 export function EdgeScriptForm({
   edgeInfo,
   commands,
   isNomadTokenVisible,
-  hideAsyncMode,
-}: Props) {
+  asyncMode,
+  children,
+}: PropsWithChildren<Props>) {
   const showOsSelector = !(commands instanceof Array);
 
   return (
@@ -41,6 +43,8 @@ export function EdgeScriptForm({
       >
         {({ values, setFieldValue }) => (
           <>
+            {children}
+
             <EdgeScriptSettingsFieldset
               isNomadTokenVisible={
                 isNomadTokenVisible && values.platform === 'nomad'
@@ -63,7 +67,7 @@ export function EdgeScriptForm({
                 onPlatformChange={(platform) =>
                   setFieldValue('platform', platform)
                 }
-                hideAsyncMode={hideAsyncMode}
+                asyncMode={asyncMode}
               />
             </div>
           </>

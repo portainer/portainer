@@ -14,6 +14,8 @@
     environment-type="DOCKER"
     is-force-pull-visible="$ctrl.stack.Type !== 3"
     base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+    webhook-id="{{ $ctrl.state.webhookId }}"
+    webhooks-docs="https://docs.portainer.io/user/docker/stacks/webhooks"
   ></git-form-auto-update-fieldset>
   <div class="form-group">
     <div class="col-sm-12">

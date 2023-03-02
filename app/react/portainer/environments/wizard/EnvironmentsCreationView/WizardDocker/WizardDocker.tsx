@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Zap, Cloud, Network, Plug2 } from 'lucide-react';
+import { Zap, Network, Plug2 } from 'lucide-react';
+import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
+import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
@@ -21,8 +25,8 @@ interface Props {
 }
 
 const defaultOptions: BoxSelectorOption<
-  'agent' | 'api' | 'socket' | 'edgeAgent'
->[] = [
+  'agent' | 'api' | 'socket' | 'edgeAgentStandard' | 'edgeAgentAsync'
+>[] = _.compact([
   {
     id: 'agent',
     icon: <BadgeIcon icon={Zap} size="3xl" />,
@@ -45,17 +49,28 @@ const defaultOptions: BoxSelectorOption<
     value: 'socket',
   },
   {
-    id: 'edgeAgent',
-    icon: <BadgeIcon icon={Cloud} size="3xl" />,
-    label: 'Edge Agent',
+    id: 'edgeAgentStandard',
+    icon: EdgeAgentStandardIcon,
+    iconType: 'badge',
+    label: 'Edge Agent Standard',
     description: '',
-    value: 'edgeAgent',
-    hide: window.ddExtension,
+    value: 'edgeAgentStandard',
   },
-];
+  isBE && {
+    id: 'edgeAgentAsync',
+    icon: EdgeAgentAsyncIcon,
+    iconType: 'badge',
+    label: 'Edge Agent Async',
+    description: '',
+    value: 'edgeAgentAsync',
+  },
+]);
 
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
-  const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'edgeAgent');
+  const options = useFilterEdgeOptionsIfNeeded(
+    defaultOptions,
+    'edgeAgentStandard'
+  );
 
   const [creationType, setCreationType] = useState(options[0].value);
 
@@ -74,7 +89,14 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
     </div>
   );
 
-  function getTab(creationType: 'agent' | 'api' | 'socket' | 'edgeAgent') {
+  function getTab(
+    creationType:
+      | 'agent'
+      | 'api'
+      | 'socket'
+      | 'edgeAgentStandard'
+      | 'edgeAgentAsync'
+  ) {
     switch (creationType) {
       case 'agent':
         return (
@@ -95,10 +117,29 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
             onCreate={(environment) => onCreate(environment, 'localEndpoint')}
           />
         );
-      case 'edgeAgent':
+      case 'edgeAgentStandard':
         return (
           <EdgeAgentTab
-            onCreate={(environment) => onCreate(environment, 'dockerEdgeAgent')}
+            onCreate={(environment) =>
+              onCreate(environment, 'dockerEdgeAgentStandard')
+            }
+            commands={{
+              linux: isDockerStandalone
+                ? [commandsTabs.standaloneLinux]
+                : [commandsTabs.swarmLinux],
+              win: isDockerStandalone
+                ? [commandsTabs.standaloneWindow]
+                : [commandsTabs.swarmWindows],
+            }}
+          />
+        );
+      case 'edgeAgentAsync':
+        return (
+          <EdgeAgentTab
+            asyncMode
+            onCreate={(environment) =>
+              onCreate(environment, 'dockerEdgeAgentAsync')
+            }
             commands={{
               linux: isDockerStandalone
                 ? [commandsTabs.standaloneLinux]

@@ -83,10 +83,11 @@
             on-change="(onChangeFormValues)"
             is-docker-standalone="isDockerStandalone"
             is-additional-files-field-visible="true"
-            is-auto-update-visible="true"
             is-auth-explanation-visible="true"
             is-force-pull-visible="true"
             base-webhook-url="{{ state.baseWebhookUrl }}"
+            webhook-id="{{ state.webhookId }}"
+            webhooks-docs="https://docs.portainer.io/user/docker/stacks/webhooks"
           ></git-form>
 
           <div ng-show="state.Method === 'template'">

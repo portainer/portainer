@@ -20,9 +20,6 @@
   >
     <div ng-show="!$ctrl.multiItemDisable" class="vertical-center mt-5 mb-5">
       <label class="control-label !pt-0 text-left">Published ports</label>
-      <span class="label label-default interactive vertical-center ml-2.5" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
-        <pr-icon icon="'plus'" mode="'alt'" size="'sm'"></pr-icon> publish a new port
-      </span>
     </div>
     <div ng-repeat="servicePort in $ctrl.service.Ports" class="service-form row mt-5">
       <div class="form-group col-sm-3 !mx-0 !pl-0">
@@ -181,6 +178,11 @@
           </button>
         </div>
       </div>
+    </div>
+    <div class="mt-4">
+      <span class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
+        <pr-icon icon="'plus'" size="'sm'"></pr-icon> Publish a new port
+      </span>
     </div>
   </div>
 </ng-form>

@@ -11,10 +11,11 @@ export const gitForm: IComponentOptions = {
     is-docker-standalone="$ctrl.isDockerStandalone"
     deploy-method="$ctrl.deployMethod"
     is-additional-files-field-visible="$ctrl.isAdditionalFilesFieldVisible"
-    is-auto-update-visible="$ctrl.isAutoUpdateVisible"
     is-force-pull-visible="$ctrl.isForcePullVisible"
     is-auth-explanation-visible="$ctrl.isAuthExplanationVisible"
     base-webhook-url="$ctrl.baseWebhookUrl"
+    webhook-id="$ctrl.webhookId"
+    webhooks-docs="$ctrl.webhooksDocs"
     errors="$ctrl.errors">
   </react-git-form>
 </ng-form>`,
@@ -25,9 +26,10 @@ export const gitForm: IComponentOptions = {
     deployMethod: '@',
     baseWebhookUrl: '@',
     isAdditionalFilesFieldVisible: '<',
-    isAutoUpdateVisible: '<',
     isForcePullVisible: '<',
     isAuthExplanationVisible: '<',
+    webhookId: '@',
+    webhooksDocs: '@',
   },
   controller,
 };

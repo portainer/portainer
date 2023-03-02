@@ -1,4 +1,4 @@
-package stackutils
+package update
 
 import (
 	"testing"
@@ -7,25 +7,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_ValidateStackAutoUpdate(t *testing.T) {
+func Test_ValidateAutoUpdate(t *testing.T) {
 	tests := []struct {
 		name    string
-		value   *portainer.StackAutoUpdate
+		value   *portainer.AutoUpdateSettings
 		wantErr bool
 	}{
 		{
 			name:    "webhook is not a valid UUID",
-			value:   &portainer.StackAutoUpdate{Webhook: "fake-webhook"},
+			value:   &portainer.AutoUpdateSettings{Webhook: "fake-webhook"},
 			wantErr: true,
 		},
 		{
 			name:    "incorrect interval value",
-			value:   &portainer.StackAutoUpdate{Interval: "1dd2hh3mm"},
+			value:   &portainer.AutoUpdateSettings{Interval: "1dd2hh3mm"},
 			wantErr: true,
 		},
 		{
 			name: "valid auto update",
-			value: &portainer.StackAutoUpdate{
+			value: &portainer.AutoUpdateSettings{
 				Webhook:  "8dce8c2f-9ca1-482b-ad20-271e86536ada",
 				Interval: "5h30m40s10ms",
 			},
@@ -35,7 +35,7 @@ func Test_ValidateStackAutoUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateStackAutoUpdate(tt.value)
+			err := ValidateAutoUpdateSettings(tt.value)
 			assert.Equalf(t, tt.wantErr, err != nil, "received %+v", err)
 		})
 	}

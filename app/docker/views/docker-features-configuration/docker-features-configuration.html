@@ -48,7 +48,7 @@
                 name="'disableSysctlSettingForRegularUsers'"
                 label="'Enable Change Window'"
                 label-class="'col-sm-7 col-lg-4'"
-                feature-id="$ctrl.limitedFeature"
+                feature-id="$ctrl.limitedFeatureAutoUpdate"
                 tooltip="'Specify a time-frame during which automatic updates can occur in this environment.'"
                 on-change="($ctrl.onToggleAutoUpdate)"
               >
@@ -146,6 +146,21 @@
             </span>
           </div>
           <!-- !security -->
+
+          <!-- other -->
+          <div class="col-sm-12 form-section-title"> Other </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                label="'Show a notification to indicate out-of-date images for Docker environments'"
+                checked="false"
+                name="'outOfDateImageToggle'"
+                label-class="'col-sm-7 col-lg-4'"
+                feature-id="$ctrl.limitedFeatureUpToDateImage"
+              ></por-switch-field>
+            </div>
+          </div>
+          <!-- !other -->
 
           <!-- actions -->
           <div class="col-sm-12 form-section-title"> Actions </div>

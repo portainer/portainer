@@ -90,6 +90,7 @@ export function Primary({
             isForcePullVisible={isForcePullVisible}
             deployMethod={deployMethod}
             baseWebhookUrl="ws://localhost:9000"
+            webhookId="1234"
           />
         </Form>
       )}

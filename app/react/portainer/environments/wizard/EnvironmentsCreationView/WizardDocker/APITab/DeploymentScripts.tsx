@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
-
 import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
@@ -21,12 +19,6 @@ const deployments = [
 
 export function DeploymentScripts() {
   const [deployType, setDeployType] = useState(deployments[0].id);
-
-  const agentDetailsQuery = useAgentDetails();
-
-  if (!agentDetailsQuery) {
-    return null;
-  }
 
   const options = deployments.map((c) => ({
     id: c.id,

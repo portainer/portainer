@@ -176,22 +176,26 @@ function getConnectionTypeOptions(platformTypes: Filter<PlatformType>[]) {
     [PlatformType.Docker]: [
       ConnectionType.API,
       ConnectionType.Agent,
-      ConnectionType.EdgeAgent,
-      ConnectionType.EdgeDevice,
+      ConnectionType.EdgeAgentStandard,
+      ConnectionType.EdgeAgentAsync,
     ],
     [PlatformType.Azure]: [ConnectionType.API],
     [PlatformType.Kubernetes]: [
       ConnectionType.Agent,
-      ConnectionType.EdgeAgent,
-      ConnectionType.EdgeDevice,
+      ConnectionType.EdgeAgentStandard,
+      ConnectionType.EdgeAgentAsync,
     ],
-    [PlatformType.Nomad]: [ConnectionType.EdgeAgent, ConnectionType.EdgeDevice],
+    [PlatformType.Nomad]: [
+      ConnectionType.EdgeAgentStandard,
+      ConnectionType.EdgeAgentAsync,
+    ],
   };
 
   const connectionTypesDefaultOptions = [
     { value: ConnectionType.API, label: 'API' },
     { value: ConnectionType.Agent, label: 'Agent' },
-    { value: ConnectionType.EdgeAgent, label: 'Edge Agent' },
+    { value: ConnectionType.EdgeAgentStandard, label: 'Edge Agent Standard' },
+    { value: ConnectionType.EdgeAgentAsync, label: 'Edge Agent Async' },
   ];
 
   if (platformTypes.length === 0) {
@@ -226,12 +230,12 @@ function getPlatformTypeOptions(connectionTypes: Filter<ConnectionType>[]) {
   const connectionTypePlatformType = {
     [ConnectionType.API]: [PlatformType.Docker, PlatformType.Azure],
     [ConnectionType.Agent]: [PlatformType.Docker, PlatformType.Kubernetes],
-    [ConnectionType.EdgeAgent]: [
+    [ConnectionType.EdgeAgentStandard]: [
       PlatformType.Kubernetes,
       PlatformType.Nomad,
       PlatformType.Docker,
     ],
-    [ConnectionType.EdgeDevice]: [
+    [ConnectionType.EdgeAgentAsync]: [
       PlatformType.Nomad,
       PlatformType.Docker,
       PlatformType.Kubernetes,
