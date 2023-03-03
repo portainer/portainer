@@ -1213,9 +1213,13 @@ class KubernetesCreateApplicationController {
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
 
-        const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+        if (this.resourcePools.length) {
+          const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+          this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
+          this.updateNamespaceLimits(namespaceWithQuota);
+          this.updateSliders(namespaceWithQuota);
+        }
         this.formValues.ResourcePool = this.resourcePools[0];
-        this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
         if (!this.formValues.ResourcePool) {
           return;
         }
@@ -1281,9 +1285,6 @@ class KubernetesCreateApplicationController {
         this.formValues.IsPublishingService = this.formValues.PublishedPorts.length > 0;
 
         this.oldFormValues = angular.copy(this.formValues);
-
-        this.updateNamespaceLimits(namespaceWithQuota);
-        this.updateSliders(namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {
