@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
+import { withControlledInput } from '@/react-tools/withControlledInput';
 import { StackContainersDatatable } from '@/react/docker/stacks/ItemView/StackContainersDatatable';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
 import { TemplateListDropdownAngular } from '@/react/docker/app-templates/TemplateListDropdown';
@@ -11,6 +12,8 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DockerfileDetails } from '@/react/docker/images/ItemView/DockerfileDetails';
 import { HealthStatus } from '@/react/docker/containers/ItemView/HealthStatus';
+import { GpusList } from '@/react/docker/host/SetupView/GpusList';
+import { GpusInsights } from '@/react/docker/host/SetupView/GpusInsights';
 
 export const componentsModule = angular
   .module('portainer.docker.react.components', [])
@@ -45,4 +48,9 @@ export const componentsModule = angular
       'usedAllGpus',
       'enableGpuManagement',
     ])
-  ).name;
+  )
+  .component(
+    'gpusList',
+    r2a(withControlledInput(GpusList), ['value', 'onChange'])
+  )
+  .component('gpusInsights', r2a(GpusInsights, [])).name;
