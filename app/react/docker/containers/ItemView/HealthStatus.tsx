@@ -38,7 +38,7 @@ export function HealthStatus({ health }: Props) {
         </DetailsTable.Row>
 
         <DetailsTable.Row label="Failure count">
-          {health.FailingStreak}
+          <div className="vertical-center">{health.FailingStreak}</div>
         </DetailsTable.Row>
 
         <DetailsTable.Row label="Last output">
