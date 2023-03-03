@@ -16,3 +16,4 @@ export const STACK_PULL_IMAGE = 'stack-pull-image';
 export const STACK_WEBHOOK = 'stack-webhook';
 export const CONTAINER_WEBHOOK = 'container-webhook';
 export const K8S_ANNOTATIONS = 'k8s-annotations';
+export const K8S_ACCESS_CONTROL = 'k8s-security';

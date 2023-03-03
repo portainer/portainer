@@ -39,4 +39,5 @@ export enum FeatureId {
   K8S_ADM_ONLY_USR_INGRESS_DEPLY = 'k8s-admin-only-ingress-deploy',
   K8S_ROLLING_RESTART = 'k8s-rolling-restart',
   K8S_ANNOTATIONS = 'k8s-annotations',
+  K8S_ACCESS_CONTROL = 'k8s-security',
 }

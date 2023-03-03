@@ -374,8 +374,8 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     };
 
     const endpointKubernetesSecurityConstraint = {
-      name: 'kubernetes.cluster.securityConstraint',
-      url: '/securityConstraint',
+      name: 'kubernetes.security',
+      url: '/security',
       views: {
         'content@': {
           templateUrl: '../kubernetes/views/security-constraint/constraint.html',

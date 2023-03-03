@@ -1,4 +1,4 @@
-import { Box, Edit, Layers, Lock, Server, Shuffle } from 'lucide-react';
+import { Box, Edit, Layers, Lock, Server, Shuffle, Shield } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Authorized } from '@/react/hooks/useUser';
@@ -100,6 +100,20 @@ export function KubernetesSidebar({ environmentId }: Props) {
         data-cy="k8sSidebar-volumes"
       />
 
+      <Authorized
+        authorizations="K8sClusterSetupRW"
+        adminOnlyCE
+        environmentId={environmentId}
+      >
+        <SidebarItem
+          to="kubernetes.security"
+          params={{ endpointId: environmentId }}
+          label="Security"
+          data-cy="k8sSidebar-security"
+          icon={Shield}
+        />
+      </Authorized>
+
       <SidebarItem
         label="Cluster"
         to="kubernetes.cluster"
@@ -117,19 +131,6 @@ export function KubernetesSidebar({ environmentId }: Props) {
             params={{ endpointId: environmentId }}
             label="Setup"
             data-cy="k8sSidebar-setup"
-          />
-        </Authorized>
-
-        <Authorized
-          authorizations="K8sClusterSetupRW"
-          adminOnlyCE
-          environmentId={environmentId}
-        >
-          <SidebarItem
-            to="kubernetes.cluster.securityConstraint"
-            params={{ endpointId: environmentId }}
-            label="Security constraints"
-            data-cy="k8sSidebar-securityConstraints"
           />
         </Authorized>
 

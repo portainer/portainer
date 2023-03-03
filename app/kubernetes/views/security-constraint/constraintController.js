@@ -7,6 +7,7 @@ angular.module('portainer.kubernetes').controller('KubernetesSecurityConstraintC
   'EndpointService',
   function ($scope, EndpointProvider, EndpointService) {
     $scope.limitedFeaturePodSecurityPolicy = FeatureId.POD_SECURITY_POLICY_CONSTRAINT;
+    $scope.limitedFeatureAccessControl = FeatureId.K8S_ACCESS_CONTROL;
     $scope.state = {
       viewReady: false,
       actionInProgress: false,

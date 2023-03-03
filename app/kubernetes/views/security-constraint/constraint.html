@@ -1,10 +1,10 @@
 <page-header
   ng-if="state.viewReady"
-  title="'Kubernetes security constraints'"
+  title="'Security'"
   breadcrumbs="[
 { label:'Environments', link:'portainer.endpoints' }, 
 { label:endpoint.Name, link:'portainer.endpoints.endpoint', linkParams:{id: endpoint.Id} }, 
-'Security constraints'
+'Security'
 ]"
   reload="true"
 ></page-header>
@@ -12,29 +12,73 @@
 <kubernetes-view-loading view-ready="state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="state.viewReady">
-  <div class="row">
-    <div class="col-sm-12">
-      <rd-widget>
-        <rd-widget-header icon="shield" title-text="Pod security constraints"></rd-widget-header>
-        <rd-widget-body>
-          <form class="form-horizontal" name="kubernetesSecurityConstraintForm">
-            <!--  main toggle  -->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <por-switch-field
-                  checked="formValues.enabled"
-                  name="'disableSysctlSettingForRegularUsers'"
-                  label="'Enable pod security constraints'"
-                  feature-id="limitedFeaturePodSecurityPolicy"
-                  label-class="'col-sm-3 col-lg-2 px-0'"
-                  switch-class="'col-sm-8'"
+  <div class="be-indicator-container limited-be">
+    <div class="overlay">
+      <div class="limited-be-link vertical-center"
+        ><be-feature-indicator feature="limitedFeatureAccessControl"></be-feature-indicator
+        ><portainer-tooltip message="'This feature is currently limited to Business Edition users only. '"></portainer-tooltip
+      ></div>
+      <div class="limited-be-content">
+        <rd-widget>
+          <rd-widget-header icon="user" title-text="Access Control"></rd-widget-header>
+          <rd-widget-body>
+            <div class="inline-flex">
+              <div class="mr-2 inline"><pr-icon icon="'info'" mode="'primary'"></pr-icon></div>
+              <div class="inline">
+                <div>
+                  <a class="hyperlink" href="https://kubernetes.io/docs/reference/access-authn-authz/authorization/" target="_blank">Kubernetes authorization</a> generally uses
+                  <a class="hyperlink" href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/" target="_blank">role based access control</a> (RBAC) to determine if a
+                  user or process has the permissions to access or perform certain actions within the cluster.
+                </div>
+                <br />
+                <div
+                  >The <b>Cluster Roles</b> and <b>Roles</b> screens (under this Security sub-menu) list the resources where permissions are defined in your cluster, and the
+                  Bindings that grant those permissions to subjects (Users, Groups and Service Accounts). The <b>Service Accounts</b> screens lists existing identities (typically
+                  for a Pod or set of Pods).</div
                 >
-                </por-switch-field>
               </div>
             </div>
-          </form>
-        </rd-widget-body>
-      </rd-widget>
+          </rd-widget-body>
+        </rd-widget>
+      </div>
+    </div>
+  </div>
+
+  <div class="be-indicator-container limited-be">
+    <div class="overlay">
+      <div class="limited-be-link vertical-center"
+        ><be-feature-indicator feature="limitedFeaturePodSecurityPolicy"></be-feature-indicator
+        ><portainer-tooltip message="'This feature is currently limited to Business Edition users only. '"></portainer-tooltip
+      ></div>
+      <div class="limited-be-content">
+        <rd-widget>
+          <rd-widget-header icon="shield" title-text="Pod security constraints"></rd-widget-header>
+          <rd-widget-body>
+            <form class="form-horizontal" name="kubernetesSecurityConstraintForm">
+              <!--  main toggle  -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <p class="text-muted small vertical-center">
+                    <pr-icon icon="'info'" class-name="'icon icon-sm icon-primary'"></pr-icon>
+                    You may configure privilege and access control settings for Pods in your cluster.
+                  </p>
+                </div>
+                <div class="col-sm-12">
+                  <por-switch-field
+                    checked="formValues.enabled"
+                    name="'disableSysctlSettingForRegularUsers'"
+                    label="'Enable pod security constraints'"
+                    feature-id="limitedFeaturePodSecurityPolicy"
+                    label-class="'col-sm-3 col-lg-2 px-0'"
+                    switch-class="'col-sm-8'"
+                  >
+                  </por-switch-field>
+                </div>
+              </div>
+            </form>
+          </rd-widget-body>
+        </rd-widget>
+      </div>
     </div>
   </div>
 </div>
