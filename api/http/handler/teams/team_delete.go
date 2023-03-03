@@ -17,7 +17,7 @@ import (
 // @tags teams
 // @security ApiKeyAuth
 // @security jwt
-// @param id path string true "Team Id"
+// @param id path int true "Team Id"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"

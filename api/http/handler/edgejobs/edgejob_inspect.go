@@ -21,7 +21,7 @@ type edgeJobInspectResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeJob Id"
+// @param id path int true "EdgeJob Id"
 // @success 200 {object} portainer.EdgeJob
 // @failure 500
 // @failure 400

@@ -20,7 +20,7 @@ type stackFileResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @success 200 {object} stackFileResponse
 // @failure 500
 // @failure 400

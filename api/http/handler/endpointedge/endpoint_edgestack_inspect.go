@@ -21,7 +21,7 @@ type configResponse struct {
 // @tags edge, endpoints, edge_stacks
 // @accept json
 // @produce json
-// @param id path string true "environment(endpoint) Id"
+// @param id path int true "environment(endpoint) Id"
 // @param stackId path string true "EdgeStack Id"
 // @success 200 {object} configResponse
 // @failure 500

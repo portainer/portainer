@@ -19,7 +19,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "Team Id"
+// @param id path int true "Team Id"
 // @success 200 {array} portainer.TeamMembership "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
