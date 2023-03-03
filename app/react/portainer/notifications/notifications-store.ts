@@ -20,22 +20,15 @@ export const notificationsStore = create<NotificationsState>()(
       userNotifications: {},
       addNotification: (userId: number, notification: ToastNotification) => {
         set((state) => {
-          const currentUserNotifications =
-            state.userNotifications[userId] || [];
           // keep the new notification at the start of the list, so sorting by newest time isn't required
           const newUserNotifications = [
             notification,
-            ...currentUserNotifications,
+            ...(state.userNotifications[userId] || []),
           ];
-          const maxNotifications = 50;
-          const reducedNotifications = newUserNotifications.slice(
-            0,
-            maxNotifications
-          );
           return {
             userNotifications: {
               ...state.userNotifications,
-              [userId]: reducedNotifications,
+              [userId]: newUserNotifications,
             },
           };
         });

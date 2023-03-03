@@ -33,6 +33,7 @@ export function NotificationsMenu() {
     notificationsStore,
     (state) => state.userNotifications[user.Id]
   );
+  const reducedNotifications = userNotifications?.slice(0, 50);
 
   return (
     <Menu>
@@ -55,7 +56,7 @@ export function NotificationsMenu() {
           <Icon icon={Bell} />
           <span
             className={
-              userNotifications?.length > 0 ? notificationStyles.badge : ''
+              reducedNotifications?.length > 0 ? notificationStyles.badge : ''
             }
           />
         </div>
@@ -77,7 +78,7 @@ export function NotificationsMenu() {
               <h4>Notifications</h4>
             </div>
             <div className={notificationStyles.itemLast}>
-              {userNotifications?.length > 0 && (
+              {reducedNotifications?.length > 0 && (
                 <Button
                   color="none"
                   onClick={(e) => {
@@ -93,10 +94,10 @@ export function NotificationsMenu() {
             </div>
           </div>
         </div>
-        {userNotifications?.length > 0 ? (
+        {reducedNotifications?.length > 0 ? (
           <>
             <div className={notificationStyles.notifications}>
-              {userNotifications.map((notification) => (
+              {reducedNotifications.map((notification) => (
                 <MenuLink
                   to="portainer.notifications"
                   params={{ id: notification.id }}
