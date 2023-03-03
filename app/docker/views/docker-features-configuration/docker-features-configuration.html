@@ -150,9 +150,42 @@
           <!-- other -->
           <div class="col-sm-12 form-section-title"> Other </div>
           <div class="form-group">
+            <div class="col-sm-12 pb-3">
+              <insights-box
+                header="'GPU settings update'"
+                set-html-content="true"
+                insight-close-id="'gpu-settings-update-closed'"
+                content="'
+                  <p>
+                    From 2.18 on, the set-up of available GPUs for a Docker Standalone environment has been shifted from Add environment and Environment details to Host -> Setup, so as to align with other settings.
+                  </p>
+                  <p>
+                    A toggle has been introduced for enabling/disabling management of GPU settings in the Portainer UI - to alleviate the performance impact of showing those settings.
+                  </p>
+                  <p>
+                    The UI has been updated to clarify that GPU settings support is only for Docker Standalone (and not Docker Swarm, which was never supported in the UI).
+                  </p>'"
+              ></insights-box>
+            </div>
             <div class="col-sm-12">
               <por-switch-field
-                label="'Show a notification to indicate out-of-date images for Docker environments'"
+                label="'Show GPU in the UI'"
+                tooltip="'This allows managing of GPUs for container/stack hardware acceleration via the Portainer UI.'"
+                checked="$ctrl.state.enableGPUManagement"
+                name="'enableGPUManagement'"
+                on-change="($ctrl.onToggleGPUManagement)"
+                label-class="'col-sm-7 col-lg-4'"
+                disabled="!$ctrl.isDockerStandaloneEnv"
+              ></por-switch-field>
+            </div>
+            <div class="col-sm-12">
+              <div class="pl-4">
+                <gpus-list ng-if="$ctrl.state.enableGPUManagement && $ctrl.endpoint" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <por-switch-field
+                label="'Show an image(s) up to date indicator for Stacks, Services and Containers'"
                 checked="false"
                 name="'outOfDateImageToggle'"
                 label-class="'col-sm-7 col-lg-4'"
@@ -166,7 +199,13 @@
           <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.save()" ng-disabled="$ctrl.state.actionInProgress" button-spinner="$ctrl.state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm !ml-0"
+                ng-click="$ctrl.save()"
+                ng-disabled="$ctrl.state.actionInProgress"
+                button-spinner="$ctrl.state.actionInProgress"
+              >
                 <span ng-hide="$ctrl.state.actionInProgress">Save configuration</span>
                 <span ng-show="$ctrl.state.actionInProgress">Saving...</span>
               </button>

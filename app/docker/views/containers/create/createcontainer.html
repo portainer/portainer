@@ -17,8 +17,8 @@
         <form class="form-horizontal" autocomplete="off">
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-10">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-8">
               <input type="text" class="form-control" ng-model="config.name" id="container_name" placeholder="e.g. myContainer" />
             </div>
           </div>
@@ -37,8 +37,6 @@
               model="formValues.RegistryModel"
               ng-if="formValues.RegistryModel.Registry"
               auto-complete="true"
-              label-class="col-sm-1"
-              input-class="col-sm-11"
               endpoint="endpoint"
               is-admin="isAdmin"
               check-rate-limits="formValues.alwaysPull"
@@ -169,7 +167,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)
                    || (fromContainer.IsPortainer && fromContainer.Name === '/' + config.name)"
                 ng-click="create()"
@@ -701,17 +699,20 @@
               </div>
               <!-- !shm-size-input -->
               <!-- #region GPU -->
-              <div class="col-sm-12 form-section-title"> GPU </div>
+              <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
+                <div class="col-sm-12 form-section-title"> GPU </div>
 
-              <gpu
-                ng-if="applicationState.endpoint.apiVersion >= 1.4"
-                values="formValues.GPU"
-                on-change="(onGpuChange)"
-                gpus="endpoint.Gpus"
-                used-gpus="gpuUseList"
-                used-all-gpus="gpuUseAll"
-              >
-              </gpu>
+                <gpu
+                  ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                  values="formValues.GPU"
+                  on-change="(onGpuChange)"
+                  gpus="endpoint.Gpus"
+                  used-gpus="gpuUseList"
+                  used-all-gpus="gpuUseAll"
+                  enable-gpu-management="endpoint.EnableGPUManagement"
+                >
+                </gpu>
+              </div>
 
               <!-- #endregion GPU -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">

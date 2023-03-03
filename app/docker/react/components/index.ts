@@ -37,5 +37,12 @@ export const componentsModule = angular
   )
   .component(
     'gpu',
-    r2a(Gpu, ['values', 'onChange', 'gpus', 'usedGpus', 'usedAllGpus'])
+    r2a(Gpu, [
+      'values',
+      'onChange',
+      'gpus',
+      'usedGpus',
+      'usedAllGpus',
+      'enableGpuManagement',
+    ])
   ).name;

@@ -358,11 +358,6 @@ input:-webkit-autofill {
 }
 
 /* Overide Vendor CSS */
-
-.btn-link:hover {
-  color: var(--text-link-hover-color) !important;
-}
-
 .multiSelect.inlineBlock button {
   margin: 0;
 }

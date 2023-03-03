@@ -10,6 +10,7 @@ import { OptionProps } from 'react-select/dist/declarations/src/components/Optio
 import { Select } from '@@/form-components/ReactSelect';
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { TextTip } from '@@/Tip/TextTip';
 
 interface Values {
   enabled: boolean;
@@ -35,6 +36,7 @@ export interface Props {
   gpus: GPU[];
   usedGpus: string[];
   usedAllGpus: boolean;
+  enableGpuManagement?: boolean;
 }
 
 const NvidiaCapabilitiesOptions = [
@@ -103,6 +105,7 @@ export function Gpu({
   gpus = [],
   usedGpus = [],
   usedAllGpus,
+  enableGpuManagement,
 }: Props) {
   const options = useMemo(() => {
     const options = (gpus || []).map((gpu) => ({
@@ -181,30 +184,38 @@ export function Gpu({
 
   return (
     <div>
+      {!enableGpuManagement && (
+        <TextTip color="blue">
+          GPU in the UI is not currently enabled for this environment.
+        </TextTip>
+      )}
       <div className="form-group">
         <div className="col-sm-3 col-lg-2 control-label text-left">
           Enable GPU
           <Switch
             id="enabled"
             name="enabled"
-            checked={values.enabled}
+            checked={values.enabled && !!enableGpuManagement}
             onChange={toggleEnableGpu}
             className="ml-2"
+            disabled={enableGpuManagement === false}
           />
         </div>
-        <div className="col-sm-9 col-lg-10 text-left">
-          <Select<GpuOption, true>
-            isMulti
-            closeMenuOnSelect
-            value={gpuValue}
-            isClearable={false}
-            backspaceRemovesValue={false}
-            isDisabled={!values.enabled}
-            onChange={onChangeSelectedGpus}
-            options={options}
-            components={{ MultiValueRemove }}
-          />
-        </div>
+        {enableGpuManagement && values.enabled && (
+          <div className="col-sm-9 col-lg-10 text-left">
+            <Select<GpuOption, true>
+              isMulti
+              closeMenuOnSelect
+              value={gpuValue}
+              isClearable={false}
+              backspaceRemovesValue={false}
+              isDisabled={!values.enabled}
+              onChange={onChangeSelectedGpus}
+              options={options}
+              components={{ MultiValueRemove }}
+            />
+          </div>
+        )}
       </div>
 
       {values.enabled && (

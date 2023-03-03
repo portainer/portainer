@@ -17,7 +17,6 @@ import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { MoreSettingsSection } from '../../MoreSettingsSection';
-import { Hardware } from '../../Hardware/Hardware';
 
 import { EdgeAgentFieldset } from './EdgeAgentFieldset';
 import { useValidationSchema } from './EdgeAgentForm.validation';
@@ -26,16 +25,10 @@ import { FormValues } from './types';
 interface Props {
   onCreate(environment: Environment): void;
   readonly: boolean;
-  showGpus?: boolean;
   asyncMode: boolean;
 }
 
-export function EdgeAgentForm({
-  onCreate,
-  readonly,
-  asyncMode,
-  showGpus = false,
-}: Props) {
+export function EdgeAgentForm({ onCreate, readonly, asyncMode }: Props) {
   const settingsQuery = useSettings();
 
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
@@ -76,7 +69,6 @@ export function EdgeAgentForm({
                 />
               )}
             </FormSection>
-            {showGpus && <Hardware />}
           </MoreSettingsSection>
 
           {!readonly && (
@@ -133,6 +125,5 @@ export function buildInitialValues(settings: Settings): FormValues {
       PingInterval: EDGE_ASYNC_INTERVAL_USE_DEFAULT,
       SnapshotInterval: EDGE_ASYNC_INTERVAL_USE_DEFAULT,
     },
-    gpus: [],
   };
 }

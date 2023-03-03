@@ -1,9 +1,9 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
 import { FormikErrors } from 'formik';
-import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 
-import { AddButton, Button } from '@@/buttons';
+import { Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -79,18 +79,10 @@ export function InputList<T = DefaultType>({
   return (
     <div className={clsx('form-group', styles.root)}>
       <div className={clsx('col-sm-12', styles.header)}>
-        <div className={clsx('control-label text-left', styles.label)}>
+        <span className="control-label space-right pt-2 text-left !font-bold">
           {label}
           {tooltip && <Tooltip message={tooltip} />}
-        </div>
-        {!(isAddButtonHidden || readOnly) && (
-          <AddButton
-            label={addLabel}
-            className="space-left"
-            onClick={handleAdd}
-            disabled={disabled}
-          />
-        )}
+        </span>
       </div>
 
       {textTip && (
@@ -99,68 +91,86 @@ export function InputList<T = DefaultType>({
         </div>
       )}
 
-      <div className={clsx('col-sm-12', styles.items, 'space-y-4')}>
-        {value.map((item, index) => {
-          const key = itemKeyGetter(item, index);
-          const error = typeof errors === 'object' ? errors[index] : undefined;
+      {value.length > 0 && (
+        <div className="col-sm-12 mt-5 flex flex-col gap-y-5">
+          {value.map((item, index) => {
+            const key = itemKeyGetter(item, index);
+            const error =
+              typeof errors === 'object' ? errors[index] : undefined;
 
-          return (
-            <div
-              key={key}
-              className={clsx(
-                styles.itemLine,
-                { [styles.hasError]: !!error },
-                'vertical-center'
-              )}
-            >
-              {Item ? (
-                <Item
-                  item={item}
-                  onChange={(value: T) => handleChangeItem(key, value)}
-                  error={error}
-                  disabled={disabled}
-                  readOnly={readOnly}
-                />
-              ) : (
-                renderItem(
-                  item,
-                  (value: T) => handleChangeItem(key, value),
-                  error
-                )
-              )}
-              <div className={clsx(styles.itemActions, 'items-start')}>
-                {!readOnly && movable && (
-                  <>
-                    <Button
-                      size="medium"
-                      disabled={disabled || index === 0}
-                      onClick={() => handleMoveUp(index)}
-                      className="vertical-center btn-only-icon"
-                      icon={ArrowUp}
-                    />
-                    <Button
-                      size="medium"
-                      type="button"
-                      disabled={disabled || index === value.length - 1}
-                      onClick={() => handleMoveDown(index)}
-                      className="vertical-center btn-only-icon"
-                      icon={ArrowDown}
-                    />
-                  </>
+            return (
+              <div
+                key={key}
+                className={clsx(
+                  styles.itemLine,
+                  { [styles.hasError]: !!error },
+                  'vertical-center'
                 )}
-                {!readOnly && (
-                  <Button
-                    color="dangerlight"
-                    size="medium"
-                    onClick={() => handleRemoveItem(key, item)}
-                    className="vertical-center btn-only-icon"
-                    icon={Trash2}
+              >
+                {Item ? (
+                  <Item
+                    item={item}
+                    onChange={(value: T) => handleChangeItem(key, value)}
+                    error={error}
+                    disabled={disabled}
+                    readOnly={readOnly}
                   />
+                ) : (
+                  renderItem(
+                    item,
+                    (value: T) => handleChangeItem(key, value),
+                    error
+                  )
                 )}
+                <div className="items-start">
+                  {!readOnly && movable && (
+                    <>
+                      <Button
+                        size="medium"
+                        disabled={disabled || index === 0}
+                        onClick={() => handleMoveUp(index)}
+                        className="vertical-center btn-only-icon"
+                        icon={ArrowUp}
+                      />
+                      <Button
+                        size="medium"
+                        type="button"
+                        disabled={disabled || index === value.length - 1}
+                        onClick={() => handleMoveDown(index)}
+                        className="vertical-center btn-only-icon"
+                        icon={ArrowDown}
+                      />
+                    </>
+                  )}
+                  {!readOnly && (
+                    <Button
+                      color="dangerlight"
+                      size="medium"
+                      onClick={() => handleRemoveItem(key, item)}
+                      className="vertical-center btn-only-icon"
+                      icon={Trash2}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+      )}
+      <div className="col-sm-12 mt-5">
+        {!(isAddButtonHidden || readOnly) && (
+          <Button
+            onClick={handleAdd}
+            disabled={disabled}
+            type="button"
+            color="default"
+            className="!ml-0"
+            size="small"
+            icon={Plus}
+          >
+            {addLabel}
+          </Button>
+        )}
       </div>
     </div>
   );

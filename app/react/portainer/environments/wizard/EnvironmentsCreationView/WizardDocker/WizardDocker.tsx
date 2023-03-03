@@ -109,12 +109,14 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
         return (
           <APITab
             onCreate={(environment) => onCreate(environment, 'dockerApi')}
+            isDockerStandalone={isDockerStandalone}
           />
         );
       case 'socket':
         return (
           <SocketTab
             onCreate={(environment) => onCreate(environment, 'localEndpoint')}
+            isDockerStandalone={isDockerStandalone}
           />
         );
       case 'edgeAgentStandard':
