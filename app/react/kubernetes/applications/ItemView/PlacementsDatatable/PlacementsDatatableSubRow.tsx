@@ -77,7 +77,7 @@ export function SubRow({ node, cellCount }: SubRowProps) {
 }
 
 function isDefined<T>(arr?: Array<T>): arr is Array<T> {
-  return !!arr && arr.length > 0 && arr.length > 0;
+  return !!arr && arr.length > 0;
 }
 
 function UnmetTaintsInfo({
