@@ -132,7 +132,7 @@ export function ConsoleView() {
                     value={command}
                     onChange={(e) => setCommand(e.target.value)}
                     id="consoleCommand"
-                    auto-focus="true"
+                    autoFocus
                   />
                 </div>
               </div>
