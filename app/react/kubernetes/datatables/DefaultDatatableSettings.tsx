@@ -1,4 +1,4 @@
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useAuthorizations } from '@/react/hooks/useUser';
 
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { Checkbox } from '@@/form-components/Checkbox';
@@ -62,8 +62,12 @@ export function SystemResourcesSettings({
   value: boolean;
   onChange: (value: boolean) => void;
 }) {
-  const { isAdmin } = useCurrentUser();
-  if (!isAdmin) {
+  const authorized = useAuthorizations(
+    'K8sAccessSystemNamespaces',
+    undefined,
+    true
+  );
+  if (!authorized) {
     return null;
   }
 

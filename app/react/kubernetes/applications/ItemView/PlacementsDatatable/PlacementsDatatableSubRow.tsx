@@ -2,17 +2,23 @@ import clsx from 'clsx';
 import { Fragment } from 'react';
 
 import { nodeAffinityValues } from '@/kubernetes/filters/application';
+import { useAuthorizations } from '@/react/hooks/useUser';
 
 import { Affinity, Label, Node, Taint } from '../types';
 
 interface SubRowProps {
-  isAdmin: boolean;
   node: Node;
   cellCount: number;
 }
 
-export function SubRow({ isAdmin, node, cellCount }: SubRowProps) {
-  if (!isAdmin) {
+export function SubRow({ node, cellCount }: SubRowProps) {
+  const authorized = useAuthorizations(
+    'K8sApplicationErrorDetailsR',
+    undefined,
+    true
+  );
+
+  if (!authorized) {
     <>
       {isDefined(node.UnmetTaints) && (
         <tr
