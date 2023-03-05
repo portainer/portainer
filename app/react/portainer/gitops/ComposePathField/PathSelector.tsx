@@ -42,7 +42,7 @@ export function PathSelector({
   const enabled = Boolean(
     model.RepositoryURL && model.RepositoryURLValid && searchTerm
   );
-  const { data: searchResult } = useSearch(payload, enabled);
+  const { data: searchResults } = useSearch(payload, enabled);
   const { ref, updateCaret } = useCaretPosition();
 
   return (
@@ -59,10 +59,10 @@ export function PathSelector({
         placeholder={placeholder}
         value={value}
       />
-      <ComboboxPopover>
-        {searchResult && searchResult.length > 0 && (
+      {searchResults && searchResults.length > 0 && (
+        <ComboboxPopover>
           <ComboboxList>
-            {searchResult.map((result: string, index: number) => (
+            {searchResults.map((result: string, index: number) => (
               <ComboboxOption
                 key={index}
                 value={result}
@@ -74,8 +74,8 @@ export function PathSelector({
               />
             ))}
           </ComboboxList>
-        )}
-      </ComboboxPopover>
+        </ComboboxPopover>
+      )}
     </Combobox>
   );
 
