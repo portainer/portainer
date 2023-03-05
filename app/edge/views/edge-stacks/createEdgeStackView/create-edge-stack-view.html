@@ -48,8 +48,9 @@
 
           <edge-stack-deployment-type-selector
             value="$ctrl.formValues.DeploymentType"
-            has-docker-endpoint="$ctrl.hasType(4)"
-            has-kube-endpoint="$ctrl.hasType(7)"
+            has-docker-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnDocker)"
+            has-kube-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnKubernetes)"
+            has-nomad-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnNomad)"
             on-change="($ctrl.onChangeDeploymentType)"
           ></edge-stack-deployment-type-selector>
 

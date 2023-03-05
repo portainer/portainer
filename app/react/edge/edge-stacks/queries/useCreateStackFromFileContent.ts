@@ -38,5 +38,4 @@ export async function createStackFromFileContent({
   } catch (e) {
     throw parseAxiosError(e as Error);
   }
-  // return await EdgeStacks.create({ method: 'string', dryrun: dryrun ? 'true' : 'false' }, payload).$promise;
 }

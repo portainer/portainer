@@ -3,6 +3,7 @@ import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
 import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -27,6 +28,7 @@ export default class CreateEdgeStackViewController {
     };
 
     this.EditorType = EditorType;
+    this.EnvironmentType = EnvironmentType;
 
     this.state = {
       Method: 'editor',
