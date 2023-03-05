@@ -25,7 +25,6 @@ const theme = createTheme({
     caret: 'var(--border-codemirror-cursor-color)',
     selection: 'var(--bg-codemirror-selected-color)',
     selectionMatch: 'var(--bg-codemirror-selected-color)',
-
     gutterBackground: 'var(--bg-codemirror-gutters-color)',
   },
   styles: [

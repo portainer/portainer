@@ -49,3 +49,24 @@
 .root :global(.cm-editor .cm-scroller) {
   border-radius: 8px;
 }
+
+/*  Search Panel  */
+/* Ideally we would use a react component for that, but this is the easy solution for onw */
+
+.root :global(.cm-panels.cm-panels-bottom) {
+  background-color: var(--bg-codemirror-gutters-color);
+  border-top-color: transparent;
+  color: var(--text-codemirror-color);
+}
+
+.root :global(.cm-button) {
+  @apply bg-blue-8;
+  color: var(--text-codemirror-color);
+  background-image: none;
+}
+
+.root :global(.cm-textfield) {
+  border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-inputbox);
+  color: var(--text-form-control-color);
+}
