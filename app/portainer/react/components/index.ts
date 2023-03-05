@@ -33,17 +33,19 @@ import { customTemplatesModule } from './custom-templates';
 import { gitFormModule } from './git-form';
 import { settingsModule } from './settings';
 import { accessControlModule } from './access-control';
-import { environmentsModule } from './envronments';
-import { envListModule } from './enviroments-list-view-components';
+import { environmentsModule } from './environments';
+import { envListModule } from './environments-list-view-components';
+import { registriesModule } from './registries';
 
 export const componentsModule = angular
   .module('portainer.app.react.components', [
-    customTemplatesModule,
-    gitFormModule,
-    settingsModule,
     accessControlModule,
-    environmentsModule,
+    customTemplatesModule,
     envListModule,
+    environmentsModule,
+    gitFormModule,
+    registriesModule,
+    settingsModule,
   ])
   .component(
     'tagSelector',
