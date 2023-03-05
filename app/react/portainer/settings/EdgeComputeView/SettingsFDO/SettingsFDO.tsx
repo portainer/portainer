@@ -3,6 +3,10 @@ import { Formik, Field, Form } from 'formik';
 import { Laptop } from 'lucide-react';
 
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
+import {
+  FeatureFlag,
+  useFeatureFlag,
+} from '@/react/portainer/feature-flags/useFeatureFlag';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -28,6 +32,25 @@ interface Props {
 }
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
+  const flagEnabledQuery = useFeatureFlag(FeatureFlag.FDO);
+
+  if (!flagEnabledQuery.data) {
+    return (
+      <Widget>
+        <Widget.Body>
+          <TextTip color="blue">
+            Since FDO is still an experimental feature that requires additional
+            infrastructure, it has been temporarily hidden in the UI.
+          </TextTip>
+        </Widget.Body>
+      </Widget>
+    );
+  }
+
+  return <SettingsFDOForm settings={settings} onSubmit={onSubmit} />;
+}
+
+export function SettingsFDOForm({ settings, onSubmit }: Props) {
   const fdoConfiguration = settings ? settings.fdoConfiguration : null;
   const initialFDOEnabled = fdoConfiguration ? fdoConfiguration.enabled : false;
 
