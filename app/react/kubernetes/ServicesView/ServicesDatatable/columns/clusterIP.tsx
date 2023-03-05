@@ -1,20 +1,17 @@
-import { CellProps, Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Service } from '../../types';
-
-export const clusterIP: Column<Service> = {
-  Header: 'Cluster IP',
-  accessor: 'ClusterIPs',
+export const clusterIP = columnHelper.accessor('ClusterIPs', {
+  header: 'Cluster IP',
   id: 'clusterIP',
-  Cell: ({ value: clusterIPs }: CellProps<Service, Service['ClusterIPs']>) => {
+  cell: ({ getValue }) => {
+    const clusterIPs = getValue();
+
     if (!clusterIPs?.length) {
       return '-';
     }
     return clusterIPs.map((ip) => <div key={ip}>{ip}</div>);
   },
-  disableFilters: true,
-  canHide: true,
-  sortType: (rowA, rowB) => {
+  sortingFn: (rowA, rowB) => {
     const a = rowA.original.ClusterIPs;
     const b = rowB.original.ClusterIPs;
 
@@ -38,4 +35,4 @@ export const clusterIP: Column<Service> = {
       }
     );
   },
-};
+});
