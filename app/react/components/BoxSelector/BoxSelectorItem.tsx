@@ -89,15 +89,15 @@ export function BoxSelectorItem<T extends Value>({
       return <BadgeIcon icon={option.icon} />;
     }
 
-    if (option.iconType === 'logo') {
-      return <LogoIcon icon={option.icon} />;
+    if (option.iconType === 'raw') {
+      return (
+        <Icon
+          icon={option.icon}
+          className={clsx(styles.icon, '!flex items-center')}
+        />
+      );
     }
 
-    return (
-      <Icon
-        icon={option.icon}
-        className={clsx(styles.icon, '!flex items-center')}
-      />
-    );
+    return <LogoIcon icon={option.icon} />;
   }
 }

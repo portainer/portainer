@@ -40,6 +40,7 @@ export function EdgeStackDeploymentTypeSelector({
         hasDockerEndpoint
           ? 'Cannot use this option with Edge Docker environments'
           : '',
+      iconType: 'logo',
     },
   ];
 

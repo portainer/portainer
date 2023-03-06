@@ -3,8 +3,6 @@ import { Edit } from 'lucide-react';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Openldap from '@/assets/ico/vendor/openldap.svg?c';
 
-import { BadgeIcon } from '@@/BadgeIcon';
-
 const SERVER_TYPES = {
   CUSTOM: 0,
   OPEN_LDAP: 1,
@@ -14,7 +12,8 @@ const SERVER_TYPES = {
 export const options = [
   {
     id: 'ldap_custom',
-    icon: <BadgeIcon icon={Edit} />,
+    icon: Edit,
+    iconType: 'badge',
     label: 'Custom',
     value: SERVER_TYPES.CUSTOM,
   },
@@ -24,5 +23,6 @@ export const options = [
     label: 'OpenLDAP',
     value: SERVER_TYPES.OPEN_LDAP,
     feature: FeatureId.EXTERNAL_AUTH_LDAP,
+    iconType: 'logo',
   },
 ];
