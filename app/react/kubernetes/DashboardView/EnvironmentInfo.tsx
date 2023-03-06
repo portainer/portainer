@@ -12,7 +12,7 @@ export function EnvironmentInfo() {
   const { data: environmentData, ...environmentQuery } =
     useEnvironment(environmentId);
   const tagsQuery = useTagsForEnvironment(environmentId);
-  const tagNames = tagsQuery.tags?.map((tag) => tag.Name).join(', ') ?? '-';
+  const tagNames = tagsQuery.tags?.map((tag) => tag.Name).join(', ');
 
   return (
     <Widget>
@@ -34,7 +34,7 @@ export function EnvironmentInfo() {
               </tr>
               <tr>
                 <td className="!pl-0">Tags</td>
-                <td>{tagNames}</td>
+                <td>{tagNames || '-'}</td>
               </tr>
             </tbody>
           </table>
