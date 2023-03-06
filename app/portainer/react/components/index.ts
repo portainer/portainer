@@ -4,6 +4,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
 
 import { Icon } from '@@/Icon';
 import { ReactQueryDevtoolsWrapper } from '@@/ReactQueryDevtoolsWrapper';
@@ -188,4 +189,5 @@ export const componentsModule = angular
       'value',
       'height',
     ])
-  ).name;
+  )
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, [])).name;
