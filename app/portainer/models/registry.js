@@ -32,13 +32,13 @@ export function RegistryManagementConfigurationDefaultModel(registry) {
     this.TLSSkipVerify = true;
   }
 
-  if (registry.Type === RegistryTypes.QUAY || registry.Type === RegistryTypes.AZURE || registry.Type === RegistryTypes.ECR) {
+  if (registry.Type === RegistryTypes.QUAY || registry.Type === RegistryTypes.ECR) {
     this.Authentication = true;
     this.Username = registry.Username;
     this.TLS = true;
   }
 
-  if ((registry.Type === RegistryTypes.CUSTOM || registry.Type === RegistryTypes.PROGET) && registry.Authentication) {
+  if ((registry.Type === RegistryTypes.CUSTOM || registry.Type === RegistryTypes.PROGET || registry.Type === RegistryTypes.AZURE) && registry.Authentication) {
     this.Authentication = true;
     this.Username = registry.Username;
   }
