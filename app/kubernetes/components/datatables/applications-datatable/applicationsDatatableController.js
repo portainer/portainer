@@ -154,12 +154,14 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
         });
         this.state.namespaces = namespaces;
 
-        if (this.state.namespaces.length > 1) {
-          let defaultNS = this.state.namespaces.find((ns) => ns.Name === 'default');
-          defaultNS = defaultNS || this.state.namespaces[1];
-          this.state.namespace = defaultNS.Value;
-        } else {
-          this.state.namespace = this.state.namespaces[0].Value;
+        if (this.state.namespace && !this.state.namespaces.find((ns) => ns.Name === this.state.namespace)) {
+          if (this.state.namespaces.length > 1) {
+            let defaultNS = this.state.namespaces.find((ns) => ns.Name === 'default');
+            defaultNS = defaultNS || this.state.namespaces[1];
+            this.state.namespace = defaultNS.Value;
+          } else {
+            this.state.namespace = this.state.namespaces[0].Value;
+          }
         }
       }
     };
