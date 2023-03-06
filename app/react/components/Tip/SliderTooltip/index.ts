@@ -1,0 +1,1 @@
+export { SliderTooltip } from './SliderTooltip';
