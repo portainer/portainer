@@ -154,50 +154,6 @@ code {
   background-color: var(--bg-table-selected-color);
 }
 
-.CodeMirror-gutters {
-  background: var(--bg-codemirror-gutters-color);
-  border-right: 0px;
-}
-
-.CodeMirror-linenumber {
-  text-align: left;
-}
-
-.CodeMirror pre.CodeMirror-line,
-.CodeMirror pre.CodeMirror-line-like {
-  padding: 0 20px;
-}
-
-.CodeMirror {
-  background: var(--bg-codemirror-color);
-  color: var(--text-codemirror-color);
-  border-radius: 8px;
-}
-
-.CodeMirror-selected {
-  background: var(--bg-codemirror-selected-color) !important;
-}
-
-.CodeMirror-cursor {
-  border-left: 1px solid var(--border-codemirror-cursor-color);
-}
-
-.cm-s-default .cm-atom {
-  color: var(--text-cm-default-color);
-}
-
-.cm-s-default .cm-meta {
-  color: var(--text-cm-meta-color);
-}
-
-.cm-s-default .cm-string {
-  color: var(--text-cm-string-color);
-}
-
-.cm-s-default .cm-number {
-  color: var(--text-cm-number-color);
-}
-
 .dropdown-menu {
   background: var(--bg-dropdown-menu-color);
   border-radius: 8px;
