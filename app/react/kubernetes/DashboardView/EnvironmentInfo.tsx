@@ -29,7 +29,7 @@ export function EnvironmentInfo() {
               <tr ng-if="ctrl.showEnvUrl">
                 <td className="!border-t !pl-0">URL</td>
                 <td className="!border-t">
-                  {stripProtocol(environmentData.URL)}
+                  {stripProtocol(environmentData.URL) || '-'}
                 </td>
               </tr>
               <tr>
