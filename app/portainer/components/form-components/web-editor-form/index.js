@@ -12,6 +12,7 @@ export const webEditorForm = {
     readOnly: '<',
     onChange: '<',
     hideTitle: '<',
+    height: '@',
   },
 
   transclude: {

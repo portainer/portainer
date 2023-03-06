@@ -164,9 +164,6 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
 	payload.EdgeCheckinInterval = checkinInterval
 
-	isEdgeDevice, _ := request.RetrieveBooleanMultiPartFormValue(r, "IsEdgeDevice", true)
-	payload.IsEdgeDevice = isEdgeDevice
-
 	return nil
 }
 
@@ -196,7 +193,6 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @param TagIDs formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
 // @param EdgeCheckinInterval formData int false "The check in interval for edge agent (in seconds)"
 // @param EdgeTunnelServerAddress formData string true "URL or IP address that will be used to establish a reverse tunnel"
-// @param IsEdgeDevice formData bool false "Is Edge Device"
 // @param Gpus formData array false "List of GPUs"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"

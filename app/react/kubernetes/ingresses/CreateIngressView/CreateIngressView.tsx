@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo, ReactNode } from 'react';
+import { useState, useEffect, useMemo, ReactNode, useCallback } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
+import { debounce } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
@@ -286,9 +287,155 @@ export function CreateIngressView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ingressRule, servicePorts]);
 
+  const validate = useCallback(
+    (
+      ingressRule: Rule,
+      ingressNames: string[],
+      serviceOptions: Option<string>[],
+      existingIngressClass?: IngressController
+    ) => {
+      const errors: Record<string, ReactNode> = {};
+      const rule = { ...ingressRule };
+
+      // User cannot edit the namespace and the ingress name
+      if (!isEdit) {
+        if (!rule.Namespace) {
+          errors.namespace = 'Namespace is required';
+        }
+
+        const nameRegex = /^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/;
+        if (!rule.IngressName) {
+          errors.ingressName = 'Ingress name is required';
+        } else if (!nameRegex.test(rule.IngressName)) {
+          errors.ingressName =
+            "This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').";
+        } else if (ingressNames.includes(rule.IngressName)) {
+          errors.ingressName = 'Ingress name already exists';
+        }
+
+        if (!rule.IngressClassName) {
+          errors.className = 'Ingress class is required';
+        }
+      }
+
+      if (isEdit && !ingressRule.IngressClassName) {
+        errors.className =
+          'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
+      }
+
+      if (
+        isEdit &&
+        (!existingIngressClass ||
+          (existingIngressClass && !existingIngressClass.Availability)) &&
+        ingressRule.IngressClassName
+      ) {
+        if (!rule.IngressType) {
+          errors.className =
+            'Currently set to an ingress class that cannot be found in the cluster - you must select a valid class.';
+        } else {
+          errors.className =
+            'Currently set to an ingress class that you do not have access to - you must select a valid class.';
+        }
+      }
+
+      const duplicatedAnnotations: string[] = [];
+      rule.Annotations?.forEach((a, i) => {
+        if (!a.Key) {
+          errors[`annotations.key[${i}]`] = 'Annotation key is required';
+        } else if (duplicatedAnnotations.includes(a.Key)) {
+          errors[`annotations.key[${i}]`] = 'Annotation cannot be duplicated';
+        }
+        if (!a.Value) {
+          errors[`annotations.value[${i}]`] = 'Annotation value is required';
+        }
+        duplicatedAnnotations.push(a.Key);
+      });
+
+      const duplicatedHosts: string[] = [];
+      // Check if the paths are duplicates
+      rule.Hosts?.forEach((host, hi) => {
+        if (!host.NoHost) {
+          if (!host.Host) {
+            errors[`hosts[${hi}].host`] = 'Host is required';
+          } else if (duplicatedHosts.includes(host.Host)) {
+            errors[`hosts[${hi}].host`] = 'Host cannot be duplicated';
+          }
+          duplicatedHosts.push(host.Host);
+        }
+
+        // Validate service
+        host.Paths?.forEach((path, pi) => {
+          if (!path.ServiceName) {
+            errors[`hosts[${hi}].paths[${pi}].servicename`] =
+              'Service name is required';
+          }
+
+          if (
+            isEdit &&
+            path.ServiceName &&
+            !serviceOptions.find((s) => s.value === path.ServiceName)
+          ) {
+            errors[`hosts[${hi}].paths[${pi}].servicename`] = (
+              <span>
+                Currently set to {path.ServiceName}, which does not exist. You
+                can create a service with this name for a particular deployment
+                via{' '}
+                <Link
+                  to="kubernetes.applications"
+                  params={{ id: environmentId }}
+                  className="text-primary"
+                  target="_blank"
+                >
+                  Applications
+                </Link>
+                , and on returning here it will be picked up.
+              </span>
+            );
+          }
+
+          if (!path.ServicePort) {
+            errors[`hosts[${hi}].paths[${pi}].serviceport`] =
+              'Service port is required';
+          }
+        });
+        // Validate paths
+        const paths = host.Paths.map((path) => path.Route);
+        paths.forEach((item, idx) => {
+          if (!item) {
+            errors[`hosts[${hi}].paths[${idx}].path`] = 'Path cannot be empty';
+          } else if (paths.indexOf(item) !== idx) {
+            errors[`hosts[${hi}].paths[${idx}].path`] =
+              'Paths cannot be duplicated';
+          } else {
+            // Validate host and path combination globally
+            const isExists = checkIfPathExistsWithHost(
+              ingresses,
+              host.Host,
+              item,
+              params.name
+            );
+            if (isExists) {
+              errors[`hosts[${hi}].paths[${idx}].path`] =
+                'Path is already in use with the same host';
+            }
+          }
+        });
+      });
+
+      setErrors(errors);
+      if (Object.keys(errors).length > 0) {
+        return false;
+      }
+      return true;
+    },
+    [ingresses, environmentId, isEdit, params.name]
+  );
+
+  const debouncedValidate = useMemo(() => debounce(validate, 300), [validate]);
+
   useEffect(() => {
     if (namespace.length > 0) {
-      validate(
+      debouncedValidate(
         ingressRule,
         ingressNames || [],
         servicesOptions || [],
@@ -302,6 +449,7 @@ export function CreateIngressView() {
     ingressNames,
     servicesOptions,
     existingIngressClass,
+    debouncedValidate,
   ]);
 
   return (
@@ -360,146 +508,6 @@ export function CreateIngressView() {
       </div>
     </>
   );
-
-  function validate(
-    ingressRule: Rule,
-    ingressNames: string[],
-    serviceOptions: Option<string>[],
-    existingIngressClass?: IngressController
-  ) {
-    const errors: Record<string, ReactNode> = {};
-    const rule = { ...ingressRule };
-
-    // User cannot edit the namespace and the ingress name
-    if (!isEdit) {
-      if (!rule.Namespace) {
-        errors.namespace = 'Namespace is required';
-      }
-
-      const nameRegex = /^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/;
-      if (!rule.IngressName) {
-        errors.ingressName = 'Ingress name is required';
-      } else if (!nameRegex.test(rule.IngressName)) {
-        errors.ingressName =
-          "This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').";
-      } else if (ingressNames.includes(rule.IngressName)) {
-        errors.ingressName = 'Ingress name already exists';
-      }
-
-      if (!rule.IngressClassName) {
-        errors.className = 'Ingress class is required';
-      }
-    }
-
-    if (isEdit && !ingressRule.IngressClassName) {
-      errors.className =
-        'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
-    }
-
-    if (
-      isEdit &&
-      (!existingIngressClass ||
-        (existingIngressClass && !existingIngressClass.Availability)) &&
-      ingressRule.IngressClassName
-    ) {
-      if (!rule.IngressType) {
-        errors.className =
-          'Currently set to an ingress class that cannot be found in the cluster - you must select a valid class.';
-      } else {
-        errors.className =
-          'Currently set to an ingress class that you do not have access to - you must select a valid class.';
-      }
-    }
-
-    const duplicatedAnnotations: string[] = [];
-    rule.Annotations?.forEach((a, i) => {
-      if (!a.Key) {
-        errors[`annotations.key[${i}]`] = 'Annotation key is required';
-      } else if (duplicatedAnnotations.includes(a.Key)) {
-        errors[`annotations.key[${i}]`] = 'Annotation cannot be duplicated';
-      }
-      if (!a.Value) {
-        errors[`annotations.value[${i}]`] = 'Annotation value is required';
-      }
-      duplicatedAnnotations.push(a.Key);
-    });
-
-    const duplicatedHosts: string[] = [];
-    // Check if the paths are duplicates
-    rule.Hosts?.forEach((host, hi) => {
-      if (!host.NoHost) {
-        if (!host.Host) {
-          errors[`hosts[${hi}].host`] = 'Host is required';
-        } else if (duplicatedHosts.includes(host.Host)) {
-          errors[`hosts[${hi}].host`] = 'Host cannot be duplicated';
-        }
-        duplicatedHosts.push(host.Host);
-      }
-
-      // Validate service
-      host.Paths?.forEach((path, pi) => {
-        if (!path.ServiceName) {
-          errors[`hosts[${hi}].paths[${pi}].servicename`] =
-            'Service name is required';
-        }
-
-        if (
-          isEdit &&
-          path.ServiceName &&
-          !serviceOptions.find((s) => s.value === path.ServiceName)
-        ) {
-          errors[`hosts[${hi}].paths[${pi}].servicename`] = (
-            <span>
-              Currently set to {path.ServiceName}, which does not exist. You can
-              create a service with this name for a particular deployment via{' '}
-              <Link
-                to="kubernetes.applications"
-                params={{ id: environmentId }}
-                className="text-primary"
-                target="_blank"
-              >
-                Applications
-              </Link>
-              , and on returning here it will be picked up.
-            </span>
-          );
-        }
-
-        if (!path.ServicePort) {
-          errors[`hosts[${hi}].paths[${pi}].serviceport`] =
-            'Service port is required';
-        }
-      });
-      // Validate paths
-      const paths = host.Paths.map((path) => path.Route);
-      paths.forEach((item, idx) => {
-        if (!item) {
-          errors[`hosts[${hi}].paths[${idx}].path`] = 'Path cannot be empty';
-        } else if (paths.indexOf(item) !== idx) {
-          errors[`hosts[${hi}].paths[${idx}].path`] =
-            'Paths cannot be duplicated';
-        } else {
-          // Validate host and path combination globally
-          const isExists = checkIfPathExistsWithHost(
-            ingresses,
-            host.Host,
-            item,
-            params.name
-          );
-          if (isExists) {
-            errors[`hosts[${hi}].paths[${idx}].path`] =
-              'Path is already in use with the same host';
-          }
-        }
-      });
-    });
-
-    setErrors(errors);
-    if (Object.keys(errors).length > 0) {
-      return false;
-    }
-    return true;
-  }
 
   function handleNamespaceChange(ns: string) {
     setNamespace(ns);

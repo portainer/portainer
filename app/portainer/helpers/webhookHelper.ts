@@ -1,3 +1,5 @@
+import uuid from 'uuid';
+
 import { API_ENDPOINT_STACKS, API_ENDPOINT_WEBHOOKS } from '@/constants';
 
 import { baseHref } from './pathHelper';
@@ -14,6 +16,10 @@ export function baseStackWebhookUrl() {
 
 export function stackWebhookUrl(token: string) {
   return `${baseStackWebhookUrl()}/${token}`;
+}
+
+export function createWebhookId() {
+  return uuid();
 }
 
 /* @ngInject */

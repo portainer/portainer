@@ -1,0 +1,72 @@
+.root {
+  --text-cm-default-color: var(--blue-1);
+  --text-cm-meta-color: var(--black-color);
+  --text-cm-string-color: var(--red-3);
+  --text-cm-number-color: var(--green-1);
+  --text-cm-keyword-color: var(--ui-blue-dark-9);
+  --text-codemirror-color: var(--black-color);
+  --bg-codemirror-color: var(--white-color);
+  --bg-codemirror-gutters-color: var(--grey-17);
+  --bg-codemirror-selected-color: var(--grey-22);
+  --border-codemirror-cursor-color: var(--black-color);
+}
+
+:global([theme='dark']) .root {
+  --text-cm-default-color: var(--blue-10);
+  --text-cm-meta-color: var(--white-color);
+  --text-cm-string-color: var(--red-5);
+  --text-cm-number-color: var(--green-2);
+  --text-cm-keyword-color: var(--ui-purple-6);
+  --text-codemirror-color: var(--white-color);
+  --bg-codemirror-color: var(--grey-2);
+  --bg-codemirror-gutters-color: var(--grey-3);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --border-codemirror-cursor-color: var(--white-color);
+}
+
+:global([theme='highcontrast']) .root {
+  --text-cm-default-color: var(--blue-9);
+  --text-cm-meta-color: var(--white-color);
+  --text-cm-string-color: var(--red-7);
+  --text-cm-number-color: var(--green-2);
+  --text-cm-keyword-color: var(--ui-purple-6);
+  --text-codemirror-color: var(--white-color);
+  --bg-codemirror-color: var(--black-color);
+  --bg-codemirror-gutters-color: var(--ui-gray-warm-11);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --border-codemirror-cursor-color: var(--white-color);
+}
+
+.root :global(.cm-editor .cm-gutters) {
+  border-right: 0px;
+}
+
+.root :global(.cm-editor .cm-gutters .cm-lineNumbers .cm-gutterElement) {
+  text-align: left;
+}
+
+.root :global(.cm-editor),
+.root :global(.cm-editor .cm-scroller) {
+  border-radius: 8px;
+}
+
+/*  Search Panel  */
+/* Ideally we would use a react component for that, but this is the easy solution for onw */
+
+.root :global(.cm-panels.cm-panels-bottom) {
+  background-color: var(--bg-codemirror-gutters-color);
+  border-top-color: transparent;
+  color: var(--text-codemirror-color);
+}
+
+.root :global(.cm-button) {
+  @apply bg-blue-8;
+  color: var(--text-codemirror-color);
+  background-image: none;
+}
+
+.root :global(.cm-textfield) {
+  border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-inputbox);
+  color: var(--text-form-control-color);
+}

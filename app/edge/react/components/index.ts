@@ -20,7 +20,7 @@ export const componentsModule = angular
       'edgeInfo',
       'commands',
       'isNomadTokenVisible',
-      'hideAsyncMode',
+      'asyncMode',
     ])
   )
   .component(

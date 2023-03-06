@@ -110,6 +110,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     tagsPartialMatch: true,
     agentVersions: agentVersions.map((a) => a.value),
     updateInformation: isBE,
+    edgeAsync: getEdgeAsyncValue(connectionTypes),
   };
 
   const queryWithSort = {
@@ -282,8 +283,8 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
         EnvironmentType.AgentOnDocker,
         EnvironmentType.AgentOnKubernetes,
       ],
-      [ConnectionType.EdgeAgent]: EdgeTypes,
-      [ConnectionType.EdgeDevice]: EdgeTypes,
+      [ConnectionType.EdgeAgentStandard]: EdgeTypes,
+      [ConnectionType.EdgeAgentAsync]: EdgeTypes,
     };
 
     const selectedTypesByPlatform = platformTypes.flatMap(
@@ -404,4 +405,22 @@ function renderItems(
   }
 
   return items;
+}
+
+function getEdgeAsyncValue(connectionTypes: Filter<ConnectionType>[]) {
+  const hasEdgeAsync = connectionTypes.some(
+    (connectionType) => connectionType.value === ConnectionType.EdgeAgentAsync
+  );
+
+  const hasEdgeStandard = connectionTypes.some(
+    (connectionType) =>
+      connectionType.value === ConnectionType.EdgeAgentStandard
+  );
+
+  // If both are selected, we don't want to filter on either, and same for if both are not selected
+  if (hasEdgeAsync === hasEdgeStandard) {
+    return undefined;
+  }
+
+  return hasEdgeAsync;
 }

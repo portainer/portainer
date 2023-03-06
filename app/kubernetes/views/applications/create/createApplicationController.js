@@ -199,7 +199,7 @@ class KubernetesCreateApplicationController {
         }
 
         this.state.updateWebEditorInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, { stackFile: this.stackFileContent });
         this.state.isEditorDirty = false;
         await this.$state.reload(this.$state.current);
       } catch (err) {

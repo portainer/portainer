@@ -31,7 +31,6 @@ export interface RepoConfigResponse {
 export type AutoUpdateModel = {
   RepositoryAutomaticUpdates: boolean;
   RepositoryMechanism: AutoUpdateMechanism;
-  RepositoryWebhookId: string;
   RepositoryFetchInterval: string;
   ForcePullImage: boolean;
   RepositoryAutomaticUpdatesForce: boolean;

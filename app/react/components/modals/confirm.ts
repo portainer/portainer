@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 import { openDialog, DialogOptions } from './Dialog';
 import { OnSubmit, ModalType } from './Modal';
 import { ButtonOptions } from './types';
@@ -45,7 +47,7 @@ export function confirmWebEditorDiscard() {
   });
 }
 
-export function confirmDelete(message: string) {
+export function confirmDelete(message: ReactNode) {
   return confirmDestructive({
     title: 'Are you sure?',
     message,

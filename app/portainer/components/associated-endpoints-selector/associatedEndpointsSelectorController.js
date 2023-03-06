@@ -54,8 +54,8 @@ class AssoicatedEndpointsSelectorController {
   /* #region  internal queries to retrieve endpoints per "side" of the selector */
   getAvailableEndpoints() {
     return this.$async(async () => {
-      const { start, search, limit } = this.getPaginationData('available');
-      const query = { search, types: EdgeTypes };
+      const { start, filter, limit } = this.getPaginationData('available');
+      const query = { search: filter, types: EdgeTypes };
 
       const response = await getEnvironments({ start, limit, query });
 
@@ -70,8 +70,8 @@ class AssoicatedEndpointsSelectorController {
       let response = { value: [], totalCount: 0 };
       if (this.endpointIds.length > 0) {
         // fetch only if already has associated endpoints
-        const { start, search, limit } = this.getPaginationData('associated');
-        const query = { search, types: EdgeTypes, endpointIds: this.endpointIds };
+        const { start, filter, limit } = this.getPaginationData('associated');
+        const query = { search: filter, types: EdgeTypes, endpointIds: this.endpointIds };
 
         response = await getEnvironments({ start, limit, query });
       }
@@ -94,10 +94,10 @@ class AssoicatedEndpointsSelectorController {
 
   /* #region  Utils funcs */
   getPaginationData(tableType) {
-    const { pageNumber, limit, search } = this.state[tableType];
+    const { pageNumber, limit, filter } = this.state[tableType];
     const start = (pageNumber - 1) * limit + 1;
 
-    return { start, search, limit };
+    return { start, filter, limit };
   }
 
   setTableData(tableType, endpoints, totalCount) {

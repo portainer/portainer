@@ -18,7 +18,8 @@ func TestHandler_webhookInvoke(t *testing.T) {
 
 	webhookID := newGuidString(t)
 	store.StackService.Create(&portainer.Stack{
-		AutoUpdate: &portainer.StackAutoUpdate{
+		ID: 1,
+		AutoUpdate: &portainer.AutoUpdateSettings{
 			Webhook: webhookID,
 		},
 	})

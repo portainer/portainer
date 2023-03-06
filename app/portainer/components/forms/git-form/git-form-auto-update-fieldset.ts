@@ -10,6 +10,8 @@ export const gitFormAutoUpdate: IComponentOptions = {
     environment-type="$ctrl.environmentType"
     is-force-pull-visible="$ctrl.isForcePullVisible"
     base-webhook-url="$ctrl.baseWebhookUrl"
+    webhook-id="$ctrl.webhookId"
+    webhooks-docs="$ctrl.webhooksDocs"
     errors="$ctrl.errors">
     </react-git-form-auto-update-fieldset>
   </ng-form>`,
@@ -19,6 +21,8 @@ export const gitFormAutoUpdate: IComponentOptions = {
     environmentType: '@',
     isForcePullVisible: '<',
     baseWebhookUrl: '@',
+    webhookId: '@',
+    webhooksDocs: '@',
   },
   controller,
 };
