@@ -21,9 +21,8 @@
             ng-model="$ctrl.state.namespace"
             ng-change="$ctrl.onChangeNamespace()"
             data-cy="component-namespaceSelect"
-            ng-options="o.Name as (o.Name + (o.IsSystem ? ' - system' : '')) for o in $ctrl.state.namespaces"
+            ng-options="o.Value as (o.Name + (o.IsSystem ? ' - system' : '')) for o in $ctrl.state.namespaces"
           >
-            <option value="">All namespaces</option>
           </select>
         </div>
       </div>

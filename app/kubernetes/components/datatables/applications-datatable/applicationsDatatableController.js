@@ -145,18 +145,21 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
 
     this.updateNamespace = function () {
       if (this.namespaces) {
-        const namespaces = [];
+        const namespaces = [{ Name: 'All namespaces', Value: '', IsSystem: false }];
         this.namespaces.find((ns) => {
           if (!this.settings.showSystem && ns.IsSystem) {
             return false;
           }
-          namespaces.push(ns);
+          namespaces.push({ Name: ns.Name, Value: ns.Name, IsSystem: ns.IsSystem });
         });
         this.state.namespaces = namespaces;
 
-        if (this.state.namespace && !this.state.namespaces.find((ns) => ns.Name === this.state.namespace)) {
-          this.state.namespace = this.state.namespaces[0].Name;
-          this.onChangeNamespaceDropdown(this.state.namespace);
+        if (this.state.namespaces.length > 1) {
+          let defaultNS = this.state.namespaces.find((ns) => ns.Name === 'default');
+          defaultNS = defaultNS || this.state.namespaces[1];
+          this.state.namespace = defaultNS.Value;
+        } else {
+          this.state.namespace = this.state.namespaces[0].Value;
         }
       }
     };
@@ -208,7 +211,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
         this.settings.open = false;
       }
 
-      this.setSystemResources(this.settings.showSystem);
+      this.setSystemResources && this.setSystemResources(this.settings.showSystem);
 
       // Set the default selected namespace
       if (!this.state.namespace) {

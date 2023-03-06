@@ -190,7 +190,7 @@ class KubernetesApplicationsController {
 
     this.state.namespaces = await this.KubernetesNamespaceService.get();
     this.state.namespaces = _.sortBy(this.state.namespaces, 'Name');
-    this.state.namespace = this.state.namespaces.find((n) => n.Name === 'default') ? 'default' : this.state.namespaces[0].Name;
+    this.state.namespace = this.state.namespaces.length ? (this.state.namespaces.find((n) => n.Name === 'default') ? 'default' : this.state.namespaces[0].Name) : '';
 
     await this.getApplications();
 
