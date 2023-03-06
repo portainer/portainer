@@ -50,16 +50,14 @@ const defaultOptions: BoxSelectorOption<
   },
   {
     id: 'edgeAgentStandard',
-    icon: EdgeAgentStandardIcon,
-    iconType: 'badge',
+    icon: <BadgeIcon icon={EdgeAgentStandardIcon} size="3xl" />,
     label: 'Edge Agent Standard',
     description: '',
     value: 'edgeAgentStandard',
   },
   isBE && {
     id: 'edgeAgentAsync',
-    icon: EdgeAgentAsyncIcon,
-    iconType: 'badge',
+    icon: <BadgeIcon icon={EdgeAgentAsyncIcon} size="3xl" />,
     label: 'Edge Agent Async',
     description: '',
     value: 'edgeAgentAsync',
