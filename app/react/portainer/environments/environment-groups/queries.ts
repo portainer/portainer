@@ -5,8 +5,12 @@ import { error as notifyError } from '@/portainer/services/notifications';
 import { EnvironmentGroup, EnvironmentGroupId } from './types';
 import { getGroup, getGroups } from './environment-groups.service';
 
-export function useGroups() {
-  return useQuery<EnvironmentGroup[]>(['environment-groups'], getGroups);
+export function useGroups<T = EnvironmentGroup[]>({
+  select,
+}: { select?: (group: EnvironmentGroup[]) => T } = {}) {
+  return useQuery(['environment-groups'], getGroups, {
+    select,
+  });
 }
 
 export function useGroup<T = EnvironmentGroup>(

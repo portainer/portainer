@@ -2,18 +2,19 @@ import { components, OptionProps } from 'react-select';
 
 import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
-import { Select } from '@@/form-components/ReactSelect';
-
-import { Filter } from './types';
+import {
+  type Option as OptionType,
+  PortainerSelect,
+} from '@@/form-components/PortainerSelect';
 
 interface Props<TValue = number> {
-  filterOptions?: Filter<TValue>[];
-  onChange: (filterOptions: Filter<TValue>[]) => void;
+  filterOptions?: OptionType<TValue>[];
+  onChange: (value: TValue[]) => void;
   placeHolder: string;
-  value: Filter<TValue>[];
+  value: TValue[];
 }
 
-function Option<TValue = number>(props: OptionProps<Filter<TValue>, true>) {
+function Option<TValue = number>(props: OptionProps<OptionType<TValue>, true>) {
   const { isSelected, label } = props;
   return (
     <div>
@@ -21,8 +22,10 @@ function Option<TValue = number>(props: OptionProps<Filter<TValue>, true>) {
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       >
-        <input type="checkbox" checked={isSelected} onChange={() => null} />{' '}
-        <label>{label}</label>
+        <div className="flex items-center gap-2">
+          <input type="checkbox" checked={isSelected} onChange={() => null} />
+          <label className="whitespace-nowrap">{label}</label>
+        </div>
       </components.Option>
     </div>
   );
@@ -35,14 +38,14 @@ export function HomepageFilter<TValue = number>({
   value,
 }: Props<TValue>) {
   return (
-    <Select
-      closeMenuOnSelect={false}
+    <PortainerSelect<TValue>
       placeholder={placeHolder}
       options={filterOptions}
       value={value}
       isMulti
       components={{ Option }}
       onChange={(option) => onChange([...option])}
+      bindToBody
     />
   );
 }
