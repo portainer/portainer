@@ -9,7 +9,7 @@ import { useGroups } from '../../environments/environment-groups/queries';
 
 import { HomepageFilter } from './HomepageFilter';
 import { SortbySelector } from './SortbySelector';
-import { ConnectionType, Filter } from './types';
+import { ConnectionType } from './types';
 import styles from './EnvironmentList.module.css';
 
 const status = [
@@ -17,11 +17,10 @@ const status = [
   { value: EnvironmentStatus.Down, label: 'Down' },
 ];
 
-const sortByOptions = [
-  { value: 1, label: 'Name' },
-  { value: 2, label: 'Group' },
-  { value: 3, label: 'Status' },
-];
+const sortByOptions = ['Name', 'Group', 'Status'].map((v) => ({
+  value: v,
+  label: v,
+}));
 
 export function EnvironmentListFilters({
   agentVersions,
@@ -37,32 +36,32 @@ export function EnvironmentListFilters({
   sortByDescending,
   sortByState,
   sortOnDescending,
-  sortOnchange,
+  sortOnChange,
   statusOnChange,
   statusState,
   tagOnChange,
   tagState,
 }: {
-  platformTypes: Filter<PlatformType>[];
-  setPlatformTypes: (value: Filter<PlatformType>[]) => void;
+  platformTypes: PlatformType[];
+  setPlatformTypes: (value: PlatformType[]) => void;
 
-  connectionTypes: Filter<ConnectionType>[];
-  setConnectionTypes: (value: Filter<ConnectionType>[]) => void;
+  connectionTypes: ConnectionType[];
+  setConnectionTypes: (value: ConnectionType[]) => void;
 
-  statusState: Filter<number>[];
-  statusOnChange: (filterOptions: Filter[]) => void;
+  statusState: number[];
+  statusOnChange: (value: number[]) => void;
 
-  tagOnChange: (filterOptions: Filter[]) => void;
-  tagState: Filter<number>[];
+  tagOnChange: (value: number[]) => void;
+  tagState: number[];
 
-  groupOnChange: (filterOptions: Filter[]) => void;
-  groupState: Filter<number>[];
+  groupOnChange: (value: number[]) => void;
+  groupState: number[];
 
-  setAgentVersions: (value: Filter<string>[]) => void;
-  agentVersions: Filter<string>[];
+  setAgentVersions: (value: string[]) => void;
+  agentVersions: string[];
 
-  sortByState: Filter<number> | undefined;
-  sortOnchange: (filterOptions: Filter) => void;
+  sortByState: string;
+  sortOnChange: (value: string) => void;
 
   sortOnDescending: () => void;
   sortByDescending: boolean;
@@ -85,7 +84,7 @@ export function EnvironmentListFilters({
   }));
 
   const tagsQuery = useTags();
-  const tagOptions = [...(tagsQuery.tags || [])];
+  const tagOptions = [...(tagsQuery.data || [])];
   const uniqueTag = [
     ...new Map(tagOptions.map((item) => [item.ID, item])).values(),
   ].map(({ ID: value, Name: label }) => ({
@@ -136,7 +135,7 @@ export function EnvironmentListFilters({
         />
       </div>
       <div className={styles.filterLeft}>
-        <HomepageFilter<string>
+        <HomepageFilter
           filterOptions={
             agentVersionsQuery.data?.map((v) => ({
               label: v,
@@ -159,7 +158,7 @@ export function EnvironmentListFilters({
       <div className={styles.filterRight}>
         <SortbySelector
           filterOptions={sortByOptions}
-          onChange={sortOnchange}
+          onChange={sortOnChange}
           onDescending={sortOnDescending}
           placeHolder="Sort By"
           sortByDescending={sortByDescending}
@@ -171,7 +170,7 @@ export function EnvironmentListFilters({
   );
 }
 
-function getConnectionTypeOptions(platformTypes: Filter<PlatformType>[]) {
+function getConnectionTypeOptions(platformTypes: PlatformType[]) {
   const platformTypeConnectionType = {
     [PlatformType.Docker]: [
       ConnectionType.API,
@@ -204,12 +203,12 @@ function getConnectionTypeOptions(platformTypes: Filter<PlatformType>[]) {
 
   return _.compact(
     _.intersection(
-      ...platformTypes.map((p) => platformTypeConnectionType[p.value])
+      ...platformTypes.map((p) => platformTypeConnectionType[p])
     ).map((c) => connectionTypesDefaultOptions.find((o) => o.value === c))
   );
 }
 
-function getPlatformTypeOptions(connectionTypes: Filter<ConnectionType>[]) {
+function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
   const platformDefaultOptions = [
     { value: PlatformType.Docker, label: 'Docker' },
     { value: PlatformType.Azure, label: 'Azure' },
@@ -244,7 +243,7 @@ function getPlatformTypeOptions(connectionTypes: Filter<ConnectionType>[]) {
 
   return _.compact(
     _.intersection(
-      ...connectionTypes.map((p) => connectionTypePlatformType[p.value])
+      ...connectionTypes.map((p) => connectionTypePlatformType[p])
     ).map((c) => platformDefaultOptions.find((o) => o.value === c))
   );
 }

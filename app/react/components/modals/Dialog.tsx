@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState, useRef } from 'react';
 
 import { Button } from '@@/buttons';
 
@@ -26,6 +26,37 @@ export function Dialog<T>({
 }: Props<T>) {
   const ariaLabel = requireString(title) || requireString(message) || 'Dialog';
 
+  const [count, setCount] = useState<number>(0);
+  const countRef = useRef(count);
+  countRef.current = count;
+
+  useEffect(() => {
+    let retFn;
+
+    // only countdown the first button with non-zero timeout
+    for (let i = 0; i < buttons.length; i++) {
+      const button = buttons[i];
+      if (button.timeout) {
+        setCount(button.timeout as number);
+
+        const intervalID = setInterval(() => {
+          const count = countRef.current;
+
+          setCount(count - 1);
+          if (count === 1) {
+            onSubmit(button.value);
+          }
+        }, 1000);
+
+        retFn = () => clearInterval(intervalID);
+
+        break;
+      }
+    }
+
+    return retFn;
+  }, [buttons, onSubmit]);
+
   return (
     <Modal onDismiss={() => onSubmit()} aria-label={ariaLabel}>
       {title && <Modal.Header title={title} modalType={modalType} />}
@@ -39,7 +70,7 @@ export function Dialog<T>({
             key={index}
             size="medium"
           >
-            {button.label}
+            {button.label} {button.timeout && count ? `(${count})` : null}
           </Button>
         ))}
       </Modal.Footer>

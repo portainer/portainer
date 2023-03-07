@@ -1,3 +1,7 @@
+import { EnvironmentStatus } from '@/react/portainer/environments/types';
+
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
 import { reactModule } from './react';
@@ -16,31 +20,43 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
       onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, KubernetesHealthService, KubernetesNamespaceService, Notifications, StateManager) {
         return $async(async () => {
-          if (![5, 6, 7].includes(endpoint.Type)) {
+          const kubeTypes = [
+            PortainerEndpointTypes.KubernetesLocalEnvironment,
+            PortainerEndpointTypes.AgentOnKubernetesEnvironment,
+            PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment,
+          ];
+
+          if (!kubeTypes.includes(endpoint.Type)) {
             $state.go('portainer.home');
             return;
           }
           try {
-            if (endpoint.Type === 7) {
+            if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
               //edge
               try {
                 await KubernetesHealthService.ping(endpoint.Id);
-                endpoint.Status = 1;
+                endpoint.Status = EnvironmentStatus.Up;
               } catch (e) {
-                endpoint.Status = 2;
+                endpoint.Status = EnvironmentStatus.Down;
               }
             }
 
             await StateManager.updateEndpointState(endpoint);
 
-            if (endpoint.Type === 7 && endpoint.Status === 2) {
+            if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment && endpoint.Status === EnvironmentStatus.Down) {
               throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
             }
 
             await KubernetesNamespaceService.get();
           } catch (e) {
-            Notifications.error('Failed loading environment', e);
-            $state.go('portainer.home', {}, { reload: true });
+            let params = {};
+
+            if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
+              params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'kubernetes.dashboard' };
+            } else {
+              Notifications.error('Failed loading environment', e);
+            }
+            $state.go('portainer.home', params, { reload: true, inherit: false });
           }
         });
       },

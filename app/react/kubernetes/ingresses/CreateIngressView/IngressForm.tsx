@@ -116,7 +116,7 @@ export function IngressForm({
           <div className="form-horizontal">
             <div className="form-group">
               <label
-                className="control-label text-muted col-sm-3 col-lg-2 required"
+                className="control-label text-muted col-sm-3 col-lg-2"
                 htmlFor="namespace"
               >
                 Namespace
@@ -491,9 +491,7 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">
-                          Path type
-                        </span>
+                        <span className="input-group-addon">Path type</span>
                         <Select
                           key={servicePorts.toString() + path.PathType}
                           name={`ingress_pathType_${hostIndex}_${pathIndex}`}

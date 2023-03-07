@@ -32,7 +32,7 @@ export function EdgeAgentForm({ onCreate, readonly, asyncMode }: Props) {
   const settingsQuery = useSettings();
 
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
-  const validation = useValidationSchema(asyncMode);
+  const validation = useValidationSchema();
 
   if (!settingsQuery.data) {
     return null;

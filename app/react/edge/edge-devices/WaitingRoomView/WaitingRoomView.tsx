@@ -1,5 +1,3 @@
-import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
-import { EdgeTypes } from '@/react/portainer/environments/types';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { InformationPanel } from '@@/InformationPanel';
@@ -11,12 +9,6 @@ import { Datatable } from './Datatable';
 export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
-  const { environments, isLoading, totalCount } = useEnvironmentList({
-    edgeDeviceUntrusted: true,
-    excludeSnapshots: true,
-    types: EdgeTypes,
-  });
-
   return (
     <>
       <PageHeader
@@ -35,11 +27,7 @@ function WaitingRoomView() {
         </TextTip>
       </InformationPanel>
 
-      <Datatable
-        devices={environments}
-        totalCount={totalCount}
-        isLoading={isLoading}
-      />
+      <Datatable />
     </>
   );
 }

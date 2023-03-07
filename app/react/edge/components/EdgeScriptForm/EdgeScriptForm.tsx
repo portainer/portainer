@@ -16,6 +16,9 @@ const edgePropertiesFormInitialValues: ScriptFormValues = {
   nomadToken: '',
   authEnabled: true,
   tlsEnabled: false,
+  edgeGroupsIds: [],
+  group: 0,
+  tagsIds: [],
 };
 
 interface Props {
@@ -23,6 +26,7 @@ interface Props {
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
   isNomadTokenVisible?: boolean;
   asyncMode?: boolean;
+  showMetaFields?: boolean;
 }
 
 export function EdgeScriptForm({
@@ -30,6 +34,7 @@ export function EdgeScriptForm({
   commands,
   isNomadTokenVisible,
   asyncMode,
+  showMetaFields,
   children,
 }: PropsWithChildren<Props>) {
   const showOsSelector = !(commands instanceof Array);
@@ -50,6 +55,7 @@ export function EdgeScriptForm({
                 isNomadTokenVisible && values.platform === 'nomad'
               }
               hideIdGetter={edgeInfo.id !== undefined}
+              showMetaFields={showMetaFields}
             />
             <div className="mt-8">
               {showOsSelector && (

@@ -7,7 +7,7 @@ import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhoo
 
 class StackRedeployGitFormController {
   /* @ngInject */
-  constructor($async, $state, $compile, $scope, StackService, ModalService, Notifications, FormHelper) {
+  constructor($async, $state, $compile, $scope, StackService, Notifications, FormHelper) {
     this.$async = $async;
     this.$state = $state;
     this.$compile = $compile;
