@@ -82,9 +82,11 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 	}
 
 	err = manager.deployer.Remove(ctx, stack.Name, nil, libstack.Options{
+		WorkingDir:  stack.ProjectPath,
 		EnvFilePath: envFilePath,
 		Host:        url,
 	})
+
 	return errors.Wrap(err, "failed to remove a stack")
 }
 
