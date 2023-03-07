@@ -34,9 +34,5 @@ function messageHTML(value: string) {
     message = 'unlimited';
   }
 
-  return (
-    <div className={styles.tooltipContainer}>
-      <div className={styles.tooltipMessage}>{message}</div>
-    </div>
-  );
+  return <div className={styles.tooltipContainer}>{message}</div>;
 }
