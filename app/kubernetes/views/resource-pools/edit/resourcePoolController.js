@@ -219,6 +219,7 @@ class KubernetesResourcePoolController {
           return;
         }
         await this.KubernetesResourcePoolService.toggleSystem(this.endpoint.Id, namespaceName, !this.isSystem);
+        await this.KubernetesNamespaceService.refreshCacheAsync();
 
         this.Notifications.success('Namespace successfully updated', namespaceName);
         this.$state.reload(this.$state.current);
