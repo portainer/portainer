@@ -133,7 +133,7 @@ export function buildGitValidationSchema(
     ComposeFilePathInRepository: string().required(
       'Compose file path is required'
     ),
-    AdditionalFiles: array(string().required()).default([]),
+    AdditionalFiles: array(string().required('Path is required')).default([]),
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
   }).concat(gitAuthValidation(gitCredentials));

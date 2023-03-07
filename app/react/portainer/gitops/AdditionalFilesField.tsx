@@ -35,8 +35,8 @@ function Item({
   const { ref, updateCaret } = useCaretPosition();
 
   return (
-    <>
-      <InputGroup size="small" className="col-sm-5">
+    <div className="relative flex flex-col">
+      <InputGroup size="small">
         <InputGroup.Addon>path</InputGroup.Addon>
         <InputGroup.Input
           mRef={ref}
@@ -50,7 +50,11 @@ function Item({
           }}
         />
       </InputGroup>
-      {error && <FormError>{error}</FormError>}
-    </>
+      {error && (
+        <div className="absolute -bottom-7">
+          <FormError>{error}</FormError>
+        </div>
+      )}
+    </div>
   );
 }
