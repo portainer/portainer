@@ -1,6 +1,4 @@
 import Tippy from '@tippyjs/react';
-import clsx from 'clsx';
-import _ from 'lodash';
 
 import 'tippy.js/dist/tippy.css';
 
@@ -13,11 +11,9 @@ export interface Props {
 }
 
 export function SliderTooltip({ value, child, delay }: Props) {
-  const id = _.uniqueId('tooltip-container-');
-
   return (
     <Tippy
-      className={clsx(id, styles.tooltip, '')}
+      className={styles.tooltip}
       content={messageHTML(value)}
       placement="top"
       showOnCreate
