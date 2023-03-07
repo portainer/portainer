@@ -185,7 +185,7 @@ class KubernetesApplicationsController {
       ports: [],
       namespaces: [],
       namespace: '',
-      isSystemResources: false,
+      isSystemResources: undefined,
     };
 
     this.state.namespaces = await this.KubernetesNamespaceService.get();

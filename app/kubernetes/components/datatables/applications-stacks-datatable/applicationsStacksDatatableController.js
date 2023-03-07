@@ -145,7 +145,7 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsStacksD
         this.filters.state.open = false;
       }
 
-      var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+      var storedSettings = DatatableService.getDataTableSettings(this.settingsKey);
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
