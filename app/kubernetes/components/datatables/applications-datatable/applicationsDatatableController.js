@@ -167,9 +167,11 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.$onChanges = function () {
-      this.settings.showSystem = this.isSystemResources;
+      if (typeof this.isSystemResources !== 'undefined') {
+        this.settings.showSystem = this.isSystemResources;
+        DatatableService.setDataTableSettings(this.settingsKey, this.settings);
+      }
       this.state.namespace = this.namespace;
-      DatatableService.setDataTableSettings(this.tableKey, this.settings);
       this.updateNamespace();
       this.prepareTableFromDataset();
     };
@@ -211,9 +213,9 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
-      }
 
-      this.setSystemResources && this.setSystemResources(this.settings.showSystem);
+        this.setSystemResources && this.setSystemResources(this.settings.showSystem);
+      }
 
       // Set the default selected namespace
       if (!this.state.namespace) {

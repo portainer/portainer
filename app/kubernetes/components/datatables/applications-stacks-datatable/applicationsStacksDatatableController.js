@@ -103,14 +103,17 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsStacksD
           } else {
             this.state.namespace = this.state.namespaces[0].Value;
           }
+          this.onChangeNamespaceDropdown(this.state.namespace);
         }
       }
     };
 
     this.$onChanges = function () {
-      this.settings.showSystem = this.isSystemResources;
+      if (typeof this.isSystemResources !== 'undefined') {
+        this.settings.showSystem = this.isSystemResources;
+        DatatableService.setDataTableSettings(this.settingsKey, this.settings);
+      }
       this.state.namespace = this.namespace;
-      DatatableService.setDataTableSettings(this.tableKey, this.settings);
       this.updateNamespace();
       this.prepareTableFromDataset();
     };
@@ -146,9 +149,9 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsStacksD
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
-      }
 
-      this.setSystemResources && this.setSystemResources(this.settings.showSystem);
+        this.setSystemResources && this.setSystemResources(this.settings.showSystem);
+      }
 
       // Set the default selected namespace
       if (!this.state.namespace) {

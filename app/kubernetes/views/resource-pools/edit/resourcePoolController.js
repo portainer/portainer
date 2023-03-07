@@ -35,7 +35,8 @@ class KubernetesResourcePoolController {
     KubernetesPodService,
     KubernetesApplicationService,
     KubernetesIngressService,
-    KubernetesVolumeService
+    KubernetesVolumeService,
+    KubernetesNamespaceService
   ) {
     Object.assign(this, {
       $async,
@@ -54,6 +55,7 @@ class KubernetesResourcePoolController {
       KubernetesApplicationService,
       KubernetesIngressService,
       KubernetesVolumeService,
+      KubernetesNamespaceService,
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
