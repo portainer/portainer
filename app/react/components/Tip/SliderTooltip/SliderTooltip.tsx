@@ -9,9 +9,10 @@ import styles from './SliderTooltip.module.css';
 export interface Props {
   value: string;
   child: React.ReactElement;
+  delay: number;
 }
 
-export function SliderTooltip({ value, child }: Props) {
+export function SliderTooltip({ value, child, delay }: Props) {
   const id = _.uniqueId('tooltip-container-');
 
   return (
@@ -22,6 +23,7 @@ export function SliderTooltip({ value, child }: Props) {
       showOnCreate
       hideOnClick={false}
       trigger="manual"
+      delay={delay}
       arrow
       allowHTML
     >

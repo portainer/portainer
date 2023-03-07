@@ -1,6 +1,9 @@
+import { useCallback } from 'react';
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { Lock, XCircle, CheckCircle } from 'lucide-react';
+
+import { SliderTooltip } from '@@/Tip/SliderTooltip';
 
 import 'rc-slider/assets/index.css';
 
@@ -87,10 +90,22 @@ export function PasswordLengthSlider({
     onChange(sliderValue);
   }
 
+  const sliderTooltip = useCallback(
+    (node, handleProps) => (
+      <SliderTooltip
+        value={`${handleProps.value} characters`}
+        child={node}
+        delay={800}
+      />
+    ),
+    []
+  );
+
   return (
     <div className={clsx(styles.root, styles[sliderProps.strength])}>
       <div className="col-sm-4">
         <RcSlider
+          handleRender={sliderTooltip}
           min={min}
           max={max}
           step={step}

@@ -36,6 +36,7 @@ export function Slider({
       <SliderTooltip
         value={translateMinValue(handleProps.value)}
         child={node}
+        delay={0}
       />
     ),
     []
