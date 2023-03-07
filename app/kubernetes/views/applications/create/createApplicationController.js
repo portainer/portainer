@@ -1213,6 +1213,12 @@ class KubernetesCreateApplicationController {
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
 
+        // this.state.nodes.memory and this.state.nodes.cpu are used to calculate the slider limits, so set them before calling updateSliders()
+        _.forEach(nodes, (item) => {
+          this.state.nodes.memory += filesizeParser(item.Memory);
+          this.state.nodes.cpu += item.CPU;
+        });
+
         if (this.resourcePools.length) {
           const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
           this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
@@ -1224,10 +1230,6 @@ class KubernetesCreateApplicationController {
           return;
         }
 
-        _.forEach(nodes, (item) => {
-          this.state.nodes.memory += filesizeParser(item.Memory);
-          this.state.nodes.cpu += item.CPU;
-        });
         this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
         this.nodeNumber = nodes.length;
 
