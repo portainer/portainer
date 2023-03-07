@@ -32,16 +32,14 @@ export function useConfigurations(
 
 export function useConfigurationsForCluster(
   environemtId: EnvironmentId,
-  namespaces: string[],
-  isNamespaceFresh: boolean
+  namespaces?: string[]
 ) {
   return useQuery(
     ['environments', environemtId, 'kubernetes', 'configmaps'],
-    () => getConfigMapsForCluster(environemtId, namespaces),
+    () => namespaces && getConfigMapsForCluster(environemtId, namespaces),
     {
       ...withError('Unable to retrieve applications'),
-      // wait until fresh namespaces are loaded (isNamespaceFresh), so that standard users don't get 403 errors for applications in admin namespaces
-      enabled: isNamespaceFresh,
+      enabled: !!namespaces,
     }
   );
 }

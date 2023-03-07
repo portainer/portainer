@@ -129,6 +129,7 @@ export const componentsModule = angular
       'pluralType',
       'isLoading',
       'isRefetching',
+      'dataCy',
     ])
   )
   .component(

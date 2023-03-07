@@ -20,21 +20,12 @@ export function DashboardView() {
   const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
   const namespaceNames = namespaces && Object.keys(namespaces);
   const { data: applications, ...applicationsQuery } =
-    useApplicationsForCluster(
-      environmentId,
-      namespaceNames || [],
-      !namespacesQuery.isStale
-    );
+    useApplicationsForCluster(environmentId, namespaceNames);
   const { data: configurations, ...configurationsQuery } =
-    useConfigurationsForCluster(
-      environmentId,
-      namespaceNames || [],
-      !namespacesQuery.isStale
-    );
+    useConfigurationsForCluster(environmentId, namespaceNames);
   const { data: pvcs, ...pvcsQuery } = usePVCsForCluster(
     environmentId,
-    namespaceNames || [],
-    !namespacesQuery.isStale
+    namespaceNames
   );
 
   return (
@@ -57,6 +48,7 @@ export function DashboardView() {
             icon={Layers}
             to="kubernetes.resourcePools"
             type="Namespace"
+            dataCy="dashboard-namespace"
           />
           <DashboardItem
             value={applications?.length}
@@ -67,6 +59,7 @@ export function DashboardView() {
             icon={Box}
             to="kubernetes.applications"
             type="Application"
+            dataCy="dashboard-application"
           />
           <DashboardItem
             value={configurations?.length}
@@ -80,6 +73,7 @@ export function DashboardView() {
             to="kubernetes.configurations"
             type="ConfigMaps & Secrets"
             pluralType="ConfigMaps & Secrets"
+            dataCy="dashboard-config"
           />
           <DashboardItem
             value={pvcs?.length}
@@ -90,6 +84,7 @@ export function DashboardView() {
             icon={Database}
             to="kubernetes.volumes"
             type="Volume"
+            dataCy="dashboard-volume"
           />
         </DashboardGrid>
       </div>

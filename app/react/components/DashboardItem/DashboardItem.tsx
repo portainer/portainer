@@ -15,6 +15,7 @@ interface Props extends IconProps {
   value?: number;
   to?: string;
   children?: ReactNode;
+  dataCy?: string;
 }
 
 export function DashboardItem({
@@ -26,6 +27,7 @@ export function DashboardItem({
   value,
   to,
   children,
+  dataCy,
 }: Props) {
   const Item = (
     <div
@@ -35,6 +37,7 @@ export function DashboardItem({
         'th-dark:border-gray-neutral-8 th-dark:bg-gray-iron-10 th-dark:hover:border-blue-8 th-dark:hover:bg-gray-10',
         'th-highcontrast:border-white th-highcontrast:bg-black th-highcontrast:hover:border-blue-8 th-highcontrast:hover:bg-gray-11'
       )}
+      data-cy={dataCy}
     >
       <div
         className={clsx(

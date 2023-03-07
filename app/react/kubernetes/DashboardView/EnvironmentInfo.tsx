@@ -12,7 +12,7 @@ export function EnvironmentInfo() {
   const { data: environmentData, ...environmentQuery } =
     useEnvironment(environmentId);
   const tagsQuery = useTagsForEnvironment(environmentId);
-  const tagNames = tagsQuery.tags?.map((tag) => tag.Name).join(', ');
+  const tagNames = tagsQuery.tags?.map((tag) => tag.Name).join(', ') || '-';
 
   return (
     <Widget>
@@ -24,17 +24,22 @@ export function EnvironmentInfo() {
             <tbody>
               <tr>
                 <td className="!border-none !pl-0">Environment</td>
-                <td className="!border-none">{environmentData.Name}</td>
+                <td
+                  className="!border-none"
+                  data-cy="dashboard-environmentName"
+                >
+                  {environmentData.Name}
+                </td>
               </tr>
               <tr ng-if="ctrl.showEnvUrl">
                 <td className="!border-t !pl-0">URL</td>
-                <td className="!border-t">
+                <td className="!border-t" data-cy="dashboard-environmenturl">
                   {stripProtocol(environmentData.URL) || '-'}
                 </td>
               </tr>
               <tr>
                 <td className="!pl-0">Tags</td>
-                <td>{tagNames || '-'}</td>
+                <td data-cy="dashboard-environmentTags">{tagNames}</td>
               </tr>
             </tbody>
           </table>
