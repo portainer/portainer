@@ -37,7 +37,15 @@ func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Req
 		)
 	}
 
-	services, err := cli.GetServices(namespace)
+	lookup, err := request.RetrieveBooleanQueryParameter(r, "lookupapplications", true)
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid lookupapplications query parameter",
+			err,
+		)
+	}
+
+	services, err := cli.GetServices(namespace, lookup)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to retrieve services",

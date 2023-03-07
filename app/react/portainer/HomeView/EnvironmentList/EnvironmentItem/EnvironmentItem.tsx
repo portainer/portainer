@@ -130,16 +130,20 @@ export function EnvironmentItem({
 }
 
 function useEnvironmentTagNames(tagIds?: TagId[]) {
-  const { tags, isLoading } = useTags((tags) => {
-    if (!tagIds) {
-      return [];
-    }
-    return _.compact(
-      tagIds
-        .map((id) => tags.find((tag) => tag.ID === id))
-        .map((tag) => tag?.Name)
-    );
+  const tagsQuery = useTags({
+    select: (tags) => {
+      if (!tagIds) {
+        return [];
+      }
+      return _.compact(
+        tagIds
+          .map((id) => tags.find((tag) => tag.ID === id))
+          .map((tag) => tag?.Name)
+      );
+    },
   });
+
+  const { data: tags, isLoading } = tagsQuery;
 
   if (tags && tags.length > 0) {
     return tags.join(', ');

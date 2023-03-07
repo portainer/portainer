@@ -81,6 +81,11 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 	err := store.User().Create(admin)
 	assert.NoError(t, err, "error creating an admin")
 
+	err = store.Endpoint().Create(&portainer.Endpoint{
+		ID: 0,
+	})
+	assert.NoError(t, err, "error creating environment")
+
 	err = store.Stack().Create(&portainer.Stack{
 		ID:          1,
 		CreatedBy:   "admin",
@@ -104,6 +109,11 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	admin := &portainer.User{ID: 1, Username: "admin"}
 	err := store.User().Create(admin)
 	assert.NoError(t, err, "error creating an admin")
+
+	err = store.Endpoint().Create(&portainer.Endpoint{
+		ID: 0,
+	})
+	assert.NoError(t, err, "error creating environment")
 
 	err = store.Stack().Create(&portainer.Stack{
 		ID:        1,
@@ -142,7 +152,9 @@ func Test_redeployWhenChanged(t *testing.T) {
 			URL:           "url",
 			ReferenceName: "ref",
 			ConfigHash:    "oldHash",
-		}}
+		},
+	}
+
 	err = store.Stack().Create(&stack)
 	assert.NoError(t, err, "failed to create a test stack")
 

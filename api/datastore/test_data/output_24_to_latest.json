@@ -46,6 +46,7 @@
       },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
+      "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
       "Id": 1,
@@ -71,6 +72,7 @@
       "LastCheckInDate": 0,
       "Name": "local",
       "PostInitMigrations": {
+        "MigrateGPUs": true,
         "MigrateIngresses": true
       },
       "PublicURL": "",

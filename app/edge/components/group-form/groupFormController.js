@@ -37,6 +37,7 @@ export class EdgeGroupFormController {
     this.onChangeDynamic = this.onChangeDynamic.bind(this);
     this.onChangeModel = this.onChangeModel.bind(this);
     this.onChangePartialMatch = this.onChangePartialMatch.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 
     $scope.$watch(
       () => this.model,
@@ -116,6 +117,10 @@ export class EdgeGroupFormController {
         notifyError('Failure', err, 'Unable to retrieve tags');
       }
     });
+  }
+
+  handleSubmit() {
+    this.formAction(this.model);
   }
 
   $onInit() {

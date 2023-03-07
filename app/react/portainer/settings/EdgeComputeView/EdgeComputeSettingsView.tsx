@@ -1,6 +1,9 @@
 import { Settings } from '@/react/portainer/settings/types';
 
+import { isBE } from '../../feature-flags/feature-flags.service';
+
 import { EdgeComputeSettings } from './EdgeComputeSettings';
+import { DeploymentSyncOptions } from './DeploymentSyncOptions/DeploymentSyncOptions';
 import { AutomaticEdgeEnvCreation } from './AutomaticEdgeEnvCreation';
 
 interface Props {
@@ -13,7 +16,9 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
     <div className="row">
       <EdgeComputeSettings settings={settings} onSubmit={onSubmit} />
 
-      {process.env.PORTAINER_EDITION === 'BE' && <AutomaticEdgeEnvCreation />}
+      <DeploymentSyncOptions />
+
+      {isBE && <AutomaticEdgeEnvCreation />}
     </div>
   );
 }

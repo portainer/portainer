@@ -1,13 +1,15 @@
 export interface AnalyticsState {
   dockerAgent: number;
   dockerApi: number;
-  dockerEdgeAgent: number;
+  dockerEdgeAgentStandard: number;
+  dockerEdgeAgentAsync: number;
   kubernetesAgent: number;
-  kubernetesEdgeAgent: number;
+  kubernetesEdgeAgentStandard: number;
+  kubernetesEdgeAgentAsync: number;
   kaasAgent: number;
   aciApi: number;
   localEndpoint: number;
-  nomadEdgeAgent: number;
+  nomadEdgeAgentStandard: number;
 }
 
 export type AnalyticsStateKey = keyof AnalyticsState;

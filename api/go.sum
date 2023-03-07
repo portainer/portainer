@@ -344,6 +344,12 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/portainer/docker-compose-wrapper v0.0.0-20221215210951-2c30d1b17a27 h1:PceCpp86SDYb3lZHT4KpuBCkmcJMW5x1qrdFNEfAdUo=
 github.com/portainer/docker-compose-wrapper v0.0.0-20221215210951-2c30d1b17a27/go.mod h1:03UmPLyjiPUexGJuW20mQXvmsoSpeErvMlItJGtq/Ww=
+github.com/portainer/docker-compose-wrapper v0.0.0-20230209071700-ee11af9c546a h1:4VGM1OH15fqm5rgki0eLF6vND/NxHfoPt3CA6/YdA0k=
+github.com/portainer/docker-compose-wrapper v0.0.0-20230209071700-ee11af9c546a/go.mod h1:03UmPLyjiPUexGJuW20mQXvmsoSpeErvMlItJGtq/Ww=
+github.com/portainer/docker-compose-wrapper v0.0.0-20230209082344-8a5b52de366f h1:z/lmLhZMMSIwg70Ap1rPluXNe1vQXH9gfK9K/ols4JA=
+github.com/portainer/docker-compose-wrapper v0.0.0-20230209082344-8a5b52de366f/go.mod h1:03UmPLyjiPUexGJuW20mQXvmsoSpeErvMlItJGtq/Ww=
+github.com/portainer/docker-compose-wrapper v0.0.0-20230301083819-3dbc6abf1ce7 h1:/i985KPNw0KvVtLhTEPUa86aJMtun5ZPOyFCJzdY+dY=
+github.com/portainer/docker-compose-wrapper v0.0.0-20230301083819-3dbc6abf1ce7/go.mod h1:03UmPLyjiPUexGJuW20mQXvmsoSpeErvMlItJGtq/Ww=
 github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a h1:B0z3skIMT+OwVNJPQhKp52X+9OWW6A9n5UWig3lHBJk=
 github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a/go.mod h1:n54EEIq+MM0NNtqLeCby8ljL+l275VpolXO0ibHegLE=
 github.com/portainer/libhttp v0.0.0-20230206214615-dabd58de9f44 h1:4LYprPd3TsYjHk7CaTmCov1ceG6VKJsL40fJIWiRxpw=

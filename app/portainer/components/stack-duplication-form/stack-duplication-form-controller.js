@@ -1,4 +1,4 @@
-import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 
 angular.module('portainer.app').controller('StackDuplicationFormController', [
   'Notifications',

@@ -1,6 +1,7 @@
 import { CopyButton } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
+import { Code } from '@@/Code';
 
 export function EdgeKeyDisplay({ edgeKey }: { edgeKey: string }) {
   return (
@@ -15,9 +16,7 @@ export function EdgeKeyDisplay({ edgeKey }: { edgeKey: string }) {
         <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a>
       </p>
 
-      <div className="mt-2 break-words">
-        <code>{edgeKey}</code>
-      </div>
+      <Code>{edgeKey}</Code>
 
       <CopyButton copyText={edgeKey}>Copy token</CopyButton>
     </FormSection>

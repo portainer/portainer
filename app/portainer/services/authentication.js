@@ -36,7 +36,6 @@ angular.module('portainer.app').factory('Authentication', [
         await setUser(jwt);
         return true;
       } catch (error) {
-        console.log('Unable to initialize authentication service', error);
         return tryAutoLoginExtension();
       }
     }

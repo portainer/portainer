@@ -10,6 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/maps"
+	"github.com/rs/zerolog/log"
 )
 
 // @id EdgeJobDelete
@@ -40,7 +41,7 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 	edgeJobFolder := handler.FileService.GetEdgeJobFolder(strconv.Itoa(edgeJobID))
 	err = handler.FileService.RemoveDirectory(edgeJobFolder)
 	if err != nil {
-		return httperror.InternalServerError("Unable to remove the files associated to the Edge job on the filesystem", err)
+		log.Warn().Err(err).Msg("Unable to remove the files associated to the Edge job on the filesystem")
 	}
 
 	handler.ReverseTunnelService.RemoveEdgeJob(edgeJob.ID)

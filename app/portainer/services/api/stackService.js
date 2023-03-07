@@ -270,7 +270,7 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     };
 
-    service.updateKubeStack = function (stack, stackFile, gitConfig) {
+    service.updateKubeStack = function (stack, { stackFile, gitConfig, webhookId }) {
       let payload = {};
 
       if (stackFile) {
@@ -279,7 +279,7 @@ angular.module('portainer.app').factory('StackService', [
         };
       } else {
         payload = {
-          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate),
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
@@ -455,11 +455,11 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     }
 
-    service.updateGitStackSettings = function (id, endpointId, env, gitConfig) {
+    service.updateGitStackSettings = function (id, endpointId, env, gitConfig, webhookId) {
       return Stack.updateGitStackSettings(
         { endpointId, id },
         {
-          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate),
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           Env: env,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,

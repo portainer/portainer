@@ -8,19 +8,21 @@ import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { FormSection } from '@@/form-components/FormSection';
 
 import { useCreateEdgeDeviceParam } from '../hooks/useCreateEdgeDeviceParam';
 
+import { EnvironmentSelector } from './EnvironmentSelector';
 import {
-  EnvironmentSelector,
-  EnvironmentSelectorValue,
-} from './EnvironmentSelector';
-import { environmentTypes } from './environment-types';
+  EnvironmentOptionValue,
+  existingEnvironmentTypes,
+  newEnvironmentTypes,
+} from './environment-types';
 
 export function EnvironmentTypeSelectView() {
   const createEdgeDevice = useCreateEdgeDeviceParam();
 
-  const [types, setTypes] = useState<EnvironmentSelectorValue[]>([]);
+  const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
 
@@ -36,11 +38,34 @@ export function EnvironmentTypeSelectView() {
           <Widget>
             <WidgetTitle icon={Wand2} title="Environment Wizard" />
             <WidgetBody>
-              <EnvironmentSelector
-                value={types}
-                onChange={setTypes}
-                createEdgeDevice={createEdgeDevice}
-              />
+              <div className="form-horizontal">
+                <FormSection title="Select your environment(s)">
+                  <p className="text-muted small">
+                    You can onboard different types of environments, select all
+                    that apply.
+                  </p>
+                  <p className="control-label !mb-2">
+                    Connect to existing environments
+                  </p>
+                  <EnvironmentSelector
+                    value={types}
+                    onChange={setTypes}
+                    createEdgeDevice={createEdgeDevice}
+                    options={existingEnvironmentTypes}
+                  />
+                  <p className="control-label !mb-2">Set up new environments</p>
+                  <EnvironmentSelector
+                    value={types}
+                    onChange={setTypes}
+                    createEdgeDevice={createEdgeDevice}
+                    options={newEnvironmentTypes}
+                    hiddenSpacingCount={
+                      existingEnvironmentTypes.length -
+                      newEnvironmentTypes.length
+                    }
+                  />
+                </FormSection>
+              </div>
               <Button
                 disabled={types.length === 0}
                 onClick={() => startWizard()}
@@ -58,6 +83,11 @@ export function EnvironmentTypeSelectView() {
     if (types.length === 0) {
       return;
     }
+
+    const environmentTypes = [
+      ...existingEnvironmentTypes,
+      ...newEnvironmentTypes,
+    ];
 
     const steps = _.compact(
       types.map((id) => environmentTypes.find((eType) => eType.id === id))

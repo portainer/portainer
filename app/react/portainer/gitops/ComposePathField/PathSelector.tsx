@@ -7,6 +7,7 @@ import {
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
 import { ChangeEvent } from 'react';
+import clsx from 'clsx';
 
 import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
 import { useDebounce } from '@/react/hooks/useDebounce';
@@ -41,7 +42,7 @@ export function PathSelector({
   const enabled = Boolean(
     model.RepositoryURL && model.RepositoryURLValid && searchTerm
   );
-  const { data: searchResult } = useSearch(payload, enabled);
+  const { data: searchResults } = useSearch(payload, enabled);
   const { ref, updateCaret } = useCaretPosition();
 
   return (
@@ -58,14 +59,18 @@ export function PathSelector({
         placeholder={placeholder}
         value={value}
       />
-      {searchResult && searchResult.length > 0 && searchTerm !== '' && (
+      {searchResults && searchResults.length > 0 && (
         <ComboboxPopover>
           <ComboboxList>
-            {searchResult.map((result: string, index: number) => (
+            {searchResults.map((result: string, index: number) => (
               <ComboboxOption
                 key={index}
                 value={result}
-                className={`[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`}
+                className={clsx(
+                  `[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`,
+                  `hover:th-highcontrast:!bg-black hover:th-dark:!bg-black`,
+                  'th-highcontrast:bg-gray-10 th-dark:bg-gray-10 '
+                )}
               />
             ))}
           </ComboboxList>

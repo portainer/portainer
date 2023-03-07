@@ -139,6 +139,7 @@ export type Environment = {
   TagIds: TagId[];
   GroupId: EnvironmentGroupId;
   DeploymentOptions: DeploymentOptions | null;
+  EnableGPUManagement: boolean;
   EdgeID?: string;
   EdgeKey: string;
   EdgeCheckinInterval?: number;

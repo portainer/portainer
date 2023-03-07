@@ -25,6 +25,7 @@ import { Slider } from '@@/form-components/Slider';
 import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
 import { CodeEditor } from '@@/CodeEditor';
+import { InsightsBox } from '@@/InsightsBox';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -32,13 +33,19 @@ import { customTemplatesModule } from './custom-templates';
 import { gitFormModule } from './git-form';
 import { settingsModule } from './settings';
 import { accessControlModule } from './access-control';
+import { environmentsModule } from './environments';
+import { envListModule } from './environments-list-view-components';
+import { registriesModule } from './registries';
 
 export const componentsModule = angular
   .module('portainer.app.react.components', [
-    customTemplatesModule,
-    gitFormModule,
-    settingsModule,
     accessControlModule,
+    customTemplatesModule,
+    envListModule,
+    environmentsModule,
+    gitFormModule,
+    registriesModule,
+    settingsModule,
   ])
   .component(
     'tagSelector',
@@ -72,6 +79,10 @@ export const componentsModule = angular
   .component('badge', r2a(Badge, ['type', 'className']))
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
+  .component(
+    'insightsBox',
+    r2a(InsightsBox, ['header', 'content', 'setHtmlContent', 'insightCloseId'])
+  )
   .component(
     'passwordCheckHint',
     r2a(withReactQuery(PasswordCheckHint), [
@@ -159,6 +170,7 @@ export const componentsModule = angular
       'options',
       'isMulti',
       'isClearable',
+      'components',
     ])
   )
   .component(

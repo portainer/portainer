@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"errors"
 	"net/http"
+	"time"
 )
 
 type (
@@ -18,15 +19,17 @@ type (
 	K8sIngressControllers []K8sIngressController
 
 	K8sIngressInfo struct {
-		Name        string            `json:"Name"`
-		UID         string            `json:"UID"`
-		Type        string            `json:"Type"`
-		Namespace   string            `json:"Namespace"`
-		ClassName   string            `json:"ClassName"`
-		Annotations map[string]string `json:"Annotations"`
-		Hosts       []string          `json:"Hosts"`
-		Paths       []K8sIngressPath  `json:"Paths"`
-		TLS         []K8sIngressTLS   `json:"TLS"`
+		Name         string            `json:"Name"`
+		UID          string            `json:"UID"`
+		Type         string            `json:"Type"`
+		Namespace    string            `json:"Namespace"`
+		ClassName    string            `json:"ClassName"`
+		Annotations  map[string]string `json:"Annotations"`
+		Hosts        []string          `json:"Hosts"`
+		Paths        []K8sIngressPath  `json:"Paths"`
+		TLS          []K8sIngressTLS   `json:"TLS"`
+		Labels       map[string]string `json:"Labels,omitempty"`
+		CreationDate time.Time         `json:"CreationDate"`
 	}
 
 	K8sIngressTLS struct {

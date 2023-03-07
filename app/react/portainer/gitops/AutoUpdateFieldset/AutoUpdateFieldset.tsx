@@ -14,6 +14,8 @@ export function AutoUpdateFieldset({
   isForcePullVisible = true,
   errors,
   baseWebhookUrl,
+  webhookId,
+  webhooksDocs,
 }: {
   value: AutoUpdateModel;
   onChange: (value: AutoUpdateModel) => void;
@@ -21,6 +23,8 @@ export function AutoUpdateFieldset({
   isForcePullVisible?: boolean;
   errors?: FormikErrors<AutoUpdateModel>;
   baseWebhookUrl: string;
+  webhookId: string;
+  webhooksDocs?: string;
 }) {
   return (
     <>
@@ -45,12 +49,14 @@ export function AutoUpdateFieldset({
 
       {value.RepositoryAutomaticUpdates && (
         <AutoUpdateSettings
+          webhookId={webhookId}
           baseWebhookUrl={baseWebhookUrl}
           value={value}
           onChange={handleChange}
           environmentType={environmentType}
           showForcePullImage={isForcePullVisible}
           errors={errors}
+          webhookDocs={webhooksDocs}
         />
       )}
     </>

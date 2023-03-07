@@ -10,6 +10,8 @@
     on-change="($ctrl.onChangeAutoUpdate)"
     environment-type="KUBERNETES"
     base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+    webhook-id="{{ $ctrl.state.webhookId }}"
+    webhooks-docs="https://docs.portainer.io/user/kubernetes/applications/webhooks"
   ></git-form-auto-update-fieldset>
   <time-window-display></time-window-display>
 

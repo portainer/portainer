@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/rs/zerolog/log"
 )
 
 type updateEdgeStackPayload struct {
@@ -135,7 +136,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		// deployment type was changed - need to delete the old file
 		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 		if err != nil {
-			return httperror.InternalServerError("Unable to clear old files", err)
+			log.Warn().Err(err).Msg("Unable to clear old files")
 		}
 
 		stack.EntryPoint = ""
