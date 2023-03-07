@@ -29,10 +29,16 @@ export function InsightsBox({ header, content, insightCloseId }: Props) {
         <Lightbulb className="h-4 text-warning-7 th-highcontrast:text-warning-6 th-dark:text-warning-6" />
       </div>
       <div>
-        <p className={clsx('mb-2 font-bold', insightCloseId && 'pr-4')}>
+        <p
+          className={clsx(
+            // text-[0.9em] matches .form-horizontal .control-label font-size used in many labels in portainer
+            'mb-2 text-[0.9em] font-medium',
+            insightCloseId && 'pr-4'
+          )}
+        >
           {header}
         </p>
-        <div>{content}</div>
+        <div className="small">{content}</div>
       </div>
       {insightCloseId && (
         <Button
