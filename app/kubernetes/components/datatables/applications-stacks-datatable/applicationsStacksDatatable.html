@@ -10,6 +10,22 @@
         Stacks
       </div>
       <!-- actions -->
+      <div class="form-group namespaces !mb-0 !mr-0 min-w-[280px]">
+        <div class="input-group">
+          <span class="input-group-addon">
+            <pr-icon icon="'filter'"></pr-icon>
+            Namespace
+          </span>
+          <select
+            class="form-control"
+            ng-model="$ctrl.state.namespace"
+            ng-change="$ctrl.onChangeNamespace()"
+            data-cy="component-namespaceSelect"
+            ng-options="o.Value as (o.Name + (o.IsSystem ? ' - system' : '')) for o in $ctrl.state.namespaces"
+          >
+          </select>
+        </div>
+      </div>
       <div class="searchBar vertical-center">
         <pr-icon icon="'search'" class-name="'!h-3'"></pr-icon>
         <input

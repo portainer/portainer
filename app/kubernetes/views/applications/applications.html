@@ -19,6 +19,11 @@
                 refresh-callback="ctrl.getApplications"
                 on-publishing-mode-click="(ctrl.onPublishingModeClick)"
                 is-primary="true"
+                namespaces="ctrl.state.namespaces"
+                namespace="ctrl.state.namespace"
+                on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
+                is-system-resources="ctrl.state.isSystemResources"
+                set-system-resources="(ctrl.setSystemResources)"
               >
               </kubernetes-applications-datatable>
             </uib-tab>
@@ -30,6 +35,11 @@
                 order-by="Name"
                 refresh-callback="ctrl.getApplications"
                 remove-action="ctrl.removeStacksAction"
+                namespaces="ctrl.state.namespaces"
+                namespace="ctrl.state.namespace"
+                on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
+                is-system-resources="ctrl.state.isSystemResources"
+                set-system-resources="(ctrl.setSystemResources)"
               >
               </kubernetes-applications-stacks-datatable>
             </uib-tab>

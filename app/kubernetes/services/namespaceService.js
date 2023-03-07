@@ -7,9 +7,10 @@ import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaces) {
+  constructor($async, KubernetesNamespaces, LocalStorage) {
     this.$async = $async;
     this.KubernetesNamespaces = KubernetesNamespaces;
+    this.LocalStorage = LocalStorage;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -17,6 +18,7 @@ class KubernetesNamespaceService {
     this.deleteAsync = this.deleteAsync.bind(this);
     this.getJSONAsync = this.getJSONAsync.bind(this);
     this.updateFinalizeAsync = this.updateFinalizeAsync.bind(this);
+    this.refreshCacheAsync = this.refreshCacheAsync.bind(this);
   }
 
   /**
@@ -79,11 +81,19 @@ class KubernetesNamespaceService {
     }
   }
 
-  get(name) {
+  async get(name) {
     if (name) {
       return this.$async(this.getAsync, name);
     }
-    return this.$async(this.getAllAsync);
+    const cachedAllowedNamespaces = this.LocalStorage.getAllowedNamespaces();
+    if (cachedAllowedNamespaces) {
+      updateNamespaces(cachedAllowedNamespaces);
+      return cachedAllowedNamespaces;
+    } else {
+      const allowedNamespaces = await this.getAllAsync();
+      this.LocalStorage.storeAllowedNamespaces(allowedNamespaces);
+      return allowedNamespaces;
+    }
   }
 
   /**
@@ -94,6 +104,7 @@ class KubernetesNamespaceService {
       const payload = KubernetesNamespaceConverter.createPayload(namespace);
       const params = {};
       const data = await this.KubernetesNamespaces().create(params, payload).$promise;
+      await this.refreshCacheAsync();
       return data;
     } catch (err) {
       throw new PortainerError('Unable to create namespace', err);
@@ -102,6 +113,14 @@ class KubernetesNamespaceService {
 
   create(namespace) {
     return this.$async(this.createAsync, namespace);
+  }
+
+  async refreshCacheAsync() {
+    this.LocalStorage.deleteAllowedNamespaces();
+    const allowedNamespaces = await this.getAllAsync();
+    this.LocalStorage.storeAllowedNamespaces(allowedNamespaces);
+    updateNamespaces(allowedNamespaces);
+    return allowedNamespaces;
   }
 
   /**
