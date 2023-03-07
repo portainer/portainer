@@ -34,12 +34,15 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
+              isLoading={subscriptionsQuery.isLoading}
+              isRefetching={subscriptionsQuery.isRefetching}
               icon={Subscription}
               type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
               <DashboardItem
                 value={resourceGroupsCount}
+                isLoading={resourceGroupsQuery.isLoading}
                 icon={Package}
                 type="Resource group"
               />

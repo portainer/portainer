@@ -1,7 +1,7 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { Namespaces } from './types';
+import { Namespaces, SelfSubjectAccessReviewResponse } from './types';
 
 export async function getNamespace(
   environmentId: EnvironmentId,
@@ -25,6 +25,39 @@ export async function getNamespaces(environmentId: EnvironmentId) {
     return namespaces;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to retrieve namespaces');
+  }
+}
+
+export async function getSelfSubjectAccessReview(
+  environmentId: EnvironmentId,
+  namespaceName: string,
+  verb = 'list',
+  resource = 'deployments',
+  group = 'apps'
+) {
+  try {
+    const { data: accessReview } =
+      await axios.post<SelfSubjectAccessReviewResponse>(
+        `endpoints/${environmentId}/kubernetes/apis/authorization.k8s.io/v1/selfsubjectaccessreviews`,
+        {
+          spec: {
+            resourceAttributes: {
+              group,
+              resource,
+              verb,
+              namespace: namespaceName,
+            },
+          },
+          apiVersion: 'authorization.k8s.io/v1',
+          kind: 'SelfSubjectAccessReview',
+        }
+      );
+    return accessReview;
+  } catch (e) {
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve self subject access review'
+    );
   }
 }
 

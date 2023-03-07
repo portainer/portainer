@@ -233,6 +233,7 @@
     "html-webpack-plugin": "^5.5.0",
     "husky": "4.2.5",
     "jest": "^27.4.3",
+    "kubernetes-types": "^1.26.0",
     "lint-staged": ">=10",
     "load-grunt-tasks": "^3.5.2",
     "lodash-webpack-plugin": "^0.11.6",

@@ -19,10 +19,12 @@ test('should show the selected tags', async () => {
     {
       ID: 1,
       Name: 'tag1',
+      Endpoints: {},
     },
     {
       ID: 2,
       Name: 'tag2',
+      Endpoints: {},
     },
   ];
 

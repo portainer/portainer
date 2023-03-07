@@ -5,6 +5,7 @@ import {
   withError,
   withInvalidate,
 } from '@/react-tools/react-query';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { createTag, getTags } from './tags.service';
 import { Tag, TagId } from './types';
@@ -22,6 +23,14 @@ export function useTags<T = Tag[]>({
     select,
     ...withError('Failed to retrieve tags'),
   });
+}
+
+export function useTagsForEnvironment(environmentId: EnvironmentId) {
+  const { data: tags, isLoading } = useTags({
+    select: (tags) => tags.filter((tag) => tag.Endpoints[environmentId]),
+  });
+
+  return { tags, isLoading };
 }
 
 export function useCreateTagMutation() {

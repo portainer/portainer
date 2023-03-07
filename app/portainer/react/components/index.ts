@@ -121,7 +121,17 @@ export const componentsModule = angular
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
   .component(
     'dashboardItem',
-    r2a(DashboardItem, ['icon', 'type', 'value', 'children'])
+    r2a(DashboardItem, [
+      'icon',
+      'type',
+      'value',
+      'to',
+      'children',
+      'pluralType',
+      'isLoading',
+      'isRefetching',
+      'dataCy',
+    ])
   )
   .component(
     'datatableSearchbar',
