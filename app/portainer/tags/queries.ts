@@ -26,9 +26,9 @@ export function useTags<T = Tag[]>({
 }
 
 export function useTagsForEnvironment(environmentId: EnvironmentId) {
-  const { tags, isLoading } = useTags((tags) =>
-    tags.filter((tag) => tag.Endpoints[environmentId])
-  );
+  const { data: tags, isLoading } = useTags({
+    select: (tags) => tags.filter((tag) => tag.Endpoints[environmentId]),
+  });
 
   return { tags, isLoading };
 }
