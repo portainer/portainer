@@ -41,10 +41,12 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 	if podmanModeEnvVar == "1" {
 		return PlatformPodman, nil
 	}
+
 	serviceHostKubernetesEnvVar := os.Getenv(KubernetesServiceHost)
 	if serviceHostKubernetesEnvVar != "" {
 		return PlatformKubernetes, nil
 	}
+
 	nomadJobName := os.Getenv(NomadJobName)
 	if nomadJobName != "" {
 		return PlatformNomad, nil
