@@ -17,6 +17,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+const (
+	DefaultKubeClientQPS   = 30
+	DefaultKubeClientBurst = 100
+)
+
 type (
 	// ClientFactory is used to create Kubernetes clients
 	ClientFactory struct {
@@ -113,6 +118,9 @@ func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, k
 		return nil, err
 	}
 
+	cliConfig.QPS = DefaultKubeClientQPS
+	cliConfig.Burst = DefaultKubeClientBurst
+
 	cli, err := kubernetes.NewForConfig(cliConfig)
 	if err != nil {
 		return nil, err
@@ -198,7 +206,10 @@ func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernete
 	if err != nil {
 		return nil, err
 	}
+
 	config.Insecure = true
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
 
 	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
 		return &agentHeaderRoundTripper{
@@ -216,6 +227,9 @@ func buildLocalClient() (*kubernetes.Clientset, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
 
 	return kubernetes.NewForConfig(config)
 }
