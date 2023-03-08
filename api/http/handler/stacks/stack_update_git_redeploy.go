@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -135,12 +133,6 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		stack.Option = &portainer.StackOption{
 			Prune: payload.Prune,
 		}
-	}
-
-	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
-	err = filesystem.MoveDirectory(stack.ProjectPath, backupProjectPath)
-	if err != nil {
-		return httperror.InternalServerError("Unable to move git repository directory", err)
 	}
 
 	repositoryUsername := ""
