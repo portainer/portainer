@@ -1286,8 +1286,6 @@ type (
 	UserThemeSettings struct {
 		// Color represents the color theme of the UI
 		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
-		// SubtleUpgradeButton indicates if the upgrade banner should be displayed in a subtle way
-		SubtleUpgradeButton bool `json:"subtleUpgradeButton"`
 	}
 
 	// Webhook represents a url webhook that can be used to update a service

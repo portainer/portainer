@@ -905,8 +905,7 @@
       },
       "Role": 1,
       "ThemeSettings": {
-        "color": "",
-        "subtleUpgradeButton": false
+        "color": ""
       },
       "TokenIssueAt": 0,
       "UserTheme": "",
@@ -936,8 +935,7 @@
       },
       "Role": 1,
       "ThemeSettings": {
-        "color": "",
-        "subtleUpgradeButton": false
+        "color": ""
       },
       "TokenIssueAt": 0,
       "UserTheme": "",

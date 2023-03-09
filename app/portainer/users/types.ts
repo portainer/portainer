@@ -22,6 +22,5 @@ export type User = {
   };
   ThemeSettings: {
     color: 'dark' | 'light' | 'highcontrast' | 'auto';
-    subtleUpgradeButton: boolean;
   };
 };
