@@ -64,11 +64,7 @@ function InnerSelector({
 }) {
   const edgeGroupsQuery = useEdgeGroups();
 
-  if (!edgeGroupsQuery.data) {
-    return null;
-  }
-
-  const items = edgeGroupsQuery.data.filter(isGroupVisible);
+  const items = (edgeGroupsQuery.data || []).filter(isGroupVisible);
 
   const valueGroups = _.compact(
     value.map((id) => items.find((item) => item.Id === id))
