@@ -165,7 +165,10 @@ class KubernetesConfigureController {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
       const resourcePools = _.filter(
         allResourcePools,
-        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+        (resourcePool) =>
+          !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) &&
+          !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name) &&
+          resourcePool.Namespace.Status === 'Active'
       );
 
       ingressesToDel.forEach((ingress) => {

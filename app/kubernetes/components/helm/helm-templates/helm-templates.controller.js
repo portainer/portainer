@@ -141,7 +141,9 @@ export default class HelmTemplatesController {
     try {
       const resourcePools = await this.KubernetesResourcePoolService.get();
 
-      const nonSystemNamespaces = resourcePools.filter((resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+      const nonSystemNamespaces = resourcePools.filter(
+        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && resourcePool.Namespace.Status === 'Active'
+      );
       this.state.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
       this.state.resourcePool = this.state.resourcePools[0];
     } catch (err) {
