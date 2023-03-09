@@ -1213,17 +1213,23 @@ class KubernetesCreateApplicationController {
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
 
-        const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
-        this.formValues.ResourcePool = this.resourcePools[0];
-        this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
-        if (!this.formValues.ResourcePool) {
-          return;
-        }
-
+        // this.state.nodes.memory and this.state.nodes.cpu are used to calculate the slider limits, so set them before calling updateSliders()
         _.forEach(nodes, (item) => {
           this.state.nodes.memory += filesizeParser(item.Memory);
           this.state.nodes.cpu += item.CPU;
         });
+
+        if (this.resourcePools.length) {
+          const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+          this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
+          this.updateNamespaceLimits(namespaceWithQuota);
+          this.updateSliders(namespaceWithQuota);
+        }
+        this.formValues.ResourcePool = this.resourcePools[0];
+        if (!this.formValues.ResourcePool) {
+          return;
+        }
+
         this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
         this.nodeNumber = nodes.length;
 
@@ -1281,9 +1287,6 @@ class KubernetesCreateApplicationController {
         this.formValues.IsPublishingService = this.formValues.PublishedPorts.length > 0;
 
         this.oldFormValues = angular.copy(this.formValues);
-
-        this.updateNamespaceLimits(namespaceWithQuota);
-        this.updateSliders(namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {
