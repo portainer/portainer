@@ -12,8 +12,6 @@ import clsx from 'clsx';
 import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
 import { useDebounce } from '@/react/hooks/useDebounce';
 
-import { useCaretPosition } from '@@/form-components/useCaretPosition';
-
 import { getAuthentication } from '../utils';
 import { GitFormModel } from '../types';
 
