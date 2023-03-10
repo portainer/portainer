@@ -1,7 +1,8 @@
+import { useStateWrapper } from '@/react/hooks/useStateWrapper';
+
 import { FormControl } from '@@/form-components/FormControl';
 import { TextTip } from '@@/Tip/TextTip';
 import { Input } from '@@/form-components/Input';
-import { useCaretPosition } from '@@/form-components/useCaretPosition';
 
 import { GitFormModel } from '../types';
 import { isBE } from '../../feature-flags/feature-flags.service';
@@ -25,7 +26,7 @@ export function ComposePathField({
   isDockerStandalone,
   errors,
 }: Props) {
-  const { ref, updateCaret } = useCaretPosition();
+  const [inputValue, updateInputValue] = useStateWrapper(value, onChange);
 
   return (
     <div className="form-group">
@@ -65,11 +66,9 @@ export function ComposePathField({
             />
           ) : (
             <Input
-              mRef={ref}
-              value={value}
+              value={inputValue}
               onChange={(e) => {
-                onChange(e.target.value);
-                updateCaret();
+                updateInputValue(e.target.value);
               }}
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
             />
