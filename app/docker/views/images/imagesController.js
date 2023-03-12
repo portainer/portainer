@@ -167,6 +167,6 @@ function confirmImageForceRemoval() {
     title: 'Are you sure?',
     modalType: ModalType.Destructive,
     message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
-    confirmButton: buildConfirmButton('Remote the image', 'danger'),
+    confirmButton: buildConfirmButton('Remove the image', 'danger'),
   });
 }
