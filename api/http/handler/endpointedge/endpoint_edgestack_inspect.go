@@ -14,8 +14,9 @@ import (
 )
 
 type configResponse struct {
-	StackFileContent string
-	Name             string
+	StackFileContent  string
+	DotEnvFileContent string
+	Name              string
 	// Namespace to use for Kubernetes manifests, leave empty to use the namespaces defined in the manifest
 	Namespace string
 }
@@ -81,9 +82,12 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
 	}
 
+	dotEnvFileContent, _ := handler.FileService.GetFileContent(edgeStack.ProjectPath, ".env")
+
 	return response.JSON(w, configResponse{
-		StackFileContent: string(stackFileContent),
-		Name:             edgeStack.Name,
-		Namespace:        namespace,
+		StackFileContent:  string(stackFileContent),
+		DotEnvFileContent: string(dotEnvFileContent),
+		Name:              edgeStack.Name,
+		Namespace:         namespace,
 	})
 }
