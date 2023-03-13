@@ -588,9 +588,12 @@ type (
 		Flags         KubernetesFlags         `json:"Flags"`
 	}
 
+	// KubernetesFlags are used to detect if we need to run initial cluster
+	// detection again.
 	KubernetesFlags struct {
-		IsServerMetricsDetected bool `json:"IsServerMetricsDetected"`
-		IsServerStorageDetected bool `json:"IsServerStorageDetected"`
+		IsServerMetricsDetected      bool `json:"IsServerMetricsDetected"`
+		IsServerIngressClassDetected bool `json:"IsServerIngressClassDetected"`
+		IsServerStorageDetected      bool `json:"IsServerStorageDetected"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
