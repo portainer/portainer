@@ -64,6 +64,7 @@
           "UseServerMetrics": false
         },
         "Flags": {
+          "IsServerIngressClassDetected": false,
           "IsServerMetricsDetected": false,
           "IsServerStorageDetected": false
         },
