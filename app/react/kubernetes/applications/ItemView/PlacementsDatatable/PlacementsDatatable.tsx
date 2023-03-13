@@ -1,7 +1,5 @@
 import { Minimize2 } from 'lucide-react';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
-
 import {
   BasicTableSettings,
   createPersistedStore,
@@ -37,7 +35,6 @@ export function PlacementsDatatable({
   dataset: Node[];
   onRefresh: () => Promise<void>;
 }) {
-  const { isAdmin } = useCurrentUser();
   const tableState = useTableState(settingsStore, storageKey);
 
   useRepeater(tableState.autoRefreshRate, onRefresh);
@@ -62,11 +59,7 @@ export function PlacementsDatatable({
       )}
       emptyContentLabel="No node available."
       renderSubRow={(row) => (
-        <SubRow
-          isAdmin={isAdmin}
-          node={row.original}
-          cellCount={row.getVisibleCells().length}
-        />
+        <SubRow node={row.original} cellCount={row.getVisibleCells().length} />
       )}
     />
   );
