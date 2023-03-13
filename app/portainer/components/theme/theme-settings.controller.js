@@ -13,7 +13,6 @@ export default class ThemeSettingsController {
     this.UserService = UserService;
 
     this.setThemeColor = this.setThemeColor.bind(this);
-    this.setSubtleUpgradeButton = this.setSubtleUpgradeButton.bind(this);
   }
 
   async setThemeColor(color) {
@@ -26,13 +25,6 @@ export default class ThemeSettingsController {
 
       this.state.themeColor = color;
       this.updateThemeSettings({ color });
-    });
-  }
-
-  async setSubtleUpgradeButton(value) {
-    return this.$async(async () => {
-      this.state.subtleUpgradeButton = value;
-      this.updateThemeSettings({ subtleUpgradeButton: value });
     });
   }
 
@@ -57,7 +49,6 @@ export default class ThemeSettingsController {
         userId: null,
         themeColor: 'auto',
         isDemo: state.application.demoEnvironment.enabled,
-        subtleUpgradeButton: false,
       };
 
       this.state.availableThemes = options;
@@ -67,7 +58,6 @@ export default class ThemeSettingsController {
         const user = await this.UserService.user(this.state.userId);
 
         this.state.themeColor = user.ThemeSettings.color || this.state.themeColor;
-        this.state.subtleUpgradeButton = !!user.ThemeSettings.subtleUpgradeButton;
       } catch (err) {
         notifyError('Failure', err, 'Unable to get user details');
       }

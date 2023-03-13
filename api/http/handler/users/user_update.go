@@ -18,8 +18,6 @@ import (
 type themePayload struct {
 	// Color represents the color theme of the UI
 	Color *string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
-	// SubtleUpgradeButton indicates if the upgrade banner should be displayed in a subtle way
-	SubtleUpgradeButton *bool `json:"subtleUpgradeButton" example:"false"`
 }
 
 type userUpdatePayload struct {
@@ -33,11 +31,11 @@ type userUpdatePayload struct {
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.Contains(payload.Username, " ") {
-		return errors.New("Invalid username. Must not contain any whitespace")
+		return errors.New("invalid username. Must not contain any whitespace")
 	}
 
 	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
-		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+		return errors.New("invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
 	return nil
 }
@@ -119,10 +117,6 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	if payload.Theme != nil {
 		if payload.Theme.Color != nil {
 			user.ThemeSettings.Color = *payload.Theme.Color
-		}
-
-		if payload.Theme.SubtleUpgradeButton != nil {
-			user.ThemeSettings.SubtleUpgradeButton = *payload.Theme.SubtleUpgradeButton
 		}
 	}
 

@@ -19,7 +19,6 @@ export function createMockUsers(
     PortainerAuthorizations: {},
     ThemeSettings: {
       color: 'auto',
-      subtleUpgradeButton: false,
     },
   }));
 }
