@@ -8,13 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cbroglie/mustache"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/portainer/api/filesystem"
+
+	"github.com/cbroglie/mustache"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -65,7 +66,7 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 	projectName := fmt.Sprintf(
 		"portainer-upgrade-%d-%s",
 		timeId,
-		strings.Replace(version, ".", "-", -1))
+		strings.ReplaceAll(version, ".", "-"))
 
 	err = service.composeDeployer.Deploy(
 		ctx,

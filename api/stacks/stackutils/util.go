@@ -24,6 +24,7 @@ func GetStackFilePaths(stack *portainer.Stack, absolute bool) []string {
 	for _, file := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
 		filePaths = append(filePaths, filesystem.JoinPaths(stack.ProjectPath, file))
 	}
+
 	return filePaths
 }
 

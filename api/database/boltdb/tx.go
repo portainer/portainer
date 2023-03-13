@@ -92,7 +92,7 @@ func (tx *DbTransaction) CreateObject(bucketName string, fn func(uint64) (int, i
 		return err
 	}
 
-	return bucket.Put(tx.conn.ConvertToKey(int(id)), data)
+	return bucket.Put(tx.conn.ConvertToKey(id), data)
 }
 
 func (tx *DbTransaction) CreateObjectWithId(bucketName string, id int, obj interface{}) error {

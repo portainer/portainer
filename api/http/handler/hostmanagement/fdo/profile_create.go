@@ -48,15 +48,16 @@ func (handler *Handler) createProfile(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
-	switch method {
-	case "editor":
+	if method == "editor" {
 		return handler.createFDOProfileFromFileContent(w, r)
 	}
+
 	return httperror.BadRequest("Invalid method. Value must be one of: editor", errors.New("invalid method"))
 }
 
 func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload createProfileFromFileContentPayload
+
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
@@ -66,6 +67,7 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
+
 	if !isUnique {
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
 	}
@@ -80,6 +82,7 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist profile file on disk", err)
 	}
+
 	profile.FilePath = filePath
 	profile.DateCreated = time.Now().Unix()
 

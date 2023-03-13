@@ -150,8 +150,7 @@ func (transport *baseTransport) getRoundTripToken(request *http.Request, tokenMa
 func decorateAgentRequest(r *http.Request, dataStore dataservices.DataStore) error {
 	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
 
-	switch {
-	case strings.HasPrefix(requestPath, "/dockerhub"):
+	if strings.HasPrefix(requestPath, "/dockerhub") {
 		return decorateAgentDockerHubRequest(r, dataStore)
 	}
 
