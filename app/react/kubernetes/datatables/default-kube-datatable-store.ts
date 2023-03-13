@@ -1,9 +1,7 @@
 import { refreshableSettings, createPersistedStore } from '@@/datatables/types';
 
-import {
-  systemResourcesSettings,
-  TableSettings,
-} from './DefaultDatatableSettings';
+import { TableSettings } from './DefaultDatatableSettings';
+import { systemResourcesSettings } from './SystemResourcesSettings';
 
 export function createStore(
   storageKey: string,
