@@ -14,30 +14,35 @@ func streamFromWebsocketToWriter(websocketConn *websocket.Conn, writer io.Writer
 		_, in, err := websocketConn.ReadMessage()
 		if err != nil {
 			errorChan <- err
+
 			break
 		}
 
 		_, err = writer.Write(in)
 		if err != nil {
 			errorChan <- err
+
 			break
 		}
 	}
 }
 
 func streamFromReaderToWebsocket(websocketConn *websocket.Conn, reader io.Reader, errorChan chan error) {
+	out := make([]byte, readerBufferSize)
+
 	for {
-		out := make([]byte, readerBufferSize)
 		_, err := reader.Read(out)
 		if err != nil {
 			errorChan <- err
+
 			break
 		}
 
-		processedOutput := validString(string(out[:]))
+		processedOutput := validString(string(out))
 		err = websocketConn.WriteMessage(websocket.TextMessage, []byte(processedOutput))
 		if err != nil {
 			errorChan <- err
+
 			break
 		}
 	}
@@ -46,6 +51,7 @@ func streamFromReaderToWebsocket(websocketConn *websocket.Conn, reader io.Reader
 func validString(s string) string {
 	if !utf8.ValidString(s) {
 		v := make([]rune, 0, len(s))
+
 		for i, r := range s {
 			if r == utf8.RuneError {
 				_, size := utf8.DecodeRuneInString(s[i:])
@@ -53,9 +59,12 @@ func validString(s string) string {
 					continue
 				}
 			}
+
 			v = append(v, r)
 		}
+
 		s = string(v)
 	}
+
 	return s
 }

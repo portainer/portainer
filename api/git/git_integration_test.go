@@ -60,7 +60,7 @@ func TestService_ListRefs_Github_Concurrently(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
-	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
+	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
 	repositoryUrl := privateGitRepoURL
 	go service.ListRefs(repositoryUrl, username, accessToken, false)
@@ -224,7 +224,7 @@ func TestService_ListFiles_Github_Concurrently(t *testing.T) {
 	repositoryUrl := privateGitRepoURL
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
-	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
+	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
 	go service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
 	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})

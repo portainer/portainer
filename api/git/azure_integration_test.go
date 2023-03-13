@@ -8,14 +8,13 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	gittypes "github.com/portainer/portainer/api/git/types"
+
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	privateAzureRepoURL = "https://portainer.visualstudio.com/gitops-test/_git/gitops-test"
-)
+const privateAzureRepoURL = "https://portainer.visualstudio.com/gitops-test/_git/gitops-test"
 
 func TestService_ClonePublicRepository_Azure(t *testing.T) {
 	ensureIntegrationTest(t)
@@ -107,7 +106,7 @@ func TestService_ListRefs_Azure_Concurrently(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
-	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
+	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
 	go service.ListRefs(privateAzureRepoURL, username, accessToken, false)
 	service.ListRefs(privateAzureRepoURL, username, accessToken, false)
@@ -269,7 +268,7 @@ func TestService_ListFiles_Azure_Concurrently(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
-	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
+	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
 	go service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{})
 	service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{})
