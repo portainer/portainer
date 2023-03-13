@@ -10,7 +10,6 @@ const mockUser: User = {
   Username: 'mock',
   ThemeSettings: {
     color: 'auto',
-    subtleUpgradeButton: false,
   },
 };
 

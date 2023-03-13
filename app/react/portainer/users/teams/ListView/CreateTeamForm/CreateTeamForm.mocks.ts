@@ -22,7 +22,6 @@ export function mockExampleData() {
       Role: 2,
       ThemeSettings: {
         color: 'auto',
-        subtleUpgradeButton: false,
       },
       EndpointAuthorizations: {},
       PortainerAuthorizations: {
@@ -50,7 +49,6 @@ export function mockExampleData() {
       Role: 2,
       ThemeSettings: {
         color: 'auto',
-        subtleUpgradeButton: false,
       },
       EndpointAuthorizations: {},
       PortainerAuthorizations: {

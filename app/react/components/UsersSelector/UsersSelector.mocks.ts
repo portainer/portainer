@@ -26,7 +26,6 @@ export function createMockUser(id: number, username: string): UserViewModel {
     AuthenticationMethod: '',
     ThemeSettings: {
       color: 'auto',
-      subtleUpgradeButton: false,
     },
   };
 }
