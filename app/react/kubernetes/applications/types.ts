@@ -11,7 +11,10 @@ import {
 import { Pod, PodList } from 'kubernetes-types/core/v1';
 import { RawExtension } from 'kubernetes-types/runtime';
 
-export type Application = Deployment | DaemonSet | StatefulSet | Pod;
+export type Application = (Deployment | DaemonSet | StatefulSet | Pod) & {
+  Name: string;
+  ResourcePool: string;
+};
 
 // Revisions are have the previous application state and are used for rolling back applications to their previous state.
 // Deployments use ReplicaSets, StatefulSets and DaemonSets use ControllerRevisions, and Pods don't have revisions.
@@ -34,3 +37,10 @@ type Patch = {
 }[];
 
 export type ApplicationPatch = Patch | RawExtension;
+
+export type KubernetesStack = {
+  Name: string;
+  ResourcePool: string;
+  Applications: Array<Application>;
+  Highlighted: boolean;
+};

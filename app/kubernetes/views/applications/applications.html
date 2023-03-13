@@ -30,6 +30,7 @@
             </uib-tab>
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading class="vertical-center"> <pr-icon icon="'list'"></pr-icon> Stacks </uib-tab-heading>
+
               <kubernetes-applications-stacks-datatable
                 dataset="ctrl.state.stacks"
                 table-key="kubernetes.applications.stacks"
@@ -44,6 +45,16 @@
                 set-system-resources="(ctrl.setSystemResources)"
               >
               </kubernetes-applications-stacks-datatable>
+
+              <react-kubernetes-applications-stacks-datatable
+                dataset="ctrl.state.stacks"
+                on-refresh="(ctrl.getApplications)"
+                on-remove="(ctrl.removeStacksAction)"
+                namespaces="ctrl.state.namespaces"
+                namespace="ctrl.state.namespace"
+                on-namespace-change="(ctrl.onChangeNamespaceDropdown)"
+              >
+              </react-kubernetes-applications-stacks-datatable>
             </uib-tab>
           </uib-tabset>
         </rd-widget-body>
