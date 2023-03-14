@@ -6,14 +6,13 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/rs/zerolog/log"
 )
 
 // UpdateGitObject updates a git object based on its config
-func UpdateGitObject(gitService portainer.GitService, dataStore dataservices.DataStore, objId string, gitConfig *gittypes.RepoConfig, autoUpdateConfig *portainer.AutoUpdateSettings, projectPath string) (bool, string, error) {
+func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *gittypes.RepoConfig, forceUpdate bool, projectPath string) (bool, string, error) {
 	if gitConfig == nil {
 		return false, "", nil
 	}
@@ -35,7 +34,7 @@ func UpdateGitObject(gitService portainer.GitService, dataStore dataservices.Dat
 	}
 
 	hashChanged := !strings.EqualFold(newHash, gitConfig.ConfigHash)
-	forceUpdate := autoUpdateConfig != nil && autoUpdateConfig.ForceUpdate
+
 	if !hashChanged && !forceUpdate {
 		log.Debug().
 			Str("hash", newHash).
