@@ -1,16 +1,17 @@
-import uuidv4 from 'uuid/v4';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
+import { parseAutoUpdateResponse } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
+import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
+
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
-  constructor($async, $state, StackService, Notifications, WebhookHelper) {
+  constructor($async, $state, StackService, Notifications) {
     this.$async = $async;
     this.$state = $state;
     this.StackService = StackService;
     this.Notifications = Notifications;
-    this.WebhookHelper = WebhookHelper;
 
     this.state = {
       saveGitSettingsInProgress: false,
@@ -18,6 +19,8 @@ class KubernetesRedeployAppGitFormController {
       showConfig: false,
       isEdit: false,
       hasUnsavedChanges: false,
+      baseWebhookUrl: baseStackWebhookUrl(),
+      webhookId: createWebhookId(),
     };
 
     this.formValues = {
@@ -26,37 +29,44 @@ class KubernetesRedeployAppGitFormController {
       RepositoryUsername: '',
       RepositoryPassword: '',
       // auto update
-      AutoUpdate: {
-        RepositoryAutomaticUpdates: false,
-        RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
-        RepositoryFetchInterval: '5m',
-        RepositoryWebhookURL: '',
-      },
+      AutoUpdate: parseAutoUpdateResponse(),
     };
 
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
     this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
+    this.onChangeGitAuth = this.onChangeGitAuth.bind(this);
   }
 
   onChangeRef(value) {
     this.onChange({ RefName: value });
   }
 
-  onChange(values) {
-    this.formValues = {
-      ...this.formValues,
-      ...values,
-    };
-    this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
+  async onChange(values) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+
+      this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
+    });
   }
 
-  onChangeAutoUpdate(values) {
-    this.onChange({
-      AutoUpdate: {
-        ...this.formValues.AutoUpdate,
-        ...values,
-      },
+  onChangeGitAuth(values) {
+    return this.$async(async () => {
+      this.onChange(values);
+    });
+  }
+
+  async onChangeAutoUpdate(values) {
+    return this.$async(async () => {
+      await this.onChange({
+        AutoUpdate: {
+          ...this.formValues.AutoUpdate,
+          ...values,
+        },
+      });
     });
   }
 
@@ -108,7 +118,7 @@ class KubernetesRedeployAppGitFormController {
     return this.$async(async () => {
       try {
         this.state.saveGitSettingsInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, null, this.formValues);
+        await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, { gitConfig: this.formValues, webhookId: this.state.webhookId });
         this.savedFormValues = angular.copy(this.formValues);
         this.state.hasUnsavedChanges = false;
         this.Notifications.success('Success', 'Save stack settings successfully');
@@ -126,21 +136,11 @@ class KubernetesRedeployAppGitFormController {
 
   $onInit() {
     this.formValues.RefName = this.stack.GitConfig.ReferenceName;
-    // Init auto update
-    if (this.stack.AutoUpdate && (this.stack.AutoUpdate.Interval || this.stack.AutoUpdate.Webhook)) {
-      this.formValues.AutoUpdate.RepositoryAutomaticUpdates = true;
 
-      if (this.stack.AutoUpdate.Interval) {
-        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.INTERVAL;
-        this.formValues.AutoUpdate.RepositoryFetchInterval = this.stack.AutoUpdate.Interval;
-      } else if (this.stack.AutoUpdate.Webhook) {
-        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.WEBHOOK;
-        this.formValues.AutoUpdate.RepositoryWebhookURL = this.WebhookHelper.returnStackWebhookUrl(this.stack.AutoUpdate.Webhook);
-      }
-    }
+    this.formValues.AutoUpdate = parseAutoUpdateResponse(this.stack.AutoUpdate);
 
-    if (!this.formValues.AutoUpdate.RepositoryWebhookURL) {
-      this.formValues.AutoUpdate.RepositoryWebhookURL = this.WebhookHelper.returnStackWebhookUrl(uuidv4());
+    if (this.stack.AutoUpdate.Webhook) {
+      this.state.webhookId = this.stack.AutoUpdate.Webhook;
     }
 
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {

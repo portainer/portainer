@@ -32,6 +32,20 @@ type (
 	// Authorizations represents a set of authorizations associated to a role
 	Authorizations map[Authorization]bool
 
+	//AutoUpdateSettings represents the git auto sync config for stack deployment
+	AutoUpdateSettings struct {
+		// Auto update interval
+		Interval string `example:"1m30s"`
+		// A UUID generated from client
+		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
+		// Autoupdate job id
+		JobID string `example:"15"`
+		// Force update ignores repo changes
+		ForceUpdate bool `example:"false"`
+		// Pull latest image
+		ForcePullImage bool `example:"false"`
+	}
+
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment(endpoint).
 	AzureCredentials struct {
@@ -207,15 +221,21 @@ type (
 		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
-	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	// DockerContainerSnapshot is an extent of Docker's Container struct
+	// It contains some information of Docker's ContainerJSON struct
+	DockerContainerSnapshot struct {
+		types.Container
+		Env []string `json:"Env"`
+	}
 
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
-		Containers []types.Container       `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody `json:"Volumes" swaggerignore:"true"`
-		Networks   []types.NetworkResource `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary    `json:"Images" swaggerignore:"true"`
-		Info       types.Info              `json:"Info" swaggerignore:"true"`
-		Version    types.Version           `json:"Version" swaggerignore:"true"`
+		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
+		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
+		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
+		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -376,20 +396,13 @@ type (
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
 
-		Edge struct {
-			// Whether the device has been started in edge async mode
-			AsyncMode bool
-			// The ping interval for edge agent - used in edge async mode [seconds]
-			PingInterval int `json:"PingInterval" example:"60"`
-			// The snapshot interval for edge agent - used in edge async mode [seconds]
-			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
-			// The command list interval for edge agent - used in edge async mode [seconds]
-			CommandInterval int `json:"CommandInterval" example:"60"`
-		}
+		Edge EnvironmentEdgeSettings
 
 		Agent struct {
 			Version string `example:"1.0.0"`
 		}
+
+		EnableGPUManagement bool `json:"EnableGPUManagement"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -404,6 +417,17 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+	}
+
+	EnvironmentEdgeSettings struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -480,6 +504,7 @@ type (
 	// EndpointPostInitMigrations
 	EndpointPostInitMigrations struct {
 		MigrateIngresses bool `json:"MigrateIngresses"`
+		MigrateGPUs      bool `json:"MigrateGPUs"`
 	}
 
 	// Extension represents a deprecated Portainer extension
@@ -911,7 +936,8 @@ type (
 			PingInterval int `json:"PingInterval" example:"5"`
 			// The snapshot interval for edge agent - used in edge async mode (in seconds)
 			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-			// EdgeAsyncMode enables edge async mode by default
+
+			// Deprecated 2.18
 			AsyncMode bool
 		}
 
@@ -977,7 +1003,7 @@ type (
 		// Only applies when deploying stack with multiple files
 		AdditionalFiles []string `json:"AdditionalFiles"`
 		// The auto update settings of a git stack
-		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
+		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`
 		// The git config of this stack
@@ -988,16 +1014,6 @@ type (
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
-	}
-
-	//StackAutoUpdate represents the git auto sync config for stack deployment
-	StackAutoUpdate struct {
-		// Auto update interval
-		Interval string `example:"1m30s"`
-		// A UUID generated from client
-		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
-		// Autoupdate job id
-		JobID string `example:"15"`
 	}
 
 	// StackOption represents the options for stack deployment
@@ -1235,16 +1251,19 @@ type (
 		ID       UserID `json:"Id" example:"1"`
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" swaggerignore:"true"`
-		// User Theme
-		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role         UserRole `json:"Role" example:"1"`
-		TokenIssueAt int64    `json:"TokenIssueAt" example:"1"`
+		Role          UserRole `json:"Role" example:"1"`
+		TokenIssueAt  int64    `json:"TokenIssueAt" example:"1"`
+		ThemeSettings UserThemeSettings
 
 		// Deprecated fields
+
+		// Deprecated
+		UserTheme string `example:"dark"`
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
-		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
+		PortainerAuthorizations Authorizations
+		// Deprecated in DBVersion == 25
+		EndpointAuthorizations EndpointAuthorizations
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user
@@ -1262,6 +1281,12 @@ type (
 	// UserRole represents the role of a user. It can be either an administrator
 	// or a regular user
 	UserRole int
+
+	// UserThemeSettings represents the theme settings for a user
+	UserThemeSettings struct {
+		// Color represents the color theme of the UI
+		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
+	}
 
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
@@ -1405,7 +1430,7 @@ type (
 		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
 		CreateService(namespace string, service models.K8sServiceInfo) error
 		UpdateService(namespace string, service models.K8sServiceInfo) error
-		GetServices(namespace string) ([]models.K8sServiceInfo, error)
+		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
@@ -1483,7 +1508,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.18.0"
+	APIVersion = "2.19.0"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1530,7 +1555,9 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []featureflags.Feature{}
+var SupportedFeatureFlags = []featureflags.Feature{
+	"fdo",
+}
 
 const (
 	_ AuthenticationMethod = iota

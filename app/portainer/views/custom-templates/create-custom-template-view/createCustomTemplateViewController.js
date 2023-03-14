@@ -206,6 +206,7 @@ class CreateCustomTemplateViewController {
     this.state.endpointMode = applicationState.endpoint.mode;
     let stackType = 0;
     if (this.state.endpointMode.provider === 'DOCKER_STANDALONE') {
+      this.isDockerStandalone = true;
       stackType = 2;
     } else if (this.state.endpointMode.provider === 'DOCKER_SWARM_MODE') {
       stackType = 1;

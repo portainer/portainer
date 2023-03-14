@@ -39,7 +39,9 @@ class KubeManifestFormController {
   }
 
   onChangeMethod(method) {
-    this.state.Method = method;
+    return this.$async(async () => {
+      this.state.Method = method;
+    });
   }
 }
 

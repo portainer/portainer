@@ -1,3 +1,5 @@
+export type StackId = number;
+
 export enum StackType {
   /**
    * Represents a stack managed via docker stack

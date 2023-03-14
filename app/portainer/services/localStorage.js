@@ -112,13 +112,22 @@ angular.module('portainer.app').factory('LocalStorage', [
         localStorageService.clearAll();
       },
       cleanAuthData() {
-        localStorageService.remove('JWT', 'APPLICATION_STATE', 'LOGIN_STATE_UUID');
+        localStorageService.remove('JWT', 'APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
       },
       storeKubernetesSummaryToggle(value) {
         localStorageService.set('kubernetes_summary_expanded', value);
       },
       getKubernetesSummaryToggle() {
         return localStorageService.get('kubernetes_summary_expanded');
+      },
+      storeAllowedNamespaces: function (namespaces) {
+        localStorageService.set('ALLOWED_NAMESPACES', namespaces);
+      },
+      getAllowedNamespaces: function () {
+        return localStorageService.get('ALLOWED_NAMESPACES');
+      },
+      deleteAllowedNamespaces: function () {
+        localStorageService.remove('ALLOWED_NAMESPACES');
       },
     };
   },

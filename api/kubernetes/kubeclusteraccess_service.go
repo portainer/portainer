@@ -98,7 +98,7 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 
 	// When the api call is internal, the baseURL should not be used.
 	if hostURL == "localhost" {
-		hostURL = hostURL + service.httpsBindAddr
+		hostURL += service.httpsBindAddr
 		baseURL = "/"
 	}
 

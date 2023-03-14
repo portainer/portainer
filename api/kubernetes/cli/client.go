@@ -11,10 +11,14 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+)
+
+const (
+	DefaultKubeClientQPS   = 30
+	DefaultKubeClientBurst = 100
 )
 
 type (
@@ -122,6 +126,9 @@ func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, k
 		return nil, err
 	}
 
+	cliConfig.QPS = DefaultKubeClientQPS
+	cliConfig.Burst = DefaultKubeClientBurst
+
 	cli, err := kubernetes.NewForConfig(cliConfig)
 	if err != nil {
 		return nil, err
@@ -201,7 +208,10 @@ func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernete
 	if err != nil {
 		return nil, err
 	}
+
 	config.Insecure = true
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
 
 	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
 		return &agentHeaderRoundTripper{
@@ -220,30 +230,13 @@ func buildLocalClient() (*kubernetes.Clientset, error) {
 		return nil, err
 	}
 
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
+
 	return kubernetes.NewForConfig(config)
 }
 
-func (factory *ClientFactory) PostInitMigrateIngresses() error {
-	endpoints, err := factory.dataStore.Endpoint().Endpoints()
-	if err != nil {
-		return err
-	}
-	for i := range endpoints {
-		// Early exit if we do not need to migrate!
-		if !endpoints[i].PostInitMigrations.MigrateIngresses {
-			return nil
-		}
-
-		err := factory.migrateEndpointIngresses(&endpoints[i])
-		if err != nil {
-			log.Debug().Err(err).Msg("failure migrating endpoint ingresses")
-		}
-	}
-
-	return nil
-}
-
-func (factory *ClientFactory) migrateEndpointIngresses(e *portainer.Endpoint) error {
+func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint) error {
 	// classes is a list of controllers which have been manually added to the
 	// cluster setup view. These need to all be allowed globally, but then
 	// blocked in specific namespaces which they were not previously allowed in.

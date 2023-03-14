@@ -3,10 +3,27 @@ import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
 import Nomad from '@/assets/ico/vendor/nomad.svg?c';
+import KaaS from '@/assets/ico/vendor/kaas-icon.svg?c';
+import InstallK8s from '@/assets/ico/vendor/install-kubernetes.svg?c';
 
-import KaaSIcon from './kaas-icon.svg?c';
+import { BoxSelectorOption } from '@@/BoxSelector';
 
-export const environmentTypes = [
+export type EnvironmentOptionValue =
+  | 'dockerStandalone'
+  | 'dockerSwarm'
+  | 'kubernetes'
+  | 'aci'
+  | 'nomad'
+  | 'kaas'
+  | 'k8sInstall';
+
+export interface EnvironmentOption
+  extends BoxSelectorOption<EnvironmentOptionValue> {
+  id: EnvironmentOptionValue;
+  value: EnvironmentOptionValue;
+}
+
+export const existingEnvironmentTypes: EnvironmentOption[] = [
   {
     id: 'dockerStandalone',
     value: 'dockerStandalone',
@@ -49,23 +66,43 @@ export const environmentTypes = [
     feature: FeatureId.NOMAD,
     disabledWhenLimited: true,
   },
+];
+
+export const newEnvironmentTypes: EnvironmentOption[] = [
   {
     id: 'kaas',
     value: 'kaas',
-    label: 'KaaS',
-    description: 'Provision a Kubernetes environment with a cloud provider',
-    icon: KaaSIcon,
+    label: 'Provision KaaS Cluster',
+    description:
+      "Provision a Kubernetes cluster via a cloud provider's Kubernetes as a Service",
+    icon: KaaS,
     iconType: 'logo',
     feature: FeatureId.KAAS_PROVISIONING,
     disabledWhenLimited: true,
   },
-] as const;
+  {
+    id: 'k8sInstall',
+    value: 'k8sInstall',
+    label: 'Create Kubernetes cluster',
+    description: 'Create a Kubernetes cluster on existing infrastructure',
+    icon: InstallK8s,
+    iconType: 'logo',
+    feature: FeatureId.K8SINSTALL,
+    disabledWhenLimited: true,
+  },
+];
 
-export const formTitles = {
+export const environmentTypes = [
+  ...existingEnvironmentTypes,
+  ...newEnvironmentTypes,
+];
+
+export const formTitles: Record<EnvironmentOptionValue, string> = {
   dockerStandalone: 'Connect to your Docker Standalone environment',
   dockerSwarm: 'Connect to your Docker Swarm environment',
   kubernetes: 'Connect to your Kubernetes environment',
   aci: 'Connect to your ACI environment',
   nomad: 'Connect to your Nomad environment',
   kaas: 'Provision a KaaS environment',
+  k8sInstall: 'Create a Kubernetes cluster',
 };

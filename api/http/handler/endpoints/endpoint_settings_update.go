@@ -28,6 +28,10 @@ type endpointSettingsUpdatePayload struct {
 	AllowSysctlSettingForRegularUsers *bool `json:"allowSysctlSettingForRegularUsers" example:"true"`
 	// Whether host management features are enabled
 	EnableHostManagementFeatures *bool `json:"enableHostManagementFeatures" example:"true"`
+
+	EnableGPUManagement *bool `json:"enableGPUManagement" example:"false"`
+
+	Gpus []portainer.Pair `json:"gpus"`
 }
 
 func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
@@ -105,6 +109,14 @@ func (handler *Handler) endpointSettingsUpdate(w http.ResponseWriter, r *http.Re
 
 	if payload.EnableHostManagementFeatures != nil {
 		securitySettings.EnableHostManagementFeatures = *payload.EnableHostManagementFeatures
+	}
+
+	if payload.EnableGPUManagement != nil {
+		endpoint.EnableGPUManagement = *payload.EnableGPUManagement
+	}
+
+	if payload.Gpus != nil {
+		endpoint.Gpus = payload.Gpus
 	}
 
 	endpoint.SecuritySettings = securitySettings

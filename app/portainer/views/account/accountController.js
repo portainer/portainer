@@ -10,13 +10,11 @@ angular.module('portainer.app').controller('AccountController', [
   'Notifications',
   'SettingsService',
   'StateManager',
-  'ThemeManager',
-  function ($scope, $state, Authentication, UserService, Notifications, SettingsService, StateManager, ThemeManager) {
+  function ($scope, $state, Authentication, UserService, Notifications, SettingsService, StateManager) {
     $scope.formValues = {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
-      userTheme: '',
     };
 
     $scope.updatePassword = async function () {
@@ -98,24 +96,6 @@ angular.module('portainer.app').controller('AccountController', [
       });
     };
 
-    // Update DOM for theme attribute & LocalStorage
-    $scope.setTheme = function (theme) {
-      ThemeManager.setTheme(theme);
-      StateManager.updateTheme(theme);
-    };
-
-    // Rest API Call to update theme with userID in DB
-    $scope.updateTheme = function () {
-      UserService.updateUserTheme($scope.userID, $scope.formValues.userTheme)
-        .then(function success() {
-          Notifications.success('Success', 'User theme successfully updated');
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, err.msg);
-        });
-    };
-
     async function initView() {
       const state = StateManager.getState();
       const userDetails = Authentication.getUserDetails();
@@ -127,10 +107,6 @@ angular.module('portainer.app').controller('AccountController', [
       if (state.application.demoEnvironment.enabled) {
         $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);
       }
-
-      const data = await UserService.user($scope.userID);
-
-      $scope.formValues.userTheme = data.UserTheme;
 
       SettingsService.publicSettings()
         .then(function success(data) {

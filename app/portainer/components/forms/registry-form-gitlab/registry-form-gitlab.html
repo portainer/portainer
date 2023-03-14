@@ -3,12 +3,12 @@
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
       <p>
-        For information on how to generate a Gitlab Personal Access Token, follow the
-        <a href="https://gitlab.com/help/user/profile/personal_access_tokens.md" target="_blank">gitlab guide</a>.
+        For information on how to generate a GitLab Personal Access Token, follow the
+        <a href="https://gitlab.com/help/user/profile/personal_access_tokens.md" target="_blank">GitLab guide</a>.
       </p>
     </span>
   </div>
-  <div class="col-sm-12 form-section-title"> Gitlab registry connection details </div>
+  <div class="col-sm-12 form-section-title"> GitLab registry connection details </div>
   <!-- credentials-user -->
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">Username</label>
@@ -122,7 +122,7 @@
   </div>
 </form>
 <div class="form-horizontal" ng-if="$ctrl.projects">
-  <div class="col-sm-12 form-section-title"> Gitlab projects </div>
+  <div class="col-sm-12 form-section-title"> GitLab projects </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small"> Select the project's registries you want to manage. Portainer will create one registry for each selected project. </span>
     <span class="col-sm-12 text-muted small vertical-center">
@@ -133,7 +133,7 @@
   <div class="form-group">
     <div class="col-sm-12">
       <gitlab-projects-datatable
-        title-text="Gitlab projects"
+        title-text="GitLab projects"
         title-icon="list"
         dataset="$ctrl.projects"
         table-key="gitlab_projects"

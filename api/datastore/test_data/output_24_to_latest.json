@@ -46,6 +46,7 @@
       },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
+      "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
       "Id": 1,
@@ -71,6 +72,7 @@
       "LastCheckInDate": 0,
       "Name": "local",
       "PostInitMigrations": {
+        "MigrateGPUs": true,
         "MigrateIngresses": true
       },
       "PublicURL": "",
@@ -902,6 +904,9 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": ""
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "admin"
@@ -929,12 +934,15 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": ""
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "prabhat"
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.18.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.19.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

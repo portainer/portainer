@@ -32,10 +32,4 @@
   </file-upload-description>
 </file-upload-form>
 
-<git-form
-  ng-if="$ctrl.state.Method === 'repository'"
-  deploy-method="kubernetes"
-  model="$ctrl.formValues"
-  on-change="($ctrl.onChangeFormValues)"
-  hide-rebuild-info="true"
-></git-form>
+<git-form ng-if="$ctrl.state.Method === 'repository'" deploy-method="kubernetes" value="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>

@@ -7,7 +7,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
-	"math/big"
 
 	"github.com/portainer/libcrypto"
 )
@@ -114,9 +113,6 @@ func (service *ECDSAService) CreateSignature(message string) (string, error) {
 	}
 
 	hash := libcrypto.HashFromBytes([]byte(message))
-
-	r := big.NewInt(0)
-	s := big.NewInt(0)
 
 	r, s, err := ecdsa.Sign(rand.Reader, service.privateKey, hash)
 	if err != nil {

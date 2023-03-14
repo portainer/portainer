@@ -1,8 +1,8 @@
-import { useEnvironment } from '@/react/portainer/environments/queries/useEnvironment';
+import { useEnvironment } from '@/react/portainer/environments/queries';
 
 import { useEnvironmentId } from './useEnvironmentId';
 
-export function useCurrentEnvironment() {
-  const id = useEnvironmentId();
+export function useCurrentEnvironment(force = true) {
+  const id = useEnvironmentId(force);
   return useEnvironment(id);
 }

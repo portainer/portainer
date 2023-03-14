@@ -51,6 +51,10 @@ export function parseIsoDate(date) {
   return moment(date, TIME_FORMAT).toDate();
 }
 
+export function formatDate(date, strFormat = 'YYYY-MM-DD HH:mm:ss Z') {
+  return moment(date, strFormat).format(TIME_FORMAT);
+}
+
 export function getPairKey(pair, separator) {
   if (!pair.includes(separator)) {
     return pair;

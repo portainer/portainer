@@ -1,9 +1,14 @@
 import { useFormikContext, Field } from 'formik';
 
+import { GroupField } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/MetadataFieldset/GroupsField';
+
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
+import { TagSelector } from '@@/TagSelector';
+
+import { EdgeGroupsSelector } from '../../edge-stacks/components/EdgeGroupsSelector';
 
 import { NomadTokenField } from './NomadTokenField';
 import { ScriptFormValues } from './types';
@@ -11,16 +16,36 @@ import { ScriptFormValues } from './types';
 interface Props {
   isNomadTokenVisible?: boolean;
   hideIdGetter?: boolean;
+  showMetaFields?: boolean;
 }
 
 export function EdgeScriptSettingsFieldset({
   isNomadTokenVisible,
   hideIdGetter,
+  showMetaFields,
 }: Props) {
   const { values, setFieldValue } = useFormikContext<ScriptFormValues>();
 
   return (
     <>
+      {showMetaFields && (
+        <>
+          <GroupField name="group" />
+
+          <EdgeGroupsSelector
+            value={values.edgeGroupsIds}
+            onChange={(value) => setFieldValue('edgeGroupsIds', value)}
+            isGroupVisible={(group) => !group.Dynamic}
+            horizontal
+          />
+
+          <TagSelector
+            value={values.tagsIds}
+            onChange={(value) => setFieldValue('tagsIds', value)}
+          />
+        </>
+      )}
+
       {!hideIdGetter && (
         <>
           <FormControl

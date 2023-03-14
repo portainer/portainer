@@ -95,10 +95,12 @@ func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	if err != nil {
 		t.Fatalf("can't open a git repo at %s with error %v", dir, err)
 	}
+
 	iter, err := repo.Log(&git.LogOptions{All: true})
 	if err != nil {
 		t.Fatalf("can't get a commit history iterator with error %v", err)
 	}
+
 	count := 0
 	err = iter.ForEach(func(_ *object.Commit) error {
 		count++
@@ -107,6 +109,7 @@ func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	if err != nil {
 		t.Fatalf("can't iterate over the commit history with error %v", err)
 	}
+
 	return count
 }
 

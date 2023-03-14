@@ -6,5 +6,5 @@
  */
 export function baseHref() {
   const base = document.getElementById('base');
-  return base ? base.getAttribute('href') : '/';
+  return base ? base.getAttribute('href') || '/' : '/';
 }

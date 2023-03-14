@@ -11,6 +11,7 @@ import servicesModule from './services';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
+import { helpersModule } from './helpers';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -41,6 +42,7 @@ angular
     reactModule,
     sidebarModule,
     environmentsModule,
+    helpersModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -146,6 +148,7 @@ angular
           'sidebar@': {},
         },
       };
+
       const logout = {
         name: 'portainer.logout',
         url: '/logout',
@@ -194,6 +197,16 @@ angular
           'content@': {
             templateUrl: './views/devices/import/importDevice.html',
             controller: 'ImportDeviceController',
+          },
+        },
+      };
+
+      const edgeAutoCreateScript = {
+        name: 'portainer.endpoints.edgeAutoCreateScript',
+        url: '/aeec',
+        views: {
+          'content@': {
+            component: 'edgeAutoCreateScriptView',
           },
         },
       };
@@ -287,7 +300,7 @@ angular
 
       var home = {
         name: 'portainer.home',
-        url: '/home',
+        url: '/home?redirect&environmentId&environmentName&route',
         views: {
           'content@': {
             component: 'homeView',
@@ -422,6 +435,7 @@ angular
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
+      $stateRegistryProvider.register(edgeAutoCreateScript);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);

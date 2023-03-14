@@ -12,10 +12,12 @@
   font-size: 12px;
   display: block;
   border-radius: 8px;
-  padding: 15px;
+
+  padding: 20px 15px;
   text-align: left;
   box-shadow: var(--shadow-boxselector-color);
   position: relative;
+  margin-bottom: 0;
 
   text-align: left;
   height: 100%;
@@ -46,7 +48,5 @@
   @apply th-dark:border-blue-7 th-dark:bg-blue-10;
   @apply th-highcontrast:border-blue-7 th-highcontrast:bg-blue-10;
 
-  border-radius: 8px;
-  padding: 15px;
   box-shadow: none;
 }

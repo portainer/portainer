@@ -38,17 +38,19 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 // with an agent enabled environment(endpoint) to target a specific node in an agent cluster.
 // The underlying http client timeout may be specified, a default value is used otherwise.
 func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeName string, timeout *time.Duration) (*client.Client, error) {
-	if endpoint.Type == portainer.AzureEnvironment {
+	switch endpoint.Type {
+	case portainer.AzureEnvironment:
 		return nil, errUnsupportedEnvironmentType
-	} else if endpoint.Type == portainer.AgentOnDockerEnvironment {
+	case portainer.AgentOnDockerEnvironment:
 		return createAgentClient(endpoint, factory.signatureService, nodeName, timeout)
-	} else if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+	case portainer.EdgeAgentOnDockerEnvironment:
 		return createEdgeClient(endpoint, factory.signatureService, factory.reverseTunnelService, nodeName, timeout)
 	}
 
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
 		return createLocalClient(endpoint)
 	}
+
 	return createTCPClient(endpoint, timeout)
 }
 

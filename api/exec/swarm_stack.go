@@ -59,6 +59,7 @@ func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoin
 	if err != nil {
 		return err
 	}
+
 	for _, registry := range registries {
 		if registry.Authentication {
 			err = registryutils.EnsureRegTokenValid(manager.dataStore, &registry)
@@ -75,6 +76,7 @@ func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoin
 			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
 		}
 	}
+
 	return nil
 }
 
@@ -84,7 +86,9 @@ func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 	if err != nil {
 		return err
 	}
+
 	args = append(args, "logout")
+
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
 
@@ -101,6 +105,7 @@ func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, pul
 	} else {
 		args = append(args, "stack", "deploy", "--with-registry-auth")
 	}
+
 	if !pullImage {
 		args = append(args, "--resolve-image=never")
 	}
@@ -112,6 +117,7 @@ func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, pul
 	for _, envvar := range stack.Env {
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
+
 	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
 }
 
@@ -121,7 +127,9 @@ func (manager *SwarmStackManager) Remove(stack *portainer.Stack, endpoint *porta
 	if err != nil {
 		return err
 	}
+
 	args = append(args, "stack", "rm", stack.Name)
+
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
 
@@ -198,6 +206,7 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string
 	if config["HttpHeaders"] == nil {
 		config["HttpHeaders"] = make(map[string]interface{})
 	}
+
 	headersObject := config["HttpHeaders"].(map[string]interface{})
 	headersObject["X-PortainerAgent-ManagerOperation"] = "1"
 	headersObject["X-PortainerAgent-Signature"] = signature
@@ -230,5 +239,6 @@ func configureFilePaths(args []string, filePaths []string) []string {
 	for _, path := range filePaths {
 		args = append(args, "--compose-file", path)
 	}
+
 	return args
 }

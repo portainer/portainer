@@ -22,7 +22,7 @@ export interface EnvironmentsQueryParams {
   tagsPartialMatch?: boolean;
   groupIds?: EnvironmentGroupId[];
   status?: EnvironmentStatus[];
-  edgeDevice?: boolean;
+  edgeAsync?: boolean;
   edgeDeviceUntrusted?: boolean;
   excludeSnapshots?: boolean;
   provisioned?: boolean;

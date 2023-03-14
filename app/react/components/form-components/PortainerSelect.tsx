@@ -1,4 +1,8 @@
-import { OptionsOrGroups } from 'react-select';
+import {
+  GroupBase,
+  OptionsOrGroups,
+  SelectComponentsConfig,
+} from 'react-select';
 import _ from 'lodash';
 
 import { AutomationTestingProps } from '@/types';
@@ -10,9 +14,10 @@ export interface Option<TValue> {
   label: string;
 }
 
-type Group<TValue> = { label: string; options: Option<TValue>[] };
-
-type Options<TValue> = OptionsOrGroups<Option<TValue>, Group<TValue>>;
+type Options<TValue> = OptionsOrGroups<
+  Option<TValue>,
+  GroupBase<Option<TValue>>
+>;
 
 interface SharedProps extends AutomationTestingProps {
   name?: string;
@@ -28,6 +33,11 @@ interface MultiProps<TValue> extends SharedProps {
   onChange(value: readonly TValue[]): void;
   options: Options<TValue>;
   isMulti: true;
+  components?: SelectComponentsConfig<
+    Option<TValue>,
+    true,
+    GroupBase<Option<TValue>>
+  >;
 }
 
 interface SingleProps<TValue> extends SharedProps {
@@ -35,6 +45,11 @@ interface SingleProps<TValue> extends SharedProps {
   onChange(value: TValue | null): void;
   options: Options<TValue>;
   isMulti?: never;
+  components?: SelectComponentsConfig<
+    Option<TValue>,
+    false,
+    GroupBase<Option<TValue>>
+  >;
 }
 
 type Props<TValue> = MultiProps<TValue> | SingleProps<TValue>;
@@ -66,6 +81,7 @@ export function SingleSelect<TValue = string>({
   placeholder,
   isClearable,
   bindToBody,
+  components,
 }: SingleProps<TValue>) {
   const selectedValue =
     value || (typeof value === 'number' && value === 0)
@@ -86,6 +102,7 @@ export function SingleSelect<TValue = string>({
       placeholder={placeholder}
       isDisabled={disabled}
       menuPortalTarget={bindToBody ? document.body : undefined}
+      components={components}
     />
   );
 }
@@ -124,6 +141,7 @@ export function MultiSelect<TValue = string>({
   disabled,
   isClearable,
   bindToBody,
+  components,
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
@@ -142,12 +160,13 @@ export function MultiSelect<TValue = string>({
       placeholder={placeholder}
       isDisabled={disabled}
       menuPortalTarget={bindToBody ? document.body : undefined}
+      components={components}
     />
   );
 }
 
 function isGroup<TValue>(
-  option: Option<TValue> | Group<TValue>
-): option is Group<TValue> {
+  option: Option<TValue> | GroupBase<Option<TValue>>
+): option is GroupBase<Option<TValue>> {
   return 'options' in option;
 }

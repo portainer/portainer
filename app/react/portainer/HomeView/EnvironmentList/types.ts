@@ -6,6 +6,6 @@ export interface Filter<T = number> {
 export enum ConnectionType {
   API,
   Agent,
-  EdgeAgent,
-  EdgeDevice,
+  EdgeAgentStandard,
+  EdgeAgentAsync,
 }

@@ -9,9 +9,22 @@ import { confirmDelete } from '@@/modals/confirm';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, LocalStorage, StackService) {
+  constructor(
+    $async,
+    $state,
+    $scope,
+    Notifications,
+    KubernetesApplicationService,
+    HelmService,
+    KubernetesConfigurationService,
+    Authentication,
+    LocalStorage,
+    StackService,
+    KubernetesNamespaceService
+  ) {
     this.$async = $async;
     this.$state = $state;
+    this.$scope = $scope;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.HelmService = HelmService;
@@ -19,6 +32,7 @@ class KubernetesApplicationsController {
     this.Authentication = Authentication;
     this.LocalStorage = LocalStorage;
     this.StackService = StackService;
+    this.KubernetesNamespaceService = KubernetesNamespaceService;
 
     this.onInit = this.onInit.bind(this);
     this.getApplications = this.getApplications.bind(this);
@@ -28,6 +42,8 @@ class KubernetesApplicationsController {
     this.removeStacksAction = this.removeStacksAction.bind(this);
     this.removeStacksActionAsync = this.removeStacksActionAsync.bind(this);
     this.onPublishingModeClick = this.onPublishingModeClick.bind(this);
+    this.onChangeNamespaceDropdown = this.onChangeNamespaceDropdown.bind(this);
+    this.setSystemResources = this.setSystemResources.bind(this);
   }
 
   selectTab(index) {
@@ -126,18 +142,32 @@ class KubernetesApplicationsController {
     });
   }
 
+  onChangeNamespaceDropdown(namespace) {
+    this.state.namespace = namespace;
+    this.getApplicationsAsync();
+  }
+
   async getApplicationsAsync() {
     try {
-      const [applications, configurations] = await Promise.all([this.KubernetesApplicationService.get(), this.KubernetesConfigurationService.get()]);
+      const [applications, configurations] = await Promise.all([
+        this.KubernetesApplicationService.get(this.state.namespace),
+        this.KubernetesConfigurationService.get(this.state.namespace),
+      ]);
       const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
       const { helmApplications, nonHelmApplications } = KubernetesApplicationHelper.getNestedApplications(configuredApplications);
 
       this.state.applications = [...helmApplications, ...nonHelmApplications];
       this.state.stacks = KubernetesStackHelper.stacksFromApplications(applications);
       this.state.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
+
+      this.$scope.$apply();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }
+  }
+
+  setSystemResources(flag) {
+    this.state.isSystemResources = flag;
   }
 
   getApplications() {
@@ -153,7 +183,16 @@ class KubernetesApplicationsController {
       applications: [],
       stacks: [],
       ports: [],
+      namespaces: [],
+      namespace: '',
+      isSystemResources: undefined,
     };
+
+    this.state.namespaces = await this.KubernetesNamespaceService.get();
+    this.state.namespaces = this.state.namespaces.filter((n) => n.Status !== 'Terminating');
+    this.state.namespaces = _.sortBy(this.state.namespaces, 'Name');
+    this.state.namespace = this.state.namespaces.length ? (this.state.namespaces.find((n) => n.Name === 'default') ? 'default' : this.state.namespaces[0].Name) : '';
+
     await this.getApplications();
 
     this.state.viewReady = true;

@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-import { FeatureFlag, useFeatureFlag } from './useRedirectFeatureFlag';
+import { FeatureFlag, useFeatureFlag } from './useFeatureFlag';
 
 export function withFeatureFlag<T>(
   WrappedComponent: ComponentType<T>,

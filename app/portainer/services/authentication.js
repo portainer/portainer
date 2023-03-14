@@ -36,7 +36,6 @@ angular.module('portainer.app').factory('Authentication', [
         await setUser(jwt);
         return true;
       } catch (error) {
-        console.log('Unable to initialize authentication service', error);
         return tryAutoLoginExtension();
       }
     }
@@ -102,7 +101,7 @@ angular.module('portainer.app').factory('Authentication', [
       const data = await UserService.user(user.ID);
 
       // Initialize user theme base on UserTheme from database
-      const userTheme = data.UserTheme;
+      const userTheme = data.ThemeSettings ? data.ThemeSettings.color : 'auto';
       if (userTheme === 'auto' || !userTheme) {
         ThemeManager.autoTheme();
       } else {

@@ -209,7 +209,7 @@
           <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.QUAY">
             <!-- organisation-checkbox -->
             <div class="form-group">
-              <label class="col-sm-3 col-lg-2 control-label text-left"> Use organisation registry </label>
+              <label class="col-sm-3 col-lg-2 control-label text-left"> Use organization registry </label>
               <div class="col-sm-9 col-lg-10">
                 <por-switch-field
                   checked="$ctrl.registry.Quay.UseOrganisation"
@@ -222,7 +222,7 @@
             <div ng-if="$ctrl.registry.Quay.UseOrganisation">
               <!-- organisation_name -->
               <div class="form-group">
-                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label required text-left">Organisation name</label>
+                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label required text-left">Organization name</label>
                 <div class="col-sm-9 col-lg-10">
                   <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="$ctrl.registry.Quay.OrganisationName" required />
                 </div>
