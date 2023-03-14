@@ -145,7 +145,16 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		repositoryUsername = payload.RepositoryUsername
 	}
 
-	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, git.CloneOptions{ProjectPath: stack.ProjectPath, URL: stack.GitConfig.URL, ReferenceName: stack.GitConfig.ReferenceName, Username: repositoryUsername, Password: repositoryPassword})
+	cloneOptions := git.CloneOptions{
+		ProjectPath:   stack.ProjectPath,
+		URL:           stack.GitConfig.URL,
+		ReferenceName: stack.GitConfig.ReferenceName,
+		Username:      repositoryUsername,
+		Password:      repositoryPassword,
+		TLSSkipVerify: stack.GitConfig.TLSSkipVerify,
+	}
+
+	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, cloneOptions)
 	if err != nil {
 		return httperror.InternalServerError("Unable to clone git repository directory", err)
 	}
@@ -157,7 +166,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httpErr
 	}
 
-	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword, stack.GitConfig.TLSSkipVerify)
 	if err != nil {
 		return httperror.InternalServerError("Unable get latest commit id", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID))
 	}

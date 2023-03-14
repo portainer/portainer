@@ -59,6 +59,7 @@ class KubernetesDeployController {
       ComposeFilePathInRepository: '',
       Variables: {},
       AutoUpdate: parseAutoUpdateResponse(),
+      TLSSkipVerify: false,
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;

@@ -109,6 +109,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create temp file")
 	}
+
 	defer zipFile.Close()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", downloadUrl, nil)
@@ -126,6 +127,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to make an HTTP request")
 	}
+
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {

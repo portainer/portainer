@@ -38,7 +38,7 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 
 	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
-	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "")
+	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "", false)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, getCommitHistoryLength(t, err, dir), "cloned repo has incorrect depth")
 }
@@ -50,7 +50,7 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 
 	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
-	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "")
+	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "", false)
 	assert.NoError(t, err)
 	assert.NoDirExists(t, filepath.Join(dir, ".git"))
 }
@@ -84,7 +84,7 @@ func Test_latestCommitID(t *testing.T) {
 	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
 
-	id, err := service.LatestCommitID(repositoryURL, referenceName, "", "")
+	id, err := service.LatestCommitID(repositoryURL, referenceName, "", "", false)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "68dcaa7bd452494043c64252ab90db0f98ecf8d2", id)
