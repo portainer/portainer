@@ -59,15 +59,10 @@ export class EditEdgeStackViewController {
         this.Notifications.error('Failure', err, 'Unable to retrieve stack data');
       }
 
-      this.$window.onbeforeunload = () => {
-        if (this.isEditorDirty()) {
-          return '';
-        }
-      };
       this.oldFileContent = this.formValues.StackFileContent;
 
       this.$window.onbeforeunload = () => {
-        if (this.formValues.StackFileContent !== this.oldFileContent && this.state.isEditorDirty) {
+        if (this.isEditorDirty()) {
           return '';
         }
       };
