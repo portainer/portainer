@@ -15,18 +15,18 @@ func NewGitService(cloneErr error, id string) portainer.GitService {
 	}
 }
 
-func (g *gitService) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
+func (g *gitService) CloneRepository(destination, repositoryURL, referenceName, username, password string, tlsSkipVerify bool) error {
 	return g.cloneErr
 }
 
-func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
+func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error) {
 	return g.id, nil
 }
 
-func (g *gitService) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
+func (g *gitService) ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error) {
 	return nil, nil
 }
 
-func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
+func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
 	return nil, nil
 }
