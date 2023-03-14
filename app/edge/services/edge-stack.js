@@ -56,6 +56,7 @@ angular.module('portainer.edge').factory('EdgeStackService', function EdgeStackS
           RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
           RepositoryUsername: repositoryOptions.RepositoryUsername,
           RepositoryPassword: repositoryOptions.RepositoryPassword,
+          TLSSkipVerify: repositoryOptions.TLSSkipVerify,
         }
       ).$promise;
     } catch (err) {

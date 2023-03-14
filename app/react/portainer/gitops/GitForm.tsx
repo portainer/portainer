@@ -141,7 +141,18 @@ export function buildGitValidationSchema(
 ): SchemaOf<GitFormModel> {
   return object({
     RepositoryURL: string()
-      .url('Invalid Url')
+      .test('valid URL', 'The URL must be a valid URL', (value) => {
+        if (!value) {
+          return true;
+        }
+
+        try {
+          const url = new URL(value);
+          return !!url.hostname;
+        } catch {
+          return false;
+        }
+      })
       .required('Repository URL is required'),
     RepositoryReferenceName: refFieldValidation(),
     ComposeFilePathInRepository: string().required(
