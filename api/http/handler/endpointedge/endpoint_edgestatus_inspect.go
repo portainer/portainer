@@ -81,16 +81,14 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 
 	if _, ok := handler.DataStore.Endpoint().Heartbeat(portainer.EndpointID(endpointID)); !ok {
-		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", nil)
+		// EE-5910
+		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		if handler.DataStore.IsErrObjectNotFound(err) {
-			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-		}
-
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		// EE-5910
+		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
