@@ -24,6 +24,7 @@ export function RefSelector({
   const payload = {
     repository: model.RepositoryURL,
     stackId,
+    tlsSkipVerify: model.TLSSkipVerify,
     ...creds,
   };
 

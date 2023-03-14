@@ -6,6 +6,7 @@ interface RefsPayload {
   repository: string;
   username?: string;
   password?: string;
+  tlsSkipVerify?: boolean;
 }
 
 export function useGitRefs<T = string[]>(
