@@ -70,6 +70,7 @@ export function Primary({
     ComposeFilePathInRepository: '',
     NewCredentialName: '',
     SaveCredential: false,
+    TLSSkipVerify: false,
   };
 
   return (

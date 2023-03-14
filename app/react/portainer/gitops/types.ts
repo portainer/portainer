@@ -60,6 +60,7 @@ export interface GitFormModel extends GitAuthModel {
 
   SaveCredential?: boolean;
   NewCredentialName?: string;
+  TLSSkipVerify: boolean;
 
   /**
    * Auto update

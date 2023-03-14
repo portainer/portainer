@@ -23,6 +23,7 @@ export default class CreateEdgeStackViewController {
       Groups: [],
       DeploymentType: 0,
       UseManifestNamespaces: false,
+      TLSSkipVerify: false,
     };
 
     this.EditorType = EditorType;

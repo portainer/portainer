@@ -201,6 +201,8 @@ type swarmStackFromGitRepositoryPayload struct {
 	Registries []portainer.RegistryID
 	// Uses the manifest's namespaces instead of the default one
 	UseManifestNamespaces bool
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -247,6 +249,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request, dryru
 		URL:            payload.RepositoryURL,
 		ReferenceName:  payload.RepositoryReferenceName,
 		ConfigFilePath: payload.FilePathInRepository,
+		TLSSkipVerify:  payload.TLSSkipVerify,
 	}
 
 	if payload.RepositoryAuthentication {
@@ -345,7 +348,7 @@ func (handler *Handler) storeManifestFromGitRepository(stackFolder string, relat
 		repositoryPassword = repositoryConfig.Authentication.Password
 	}
 
-	err = handler.GitService.CloneRepository(projectPath, repositoryConfig.URL, repositoryConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	err = handler.GitService.CloneRepository(projectPath, repositoryConfig.URL, repositoryConfig.ReferenceName, repositoryUsername, repositoryPassword, repositoryConfig.TLSSkipVerify)
 	if err != nil {
 		return "", "", "", err
 	}

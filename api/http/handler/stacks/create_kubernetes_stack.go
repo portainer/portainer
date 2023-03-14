@@ -46,9 +46,11 @@ type kubernetesGitDeploymentPayload struct {
 	ManifestFile             string
 	AdditionalFiles          []string
 	AutoUpdate               *portainer.AutoUpdateSettings
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
-func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication, composeFormat bool, namespace, manifest string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings) stackbuilders.StackPayload {
+func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication, composeFormat bool, namespace, manifest string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, repoSkipSSLVerify bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		StackName: name,
 		RepositoryConfigPayload: stackbuilders.RepositoryConfigPayload{
@@ -57,6 +59,7 @@ func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsern
 			Authentication: repoAuthentication,
 			Username:       repoUsername,
 			Password:       repoPassword,
+			TLSSkipVerify:  repoSkipSSLVerify,
 		},
 		Namespace:       namespace,
 		ComposeFormat:   composeFormat,
@@ -203,7 +206,9 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		payload.Namespace,
 		payload.ManifestFile,
 		payload.AdditionalFiles,
-		payload.AutoUpdate)
+		payload.AutoUpdate,
+		payload.TLSSkipVerify,
+	)
 
 	k8sStackBuilder := stackbuilders.CreateKubernetesStackGitBuilder(handler.DataStore,
 		handler.FileService,

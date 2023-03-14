@@ -57,6 +57,7 @@ angular
         EnableWebhook: false,
         Variables: {},
         AutoUpdate: parseAutoUpdateResponse(),
+        TLSSkipVerify: false,
       };
 
       $scope.state = {

@@ -3,8 +3,8 @@ package gittypes
 import "errors"
 
 var (
-	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
-	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
+	ErrIncorrectRepositoryURL = errors.New("git repository could not be found, please ensure that the URL is correct")
+	ErrAuthenticationFailure  = errors.New("authentication failed, please ensure that the git credentials are correct")
 )
 
 // RepoConfig represents a configuration for a repo
@@ -19,6 +19,8 @@ type RepoConfig struct {
 	Authentication *GitAuthentication
 	// Repository hash
 	ConfigHash string `example:"bc4c183d756879ea4d173315338110b31004b8e0"`
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
 type GitAuthentication struct {
