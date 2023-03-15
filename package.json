@@ -194,7 +194,7 @@
     "mini-css-extract-plugin": "^2.5.3",
     "msw-storybook-addon": "^1.8.0",
     "ngtemplate-loader": "^2.1.0",
-    "plop": "^2.6.0",
+    "plop": "^3.1.2",
     "postcss": "^8.4.14",
     "postcss-loader": "^6.2.1",
     "prettier": "^2.8.8",
