@@ -81,18 +81,19 @@ class KubernetesNamespaceService {
     }
   }
 
-  async get(name) {
+  async get(name, refreshCache = false) {
     if (name) {
       return this.$async(this.getAsync, name);
     }
     const cachedAllowedNamespaces = this.LocalStorage.getAllowedNamespaces();
-    if (cachedAllowedNamespaces) {
-      updateNamespaces(cachedAllowedNamespaces);
-      return cachedAllowedNamespaces;
-    } else {
+    if (!cachedAllowedNamespaces || refreshCache) {
       const allowedNamespaces = await this.getAllAsync();
       this.LocalStorage.storeAllowedNamespaces(allowedNamespaces);
+      updateNamespaces(allowedNamespaces);
       return allowedNamespaces;
+    } else {
+      updateNamespaces(cachedAllowedNamespaces);
+      return cachedAllowedNamespaces;
     }
   }
 

@@ -1208,7 +1208,10 @@ class KubernetesCreateApplicationController {
         ]);
         this.nodesLimits = nodesLimits;
 
-        const nonSystemNamespaces = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+        const nonSystemNamespaces = _.filter(
+          resourcePools,
+          (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && resourcePool.Namespace.Status === 'Active'
+        );
 
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
