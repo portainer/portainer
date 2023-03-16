@@ -96,8 +96,10 @@ export function KubeconfigPrompt({
                   <Checkbox
                     id={`${env.Id}`}
                     label={`${env.Name} (${env.URL})`}
-                    checked={!!selection[env.Id]}
-                    onChange={() => toggleSelection(env.Id, !selection[env.Id])}
+                    checked={selection.includes(env.Id)}
+                    onChange={() =>
+                      toggleSelection(env.Id, !selection.includes(env.Id))
+                    }
                   />
                 </div>
               ))}
