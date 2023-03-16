@@ -109,11 +109,11 @@ export function GitForm({
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
-            label="Skip SSL Verification"
+            label="Skip TLS Verification"
             checked={value.TLSSkipVerify}
             onChange={(value) => handleChange({ TLSSkipVerify: value })}
             name="TLSSkipVerify"
-            tooltip="Enabling this will allow skipping SSL validation for any self-signed certificate."
+            tooltip="Enabling this will allow skipping TLS validation for any self-signed certificate."
             labelClass="col-sm-3 col-lg-2"
           />
         </div>
