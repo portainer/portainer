@@ -45,16 +45,16 @@ angular.module('portainer.docker').controller('DashboardController', [
     $scope.buildGpusStr = function (gpuUseSet) {
       var gpusAvailable = new Object();
       for (let i = 0; i < ($scope.endpoint.Gpus || []).length; i++) {
-        if (!gpuUseSet.has($scope.endpoint.Gpus[i].name)) {
+        if (!gpuUseSet.has($scope.endpoint.Gpus[i].value)) {
           var exist = false;
           for (let gpuAvailable in gpusAvailable) {
-            if ($scope.endpoint.Gpus[i].value == gpuAvailable) {
+            if ($scope.endpoint.Gpus[i].name == gpuAvailable) {
               gpusAvailable[gpuAvailable] += 1;
               exist = true;
             }
           }
           if (exist === false) {
-            gpusAvailable[$scope.endpoint.Gpus[i].value] = 1;
+            gpusAvailable[$scope.endpoint.Gpus[i].name] = 1;
           }
         }
       }
