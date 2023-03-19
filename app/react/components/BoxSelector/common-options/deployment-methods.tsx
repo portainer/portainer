@@ -9,6 +9,7 @@ export const kubernetes: BoxSelectorOption<'kubernetes'> = {
   label: 'Kubernetes',
   description: 'Kubernetes manifest format',
   value: 'kubernetes',
+  iconType: 'logo',
 };
 
 export const compose: BoxSelectorOption<'compose'> = {
@@ -17,4 +18,5 @@ export const compose: BoxSelectorOption<'compose'> = {
   label: 'Compose',
   description: 'docker-compose format',
   value: 'compose',
+  iconType: 'logo',
 };

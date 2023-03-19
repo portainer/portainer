@@ -5,12 +5,11 @@ import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Ldap from '@/assets/ico/ldap.svg?c';
 import OAuth from '@/assets/ico/oauth.svg?c';
 
-import { BadgeIcon } from '@@/BadgeIcon';
-
 export const options = [
   {
     id: 'auth_internal',
-    icon: <BadgeIcon icon={ArrowDownCircle} />,
+    icon: ArrowDownCircle,
+    iconType: 'badge',
     label: 'Internal',
     description: 'Internal authentication mechanism',
     value: 1,
@@ -20,6 +19,7 @@ export const options = [
     icon: Ldap,
     label: 'LDAP',
     description: 'LDAP authentication',
+    iconType: 'logo',
     value: 2,
   },
   {
@@ -27,6 +27,7 @@ export const options = [
     icon: Microsoft,
     label: 'Microsoft Active Directory',
     description: 'AD authentication',
+    iconType: 'logo',
     value: 4,
     feature: FeatureId.HIDE_INTERNAL_AUTH,
   },
@@ -35,6 +36,7 @@ export const options = [
     icon: OAuth,
     label: 'OAuth',
     description: 'OAuth authentication',
+    iconType: 'logo',
     value: 3,
   },
 ];

@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import { Icon as ReactFeatherComponentType, Check } from 'lucide-react';
 import { Fragment } from 'react';
 
-import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { Icon } from '@/react/components/Icon';
 
 import { BadgeIcon } from '@@/BadgeIcon';
+import { getFeatureDetails } from '@@/BEFeatureIndicator/utils';
 
 import styles from './BoxSelectorItem.module.css';
 import { BoxSelectorOption, Value } from './types';
@@ -36,7 +36,9 @@ export function BoxSelectorItem<T extends Value>({
   slim = false,
   checkIcon = Check,
 }: Props<T>) {
-  const limitedToBE = isLimitedToBE(option.feature);
+  const { limitedToBE = false, url: featureUrl } = getFeatureDetails(
+    option.feature
+  );
 
   const beIndicatorTooltipId = `box-selector-item-${radioName}-${option.id}-limited`;
 
@@ -57,7 +59,12 @@ export function BoxSelectorItem<T extends Value>({
       type={type}
       checkIcon={checkIcon}
     >
-      {limitedToBE && <LimitedToBeIndicator tooltipId={beIndicatorTooltipId} />}
+      {limitedToBE && (
+        <LimitedToBeIndicator
+          tooltipId={beIndicatorTooltipId}
+          url={featureUrl}
+        />
+      )}
       <div
         className={clsx('flex gap-2', {
           'opacity-30': limitedToBE,
@@ -89,15 +96,15 @@ export function BoxSelectorItem<T extends Value>({
       return <BadgeIcon icon={option.icon} />;
     }
 
-    if (option.iconType === 'logo') {
-      return <LogoIcon icon={option.icon} />;
+    if (option.iconType === 'raw') {
+      return (
+        <Icon
+          icon={option.icon}
+          className={clsx(styles.icon, '!flex items-center')}
+        />
+      );
     }
 
-    return (
-      <Icon
-        icon={option.icon}
-        className={clsx(styles.icon, '!flex items-center')}
-      />
-    );
+    return <LogoIcon icon={option.icon} />;
   }
 }
