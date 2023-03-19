@@ -125,7 +125,12 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 			return true
 		}
 
-		return endpoint.UserTrusted == !query.edgeDeviceUntrusted
+		if !query.edgeDeviceUntrusted {
+			return endpoint.UserTrusted
+		}
+
+		// if untrusted, filter out hidden edge environments
+		return !endpoint.UserTrusted && !endpoint.Edge.Hidden
 	})
 
 	if len(query.status) > 0 {

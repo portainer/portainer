@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge/cache"
+	"github.com/rs/zerolog/log"
 )
 
 type stackStatusResponse struct {
@@ -93,6 +94,15 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
+		// if endpoint is not trusted, make it visible on the waiting room
+		if !endpoint.UserTrusted {
+			endpoint.Edge.Hidden = false
+			err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+			if err != nil {
+				log.Error().Err(err).Msg("Unable to update endpoint")
+			}
+		}
+
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
