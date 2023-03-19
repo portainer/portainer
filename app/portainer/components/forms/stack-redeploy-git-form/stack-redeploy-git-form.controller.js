@@ -182,7 +182,7 @@ class StackRedeployGitFormController {
 
     this.formValues.AutoUpdate = parseAutoUpdateResponse(this.stack.AutoUpdate);
 
-    if (this.stack.AutoUpdate.Webhook) {
+    if (this.stack.AutoUpdate && this.stack.AutoUpdate.Webhook) {
       this.state.webhookId = this.stack.AutoUpdate.Webhook;
     }
 
