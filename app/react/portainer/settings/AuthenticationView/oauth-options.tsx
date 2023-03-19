@@ -5,8 +5,6 @@ import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Google from '@/assets/ico/vendor/google.svg?c';
 import Github from '@/assets/ico/vendor/github.svg?c';
 
-import { BadgeIcon } from '@@/BadgeIcon';
-
 export const options = [
   {
     id: 'microsoft',
@@ -14,6 +12,7 @@ export const options = [
     label: 'Microsoft',
     description: 'Microsoft OAuth provider',
     value: 'microsoft',
+    iconType: 'logo',
     feature: FeatureId.HIDE_INTERNAL_AUTH,
   },
   {
@@ -22,6 +21,7 @@ export const options = [
     label: 'Google',
     description: 'Google OAuth provider',
     value: 'google',
+    iconType: 'logo',
     feature: FeatureId.HIDE_INTERNAL_AUTH,
   },
   {
@@ -30,11 +30,13 @@ export const options = [
     label: 'Github',
     description: 'Github OAuth provider',
     value: 'github',
+    iconType: 'logo',
     feature: FeatureId.HIDE_INTERNAL_AUTH,
   },
   {
     id: 'custom',
-    icon: <BadgeIcon icon={Edit} />,
+    icon: Edit,
+    iconType: 'badge',
     label: 'Custom',
     description: 'Custom OAuth provider',
     value: 'custom',
