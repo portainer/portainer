@@ -1,9 +1,10 @@
 import { FormikErrors } from 'formik';
 
+import { useStateWrapper } from '@/react/hooks/useStateWrapper';
+
 import { FormError } from '@@/form-components/FormError';
 import { InputGroup } from '@@/form-components/InputGroup';
 import { InputList, ItemProps } from '@@/form-components/InputList';
-import { useCaretPosition } from '@@/form-components/useCaretPosition';
 
 interface Props {
   value: Array<string>;
@@ -32,21 +33,19 @@ function Item({
   error,
   readOnly,
 }: ItemProps<string>) {
-  const { ref, updateCaret } = useCaretPosition();
+  const [inputValue, updateInputValue] = useStateWrapper(item, onChange);
 
   return (
     <div className="relative flex flex-col">
       <InputGroup size="small">
         <InputGroup.Addon>path</InputGroup.Addon>
         <InputGroup.Input
-          mRef={ref}
           required
           disabled={disabled}
           readOnly={readOnly}
-          value={item}
+          value={inputValue}
           onChange={(e) => {
-            onChange(e.target.value);
-            updateCaret();
+            updateInputValue(e.target.value);
           }}
         />
       </InputGroup>
