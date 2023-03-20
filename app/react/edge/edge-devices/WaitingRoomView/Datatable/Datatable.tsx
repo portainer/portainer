@@ -3,6 +3,7 @@ import { Trash2 } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/queries/useDeleteEnvironmentsMutation';
 
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -14,7 +15,6 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
 
 import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
-import { useHideEnvironmentsMutation } from '../useHideEnvironmentsMutation';
 
 import { columns } from './columns';
 import { Filter } from './Filter';
@@ -26,7 +26,7 @@ const settingsStore = createPersistedStore(storageKey, 'Name');
 
 export function Datatable() {
   const associateMutation = useAssociateDeviceMutation();
-  const removeMutation = useHideEnvironmentsMutation();
+  const removeMutation = useDeleteEnvironmentsMutation();
   const licenseOverused = useLicenseOverused();
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
@@ -93,7 +93,7 @@ export function Datatable() {
     const confirmed = await confirm({
       title: 'Are you sure?',
       message:
-        "You're about to remove edge device(s) from waiting room, which will not be shown until next check-in.",
+        "You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup.",
       confirmButton: buildConfirmButton('Remove', 'danger'),
       modalType: ModalType.Destructive,
     });

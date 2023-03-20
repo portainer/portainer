@@ -428,8 +428,6 @@ type (
 		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
 		// The command list interval for edge agent - used in edge async mode [seconds]
 		CommandInterval int `json:"CommandInterval" example:"60"`
-		// Hidden is used to hide the endpoint from the waiting room (relevant only to not trusted edge devices)
-		Hidden bool
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)

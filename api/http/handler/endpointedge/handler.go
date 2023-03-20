@@ -42,7 +42,5 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 	endpointRouter.PathPrefix("/edge/jobs/{jobID}/logs").Handler(
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeJobsLogs))).Methods(http.MethodPost)
 
-	endpointRouter.PathPrefix("/edge/hide").Handler(bouncer.AdminAccess(httperror.LoggerHandler(h.endpointHide))).Methods(http.MethodPost)
-
 	return h
 }

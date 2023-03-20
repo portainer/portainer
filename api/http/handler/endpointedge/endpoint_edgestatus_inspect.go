@@ -93,8 +93,6 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		handler.makeUntrustedEnvironmentVisible(endpoint)
-
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
