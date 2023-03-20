@@ -72,13 +72,5 @@ function LastCheckinDateCell({
     return '-';
   }
 
-  const checkIn = moment(value * 1000).utc();
-
-  const now = moment().utc();
-
-  const diff = checkIn.diff(now);
-
-  const duration = moment.duration(diff);
-
-  return `${duration.humanize()} ago`;
+  return moment(value * 1000).fromNow();
 }
