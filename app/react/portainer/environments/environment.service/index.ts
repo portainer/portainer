@@ -29,6 +29,7 @@ export interface EnvironmentsQueryParams {
   name?: string;
   agentVersions?: string[];
   updateInformation?: boolean;
+  edgeCheckInPassedSeconds?: number;
 }
 
 export interface GetEnvironmentsOptions {
