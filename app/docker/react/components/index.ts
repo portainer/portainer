@@ -14,6 +14,7 @@ import { DockerfileDetails } from '@/react/docker/images/ItemView/DockerfileDeta
 import { HealthStatus } from '@/react/docker/containers/ItemView/HealthStatus';
 import { GpusList } from '@/react/docker/host/SetupView/GpusList';
 import { GpusInsights } from '@/react/docker/host/SetupView/GpusInsights';
+import { InsightsBox } from '@/react/components/InsightsBox';
 
 export const componentsModule = angular
   .module('portainer.docker.react.components', [])
@@ -52,5 +53,16 @@ export const componentsModule = angular
   .component(
     'gpusList',
     r2a(withControlledInput(GpusList), ['value', 'onChange'])
+  )
+  .component(
+    'insightsBox',
+    r2a(InsightsBox, [
+      'header',
+      'content',
+      'setHtmlContent',
+      'insightCloseId',
+      'type',
+      'className',
+    ])
   )
   .component('gpusInsights', r2a(GpusInsights, [])).name;

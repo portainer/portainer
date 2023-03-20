@@ -66,7 +66,12 @@
 .toolBar .searchBar {
   margin-right: 10px;
   display: inline-flex;
-  min-height: 30px;
+  flex-basis: 7rem;
+  flex-grow: 1;
+  flex-shrink: 1;
+  align-items: center;
+  min-width: 7rem;
+  max-width: 14rem;
 }
 
 .datatable .searchBar input[type='text'] {
