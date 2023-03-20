@@ -152,7 +152,7 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 // TrustedEdgeEnvironmentAccess defines a security check for Edge environments, checks if
 // the request is coming from a trusted Edge environment
 func (bouncer *RequestBouncer) TrustedEdgeEnvironmentAccess(endpoint *portainer.Endpoint) error {
-	if endpoint.LastCheckInDate > 0 || endpoint.UserTrusted {
+	if endpoint.UserTrusted {
 		return nil
 	}
 
