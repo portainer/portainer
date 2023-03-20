@@ -397,14 +397,16 @@ class KubernetesApplicationHelper {
   static generatePersistedFoldersFormValuesFromPersistedFolders(persistedFolders, persistentVolumeClaims) {
     const finalRes = _.map(persistedFolders, (folder) => {
       const pvc = _.find(persistentVolumeClaims, (item) => _.startsWith(item.Name, folder.PersistentVolumeClaimName));
-      const res = new KubernetesApplicationPersistedFolderFormValue(pvc.StorageClass);
-      res.PersistentVolumeClaimName = folder.PersistentVolumeClaimName;
-      res.Size = parseInt(pvc.Storage, 10);
-      res.SizeUnit = pvc.Storage.slice(-2);
-      res.ContainerPath = folder.MountPath;
-      return res;
+      if (pvc) {
+        const res = new KubernetesApplicationPersistedFolderFormValue(pvc.StorageClass);
+        res.PersistentVolumeClaimName = folder.PersistentVolumeClaimName;
+        res.Size = parseInt(pvc.Storage, 10);
+        res.SizeUnit = pvc.Storage.slice(-2);
+        res.ContainerPath = folder.MountPath;
+        return res;
+      }
     });
-    return finalRes;
+    return finalRes.filter((item) => item !== undefined);
   }
 
   static generateVolumesFromPersistentVolumClaims(app, volumeClaims) {
