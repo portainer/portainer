@@ -1,7 +1,7 @@
 <div class="datatable">
   <!-- toolbar header actions and settings -->
   <div ng-if="$ctrl.isPrimary" class="toolBar !flex-col !gap-0">
-    <div class="toolBar !items-start !gap-x-5 !p-0">
+    <div class="toolBar w-full !items-start !gap-x-5 !p-0">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
           <pr-icon icon="'box'"></pr-icon>
@@ -136,12 +136,7 @@
     </div>
     <div class="w-full">
       <div class="w-fit">
-        <insights-box
-          class-name="'mt-2'"
-          type="'slim'"
-          header="'From 2.18 and on, you can filter this view by namespace.'"
-          insight-close-id="'k8s-namespace-filtering'"
-        ></insights-box>
+        <insights-box class-name="'mt-2'" type="'slim'" header="'From 2.18 on, you can filter this view by namespace.'" insight-close-id="'k8s-namespace-filtering'"></insights-box>
       </div>
     </div>
   </div>
