@@ -179,6 +179,8 @@ export default class DockerFeaturesConfigurationController {
       disableSysctlSettingForRegularUsers: !securitySettings.allowSysctlSettingForRegularUsers,
     };
 
+    // this.endpoint.Gpus could be null as it is Gpus: []Pair in the API
+    this.endpoint.Gpus = this.endpoint.Gpus || [];
     this.state.enableGPUManagement = this.isDockerStandaloneEnv && (this.endpoint.EnableGPUManagement || this.endpoint.Gpus.length > 0);
     this.initialGPUs = this.endpoint.Gpus;
     this.initialEnableGPUManagement = this.endpoint.EnableGPUManagement;
