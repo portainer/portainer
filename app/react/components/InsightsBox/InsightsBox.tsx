@@ -47,7 +47,7 @@ export function InsightsBox({
           <p
             className={clsx(
               // text-[0.9em] matches .form-horizontal .control-label font-size used in many labels in portainer
-              'text-[0.9em] font-medium',
+              'align-middle text-[0.9em] font-medium',
               insightCloseId && 'pr-10',
               content ? 'mb-2' : 'mb-0'
             )}
