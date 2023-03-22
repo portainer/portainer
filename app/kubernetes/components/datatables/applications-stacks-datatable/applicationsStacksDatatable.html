@@ -1,114 +1,121 @@
 <div class="datatable">
   <!-- table title and action menu -->
-  <div class="toolBar !flex-col gap-1">
-    <div class="toolBar vertical-center w-full flex-wrap !gap-x-5 !gap-y-1 !p-0">
-      <!-- title -->
+  <div class="toolBar !flex-col !gap-0">
+    <div class="toolBar w-full !items-start !gap-x-5 !p-0">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
           <pr-icon icon="'list'"></pr-icon>
         </div>
         Stacks
       </div>
-      <!-- actions -->
-      <div class="form-group namespaces !mb-0 !mr-0 min-w-[280px]">
-        <div class="input-group">
-          <span class="input-group-addon">
-            <pr-icon icon="'filter'"></pr-icon>
-            Namespace
-          </span>
-          <select
-            class="form-control"
-            ng-model="$ctrl.state.namespace"
-            ng-change="$ctrl.onChangeNamespace()"
-            data-cy="component-namespaceSelect"
-            ng-options="o.Value as (o.Name + (o.IsSystem ? ' - system' : '')) for o in $ctrl.state.namespaces"
+      <!-- use row reverse to make the left most items wrap first to the right side in the next line -->
+      <div class="inline-flex flex-row-reverse flex-wrap !gap-x-5 gap-y-3">
+        <div class="actionBar !mr-0 !gap-3">
+          <button
+            type="button"
+            class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="k8sApp-removeStackButton"
           >
-          </select>
-        </div>
-      </div>
-      <div class="searchBar vertical-center">
-        <pr-icon icon="'search'" class-name="'!h-3'"></pr-icon>
-        <input
-          type="text"
-          class="searchInput min-w-min self-start"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search for a stack..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
-      <div class="actionBar !mr-0 !gap-3">
-        <button
-          type="button"
-          class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="k8sApp-removeStackButton"
-        >
-          <pr-icon icon="'trash-2'"></pr-icon>
-          Remove
-        </button>
-        <div class="settings" data-cy="k8sApp-StackTableSettings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle>
-              <pr-icon icon="'more-vertical'" class-name="'!mr-0 !h-4'"></pr-icon>
-            </span>
-            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
-              <div class="tableMenu">
-                <div class="menuHeader"> Table settings </div>
-                <div class="menuContent">
-                  <div>
-                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                      <input id="applications_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
-                      <label for="applications_setting_show_system">Show system resources</label>
-                    </div>
-                    <div class="md-checkbox">
-                      <input
-                        id="setting_auto_refresh"
-                        type="checkbox"
-                        ng-model="$ctrl.settings.repeater.autoRefresh"
-                        ng-change="$ctrl.onSettingsRepeaterChange()"
-                        data-cy="k8sApp-autoRefreshCheckbox-stack"
-                      />
-                      <label for="setting_auto_refresh">Auto refresh</label>
-                    </div>
-                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate"> Refresh rate </label>
-                      <select
-                        id="settings_refresh_rate"
-                        ng-model="$ctrl.settings.repeater.refreshRate"
-                        ng-change="$ctrl.onSettingsRepeaterChange()"
-                        class="small-select"
-                        data-cy="k8sApp-refreshRateDropdown-stack"
-                      >
-                        <option value="10">10s</option>
-                        <option value="30">30s</option>
-                        <option value="60">1min</option>
-                        <option value="120">2min</option>
-                        <option value="300">5min</option>
-                      </select>
-                      <span>
-                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
-                      </span>
+            <pr-icon icon="'trash-2'"></pr-icon>
+            Remove
+          </button>
+          <div class="settings" data-cy="k8sApp-StackTableSettings">
+            <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+              <span uib-dropdown-toggle>
+                <pr-icon icon="'more-vertical'" class-name="'!mr-0 !h-4'"></pr-icon>
+              </span>
+              <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+                <div class="tableMenu">
+                  <div class="menuHeader"> Table settings </div>
+                  <div class="menuContent">
+                    <div>
+                      <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                        <input id="applications_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                        <label for="applications_setting_show_system">Show system resources</label>
+                      </div>
+                      <div class="md-checkbox">
+                        <input
+                          id="setting_auto_refresh"
+                          type="checkbox"
+                          ng-model="$ctrl.settings.repeater.autoRefresh"
+                          ng-change="$ctrl.onSettingsRepeaterChange()"
+                          data-cy="k8sApp-autoRefreshCheckbox-stack"
+                        />
+                        <label for="setting_auto_refresh">Auto refresh</label>
+                      </div>
+                      <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                        <label for="settings_refresh_rate"> Refresh rate </label>
+                        <select
+                          id="settings_refresh_rate"
+                          ng-model="$ctrl.settings.repeater.refreshRate"
+                          ng-change="$ctrl.onSettingsRepeaterChange()"
+                          class="small-select"
+                          data-cy="k8sApp-refreshRateDropdown-stack"
+                        >
+                          <option value="10">10s</option>
+                          <option value="30">30s</option>
+                          <option value="60">1min</option>
+                          <option value="120">2min</option>
+                          <option value="300">5min</option>
+                        </select>
+                        <span>
+                          <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton-stack">Close</a>
+                  <div>
+                    <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton-stack">Close</a>
+                  </div>
                 </div>
               </div>
-            </div>
-          </span>
+            </span>
+          </div>
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" class-name="'!h-3'"></pr-icon>
+          <input
+            type="text"
+            class="searchInput min-w-min self-start"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
+
+        <div class="form-group namespaces !mb-0 !mr-0 !h-[30px] w-fit min-w-[140px]">
+          <div class="input-group">
+            <span class="input-group-addon">
+              <pr-icon icon="'filter'" size="'sm'"></pr-icon>
+              Namespace
+            </span>
+            <select
+              class="form-control !h-[30px] !py-1"
+              ng-model="$ctrl.state.namespace"
+              ng-change="$ctrl.onChangeNamespace()"
+              data-cy="component-namespaceSelect"
+              ng-options="o.Value as (o.Name + (o.IsSystem ? ' - system' : '')) for o in $ctrl.state.namespaces"
+            >
+            </select>
+          </div>
         </div>
       </div>
     </div>
     <!-- info text -->
-    <div class="flex w-full flex-row">
-      <span class="small text-muted vertical-center mt-1" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+    <div class="flex w-full flex-row" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+      <span class="small text-muted vertical-center mt-1">
         <pr-icon icon="'info'" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
+    </div>
+    <div class="w-full">
+      <div class="w-fit">
+        <insights-box class-name="'mt-2'" type="'slim'" header="'From 2.18 on, you can filter this view by namespace.'" insight-close-id="'k8s-namespace-filtering'"></insights-box>
+      </div>
     </div>
   </div>
   <div class="table-responsive">
