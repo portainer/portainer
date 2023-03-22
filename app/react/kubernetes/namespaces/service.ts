@@ -3,6 +3,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Namespaces, SelfSubjectAccessReviewResponse } from './types';
 
+// getNamespace is used to retrieve a namespace using the Portainer backend
 export async function getNamespace(
   environmentId: EnvironmentId,
   namespace: string
@@ -17,6 +18,7 @@ export async function getNamespace(
   }
 }
 
+// getNamespaces is used to retrieve namespaces using the Portainer backend with caching
 export async function getNamespaces(environmentId: EnvironmentId) {
   try {
     const { data: namespaces } = await axios.get<Namespaces>(
