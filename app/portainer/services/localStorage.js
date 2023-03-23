@@ -120,11 +120,16 @@ angular.module('portainer.app').factory('LocalStorage', [
       getKubernetesSummaryToggle() {
         return localStorageService.get('kubernetes_summary_expanded');
       },
-      storeAllowedNamespaces: function (namespaces) {
-        localStorageService.set('ALLOWED_NAMESPACES', namespaces);
+      storeAllowedNamespaces: function (envID, namespaces) {
+        let cachedNamespaces = localStorageService.get('ALLOWED_NAMESPACES');
+        cachedNamespaces = cachedNamespaces || {};
+        cachedNamespaces[envID] = namespaces;
+        localStorageService.set('ALLOWED_NAMESPACES', cachedNamespaces);
       },
-      getAllowedNamespaces: function () {
-        return localStorageService.get('ALLOWED_NAMESPACES');
+      getAllowedNamespaces: function (envID) {
+        let namespaces = localStorageService.get('ALLOWED_NAMESPACES');
+        namespaces = namespaces || {};
+        return namespaces[envID];
       },
       deleteAllowedNamespaces: function () {
         localStorageService.remove('ALLOWED_NAMESPACES');
