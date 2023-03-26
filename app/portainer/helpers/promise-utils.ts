@@ -9,3 +9,15 @@ export function promiseSequence<T>(promises: (() => Promise<T>)[]) {
     Promise.resolve<T>(undefined as unknown as T)
   );
 }
+
+export function isFulfilled<T>(
+  result: PromiseSettledResult<T>
+): result is PromiseFulfilledResult<T> {
+  return result.status === 'fulfilled';
+}
+
+export function getFulfilledResults<T>(
+  results: Array<PromiseSettledResult<T>>
+) {
+  return results.filter(isFulfilled).map((result) => result.value);
+}

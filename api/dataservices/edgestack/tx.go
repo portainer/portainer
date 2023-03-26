@@ -28,7 +28,7 @@ func (service ServiceTx) EdgeStacks() ([]portainer.EdgeStack, error) {
 			stack, ok := obj.(*portainer.EdgeStack)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")
-				return nil, fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
+				return nil, fmt.Errorf("failed to convert to EdgeStack object: %s", obj)
 			}
 
 			stacks = append(stacks, *stack)
