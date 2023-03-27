@@ -7,12 +7,11 @@ import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, $state, KubernetesNamespaces, LocalStorage, EndpointProvider) {
+  constructor($async, $state, KubernetesNamespaces, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.KubernetesNamespaces = KubernetesNamespaces;
     this.LocalStorage = LocalStorage;
-    this.EndpointProvider = EndpointProvider;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
