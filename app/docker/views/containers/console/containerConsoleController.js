@@ -1,5 +1,6 @@
 import { Terminal } from 'xterm';
 import { baseHref } from '@/portainer/helpers/pathHelper';
+import { commandStringToArray } from '@/docker/helpers/containers';
 
 angular.module('portainer.docker').controller('ContainerConsoleController', [
   '$scope',
@@ -101,7 +102,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         AttachStderr: true,
         Tty: true,
         User: $scope.formValues.user,
-        Cmd: ContainerHelper.commandStringToArray(command),
+        Cmd: commandStringToArray(command),
       };
 
       ContainerService.createExec(execConfig)
