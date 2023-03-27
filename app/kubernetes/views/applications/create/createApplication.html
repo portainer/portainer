@@ -114,11 +114,11 @@
                 value="ctrl.stackFileContent"
                 yml="true"
                 identifier="kubernetes-deploy-editor"
-                placeholder="# Define or paste the content of your manifest file here"
+                placeholder="Define or paste the content of your manifest file here"
                 on-change="(ctrl.onChangeFileContent)"
               >
                 <editor-description>
-                  <div class="text-muted small flex gap-1" ng-show="ctrl.stack.IsComposeFormat">
+                  <div class="flex gap-1" ng-show="ctrl.stack.IsComposeFormat">
                     <pr-icon icon="'alert-circle'" mode="'warning'" class-name="'!mt-1'"></pr-icon>
                     <div>
                       <p>
@@ -127,17 +127,17 @@
                         conversion tool which enables this. The reason for this is because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and
                         Exposures (CVEs).
                       </p>
-                      <p
-                        >Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and
-                        new pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.</p
-                      >
+                      <p>
+                        Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and new
+                        pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.
+                      </p>
                       <p>
                         We advise installing your own instance of Kompose in a sandbox environment, performing conversions of your Docker Compose files to Kubernetes manifests and
                         using those manifests to set up applications.
                       </p>
                     </div>
                   </div>
-                  <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
+                  <span ng-show="!ctrl.stack.IsComposeFormat">
                     <p class="vertical-center">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                       This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
