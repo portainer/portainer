@@ -18,7 +18,7 @@ package endpoints
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /api/endpoints/{id}/docker/v2/browse/put [post]
+// @router /endpoints/{id}/docker/v2/browse/put [post]
 func _fileBrowseFileUploadV2() {
 	// dummy function to make swag pick up the above docs for the following REST call
 	// POST request on /browse/put?volumeID=:id

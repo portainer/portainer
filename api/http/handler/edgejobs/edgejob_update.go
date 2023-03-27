@@ -41,7 +41,7 @@ func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param id path string true "EdgeJob Id"
+// @param id path int true "EdgeJob Id"
 // @param body body edgeJobUpdatePayload true "EdgeGroup data"
 // @success 200 {object} portainer.EdgeJob
 // @failure 500
