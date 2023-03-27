@@ -115,7 +115,6 @@
     "react-select": "^5.2.1",
     "sanitize-html": "^2.8.1",
     "spinkit": "^2.0.1",
-    "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
     "strip-ansi": "^6.0.0",
     "tippy.js": "^6.3.7",
     "toastr": "^2.1.4",
