@@ -13,6 +13,7 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsStacksDa
     namespaces: '<',
     namespace: '<',
     onChangeNamespaceDropdown: '<',
+    isAppsLoading: '<',
     isSystemResources: '<',
     setSystemResources: '<',
   },

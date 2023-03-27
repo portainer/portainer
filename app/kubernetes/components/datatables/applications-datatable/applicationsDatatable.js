@@ -18,6 +18,7 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     namespaces: '<',
     namespace: '<',
     onChangeNamespaceDropdown: '<',
+    isAppsLoading: '<',
     isSystemResources: '<',
     setSystemResources: '<',
   },

@@ -7,8 +7,9 @@ import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaces, LocalStorage, EndpointProvider) {
+  constructor($async, $state, KubernetesNamespaces, LocalStorage, EndpointProvider) {
     this.$async = $async;
+    this.$state = $state;
     this.KubernetesNamespaces = KubernetesNamespaces;
     this.LocalStorage = LocalStorage;
     this.EndpointProvider = EndpointProvider;
@@ -82,14 +83,14 @@ class KubernetesNamespaceService {
     }
   }
 
-  async get(name, refreshCache = false) {
+  async get(name, refreshCache = false, environmentId = this.$state.params.endpointId) {
     if (name) {
       return this.$async(this.getAsync, name);
     }
-    const cachedAllowedNamespaces = this.LocalStorage.getAllowedNamespaces(this.EndpointProvider.endpointID());
+    const cachedAllowedNamespaces = this.LocalStorage.getAllowedNamespaces(environmentId);
     if (!cachedAllowedNamespaces || refreshCache) {
       const allowedNamespaces = await this.getAllAsync();
-      this.LocalStorage.storeAllowedNamespaces(this.EndpointProvider.endpointID(), allowedNamespaces);
+      this.LocalStorage.storeAllowedNamespaces(environmentId, allowedNamespaces);
       updateNamespaces(allowedNamespaces);
       return allowedNamespaces;
     } else {
@@ -117,10 +118,10 @@ class KubernetesNamespaceService {
     return this.$async(this.createAsync, namespace);
   }
 
-  async refreshCacheAsync() {
+  async refreshCacheAsync(environmentId = this.$state.params.endpointId) {
     this.LocalStorage.deleteAllowedNamespaces();
     const allowedNamespaces = await this.getAllAsync();
-    this.LocalStorage.storeAllowedNamespaces(this.EndpointProvider.endpointID(), allowedNamespaces);
+    this.LocalStorage.storeAllowedNamespaces(environmentId, allowedNamespaces);
     updateNamespaces(allowedNamespaces);
     return allowedNamespaces;
   }

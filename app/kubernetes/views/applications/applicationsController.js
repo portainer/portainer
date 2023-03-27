@@ -144,11 +144,12 @@ class KubernetesApplicationsController {
 
   onChangeNamespaceDropdown(namespace) {
     this.state.namespace = namespace;
-    this.getApplicationsAsync();
+    return this.$async(this.getApplicationsAsync);
   }
 
   async getApplicationsAsync() {
     try {
+      this.state.isAppsLoading = true;
       const [applications, configurations] = await Promise.all([
         this.KubernetesApplicationService.get(this.state.namespace),
         this.KubernetesConfigurationService.get(this.state.namespace),
@@ -163,6 +164,8 @@ class KubernetesApplicationsController {
       this.$scope.$apply();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
+    } finally {
+      this.state.isAppsLoading = false;
     }
   }
 
