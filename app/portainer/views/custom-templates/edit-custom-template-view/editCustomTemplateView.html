@@ -7,7 +7,7 @@
         <form class="form-horizontal" name="customTemplateForm">
           <custom-template-common-fields form-values="$ctrl.formValues" show-platform-field="true" show-type-field="true"></custom-template-common-fields>
 
-          <git-form model="$ctrl.formValues" on-change="($ctrl.handleChange)" ng-if="$ctrl.formValues.GitConfig"></git-form>
+          <git-form value="$ctrl.formValues" on-change="($ctrl.handleChange)" ng-if="$ctrl.formValues.GitConfig"></git-form>
 
           <div class="form-group">
             <div class="col-sm-12"

@@ -3,6 +3,7 @@ import { AccessControlFormData } from '@/portainer/components/accessControlForm/
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
+import { getFilePreview } from '@/react/portainer/gitops/gitops.service';
 
 class KubeEditCustomTemplateViewController {
   /* @ngInject */

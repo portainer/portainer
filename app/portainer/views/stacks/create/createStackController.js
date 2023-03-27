@@ -72,6 +72,7 @@ angular
         baseWebhookUrl: baseStackWebhookUrl(),
         webhookId: createWebhookId(),
         templateLoadFailed: false,
+        isEditorReadOnly: false,
       };
 
       $scope.currentUser = {
@@ -304,6 +305,8 @@ angular
             try {
               $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
               onChangeFileContent($scope.state.templateContent);
+
+              $scope.state.isEditorReadOnly = true;
             } catch (err) {
               $scope.state.templateLoadFailed = true;
               throw err;
