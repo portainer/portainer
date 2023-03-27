@@ -19,7 +19,7 @@ import (
 // @tags edge_jobs
 // @security ApiKeyAuth
 // @security jwt
-// @param id path string true "EdgeJob Id"
+// @param id path int true "EdgeJob Id"
 // @success 204
 // @failure 500
 // @failure 400
