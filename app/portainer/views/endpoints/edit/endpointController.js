@@ -10,7 +10,7 @@ import { isEdgeEnvironment, isDockerAPIEnvironment } from '@/react/portainer/env
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
 import { buildConfirmButton } from '@@/modals/utils';
-import { getInfo } from '@/docker/services/system.service';
+import { getInfo } from '@/react/docker/proxy/queries/useInfo';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
