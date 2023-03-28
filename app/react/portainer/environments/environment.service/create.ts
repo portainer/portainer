@@ -108,7 +108,6 @@ export interface EnvironmentOptions {
   meta?: EnvironmentMetadata;
   azure?: AzureSettings;
   tls?: TLSSettings;
-  isEdgeDevice?: boolean;
   pollFrequency?: number;
   edge?: EdgeSettings;
   tunnelServerAddr?: string;
@@ -167,7 +166,6 @@ interface CreateEdgeAgentEnvironment {
   tunnelServerAddr?: string;
   meta?: EnvironmentMetadata;
   pollFrequency: number;
-  isEdgeDevice?: boolean;
   edge: EdgeSettings;
 }
 
@@ -175,7 +173,6 @@ export function createEdgeAgentEnvironment({
   name,
   portainerUrl,
   meta = { tagIds: [] },
-  isEdgeDevice,
   pollFrequency,
   edge,
 }: CreateEdgeAgentEnvironment) {
@@ -188,7 +185,6 @@ export function createEdgeAgentEnvironment({
         skipVerify: true,
         skipClientVerify: true,
       },
-      isEdgeDevice,
       pollFrequency,
       edge,
       meta,
@@ -216,7 +212,6 @@ async function createEnvironment(
       GroupID: groupId,
       TagIds: arrayToJson(tagIds),
       CheckinInterval: options.pollFrequency,
-      IsEdgeDevice: options.isEdgeDevice,
     };
 
     const { tls, azure } = options;

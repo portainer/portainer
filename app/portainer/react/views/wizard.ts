@@ -46,7 +46,7 @@ function config($stateRegistryProvider: StateRegistry) {
 
   $stateRegistryProvider.register({
     name: 'portainer.wizard.endpoints',
-    url: '/endpoints?edgeDevice',
+    url: '/endpoints',
     views: {
       'content@': {
         component: 'wizardEnvironmentTypeSelectView',
