@@ -83,12 +83,22 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		err := deployer.DeployComposeStack(stack, endpoint, registries, true, false)
+
+		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+			err = deployer.DeployRemoteComposeStack(stack, endpoint, registries, true, false)
+		} else {
+			err = deployer.DeployComposeStack(stack, endpoint, registries, true, false)
+		}
+
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
 	case portainer.DockerSwarmStack:
-		err := deployer.DeploySwarmStack(stack, endpoint, registries, true, true)
+		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+			err = deployer.DeployRemoteSwarmStack(stack, endpoint, registries, true, true)
+		} else {
+			err = deployer.DeploySwarmStack(stack, endpoint, registries, true, true)
+		}
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}

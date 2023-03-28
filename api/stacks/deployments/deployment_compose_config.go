@@ -84,6 +84,9 @@ func (config *ComposeStackDeploymentConfig) Deploy() error {
 			return err
 		}
 	}
+	if config.stack.GitConfig != nil && len(config.stack.GitConfig.URL) != 0 {
+		return config.StackDeployer.DeployRemoteComposeStack(config.stack, config.endpoint, config.registries, config.forcePullImage, config.ForceCreate)
+	}
 
 	return config.StackDeployer.DeployComposeStack(config.stack, config.endpoint, config.registries, config.forcePullImage, config.ForceCreate)
 }

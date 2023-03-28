@@ -133,8 +133,14 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
+		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+			return handler.StackDeployer.StartRemoteComposeStack(stack, endpoint)
+		}
 		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, false)
 	case portainer.DockerSwarmStack:
+		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+			return handler.StackDeployer.StartRemoteSwarmStack(stack, endpoint)
+		}
 		return handler.SwarmStackManager.Deploy(stack, true, true, endpoint)
 	}
 	return nil
