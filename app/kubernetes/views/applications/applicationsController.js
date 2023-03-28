@@ -144,6 +144,8 @@ class KubernetesApplicationsController {
 
   onChangeNamespaceDropdown(namespace) {
     this.state.namespace = namespace;
+    // save the selected namespace in local storage with the key 'kubernetes_namespace_filter_${environmentId}'
+    this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, namespace);
     this.getApplicationsAsync();
   }
 
@@ -189,9 +191,19 @@ class KubernetesApplicationsController {
     };
 
     this.state.namespaces = await this.KubernetesNamespaceService.get();
+
+    const savedNamespace = this.LocalStorage.getNamespaceFilter(this.endpoint.Id); // could be null if not found, and '' if all namepsaces is selected
+    const preferredNamespace = savedNamespace === null ? 'default' : savedNamespace;
+
     this.state.namespaces = this.state.namespaces.filter((n) => n.Status === 'Active');
     this.state.namespaces = _.sortBy(this.state.namespaces, 'Name');
-    this.state.namespace = this.state.namespaces.length ? (this.state.namespaces.find((n) => n.Name === 'default') ? 'default' : this.state.namespaces[0].Name) : '';
+    // set all namespaces ('') if there are no namespaces, or if all namespaces is selected
+    if (!this.state.namespaces.length || preferredNamespace === '') {
+      this.state.namespace = '';
+    } else {
+      // otherwise, set the preferred namespace if it exists, otherwise set the first namespace
+      this.state.namespace = this.state.namespaces.find((n) => n.Name === preferredNamespace) ? preferredNamespace : this.state.namespaces[0].Name;
+    }
 
     await this.getApplications();
 
