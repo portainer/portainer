@@ -13,11 +13,11 @@ class KubernetesApplicationsController {
     $async,
     $state,
     $scope,
+    Authentication,
     Notifications,
     KubernetesApplicationService,
     HelmService,
     KubernetesConfigurationService,
-    Authentication,
     LocalStorage,
     StackService,
     KubernetesNamespaceService
@@ -25,6 +25,7 @@ class KubernetesApplicationsController {
     this.$async = $async;
     this.$state = $state;
     this.$scope = $scope;
+    this.Authentication = Authentication;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.HelmService = HelmService;
@@ -142,18 +143,18 @@ class KubernetesApplicationsController {
     });
   }
 
-  onChangeNamespaceDropdown(namespace) {
-    this.state.namespace = namespace;
-    // save the selected namespace in local storage with the key 'kubernetes_namespace_filter_${environmentId}'
-    this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, namespace);
+  onChangeNamespaceDropdown(namespaceName) {
+    this.state.namespaceName = namespaceName;
+    // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
+    this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
     this.getApplicationsAsync();
   }
 
   async getApplicationsAsync() {
     try {
       const [applications, configurations] = await Promise.all([
-        this.KubernetesApplicationService.get(this.state.namespace),
-        this.KubernetesConfigurationService.get(this.state.namespace),
+        this.KubernetesApplicationService.get(this.state.namespaceName),
+        this.KubernetesConfigurationService.get(this.state.namespaceName),
       ]);
       const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
       const { helmApplications, nonHelmApplications } = KubernetesApplicationHelper.getNestedApplications(configuredApplications);
@@ -186,23 +187,24 @@ class KubernetesApplicationsController {
       stacks: [],
       ports: [],
       namespaces: [],
-      namespace: '',
+      namespaceName: '',
       isSystemResources: undefined,
     };
 
+    this.user = this.Authentication.getUserDetails();
     this.state.namespaces = await this.KubernetesNamespaceService.get();
 
-    const savedNamespace = this.LocalStorage.getNamespaceFilter(this.endpoint.Id); // could be null if not found, and '' if all namepsaces is selected
+    const savedNamespace = this.LocalStorage.getNamespaceFilter(this.endpoint.Id, this.user.ID); // could be null if not found, and '' if all namepsaces is selected
     const preferredNamespace = savedNamespace === null ? 'default' : savedNamespace;
 
     this.state.namespaces = this.state.namespaces.filter((n) => n.Status === 'Active');
     this.state.namespaces = _.sortBy(this.state.namespaces, 'Name');
     // set all namespaces ('') if there are no namespaces, or if all namespaces is selected
     if (!this.state.namespaces.length || preferredNamespace === '') {
-      this.state.namespace = '';
+      this.state.namespaceName = '';
     } else {
-      // otherwise, set the preferred namespace if it exists, otherwise set the first namespace
-      this.state.namespace = this.state.namespaces.find((n) => n.Name === preferredNamespace) ? preferredNamespace : this.state.namespaces[0].Name;
+      // otherwise, set the preferred namespaceName if it exists, otherwise set the first namespaceName
+      this.state.namespaceName = this.state.namespaces.find((n) => n.Name === preferredNamespace) ? preferredNamespace : this.state.namespaces[0].Name;
     }
 
     await this.getApplications();

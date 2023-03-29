@@ -105,12 +105,12 @@ angular.module('portainer.app').factory('LocalStorage', [
         const activeTab = localStorageService.get('active_tab_' + key);
         return activeTab === null ? 0 : activeTab;
       },
-      storeNamespaceFilter: function (environmentId, data) {
+      storeNamespaceFilter: function (environmentId, userID, data) {
         // store one filter per environment
-        localStorageService.set(`kubernetes_namespace_filter_${environmentId}`, data);
+        localStorageService.set(`kubernetes_namespace_filter_${environmentId}_${userID}`, data);
       },
-      getNamespaceFilter: function (environmentId) {
-        return localStorageService.get(`kubernetes_namespace_filter_${environmentId}`);
+      getNamespaceFilter: function (environmentId, userID) {
+        return localStorageService.get(`kubernetes_namespace_filter_${environmentId}_${userID}`);
       },
       storeLogoutReason: (reason) => localStorageService.set('logout_reason', reason),
       getLogoutReason: () => localStorageService.get('logout_reason'),
