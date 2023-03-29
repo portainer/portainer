@@ -47,9 +47,10 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 	}
 
 	cloneParams := &cloneRepositoryParameters{
-		url:   gitConfig.URL,
-		ref:   gitConfig.ReferenceName,
-		toDir: projectPath,
+		url:           gitConfig.URL,
+		ref:           gitConfig.ReferenceName,
+		toDir:         projectPath,
+		tlsSkipVerify: gitConfig.TLSSkipVerify,
 	}
 	if gitConfig.Authentication != nil {
 		cloneParams.auth = &gitAuth{
