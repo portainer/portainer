@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -166,7 +167,7 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 
 // ListRefs will list target repository's references without cloning the repository
 func (service *Service) ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error) {
-	refCacheKey := generateCacheKey(repositoryURL, password)
+	refCacheKey := generateCacheKey(repositoryURL, username, password, strconv.FormatBool(tlsSkipVerify))
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
 		service.repoRefCache.Remove(refCacheKey)
@@ -224,7 +225,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 // ListFiles will list all the files of the target repository with specific extensions.
 // If extension is not provided, it will list all the files under the target repository
 func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
-	repoKey := generateCacheKey(repositoryURL, referenceName)
+	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify))
 
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
