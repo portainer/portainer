@@ -144,7 +144,7 @@ class KubernetesApplicationsController {
   }
 
   onChangeNamespaceDropdown(namespace) {
-    this.state.namespace = namespace;
+    this.state.namespaceName = namespace;
     return this.$async(this.getApplicationsAsync);
   }
 
