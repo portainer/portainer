@@ -290,7 +290,8 @@ class KubernetesDeployController {
   async getNamespacesAsync() {
     try {
       const pools = await this.KubernetesResourcePoolService.get();
-      const namespaces = _.map(pools, 'Namespace').sort((a, b) => {
+      let namespaces = pools.filter((pool) => pool.Namespace.Status === 'Active');
+      namespaces = _.map(namespaces, 'Namespace').sort((a, b) => {
         if (a.Name === 'default') {
           return -1;
         }

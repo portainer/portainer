@@ -3,9 +3,11 @@ import { useQuery } from 'react-query';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
 
-import { getIngresses } from '../ingresses/service';
-
-import { getNamespaces, getNamespace } from './service';
+import {
+  getNamespaces,
+  getNamespace,
+  getSelfSubjectAccessReview,
+} from './service';
 import { Namespaces } from './types';
 
 export function useNamespaces(environmentId: EnvironmentId) {
@@ -13,18 +15,23 @@ export function useNamespaces(environmentId: EnvironmentId) {
     ['environments', environmentId, 'kubernetes', 'namespaces'],
     async () => {
       const namespaces = await getNamespaces(environmentId);
-      const settledNamespacesPromise = await Promise.allSettled(
-        Object.keys(namespaces).map((namespace) =>
-          getIngresses(environmentId, namespace).then(() => namespace)
+      const namespaceNames = Object.keys(namespaces);
+      // use seflsubjectaccess reviews to avoid forbidden requests
+      const allNamespaceAccessReviews = await Promise.all(
+        namespaceNames.map((namespaceName) =>
+          getSelfSubjectAccessReview(environmentId, namespaceName)
         )
       );
-      const ns: Namespaces = {};
-      settledNamespacesPromise.forEach((namespace) => {
-        if (namespace.status === 'fulfilled') {
-          ns[namespace.value] = namespaces[namespace.value];
+      const allowedNamespacesNames = allNamespaceAccessReviews
+        .filter((accessReview) => accessReview.status.allowed)
+        .map((accessReview) => accessReview.spec.resourceAttributes.namespace);
+      const allowedNamespaces = namespaceNames.reduce((acc, namespaceName) => {
+        if (allowedNamespacesNames.includes(namespaceName)) {
+          acc[namespaceName] = namespaces[namespaceName];
         }
-      });
-      return ns;
+        return acc;
+      }, {} as Namespaces);
+      return allowedNamespaces;
     },
     {
       onError: (err) => {

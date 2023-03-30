@@ -1,5 +1,5 @@
-import { useRouter } from '@uirouter/react';
-import { useState } from 'react';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useEffect, useState } from 'react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { snapshotEndpoints } from '@/react/portainer/environments/environment.service';
@@ -9,6 +9,7 @@ import * as notifications from '@/portainer/services/notifications';
 import { confirm } from '@@/modals/confirm';
 import { PageHeader } from '@@/PageHeader';
 import { ModalType } from '@@/modals';
+import { buildConfirmButton } from '@@/modals/utils';
 
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
@@ -17,10 +18,37 @@ import { LicenseNodePanel } from './LicenseNodePanel';
 import { BackupFailedPanel } from './BackupFailedPanel';
 
 export function HomeView() {
-  const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] =
-    useState(false);
+  const { params } = useCurrentStateAndParams();
+  const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] = useState(
+    !!params.redirect
+  );
 
   const router = useRouter();
+
+  useEffect(() => {
+    async function redirect() {
+      const options = {
+        title: `Failed connecting to ${params.environmentName}`,
+        message: `There was an issue connecting to edge agent via tunnel. Click 'Retry' below to retry now, or wait 10 seconds to automatically retry.`,
+        confirmButton: buildConfirmButton('Retry', 'primary', 10),
+        modalType: ModalType.Destructive,
+      };
+
+      if (await confirm(options)) {
+        setConnectingToEdgeEndpoint(true);
+        router.stateService.go(params.route, {
+          endpointId: params.environmentId,
+        });
+      } else {
+        router.stateService.go('portainer.home', {}, { inherit: false });
+      }
+    }
+
+    if (params.redirect) {
+      redirect();
+    }
+  }, [params, setConnectingToEdgeEndpoint, router]);
+
   return (
     <>
       <PageHeader

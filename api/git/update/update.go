@@ -34,7 +34,7 @@ func UpdateGitObject(gitService portainer.GitService, dataStore dataservices.Dat
 		return false, "", errors.WithMessagef(err, "failed to fetch latest commit id of %v", objId)
 	}
 
-	hashChanged := !strings.EqualFold(newHash, string(gitConfig.ConfigHash))
+	hashChanged := !strings.EqualFold(newHash, gitConfig.ConfigHash)
 	forceUpdate := autoUpdateConfig != nil && autoUpdateConfig.ForceUpdate
 	if !hashChanged && !forceUpdate {
 		log.Debug().

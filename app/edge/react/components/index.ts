@@ -7,12 +7,19 @@ import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInInt
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/components/EdgeStackDeploymentTypeSelector';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 export const componentsModule = angular
   .module('portainer.edge.react.components', [])
   .component(
     'edgeGroupsSelector',
-    r2a(EdgeGroupsSelector, ['items', 'onChange', 'value'])
+    r2a(withUIRouter(withReactQuery(EdgeGroupsSelector)), [
+      'onChange',
+      'value',
+      'error',
+      'horizontal',
+      'isGroupVisible',
+    ])
   )
   .component(
     'edgeScriptForm',
@@ -21,6 +28,7 @@ export const componentsModule = angular
       'commands',
       'isNomadTokenVisible',
       'asyncMode',
+      'showMetaFields',
     ])
   )
   .component(

@@ -4,6 +4,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
 
 import { Icon } from '@@/Icon';
 import { ReactQueryDevtoolsWrapper } from '@@/ReactQueryDevtoolsWrapper';
@@ -32,15 +33,19 @@ import { customTemplatesModule } from './custom-templates';
 import { gitFormModule } from './git-form';
 import { settingsModule } from './settings';
 import { accessControlModule } from './access-control';
-import { envListModule } from './enviroments-list-view-components';
+import { environmentsModule } from './environments';
+import { envListModule } from './environments-list-view-components';
+import { registriesModule } from './registries';
 
 export const componentsModule = angular
   .module('portainer.app.react.components', [
-    customTemplatesModule,
-    gitFormModule,
-    settingsModule,
     accessControlModule,
+    customTemplatesModule,
     envListModule,
+    environmentsModule,
+    gitFormModule,
+    registriesModule,
+    settingsModule,
   ])
   .component(
     'tagSelector',
@@ -111,7 +116,17 @@ export const componentsModule = angular
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
   .component(
     'dashboardItem',
-    r2a(DashboardItem, ['icon', 'type', 'value', 'children'])
+    r2a(DashboardItem, [
+      'icon',
+      'type',
+      'value',
+      'to',
+      'children',
+      'pluralType',
+      'isLoading',
+      'isRefetching',
+      'dataCy',
+    ])
   )
   .component(
     'datatableSearchbar',
@@ -152,6 +167,7 @@ export const componentsModule = angular
       'options',
       'isMulti',
       'isClearable',
+      'components',
     ])
   )
   .component(
@@ -178,4 +194,5 @@ export const componentsModule = angular
       'value',
       'height',
     ])
-  ).name;
+  )
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, [])).name;

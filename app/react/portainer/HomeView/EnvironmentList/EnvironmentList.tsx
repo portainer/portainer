@@ -29,7 +29,7 @@ import { PaginationControls } from '@@/PaginationControls';
 import { SearchBar, useSearchBarState } from '@@/datatables/SearchBar';
 
 import { useHomePageFilter } from './HomepageFilter';
-import { ConnectionType, Filter } from './types';
+import { ConnectionType } from './types';
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
 import { NoEnvironmentsInfoPanel } from './NoEnvironmentsInfoPanel';
@@ -48,15 +48,16 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
   const { isAdmin } = useUser();
   const currentEnvStore = useStore(environmentStore);
 
-  const [platformTypes, setPlatformTypes] = useHomePageFilter<
-    Filter<PlatformType>[]
-  >('platformType', []);
+  const [platformTypes, setPlatformTypes] = useHomePageFilter<PlatformType[]>(
+    'platformType',
+    []
+  );
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
   const [page, setPage] = useState(1);
 
   const [connectionTypes, setConnectionTypes] = useHomePageFilter<
-    Filter<ConnectionType>[]
+    ConnectionType[]
   >('connectionTypes', []);
 
   const [statusFilter, setStatusFilter] = useHomePageFilter<
@@ -77,20 +78,17 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     false
   );
 
-  const [statusState, setStatusState] = useHomePageFilter<Filter[]>(
+  const [statusState, setStatusState] = useHomePageFilter<number[]>(
     'status_state',
     []
   );
-  const [tagState, setTagState] = useHomePageFilter<Filter[]>('tag_state', []);
-  const [groupState, setGroupState] = useHomePageFilter<Filter[]>(
+  const [tagState, setTagState] = useHomePageFilter<number[]>('tag_state', []);
+  const [groupState, setGroupState] = useHomePageFilter<number[]>(
     'group_state',
     []
   );
-  const [sortByState, setSortByState] = useHomePageFilter<Filter | undefined>(
-    'sort_by_state',
-    undefined
-  );
-  const [agentVersions, setAgentVersions] = useHomePageFilter<Filter<string>[]>(
+
+  const [agentVersions, setAgentVersions] = useHomePageFilter<string[]>(
     'agentVersions',
     []
   );
@@ -98,17 +96,14 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
   const groupsQuery = useGroups();
 
   const environmentsQueryParams: EnvironmentsQueryParams = {
-    types: getTypes(
-      platformTypes.map((p) => p.value),
-      connectionTypes.map((p) => p.value)
-    ),
+    types: getTypes(platformTypes, connectionTypes),
     search: searchBarValue,
     status: statusFilter,
     tagIds: tagFilter?.length ? tagFilter : undefined,
     groupIds: groupFilter,
     provisioned: true,
     tagsPartialMatch: true,
-    agentVersions: agentVersions.map((a) => a.value),
+    agentVersions,
     updateInformation: isBE,
     edgeAsync: getEdgeAsyncValue(connectionTypes),
   };
@@ -202,11 +197,11 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
               setAgentVersions={setAgentVersions}
               agentVersions={agentVersions}
               clearFilter={clearFilter}
-              sortOnchange={sortOnchange}
+              sortOnChange={sortOnchange}
               sortOnDescending={sortOnDescending}
               sortByDescending={sortByDescending}
               sortByButton={sortByButton}
-              sortByState={sortByState}
+              sortByState={sortByFilter}
             />
           </div>
           <div
@@ -305,50 +300,32 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     return _.intersection(selectedTypesByConnection, selectedTypesByPlatform);
   }
 
-  function statusOnChange(filterOptions: Filter[]) {
-    setStatusState(filterOptions);
-    if (filterOptions.length === 0) {
+  function statusOnChange(value: number[]) {
+    setStatusState(value);
+    if (value.length === 0) {
       setStatusFilter([]);
     } else {
-      const filteredStatus = [
-        ...new Set(
-          filterOptions.map(
-            (filterOptions: { value: number }) => filterOptions.value
-          )
-        ),
-      ];
+      const filteredStatus = [...new Set(value)];
       setStatusFilter(filteredStatus);
     }
   }
 
-  function groupOnChange(filterOptions: Filter[]) {
-    setGroupState(filterOptions);
-    if (filterOptions.length === 0) {
+  function groupOnChange(value: number[]) {
+    setGroupState(value);
+    if (value.length === 0) {
       setGroupFilter([]);
     } else {
-      const filteredGroups = [
-        ...new Set(
-          filterOptions.map(
-            (filterOptions: { value: number }) => filterOptions.value
-          )
-        ),
-      ];
+      const filteredGroups = [...new Set(value)];
       setGroupFilter(filteredGroups);
     }
   }
 
-  function tagOnChange(filterOptions: Filter[]) {
-    setTagState(filterOptions);
-    if (filterOptions.length === 0) {
+  function tagOnChange(value: number[]) {
+    setTagState(value);
+    if (value.length === 0) {
       setTagFilter([]);
     } else {
-      const filteredTags = [
-        ...new Set(
-          filterOptions.map(
-            (filterOptions: { value: number }) => filterOptions.value
-          )
-        ),
-      ];
+      const filteredTags = [...new Set(value)];
       setTagFilter(filteredTags);
     }
   }
@@ -365,16 +342,9 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     setConnectionTypes([]);
   }
 
-  function sortOnchange(filterOptions: Filter) {
-    if (filterOptions !== null) {
-      setSortByFilter(filterOptions.label);
-      setSortByButton(true);
-      setSortByState(filterOptions);
-    } else {
-      setSortByFilter('');
-      setSortByButton(true);
-      setSortByState(undefined);
-    }
+  function sortOnchange(value: string) {
+    setSortByFilter(value);
+    setSortByButton(!!value);
   }
 
   function sortOnDescending() {
@@ -407,14 +377,13 @@ function renderItems(
   return items;
 }
 
-function getEdgeAsyncValue(connectionTypes: Filter<ConnectionType>[]) {
+function getEdgeAsyncValue(connectionTypes: ConnectionType[]) {
   const hasEdgeAsync = connectionTypes.some(
-    (connectionType) => connectionType.value === ConnectionType.EdgeAgentAsync
+    (connectionType) => connectionType === ConnectionType.EdgeAgentAsync
   );
 
   const hasEdgeStandard = connectionTypes.some(
-    (connectionType) =>
-      connectionType.value === ConnectionType.EdgeAgentStandard
+    (connectionType) => connectionType === ConnectionType.EdgeAgentStandard
   );
 
   // If both are selected, we don't want to filter on either, and same for if both are not selected

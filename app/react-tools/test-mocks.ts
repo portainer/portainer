@@ -19,7 +19,6 @@ export function createMockUsers(
     PortainerAuthorizations: {},
     ThemeSettings: {
       color: 'auto',
-      subtleUpgradeButton: false,
     },
   }));
 }
@@ -83,6 +82,7 @@ export function createMockEnvironment(): Environment {
     },
     Nomad: { Snapshots: [] },
     EdgeKey: '',
+    EnableGPUManagement: false,
     Id: 3,
     UserTrusted: false,
     Edge: {

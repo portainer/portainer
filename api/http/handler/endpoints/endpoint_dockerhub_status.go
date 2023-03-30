@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -128,7 +129,6 @@ func getDockerHubToken(httpClient *client.HTTPClient, registry *portainer.Regist
 }
 
 func getDockerHubLimits(httpClient *client.HTTPClient, token string) (*dockerhubStatusResponse, error) {
-
 	requestURL := "https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest"
 
 	req, err := http.NewRequest(http.MethodHead, requestURL, nil)
@@ -142,7 +142,9 @@ func getDockerHubLimits(httpClient *client.HTTPClient, token string) (*dockerhub
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("failed fetching dockerhub limits")

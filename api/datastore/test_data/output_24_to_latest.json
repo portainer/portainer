@@ -46,6 +46,7 @@
       },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
+      "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
       "Id": 1,
@@ -63,6 +64,7 @@
           "UseServerMetrics": false
         },
         "Flags": {
+          "IsServerIngressClassDetected": false,
           "IsServerMetricsDetected": false,
           "IsServerStorageDetected": false
         },
@@ -71,6 +73,7 @@
       "LastCheckInDate": 0,
       "Name": "local",
       "PostInitMigrations": {
+        "MigrateGPUs": true,
         "MigrateIngresses": true
       },
       "PublicURL": "",
@@ -903,8 +906,7 @@
       },
       "Role": 1,
       "ThemeSettings": {
-        "color": "",
-        "subtleUpgradeButton": false
+        "color": ""
       },
       "TokenIssueAt": 0,
       "UserTheme": "",
@@ -934,8 +936,7 @@
       },
       "Role": 1,
       "ThemeSettings": {
-        "color": "",
-        "subtleUpgradeButton": false
+        "color": ""
       },
       "TokenIssueAt": 0,
       "UserTheme": "",
@@ -943,6 +944,6 @@
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.18.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.19.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

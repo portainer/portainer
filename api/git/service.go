@@ -10,9 +10,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var (
-	REPOSITORY_CACHE_SIZE = 4
-	REPOSITORY_CACHE_TTL  = 5 * time.Minute
+const (
+	repositoryCacheSize = 4
+	repositoryCacheTTL  = 5 * time.Minute
 )
 
 // baseOption provides a minimum group of information to operate a git repository, like git-remote
@@ -58,7 +58,7 @@ type Service struct {
 
 // NewService initializes a new service.
 func NewService(ctx context.Context) *Service {
-	return newService(ctx, REPOSITORY_CACHE_SIZE, REPOSITORY_CACHE_TTL)
+	return newService(ctx, repositoryCacheSize, repositoryCacheTTL)
 }
 
 func newService(ctx context.Context, cacheSize int, cacheTTL time.Duration) *Service {

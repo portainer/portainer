@@ -12,19 +12,7 @@
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0">
               <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
-              <div class="col-sm-12 form-section-title"> Namespace </div>
-              <form class="form-horizontal mt-3" name="ctrl.deploymentForm">
-                <div class="form-group" ng-if="ctrl.formValues.Namespace">
-                  <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
-                  <div class="col-sm-8">
-                    <select
-                      ng-disabled="ctrl.formValues.namespace_toggle"
-                      class="form-control"
-                      ng-model="ctrl.formValues.Namespace"
-                      ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
-                    ></select>
-                  </div>
-                </div>
+              <form class="form-horizontal mt-6" name="ctrl.deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
                     Use namespace(s) specified from manifest
@@ -40,6 +28,18 @@
                     <span class="ml-2 mb-1 switch-values" ng-if="!ctrl.formValues.namespace_toggle">No</span> -->
                   </div>
                 </div>
+                <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                  <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
+                  <div class="col-sm-8">
+                    <select
+                      ng-disabled="ctrl.formValues.namespace_toggle"
+                      class="form-control"
+                      ng-model="ctrl.formValues.Namespace"
+                      ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
+                    ></select>
+                  </div>
+                </div>
+
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
                   <div class="col-sm-12 small text-warning">
                     <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>

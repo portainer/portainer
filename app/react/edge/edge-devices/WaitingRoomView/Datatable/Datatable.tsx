@@ -12,27 +12,24 @@ import { useSearchBarState } from '@@/datatables/SearchBar';
 import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 
 import { columns } from './columns';
+import { Filter } from './Filter';
+import { useEnvironments } from './useEnvironments';
 
 const storageKey = 'edge-devices-waiting-room';
 
 const settingsStore = createPersistedStore(storageKey, 'Name');
 
-interface Props {
-  devices: Environment[];
-  isLoading: boolean;
-  totalCount: number;
-}
-
-export function Datatable({ devices, isLoading, totalCount }: Props) {
+export function Datatable() {
   const associateMutation = useAssociateDeviceMutation();
   const licenseOverused = useLicenseOverused();
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
+  const { data: environments, totalCount, isLoading } = useEnvironments();
 
   return (
     <GenericDatatable
       columns={columns}
-      dataset={devices}
+      dataset={environments}
       initialPageSize={settings.pageSize}
       onPageSizeChange={settings.setPageSize}
       initialSortBy={settings.sortBy}
@@ -62,6 +59,7 @@ export function Datatable({ devices, isLoading, totalCount }: Props) {
       )}
       isLoading={isLoading}
       totalCount={totalCount}
+      description={<Filter />}
     />
   );
 

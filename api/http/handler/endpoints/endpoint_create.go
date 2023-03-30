@@ -38,7 +38,6 @@ type endpointCreatePayload struct {
 	AzureAuthenticationKey string
 	TagIDs                 []portainer.TagID
 	EdgeCheckinInterval    int
-	IsEdgeDevice           bool
 }
 
 type endpointCreationEnum int
@@ -381,7 +380,6 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeKey:             edgeKey,
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 		Kubernetes:          portainer.KubernetesDefault(),
-		IsEdgeDevice:        payload.IsEdgeDevice,
 		UserTrusted:         true,
 	}
 
@@ -435,7 +433,6 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
-		IsEdgeDevice:       payload.IsEdgeDevice,
 	}
 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
@@ -501,7 +498,6 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
-		IsEdgeDevice:       payload.IsEdgeDevice,
 	}
 
 	endpoint.Agent.Version = agentVersion

@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <div class="dashboard-grid mx-4">
+  <div class="mx-4 grid grid-cols-2 gap-3">
     <a class="no-link" ui-sref="docker.stacks" ng-if="showStacks">
       <dashboard-item icon="'layers'" type="'Stack'" value="stackCount"></dashboard-item>
     </a>
@@ -106,7 +106,12 @@
     </a>
 
     <div>
-      <dashboard-item icon="'cpu'" type="'GPU'" value="endpoint.Gpus.length"></dashboard-item>
+      <dashboard-item
+        ng-if="endpoint.EnableGPUManagement && applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"
+        icon="'cpu'"
+        type="'GPU'"
+        value="endpoint.Gpus.length"
+      ></dashboard-item>
     </div>
   </div>
 </div>

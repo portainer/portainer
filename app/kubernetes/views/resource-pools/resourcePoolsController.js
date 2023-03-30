@@ -17,6 +17,12 @@ class KubernetesResourcePoolsController {
     this.getResourcePoolsAsync = this.getResourcePoolsAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
+    this.onReload = this.onReload.bind(this);
+  }
+
+  async onReload() {
+    await this.KubernetesNamespaceService.refreshCacheAsync();
+    this.$state.reload(this.$state.current);
   }
 
   async removeActionAsync(selectedItems) {
@@ -44,6 +50,7 @@ class KubernetesResourcePoolsController {
       } finally {
         --actionCount;
         if (actionCount === 0) {
+          await this.KubernetesNamespaceService.refreshCacheAsync();
           this.$state.reload(this.$state.current);
         }
       }
@@ -70,7 +77,7 @@ class KubernetesResourcePoolsController {
 
   async getResourcePoolsAsync() {
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.get('', { getQuota: true });
+      this.resourcePools = await this.KubernetesResourcePoolService.get('', { getQuota: true, refreshCache: true });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive namespaces');
     }

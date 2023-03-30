@@ -50,8 +50,16 @@ export type IngressClass = {
   Type: string;
 };
 
+interface StorageClass {
+  Name: string;
+  AccessModes: string[];
+  AllowVolumeExpansion: boolean;
+  Provisioner: string;
+}
+
 export interface KubernetesConfiguration {
   UseLoadBalancer?: boolean;
+  StorageClasses?: StorageClass[];
   UseServerMetrics?: boolean;
   EnableResourceOverCommit?: boolean;
   ResourceOverCommitPercentage?: number;
@@ -131,6 +139,7 @@ export type Environment = {
   TagIds: TagId[];
   GroupId: EnvironmentGroupId;
   DeploymentOptions: DeploymentOptions | null;
+  EnableGPUManagement: boolean;
   EdgeID?: string;
   EdgeKey: string;
   EdgeCheckinInterval?: number;
@@ -143,7 +152,6 @@ export type Environment = {
   Kubernetes: KubernetesSettings;
   Nomad: NomadSettings;
   PublicURL?: string;
-  IsEdgeDevice?: boolean;
   UserTrusted: boolean;
   AMTDeviceGUID?: string;
   Edge: EnvironmentEdge;

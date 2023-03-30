@@ -10,5 +10,6 @@ angular.module('portainer.app').component('codeEditor', {
     readOnly: '<',
     onChange: '<',
     value: '<',
+    height: '@',
   },
 });

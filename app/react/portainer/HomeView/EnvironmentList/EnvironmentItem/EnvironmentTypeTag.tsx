@@ -32,11 +32,9 @@ export function EnvironmentTypeTag({
 
 function getTypeLabel(environment: Environment) {
   if (isEdgeEnvironment(environment.Type)) {
-    if (environment.Edge.AsyncMode) {
-      return 'Edge Agent Async';
-    }
-
-    return 'Edge Agent Standard';
+    return environment.Edge.AsyncMode
+      ? 'Edge Agent Async'
+      : 'Edge Agent Standard';
   }
 
   if (isLocalEnvironment(environment)) {

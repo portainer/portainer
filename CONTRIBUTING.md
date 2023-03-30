@@ -93,7 +93,7 @@ $ yarn start
 
 Portainer can now be accessed at <https://localhost:9443>.
 
-Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
+Find more detailed steps at <https://docs.portainer.io/contribute/build>.
 
 ### Build customisation
 
@@ -102,6 +102,10 @@ You can customise the following settings:
 - `PORTAINER_DATA`: The host dir or volume name used by portainer (default is `/tmp/portainer`, which won't persist over reboots).
 - `PORTAINER_PROJECT`: The root dir of the repository - `${portainerRoot}/dist/` is imported into the container to get the build artifacts and external tools (defaults to `your current dir`).
 - `PORTAINER_FLAGS`: a list of flags to be used on the portainer commandline, in the form `--admin-password=<pwd hash> --feat fdo=false --feat open-amt` (default: `""`).
+
+## Testing your build
+
+The `--log-level=DEBUG` flag can be passed to the Portainer container in order to provide additional debug output which may be useful when troubleshooting your builds. Please note that this flag was originally intended for internal use and as such the format, functionality and output may change between releases without warning.
 
 ## Adding api docs
 

@@ -15,7 +15,6 @@ interface Props {
   onCreate: (environment: Environment) => void;
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
   isNomadTokenVisible?: boolean;
-  showGpus?: boolean;
   asyncMode?: boolean;
 }
 
@@ -23,7 +22,6 @@ export function EdgeAgentTab({
   onCreate,
   commands,
   isNomadTokenVisible,
-  showGpus = false,
   asyncMode = false,
 }: Props) {
   const [edgeInfo, setEdgeInfo] = useState<EdgeInfo>();
@@ -35,7 +33,6 @@ export function EdgeAgentTab({
         onCreate={handleCreate}
         readonly={!!edgeInfo}
         key={formKey}
-        showGpus={showGpus}
         asyncMode={asyncMode}
       />
 

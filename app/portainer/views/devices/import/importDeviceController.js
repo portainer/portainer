@@ -82,8 +82,7 @@ angular
                 null,
                 null,
                 null,
-                null,
-                true
+                null
               );
             } catch (err) {
               Notifications.error('Failure', err, 'Unable to create the environment');

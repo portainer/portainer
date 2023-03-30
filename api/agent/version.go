@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -42,7 +43,9 @@ func GetAgentVersionAndPlatform(endpointUrl string, tlsConfig *tls.Config) (port
 	if err != nil {
 		return 0, "", err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
 		return 0, "", fmt.Errorf("Failed request with status %d", resp.StatusCode)

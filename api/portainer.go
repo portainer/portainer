@@ -225,7 +225,7 @@ type (
 	// It contains some information of Docker's ContainerJSON struct
 	DockerContainerSnapshot struct {
 		types.Container
-		Env []string `json:"Env"`
+		Env []string `json:"Env,omitempty"` // EE-5240
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -388,8 +388,7 @@ type (
 		LastCheckInDate int64
 		// QueryDate of each query with the endpoints list
 		QueryDate int64
-		// IsEdgeDevice marks if the environment was created as an EdgeDevice
-		IsEdgeDevice bool
+
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
@@ -401,6 +400,8 @@ type (
 		Agent struct {
 			Version string `example:"1.0.0"`
 		}
+
+		EnableGPUManagement bool `json:"EnableGPUManagement"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -415,6 +416,9 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+
+		// Deprecated v2.18
+		IsEdgeDevice bool
 	}
 
 	EnvironmentEdgeSettings struct {
@@ -502,6 +506,7 @@ type (
 	// EndpointPostInitMigrations
 	EndpointPostInitMigrations struct {
 		MigrateIngresses bool `json:"MigrateIngresses"`
+		MigrateGPUs      bool `json:"MigrateGPUs"`
 	}
 
 	// Extension represents a deprecated Portainer extension
@@ -585,9 +590,12 @@ type (
 		Flags         KubernetesFlags         `json:"Flags"`
 	}
 
+	// KubernetesFlags are used to detect if we need to run initial cluster
+	// detection again.
 	KubernetesFlags struct {
-		IsServerMetricsDetected bool `json:"IsServerMetricsDetected"`
-		IsServerStorageDetected bool `json:"IsServerStorageDetected"`
+		IsServerMetricsDetected      bool `json:"IsServerMetricsDetected"`
+		IsServerIngressClassDetected bool `json:"IsServerIngressClassDetected"`
+		IsServerStorageDetected      bool `json:"IsServerStorageDetected"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
@@ -1283,8 +1291,6 @@ type (
 	UserThemeSettings struct {
 		// Color represents the color theme of the UI
 		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
-		// SubtleUpgradeButton indicates if the upgrade banner should be displayed in a subtle way
-		SubtleUpgradeButton bool `json:"subtleUpgradeButton"`
 	}
 
 	// Webhook represents a url webhook that can be used to update a service
@@ -1507,7 +1513,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.18.0"
+	APIVersion = "2.19.0"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1554,7 +1560,9 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []featureflags.Feature{}
+var SupportedFeatureFlags = []featureflags.Feature{
+	"fdo",
+}
 
 const (
 	_ AuthenticationMethod = iota

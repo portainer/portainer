@@ -1,4 +1,3 @@
-import { Gpu } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
@@ -18,7 +17,6 @@ interface CreateLocalDockerEnvironment {
   socketPath?: string;
   publicUrl?: string;
   meta?: EnvironmentMetadata;
-  gpus?: Gpu[];
 }
 
 export async function createLocalDockerEnvironment({
@@ -26,7 +24,6 @@ export async function createLocalDockerEnvironment({
   socketPath = '',
   publicUrl = '',
   meta = { tagIds: [] },
-  gpus = [],
 }: CreateLocalDockerEnvironment) {
   const url = prefixPath(socketPath);
 
@@ -37,7 +34,6 @@ export async function createLocalDockerEnvironment({
       url,
       publicUrl,
       meta,
-      gpus,
     }
   );
 
@@ -112,8 +108,6 @@ export interface EnvironmentOptions {
   meta?: EnvironmentMetadata;
   azure?: AzureSettings;
   tls?: TLSSettings;
-  isEdgeDevice?: boolean;
-  gpus?: Gpu[];
   pollFrequency?: number;
   edge?: EdgeSettings;
   tunnelServerAddr?: string;
@@ -145,7 +139,6 @@ export interface CreateAgentEnvironmentValues {
   name: string;
   environmentUrl: string;
   meta: EnvironmentMetadata;
-  gpus: Gpu[];
 }
 
 export function createAgentEnvironment({
@@ -173,8 +166,6 @@ interface CreateEdgeAgentEnvironment {
   tunnelServerAddr?: string;
   meta?: EnvironmentMetadata;
   pollFrequency: number;
-  gpus?: Gpu[];
-  isEdgeDevice?: boolean;
   edge: EdgeSettings;
 }
 
@@ -182,8 +173,6 @@ export function createEdgeAgentEnvironment({
   name,
   portainerUrl,
   meta = { tagIds: [] },
-  gpus = [],
-  isEdgeDevice,
   pollFrequency,
   edge,
 }: CreateEdgeAgentEnvironment) {
@@ -196,8 +185,6 @@ export function createEdgeAgentEnvironment({
         skipVerify: true,
         skipClientVerify: true,
       },
-      gpus,
-      isEdgeDevice,
       pollFrequency,
       edge,
       meta,
@@ -225,8 +212,6 @@ async function createEnvironment(
       GroupID: groupId,
       TagIds: arrayToJson(tagIds),
       CheckinInterval: options.pollFrequency,
-      IsEdgeDevice: options.isEdgeDevice,
-      Gpus: arrayToJson(options.gpus),
     };
 
     const { tls, azure } = options;

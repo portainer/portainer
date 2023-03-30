@@ -6,7 +6,6 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -26,12 +25,15 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return errors.New("invalid Edge group name")
 	}
+
 	if payload.Dynamic && len(payload.TagIDs) == 0 {
 		return errors.New("tagIDs is mandatory for a dynamic Edge group")
 	}
+
 	if !payload.Dynamic && len(payload.Endpoints) == 0 {
 		return errors.New("environment is mandatory for a static Edge group")
 	}
+
 	return nil
 }
 
@@ -56,7 +58,6 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var edgeGroup *portainer.EdgeGroup
-
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		edgeGroups, err := tx.EdgeGroup().EdgeGroups()
 		if err != nil {
@@ -101,13 +102,6 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 
 		return nil
 	})
-	if err != nil {
-		if httpErr, ok := err.(*httperror.HandlerError); ok {
-			return httpErr
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.JSON(w, edgeGroup)
+	return txResponse(w, edgeGroup, err)
 }

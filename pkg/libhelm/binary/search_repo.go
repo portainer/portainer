@@ -68,6 +68,7 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get index file")
 	}
+	defer resp.Body.Close()
 
 	var file File
 	err = yaml.NewDecoder(resp.Body).Decode(&file)

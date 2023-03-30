@@ -13,7 +13,6 @@ import { BadgeIcon } from '@@/BadgeIcon';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
-import { useFilterEdgeOptionsIfNeeded } from '../useOnlyEdgeOptions';
 
 import { AgentTab } from './AgentTab';
 import { APITab } from './APITab';
@@ -24,7 +23,7 @@ interface Props {
   isDockerStandalone?: boolean;
 }
 
-const defaultOptions: BoxSelectorOption<
+const options: BoxSelectorOption<
   'agent' | 'api' | 'socket' | 'edgeAgentStandard' | 'edgeAgentAsync'
 >[] = _.compact([
   {
@@ -50,16 +49,14 @@ const defaultOptions: BoxSelectorOption<
   },
   {
     id: 'edgeAgentStandard',
-    icon: EdgeAgentStandardIcon,
-    iconType: 'badge',
+    icon: <BadgeIcon icon={EdgeAgentStandardIcon} size="3xl" />,
     label: 'Edge Agent Standard',
     description: '',
     value: 'edgeAgentStandard',
   },
   isBE && {
     id: 'edgeAgentAsync',
-    icon: EdgeAgentAsyncIcon,
-    iconType: 'badge',
+    icon: <BadgeIcon icon={EdgeAgentAsyncIcon} size="3xl" />,
     label: 'Edge Agent Async',
     description: '',
     value: 'edgeAgentAsync',
@@ -67,11 +64,6 @@ const defaultOptions: BoxSelectorOption<
 ]);
 
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
-  const options = useFilterEdgeOptionsIfNeeded(
-    defaultOptions,
-    'edgeAgentStandard'
-  );
-
   const [creationType, setCreationType] = useState(options[0].value);
 
   const tab = getTab(creationType);
@@ -109,12 +101,14 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
         return (
           <APITab
             onCreate={(environment) => onCreate(environment, 'dockerApi')}
+            isDockerStandalone={isDockerStandalone}
           />
         );
       case 'socket':
         return (
           <SocketTab
             onCreate={(environment) => onCreate(environment, 'localEndpoint')}
+            isDockerStandalone={isDockerStandalone}
           />
         );
       case 'edgeAgentStandard':

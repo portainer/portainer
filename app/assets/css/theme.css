@@ -120,8 +120,6 @@
   --bg-navtabs-hover-color: var(--grey-16);
   --bg-nav-tab-active-color: var(--ui-gray-4);
   --bg-table-selected-color: var(--grey-14);
-  --bg-codemirror-color: var(--white-color);
-  --bg-codemirror-gutters-color: var(--grey-17);
   --bg-dropdown-menu-color: var(--white-color);
   --bg-log-viewer-color: var(--white-color);
   --bg-log-line-selected-color: var(--grey-18);
@@ -136,7 +134,6 @@
   --bg-item-highlighted-color: var(--grey-21);
   --bg-item-highlighted-null-color: var(--grey-14);
   --bg-panel-body-color: var(--white-color);
-  --bg-codemirror-selected-color: var(--grey-22);
   --bg-tooltip-color: var(--ui-gray-11);
   --bg-input-sm-color: var(--white-color);
   --bg-app-datatable-thead: var(--grey-23);
@@ -182,11 +179,7 @@
   --text-navtabs-color: var(--grey-7);
   --text-navtabs-hover-color: var(--grey-6);
   --text-nav-tab-active-color: var(--grey-25);
-  --text-cm-default-color: var(--blue-1);
-  --text-cm-meta-color: var(--black-color);
-  --text-cm-string-color: var(--red-3);
-  --text-cm-number-color: var(--green-1);
-  --text-codemirror-color: var(--black-color);
+
   --text-dropdown-menu-color: var(--grey-6);
   --text-log-viewer-color: var(--black-color);
   --text-json-tree-color: var(--blue-3);
@@ -224,7 +217,6 @@
   --border-md-checkbox-color: var(--grey-19);
   --border-modal-header-color: var(--grey-45);
   --border-navtabs-color: var(--ui-white);
-  --border-codemirror-cursor-color: var(--black-color);
   --border-pre-color: var(--grey-43);
   --border-pagination-span-color: var(--ui-white);
   --border-pagination-hover-color: var(--ui-white);
@@ -281,9 +273,6 @@
   --bg-card-color: var(--grey-1);
   --bg-checkbox-border-color: var(--grey-8);
   --bg-code-color: var(--grey-2);
-  --bg-codemirror-color: var(--grey-2);
-  --bg-codemirror-gutters-color: var(--grey-3);
-  --bg-codemirror-selected-color: var(--grey-3);
   --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-main-color: var(--grey-2);
   --bg-sidebar-color: var(--grey-1);
@@ -361,11 +350,7 @@
   --text-navtabs-color: var(--grey-8);
   --text-navtabs-hover-color: var(--grey-9);
   --text-nav-tab-active-color: var(--white-color);
-  --text-cm-default-color: var(--blue-10);
-  --text-cm-meta-color: var(--white-color);
-  --text-cm-string-color: var(--red-5);
-  --text-cm-number-color: var(--green-2);
-  --text-codemirror-color: var(--white-color);
+
   --text-dropdown-menu-color: var(--white-color);
   --text-log-viewer-color: var(--white-color);
   --text-json-tree-color: var(--grey-40);
@@ -403,7 +388,6 @@
   --border-md-checkbox-color: var(--grey-41);
   --border-modal-header-color: var(--grey-1);
   --border-navtabs-color: var(--grey-38);
-  --border-codemirror-cursor-color: var(--white-color);
   --border-pre-color: var(--grey-3);
   --border-blocklist: var(--ui-gray-9);
   --border-blocklist-item-selected-color: var(--grey-38);
@@ -468,15 +452,12 @@
   --bg-switch-box-color: var(--grey-53);
   --bg-panel-body-color: var(--black-color);
   --bg-dropdown-menu-color: var(--ui-gray-warm-8);
-  --bg-codemirror-selected-color: var(--grey-3);
   --bg-motd-body-color: var(--black-color);
   --bg-blocklist-hover-color: var(--black-color);
   --bg-blocklist-item-selected-color: var(--black-color);
   --bg-input-group-addon-color: var(--grey-3);
   --bg-table-color: var(--black-color);
-  --bg-codemirror-gutters-color: var(--ui-gray-warm-11);
-  --bg-codemirror-color: var(--black-color);
-  --bg-codemirror-selected-color: var(--grey-3);
+
   --bg-log-viewer-color: var(--black-color);
   --bg-log-line-selected-color: var(--grey-3);
   --bg-modal-content-color: var(--black-color);
@@ -536,7 +517,6 @@
   --text-tooltip-color: var(--white-color);
   --text-blocklist-item-selected-color: var(--blue-9);
   --text-input-group-addon-color: var(--white-color);
-  --text-codemirror-color: var(--white-color);
   --text-dropdown-menu-color: var(--white-color);
   --text-log-viewer-color: var(--white-color);
   --text-summary-color: var(--white-color);
@@ -582,7 +562,6 @@
   --border-pre-next-month: var(--white-color);
   --border-daterangepicker-after: var(--black-color);
   --border-pre-color: var(--grey-3);
-  --border-codemirror-cursor-color: var(--white-color);
   --border-modal: 1px solid var(--white-color);
   --border-sortbutton: var(--black-color);
   --border-bootbox: var(--black-color);
@@ -596,9 +575,7 @@
 
   --text-input-textarea: var(--black-color);
   --bg-item-highlighted-null-color: var(--grey-2);
-  --text-cm-default-color: var(--blue-9);
-  --text-cm-meta-color: var(--white-color);
-  --text-cm-string-color: var(--red-7);
+
   --text-progress-bar-color: var(--black-color);
 
   --user-menu-icon-color: var(--white-color);

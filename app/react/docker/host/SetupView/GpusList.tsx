@@ -48,11 +48,12 @@ function Item({ item, onChange }: ItemProps<Gpu>) {
 export function GpusList({ value, onChange }: Props) {
   return (
     <InputList<Gpu>
-      label="GPU"
+      label="GPUs"
+      tooltip="You may optionally set up the GPUs that will be selectable against containers, although 'All GPUs' will always be available."
       value={value}
       onChange={onChange}
       itemBuilder={() => ({ value: '', name: '' })}
-      addLabel="add"
+      addLabel="Add GPU"
       item={Item}
     />
   );

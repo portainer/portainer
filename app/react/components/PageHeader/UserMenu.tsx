@@ -8,6 +8,7 @@ import { UISrefProps, useSref } from '@uirouter/react';
 import clsx from 'clsx';
 import { User, ChevronDown } from 'lucide-react';
 
+import { queryClient } from '@/react-tools/react-query';
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/react/hooks/useUser';
 
@@ -78,7 +79,10 @@ function MenuLink({
   return (
     <ReachMenuLink
       href={anchorProps.href}
-      onClick={anchorProps.onClick}
+      onClick={(e) => {
+        queryClient.clear();
+        anchorProps.onClick(e);
+      }}
       className={styles.menuLink}
       aria-label={label}
       data-cy={dataCy}

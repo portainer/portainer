@@ -128,6 +128,7 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	if err != nil {
 		return "", err
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("unexpected status code %s", response.Status)
@@ -137,6 +138,8 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	if err != nil {
 		return "", err
 	}
+
 	block, _ := pem.Decode(certificate)
+
 	return base64.StdEncoding.EncodeToString(block.Bytes), nil
 }

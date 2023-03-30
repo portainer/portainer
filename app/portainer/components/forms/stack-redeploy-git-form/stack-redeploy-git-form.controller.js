@@ -7,7 +7,7 @@ import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhoo
 
 class StackRedeployGitFormController {
   /* @ngInject */
-  constructor($async, $state, $compile, $scope, StackService, ModalService, Notifications, FormHelper) {
+  constructor($async, $state, $compile, $scope, StackService, Notifications, FormHelper) {
     this.$async = $async;
     this.$state = $state;
     this.$compile = $compile;
@@ -182,7 +182,7 @@ class StackRedeployGitFormController {
 
     this.formValues.AutoUpdate = parseAutoUpdateResponse(this.stack.AutoUpdate);
 
-    if (this.stack.AutoUpdate.Webhook) {
+    if (this.stack.AutoUpdate && this.stack.AutoUpdate.Webhook) {
       this.state.webhookId = this.stack.AutoUpdate.Webhook;
     }
 
