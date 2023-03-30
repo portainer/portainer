@@ -225,7 +225,7 @@ type (
 	// It contains some information of Docker's ContainerJSON struct
 	DockerContainerSnapshot struct {
 		types.Container
-		Env []string `json:"Env"`
+		Env []string `json:"Env,omitempty"` // EE-5240
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -388,8 +388,7 @@ type (
 		LastCheckInDate int64
 		// QueryDate of each query with the endpoints list
 		QueryDate int64
-		// IsEdgeDevice marks if the environment was created as an EdgeDevice
-		IsEdgeDevice bool
+
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
@@ -417,6 +416,9 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+
+		// Deprecated v2.18
+		IsEdgeDevice bool
 	}
 
 	EnvironmentEdgeSettings struct {

@@ -135,13 +135,14 @@
   <!-- !execution-method -->
 
   <!-- web-editor -->
+  <!-- TODO use web-editor-form component -->
   <div ng-show="$ctrl.formValues.method === 'editor'">
     <div class="col-sm-12 form-section-title"> Web editor </div>
     <div class="form-group">
       <div class="col-sm-12">
         <code-editor
           identifier="execute-edge-job-editor"
-          placeholder="# Define or paste the content of your script file here"
+          placeholder="Define or paste the content of your script file here"
           on-change="($ctrl.editorUpdate)"
           value="$ctrl.model.FileContent"
         ></code-editor>

@@ -15,7 +15,6 @@ import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
-import { useFilterEdgeOptionsIfNeeded } from '../useOnlyEdgeOptions';
 
 import { AgentPanel } from './AgentPanel';
 import { KubeConfigTeaserForm } from './KubeConfigTeaserForm';
@@ -30,7 +29,7 @@ type CreationType =
   | 'edgeAgentAsync'
   | 'kubeconfig';
 
-const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
+const options: BoxSelectorOption<CreationType>[] = _.compact([
   {
     id: 'agent_endpoint',
     icon: Zap,
@@ -67,8 +66,6 @@ const defaultOptions: BoxSelectorOption<CreationType>[] = _.compact([
 ]);
 
 export function WizardKubernetes({ onCreate }: Props) {
-  const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'agent');
-
   const [creationType, setCreationType] = useState(options[0].value);
 
   const tab = getTab(creationType);

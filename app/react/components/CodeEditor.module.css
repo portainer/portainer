@@ -70,3 +70,7 @@
   background-color: var(--bg-inputbox);
   color: var(--text-form-control-color);
 }
+
+.root :global(.cm-content[contenteditable='true']) {
+  @apply h-full;
+}

@@ -103,6 +103,8 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
+
 	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
@@ -132,6 +134,8 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
+
 	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
@@ -141,10 +145,12 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 		if response.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
+
 		errorResponse := parseError(responseBody)
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
+
 		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
