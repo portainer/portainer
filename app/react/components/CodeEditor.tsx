@@ -6,6 +6,7 @@ import { createTheme } from '@uiw/codemirror-themes';
 import { tags as highlightTags } from '@lezer/highlight';
 
 import styles from './CodeEditor.module.css';
+import { TextTip } from './Tip/TextTip';
 
 interface Props {
   id: string;
@@ -53,16 +54,18 @@ export function CodeEditor({
   const extensions = useMemo(() => (isYaml ? [yamlLanguage] : []), [isYaml]);
 
   return (
-    <CodeMirror
-      className={styles.root}
-      theme={theme}
-      value={value}
-      onChange={onChange}
-      readOnly={readonly}
-      placeholder={placeholder}
-      id={id}
-      extensions={extensions}
-      height={height}
-    />
+    <>
+      {!!placeholder && <TextTip color="blue">{placeholder}</TextTip>}
+      <CodeMirror
+        className={styles.root}
+        theme={theme}
+        value={value}
+        onChange={onChange}
+        readOnly={readonly}
+        id={id}
+        extensions={extensions}
+        height={height}
+      />
+    </>
   );
 }
