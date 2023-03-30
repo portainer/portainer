@@ -34,7 +34,7 @@
     value="$ctrl.model.StackFileContent"
     yml="true"
     identifier="compose-editor"
-    placeholder="# Define or paste the content of your docker compose file here"
+    placeholder="Define or paste the content of your docker compose file here"
     on-change="($ctrl.onChangeComposeConfig)"
     read-only="$ctrl.hasKubeEndpoint()"
   >
@@ -63,7 +63,7 @@
       value="$ctrl.model.StackFileContent"
       yml="true"
       identifier="kube-manifest-editor"
-      placeholder="# Define or paste the content of your manifest here"
+      placeholder="Define or paste the content of your manifest here"
       on-change="($ctrl.onChangeKubeManifest)"
     >
       <editor-description>

@@ -113,15 +113,13 @@
             on-change="(onChangeFileContent)"
             ng-required="true"
             yml="true"
-            placeholder="# Define or paste the content of your docker compose file here"
+            placeholder="Define or paste the content of your docker compose file here"
           >
             <editor-description>
-              <span class="col-sm-12 text-muted small">
+              <p>
                 You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-              </span>
-              <div class="col-sm-12" ng-if="state.editorYamlValidationError">
-                <span class="text-danger small">{{ state.editorYamlValidationError }}</span>
-              </div>
+              </p>
+              <p ng-if="state.editorYamlValidationError" class="text-danger">{{ state.editorYamlValidationError }}</p>
             </editor-description>
           </web-editor-form>
 

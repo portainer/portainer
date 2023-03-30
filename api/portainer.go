@@ -225,7 +225,7 @@ type (
 	// It contains some information of Docker's ContainerJSON struct
 	DockerContainerSnapshot struct {
 		types.Container
-		Env []string `json:"Env"`
+		Env []string `json:"Env,omitempty"` // EE-5240
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
