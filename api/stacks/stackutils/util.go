@@ -15,6 +15,10 @@ func UserIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.Endpo
 }
 
 // GetStackFilePaths returns a list of file paths based on stack project path
+// If absolute is false, the path sanitization step will be skipped, which makes the returning
+// paths vulnerable to path traversal attacks. Thus, the followed function using the returning
+// paths are responsible to sanitize the raw paths
+// If absolute is true, the raw paths will be sanitized
 func GetStackFilePaths(stack *portainer.Stack, absolute bool) []string {
 	if !absolute {
 		return append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
