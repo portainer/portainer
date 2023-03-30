@@ -179,7 +179,11 @@ function TableActions({ selectedItems }: TableActionsProps) {
           Remove
         </Button>
 
-        <Link to="kubernetes.deploy" className="space-left">
+        <Link
+          to="kubernetes.deploy"
+          params={{ referrer: 'kubernetes.services' }}
+          className="space-left hover:no-underline"
+        >
           <Button className="btn-wrapper" color="primary" icon="plus">
             Create from manifest
           </Button>
