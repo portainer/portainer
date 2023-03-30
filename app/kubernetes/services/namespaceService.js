@@ -7,9 +7,8 @@ import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, $state, KubernetesNamespaces, LocalStorage) {
+  constructor($async, KubernetesNamespaces, LocalStorage) {
     this.$async = $async;
-    this.$state = $state;
     this.KubernetesNamespaces = KubernetesNamespaces;
     this.LocalStorage = LocalStorage;
 
@@ -19,7 +18,6 @@ class KubernetesNamespaceService {
     this.deleteAsync = this.deleteAsync.bind(this);
     this.getJSONAsync = this.getJSONAsync.bind(this);
     this.updateFinalizeAsync = this.updateFinalizeAsync.bind(this);
-    this.refreshCacheAsync = this.refreshCacheAsync.bind(this);
   }
 
   /**
@@ -82,20 +80,13 @@ class KubernetesNamespaceService {
     }
   }
 
-  async get(name, refreshCache = false, environmentId = this.$state.params.endpointId) {
+  async get(name) {
     if (name) {
       return this.$async(this.getAsync, name);
     }
-    const cachedAllowedNamespaces = this.LocalStorage.getAllowedNamespaces(environmentId);
-    if (!cachedAllowedNamespaces || refreshCache) {
-      const allowedNamespaces = await this.getAllAsync();
-      this.LocalStorage.storeAllowedNamespaces(environmentId, allowedNamespaces);
-      updateNamespaces(allowedNamespaces);
-      return allowedNamespaces;
-    } else {
-      updateNamespaces(cachedAllowedNamespaces);
-      return cachedAllowedNamespaces;
-    }
+    const allowedNamespaces = await this.getAllAsync();
+    updateNamespaces(allowedNamespaces);
+    return allowedNamespaces;
   }
 
   /**
@@ -106,7 +97,6 @@ class KubernetesNamespaceService {
       const payload = KubernetesNamespaceConverter.createPayload(namespace);
       const params = {};
       const data = await this.KubernetesNamespaces().create(params, payload).$promise;
-      await this.refreshCacheAsync();
       return data;
     } catch (err) {
       throw new PortainerError('Unable to create namespace', err);
@@ -115,14 +105,6 @@ class KubernetesNamespaceService {
 
   create(namespace) {
     return this.$async(this.createAsync, namespace);
-  }
-
-  async refreshCacheAsync(environmentId = this.$state.params.endpointId) {
-    this.LocalStorage.deleteAllowedNamespaces();
-    const allowedNamespaces = await this.getAllAsync();
-    this.LocalStorage.storeAllowedNamespaces(environmentId, allowedNamespaces);
-    updateNamespaces(allowedNamespaces);
-    return allowedNamespaces;
   }
 
   /**

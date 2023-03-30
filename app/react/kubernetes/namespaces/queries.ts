@@ -16,7 +16,7 @@ export function useNamespaces(environmentId: EnvironmentId) {
     async () => {
       const namespaces = await getNamespaces(environmentId);
       const namespaceNames = Object.keys(namespaces);
-      // use seflsubjectaccess reviews to avoid forbidden requests
+      // use selfsubjectaccess reviews to avoid forbidden requests
       const allNamespaceAccessReviews = await Promise.all(
         namespaceNames.map((namespaceName) =>
           getSelfSubjectAccessReview(environmentId, namespaceName)
