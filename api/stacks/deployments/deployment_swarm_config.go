@@ -78,7 +78,7 @@ func (config *SwarmStackDeploymentConfig) Deploy() error {
 		}
 	}
 
-	if config.stack.GitConfig != nil && len(config.stack.GitConfig.URL) != 0 {
+	if stackutils.IsGitStack(config.stack) {
 		return config.StackDeployer.DeployRemoteSwarmStack(config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
 	}
 

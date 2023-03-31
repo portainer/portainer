@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -84,7 +85,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	switch stack.Type {
 	case portainer.DockerComposeStack:
 
-		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+		if stackutils.IsGitStack(stack) {
 			err = deployer.DeployRemoteComposeStack(stack, endpoint, registries, true, false)
 		} else {
 			err = deployer.DeployComposeStack(stack, endpoint, registries, true, false)
@@ -94,7 +95,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
 	case portainer.DockerSwarmStack:
-		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+		if stackutils.IsGitStack(stack) {
 			err = deployer.DeployRemoteSwarmStack(stack, endpoint, registries, true, true)
 		} else {
 			err = deployer.DeploySwarmStack(stack, endpoint, registries, true, true)

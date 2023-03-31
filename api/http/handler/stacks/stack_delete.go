@@ -188,13 +188,13 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 
 func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	if stack.Type == portainer.DockerSwarmStack {
-		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+		if stackutils.IsGitStack(stack) {
 			return handler.StackDeployer.UndeployRemoteSwarmStack(stack, endpoint)
 		}
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
 	if stack.Type == portainer.DockerComposeStack {
-		if stack.GitConfig != nil && len(stack.GitConfig.URL) != 0 {
+		if stackutils.IsGitStack(stack) {
 			return handler.StackDeployer.UndeployRemoteComposeStack(stack, endpoint)
 		}
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
