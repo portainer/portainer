@@ -151,7 +151,7 @@ func (service ServiceTx) updateEdgeStacksAfterRelationChange(previousRelationSta
 				}
 			}
 
-			service.service.updateStackFn(refStackId, func(edgeStack *portainer.EdgeStack) {
+			service.service.updateStackFnTx(service.tx, refStackId, func(edgeStack *portainer.EdgeStack) {
 				edgeStack.NumDeployments = numDeployments
 			})
 		}
