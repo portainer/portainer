@@ -218,16 +218,15 @@ func (d *stackDeployer) createDockerClient(ctx context.Context, endpoint *portai
 		return nil, errors.Wrap(err, "unable to create Docker client")
 	}
 
-	// only for swarm
 	info, err := cli.Info(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get agent info")
 	}
 
-	// if swarm - create client for swarm leader
-	if info.Swarm.LocalNodeState == swarm.LocalNodeStateInactive {
+	if isNotInASwarm(&info) {
 		return cli, nil
 	}
+
 	nodes, err := cli.NodeList(ctx, types.NodeListOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list nodes")
@@ -268,4 +267,10 @@ func getTargetSocketBind(osType string) string {
 		targetSocketBind = "/var/run/docker.sock"
 	}
 	return targetSocketBind
+}
+
+// Per https://stackoverflow.com/a/50590287 and Docker's LocalNodeState possible values
+// `LocalNodeStateInactive` means the node is not in a swarm cluster
+func isNotInASwarm(info *types.Info) bool {
+	return info.Swarm.LocalNodeState == swarm.LocalNodeStateInactive
 }
