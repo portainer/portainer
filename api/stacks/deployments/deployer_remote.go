@@ -156,7 +156,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 		Msg("running unpacker")
 
 	rand.Seed(time.Now().UnixNano())
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
+	unpackerContainer, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: image,
 		Cmd:   cmd,
 	}, &container.HostConfig{
@@ -166,17 +166,16 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 		},
 	}, nil, nil, fmt.Sprintf("portainer-unpacker-%d-%s-%d", stack.ID, stack.Name, rand.Intn(100)))
 
-	defer cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
-
 	if err != nil {
 		return errors.Wrap(err, "unable to create unpacker container")
 	}
+	defer cli.ContainerRemove(ctx, unpackerContainer.ID, types.ContainerRemoveOptions{})
 
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := cli.ContainerStart(ctx, unpackerContainer.ID, types.ContainerStartOptions{}); err != nil {
 		return errors.Wrap(err, "start unpacker container error")
 	}
 
-	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	statusCh, errCh := cli.ContainerWait(ctx, unpackerContainer.ID, container.WaitConditionNotRunning)
 	select {
 	case err := <-errCh:
 		if err != nil {
@@ -185,7 +184,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	case <-statusCh:
 	}
 
-	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		log.Error().Err(err).Msg("unable to get logs from unpacker container")
 	} else {
@@ -199,7 +198,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 		}
 	}
 
-	status, err := cli.ContainerInspect(ctx, resp.ID)
+	status, err := cli.ContainerInspect(ctx, unpackerContainer.ID)
 	if err != nil {
 		return errors.Wrap(err, "fetch container information error")
 	}
