@@ -29,33 +29,37 @@ const (
 )
 
 type unpackerCmdBuilderOptions struct {
-	stackOperation     StackRemoteOperation
 	pullImage          bool
 	prune              bool
 	composeDestination string
 	registries         []portainer.Registry
 }
 
-type BuildCmdFunc func(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string
+type buildCmdFunc func(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string
+
+var funcmap = map[StackRemoteOperation]buildCmdFunc{
+	OperationDeploy:        buildDeployCmd,
+	OperationUndeploy:      buildUndeployCmd,
+	OperationComposeStart:  buildComposeStartCmd,
+	OperationComposeStop:   buildComposeStopCmd,
+	OperationSwarmDeploy:   buildSwarmDeployCmd,
+	OperationSwarmUndeploy: buildSwarmUndeployCmd,
+	OperationSwarmStart:    buildSwarmStartCmd,
+	OperationSwarmStop:     buildSwarmStopCmd,
+}
 
 // build the unpacker cmd for stack based on stackOperation
-func (d *stackDeployer) buildUnpackerCmdForStack(stack *portainer.Stack, opts unpackerCmdBuilderOptions) []string {
+func (d *stackDeployer) buildUnpackerCmdForStack(stack *portainer.Stack, operation StackRemoteOperation, opts unpackerCmdBuilderOptions) ([]string, error) {
 
-	funcmap := map[StackRemoteOperation]BuildCmdFunc{
-		OperationDeploy:        buildDeployCmd,
-		OperationUndeploy:      buildUndeployCmd,
-		OperationComposeStart:  buildComposeStartCmd,
-		OperationComposeStop:   buildComposeStopCmd,
-		OperationSwarmDeploy:   buildSwarmDeployCmd,
-		OperationSwarmUndeploy: buildSwarmUndeployCmd,
-		OperationSwarmStart:    buildSwarmStartCmd,
-		OperationSwarmStop:     buildSwarmStopCmd,
+	fn := funcmap[operation]
+	if fn == nil {
+		return nil, fmt.Errorf("unknown stack operation %s", operation)
 	}
 
 	registriesStrings := getRegistry(opts.registries, d.dataStore)
 	envStrings := getEnv(stack.Env)
 
-	return funcmap[opts.stackOperation](stack, opts, registriesStrings, envStrings)
+	return fn(stack, opts, registriesStrings, envStrings), nil
 }
 
 // deploy [-u username -p password] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
