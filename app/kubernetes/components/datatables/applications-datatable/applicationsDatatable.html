@@ -244,6 +244,7 @@
       </thead>
       <tbody>
         <tr
+          ng-show="!$ctrl.isAppsLoading"
           ng-click="$ctrl.expandItem(item, !$ctrl.isItemExpanded(item))"
           dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.applyFilters | filter:$ctrl.state.textFilter | filter:$ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
           ng-class="{ active: item.Checked, interactive: $ctrl.isExpandable(item), 'secondary-body': !$ctrl.isPrimary }"
@@ -335,16 +336,16 @@
             </span>
           </td>
         </tr>
-        <tr ng-if="!$ctrl.dataset">
+        <tr ng-if="$ctrl.isAppsLoading">
           <td colspan="8" class="text-muted text-center">Loading...</td>
         </tr>
-        <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+        <tr ng-if="$ctrl.state.filteredDataSet.length === 0 && !$ctrl.isAppsLoading">
           <td colspan="8" class="text-muted text-center">No application available.</td>
         </tr>
       </tbody>
     </table>
   </div>
-  <div ng-if="$ctrl.isPrimary" class="footer pl-5" ng-if="$ctrl.dataset">
+  <div class="footer pl-5" ng-if="$ctrl.isPrimary && $ctrl.dataset">
     <div class="infoBar !ml-0" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
     <div class="paginationControls">
       <form class="form-inline">

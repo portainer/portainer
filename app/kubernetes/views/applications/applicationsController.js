@@ -143,15 +143,14 @@ class KubernetesApplicationsController {
     });
   }
 
-  onChangeNamespaceDropdown(namespaceName) {
-    this.state.namespaceName = namespaceName;
-    // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
-    this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
-    this.getApplicationsAsync();
+  onChangeNamespaceDropdown(namespace) {
+    this.state.namespaceName = namespace;
+    return this.$async(this.getApplicationsAsync);
   }
 
   async getApplicationsAsync() {
     try {
+      this.state.isAppsLoading = true;
       const [applications, configurations] = await Promise.all([
         this.KubernetesApplicationService.get(this.state.namespaceName),
         this.KubernetesConfigurationService.get(this.state.namespaceName),
@@ -166,6 +165,8 @@ class KubernetesApplicationsController {
       this.$scope.$apply();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
+    } finally {
+      this.state.isAppsLoading = false;
     }
   }
 
