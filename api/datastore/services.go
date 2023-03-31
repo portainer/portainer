@@ -104,7 +104,7 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.EdgeStackService = edgeStackService
-	endpointRelationService.RegisterUpdateStackFunction(edgeStackService.UpdateEdgeStackFunc)
+	endpointRelationService.RegisterUpdateStackFunction(edgeStackService.UpdateEdgeStackFunc, edgeStackService.UpdateEdgeStackFuncTx)
 
 	edgeGroupService, err := edgegroup.NewService(store.connection)
 	if err != nil {
