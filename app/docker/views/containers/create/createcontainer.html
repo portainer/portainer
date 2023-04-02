@@ -264,23 +264,11 @@
               ></docker-create-container-env-vars-tab>
             </div>
             <!-- !tab-env -->
-            <!-- tab-restart-policy -->
+
             <div class="tab-pane" id="restart-policy">
-              <form class="form-horizontal" style="margin-top: 15px">
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <label class="control-label text-left"> Restart policy </label>
-                    <div class="btn-group btn-group-sm" style="margin-left: 20px">
-                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'"> Never </label>
-                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'"> Always </label>
-                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'"> On failure </label>
-                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'"> Unless stopped </label>
-                    </div>
-                  </div>
-                </div>
-              </form>
+              <docker-create-container-restart-policy-tab values="formValues.restartPolicy" on-change="(onRestartPolicyChange)"></docker-create-container-restart-policy-tab>
             </div>
-            <!-- !tab-restart-policy -->
+
             <!-- tab-runtime-resources -->
             <div class="tab-pane" id="runtime-resources">
               <docker-create-container-resources-tab
