@@ -584,10 +584,10 @@ func (store *Store) Export(filename string) (err error) {
 		backup.Version = *version
 	}
 
-	backup.Metadata, err = store.connection.BackupMetadata()
-	if err != nil {
-		log.Error().Err(err).Msg("exporting Metadata")
-	}
+	// backup.Metadata, err = store.connection.BackupMetadata()
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("exporting Metadata")
+	// }
 
 	b, err := json.MarshalIndent(backup, "", "  ")
 	if err != nil {
@@ -689,5 +689,5 @@ func (store *Store) Import(filename string) (err error) {
 		store.Webhook().UpdateWebhook(v.ID, &v)
 	}
 
-	return store.connection.RestoreMetadata(backup.Metadata)
+	return nil
 }

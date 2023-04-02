@@ -60,33 +60,18 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 // Endpoint returns an environment(endpoint) by ID.
 func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var endpoint *portainer.Endpoint
-	var err error
-
-	err = service.connection.ViewTx(func(tx portainer.Transaction) error {
-		endpoint, err = service.Tx(tx).Endpoint(ID)
-		return err
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	endpoint.LastCheckInDate, _ = service.Heartbeat(ID)
 
 	return endpoint, nil
 }
 
 // UpdateEndpoint updates an environment(endpoint).
 func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
-	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
-		return service.Tx(tx).UpdateEndpoint(ID, endpoint)
-	})
+	return nil
 }
 
 // DeleteEndpoint deletes an environment(endpoint).
 func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
-	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
-		return service.Tx(tx).DeleteEndpoint(ID)
-	})
+	return nil
 }
 
 func (service *Service) endpoints() ([]portainer.Endpoint, error) {
@@ -139,20 +124,5 @@ func (service *Service) UpdateHeartbeat(endpointID portainer.EndpointID) {
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
-	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
-		return service.Tx(tx).Create(endpoint)
-	})
-}
-
-// GetNextIdentifier returns the next identifier for an environment(endpoint).
-func (service *Service) GetNextIdentifier() int {
-	var identifier int
-
-	service.connection.UpdateTx(func(tx portainer.Transaction) error {
-		identifier = service.Tx(tx).GetNextIdentifier()
-
-		return nil
-	})
-
-	return identifier
+	return nil
 }

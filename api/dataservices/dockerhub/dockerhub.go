@@ -21,11 +21,6 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -35,15 +30,10 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 	var dockerhub portainer.DockerHub
 
-	err := service.connection.GetObject(BucketName, []byte(dockerHubKey), &dockerhub)
-	if err != nil {
-		return nil, err
-	}
-
 	return &dockerhub, nil
 }
 
 // UpdateDockerHub updates a DockerHub object.
 func (service *Service) UpdateDockerHub(dockerhub *portainer.DockerHub) error {
-	return service.connection.UpdateObject(BucketName, []byte(dockerHubKey), dockerhub)
+	return nil
 }

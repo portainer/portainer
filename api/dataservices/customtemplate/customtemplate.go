@@ -1,11 +1,7 @@
 package customtemplate
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -38,56 +34,49 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 	var customTemplates = make([]portainer.CustomTemplate, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.CustomTemplate{},
-		func(obj interface{}) (interface{}, error) {
-			//var tag portainer.Tag
-			customTemplate, ok := obj.(*portainer.CustomTemplate)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to CustomTemplate object")
-				return nil, fmt.Errorf("Failed to convert to CustomTemplate object: %s", obj)
-			}
-			customTemplates = append(customTemplates, *customTemplate)
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.CustomTemplate{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		//var tag portainer.Tag
+	// 		customTemplate, ok := obj.(*portainer.CustomTemplate)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to CustomTemplate object")
+	// 			return nil, fmt.Errorf("Failed to convert to CustomTemplate object: %s", obj)
+	// 		}
+	// 		customTemplates = append(customTemplates, *customTemplate)
 
-			return &portainer.CustomTemplate{}, nil
-		})
+	// 		return &portainer.CustomTemplate{}, nil
+	// 	})
 
-	return customTemplates, err
+	return customTemplates, nil
 }
 
 // CustomTemplate returns an custom template by ID.
 func (service *Service) CustomTemplate(ID portainer.CustomTemplateID) (*portainer.CustomTemplate, error) {
 	var customTemplate portainer.CustomTemplate
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &customTemplate)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &customTemplate)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &customTemplate, nil
 }
 
 // UpdateCustomTemplate updates an custom template.
 func (service *Service) UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, customTemplate)
+	return nil
 }
 
 // DeleteCustomTemplate deletes an custom template.
 func (service *Service) DeleteCustomTemplate(ID portainer.CustomTemplateID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }
 
 // CreateCustomTemplate uses the existing id and saves it.
 // TODO: where does the ID come from, and is it safe?
 func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
-	return service.connection.CreateObjectWithId(BucketName, int(customTemplate.ID), customTemplate)
-}
-
-// GetNextIdentifier returns the next identifier for a custom template.
-func (service *Service) GetNextIdentifier() int {
-	return service.connection.GetNextIdentifier(BucketName)
+	return nil
 }

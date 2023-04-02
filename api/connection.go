@@ -1,9 +1,5 @@
 package portainer
 
-import (
-	"io"
-)
-
 type ReadTransaction interface {
 	GetObject(bucketName string, key []byte, object interface{}) error
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
@@ -25,19 +21,11 @@ type Transaction interface {
 }
 
 type Connection interface {
-	Transaction
-
 	Open() error
 	Close() error
-
-	UpdateTx(fn func(Transaction) error) error
-	ViewTx(fn func(Transaction) error) error
-
-	// write the db contents to filename as json (the schema needs defining)
-	ExportRaw(filename string) error
+	Init() error
 
 	// TODO: this one is very database specific atm
-	BackupTo(w io.Writer) error
 	GetDatabaseFileName() string
 	GetDatabaseFilePath() string
 	GetStorePath() string
@@ -45,10 +33,4 @@ type Connection interface {
 	IsEncryptedStore() bool
 	NeedsEncryptionMigration() (bool, error)
 	SetEncrypted(encrypted bool)
-
-	BackupMetadata() (map[string]interface{}, error)
-	RestoreMetadata(s map[string]interface{}) error
-
-	UpdateObjectFunc(bucketName string, key []byte, object any, updateFn func()) error
-	ConvertToKey(v int) []byte
 }

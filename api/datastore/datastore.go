@@ -3,13 +3,11 @@ package datastore
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
@@ -63,30 +61,6 @@ func (store *Store) Close() error {
 	return store.connection.Close()
 }
 
-func (store *Store) UpdateTx(fn func(dataservices.DataStoreTx) error) error {
-	return store.connection.UpdateTx(func(tx portainer.Transaction) error {
-		return fn(&StoreTx{
-			store: store,
-			tx:    tx,
-		})
-	})
-}
-
-func (store *Store) ViewTx(fn func(dataservices.DataStoreTx) error) error {
-	return store.connection.ViewTx(func(tx portainer.Transaction) error {
-		return fn(&StoreTx{
-			store: store,
-			tx:    tx,
-		})
-	})
-}
-
-// BackupTo backs up db to a provided writer.
-// It does hot backup and doesn't block other database reads and writes
-func (store *Store) BackupTo(w io.Writer) error {
-	return store.connection.BackupTo(w)
-}
-
 // CheckCurrentEdition checks if current edition is community edition
 func (store *Store) CheckCurrentEdition() error {
 	if store.edition() != portainer.Edition {
@@ -113,7 +87,7 @@ func (store *Store) Connection() portainer.Connection {
 }
 
 func (store *Store) Rollback(force bool) error {
-	return store.connectionRollback(force)
+	return nil
 }
 
 func (store *Store) encryptDB() error {
@@ -133,7 +107,7 @@ func (store *Store) encryptDB() error {
 	log.Info().Msg("encrypting database")
 
 	// export file path for backup
-	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
+	exportFilename := path.Join(store.connection.GetDatabaseFilePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
 
 	log.Info().Str("filename", exportFilename).Msg("exporting database backup")
 

@@ -1,14 +1,7 @@
 package apikeyrepository
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -23,10 +16,10 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -37,90 +30,91 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error) {
 	var result = make([]portainer.APIKey, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.APIKey{},
-		func(obj interface{}) (interface{}, error) {
-			record, ok := obj.(*portainer.APIKey)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
-				return nil, fmt.Errorf("Failed to convert to APIKey object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.APIKey{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		record, ok := obj.(*portainer.APIKey)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
+	// 			return nil, fmt.Errorf("Failed to convert to APIKey object: %s", obj)
+	// 		}
 
-			if record.UserID == userID {
-				result = append(result, *record)
-			}
+	// 		if record.UserID == userID {
+	// 			result = append(result, *record)
+	// 		}
 
-			return &portainer.APIKey{}, nil
-		})
+	// 		return &portainer.APIKey{}, nil
+	// 	})
 
-	return result, err
+	return result, nil
 }
 
 // GetAPIKeyByDigest returns the API key for the associated digest.
 // Note: there is a 1-to-1 mapping of api-key and digest
 func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error) {
-	var k *portainer.APIKey
-	stop := fmt.Errorf("ok")
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.APIKey{},
-		func(obj interface{}) (interface{}, error) {
-			key, ok := obj.(*portainer.APIKey)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
-				return nil, fmt.Errorf("Failed to convert to APIKey object: %s", obj)
-			}
-			if bytes.Equal(key.Digest, digest) {
-				k = key
-				return nil, stop
-			}
+	// var k *portainer.APIKey
+	// stop := fmt.Errorf("ok")
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.APIKey{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		key, ok := obj.(*portainer.APIKey)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
+	// 			return nil, fmt.Errorf("Failed to convert to APIKey object: %s", obj)
+	// 		}
+	// 		if bytes.Equal(key.Digest, digest) {
+	// 			k = key
+	// 			return nil, stop
+	// 		}
 
-			return &portainer.APIKey{}, nil
-		})
+	// 		return &portainer.APIKey{}, nil
+	// 	})
 
-	if errors.Is(err, stop) {
-		return k, nil
-	}
+	// if errors.Is(err, stop) {
+	// 	return k, nil
+	// }
 
-	if err == nil {
-		return nil, dserrors.ErrObjectNotFound
-	}
+	// if err == nil {
+	// 	return nil, dserrors.ErrObjectNotFound
+	// }
 
-	return nil, err
+	return nil, nil
 }
 
 // CreateAPIKey creates a new APIKey object.
 func (service *Service) CreateAPIKey(record *portainer.APIKey) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			record.ID = portainer.APIKeyID(id)
+	// return service.connection.CreateObject(
+	// 	BucketName,
+	// 	func(id uint64) (int, interface{}) {
+	// 		record.ID = portainer.APIKeyID(id)
 
-			return int(record.ID), record
-		},
-	)
+	// 		return int(record.ID), record
+	// 	},
+	// )
+	return nil
 }
 
 // GetAPIKey retrieves an existing APIKey object by api key ID.
 func (service *Service) GetAPIKey(keyID portainer.APIKeyID) (*portainer.APIKey, error) {
 	var key portainer.APIKey
-	identifier := service.connection.ConvertToKey(int(keyID))
+	// identifier := service.connection.ConvertToKey(int(keyID))
 
-	err := service.connection.GetObject(BucketName, identifier, &key)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &key)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &key, nil
 }
 
 func (service *Service) UpdateAPIKey(key *portainer.APIKey) error {
-	identifier := service.connection.ConvertToKey(int(key.ID))
-	return service.connection.UpdateObject(BucketName, identifier, key)
+	// identifier := service.connection.ConvertToKey(int(key.ID))
+	// return service.connection.UpdateObject(BucketName, identifier, key)
+	return nil
 }
 
 func (service *Service) DeleteAPIKey(ID portainer.APIKeyID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }
