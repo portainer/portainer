@@ -67,6 +67,8 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 
 	repoConfig.URL = payload.URL
 	repoConfig.ReferenceName = payload.ReferenceName
+	repoConfig.TLSSkipVerify = payload.TLSSkipVerify
+
 	repoConfig.ConfigFilePath = payload.ComposeFile
 	if payload.ComposeFile == "" {
 		repoConfig.ConfigFilePath = filesystem.ComposeFileDefaultName

@@ -15,8 +15,6 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	gittypes "github.com/portainer/portainer/api/git/types"
 
-	"github.com/go-git/go-git/v5/plumbing/transport/client"
-	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
 )
 
@@ -51,20 +49,21 @@ type azureItem struct {
 }
 
 type azureClient struct {
-	client  *http.Client
 	baseUrl string
 }
 
 func NewAzureClient() *azureClient {
-	httpsCli := newHttpClientForAzure()
 	return &azureClient{
-		client:  httpsCli,
 		baseUrl: "https://dev.azure.com",
 	}
 }
 
-func newHttpClientForAzure() *http.Client {
+func newHttpClientForAzure(insecureSkipVerify bool) *http.Client {
 	tlsConfig := crypto.CreateTLSConfiguration()
+
+	if insecureSkipVerify {
+		tlsConfig.InsecureSkipVerify = true
+	}
 
 	httpsCli := &http.Client{
 		Transport: &http.Transport{
@@ -73,8 +72,6 @@ func newHttpClientForAzure() *http.Client {
 		},
 		Timeout: 300 * time.Second,
 	}
-
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 
 	return httpsCli
 }
@@ -109,6 +106,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create temp file")
 	}
+
 	defer zipFile.Close()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", downloadUrl, nil)
@@ -122,10 +120,14 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 		return "", errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	res, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	res, err := client.Do(req)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to make an HTTP request")
 	}
+
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
@@ -171,7 +173,10 @@ func (a *azureClient) getRootItem(ctx context.Context, opt fetchOption) (*azureI
 		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	resp, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
@@ -410,7 +415,10 @@ func (a *azureClient) listRefs(ctx context.Context, opt baseOption) ([]string, e
 		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	resp, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
@@ -467,7 +475,10 @@ func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string,
 		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	resp, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}

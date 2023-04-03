@@ -213,6 +213,8 @@ type customTemplateFromGitRepositoryPayload struct {
 	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -279,7 +281,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		repositoryPassword = ""
 	}
 
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
+	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword, payload.TLSSkipVerify)
 	if err != nil {
 		if err == gittypes.ErrAuthenticationFailure {
 			return nil, fmt.Errorf("invalid git credential")

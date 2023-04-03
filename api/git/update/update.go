@@ -6,14 +6,13 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/rs/zerolog/log"
 )
 
 // UpdateGitObject updates a git object based on its config
-func UpdateGitObject(gitService portainer.GitService, dataStore dataservices.DataStore, objId string, gitConfig *gittypes.RepoConfig, autoUpdateConfig *portainer.AutoUpdateSettings, projectPath string) (bool, string, error) {
+func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *gittypes.RepoConfig, forceUpdate bool, projectPath string) (bool, string, error) {
 	if gitConfig == nil {
 		return false, "", nil
 	}
@@ -29,13 +28,13 @@ func UpdateGitObject(gitService portainer.GitService, dataStore dataservices.Dat
 		return false, "", errors.WithMessagef(err, "failed to get credentials for %v", objId)
 	}
 
-	newHash, err := gitService.LatestCommitID(gitConfig.URL, gitConfig.ReferenceName, username, password)
+	newHash, err := gitService.LatestCommitID(gitConfig.URL, gitConfig.ReferenceName, username, password, gitConfig.TLSSkipVerify)
 	if err != nil {
 		return false, "", errors.WithMessagef(err, "failed to fetch latest commit id of %v", objId)
 	}
 
 	hashChanged := !strings.EqualFold(newHash, gitConfig.ConfigHash)
-	forceUpdate := autoUpdateConfig != nil && autoUpdateConfig.ForceUpdate
+
 	if !hashChanged && !forceUpdate {
 		log.Debug().
 			Str("hash", newHash).
@@ -48,9 +47,10 @@ func UpdateGitObject(gitService portainer.GitService, dataStore dataservices.Dat
 	}
 
 	cloneParams := &cloneRepositoryParameters{
-		url:   gitConfig.URL,
-		ref:   gitConfig.ReferenceName,
-		toDir: projectPath,
+		url:           gitConfig.URL,
+		ref:           gitConfig.ReferenceName,
+		toDir:         projectPath,
+		tlsSkipVerify: gitConfig.TLSSkipVerify,
 	}
 	if gitConfig.Authentication != nil {
 		cloneParams.auth = &gitAuth{
@@ -78,6 +78,8 @@ type cloneRepositoryParameters struct {
 	ref   string
 	toDir string
 	auth  *gitAuth
+	// tlsSkipVerify skips SSL verification when cloning the Git repository
+	tlsSkipVerify bool `example:"false"`
 }
 
 type gitAuth struct {
@@ -87,8 +89,8 @@ type gitAuth struct {
 
 func cloneGitRepository(gitService portainer.GitService, cloneParams *cloneRepositoryParameters) error {
 	if cloneParams.auth != nil {
-		return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, cloneParams.auth.username, cloneParams.auth.password)
+		return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, cloneParams.auth.username, cloneParams.auth.password, cloneParams.tlsSkipVerify)
 	}
 
-	return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, "", "")
+	return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, "", "", cloneParams.tlsSkipVerify)
 }

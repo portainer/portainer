@@ -44,6 +44,7 @@ class CreateCustomTemplateViewController {
       Type: 1,
       AccessControlData: new AccessControlFormData(),
       Variables: [],
+      TLSSkipVerify: false,
     };
 
     this.state = {
