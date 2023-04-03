@@ -226,6 +226,7 @@ func (d *stackDeployer) createDockerClient(ctx context.Context, endpoint *portai
 	if isNotInASwarm(&info) {
 		return cli, nil
 	}
+	defer cli.Close()
 
 	nodes, err := cli.NodeList(ctx, types.NodeListOptions{})
 	if err != nil {
@@ -248,7 +249,6 @@ func (d *stackDeployer) createDockerClient(ctx context.Context, endpoint *portai
 		return nil, errors.New("no leader node available")
 	}
 
-	cli.Close()
 	return d.ClientFactory.CreateClient(endpoint, managerNode.Description.Hostname, &timeout)
 }
 
