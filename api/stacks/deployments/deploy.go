@@ -53,14 +53,14 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 			Str("author", author).
 			Str("stack", stack.Name).
 			Int("endpoint_id", int(stack.EndpointID)).
-			Msg("cannot autoupdate a stack, stack author user is missing")
+			Msg("cannot auto update a stack, stack author user is missing")
 
 		return &StackAuthorMissingErr{int(stack.ID), author}
 	}
 
 	var gitCommitChangedOrForceUpdate bool
 	if !stack.FromAppTemplate {
-		updated, newHash, err := update.UpdateGitObject(gitService, datastore, fmt.Sprintf("stack:%d", stackID), stack.GitConfig, stack.AutoUpdate, stack.ProjectPath)
+		updated, newHash, err := update.UpdateGitObject(gitService, fmt.Sprintf("stack:%d", stackID), stack.GitConfig, false, stack.ProjectPath)
 		if err != nil {
 			return err
 		}
@@ -99,7 +99,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 		err := deployer.DeployKubernetesStack(stack, endpoint, user)
 		if err != nil {
-			return errors.WithMessagef(err, "failed to deploy a kubternetes app stack %v", stackID)
+			return errors.WithMessagef(err, "failed to deploy a kubernetes app stack %v", stackID)
 		}
 	default:
 		return errors.Errorf("cannot update stack, type %v is unsupported", stack.Type)

@@ -18,31 +18,11 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/edge/edgestacks"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
 
 	"github.com/pkg/errors"
 )
-
-type gitService struct {
-	cloneErr error
-	id       string
-}
-
-func (g *gitService) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
-	return g.cloneErr
-}
-
-func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
-	return g.id, nil
-}
-
-func (g *gitService) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
-	return nil, nil
-}
-
-func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
-	return nil, nil
-}
 
 // Helpers
 func setupHandler(t *testing.T) (*Handler, string, func()) {
@@ -98,7 +78,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		t.Fatal(err)
 	}
 
-	handler.GitService = &gitService{errors.New("Clone error"), "git-service-id"}
+	handler.GitService = testhelpers.NewGitService(errors.New("Clone error"), "git-service-id")
 
 	return handler, rawAPIKey, storeTeardown
 }

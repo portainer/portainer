@@ -59,6 +59,7 @@ class KubernetesDeployController {
       ComposeFilePathInRepository: '',
       Variables: {},
       AutoUpdate: parseAutoUpdateResponse(),
+      TLSSkipVerify: false,
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
@@ -248,6 +249,7 @@ class KubernetesDeployController {
       };
 
       if (method === KubernetesDeployRequestMethods.REPOSITORY) {
+        payload.TLSSkipVerify = this.formValues.TLSSkipVerify;
         payload.RepositoryURL = this.formValues.RepositoryURL;
         payload.RepositoryReferenceName = this.formValues.RepositoryReferenceName;
         payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;

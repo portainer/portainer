@@ -6,32 +6,12 @@ import (
 	"testing"
 
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
-
-type gitService struct {
-	cloneErr error
-	id       string
-}
-
-func (g *gitService) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
-	return g.cloneErr
-}
-
-func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
-	return g.id, nil
-}
-
-func (g *gitService) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
-	return nil, nil
-}
-
-func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
-	return nil, nil
-}
 
 type noopDeployer struct{}
 
@@ -67,7 +47,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 	err = store.Stack().Create(&portainer.Stack{ID: 1, CreatedBy: "admin"})
 	assert.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(1, nil, store, &gitService{nil, ""})
+	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(nil, ""))
 	assert.NoError(t, err)
 }
 
@@ -97,7 +77,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 		}})
 	assert.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(1, nil, store, &gitService{nil, "oldHash"})
+	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(nil, "oldHash"))
 	assert.NoError(t, err)
 }
 
@@ -125,7 +105,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 		}})
 	assert.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(1, nil, store, &gitService{cloneErr, "newHash"})
+	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
 	assert.Error(t, err)
 	assert.ErrorIs(t, err, cloneErr, "should failed to clone but didn't, check test setup")
 }
@@ -162,7 +142,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 		stack.Type = portainer.DockerComposeStack
 		store.Stack().UpdateStack(stack.ID, &stack)
 
-		err = RedeployWhenChanged(1, &noopDeployer{}, store, &gitService{nil, "newHash"})
+		err = RedeployWhenChanged(1, &noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 		assert.NoError(t, err)
 	})
 
@@ -170,7 +150,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 		stack.Type = portainer.DockerSwarmStack
 		store.Stack().UpdateStack(stack.ID, &stack)
 
-		err = RedeployWhenChanged(1, &noopDeployer{}, store, &gitService{nil, "newHash"})
+		err = RedeployWhenChanged(1, &noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 		assert.NoError(t, err)
 	})
 
@@ -178,7 +158,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 		stack.Type = portainer.KubernetesStack
 		store.Stack().UpdateStack(stack.ID, &stack)
 
-		err = RedeployWhenChanged(1, &noopDeployer{}, store, &gitService{nil, "newHash"})
+		err = RedeployWhenChanged(1, &noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 		assert.NoError(t, err)
 	})
 }

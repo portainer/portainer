@@ -8,19 +8,23 @@ interface Creds {
   password?: string;
   gitCredentialId?: number;
 }
+interface CheckRepoOptions {
+  creds?: Creds;
+  force?: boolean;
+  tlsSkipVerify?: boolean;
+}
 
 export function useCheckRepo(
   url: string,
-  creds: Creds,
-  force: boolean,
+  options: CheckRepoOptions,
   {
     enabled,
     onSettled,
   }: { enabled?: boolean; onSettled?(isValid?: boolean): void } = {}
 ) {
   return useQuery(
-    ['git_repo_valid', url, creds, force],
-    () => checkRepo(url, creds, force),
+    ['git_repo_valid', url, options],
+    () => checkRepo(url, options),
     {
       enabled: !!url && enabled,
       onSettled,
@@ -31,13 +35,12 @@ export function useCheckRepo(
 
 export async function checkRepo(
   repository: string,
-  creds: Creds,
-  force: boolean
+  { force, ...options }: CheckRepoOptions
 ): Promise<boolean> {
   try {
     await axios.post<string[]>(
       '/gitops/repo/refs',
-      { repository, ...creds },
+      { repository, tlsSkipVerify: options.tlsSkipVerify, ...options.creds },
       force ? { params: { force } } : {}
     );
     return true;
@@ -45,11 +48,12 @@ export async function checkRepo(
     throw parseAxiosError(error as Error, '', (axiosError: AxiosError) => {
       let details = axiosError.response?.data.details;
 
+      const { creds = {} } = options;
       // If no credentials were provided alter error from git to indicate repository is not found or is private
       if (
         !(creds.username && creds.password) &&
         details ===
-          'Authentication failed, please ensure that the git credentials are correct.'
+          'authentication failed, please ensure that the git credentials are correct'
       ) {
         details =
           'Git repository could not be found or is private, please ensure that the URL is correct or credentials are provided.';

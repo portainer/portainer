@@ -57,6 +57,7 @@ angular
         EnableWebhook: false,
         Variables: {},
         AutoUpdate: parseAutoUpdateResponse(),
+        TLSSkipVerify: false,
       };
 
       $scope.state = {
@@ -175,6 +176,7 @@ angular
             RepositoryUsername: $scope.formValues.RepositoryUsername,
             RepositoryPassword: $scope.formValues.RepositoryPassword,
             AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate, $scope.state.webhookId),
+            TLSSkipVerify: $scope.formValues.TLSSkipVerify,
           };
 
           return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
@@ -201,6 +203,7 @@ angular
             RepositoryUsername: $scope.formValues.RepositoryUsername,
             RepositoryPassword: $scope.formValues.RepositoryPassword,
             AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate, $scope.state.webhookId),
+            TLSSkipVerify: $scope.formValues.TLSSkipVerify,
           };
 
           return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);

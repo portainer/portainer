@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -20,6 +21,7 @@ type baseOption struct {
 	repositoryUrl string
 	username      string
 	password      string
+	tlsSkipVerify bool
 }
 
 // fetchOption allows to specify the reference name of the target repository
@@ -119,13 +121,14 @@ func (service *Service) timerHasStopped() bool {
 
 // CloneRepository clones a git repository using the specified URL in the specified
 // destination folder.
-func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
+func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string, tlsSkipVerify bool) error {
 	options := cloneOption{
 		fetchOption: fetchOption{
 			baseOption: baseOption{
 				repositoryUrl: repositoryURL,
 				username:      username,
 				password:      password,
+				tlsSkipVerify: tlsSkipVerify,
 			},
 			referenceName: referenceName,
 		},
@@ -144,12 +147,13 @@ func (service *Service) cloneRepository(destination string, options cloneOption)
 }
 
 // LatestCommitID returns SHA1 of the latest commit of the specified reference
-func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
+func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error) {
 	options := fetchOption{
 		baseOption: baseOption{
 			repositoryUrl: repositoryURL,
 			username:      username,
 			password:      password,
+			tlsSkipVerify: tlsSkipVerify,
 		},
 		referenceName: referenceName,
 	}
@@ -162,8 +166,8 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 }
 
 // ListRefs will list target repository's references without cloning the repository
-func (service *Service) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
-	refCacheKey := generateCacheKey(repositoryURL, password)
+func (service *Service) ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error) {
+	refCacheKey := generateCacheKey(repositoryURL, username, password, strconv.FormatBool(tlsSkipVerify))
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
 		service.repoRefCache.Remove(refCacheKey)
@@ -193,6 +197,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
+		tlsSkipVerify: tlsSkipVerify,
 	}
 
 	var (
@@ -219,8 +224,8 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 
 // ListFiles will list all the files of the target repository with specific extensions.
 // If extension is not provided, it will list all the files under the target repository
-func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
-	repoKey := generateCacheKey(repositoryURL, referenceName)
+func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
+	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify))
 
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
@@ -246,6 +251,7 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 			repositoryUrl: repositoryURL,
 			username:      username,
 			password:      password,
+			tlsSkipVerify: tlsSkipVerify,
 		},
 		referenceName: referenceName,
 	}

@@ -355,6 +355,7 @@ angular.module('portainer.app').factory('StackService', [
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
         FromAppTemplate: repositoryOptions.FromAppTemplate,
+        TLSSkipVerify: repositoryOptions.TLSSkipVerify,
       };
 
       if (repositoryOptions.AutoUpdate) {
@@ -382,6 +383,7 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
             FromAppTemplate: repositoryOptions.FromAppTemplate,
+            TLSSkipVerify: repositoryOptions.TLSSkipVerify,
           };
 
           if (repositoryOptions.AutoUpdate) {

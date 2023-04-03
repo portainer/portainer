@@ -395,7 +395,7 @@ func (transport *Transport) updateDefaultGitBranch(request *http.Request) error 
 	remote := request.URL.Query().Get("remote")
 	if strings.HasSuffix(remote, ".git") {
 		repositoryURL := remote[:len(remote)-4]
-		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "")
+		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "", false)
 		if err != nil {
 			return err
 		}
