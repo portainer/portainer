@@ -216,7 +216,7 @@ func getEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portaine
 
 		for i := 0; i < len(intervals); i++ {
 			effectiveInterval := intervals[i][0]
-			if effectiveInterval == 0 {
+			if effectiveInterval <= 0 {
 				effectiveInterval = intervals[i][1]
 			}
 			if effectiveInterval > 0 && effectiveInterval < defaultInterval {
@@ -231,5 +231,5 @@ func getEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portaine
 		return endpoint.EdgeCheckinInterval
 	}
 
-	return settings.Edge.CommandInterval
+	return settings.EdgeAgentCheckinInterval
 }
