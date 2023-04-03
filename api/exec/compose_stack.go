@@ -53,7 +53,7 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Deploy(ctx, filePaths, libstack.DeployOptions{
 		Options: libstack.Options{
 			WorkingDir:  stack.ProjectPath,
@@ -106,7 +106,7 @@ func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.S
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Pull(ctx, filePaths, libstack.Options{
 		WorkingDir:  stack.ProjectPath,
 		EnvFilePath: envFilePath,
