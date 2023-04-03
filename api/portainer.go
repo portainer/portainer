@@ -388,6 +388,9 @@ type (
 		LastCheckInDate int64
 		// QueryDate of each query with the endpoints list
 		QueryDate int64
+		// Heartbeat indicates the heartbeat status of an edge environment
+		Heartbeat bool `json:"Heartbeat" example:"true"`
+
 		// IsEdgeDevice marks if the environment was created as an EdgeDevice
 		IsEdgeDevice bool
 		// Whether the device has been trusted or not by the user
