@@ -49,6 +49,7 @@
       "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
+      "Heartbeat": false,
       "Id": 1,
       "IsEdgeDevice": false,
       "Kubernetes": {
