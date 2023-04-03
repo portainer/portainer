@@ -62,11 +62,12 @@ func (d *stackDeployer) buildUnpackerCmdForStack(stack *portainer.Stack, operati
 	return fn(stack, opts, registriesStrings, envStrings), nil
 }
 
-// deploy [-u username -p password] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
+// deploy [-u username -p password] [--skip-tls-verify] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{}
 	cmd = append(cmd, UnpackerCmdDeploy)
 	cmd = appendGitAuthIfNeeded(cmd, stack)
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
 	cmd = append(cmd, env...)
 	cmd = append(cmd, registries...)
 	cmd = append(cmd, stack.GitConfig.URL)
@@ -91,11 +92,12 @@ func buildUndeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, re
 	return cmd
 }
 
-// deploy [-u username -p password] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
+// deploy [-u username -p password] [--skip-tls-verify] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildComposeStartCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{}
 	cmd = append(cmd, UnpackerCmdDeploy)
 	cmd = appendGitAuthIfNeeded(cmd, stack)
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
 	cmd = append(cmd, "-k")
 	cmd = append(cmd, env...)
 	cmd = append(cmd, stack.GitConfig.URL)
@@ -121,12 +123,12 @@ func buildComposeStopCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions,
 	return cmd
 }
 
-// swarm-deploy [-u username -p password] [-f] [-r] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <git-ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
+// swarm-deploy [-u username -p password] [--skip-tls-verify] [-f] [-r] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <git-ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildSwarmDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{}
 	cmd = append(cmd, UnpackerCmdSwarmDeploy)
 	cmd = appendGitAuthIfNeeded(cmd, stack)
-
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
 	if opts.pullImage {
 		cmd = append(cmd, "-f")
 	}
@@ -154,10 +156,11 @@ func buildSwarmUndeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOption
 	return cmd
 }
 
-// swarm-deploy [-u username -p password] [-f] [-r] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
+// swarm-deploy [-u username -p password] [-f] [-r] [-k] [--skip-tls-verify] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildSwarmStartCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{}
 	cmd = append(cmd, UnpackerCmdSwarmDeploy, "-f", "-r", "-k")
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
 	cmd = append(cmd, getEnv(stack.Env)...)
 	cmd = append(cmd, stack.GitConfig.URL)
 	cmd = append(cmd, stack.GitConfig.ReferenceName)
@@ -180,6 +183,13 @@ func buildSwarmStopCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, r
 func appendGitAuthIfNeeded(cmd []string, stack *portainer.Stack) []string {
 	if stack.GitConfig.Authentication != nil && len(stack.GitConfig.Authentication.Password) != 0 {
 		cmd = append(cmd, "-u", stack.GitConfig.Authentication.Username, "-p", stack.GitConfig.Authentication.Password)
+	}
+	return cmd
+}
+
+func appendSkipTLSVerifyIfNeeded(cmd []string, stack *portainer.Stack) []string {
+	if stack.GitConfig.TLSSkipVerify {
+		cmd = append(cmd, "--skip-tls-verify")
 	}
 	return cmd
 }
