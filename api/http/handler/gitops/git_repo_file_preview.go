@@ -23,6 +23,8 @@ type repositoryFilePreviewPayload struct {
 	Password   string `json:"password" example:"myGitPassword"`
 	// Path to file whose content will be read
 	TargetFile string `json:"targetFile" example:"docker-compose.yml"`
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
 func (payload *repositoryFilePreviewPayload) Validate(r *http.Request) error {
@@ -66,7 +68,7 @@ func (handler *Handler) gitOperationRepoFilePreview(w http.ResponseWriter, r *ht
 		return httperror.InternalServerError("Unable to create temporary folder", err)
 	}
 
-	err = handler.gitService.CloneRepository(projectPath, payload.Repository, payload.Reference, payload.Username, payload.Password)
+	err = handler.gitService.CloneRepository(projectPath, payload.Repository, payload.Reference, payload.Username, payload.Password, payload.TLSSkipVerify)
 	if err != nil {
 		if err == gittypes.ErrAuthenticationFailure {
 			return httperror.BadRequest("Invalid git credential", err)

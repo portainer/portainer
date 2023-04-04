@@ -16,6 +16,7 @@ class EditCustomTemplateViewController {
 
     this.formValues = {
       Variables: [],
+      TLSSkipVerify: false,
     };
     this.state = {
       formValidationError: '',
@@ -174,6 +175,7 @@ class EditCustomTemplateViewController {
       RepositoryReferenceName: config.ReferenceName,
       ComposeFilePathInRepository: config.ConfigFilePath,
       RepositoryAuthentication: config.Authentication !== null,
+      TLSSkipVerify: config.TLSSkipVerify,
     };
 
     if (config.Authentication) {
@@ -201,6 +203,7 @@ class EditCustomTemplateViewController {
     const payload = {
       repository: this.formValues.RepositoryURL,
       targetFile: this.formValues.ComposeFilePathInRepository,
+      tlsSkipVerify: this.formValues.TLSSkipVerify,
       ...creds,
     };
 

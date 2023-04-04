@@ -6,6 +6,7 @@ interface PreviewPayload {
   reference?: string;
   username?: string;
   password?: string;
+  tlsSkipVerify?: boolean;
 }
 
 interface PreviewResponse {

@@ -30,12 +30,12 @@ type TestGitService struct {
 	targetFilePath string
 }
 
-func (g *TestGitService) CloneRepository(destination string, repositoryURL, referenceName string, username, password string) error {
+func (g *TestGitService) CloneRepository(destination string, repositoryURL, referenceName string, username, password string, tlsSkipVerify bool) error {
 	time.Sleep(100 * time.Millisecond)
 	return createTestFile(g.targetFilePath)
 }
 
-func (g *TestGitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
+func (g *TestGitService) LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error) {
 	return "", nil
 }
 

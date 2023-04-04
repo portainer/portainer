@@ -14,6 +14,7 @@ class KubeEditCustomTemplateViewController {
 
     this.formValues = {
       Variables: [],
+      TLSSkipVerify: false,
     };
     this.state = {
       formValidationError: '',
@@ -109,6 +110,7 @@ class KubeEditCustomTemplateViewController {
       RepositoryReferenceName: config.ReferenceName,
       ComposeFilePathInRepository: config.ConfigFilePath,
       RepositoryAuthentication: config.Authentication !== null,
+      TLSSkipVerify: config.TLSSkipVerify,
     };
 
     if (config.Authentication) {
@@ -136,6 +138,7 @@ class KubeEditCustomTemplateViewController {
     const payload = {
       repository: this.formValues.RepositoryURL,
       targetFile: this.formValues.ComposeFilePathInRepository,
+      tlsSkipVerify: this.formValues.TLSSkipVerify,
       ...creds,
     };
 
