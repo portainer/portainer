@@ -7,6 +7,7 @@ import { GitAuthModel } from '@/react/portainer/gitops/types';
 import { gitAuthValidation } from '@/react/portainer/gitops/AuthFieldset';
 import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 import { getGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { validateForm } from '@@/form-components/validate-form';
 
@@ -75,23 +76,24 @@ export default class GitFormAuthFieldsetController {
   }
 
   async $onInit() {
-    try {
-      this.gitCredentials = await getGitCredentials(
-        this.Authentication.getUserDetails().ID
-      );
-    } catch (err) {
-      notifyError(
-        'Failure',
-        err as Error,
-        'Unable to retrieve user saved git credentials'
-      );
+    if (isBE) {
+      try {
+        // Only BE version support /gitcredentials
+        this.gitCredentials = await getGitCredentials(
+          this.Authentication.getUserDetails().ID
+        );
+      } catch (err) {
+        notifyError(
+          'Failure',
+          err as Error,
+          'Unable to retrieve user saved git credentials'
+        );
+      }
     }
-
     // this should never happen, but just in case
     if (!this.value) {
       throw new Error('GitFormController: value is required');
     }
-
     await this.runGitValidation(this.value);
   }
 }
