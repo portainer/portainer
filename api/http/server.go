@@ -28,6 +28,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
@@ -143,10 +144,7 @@ func (server *Server) Start() error {
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
 
-	var customTemplatesHandler = customtemplates.NewHandler(requestBouncer)
-	customTemplatesHandler.DataStore = server.DataStore
-	customTemplatesHandler.FileService = server.FileService
-	customTemplatesHandler.GitService = server.GitService
+	var customTemplatesHandler = customtemplates.NewHandler(requestBouncer, server.DataStore, server.FileService, server.GitService)
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
@@ -195,6 +193,8 @@ func (server *Server) Start() error {
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
+
+	var gitOperationHandler = gitops.NewHandler(requestBouncer, server.DataStore, server.GitService, server.FileService)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
@@ -297,6 +297,7 @@ func (server *Server) Start() error {
 		EndpointHelmHandler:    endpointHelmHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
+		GitOperationHandler:    gitOperationHandler,
 		FileHandler:            fileHandler,
 		LDAPHandler:            ldapHandler,
 		HelmTemplatesHandler:   helmTemplatesHandler,

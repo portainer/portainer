@@ -91,19 +91,31 @@
           ></git-form>
 
           <div ng-show="state.Method === 'template'">
-            <custom-template-selector
-              new-template-path="docker.templates.custom.new"
-              stack-type="state.StackType"
-              on-change="(onChangeTemplateId)"
-              value="state.selectedTemplateId"
-            ></custom-template-selector>
+            <div class="col-sm-12">
+              <custom-template-selector
+                new-template-path="docker.templates.custom.new"
+                stack-type="state.StackType"
+                on-change="(onChangeTemplateId)"
+                value="state.selectedTemplateId"
+              ></custom-template-selector>
 
-            <custom-templates-variables-field
-              ng-if="isTemplateVariablesEnabled && state.selectedTemplate"
-              definitions="state.selectedTemplate.Variables"
-              value="formValues.Variables"
-              on-change="(onChangeTemplateVariables)"
-            ></custom-templates-variables-field>
+              <custom-templates-variables-field
+                ng-if="isTemplateVariablesEnabled && state.selectedTemplate"
+                definitions="state.selectedTemplate.Variables"
+                value="formValues.Variables"
+                on-change="(onChangeTemplateVariables)"
+              ></custom-templates-variables-field>
+
+              <span ng-if="state.Method === 'template' && state.selectedTemplateId && state.templateLoadFailed">
+                <p class="small vertical-center text-danger mb-5" ng-if="currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId">
+                  <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
+                  <a ui-sref="docker.templates.custom.edit({id: state.selectedTemplateId})">click here</a> for configuration.</p
+                >
+                <p class="small vertical-center text-danger mb-5" ng-if="!(currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId)">
+                  <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
+                >
+              </span>
+            </div>
           </div>
 
           <web-editor-form
@@ -114,6 +126,7 @@
             ng-required="true"
             yml="true"
             placeholder="Define or paste the content of your docker compose file here"
+            read-only="state.isEditorReadOnly"
           >
             <editor-description>
               <p>

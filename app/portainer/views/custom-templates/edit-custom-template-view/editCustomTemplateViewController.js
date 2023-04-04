@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { getFilePreview } from '@/react/portainer/gitops/gitops.service';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
@@ -13,11 +14,18 @@ class EditCustomTemplateViewController {
 
     this.isTemplateVariablesEnabled = isBE;
 
-    this.formValues = null;
+    this.formValues = {
+      Variables: [],
+      TLSSkipVerify: false,
+    };
     this.state = {
       formValidationError: '',
       isEditorDirty: false,
       isTemplateValid: true,
+      isEditorReadOnly: false,
+      templateLoadFailed: false,
+      templatePreviewFailed: false,
+      templatePreviewError: '',
     };
     this.templates = [];
 
@@ -28,6 +36,7 @@ class EditCustomTemplateViewController {
     this.editorUpdate = this.editorUpdate.bind(this);
     this.onVariablesChange = this.onVariablesChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.previewFileFromGitRepository = this.previewFileFromGitRepository.bind(this);
   }
 
   getTemplate() {
@@ -35,14 +44,25 @@ class EditCustomTemplateViewController {
   }
   async getTemplateAsync() {
     try {
-      const [template, file] = await Promise.all([
-        this.CustomTemplateService.customTemplate(this.$state.params.id),
-        this.CustomTemplateService.customTemplateFile(this.$state.params.id),
-      ]);
-      template.FileContent = file;
+      const template = await this.CustomTemplateService.customTemplate(this.$state.params.id);
+
+      if (template.GitConfig !== null) {
+        this.state.isEditorReadOnly = true;
+      }
+
+      try {
+        template.FileContent = await this.CustomTemplateService.customTemplateFile(this.$state.params.id, template.GitConfig !== null);
+      } catch (err) {
+        this.state.templateLoadFailed = true;
+        throw err;
+      }
+
       template.Variables = template.Variables || [];
-      this.formValues = template;
+
+      this.formValues = { ...this.formValues, ...template };
+
       this.parseTemplate(template.FileContent);
+      this.parseGitConfig(template.GitConfig);
 
       this.oldFileContent = this.formValues.FileContent;
       if (template.ResourceControl) {
@@ -143,6 +163,62 @@ class EditCustomTemplateViewController {
     if (isValid) {
       this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
     }
+  }
+
+  parseGitConfig(config) {
+    if (config === null) {
+      return;
+    }
+
+    let flatConfig = {
+      RepositoryURL: config.URL,
+      RepositoryReferenceName: config.ReferenceName,
+      ComposeFilePathInRepository: config.ConfigFilePath,
+      RepositoryAuthentication: config.Authentication !== null,
+      TLSSkipVerify: config.TLSSkipVerify,
+    };
+
+    if (config.Authentication) {
+      flatConfig = {
+        ...flatConfig,
+        RepositoryUsername: config.Authentication.Username,
+        RepositoryPassword: config.Authentication.Password,
+      };
+    }
+
+    this.formValues = { ...this.formValues, ...flatConfig };
+  }
+
+  previewFileFromGitRepository() {
+    this.state.templatePreviewFailed = false;
+    this.state.templatePreviewError = '';
+
+    let creds = {};
+    if (this.formValues.RepositoryAuthentication) {
+      creds = {
+        username: this.formValues.RepositoryUsername,
+        password: this.formValues.RepositoryPassword,
+      };
+    }
+    const payload = {
+      repository: this.formValues.RepositoryURL,
+      targetFile: this.formValues.ComposeFilePathInRepository,
+      tlsSkipVerify: this.formValues.TLSSkipVerify,
+      ...creds,
+    };
+
+    this.$async(async () => {
+      try {
+        this.formValues.FileContent = await getFilePreview(payload);
+        this.state.isEditorDirty = true;
+
+        // check if the template contains mustache template symbol
+        this.parseTemplate(this.formValues.FileContent);
+      } catch (err) {
+        this.state.templatePreviewError = err.message;
+        this.state.templatePreviewFailed = true;
+      }
+    });
   }
 
   async uiCanExit() {

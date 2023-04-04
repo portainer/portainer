@@ -10,8 +10,11 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 type customTemplateUpdatePayload struct {
@@ -29,18 +32,37 @@ type customTemplateUpdatePayload struct {
 	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
 	// Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)
 	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
+	// URL of a Git repository hosting the Stack file
+	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// Reference name of a Git repository hosting the Stack file
+	RepositoryReferenceName string `example:"refs/heads/master"`
+	// Use basic authentication to clone the Git repository
+	RepositoryAuthentication bool `example:"true"`
+	// Username used in basic authentication. Required when RepositoryAuthentication is true
+	// and RepositoryGitCredentialID is 0
+	RepositoryUsername string `example:"myGitUsername"`
+	// Password used in basic authentication. Required when RepositoryAuthentication is true
+	// and RepositoryGitCredentialID is 0
+	RepositoryPassword string `example:"myGitPassword"`
+	// GitCredentialID used to identify the bound git credential. Required when RepositoryAuthentication
+	// is true and RepositoryUsername/RepositoryPassword are not provided
+	RepositoryGitCredentialID int `example:"0"`
+	// Path to the Stack file inside the Git repository
+	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Content of stack file
 	FileContent string `validate:"required"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
+	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
+	IsComposeFormat bool `example:"false"`
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Title) {
 		return errors.New("Invalid custom template title")
 	}
-	if govalidator.IsNull(payload.FileContent) {
-		return errors.New("Invalid file content")
+	if govalidator.IsNull(payload.FileContent) && govalidator.IsNull(payload.RepositoryURL) {
+		return errors.New("Either file content or git repository url need to be provided")
 	}
 	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
@@ -55,7 +77,19 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	return validateVariablesDefinitions(payload.Variables)
+	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	}
+	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
+		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
+	}
+
+	err := validateVariablesDefinitions(payload.Variables)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // @id CustomTemplateUpdate
@@ -115,12 +149,6 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 	}
 
-	templateFolder := strconv.Itoa(customTemplateID)
-	_, err = handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
-	if err != nil {
-		return httperror.InternalServerError("Unable to persist updated custom template file on disk", err)
-	}
-
 	customTemplate.Title = payload.Title
 	customTemplate.Logo = payload.Logo
 	customTemplate.Description = payload.Description
@@ -128,6 +156,42 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	customTemplate.Platform = payload.Platform
 	customTemplate.Type = payload.Type
 	customTemplate.Variables = payload.Variables
+	customTemplate.IsComposeFormat = payload.IsComposeFormat
+
+	if payload.RepositoryURL != "" {
+		if !govalidator.IsURL(payload.RepositoryURL) {
+			return httperror.BadRequest("Invalid repository URL. Must correspond to a valid URL format", err)
+		}
+
+		gitConfig := &gittypes.RepoConfig{
+			URL:            payload.RepositoryURL,
+			ReferenceName:  payload.RepositoryReferenceName,
+			ConfigFilePath: payload.ComposeFilePathInRepository,
+		}
+
+		if payload.RepositoryAuthentication {
+			gitConfig.Authentication = &gittypes.GitAuthentication{
+				Username: payload.RepositoryUsername,
+				Password: payload.RepositoryPassword,
+			}
+		}
+
+		commitHash, err := stackutils.DownloadGitRepository(*gitConfig, handler.GitService, func() string {
+			return customTemplate.ProjectPath
+		})
+		if err != nil {
+			return httperror.InternalServerError(err.Error(), err)
+		}
+
+		gitConfig.ConfigHash = commitHash
+		customTemplate.GitConfig = gitConfig
+	} else {
+		templateFolder := strconv.Itoa(customTemplateID)
+		_, err = handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
+		if err != nil {
+			return httperror.InternalServerError("Unable to persist updated custom template file on disk", err)
+		}
+	}
 
 	err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
 	if err != nil {

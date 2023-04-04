@@ -1,4 +1,5 @@
 import angular from 'angular';
+import PortainerError from 'Portainer/error';
 
 angular.module('portainer.app').factory('CustomTemplateService', CustomTemplateServiceFactory);
 
@@ -24,12 +25,12 @@ function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadServ
     return CustomTemplates.remove({ id }).$promise;
   };
 
-  service.customTemplateFile = async function customTemplateFile(id) {
+  service.customTemplateFile = async function customTemplateFile(id, remote = false) {
     try {
-      const { FileContent } = await CustomTemplates.file({ id }).$promise;
+      const { FileContent } = remote ? await CustomTemplates.gitFetch({ id }).$promise : await CustomTemplates.file({ id }).$promise;
       return FileContent;
     } catch (err) {
-      throw { msg: 'Unable to retrieve customTemplate content', err };
+      throw new PortainerError('Unable to retrieve custom template content', err);
     }
   };
 

@@ -35,6 +35,8 @@
             <file-upload-description> You can upload a Manifest file from your computer. </file-upload-description>
           </file-upload-form>
 
+          <git-form deploy-method="kubernetes" ng-if="$ctrl.state.method === 'repository'" value="$ctrl.formValues" on-change="($ctrl.handleChange)"></git-form>
+
           <custom-templates-variables-definition-field
             ng-if="$ctrl.isTemplateVariablesEnabled"
             value="$ctrl.formValues.Variables"

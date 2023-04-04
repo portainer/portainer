@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
@@ -56,6 +57,7 @@ type Handler struct {
 	EndpointHandler        *endpoints.Handler
 	EndpointHelmHandler    *helm.Handler
 	EndpointProxyHandler   *endpointproxy.Handler
+	GitOperationHandler    *gitops.Handler
 	HelmTemplatesHandler   *helm.Handler
 	KubernetesHandler      *kubernetes.Handler
 	FileHandler            *file.Handler
@@ -121,6 +123,8 @@ type Handler struct {
 // @tag.description Manage Docker environments(endpoints)
 // @tag.name endpoint_groups
 // @tag.description Manage environment(endpoint) groups
+// @tag.name gitops
+// @tag.description Operate git repository
 // @tag.name kubernetes
 // @tag.description Manage Kubernetes cluster
 // @tag.name motd
@@ -203,6 +207,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
+	case strings.HasPrefix(r.URL.Path, "/api/gitops"):
+		http.StripPrefix("/api", h.GitOperationHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/ldap"):
 		http.StripPrefix("/api", h.LDAPHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):

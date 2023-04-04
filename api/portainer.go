@@ -181,6 +181,9 @@ type (
 		Type            StackType        `json:"Type" example:"1"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
+		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
+		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
+		IsComposeFormat bool `example:"false"`
 	}
 
 	// CustomTemplateID represents a custom template identifier

@@ -105,6 +105,16 @@
                   ></custom-templates-variables-field>
                 </div>
 
+                <span ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId && ctrl.state.templateLoadFailed">
+                  <p class="small vertical-center text-danger mb-5" ng-if="ctrl.currentUser.isAdmin || ctrl.currentUser.id === ctrl.state.template.CreatedByUserId">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
+                    <a ui-sref="kubernetes.templates.custom.edit({id: ctrl.state.templateId})">click here</a> for configuration.</p
+                  >
+                  <p class="small vertical-center text-danger mb-5" ng-if="!(ctrl.currentUser.isAdmin || ctrl.currentUser.id === ctrl.state.template.CreatedByUserId)">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
+                  >
+                </span>
+
                 <!-- editor -->
                 <div class="mt-4">
                   <web-editor-form
@@ -115,6 +125,7 @@
                     ng-required="true"
                     yml="true"
                     placeholder="Define or paste the content of your manifest file here"
+                    read-only="ctrl.state.isEditorReadOnly"
                   >
                     <editor-description>
                       <p class="vertical-center">

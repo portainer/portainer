@@ -7,6 +7,22 @@
         <form class="form-horizontal" name="$ctrl.form">
           <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
 
+          <git-form value="$ctrl.formValues" on-change="($ctrl.handleChange)" ng-if="$ctrl.formValues.GitConfig"></git-form>
+
+          <div class="form-group">
+            <div class="col-sm-12"
+              ><button type="button" class="btn btn-sm btn-light !ml-0" ng-if="$ctrl.formValues.GitConfig" ng-click="$ctrl.previewFileFromGitRepository()">
+                <pr-icon icon="'refresh-cw'" feather="true"></pr-icon>Reload custom template</button
+              >
+            </div>
+            <div class="col-sm-12" ng-if="$ctrl.state.templatePreviewFailed">
+              <p class="small vertical-center text-danger mt-5">
+                <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>
+                Custom template could not be loaded, {{ $ctrl.state.templatePreviewError }}.</p
+              >
+            </div>
+          </div>
+
           <web-editor-form
             identifier="template-editor"
             value="$ctrl.formValues.FileContent"
@@ -14,6 +30,7 @@
             ng-required="true"
             yml="true"
             placeholder="Define or paste the content of your manifest file here"
+            read-only="$ctrl.state.isEditorReadOnly"
           >
             <editor-description>
               <p>Templates allow deploying any kind of Kubernetes resource (Deployment, Secret, ConfigMap...)</p>
@@ -31,7 +48,11 @@
             is-variables-names-from-parent="true"
           ></custom-templates-variables-definition-field>
 
-          <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
+          <por-access-control-form
+            form-data="$ctrl.formValues.AccessControlData"
+            resource-control="$ctrl.formValues.ResourceControl"
+            ng-if="$ctrl.formValues.AccessControlData"
+          ></por-access-control-form>
 
           <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
