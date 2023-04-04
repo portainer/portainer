@@ -25,8 +25,8 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 // @tags edge, endpoints
 // @accept json
 // @produce json
-// @param id path string true "environment(endpoint) Id"
-// @param jobID path string true "Job Id"
+// @param id path int true "environment(endpoint) Id"
+// @param jobID path int true "Job Id"
 // @success 200
 // @failure 500
 // @failure 400

@@ -99,7 +99,7 @@ type Handler struct {
 
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
+// @name x-api-key
 
 // @securitydefinitions.apikey jwt
 // @in header
@@ -109,6 +109,8 @@ type Handler struct {
 // @tag.description Authenticate against Portainer HTTP API
 // @tag.name custom_templates
 // @tag.description Manage Custom Templates
+// @tag.name edge
+// @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name edge_groups
 // @tag.description Manage Edge Groups
 // @tag.name edge_jobs
@@ -117,8 +119,6 @@ type Handler struct {
 // @tag.description Manage Edge Stacks
 // @tag.name edge_templates
 // @tag.description Manage Edge Templates
-// @tag.name edge
-// @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name endpoints
 // @tag.description Manage Docker environments(endpoints)
 // @tag.name endpoint_groups
@@ -137,8 +137,14 @@ type Handler struct {
 // @tag.description Manage roles
 // @tag.name settings
 // @tag.description Manage Portainer settings
-// @tag.name users
-// @tag.description Manage users
+// @tag.name ssl
+// @tag.description Manage ssl settings
+// @tag.name stacks
+// @tag.description Manage stacks
+// @tag.name status
+// @tag.description Information about the Portainer instance
+// @tag.name system
+// @tag.description Manage Portainer system
 // @tag.name tags
 // @tag.description Manage tags
 // @tag.name teams
@@ -147,20 +153,14 @@ type Handler struct {
 // @tag.description Manage team memberships
 // @tag.name templates
 // @tag.description Manage App Templates
-// @tag.name stacks
-// @tag.description Manage stacks
-// @tag.name ssl
-// @tag.description Manage ssl settings
+// @tag.name users
+// @tag.description Manage users
 // @tag.name upload
 // @tag.description Upload files
 // @tag.name webhooks
 // @tag.description Manage webhooks
 // @tag.name websocket
 // @tag.description Create exec sessions using websockets
-// @tag.name status
-// @tag.description Information about the Portainer instance
-// @tag.name system
-// @tag.description Manage Portainer system
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

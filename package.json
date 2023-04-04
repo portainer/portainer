@@ -20,7 +20,7 @@
     "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
-    "prebuild:docs": "go install github.com/swaggo/swag/cmd/swag@v1.7.1",
+    "prebuild:docs": "go install github.com/swaggo/swag/cmd/swag@v1.8.11",
     "build:docs": "cd api && swag init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./",
     "validate:docs": "swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml && swagger-cli validate api/docs/openapi.yaml",
     "clean": "grunt clean:all",
