@@ -15,7 +15,7 @@ import (
 // @description Authorized only if the request is done by an Edge Environment(Endpoint)
 // @tags edge_stacks
 // @produce json
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
 // @failure 400

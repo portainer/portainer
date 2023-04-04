@@ -15,7 +15,7 @@ import (
 // @tags edge_stacks
 // @security ApiKeyAuth
 // @security jwt
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @success 204
 // @failure 500
 // @failure 400
