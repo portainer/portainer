@@ -139,12 +139,14 @@ class KubernetesRedeployAppGitFormController {
 
     this.formValues.AutoUpdate = parseAutoUpdateResponse(this.stack.AutoUpdate);
 
-    if (this.stack.AutoUpdate.Webhook) {
+    if (this.stack.AutoUpdate && this.stack.AutoUpdate.Webhook) {
       this.state.webhookId = this.stack.AutoUpdate.Webhook;
     }
 
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
+      this.formValues.RepositoryPassword = this.stack.GitConfig.Authentication.Password;
+
       this.formValues.RepositoryAuthentication = true;
       this.state.isEdit = true;
     }
