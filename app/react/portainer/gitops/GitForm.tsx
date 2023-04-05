@@ -162,5 +162,5 @@ export function buildGitValidationSchema(
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials));
+  }).concat(gitAuthValidation(gitCredentials, false));
 }

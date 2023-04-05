@@ -24,6 +24,8 @@ export default class GitFormAuthFieldsetController {
 
   value?: GitAuthModel;
 
+  isAuthEdit: boolean;
+
   onChange?: (value: GitAuthModel) => void;
 
   /* @ngInject */
@@ -34,6 +36,7 @@ export default class GitFormAuthFieldsetController {
     this.$async = $async;
     this.Authentication = Authentication;
 
+    this.isAuthEdit = false;
     this.handleChange = this.handleChange.bind(this);
     this.runGitValidation = this.runGitValidation.bind(this);
   }
@@ -49,10 +52,10 @@ export default class GitFormAuthFieldsetController {
       ...newValues,
     };
     this.onChange?.(value);
-    await this.runGitValidation(value);
+    await this.runGitValidation(value, false);
   }
 
-  async runGitValidation(value: GitAuthModel) {
+  async runGitValidation(value: GitAuthModel, isAuthEdit: boolean) {
     return this.$async(async () => {
       this.errors = {};
       this.gitFormAuthFieldset?.$setValidity(
@@ -62,7 +65,7 @@ export default class GitFormAuthFieldsetController {
       );
 
       this.errors = await validateForm<GitAuthModel>(
-        () => gitAuthValidation(this.gitCredentials),
+        () => gitAuthValidation(this.gitCredentials, isAuthEdit),
         value
       );
       if (this.errors && Object.keys(this.errors).length > 0) {
@@ -94,6 +97,6 @@ export default class GitFormAuthFieldsetController {
     if (!this.value) {
       throw new Error('GitFormController: value is required');
     }
-    await this.runGitValidation(this.value);
+    await this.runGitValidation(this.value, this.isAuthEdit);
   }
 }

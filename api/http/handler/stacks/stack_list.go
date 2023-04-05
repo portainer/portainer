@@ -85,7 +85,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	for _, stack := range stacks {
 		if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
 			// sanitize password in the http response to minimise possible security leaks
-			stack.GitConfig.Authentication.Password = "(redact)"
+			stack.GitConfig.Authentication.Password = ""
 		}
 	}
 

@@ -18,6 +18,15 @@ class KubernetesRedeployAppGitFormController {
       redeployInProgress: false,
       showConfig: false,
       isEdit: false,
+
+      // isAuthEdit is used to preserve the editing state of the AuthFieldset component.
+      // Within the stack editing page, users have the option to turn the AuthFieldset on or off
+      // and save the stack setting. If the user enables the AuthFieldset, it implies that they
+      // must input new Git authentication, rather than edit existing authentication. Thus,
+      // a dedicated state tracker is required to differentiate between the editing state of
+      // AuthFieldset component and the whole stack
+      // When isAuthEdit is true, PAT field needs to be validated.
+      isAuthEdit: false,
       hasUnsavedChanges: false,
       baseWebhookUrl: baseStackWebhookUrl(),
       webhookId: createWebhookId(),
@@ -121,6 +130,13 @@ class KubernetesRedeployAppGitFormController {
         await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, { gitConfig: this.formValues, webhookId: this.state.webhookId });
         this.savedFormValues = angular.copy(this.formValues);
         this.state.hasUnsavedChanges = false;
+
+        if (!(this.stack.GitConfig && this.stack.GitConfig.Authentication)) {
+          // update the AuthFieldset setting
+          this.state.isAuthEdit = false;
+          this.formValues.RepositoryUsername = '';
+          this.formValues.RepositoryPassword = '';
+        }
         this.Notifications.success('Success', 'Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save application settings');
@@ -149,6 +165,7 @@ class KubernetesRedeployAppGitFormController {
 
       this.formValues.RepositoryAuthentication = true;
       this.state.isEdit = true;
+      this.state.isAuthEdit = true;
     }
 
     this.savedFormValues = angular.copy(this.formValues);

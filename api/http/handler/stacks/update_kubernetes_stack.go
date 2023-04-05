@@ -66,13 +66,6 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 		if payload.RepositoryAuthentication {
 			password := payload.RepositoryPassword
-
-			// if payload password is "(redact)", it means that the password is not changed
-			// we should still use the password saved in the current stack
-			if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && payload.RepositoryPassword == "(redact)" {
-				password = stack.GitConfig.Authentication.Password
-			}
-
 			if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 				password = stack.GitConfig.Authentication.Password
 			}
