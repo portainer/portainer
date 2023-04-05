@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
@@ -103,6 +104,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
 		paginatedEndpoints[idx].QueryDate = time.Now().Unix()
+		endpointutils.UpdateEdgeEndpointHeartbeat(&paginatedEndpoints[idx], settings)
 		if !query.excludeSnapshots {
 			err = handler.SnapshotService.FillSnapshotData(&paginatedEndpoints[idx])
 			if err != nil {
