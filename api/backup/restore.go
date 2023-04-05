@@ -3,8 +3,10 @@ package backup
 import (
 	"context"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/pkg/errors"
@@ -43,6 +45,12 @@ func RestoreArchive(archive io.Reader, password string, filestorePath string, ga
 		return errors.Wrap(err, "Failed to stop db")
 	}
 
+	// At some point, backups were created containing a subdirectory, now we need to handle both
+	restorePath, err = getRestoreSourcePath(restorePath)
+	if err != nil {
+		return errors.Wrap(err, "failed to restore from backup. Portainer database missing from backup file")
+	}
+
 	if err = restoreFiles(restorePath, filestorePath); err != nil {
 		return errors.Wrap(err, "failed to restore the system state")
 	}
@@ -57,6 +65,26 @@ func decrypt(r io.Reader, password string) (io.Reader, error) {
 
 func extractArchive(r io.Reader, destinationDirPath string) error {
 	return archive.ExtractTarGz(r, destinationDirPath)
+}
+
+func getRestoreSourcePath(dir string) (string, error) {
+	// find portainer.db or portainer.edb file. Return the parent directory
+	var portainerdbRegex = regexp.MustCompile(`^portainer.e?db$`)
+
+	backupDirPath := dir
+	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if portainerdbRegex.MatchString(d.Name()) {
+			backupDirPath = filepath.Dir(path)
+			return filepath.SkipDir
+		}
+		return nil
+	})
+
+	return backupDirPath, err
 }
 
 func restoreFiles(srcDir string, destinationDir string) error {
