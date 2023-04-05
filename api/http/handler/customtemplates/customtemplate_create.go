@@ -281,6 +281,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		URL:            payload.RepositoryURL,
 		ReferenceName:  payload.RepositoryReferenceName,
 		ConfigFilePath: payload.ComposeFilePathInRepository,
+		TLSSkipVerify:  payload.TLSSkipVerify,
 	}
 
 	if payload.RepositoryAuthentication {
