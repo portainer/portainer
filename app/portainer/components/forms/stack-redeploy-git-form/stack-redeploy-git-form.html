@@ -37,7 +37,13 @@
     is-url-valid="true"
     stack-id="$ctrl.gitStackId"
   ></git-form-ref-field>
-  <git-form-auth-fieldset ng-if="$ctrl.state.showConfig" value="$ctrl.formValues" on-change="($ctrl.onChangeGitAuth)" is-auth-explanation-visible="true"></git-form-auth-fieldset>
+  <git-form-auth-fieldset
+    ng-if="$ctrl.state.showConfig"
+    value="$ctrl.formValues"
+    on-change="($ctrl.onChangeGitAuth)"
+    is-auth-explanation-visible="true"
+    is-auth-edit="$ctrl.state.isAuthEdit"
+  ></git-form-auth-fieldset>
 
   <environment-variables-panel
     ng-model="$ctrl.formValues.Env"

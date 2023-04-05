@@ -140,9 +140,9 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	if payload.RepositoryAuthentication {
 		repositoryPassword = payload.RepositoryPassword
 
-		// if payload password is "(redact)", it means that the password is not changed
-		// we should still use the password saved in the current stack
-		if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && payload.RepositoryPassword == "(redact)" {
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
+		if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && payload.RepositoryPassword == "" {
 			repositoryPassword = stack.GitConfig.Authentication.Password
 		}
 
@@ -194,7 +194,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
 		// sanitize password in the http response to minimise possible security leaks
-		stack.GitConfig.Authentication.Password = "(redact)"
+		stack.GitConfig.Authentication.Password = ""
 	}
 
 	return response.JSON(w, stack)
