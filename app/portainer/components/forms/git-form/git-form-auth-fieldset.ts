@@ -9,7 +9,7 @@ export const gitFormAuthFieldset: IComponentOptions = {
   <react-git-form-auth-fieldset
     value="$ctrl.value"
     on-change="$ctrl.handleChange"
-    is-explanation-visible="$ctrl.isExplanationVisible"
+    is-auth-explanation-visible="$ctrl.isAuthExplanationVisible"
     errors="$ctrl.errors"
     is-auth-edit="$ctrl.isAuthEdit">
   </react-git-form-auth-fieldset>
@@ -17,7 +17,7 @@ export const gitFormAuthFieldset: IComponentOptions = {
   bindings: {
     value: '<',
     onChange: '<',
-    isExplanationVisible: '<',
+    isAuthExplanationVisible: '<',
     isAuthEdit: '<',
   },
 };

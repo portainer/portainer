@@ -18,14 +18,14 @@ import { NewCredentialForm } from './NewCredentialForm';
 interface Props {
   value: GitAuthModel;
   onChange: (value: Partial<GitAuthModel>) => void;
-  isExplanationVisible?: boolean;
+  isAuthExplanationVisible?: boolean;
   errors?: FormikErrors<GitAuthModel>;
 }
 
 export function AuthFieldset({
   value,
   onChange,
-  isExplanationVisible,
+  isAuthExplanationVisible,
   errors,
 }: Props) {
   const [username, setUsername] = useDebounce(
@@ -56,7 +56,7 @@ export function AuthFieldset({
 
       {value.RepositoryAuthentication && (
         <>
-          {isExplanationVisible && (
+          {isAuthExplanationVisible && (
             <TextTip color="orange">
               Enabling authentication will store the credentials and it is
               advisable to use a git service account
