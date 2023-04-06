@@ -51,7 +51,7 @@ export function GitForm({
       <AuthFieldset
         value={value}
         onChange={handleChange}
-        isExplanationVisible={isAuthExplanationVisible}
+        isAuthExplanationVisible={isAuthExplanationVisible}
         errors={errors}
       />
 
