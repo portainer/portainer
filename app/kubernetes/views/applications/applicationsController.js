@@ -143,8 +143,10 @@ class KubernetesApplicationsController {
     });
   }
 
-  onChangeNamespaceDropdown(namespace) {
-    this.state.namespaceName = namespace;
+  onChangeNamespaceDropdown(namespaceName) {
+    this.state.namespaceName = namespaceName;
+    // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
+    this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
     return this.$async(this.getApplicationsAsync);
   }
 
