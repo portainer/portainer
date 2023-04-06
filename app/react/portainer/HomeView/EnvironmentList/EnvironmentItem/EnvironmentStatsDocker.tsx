@@ -8,6 +8,7 @@ import {
   List,
   Power,
   Shuffle,
+  Calculator,
 } from 'lucide-react';
 
 import Memory from '@/assets/ico/memory.svg?c';
@@ -19,9 +20,10 @@ import { StatsItem } from '@@/StatsItem';
 
 interface Props {
   snapshot?: DockerSnapshot;
+  gpus?: [];
 }
 
-export function EnvironmentStatsDocker({ snapshot }: Props) {
+export function EnvironmentStatsDocker({ snapshot, gpus }: Props) {
   if (!snapshot) {
     return <>No snapshot available</>;
   }
@@ -53,6 +55,8 @@ export function EnvironmentStatsDocker({ snapshot }: Props) {
       <StatsItem value={addPlural(snapshot.ImageCount, 'image')} icon={List} />
 
       <StatsItem icon={Cpu} value={`${snapshot.TotalCPU} CPU`} />
+
+      <StatsItem icon={Calculator} value={`${gpus?.length} GPU`} />
 
       <StatsItem
         icon={Memory}
