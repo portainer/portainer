@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { useContainerStatusComponent } from '@/react/docker/DashboardView/ContainerStatus';
 import { useImagesTotalSizeComponent } from '@/react/docker/DashboardView/ImagesTotalSize';
+import { useGpusStatusComponent } from '@/react/docker/DashboardView/GpusStatus';
 
 angular.module('portainer.docker').controller('DashboardController', [
   '$scope',
@@ -107,18 +108,19 @@ angular.module('portainer.docker').controller('DashboardController', [
           $scope.gpuFreeStr = 'all';
           if ($scope.gpuUseAll == true) $scope.gpuFreeStr = 'none';
           else $scope.gpuFreeStr = $scope.buildGpusStr(new Set($scope.gpuUseList));
+          $scope.gpuStatusComponent = useGpusStatusComponent($scope.gpuFreeStr);
 
           $scope.endpointTags = endpoint.TagIds.length
             ? _.join(
-                _.filter(
-                  _.map(endpoint.TagIds, (id) => {
-                    const tag = data.tags.find((tag) => tag.Id === id);
-                    return tag ? tag.Name : '';
-                  }),
-                  Boolean
-                ),
-                ', '
-              )
+              _.filter(
+                _.map(endpoint.TagIds, (id) => {
+                  const tag = data.tags.find((tag) => tag.Id === id);
+                  return tag ? tag.Name : '';
+                }),
+                Boolean
+              ),
+              ', '
+            )
             : '-';
         })
         .catch(function error(err) {
