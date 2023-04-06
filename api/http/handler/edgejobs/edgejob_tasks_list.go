@@ -6,10 +6,11 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/maps"
+	"github.com/portainer/portainer/pkg/featureflags"
 )
 
 type taskContainer struct {
@@ -37,20 +38,34 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 		return httperror.BadRequest("Invalid Edge job identifier route variable", err)
 	}
 
-	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
+	var tasks []taskContainer
+	if featureflags.IsEnabled(portainer.FeatureNoTx) {
+		tasks, err = listEdgeJobTasks(handler.DataStore, portainer.EdgeJobID(edgeJobID))
+	} else {
+		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			tasks, err = listEdgeJobTasks(tx, portainer.EdgeJobID(edgeJobID))
+			return err
+		})
+	}
+
+	return txResponse(w, tasks, err)
+}
+
+func listEdgeJobTasks(tx dataservices.DataStoreTx, edgeJobID portainer.EdgeJobID) ([]taskContainer, error) {
+	edgeJob, err := tx.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
+	if tx.IsErrObjectNotFound(err) {
+		return nil, httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
 	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
+		return nil, httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
 	}
 
 	tasks := make([]taskContainer, 0)
 
 	endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
 	if len(edgeJob.EdgeGroups) > 0 {
-		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
+		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, tx)
 		if err != nil {
-			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
+			return nil, httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 
 		endpointsMap = convertEndpointsToMetaObject(endpoints)
@@ -67,5 +82,5 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 		})
 	}
 
-	return response.JSON(w, tasks)
+	return tasks, nil
 }

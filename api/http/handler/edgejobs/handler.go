@@ -3,11 +3,13 @@ package edgejobs
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle Edge job operations.
@@ -44,6 +46,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksCollect)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/{id}/tasks/{taskID}/logs",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksClear)))).Methods(http.MethodDelete)
+
 	return h
 }
 
@@ -55,4 +58,16 @@ func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portaine
 	}
 
 	return endpointsMap
+}
+
+func txResponse(w http.ResponseWriter, r any, err error) *httperror.HandlerError {
+	if err != nil {
+		if httpErr, ok := err.(*httperror.HandlerError); ok {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	return response.JSON(w, r)
 }

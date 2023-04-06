@@ -39,7 +39,7 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		edgeJob, err := tx.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-		if handler.DataStore.IsErrObjectNotFound(err) {
+		if tx.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
 		} else if err != nil {
 			return httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
