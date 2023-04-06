@@ -21,7 +21,6 @@
           type="text"
           class="form-control"
           aria-describedby="registry-name"
-          uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
           ng-model="$ctrl.model.Image"
           name="image_name"
           placeholder="e.g. my-image:my-tag"
@@ -51,7 +50,7 @@
       </span>
       <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image </label>
       <div ng-class="$ctrl.inputClass" class="col-sm-8">
-        <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" required />
+        <input type="text" class="form-control" typeahead-min-length=0 uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:10" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" ng-change="$ctrl.onImageChange()" typeahead-wait-ms=100 required />
       </div>
     </div>
   </div>

@@ -68,6 +68,7 @@ class porImageRegistryController {
   }
 
   async onImageChange() {
+    this.prepareAutocomplete();
     if (!this.isDockerHubRegistry()) {
       this.setValidity(true);
     }
@@ -114,6 +115,7 @@ class porImageRegistryController {
 
         const images = await this.ImageService.images();
         this.images = this.ImageService.getUniqueTagListFromImages(images);
+        this.prepareAutocomplete();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve images');
       }
