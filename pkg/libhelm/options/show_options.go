@@ -19,4 +19,6 @@ type ShowOptions struct {
 	OutputFormat ShowOutputFormat
 	Chart        string
 	Repo         string
+
+	Env []string
 }
