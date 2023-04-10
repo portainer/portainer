@@ -51,7 +51,7 @@ export function GitForm({
       <AuthFieldset
         value={value}
         onChange={handleChange}
-        isExplanationVisible={isAuthExplanationVisible}
+        isAuthExplanationVisible={isAuthExplanationVisible}
         errors={errors}
       />
 
@@ -162,5 +162,5 @@ export function buildGitValidationSchema(
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials));
+  }).concat(gitAuthValidation(gitCredentials, false));
 }

@@ -35,6 +35,14 @@
     is-url-valid="true"
   ></git-form-ref-field>
 
+  <git-form-auth-fieldset
+    ng-if="$ctrl.state.showConfig"
+    value="$ctrl.formValues"
+    on-change="($ctrl.onChangeGitAuth)"
+    is-auth-explanation-visible="true"
+    is-auth-edit="$ctrl.state.isAuthEdit"
+  ></git-form-auth-fieldset>
+
   <div class="col-sm-12 form-section-title"> Actions </div>
   <!-- #Git buttons -->
   <button
