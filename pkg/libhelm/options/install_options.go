@@ -9,4 +9,7 @@ type InstallOptions struct {
 	ValuesFile              string
 	PostRenderer            string
 	KubernetesClusterAccess *KubernetesClusterAccess
+
+	// Optional environment vars to pass when running helm
+	Env []string
 }
