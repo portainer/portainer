@@ -151,6 +151,9 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	if payload.RepositoryAuthentication {
 		password := payload.RepositoryPassword
+
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
 		if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 			password = stack.GitConfig.Authentication.Password
 		}
