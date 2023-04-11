@@ -285,13 +285,15 @@ export function ContainersDatatableActions({
 
   async function removeSelectedContainers(
     containers: DockerContainer[],
-    cleanVolumes: boolean
+    removeVolumes: boolean
   ) {
     for (let i = 0; i < containers.length; i += 1) {
       const container = containers[i];
       try {
-        setPortainerAgentTargetHeader(container.NodeName);
-        await removeContainer(endpointId, container, cleanVolumes);
+        await removeContainer(endpointId, container.Id, {
+          removeVolumes,
+          nodeName: container.NodeName,
+        });
         notifications.success(
           'Container successfully removed',
           container.Names[0]

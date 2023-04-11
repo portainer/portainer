@@ -8,7 +8,7 @@ import { useEnvironment } from '@/react/portainer/environments/queries';
 import { DockerContainer, ContainerStatus } from './types';
 import { DockerContainerResponse } from './types/response';
 
-export function parseListViewModel(
+export function toListViewModel(
   response: DockerContainerResponse
 ): DockerContainer {
   const resourceControl =

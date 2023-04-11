@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { InputList } from '@@/form-components/InputList';
 import { ArrayError } from '@@/form-components/InputList/InputList';
 
@@ -7,7 +5,7 @@ import { Item } from './Item';
 import { Values } from './types';
 
 export function LabelsTab({
-  values: initialValues,
+  values,
   onChange,
   errors,
 }: {
@@ -15,8 +13,6 @@ export function LabelsTab({
   onChange: (values: Values) => void;
   errors?: ArrayError<Values>;
 }) {
-  const [values, setControlledValues] = useState(initialValues);
-
   return (
     <InputList
       label="Labels"
@@ -29,7 +25,6 @@ export function LabelsTab({
   );
 
   function handleChange(values: Values) {
-    setControlledValues(values);
     onChange(values);
   }
 }
