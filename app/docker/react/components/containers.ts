@@ -42,6 +42,10 @@ import {
   LabelsTab,
   labelsTabUtils,
 } from '@/react/docker/containers/CreateView/LabelsTab';
+import {
+  BaseForm,
+  baseFormUtils,
+} from '@/react/docker/containers/CreateView/BaseForm';
 
 const ngModule = angular
   .module('portainer.docker.react.components.containers', [])
@@ -125,4 +129,12 @@ withFormValidation(
   'dockerCreateContainerLabelsTab',
   [],
   labelsTabUtils.validation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withReactQuery(withCurrentUser(BaseForm))),
+  'dockerCreateContainerBaseForm',
+  ['isValid', 'isLoading', 'setFieldError'],
+  baseFormUtils.validation
 );

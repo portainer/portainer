@@ -71,7 +71,6 @@ export interface Registry {
   Username: string;
   Password: string;
   RegistryAccesses: RegistryAccesses;
-  Checked: boolean;
   Gitlab: Gitlab;
   Quay: Quay;
   Github: Github;

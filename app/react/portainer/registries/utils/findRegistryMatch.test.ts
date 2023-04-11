@@ -17,7 +17,6 @@ function buildTestRegistry(
     Authentication: false,
     Password: '',
     BaseURL: '',
-    Checked: false,
     Ecr: { Region: '' },
     Github: { OrganisationName: '', UseOrganisation: false },
     Quay: { OrganisationName: '', UseOrganisation: false },
