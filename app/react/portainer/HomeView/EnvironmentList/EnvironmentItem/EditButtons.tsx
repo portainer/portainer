@@ -23,7 +23,9 @@ export function EditButtons({ environment }: { environment: Environment }) {
 
   const buttonsClasses = clsx(
     'w-full h-full !ml-0 !rounded-none',
-    'hover:bg-gray-3 th-dark:hover:bg-gray-9 th-highcontrast:hover:bg-white'
+    'hover:bg-gray-3',
+    'th-dark:hover:bg-gray-9',
+    'th-highcontrast:hover:bg-white th-highcontrast:hover:text-black'
   );
 
   return (
