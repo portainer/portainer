@@ -1,31 +1,14 @@
 import { useQuery } from 'react-query';
+import { SystemInfo } from 'docker-types/generated/1.41';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { buildUrl } from './build-url';
 
-export interface PluginInfoResponse {
-  Volume: Array<string>;
-  Network: Array<string>;
-  Authorization: Array<string>;
-  Log: Array<string>;
-}
-
-/**
- * https://docs.docker.com/engine/api/v1.42/#tag/System/operation/SystemInfo
- */
-export interface InfoResponse {
-  Swarm?: {
-    NodeID: string;
-    ControlAvailable: boolean;
-  };
-  Plugins: PluginInfoResponse;
-}
-
 export async function getInfo(environmentId: EnvironmentId) {
   try {
-    const { data } = await axios.get<InfoResponse>(
+    const { data } = await axios.get<SystemInfo>(
       buildUrl(environmentId, 'info')
     );
     return data;
@@ -34,9 +17,9 @@ export async function getInfo(environmentId: EnvironmentId) {
   }
 }
 
-export function useInfo<TSelect = InfoResponse>(
+export function useInfo<TSelect = SystemInfo>(
   environmentId: EnvironmentId,
-  select?: (info: InfoResponse) => TSelect
+  select?: (info: SystemInfo) => TSelect
 ) {
   return useQuery(
     ['environment', environmentId, 'docker', 'info'],
@@ -45,4 +28,16 @@ export function useInfo<TSelect = InfoResponse>(
       select,
     }
   );
+}
+
+export function useIsStandAlone(environmentId: EnvironmentId) {
+  const query = useInfo(environmentId, (info) => !info.Swarm?.NodeID);
+
+  return !!query.data;
+}
+
+export function useIsSwarm(environmentId: EnvironmentId) {
+  const query = useInfo(environmentId, (info) => !!info.Swarm?.NodeID);
+
+  return !!query.data;
 }
