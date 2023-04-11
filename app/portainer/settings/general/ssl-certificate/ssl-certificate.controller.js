@@ -21,9 +21,8 @@ class SslCertificateController {
       reloadingPage: false,
     };
 
-    const pemPattern = '.pem';
-    this.certFilePattern = `${pemPattern},.crt,.cer,.cert`;
-    this.keyFilePattern = `${pemPattern},.key`;
+    this.certFilePattern = `.pem,.crt,.cer,.cert`;
+    this.keyFilePattern = `.pem,.key`;
 
     this.save = this.save.bind(this);
     this.onChangeForceHTTPS = this.onChangeForceHTTPS.bind(this);
@@ -46,7 +45,7 @@ class SslCertificateController {
         const cert = this.formValues.certFile ? await this.formValues.certFile.text() : null;
         const key = this.formValues.keyFile ? await this.formValues.keyFile.text() : null;
         const httpEnabled = !this.formValues.forceHTTPS;
-        await this.SSLService.upload(httpEnabled, cert, key);
+        await this.SSLService.upload({ httpEnabled, cert, key });
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
         location.reload();
