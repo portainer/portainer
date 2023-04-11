@@ -37,7 +37,12 @@
             <button type="button" class="btn btn-sm btn-secondary vertical-center !ml-0" ui-sref="kubernetes.configurations.new" data-cy="k8sConfig-addConfigWithFormButton">
               <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Add with form
             </button>
-            <button type="button" class="btn btn-sm btn-primary vertical-center !ml-0" ui-sref="kubernetes.deploy" data-cy="k8sConfig-deployFromManifestButton">
+            <button
+              type="button"
+              class="btn btn-sm btn-primary vertical-center !ml-0"
+              ui-sref="kubernetes.deploy({ referrer: 'kubernetes.configurations' })"
+              data-cy="k8sConfig-deployFromManifestButton"
+            >
               <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Create from manifest
             </button>
           </div>

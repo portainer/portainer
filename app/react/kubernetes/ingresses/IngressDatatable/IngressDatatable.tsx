@@ -94,7 +94,11 @@ export function IngressDatatable() {
           </Link>
         </Authorized>
         <Authorized authorizations="K8sIngressesW">
-          <Link to="kubernetes.deploy" className="space-left no-decoration">
+          <Link
+            to="kubernetes.deploy"
+            className="space-left no-decoration"
+            params={{ referrer: 'kubernetes.ingresses' }}
+          >
             <Button icon={Plus} className="btn-wrapper">
               Create from manifest
             </Button>
