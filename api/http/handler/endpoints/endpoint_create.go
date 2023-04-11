@@ -36,7 +36,7 @@ type endpointCreatePayload struct {
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
-	TagIDs                 []portainer.TagID `json:"tagIds"`
+	TagIDs                 []portainer.TagID
 	EdgeCheckinInterval    int
 	IsEdgeDevice           bool
 }

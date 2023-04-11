@@ -41,7 +41,7 @@ type endpointUpdatePayload struct {
 	// Azure authentication key
 	AzureAuthenticationKey *string `example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
 	// List of tag identifiers to which this environment(endpoint) is associated
-	TagIDs             []portainer.TagID `json:"tagIds" example:"1,2"`
+	TagIDs             []portainer.TagID `example:"1,2"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 	// The check in interval for edge agent (in seconds)
