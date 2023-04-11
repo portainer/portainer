@@ -94,7 +94,8 @@ body,
   font-size: 16px;
 }
 
-.form-horizontal .control-label.text-left {
+.form-horizontal .control-label.text-left,
+.form-row .control-label.text-left {
   text-align: left;
   font-size: 0.9em;
 }

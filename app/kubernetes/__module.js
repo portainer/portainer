@@ -174,7 +174,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       url: '/:pod/:container/console',
       views: {
         'content@': {
-          component: 'kubernetesApplicationConsoleView',
+          component: 'kubernetesConsoleView',
         },
       },
     };
