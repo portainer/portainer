@@ -3,6 +3,7 @@ import { getTemplateVariables, intersectVariables } from '@/react/portainer/cust
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { editor, upload, git } from '@@/BoxSelector/common-options/build-methods';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
+import { KUBE_TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 class KubeCreateCustomTemplateViewController {
   /* @ngInject */
@@ -20,6 +21,7 @@ class KubeCreateCustomTemplateViewController {
       formValidationError: '',
       isEditorDirty: false,
       isTemplateValid: true,
+      templateNameRegex: KUBE_TEMPLATE_NAME_VALIDATION_REGEX,
     };
 
     this.formValues = {

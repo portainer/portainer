@@ -5,7 +5,13 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal" name="customTemplateForm">
-          <custom-template-common-fields form-values="$ctrl.formValues" show-platform-field="true" show-type-field="true"></custom-template-common-fields>
+          <custom-template-common-fields
+            form-values="$ctrl.formValues"
+            show-platform-field="true"
+            show-type-field="true"
+            name-regex="$ctrl.state.templateNameRegex"
+            name-regex-error="'This field must consist of lower-case alphanumeric characters, \'_\' or \'-\' (e.g. \'my-name\', or \'abc-123\').'"
+          ></custom-template-common-fields>
 
           <git-form value="$ctrl.formValues" on-change="($ctrl.handleChange)" ng-if="$ctrl.formValues.GitConfig"></git-form>
 
