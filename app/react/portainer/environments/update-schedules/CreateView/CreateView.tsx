@@ -91,7 +91,9 @@ function CreateView() {
                       for 2.15.0+ only.
                     </TextTip>
 
-                    <ScheduleTypeSelector />
+                    <div className="mt-2">
+                      <ScheduleTypeSelector />
+                    </div>
 
                     <div className="form-group">
                       <div className="col-sm-12">
