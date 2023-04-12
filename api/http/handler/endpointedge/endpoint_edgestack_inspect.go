@@ -3,6 +3,8 @@ package endpointedge
 import (
 	"errors"
 	"net/http"
+	"os"
+	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -82,7 +84,13 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
 	}
 
-	dotEnvFileContent, _ := handler.FileService.GetFileContent(edgeStack.ProjectPath, ".env")
+	var dotEnvFileContent []byte
+	if _, err = os.Stat(path.Join(edgeStack.ProjectPath, ".env")); err == nil {
+		dotEnvFileContent, err = handler.FileService.GetFileContent(edgeStack.ProjectPath, ".env")
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve .env file from disk", err)
+		}
+	}
 
 	return response.JSON(w, configResponse{
 		StackFileContent:  string(stackFileContent),
