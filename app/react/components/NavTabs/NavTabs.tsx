@@ -25,7 +25,7 @@ export function NavTabs<T extends string | number = string>({
   const selected = options.find((option) => option.id === selectedId);
 
   return (
-    <div className="nav-container">
+    <div>
       <ul className="nav nav-tabs">
         {options.map((option) => (
           <li
