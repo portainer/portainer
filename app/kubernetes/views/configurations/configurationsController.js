@@ -28,7 +28,7 @@ class KubernetesConfigurationsController {
       this.configurations = await this.KubernetesConfigurationService.get();
       KubernetesConfigurationHelper.setConfigurationsUsed(this.configurations, this.applications);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
+      this.Notifications.error('Failure', err, 'Unable to retrieve ConfigMaps & Secrets');
     } finally {
       this.state.configurationsLoading = false;
     }
@@ -47,7 +47,7 @@ class KubernetesConfigurationsController {
         const index = this.configurations.indexOf(configuration);
         this.configurations.splice(index, 1);
       } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to remove configuration');
+        this.Notifications.error('Failure', err, 'Unable to remove ConfigMaps & Secrets');
       } finally {
         --actionCount;
         if (actionCount === 0) {
@@ -58,7 +58,7 @@ class KubernetesConfigurationsController {
   }
 
   removeAction(selectedItems) {
-    confirmDelete('Do you want to remove the selected configuration(s)?').then((confirmed) => {
+    confirmDelete('Do you want to remove the selected ConfigMap(s) & Secret(s)?').then((confirmed) => {
       if (confirmed) {
         return this.$async(this.removeActionAsync, selectedItems);
       }

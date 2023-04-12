@@ -87,6 +87,11 @@ class KubernetesConfigurationController {
   // It looks like we're still doing a create/delete process but we've decided to get rid of this
   // approach.
   async updateConfigurationAsync() {
+    let kind = 'ConfigMap';
+    if (this.formValues.Kind === KubernetesConfigurationKinds.SECRET) {
+      kind = 'Secret';
+    }
+
     try {
       this.state.actionInProgress = true;
       if (
@@ -96,7 +101,7 @@ class KubernetesConfigurationController {
       ) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
-        this.Notifications.success('Success', 'Configuration succesfully updated');
+        this.Notifications.success('Success', `${kind} successfully updated`);
         this.$state.go(
           'kubernetes.configurations.configuration',
           {
@@ -107,11 +112,11 @@ class KubernetesConfigurationController {
         );
       } else {
         await this.KubernetesConfigurationService.update(this.formValues, this.configuration);
-        this.Notifications.success('Success', 'Configuration succesfully updated');
+        this.Notifications.success('Success', `${kind} successfully updated`);
         this.$state.reload(this.$state.current);
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to update configuration');
+      this.Notifications.error('Failure', err, `Unable to update ${kind}`);
     } finally {
       this.state.actionInProgress = false;
     }

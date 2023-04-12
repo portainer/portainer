@@ -1,7 +1,7 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Create configuration'"
-  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations' }, 'Create a configuration']"
+  title="'Create ConfigMap or Secret'"
+  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations' }, 'Create a ConfigMap or Secret']"
   reload="true"
 ></page-header>
 
@@ -53,7 +53,7 @@
                   ng-model="ctrl.formValues.Name"
                   ng-pattern="/^[a-z0-9]([a-z0-9-.]{0,61}[a-z0-9])?$/"
                   ng-change="ctrl.onChangeName()"
-                  placeholder="my-configuration"
+                  placeholder="my-configmap-or-secret"
                   auto-focus
                   required
                   data-cy="k8sConfigCreate-nameInput"
@@ -81,10 +81,10 @@
             </div>
 
             <div ng-if="ctrl.formValues.ResourcePool">
-              <div class="col-sm-12 form-section-title"> Configuration kind </div>
+              <div class="col-sm-12 form-section-title"> Kind </div>
 
               <div class="form-group">
-                <div class="col-sm-12 small text-muted"> Select the kind of data that you want to save in the configuration. </div>
+                <div class="col-sm-12 small text-muted"> Select the kind of data that you want to save. </div>
               </div>
 
               <box-selector options="ctrl.typeOptions" value="ctrl.formValues.Kind" on-change="(ctrl.onChangeKind)" radio-name="'Kind'" slim="true"> </box-selector>

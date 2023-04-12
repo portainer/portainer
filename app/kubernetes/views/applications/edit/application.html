@@ -214,7 +214,7 @@
 
           <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px">
             <pr-icon icon="'info'" mode="'primary'" class="mr-1"></pr-icon>
-            This application is not using any environment variable or configuration.
+            This application is not using any environment variable, ConfigMap or Secret.
           </div>
 
           <table class="table" ng-if="ctrl.application.Env.length > 0">
