@@ -65,7 +65,7 @@ export function parseAxiosError(
   let resultMsg = msg;
 
   if (isAxiosError(err)) {
-    const { error, details } = parseError(err as AxiosError);
+    const { error, details } = parseError(err);
     resultErr = error;
     if (msg && details) {
       resultMsg = `${msg}: ${details}`;
