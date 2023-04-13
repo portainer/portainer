@@ -4,43 +4,43 @@ go 1.19
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/Microsoft/go-winio v0.5.1
+	github.com/Microsoft/go-winio v0.5.2
 	github.com/VictoriaMetrics/fastcache v1.12.0
-	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
-	github.com/aws/aws-sdk-go-v2 v1.11.1
-	github.com/aws/aws-sdk-go-v2/credentials v1.6.2
-	github.com/aws/aws-sdk-go-v2/service/ecr v1.10.1
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
+	github.com/aws/aws-sdk-go-v2 v1.17.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.2
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.14.0
 	github.com/cbroglie/mustache v1.4.0
 	github.com/coreos/go-semver v0.3.0
-	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
-	github.com/docker/cli v20.10.9+incompatible
+	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
+	github.com/docker/cli v20.10.12+incompatible
 	github.com/docker/docker v20.10.16+incompatible
 	github.com/fvbommel/sortorder v1.0.2
 	github.com/fxamacker/cbor/v2 v2.3.0
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
 	github.com/go-git/go-git/v5 v5.3.0
-	github.com/go-ldap/ldap/v3 v3.1.8
+	github.com/go-ldap/ldap/v3 v3.4.1
 	github.com/go-playground/validator/v10 v10.10.1
-	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/google/go-cmp v0.5.9
 	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/mux v1.7.3
+	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru v0.5.4
-	github.com/joho/godotenv v1.3.0
+	github.com/joho/godotenv v1.4.0
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
 	github.com/json-iterator/go v1.1.12
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
-	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
+	github.com/orcaman/concurrent-map v1.0.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/portainer/docker-compose-wrapper v0.0.0-20230301083819-3dbc6abf1ce7
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
 	github.com/portainer/libhttp v0.0.0-20230206214615-dabd58de9f44
 	github.com/portainer/portainer/pkg/featureflags v0.0.0-20230209201943-d73622ed9cd4
-	github.com/portainer/portainer/pkg/libhelm v0.0.0-20221201012749-4fee35924724
+	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230410231754-96474a42eacb
 	github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.29.0
@@ -48,8 +48,8 @@ require (
 	github.com/viney-shih/go-lock v1.1.1
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
-	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.26.1
@@ -59,13 +59,14 @@ require (
 )
 
 require (
+	github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20210208195552-ff826a37aa15 // indirect
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
-	github.com/aws/smithy-go v1.9.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.25 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.19 // indirect
+	github.com/aws/smithy-go v1.13.4 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
@@ -76,7 +77,7 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.3.1 // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.1.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
