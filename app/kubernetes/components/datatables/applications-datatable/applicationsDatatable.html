@@ -276,7 +276,7 @@
             </a>
             <a
               ng-if="!item.KubernetesApplications"
-              ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
+              ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool, 'resource-type': $ctrl.applicationTypeEnumToParamMap[item.ApplicationType] })"
               ng-click="$event.stopPropagation()"
               class="hyperlink"
               >{{ item.Name }}

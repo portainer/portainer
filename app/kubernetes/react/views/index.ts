@@ -8,9 +8,17 @@ import { IngressesDatatableView } from '@/react/kubernetes/ingresses/IngressData
 import { CreateIngressView } from '@/react/kubernetes/ingresses/CreateIngressView';
 import { DashboardView } from '@/react/kubernetes/DashboardView';
 import { ServicesView } from '@/react/kubernetes/ServicesView';
+import { ApplicationDetailsView } from '@/react/kubernetes/applications/DetailsView';
 
 export const viewsModule = angular
   .module('portainer.kubernetes.react.views', [])
+  .component(
+    'kubernetesApplicationDetailsView',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(ApplicationDetailsView))),
+      []
+    )
+  )
   .component(
     'kubernetesServicesView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ServicesView))), [])
