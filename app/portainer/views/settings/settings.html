@@ -273,10 +273,11 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="download" title-text="Backup Portainer"></rd-widget-header>
+      <rd-widget-header icon="download" title-text="Back up Portainer"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
           <div class="col-sm-12 form-section-title"> Backup configuration </div>
+          <div class="text-muted small mb-3">This will back up your Portainer server configuration and does not include containers.</div>
 
           <box-selector slim="true" options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
 
