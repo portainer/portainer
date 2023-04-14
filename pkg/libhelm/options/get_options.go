@@ -17,4 +17,6 @@ type GetOptions struct {
 	Namespace               string
 	ReleaseResource         releaseResource
 	KubernetesClusterAccess *KubernetesClusterAccess
+
+	Env []string
 }

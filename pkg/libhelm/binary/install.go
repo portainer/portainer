@@ -33,7 +33,7 @@ func (hbpm *helmBinaryPackageManager) Install(installOpts options.InstallOptions
 		args = append(args, "--post-renderer", installOpts.PostRenderer)
 	}
 
-	result, err := hbpm.runWithKubeConfig("install", args, installOpts.KubernetesClusterAccess)
+	result, err := hbpm.runWithKubeConfig("install", args, installOpts.KubernetesClusterAccess, installOpts.Env)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run helm install on specified args")
 	}
