@@ -15,7 +15,7 @@ on:
     
 jobs:
   client-dependencies:
-    name: Client dependency check
+    name: Client Dependency Check
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
@@ -23,9 +23,10 @@ jobs:
     outputs:
       jsdiff: ${{ steps.set-diff-matrix.outputs.js_diff_result }}
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout Repository
+        uses: actions/checkout@master
 
-      - name: Run Snyk to check for vulnerabilities
+      - name: Scan Vulnerability by Snyk 
         uses: snyk/actions/node@master
         continue-on-error: true # To make sure that artifact upload gets called
         env:
@@ -33,13 +34,13 @@ jobs:
         with:
           json: true
 
-      - name: Upload js security scan result as artifact
+      - name: Upload Scan Result As Pull-Request Artifact
         uses: actions/upload-artifact@v3
         with:
           name: js-security-scan-feat-result
           path: snyk.json
 
-      - name: Download artifacts from develop branch
+      - name: Download Artifacts From develop Branch Built By Nightly Scan
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -51,24 +52,24 @@ jobs:
             echo "null" > ./js-snyk-develop.json
           fi
 
-      - name: Export scan result to html file 
+      - name: PR vs Develop Scan Report Comparison Export to HTML
         run: | 
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="/data/js-snyk-develop.json" -output-type=table -export -export-filename="/data/js-result")
 
-      - name: Upload js result html file
+      - name: Upload HTML File As Artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-js-result-compare-to-develop-${{github.run_id}}
           path: js-result.html
 
-      - name: Analyse the js diff result
+      - name: Analyse Different Vulnerabilites Compared to develop Branch
         id: set-diff-matrix
         run: | 
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="./data/js-snyk-develop.json" -output-type=matrix)
-          echo "::set-output name=js_diff_result::${result}"
+          echo "js_diff_result=${result}" >> $GITHUB_OUTPUT
 
   server-dependencies:
-    name: Server dependency check
+    name: Server Dependency Check
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
@@ -76,16 +77,18 @@ jobs:
     outputs:
       godiff: ${{ steps.set-diff-matrix.outputs.go_diff_result }}
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout Repository
+        uses: actions/checkout@master
 
-      - uses: actions/setup-go@v3
+      - name: Install Golang
+        uses: actions/setup-go@v3
         with:
           go-version: '1.19.4'
 
-      - name: Download go modules
+      - name: Download Go Modules
         run: cd ./api && go get -t -v -d ./...
 
-      - name: Run Snyk to check for vulnerabilities
+      - name: Scan Vulnerability by Snyk
         continue-on-error: true # To make sure that artifact upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -93,13 +96,13 @@ jobs:
           yarn global add snyk
           snyk test --file=./api/go.mod --json-file-output=snyk.json 2>/dev/null || :
 
-      - name: Upload go security scan result as artifact
+      - name: Upload Scan Result As Pull-Request Artifact
         uses: actions/upload-artifact@v3
         with:
           name: go-security-scan-feature-result
           path: snyk.json
 
-      - name: Download artifacts from develop branch
+      - name: Download Artifacts From develop Branch Built By Nightly Scan
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -111,24 +114,24 @@ jobs:
             echo "null" > ./go-snyk-develop.json
           fi
 
-      - name: Export scan result to html file 
+      - name: PR vs Develop Scan Report Comparison Export to HTML
         run: | 
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="/data/go-snyk-develop.json" -output-type=table -export -export-filename="/data/go-result")
 
-      - name: Upload go result html file
+      - name: Upload HTML File As Artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-go-result-compare-to-develop-${{github.run_id}}
           path: go-result.html
 
-      - name: Analyse the go diff result
+      - name: Analyse Different Vulnerabilites Aginst develop Branch
         id: set-diff-matrix
         run: | 
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="/data/go-snyk-develop.json" -output-type=matrix)
-          echo "::set-output name=go_diff_result::${result}"
+          echo "go_diff_result=${result}" >> $GITHUB_OUTPUT
 
   image-vulnerability:
-    name: Build docker image and Image vulnerability check
+    name: Image Vulnerability Check
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
@@ -167,19 +170,19 @@ jobs:
         run: |
           docker load --input /tmp/trivy-portainer-image.tar
 
-      - name: Run Trivy vulnerability scanner
+      - name: Scan Vulnerability by Trivy
         uses: docker://docker.io/aquasec/trivy:latest
         continue-on-error: true 
         with:
           args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
 
-      - name: Upload image security scan result as artifact
+      - name: Upload Image Security Scan Result As Artifact
         uses: actions/upload-artifact@v3
         with:
           name: image-security-scan-feature-result
           path: image-trivy.json
 
-      - name: Download artifacts from develop branch
+      - name: Download Artifacts From develop Branch Built By Nightly Scan
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -191,24 +194,24 @@ jobs:
             echo "null" > ./image-trivy-develop.json
           fi
 
-      - name: Export scan result to html file 
+      - name: PR vs Develop Scan Report Comparison Export to HTML
         run: | 
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="/data/image-trivy-develop.json" -output-type=table -export -export-filename="/data/image-result")
 
-      - name: Upload image result html file
+      - name: Upload HTML File As Artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-image-result-compare-to-develop-${{github.run_id}}
           path: image-result.html
 
-      - name: Analyse the image diff result
+      - name: Analyse Different Vulnerabilites Aginst develop Branch
         id: set-diff-matrix
         run: | 
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="./data/image-trivy-develop.json" -output-type=matrix)
-          echo "::set-output name=image_diff_result::${result}"
+          echo "image_diff_result=${result}" >> $GITHUB_OUTPUT
 
   result-analysis:
-    name: Analyse scan result compared to develop
+    name: Analyse Scan Result Against develop Branch
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
@@ -220,8 +223,7 @@ jobs:
         godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
         imagediff: ${{fromJson(needs.image-vulnerability.outputs.imagediff)}}
     steps:
-
-      - name: Check job status of diff result
+      - name: Check Job Status of Diff Result
         if: >-
           matrix.jsdiff.status == 'failure' ||
           matrix.godiff.status == 'failure' ||
