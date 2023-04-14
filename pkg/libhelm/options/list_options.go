@@ -6,4 +6,6 @@ type ListOptions struct {
 	Selector                string
 	Namespace               string
 	KubernetesClusterAccess *KubernetesClusterAccess
+
+	Env []string
 }

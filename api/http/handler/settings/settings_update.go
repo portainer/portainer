@@ -143,7 +143,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 			newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
 
 			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
-				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
+				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL, nil)
 				if err != nil {
 					return httperror.BadRequest("Invalid Helm repository URL. Must correspond to a valid URL format", err)
 				}
