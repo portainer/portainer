@@ -33,6 +33,13 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       },
     };
 
+    this.applicationTypeEnumToParamMap = {
+      [KubernetesApplicationTypes.DEPLOYMENT]: 'Deployment',
+      [KubernetesApplicationTypes.DAEMONSET]: 'DaemonSet',
+      [KubernetesApplicationTypes.STATEFULSET]: 'StatefulSet',
+      [KubernetesApplicationTypes.POD]: 'Pod',
+    };
+
     this.expandAll = function () {
       this.state.expandAll = !this.state.expandAll;
       this.state.filteredDataSet.forEach((item) => this.expandItem(item, this.state.expandAll));

@@ -143,6 +143,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/angular": "^1.8.3",
     "@types/file-saver": "^2.0.4",
+    "@types/filesize-parser": "^1.5.1",
     "@types/jest": "^27.0.3",
     "@types/jquery": "^3.5.10",
     "@types/mustache": "^4.1.2",

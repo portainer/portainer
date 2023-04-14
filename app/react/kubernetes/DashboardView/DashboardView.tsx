@@ -8,7 +8,7 @@ import { DashboardItem } from '@@/DashboardItem/DashboardItem';
 import { PageHeader } from '@@/PageHeader';
 
 import { useNamespaces } from '../namespaces/queries';
-import { useApplicationsForCluster } from '../applications/queries';
+import { useApplicationsForCluster } from '../applications/application.queries';
 import { useConfigurationsForCluster } from '../configs/queries';
 import { usePVCsForCluster } from '../volumes/queries';
 
