@@ -109,7 +109,7 @@ export function SettingsFDOForm({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
-                <TextTip color="blue">
+                <TextTip color="blue" className="mb-2">
                   When enabled, this will allow Portainer to interact with FDO
                   Services.
                 </TextTip>
@@ -185,7 +185,7 @@ export function SettingsFDOForm({ settings, onSubmit }: Props) {
           {edgeComputeFeaturesEnabled && isFDOEnabled && (
             <div className={styles.fdoTable}>
               <FormSectionTitle>Device Profiles</FormSectionTitle>
-              <TextTip color="blue">
+              <TextTip color="blue" className="mb-2">
                 Add, Edit and Manage the list of device profiles available
                 during FDO device setup
               </TextTip>
