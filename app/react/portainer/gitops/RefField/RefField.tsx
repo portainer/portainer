@@ -80,7 +80,7 @@ function Wrapper({
 }: PropsWithChildren<{ tip: ReactNode; errors?: string }>) {
   return (
     <div className="form-group">
-      <span className="col-sm-12">
+      <span className="col-sm-12 mb-2">
         <TextTip color="blue">{tip}</TextTip>
       </span>
       <div className="col-sm-12">
