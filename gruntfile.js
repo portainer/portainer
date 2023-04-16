@@ -29,7 +29,7 @@ module.exports = function (grunt) {
       dockerVersion: 'v20.10.21',
       dockerComposePluginVersion: 'v2.17.2',
       helmVersion: 'v3.11.2',
-      kubectlVersion: 'v1.24.1',
+      kubectlVersion: 'v1.26.3',
     },
     env: gruntConfig.env,
     clean: gruntConfig.clean,
