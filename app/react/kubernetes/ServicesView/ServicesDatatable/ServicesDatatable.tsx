@@ -182,7 +182,7 @@ function TableActions({ selectedItems }: TableActionsProps) {
         <Link
           to="kubernetes.deploy"
           params={{ referrer: 'kubernetes.services' }}
-          className="space-left hover:no-underline"
+          className="space-left hover:no-decoration"
         >
           <Button className="btn-wrapper" color="primary" icon="plus">
             Create from manifest
