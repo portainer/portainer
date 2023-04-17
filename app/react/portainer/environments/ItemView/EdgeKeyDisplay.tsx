@@ -18,7 +18,9 @@ export function EdgeKeyDisplay({ edgeKey }: { edgeKey: string }) {
 
       <Code>{edgeKey}</Code>
 
-      <CopyButton copyText={edgeKey}>Copy token</CopyButton>
+      <CopyButton copyText={edgeKey} className="mt-2">
+        Copy token
+      </CopyButton>
     </FormSection>
   );
 }
