@@ -36,7 +36,7 @@ function TimeWindowDisplay() {
   );
 
   return (
-    <TextTip color="orange">
+    <TextTip color="orange" className="mb-2">
       A change window is enabled, automatic updates will not occur outside of{' '}
       <span className="font-bold">
         {shortTime(startTimeUtc)} - {shortTime(endTimeUtc)} UTC (

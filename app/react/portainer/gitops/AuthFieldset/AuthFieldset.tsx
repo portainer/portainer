@@ -57,7 +57,7 @@ export function AuthFieldset({
       {value.RepositoryAuthentication && (
         <>
           {isAuthExplanationVisible && (
-            <TextTip color="orange">
+            <TextTip color="orange" className="mb-2">
               Enabling authentication will store the credentials and it is
               advisable to use a git service account
             </TextTip>

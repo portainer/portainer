@@ -33,7 +33,7 @@ export function AutoUpdateSettings({
 }) {
   return (
     <>
-      <TextTip color="orange">
+      <TextTip color="orange" className="mb-2">
         Any changes to this stack or application that have been made locally via
         Portainer or directly in the cluster will be overwritten by the git
         repository content, which may cause service interruption.
