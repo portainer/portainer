@@ -1,14 +1,7 @@
 package team
 
 import (
-	"errors"
-	"fmt"
-	"strings"
-
 	portainer "github.com/portainer/portainer/api"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -27,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -40,89 +33,92 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Team returns a Team by ID
 func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
 	var team portainer.Team
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &team)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &team)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &team, nil
 }
 
 // TeamByName returns a team by name.
 func (service *Service) TeamByName(name string) (*portainer.Team, error) {
-	var t *portainer.Team
+	// var t *portainer.Team
 
-	stop := fmt.Errorf("ok")
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Team{},
-		func(obj interface{}) (interface{}, error) {
-			team, ok := obj.(*portainer.Team)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Team object")
-				return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
-			}
+	// stop := fmt.Errorf("ok")
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.Team{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		team, ok := obj.(*portainer.Team)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Team object")
+	// 			return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
+	// 		}
 
-			if strings.EqualFold(team.Name, name) {
-				t = team
-				return nil, stop
-			}
+	// 		if strings.EqualFold(team.Name, name) {
+	// 			t = team
+	// 			return nil, stop
+	// 		}
 
-			return &portainer.Team{}, nil
-		})
-	if errors.Is(err, stop) {
-		return t, nil
-	}
-	if err == nil {
-		return nil, dserrors.ErrObjectNotFound
-	}
+	// 		return &portainer.Team{}, nil
+	// 	})
+	// if errors.Is(err, stop) {
+	// 	return t, nil
+	// }
+	// if err == nil {
+	// 	return nil, dserrors.ErrObjectNotFound
+	// }
 
-	return nil, err
+	return nil, nil
 }
 
 // Teams return an array containing all the teams.
 func (service *Service) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Team{},
-		func(obj interface{}) (interface{}, error) {
-			team, ok := obj.(*portainer.Team)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Team object")
-				return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.Team{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		team, ok := obj.(*portainer.Team)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Team object")
+	// 			return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
+	// 		}
 
-			teams = append(teams, *team)
+	// 		teams = append(teams, *team)
 
-			return &portainer.Team{}, nil
-		})
+	// 		return &portainer.Team{}, nil
+	// 	})
 
-	return teams, err
+	return teams, nil
 }
 
 // UpdateTeam saves a Team.
 func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, team)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, team)
+	return nil
 }
 
 // CreateTeam creates a new Team.
 func (service *Service) Create(team *portainer.Team) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			team.ID = portainer.TeamID(id)
-			return int(team.ID), team
-		},
-	)
+	// return service.connection.CreateObject(
+	// 	BucketName,
+	// 	func(id uint64) (int, interface{}) {
+	// 		team.ID = portainer.TeamID(id)
+	// 		return int(team.ID), team
+	// 	},
+	// )
+	return nil
 }
 
 // DeleteTeam deletes a Team.
 func (service *Service) DeleteTeam(ID portainer.TeamID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }

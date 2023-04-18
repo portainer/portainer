@@ -1,11 +1,7 @@
 package endpointgroup
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,11 +20,6 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -44,57 +35,38 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 // EndpointGroup returns an environment(endpoint) group by ID.
 func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.EndpointGroup, error) {
 	var endpointGroup portainer.EndpointGroup
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &endpointGroup)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &endpointGroup)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &endpointGroup, nil
 }
 
 // UpdateEndpointGroup updates an environment(endpoint) group.
 func (service *Service) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, endpointGroup)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, endpointGroup)
+	return nil
 }
 
 // DeleteEndpointGroup deletes an environment(endpoint) group.
 func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }
 
 // EndpointGroups return an array containing all the environment(endpoint) groups.
 func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	var endpointGroups = make([]portainer.EndpointGroup, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.EndpointGroup{},
-		func(obj interface{}) (interface{}, error) {
-			endpointGroup, ok := obj.(*portainer.EndpointGroup)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointGroup object")
-				return nil, fmt.Errorf("Failed to convert to EndpointGroup object: %s", obj)
-			}
-
-			endpointGroups = append(endpointGroups, *endpointGroup)
-
-			return &portainer.EndpointGroup{}, nil
-		})
-
-	return endpointGroups, err
+	return endpointGroups, nil
 }
 
 // CreateEndpointGroup assign an ID to a new environment(endpoint) group and saves it.
 func (service *Service) Create(endpointGroup *portainer.EndpointGroup) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			endpointGroup.ID = portainer.EndpointGroupID(id)
-			return int(endpointGroup.ID), endpointGroup
-		},
-	)
+	return nil
 }

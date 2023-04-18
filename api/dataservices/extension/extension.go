@@ -1,11 +1,7 @@
 package extension
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -37,12 +33,12 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Extension returns a extension by ID
 func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extension, error) {
 	var extension portainer.Extension
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &extension)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &extension)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &extension, nil
 }
@@ -51,31 +47,33 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 func (service *Service) Extensions() ([]portainer.Extension, error) {
 	var extensions = make([]portainer.Extension, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Extension{},
-		func(obj interface{}) (interface{}, error) {
-			extension, ok := obj.(*portainer.Extension)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Extension object")
-				return nil, fmt.Errorf("Failed to convert to Extension object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.Extension{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		extension, ok := obj.(*portainer.Extension)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Extension object")
+	// 			return nil, fmt.Errorf("Failed to convert to Extension object: %s", obj)
+	// 		}
 
-			extensions = append(extensions, *extension)
+	// 		extensions = append(extensions, *extension)
 
-			return &portainer.Extension{}, nil
-		})
+	// 		return &portainer.Extension{}, nil
+	// 	})
 
-	return extensions, err
+	return extensions, nil
 }
 
 // Persist persists a extension inside the database.
 func (service *Service) Persist(extension *portainer.Extension) error {
-	return service.connection.CreateObjectWithId(BucketName, int(extension.ID), extension)
+	// return service.connection.CreateObjectWithId(BucketName, int(extension.ID), extension)
+	return nil
 }
 
 // DeleteExtension deletes a Extension.
 func (service *Service) DeleteExtension(ID portainer.ExtensionID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }

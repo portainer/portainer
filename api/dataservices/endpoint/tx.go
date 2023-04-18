@@ -21,24 +21,24 @@ func (service ServiceTx) BucketName() string {
 // Endpoint returns an environment(endpoint) by ID.
 func (service ServiceTx) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var endpoint portainer.Endpoint
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.GetObject(BucketName, identifier, &endpoint)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &endpoint)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &endpoint, nil
 }
 
 // UpdateEndpoint updates an environment(endpoint).
 func (service ServiceTx) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.UpdateObject(BucketName, identifier, endpoint)
-	if err != nil {
-		return err
-	}
+	// err := service.tx.UpdateObject(BucketName, identifier, endpoint)
+	// if err != nil {
+	// 	return err
+	// }
 
 	service.service.mu.Lock()
 	if len(endpoint.EdgeID) > 0 {
@@ -54,12 +54,12 @@ func (service ServiceTx) UpdateEndpoint(ID portainer.EndpointID, endpoint *porta
 
 // DeleteEndpoint deletes an environment(endpoint).
 func (service ServiceTx) DeleteEndpoint(ID portainer.EndpointID) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.DeleteObject(BucketName, identifier)
-	if err != nil {
-		return err
-	}
+	// err := service.tx.DeleteObject(BucketName, identifier)
+	// if err != nil {
+	// 	return err
+	// }
 
 	service.service.mu.Lock()
 	for edgeID, endpointID := range service.service.idxEdgeID {

@@ -2,7 +2,6 @@ package dataservices
 
 import (
 	"errors"
-	"io"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -44,12 +43,8 @@ type (
 		Open() (newStore bool, err error)
 		Init() error
 		Close() error
-		UpdateTx(func(DataStoreTx) error) error
-		ViewTx(func(DataStoreTx) error) error
-		MigrateData() error
 		Rollback(force bool) error
 		CheckCurrentEdition() error
-		BackupTo(w io.Writer) error
 		Export(filename string) (err error)
 
 		DataStoreTx
@@ -57,7 +52,6 @@ type (
 
 	// CustomTemplateService represents a service to manage custom templates
 	CustomTemplateService interface {
-		GetNextIdentifier() int
 		CustomTemplates() ([]portainer.CustomTemplate, error)
 		CustomTemplate(ID portainer.CustomTemplateID) (*portainer.CustomTemplate, error)
 		Create(customTemplate *portainer.CustomTemplate) error
@@ -85,7 +79,6 @@ type (
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
-		GetNextIdentifier() int
 		BucketName() string
 	}
 
@@ -99,7 +92,6 @@ type (
 		UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
 		DeleteEdgeStack(ID portainer.EdgeStackID) error
-		GetNextIdentifier() int
 		BucketName() string
 	}
 
@@ -113,7 +105,6 @@ type (
 		Create(endpoint *portainer.Endpoint) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
 		DeleteEndpoint(ID portainer.EndpointID) error
-		GetNextIdentifier() int
 		BucketName() string
 	}
 
@@ -144,7 +135,6 @@ type (
 		Create(FDOProfile *portainer.FDOProfile) error
 		Update(ID portainer.FDOProfileID, FDOProfile *portainer.FDOProfile) error
 		Delete(ID portainer.FDOProfileID) error
-		GetNextIdentifier() int
 		BucketName() string
 	}
 
@@ -239,7 +229,6 @@ type (
 		Create(stack *portainer.Stack) error
 		UpdateStack(ID portainer.StackID, stack *portainer.Stack) error
 		DeleteStack(ID portainer.StackID) error
-		GetNextIdentifier() int
 		StackByWebhookID(ID string) (*portainer.Stack, error)
 		RefreshableStacks() ([]portainer.Stack, error)
 		BucketName() string

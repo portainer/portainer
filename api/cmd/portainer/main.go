@@ -18,7 +18,6 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/database"
-	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
@@ -30,6 +29,7 @@ import (
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http"
+	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -83,14 +83,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		log.Fatal().Err(err).Msg("failed creating database connection")
 	}
 
-	if bconn, ok := connection.(*boltdb.DbConnection); ok {
-		bconn.MaxBatchSize = *flags.MaxBatchSize
-		bconn.MaxBatchDelay = *flags.MaxBatchDelay
-		bconn.InitialMmapSize = *flags.InitialMmapSize
-	} else {
-		log.Fatal().Msg("failed creating database connection: expecting a boltdb database type but a different one was received")
-	}
-
 	store := datastore.NewStore(*flags.Data, fileService, connection)
 	isNew, err := store.Open()
 	if err != nil {
@@ -132,10 +124,10 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 			log.Fatal().Err(err).Msg("failed updating settings from flags")
 		}
 	} else {
-		err = store.MigrateData()
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed migration")
-		}
+		// err = store.MigrateData()
+		// if err != nil {
+		// 	log.Fatal().Err(err).Msg("failed migration")
+		// }
 	}
 
 	err = updateSettingsFromFlags(store, flags)
@@ -345,6 +337,143 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 		return loadAndParseKeyPair(fileService, signatureService)
 	}
 	return generateAndStoreKeyPair(fileService, signatureService)
+}
+
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
+	tlsConfiguration := portainer.TLSConfiguration{
+		TLS:           *flags.TLS,
+		TLSSkipVerify: *flags.TLSSkipVerify,
+	}
+
+	if *flags.TLS {
+		tlsConfiguration.TLSCACertPath = *flags.TLSCacert
+		tlsConfiguration.TLSCertPath = *flags.TLSCert
+		tlsConfiguration.TLSKeyPath = *flags.TLSKey
+	} else if !*flags.TLS && *flags.TLSSkipVerify {
+		tlsConfiguration.TLS = true
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:               "primary",
+		URL:                *flags.EndpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          tlsConfiguration,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		TagIDs:             []portainer.TagID{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
+
+		SecuritySettings: portainer.EndpointSecuritySettings{
+			AllowVolumeBrowserForRegularUsers: false,
+			EnableHostManagementFeatures:      false,
+
+			AllowSysctlSettingForRegularUsers:         true,
+			AllowBindMountsForRegularUsers:            true,
+			AllowPrivilegedModeForRegularUsers:        true,
+			AllowHostNamespaceForRegularUsers:         true,
+			AllowContainerCapabilitiesForRegularUsers: true,
+			AllowDeviceMappingForRegularUsers:         true,
+			AllowStackManagementForRegularUsers:       true,
+		},
+	}
+
+	if strings.HasPrefix(endpoint.URL, "tcp://") {
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(tlsConfiguration.TLSCACertPath, tlsConfiguration.TLSCertPath, tlsConfiguration.TLSKeyPath, tlsConfiguration.TLSSkipVerify)
+		if err != nil {
+			return err
+		}
+
+		agentOnDockerEnvironment, err := client.ExecutePingOperation(endpoint.URL, tlsConfig)
+		if err != nil {
+			return err
+		}
+
+		if agentOnDockerEnvironment {
+			endpoint.Type = portainer.AgentOnDockerEnvironment
+		}
+	}
+
+	err := snapshotService.SnapshotEndpoint(endpoint)
+	if err != nil {
+		log.Error().
+			Str("endpoint", endpoint.Name).
+			Str("URL", endpoint.URL).
+			Err(err).
+			Msg("environment snapshot error")
+	}
+
+	return dataStore.Endpoint().Create(endpoint)
+}
+
+func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
+	if strings.HasPrefix(endpointURL, "tcp://") {
+		_, err := client.ExecutePingOperation(endpointURL, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:               "primary",
+		URL:                endpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          portainer.TLSConfiguration{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		TagIDs:             []portainer.TagID{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
+
+		SecuritySettings: portainer.EndpointSecuritySettings{
+			AllowVolumeBrowserForRegularUsers: false,
+			EnableHostManagementFeatures:      false,
+
+			AllowSysctlSettingForRegularUsers:         true,
+			AllowBindMountsForRegularUsers:            true,
+			AllowPrivilegedModeForRegularUsers:        true,
+			AllowHostNamespaceForRegularUsers:         true,
+			AllowContainerCapabilitiesForRegularUsers: true,
+			AllowDeviceMappingForRegularUsers:         true,
+			AllowStackManagementForRegularUsers:       true,
+		},
+	}
+
+	err := snapshotService.SnapshotEndpoint(endpoint)
+	if err != nil {
+		log.Error().
+			Str("endpoint", endpoint.Name).
+			Str("URL", endpoint.URL).Err(err).
+			Msg("environment snapshot error")
+	}
+
+	return dataStore.Endpoint().Create(endpoint)
+}
+
+func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
+	if *flags.EndpointURL == "" {
+		return nil
+	}
+
+	endpoints, err := dataStore.Endpoint().Endpoints()
+	if err != nil {
+		return err
+	}
+
+	if len(endpoints) > 0 {
+		log.Info().Msg("instance already has defined environments, skipping the environment defined via CLI")
+
+		return nil
+	}
+
+	if *flags.TLS || *flags.TLSSkipVerify {
+		return createTLSSecuredEndpoint(flags, dataStore, snapshotService)
+	}
+	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
 func loadEncryptionSecretKey(keyfilename string) []byte {

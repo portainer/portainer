@@ -43,12 +43,12 @@ func (service ServiceTx) EndpointRelations() ([]portainer.EndpointRelation, erro
 // EndpointRelation returns an Environment(Endpoint) relation object by EndpointID
 func (service ServiceTx) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
 	var endpointRelation portainer.EndpointRelation
-	identifier := service.service.connection.ConvertToKey(int(endpointID))
+	// identifier := service.service.connection.ConvertToKey(int(endpointID))
 
-	err := service.tx.GetObject(BucketName, identifier, &endpointRelation)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &endpointRelation)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &endpointRelation, nil
 }
@@ -65,12 +65,12 @@ func (service ServiceTx) Create(endpointRelation *portainer.EndpointRelation) er
 func (service ServiceTx) UpdateEndpointRelation(endpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	previousRelationState, _ := service.EndpointRelation(endpointID)
 
-	identifier := service.service.connection.ConvertToKey(int(endpointID))
-	err := service.tx.UpdateObject(BucketName, identifier, endpointRelation)
-	cache.Del(endpointID)
-	if err != nil {
-		return err
-	}
+	// identifier := service.service.connection.ConvertToKey(int(endpointID))
+	// err := service.tx.UpdateObject(BucketName, identifier, endpointRelation)
+	// cache.Del(endpointID)
+	// if err != nil {
+	// 	return err
+	// }
 
 	updatedRelationState, _ := service.EndpointRelation(endpointID)
 
@@ -83,12 +83,12 @@ func (service ServiceTx) UpdateEndpointRelation(endpointID portainer.EndpointID,
 func (service ServiceTx) DeleteEndpointRelation(endpointID portainer.EndpointID) error {
 	deletedRelation, _ := service.EndpointRelation(endpointID)
 
-	identifier := service.service.connection.ConvertToKey(int(endpointID))
-	err := service.tx.DeleteObject(BucketName, identifier)
-	cache.Del(endpointID)
-	if err != nil {
-		return err
-	}
+	// identifier := service.service.connection.ConvertToKey(int(endpointID))
+	// err := service.tx.DeleteObject(BucketName, identifier)
+	// cache.Del(endpointID)
+	// if err != nil {
+	// 	return err
+	// }
 
 	service.updateEdgeStacksAfterRelationChange(deletedRelation, nil)
 

@@ -1,11 +1,7 @@
 package fdoprofile
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -38,58 +34,56 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) FDOProfiles() ([]portainer.FDOProfile, error) {
 	var fdoProfiles = make([]portainer.FDOProfile, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.FDOProfile{},
-		func(obj interface{}) (interface{}, error) {
-			fdoProfile, ok := obj.(*portainer.FDOProfile)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to FDOProfile object")
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.FDOProfile{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		fdoProfile, ok := obj.(*portainer.FDOProfile)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to FDOProfile object")
 
-				return nil, fmt.Errorf("Failed to convert to FDOProfile object: %s", obj)
-			}
-			fdoProfiles = append(fdoProfiles, *fdoProfile)
-			return &portainer.FDOProfile{}, nil
-		})
+	// 			return nil, fmt.Errorf("Failed to convert to FDOProfile object: %s", obj)
+	// 		}
+	// 		fdoProfiles = append(fdoProfiles, *fdoProfile)
+	// 		return &portainer.FDOProfile{}, nil
+	// 	})
 
-	return fdoProfiles, err
+	return fdoProfiles, nil
 }
 
 // FDOProfile returns an FDO Profile by ID.
 func (service *Service) FDOProfile(ID portainer.FDOProfileID) (*portainer.FDOProfile, error) {
 	var FDOProfile portainer.FDOProfile
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &FDOProfile)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &FDOProfile)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &FDOProfile, nil
 }
 
 // Create assign an ID to a new FDO Profile and saves it.
 func (service *Service) Create(FDOProfile *portainer.FDOProfile) error {
-	return service.connection.CreateObjectWithId(
-		BucketName,
-		int(FDOProfile.ID),
-		FDOProfile,
-	)
+	// return service.connection.CreateObjectWithId(
+	// 	BucketName,
+	// 	int(FDOProfile.ID),
+	// 	FDOProfile,
+	// )
+	return nil
 }
 
 // Update updates an FDO Profile.
 func (service *Service) Update(ID portainer.FDOProfileID, FDOProfile *portainer.FDOProfile) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, FDOProfile)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, FDOProfile)
+	return nil
 }
 
 // Delete deletes an FDO Profile.
 func (service *Service) Delete(ID portainer.FDOProfileID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
-}
-
-// GetNextIdentifier returns the next identifier for a FDO Profile.
-func (service *Service) GetNextIdentifier() int {
-	return service.connection.GetNextIdentifier(BucketName)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }

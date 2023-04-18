@@ -1,12 +1,9 @@
 package version
 
 import (
-	"errors"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 const (
@@ -23,10 +20,10 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -64,16 +61,17 @@ func (service *Service) Edition() (portainer.SoftwareEdition, error) {
 // IsUpdating retrieves the database updating status.
 func (service *Service) IsUpdating() (bool, error) {
 	var isUpdating bool
-	err := service.connection.GetObject(BucketName, []byte(updatingKey), &isUpdating)
-	if err != nil && errors.Is(err, dserrors.ErrObjectNotFound) {
-		return false, nil
-	}
-	return isUpdating, err
+	// err := service.connection.GetObject(BucketName, []byte(updatingKey), &isUpdating)
+	// if err != nil && errors.Is(err, dserrors.ErrObjectNotFound) {
+	// 	return false, nil
+	// }
+	return isUpdating, nil
 }
 
 // StoreIsUpdating store the database updating status.
 func (service *Service) StoreIsUpdating(isUpdating bool) error {
-	return service.connection.DeleteObject(BucketName, []byte(updatingKey))
+	// return service.connection.DeleteObject(BucketName, []byte(updatingKey))
+	return nil
 }
 
 // InstanceID retrieves the stored instance ID.
@@ -105,15 +103,16 @@ func (service *Service) UpdateInstanceID(id string) error {
 func (service *Service) Version() (*models.Version, error) {
 	var v models.Version
 
-	err := service.connection.GetObject(BucketName, []byte(versionKey), &v)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, []byte(versionKey), &v)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &v, nil
 }
 
 // UpdateVersion persists a Version object.
 func (service *Service) UpdateVersion(version *models.Version) error {
-	return service.connection.UpdateObject(BucketName, []byte(versionKey), version)
+	// return service.connection.UpdateObject(BucketName, []byte(versionKey), version)
+	return nil
 }

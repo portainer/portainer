@@ -1,11 +1,7 @@
 package schedule
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -37,48 +33,50 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Schedule returns a schedule by ID.
 func (service *Service) Schedule(ID portainer.ScheduleID) (*portainer.Schedule, error) {
 	var schedule portainer.Schedule
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &schedule)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &schedule)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &schedule, nil
 }
 
 // UpdateSchedule updates a schedule.
 func (service *Service) UpdateSchedule(ID portainer.ScheduleID, schedule *portainer.Schedule) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, schedule)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, schedule)
+	return nil
 }
 
 // DeleteSchedule deletes a schedule.
 func (service *Service) DeleteSchedule(ID portainer.ScheduleID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }
 
 // Schedules return a array containing all the schedules.
 func (service *Service) Schedules() ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Schedule{},
-		func(obj interface{}) (interface{}, error) {
-			schedule, ok := obj.(*portainer.Schedule)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
-				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.Schedule{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		schedule, ok := obj.(*portainer.Schedule)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
+	// 			return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
+	// 		}
 
-			schedules = append(schedules, *schedule)
+	// 		schedules = append(schedules, *schedule)
 
-			return &portainer.Schedule{}, nil
-		})
+	// 		return &portainer.Schedule{}, nil
+	// 	})
 
-	return schedules, err
+	return schedules, nil
 }
 
 // SchedulesByJobType return a array containing all the schedules
@@ -86,32 +84,28 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Schedule{},
-		func(obj interface{}) (interface{}, error) {
-			schedule, ok := obj.(*portainer.Schedule)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
-				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.Schedule{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		schedule, ok := obj.(*portainer.Schedule)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
+	// 			return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
+	// 		}
 
-			if schedule.JobType == jobType {
-				schedules = append(schedules, *schedule)
-			}
+	// 		if schedule.JobType == jobType {
+	// 			schedules = append(schedules, *schedule)
+	// 		}
 
-			return &portainer.Schedule{}, nil
-		})
+	// 		return &portainer.Schedule{}, nil
+	// 	})
 
-	return schedules, err
+	return schedules, nil
 }
 
 // Create assign an ID to a new schedule and saves it.
 func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
-	return service.connection.CreateObjectWithId(BucketName, int(schedule.ID), schedule)
-}
-
-// GetNextIdentifier returns the next identifier for a schedule.
-func (service *Service) GetNextIdentifier() int {
-	return service.connection.GetNextIdentifier(BucketName)
+	// return service.connection.CreateObjectWithId(BucketName, int(schedule.ID), schedule)
+	return nil
 }

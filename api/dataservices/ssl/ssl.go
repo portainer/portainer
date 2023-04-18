@@ -21,11 +21,6 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -35,15 +30,11 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) Settings() (*portainer.SSLSettings, error) {
 	var settings portainer.SSLSettings
 
-	err := service.connection.GetObject(BucketName, []byte(key), &settings)
-	if err != nil {
-		return nil, err
-	}
-
 	return &settings, nil
 }
 
 // UpdateSettings persists a SSLSettings object.
 func (service *Service) UpdateSettings(settings *portainer.SSLSettings) error {
-	return service.connection.UpdateObject(BucketName, []byte(key), settings)
+	// return service.connection.UpdateObject(BucketName, []byte(key), settings)
+	return nil
 }

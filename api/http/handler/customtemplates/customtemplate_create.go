@@ -156,9 +156,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 		return nil, err
 	}
 
-	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:          portainer.CustomTemplateID(customTemplateID),
 		Title:       payload.Title,
 		EntryPoint:  filesystem.ComposeFileDefaultName,
 		Description: payload.Description,
@@ -169,7 +167,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 		Variables:   payload.Variables,
 	}
 
-	templateFolder := strconv.Itoa(customTemplateID)
+	templateFolder := strconv.Itoa(int(customTemplate.ID))
 	projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
 	if err != nil {
 		return nil, err
@@ -270,9 +268,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		return nil, err
 	}
 
-	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:              portainer.CustomTemplateID(customTemplateID),
 		Title:           payload.Title,
 		Description:     payload.Description,
 		Note:            payload.Note,
@@ -284,7 +280,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	}
 
 	getProjectPath := func() string {
-		return handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
+		return handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(int(customTemplate.ID)))
 	}
 	projectPath := getProjectPath()
 	customTemplate.ProjectPath = projectPath
@@ -450,9 +446,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 		return nil, err
 	}
 
-	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:          portainer.CustomTemplateID(customTemplateID),
 		Title:       payload.Title,
 		Description: payload.Description,
 		Note:        payload.Note,
@@ -463,7 +457,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 		Variables:   payload.Variables,
 	}
 
-	templateFolder := strconv.Itoa(customTemplateID)
+	templateFolder := strconv.Itoa(int(customTemplate.ID))
 	projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
 	if err != nil {
 		return nil, err

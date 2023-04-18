@@ -1,11 +1,7 @@
 package helmuserrepository
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -38,67 +34,70 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) HelmUserRepositories() ([]portainer.HelmUserRepository, error) {
 	var repos = make([]portainer.HelmUserRepository, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.HelmUserRepository{},
-		func(obj interface{}) (interface{}, error) {
-			r, ok := obj.(*portainer.HelmUserRepository)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to HelmUserRepository object")
-				return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.HelmUserRepository{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		r, ok := obj.(*portainer.HelmUserRepository)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to HelmUserRepository object")
+	// 			return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
+	// 		}
 
-			repos = append(repos, *r)
+	// 		repos = append(repos, *r)
 
-			return &portainer.HelmUserRepository{}, nil
-		})
+	// 		return &portainer.HelmUserRepository{}, nil
+	// 	})
 
-	return repos, err
+	return repos, nil
 }
 
 // HelmUserRepositoryByUserID return an array containing all the HelmUserRepository objects where the specified userID is present.
 func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error) {
 	var result = make([]portainer.HelmUserRepository, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.HelmUserRepository{},
-		func(obj interface{}) (interface{}, error) {
-			record, ok := obj.(*portainer.HelmUserRepository)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to HelmUserRepository object")
-				return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.HelmUserRepository{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		record, ok := obj.(*portainer.HelmUserRepository)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to HelmUserRepository object")
+	// 			return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
+	// 		}
 
-			if record.UserID == userID {
-				result = append(result, *record)
-			}
+	// 		if record.UserID == userID {
+	// 			result = append(result, *record)
+	// 		}
 
-			return &portainer.HelmUserRepository{}, nil
-		})
+	// 		return &portainer.HelmUserRepository{}, nil
+	// 	})
 
-	return result, err
+	return result, nil
 }
 
 // CreateHelmUserRepository creates a new HelmUserRepository object.
 func (service *Service) Create(record *portainer.HelmUserRepository) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			record.ID = portainer.HelmUserRepositoryID(id)
-			return int(record.ID), record
-		},
-	)
+	// return service.connection.CreateObject(
+	// 	BucketName,
+	// 	func(id uint64) (int, interface{}) {
+	// 		record.ID = portainer.HelmUserRepositoryID(id)
+	// 		return int(record.ID), record
+	// 	},
+	// )
+	return nil
 }
 
 // UpdateHelmUserRepostory updates an registry.
 func (service *Service) UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, registry *portainer.HelmUserRepository) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, registry)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, registry)
+	return nil
 }
 
 // DeleteHelmUserRepository deletes an registry.
 func (service *Service) DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }

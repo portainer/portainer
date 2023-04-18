@@ -38,9 +38,7 @@ func initDemoEndpoints(store dataservices.DataStore) ([]portainer.EndpointID, er
 }
 
 func initDemoLocalEndpoint(store dataservices.DataStore) (portainer.EndpointID, error) {
-	id := portainer.EndpointID(store.Endpoint().GetNextIdentifier())
 	localEndpoint := &portainer.Endpoint{
-		ID:        id,
 		Name:      "local",
 		URL:       "unix:///var/run/docker.sock",
 		PublicURL: "demo.portainer.io",
@@ -61,15 +59,15 @@ func initDemoLocalEndpoint(store dataservices.DataStore) (portainer.EndpointID, 
 
 	err := store.Endpoint().Create(localEndpoint)
 	if err != nil {
-		return id, errors.WithMessage(err, "failed creating local endpoint")
+		return localEndpoint.ID, errors.WithMessage(err, "failed creating local endpoint")
 	}
 
-	err = store.Snapshot().Create(&portainer.Snapshot{EndpointID: id})
+	err = store.Snapshot().Create(&portainer.Snapshot{EndpointID: localEndpoint.ID})
 	if err != nil {
-		return id, errors.WithMessage(err, "failed creating snapshot")
+		return localEndpoint.ID, errors.WithMessage(err, "failed creating snapshot")
 	}
 
-	return id, errors.WithMessage(err, "failed creating local endpoint")
+	return localEndpoint.ID, errors.WithMessage(err, "failed creating local endpoint")
 }
 
 func initDemoSettings(

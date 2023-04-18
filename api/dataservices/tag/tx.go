@@ -43,12 +43,12 @@ func (service ServiceTx) Tags() ([]portainer.Tag, error) {
 // Tag returns a tag by ID.
 func (service ServiceTx) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 	var tag portainer.Tag
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.GetObject(BucketName, identifier, &tag)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &tag)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &tag, nil
 }
@@ -66,8 +66,9 @@ func (service ServiceTx) Create(tag *portainer.Tag) error {
 
 // UpdateTag updates a tag
 func (service ServiceTx) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.UpdateObject(BucketName, identifier, tag)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.UpdateObject(BucketName, identifier, tag)
+	return nil
 }
 
 // UpdateTagFunc is a no-op inside a transaction
@@ -77,6 +78,7 @@ func (service ServiceTx) UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *
 
 // DeleteTag deletes a tag.
 func (service ServiceTx) DeleteTag(ID portainer.TagID) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.DeleteObject(BucketName, identifier)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.DeleteObject(BucketName, identifier)
+	return nil
 }

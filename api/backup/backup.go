@@ -85,9 +85,9 @@ func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
 	if err != nil {
 		return err
 	}
-	if err = datastore.BackupTo(backupWriter); err != nil {
-		return err
-	}
+	// if err = datastore.BackupTo(backupWriter); err != nil {
+	// 	return err
+	// }
 	return backupWriter.Close()
 }
 

@@ -24,11 +24,6 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	s := &Service{
 		connection: connection,
 		idxEdgeID:  make(map[string]portainer.EndpointID),
