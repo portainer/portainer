@@ -11,7 +11,7 @@ export function EdgeKeyDisplay({ edgeKey }: { edgeKey: string }) {
         associate the Edge agent with this environment.
       </TextTip>
 
-      <p className="small text-muted">
+      <p className="small text-muted mt-2">
         You can read more about pre-staging in the user-guide available{' '}
         <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a>
       </p>
