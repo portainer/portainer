@@ -330,9 +330,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		return nil, httperror.InternalServerError("Unable to authenticate against Azure", err)
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:                 portainer.EndpointID(endpointID),
 		Name:               payload.Name,
 		URL:                "https://management.azure.com",
 		Type:               portainer.AzureEnvironment,
@@ -357,17 +355,14 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 }
 
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
-
 	portainerHost, err := edge.ParseHostForEdge(payload.URL)
 	if err != nil {
 		return nil, httperror.BadRequest("Unable to parse host", err)
 	}
 
-	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
+	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, 0) // TODO: endpoint ID
 
 	endpoint := &portainer.Endpoint{
-		ID:      portainer.EndpointID(endpointID),
 		Name:    payload.Name,
 		URL:     portainerHost,
 		Type:    portainer.EdgeAgentOnDockerEnvironment,
@@ -419,9 +414,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		}
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      endpointType,
@@ -452,10 +445,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		payload.URL = "https://kubernetes.default.svc"
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
-
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      portainer.KubernetesLocalEnvironment,
@@ -483,9 +473,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 }
 
 func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType, agentVersion string) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      endpointType,

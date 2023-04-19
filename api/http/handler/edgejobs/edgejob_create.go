@@ -95,11 +95,11 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		edgeJob, err = handler.createEdgeJob(handler.DataStore, &payload.edgeJobBasePayload, []byte(payload.FileContent))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, []byte(payload.FileContent))
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, []byte(payload.FileContent))
 
-			return err
-		})
+		// 	return err
+		// })
 	}
 
 	return txResponse(w, edgeJob, err)
@@ -204,11 +204,11 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		edgeJob, err = handler.createEdgeJob(handler.DataStore, &payload.edgeJobBasePayload, payload.File)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, payload.File)
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, payload.File)
 
-			return err
-		})
+		// 	return err
+		// })
 	}
 
 	return txResponse(w, edgeJob, err)
@@ -216,7 +216,6 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 
 func (handler *Handler) createEdgeJobObjectFromPayload(tx dataservices.DataStoreTx, payload *edgeJobBasePayload) *portainer.EdgeJob {
 	return &portainer.EdgeJob{
-		ID:                  portainer.EdgeJobID(tx.EdgeJob().GetNextIdentifier()),
 		Name:                payload.Name,
 		CronExpression:      payload.CronExpression,
 		Recurring:           payload.Recurring,

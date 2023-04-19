@@ -37,9 +37,9 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = handler.deleteEdgeJob(handler.DataStore, portainer.EdgeJobID(edgeJobID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.deleteEdgeJob(tx, portainer.EdgeJobID(edgeJobID))
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return handler.deleteEdgeJob(tx, portainer.EdgeJobID(edgeJobID))
+		// })
 	}
 
 	if err != nil {

@@ -36,9 +36,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = deleteTag(handler.DataStore, portainer.TagID(id))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return deleteTag(tx, portainer.TagID(id))
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return deleteTag(tx, portainer.TagID(id))
+		// })
 	}
 
 	if err != nil {

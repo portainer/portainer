@@ -64,15 +64,15 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 
 		err = handler.clearEdgeJobTaskLogs(handler.DataStore, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			updateEdgeJobFn := func(edgeJob *portainer.EdgeJob, endpointID portainer.EndpointID, endpointsFromGroups []portainer.EndpointID) error {
-				mutationFn(edgeJob, endpointID, endpointsFromGroups)
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	updateEdgeJobFn := func(edgeJob *portainer.EdgeJob, endpointID portainer.EndpointID, endpointsFromGroups []portainer.EndpointID) error {
+		// 		mutationFn(edgeJob, endpointID, endpointsFromGroups)
 
-				return tx.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
-			}
+		// 		return tx.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
+		// 	}
 
-			return handler.clearEdgeJobTaskLogs(tx, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
-		})
+		// 	return handler.clearEdgeJobTaskLogs(tx, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
+		// })
 	}
 
 	if err != nil {

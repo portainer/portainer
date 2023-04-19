@@ -72,9 +72,7 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
 	}
 
-	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
 	profile := &portainer.FDOProfile{
-		ID:   portainer.FDOProfileID(profileID),
 		Name: payload.Name,
 	}
 

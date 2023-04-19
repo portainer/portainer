@@ -43,13 +43,12 @@ func (handler *Handler) duplicateProfile(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to retrieve Profile file content", err)
 	}
 
-	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
+	// TODO: Looks wrong
 	if err != nil {
 		return httperror.InternalServerError("Unable to duplicate Profile", err)
 	}
 
 	newProfile := &portainer.FDOProfile{
-		ID:   portainer.FDOProfileID(profileID),
 		Name: fmt.Sprintf("%s - copy", originalProfile.Name),
 	}
 

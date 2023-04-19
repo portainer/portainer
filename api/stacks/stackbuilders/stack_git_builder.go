@@ -38,8 +38,6 @@ type GitMethodStackBuilder struct {
 }
 
 func (b *GitMethodStackBuilder) SetGeneralInfo(payload *StackPayload, endpoint *portainer.Endpoint) GitMethodStackBuildProcess {
-	stackID := b.dataStore.Stack().GetNextIdentifier()
-	b.stack.ID = portainer.StackID(stackID)
 	b.stack.EndpointID = endpoint.ID
 	b.stack.AdditionalFiles = payload.AdditionalFiles
 	b.stack.Status = portainer.StackStatusActive

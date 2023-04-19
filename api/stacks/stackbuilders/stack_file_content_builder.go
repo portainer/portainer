@@ -27,8 +27,6 @@ type FileContentMethodStackBuilder struct {
 }
 
 func (b *FileContentMethodStackBuilder) SetGeneralInfo(payload *StackPayload, endpoint *portainer.Endpoint) FileContentMethodStackBuildProcess {
-	stackID := b.dataStore.Stack().GetNextIdentifier()
-	b.stack.ID = portainer.StackID(stackID)
 	b.stack.EndpointID = endpoint.ID
 	b.stack.Status = portainer.StackStatusActive
 	b.stack.CreationDate = time.Now().Unix()

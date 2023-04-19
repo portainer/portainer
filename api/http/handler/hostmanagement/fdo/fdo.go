@@ -115,9 +115,7 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 }
 
 func (handler *Handler) addDefaultProfile() error {
-	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
 	profile := &portainer.FDOProfile{
-		ID:   portainer.FDOProfileID(profileID),
 		Name: "Docker Standalone + Edge",
 	}
 

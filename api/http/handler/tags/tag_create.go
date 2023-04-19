@@ -49,10 +49,10 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		tag, err = createTag(handler.DataStore, payload)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			tag, err = createTag(tx, payload)
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	tag, err = createTag(tx, payload)
+		// 	return err
+		// })
 	}
 
 	return txResponse(w, tag, err)

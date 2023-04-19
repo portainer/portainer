@@ -5,11 +5,9 @@ import (
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/slices"
 
 	"github.com/asaskevich/govalidator"
@@ -54,122 +52,123 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 // @failure 500
 // @router /edge_groups/{id} [put]
 func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest("Invalid Edge group identifier route variable", err)
-	}
+	// edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	// if err != nil {
+	// 	return httperror.BadRequest("Invalid Edge group identifier route variable", err)
+	// }
 
-	var payload edgeGroupUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
-	}
+	// var payload edgeGroupUpdatePayload
+	// err = request.DecodeAndValidateJSONPayload(r, &payload)
+	// if err != nil {
+	// 	return httperror.BadRequest("Invalid request payload", err)
+	// }
 
-	var edgeGroup *portainer.EdgeGroup
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		edgeGroup, err = tx.EdgeGroup().EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
-		if handler.DataStore.IsErrObjectNotFound(err) {
-			return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
-		} else if err != nil {
-			return httperror.InternalServerError("Unable to find an Edge group with the specified identifier inside the database", err)
-		}
+	// var edgeGroup *portainer.EdgeGroup
+	// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	// 	edgeGroup, err = tx.EdgeGroup().EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
+	// 	if handler.DataStore.IsErrObjectNotFound(err) {
+	// 		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
+	// 	} else if err != nil {
+	// 		return httperror.InternalServerError("Unable to find an Edge group with the specified identifier inside the database", err)
+	// 	}
 
-		if payload.Name != "" {
-			edgeGroups, err := tx.EdgeGroup().EdgeGroups()
-			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
-			}
+	// 	if payload.Name != "" {
+	// 		edgeGroups, err := tx.EdgeGroup().EdgeGroups()
+	// 		if err != nil {
+	// 			return httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
+	// 		}
 
-			for _, edgeGroup := range edgeGroups {
-				if edgeGroup.Name == payload.Name && edgeGroup.ID != portainer.EdgeGroupID(edgeGroupID) {
-					return httperror.BadRequest("Edge group name must be unique", errors.New("edge group name must be unique"))
-				}
-			}
+	// 		for _, edgeGroup := range edgeGroups {
+	// 			if edgeGroup.Name == payload.Name && edgeGroup.ID != portainer.EdgeGroupID(edgeGroupID) {
+	// 				return httperror.BadRequest("Edge group name must be unique", errors.New("edge group name must be unique"))
+	// 			}
+	// 		}
 
-			edgeGroup.Name = payload.Name
-		}
+	// 		edgeGroup.Name = payload.Name
+	// 	}
 
-		endpoints, err := tx.Endpoint().Endpoints()
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve environments from database", err)
-		}
+	// 	endpoints, err := tx.Endpoint().Endpoints()
+	// 	if err != nil {
+	// 		return httperror.InternalServerError("Unable to retrieve environments from database", err)
+	// 	}
 
-		endpointGroups, err := tx.EndpointGroup().EndpointGroups()
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve environment groups from database", err)
-		}
+	// 	endpointGroups, err := tx.EndpointGroup().EndpointGroups()
+	// 	if err != nil {
+	// 		return httperror.InternalServerError("Unable to retrieve environment groups from database", err)
+	// 	}
 
-		oldRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
+	// 	oldRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
 
-		edgeGroup.Dynamic = payload.Dynamic
-		if edgeGroup.Dynamic {
-			edgeGroup.TagIDs = payload.TagIDs
-		} else {
-			endpointIDs := []portainer.EndpointID{}
-			for _, endpointID := range payload.Endpoints {
-				endpoint, err := tx.Endpoint().Endpoint(endpointID)
-				if err != nil {
-					return httperror.InternalServerError("Unable to retrieve environment from the database", err)
-				}
+	// 	edgeGroup.Dynamic = payload.Dynamic
+	// 	if edgeGroup.Dynamic {
+	// 		edgeGroup.TagIDs = payload.TagIDs
+	// 	} else {
+	// 		endpointIDs := []portainer.EndpointID{}
+	// 		for _, endpointID := range payload.Endpoints {
+	// 			endpoint, err := tx.Endpoint().Endpoint(endpointID)
+	// 			if err != nil {
+	// 				return httperror.InternalServerError("Unable to retrieve environment from the database", err)
+	// 			}
 
-				if endpointutils.IsEdgeEndpoint(endpoint) {
-					endpointIDs = append(endpointIDs, endpoint.ID)
-				}
-			}
-			edgeGroup.Endpoints = endpointIDs
-		}
+	// 			if endpointutils.IsEdgeEndpoint(endpoint) {
+	// 				endpointIDs = append(endpointIDs, endpoint.ID)
+	// 			}
+	// 		}
+	// 		edgeGroup.Endpoints = endpointIDs
+	// 	}
 
-		if payload.PartialMatch != nil {
-			edgeGroup.PartialMatch = *payload.PartialMatch
-		}
+	// 	if payload.PartialMatch != nil {
+	// 		edgeGroup.PartialMatch = *payload.PartialMatch
+	// 	}
 
-		err = tx.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
-		if err != nil {
-			return httperror.InternalServerError("Unable to persist Edge group changes inside the database", err)
-		}
+	// 	err = tx.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
+	// 	if err != nil {
+	// 		return httperror.InternalServerError("Unable to persist Edge group changes inside the database", err)
+	// 	}
 
-		newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
-		endpointsToUpdate := append(newRelatedEndpoints, oldRelatedEndpoints...)
+	// 	newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
+	// 	endpointsToUpdate := append(newRelatedEndpoints, oldRelatedEndpoints...)
 
-		edgeJobs, err := tx.EdgeJob().EdgeJobs()
-		if err != nil {
-			return httperror.InternalServerError("Unable to fetch Edge jobs", err)
-		}
+	// 	edgeJobs, err := tx.EdgeJob().EdgeJobs()
+	// 	if err != nil {
+	// 		return httperror.InternalServerError("Unable to fetch Edge jobs", err)
+	// 	}
 
-		for _, endpointID := range endpointsToUpdate {
-			err = handler.updateEndpointStacks(tx, endpointID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to persist Environment relation changes inside the database", err)
-			}
+	// 	for _, endpointID := range endpointsToUpdate {
+	// 		err = handler.updateEndpointStacks(tx, endpointID)
+	// 		if err != nil {
+	// 			return httperror.InternalServerError("Unable to persist Environment relation changes inside the database", err)
+	// 		}
 
-			endpoint, err := tx.Endpoint().Endpoint(endpointID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to get Environment from database", err)
-			}
+	// 		endpoint, err := tx.Endpoint().Endpoint(endpointID)
+	// 		if err != nil {
+	// 			return httperror.InternalServerError("Unable to get Environment from database", err)
+	// 		}
 
-			if !endpointutils.IsEdgeEndpoint(endpoint) {
-				continue
-			}
+	// 		if !endpointutils.IsEdgeEndpoint(endpoint) {
+	// 			continue
+	// 		}
 
-			var operation string
-			if slices.Contains(newRelatedEndpoints, endpointID) {
-				operation = "add"
-			} else if slices.Contains(oldRelatedEndpoints, endpointID) {
-				operation = "remove"
-			} else {
-				continue
-			}
+	// 		var operation string
+	// 		if slices.Contains(newRelatedEndpoints, endpointID) {
+	// 			operation = "add"
+	// 		} else if slices.Contains(oldRelatedEndpoints, endpointID) {
+	// 			operation = "remove"
+	// 		} else {
+	// 			continue
+	// 		}
 
-			err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpoint, edgeJobs, operation)
-			if err != nil {
-				return httperror.InternalServerError("Unable to persist Environment Edge Jobs changes inside the database", err)
-			}
-		}
+	// 		err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpoint, edgeJobs, operation)
+	// 		if err != nil {
+	// 			return httperror.InternalServerError("Unable to persist Environment Edge Jobs changes inside the database", err)
+	// 		}
+	// 	}
 
-		return nil
-	})
+	// 	return nil
+	// })
 
-	return txResponse(w, edgeGroup, err)
+	// return txResponse(w, edgeGroup, err)
+	return nil
 }
 
 func (handler *Handler) updateEndpointStacks(tx dataservices.DataStoreTx, endpointID portainer.EndpointID) error {

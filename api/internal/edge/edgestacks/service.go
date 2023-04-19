@@ -42,9 +42,7 @@ func (service *Service) BuildEdgeStack(
 		return nil, err
 	}
 
-	stackID := tx.EdgeStack().GetNextIdentifier()
 	return &portainer.EdgeStack{
-		ID:                    portainer.EdgeStackID(stackID),
 		Name:                  name,
 		DeploymentType:        deploymentType,
 		CreationDate:          time.Now().Unix(),

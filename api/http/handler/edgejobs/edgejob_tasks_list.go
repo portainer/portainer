@@ -42,10 +42,10 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		tasks, err = listEdgeJobTasks(handler.DataStore, portainer.EdgeJobID(edgeJobID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			tasks, err = listEdgeJobTasks(tx, portainer.EdgeJobID(edgeJobID))
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	tasks, err = listEdgeJobTasks(tx, portainer.EdgeJobID(edgeJobID))
+		// 	return err
+		// })
 	}
 
 	return txResponse(w, tasks, err)

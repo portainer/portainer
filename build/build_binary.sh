@@ -33,7 +33,7 @@ BINARY_VERSION_FILE="../binary-version.json"
 echo "$ldflags"
 
 # the build takes 2 seconds
-GOOS=${1:-$(go env GOOS)} GOARCH=${2:-$(go env GOARCH)} CGO_ENABLED=0 go build \
+GOOS=${1:-$(go env GOOS)} GOARCH=${2:-$(go env GOARCH)} CGO_ENABLED=1 go build \
 	-trimpath \
 	--installsuffix cgo \
 	--ldflags "$ldflags" \
