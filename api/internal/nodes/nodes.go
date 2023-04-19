@@ -8,7 +8,9 @@ import (
 func NodesCount(endpoints []portainer.Endpoint) int {
 	nodes := 0
 	for _, env := range endpoints {
-		nodes += countNodes(&env)
+		if env.UserTrusted {
+			nodes += countNodes(&env)
+		}
 	}
 
 	return nodes
