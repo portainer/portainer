@@ -87,6 +87,21 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 	return nil
 }
 
+// @id StackCreateDockerStandaloneString
+// @summary Deploy a new stack
+// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body composeStackFromFileContentPayload false "Required when using method=string and type=2"
+// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/standalone/string [post]
 func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -201,6 +216,21 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	return nil
 }
 
+// @id StackCreateDockerStandaloneRepository
+// @summary Deploy a new stack
+// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @accept json
+// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @param body body composeStackFromGitRepositoryPayload false "Required when using method=repository and type=2"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/standalone/repository [post]
 func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -318,6 +348,23 @@ func decodeRequestForm(r *http.Request) (*composeStackFromFileUploadPayload, err
 	return payload, nil
 }
 
+// @id StackCreateDockerStandaloneFile
+// @summary Deploy a new stack
+// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept multipart/form-data
+// @produce json
+// @param Name formData string false "Name of the stack"
+// @param Env formData string false "Environment(Endpoint) variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]."
+// @param file formData file false "Stack file"
+// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/standalone/file [post]
 func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	payload, err := decodeRequestForm(r)
 	if err != nil {
