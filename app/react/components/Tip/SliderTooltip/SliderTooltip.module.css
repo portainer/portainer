@@ -21,6 +21,10 @@
   font-size: 12px !important;
 }
 
+.tooltip-centered .tooltip-container {
+  text-align: center;
+}
+
 .tooltip-message a {
   color: var(--blue-15) !important;
 }
