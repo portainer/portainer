@@ -127,7 +127,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createCustomTemplate = function createCustomTemplate(data) {
       return Upload.upload({
-        url: 'api/custom_templates?method=file',
+        url: 'api/custom_templates/file',
         data,
         ignoreLoadingBar: true,
       });

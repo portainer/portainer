@@ -40,7 +40,7 @@ function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadServ
 
   service.createCustomTemplateFromFileContent = async function createCustomTemplateFromFileContent(payload) {
     try {
-      return await CustomTemplates.create({ method: 'string' }, payload).$promise;
+      return await CustomTemplates.create({}, { method: 'string', ...payload }).$promise;
     } catch (err) {
       throw { msg: 'Unable to create the customTemplate', err };
     }
@@ -57,7 +57,7 @@ function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadServ
 
   service.createCustomTemplateFromGitRepository = async function createCustomTemplateFromGitRepository(payload) {
     try {
-      return await CustomTemplates.create({ method: 'repository' }, payload).$promise;
+      return await CustomTemplates.create({}, { method: 'repository', ...payload }).$promise;
     } catch (err) {
       throw { msg: 'Unable to create the customTemplate', err };
     }
