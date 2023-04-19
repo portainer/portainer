@@ -30,7 +30,7 @@ angular.module('portainer.edge').factory('EdgeStackService', function EdgeStackS
 
   service.createStackFromFileContent = async function createStackFromFileContent(payload) {
     try {
-      return await EdgeStacks.create({ method: 'string' }, payload).$promise;
+      return await EdgeStacks.create({}, { method: 'string', ...payload }).$promise;
     } catch (err) {
       throw { msg: 'Unable to create the stack', err };
     }
@@ -47,9 +47,10 @@ angular.module('portainer.edge').factory('EdgeStackService', function EdgeStackS
   service.createStackFromGitRepository = async function createStackFromGitRepository(payload, repositoryOptions) {
     try {
       return await EdgeStacks.create(
-        { method: 'repository' },
+        {},
         {
           ...payload,
+          method: 'repository',
           RepositoryURL: repositoryOptions.RepositoryURL,
           RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
           FilePathInRepository: repositoryOptions.FilePathInRepository,

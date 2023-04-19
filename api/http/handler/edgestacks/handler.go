@@ -34,7 +34,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		edgeStacksService: edgeStacksService,
 	}
 
-	h.Handle("/edge_stacks",
+	h.Handle("/edge_stacks/create/{method}",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_stacks",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackList)))).Methods(http.MethodGet)
