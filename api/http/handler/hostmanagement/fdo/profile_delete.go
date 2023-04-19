@@ -16,6 +16,7 @@ import (
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt
+// @param id path int true "FDO Profile identifier"
 // @produce json
 // @success 200 "Success"
 // @failure 400 "Invalid request"

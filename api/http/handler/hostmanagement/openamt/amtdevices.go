@@ -80,6 +80,8 @@ func (payload *deviceActionPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
+// @param id path int true "Environment identifier"
+// @param deviceId path int true "Device identifier"
 // @param body body deviceActionPayload true "Device Action"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
@@ -140,6 +142,8 @@ type AuthorizationResponse struct {
 // @security jwt
 // @accept json
 // @produce json
+// @param id path int true "Environment identifier"
+// @param deviceId path int true "Device identifier"
 // @param body body deviceFeaturesPayload true "Device Features"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
