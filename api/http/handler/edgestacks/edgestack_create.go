@@ -336,7 +336,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 // @tags edge_stacks
 // @security ApiKeyAuth
 // @security jwt
-// @consumes multipart/form-data
+// @accept multipart/form-data
 // @produce json
 // @param Name formData string true "Name of the stack"
 // @param file formData file true "Content of the Stack file"
