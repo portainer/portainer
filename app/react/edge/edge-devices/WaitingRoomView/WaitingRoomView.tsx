@@ -3,12 +3,16 @@ import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 import { PageHeader } from '@@/PageHeader';
+import { Link } from '@@/Link';
+import { Alert } from '@@/Alert';
 
 import { Datatable } from './Datatable';
+import { useWillExceedNodeLimit } from './queries';
 
 export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
+  const willExceed = useWillExceedNodeLimit();
   return (
     <>
       <PageHeader
@@ -26,6 +30,18 @@ function WaitingRoomView() {
           room.
         </TextTip>
       </InformationPanel>
+
+      {willExceed && (
+        <div className="row">
+          <div className="col-sm-12">
+            <Alert color="warn">
+              Associating all nodes in waiting room will exceed the node limit
+              of your current license. Go to <Link to="license">Licenses</Link>{' '}
+              page to view the current usage.
+            </Alert>
+          </div>
+        </div>
+      )}
 
       <Datatable />
     </>
