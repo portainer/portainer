@@ -176,20 +176,20 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @accept multipart/form-data
 // @produce json
 // @param Name formData string true "Name that will be used to identify this environment(endpoint) (example: my-environment)"
-// @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment" Enum(1,2,3,4,5)
-// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)". Cannot be empty if EndpointCreationType is set to 4 (Edge agent environment)
+// @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment)" Enum(1,2,3,4,5)
+// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine). Cannot be empty if EndpointCreationType is set to 4 (Edge agent environment)"
 // @param PublicURL formData string false "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)"
 // @param GroupID formData int false "Environment(Endpoint) group identifier. If not specified will default to 1 (unassigned)."
-// @param TLS formData bool false "Require TLS to connect against this environment(endpoint)"
-// @param TLSSkipVerify formData bool false "Skip server verification when using TLS"
-// @param TLSSkipClientVerify formData bool false "Skip client verification when using TLS"
+// @param TLS formData bool false "Require TLS to connect against this environment(endpoint). Must be true if EndpointCreationType is set to 2 (Agent environment)"
+// @param TLSSkipVerify formData bool false "Skip server verification when using TLS. Must be true if EndpointCreationType is set to 2 (Agent environment)"
+// @param TLSSkipClientVerify formData bool false "Skip client verification when using TLS. Must be true if EndpointCreationType is set to 2 (Agent environment)"
 // @param TLSCACertFile formData file false "TLS CA certificate file"
 // @param TLSCertFile formData file false "TLS client certificate file"
 // @param TLSKeyFile formData file false "TLS client key file"
 // @param AzureApplicationID formData string false "Azure application ID. Required if environment(endpoint) type is set to 3"
 // @param AzureTenantID formData string false "Azure tenant ID. Required if environment(endpoint) type is set to 3"
 // @param AzureAuthenticationKey formData string false "Azure authentication key. Required if environment(endpoint) type is set to 3"
-// @param TagIDs formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
+// @param TagIds formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
 // @param EdgeCheckinInterval formData int false "The check in interval for edge agent (in seconds)"
 // @param EdgeTunnelServerAddress formData string true "URL or IP address that will be used to establish a reverse tunnel"
 // @param Gpus formData array false "List of GPUs"

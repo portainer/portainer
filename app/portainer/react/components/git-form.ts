@@ -56,7 +56,7 @@ export const gitFormModule = angular
     'reactGitFormAuthFieldset',
     r2a(withUIRouter(withReactQuery(withCurrentUser(AuthFieldset))), [
       'value',
-      'isExplanationVisible',
+      'isAuthExplanationVisible',
       'onChange',
       'errors',
     ])

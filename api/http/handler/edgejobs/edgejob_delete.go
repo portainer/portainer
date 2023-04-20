@@ -8,8 +8,10 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/maps"
+	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,14 +33,34 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid Edge job identifier route variable", err)
 	}
 
-	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
+	if featureflags.IsEnabled(portainer.FeatureNoTx) {
+		err = handler.deleteEdgeJob(handler.DataStore, portainer.EdgeJobID(edgeJobID))
+	} else {
+		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return handler.deleteEdgeJob(tx, portainer.EdgeJobID(edgeJobID))
+		})
+	}
+
+	if err != nil {
+		if httpErr, ok := err.(*httperror.HandlerError); ok {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	return response.Empty(w)
+}
+
+func (handler *Handler) deleteEdgeJob(tx dataservices.DataStoreTx, edgeJobID portainer.EdgeJobID) error {
+	edgeJob, err := tx.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
+	if tx.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
 	}
 
-	edgeJobFolder := handler.FileService.GetEdgeJobFolder(strconv.Itoa(edgeJobID))
+	edgeJobFolder := handler.FileService.GetEdgeJobFolder(strconv.Itoa(int(edgeJobID)))
 	err = handler.FileService.RemoveDirectory(edgeJobFolder)
 	if err != nil {
 		log.Warn().Err(err).Msg("Unable to remove the files associated to the Edge job on the filesystem")
@@ -48,7 +70,7 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 
 	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
 	if len(edgeJob.EdgeGroups) > 0 {
-		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, handler.DataStore)
+		endpoints, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, tx)
 		if err != nil {
 			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
@@ -63,10 +85,10 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 		handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpointID, edgeJob.ID)
 	}
 
-	err = handler.DataStore.EdgeJob().DeleteEdgeJob(edgeJob.ID)
+	err = tx.EdgeJob().DeleteEdgeJob(edgeJob.ID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the Edge job from the database", err)
 	}
 
-	return response.Empty(w)
+	return nil
 }

@@ -62,7 +62,7 @@ function CreateView() {
           <Widget>
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
-              <TextTip color="blue">
+              <TextTip color="blue" className="mb-2">
                 Devices need to be allocated to an Edge group, visit the{' '}
                 <Link to="edge.groups">Edge Groups</Link> page to assign
                 environments and create groups.
@@ -91,7 +91,9 @@ function CreateView() {
                       for 2.15.0+ only.
                     </TextTip>
 
-                    <ScheduleTypeSelector />
+                    <div className="mt-2">
+                      <ScheduleTypeSelector />
+                    </div>
 
                     <div className="form-group">
                       <div className="col-sm-12">

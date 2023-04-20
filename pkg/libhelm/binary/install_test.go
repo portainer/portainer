@@ -61,7 +61,7 @@ func Test_Install(t *testing.T) {
 		}
 
 		release, err := hbpm.Install(installOpts)
-		defer hbpm.run("uninstall", []string{"test-nginx"})
+		defer hbpm.run("uninstall", []string{"test-nginx"}, nil)
 
 		is.NoError(err, "should successfully install release", release)
 	})
@@ -73,7 +73,7 @@ func Test_Install(t *testing.T) {
 			Repo:  "https://charts.bitnami.com/bitnami",
 		}
 		release, err := hbpm.Install(installOpts)
-		defer hbpm.run("uninstall", []string{release.Name})
+		defer hbpm.run("uninstall", []string{release.Name}, nil)
 
 		is.NoError(err, "should successfully install release", release)
 	})
@@ -92,7 +92,7 @@ func Test_Install(t *testing.T) {
 			ValuesFile: values,
 		}
 		release, err := hbpm.Install(installOpts)
-		defer hbpm.run("uninstall", []string{"test-nginx-2"})
+		defer hbpm.run("uninstall", []string{"test-nginx-2"}, nil)
 
 		is.NoError(err, "should successfully install release", release)
 	})
@@ -105,7 +105,7 @@ func Test_Install(t *testing.T) {
 			Repo:  "https://portainer.github.io/k8s/",
 		}
 		release, err := hbpm.Install(installOpts)
-		defer hbpm.run("uninstall", []string{installOpts.Name})
+		defer hbpm.run("uninstall", []string{installOpts.Name}, nil)
 
 		is.NoError(err, "should successfully install release", release)
 	})

@@ -42,7 +42,13 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
+	}
+
 	hideFields(endpoint)
+	endpointutils.UpdateEdgeEndpointHeartbeat(endpoint, settings)
 	endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 
 	if !excludeSnapshot(r) {

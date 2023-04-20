@@ -72,5 +72,5 @@
 }
 
 .root :global(.cm-content[contenteditable='true']) {
-  @apply h-full;
+  min-height: 100%;
 }
