@@ -42,11 +42,15 @@ func (tx *StoreTx) EndpointRelation() dataservices.EndpointRelationService {
 
 func (tx *StoreTx) FDOProfile() dataservices.FDOProfileService                 { return nil }
 func (tx *StoreTx) HelmUserRepository() dataservices.HelmUserRepositoryService { return nil }
-func (tx *StoreTx) Registry() dataservices.RegistryService                     { return nil }
-func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService       { return nil }
-func (tx *StoreTx) Role() dataservices.RoleService                             { return nil }
-func (tx *StoreTx) APIKeyRepository() dataservices.APIKeyRepository            { return nil }
-func (tx *StoreTx) Settings() dataservices.SettingsService                     { return nil }
+
+func (tx *StoreTx) Registry() dataservices.RegistryService {
+	return nil
+}
+
+func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService { return nil }
+func (tx *StoreTx) Role() dataservices.RoleService                       { return nil }
+func (tx *StoreTx) APIKeyRepository() dataservices.APIKeyRepository      { return nil }
+func (tx *StoreTx) Settings() dataservices.SettingsService               { return nil }
 
 func (tx *StoreTx) Snapshot() dataservices.SnapshotService {
 	return tx.store.SnapshotService.Tx(tx.tx)
