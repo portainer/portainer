@@ -63,7 +63,7 @@ jobs:
           name: html-js-result-compare-to-develop-${{github.run_id}}
           path: js-result.html
 
-      - name: analyse different vulnerabilities compared to develop branch
+      - name: analyse different vulnerabilities against develop branch
         id: set-diff-matrix
         run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest diff --report-type=snyk --path="/data/js-snyk-feature.json" --compare-to="/data/js-snyk-develop.json" --output-type=matrix)
@@ -84,7 +84,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.19.4'
+          go-version: '1.19.5'
 
       - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
