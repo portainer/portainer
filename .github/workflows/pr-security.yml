@@ -12,6 +12,7 @@ on:
       - 'build/linux/Dockerfile'
       - 'build/linux/alpine.Dockerfile'
       - 'build/windows/Dockerfile'
+      - '.github/workflows/pr-security.yml'
     
 jobs:
   client-dependencies:
