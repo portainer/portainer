@@ -1,5 +1,7 @@
 package portainer
 
+import "gorm.io/gorm"
+
 type ReadTransaction interface {
 	GetObject(bucketName string, key []byte, object interface{}) error
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
@@ -24,6 +26,7 @@ type Connection interface {
 	Open() error
 	Close() error
 	Init() error
+	GetDB() *gorm.DB
 
 	// TODO: this one is very database specific atm
 	GetDatabaseFileName() string

@@ -26,7 +26,7 @@ func (m *Migrator) Migrate() error {
 		return migrationError(err, "get version service")
 	}
 
-	schemaVersion, err := semver.NewVersion(version.SchemaVersion)
+	schemaVersion, err := semver.NewVersion(version.Value)
 	if err != nil {
 		return migrationError(err, "invalid db schema version")
 	}

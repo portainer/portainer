@@ -1,16 +1,10 @@
 package version
 
 import (
+	"strconv"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
-	"github.com/portainer/portainer/api/dataservices"
-)
-
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName  = "version"
-	versionKey  = "VERSION"
-	updatingKey = "DB_UPDATING"
 )
 
 // Service represents a service to manage stored versions.
@@ -20,99 +14,107 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	// err := connection.SetServiceName(BucketName)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	return &Service{
 		connection: connection,
 	}, nil
 }
 
-func (service *Service) SchemaVersion() (string, error) {
-	v, err := service.Version()
-	if err != nil {
-		return "", err
+// DBVersion retrieves the stored database version.
+func (service *Service) DBVersion() (int, error) {
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.VersionKey)
+	if tx.Error != nil {
+		return 0, tx.Error
 	}
-
-	return v.SchemaVersion, nil
+	return strconv.Atoi(version.Value)
 }
 
-func (service *Service) UpdateSchemaVersion(version string) error {
-	v, err := service.Version()
-	if err != nil {
-		return err
-	}
-
-	v.SchemaVersion = version
-	return service.UpdateVersion(v)
-}
-
+// Edition retrieves the stored portainer edition.
 func (service *Service) Edition() (portainer.SoftwareEdition, error) {
-	v, err := service.Version()
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.EditionKey)
+	if tx.Error != nil {
+		return 0, tx.Error
+	}
+	e, err := strconv.Atoi(version.Value)
 	if err != nil {
 		return 0, err
 	}
+	return portainer.SoftwareEdition(e), nil
+}
 
-	return portainer.SoftwareEdition(v.Edition), nil
+// StoreDBVersion store the database version.
+func (service *Service) StoreDBVersion(v int) error {
+	db := service.connection.GetDB()
+	tx := db.Model(&models.Version{}).Where("key = ?", models.VersionKey).Update("value", strconv.FormatInt(int64(v), 10)).Limit(1)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 // IsUpdating retrieves the database updating status.
 func (service *Service) IsUpdating() (bool, error) {
-	var isUpdating bool
-	// err := service.connection.GetObject(BucketName, []byte(updatingKey), &isUpdating)
-	// if err != nil && errors.Is(err, dserrors.ErrObjectNotFound) {
-	// 	return false, nil
-	// }
-	return isUpdating, nil
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.UpdatingKey)
+	if tx.Error != nil {
+		return false, tx.Error
+	}
+	return version.Value == "true", nil
 }
 
 // StoreIsUpdating store the database updating status.
 func (service *Service) StoreIsUpdating(isUpdating bool) error {
-	// return service.connection.DeleteObject(BucketName, []byte(updatingKey))
+	db := service.connection.GetDB()
+	tx := db.Model(&models.Version{}).Where("key = ?", models.UpdatingKey).Update("value", strconv.FormatBool(isUpdating)).Limit(1)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
 
 // InstanceID retrieves the stored instance ID.
 func (service *Service) InstanceID() (string, error) {
-	v, err := service.Version()
-	if err != nil {
-		return "", err
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.InstanceKey)
+	if tx.Error != nil {
+		return "", tx.Error
 	}
-
-	return v.InstanceID, nil
+	return version.Value, nil
 }
 
 // StoreInstanceID store the instance ID.
-func (service *Service) UpdateInstanceID(id string) error {
-	v, err := service.Version()
-	if err != nil {
-		if !dataservices.IsErrObjectNotFound(err) {
-			return err
-		}
-
-		v = &models.Version{}
+func (service *Service) StoreInstanceID(ID string) error {
+	db := service.connection.GetDB()
+	tx := db.FirstOrCreate(&models.Version{Key: models.InstanceKey, Value: ID})
+	if tx.Error != nil {
+		return tx.Error
 	}
 
-	v.InstanceID = id
-	return service.UpdateVersion(v)
+	return nil
 }
 
 // Version retrieve the version object.
 func (service *Service) Version() (*models.Version, error) {
-	var v models.Version
-
-	// err := service.connection.GetObject(BucketName, []byte(versionKey), &v)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	return &v, nil
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.VersionKey)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return &version, nil
 }
 
 // UpdateVersion persists a Version object.
 func (service *Service) UpdateVersion(version *models.Version) error {
-	// return service.connection.UpdateObject(BucketName, []byte(versionKey), version)
+	db := service.connection.GetDB()
+	tx := db.Model(&models.Version{}).Where("key = ?", models.VersionKey).Update("value", version).Limit(1)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
