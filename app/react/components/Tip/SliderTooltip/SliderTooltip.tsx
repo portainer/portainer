@@ -14,6 +14,7 @@ export interface Props {
 export function SliderTooltip({ value, child, delay }: Props) {
   return (
     <Tippy
+      appendTo="parent"
       className={clsx(styles.tooltipCentered, styles.tooltip)}
       content={messageHTML(value)}
       placement="top"
