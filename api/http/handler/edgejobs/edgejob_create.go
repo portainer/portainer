@@ -80,7 +80,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 // @security jwt
 // @produce json
 // @param body body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
-// @success 200 {object} portaineree.EdgeGroup
+// @success 200 {object} portainer.EdgeGroup
 // @failure 503 "Edge compute features are disabled"
 // @failure 500
 // @router /edge_jobs/create/string [post]
@@ -189,7 +189,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 // @param EdgeGroups formData string true "JSON stringified array of Edge Groups ids"
 // @param Endpoints formData string true "JSON stringified array of Environment ids"
 // @param Recurring formData bool false "If recurring"
-// @success 200 {object} portaineree.EdgeGroup
+// @success 200 {object} portainer.EdgeGroup
 // @failure 503 "Edge compute features are disabled"
 // @failure 500
 // @router /edge_jobs/create/filew [post]
