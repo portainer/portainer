@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { getFilePreview } from '@/react/portainer/gitops/gitops.service';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
@@ -26,6 +27,7 @@ class EditCustomTemplateViewController {
       templateLoadFailed: false,
       templatePreviewFailed: false,
       templatePreviewError: '',
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
     this.templates = [];
 

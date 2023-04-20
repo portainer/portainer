@@ -4,6 +4,7 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { getFilePreview } from '@/react/portainer/gitops/gitops.service';
+import { KUBE_TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 class KubeEditCustomTemplateViewController {
   /* @ngInject */
@@ -24,6 +25,7 @@ class KubeEditCustomTemplateViewController {
       templateLoadFailed: false,
       templatePreviewFailed: false,
       templatePreviewError: '',
+      templateNameRegex: KUBE_TEMPLATE_NAME_VALIDATION_REGEX,
     };
     this.templates = [];
 
