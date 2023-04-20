@@ -89,7 +89,7 @@ jobs:
       - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
 
-       - name: scan vulnerabilities by Snyk
+      - name: scan vulnerabilities by Snyk
         continue-on-error: true # To make sure that artifact upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
