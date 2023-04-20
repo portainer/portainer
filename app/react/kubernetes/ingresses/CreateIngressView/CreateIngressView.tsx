@@ -339,14 +339,31 @@ export function CreateIngressView() {
       }
 
       const duplicatedAnnotations: string[] = [];
+      const re = /^([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$/;
       rule.Annotations?.forEach((a, i) => {
         if (!a.Key) {
-          errors[`annotations.key[${i}]`] = 'Annotation key is required';
+          errors[`annotations.key[${i}]`] = 'Key is required.';
         } else if (duplicatedAnnotations.includes(a.Key)) {
-          errors[`annotations.key[${i}]`] = 'Annotation cannot be duplicated';
+          errors[`annotations.key[${i}]`] =
+            'Key is a duplicate of an existing one.';
+        } else {
+          const key = a.Key.split('/');
+          if (key.length > 2) {
+            errors[`annotations.key[${i}]`] =
+              'Two segments are allowed, separated by a slash (/): a prefix (optional) and a name.';
+          } else if (key[0].length > 253) {
+            errors[`annotations.key[${i}]`] =
+              'Prefix (before the slash) cannot be more than 253 characters.';
+          } else if (key[1].length > 63) {
+            errors[`annotations.key[${i}]`] =
+              'Name (after the slash) cannot be more than 63 characters.';
+          } else if (!re.test(key[1])) {
+            errors[`annotations.key[${i}]`] =
+              'Must begin and end with an alphanumeric character, and have dashes, underscores and alphanumerics between.';
+          }
         }
         if (!a.Value) {
-          errors[`annotations.value[${i}]`] = 'Annotation value is required';
+          errors[`annotations.value[${i}]`] = 'Value is required.';
         }
         duplicatedAnnotations.push(a.Key);
       });
