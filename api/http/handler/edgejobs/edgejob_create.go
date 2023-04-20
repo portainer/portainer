@@ -73,7 +73,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 }
 
 // @id EdgeJobCreateString
-// @summary Create an EdgeJob
+// @summary Create an EdgeJob from a text
 // @description **Access policy**: administrator
 // @tags edge_jobs
 // @security ApiKeyAuth
@@ -176,7 +176,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 }
 
 // @id EdgeJobCreateFile
-// @summary Create an EdgeJob
+// @summary Create an EdgeJob from a file
 // @description **Access policy**: administrator
 // @tags edge_jobs
 // @accept multipart/form-data
@@ -192,7 +192,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 // @success 200 {object} portainer.EdgeGroup
 // @failure 503 "Edge compute features are disabled"
 // @failure 500
-// @router /edge_jobs/create/filew [post]
+// @router /edge_jobs/create/file [post]
 func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &edgeJobCreateFromFilePayload{}
 	err := payload.Validate(r)

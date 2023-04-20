@@ -95,13 +95,13 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 }
 
 // @id EdgeStackCreateString
-// @summary Create an EdgeStack
+// @summary Create an EdgeStack from a text
 // @description **Access policy**: administrator
 // @tags edge_stacks
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body swarmStackFromFileContentPayload true "body"
+// @param body body swarmStackFromFileContentPayload true ""
 // @param dryrun query string false "if true, will not create an edge stack, but just will check the settings and return a non-persisted edge stack object"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
@@ -228,7 +228,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 }
 
 // @id EdgeStackCreateRepository
-// @summary Create an EdgeStack
+// @summary Create an EdgeStack from a git repository
 // @description **Access policy**: administrator
 // @tags edge_stacks
 // @security ApiKeyAuth
@@ -331,7 +331,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 }
 
 // @id EdgeStackCreateFile
-// @summary Create an EdgeStack
+// @summary Create an EdgeStack from file
 // @description **Access policy**: administrator
 // @tags edge_stacks
 // @security ApiKeyAuth

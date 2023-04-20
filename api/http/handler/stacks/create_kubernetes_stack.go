@@ -133,19 +133,19 @@ type createKubernetesStackResponse struct {
 }
 
 // @id StackCreateKubernetesFile
-// @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @summary Deploy a new kubernetes stack from a file
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body kubernetesStringDeploymentPayload false "Required when using method=string and type=3"
-// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @param body body kubernetesStringDeploymentPayload true ""
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /stacks/kubernetes/string [post]
+// @router /stacks/create/kubernetes/string [post]
 func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	if !endpointutils.IsKubernetesEndpoint(endpoint) {
 		return httperror.BadRequest("Environment type does not match", errors.New("Environment type does not match"))
@@ -190,19 +190,19 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 }
 
 // @id StackCreateKubernetesGit
-// @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @summary Deploy a new kubernetes stack from a git repository
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body kubernetesGitDeploymentPayload false "Required when using method=repository and type=3"
-// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @param body body kubernetesGitDeploymentPayload true ""
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /stacks/kubernetes/repository [post]
+// @router /stacks/create/kubernetes/repository [post]
 func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	if !endpointutils.IsKubernetesEndpoint(endpoint) {
 		return httperror.BadRequest("Environment type does not match", errors.New("Environment type does not match"))
@@ -272,19 +272,19 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 }
 
 // @id StackCreateKubernetesUrl
-// @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @summary Deploy a new kubernetes stack from a url
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body kubernetesManifestURLDeploymentPayload false "Required when using method=url and type=3"
-// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @param body body kubernetesManifestURLDeploymentPayload true ""
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /stacks/kubernetes/url [post]
+// @router /stacks/create/kubernetes/url [post]
 func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesManifestURLDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
