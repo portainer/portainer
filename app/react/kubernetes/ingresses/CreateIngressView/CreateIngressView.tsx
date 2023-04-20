@@ -351,10 +351,15 @@ export function CreateIngressView() {
           if (key.length > 2) {
             errors[`annotations.key[${i}]`] =
               'Two segments are allowed, separated by a slash (/): a prefix (optional) and a name.';
-          } else if (key[0].length > 253) {
-            errors[`annotations.key[${i}]`] =
-              'Prefix (before the slash) cannot be more than 253 characters.';
-          } else if (key[1].length > 63) {
+          } else if (key.length === 2) {
+            if (key[0].length > 253) {
+              errors[`annotations.key[${i}]`] =
+                'Prefix (before the slash) cannot be more than 253 characters.';
+            } else if (key[1].length > 63) {
+              errors[`annotations.key[${i}]`] =
+                'Name (after the slash) cannot be more than 63 characters.';
+            }
+          } else if (key.length === 1 && key[0].length > 63) {
             errors[`annotations.key[${i}]`] =
               'Name (after the slash) cannot be more than 63 characters.';
           } else if (!re.test(key[1])) {
