@@ -61,7 +61,7 @@ func createStackPayloadFromSwarmFileContentPayload(name string, swarmID string, 
 // @security jwt
 // @accept json
 // @produce json
-// @param body body swarmStackFromFileContentPayload true ""
+// @param body body swarmStackFromFileContentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
@@ -184,7 +184,7 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 // @produce json
 // @accept json
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
-// @param body body swarmStackFromGitRepositoryPayload true ""
+// @param body body swarmStackFromGitRepositoryPayload true "stack config"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

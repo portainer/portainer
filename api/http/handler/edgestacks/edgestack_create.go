@@ -101,7 +101,7 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body swarmStackFromFileContentPayload true ""
+// @param body body swarmStackFromFileContentPayload true "stack config"
 // @param dryrun query string false "if true, will not create an edge stack, but just will check the settings and return a non-persisted edge stack object"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
@@ -235,7 +235,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 // @security jwt
 // @produce json
 // @param method query string true "Creation Method" Enums(file,string,repository)
-// @param body body swarmStackFromGitRepositoryPayload true "Required when using method=repository"
+// @param body body swarmStackFromGitRepositoryPayload true "stack config"
 // @param dryrun query string false "if true, will not create an edge stack, but just will check the settings and return a non-persisted edge stack object"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500

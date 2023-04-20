@@ -96,7 +96,7 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 // @security jwt
 // @accept json
 // @produce json
-// @param body body composeStackFromFileContentPayload true ""
+// @param body body composeStackFromFileContentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
@@ -226,7 +226,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 // @produce json
 // @accept json
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
-// @param body body composeStackFromGitRepositoryPayload true ""
+// @param body body composeStackFromGitRepositoryPayload true "stack config"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

@@ -140,7 +140,7 @@ type createKubernetesStackResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body kubernetesStringDeploymentPayload true ""
+// @param body body kubernetesStringDeploymentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
@@ -197,7 +197,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body kubernetesGitDeploymentPayload true ""
+// @param body body kubernetesGitDeploymentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
@@ -279,7 +279,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param body body kubernetesManifestURLDeploymentPayload true ""
+// @param body body kubernetesManifestURLDeploymentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
