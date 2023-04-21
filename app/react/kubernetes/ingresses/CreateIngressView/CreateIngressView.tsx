@@ -354,17 +354,22 @@ export function CreateIngressView() {
           } else if (key.length === 2) {
             if (key[0].length > 253) {
               errors[`annotations.key[${i}]`] =
-                'Prefix (before the slash) cannot be more than 253 characters.';
+                "Prefix (before the slash) can't exceed 253 characters.";
             } else if (key[1].length > 63) {
               errors[`annotations.key[${i}]`] =
-                'Name (after the slash) cannot be more than 63 characters.';
+                "Name (after the slash) can't exceed 63 characters.";
+            } else if (!re.test(key[1])) {
+              errors[`annotations.key[${i}]`] =
+                'Must begin and end with an alphanumeric character, and have dashes, underscores and alphanumerics between.';
             }
-          } else if (key.length === 1 && key[0].length > 63) {
-            errors[`annotations.key[${i}]`] =
-              'Name (after the slash) cannot be more than 63 characters.';
-          } else if (!re.test(key[1])) {
-            errors[`annotations.key[${i}]`] =
-              'Must begin and end with an alphanumeric character, and have dashes, underscores and alphanumerics between.';
+          } else if (key.length === 1) {
+            if (key[0].length > 63) {
+              errors[`annotations.key[${i}]`] =
+                "Name (the segment after a slash (/), or only segment if no slash) can't exceed 63 characters.";
+            } else if (!re.test(key[0])) {
+              errors[`annotations.key[${i}]`] =
+                'Must begin and end with an alphanumeric character, and have dashes, underscores and alphanumerics between.';
+            }
           }
         }
         if (!a.Value) {
