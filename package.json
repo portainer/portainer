@@ -136,7 +136,7 @@
     "mustache": "^4.2.0",
     "ng-file-upload": "~12.2.13",
     "parse-duration": "^1.0.2",
-    "rc-slider": "^9.7.5",
+    "rc-slider": "^10.0.0",
     "react": "^17.0.2",
     "react-datetime-picker": "^4.2.0",
     "react-dom": "^17.0.2",
