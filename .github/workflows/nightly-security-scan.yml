@@ -5,12 +5,15 @@ on:
     - cron: '0 20 * * *'
   workflow_dispatch:
     
+env:
+  working_branch: "refs/heads/fix/EE-3059/security-scan-debug"
+  
 jobs:
   client-dependencies:
     name: Client Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
+      github.ref == ${{ env.working_branch }}
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
@@ -52,7 +55,7 @@ jobs:
     name: Server Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
+      github.ref == ${{ env.working_branch }}
     outputs:
       go: ${{ steps.set-matrix.outputs.go_result }}
     steps:
@@ -102,7 +105,7 @@ jobs:
     name: Image Vulnerability Check
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
+      github.ref == ${{ env.working_branch }}
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
     steps:
@@ -140,7 +143,7 @@ jobs:
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
+      github.ref == ${{ env.working_branch }}
     strategy:
       matrix: 
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
@@ -149,12 +152,12 @@ jobs:
     steps:
       - name: display the results of js, Go, and image scan
         run: |
-          echo ${{ matrix.js.status }}
-          echo ${{ matrix.go.status }}
-          echo ${{ matrix.image.status }}
-          echo ${{ matrix.js.summary }}
-          echo ${{ matrix.go.summary }}
-          echo ${{ matrix.image.summary }}
+          echo "${{ matrix.js.status }}"
+          echo "${{ matrix.go.status }}"
+          echo "${{ matrix.image.status }}"
+          echo "${{ matrix.js.summary }}"
+          echo "${{ matrix.go.summary }}"
+          echo "${{ matrix.image.summary }}"
 
       - name: send message to Slack 
         if: >- 
