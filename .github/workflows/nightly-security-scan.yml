@@ -7,13 +7,13 @@ on:
     
 env:
   working_branch: "refs/heads/fix/EE-3059/security-scan-debug"
-  
+
 jobs:
   client-dependencies:
     name: Client Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == ${{ env.working_branch }}
+      github.ref == "$working_branch"
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
@@ -55,7 +55,7 @@ jobs:
     name: Server Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == ${{ env.working_branch }}
+      github.ref == "$working_branch"
     outputs:
       go: ${{ steps.set-matrix.outputs.go_result }}
     steps:
@@ -105,7 +105,7 @@ jobs:
     name: Image Vulnerability Check
     runs-on: ubuntu-latest
     if: >-
-      github.ref == ${{ env.working_branch }}
+      github.ref == "$working_branch"
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
     steps:
@@ -143,7 +143,7 @@ jobs:
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
-      github.ref == ${{ env.working_branch }}
+      github.ref == "$working_branch"
     strategy:
       matrix: 
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
