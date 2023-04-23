@@ -10,7 +10,7 @@ jobs:
     name: Client Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
@@ -33,7 +33,7 @@ jobs:
 
       - name: develop scan report export to html
         run: |
-          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=table --export --export-filename="/data/js-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:pr5 summary --report-type=snyk --path="/data/snyk.json" --output-type=table --export --export-filename="/data/js-result")
 
       - name: upload html file as artifact
         uses: actions/upload-artifact@v3
@@ -44,14 +44,15 @@ jobs:
       - name: analyse vulnerabilities 
         id: set-matrix
         run: |
-          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:pr5 summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
           echo "js_result=${result}" >> $GITHUB_OUTPUT
+          echo "${result}"
 
   server-dependencies:
     name: Server Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
     outputs:
       go: ${{ steps.set-matrix.outputs.go_result }}
     steps:
@@ -82,7 +83,7 @@ jobs:
 
       - name: develop scan report export to html
         run: |
-          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=table --export --export-filename="/data/go-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:pr5 summary --report-type=snyk --path="/data/snyk.json" --output-type=table --export --export-filename="/data/go-result")
 
       - name: upload html file as artifact
         uses: actions/upload-artifact@v3
@@ -93,14 +94,15 @@ jobs:
       - name: analyse vulnerabilities
         id: set-matrix
         run: |
-          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:pr5 summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
           echo "go_result=${result}" >> $GITHUB_OUTPUT
+          echo "${result}"
 
   image-vulnerability:
     name: Image Vulnerability Check
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/develop'
+      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
     steps:
@@ -118,7 +120,7 @@ jobs:
 
       - name: develop scan report export to html
         run: |
-          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=table --export --export-filename="/data/image-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:pr5 summary --report-type=trivy --path="/data/image-trivy.json" --output-type=table --export --export-filename="/data/image-result")
 
       - name: upload html file as artifact
         uses: actions/upload-artifact@v3
@@ -129,15 +131,16 @@ jobs:
       - name: analyse vulnerabilities
         id: set-matrix
         run: |
-          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:pr5 summary --report-type=trivy --path="/data/image-trivy.json" --output-type=matrix)
           echo "image_result=${result}" >> $GITHUB_OUTPUT
+          echo "${result}"
 
   result-analysis:
     name: Analyse Scan Results
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/develop'
+      github.ref == 'refs/heads/fix/EE-3059/security-scan-debug' 
     strategy:
       matrix: 
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
