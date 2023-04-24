@@ -59,7 +59,7 @@ func (handler *Handler) createSwarmStack(method string, dryrun bool, userID port
 	case "file":
 		return handler.createSwarmStackFromFileUpload(r, dryrun)
 	}
-	return nil, errors.New("Invalid value for query parameter: method. Value must be one of: string, repository or file")
+	return nil, &InvalidPayloadError{"Invalid value for query parameter: method. Value must be one of: string, repository or file"}
 }
 
 type swarmStackFromFileContentPayload struct {
