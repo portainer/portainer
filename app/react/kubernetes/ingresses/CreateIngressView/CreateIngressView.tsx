@@ -360,7 +360,7 @@ export function CreateIngressView() {
                 "Name (after the slash) can't exceed 63 characters.";
             } else if (!re.test(key[1])) {
               errors[`annotations.key[${i}]`] =
-                'Must begin and end with an alphanumeric character, and have dashes, underscores and alphanumerics between.';
+                'Start and end with alphanumeric characters only, limiting characters in between to dashes, underscores, and alphanumerics.';
             }
           } else if (key.length === 1) {
             if (key[0].length > 63) {
@@ -368,7 +368,7 @@ export function CreateIngressView() {
                 "Name (the segment after a slash (/), or only segment if no slash) can't exceed 63 characters.";
             } else if (!re.test(key[0])) {
               errors[`annotations.key[${i}]`] =
-                'Must begin and end with an alphanumeric character, and have dashes, underscores and alphanumerics between.';
+                'Start and end with alphanumeric characters only, limiting characters in between to dashes, underscores, and alphanumerics.';
             }
           }
         }
