@@ -146,12 +146,12 @@ jobs:
     steps:
       - name: display the results of js, Go, and image scan
         run: |
-          echo ${{ matrix.js.status }}
-          echo ${{ matrix.go.status }}
-          echo ${{ matrix.image.status }}
-          echo ${{ matrix.js.summary }}
-          echo ${{ matrix.go.summary }}
-          echo ${{ matrix.image.summary }}
+          echo "${{ matrix.js.status }}"
+          echo "${{ matrix.go.status }}"
+          echo "${{ matrix.image.status }}"
+          echo "${{ matrix.js.summary }}"
+          echo "${{ matrix.go.summary }}"
+          echo "${{ matrix.image.summary }}"
 
       - name: send message to Slack 
         if: >- 

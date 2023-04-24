@@ -230,10 +230,10 @@ jobs:
           matrix.godiff.status == 'failure' ||
           matrix.imagediff.status == 'failure' 
         run: |
-          echo ${{ matrix.jsdiff.status }}
-          echo ${{ matrix.godiff.status }}
-          echo ${{ matrix.imagediff.status }}
-          echo ${{ matrix.jsdiff.summary }}
-          echo ${{ matrix.godiff.summary }}
-          echo ${{ matrix.imagediff.summary }}
+          echo "${{ matrix.jsdiff.status }}"
+          echo "${{ matrix.godiff.status }}"
+          echo "${{ matrix.imagediff.status }}"
+          echo "${{ matrix.jsdiff.summary }}"
+          echo "${{ matrix.godiff.summary }}"
+          echo "${{ matrix.imagediff.summary }}"
           exit 1
