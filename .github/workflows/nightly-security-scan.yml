@@ -6,14 +6,13 @@ on:
   workflow_dispatch:
     
 env:
-  working_branch: "refs/heads/fix/EE-3059/security-scan-debug"
+  working_branch: refs/heads/fix/EE-3059/security-scan-debug
 
 jobs:
   client-dependencies:
     name: Client Dependency Check
     runs-on: ubuntu-latest
-    if: >- # only run for develop branch
-      github.ref == env.working_branch
+    if: github.ref == env.working_branch
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
