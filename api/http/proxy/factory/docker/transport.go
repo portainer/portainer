@@ -471,7 +471,7 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 			return err
 		}
 
-		header := base64.StdEncoding.EncodeToString(headerData)
+		header := base64.URLEncoding.EncodeToString(headerData)
 
 		request.Header.Set("X-Registry-Auth", header)
 	}
