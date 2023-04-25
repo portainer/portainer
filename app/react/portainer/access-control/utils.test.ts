@@ -3,6 +3,25 @@ import { ResourceControlOwnership, ResourceControlType } from './types';
 import { parseAccessControlFormData } from './utils';
 
 describe('parseAccessControlFormData', () => {
+  test('when ownership is private and resource is supplied, authorizedUsers should be UserAccess', () => {
+    const resourceControl = buildResourceControl(
+      ResourceControlOwnership.PRIVATE
+    );
+    resourceControl.UserAccesses = [{ UserId: 1, AccessLevel: 1 }];
+
+    const actual = parseAccessControlFormData(false, 1, resourceControl);
+    expect(actual.authorizedUsers).toContain(1);
+    expect(actual.authorizedUsers).toHaveLength(1);
+  });
+
+  test('when not admin and no resource control, ownership should be set to private and authorizedUsers is only currentUserId', () => {
+    const actual = parseAccessControlFormData(false, 1);
+
+    expect(actual.ownership).toBe(ResourceControlOwnership.PRIVATE);
+    expect(actual.authorizedUsers).toContain(1);
+    expect(actual.authorizedUsers).toHaveLength(1);
+  });
+
   [
     ResourceControlOwnership.ADMINISTRATORS,
     ResourceControlOwnership.RESTRICTED,
@@ -12,7 +31,7 @@ describe('parseAccessControlFormData', () => {
     test(`when resource control supplied, if user is not admin, will change ownership to rc ownership (${ownership})`, () => {
       const resourceControl = buildResourceControl(ownership);
 
-      const actual = parseAccessControlFormData(false, resourceControl);
+      const actual = parseAccessControlFormData(false, 0, resourceControl);
       expect(actual.ownership).toBe(resourceControl.Ownership);
     });
   });
@@ -25,13 +44,13 @@ describe('parseAccessControlFormData', () => {
     test(`when resource control supplied and user is admin, if resource ownership is ${ownership} , will change ownership to rc ownership`, () => {
       const resourceControl = buildResourceControl(ownership);
 
-      const actual = parseAccessControlFormData(true, resourceControl);
+      const actual = parseAccessControlFormData(true, 0, resourceControl);
       expect(actual.ownership).toBe(resourceControl.Ownership);
     });
   });
 
   test('when isAdmin and resource control not supplied, ownership should be set to Administrator', () => {
-    const actual = parseAccessControlFormData(true);
+    const actual = parseAccessControlFormData(true, 0);
 
     expect(actual.ownership).toBe(ResourceControlOwnership.ADMINISTRATORS);
   });
@@ -41,7 +60,7 @@ describe('parseAccessControlFormData', () => {
       ResourceControlOwnership.PRIVATE
     );
 
-    const actual = parseAccessControlFormData(true, resourceControl);
+    const actual = parseAccessControlFormData(true, 0, resourceControl);
     expect(actual.ownership).toBe(ResourceControlOwnership.RESTRICTED);
   });
 

@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useMutation } from 'react-query';
 import { object } from 'yup';
 
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -43,7 +43,7 @@ export function AccessControlPanelForm({
   onCancelClick,
   onUpdateSuccess,
 }: Props) {
-  const { isAdmin } = useUser();
+  const { isAdmin, user } = useCurrentUser();
 
   const updateAccess = useMutation(
     (variables: AccessControlFormData) =>
@@ -64,7 +64,11 @@ export function AccessControlPanelForm({
   );
 
   const initialValues = {
-    accessControl: parseAccessControlFormData(isAdmin, resourceControl),
+    accessControl: parseAccessControlFormData(
+      isAdmin,
+      user.Id,
+      resourceControl
+    ),
   };
 
   return (

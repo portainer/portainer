@@ -6,7 +6,7 @@ import {
   Subscription,
 } from '@/react/azure/types';
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { useProvider } from '@/react/azure/queries/useProvider';
 import { useResourceGroups } from '@/react/azure/queries/useResourceGroups';
 import { useSubscriptions } from '@/react/azure/queries/useSubscriptions';
@@ -37,7 +37,7 @@ export function useFormState(
   resourceGroups: Record<string, ResourceGroup[]> = {},
   providers: Record<string, ProviderViewModel> = {}
 ) {
-  const { isAdmin } = useUser();
+  const { isAdmin, user } = useCurrentUser();
 
   const subscriptionOptions = subscriptions.map((s) => ({
     value: s.subscriptionId,
@@ -67,7 +67,7 @@ export function useFormState(
     cpu: 1,
     ports: [{ container: 80, host: 80, protocol: 'TCP' }],
     allocatePublicIP: true,
-    accessControl: parseAccessControlFormData(isAdmin),
+    accessControl: parseAccessControlFormData(isAdmin, user.Id),
   };
 
   return {
