@@ -283,6 +283,12 @@ class KubernetesDeployController {
 
       this.Notifications.success('Success', 'Manifest successfully deployed');
       this.state.isEditorDirty = false;
+
+      if (this.$state.params.referrer) {
+        this.$state.go(this.$state.params.referrer);
+        return;
+      }
+
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Unable to deploy manifest', err, 'Unable to deploy resources');
