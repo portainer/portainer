@@ -15,6 +15,7 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { updateIngressControllerClassMap, getIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 import { confirmUpdate } from '@@/modals/confirm';
+import { confirmUpdateNamespace } from '@/react/kubernetes/namespaces/ItemView/ConfirmUpdateNamespace';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -178,19 +179,8 @@ class KubernetesResourcePoolController {
       registries: registriesToDelete.length !== 0,
     };
 
-    if (warnings.quota || warnings.ingress || warnings.registries) {
-      const messages = {
-        quota:
-          'Reducing the quota assigned to an "in-use" namespace may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
-        ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
-        registries:
-          'Some registries you removed might be used by one or more applications inside this environment. Removing the registries access could lead to a service interruption for these applications.',
-      };
-      const displayedMessage = `${warnings.quota ? messages.quota + '<br/><br/>' : ''}
-      ${warnings.ingress ? messages.ingress + '<br/><br/>' : ''}
-      ${warnings.registries ? messages.registries + '<br/><br/>' : ''}
-      Do you wish to continue?`;
-      confirmUpdate(displayedMessage, (confirmed) => {
+    if (warnings.quota || warnings.registries) {
+      confirmUpdateNamespace(warnings.quota, warnings.ingress, warnings.registries).then((confirmed) => {
         if (confirmed) {
           return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }

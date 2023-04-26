@@ -10,6 +10,7 @@ import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@
 import { buildConfirmButton } from '@@/modals/utils';
 import { confirm } from '@@/modals/confirm';
 import { getIsRBACEnabled } from '@/react/kubernetes/cluster/getIsRBACEnabled';
+import { ModalType } from '@@/modals/Modal/types';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
@@ -392,6 +393,7 @@ class KubernetesConfigureController {
       return confirm({
         title: 'Are you sure?',
         message: 'You currently have unsaved changes in the cluster setup view. Are you sure you want to leave?',
+        modalType: ModalType.Warn,
         confirmButton: buildConfirmButton('Yes', 'danger'),
       });
     }
