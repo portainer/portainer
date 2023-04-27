@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { EnvironmentType } from '@/react/portainer/environments/types';
+import { createWebhookId } from '@/portainer/helpers/webhookHelper';
 
 export class EditEdgeStackViewController {
   /* @ngInject */
@@ -110,6 +111,7 @@ export class EditEdgeStackViewController {
         edgeGroups: values.edgeGroups,
         deploymentType: values.deploymentType,
         updateVersion,
+        webhook: values.webhookEnabled ? this.stack.Webhook || createWebhookId() : '',
       });
       this.Notifications.success('Success', 'Stack successfully deployed');
       this.state.isStackDeployed = true;
