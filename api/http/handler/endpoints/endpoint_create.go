@@ -192,7 +192,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @param TagIds formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
 // @param EdgeCheckinInterval formData int false "The check in interval for edge agent (in seconds)"
 // @param EdgeTunnelServerAddress formData string true "URL or IP address that will be used to establish a reverse tunnel"
-// @param Gpus formData array false "List of GPUs"
+// @param Gpus formData string false "List of GPUs - json stringified array of {name, value} structs"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

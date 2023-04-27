@@ -65,7 +65,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createSchedule = function (payload) {
       return Upload.upload({
-        url: 'api/edge_jobs?method=file',
+        url: 'api/edge_jobs/create/file',
         data: {
           file: payload.File,
           Name: payload.Name,
@@ -90,7 +90,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createSwarmStack = function (stackName, swarmId, file, env, endpointId) {
       return Upload.upload({
-        url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
+        url: `api/stacks/create/swarm/file?endpointId=${endpointId}`,
         data: {
           file: file,
           Name: stackName,
@@ -103,7 +103,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createComposeStack = function (stackName, file, env, endpointId) {
       return Upload.upload({
-        url: 'api/stacks?method=file&type=2&endpointId=' + endpointId,
+        url: `api/stacks/create/standalone/file?endpointId=${endpointId}`,
         data: {
           file: file,
           Name: stackName,
@@ -115,7 +115,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createEdgeStack = function createEdgeStack({ EdgeGroups, ...payload }, file) {
       return Upload.upload({
-        url: 'api/edge_stacks?method=file',
+        url: `api/edge_stacks/create/file`,
         data: {
           file,
           EdgeGroups: Upload.json(EdgeGroups),
@@ -127,7 +127,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createCustomTemplate = function createCustomTemplate(data) {
       return Upload.upload({
-        url: 'api/custom_templates?method=file',
+        url: 'api/custom_templates/create/file',
         data,
         ignoreLoadingBar: true,
       });

@@ -317,7 +317,7 @@ angular.module('portainer.app').factory('StackService', [
         StackFileContent: stackFileContent,
         Env: env,
       };
-      return Stack.create({ method: 'string', type: 2, endpointId: endpointId }, payload).$promise;
+      return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'standalone', ...payload }).$promise;
     };
 
     service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
@@ -331,7 +331,7 @@ angular.module('portainer.app').factory('StackService', [
             StackFileContent: stackFileContent,
             Env: env,
           };
-          return Stack.create({ method: 'string', type: 1, endpointId: endpointId }, payload).$promise;
+          return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'swarm', ...payload }).$promise;
         })
         .then(function success(data) {
           deferred.resolve(data);
@@ -362,7 +362,7 @@ angular.module('portainer.app').factory('StackService', [
         payload.AutoUpdate = repositoryOptions.AutoUpdate;
       }
 
-      return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
+      return Stack.create({ endpointId: endpointId }, { method: 'repository', type: 'standalone', ...payload }).$promise;
     };
 
     service.createSwarmStackFromGitRepository = function (name, repositoryOptions, env, endpointId) {
@@ -390,7 +390,7 @@ angular.module('portainer.app').factory('StackService', [
             payload.AutoUpdate = repositoryOptions.AutoUpdate;
           }
 
-          return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
+          return Stack.create({ endpointId: endpointId }, { method: 'repository', type: 'swarm', ...payload }).$promise;
         })
         .then(function success(data) {
           deferred.resolve(data);
@@ -409,7 +409,7 @@ angular.module('portainer.app').factory('StackService', [
 
     async function kubernetesDeployAsync(endpointId, method, payload) {
       try {
-        await Stack.create({ endpointId: endpointId, method: method, type: 3 }, payload).$promise;
+        await Stack.create({ endpointId: endpointId }, { method, type: 'kubernetes', ...payload }).$promise;
       } catch (err) {
         throw { err: err };
       }

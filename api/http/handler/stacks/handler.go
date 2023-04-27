@@ -55,7 +55,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
 	}
-	h.Handle("/stacks",
+
+	h.Handle("/stacks/create/{type}/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
 	h.Handle("/stacks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackList))).Methods(http.MethodGet)

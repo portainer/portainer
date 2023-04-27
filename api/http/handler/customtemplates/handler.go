@@ -29,7 +29,8 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		GitService:     gitService,
 		gitFetchMutexs: make(map[portainer.TemplateID]*sync.Mutex),
 	}
-	h.Handle("/custom_templates",
+
+	h.Handle("/custom_templates/create/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateCreate))).Methods(http.MethodPost)
 	h.Handle("/custom_templates",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateList))).Methods(http.MethodGet)
