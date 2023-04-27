@@ -117,6 +117,11 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.InternalServerError("Unable to Unable to persist environment changes inside the database", err)
 	}
 
+	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(endpoint)
+	if err != nil {
+		return httperror.Forbidden("Permission denied to access environment", err)
+	}
+
 	checkinInterval := endpoint.EdgeCheckinInterval
 	if endpoint.EdgeCheckinInterval == 0 {
 		settings, err := handler.DataStore.Settings().Settings()

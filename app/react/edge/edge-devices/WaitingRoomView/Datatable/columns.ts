@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { CellProps, Column } from 'react-table';
 
 import { WaitingRoomEnvironment } from '../types';
@@ -52,4 +53,24 @@ export const columns: readonly Column<WaitingRoomEnvironment>[] = [
     canHide: false,
     sortType: 'string',
   },
+  {
+    Header: 'Last Check-in',
+    accessor: 'LastCheckInDate',
+    Cell: LastCheckinDateCell,
+    id: 'last-check-in',
+    disableFilters: true,
+    Filter: () => null,
+    canHide: false,
+    sortType: 'string',
+  },
 ] as const;
+
+function LastCheckinDateCell({
+  value,
+}: CellProps<WaitingRoomEnvironment, number>) {
+  if (!value) {
+    return '-';
+  }
+
+  return moment(value * 1000).fromNow();
+}
