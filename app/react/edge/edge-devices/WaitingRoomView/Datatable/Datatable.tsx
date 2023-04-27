@@ -1,13 +1,18 @@
 import { useStore } from 'zustand';
+import { Trash2 } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/queries/useDeleteEnvironmentsMutation';
 
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
 import { createPersistedStore } from '@@/datatables/types';
 import { useSearchBarState } from '@@/datatables/SearchBar';
+import { confirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 
 import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 
@@ -21,6 +26,7 @@ const settingsStore = createPersistedStore(storageKey, 'Name');
 
 export function Datatable() {
   const associateMutation = useAssociateDeviceMutation();
+  const removeMutation = useDeleteEnvironmentsMutation();
   const licenseOverused = useLicenseOverused();
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
@@ -40,6 +46,15 @@ export function Datatable() {
       emptyContentLabel="No Edge Devices found"
       renderTableActions={(selectedRows) => (
         <>
+          <Button
+            onClick={() => handleRemoveDevice(selectedRows)}
+            disabled={selectedRows.length === 0 || licenseOverused}
+            color="dangerlight"
+            icon={Trash2}
+          >
+            Remove Device
+          </Button>
+
           <Button
             onClick={() => handleAssociateDevice(selectedRows)}
             disabled={selectedRows.length === 0}
@@ -69,6 +84,29 @@ export function Datatable() {
       {
         onSuccess() {
           notifySuccess('Success', 'Edge devices associated successfully');
+        },
+      }
+    );
+  }
+
+  async function handleRemoveDevice(devices: Environment[]) {
+    const confirmed = await confirm({
+      title: 'Are you sure?',
+      message:
+        "You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup.",
+      confirmButton: buildConfirmButton('Remove', 'danger'),
+      modalType: ModalType.Destructive,
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    removeMutation.mutate(
+      devices.map((d) => d.Id),
+      {
+        onSuccess() {
+          notifySuccess('Success', 'Edge devices were hidden successfully');
         },
       }
     );
