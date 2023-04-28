@@ -5,7 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
-	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/filesystem"
 
 	"github.com/rs/zerolog/log"
@@ -58,17 +57,17 @@ func NewTestStore(t testing.TB, init, secure bool) (bool, *Store, func(), error)
 		}
 	}
 
-	if newStore {
-		// from MigrateData
-		v := models.Version{
-			SchemaVersion: portainer.APIVersion,
-			Edition:       int(portainer.PortainerCE),
-		}
-		err = store.VersionService.UpdateVersion(&v)
-		if err != nil {
-			return newStore, nil, nil, err
-		}
-	}
+	// if newStore {
+	// 	// from MigrateData
+	// 	v := models.Version{
+	// 		SchemaVersion: portainer.APIVersion,
+	// 		Edition:       int(portainer.PortainerCE),
+	// 	}
+	// 	err = store.VersionService.UpdateVersion(&v)
+	// 	if err != nil {
+	// 		return newStore, nil, nil, err
+	// 	}
+	// }
 
 	teardown := func() {
 		err := store.Close()

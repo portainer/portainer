@@ -1,11 +1,13 @@
 package migrator
 
 import (
+	"fmt"
 	"reflect"
 	"runtime"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database/models"
 
 	"github.com/Masterminds/semver"
 	"github.com/rs/zerolog/log"
@@ -21,14 +23,26 @@ func GetFunctionName(i interface{}) string {
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) Migrate() error {
-	version, err := m.versionService.Version()
+	versions, err := m.versionService.GetAll()
 	if err != nil {
 		return migrationError(err, "get version service")
 	}
 
-	schemaVersion, err := semver.NewVersion(version.Value)
+	version, ok := versions[models.VersionKey]
+	if !ok {
+		return migrationError(err, "no version specified in the DB")
+	}
+
+	schemaVersion, err := semver.NewVersion(fmt.Sprintf("%v", version))
 	if err != nil {
 		return migrationError(err, "invalid db schema version")
+	}
+
+	migratorCount, ok := versions[models.MigratorCountKey]
+	if ok {
+		migratorCount = migratorCount.(int)
+	} else {
+		migratorCount = 0
 	}
 
 	newMigratorCount := 0
@@ -38,7 +52,7 @@ func (m *Migrator) Migrate() error {
 		// e.g. development builds
 		latestMigrations := m.LatestMigrations()
 		if latestMigrations.Version.Equal(schemaVersion) &&
-			version.MigratorCount != len(latestMigrations.MigrationFuncs) {
+			migratorCount != len(latestMigrations.MigrationFuncs) {
 			err := runMigrations(latestMigrations.MigrationFuncs)
 			if err != nil {
 				return err
@@ -68,10 +82,10 @@ func (m *Migrator) Migrate() error {
 		return migrationError(err, "Always migrations returned error")
 	}
 
-	version.SchemaVersion = portainer.APIVersion
-	version.MigratorCount = newMigratorCount
+	versions[models.SchemaVersionKey] = portainer.APIVersion
+	versions[models.MigratorCountKey] = newMigratorCount
 
-	err = m.versionService.UpdateVersion(version)
+	err = m.versionService.UpdateAll(versions)
 	if err != nil {
 		return migrationError(err, "StoreDBVersion")
 	}
@@ -91,35 +105,35 @@ func runMigrations(migrationFuncs []func() error) error {
 	return nil
 }
 
-func (m *Migrator) NeedsMigration() bool {
-	// we need to migrate if anything changes with the version in the DB vs what our software version is.
-	// If the version matches, then it's all down to the number of migration funcs we have for the current version
-	// i.e. the MigratorCount
+// func (m *Migrator) NeedsMigration() bool {
+// 	// we need to migrate if anything changes with the version in the DB vs what our software version is.
+// 	// If the version matches, then it's all down to the number of migration funcs we have for the current version
+// 	// i.e. the MigratorCount
 
-	// In this particular instance we should log a fatal error
-	if m.CurrentDBEdition() != portainer.PortainerCE {
-		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://documentation.portainer.io/v2.0-be/downgrade/be-to-ce/")
-		return false
-	}
+// 	// In this particular instance we should log a fatal error
+// 	if m.CurrentDBEdition() != portainer.PortainerCE {
+// 		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://documentation.portainer.io/v2.0-be/downgrade/be-to-ce/")
+// 		return false
+// 	}
 
-	if m.CurrentSemanticDBVersion().LessThan(semver.MustParse(portainer.APIVersion)) {
-		return true
-	}
+// 	if m.CurrentSemanticDBVersion().LessThan(semver.MustParse(portainer.APIVersion)) {
+// 		return true
+// 	}
 
-	// Check if we have any migrations for the current version
-	latestMigrations := m.LatestMigrations()
-	if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
-		if m.currentDBVersion.MigratorCount != len(latestMigrations.MigrationFuncs) {
-			return true
-		}
-	} else {
-		// One remaining possibility if we get here.  If our migrator count > 0 and we have no migration funcs
-		// for the current version (i.e. they were deleted during development).  Then we we need to migrate.
-		// This is to reset the migrator count back to 0
-		if m.currentDBVersion.MigratorCount > 0 {
-			return true
-		}
-	}
+// 	// Check if we have any migrations for the current version
+// 	latestMigrations := m.LatestMigrations()
+// 	if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
+// 		if m.currentDBVersion.MigratorCount != len(latestMigrations.MigrationFuncs) {
+// 			return true
+// 		}
+// 	} else {
+// 		// One remaining possibility if we get here.  If our migrator count > 0 and we have no migration funcs
+// 		// for the current version (i.e. they were deleted during development).  Then we we need to migrate.
+// 		// This is to reset the migrator count back to 0
+// 		if m.currentDBVersion.MigratorCount > 0 {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }

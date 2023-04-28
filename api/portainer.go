@@ -901,18 +901,19 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
+		ID int `json:"-" gorm:"unique,primaryKey,autoIncrement"`
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
 		LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
 		// A list of label name & value that will be used to hide containers when querying containers
-		BlackListedLabels []Pair `json:"BlackListedLabels"`
+		BlackListedLabels []Pair `json:"BlackListedLabels" gorm:"serializer:json"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 		AuthenticationMethod AuthenticationMethod          `json:"AuthenticationMethod" example:"1"`
-		InternalAuthSettings InternalAuthSettings          `json:"InternalAuthSettings"`
-		LDAPSettings         LDAPSettings                  `json:"LDAPSettings"`
-		OAuthSettings        OAuthSettings                 `json:"OAuthSettings"`
-		OpenAMTConfiguration OpenAMTConfiguration          `json:"openAMTConfiguration"`
-		FDOConfiguration     FDOConfiguration              `json:"fdoConfiguration"`
-		FeatureFlagSettings  map[featureflags.Feature]bool `json:"FeatureFlagSettings"`
+		InternalAuthSettings InternalAuthSettings          `json:"InternalAuthSettings" gorm:"serializer:json"`
+		LDAPSettings         LDAPSettings                  `json:"LDAPSettings" gorm:"serializer:json"`
+		OAuthSettings        OAuthSettings                 `json:"OAuthSettings" gorm:"serializer:json"`
+		OpenAMTConfiguration OpenAMTConfiguration          `json:"openAMTConfiguration" gorm:"serializer:json"`
+		FDOConfiguration     FDOConfiguration              `json:"fdoConfiguration" gorm:"serializer:json"`
+		FeatureFlagSettings  map[featureflags.Feature]bool `json:"FeatureFlagSettings" gorm:"serializer:json"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -922,7 +923,7 @@ type (
 		// Show the Kompose build option (discontinued in 2.18)
 		ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
 		// Whether edge compute features are enabled
-		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures"`
+		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" gorm:"serializer:json"`
 		// The duration of a user session
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
 		// The expiry of a Kubeconfig
@@ -952,7 +953,7 @@ type (
 
 			// Deprecated 2.18
 			AsyncMode bool
-		}
+		} `json:"Edge" gorm:"serializer:json"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

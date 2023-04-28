@@ -5,10 +5,12 @@ import (
 )
 
 const (
-	VersionKey  string = "DB_VERSION"
-	InstanceKey string = "INSTANCE_ID"
-	EditionKey  string = "EDITION"
-	UpdatingKey string = "DB_UPDATING"
+	VersionKey       string = "DB_VERSION"
+	InstanceKey      string = "INSTANCE_ID"
+	EditionKey       string = "EDITION"
+	UpdatingKey      string = "DB_UPDATING"
+	MigratorCountKey string = "MIGRATOR_COUNT"
+	SchemaVersionKey string = "SCHEMA_VERSION"
 )
 
 type Version struct {

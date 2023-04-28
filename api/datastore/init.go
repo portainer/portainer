@@ -8,6 +8,9 @@ import (
 
 // Init creates the default data set.
 func (store *Store) Init() error {
+
+	store.connection.Init()
+
 	err := store.checkOrCreateDefaultSettings()
 	if err != nil {
 		return err

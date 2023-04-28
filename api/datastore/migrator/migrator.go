@@ -119,15 +119,15 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 }
 
 func (m *Migrator) CurrentDBVersion() string {
-	return m.currentDBVersion.SchemaVersion
+	return "" //m.currentDBVersion.SchemaVersion
 }
 
 func (m *Migrator) CurrentDBEdition() portainer.SoftwareEdition {
-	return portainer.SoftwareEdition(m.currentDBVersion.Edition)
+	return portainer.SoftwareEdition(1) //m.currentDBVersion.Edition
 }
 
 func (m *Migrator) CurrentSemanticDBVersion() *semver.Version {
-	v, err := semver.NewVersion(m.currentDBVersion.SchemaVersion)
+	v, err := semver.NewVersion("2.19.0") // m.currentDBVersion.SchemaVersion
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg("failed to parse current version")
 	}

@@ -63,6 +63,7 @@ func (store *Store) Close() error {
 
 // CheckCurrentEdition checks if current edition is community edition
 func (store *Store) CheckCurrentEdition() error {
+	fmt.Println("Edition:", store.edition(), portainer.Edition)
 	if store.edition() != portainer.Edition {
 		return portainerErrors.ErrWrongDBEdition
 	}

@@ -294,9 +294,11 @@ type (
 	VersionService interface {
 		Edition() (portainer.SoftwareEdition, error)
 		InstanceID() (string, error)
-		UpdateInstanceID(ID string) error
+		// UpdateInstanceID(ID string) error
 		Version() (*models.Version, error)
 		UpdateVersion(*models.Version) error
+		GetAll() (map[string]interface{}, error)
+		UpdateAll(map[string]interface{}) error
 	}
 
 	// WebhookService represents a service for managing webhook data.

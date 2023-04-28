@@ -1,10 +1,12 @@
 package version
 
 import (
+	"fmt"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
+	"gorm.io/gorm"
 )
 
 // Service represents a service to manage stored versions.
@@ -42,6 +44,7 @@ func (service *Service) Edition() (portainer.SoftwareEdition, error) {
 	if err != nil {
 		return 0, err
 	}
+	fmt.Println(portainer.SoftwareEdition(e))
 	return portainer.SoftwareEdition(e), nil
 }
 
@@ -116,5 +119,33 @@ func (service *Service) UpdateVersion(version *models.Version) error {
 	if tx.Error != nil {
 		return tx.Error
 	}
+	return nil
+}
+
+// Version retrieve the version object.
+func (service *Service) GetAll() (map[string]interface{}, error) {
+	db := service.connection.GetDB()
+	var all map[string]interface{}
+	tx := db.Find(&all)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return all, nil
+}
+
+// Version retrieve the version object.
+func (service *Service) UpdateAll(all map[string]interface{}) error {
+	db := service.connection.GetDB()
+	db.Transaction(func(tx *gorm.DB) error {
+		for k, v := range all {
+			tx := db.Model(&models.Version{}).Where(models.Version{Key: k}).FirstOrCreate(&models.Version{Key: k, Value: fmt.Sprintf("%v", v)})
+			if tx.Error != nil {
+				tx.Rollback()
+				return tx.Error
+			}
+		}
+		tx.Commit()
+		return nil
+	})
 	return nil
 }

@@ -36,17 +36,21 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 // Settings retrieve the settings object.
 func (service *Service) Settings() (*portainer.Settings, error) {
 	var settings portainer.Settings
-
-	// err := service.connection.GetObject(BucketName, []byte(settingsKey), &settings)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	db := service.connection.GetDB()
+	tx := db.First(&settings, `id = ?`, 1)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return &settings, nil
 }
 
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
-	// return service.connection.UpdateObject(BucketName, []byte(settingsKey), settings)
+	db := service.connection.GetDB()
+	tx := db.Model(&portainer.Settings{}).Where(portainer.Settings{ID: 1}).FirstOrCreate(settings)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }

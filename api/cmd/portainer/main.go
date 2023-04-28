@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/sha256"
+	"fmt"
 	"math/rand"
 	"os"
 	"path"
@@ -105,6 +106,8 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		log.Fatal().Err(err).Msg("failed initializing data store")
 	}
 
+	fmt.Println("IsNew:", isNew)
+
 	if isNew {
 		instanceId, err := uuid.NewV4()
 		if err != nil {
@@ -112,12 +115,15 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		}
 
 		// from MigrateData
-		v := models.Version{
-			SchemaVersion: portainer.APIVersion,
-			Edition:       int(portainer.PortainerCE),
-			InstanceID:    instanceId.String(),
+		v := map[string]interface{}{
+			models.SchemaVersionKey: portainer.APIVersion,
+			models.EditionKey:       int(portainer.PortainerCE),
+			models.InstanceKey:      instanceId.String(),
 		}
-		store.VersionService.UpdateVersion(&v)
+		err = store.VersionService.UpdateAll(v)
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed inserting version bucket")
+		}
 
 		err = updateSettingsFromFlags(store, flags)
 		if err != nil {
