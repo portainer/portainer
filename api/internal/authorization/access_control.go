@@ -127,7 +127,7 @@ func DecorateCustomTemplates(templates []portainer.CustomTemplate, resourceContr
 
 		resourceControl := GetResourceControlByResourceIDAndType(strconv.Itoa(int(template.ID)), portainer.CustomTemplateResourceControl, resourceControls)
 		if resourceControl != nil {
-			templates[idx].ResourceControl = resourceControl
+			templates[idx].ResourceControlID = resourceControl.ID
 		}
 	}
 
@@ -152,7 +152,7 @@ func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate,
 	authorizedTemplates := make([]portainer.CustomTemplate, 0)
 
 	for _, customTemplate := range customTemplates {
-		if customTemplate.CreatedByUserID == user.ID || (customTemplate.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, customTemplate.ResourceControl)) {
+		if customTemplate.CreatedByUserID == user.ID || (customTemplate.ResourceControlID == 0 && UserCanAccessResource(user.ID, userTeamIDs, customTemplate.ResourceControl)) {
 			authorizedTemplates = append(authorizedTemplates, customTemplate)
 		}
 	}
