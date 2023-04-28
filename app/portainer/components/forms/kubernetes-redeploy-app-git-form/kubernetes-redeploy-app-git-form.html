@@ -43,6 +43,19 @@
     is-auth-edit="$ctrl.state.isAuthEdit"
   ></git-form-auth-fieldset>
 
+  <div class="form-group" ng-if="$ctrl.state.showConfig">
+    <div class="col-sm-12">
+      <por-switch-field
+        name="TLSSkipVerify"
+        checked="$ctrl.formValues.TLSSkipVerify"
+        tooltip="'Enabling this will allow skipping TLS validation for any self-signed certificate.'"
+        label-class="'col-sm-3 col-lg-2'"
+        label="'Skip TLS Verification'"
+        on-change="($ctrl.onChangeTLSSkipVerify)"
+      ></por-switch-field>
+    </div>
+  </div>
+
   <div class="col-sm-12 form-section-title"> Actions </div>
   <!-- #Git buttons -->
   <button
@@ -61,6 +74,7 @@
     </span>
     <span ng-show="$ctrl.state.redeployInProgress">In progress...</span>
   </button>
+
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.saveGitSettings()"

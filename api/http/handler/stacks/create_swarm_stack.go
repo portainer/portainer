@@ -165,6 +165,7 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 			Authentication: repoAuthentication,
 			Username:       repoUsername,
 			Password:       repoPassword,
+			TLSSkipVerify:  repoSkipSSLVerify,
 		},
 		ComposeFile:     composeFile,
 		AdditionalFiles: additionalFiles,
