@@ -31,6 +31,7 @@ type kubernetesGitStackUpdatePayload struct {
 	RepositoryUsername       string
 	RepositoryPassword       string
 	AutoUpdate               *portainer.AutoUpdateSettings
+	TLSSkipVerify            bool
 }
 
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
@@ -62,6 +63,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		}
 
 		stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
+		stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
 		stack.AutoUpdate = payload.AutoUpdate
 
 		if payload.RepositoryAuthentication {
