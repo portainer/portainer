@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
-	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/kubernetes"
 
 	"github.com/gorilla/mux"
@@ -121,7 +120,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 		}
 
 		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-		if err == portainerDsErrors.ErrObjectNotFound {
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(
 				w,
 				http.StatusNotFound,

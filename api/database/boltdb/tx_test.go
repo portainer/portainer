@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 const testBucketName = "test-bucket"
@@ -97,7 +97,7 @@ func TestTxs(t *testing.T) {
 	err = conn.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetObject(testBucketName, conn.ConvertToKey(testId), &obj)
 	})
-	if err != dserrors.ErrObjectNotFound {
+	if !dataservices.IsErrObjectNotFound(err) {
 		t.Fatal(err)
 	}
 
