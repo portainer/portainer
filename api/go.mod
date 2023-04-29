@@ -41,7 +41,7 @@ require (
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
 	github.com/portainer/libhttp v0.0.0-20230206214615-dabd58de9f44
 	github.com/portainer/portainer/pkg/featureflags v0.0.0-20230209201943-d73622ed9cd4
-	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230410231754-96474a42eacb
+	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230428192433-0f9a0e25f290
 	github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.29.0

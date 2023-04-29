@@ -334,8 +334,8 @@ github.com/portainer/libhttp v0.0.0-20230206214615-dabd58de9f44 h1:4LYprPd3TsYjH
 github.com/portainer/libhttp v0.0.0-20230206214615-dabd58de9f44/go.mod h1:H49JLiywwLt2rrJVroafEWy8fIs0i7mThAThK40sbb8=
 github.com/portainer/portainer/pkg/featureflags v0.0.0-20230209201943-d73622ed9cd4 h1:gnXwaF0GnFUIlynRq994WFOtqOULTKZks4aSWuonlhA=
 github.com/portainer/portainer/pkg/featureflags v0.0.0-20230209201943-d73622ed9cd4/go.mod h1:T37rFZMg+PhRhT9n/z9cLSj9khJSdwHj3/Ac5PZQgKI=
-github.com/portainer/portainer/pkg/libhelm v0.0.0-20230410231754-96474a42eacb h1:Mye2NvFDr5amKu/TkLpAkpAosBTSbhUOPHnNSIEzM8Q=
-github.com/portainer/portainer/pkg/libhelm v0.0.0-20230410231754-96474a42eacb/go.mod h1:cFRD6PvOwpd2pf/O1r/IMKl+ZB12pWfo/Evleh3aCfM=
+github.com/portainer/portainer/pkg/libhelm v0.0.0-20230428192433-0f9a0e25f290 h1:A17F2swFKgKwBaxREQaHgGHVleXDr3rfSKOGxczWrJ0=
+github.com/portainer/portainer/pkg/libhelm v0.0.0-20230428192433-0f9a0e25f290/go.mod h1:cFRD6PvOwpd2pf/O1r/IMKl+ZB12pWfo/Evleh3aCfM=
 github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73 h1:7bPOnwucE0nor0so1BQJxQKCL5t+vCWO4nAz/S0lci0=
 github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73/go.mod h1:E2w/A6qsKuG2VyiUubPdXpDyPykWfQqxuCs0YNS0MhM=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
