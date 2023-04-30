@@ -35,7 +35,7 @@ type PropNames<T> = Exclude<keyof T, number | symbol>;
  * if the second parameter has any ts errors check that the component has the correct props
  */
 export function react2angular<T, U extends PropNames<T>[]>(
-  Component: React.ComponentType<T>,
+  Component: React.ComponentType<T & JSX.IntrinsicAttributes>,
   propNames: U & ([PropNames<T>] extends [U[number]] ? unknown : PropNames<T>)
 ): IComponentOptions & { name: string } {
   const bindings = Object.fromEntries(propNames.map((key) => [key, '<']));
