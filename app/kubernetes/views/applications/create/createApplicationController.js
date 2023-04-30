@@ -1044,7 +1044,7 @@ class KubernetesCreateApplicationController {
       this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
       _.remove(this.formValues.Configurations, (item) => item.SelectedConfiguration === undefined);
       await this.KubernetesApplicationService.create(this.formValues);
-      this.Notifications.success('Application successfully deployed', this.formValues.Name);
+      this.Notifications.success('Request to deploy application successfully submitted', this.formValues.Name);
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create application');
@@ -1066,7 +1066,7 @@ class KubernetesCreateApplicationController {
     try {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues);
-      this.Notifications.success('Success', 'Application successfully updated');
+      this.Notifications.success('Success', 'Request to update application successfully submitted');
       this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update application');

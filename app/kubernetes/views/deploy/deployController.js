@@ -281,7 +281,7 @@ class KubernetesDeployController {
 
       await this.StackService.kubernetesDeploy(this.endpoint.Id, method, payload);
 
-      this.Notifications.success('Success', 'Manifest successfully deployed');
+      this.Notifications.success('Success', 'Request to deploy manifest successfully submitted');
       this.state.isEditorDirty = false;
 
       if (this.$state.params.referrer) {
