@@ -113,7 +113,7 @@ export function ConsoleView() {
             <div className="row">
               <div className="col-sm-12 form-section-title">Console</div>
             </div>
-            <div className="form-row">
+            <div className="form-row flex">
               <label
                 htmlFor="consoleCommand"
                 className="col-sm-3 col-lg-2 control-label m-0 p-0 text-left"
@@ -135,9 +135,9 @@ export function ConsoleView() {
                 />
               </div>
             </div>
-            <div className="row">
+            <div className="row mt-4">
               <Button
-                className="btn btn-primary mt-3 ml-3"
+                className="btn btn-primary !ml-0"
                 onClick={
                   connectionStatus === 'closed'
                     ? connectConsole
