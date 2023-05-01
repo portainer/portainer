@@ -65,6 +65,9 @@ export function CodeEditor({
         id={id}
         extensions={extensions}
         height={height}
+        basicSetup={{
+          highlightSelectionMatches: false,
+        }}
       />
     </>
   );
