@@ -1,6 +1,9 @@
+import { useCallback } from 'react';
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { Lock, XCircle, CheckCircle } from 'lucide-react';
+
+import { SliderTooltip } from '@@/Tip/SliderTooltip';
 
 import 'rc-slider/assets/index.css';
 
@@ -13,7 +16,7 @@ export interface Props {
   max: number;
   step: number;
   value: number;
-  onChange(value: number): void;
+  onChange(value: number | number[]): void;
 }
 
 type Strength = 'weak' | 'good' | 'strong' | 'veryStrong';
@@ -43,8 +46,6 @@ const sliderProperties: Record<
     text: 'Very strong password',
   },
 };
-
-const SliderWithTooltip = RcSlider.createSliderWithTooltip(RcSlider);
 
 export function PasswordLengthSlider({
   min,
@@ -85,31 +86,32 @@ export function PasswordLengthSlider({
     }
   }
 
-  function handleChange(sliderValue: number) {
+  function handleChange(sliderValue: number | number[]) {
     onChange(sliderValue);
   }
+
+  const sliderTooltip = useCallback(
+    (node, handleProps) => (
+      <SliderTooltip
+        value={`${handleProps.value} characters`}
+        child={node}
+        delay={800}
+      />
+    ),
+    []
+  );
 
   return (
     <div className={clsx(styles.root, styles[sliderProps.strength])}>
       <div className="col-sm-4">
-        <SliderWithTooltip
-          tipFormatter={(value) => `${value} characters`}
+        <RcSlider
+          handleRender={sliderTooltip}
           min={min}
           max={max}
           step={step}
           defaultValue={12}
           value={value}
           onChange={handleChange}
-          handleStyle={{
-            height: 25,
-            width: 25,
-            borderWidth: 1.85,
-            borderColor: sliderProps.color,
-            top: 1.5,
-            boxShadow: 'none',
-          }}
-          railStyle={{ height: 10 }}
-          trackStyle={{ backgroundColor: sliderProps.color, height: 10 }}
         />
       </div>
 

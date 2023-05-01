@@ -23,23 +23,8 @@ func (e *InvalidPayloadError) Error() string {
 	return e.msg
 }
 
-// @id EdgeStackCreate
-// @summary Create an EdgeStack
-// @description **Access policy**: administrator
-// @tags edge_stacks
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param method query string true "Creation Method" Enums(file,string,repository)
-// @param body_string body swarmStackFromFileContentPayload true "Required when using method=string"
-// @param body_file body swarmStackFromFileUploadPayload true "Required when using method=file"
-// @param body_repository body swarmStackFromGitRepositoryPayload true "Required when using method=repository"
-// @success 200 {object} portainer.EdgeStack
-// @failure 500
-// @failure 503 "Edge compute features are disabled"
-// @router /edge_stacks [post]
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	method, err := request.RetrieveQueryParameter(r, "method", false)
+	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
@@ -74,7 +59,7 @@ func (handler *Handler) createSwarmStack(method string, dryrun bool, userID port
 	case "file":
 		return handler.createSwarmStackFromFileUpload(r, dryrun)
 	}
-	return nil, errors.New("Invalid value for query parameter: method. Value must be one of: string, repository or file")
+	return nil, &InvalidPayloadError{"Invalid value for query parameter: method. Value must be one of: string, repository or file"}
 }
 
 type swarmStackFromFileContentPayload struct {
@@ -109,6 +94,19 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 	return nil
 }
 
+// @id EdgeStackCreateString
+// @summary Create an EdgeStack from a text
+// @description **Access policy**: administrator
+// @tags edge_stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body swarmStackFromFileContentPayload true "stack config"
+// @param dryrun query string false "if true, will not create an edge stack, but just will check the settings and return a non-persisted edge stack object"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @router /edge_stacks/create/string [post]
 func (handler *Handler) createSwarmStackFromFileContent(r *http.Request, dryrun bool) (*portainer.EdgeStack, error) {
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -229,6 +227,20 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
+// @id EdgeStackCreateRepository
+// @summary Create an EdgeStack from a git repository
+// @description **Access policy**: administrator
+// @tags edge_stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file,string,repository)
+// @param body body swarmStackFromGitRepositoryPayload true "stack config"
+// @param dryrun query string false "if true, will not create an edge stack, but just will check the settings and return a non-persisted edge stack object"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @router /edge_stacks/create/repository [post]
 func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request, dryrun bool, userID portainer.UserID) (*portainer.EdgeStack, error) {
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -299,14 +311,14 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	}
 	payload.EdgeGroups = edgeGroups
 
-	deploymentType, err := request.RetrieveNumericMultiPartFormValue(r, "DeploymentType", true)
+	deploymentType, err := request.RetrieveNumericMultiPartFormValue(r, "DeploymentType", false)
 	if err != nil {
 		return &InvalidPayloadError{msg: "Invalid deployment type"}
 	}
 	payload.DeploymentType = portainer.EdgeStackDeploymentType(deploymentType)
 
 	var registries []portainer.RegistryID
-	request.RetrieveMultiPartFormJSONValue(r, "Registries", &registries, false)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Registries", &registries, true)
 	if err != nil {
 		return errors.New("Invalid registry type")
 	}
@@ -318,6 +330,27 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	return nil
 }
 
+// @id EdgeStackCreateFile
+// @summary Create an EdgeStack from file
+// @description **Access policy**: administrator
+// @tags edge_stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept multipart/form-data
+// @produce json
+// @param Name formData string true "Name of the stack"
+// @param file formData file true "Content of the Stack file"
+// @param EdgeGroups formData string true "JSON stringified array of Edge Groups ids"
+// @param DeploymentType formData int true "deploy type 0 - 'compose', 1 - 'kubernetes', 2 - 'nomad'"
+// @param Registries formData string false "JSON stringified array of Registry ids to use for this stack"
+// @param UseManifestNamespaces formData bool false "Uses the manifest's namespaces instead of the default one, relevant only for kube environments"
+// @param PrePullImage formData bool false "Pre Pull image"
+// @param RetryDeploy formData bool false "Retry deploy"
+// @param dryrun query string false "if true, will not create an edge stack, but just will check the settings and return a non-persisted edge stack object"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @router /edge_stacks/create/file [post]
 func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request, dryrun bool) (*portainer.EdgeStack, error) {
 	payload := &swarmStackFromFileUploadPayload{}
 	err := payload.Validate(r)

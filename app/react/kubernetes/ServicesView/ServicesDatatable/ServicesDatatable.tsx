@@ -168,7 +168,7 @@ function TableActions({ selectedItems }: TableActionsProps) {
 
   return (
     <div className="servicesDatatable-actions">
-      <Authorized authorizations="K8sServiceW">
+      <Authorized authorizations="K8sServicesW">
         <Button
           className="btn-wrapper"
           color="dangerlight"
@@ -179,7 +179,11 @@ function TableActions({ selectedItems }: TableActionsProps) {
           Remove
         </Button>
 
-        <Link to="kubernetes.deploy" className="space-left">
+        <Link
+          to="kubernetes.deploy"
+          params={{ referrer: 'kubernetes.services' }}
+          className="space-left hover:no-decoration"
+        >
           <Button className="btn-wrapper" color="primary" icon="plus">
             Create from manifest
           </Button>

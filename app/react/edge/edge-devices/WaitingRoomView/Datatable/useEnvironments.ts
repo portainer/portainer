@@ -30,6 +30,7 @@ export function useEnvironments() {
     tagIds: filterStore.tags.length ? filterStore.tags : undefined,
     groupIds: filterStore.groups.length ? filterStore.groups : undefined,
     endpointIds: filterByEnvironmentsIds,
+    edgeCheckInPassedSeconds: filterStore.checkIn,
   });
 
   const groupsQuery = useGroups({

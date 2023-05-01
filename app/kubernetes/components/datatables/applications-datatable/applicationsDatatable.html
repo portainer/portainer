@@ -89,7 +89,7 @@
             ng-if="$ctrl.isPrimary"
             type="button"
             class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
-            ui-sref="kubernetes.deploy"
+            ui-sref="kubernetes.deploy({ referrer: 'kubernetes.applications' })"
             data-cy="k8sApp-deployFromManifestButton"
           >
             <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Create from manifest

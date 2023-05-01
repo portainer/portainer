@@ -16,12 +16,13 @@ import (
 // @tags edge_stacks
 // @produce json
 // @param id path int true "EdgeStack Id"
+// @param environmentId path int true "Environment identifier"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
 // @failure 400
 // @failure 404
 // @failure 403
-// @router /edge_stacks/{id}/status/{endpoint_id} [delete]
+// @router /edge_stacks/{id}/status/{environmentId} [delete]
 func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

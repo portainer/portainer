@@ -5,7 +5,7 @@ angular.module('portainer.edge').factory('EdgeStacks', function EdgeStacksFactor
     API_ENDPOINT_EDGE_STACKS + '/:id/:action',
     {},
     {
-      create: { method: 'POST', ignoreLoadingBar: true },
+      create: { method: 'POST', ignoreLoadingBar: true, params: { id: 'create', action: '@method' } },
       query: { method: 'GET', isArray: true },
       get: { method: 'GET', params: { id: '@id' } },
       update: { method: 'PUT', params: { id: '@id' } },

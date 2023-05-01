@@ -54,6 +54,7 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 // @tags intel
 // @security jwt
 // @produce json
+// @param guid path int true "Guid"
 // @param body body deviceConfigurePayload true "Device Configuration"
 // @success 200 "Success"
 // @failure 400 "Invalid request"

@@ -20,6 +20,7 @@ import (
 // @tags intel
 // @security jwt
 // @produce json
+// @param id path int true "FDO Profile identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

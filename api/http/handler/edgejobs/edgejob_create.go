@@ -27,22 +27,8 @@ type edgeJobBasePayload struct {
 	EdgeGroups     []portainer.EdgeGroupID
 }
 
-// @id EdgeJobCreate
-// @summary Create an EdgeJob
-// @description **Access policy**: administrator
-// @tags edge_jobs
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param method query string true "Creation Method" Enums(file, string)
-// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
-// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
-// @success 200 {object} portainer.EdgeGroup
-// @failure 503 "Edge compute features are disabled"
-// @failure 500
-// @router /edge_jobs [post]
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	method, err := request.RetrieveQueryParameter(r, "method", false)
+	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
@@ -86,6 +72,18 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 	return nil
 }
 
+// @id EdgeJobCreateString
+// @summary Create an EdgeJob from a text
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @router /edge_jobs/create/string [post]
 func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload edgeJobCreateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -177,6 +175,24 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id EdgeJobCreateFile
+// @summary Create an EdgeJob from a file
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @accept multipart/form-data
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param file formData file true "Content of the Stack file"
+// @param Name formData string true "Name of the stack"
+// @param CronExpression formData string true "A cron expression to schedule this job"
+// @param EdgeGroups formData string true "JSON stringified array of Edge Groups ids"
+// @param Endpoints formData string true "JSON stringified array of Environment ids"
+// @param Recurring formData bool false "If recurring"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @router /edge_jobs/create/file [post]
 func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &edgeJobCreateFromFilePayload{}
 	err := payload.Validate(r)

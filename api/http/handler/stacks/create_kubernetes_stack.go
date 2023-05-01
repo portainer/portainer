@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/git/update"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
@@ -131,7 +132,25 @@ type createKubernetesStackResponse struct {
 	Output string `json:"Output"`
 }
 
+// @id StackCreateKubernetesFile
+// @summary Deploy a new kubernetes stack from a file
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body kubernetesStringDeploymentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/kubernetes/string [post]
 func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	if !endpointutils.IsKubernetesEndpoint(endpoint) {
+		return httperror.BadRequest("Environment type does not match", errors.New("Environment type does not match"))
+	}
+
 	var payload kubernetesStringDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
@@ -170,7 +189,25 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	return response.JSON(w, resp)
 }
 
+// @id StackCreateKubernetesGit
+// @summary Deploy a new kubernetes stack from a git repository
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body kubernetesGitDeploymentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/kubernetes/repository [post]
 func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	if !endpointutils.IsKubernetesEndpoint(endpoint) {
+		return httperror.BadRequest("Environment type does not match", errors.New("Environment type does not match"))
+	}
+
 	var payload kubernetesGitDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
@@ -234,6 +271,20 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	return response.JSON(w, resp)
 }
 
+// @id StackCreateKubernetesUrl
+// @summary Deploy a new kubernetes stack from a url
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body kubernetesManifestURLDeploymentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/kubernetes/url [post]
 func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesManifestURLDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {

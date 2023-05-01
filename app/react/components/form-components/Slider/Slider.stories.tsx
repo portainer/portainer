@@ -28,7 +28,13 @@ function Template({
       max={max}
       step={step}
       value={sliderValue}
-      onChange={setSliderValue}
+      onChange={(value) => {
+        if (Array.isArray(value)) {
+          setSliderValue(value[0]);
+        } else {
+          setSliderValue(value);
+        }
+      }}
       dataCy={dataCy}
       visibleTooltip={visibleTooltip}
     />

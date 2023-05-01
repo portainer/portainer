@@ -42,7 +42,8 @@ function getBaseUrl() {
   const port = parseInt(window.location.port, 10);
   const displayPort =
     (protocol === 'http' && port === 80) ||
-    (protocol === 'https' && port === 443)
+    (protocol === 'https' && port === 443) ||
+    Number.isNaN(port)
       ? ''
       : `:${port}`;
   return `${protocol}://${hostname}${displayPort}${baseHref()}`;
