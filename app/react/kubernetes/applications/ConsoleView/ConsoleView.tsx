@@ -101,66 +101,68 @@ export function ConsoleView() {
   }, [terminal, socket]);
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <PageHeader
-          title="Application console"
-          breadcrumbs={breadcrumbs}
-          reload
-        />
-        <Widget>
-          <WidgetBody>
-            <div className="row">
-              <div className="col-sm-12 form-section-title">Console</div>
-            </div>
-            <div className="form-row flex">
-              <label
-                htmlFor="consoleCommand"
-                className="col-sm-3 col-lg-2 control-label m-0 p-0 text-left"
-              >
-                Command
-              </label>
-              <div className="col-sm-8 input-group p-0">
-                <span className="input-group-addon">
-                  <Icon icon={TerminalIcon} className="mr-1" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="/bin/bash"
-                  value={command}
-                  onChange={(e) => setCommand(e.target.value)}
-                  id="consoleCommand"
-                  auto-focus="true"
-                />
+    <>
+      <PageHeader
+        title="Application console"
+        breadcrumbs={breadcrumbs}
+        reload
+      />
+      <div className="row">
+        <div className="col-sm-12">
+          <Widget>
+            <WidgetBody>
+              <div className="row">
+                <div className="col-sm-12 form-section-title">Console</div>
               </div>
+              <div className="form-row flex">
+                <label
+                  htmlFor="consoleCommand"
+                  className="col-sm-3 col-lg-2 control-label m-0 p-0 text-left"
+                >
+                  Command
+                </label>
+                <div className="col-sm-8 input-group p-0">
+                  <span className="input-group-addon">
+                    <Icon icon={TerminalIcon} className="mr-1" />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="/bin/bash"
+                    value={command}
+                    onChange={(e) => setCommand(e.target.value)}
+                    id="consoleCommand"
+                    auto-focus="true"
+                  />
+                </div>
+              </div>
+              <div className="row mt-4">
+                <Button
+                  className="btn btn-primary !ml-0"
+                  onClick={
+                    connectionStatus === 'closed'
+                      ? connectConsole
+                      : disconnectConsole
+                  }
+                  disabled={connectionStatus === 'connecting'}
+                >
+                  {connectionStatus === 'open' && 'Disconnect'}
+                  {connectionStatus === 'connecting' && 'Connecting'}
+                  {connectionStatus !== 'connecting' &&
+                    connectionStatus !== 'open' &&
+                    'Connect'}
+                </Button>
+              </div>
+            </WidgetBody>
+          </Widget>
+          <div className="row">
+            <div className="col-sm-12 p-0">
+              <div id="terminal-container" className="terminal-container" />
             </div>
-            <div className="row mt-4">
-              <Button
-                className="btn btn-primary !ml-0"
-                onClick={
-                  connectionStatus === 'closed'
-                    ? connectConsole
-                    : disconnectConsole
-                }
-                disabled={connectionStatus === 'connecting'}
-              >
-                {connectionStatus === 'open' && 'Disconnect'}
-                {connectionStatus === 'connecting' && 'Connecting'}
-                {connectionStatus !== 'connecting' &&
-                  connectionStatus !== 'open' &&
-                  'Connect'}
-              </Button>
-            </div>
-          </WidgetBody>
-        </Widget>
-        <div className="row">
-          <div className="col-sm-12 p-0">
-            <div id="terminal-container" className="terminal-container" />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 
   function connectConsole() {
