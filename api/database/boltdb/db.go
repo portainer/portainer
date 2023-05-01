@@ -183,7 +183,7 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 func (connection *DbConnection) ExportRaw(filename string) error {
 	databasePath := connection.GetDatabaseFilePath()
 	if _, err := os.Stat(databasePath); err != nil {
-		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
+		return fmt.Errorf("stat on %s failed, error: %w", databasePath, err)
 	}
 
 	b, err := connection.ExportJSON(databasePath, true)

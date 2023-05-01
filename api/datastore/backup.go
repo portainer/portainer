@@ -115,7 +115,7 @@ func (store *Store) backupWithOptions(options *BackupOptions) (string, error) {
 
 	if err := store.Close(); err != nil {
 		return options.BackupPath, fmt.Errorf(
-			"error closing datastore before creating backup: %v",
+			"error closing datastore before creating backup: %w",
 			err,
 		)
 	}
@@ -126,7 +126,7 @@ func (store *Store) backupWithOptions(options *BackupOptions) (string, error) {
 
 	if _, err := store.Open(); err != nil {
 		return options.BackupPath, fmt.Errorf(
-			"error opening datastore after creating backup: %v",
+			"error opening datastore after creating backup: %w",
 			err,
 		)
 	}

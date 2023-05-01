@@ -1,11 +1,12 @@
 package stack
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -71,11 +72,11 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 
 			return &portainer.Stack{}, nil
 		})
-	if err == stop {
+	if errors.Is(err, stop) {
 		return s, nil
 	}
 	if err == nil {
-		return nil, errors.ErrObjectNotFound
+		return nil, dserrors.ErrObjectNotFound
 	}
 
 	return nil, err
@@ -92,7 +93,7 @@ func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 			stack, ok := obj.(portainer.Stack)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
-				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
+				return nil, fmt.Errorf("failed to convert to Stack object: %s", obj)
 			}
 
 			if stack.Name == name {
@@ -173,11 +174,11 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 
 			return &portainer.Stack{}, nil
 		})
-	if err == stop {
+	if errors.Is(err, stop) {
 		return s, nil
 	}
 	if err == nil {
-		return nil, errors.ErrObjectNotFound
+		return nil, dserrors.ErrObjectNotFound
 	}
 
 	return nil, err

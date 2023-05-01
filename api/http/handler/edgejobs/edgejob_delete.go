@@ -1,6 +1,7 @@
 package edgejobs
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -42,8 +43,9 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if err != nil {
-		if httpErr, ok := err.(*httperror.HandlerError); ok {
-			return httpErr
+		var handlerError *httperror.HandlerError
+		if errors.As(err, &handlerError) {
+			return handlerError
 		}
 
 		return httperror.InternalServerError("Unexpected error", err)
