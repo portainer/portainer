@@ -131,7 +131,7 @@ export function ApplicationSummaryWidget() {
             )}
           </tr>
         )}
-        {(applicationRequests?.cpu || applicationRequests?.memoryBytes) && (
+        {(!!applicationRequests?.cpu || !!applicationRequests?.memoryBytes) && (
           <tr>
             <td>
               Resource reservations
@@ -140,12 +140,12 @@ export function ApplicationSummaryWidget() {
               )}
             </td>
             <td>
-              {applicationRequests?.cpu && (
+              {!!applicationRequests?.cpu && (
                 <div data-cy="k8sAppDetail-cpuReservation">
                   CPU {applicationRequests.cpu}
                 </div>
               )}
-              {applicationRequests?.memoryBytes && (
+              {!!applicationRequests?.memoryBytes && (
                 <div data-cy="k8sAppDetail-memoryReservation">
                   Memory{' '}
                   {bytesToReadableFormat(applicationRequests.memoryBytes)}

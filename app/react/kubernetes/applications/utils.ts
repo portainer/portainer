@@ -108,13 +108,15 @@ function parseCpu(cpu: string) {
   return res;
 }
 
-// bytesToReadableFormat converts bytes to a human readable string (e.g. '1.5 GB')
+// bytesToReadableFormat converts bytes to a human readable string (e.g. '1.5 GB'), assuming base 10
+// there's some discussion about whether base 2 or base 10 should be used for memory units
+// https://www.quora.com/Is-1-GB-equal-to-1024-MB-or-1000-MB
 export function bytesToReadableFormat(memoryBytes: number) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
   let unitIndex = 0;
   let memoryValue = memoryBytes;
-  while (memoryValue > 1024 && unitIndex < units.length) {
-    memoryValue /= 1024;
+  while (memoryValue > 1000 && unitIndex < units.length) {
+    memoryValue /= 1000;
     unitIndex++;
   }
   return `${memoryValue.toFixed(1)} ${units[unitIndex]}`;
