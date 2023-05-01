@@ -4,6 +4,7 @@ linters:
   enable:
     - depguard
     - errorlint
+    - exportloopref
 linters-settings:
   depguard:
     list-type: denylist
