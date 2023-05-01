@@ -16,24 +16,24 @@ import (
 
 type endpointUpdatePayload struct {
 	// Name that will be used to identify this environment(endpoint)
-	Name *string `example:"my-environment"`
+	Name *string `json:"Name" example:"my-environment"`
 	// URL or IP address of a Docker host
-	URL *string `example:"docker.mydomain.tld:2375"`
+	URL *string `json:"URL" example:"docker.mydomain.tld:2375"`
 	// URL or IP address where exposed containers will be reachable.\
 	// Defaults to URL if not specified
-	PublicURL *string `example:"docker.mydomain.tld:2375"`
+	PublicURL *string `json:"PublicURL" example:"docker.mydomain.tld:2375"`
 	// GPUs information
-	Gpus []portainer.Pair
+	Gpus []portainer.Pair `json:"Gpus"`
 	// Group identifier
-	GroupID *int `example:"1"`
+	GroupID *int `json:"GroupId" example:"1"`
 	// Require TLS to connect against this environment(endpoint)
-	TLS *bool `example:"true"`
+	TLS *bool `json:"TLS" example:"true"`
 	// Skip server verification when using TLS
-	TLSSkipVerify *bool `example:"false"`
+	TLSSkipVerify *bool `json:"TLSSkipVerify" example:"false"`
 	// Skip client verification when using TLS
 	TLSSkipClientVerify *bool `example:"false"`
 	// The status of the environment(endpoint) (1 - up, 2 - down)
-	Status *int `example:"1"`
+	Status *int `json:"Status" example:"1"`
 	// Azure application ID
 	AzureApplicationID *string `example:"eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"`
 	// Azure tenant ID
@@ -41,13 +41,13 @@ type endpointUpdatePayload struct {
 	// Azure authentication key
 	AzureAuthenticationKey *string `example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
 	// List of tag identifiers to which this environment(endpoint) is associated
-	TagIDs             []portainer.TagID `example:"1,2"`
-	UserAccessPolicies portainer.UserAccessPolicies
-	TeamAccessPolicies portainer.TeamAccessPolicies
+	TagIDs             []portainer.TagID            `json:"TagIds" example:"1,2"`
+	UserAccessPolicies portainer.UserAccessPolicies `json:"UserAccessPolicies"`
+	TeamAccessPolicies portainer.TeamAccessPolicies `json:"TeamAccessPolicies"`
 	// The check in interval for edge agent (in seconds)
-	EdgeCheckinInterval *int `example:"5"`
+	EdgeCheckinInterval *int `json:"EdgeCheckinInterval" example:"5"`
 	// Associated Kubernetes data
-	Kubernetes *portainer.KubernetesData
+	Kubernetes *portainer.KubernetesData `json:"Kubernetes"`
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
