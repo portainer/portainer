@@ -12,7 +12,7 @@ on:
       - 'build/linux/Dockerfile'
       - 'build/linux/alpine.Dockerfile'
       - 'build/windows/Dockerfile'
-    
+
 jobs:
   client-dependencies:
     name: Client dependency check
@@ -51,8 +51,8 @@ jobs:
             echo "null" > ./js-snyk-develop.json
           fi
 
-      - name: Export scan result to html file 
-        run: | 
+      - name: Export scan result to html file
+        run: |
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="/data/js-snyk-develop.json" -output-type=table -export -export-filename="/data/js-result")
 
       - name: Upload js result html file
@@ -63,7 +63,7 @@ jobs:
 
       - name: Analyse the js diff result
         id: set-diff-matrix
-        run: | 
+        run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="./data/js-snyk-develop.json" -output-type=matrix)
           echo "::set-output name=js_diff_result::${result}"
 
@@ -111,8 +111,8 @@ jobs:
             echo "null" > ./go-snyk-develop.json
           fi
 
-      - name: Export scan result to html file 
-        run: | 
+      - name: Export scan result to html file
+        run: |
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="/data/go-snyk-develop.json" -output-type=table -export -export-filename="/data/go-result")
 
       - name: Upload go result html file
@@ -123,7 +123,7 @@ jobs:
 
       - name: Analyse the go diff result
         id: set-diff-matrix
-        run: | 
+        run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="/data/go-snyk-develop.json" -output-type=matrix)
           echo "::set-output name=go_diff_result::${result}"
 
@@ -149,8 +149,11 @@ jobs:
         with:
           node-version: 18.x
 
-      - name: Install packages and build
-        run: yarn install && yarn build
+      - name: Install packages
+        run: yarn --frozen-lockfile
+
+      - name: build
+        run: make build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -169,9 +172,9 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         uses: docker://docker.io/aquasec/trivy:latest
-        continue-on-error: true 
+        continue-on-error: true
         with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
+          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}
 
       - name: Upload image security scan result as artifact
         uses: actions/upload-artifact@v3
@@ -191,8 +194,8 @@ jobs:
             echo "null" > ./image-trivy-develop.json
           fi
 
-      - name: Export scan result to html file 
-        run: | 
+      - name: Export scan result to html file
+        run: |
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="/data/image-trivy-develop.json" -output-type=table -export -export-filename="/data/image-result")
 
       - name: Upload image result html file
@@ -203,7 +206,7 @@ jobs:
 
       - name: Analyse the image diff result
         id: set-diff-matrix
-        run: | 
+        run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="./data/image-trivy-develop.json" -output-type=matrix)
           echo "::set-output name=image_diff_result::${result}"
 
@@ -215,17 +218,16 @@ jobs:
       github.event.pull_request &&
       github.event.review.body == '/scan'
     strategy:
-      matrix: 
+      matrix:
         jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}
         godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
         imagediff: ${{fromJson(needs.image-vulnerability.outputs.imagediff)}}
     steps:
-
       - name: Check job status of diff result
         if: >-
           matrix.jsdiff.status == 'failure' ||
           matrix.godiff.status == 'failure' ||
-          matrix.imagediff.status == 'failure' 
+          matrix.imagediff.status == 'failure'
         run: |
           echo ${{ matrix.jsdiff.status }}
           echo ${{ matrix.godiff.status }}

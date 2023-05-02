@@ -1,16 +1,16 @@
 name: Nightly Code Security Scan
 
-on: 
+on:
   schedule:
     - cron: '0 8 * * *'
   workflow_dispatch:
-    
+
 jobs:
   client-dependencies:
     name: Client dependency check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop'
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
@@ -24,14 +24,14 @@ jobs:
         with:
           json: true
 
-      - name: Upload js security scan result as artifact 
+      - name: Upload js security scan result as artifact
         uses: actions/upload-artifact@v3
         with:
           name: js-security-scan-develop-result
           path: snyk.json
 
-      - name: Export scan result to html file 
-        run: | 
+      - name: Export scan result to html file
+        run: |
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="/data/js-result")
 
       - name: Upload js result html file
@@ -42,7 +42,7 @@ jobs:
 
       - name: Analyse the js result
         id: set-matrix
-        run: | 
+        run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
           echo "::set-output name=js_result::${result}"
 
@@ -50,7 +50,7 @@ jobs:
     name: Server dependency check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop'
     outputs:
       go: ${{ steps.set-matrix.outputs.go_result }}
     steps:
@@ -77,8 +77,8 @@ jobs:
           name: go-security-scan-develop-result
           path: snyk.json
 
-      - name: Export scan result to html file 
-        run: | 
+      - name: Export scan result to html file
+        run: |
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="/data/go-result")
 
       - name: Upload go result html file
@@ -89,7 +89,7 @@ jobs:
 
       - name: Analyse the go result
         id: set-matrix
-        run: | 
+        run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
           echo "::set-output name=go_result::${result}"
 
@@ -114,8 +114,11 @@ jobs:
         with:
           node-version: 18.x
 
-      - name: Install packages and build
-        run: yarn install && yarn build
+      - name: Install packages
+        run: yarn --frozen-lockfile
+
+      - name: build
+        run: make build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -134,9 +137,9 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         uses: docker://docker.io/aquasec/trivy:latest
-        continue-on-error: true 
+        continue-on-error: true
         with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
+          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}
 
       - name: Upload image security scan result as artifact
         uses: actions/upload-artifact@v3
@@ -144,8 +147,8 @@ jobs:
           name: image-security-scan-develop-result
           path: image-trivy.json
 
-      - name: Export scan result to html file 
-        run: | 
+      - name: Export scan result to html file
+        run: |
           $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=table -export -export-filename="/data/image-result")
 
       - name: Upload go result html file
@@ -156,7 +159,7 @@ jobs:
 
       - name: Analyse the trivy result
         id: set-matrix
-        run: | 
+        run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
           echo "::set-output name=image_result::${result}"
 
@@ -167,7 +170,7 @@ jobs:
     if: >-
       github.ref == 'refs/heads/develop'
     strategy:
-      matrix: 
+      matrix:
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
         go: ${{fromJson(needs.server-dependencies.outputs.go)}}
         image: ${{fromJson(needs.image-vulnerability.outputs.image)}}
@@ -182,7 +185,7 @@ jobs:
           echo ${{ matrix.image.summary }}
 
       - name: Send Slack message
-        if: >- 
+        if: >-
           matrix.js.status == 'failure' ||
           matrix.go.status == 'failure' || 
           matrix.image.status == 'failure'
