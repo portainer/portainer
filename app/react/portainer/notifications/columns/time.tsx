@@ -1,13 +1,13 @@
-import { Column } from 'react-table';
-
 import { isoDate } from '@/portainer/filters/filters';
 
-import { ToastNotification } from '../types';
+import { columnHelper } from './helper';
 
-export const time: Column<ToastNotification> = {
-  Header: 'Time',
-  accessor: (row) => (row.timeStamp ? isoDate(row.timeStamp) : '-'),
+export const time = columnHelper.accessor('timeStamp', {
+  header: 'Time',
   id: 'time',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ getValue }) => {
+    const value = getValue();
+
+    return value ? isoDate(value) : '-';
+  },
+});

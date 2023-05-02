@@ -1,4 +1,3 @@
-import { useStore } from 'zustand';
 import { Trash2 } from 'lucide-react';
 
 import { Environment } from '@/react/portainer/environments/types';
@@ -9,7 +8,7 @@ import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
 import { createPersistedStore } from '@@/datatables/types';
-import { useSearchBarState } from '@@/datatables/SearchBar';
+import { useTableState } from '@@/datatables/useTableState';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
@@ -28,20 +27,14 @@ export function Datatable() {
   const associateMutation = useAssociateDeviceMutation();
   const removeMutation = useDeleteEnvironmentsMutation();
   const licenseOverused = useLicenseOverused();
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
   const { data: environments, totalCount, isLoading } = useEnvironments();
 
   return (
     <GenericDatatable
+      settingsManager={tableState}
       columns={columns}
       dataset={environments}
-      initialPageSize={settings.pageSize}
-      onPageSizeChange={settings.setPageSize}
-      initialSortBy={settings.sortBy}
-      onSortByChange={settings.setSortBy}
-      searchValue={search}
-      onSearchChange={setSearch}
       title="Edge Devices Waiting Room"
       emptyContentLabel="No Edge Devices found"
       renderTableActions={(selectedRows) => (
@@ -57,7 +50,7 @@ export function Datatable() {
 
           <Button
             onClick={() => handleAssociateDevice(selectedRows)}
-            disabled={selectedRows.length === 0}
+            disabled={selectedRows.length === 0 || licenseOverused}
           >
             Associate Device
           </Button>

@@ -1,12 +1,12 @@
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
-import { ColumnInstance } from 'react-table';
 import { Columns } from 'lucide-react';
+import { Column } from '@tanstack/react-table';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 
 interface Props<D extends object> {
-  columns: ColumnInstance<D>[];
+  columns: Column<D>[];
   onChange: (value: string[]) => void;
   value: string[];
 }
@@ -40,8 +40,12 @@ export function ColumnVisibilityMenu<D extends object>({
                 {columns.map((column) => (
                   <div key={column.id}>
                     <Checkbox
-                      checked={column.isVisible}
-                      label={column.Header as string}
+                      checked={column.getIsVisible()}
+                      label={
+                        typeof column.columnDef.header === 'string'
+                          ? column.columnDef.header
+                          : ''
+                      }
                       id={`visibility_${column.id}`}
                       onChange={(e) =>
                         handleChangeColumnVisibility(

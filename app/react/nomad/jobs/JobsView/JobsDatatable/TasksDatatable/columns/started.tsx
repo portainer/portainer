@@ -1,8 +1,9 @@
 import moment from 'moment';
-import { Column } from 'react-table';
 
 import { Task } from '@/react/nomad/types';
 import { isoDate } from '@/portainer/filters/filters';
+
+import { columnHelper } from './helper';
 
 function accessor(row: Task) {
   const momentDate = moment(row.StartedAt);
@@ -10,10 +11,7 @@ function accessor(row: Task) {
   return isValid ? isoDate(momentDate) : '-';
 }
 
-export const started: Column<Task> = {
-  accessor,
-  Header: 'Started',
+export const started = columnHelper.accessor(accessor, {
+  header: 'Started',
   id: 'startedName',
-  disableFilters: true,
-  canHide: true,
-};
+});

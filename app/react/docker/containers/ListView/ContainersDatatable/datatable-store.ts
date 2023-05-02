@@ -9,7 +9,7 @@ import { QuickAction, TableSettings } from './types';
 export const TRUNCATE_LENGTH = 32;
 
 export function createStore(storageKey: string) {
-  return createPersistedStore<TableSettings>(storageKey, 'Name', (set) => ({
+  return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
     ...hiddenColumnsSettings(set),
     ...refreshableSettings(set),
     truncateContainerName: TRUNCATE_LENGTH,

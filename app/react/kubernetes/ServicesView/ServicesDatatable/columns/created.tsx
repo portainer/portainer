@@ -1,23 +1,20 @@
-import { CellProps, Column } from 'react-table';
-
 import { formatDate } from '@/portainer/filters/filters';
 
-import { Service } from '../../types';
+import { columnHelper } from './helper';
 
-export const created: Column<Service> = {
-  Header: 'Created',
+export const created = columnHelper.accessor('CreationTimestamp', {
+  header: 'Created',
   id: 'created',
-  accessor: (row) => row.CreationTimestamp,
-  Cell: ({ row }: CellProps<Service>) => {
+  cell: ({ row, getValue }) => {
+    const date = formatDate(getValue());
+
     const owner =
       row.original.Labels?.['io.portainer.kubernetes.application.owner'];
 
     if (owner) {
-      return `${formatDate(row.original.CreationTimestamp)} by ${owner}`;
+      return `${date} by ${owner}`;
     }
 
-    return formatDate(row.original.CreationTimestamp);
+    return date;
   },
-  disableFilters: true,
-  canHide: true,
-};
+});

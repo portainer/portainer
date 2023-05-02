@@ -1,5 +1,4 @@
 import { Clock, Trash2 } from 'lucide-react';
-import { useStore } from 'zustand';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
@@ -9,7 +8,7 @@ import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
-import { useSearchBarState } from '@@/datatables/SearchBar';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { useList } from '../queries/list';
 import { EdgeUpdateSchedule, StatusType } from '../types';
@@ -25,8 +24,7 @@ const settingsStore = createStore(storageKey);
 export default withLimitToBE(ListView);
 
 export function ListView() {
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
 
   const listQuery = useList(true);
 
@@ -47,6 +45,7 @@ export function ListView() {
       <Datatable
         dataset={listQuery.data}
         columns={columns}
+        settingsManager={tableState}
         title="Update & rollback"
         titleIcon={Clock}
         emptyContentLabel="No schedules found"
@@ -55,12 +54,6 @@ export function ListView() {
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
-        initialPageSize={settings.pageSize}
-        onPageSizeChange={settings.setPageSize}
-        initialSortBy={settings.sortBy}
-        onSortByChange={settings.setSortBy}
-        searchValue={search}
-        onSearchChange={setSearch}
         isRowSelectable={(row) => row.original.status === StatusType.Pending}
       />
     </>

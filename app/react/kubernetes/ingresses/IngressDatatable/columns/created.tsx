@@ -1,23 +1,19 @@
-import { CellProps, Column } from 'react-table';
-
 import { formatDate } from '@/portainer/filters/filters';
 
-import { Ingress } from '../../types';
+import { columnHelper } from './helper';
 
-export const created: Column<Ingress> = {
-  Header: 'Created',
-  id: 'created',
-  accessor: (row) => row.CreationDate,
-  Cell: ({ row }: CellProps<Ingress>) => {
+export const created = columnHelper.accessor('CreationDate', {
+  header: 'Created',
+  cell: ({ row, getValue }) => {
+    const date = formatDate(getValue());
     const owner =
       row.original.Labels?.['io.portainer.kubernetes.ingress.owner'];
 
     if (owner) {
-      return `${formatDate(row.original.CreationDate)} by ${owner}`;
+      return `${date} by ${owner}`;
     }
 
-    return formatDate(row.original.CreationDate);
+    return date;
   },
-  disableFilters: true,
-  canHide: true,
-};
+  id: 'created',
+});

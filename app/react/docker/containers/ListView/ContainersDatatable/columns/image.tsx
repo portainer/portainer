@@ -1,24 +1,18 @@
-import { Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 import { useSref } from '@uirouter/react';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
 
-export const image: Column<DockerContainer> = {
-  Header: 'Image',
-  accessor: 'Image',
+import { columnHelper } from './helper';
+
+export const image = columnHelper.accessor('Image', {
+  header: 'Image',
   id: 'image',
-  disableFilters: true,
-  Cell: ImageCell,
-  canHide: true,
-  sortType: 'string',
-  Filter: () => null,
-};
+  cell: ImageCell,
+});
 
-interface Props {
-  value: string;
-}
-
-function ImageCell({ value: imageName }: Props) {
+function ImageCell({ getValue }: CellContext<DockerContainer, string>) {
+  const imageName = getValue();
   const linkProps = useSref('docker.images.image', { id: imageName });
   const shortImageName = trimSHASum(imageName);
 

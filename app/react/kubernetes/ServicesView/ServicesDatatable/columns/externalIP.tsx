@@ -1,8 +1,108 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 
 import { Service } from '../../types';
 
-import { ExternalIPLink } from './externalIPLink';
+import { ExternalIPLink } from './ExternalIPLink';
+import { columnHelper } from './helper';
+
+export const externalIP = columnHelper.accessor(
+  (row) => {
+    if (row.Type === 'ExternalName') {
+      return row.ExternalName;
+    }
+
+    if (row.ExternalIPs?.length) {
+      return row.ExternalIPs?.slice(0);
+    }
+
+    return row.IngressStatus?.slice(0);
+  },
+  {
+    header: 'External IP',
+    id: 'externalIP',
+    cell: Cell,
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.IngressStatus;
+      const b = rowB.original.IngressStatus;
+      const aExternal = rowA.original.ExternalIPs;
+      const bExternal = rowB.original.ExternalIPs;
+
+      const ipA = a?.[0].IP || aExternal?.[0] || rowA.original.ExternalName;
+      const ipB = b?.[0].IP || bExternal?.[0] || rowA.original.ExternalName;
+
+      if (!ipA) return 1;
+      if (!ipB) return -1;
+
+      // use a nat sort order for ip addresses
+      return ipA.localeCompare(
+        ipB,
+        navigator.languages[0] || navigator.language,
+        {
+          numeric: true,
+          ignorePunctuation: true,
+        }
+      );
+    },
+  }
+);
+
+function Cell({ row }: CellContext<Service, string>) {
+  if (row.original.Type === 'ExternalName') {
+    if (row.original.ExternalName) {
+      const linkTo = `http://${row.original.ExternalName}`;
+      return <ExternalIPLink to={linkTo} text={row.original.ExternalName} />;
+    }
+    return '-';
+  }
+
+  const [scheme, port] = getSchemeAndPort(row.original);
+  if (row.original.ExternalIPs?.length) {
+    return row.original.ExternalIPs?.map((ip, index) => {
+      // some ips come through blank
+      if (ip.length === 0) {
+        return '-';
+      }
+
+      if (scheme) {
+        let linkTo = `${scheme}://${ip}`;
+        if (port !== 80 && port !== 443) {
+          linkTo = `${linkTo}:${port}`;
+        }
+        return (
+          <div key={index}>
+            <ExternalIPLink to={linkTo} text={ip} />
+          </div>
+        );
+      }
+      return <div key={index}>{ip}</div>;
+    });
+  }
+
+  const status = row.original.IngressStatus;
+  if (status) {
+    return status?.map((status, index) => {
+      // some ips come through blank
+      if (status.IP.length === 0) {
+        return '-';
+      }
+
+      if (scheme) {
+        let linkTo = `${scheme}://${status.IP}`;
+        if (port !== 80 && port !== 443) {
+          linkTo = `${linkTo}:${port}`;
+        }
+        return (
+          <div key={index}>
+            <ExternalIPLink to={linkTo} text={status.IP} />
+          </div>
+        );
+      }
+      return <div key={index}>{status.IP}</div>;
+    });
+  }
+
+  return '-';
+}
 
 // calculate the scheme based on the ports of the service
 // favour https over http.
@@ -37,100 +137,3 @@ function getSchemeAndPort(svc: Service): [string, number] {
 
   return [scheme, servicePort];
 }
-
-export const externalIP: Column<Service> = {
-  Header: 'External IP',
-  id: 'externalIP',
-  accessor: (row) => {
-    if (row.Type === 'ExternalName') {
-      return row.ExternalName;
-    }
-
-    if (row.ExternalIPs?.length) {
-      return row.ExternalIPs?.slice(0);
-    }
-
-    return row.IngressStatus?.slice(0);
-  },
-  Cell: ({ row }: CellProps<Service>) => {
-    if (row.original.Type === 'ExternalName') {
-      if (row.original.ExternalName) {
-        const linkto = `http://${row.original.ExternalName}`;
-        return <ExternalIPLink to={linkto} text={row.original.ExternalName} />;
-      }
-      return '-';
-    }
-
-    const [scheme, port] = getSchemeAndPort(row.original);
-    if (row.original.ExternalIPs?.length) {
-      return row.original.ExternalIPs?.map((ip, index) => {
-        // some ips come through blank
-        if (ip.length === 0) {
-          return '-';
-        }
-
-        if (scheme) {
-          let linkto = `${scheme}://${ip}`;
-          if (port !== 80 && port !== 443) {
-            linkto = `${linkto}:${port}`;
-          }
-          return (
-            <div key={index}>
-              <ExternalIPLink to={linkto} text={ip} />
-            </div>
-          );
-        }
-        return <div key={index}>{ip}</div>;
-      });
-    }
-
-    const status = row.original.IngressStatus;
-    if (status) {
-      return status?.map((status, index) => {
-        // some ips come through blank
-        if (status.IP.length === 0) {
-          return '-';
-        }
-
-        if (scheme) {
-          let linkto = `${scheme}://${status.IP}`;
-          if (port !== 80 && port !== 443) {
-            linkto = `${linkto}:${port}`;
-          }
-          return (
-            <div key={index}>
-              <ExternalIPLink to={linkto} text={status.IP} />
-            </div>
-          );
-        }
-        return <div key={index}>{status.IP}</div>;
-      });
-    }
-
-    return '-';
-  },
-  disableFilters: true,
-  canHide: true,
-  sortType: (rowA, rowB) => {
-    const a = rowA.original.IngressStatus;
-    const b = rowB.original.IngressStatus;
-    const aExternal = rowA.original.ExternalIPs;
-    const bExternal = rowB.original.ExternalIPs;
-
-    const ipA = a?.[0].IP || aExternal?.[0] || rowA.original.ExternalName;
-    const ipB = b?.[0].IP || bExternal?.[0] || rowA.original.ExternalName;
-
-    if (!ipA) return 1;
-    if (!ipB) return -1;
-
-    // use a nat sort order for ip addresses
-    return ipA.localeCompare(
-      ipB,
-      navigator.languages[0] || navigator.language,
-      {
-        numeric: true,
-        ignorePunctuation: true,
-      }
-    );
-  },
-};
