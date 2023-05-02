@@ -16,13 +16,16 @@ WEBPACK_CONFIG=webpack/webpack.$(ENV).js
 
 ##@ Building
 
+init-dist:
+	mkdir -p dist
+
 build-storybook:
 	yarn storybook:build
 
-build-client: ## Build the client
-	@export NODE_ENV=$(ENV) && yarn build:client --config $(WEBPACK_CONFIG)
+build-client: init-dist ## Build the client
+	@export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
 
-build-server: ## Build the server binary
+build-server: init-dist ## Build the server binary
 	@./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
 build: build-server build-client ## Build the server and client
@@ -30,7 +33,7 @@ build: build-server build-client ## Build the server and client
 build-image: build ## Build the Portainer image
 	docker build -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
 
-devops: clean download-binaries build-client ## Build the server binary for CI
+devops: clean init-dist download-binaries build-client ## Build the server binary for CI
 	echo "Building the devops binary..."
 	@./build/build_binary_azuredevops.sh "$(PLATFORM)" "$(ARCH)"
 
