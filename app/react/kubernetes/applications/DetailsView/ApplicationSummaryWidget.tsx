@@ -32,6 +32,7 @@ import {
   useApplication,
   usePatchApplicationMutation,
 } from '../application.queries';
+import { Application } from '../types';
 
 export function ApplicationSummaryWidget() {
   const stateAndParams = useCurrentStateAndParams();
@@ -54,8 +55,7 @@ export function ApplicationSummaryWidget() {
   const externalApplication = application && isExternalApplication(application);
   const applicationRequests = application && getResourceRequests(application);
   const applicationOwner = application?.metadata?.labels?.[appOwnerLabel];
-  const applicationDeployMethod =
-    application?.metadata?.labels?.[appDeployMethodLabel] || 'application form';
+  const applicationDeployMethod = getApplicationDeployMethod(application);
   const applicationNote =
     application?.metadata?.annotations?.[appNoteAnnotation];
 
@@ -176,13 +176,15 @@ export function ApplicationSummaryWidget() {
                   'YYYY-MM-DD HH:mm:ss'
                 )}
               </span>
-              <span
-                className="flex items-center gap-1"
-                data-cy="k8sAppDetail-creationMethod"
-              >
-                <Clock />
-                Deployed from {applicationDeployMethod}
-              </span>
+              {(!externalApplication || systemNamespace) && (
+                <span
+                  className="flex items-center gap-1"
+                  data-cy="k8sAppDetail-creationMethod"
+                >
+                  <Clock />
+                  Deployed from {applicationDeployMethod}
+                </span>
+              )}
             </div>
           </td>
         </tr>
@@ -275,4 +277,13 @@ export function ApplicationSummaryWidget() {
       }
     }
   }
+}
+
+function getApplicationDeployMethod(application?: Application) {
+  if (!application?.metadata?.labels?.[appDeployMethodLabel])
+    return 'application form';
+  if (application?.metadata?.labels?.[appDeployMethodLabel] === 'content') {
+    return 'manifest';
+  }
+  return application?.metadata?.labels?.[appDeployMethodLabel];
 }
