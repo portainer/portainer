@@ -35,7 +35,7 @@ func (service ServiceTx) Role(ID portainer.RoleID) (*portainer.Role, error) {
 func (service ServiceTx) Roles() ([]portainer.Role, error) {
 	var sets = make([]portainer.Role, 0)
 
-	err := service.service.connection.GetAll(
+	err := service.tx.GetAll(
 		BucketName,
 		&portainer.Role{},
 		func(obj interface{}) (interface{}, error) {
