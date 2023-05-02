@@ -14,11 +14,10 @@ type edgeStackFromFileUploadPayload struct {
 	StackFileContent []byte
 	EdgeGroups       []portainer.EdgeGroupID
 	// Deployment type to deploy this stack
-	// Valid values are: 0 - 'compose', 1 - 'kubernetes', 2 - 'nomad'
-	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments(endpoints)
-	// kubernetes deploytype is enabled only for kubernetes environments(endpoints)
-	// nomad deploytype is enabled only for nomad environments(endpoints)
-	DeploymentType portainer.EdgeStackDeploymentType `example:"0" enums:"0,1,2"`
+	// Valid values are: 0 - 'compose', 1 - 'kubernetes'
+	// compose is enabled only for docker environments
+	// kubernetes is enabled only for kubernetes environments
+	DeploymentType portainer.EdgeStackDeploymentType `example:"0" enums:"0,1"`
 	Registries     []portainer.RegistryID
 	// Uses the manifest's namespaces instead of the default one
 	UseManifestNamespaces bool
@@ -49,6 +48,9 @@ func (payload *edgeStackFromFileUploadPayload) Validate(r *http.Request) error {
 		return httperrors.NewInvalidPayloadError("Invalid deployment type")
 	}
 	payload.DeploymentType = portainer.EdgeStackDeploymentType(deploymentType)
+	if payload.DeploymentType != portainer.EdgeStackDeploymentCompose && payload.DeploymentType != portainer.EdgeStackDeploymentKubernetes {
+		return httperrors.NewInvalidPayloadError("Invalid deployment type")
+	}
 
 	var registries []portainer.RegistryID
 	err = request.RetrieveMultiPartFormJSONValue(r, "Registries", &registries, true)
