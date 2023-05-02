@@ -12,6 +12,8 @@ dockerComposeVersion=$(jq -r '.dockerCompose' < "${BINARY_VERSION_FILE}")
 helmVersion=$(jq -r '.helm' < "${BINARY_VERSION_FILE}")
 kubectlVersion=$(jq -r '.kubectl' < "${BINARY_VERSION_FILE}")
 
+mkdir -p dist
+
 echo "Downloading binaries for docker ${dockerVersion}, docker-compose ${dockerComposeVersion}, helm ${helmVersion}, kubectl ${kubectlVersion}"
 
 ./build/download_docker_binary.sh "$PLATFORM" "$ARCH" "$dockerVersion" &
