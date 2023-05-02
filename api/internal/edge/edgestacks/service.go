@@ -80,6 +80,9 @@ func (service *Service) PersistEdgeStack(
 
 	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
+		if err == edge.ErrEdgeGroupNotFound {
+			return nil, NewInvalidPayloadError(err.Error())
+		}
 		return nil, fmt.Errorf("unable to persist environment relation in database: %w", err)
 	}
 
