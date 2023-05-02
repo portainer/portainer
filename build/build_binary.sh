@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
+
 DEBUG=${DEBUG:-""}
 if [ -n "$DEBUG" ]; then
 	set -x
@@ -17,7 +19,8 @@ GO_VERSION=${GO_VERSION:-"0"}
 # copy templates
 cp -r "./mustache-templates" "./dist"
 
-cd api
+
+cd api || exit 1
 # the go get adds 8 seconds
 go get -t -d -v ./...
 
@@ -31,6 +34,6 @@ GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build \
 	--X 'github.com/portainer/portainer/api/build.NodejsVersion=${NODE_VERSION}' \
 	--X 'github.com/portainer/portainer/api/build.YarnVersion=${YARN_VERSION}' \
 	--X 'github.com/portainer/portainer/api/build.WebpackVersion=${WEBPACK_VERSION}' \
-	--X 'github.com/portainer/portainer/api/build.GoVersion=${GO_VERSION}'" \
-	-o "../dist/portainer" \
-	./cmd/portainer/
+  --X 'github.com/portainer/portainer/api/build.GoVersion=${GO_VERSION}'" \
+  -o "../dist/portainer" \
+  ./cmd/portainer/

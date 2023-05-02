@@ -1,0 +1,29 @@
+name: Validate OpenAPI specs
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+      - 'release/*'
+
+jobs:
+  openapi-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Download golang modules
+        run: cd ./api && go get -t -v -d ./...
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn --frozen-lockfile
+
+      - name: Validate OpenAPI Spec
+        run: make docs-validate
