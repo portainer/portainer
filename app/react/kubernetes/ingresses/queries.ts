@@ -7,6 +7,7 @@ import {
   withInvalidate,
 } from '@/react-tools/react-query';
 import { getServices } from '@/react/kubernetes/networks/services/service';
+import { isFulfilled } from '@/react/utils';
 
 import {
   getIngresses,
@@ -192,10 +193,4 @@ export function useIngressControllers(
       ...withError('Unable to get ingress controllers'),
     }
   );
-}
-
-function isFulfilled<T>(
-  input: PromiseSettledResult<T>
-): input is PromiseFulfilledResult<T> {
-  return input.status === 'fulfilled';
 }
