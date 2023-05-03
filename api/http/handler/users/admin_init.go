@@ -76,5 +76,8 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to persist user inside the database", err)
 	}
 
+	// After the admin user is created, we can notify the endpoint initialization process
+	handler.AdminCreationDone <- struct{}{}
+
 	return response.JSON(w, user)
 }

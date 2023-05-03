@@ -106,6 +106,7 @@ type Server struct {
 	StackDeployer               deployments.StackDeployer
 	DemoService                 *demo.Service
 	UpgradeService              upgrade.Service
+	AdminCreationDone           chan struct{}
 }
 
 // Start starts the HTTP server
