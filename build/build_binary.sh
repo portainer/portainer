@@ -1,20 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DEBUG=${DEBUG:-""}
-if [ -n "$DEBUG" ]; then
-	set -x
-fi
-
 mkdir -p dist
 
 # populate tool versions
-BUILD_NUMBER=${BUILD_NUMBER:-"N/A"}
-CONTAINER_IMAGE_TAG=${CONTAINER_IMAGE_TAG:-"N/A"}
-NODE_VERSION=${NODE_VERSION:-"0"}
-YARN_VERSION=${YARN_VERSION:-"0"}
-WEBPACK_VERSION=${WEBPACK_VERSION:-"0"}
-GO_VERSION=${GO_VERSION:-"0"}
+BUILDNUMBER="N/A"
+CONTAINER_IMAGE_TAG="N/A"
+NODE_VERSION="0"
+YARN_VERSION="0"
+WEBPACK_VERSION="0"
+GO_VERSION="0"
 
 # copy templates
 cp -r "./mustache-templates" "./dist"
@@ -24,16 +19,23 @@ cd api || exit 1
 # the go get adds 8 seconds
 go get -t -d -v ./...
 
+
+ldflags="-s -X 'github.com/portainer/liblicense.LicenseServerBaseURL=https://api.portainer.io' \
+-X 'github.com/portainer/portainer-ee/api/build.BuildNumber=${BUILDNUMBER}' \
+-X 'github.com/portainer/portainer-ee/api/build.ImageTag=${CONTAINER_IMAGE_TAG}' \
+-X 'github.com/portainer/portainer-ee/api/build.NodejsVersion=${NODE_VERSION}' \
+-X 'github.com/portainer/portainer-ee/api/build.YarnVersion=${YARN_VERSION}' \
+-X 'github.com/portainer/portainer-ee/api/build.WebpackVersion=${WEBPACK_VERSION}' \
+-X 'github.com/portainer/portainer-ee/api/build.GoVersion=${GO_VERSION}'"
+
+BINARY_VERSION_FILE="../binary-version.json"
+
+echo "$ldflags"
+
 # the build takes 2 seconds
-GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build \
+GOOS=${1:-$(go env GOOS)} GOARCH=${2:-$(go env GOARCH)} CGO_ENABLED=0 go build \
 	-trimpath \
 	--installsuffix cgo \
-	--ldflags "-s \
-	--X 'github.com/portainer/portainer/api/build.BuildNumber=${BUILD_NUMBER}' \
-	--X 'github.com/portainer/portainer/api/build.ImageTag=${CONTAINER_IMAGE_TAG}' \
-	--X 'github.com/portainer/portainer/api/build.NodejsVersion=${NODE_VERSION}' \
-	--X 'github.com/portainer/portainer/api/build.YarnVersion=${YARN_VERSION}' \
-	--X 'github.com/portainer/portainer/api/build.WebpackVersion=${WEBPACK_VERSION}' \
-  --X 'github.com/portainer/portainer/api/build.GoVersion=${GO_VERSION}'" \
-  -o "../dist/portainer" \
-  ./cmd/portainer/
+	--ldflags "$ldflags" \
+	-o "../dist/portainer" \
+	./cmd/portainer/
