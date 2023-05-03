@@ -4,7 +4,6 @@ import PortainerError from 'Portainer/error';
 
 import { KubernetesApplication, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesApplicationRollbackHelper from 'Kubernetes/helpers/application/rollback';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
@@ -29,7 +28,6 @@ class KubernetesApplicationService {
     KubernetesPersistentVolumeClaimService,
     KubernetesNamespaceService,
     KubernetesPodService,
-    KubernetesHistoryService,
     KubernetesHorizontalPodAutoScalerService,
     KubernetesIngressService
   ) {
@@ -43,7 +41,6 @@ class KubernetesApplicationService {
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesPodService = KubernetesPodService;
-    this.KubernetesHistoryService = KubernetesHistoryService;
     this.KubernetesHorizontalPodAutoScalerService = KubernetesHorizontalPodAutoScalerService;
     this.KubernetesIngressService = KubernetesIngressService;
 
@@ -52,7 +49,6 @@ class KubernetesApplicationService {
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
     this.patchPartialAsync = this.patchPartialAsync.bind(this);
-    this.rollbackAsync = this.rollbackAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
   /* #endregion */
@@ -122,8 +118,6 @@ class KubernetesApplicationService {
     const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(namespace, boundScaler.Name) : undefined;
     application.AutoScaler = scaler;
     application.Ingresses = ingresses;
-
-    await this.KubernetesHistoryService.get(application);
 
     if (service.Yaml) {
       application.Yaml += '---\n' + service.Yaml;
@@ -426,18 +420,6 @@ class KubernetesApplicationService {
 
   delete(application) {
     return this.$async(this.deleteAsync, application);
-  }
-  /* #endregion */
-
-  /* #region  ROLLBACK */
-  async rollbackAsync(application, targetRevision) {
-    const payload = KubernetesApplicationRollbackHelper.getPatchPayload(application, targetRevision);
-    const apiService = this._getApplicationApiService(application);
-    await apiService.rollback(application.ResourcePool, application.Name, payload);
-  }
-
-  rollback(application, targetRevision) {
-    return this.$async(this.rollbackAsync, application, targetRevision);
   }
   /* #endregion */
 }

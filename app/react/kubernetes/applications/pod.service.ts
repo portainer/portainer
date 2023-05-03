@@ -1,12 +1,23 @@
 import { Pod, PodList } from 'kubernetes-types/core/v1';
 
-import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-export async function getPods(environmentId: EnvironmentId, namespace: string) {
+import { ApplicationPatch } from './types';
+
+export async function getNamespacePods(
+  environmentId: EnvironmentId,
+  namespace: string,
+  labelSelector?: string
+) {
   try {
     const { data } = await axios.get<PodList>(
-      buildUrl(environmentId, namespace)
+      buildUrl(environmentId, namespace),
+      {
+        params: {
+          labelSelector,
+        },
+      }
     );
     return data.items;
   } catch (e) {
@@ -33,20 +44,12 @@ export async function patchPod(
   environmentId: EnvironmentId,
   namespace: string,
   name: string,
-  path: string,
-  value: string
+  patch: ApplicationPatch
 ) {
-  const payload = [
-    {
-      op: 'replace',
-      path,
-      value,
-    },
-  ];
   try {
     return await axios.patch<Pod>(
       buildUrl(environmentId, namespace, name),
-      payload,
+      patch,
       {
         headers: {
           'Content-Type': 'application/json-patch+json',
@@ -55,6 +58,18 @@ export async function patchPod(
     );
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update pod');
+  }
+}
+
+export async function deletePod(
+  environmentId: EnvironmentId,
+  namespace: string,
+  name: string
+) {
+  try {
+    return await axios.delete<Pod>(buildUrl(environmentId, namespace, name));
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to delete pod');
   }
 }
 

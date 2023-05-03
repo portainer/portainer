@@ -5,15 +5,23 @@ import {
   Deployment,
   DaemonSet,
   StatefulSet,
+  ReplicaSetList,
+  ControllerRevisionList,
 } from 'kubernetes-types/apps/v1';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
-import { getPod, getPods, patchPod } from './pod.service';
-import { getNakedPods } from './utils';
-import { AppKind, Application, ApplicationList } from './types';
+import { getPod, getNamespacePods, patchPod } from './pod.service';
+import { filterRevisionsByOwnerUid, getNakedPods } from './utils';
+import {
+  AppKind,
+  Application,
+  ApplicationList,
+  ApplicationPatch,
+} from './types';
+import { appRevisionAnnotation } from './constants';
 
 // This file contains services for Kubernetes apps/v1 resources (Deployments, DaemonSets, StatefulSets)
 
@@ -58,7 +66,7 @@ async function getApplicationsForNamespace(
         namespace,
         'StatefulSet'
       ),
-      getPods(environmentId, namespace),
+      getNamespacePods(environmentId, namespace),
     ]);
     // find all pods which are 'naked' (not owned by a deployment, daemonset or statefulset)
     const nakedPods = getNakedPods(pods, deployments, daemonSets, statefulSets);
@@ -147,8 +155,7 @@ export async function patchApplication(
   namespace: string,
   appKind: AppKind,
   name: string,
-  path: string,
-  value: string
+  patch: ApplicationPatch
 ) {
   try {
     switch (appKind) {
@@ -158,8 +165,7 @@ export async function patchApplication(
           namespace,
           appKind,
           name,
-          path,
-          value
+          patch
         );
       case 'DaemonSet':
         return await patchApplicationByKind<DaemonSet>(
@@ -167,8 +173,8 @@ export async function patchApplication(
           namespace,
           appKind,
           name,
-          path,
-          value
+          patch,
+          'application/strategic-merge-patch+json'
         );
       case 'StatefulSet':
         return await patchApplicationByKind<StatefulSet>(
@@ -176,11 +182,11 @@ export async function patchApplication(
           namespace,
           appKind,
           name,
-          path,
-          value
+          patch,
+          'application/strategic-merge-patch+json'
         );
       case 'Pod':
-        return await patchPod(environmentId, namespace, name, path, value);
+        return await patchPod(environmentId, namespace, name, patch);
       default:
         throw new Error(`Unknown application kind ${appKind}`);
     }
@@ -197,23 +203,16 @@ async function patchApplicationByKind<T extends Application>(
   namespace: string,
   appKind: 'Deployment' | 'DaemonSet' | 'StatefulSet',
   name: string,
-  path: string,
-  value: string
+  patch: ApplicationPatch,
+  contentType = 'application/json-patch+json'
 ) {
-  const payload = [
-    {
-      op: 'replace',
-      path,
-      value,
-    },
-  ];
   try {
     const res = await axios.patch<T>(
       buildUrl(environmentId, namespace, `${appKind}s`, name),
-      payload,
+      patch,
       {
         headers: {
-          'Content-Type': 'application/json-patch+json',
+          'Content-Type': contentType,
         },
       }
     );
@@ -254,10 +253,120 @@ async function getApplicationsByKind<T extends ApplicationList>(
   }
 }
 
+export async function getApplicationRevisionList(
+  environmentId: EnvironmentId,
+  namespace: string,
+  deploymentUid?: string,
+  appKind?: AppKind,
+  labelSelector?: string
+) {
+  if (!deploymentUid) {
+    throw new Error('deploymentUid is required');
+  }
+  try {
+    switch (appKind) {
+      case 'Deployment': {
+        const replicaSetList = await getReplicaSetList(
+          environmentId,
+          namespace,
+          labelSelector
+        );
+        const replicaSets = replicaSetList.items;
+        // keep only replicaset(s) which are owned by the deployment with the given uid
+        const replicaSetsWithOwnerId = filterRevisionsByOwnerUid(
+          replicaSets,
+          deploymentUid
+        );
+        // keep only replicaset(s) that have been a version of the Deployment
+        const replicaSetsWithRevisionAnnotations =
+          replicaSetsWithOwnerId.filter(
+            (rs) => !!rs.metadata?.annotations?.[appRevisionAnnotation]
+          );
+
+        return {
+          ...replicaSetList,
+          items: replicaSetsWithRevisionAnnotations,
+        } as ReplicaSetList;
+      }
+      case 'DaemonSet':
+      case 'StatefulSet': {
+        const controllerRevisionList = await getControllerRevisionList(
+          environmentId,
+          namespace,
+          labelSelector
+        );
+        const controllerRevisions = controllerRevisionList.items;
+        // ensure the controller reference(s) is owned by the deployment with the given uid
+        const controllerRevisionsWithOwnerId = filterRevisionsByOwnerUid(
+          controllerRevisions,
+          deploymentUid
+        );
+
+        return {
+          ...controllerRevisionList,
+          items: controllerRevisionsWithOwnerId,
+        } as ControllerRevisionList;
+      }
+      default:
+        throw new Error(`Unknown application kind ${appKind}`);
+    }
+  } catch (e) {
+    throw parseAxiosError(
+      e as Error,
+      `Unable to retrieve revisions for ${appKind}`
+    );
+  }
+}
+
+export async function getReplicaSetList(
+  environmentId: EnvironmentId,
+  namespace: string,
+  labelSelector?: string
+) {
+  try {
+    const { data } = await axios.get<ReplicaSetList>(
+      buildUrl(environmentId, namespace, 'ReplicaSets'),
+      {
+        params: {
+          labelSelector,
+        },
+      }
+    );
+    return data;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve ReplicaSets');
+  }
+}
+
+export async function getControllerRevisionList(
+  environmentId: EnvironmentId,
+  namespace: string,
+  labelSelector?: string
+) {
+  try {
+    const { data } = await axios.get<ControllerRevisionList>(
+      buildUrl(environmentId, namespace, 'ControllerRevisions'),
+      {
+        params: {
+          labelSelector,
+        },
+      }
+    );
+    return data;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve ControllerRevisions');
+  }
+}
+
 function buildUrl(
   environmentId: EnvironmentId,
   namespace: string,
-  appKind: 'Deployments' | 'DaemonSets' | 'StatefulSets',
+  appKind:
+    | 'Deployments'
+    | 'DaemonSets'
+    | 'StatefulSets'
+    | 'ReplicaSets'
+    | 'ControllerRevisions',
   name?: string
 ) {
   let baseUrl = `/endpoints/${environmentId}/kubernetes/apis/apps/v1/namespaces/${namespace}/${appKind.toLowerCase()}`;

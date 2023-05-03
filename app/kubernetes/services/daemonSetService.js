@@ -13,7 +13,6 @@ class KubernetesDaemonSetService {
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
-    this.rollbackAsync = this.rollbackAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -109,23 +108,6 @@ class KubernetesDaemonSetService {
 
   delete(daemonSet) {
     return this.$async(this.deleteAsync, daemonSet);
-  }
-
-  /**
-   * ROLLBACK
-   */
-  async rollbackAsync(namespace, name, payload) {
-    try {
-      const params = new KubernetesCommonParams();
-      params.id = name;
-      await this.KubernetesDaemonSets(namespace).rollback(params, payload).$promise;
-    } catch (err) {
-      throw new PortainerError('Unable to rollback daemonset', err);
-    }
-  }
-
-  rollback(namespace, name, payload) {
-    return this.$async(this.rollbackAsync, namespace, name, payload);
   }
 }
 

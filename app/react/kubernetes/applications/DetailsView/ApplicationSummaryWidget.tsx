@@ -32,7 +32,7 @@ import {
   useApplication,
   usePatchApplicationMutation,
 } from '../application.queries';
-import { Application } from '../types';
+import { Application, ApplicationPatch } from '../types';
 
 export function ApplicationSummaryWidget() {
   const stateAndParams = useCurrentStateAndParams();
@@ -263,14 +263,18 @@ export function ApplicationSummaryWidget() {
   );
 
   async function patchApplicationNote() {
-    const path = `/metadata/annotations/${appNoteAnnotation}`;
-    const value = applicationNoteFormValues;
+    const patch: ApplicationPatch = [
+      {
+        op: 'replace',
+        path: `/metadata/annotations/${appNoteAnnotation}`,
+        value: 'applicationNoteFormValues',
+      },
+    ];
     if (application?.kind) {
       try {
         await patchApplicationMutation.mutateAsync({
           appKind: application.kind,
-          path,
-          value,
+          patch,
         });
         notifySuccess('Success', 'Application successfully updated');
       } catch (error) {
