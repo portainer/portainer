@@ -243,6 +243,9 @@ angular
   .filter('imagelayercommand', function () {
     'use strict';
     return function (createdBy) {
+      if (!createdBy) {
+        return '';
+      }
       return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
     };
   })
