@@ -1,13 +1,11 @@
 #!/bin/bash
 set -euo pipefail
-IFS=$'\n\t'
 
+PORTAINER_DATA=${PORTAINER_DATA:-/tmp/portainer}
+PORTAINER_PROJECT=${PORTAINER_PROJECT:-$(pwd)}
+PORTAINER_FLAGS=${PORTAINER_FLAGS:-}
 
-PORTAINER_DATA=${PORTAINER_DATA:-/tmp/portainer};
-PORTAINER_PROJECT=${PORTAINER_PROJECT:-$(pwd)};
-PORTAINER_FLAGS=${PORTAINER_FLAGS:-};
-
-docker rm -f portainer
+docker rm -f portainer > /dev/null
 
 docker run -d \
 -p 8000:8000 \
@@ -20,4 +18,4 @@ docker run -d \
 -v /tmp:/tmp \
 --name portainer \
 portainer/base \
-/app/portainer "${@:PORTAINER_FLAGS}"
+/app/portainer ${PORTAINER_FLAGS}
