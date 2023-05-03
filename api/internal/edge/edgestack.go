@@ -8,6 +8,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
+var ErrEdgeGroupNotFound = errors.New("Edge group was not found")
+
 // EdgeStackRelatedEndpoints returns a list of environments(endpoints) related to this Edge stack
 func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup) ([]portainer.EndpointID, error) {
 	edgeStackEndpoints := []portainer.EndpointID{}
@@ -23,7 +25,7 @@ func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints [
 		}
 
 		if edgeGroup == nil {
-			return nil, errors.New("Edge group was not found")
+			return nil, ErrEdgeGroupNotFound
 		}
 
 		edgeStackEndpoints = append(edgeStackEndpoints, EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)...)
