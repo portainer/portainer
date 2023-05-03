@@ -11,12 +11,23 @@
         <div class="searchBar vertical-center">
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
+            ng-if="!$ctrl.notAutoFocus"
+            auto-focus
             type="text"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search for a service..."
-            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="service-searchInput"
+          />
+          <input
+            ng-if="$ctrl.notAutoFocus"
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a service..."
             ng-model-options="{ debounce: 300 }"
             data-cy="service-searchInput"
           />
