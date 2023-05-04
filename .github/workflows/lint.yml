@@ -16,18 +16,17 @@ jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '18'
           cache: 'yarn'
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.19.4
+          go-version: 1.19.5
       - run: yarn --frozen-lockfile
-
       - name: Run linters
         uses: wearerequired/lint-action@v1
         with:
