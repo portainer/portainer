@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 	edgetypes "github.com/portainer/portainer/api/internal/edge/types"
 )
@@ -81,7 +82,7 @@ func (service *Service) PersistEdgeStack(
 	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		if err == edge.ErrEdgeGroupNotFound {
-			return nil, NewInvalidPayloadError(err.Error())
+			return nil, httperrors.NewInvalidPayloadError(err.Error())
 		}
 		return nil, fmt.Errorf("unable to persist environment relation in database: %w", err)
 	}
