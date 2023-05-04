@@ -39,7 +39,7 @@ func (payload *teamCreatePayload) Validate(r *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 409 "Team already exists"
 // @failure 500 "Server error"
-// @router /team [post]
+// @router /teams [post]
 func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload teamCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
