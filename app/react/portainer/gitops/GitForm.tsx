@@ -22,6 +22,7 @@ import { refFieldValidation } from './RefField/RefField';
 interface Props {
   value: GitFormModel;
   onChange: (value: Partial<GitFormModel>) => void;
+  environmentType?: 'DOCKER' | 'KUBERNETES' | undefined;
   deployMethod?: 'compose' | 'nomad' | 'manifest';
   isDockerStandalone?: boolean;
   isAdditionalFilesFieldVisible?: boolean;
@@ -36,6 +37,7 @@ interface Props {
 export function GitForm({
   value,
   onChange,
+  environmentType = 'DOCKER',
   deployMethod = 'compose',
   isDockerStandalone = false,
   isAdditionalFilesFieldVisible,
@@ -94,6 +96,7 @@ export function GitForm({
 
       {value.AutoUpdate && (
         <AutoUpdateFieldset
+          environmentType={environmentType}
           webhookId={webhookId}
           baseWebhookUrl={baseWebhookUrl}
           value={value.AutoUpdate}

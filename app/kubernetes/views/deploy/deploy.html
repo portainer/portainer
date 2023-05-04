@@ -80,6 +80,8 @@
                   ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT"
                   value="ctrl.formValues"
                   on-change="(ctrl.onChangeFormValues)"
+                  environment-type="KUBERNETES"
+                  is-force-pull-visible="false"
                   is-additional-files-field-visible="true"
                   is-auth-explanation-visible="true"
                   deploy-method="{{ ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ? 'compose' : 'manifest' }}"
