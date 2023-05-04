@@ -67,9 +67,12 @@ func (tx *StoreTx) Tag() dataservices.TagService {
 	return tx.store.TagService.Tx(tx.tx)
 }
 
-func (tx *StoreTx) TeamMembership() dataservices.TeamMembershipService { return nil }
-func (tx *StoreTx) Team() dataservices.TeamService                     { return nil }
-func (tx *StoreTx) TunnelServer() dataservices.TunnelServerService     { return nil }
-func (tx *StoreTx) User() dataservices.UserService                     { return nil }
-func (tx *StoreTx) Version() dataservices.VersionService               { return nil }
-func (tx *StoreTx) Webhook() dataservices.WebhookService               { return nil }
+func (tx *StoreTx) TeamMembership() dataservices.TeamMembershipService {
+	return tx.store.TeamMembershipService.Tx(tx.tx)
+}
+
+func (tx *StoreTx) Team() dataservices.TeamService                 { return nil }
+func (tx *StoreTx) TunnelServer() dataservices.TunnelServerService { return nil }
+func (tx *StoreTx) User() dataservices.UserService                 { return nil }
+func (tx *StoreTx) Version() dataservices.VersionService           { return nil }
+func (tx *StoreTx) Webhook() dataservices.WebhookService           { return nil }
