@@ -7,12 +7,13 @@ import { Link } from '@@/Link';
 import { Alert } from '@@/Alert';
 
 import { Datatable } from './Datatable';
-import { useWillExceedNodeLimit } from './queries';
+import { useLicenseOverused, useUntrustedCount } from './queries';
 
 export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
-  const willExceed = useWillExceedNodeLimit();
+  const untrustedCount = useUntrustedCount();
+  const { willExceed } = useLicenseOverused();
   return (
     <>
       <PageHeader
@@ -31,7 +32,7 @@ function WaitingRoomView() {
         </TextTip>
       </InformationPanel>
 
-      {willExceed && (
+      {willExceed(untrustedCount) && (
         <div className="row">
           <div className="col-sm-12">
             <Alert color="warn">

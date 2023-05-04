@@ -4,7 +4,6 @@ import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { useIntegratedLicenseInfo } from '@/react/portainer/licenses/use-license.service';
-import { LicenseType } from '@/react/portainer/licenses/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 
 export function useAssociateDeviceMutation() {
@@ -37,21 +36,17 @@ async function associateDevice(environmentId: EnvironmentId) {
 
 export function useLicenseOverused() {
   const integratedInfo = useIntegratedLicenseInfo();
-  return (
-    !!integratedInfo &&
-    integratedInfo.usedNodes > integratedInfo.licenseInfo.nodes &&
-    integratedInfo.licenseInfo.type === LicenseType.Essentials
-  );
-}
+  return {
+    willExceed,
+    isOverused: willExceed(0),
+  };
 
-export function useWillExceedNodeLimit() {
-  const untrusted = useUntrustedCount();
-  const integratedInfo = useIntegratedLicenseInfo();
-  return (
-    !!integratedInfo &&
-    integratedInfo.usedNodes + untrusted > integratedInfo.licenseInfo.nodes &&
-    integratedInfo.licenseInfo.type === LicenseType.Essentials
-  );
+  function willExceed(moreNodes: number) {
+    return (
+      !!integratedInfo &&
+      integratedInfo.usedNodes + moreNodes >= integratedInfo.licenseInfo.nodes
+    );
+  }
 }
 
 export function useUntrustedCount() {

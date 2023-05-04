@@ -26,7 +26,7 @@ const settingsStore = createPersistedStore(storageKey, 'Name');
 export function Datatable() {
   const associateMutation = useAssociateDeviceMutation();
   const removeMutation = useDeleteEnvironmentsMutation();
-  const licenseOverused = useLicenseOverused();
+  const { willExceed } = useLicenseOverused();
   const tableState = useTableState(settingsStore, storageKey);
   const { data: environments, totalCount, isLoading } = useEnvironments();
 
@@ -50,7 +50,7 @@ export function Datatable() {
 
           <TooltipWithChildren
             message={
-              licenseOverused && (
+              willExceed(selectedRows.length) && (
                 <>
                   Associating devices is disabled as your node count exceeds
                   your license limit
@@ -61,7 +61,9 @@ export function Datatable() {
             <span>
               <Button
                 onClick={() => handleAssociateDevice(selectedRows)}
-                disabled={selectedRows.length === 0 || licenseOverused}
+                disabled={
+                  selectedRows.length === 0 || willExceed(selectedRows.length)
+                }
               >
                 Associate Device
               </Button>
