@@ -47,7 +47,9 @@ func (tx *StoreTx) Registry() dataservices.RegistryService {
 	return nil
 }
 
-func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService { return nil }
+func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService {
+	return tx.store.ResourceControlService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) Role() dataservices.RoleService {
 	return tx.store.RoleService.Tx(tx.tx)
