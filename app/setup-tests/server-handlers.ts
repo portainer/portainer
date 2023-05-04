@@ -1,13 +1,13 @@
-import { DefaultRequestBody, PathParams, rest } from 'msw';
+import { DefaultBodyType, PathParams, rest } from 'msw';
 
 import {
   Edition,
   LicenseInfo,
   LicenseType,
-} from '@/portainer/license-management/types';
-import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+} from '@/react/portainer/licenses/types';
+import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 import { Tag } from '@/portainer/tags/types';
-import { StatusResponse } from '@/portainer/services/api/status.service';
+import { StatusResponse } from '@/react/portainer/system/useSystemStatus';
 import { createMockTeams } from '@/react-tools/test-mocks';
 import { PublicSettingsResponse } from '@/react/portainer/settings/types';
 import { UserId } from '@/portainer/users/types';
@@ -17,8 +17,8 @@ import { dockerHandlers } from './setup-handlers/docker';
 import { userHandlers } from './setup-handlers/users';
 
 const tags: Tag[] = [
-  { ID: 1, Name: 'tag1' },
-  { ID: 2, Name: 'tag2' },
+  { ID: 1, Name: 'tag1', Endpoints: {} },
+  { ID: 2, Name: 'tag2', Endpoints: {} },
 ];
 
 const licenseInfo: LicenseInfo = {
@@ -30,6 +30,8 @@ const licenseInfo: LicenseInfo = {
   expiresAt: Number.MAX_SAFE_INTEGER,
   productEdition: Edition.EE,
   valid: true,
+  enforcedAt: 0,
+  enforced: false,
 };
 
 export const handlers = [
@@ -66,15 +68,26 @@ export const handlers = [
   rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags))),
   rest.post<{ name: string }>('/api/tags', (req, res, ctx) => {
     const tagName = req.body.name;
-    const tag = { ID: tags.length + 1, Name: tagName };
+    const tag = { ID: tags.length + 1, Name: tagName, Endpoints: {} };
     tags.push(tag);
     return res(ctx.json(tag));
   }),
-  rest.get<DefaultRequestBody, PathParams, Partial<PublicSettingsResponse>>(
+  rest.get<DefaultBodyType, PathParams, Partial<PublicSettingsResponse>>(
     '/api/settings/public',
-    (req, res, ctx) => res(ctx.json({}))
+    (req, res, ctx) =>
+      res(
+        ctx.json({
+          Edge: {
+            AsyncMode: false,
+            CheckinInterval: 60,
+            CommandInterval: 60,
+            PingInterval: 60,
+            SnapshotInterval: 60,
+          },
+        })
+      )
   ),
-  rest.get<DefaultRequestBody, PathParams, Partial<StatusResponse>>(
+  rest.get<DefaultBodyType, PathParams, Partial<StatusResponse>>(
     '/api/status',
     (req, res, ctx) => res(ctx.json({}))
   ),

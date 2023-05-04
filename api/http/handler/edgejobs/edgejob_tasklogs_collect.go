@@ -7,6 +7,9 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/slices"
 )
 
 // @id EdgeJobTasksCollect
@@ -16,8 +19,8 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeJob Id"
-// @param taskID path string true "Task Id"
+// @param id path int true "EdgeJob Id"
+// @param taskID path int true "Task Id"
 // @success 204
 // @failure 500
 // @failure 400
@@ -34,25 +37,57 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 		return httperror.BadRequest("Invalid Task identifier route variable", err)
 	}
 
-	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		edgeJob, err := tx.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
+		if tx.IsErrObjectNotFound(err) {
+			return httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
+		} else if err != nil {
+			return httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
+		}
 
-	endpointID := portainer.EndpointID(taskID)
+		endpointID := portainer.EndpointID(taskID)
+		endpointsFromGroups, err := edge.GetEndpointsFromEdgeGroups(edgeJob.EdgeGroups, tx)
+		if err != nil {
+			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
+		}
 
-	meta := edgeJob.Endpoints[endpointID]
-	meta.CollectLogs = true
-	meta.LogsStatus = portainer.EdgeJobLogsStatusPending
-	edgeJob.Endpoints[endpointID] = meta
+		if slices.Contains(endpointsFromGroups, endpointID) {
+			edgeJob.GroupLogsCollection[endpointID] = portainer.EdgeJobEndpointMeta{
+				CollectLogs: true,
+				LogsStatus:  portainer.EdgeJobLogsStatusPending,
+			}
+		} else {
+			meta := edgeJob.Endpoints[endpointID]
+			meta.CollectLogs = true
+			meta.LogsStatus = portainer.EdgeJobLogsStatusPending
+			edgeJob.Endpoints[endpointID] = meta
+		}
 
-	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+		err = tx.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
+		if err != nil {
+			return httperror.InternalServerError("Unable to persist Edge job changes in the database", err)
+		}
 
-	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
+		endpoint, err := tx.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
+		}
+
+		if endpoint.Edge.AsyncMode {
+			return httperror.BadRequest("Async Edge Endpoints are not supported in Portainer CE", nil)
+		}
+
+		handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
+
+		return nil
+	})
+
 	if err != nil {
-		return httperror.InternalServerError("Unable to persist Edge job changes in the database", err)
+		if httpErr, ok := err.(*httperror.HandlerError); ok {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
 	}
 
 	return response.Empty(w)

@@ -19,5 +19,6 @@ func (m *Migrator) MigrateSettingsToDB30() error {
 
 	legacySettings.OAuthSettings.SSO = false
 	legacySettings.OAuthSettings.LogoutURI = ""
+
 	return m.settingsService.UpdateSettings(legacySettings)
 }

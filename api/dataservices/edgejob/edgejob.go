@@ -8,10 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "edgejobs"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "edgejobs"
 
 // Service represents a service for managing edge jobs data.
 type Service struct {
@@ -32,6 +30,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	return &Service{
 		connection: connection,
 	}, nil
+}
+
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
 }
 
 // EdgeJobs returns a list of Edge jobs
@@ -80,10 +85,20 @@ func (service *Service) Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJo
 	)
 }
 
-// UpdateEdgeJob updates an Edge job by ID
+// Deprecated: use UpdateEdgeJobFunc instead
 func (service *Service) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, edgeJob)
+}
+
+// UpdateEdgeJobFunc updates an edge job inside a transaction avoiding data races.
+func (service *Service) UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error {
+	id := service.connection.ConvertToKey(int(ID))
+	edgeJob := &portainer.EdgeJob{}
+
+	return service.connection.UpdateObjectFunc(BucketName, id, edgeJob, func() {
+		updateFunc(edgeJob)
+	})
 }
 
 // DeleteEdgeJob deletes an Edge job

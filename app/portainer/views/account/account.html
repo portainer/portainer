@@ -5,12 +5,12 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="lock" feather-icon="true" title-text="Change user password"></rd-widget-header>
+      <rd-widget-header icon="lock" title-text="Change user password"></rd-widget-header>
       <rd-widget-body>
         <form name="form" class="form-horizontal" style="margin-top: 15px">
           <!-- current-password-input -->
           <div class="form-group">
-            <label for="current_password" class="col-sm-2 control-label text-left required">Current password</label>
+            <label for="current_password" class="col-sm-2 control-label required text-left">Current password</label>
             <div class="col-sm-8">
               <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password" />
             </div>
@@ -18,7 +18,7 @@
           <!-- !current-password-input -->
           <!-- new-password-input -->
           <div class="form-group">
-            <label for="new_password" class="col-sm-2 control-label text-left required">New password</label>
+            <label for="new_password" class="col-sm-2 control-label required text-left">New password</label>
             <div class="col-sm-8">
               <input type="password" class="form-control" ng-model="formValues.newPassword" ng-minlength="requiredPasswordLength" id="new_password" name="new_password" />
             </div>
@@ -27,13 +27,13 @@
 
           <!-- confirm-password-input -->
           <div class="form-group">
-            <label for="confirm_password" class="col-sm-2 control-label text-left required">Confirm password</label>
+            <label for="confirm_password" class="col-sm-2 control-label required text-left">Confirm password</label>
             <div class="col-sm-8">
               <div class="input-group">
                 <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
                 <span class="input-group-addon">
-                  <pr-icon icon="'check'" feather="true" class="icon-success" ng-if="formValues.newPassword === formValues.confirmPassword"></pr-icon>
-                  <pr-icon icon="'x'" feather="true" class="icon-danger" ng-if="!(formValues.newPassword === formValues.confirmPassword)"></pr-icon>
+                  <pr-icon icon="'check'" class="icon-success" ng-if="formValues.newPassword === formValues.confirmPassword"></pr-icon>
+                  <pr-icon icon="'x'" class="icon-danger" ng-if="!(formValues.newPassword === formValues.confirmPassword)"></pr-icon>
                 </span>
               </div>
             </div>
@@ -59,24 +59,29 @@
                 Remind me later
               </button>
               <span class="text-muted small vertical-center" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !isInitialAdmin">
-                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                 You cannot change your password when using LDAP authentication.
               </span>
               <span class="text-muted small vertical-center" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && !isInitialAdmin">
-                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                 You cannot change your password when using OAuth authentication.
               </span>
             </div>
           </div>
           <div ng-if="userRole === 1">
             <p class="text-muted vertical-center">
-              <pr-icon icon="'alert-circle'" class-name="'icon-primary'" feather="true"></pr-icon>
+              <pr-icon icon="'alert-circle'" class-name="'icon-primary'"></pr-icon>
               Minimum password length is set <a ui-sref="portainer.settings.authentication">here.</a>
             </p>
           </div>
         </form>
       </rd-widget-body>
     </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
     <access-tokens-datatable
       title-text="Access tokens"
       title-icon="key"
@@ -86,6 +91,11 @@
       remove-action="removeAction"
       ui-can-exit="uiCanExit"
     ></access-tokens-datatable>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
     <theme-settings></theme-settings>
   </div>
 </div>

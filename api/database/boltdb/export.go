@@ -14,7 +14,6 @@ func backupMetadata(connection *bolt.DB) (map[string]interface{}, error) {
 	err := connection.View(func(tx *bolt.Tx) error {
 		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
-			bucket = tx.Bucket([]byte(bucketName))
 			seqId := bucket.Sequence()
 			buckets[bucketName] = int(seqId)
 			return nil
@@ -31,7 +30,7 @@ func backupMetadata(connection *bolt.DB) (map[string]interface{}, error) {
 // using this function.
 // inspired by github.com/konoui/boltdb-exporter (which has no license)
 // but very much simplified, based on how we use boltdb
-func (c *DbConnection) ExportJson(databasePath string, metadata bool) ([]byte, error) {
+func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, error) {
 	log.Debug().Str("databasePath", databasePath).Msg("exportJson")
 
 	connection, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second, ReadOnly: true})

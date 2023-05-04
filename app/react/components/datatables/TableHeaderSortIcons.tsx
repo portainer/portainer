@@ -7,14 +7,15 @@ import styles from './TableHeaderSortIcons.module.css';
 interface Props {
   sorted: boolean;
   descending: boolean;
+  className?: string;
 }
 
-export function TableHeaderSortIcons({ sorted, descending }: Props) {
+export function TableHeaderSortIcons({ sorted, descending, className }: Props) {
   return (
-    <div className="flex flex-row no-wrap w-min-max">
+    <div className="no-wrap w-min-max flex flex-row align-middle">
       <SortDownIcon
         className={clsx(
-          'space-left',
+          className,
           sorted && !descending && styles.activeSortIcon,
           styles.sortIcon
         )}

@@ -1,10 +1,12 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
-import { Briefcase } from 'react-feather';
+import { Briefcase } from 'lucide-react';
 
 import './BEFeatureIndicator.css';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
+
+import { Icon } from '@@/Icon';
 
 import { getFeatureDetails } from './utils';
 
@@ -33,8 +35,8 @@ export function BEFeatureIndicator({
       rel="noopener noreferrer"
     >
       {children}
-      {showIcon && <Briefcase className="icon icon-sm vertical-center" />}
-      <span className="be-indicator-label break-words space-left">
+      {showIcon && <Icon icon={Briefcase} className="be-indicator-icon mr-1" />}
+      <span className="be-indicator-label break-words">
         Business Edition Feature
       </span>
     </a>

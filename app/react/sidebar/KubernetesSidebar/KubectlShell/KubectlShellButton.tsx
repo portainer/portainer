@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Terminal } from 'lucide-react';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Button } from '@@/buttons';
@@ -27,8 +28,8 @@ export function KubectlShellButton({ environmentId }: Props) {
         onClick={() => handleOpen()}
         className={clsx(styles.root, '!flex')}
       >
-        <Icon icon="terminal" feather className="vertical-center" size="md" />{' '}
-        kubectl shell
+        <Icon icon={Terminal} className="vertical-center" size="md" /> kubectl
+        shell
       </Button>
 
       {open &&

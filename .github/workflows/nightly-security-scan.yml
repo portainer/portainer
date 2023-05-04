@@ -1,22 +1,23 @@
 name: Nightly Code Security Scan
 
-on: 
+on:
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 20 * * *'
   workflow_dispatch:
-    
+
 jobs:
   client-dependencies:
-    name: Client dependency check
+    name: Client Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop'
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
-      - uses: actions/checkout@master
+      - name: checkout repository
+        uses: actions/checkout@master
 
-      - name: Run Snyk to check for vulnerabilities
+      - name: scan vulnerabilities by Snyk
         uses: snyk/actions/node@master
         continue-on-error: true # To make sure that artifact upload gets called
         env:
@@ -24,166 +25,140 @@ jobs:
         with:
           json: true
 
-      - name: Upload js security scan result as artifact 
+      - name: upload scan result as develop artifact 
         uses: actions/upload-artifact@v3
         with:
           name: js-security-scan-develop-result
           path: snyk.json
 
-      - name: Export scan result to html file 
-        run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="/data/js-result")
+      - name: develop scan report export to html
+        run: |
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=table --export --export-filename="/data/js-result")
 
-      - name: Upload js result html file
+      - name: upload html file as artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-js-result-${{github.run_id}}
           path: js-result.html
 
-      - name: Analyse the js result
+      - name: analyse vulnerabilities 
         id: set-matrix
-        run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
-          echo "::set-output name=js_result::${result}"
+        run: |
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
+          echo "js_result=${result}" >> $GITHUB_OUTPUT
 
   server-dependencies:
-    name: Server dependency check
+    name: Server Dependency Check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop'
     outputs:
       go: ${{ steps.set-matrix.outputs.go_result }}
     steps:
-      - uses: actions/checkout@master
+      - name: checkout repository
+        uses: actions/checkout@master
 
-      - name: Download go modules
+      - name: install Go 
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.19.5'
+
+      - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
 
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/golang@master
+      - name: scan vulnerabilities by Snyk
         continue-on-error: true # To make sure that artifact upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=./api/go.mod
-          json: true
+        run: |
+          yarn global add snyk
+          snyk test --file=./api/go.mod --json-file-output=snyk.json 2>/dev/null || :
 
-      - name: Upload go security scan result as artifact
+      - name: upload scan result as develop artifact 
         uses: actions/upload-artifact@v3
         with:
           name: go-security-scan-develop-result
           path: snyk.json
 
-      - name: Export scan result to html file 
-        run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="/data/go-result")
+      - name: develop scan report export to html
+        run: |
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=table --export --export-filename="/data/go-result")
 
-      - name: Upload go result html file
+      - name: upload html file as artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-go-result-${{github.run_id}}
           path: go-result.html
 
-      - name: Analyse the go result
+      - name: analyse vulnerabilities
         id: set-matrix
-        run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
-          echo "::set-output name=go_result::${result}"
+        run: |
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
+          echo "go_result=${result}" >> $GITHUB_OUTPUT
 
   image-vulnerability:
-    name: Build docker image and Image vulnerability check
+    name: Image Vulnerability Check
     runs-on: ubuntu-latest
     if: >-
       github.ref == 'refs/heads/develop'
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@master
-
-      - name: Use golang 1.18
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.18'
-
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
-
-      - name: Install packages and build
-        run: yarn install && yarn build
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: build/linux/Dockerfile
-          tags: trivy-portainer:${{ github.sha }}
-          outputs: type=docker,dest=/tmp/trivy-portainer-image.tar
-
-      - name: Load docker image
-        run: |
-          docker load --input /tmp/trivy-portainer-image.tar
-
-      - name: Run Trivy vulnerability scanner
+      - name: scan vulnerabilities by Trivy 
         uses: docker://docker.io/aquasec/trivy:latest
-        continue-on-error: true 
+        continue-on-error: true
         with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
+          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress portainerci/portainer:develop
 
-      - name: Upload image security scan result as artifact
+      - name: upload image security scan result as artifact
         uses: actions/upload-artifact@v3
         with:
           name: image-security-scan-develop-result
           path: image-trivy.json
 
-      - name: Export scan result to html file 
-        run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=table -export -export-filename="/data/image-result")
+      - name: develop scan report export to html
+        run: |
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=table --export --export-filename="/data/image-result")
 
-      - name: Upload go result html file
+      - name: upload html file as artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-image-result-${{github.run_id}}
           path: image-result.html
 
-      - name: Analyse the trivy result
+      - name: analyse vulnerabilities
         id: set-matrix
-        run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
-          echo "::set-output name=image_result::${result}"
+        run: |
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=matrix)
+          echo "image_result=${result}" >> $GITHUB_OUTPUT
 
   result-analysis:
-    name: Analyse scan result
+    name: Analyse Scan Results
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
       github.ref == 'refs/heads/develop'
     strategy:
-      matrix: 
+      matrix:
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
         go: ${{fromJson(needs.server-dependencies.outputs.go)}}
         image: ${{fromJson(needs.image-vulnerability.outputs.image)}}
     steps:
-      - name: Display the results of js, go and image
+      - name: display the results of js, Go, and image scan
         run: |
-          echo ${{ matrix.js.status }}
-          echo ${{ matrix.go.status }}
-          echo ${{ matrix.image.status }}
-          echo ${{ matrix.js.summary }}
-          echo ${{ matrix.go.summary }}
-          echo ${{ matrix.image.summary }}
+          echo "${{ matrix.js.status }}"
+          echo "${{ matrix.go.status }}"
+          echo "${{ matrix.image.status }}"
+          echo "${{ matrix.js.summary }}"
+          echo "${{ matrix.go.summary }}"
+          echo "${{ matrix.image.summary }}"
 
-      - name: Send Slack message
+      - name: send message to Slack 
         if: >- 
           matrix.js.status == 'failure' ||
           matrix.go.status == 'failure' || 
           matrix.image.status == 'failure'
-        uses: slackapi/slack-github-action@v1.18.0
+        uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {

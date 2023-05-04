@@ -1,6 +1,6 @@
 import angular from 'angular';
 import uuidv4 from 'uuid/v4';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 class AuthenticationController {
   /* @ngInject */
@@ -130,7 +130,7 @@ class AuthenticationController {
   async checkForEndpointsAsync() {
     try {
       const isAdmin = this.Authentication.isAdmin();
-      const endpoints = await getEnvironments({ limit: 1 });
+      const endpoints = await getEnvironments({ limit: 1, query: { excludeSnapshots: true } });
 
       if (this.Authentication.getUserDetails().forceChangePassword) {
         return this.$state.go('portainer.account');

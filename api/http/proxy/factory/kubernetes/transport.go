@@ -3,9 +3,8 @@ package kubernetes
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path"
 	"regexp"
@@ -17,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -150,8 +150,7 @@ func (transport *baseTransport) getRoundTripToken(request *http.Request, tokenMa
 func decorateAgentRequest(r *http.Request, dataStore dataservices.DataStore) error {
 	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
 
-	switch {
-	case strings.HasPrefix(requestPath, "/dockerhub"):
+	if strings.HasPrefix(requestPath, "/dockerhub") {
 		return decorateAgentDockerHubRequest(r, dataStore)
 	}
 
@@ -189,7 +188,7 @@ func decorateAgentDockerHubRequest(r *http.Request, dataStore dataservices.DataS
 	}
 
 	r.Method = http.MethodPost
-	r.Body = ioutil.NopCloser(bytes.NewReader(newBody))
+	r.Body = io.NopCloser(bytes.NewReader(newBody))
 	r.ContentLength = int64(len(newBody))
 
 	return nil

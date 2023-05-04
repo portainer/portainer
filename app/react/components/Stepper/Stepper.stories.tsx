@@ -16,7 +16,7 @@ interface Args {
 
 function Template({ totalSteps = 5 }: Args) {
   const steps: Step[] = Array.from({ length: totalSteps }).map((_, index) => ({
-    title: `step ${index + 1}`,
+    label: `step ${index + 1}`,
   }));
 
   const [currentStep, setCurrentStep] = useState(1);

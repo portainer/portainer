@@ -20,7 +20,7 @@ type stackFileResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @success 200 {object} stackFileResponse
 // @failure 500
 // @failure 400
@@ -33,10 +33,8 @@ func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
+	if err != nil {
+		return handler.handlerDBErr(err, "Unable to find an edge stack with the specified identifier inside the database")
 	}
 
 	fileName := stack.EntryPoint
@@ -46,7 +44,7 @@ func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *h
 
 	stackFileContent, err := handler.FileService.GetFileContent(stack.ProjectPath, fileName)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
+		return httperror.InternalServerError("Unable to retrieve stack file from disk", err)
 	}
 
 	return response.JSON(w, &stackFileResponse{StackFileContent: string(stackFileContent)})

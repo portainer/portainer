@@ -1,67 +1,70 @@
-import angular from 'angular';
+import { map } from 'lodash';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { confirmDelete } from '@@/modals/confirm';
 
-angular.module('portainer.app').controller('EndpointsController', EndpointsController);
+export class EndpointsController {
+  /* @ngInject */
+  constructor($state, $async, EndpointService, GroupService, Notifications, EndpointProvider, StateManager) {
+    Object.assign(this, {
+      $state,
+      $async,
+      EndpointService,
+      GroupService,
+      Notifications,
+      EndpointProvider,
+      StateManager,
+    });
 
-function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, ModalService, Notifications, EndpointProvider, StateManager) {
-  $scope.state = {
-    loadingMessage: '',
-  };
+    this.state = {
+      loadingMessage: '',
+    };
 
-  $scope.setLoadingMessage = setLoadingMessage;
-  function setLoadingMessage(message) {
-    $scope.state.loadingMessage = message;
+    this.setLoadingMessage = this.setLoadingMessage.bind(this);
+    this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
+    this.removeAction = this.removeAction.bind(this);
   }
 
-  $scope.removeAction = removeAction;
-  function removeAction(endpoints) {
-    ModalService.confirmDeletion('This action will remove all configurations associated to your environment(s). Continue?', (confirmed) => {
+  setLoadingMessage(message) {
+    this.state.loadingMessage = message;
+  }
+
+  removeAction(endpoints) {
+    confirmDelete('This action will remove all configurations associated to your environment(s). Continue?').then((confirmed) => {
       if (!confirmed) {
         return;
       }
-      return $async(removeActionAsync, endpoints);
+      return this.$async(async () => {
+        try {
+          await Promise.all(endpoints.map(({ Id }) => this.EndpointService.deleteEndpoint(Id)));
+          this.Notifications.success('Environments successfully removed', map(endpoints, 'Name').join(', '));
+        } catch (err) {
+          this.Notifications.error('Failure', err, 'Unable to remove environment');
+        }
+
+        const id = this.EndpointProvider.endpointID();
+        // If the current endpoint was deleted, then clean endpoint store
+        if (endpoints.some((e) => e.Id === id)) {
+          this.StateManager.cleanEndpoint();
+        }
+
+        this.$state.reload();
+      });
     });
   }
 
-  async function removeActionAsync(endpoints) {
-    for (let endpoint of endpoints) {
+  getPaginatedEndpoints(start, limit, search) {
+    return this.$async(async () => {
       try {
-        await EndpointService.deleteEndpoint(endpoint.Id);
-
-        Notifications.success('Environment successfully removed', endpoint.Name);
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to remove environment');
-      }
-    }
-
-    const endpointId = EndpointProvider.endpointID();
-    // If the current endpoint was deleted, then clean endpoint store
-    if (endpoints.some((item) => item.Id === endpointId)) {
-      StateManager.cleanEndpoint();
-      // trigger sidebar rerender
-      $scope.applicationState.endpoint = {};
-    }
-
-    $state.reload();
-  }
-
-  $scope.getPaginatedEndpoints = getPaginatedEndpoints;
-  function getPaginatedEndpoints(start, limit, search) {
-    const deferred = $q.defer();
-    $q.all({
-      endpoints: getEnvironments({ start, limit, query: { search, excludeSnapshots: true } }),
-      groups: GroupService.groups(),
-    })
-      .then(function success(data) {
-        var endpoints = data.endpoints.value;
-        var groups = data.groups;
+        const [{ value: endpoints, totalCount }, groups] = await Promise.all([
+          getEnvironments({ start, limit, query: { search, excludeSnapshots: true } }),
+          this.GroupService.groups(),
+        ]);
         EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
-        deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve environment information');
-      });
-    return deferred.promise;
+        return { endpoints, totalCount };
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
+      }
+    });
   }
 }

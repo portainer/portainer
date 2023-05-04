@@ -1,12 +1,12 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
+import { Laptop } from 'lucide-react';
 
-import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import { EdgeAsyncIntervalsForm } from '@/edge/components/EdgeAsyncIntervalsForm';
+import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
+import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
-import { FormControl } from '@@/form-components/FormControl';
-import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
@@ -42,81 +42,68 @@ export function DeploymentSyncOptions() {
     return null;
   }
 
-  const initialValues = {
-    Edge: settingsQuery.data.Edge,
+  const initialValues: FormValues = {
+    Edge: {
+      CommandInterval: settingsQuery.data.Edge.CommandInterval,
+      PingInterval: settingsQuery.data.Edge.PingInterval,
+      SnapshotInterval: settingsQuery.data.Edge.SnapshotInterval,
+    },
     EdgeAgentCheckinInterval: settingsQuery.data.EdgeAgentCheckinInterval,
   };
 
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Deployment sync options" />
+        <WidgetTitle icon={Laptop} title="Deployment sync options" />
         <WidgetBody>
           <Formik<FormValues>
             initialValues={initialValues}
             onSubmit={handleSubmit}
             key={formKey}
           >
-            {({ errors, setFieldValue, values, isValid, dirty }) => (
+            {({ setFieldValue, values, isValid, dirty }) => (
               <Form className="form-horizontal">
-                <FormControl
-                  inputId="edge_async_mode"
-                  label="Use Async mode by default"
-                  size="small"
-                  errors={errors?.Edge?.AsyncMode}
-                  tooltip="Using Async allows the ability to define different ping,
-                  snapshot and command frequencies."
-                >
-                  <Switch
-                    id="edge_async_mode"
-                    name="edge_async_mode"
-                    className="space-right"
-                    checked={values.Edge.AsyncMode}
-                    onChange={(e) =>
-                      setFieldValue('Edge.AsyncMode', e.valueOf())
-                    }
-                  />
-                </FormControl>
-
-                <TextTip color="orange">
-                  Enabling Async disables the tunnel function.
+                <TextTip color="blue">
+                  Default values set here will be available to choose as an
+                  option for edge environment creation
                 </TextTip>
 
                 <FormSection title="Check-in Intervals">
-                  {!values.Edge.AsyncMode ? (
-                    <EdgeCheckinIntervalField
-                      value={values.EdgeAgentCheckinInterval}
-                      onChange={(value) =>
-                        setFieldValue('EdgeAgentCheckinInterval', value)
-                      }
-                      isDefaultHidden
-                      label="Edge agent default poll frequency"
-                      tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
-                    />
-                  ) : (
+                  <EdgeCheckinIntervalField
+                    value={values.EdgeAgentCheckinInterval}
+                    onChange={(value) =>
+                      setFieldValue('EdgeAgentCheckinInterval', value)
+                    }
+                    isDefaultHidden
+                    label="Edge agent default poll frequency"
+                    tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
+                  />
+                </FormSection>
+
+                {isBE && (
+                  <FormSection title="Async Check-in Intervals">
                     <EdgeAsyncIntervalsForm
                       values={values.Edge}
                       onChange={(value) => setFieldValue('Edge', value)}
                       isDefaultHidden
                       fieldSettings={asyncIntervalFieldSettings}
                     />
-                  )}
-                </FormSection>
+                  </FormSection>
+                )}
 
-                <FormSection title="Actions">
-                  <div className="form-group mt-5">
-                    <div className="col-sm-12">
-                      <LoadingButton
-                        disabled={!isValid || !dirty}
-                        data-cy="settings-deploySyncOptionsButton"
-                        isLoading={settingsMutation.isLoading}
-                        loadingText="Saving settings..."
-                      >
-                        Save settings
-                      </LoadingButton>
-                    </div>
+                <div className="form-group mt-5">
+                  <div className="col-sm-12">
+                    <LoadingButton
+                      disabled={!isValid || !dirty}
+                      className="!ml-0"
+                      data-cy="settings-deploySyncOptionsButton"
+                      isLoading={settingsMutation.isLoading}
+                      loadingText="Saving settings..."
+                    >
+                      Save settings
+                    </LoadingButton>
                   </div>
-                </FormSection>
+                </div>
               </Form>
             )}
           </Formik>

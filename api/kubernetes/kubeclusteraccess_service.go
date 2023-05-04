@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -63,7 +63,7 @@ func getCertificateAuthorityData(tlsCertPath string) (string, error) {
 		return "", errTLSCertNotProvided
 	}
 
-	data, err := ioutil.ReadFile(tlsCertPath)
+	data, err := os.ReadFile(tlsCertPath)
 	if err != nil {
 		return "", errors.Wrap(errTLSCertFileMissing, err.Error())
 	}
@@ -98,7 +98,7 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 
 	// When the api call is internal, the baseURL should not be used.
 	if hostURL == "localhost" {
-		hostURL = hostURL + service.httpsBindAddr
+		hostURL += service.httpsBindAddr
 		baseURL = "/"
 	}
 
@@ -106,7 +106,7 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
 	}
 
-	log.Info().
+	log.Debug().
 		Str("host_URL", hostURL).
 		Str("HTTPS_bind_address", service.httpsBindAddr).
 		Str("base_URL", baseURL).

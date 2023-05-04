@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { Team } from '@/react/portainer/users/teams/types';
 import { Role, User, UserId } from '@/portainer/users/types';
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
 export function createMockUsers(
   count: number,
@@ -12,12 +12,14 @@ export function createMockUsers(
     Id: value,
     Username: `user${value}`,
     Role: getRoles(roles, value),
-    UserTheme: '',
     RoleName: '',
     AuthenticationMethod: '',
     Checked: false,
     EndpointAuthorizations: {},
     PortainerAuthorizations: {},
+    ThemeSettings: {
+      color: 'auto',
+    },
   }));
 }
 
@@ -75,9 +77,12 @@ export function createMockEnvironment(): Environment {
       Configuration: {
         IngressClasses: [],
         IngressAvailabilityPerNamespace: false,
+        AllowNoneIngressClass: false,
       },
     },
+    Nomad: { Snapshots: [] },
     EdgeKey: '',
+    EnableGPUManagement: false,
     Id: 3,
     UserTrusted: false,
     Edge: {
@@ -97,7 +102,19 @@ export function createMockEnvironment(): Environment {
       allowVolumeBrowserForRegularUsers: false,
       enableHostManagementFeatures: false,
     },
+    DeploymentOptions: {
+      overrideGlobalOptions: false,
+      hideAddWithForm: true,
+      hideWebEditor: false,
+      hideFileUpload: false,
+    },
     Gpus: [],
     Agent: { Version: '1.0.0' },
+    EnableImageNotification: false,
+    ChangeWindow: {
+      Enabled: false,
+      EndTime: '',
+      StartTime: '',
+    },
   };
 }

@@ -22,6 +22,10 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
+import { confirmServiceForceUpdate } from '@/react/docker/services/common/update-service-modal';
+import { confirm, confirmDelete } from '@@/modals/confirm';
+import { ModalType } from '@@/modals';
+import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -44,7 +48,6 @@ angular.module('portainer.docker').controller('ServiceController', [
   'ContainerService',
   'TaskHelper',
   'Notifications',
-  'ModalService',
   'PluginService',
   'Authentication',
   'VolumeService',
@@ -76,7 +79,6 @@ angular.module('portainer.docker').controller('ServiceController', [
     ContainerService,
     TaskHelper,
     Notifications,
-    ModalService,
     PluginService,
     Authentication,
     VolumeService,
@@ -550,21 +552,16 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.rollbackService = function (service) {
-      ModalService.confirmWarn({
+      confirm({
         title: 'Rollback service',
         message: 'Are you sure you want to rollback?',
-        buttons: {
-          confirm: {
-            label: 'Yes',
-            className: 'btn-danger',
-          },
-        },
-        callback: function onConfirm(confirmed) {
-          if (!confirmed) {
-            return;
-          }
-          rollbackService(service);
-        },
+        modalType: ModalType.Warn,
+        confirmButton: buildConfirmButton('Yes', 'danger'),
+      }).then((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        rollbackService(service);
       });
     };
 
@@ -594,7 +591,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     $scope.removeService = function () {
-      ModalService.confirmDeletion('Do you want to remove this service? All the containers associated to this service will be removed too.', function onConfirm(confirmed) {
+      confirmDelete('Do you want to remove this service? All the containers associated to this service will be removed too.').then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -621,15 +618,12 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.forceUpdateService = function (service) {
-      ModalService.confirmServiceForceUpdate('Do you want to force an update of the service? All the tasks associated to the service will be recreated.', function (result) {
+      confirmServiceForceUpdate('Do you want to force an update of the service? All the tasks associated to the service will be recreated.').then(function (result) {
         if (!result) {
           return;
         }
-        var pullImage = false;
-        if (result[0]) {
-          pullImage = true;
-        }
-        forceUpdateService(service, pullImage);
+
+        forceUpdateService(service, result.pullLatest);
       });
     };
 

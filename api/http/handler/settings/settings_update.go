@@ -7,13 +7,13 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/pkg/libhelm"
 )
 
 type settingsUpdatePayload struct {
@@ -22,16 +22,18 @@ type settingsUpdatePayload struct {
 	// A list of label name & value that will be used to hide containers when querying containers
 	BlackListedLabels []portainer.Pair
 	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
-	AuthenticationMethod *int                            `example:"1"`
-	InternalAuthSettings *portainer.InternalAuthSettings `example:""`
-	LDAPSettings         *portainer.LDAPSettings         `example:""`
-	OAuthSettings        *portainer.OAuthSettings        `example:""`
+	AuthenticationMethod *int `example:"1"`
+	InternalAuthSettings *portainer.InternalAuthSettings
+	LDAPSettings         *portainer.LDAPSettings
+	OAuthSettings        *portainer.OAuthSettings
 	// The interval in which environment(endpoint) snapshots are created
 	SnapshotInterval *string `example:"5m"`
 	// URL to the templates that will be displayed in the UI when navigating to App Templates
 	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
 	// The default check in interval for edge agent (in seconds)
 	EdgeAgentCheckinInterval *int `example:"5"`
+	// Show the Kompose build option (discontinued in 2.18)
+	ShowKomposeBuildOption *bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures *bool `example:"true"`
 	// The duration of a user session
@@ -131,17 +133,20 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.TemplatesURL = *payload.TemplatesURL
 	}
 
+	if payload.ShowKomposeBuildOption != nil {
+		settings.ShowKomposeBuildOption = *payload.ShowKomposeBuildOption
+	}
+
 	if payload.HelmRepositoryURL != nil {
 		if *payload.HelmRepositoryURL != "" {
 
 			newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
 
 			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
-				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
+				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL, nil)
 				if err != nil {
 					return httperror.BadRequest("Invalid Helm repository URL. Must correspond to a valid URL format", err)
 				}
-
 			}
 
 			settings.HelmRepositoryURL = newHelmRepo
@@ -161,12 +166,15 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.LDAPSettings != nil {
 		ldapReaderDN := settings.LDAPSettings.ReaderDN
 		ldapPassword := settings.LDAPSettings.Password
+
 		if payload.LDAPSettings.ReaderDN != "" {
 			ldapReaderDN = payload.LDAPSettings.ReaderDN
 		}
+
 		if payload.LDAPSettings.Password != "" {
 			ldapPassword = payload.LDAPSettings.Password
 		}
+
 		settings.LDAPSettings = *payload.LDAPSettings
 		settings.LDAPSettings.ReaderDN = ldapReaderDN
 		settings.LDAPSettings.Password = ldapPassword
@@ -249,12 +257,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
 	settings.SnapshotInterval = snapshotInterval
 
-	err := handler.SnapshotService.SetSnapshotInterval(snapshotInterval)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return handler.SnapshotService.SetSnapshotInterval(snapshotInterval)
 }
 
 func (handler *Handler) updateTLS(settings *portainer.Settings) *httperror.HandlerError {

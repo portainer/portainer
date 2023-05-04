@@ -7,7 +7,7 @@
         <form class="form-horizontal" name="$ctrl.form">
           <!-- name-input -->
           <div class="form-group">
-            <label for="stack_name" class="col-sm-1 control-label text-left required"> Name </label>
+            <label for="stack_name" class="col-sm-1 control-label required text-left"> Name </label>
             <div class="col-sm-11">
               <input
                 type="text"
@@ -15,6 +15,7 @@
                 ng-model="$ctrl.formValues.Name"
                 id="stack_name"
                 name="nameField"
+                ng-pattern="$ctrl.formValues.DeploymentType === $ctrl.EditorType.Compose ? STACK_NAME_VALIDATION_REGEX : ''"
                 placeholder="e.g. mystack"
                 auto-focus
                 required
@@ -23,7 +24,14 @@
               <div class="help-block" ng-show="$ctrl.form.$invalid">
                 <div class="small text-warning">
                   <div ng-messages="$ctrl.form.$error">
-                    <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Name is required. </p>
+                    <p ng-message="required" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                      <span>Name is required.</span>
+                    </p>
+                    <p ng-message="pattern" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                      <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -31,35 +39,26 @@
           </div>
           <!-- !name-input -->
 
-          <div class="col-sm-12 form-section-title"> Edge Groups </div>
-          <div class="form-group" ng-if="$ctrl.edgeGroups">
-            <div class="col-sm-12">
-              <edge-groups-selector ng-if="!$ctrl.noGroups" value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
-            </div>
-            <div ng-if="$ctrl.noGroups" class="col-sm-12 small text-muted">
-              No Edge groups are available. Head over to the <a ui-sref="edge.groups">Edge groups view</a> to create one.
-            </div>
-          </div>
+          <edge-groups-selector value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
 
           <edge-stack-deployment-type-selector
             value="$ctrl.formValues.DeploymentType"
-            has-docker-endpoint="$ctrl.hasDockerEndpoint"
+            has-docker-endpoint="$ctrl.hasDockerEndpoint()"
+            has-kube-endpoint="$ctrl.hasKubeEndpoint()"
             on-change="($ctrl.onChangeDeploymentType)"
           ></edge-stack-deployment-type-selector>
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              <div class="small text-muted space-right" ng-if="$ctrl.formValues.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
-                <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
-                Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all
-                the Compose format options are supported by Kompose at the moment.
-              </div>
-            </div>
-          </div>
+          <edge-stacks-docker-compose-form
+            ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Compose"
+            form-values="$ctrl.formValues"
+            state="$ctrl.state"
+          ></edge-stacks-docker-compose-form>
 
-          <edge-stacks-docker-compose-form ng-if="$ctrl.formValues.DeploymentType == 0" form-values="$ctrl.formValues" state="$ctrl.state"></edge-stacks-docker-compose-form>
-
-          <edge-stacks-kube-manifest-form ng-if="$ctrl.formValues.DeploymentType == 1" form-values="$ctrl.formValues" state="$ctrl.state"></edge-stacks-kube-manifest-form>
+          <edge-stacks-kube-manifest-form
+            ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Kubernetes"
+            form-values="$ctrl.formValues"
+            state="$ctrl.state"
+          ></edge-stacks-kube-manifest-form>
 
           <!-- actions -->
           <div class="col-sm-12 form-section-title"> Actions </div>

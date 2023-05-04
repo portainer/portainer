@@ -34,6 +34,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
 // Tags return an array containing all the tags.
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
@@ -80,10 +87,20 @@ func (service *Service) Create(tag *portainer.Tag) error {
 	)
 }
 
-// UpdateTag updates a tag.
+// Deprecated: Use UpdateTagFunc instead.
 func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, tag)
+}
+
+// UpdateTagFunc updates a tag inside a transaction avoiding data races.
+func (service *Service) UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error {
+	id := service.connection.ConvertToKey(int(ID))
+	tag := &portainer.Tag{}
+
+	return service.connection.UpdateObjectFunc(BucketName, id, tag, func() {
+		updateFunc(tag)
+	})
 }
 
 // DeleteTag deletes a tag.

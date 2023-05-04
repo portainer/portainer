@@ -23,7 +23,7 @@ type filePayload struct {
 
 type fileResponse struct {
 	// The requested file content
-	FileContent string `example: "version:2"`
+	FileContent string `example:"version:2"`
 }
 
 func (payload *filePayload) Validate(r *http.Request) error {
@@ -63,6 +63,7 @@ func (handler *Handler) ifRequestedTemplateExists(payload *filePayload) *httperr
 			return nil
 		}
 	}
+
 	return httperror.InternalServerError("Invalid template", errors.New("requested template does not exist"))
 }
 
@@ -82,6 +83,7 @@ func (handler *Handler) ifRequestedTemplateExists(payload *filePayload) *httperr
 // @router /templates/file [post]
 func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload filePayload
+
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
@@ -98,7 +100,7 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 
 	defer handler.cleanUp(projectPath)
 
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, "", "", "")
+	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, "", "", "", false)
 	if err != nil {
 		return httperror.InternalServerError("Unable to clone git repository", err)
 	}
@@ -112,11 +114,9 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 
 }
 
-func (handler *Handler) cleanUp(projectPath string) error {
+func (handler *Handler) cleanUp(projectPath string) {
 	err := handler.FileService.RemoveDirectory(projectPath)
 	if err != nil {
 		log.Debug().Err(err).Msg("HTTP error: unable to cleanup stack creation")
 	}
-
-	return nil
 }

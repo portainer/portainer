@@ -1,11 +1,11 @@
-import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.app').controller('StacksController', StacksController);
 
 /* @ngInject */
-function StacksController($scope, $state, Notifications, StackService, ModalService, Authentication, endpoint) {
+function StacksController($scope, $state, Notifications, StackService, Authentication, endpoint) {
   $scope.removeAction = function (selectedItems) {
-    ModalService.confirmDeletion('Do you want to remove the selected stack(s)? Associated services will be removed as well.', function onConfirm(confirmed) {
+    confirmDelete('Do you want to remove the selected stack(s)? Associated services will be removed as well.').then((confirmed) => {
       if (!confirmed) {
         return;
       }
@@ -35,7 +35,6 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
     });
   }
 
-  $scope.offlineMode = false;
   $scope.createEnabled = false;
 
   $scope.getStacks = getStacks;
@@ -48,7 +47,6 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
     StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId, includeOrphanedStacks)
       .then(function success(stacks) {
         $scope.stacks = stacks;
-        $scope.offlineMode = isOfflineEndpoint(endpoint);
       })
       .catch(function error(err) {
         $scope.stacks = [];

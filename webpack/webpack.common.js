@@ -29,17 +29,8 @@ module.exports = {
         test: /\.js$/,
         type: 'javascript/auto',
         enforce: 'pre',
-        use: [
-          {
-            loader: 'source-map-loader',
-            options: {
-              filterSourceMappingUrl: (_, resourcePath) => {
-                // ignores pkgs missing sourcemaps
-                return ['chardet', 'tokenize-ansi'].every((pkg) => !resourcePath.includes(pkg));
-              },
-            },
-          },
-        ],
+        exclude: /node_modules/,
+        use: ['source-map-loader'],
       },
       {
         test: /\.(js|ts)(x)?$/,
@@ -75,7 +66,7 @@ module.exports = {
       },
       {
         test: /\.svg$/i,
-        issuer: /\.tsx?$/,
+        issuer: /\.(js|ts)(x)?$/,
         resourceQuery: /c/, // *.svg?c
         use: [{ loader: '@svgr/webpack', options: { icon: true } }],
       },

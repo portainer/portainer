@@ -1,24 +1,22 @@
-import { CellProps, Column } from 'react-table';
 import _ from 'lodash';
+import { CellContext } from '@tanstack/react-table';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
-import { EdgeUpdateSchedule } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
 
-export const groups: Column<EdgeUpdateSchedule> = {
-  Header: 'Groups',
-  accessor: 'groupIds',
-  Cell: GroupsCell,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  disableSortBy: true,
-};
+import { columnHelper } from './helper';
+
+export const groups = columnHelper.accessor('edgeGroupIds', {
+  header: 'Groups',
+  cell: GroupsCell,
+});
 
 export function GroupsCell({
-  value: groupsIds,
-}: CellProps<EdgeUpdateSchedule, Array<EdgeGroup['Id']>>) {
+  getValue,
+}: CellContext<EdgeUpdateListItemResponse, Array<EdgeGroup['Id']>>) {
+  const groupsIds = getValue();
   const groupsQuery = useEdgeGroups();
 
   const groups = _.compact(

@@ -2,11 +2,16 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
+
 	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) migrateDBVersionToDB70() error {
-	// foreach endpoint
+	log.Info().Msg("add IngressAvailabilityPerNamespace field")
+	if err := m.updateIngressFieldsForEnvDB70(); err != nil {
+		return err
+	}
+
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
@@ -43,5 +48,24 @@ func (m *Migrator) migrateDBVersionToDB70() error {
 		}
 	}
 
+	return nil
+}
+
+func (m *Migrator) updateIngressFieldsForEnvDB70() error {
+	endpoints, err := m.endpointService.Endpoints()
+	if err != nil {
+		return err
+	}
+
+	for _, endpoint := range endpoints {
+		endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace = true
+		endpoint.Kubernetes.Configuration.AllowNoneIngressClass = false
+		endpoint.PostInitMigrations.MigrateIngresses = true
+
+		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

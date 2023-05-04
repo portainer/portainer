@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,8 +11,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
 	k "github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/stacks/deployments"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -29,7 +30,8 @@ type kubernetesGitStackUpdatePayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
-	AutoUpdate               *portainer.StackAutoUpdate
+	AutoUpdate               *portainer.AutoUpdateSettings
+	TLSSkipVerify            bool
 }
 
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
@@ -40,7 +42,7 @@ func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error
 }
 
 func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error {
-	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
+	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
 	return nil
@@ -51,7 +53,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	if stack.GitConfig != nil {
 		//stop the autoupdate job if there is any
 		if stack.AutoUpdate != nil {
-			stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+			deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		}
 
 		var payload kubernetesGitStackUpdatePayload
@@ -61,6 +63,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		}
 
 		stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
+		stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
 		stack.AutoUpdate = payload.AutoUpdate
 
 		if payload.RepositoryAuthentication {
@@ -72,7 +75,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 				Username: payload.RepositoryUsername,
 				Password: password,
 			}
-			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
+			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password, stack.GitConfig.TLSSkipVerify)
 			if err != nil {
 				return httperror.InternalServerError("Unable to fetch git repository", err)
 			}
@@ -81,7 +84,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		}
 
 		if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
-			jobID, e := startAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+			jobID, e := deployments.StartAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
 			if e != nil {
 				return e
 			}
@@ -103,7 +106,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		return httperror.BadRequest("Failed to retrieve user token data", err)
 	}
 
-	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
+	tempFileDir, _ := os.MkdirTemp("", "kub_file_content")
 	defer os.RemoveAll(tempFileDir)
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {

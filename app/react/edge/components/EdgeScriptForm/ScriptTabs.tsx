@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
 
 import { Code } from '@@/Code';
 import { CopyButton } from '@@/buttons/CopyButton';
@@ -16,6 +16,7 @@ interface Props {
   commands: CommandTab[];
   platform?: Platform;
   onPlatformChange?(platform: Platform): void;
+  asyncMode?: boolean;
 }
 
 export function ScriptTabs({
@@ -24,6 +25,7 @@ export function ScriptTabs({
   edgeId,
   commands,
   platform,
+  asyncMode = false,
   onPlatformChange = () => {},
 }: Props) {
   const agentDetails = useAgentDetails();
@@ -41,7 +43,14 @@ export function ScriptTabs({
   const { agentSecret, agentVersion } = agentDetails;
 
   const options = commands.map((c) => {
-    const cmd = c.command(agentVersion, edgeKey, values, edgeId, agentSecret);
+    const cmd = c.command(
+      agentVersion,
+      edgeKey,
+      values,
+      asyncMode,
+      edgeId,
+      agentSecret
+    );
 
     return {
       id: c.id,
@@ -49,21 +58,19 @@ export function ScriptTabs({
       children: (
         <>
           <Code>{cmd}</Code>
-          <CopyButton copyText={cmd}>Copy</CopyButton>
+          <div className="mt-2">
+            <CopyButton copyText={cmd}>Copy</CopyButton>
+          </div>
         </>
       ),
     };
   });
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <NavTabs
-          selectedId={platform}
-          options={options}
-          onSelect={(id: Platform) => onPlatformChange(id)}
-        />
-      </div>
-    </div>
+    <NavTabs
+      selectedId={platform}
+      options={options}
+      onSelect={(id: Platform) => onPlatformChange(id)}
+    />
   );
 }

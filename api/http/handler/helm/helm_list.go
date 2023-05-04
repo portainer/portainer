@@ -3,10 +3,11 @@ package helm
 import (
 	"net/http"
 
-	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	_ "github.com/portainer/portainer/pkg/libhelm/release"
 )
 
 // @id HelmList
@@ -19,9 +20,9 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
-// @param namespace query string true "specify an optional namespace"
-// @param filter query string true "specify an optional filter"
-// @param selector query string true "specify an optional selector"
+// @param namespace query string false "specify an optional namespace"
+// @param filter query string false "specify an optional filter"
+// @param selector query string false "specify an optional selector"
 // @success 200 {array} release.ReleaseElement "Success"
 // @failure 400 "Invalid environment(endpoint) identifier"
 // @failure 401 "Unauthorized"
@@ -38,8 +39,6 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 		KubernetesClusterAccess: clusterAccess,
 	}
 
-	params := r.URL.Query()
-
 	// optional namespace.  The library defaults to "default"
 	namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
 	if namespace != "" {
@@ -47,12 +46,12 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	// optional filter
-	if filter := params.Get("filter"); filter != "" {
+	if filter, _ := request.RetrieveQueryParameter(r, "filter", true); filter != "" {
 		listOpts.Filter = filter
 	}
 
 	// optional selector
-	if selector := params.Get("selector"); selector != "" {
+	if selector, _ := request.RetrieveQueryParameter(r, "selector", true); selector != "" {
 		listOpts.Selector = selector
 	}
 

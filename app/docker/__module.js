@@ -1,6 +1,8 @@
 import angular from 'angular';
 
-import { EnvironmentStatus } from '@/portainer/environments/types';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+
+import { EnvironmentStatus } from '@/react/portainer/environments/types';
 
 import { reactModule } from './react';
 
@@ -14,16 +16,19 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       parent: 'endpoint',
       url: '/docker',
       abstract: true,
-      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, EndpointProvider, Notifications, StateManager, SystemService) {
+      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, Notifications, StateManager, SystemService) {
         return $async(async () => {
-          if (![1, 2, 4].includes(endpoint.Type)) {
+          const dockerTypes = [PortainerEndpointTypes.DockerEnvironment, PortainerEndpointTypes.AgentOnDockerEnvironment, PortainerEndpointTypes.EdgeAgentOnDockerEnvironment];
+
+          if (!dockerTypes.includes(endpoint.Type)) {
             $state.go('portainer.home');
             return;
           }
+
           try {
             const status = await checkEndpointStatus(endpoint);
 
-            if (endpoint.Type !== 4) {
+            if (endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
               await updateEndpointStatus(endpoint, status);
             }
             endpoint.Status = status;
@@ -32,22 +37,24 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
               throw new Error('Environment is unreachable.');
             }
 
-            EndpointProvider.setEndpointID(endpoint.Id);
-            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-
             await StateManager.updateEndpointState(endpoint);
           } catch (e) {
-            Notifications.error('Failed loading environment', e);
-            $state.go('portainer.home', {}, { reload: true });
+            let params = {};
+
+            if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
+              params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'docker.dashboard' };
+            } else {
+              Notifications.error('Failed loading environment', e);
+            }
+            $state.go('portainer.home', params, { reload: true, inherit: false });
           }
 
           async function checkEndpointStatus(endpoint) {
             try {
               await SystemService.ping(endpoint.Id);
-              return 1;
+              return EnvironmentStatus.Up;
             } catch (e) {
-              return 2;
+              return EnvironmentStatus.Down;
             }
           }
 

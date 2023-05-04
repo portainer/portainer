@@ -1,8 +1,6 @@
 package websocket
 
-import (
-	"github.com/portainer/portainer/api"
-)
+import portainer "github.com/portainer/portainer/api"
 
 type webSocketRequestParams struct {
 	ID       string

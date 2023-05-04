@@ -4,13 +4,13 @@
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
 
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+          <pr-icon icon="'search'" class="searchIcon"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -30,17 +30,31 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="endpoint-removeEndpointButton"
           >
-            <pr-icon icon="'trash-2'" feather="true" class-name="'icon-white'"></pr-icon>
+            <pr-icon icon="'trash-2'" class-name="'icon-white'"></pr-icon>
             <span>Remove</span>
           </button>
-          <button type="button" class="btn btn-sm btn-primary h-fit" ng-click="$ctrl.setReferrer()" ui-sref="portainer.wizard.endpoints" data-cy="endpoint-addEndpointButton">
-            <pr-icon icon="'plus'" feather="true" class-name="'icon-white'"></pr-icon>
+
+          <import-fdo-device-button></import-fdo-device-button>
+
+          <button ng-if="$ctrl.isBE" type="button" class="btn btn-sm btn-secondary vertical-center" ui-sref="portainer.endpoints.edgeAutoCreateScript">
+            <pr-icon icon="'plus'"></pr-icon>
+            <span>Generate AEEC script</span>
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-sm btn-primary vertical-center"
+            ng-click="$ctrl.setReferrer()"
+            ui-sref="portainer.wizard.endpoints"
+            data-cy="endpoint-addEndpointButton"
+          >
+            <pr-icon icon="'plus'" class-name="'icon-white'"></pr-icon>
             <span>Add environment</span>
           </button>
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="endpoint-endpointTable">
+        <table class="table-hover nowrap-cells table" data-cy="endpoint-endpointTable">
           <thead>
             <tr>
               <th>
@@ -116,16 +130,16 @@
               <td>{{ item.GroupName }}</td>
               <td>
                 <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})">
-                  <pr-icon icon="'users'" feather="true"></pr-icon>
+                  <pr-icon icon="'users'"></pr-icon>
                   Manage access
                 </a>
               </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="!$ctrl.state.loading && $ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No environment available.</td>
+              <td colspan="5" class="text-muted text-center">No environment available.</td>
             </tr>
           </tbody>
         </table>

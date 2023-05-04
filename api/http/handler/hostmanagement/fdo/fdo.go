@@ -89,7 +89,7 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		log.Error().Err(err).Msg("Invalid request payload")
+		log.Error().Err(err).Msg("invalid request payload")
 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
@@ -128,12 +128,7 @@ func (handler *Handler) addDefaultProfile() error {
 	profile.FilePath = filePath
 	profile.DateCreated = time.Now().Unix()
 
-	err = handler.DataStore.FDOProfile().Create(profile)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return handler.DataStore.FDOProfile().Create(profile)
 }
 
 const defaultProfileFileContent = `

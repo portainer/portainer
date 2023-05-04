@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import {
   KubernetesApplicationDataAccessPolicies,
@@ -14,6 +15,9 @@ import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { confirmUpdate, confirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -107,7 +111,7 @@ class KubernetesApplicationController {
     clipboard,
     Notifications,
     LocalStorage,
-    ModalService,
+    KubernetesResourcePoolService,
     KubernetesApplicationService,
     KubernetesEventService,
     KubernetesStackService,
@@ -120,7 +124,7 @@ class KubernetesApplicationController {
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
-    this.ModalService = ModalService;
+    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
 
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -221,7 +225,7 @@ class KubernetesApplicationController {
   }
 
   rollbackApplication() {
-    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause a service interruption. Do you wish to continue?', (confirmed) => {
+    confirmUpdate('Rolling back the application to a previous configuration may cause service interruption. Do you wish to continue?', (confirmed) => {
       if (confirmed) {
         return this.$async(this.rollbackApplicationAsync);
       }
@@ -231,6 +235,16 @@ class KubernetesApplicationController {
    * REDEPLOY
    */
   async redeployApplicationAsync() {
+    const confirmed = await confirm({
+      modalType: ModalType.Warn,
+      title: 'Are you sure?',
+      message: 'Redeploying the application may cause a service interruption. Do you wish to continue?',
+      confirmButton: buildConfirmButton('Redeploy'),
+    });
+    if (!confirmed) {
+      return;
+    }
+
     try {
       const promises = _.map(this.application.Pods, (item) => this.KubernetesPodService.delete(item));
       await Promise.all(promises);
@@ -242,11 +256,7 @@ class KubernetesApplicationController {
   }
 
   redeployApplication() {
-    this.ModalService.confirmUpdate('Redeploying the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
-      if (confirmed) {
-        return this.$async(this.redeployApplicationAsync);
-      }
-    });
+    return this.$async(this.redeployApplicationAsync);
   }
 
   /**
@@ -315,6 +325,9 @@ class KubernetesApplicationController {
         this.KubernetesNodeService.get(),
       ]);
       this.application = application;
+      if (this.application.StackId) {
+        this.stack = await this.StackService.stack(application.StackId);
+      }
       this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
       this.formValues.Note = this.application.Note;
       this.formValues.Services = this.application.Services;
@@ -348,6 +361,8 @@ class KubernetesApplicationController {
   }
 
   async onInit() {
+    this.limitedFeature = FeatureId.K8S_ROLLING_RESTART;
+
     this.state = {
       activeTab: 0,
       currentName: this.$state.$current.name,
@@ -375,6 +390,9 @@ class KubernetesApplicationController {
       Note: '',
       SelectedRevision: undefined,
     };
+
+    const resourcePools = await this.KubernetesResourcePoolService.get();
+    this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
 
     await this.getApplication();
     await this.getEvents();

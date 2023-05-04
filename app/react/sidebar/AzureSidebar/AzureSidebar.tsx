@@ -1,6 +1,6 @@
-import { Box } from 'react-feather';
+import { Box } from 'lucide-react';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';

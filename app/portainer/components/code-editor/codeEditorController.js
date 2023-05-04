@@ -1,9 +1,20 @@
 angular.module('portainer.app').controller('CodeEditorController', function CodeEditorController($document, CodeMirrorService, $scope) {
   var ctrl = this;
 
-  this.$onChanges = function $onChanges({ value }) {
-    if (value && value.currentValue && ctrl.editor && ctrl.editor.getValue() !== value.currentValue) {
+  this.$onChanges = function $onChanges({ value, readOnly }) {
+    if (!ctrl.editor) {
+      return;
+    }
+
+    if (readOnly && typeof readOnly.currentValue === 'boolean' && ctrl.editor.getValue('readOnly') !== ctrl.readOnly) {
+      ctrl.editor.setOption('readOnly', ctrl.readOnly);
+    }
+    if (value && value.currentValue && ctrl.editor.getValue() !== value.currentValue) {
       ctrl.editor.setValue(value.currentValue);
+    }
+
+    if (ctrl.editor) {
+      ctrl.editor.setOption('readOnly', ctrl.readOnly);
     }
   };
 

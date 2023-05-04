@@ -1,14 +1,17 @@
+import { ModalType } from '@@/modals';
+import { buildConfirmButton } from '@@/modals/utils';
+import { confirm, confirmChangePassword, confirmDelete } from '@@/modals/confirm';
+
 angular.module('portainer.app').controller('UserController', [
   '$q',
   '$scope',
   '$state',
   '$transition$',
   'UserService',
-  'ModalService',
   'Notifications',
   'SettingsService',
   'Authentication',
-  function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, Authentication) {
+  function ($q, $scope, $state, $transition$, UserService, Notifications, SettingsService, Authentication) {
     $scope.state = {
       updatePasswordError: '',
     };
@@ -27,7 +30,7 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.deleteUser = function () {
-      ModalService.confirmDeletion('Do you want to remove this user? This user will not be able to login into Portainer anymore.', function onConfirm(confirmed) {
+      confirmDelete('Do you want to remove this user? This user will not be able to login into Portainer anymore.').then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -39,26 +42,20 @@ angular.module('portainer.app').controller('UserController', [
       const role = $scope.formValues.Administrator ? 1 : 2;
       const oldUsername = $scope.user.Username;
       const username = $scope.formValues.username;
-      let promise = Promise.resolve(true);
+
       if (username != oldUsername) {
-        promise = new Promise((resolve) =>
-          ModalService.confirmWarn({
-            title: 'Are you sure?',
-            message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
-            buttons: {
-              confirm: {
-                label: 'Update',
-                className: 'btn-primary',
-              },
-            },
-            callback: resolve,
-          })
-        );
+        const confirmed = await confirm({
+          title: 'Are you sure?',
+          modalType: ModalType.Warn,
+          message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
+          confirmButton: buildConfirmButton('Update'),
+        });
+
+        if (!confirmed) {
+          return;
+        }
       }
-      const confirmed = await promise;
-      if (!confirmed) {
-        return;
-      }
+
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
           Notifications.success('Success', 'User successfully updated');
@@ -71,7 +68,7 @@ angular.module('portainer.app').controller('UserController', [
 
     $scope.updatePassword = async function () {
       const isCurrentUser = Authentication.getUserDetails().ID === $scope.user.Id;
-      const confirmed = !isCurrentUser || (await ModalService.confirmChangePassword());
+      const confirmed = !isCurrentUser || (await confirmChangePassword());
       if (!confirmed) {
         return;
       }

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhelm/options"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 

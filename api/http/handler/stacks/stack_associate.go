@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 // @id StackAssociate

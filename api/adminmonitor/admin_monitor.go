@@ -21,11 +21,11 @@ type Monitor struct {
 	datastore         dataservices.DataStore
 	shutdownCtx       context.Context
 	cancellationFunc  context.CancelFunc
-	mu                sync.Mutex
+	mu                sync.RWMutex
 	adminInitDisabled bool
 }
 
-// New creates a monitor that when started will wait for the timeout duration and then sends the timeout signal to disable the application
+// New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
 func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
 		timeout:           timeout,
@@ -54,7 +54,8 @@ func (m *Monitor) Start() {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
 			if err != nil {
-				log.Fatal().Err(err).Msg("")
+				log.Error().Err(err).Msg("AdminMonitor failed to determine if Portainer is Initialized")
+				return
 			}
 
 			if !initialized {
@@ -82,6 +83,7 @@ func (m *Monitor) Stop() {
 	if m.cancellationFunc == nil {
 		return
 	}
+
 	m.cancellationFunc()
 	m.cancellationFunc = nil
 }
@@ -92,12 +94,14 @@ func (m *Monitor) WasInitialized() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	return len(users) > 0, nil
 }
 
 func (m *Monitor) WasInstanceDisabled() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
 	return m.adminInitDisabled
 }
 
@@ -105,12 +109,10 @@ func (m *Monitor) WasInstanceDisabled() bool {
 // Otherwise, it will pass through the request to next
 func (m *Monitor) WithRedirect(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if m.WasInstanceDisabled() {
-			if strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
-				w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
-				httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
-				return
-			}
+		if m.WasInstanceDisabled() && strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
+			w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
+			httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
+			return
 		}
 
 		next.ServeHTTP(w, r)

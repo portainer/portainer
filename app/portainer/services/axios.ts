@@ -3,7 +3,7 @@ import { loadProgressBar } from 'axios-progress-bar';
 
 import 'axios-progress-bar/dist/nprogress.css';
 import PortainerError from '@/portainer/error';
-import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
+import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
 
 import {
   portainerAgentManagerOperation,
@@ -73,4 +73,10 @@ function defaultErrorParser(axiosError: AxiosError) {
   const details = axiosError.response?.data.details || message;
   const error = new Error(message);
   return { error, details };
+}
+
+export function isAxiosError<
+  ResponseType = { message: string; details: string }
+>(error: unknown): error is AxiosError<ResponseType> {
+  return axiosOrigin.isAxiosError(error);
 }

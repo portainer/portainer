@@ -1,12 +1,12 @@
-import { Column } from 'react-table';
+import { ScheduleType } from '../../types';
 
-import { EdgeUpdateSchedule, ScheduleType } from '../../types';
+import { columnHelper } from './helper';
 
-export const scheduleType: Column<EdgeUpdateSchedule> = {
-  Header: 'Type',
-  accessor: (row) => ScheduleType[row.type],
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  sortType: 'string',
-};
+export const scheduleType = columnHelper.accessor('type', {
+  header: 'Type',
+  cell: ({ getValue }) => {
+    const value = getValue();
+
+    return ScheduleType[value];
+  },
+});

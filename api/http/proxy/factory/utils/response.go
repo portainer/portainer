@@ -2,12 +2,12 @@ package utils
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,7 +18,10 @@ func GetResponseAsJSONObject(response *http.Response) (map[string]interface{}, e
 		return nil, err
 	}
 
-	responseObject := responseData.(map[string]interface{})
+	responseObject, ok := responseData.(map[string]interface{})
+	if !ok {
+		return nil, nil
+	}
 	return responseObject, nil
 }
 
@@ -27,6 +30,9 @@ func GetResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
 	responseData, err := getResponseBody(response)
 	if err != nil {
 		return nil, err
+	}
+	if responseData == nil {
+		return nil, nil
 	}
 
 	switch responseObject := responseData.(type) {
@@ -76,7 +82,7 @@ func RewriteResponse(response *http.Response, newResponseData interface{}, statu
 		return err
 	}
 
-	body := ioutil.NopCloser(bytes.NewReader(data))
+	body := io.NopCloser(bytes.NewReader(data))
 
 	response.StatusCode = statusCode
 	response.Body = body

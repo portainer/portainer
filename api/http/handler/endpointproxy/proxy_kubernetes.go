@@ -3,12 +3,12 @@ package endpointproxy
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
-	"strings"
-
-	"net/http"
 )
 
 func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

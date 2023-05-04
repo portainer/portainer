@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { trimSHA } from './utils';
+import { joinCommand, trimSHA } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -114,7 +114,7 @@ angular
     'use strict';
     return function (name) {
       if (name) {
-        return name.indexOf('/') === 0 ? name.replace('/', '') : name;
+        return name.indexOf('/') === 0 ? name.slice(1) : name;
       }
       return '';
     };
@@ -161,8 +161,7 @@ angular
   .filter('containername', function () {
     'use strict';
     return function (container) {
-      var name = container.Names[0];
-      return name.substring(1, name.length);
+      return container.Names[0];
     };
   })
   .filter('swarmversion', function () {
@@ -174,7 +173,7 @@ angular
   .filter('swarmhostname', function () {
     'use strict';
     return function (container) {
-      return _.split(container.Names[0], '/')[1];
+      return container.Names[0];
     };
   })
   .filter('repotags', function () {
@@ -191,12 +190,7 @@ angular
     };
   })
   .filter('command', function () {
-    'use strict';
-    return function (command) {
-      if (command) {
-        return command.join(' ');
-      }
-    };
+    return joinCommand;
   })
   .filter('hideshasum', function () {
     'use strict';

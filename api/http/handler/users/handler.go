@@ -37,6 +37,7 @@ type Handler struct {
 	DataStore               dataservices.DataStore
 	CryptoService           portainer.CryptoService
 	passwordStrengthChecker security.PasswordStrengthChecker
+	AdminCreationDone       chan<- struct{}
 }
 
 // NewHandler creates a handler to manage user operations.

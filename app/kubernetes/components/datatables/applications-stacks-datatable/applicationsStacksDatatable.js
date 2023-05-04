@@ -10,5 +10,11 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsStacksDa
     reverseOrder: '<',
     refreshCallback: '<',
     removeAction: '<',
+    namespaces: '<',
+    namespace: '<',
+    onChangeNamespaceDropdown: '<',
+    isAppsLoading: '<',
+    isSystemResources: '<',
+    setSystemResources: '<',
   },
 });

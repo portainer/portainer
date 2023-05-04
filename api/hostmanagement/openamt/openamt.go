@@ -2,15 +2,16 @@ package openamt
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
+
 	"golang.org/x/sync/errgroup"
 )
 
@@ -32,11 +33,14 @@ type Service struct {
 
 // NewService initializes a new service.
 func NewService() *Service {
+	tlsConfig := crypto.CreateTLSConfiguration()
+	tlsConfig.InsecureSkipVerify = true
+
 	return &Service{
 		httpsClient: &http.Client{
 			Timeout: httpClientTimeout,
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				TLSClientConfig: tlsConfig,
 			},
 		},
 	}
@@ -83,11 +87,8 @@ func (service *Service) Configure(configuration portainer.OpenAMTConfiguration) 
 	}
 
 	_, err = service.createOrUpdateDomain(configuration)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (service *Service) executeSaveRequest(method string, url string, token string, payload []byte) ([]byte, error) {
@@ -102,7 +103,9 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 	if err != nil {
 		return nil, err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	defer response.Body.Close()
+
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
@@ -131,7 +134,9 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	defer response.Body.Close()
+
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
@@ -140,10 +145,12 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 		if response.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
+
 		errorResponse := parseError(responseBody)
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
+
 		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
@@ -229,12 +236,7 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	}
 	configuration.MPSToken = token
 
-	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
 }
 
 func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) (string, error) {

@@ -8,26 +8,11 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
 )
-
-func (store *Store) version() (int, error) {
-	version, err := store.VersionService.DBVersion()
-	if store.IsErrObjectNotFound(err) {
-		version = 0
-	}
-	return version, err
-}
-
-func (store *Store) edition() portainer.SoftwareEdition {
-	edition, err := store.VersionService.Edition()
-	if store.IsErrObjectNotFound(err) {
-		edition = portainer.PortainerCE
-	}
-	return edition
-}
 
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
@@ -39,8 +24,6 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 
 // Open opens and initializes the BoltDB database.
 func (store *Store) Open() (newStore bool, err error) {
-	newStore = true
-
 	encryptionReq, err := store.connection.NeedsEncryptionMigration()
 	if err != nil {
 		return false, err
@@ -55,35 +38,46 @@ func (store *Store) Open() (newStore bool, err error) {
 
 	err = store.connection.Open()
 	if err != nil {
-		return newStore, err
+		return false, err
 	}
 
 	err = store.initServices()
 	if err != nil {
-		return newStore, err
+		return false, err
 	}
 
-	// if we have DBVersion in the database then ensure we flag this as NOT a new store
-	version, err := store.VersionService.DBVersion()
+	// If no settings object exists then assume we have a new store
+	_, err = store.SettingsService.Settings()
 	if err != nil {
 		if store.IsErrObjectNotFound(err) {
-			return newStore, nil
+			return true, nil
 		}
-
-		return newStore, err
+		return false, err
 	}
 
-	if version > 0 {
-		log.Debug().Int("version", version).Msg("opened existing store")
-
-		return false, nil
-	}
-
-	return newStore, nil
+	return false, nil
 }
 
 func (store *Store) Close() error {
 	return store.connection.Close()
+}
+
+func (store *Store) UpdateTx(fn func(dataservices.DataStoreTx) error) error {
+	return store.connection.UpdateTx(func(tx portainer.Transaction) error {
+		return fn(&StoreTx{
+			store: store,
+			tx:    tx,
+		})
+	})
+}
+
+func (store *Store) ViewTx(fn func(dataservices.DataStoreTx) error) error {
+	return store.connection.ViewTx(func(tx portainer.Transaction) error {
+		return fn(&StoreTx{
+			store: store,
+			tx:    tx,
+		})
+	})
 }
 
 // BackupTo backs up db to a provided writer.
@@ -94,15 +88,27 @@ func (store *Store) BackupTo(w io.Writer) error {
 
 // CheckCurrentEdition checks if current edition is community edition
 func (store *Store) CheckCurrentEdition() error {
-	if store.edition() != portainer.PortainerCE {
+	if store.edition() != portainer.Edition {
 		return portainerErrors.ErrWrongDBEdition
 	}
 	return nil
 }
 
+func (store *Store) edition() portainer.SoftwareEdition {
+	edition, err := store.VersionService.Edition()
+	if store.IsErrObjectNotFound(err) {
+		edition = portainer.PortainerCE
+	}
+	return edition
+}
+
 // TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
 	return e == portainerErrors.ErrObjectNotFound
+}
+
+func (store *Store) Connection() portainer.Connection {
+	return store.connection
 }
 
 func (store *Store) Rollback(force bool) error {
@@ -156,6 +162,7 @@ func (store *Store) encryptDB() error {
 	if err != nil {
 		// Remove the new encrypted file that we failed to import
 		os.Remove(store.connection.GetDatabaseFilePath())
+
 		log.Fatal().Err(portainerErrors.ErrDBImportFailed).Msg("")
 	}
 

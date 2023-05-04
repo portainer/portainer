@@ -91,12 +91,14 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		if err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to agent", err)
 		}
+
 		return nil
 	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 		if err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to Edge agent", err)
 		}
+
 		return nil
 	}
 
@@ -168,7 +170,7 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 		return "", false, err
 	}
 
-	tokenCache := handler.kubernetesTokenCacheManager.GetOrCreateTokenCache(int(endpoint.ID))
+	tokenCache := handler.kubernetesTokenCacheManager.GetOrCreateTokenCache(endpoint.ID)
 
 	tokenManager, err := kubernetes.NewTokenManager(kubecli, handler.DataStore, tokenCache, setLocalAdminToken)
 	if err != nil {

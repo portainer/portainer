@@ -3,7 +3,6 @@ package stacks
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -16,7 +15,9 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
 )
 
 // @id StackDelete
@@ -28,7 +29,7 @@ import (
 // @security jwt
 // @param id path int true "Stack identifier"
 // @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"
-// @param endpointId query int false "Environment(Endpoint) identifier used to remove an external stack (required when external is set to true)"
+// @param endpointId query int true "Environment(Endpoint) identifier used to remove an external stack (required when external is set to true)"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -114,7 +115,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	// stop scheduler updates of the stack before removal
 	if stack.AutoUpdate != nil {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
 	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
@@ -136,7 +137,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to remove stack files from disk", err)
+		log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 	}
 
 	return response.Empty(w)
@@ -198,8 +199,8 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		//if it is a compose format kub stack, create a temp dir and convert the manifest files into it
 		//then process the remove operation
 		if stack.IsComposeFormat {
-			fileNames := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
-			tmpDir, err := ioutil.TempDir("", "kub_delete")
+			fileNames := stackutils.GetStackFilePaths(stack, false)
+			tmpDir, err := os.MkdirTemp("", "kube_delete")
 			if err != nil {
 				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
 			}
@@ -224,7 +225,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 				manifestFiles = append(manifestFiles, manifestFilePath)
 			}
 		} else {
-			manifestFiles = stackutils.GetStackFilePaths(stack)
+			manifestFiles = stackutils.GetStackFilePaths(stack, true)
 		}
 		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)

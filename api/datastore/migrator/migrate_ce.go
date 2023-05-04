@@ -1,34 +1,18 @@
 package migrator
 
 import (
-	"errors"
 	"reflect"
 	"runtime"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 
-	werrors "github.com/pkg/errors"
+	"github.com/Masterminds/semver"
 	"github.com/rs/zerolog/log"
 )
 
-type migration struct {
-	dbversion int
-	migrate   func() error
-}
-
 func migrationError(err error, context string) error {
-	return werrors.Wrap(err, "failed in "+context)
-}
-
-func newMigration(dbversion int, migrate func() error) migration {
-	return migration{
-		dbversion: dbversion,
-		migrate:   migrate,
-	}
-}
-
-func dbTooOldError() error {
-	return errors.New("migrating from less than Portainer 1.21.0 is not supported, please contact Portainer support.")
+	return errors.Wrap(err, "failed in "+context)
 }
 
 func GetFunctionName(i interface{}) string {
@@ -37,108 +21,105 @@ func GetFunctionName(i interface{}) string {
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) Migrate() error {
-	// set DB to updating status
-	err := m.versionService.StoreIsUpdating(true)
+	version, err := m.versionService.Version()
 	if err != nil {
-		return migrationError(err, "StoreIsUpdating")
+		return migrationError(err, "get version service")
 	}
 
-	migrations := []migration{
-		// Portainer < 1.21.0
-		newMigration(17, dbTooOldError),
-
-		// Portainer 1.21.0
-		newMigration(18, m.updateUsersToDBVersion18),
-		newMigration(18, m.updateEndpointsToDBVersion18),
-		newMigration(18, m.updateEndpointGroupsToDBVersion18),
-		newMigration(18, m.updateRegistriesToDBVersion18),
-
-		// 1.22.0
-		newMigration(19, m.updateSettingsToDBVersion19),
-
-		// 1.22.1
-		newMigration(20, m.updateUsersToDBVersion20),
-		newMigration(20, m.updateSettingsToDBVersion20),
-		newMigration(20, m.updateSchedulesToDBVersion20),
-
-		// Portainer 1.23.0
-		// DBVersion 21 is missing as it was shipped as via hotfix 1.22.2
-		newMigration(22, m.updateResourceControlsToDBVersion22),
-		newMigration(22, m.updateUsersAndRolesToDBVersion22),
-
-		// Portainer 1.24.0
-		newMigration(23, m.updateTagsToDBVersion23),
-		newMigration(23, m.updateEndpointsAndEndpointGroupsToDBVersion23),
-
-		// Portainer 1.24.1
-		newMigration(24, m.updateSettingsToDB24),
-
-		// Portainer 2.0.0
-		newMigration(25, m.updateSettingsToDB25),
-		newMigration(25, m.updateStacksToDB24), // yes this looks odd. Don't be tempted to move it
-
-		// Portainer 2.1.0
-		newMigration(26, m.updateEndpointSettingsToDB25),
-
-		// Portainer 2.2.0
-		newMigration(27, m.updateStackResourceControlToDB27),
-
-		// Portainer 2.6.0
-		newMigration(30, m.migrateDBVersionToDB30),
-
-		// Portainer 2.9.0
-		newMigration(32, m.migrateDBVersionToDB32),
-
-		// Portainer 2.9.1, 2.9.2
-		newMigration(33, m.migrateDBVersionToDB33),
-
-		// Portainer 2.10
-		newMigration(34, m.migrateDBVersionToDB34),
-
-		// Portainer 2.9.3 (yep out of order, but 2.10 is EE only)
-		newMigration(35, m.migrateDBVersionToDB35),
-
-		newMigration(36, m.migrateDBVersionToDB36),
-
-		// Portainer 2.13
-		newMigration(40, m.migrateDBVersionToDB40),
-
-		// Portainer 2.14
-		newMigration(50, m.migrateDBVersionToDB50),
-
-		// Portainer 2.15
-		newMigration(60, m.migrateDBVersionToDB60),
-
-		// Portainer 2.16
-		newMigration(70, m.migrateDBVersionToDB70),
+	schemaVersion, err := semver.NewVersion(version.SchemaVersion)
+	if err != nil {
+		return migrationError(err, "invalid db schema version")
 	}
 
-	var lastDbVersion int
-	for _, migration := range migrations {
-		if m.currentDBVersion < migration.dbversion {
+	newMigratorCount := 0
+	apiVersion := semver.MustParse(portainer.APIVersion)
+	if schemaVersion.Equal(apiVersion) {
+		// detect and run migrations when the versions are the same.
+		// e.g. development builds
+		latestMigrations := m.LatestMigrations()
+		if latestMigrations.Version.Equal(schemaVersion) &&
+			version.MigratorCount != len(latestMigrations.MigrationFuncs) {
+			err := runMigrations(latestMigrations.MigrationFuncs)
+			if err != nil {
+				return err
+			}
+			newMigratorCount = len(latestMigrations.MigrationFuncs)
+		}
+	} else {
+		// regular path when major/minor/patch versions differ
+		for _, migration := range m.migrations {
+			if schemaVersion.LessThan(migration.Version) {
 
-			// Print the next line only when the version changes
-			if migration.dbversion > lastDbVersion {
-				log.Info().Int("to_version", migration.dbversion).Msg("migrating DB")
+				log.Info().Msgf("migrating data to %s", migration.Version.String())
+				err := runMigrations(migration.MigrationFuncs)
+				if err != nil {
+					return err
+				}
 			}
 
-			err := migration.migrate()
-			if err != nil {
-				return migrationError(err, GetFunctionName(migration.migrate))
+			if apiVersion.Equal(migration.Version) {
+				newMigratorCount = len(migration.MigrationFuncs)
 			}
 		}
-		lastDbVersion = migration.dbversion
 	}
 
-	log.Info().Int("version", portainer.DBVersion).Msg("setting DB version")
+	err = m.Always()
+	if err != nil {
+		return migrationError(err, "Always migrations returned error")
+	}
 
-	err = m.versionService.StoreDBVersion(portainer.DBVersion)
+	version.SchemaVersion = portainer.APIVersion
+	version.MigratorCount = newMigratorCount
+
+	err = m.versionService.UpdateVersion(version)
 	if err != nil {
 		return migrationError(err, "StoreDBVersion")
 	}
 
-	log.Info().Int("version", portainer.DBVersion).Msg("updated DB version")
+	log.Info().Msgf("db migrated to %s", portainer.APIVersion)
 
-	// reset DB updating status
-	return m.versionService.StoreIsUpdating(false)
+	return nil
+}
+
+func runMigrations(migrationFuncs []func() error) error {
+	for _, migrationFunc := range migrationFuncs {
+		err := migrationFunc()
+		if err != nil {
+			return migrationError(err, GetFunctionName(migrationFunc))
+		}
+	}
+	return nil
+}
+
+func (m *Migrator) NeedsMigration() bool {
+	// we need to migrate if anything changes with the version in the DB vs what our software version is.
+	// If the version matches, then it's all down to the number of migration funcs we have for the current version
+	// i.e. the MigratorCount
+
+	// In this particular instance we should log a fatal error
+	if m.CurrentDBEdition() != portainer.PortainerCE {
+		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://documentation.portainer.io/v2.0-be/downgrade/be-to-ce/")
+		return false
+	}
+
+	if m.CurrentSemanticDBVersion().LessThan(semver.MustParse(portainer.APIVersion)) {
+		return true
+	}
+
+	// Check if we have any migrations for the current version
+	latestMigrations := m.LatestMigrations()
+	if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
+		if m.currentDBVersion.MigratorCount != len(latestMigrations.MigrationFuncs) {
+			return true
+		}
+	} else {
+		// One remaining possibility if we get here.  If our migrator count > 0 and we have no migration funcs
+		// for the current version (i.e. they were deleted during development).  Then we we need to migrate.
+		// This is to reset the migrator count back to 0
+		if m.currentDBVersion.MigratorCount > 0 {
+			return true
+		}
+	}
+
+	return false
 }

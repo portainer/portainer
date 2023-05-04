@@ -10,6 +10,7 @@ interface Props {
   dataCy?: string;
   inputId?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function UsersSelector({
@@ -20,6 +21,7 @@ export function UsersSelector({
   dataCy,
   inputId,
   placeholder,
+  disabled,
 }: Props) {
   return (
     <Select
@@ -36,6 +38,7 @@ export function UsersSelector({
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}
+      isDisabled={disabled}
     />
   );
 }

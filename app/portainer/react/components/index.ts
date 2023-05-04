@@ -1,52 +1,82 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
-import {
-  DefaultRegistryAction,
-  DefaultRegistryDomain,
-  DefaultRegistryName,
-} from '@/react/portainer/registries/ListView/DefaultRegistry';
-import { Icon } from '@/react/components/Icon';
-import { ReactQueryDevtoolsWrapper } from '@/react/components/ReactQueryDevtoolsWrapper';
-import { AccessControlPanel } from '@/react/portainer/access-control';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
-import { SettingsFDO } from '@/react/portainer/settings/EdgeComputeView/SettingsFDO';
-import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
-import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/InternalAuth';
-import { PorAccessControlFormTeamSelector } from '@/react/portainer/access-control/PorAccessControlForm/TeamsSelector';
-import { PorAccessControlFormUserSelector } from '@/react/portainer/access-control/PorAccessControlForm/UsersSelector';
-import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
+import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
 
+import { Icon } from '@@/Icon';
+import { ReactQueryDevtoolsWrapper } from '@@/ReactQueryDevtoolsWrapper';
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
 import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { Badge } from '@@/Badge';
 import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { Slider } from '@@/form-components/Slider';
+import { TagButton } from '@@/TagButton';
+import { BETeaserButton } from '@@/BETeaserButton';
+import { CodeEditor } from '@@/CodeEditor';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
 import { customTemplatesModule } from './custom-templates';
+import { gitFormModule } from './git-form';
+import { settingsModule } from './settings';
+import { accessControlModule } from './access-control';
+import { environmentsModule } from './environments';
+import { envListModule } from './environments-list-view-components';
+import { registriesModule } from './registries';
 
 export const componentsModule = angular
-  .module('portainer.app.react.components', [customTemplatesModule])
+  .module('portainer.app.react.components', [
+    accessControlModule,
+    customTemplatesModule,
+    envListModule,
+    environmentsModule,
+    gitFormModule,
+    registriesModule,
+    settingsModule,
+  ])
   .component(
     'tagSelector',
-    r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
+    r2a(withUIRouter(withReactQuery(TagSelector)), [
+      'allowCreate',
+      'onChange',
+      'value',
+    ])
   )
   .component(
-    'portainerTooltip',
-    r2a(Tooltip, ['message', 'position', 'className'])
+    'beTeaserButton',
+    r2a(BETeaserButton, [
+      'featureId',
+      'heading',
+      'message',
+      'buttonText',
+      'className',
+      'icon',
+      'buttonClassName',
+    ])
   )
+  .component(
+    'tagButton',
+    r2a(TagButton, ['value', 'label', 'title', 'onRemove'])
+  )
+
+  .component(
+    'portainerTooltip',
+    r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage'])
+  )
+  .component('badge', r2a(Badge, ['type', 'className']))
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
   .component(
@@ -80,63 +110,36 @@ export const componentsModule = angular
   )
   .component(
     'fallbackImage',
-    r2a(FallbackImage, [
-      'src',
-      'fallbackIcon',
-      'alt',
-      'size',
-      'className',
-      'fallbackMode',
-      'fallbackClassName',
-      'feather',
-    ])
+    r2a(FallbackImage, ['src', 'fallbackIcon', 'alt', 'size', 'className'])
   )
-  .component(
-    'prIcon',
-    r2a(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
-  )
+  .component('prIcon', r2a(Icon, ['className', 'icon', 'mode', 'size']))
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
   .component(
     'dashboardItem',
-    r2a(DashboardItem, ['featherIcon', 'icon', 'type', 'value', 'children'])
-  )
-  .component(
-    'datatableSearchbar',
-    r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
-  )
-  .component('boxSelectorBadgeIcon', r2a(BadgeIcon, ['featherIcon', 'icon']))
-  .component(
-    'accessControlPanel',
-    r2a(withReactQuery(withCurrentUser(AccessControlPanel)), [
-      'disableOwnershipChange',
-      'onUpdateSuccess',
-      'resourceControl',
-      'resourceId',
-      'resourceType',
-      'environmentId',
+    r2a(DashboardItem, [
+      'icon',
+      'type',
+      'value',
+      'to',
+      'children',
+      'pluralType',
+      'isLoading',
+      'isRefetching',
+      'dataCy',
     ])
   )
   .component(
-    'defaultRegistryName',
-    r2a(withReactQuery(DefaultRegistryName), [])
+    'datatableSearchbar',
+    r2a(SearchBar, [
+      'data-cy',
+      'onChange',
+      'value',
+      'placeholder',
+      'children',
+      'className',
+    ])
   )
-  .component(
-    'defaultRegistryAction',
-    r2a(withReactQuery(DefaultRegistryAction), [])
-  )
-  .component(
-    'defaultRegistryDomain',
-    r2a(withReactQuery(DefaultRegistryDomain), [])
-  )
-  .component(
-    'settingsFdo',
-    r2a(withUIRouter(withReactQuery(SettingsFDO)), ['onSubmit', 'settings'])
-  )
-  .component('settingsOpenAmt', r2a(SettingsOpenAMT, ['onSubmit', 'settings']))
-  .component(
-    'internalAuth',
-    r2a(InternalAuth, ['onSaveSettings', 'isLoading', 'value', 'onChange'])
-  )
+  .component('badgeIcon', r2a(BadgeIcon, ['icon', 'size']))
   .component(
     'teamsSelector',
     r2a(TeamsSelector, [
@@ -147,24 +150,7 @@ export const componentsModule = angular
       'name',
       'placeholder',
       'teams',
-    ])
-  )
-  .component(
-    'porAccessControlFormTeamSelector',
-    r2a(PorAccessControlFormTeamSelector, [
-      'inputId',
-      'onChange',
-      'options',
-      'value',
-    ])
-  )
-  .component(
-    'porAccessControlFormUserSelector',
-    r2a(PorAccessControlFormUserSelector, [
-      'inputId',
-      'onChange',
-      'options',
-      'value',
+      'disabled',
     ])
   )
   .component(
@@ -181,9 +167,32 @@ export const componentsModule = angular
       'options',
       'isMulti',
       'isClearable',
+      'components',
     ])
   )
   .component(
-    'porAccessManagementUsersSelector',
-    r2a(PorAccessManagementUsersSelector, ['onChange', 'options', 'value'])
-  ).name;
+    'porSlider',
+    r2a(Slider, [
+      'min',
+      'max',
+      'step',
+      'value',
+      'onChange',
+      'visibleTooltip',
+      'dataCy',
+    ])
+  )
+
+  .component(
+    'reactCodeEditor',
+    r2a(CodeEditor, [
+      'id',
+      'placeholder',
+      'yaml',
+      'readonly',
+      'onChange',
+      'value',
+      'height',
+    ])
+  )
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, [])).name;

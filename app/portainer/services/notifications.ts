@@ -4,7 +4,7 @@ import sanitize from 'sanitize-html';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuid } from 'uuid';
 
-import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
+import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
 import { notificationsStore } from '@/react/portainer/notifications/notifications-store';
 import { ToastNotification } from '@/react/portainer/notifications/types';
 
@@ -15,7 +15,8 @@ toastr.options = {
   closeButton: true,
   progressBar: true,
   tapToDismiss: false,
-  // custom button, using the feather icon x.svg inside
+  escapeHtml: true,
+  // custom button, using the lucide icon x.svg inside
   closeHtml: `<button type="button"><svg
   xmlns="http://www.w3.org/2000/svg"
   width="18"
@@ -46,8 +47,10 @@ export function notifyError(title: string, e?: Error, fallbackText = '') {
   const msg = pickErrorMsg(e) || fallbackText;
   saveNotification(title, msg, 'error');
 
-  // eslint-disable-next-line no-console
-  console.error(e);
+  if (!_.get(e, 'resource.password')) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
 
   if (msg !== 'Invalid JWT token') {
     toastr.error(sanitize(_.escape(msg)), sanitize(title), { timeOut: 6000 });

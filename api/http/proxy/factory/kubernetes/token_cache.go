@@ -1,84 +1,78 @@
 package kubernetes
 
 import (
-	"strconv"
 	"sync"
 
-	"github.com/orcaman/concurrent-map"
+	portainer "github.com/portainer/portainer/api"
 )
 
-type (
-	// TokenCacheManager represents a service used to manage multiple tokenCache objects.
-	TokenCacheManager struct {
-		tokenCaches cmap.ConcurrentMap
-	}
+// TokenCacheManager represents a service used to manage multiple tokenCache objects.
+type TokenCacheManager struct {
+	tokenCaches map[portainer.EndpointID]*tokenCache
+	mu          sync.Mutex
+}
 
-	tokenCache struct {
-		userTokenCache cmap.ConcurrentMap
-		mutex          sync.Mutex
-	}
-)
+type tokenCache struct {
+	userTokenCache map[portainer.UserID]string
+	mu             sync.Mutex
+}
 
 // NewTokenCacheManager returns a pointer to a new instance of TokenCacheManager
 func NewTokenCacheManager() *TokenCacheManager {
 	return &TokenCacheManager{
-		tokenCaches: cmap.New(),
+		tokenCaches: make(map[portainer.EndpointID]*tokenCache),
 	}
-}
-
-// CreateTokenCache will create a new tokenCache object, associate it to the manager map of caches
-// and return a pointer to that tokenCache instance.
-func (manager *TokenCacheManager) CreateTokenCache(endpointID int) *tokenCache {
-	tokenCache := newTokenCache()
-
-	key := strconv.Itoa(endpointID)
-	manager.tokenCaches.Set(key, tokenCache)
-
-	return tokenCache
 }
 
 // GetOrCreateTokenCache will get the tokenCache from the manager map of caches if it exists,
 // otherwise it will create a new tokenCache object, associate it to the manager map of caches
 // and return a pointer to that tokenCache instance.
-func (manager *TokenCacheManager) GetOrCreateTokenCache(endpointID int) *tokenCache {
-	key := strconv.Itoa(endpointID)
-	if epCache, ok := manager.tokenCaches.Get(key); ok {
-		return epCache.(*tokenCache)
+func (manager *TokenCacheManager) GetOrCreateTokenCache(endpointID portainer.EndpointID) *tokenCache {
+	manager.mu.Lock()
+	defer manager.mu.Unlock()
+
+	if tc, ok := manager.tokenCaches[endpointID]; ok {
+		return tc
 	}
 
-	return manager.CreateTokenCache(endpointID)
+	tc := &tokenCache{
+		userTokenCache: make(map[portainer.UserID]string),
+	}
+
+	manager.tokenCaches[endpointID] = tc
+
+	return tc
 }
 
 // RemoveUserFromCache will ensure that the specific userID is removed from all registered caches.
-func (manager *TokenCacheManager) RemoveUserFromCache(userID int) {
-	for cache := range manager.tokenCaches.IterBuffered() {
-		cache.Val.(*tokenCache).removeToken(userID)
+func (manager *TokenCacheManager) RemoveUserFromCache(userID portainer.UserID) {
+	manager.mu.Lock()
+	for _, tc := range manager.tokenCaches {
+		tc.removeToken(userID)
 	}
+	manager.mu.Unlock()
 }
 
-func newTokenCache() *tokenCache {
-	return &tokenCache{
-		userTokenCache: cmap.New(),
-		mutex:          sync.Mutex{},
-	}
-}
+func (cache *tokenCache) getOrAddToken(userID portainer.UserID, tokenGetFunc func() (string, error)) (string, error) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
 
-func (cache *tokenCache) getToken(userID int) (string, bool) {
-	key := strconv.Itoa(userID)
-	token, ok := cache.userTokenCache.Get(key)
-	if ok {
-		return token.(string), true
+	if tok, ok := cache.userTokenCache[userID]; ok {
+		return tok, nil
 	}
 
-	return "", false
+	tok, err := tokenGetFunc()
+	if err != nil {
+		return "", err
+	}
+
+	cache.userTokenCache[userID] = tok
+
+	return tok, nil
 }
 
-func (cache *tokenCache) addToken(userID int, token string) {
-	key := strconv.Itoa(userID)
-	cache.userTokenCache.Set(key, token)
-}
-
-func (cache *tokenCache) removeToken(userID int) {
-	key := strconv.Itoa(userID)
-	cache.userTokenCache.Remove(key)
+func (cache *tokenCache) removeToken(userID portainer.UserID) {
+	cache.mu.Lock()
+	delete(cache.userTokenCache, userID)
+	cache.mu.Unlock()
 }

@@ -2,7 +2,7 @@ package upload
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"

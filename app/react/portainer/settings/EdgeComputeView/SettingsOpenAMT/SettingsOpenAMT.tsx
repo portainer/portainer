@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
+import { Laptop } from 'lucide-react';
 
-import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
+import { OpenAMTConfiguration } from '@/react/edge/edge-devices/open-amt/types';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -93,7 +94,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="svg-laptop" title="Intel OpenAMT" />
+        <WidgetTitle icon={Laptop} title="Intel OpenAMT" />
         <WidgetBody>
           <Formik
             initialValues={initialValues}
@@ -129,7 +130,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
-                <TextTip color="blue">
+                <TextTip color="blue" className="mb-2">
                   When enabled, this will allow Portainer to interact with an
                   OpenAMT MPS API.
                 </TextTip>
@@ -213,6 +214,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                       size="medium"
                       tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy.<br>The certificate must contain the private key.<br>On AMT 15 based devices you need to use SHA2."
                       errors={errors.certFileContent}
+                      setTooltipHtmlMessage
                     >
                       <FileUploadField
                         inputId="certificate_file"

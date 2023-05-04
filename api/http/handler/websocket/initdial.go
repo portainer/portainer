@@ -2,10 +2,11 @@ package websocket
 
 import (
 	"crypto/tls"
-	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/crypto"
 	"net"
 	"net/url"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 )
 
 func initDial(endpoint *portainer.Endpoint) (net.Conn, error) {

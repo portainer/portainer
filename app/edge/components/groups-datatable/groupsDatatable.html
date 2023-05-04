@@ -2,9 +2,9 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle vertical-center"> <pr-icon icon="'grid'" feather="true"></pr-icon> Edge Groups </div>
+        <div class="toolBarTitle vertical-center"> <pr-icon icon="'layout-grid'"></pr-icon> Edge Groups </div>
         <div class="searchBar vertical-center leading-none">
-          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -23,15 +23,15 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="edgeGroup-removeEdgeGroupButton"
           >
-            <pr-icon icon="'trash-2'" feather="true"></pr-icon> Remove
+            <pr-icon icon="'trash-2'"></pr-icon> Remove
           </button>
           <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.groups.new" data-cy="edgeGroup-addEdgeGroupButton">
-            <pr-icon icon="'plus'" feather="true"></pr-icon> Add Edge group
+            <pr-icon icon="'plus'"></pr-icon> Add Edge group
           </button>
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="edgeGroup-edgeGroupTable">
+        <table class="table-hover nowrap-cells table" data-cy="edgeGroup-edgeGroupTable">
           <thead>
             <tr>
               <th class="flex">
@@ -74,20 +74,26 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-disabled="item.HasEdgeStack" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-disabled="item.HasEdgeStack || item.HasEdgeGroup"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="edge.groups.edit({groupId: item.Id})">{{ item.Name }}</a>
-                <span ng-if="item.HasEdgeStack" class="label label-info image-tag space-left">in use</span>
+                <span ng-if="item.HasEdgeStack || item.HasEdgeGroup" class="label label-info image-tag space-left">in use</span>
               </td>
               <td>{{ item.Endpoints.length }}</td>
               <td>{{ item.Dynamic ? 'Dynamic' : 'Static' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+              <td colspan="4" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted"> No Edge group available. </td>
+              <td colspan="4" class="text-muted text-center"> No Edge group available. </td>
             </tr>
           </tbody>
         </table>

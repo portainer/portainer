@@ -1,5 +1,5 @@
 import { useRouter } from '@uirouter/react';
-import { RefreshCw } from 'react-feather';
+import { RefreshCw } from 'lucide-react';
 
 import { Button } from '../buttons';
 
@@ -7,7 +7,6 @@ import { Breadcrumbs } from './Breadcrumbs';
 import { Crumb } from './Breadcrumbs/Breadcrumbs';
 import { HeaderContainer } from './HeaderContainer';
 import { HeaderTitle } from './HeaderTitle';
-import styles from './PageHeader.module.css';
 
 interface Props {
   id?: string;
@@ -42,7 +41,7 @@ export function PageHeader({
             color="none"
             size="large"
             onClick={onClickedRefresh}
-            className={styles.reloadButton}
+            className="m-0 p-0 focus:text-inherit"
             disabled={loading}
           >
             <RefreshCw className="icon" />

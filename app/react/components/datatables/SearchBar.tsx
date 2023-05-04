@@ -1,14 +1,19 @@
-import { Search } from 'react-feather';
-import { useEffect, useMemo, useState } from 'react';
-import _ from 'lodash';
+import { ReactNode } from 'react';
+import { Search, X } from 'lucide-react';
+import clsx from 'clsx';
 
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { AutomationTestingProps } from '@/types';
+import { useDebounce } from '@/react/hooks/useDebounce';
+
+import { Button } from '@@/buttons';
 
 interface Props extends AutomationTestingProps {
   value: string;
   placeholder?: string;
   onChange(value: string): void;
+  className?: string;
+  children?: ReactNode;
 }
 
 export function SearchBar({
@@ -16,12 +21,20 @@ export function SearchBar({
   placeholder = 'Search...',
   onChange,
   'data-cy': dataCy,
+  className,
+  children,
 }: Props) {
   const [searchValue, setSearchValue] = useDebounce(value, onChange);
 
+  function onClear() {
+    setSearchValue('');
+  }
+
   return (
-    <div className="searchBar items-center flex">
-      <Search className="searchIcon feather" />
+    <div
+      className={clsx('searchBar flex min-w-[90px] items-center', className)}
+    >
+      <Search className="searchIcon lucide shrink-0" />
       <input
         type="text"
         className="searchInput"
@@ -30,28 +43,10 @@ export function SearchBar({
         placeholder={placeholder}
         data-cy={dataCy}
       />
+      {children}
+      <Button onClick={onClear} icon={X} color="none" disabled={!searchValue} />
     </div>
   );
-}
-
-function useDebounce(defaultValue: string, onChange: (value: string) => void) {
-  const [searchValue, setSearchValue] = useState(defaultValue);
-
-  useEffect(() => {
-    setSearchValue(defaultValue);
-  }, [defaultValue]);
-
-  const onChangeDebounces = useMemo(
-    () => _.debounce(onChange, 300),
-    [onChange]
-  );
-
-  return [searchValue, handleChange] as const;
-
-  function handleChange(value: string) {
-    setSearchValue(value);
-    onChangeDebounces(value);
-  }
 }
 
 export function useSearchBarState(

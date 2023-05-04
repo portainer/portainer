@@ -1,4 +1,4 @@
-import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 
 angular.module('portainer.app').controller('StackDuplicationFormController', [
   'Notifications',
@@ -38,7 +38,6 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function onChangeEnvironment(endpointId) {
-      console.log({ endpointId });
       return $scope.$evalAsync(() => {
         ctrl.formValues.endpointId = endpointId;
       });

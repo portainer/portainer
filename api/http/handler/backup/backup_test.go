@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -38,7 +37,7 @@ func listFiles(dir string) []string {
 
 func contains(t *testing.T, list []string, path string) {
 	assert.Contains(t, list, path)
-	copyContent, _ := ioutil.ReadFile(path)
+	copyContent, _ := os.ReadFile(path)
 	assert.Equal(t, "content\n", string(copyContent))
 }
 
@@ -54,10 +53,12 @@ func Test_backupHandlerWithoutPassword_shouldCreateATarballArchive(t *testing.T)
 
 	response := w.Result()
 	body, _ := io.ReadAll(response.Body)
+	response.Body.Close()
 
 	tmpdir := t.TempDir()
+
 	archivePath := filepath.Join(tmpdir, "archive.tar.gz")
-	err := ioutil.WriteFile(archivePath, body, 0600)
+	err := os.WriteFile(archivePath, body, 0600)
 	if err != nil {
 		t.Fatal("Failed to save downloaded .tar.gz archive: ", err)
 	}
@@ -89,8 +90,10 @@ func Test_backupHandlerWithPassword_shouldCreateEncryptedATarballArchive(t *test
 
 	response := w.Result()
 	body, _ := io.ReadAll(response.Body)
+	response.Body.Close()
 
 	tmpdir := t.TempDir()
+
 	dr, err := crypto.AesDecrypt(bytes.NewReader(body), []byte("secret"))
 	if err != nil {
 		t.Fatal("Failed to decrypt archive")

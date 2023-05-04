@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/pkg/errors"
+	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 type gitClient struct {
@@ -28,9 +28,10 @@ func NewGitClient(preserveGitDir bool) *gitClient {
 
 func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) error {
 	gitOptions := git.CloneOptions{
-		URL:   opt.repositoryUrl,
-		Depth: opt.depth,
-		Auth:  getAuth(opt.username, opt.password),
+		URL:             opt.repositoryUrl,
+		Depth:           opt.depth,
+		InsecureSkipTLS: opt.tlsSkipVerify,
+		Auth:            getAuth(opt.username, opt.password),
 	}
 
 	if opt.referenceName != "" {
@@ -41,7 +42,7 @@ func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) e
 
 	if err != nil {
 		if err.Error() == "authentication required" {
-			return ErrAuthenticationFailure
+			return gittypes.ErrAuthenticationFailure
 		}
 		return errors.Wrap(err, "failed to clone git repository")
 	}
@@ -60,13 +61,14 @@ func (c *gitClient) latestCommitID(ctx context.Context, opt fetchOption) (string
 	})
 
 	listOptions := &git.ListOptions{
-		Auth: getAuth(opt.username, opt.password),
+		Auth:            getAuth(opt.username, opt.password),
+		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
 	refs, err := remote.List(listOptions)
 	if err != nil {
 		if err.Error() == "authentication required" {
-			return "", ErrAuthenticationFailure
+			return "", gittypes.ErrAuthenticationFailure
 		}
 		return "", errors.Wrap(err, "failed to list repository refs")
 	}
@@ -110,7 +112,8 @@ func (c *gitClient) listRefs(ctx context.Context, opt baseOption) ([]string, err
 	})
 
 	listOptions := &git.ListOptions{
-		Auth: getAuth(opt.username, opt.password),
+		Auth:            getAuth(opt.username, opt.password),
+		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
 	refs, err := rem.List(listOptions)
@@ -132,12 +135,13 @@ func (c *gitClient) listRefs(ctx context.Context, opt baseOption) ([]string, err
 // listFiles list all filenames under the specific repository
 func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, error) {
 	cloneOption := &git.CloneOptions{
-		URL:           opt.repositoryUrl,
-		NoCheckout:    true,
-		Depth:         1,
-		SingleBranch:  true,
-		ReferenceName: plumbing.ReferenceName(opt.referenceName),
-		Auth:          getAuth(opt.username, opt.password),
+		URL:             opt.repositoryUrl,
+		NoCheckout:      true,
+		Depth:           1,
+		SingleBranch:    true,
+		ReferenceName:   plumbing.ReferenceName(opt.referenceName),
+		Auth:            getAuth(opt.username, opt.password),
+		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
 	repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)
@@ -172,9 +176,9 @@ func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, e
 func checkGitError(err error) error {
 	errMsg := err.Error()
 	if errMsg == "repository not found" {
-		return ErrIncorrectRepositoryURL
+		return gittypes.ErrIncorrectRepositoryURL
 	} else if errMsg == "authentication required" {
-		return ErrAuthenticationFailure
+		return gittypes.ErrAuthenticationFailure
 	}
 	return err
 }

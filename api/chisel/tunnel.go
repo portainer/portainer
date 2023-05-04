@@ -2,14 +2,17 @@ package chisel
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
 	"time"
 
-	"github.com/dchest/uniuri"
 	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge/cache"
+
+	"github.com/dchest/uniuri"
 )
 
 const (
@@ -49,6 +52,8 @@ func (service *Service) getTunnelDetails(endpointID portainer.EndpointID) *porta
 
 	service.tunnelDetailsMap[endpointID] = tunnel
 
+	cache.Del(endpointID)
+
 	return tunnel
 }
 
@@ -62,6 +67,10 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) portai
 
 // GetActiveTunnel retrieves an active tunnel which allows communicating with edge agent
 func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (portainer.TunnelDetails, error) {
+	if endpoint.Edge.AsyncMode {
+		return portainer.TunnelDetails{}, errors.New("cannot open tunnel on async endpoint")
+	}
+
 	tunnel := service.GetTunnelDetails(endpoint.ID)
 
 	if tunnel.Status == portainer.EdgeAgentActive {
@@ -99,6 +108,8 @@ func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID)
 	tunnel.Credentials = ""
 	tunnel.LastActivity = time.Now()
 	service.mu.Unlock()
+
+	cache.Del(endpointID)
 }
 
 // SetTunnelStatusToIdle update the status of the tunnel associated to the specified environment(endpoint).
@@ -121,6 +132,8 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 	service.ProxyManager.DeleteEndpointProxy(endpointID)
 
 	service.mu.Unlock()
+
+	cache.Del(endpointID)
 }
 
 // SetTunnelStatusToRequired update the status of the tunnel associated to the specified environment(endpoint).
@@ -129,6 +142,8 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 // and generate temporary credentials that can be used to establish a reverse tunnel on that port.
 // Credentials are encrypted using the Edge ID associated to the environment(endpoint).
 func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
+	defer cache.Del(endpointID)
+
 	tunnel := service.getTunnelDetails(endpointID)
 
 	service.mu.Lock()

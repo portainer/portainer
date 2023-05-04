@@ -2,9 +2,13 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useState } from 'react';
 import _ from 'lodash';
 import clsx from 'clsx';
+import { ArrowLeft, ArrowRight, Wand2 } from 'lucide-react';
 
 import { notifyError } from '@/portainer/services/notifications';
-import { Environment, EnvironmentId } from '@/portainer/environments/types';
+import {
+  Environment,
+  EnvironmentId,
+} from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Stepper } from '@@/Stepper';
@@ -14,8 +18,11 @@ import { Button } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
 import { Icon } from '@@/Icon';
 
-import { environmentTypes } from '../EnvironmentTypeSelectView/environment-types';
-import { EnvironmentSelectorValue } from '../EnvironmentTypeSelectView/EnvironmentSelector';
+import {
+  EnvironmentOptionValue,
+  environmentTypes,
+  formTitles,
+} from '../EnvironmentTypeSelectView/environment-types';
 
 import { WizardDocker } from './WizardDocker';
 import { WizardAzure } from './WizardAzure';
@@ -68,15 +75,12 @@ export function EnvironmentCreationView() {
 
       <div className={styles.wizardWrapper}>
         <Widget>
-          <WidgetTitle icon="svg-magic" title="Environment Wizard" />
+          <WidgetTitle icon={Wand2} title="Environment Wizard" />
           <WidgetBody>
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 
             <div className="mt-12">
-              <FormSection
-                title={`Connect to your ${currentStep.title}
-                    environment`}
-              >
+              <FormSection title={formTitles[currentStep.id]}>
                 <Component
                   onCreate={handleCreateEnvironment}
                   isDockerStandalone={isDockerStandalone}
@@ -89,11 +93,11 @@ export function EnvironmentCreationView() {
                   )}
                 >
                   <Button disabled={isFirstStep} onClick={onPreviousClick}>
-                    <Icon icon="arrow-left" feather /> Previous
+                    <Icon icon={ArrowLeft} /> Previous
                   </Button>
                   <Button onClick={onNextClick}>
                     {isLastStep ? 'Close' : 'Next'}
-                    <Icon icon="arrow-right" feather />
+                    <Icon icon={ArrowRight} />
                   </Button>
                 </div>
               </FormSection>
@@ -134,7 +138,7 @@ export function EnvironmentCreationView() {
   }
 }
 
-function useParamEnvironmentTypes(): EnvironmentSelectorValue[] {
+function useParamEnvironmentTypes(): EnvironmentOptionValue[] {
   const {
     params: { envType },
   } = useCurrentStateAndParams();
@@ -181,7 +185,7 @@ function useStepper(
     setCurrentStepIndex(currentStepIndex - 1);
   }
 
-  function getComponent(id: EnvironmentSelectorValue) {
+  function getComponent(id: EnvironmentOptionValue) {
     switch (id) {
       case 'dockerStandalone':
       case 'dockerSwarm':
@@ -201,12 +205,14 @@ function useAnalyticsState() {
     dockerAgent: 0,
     dockerApi: 0,
     kubernetesAgent: 0,
-    kubernetesEdgeAgent: 0,
+    kubernetesEdgeAgentAsync: 0,
+    kubernetesEdgeAgentStandard: 0,
     kaasAgent: 0,
     aciApi: 0,
     localEndpoint: 0,
-    nomadEdgeAgent: 0,
-    dockerEdgeAgent: 0,
+    nomadEdgeAgentStandard: 0,
+    dockerEdgeAgentAsync: 0,
+    dockerEdgeAgentStandard: 0,
   });
 
   return { analytics, setAnalytics };

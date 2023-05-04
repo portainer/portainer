@@ -49,7 +49,7 @@ function EdgeJobService(EdgeJobs, EdgeJobResults, FileUploadService) {
 
   service.createEdgeJobFromFileContent = function (model) {
     var payload = new ScheduleCreateRequest(model);
-    return EdgeJobs.create({ method: 'string' }, payload).$promise;
+    return EdgeJobs.create({}, { method: 'string', ...payload }).$promise;
   };
 
   service.createEdgeJobFromFileUpload = function (model) {

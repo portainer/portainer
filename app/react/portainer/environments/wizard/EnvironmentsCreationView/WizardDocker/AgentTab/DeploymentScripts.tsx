@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
@@ -79,7 +79,9 @@ function DeployCode({ code }: DeployCodeProps) {
       <div className="code-script">
         <Code>{code}</Code>
       </div>
-      <CopyButton copyText={code}>Copy command</CopyButton>
+      <div className="mt-2">
+        <CopyButton copyText={code}>Copy command</CopyButton>
+      </div>
     </>
   );
 }

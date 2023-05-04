@@ -36,6 +36,8 @@ export function PublicSettingsViewModel(settings) {
   this.Features = settings.Features;
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
   this.DefaultRegistry = settings.DefaultRegistry;
+  this.IsAMTEnabled = settings.IsAMTEnabled;
+  this.IsFDOEnabled = settings.IsFDOEnabled;
 }
 
 export function InternalAuthSettingsViewModel(data) {
@@ -83,5 +85,4 @@ export function EdgeSettingsViewModel(data = {}) {
   this.PingInterval = data.PingInterval;
   this.SnapshotInterval = data.SnapshotInterval;
   this.CommandInterval = data.CommandInterval;
-  this.AsyncMode = data.AsyncMode;
 }

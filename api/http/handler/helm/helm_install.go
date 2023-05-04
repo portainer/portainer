@@ -2,14 +2,11 @@ package helm
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm/options"
-	"github.com/portainer/libhelm/release"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -17,6 +14,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/validation"
+	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhelm/release"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -192,7 +191,7 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 	for _, resource := range yamlResources {
 		resource := resource // https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
-			tmpfile, err := ioutil.TempFile("", "helm-manifest-*")
+			tmpfile, err := os.CreateTemp("", "helm-manifest-*")
 			if err != nil {
 				return errors.Wrap(err, "failed to create a tmp helm manifest file")
 			}

@@ -6,11 +6,12 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/websocket"
 )
 
 // @summary Attach a websocket
@@ -66,7 +67,7 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.handleAttachRequest(w, r, params)
 	if err != nil {
-		return httperror.InternalServerError("An error occured during websocket attach operation", err)
+		return httperror.InternalServerError("An error occurred during websocket attach operation", err)
 	}
 
 	return nil
@@ -115,12 +116,7 @@ func hijackAttachStartOperation(websocketConn *websocket.Conn, endpoint *portain
 		return err
 	}
 
-	err = hijackRequest(websocketConn, httpConn, attachStartRequest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return hijackRequest(websocketConn, httpConn, attachStartRequest)
 }
 
 func createAttachStartRequest(attachID string) (*http.Request, error) {

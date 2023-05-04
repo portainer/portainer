@@ -21,6 +21,8 @@ export function ButtonGroup({
 
 function sizeClass(size: Size | undefined) {
   switch (size) {
+    case 'small':
+      return 'btn-group-sm';
     case 'xsmall':
       return 'btn-group-xs';
     case 'large':

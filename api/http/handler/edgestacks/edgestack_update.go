@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
 
@@ -12,6 +11,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/rs/zerolog/log"
 )
 
 type updateEdgeStackPayload struct {
@@ -19,13 +20,15 @@ type updateEdgeStackPayload struct {
 	Version          *int
 	EdgeGroups       []portainer.EdgeGroupID
 	DeploymentType   portainer.EdgeStackDeploymentType
+	// Uses the manifest's namespaces instead of the default one
+	UseManifestNamespaces bool
 }
 
 func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	if payload.StackFileContent == "" {
 		return errors.New("Invalid stack file content")
 	}
-	if payload.EdgeGroups != nil && len(payload.EdgeGroups) == 0 {
+	if len(payload.EdgeGroups) == 0 {
 		return errors.New("Edge Groups are mandatory for an Edge stack")
 	}
 	return nil
@@ -39,7 +42,7 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @param body body updateEdgeStackPayload true "EdgeStack data"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
@@ -53,10 +56,8 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
+	if err != nil {
+		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
 	var payload updateEdgeStackPayload
@@ -65,18 +66,20 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
+	relationConfig, err := edge.FetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
 	}
 
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}
 
+	endpointsToAdd := map[portainer.EndpointID]bool{}
+
 	if payload.EdgeGroups != nil {
-		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 		}
@@ -105,7 +108,6 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			}
 		}
 
-		endpointsToAdd := map[portainer.EndpointID]bool{}
 		for endpointID := range newRelatedSet {
 			if !oldRelatedSet[endpointID] {
 				endpointsToAdd[endpointID] = true
@@ -134,7 +136,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		// deployment type was changed - need to delete the old file
 		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 		if err != nil {
-			return httperror.InternalServerError("Unable to clear old files", err)
+			log.Warn().Err(err).Msg("Unable to clear old files")
 		}
 
 		stack.EntryPoint = ""
@@ -143,25 +145,31 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
+
 	if payload.DeploymentType == portainer.EdgeStackDeploymentCompose {
 		if stack.EntryPoint == "" {
 			stack.EntryPoint = filesystem.ComposeFileDefaultName
 		}
 
-		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+		_, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
+		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stackFolder, stack.ProjectPath, stack.EntryPoint, relatedEndpointIds)
 		if err != nil {
 			return httperror.InternalServerError("Unable to convert and persist updated Kubernetes manifest file on disk", err)
 		}
 
-	} else {
+		stack.ManifestPath = manifestPath
+	}
+
+	if payload.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		if stack.ManifestPath == "" {
 			stack.ManifestPath = filesystem.ManifestFileDefaultName
 		}
+
+		stack.UseManifestNamespaces = payload.UseManifestNamespaces
 
 		hasDockerEndpoint, err := hasDockerEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 		if err != nil {
@@ -174,13 +182,20 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))
 		if err != nil {
-			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
+			return httperror.InternalServerError("Unable to persist updated Kubernetes manifest file on disk", err)
 		}
 	}
 
-	if payload.Version != nil && *payload.Version != stack.Version {
+	versionUpdated := payload.Version != nil && *payload.Version != stack.Version
+	if versionUpdated {
 		stack.Version = *payload.Version
 		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
+	}
+
+	stack.NumDeployments = len(relatedEndpointIds)
+
+	if versionUpdated {
+		stack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
 	}
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)

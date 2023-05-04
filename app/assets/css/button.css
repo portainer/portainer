@@ -4,7 +4,7 @@
 
   border-radius: 8px;
   display: inline-flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   gap: 5px;
 }
@@ -13,7 +13,6 @@
 .btn[disabled],
 fieldset[disabled] .btn {
   @apply opacity-40;
-  pointer-events: none;
   touch-action: none;
 }
 
@@ -26,15 +25,15 @@ fieldset[disabled] .btn {
 }
 
 .btn.btn-primary {
-  @apply text-white bg-blue-8 border-blue-8;
-  @apply hover:text-white hover:bg-blue-9 hover:border-blue-9;
-  @apply th-dark:hover:bg-blue-7 th-dark:hover:border-blue-7;
+  @apply border-blue-8 bg-blue-8 text-white;
+  @apply hover:border-blue-9 hover:bg-blue-9 hover:text-white;
+  @apply th-dark:hover:border-blue-7 th-dark:hover:bg-blue-7;
 }
 
 .btn.btn-primary:active,
 .btn.btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  @apply bg-blue-9 border-blue-5;
+  @apply border-blue-5 bg-blue-9;
 }
 
 .nav-pills > li.active > a,
@@ -47,29 +46,29 @@ fieldset[disabled] .btn {
 .btn.btn-secondary {
   @apply border border-solid;
 
-  @apply text-blue-9 bg-blue-2 border-blue-8;
+  @apply border-blue-8 bg-blue-2 text-blue-9;
   @apply hover:bg-blue-3;
 
-  @apply th-dark:text-blue-3 th-dark:bg-gray-10 th-dark:border-blue-7;
+  @apply th-dark:border-blue-7 th-dark:bg-gray-10 th-dark:text-blue-3;
   @apply th-dark:hover:bg-blue-11;
 }
 
 .btn.btn-danger {
-  @apply bg-error-8 border-error-8;
-  @apply hover:bg-error-7 hover:border-error-7 hover:text-white;
+  @apply border-error-8 bg-error-8;
+  @apply hover:border-error-7 hover:bg-error-7 hover:text-white;
 }
 
 .btn.btn-danger:active,
 .btn.btn-danger.active,
 .open > .dropdown-toggle.btn-danger {
-  @apply bg-error-8 text-white border-blue-5;
+  @apply border-blue-5 bg-error-8 text-white;
 }
 
 .btn.btn-dangerlight {
   @apply text-error-9 th-dark:text-white;
   @apply bg-error-3 th-dark:bg-error-9;
   @apply hover:bg-error-2 th-dark:hover:bg-error-11;
-  @apply border-error-5 th-dark:border-error-7 th-highcontrast:border-error-7;
+  @apply border-error-5 th-highcontrast:border-error-7 th-dark:border-error-7;
   @apply border border-solid;
 }
 
@@ -84,15 +83,15 @@ fieldset[disabled] .btn {
 /* secondary-grey */
 .btn.btn-default,
 .btn.btn-light {
-  @apply bg-white border-gray-5 text-gray-9;
-  @apply hover:bg-gray-3 hover:border-gray-5 hover:text-gray-10;
+  @apply border-gray-5 bg-white text-gray-9;
+  @apply hover:border-gray-5 hover:bg-gray-3 hover:text-gray-10;
 
   /* dark mode */
-  @apply th-dark:bg-gray-iron-10 th-dark:border-gray-warm-7 th-dark:text-gray-warm-4;
-  @apply th-dark:hover:bg-gray-iron-9 th-dark:hover:border-gray-6 th-dark:hover:text-gray-warm-4;
+  @apply th-dark:border-gray-warm-7 th-dark:bg-gray-iron-10 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:border-gray-6 th-dark:hover:bg-gray-iron-9 th-dark:hover:text-gray-warm-4;
 
-  @apply th-highcontrast:bg-black th-highcontrast:border-gray-2 th-highcontrast:text-white;
-  @apply th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:border-gray-6 th-highcontrast:hover:text-gray-warm-4;
+  @apply th-highcontrast:border-gray-2 th-highcontrast:bg-black th-highcontrast:text-white;
+  @apply th-highcontrast:hover:border-gray-6 th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:text-gray-warm-4;
 }
 
 .btn.btn-light:active,
@@ -113,8 +112,8 @@ fieldset[disabled] .btn {
 
 .input-group-btn .btn.active,
 .btn-group .btn.active {
-  @apply bg-blue-2 text-blue-10 border-blue-5;
-  @apply th-dark:bg-blue-11 th-dark:text-blue-2 th-dark:border-blue-9;
+  @apply border-blue-5 bg-blue-2 text-blue-10;
+  @apply th-dark:border-blue-9 th-dark:bg-blue-11 th-dark:text-blue-2;
 }
 
 /* focus */
@@ -150,14 +149,14 @@ fieldset[disabled] .btn {
 a.no-link,
 a[ng-click] {
   @apply text-current;
-  @apply hover:no-underline hover:text-current;
-  @apply focus:no-underline focus:text-current;
+  @apply hover:text-current hover:no-underline;
+  @apply focus:text-current focus:no-underline;
 }
 
 a,
 a.hyperlink {
   @apply text-blue-8 hover:text-blue-9;
-  @apply hover:underline cursor-pointer;
+  @apply cursor-pointer hover:underline;
 }
 
 a.no-decoration {

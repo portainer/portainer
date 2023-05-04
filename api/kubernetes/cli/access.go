@@ -12,8 +12,8 @@ import (
 
 // NamespaceAccessPoliciesDeleteNamespace removes stored policies associated with a given namespace
 func (kcl *KubeClient) NamespaceAccessPoliciesDeleteNamespace(ns string) error {
-	kcl.lock.Lock()
-	defer kcl.lock.Unlock()
+	kcl.mu.Lock()
+	defer kcl.mu.Unlock()
 
 	policies, err := kcl.GetNamespaceAccessPolicies()
 	if err != nil {
@@ -42,6 +42,7 @@ func (kcl *KubeClient) GetNamespaceAccessPolicies() (map[string]portainer.K8sNam
 	if err != nil {
 		return nil, err
 	}
+
 	return policies, nil
 }
 
@@ -117,9 +118,6 @@ func (kcl *KubeClient) UpdateNamespaceAccessPolicies(accessPolicies map[string]p
 
 	configMap.Data[portainerConfigMapAccessPoliciesKey] = string(data)
 	_, err = kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Update(context.TODO(), configMap, metav1.UpdateOptions{})
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }

@@ -1,15 +1,15 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding" ng-if="$ctrl.createEnabled">
-      <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
+      <div class="toolBar vertical-center flex-wrap !gap-x-5 !gap-y-1">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="'layers'" feather="true"></pr-icon>
+            <pr-icon icon="'layers'"></pr-icon>
           </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center !mr-0">
-          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -21,33 +21,33 @@
             data-cy="stack-searchInput"
           />
         </div>
-        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
+        <div class="actionBar !gap-3" authorization="PortainerStackCreate, PortainerStackDelete">
           <button
             type="button"
-            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
             authorization="PortainerStackDelete"
             ng-disabled="!$ctrl.createEnabled || $ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="stack-removeStackButton"
           >
-            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+            <pr-icon icon="'trash-2'"></pr-icon>Remove
           </button>
           <button
             ng-disabled="!$ctrl.createEnabled"
             type="button"
-            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
             ui-sref="docker.stacks.newstack"
             authorization="PortainerStackCreate"
             data-cy="stack-addStackButton"
           >
-            <pr-icon icon="'plus'" feather="true"></pr-icon>Add stack
+            <pr-icon icon="'plus'"></pr-icon>Add stack
           </button>
         </div>
         <div class="settings">
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting ml-2" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle aria-label="Settings">
-              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+              <pr-icon icon="'more-vertical'"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -72,7 +72,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" style="display: none"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -87,12 +87,12 @@
       </div>
 
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="stack-stackTable">
+        <table class="table-hover nowrap-cells table" data-cy="stack-stackTable">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
-                <div class="flex flex-row flex-no-wrap gap-1">
-                  <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
+                <div class="flex-no-wrap flex flex-row gap-1">
+                  <span class="md-checkbox" authorization="PortainerStackCreate, PortainerStackDelete">
                     <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                     <label for="select_all"></label>
                   </span>
@@ -106,8 +106,8 @@
                   <div>
                     <span uib-dropdown-toggle ng-class="['table-filter vertical-center !ml-1', { 'filter-active': $ctrl.filters.state.enabled }]">
                       Filter
-                      <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" feather="true" size="'sm'"></pr-icon>
-                      <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" feather="true" size="'sm'"></pr-icon>
+                      <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" size="'sm'"></pr-icon>
+                      <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" size="'sm'"></pr-icon>
                     </span>
                   </div>
                   <div class="dropdown-menu" uib-dropdown-menu>
@@ -175,16 +175,15 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
+                <span class="md-checkbox" authorization="PortainerStackCreate, PortainerStackDelete">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a
-                  ng-if="!$ctrl.offlineMode && $ctrl.createEnabled"
+                  ng-if="$ctrl.createEnabled"
                   ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, regular: item.Regular, external: item.External, orphaned: item.Orphaned, orphanedRunning: item.OrphanedRunning })"
                   >{{ item.Name }}</a
                 >
-                <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
                 <span ng-if="item.Regular && item.Status == 2" class="label label-warning image-tag ml-2">Inactive</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
@@ -198,7 +197,7 @@
                   uib-tooltip="This stack was created inside an environment that is no longer registered inside Portainer."
                 >
                   Orphaned
-                  <pr-icon icon="'alert-circle'" feather="true" class-name="'ml-0.5'" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-circle'" class-name="'ml-0.5'" mode="'warning'"></pr-icon>
                 </span>
                 <span
                   ng-if="item.External"
@@ -209,7 +208,7 @@
                   uib-tooltip="This stack was created outside of Portainer. Control over this stack is limited."
                 >
                   Limited
-                  <pr-icon icon="'alert-circle'" feather="true" class-name="'ml-0.5'" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-circle'" class-name="'ml-0.5'" mode="'warning'"></pr-icon>
                 </span>
                 <span ng-if="item.Regular">Total</span>
               </td>
@@ -223,16 +222,16 @@
               </td>
               <td>
                 <span class="vertical-center">
-                  <pr-icon ng-attr-icon="item.ResourceControl.Ownership | ownershipicon" feather="true" class-name="'icon ml-0.5'"></pr-icon>
+                  <pr-icon ng-attr-icon="item.ResourceControl.Ownership | ownershipicon" class-name="'icon ml-0.5'"></pr-icon>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}
                 </span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset" data-cy="stacks-loadingTableRow">
-              <td colspan="6" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0" data-cy="stacks-noStackTableRow">
-              <td colspan="6" class="text-center text-muted">No stack available.</td>
+              <td colspan="6" class="text-muted text-center">No stack available.</td>
             </tr>
           </tbody>
         </table>

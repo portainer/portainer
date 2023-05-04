@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type endpointCreatePayload struct {
@@ -37,7 +38,6 @@ type endpointCreatePayload struct {
 	AzureAuthenticationKey string
 	TagIDs                 []portainer.TagID
 	EdgeCheckinInterval    int
-	IsEdgeDevice           bool
 }
 
 type endpointCreationEnum int
@@ -54,13 +54,13 @@ const (
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid environment name")
+		return errors.New("invalid environment name")
 	}
 	payload.Name = name
 
 	endpointCreationType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointCreationType", false)
 	if err != nil || endpointCreationType == 0 {
-		return errors.New("Invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
+		return errors.New("invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
 	}
 	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
 
@@ -73,7 +73,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	var tagIDs []portainer.TagID
 	err = request.RetrieveMultiPartFormJSONValue(r, "TagIds", &tagIDs, true)
 	if err != nil {
-		return errors.New("Invalid TagIds parameter")
+		return errors.New("invalid TagIds parameter")
 	}
 	payload.TagIDs = tagIDs
 	if payload.TagIDs == nil {
@@ -92,7 +92,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		if !payload.TLSSkipVerify {
 			caCert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
 			if err != nil {
-				return errors.New("Invalid CA certificate file. Ensure that the file is uploaded correctly")
+				return errors.New("invalid CA certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCACertFile = caCert
 		}
@@ -100,13 +100,13 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		if !payload.TLSSkipClientVerify {
 			cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 			if err != nil {
-				return errors.New("Invalid certificate file. Ensure that the file is uploaded correctly")
+				return errors.New("invalid certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCertFile = cert
 
 			key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
 			if err != nil {
-				return errors.New("Invalid key file. Ensure that the file is uploaded correctly")
+				return errors.New("invalid key file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSKeyFile = key
 		}
@@ -116,25 +116,36 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	case azureEnvironment:
 		azureApplicationID, err := request.RetrieveMultiPartFormValue(r, "AzureApplicationID", false)
 		if err != nil {
-			return errors.New("Invalid Azure application ID")
+			return errors.New("invalid Azure application ID")
 		}
 		payload.AzureApplicationID = azureApplicationID
 
 		azureTenantID, err := request.RetrieveMultiPartFormValue(r, "AzureTenantID", false)
 		if err != nil {
-			return errors.New("Invalid Azure tenant ID")
+			return errors.New("invalid Azure tenant ID")
 		}
 		payload.AzureTenantID = azureTenantID
 
 		azureAuthenticationKey, err := request.RetrieveMultiPartFormValue(r, "AzureAuthenticationKey", false)
 		if err != nil {
-			return errors.New("Invalid Azure authentication key")
+			return errors.New("invalid Azure authentication key")
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
+
+	case edgeAgentEnvironment:
+		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", false)
+		if err != nil || strings.EqualFold("", strings.Trim(endpointURL, " ")) {
+			return errors.New("URL cannot be empty")
+		}
+		payload.URL = endpointURL
+
+		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
+		payload.PublicURL = publicURL
+
 	default:
 		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
-			return errors.New("Invalid environment URL")
+			return errors.New("invalid environment URL")
 		}
 		payload.URL = endpointURL
 
@@ -145,15 +156,16 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	gpus := make([]portainer.Pair, 0)
 	err = request.RetrieveMultiPartFormJSONValue(r, "Gpus", &gpus, true)
 	if err != nil {
-		return errors.New("Invalid Gpus parameter")
+		return errors.New("invalid Gpus parameter")
 	}
 	payload.Gpus = gpus
 
-	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
-	payload.EdgeCheckinInterval = checkinInterval
-
-	isEdgeDevice, _ := request.RetrieveBooleanMultiPartFormValue(r, "IsEdgeDevice", true)
-	payload.IsEdgeDevice = isEdgeDevice
+	edgeCheckinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "EdgeCheckinInterval", true)
+	if edgeCheckinInterval == 0 {
+		// deprecated CheckinInterval
+		edgeCheckinInterval, _ = request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
+	}
+	payload.EdgeCheckinInterval = edgeCheckinInterval
 
 	return nil
 }
@@ -168,21 +180,23 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @accept multipart/form-data
 // @produce json
 // @param Name formData string true "Name that will be used to identify this environment(endpoint) (example: my-environment)"
-// @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment" Enum(1,2,3,4,5)
-// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)"
+// @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment)" Enum(1,2,3,4,5)
+// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine). Cannot be empty if EndpointCreationType is set to 4 (Edge agent environment)"
 // @param PublicURL formData string false "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)"
 // @param GroupID formData int false "Environment(Endpoint) group identifier. If not specified will default to 1 (unassigned)."
-// @param TLS formData bool false "Require TLS to connect against this environment(endpoint)"
-// @param TLSSkipVerify formData bool false "Skip server verification when using TLS"
-// @param TLSSkipClientVerify formData bool false "Skip client verification when using TLS"
+// @param TLS formData bool false "Require TLS to connect against this environment(endpoint). Must be true if EndpointCreationType is set to 2 (Agent environment)"
+// @param TLSSkipVerify formData bool false "Skip server verification when using TLS. Must be true if EndpointCreationType is set to 2 (Agent environment)"
+// @param TLSSkipClientVerify formData bool false "Skip client verification when using TLS. Must be true if EndpointCreationType is set to 2 (Agent environment)"
 // @param TLSCACertFile formData file false "TLS CA certificate file"
 // @param TLSCertFile formData file false "TLS client certificate file"
 // @param TLSKeyFile formData file false "TLS client key file"
 // @param AzureApplicationID formData string false "Azure application ID. Required if environment(endpoint) type is set to 3"
 // @param AzureTenantID formData string false "Azure tenant ID. Required if environment(endpoint) type is set to 3"
 // @param AzureAuthenticationKey formData string false "Azure authentication key. Required if environment(endpoint) type is set to 3"
-// @param TagIDs formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
+// @param TagIds formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
 // @param EdgeCheckinInterval formData int false "The check in interval for edge agent (in seconds)"
+// @param EdgeTunnelServerAddress formData string true "URL or IP address that will be used to establish a reverse tunnel"
+// @param Gpus formData string false "List of GPUs - json stringified array of {name, value} structs"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -233,6 +247,22 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		for _, stackID := range relatedEdgeStacks {
 			relationObject.EdgeStacks[stackID] = true
 		}
+	} else if endpointutils.IsKubernetesEndpoint(endpoint) {
+		endpointutils.InitialIngressClassDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
+		endpointutils.InitialMetricsDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
+		endpointutils.InitialStorageDetection(
+			endpoint,
+			handler.DataStore.Endpoint(),
+			handler.K8sClientFactory,
+		)
 	}
 
 	err = handler.DataStore.EndpointRelation().Create(relationObject)
@@ -354,7 +384,6 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeKey:             edgeKey,
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 		Kubernetes:          portainer.KubernetesDefault(),
-		IsEdgeDevice:        payload.IsEdgeDevice,
 		UserTrusted:         true,
 	}
 
@@ -374,7 +403,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, httperror.InternalServerError("An error occured while trying to create the environment", err)
+		return nil, httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
 
 	return endpoint, nil
@@ -408,7 +437,6 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
-		IsEdgeDevice:       payload.IsEdgeDevice,
 	}
 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
@@ -474,7 +502,6 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
-		IsEdgeDevice:       payload.IsEdgeDevice,
 	}
 
 	endpoint.Agent.Version = agentVersion
@@ -504,7 +531,7 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("An error occured while trying to create the environment", err)
+		return httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
 
 	return nil
@@ -530,14 +557,9 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
-		if err != nil {
-			return err
-		}
-
-		tag.Endpoints[endpoint.ID] = true
-
-		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
+		err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
+			tag.Endpoints[endpoint.ID] = true
+		})
 		if err != nil {
 			return err
 		}

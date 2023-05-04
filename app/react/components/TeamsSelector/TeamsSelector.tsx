@@ -10,6 +10,7 @@ interface Props {
   dataCy?: string;
   inputId?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function TeamsSelector({
@@ -20,6 +21,7 @@ export function TeamsSelector({
   dataCy,
   inputId,
   placeholder,
+  disabled,
 }: Props) {
   const options = teams.map((team) => ({ label: team.Name, value: team.Id }));
 
@@ -33,6 +35,7 @@ export function TeamsSelector({
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}
+      disabled={disabled}
     />
   );
 }

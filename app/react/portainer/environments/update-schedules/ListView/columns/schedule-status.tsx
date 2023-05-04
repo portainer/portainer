@@ -1,44 +1,30 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 
-import { EdgeUpdateSchedule, StatusType } from '../../types';
+import { EdgeUpdateListItemResponse } from '../../queries/list';
+import { StatusType } from '../../types';
 
-export const scheduleStatus: Column<EdgeUpdateSchedule> = {
-  Header: 'Status',
-  accessor: (row) => row.status,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  Cell: StatusCell,
-  disableSortBy: true,
-};
+import { columnHelper } from './helper';
+
+export const scheduleStatus = columnHelper.accessor('status', {
+  header: 'Status',
+  cell: StatusCell,
+});
 
 function StatusCell({
-  value: status,
-  row: { original: schedule },
-}: CellProps<EdgeUpdateSchedule, EdgeUpdateSchedule['status']>) {
-  if (schedule.time > Date.now() / 1000) {
-    return 'Scheduled';
+  getValue,
+  row: {
+    original: { statusMessage },
+  },
+}: CellContext<
+  EdgeUpdateListItemResponse,
+  EdgeUpdateListItemResponse['status']
+>) {
+  const status = getValue();
+
+  switch (status) {
+    case StatusType.Failed:
+      return statusMessage;
+    default:
+      return StatusType[status];
   }
-
-  const statusList = Object.entries(status).map(
-    ([environmentId, envStatus]) => ({ ...envStatus, environmentId })
-  );
-
-  if (statusList.length === 0) {
-    return 'No related environments';
-  }
-
-  const error = statusList.find((s) => s.status === StatusType.Failed);
-
-  if (error) {
-    return `Failed: (ID: ${error.environmentId}) ${error.error}`;
-  }
-
-  const pending = statusList.find((s) => s.status === StatusType.Pending);
-
-  if (pending) {
-    return 'Pending';
-  }
-
-  return 'Success';
 }

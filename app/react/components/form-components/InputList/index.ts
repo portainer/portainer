@@ -1,1 +1,1 @@
-export { InputList } from './InputList';
+export { InputList, type ItemProps } from './InputList';

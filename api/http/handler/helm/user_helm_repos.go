@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/portainer/libhelm"
+	"github.com/portainer/portainer/pkg/libhelm"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -25,7 +25,7 @@ type addHelmRepoUrlPayload struct {
 }
 
 func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
-	return libhelm.ValidateHelmRepositoryURL(p.URL)
+	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
 // @id HelmUserRepositoryCreate
@@ -56,6 +56,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return httperror.BadRequest("Invalid Helm repository URL", err)
 	}
+
 	// lowercase, remove trailing slash
 	p.URL = strings.TrimSuffix(strings.ToLower(p.URL), "/")
 

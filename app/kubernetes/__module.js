@@ -1,3 +1,8 @@
+import { EnvironmentStatus } from '@/react/portainer/environments/types';
+import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/service';
+
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
 import { reactModule } from './react';
@@ -14,34 +19,51 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       parent: 'endpoint',
       abstract: true,
 
-      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, KubernetesNamespaceService, Notifications, StateManager) {
+      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, KubernetesHealthService, KubernetesNamespaceService, Notifications, StateManager) {
         return $async(async () => {
-          if (![5, 6, 7].includes(endpoint.Type)) {
+          const kubeTypes = [
+            PortainerEndpointTypes.KubernetesLocalEnvironment,
+            PortainerEndpointTypes.AgentOnKubernetesEnvironment,
+            PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment,
+          ];
+
+          if (!kubeTypes.includes(endpoint.Type)) {
             $state.go('portainer.home');
             return;
           }
           try {
-            if (endpoint.Type === 7) {
+            if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
               //edge
               try {
                 await KubernetesHealthService.ping(endpoint.Id);
-                endpoint.Status = 1;
+                endpoint.Status = EnvironmentStatus.Up;
               } catch (e) {
-                endpoint.Status = 2;
+                endpoint.Status = EnvironmentStatus.Down;
               }
             }
 
-            EndpointProvider.setEndpointID(endpoint.Id);
             await StateManager.updateEndpointState(endpoint);
 
-            if (endpoint.Type === 7 && endpoint.Status === 2) {
+            if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment && endpoint.Status === EnvironmentStatus.Down) {
               throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
             }
 
-            await KubernetesNamespaceService.get();
+            // use selfsubject access review to check if we can connect to the kubernetes environment
+            // because it's gets a fast response, and is accessible to all users
+            try {
+              await getSelfSubjectAccessReview(endpoint.Id, 'default');
+            } catch (e) {
+              throw new Error('Environment is unreachable.');
+            }
           } catch (e) {
-            Notifications.error('Failed loading environment', e);
-            $state.go('portainer.home', {}, { reload: true });
+            let params = {};
+
+            if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
+              params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'kubernetes.dashboard' };
+            } else {
+              Notifications.error('Failed loading environment', e);
+            }
+            $state.go('portainer.home', params, { reload: true, inherit: false });
           }
         });
       },
@@ -63,6 +85,16 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       views: {
         'content@': {
           component: 'helmTemplatesView',
+        },
+      },
+    };
+
+    const services = {
+      name: 'kubernetes.services',
+      url: '/services',
+      views: {
+        'content@': {
+          component: 'kubernetesServicesView',
         },
       },
     };
@@ -119,7 +151,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const application = {
       name: 'kubernetes.applications.application',
-      url: '/:namespace/:name',
+      url: '/:namespace/:name?resource-type',
       views: {
         'content@': {
           component: 'kubernetesApplicationView',
@@ -261,14 +293,11 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const deploy = {
       name: 'kubernetes.deploy',
-      url: '/deploy?templateId',
+      url: '/deploy?templateId&referrer',
       views: {
         'content@': {
           component: 'kubernetesDeployView',
         },
-      },
-      params: {
-        templateId: '',
       },
     };
 
@@ -407,6 +436,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(endpointKubernetesConfiguration);
     $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
 
+    $stateRegistryProvider.register(services);
     $stateRegistryProvider.register(ingresses);
     $stateRegistryProvider.register(ingressesCreate);
     $stateRegistryProvider.register(ingressesEdit);

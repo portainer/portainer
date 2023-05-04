@@ -32,6 +32,12 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
+import { updateIngress, getIngresses } from '@/react/kubernetes/ingresses/service';
+import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateView/UpdateIngressPrompt';
+import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
+import { placementOptions } from '@/react/kubernetes/applications/CreateView/placementTypes';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -43,7 +49,6 @@ class KubernetesCreateApplicationController {
     $state,
     Notifications,
     Authentication,
-    ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
     KubernetesStackService,
@@ -61,7 +66,6 @@ class KubernetesCreateApplicationController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
-    this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesStackService = KubernetesStackService;
@@ -82,6 +86,8 @@ class KubernetesCreateApplicationController {
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
     this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
+
+    this.placementOptions = placementOptions;
 
     this.state = {
       appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
@@ -144,8 +150,26 @@ class KubernetesCreateApplicationController {
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.onServicePublishChange = this.onServicePublishChange.bind(this);
+    this.checkIngressesToUpdate = this.checkIngressesToUpdate.bind(this);
+    this.confirmUpdateApplicationAsync = this.confirmUpdateApplicationAsync.bind(this);
+    this.onDataAccessPolicyChange = this.onDataAccessPolicyChange.bind(this);
+    this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
+    this.supportGlobalDeployment = this.supportGlobalDeployment.bind(this);
+    this.onChangePlacementType = this.onChangePlacementType.bind(this);
   }
   /* #endregion */
+
+  onChangePlacementType(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.PlacementType = value;
+    });
+  }
+
+  onChangeDeploymentType(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.DeploymentType = value;
+    });
+  }
 
   onChangeFileContent(value) {
     if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
@@ -154,24 +178,28 @@ class KubernetesCreateApplicationController {
     }
   }
 
+  onDataAccessPolicyChange(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.DataAccessPolicy = value;
+      this.resetDeploymentType();
+    });
+  }
+
   async updateApplicationViaWebEditor() {
     return this.$async(async () => {
       try {
-        const confirmed = await this.ModalService.confirmAsync({
+        const confirmed = await confirm({
           title: 'Are you sure?',
-          message: 'Any changes to this application will be overriden and may cause a service interruption. Do you wish to continue?',
-          buttons: {
-            confirm: {
-              label: 'Update',
-              className: 'btn-warning',
-            },
-          },
+          message: 'Any changes to this application will be overridden and may cause a service interruption. Do you wish to continue?',
+          confirmButton: buildConfirmButton('Update', 'warning'),
+          modalType: ModalType.Warn,
         });
         if (!confirmed) {
           return;
         }
+
         this.state.updateWebEditorInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, { stackFile: this.stackFileContent });
         this.state.isEditorDirty = false;
         await this.$state.reload(this.$state.current);
       } catch (err) {
@@ -184,7 +212,7 @@ class KubernetesCreateApplicationController {
 
   async uiCanExit() {
     if (this.stackFileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 
@@ -612,6 +640,7 @@ class KubernetesCreateApplicationController {
     if (hasFolders && (hasRWOOnly || isIsolated)) {
       return false;
     }
+
     return true;
   }
 
@@ -674,6 +703,11 @@ class KubernetesCreateApplicationController {
 
   effectiveInstances() {
     return this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL ? this.nodeNumber : this.formValues.ReplicaCount;
+  }
+
+  hasPortErrors() {
+    const portError = this.formValues.Services.some((service) => service.nodePortError || service.servicePortError);
+    return portError;
   }
 
   resourceReservationsOverflow() {
@@ -836,8 +870,8 @@ class KubernetesCreateApplicationController {
   /* #endregion */
 
   /* #region  DATA AUTO REFRESH */
-  updateSliders() {
-    const quota = this.formValues.ResourcePool.Quota;
+  updateSliders(namespaceWithQuota) {
+    const quota = namespaceWithQuota.Quota;
     let minCpu = 0,
       minMemory = 0,
       maxCpu = this.state.namespaceLimits.cpu,
@@ -870,33 +904,36 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  updateNamespaceLimits() {
-    let maxCpu = this.state.nodes.cpu;
-    let maxMemory = this.state.nodes.memory;
-    const quota = this.formValues.ResourcePool.Quota;
+  updateNamespaceLimits(namespaceWithQuota) {
+    return this.$async(async () => {
+      let maxCpu = this.state.nodes.cpu;
+      let maxMemory = this.state.nodes.memory;
 
-    this.state.resourcePoolHasQuota = false;
+      const quota = namespaceWithQuota.Quota;
 
-    if (quota) {
-      if (quota.CpuLimit) {
-        this.state.resourcePoolHasQuota = true;
-        maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
-        if (this.state.isEdit && this.savedFormValues.CpuLimit) {
-          maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstances();
+      this.state.resourcePoolHasQuota = false;
+
+      if (quota) {
+        if (quota.CpuLimit) {
+          this.state.resourcePoolHasQuota = true;
+          maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
+          if (this.state.isEdit && this.savedFormValues.CpuLimit) {
+            maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstances();
+          }
+        }
+
+        if (quota.MemoryLimit) {
+          this.state.resourcePoolHasQuota = true;
+          maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
+          if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
+            maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstances();
+          }
         }
       }
 
-      if (quota.MemoryLimit) {
-        this.state.resourcePoolHasQuota = true;
-        maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
-        if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
-          maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstances();
-        }
-      }
-    }
-
-    this.state.namespaceLimits.cpu = maxCpu;
-    this.state.namespaceLimits.memory = maxMemory;
+      this.state.namespaceLimits.cpu = maxCpu;
+      this.state.namespaceLimits.memory = maxMemory;
+    });
   }
 
   refreshStacks(namespace) {
@@ -990,9 +1027,10 @@ class KubernetesCreateApplicationController {
 
   onResourcePoolSelectionChange() {
     return this.$async(async () => {
+      const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.formValues.ResourcePool.Namespace.Name);
       const namespace = this.formValues.ResourcePool.Namespace.Name;
-      this.updateNamespaceLimits();
-      this.updateSliders();
+      this.updateNamespaceLimits(namespaceWithQuota);
+      this.updateSliders(namespaceWithQuota);
       await this.refreshNamespaceData(namespace);
       this.resetFormValues();
     });
@@ -1006,7 +1044,7 @@ class KubernetesCreateApplicationController {
       this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
       _.remove(this.formValues.Configurations, (item) => item.SelectedConfiguration === undefined);
       await this.KubernetesApplicationService.create(this.formValues);
-      this.Notifications.success('Application successfully deployed', this.formValues.Name);
+      this.Notifications.success('Request to deploy application successfully submitted', this.formValues.Name);
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create application');
@@ -1015,11 +1053,20 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  async updateApplicationAsync() {
+  async updateApplicationAsync(ingressesToUpdate) {
+    if (ingressesToUpdate.length) {
+      try {
+        await Promise.all(ingressesToUpdate.map((ing) => updateIngress(this.endpoint.Id, ing)));
+        this.Notifications.success('Success', `Ingress ${ingressesToUpdate.length > 1 ? 'rules' : 'rule'} successfully updated`);
+      } catch (error) {
+        this.Notifications.error('Failure', error, 'Unable to update ingress');
+      }
+    }
+
     try {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues);
-      this.Notifications.success('Success', 'Application successfully updated');
+      this.Notifications.success('Success', 'Request to update application successfully submitted');
       this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update application');
@@ -1028,13 +1075,89 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  deployApplication() {
-    if (this.state.isEdit) {
-      this.ModalService.confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
+  async confirmUpdateApplicationAsync() {
+    const [ingressesToUpdate, servicePortsToUpdate] = await this.checkIngressesToUpdate();
+    // if there is an ingressesToUpdate, then show a warning modal with asking if they want to update the ingresses
+    if (ingressesToUpdate.length) {
+      const result = await confirmUpdateAppIngress(ingressesToUpdate, servicePortsToUpdate);
+      if (!result) {
+        return;
+      }
+
+      const { noMatch } = result;
+      if (!noMatch) {
+        return this.$async(this.updateApplicationAsync, []);
+      }
+      if (noMatch) {
+        return this.$async(this.updateApplicationAsync, ingressesToUpdate);
+      }
+    } else {
+      confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
         if (confirmed) {
-          return this.$async(this.updateApplicationAsync);
+          return this.$async(this.updateApplicationAsync, []);
         }
       });
+    }
+  }
+
+  // check if service ports with ingresses have changed and allow the user to update the ingress to the new port values with a modal
+  async checkIngressesToUpdate() {
+    let ingressesToUpdate = [];
+    let servicePortsToUpdate = [];
+    const fullIngresses = await getIngresses(this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name);
+    this.formValues.Services.forEach((updatedService) => {
+      const oldServiceIndex = this.oldFormValues.Services.findIndex((oldService) => oldService.Name === updatedService.Name);
+      const numberOfPortsInOldService = this.oldFormValues.Services[oldServiceIndex] && this.oldFormValues.Services[oldServiceIndex].Ports.length;
+      // if the service has an ingress and there is the same number of ports or more in the updated service
+      if (updatedService.Ingress && numberOfPortsInOldService && numberOfPortsInOldService <= updatedService.Ports.length) {
+        const updatedOldPorts = updatedService.Ports.slice(0, numberOfPortsInOldService);
+        const ingressesForService = fullIngresses.filter((ing) => {
+          const ingServiceNames = ing.Paths.map((path) => path.ServiceName);
+          if (ingServiceNames.includes(updatedService.Name)) {
+            return true;
+          }
+        });
+        ingressesForService.forEach((ingressForService) => {
+          updatedOldPorts.forEach((servicePort, pIndex) => {
+            if (servicePort.ingress) {
+              // if there isn't a ingress path that has a matching service name and port
+              const doesIngressPathMatchServicePort = ingressForService.Paths.find((ingPath) => ingPath.ServiceName === updatedService.Name && ingPath.Port === servicePort.port);
+              if (!doesIngressPathMatchServicePort) {
+                // then find the ingress path index to update by looking for the matching port in the old form values
+                const oldServicePort = this.oldFormValues.Services[oldServiceIndex].Ports[pIndex].port;
+                const newServicePort = servicePort.port;
+
+                const ingressPathIndex = ingressForService.Paths.findIndex((ingPath) => {
+                  return ingPath.ServiceName === updatedService.Name && ingPath.Port === oldServicePort;
+                });
+                if (ingressPathIndex !== -1) {
+                  // if the ingress to update isn't in the ingressesToUpdate list
+                  const ingressUpdateIndex = ingressesToUpdate.findIndex((ing) => ing.Name === ingressForService.Name);
+                  if (ingressUpdateIndex === -1) {
+                    // then add it to the list with the new port
+                    const ingressToUpdate = angular.copy(ingressForService);
+                    ingressToUpdate.Paths[ingressPathIndex].Port = newServicePort;
+                    ingressesToUpdate.push(ingressToUpdate);
+                  } else {
+                    // if the ingress is already in the list, then update the path with the new port
+                    ingressesToUpdate[ingressUpdateIndex].Paths[ingressPathIndex].Port = newServicePort;
+                  }
+                  if (!servicePortsToUpdate.includes(newServicePort)) {
+                    servicePortsToUpdate.push(newServicePort);
+                  }
+                }
+              }
+            }
+          });
+        });
+      }
+    });
+    return [ingressesToUpdate, servicePortsToUpdate];
+  }
+
+  deployApplication() {
+    if (this.state.isEdit) {
+      return this.$async(this.confirmUpdateApplicationAsync);
     } else {
       return this.$async(this.deployApplicationAsync);
     }
@@ -1085,19 +1208,31 @@ class KubernetesCreateApplicationController {
         ]);
         this.nodesLimits = nodesLimits;
 
-        const nonSystemNamespaces = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+        const nonSystemNamespaces = _.filter(
+          resourcePools,
+          (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && resourcePool.Namespace.Status === 'Active'
+        );
 
+        this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
 
+        // this.state.nodes.memory and this.state.nodes.cpu are used to calculate the slider limits, so set them before calling updateSliders()
+        _.forEach(nodes, (item) => {
+          this.state.nodes.memory += filesizeParser(item.Memory);
+          this.state.nodes.cpu += item.CPU;
+        });
+
+        if (this.resourcePools.length) {
+          const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+          this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
+          this.updateNamespaceLimits(namespaceWithQuota);
+          this.updateSliders(namespaceWithQuota);
+        }
         this.formValues.ResourcePool = this.resourcePools[0];
         if (!this.formValues.ResourcePool) {
           return;
         }
 
-        _.forEach(nodes, (item) => {
-          this.state.nodes.memory += filesizeParser(item.Memory);
-          this.state.nodes.cpu += item.CPU;
-        });
         this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
         this.nodeNumber = nodes.length;
 
@@ -1154,8 +1289,7 @@ class KubernetesCreateApplicationController {
 
         this.formValues.IsPublishingService = this.formValues.PublishedPorts.length > 0;
 
-        this.updateNamespaceLimits();
-        this.updateSliders();
+        this.oldFormValues = angular.copy(this.formValues);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

@@ -1,3 +1,7 @@
+import clsx from 'clsx';
+
+import { TableHeaderSortIcons } from '@@/datatables/TableHeaderSortIcons';
+
 import { TemplateListDropdown } from '../TemplateListDropdown';
 
 import styles from './TemplateListSort.module.css';
@@ -21,10 +25,6 @@ export function TemplateListSort({
   sortByButton,
   value,
 }: Props) {
-  const upIcon = 'fa fa-sort-alpha-up';
-  const downIcon = 'fa fa-sort-alpha-down';
-  const iconStyle = sortByDescending ? upIcon : downIcon;
-
   return (
     <div className={styles.sortByContainer}>
       <div className={styles.sortByElement}>
@@ -37,7 +37,7 @@ export function TemplateListSort({
       </div>
       <div className={styles.sortByElement}>
         <button
-          className={styles.sortButton}
+          className={clsx(styles.sortButton, 'h-[34px]')}
           type="button"
           disabled={!sortByButton || !value}
           onClick={(e) => {
@@ -45,7 +45,10 @@ export function TemplateListSort({
             onDescending();
           }}
         >
-          <i className={iconStyle} />
+          <TableHeaderSortIcons
+            sorted={sortByButton && !!value}
+            descending={sortByDescending}
+          />
         </button>
       </div>
     </div>

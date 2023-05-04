@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
+import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
@@ -11,8 +11,7 @@ angular.module('portainer.app').factory('StackService', [
   'ServiceService',
   'ContainerService',
   'SwarmService',
-  'EndpointProvider',
-  function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
+  function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
     'use strict';
     var service = {
       updateGit,
@@ -51,8 +50,6 @@ angular.module('portainer.app').factory('StackService', [
     service.migrateSwarmStack = function (stack, targetEndpointId, newName) {
       var deferred = $q.defer();
 
-      EndpointProvider.setEndpointID(targetEndpointId);
-
       SwarmService.swarm()
         .then(function success(data) {
           var swarm = data;
@@ -67,9 +64,6 @@ angular.module('portainer.app').factory('StackService', [
         })
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to migrate stack', err: err });
-        })
-        .finally(function final() {
-          EndpointProvider.setEndpointID(stack.EndpointId);
         });
 
       return deferred.promise;
@@ -78,14 +72,11 @@ angular.module('portainer.app').factory('StackService', [
     service.migrateComposeStack = function (stack, targetEndpointId, newName) {
       var deferred = $q.defer();
 
-      EndpointProvider.setEndpointID(targetEndpointId);
-
       Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, Name: newName })
         .$promise.then(function success() {
           deferred.resolve();
         })
         .catch(function error(err) {
-          EndpointProvider.setEndpointID(stack.EndpointId);
           deferred.reject({ msg: 'Unable to migrate stack', err: err });
         });
 
@@ -279,7 +270,7 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     };
 
-    service.updateKubeStack = function (stack, stackFile, gitConfig) {
+    service.updateKubeStack = function (stack, { stackFile, gitConfig, webhookId }) {
       let payload = {};
 
       if (stackFile) {
@@ -287,21 +278,13 @@ angular.module('portainer.app').factory('StackService', [
           StackFileContent: stackFile,
         };
       } else {
-        const autoUpdate = {};
-        if (gitConfig.AutoUpdate && gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
-          if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
-            autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
-          } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
-            autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
-          }
-        }
-
         payload = {
-          AutoUpdate: autoUpdate,
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
           RepositoryPassword: gitConfig.RepositoryPassword,
+          TLSSkipVerify: gitConfig.TLSSkipVerify,
         };
       }
 
@@ -335,7 +318,7 @@ angular.module('portainer.app').factory('StackService', [
         StackFileContent: stackFileContent,
         Env: env,
       };
-      return Stack.create({ method: 'string', type: 2, endpointId: endpointId }, payload).$promise;
+      return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'standalone', ...payload }).$promise;
     };
 
     service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
@@ -349,7 +332,7 @@ angular.module('portainer.app').factory('StackService', [
             StackFileContent: stackFileContent,
             Env: env,
           };
-          return Stack.create({ method: 'string', type: 1, endpointId: endpointId }, payload).$promise;
+          return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'swarm', ...payload }).$promise;
         })
         .then(function success(data) {
           deferred.resolve(data);
@@ -373,13 +356,14 @@ angular.module('portainer.app').factory('StackService', [
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
         FromAppTemplate: repositoryOptions.FromAppTemplate,
+        TLSSkipVerify: repositoryOptions.TLSSkipVerify,
       };
 
       if (repositoryOptions.AutoUpdate) {
         payload.AutoUpdate = repositoryOptions.AutoUpdate;
       }
 
-      return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
+      return Stack.create({ endpointId: endpointId }, { method: 'repository', type: 'standalone', ...payload }).$promise;
     };
 
     service.createSwarmStackFromGitRepository = function (name, repositoryOptions, env, endpointId) {
@@ -400,13 +384,14 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
             FromAppTemplate: repositoryOptions.FromAppTemplate,
+            TLSSkipVerify: repositoryOptions.TLSSkipVerify,
           };
 
           if (repositoryOptions.AutoUpdate) {
             payload.AutoUpdate = repositoryOptions.AutoUpdate;
           }
 
-          return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
+          return Stack.create({ endpointId: endpointId }, { method: 'repository', type: 'swarm', ...payload }).$promise;
         })
         .then(function success(data) {
           deferred.resolve(data);
@@ -425,7 +410,7 @@ angular.module('portainer.app').factory('StackService', [
 
     async function kubernetesDeployAsync(endpointId, method, payload) {
       try {
-        await Stack.create({ endpointId: endpointId, method: method, type: 3 }, payload).$promise;
+        await Stack.create({ endpointId: endpointId }, { method, type: 'kubernetes', ...payload }).$promise;
       } catch (err) {
         throw { err: err };
       }
@@ -473,28 +458,18 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     }
 
-    service.updateGitStackSettings = function (id, endpointId, env, gitConfig) {
-      // prepare auto update
-      const autoUpdate = {};
-
-      if (gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
-        if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
-          autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
-        } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
-          autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
-        }
-      }
-
+    service.updateGitStackSettings = function (id, endpointId, env, gitConfig, webhookId) {
       return Stack.updateGitStackSettings(
         { endpointId, id },
         {
-          AutoUpdate: autoUpdate,
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           Env: env,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
           RepositoryPassword: gitConfig.RepositoryPassword,
           Prune: gitConfig.Option.Prune,
+          TLSSkipVerify: gitConfig.TLSSkipVerify,
         }
       ).$promise;
     };

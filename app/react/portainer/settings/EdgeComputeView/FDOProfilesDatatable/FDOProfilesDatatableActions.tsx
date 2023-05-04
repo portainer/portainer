@@ -1,19 +1,18 @@
 import { useQueryClient } from 'react-query';
 import { useRouter } from '@uirouter/react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
-import {
-  confirmAsync,
-  confirmDestructiveAsync,
-} from '@/portainer/services/modal.service/confirm';
 import * as notifications from '@/portainer/services/notifications';
 import {
   deleteProfile,
   duplicateProfile,
 } from '@/portainer/hostmanagement/fdo/fdo.service';
 
+import { confirm, confirmDestructive } from '@@/modals/confirm';
 import { Link } from '@@/Link';
 import { Button } from '@@/buttons';
+import { buildConfirmButton } from '@@/modals/utils';
 
 interface Props {
   isFDOEnabled: boolean;
@@ -30,7 +29,7 @@ export function FDOProfilesDatatableActions({
   return (
     <div className="actionBar">
       <Link to="portainer.endpoints.profile" className="space-left">
-        <Button disabled={!isFDOEnabled} icon="plus-circle" featherIcon>
+        <Button disabled={!isFDOEnabled} icon={PlusCircle}>
           Add Profile
         </Button>
       </Link>
@@ -38,8 +37,7 @@ export function FDOProfilesDatatableActions({
       <Button
         disabled={!isFDOEnabled || selectedItems.length !== 1}
         onClick={() => onDuplicateProfileClick()}
-        icon="plus-circle"
-        featherIcon
+        icon={PlusCircle}
       >
         Duplicate
       </Button>
@@ -48,8 +46,7 @@ export function FDOProfilesDatatableActions({
         disabled={!isFDOEnabled || selectedItems.length < 1}
         color="danger"
         onClick={() => onDeleteProfileClick()}
-        icon="trash-2"
-        featherIcon
+        icon={Trash2}
       >
         Remove
       </Button>
@@ -57,15 +54,9 @@ export function FDOProfilesDatatableActions({
   );
 
   async function onDuplicateProfileClick() {
-    const confirmed = await confirmAsync({
+    const confirmed = await confirm({
       title: 'Are you sure ?',
       message: 'This action will duplicate the selected profile. Continue?',
-      buttons: {
-        confirm: {
-          label: 'Confirm',
-          className: 'btn-primary',
-        },
-      },
     });
 
     if (!confirmed) {
@@ -89,15 +80,10 @@ export function FDOProfilesDatatableActions({
   }
 
   async function onDeleteProfileClick() {
-    const confirmed = await confirmDestructiveAsync({
-      title: 'Are you sure ?',
+    const confirmed = await confirmDestructive({
+      title: 'Are you sure?',
       message: 'This action will delete the selected profile(s). Continue?',
-      buttons: {
-        confirm: {
-          label: 'Remove',
-          className: 'btn-danger',
-        },
-      },
+      confirmButton: buildConfirmButton('Remove', 'danger'),
     });
 
     if (!confirmed) {

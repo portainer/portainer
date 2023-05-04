@@ -20,8 +20,8 @@ type fileResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeJob Id"
-// @param taskID path string true "Task Id"
+// @param id path int true "EdgeJob Id"
+// @param taskID path int true "Task Id"
 // @success 200 {object} fileResponse
 // @failure 500
 // @failure 400
@@ -45,5 +45,3 @@ func (handler *Handler) edgeJobTaskLogsInspect(w http.ResponseWriter, r *http.Re
 
 	return response.JSON(w, &fileResponse{FileContent: string(logFileContent)})
 }
-
-// fmt.Sprintf("/tmp/edge_jobs/%s/logs_%s", edgeJobID, taskID)

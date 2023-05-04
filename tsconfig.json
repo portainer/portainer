@@ -5,6 +5,7 @@
     "module": "es6",
     // "module": "commonjs",
     // "module": "esnext",
+    "incremental": true,
     "target": "es2017",
     "allowJs": true,
     "checkJs": false,

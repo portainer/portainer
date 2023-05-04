@@ -1,64 +1,56 @@
-import { useFormikContext } from 'formik';
-import { useCurrentStateAndParams } from '@uirouter/react';
+import _ from 'lodash';
 
-import { EdgeTypes, EnvironmentId } from '@/portainer/environments/types';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+import { Environment } from '@/react/portainer/environments/types';
 
-import { useActiveSchedules } from '../queries/useActiveSchedules';
+import { TextTip } from '@@/Tip/TextTip';
 
+import { VersionSelect } from './VersionSelect';
 import { ScheduledTimeField } from './ScheduledTimeField';
-import { FormValues } from './types';
-import { EnvironmentSelection } from './EnvironmentSelection';
-import { ActiveSchedulesNotice } from './ActiveSchedulesNotice';
-import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
+import { semverCompare } from './utils';
 
-export function UpdateScheduleDetailsFieldset() {
-  const { values } = useFormikContext<FormValues>();
+interface Props {
+  environments: Environment[];
+  hasTimeZone: boolean;
+  hasNoTimeZone: boolean;
+  hasGroupSelected: boolean;
+  version: string;
+}
 
-  const edgeGroupsEnvironmentIds = useEdgeGroupsEnvironmentIds(values.groupIds);
-
-  const environments = useEnvironments(edgeGroupsEnvironmentIds);
-  const activeSchedules = useRelevantActiveSchedules(edgeGroupsEnvironmentIds);
+export function UpdateScheduleDetailsFieldset({
+  environments,
+  hasTimeZone,
+  hasNoTimeZone,
+  hasGroupSelected,
+  version,
+}: Props) {
+  const minVersion = _.first(
+    _.compact<string>(environments.map((env) => env.Agent.Version)).sort(
+      (a, b) => semverCompare(a, b)
+    )
+  );
 
   return (
     <>
-      <ActiveSchedulesNotice
-        selectedEdgeGroupIds={values.groupIds}
-        activeSchedules={activeSchedules}
-        environments={environments}
-      />
+      {environments.length > 0 ? (
+        !!version && (
+          <TextTip color="blue">
+            {environments.length} environment(s) will be updated to {version}
+          </TextTip>
+        )
+      ) : (
+        <TextTip color="orange">
+          No environments options for the selected edge groups
+        </TextTip>
+      )}
+      <VersionSelect minVersion={minVersion} />
 
-      <EnvironmentSelection
-        activeSchedules={activeSchedules}
-        environments={environments}
-      />
-
-      <ScheduledTimeField />
+      {hasTimeZone && hasGroupSelected && <ScheduledTimeField />}
+      {hasNoTimeZone && (
+        <TextTip>
+          These edge groups have older versions of the edge agent that do not
+          support scheduling, these will happen immediately
+        </TextTip>
+      )}
     </>
-  );
-}
-
-function useEnvironments(environmentsIds: Array<EnvironmentId>) {
-  const environmentsQuery = useEnvironmentList(
-    { endpointIds: environmentsIds, types: EdgeTypes },
-    undefined,
-    undefined,
-    environmentsIds.length > 0
-  );
-
-  return environmentsQuery.environments;
-}
-
-function useRelevantActiveSchedules(environmentIds: EnvironmentId[]) {
-  const { params } = useCurrentStateAndParams();
-
-  const scheduleId = params.id ? parseInt(params.id, 10) : 0;
-
-  const activeSchedulesQuery = useActiveSchedules(environmentIds);
-
-  return (
-    activeSchedulesQuery.data?.filter(
-      (schedule) => schedule.scheduleId !== scheduleId
-    ) || []
   );
 }

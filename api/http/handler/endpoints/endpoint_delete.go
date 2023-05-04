@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 // @id EndpointDelete
@@ -49,6 +50,11 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	err = handler.DataStore.Snapshot().DeleteSnapshot(portainer.EndpointID(endpointID))
+	if err != nil {
+		return httperror.InternalServerError("Unable to remove the snapshot from the database", err)
+	}
+
 	err = handler.DataStore.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove environment from the database", err)
@@ -62,15 +68,13 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
-		if err != nil {
+		err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
+			delete(tag.Endpoints, endpoint.ID)
+		})
+
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find tag inside the database", err)
-		}
-
-		delete(tag.Endpoints, endpoint.ID)
-
-		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
-		if err != nil {
+		} else if err != nil {
 			return httperror.InternalServerError("Unable to persist tag relation inside the database", err)
 		}
 	}
@@ -80,15 +84,12 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to retrieve edge groups from the database", err)
 	}
 
-	for idx := range edgeGroups {
-		edgeGroup := &edgeGroups[idx]
-		endpointIdx := findEndpointIndex(edgeGroup.Endpoints, endpoint.ID)
-		if endpointIdx != -1 {
-			edgeGroup.Endpoints = removeElement(edgeGroup.Endpoints, endpointIdx)
-			err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
-			if err != nil {
-				return httperror.InternalServerError("Unable to update edge group", err)
-			}
+	for _, edgeGroup := range edgeGroups {
+		err = handler.DataStore.EdgeGroup().UpdateEdgeGroupFunc(edgeGroup.ID, func(g *portainer.EdgeGroup) {
+			g.Endpoints = removeElement(g.Endpoints, endpoint.ID)
+		})
+		if err != nil {
+			return httperror.InternalServerError("Unable to update edge group", err)
 		}
 	}
 
@@ -124,23 +125,39 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	if !endpointutils.IsEdgeEndpoint(endpoint) {
+		return response.Empty(w)
+	}
+
+	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve edge jobs from the database", err)
+	}
+
+	for idx := range edgeJobs {
+		edgeJob := &edgeJobs[idx]
+		if _, ok := edgeJob.Endpoints[endpoint.ID]; ok {
+			err = handler.DataStore.EdgeJob().UpdateEdgeJobFunc(edgeJob.ID, func(j *portainer.EdgeJob) {
+				delete(j.Endpoints, endpoint.ID)
+			})
+
+			if err != nil {
+				return httperror.InternalServerError("Unable to update edge job", err)
+			}
+		}
+	}
+
 	return response.Empty(w)
 }
 
-func findEndpointIndex(tags []portainer.EndpointID, searchEndpointID portainer.EndpointID) int {
-	for idx, tagID := range tags {
-		if searchEndpointID == tagID {
-			return idx
+func removeElement(slice []portainer.EndpointID, elem portainer.EndpointID) []portainer.EndpointID {
+	for i, id := range slice {
+		if id == elem {
+			slice[i] = slice[len(slice)-1]
+
+			return slice[:len(slice)-1]
 		}
 	}
-	return -1
-}
 
-func removeElement(arr []portainer.EndpointID, index int) []portainer.EndpointID {
-	if index < 0 {
-		return arr
-	}
-	lastTagIdx := len(arr) - 1
-	arr[index] = arr[lastTagIdx]
-	return arr[:lastTagIdx]
+	return slice
 }

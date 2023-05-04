@@ -1,10 +1,15 @@
+import { confirmDelete } from '@@/modals/confirm';
 angular.module('portainer.docker').controller('SecretsController', [
   '$scope',
   '$state',
   'SecretService',
   'Notifications',
   function ($scope, $state, SecretService, Notifications) {
-    $scope.removeAction = function (selectedItems) {
+    $scope.removeAction = async function (selectedItems) {
+      const confirmed = await confirmDelete('Do you want to remove the selected secret(s)?');
+      if (!confirmed) {
+        return null;
+      }
       var actionCount = selectedItems.length;
       angular.forEach(selectedItems, function (secret) {
         SecretService.remove(secret.Id)

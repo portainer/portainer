@@ -13,6 +13,7 @@ import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import KubernetesPodConverter from 'Kubernetes/pod/converter';
+import { notifyError } from '@/portainer/services/notifications';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */
@@ -209,11 +210,15 @@ class KubernetesApplicationService {
    */
   async createAsync(formValues) {
     // formValues -> Application
-    let [app, headlessService, services, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+    let [app, headlessService, services, , claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
     if (services) {
       services.forEach(async (service) => {
-        await this.KubernetesServiceService.create(service);
+        try {
+          await this.KubernetesServiceService.create(service);
+        } catch (error) {
+          notifyError('Unable to create service', error);
+        }
       });
     }
 
@@ -221,7 +226,11 @@ class KubernetesApplicationService {
 
     if (app instanceof KubernetesStatefulSet) {
       app.VolumeClaims = claims;
-      headlessService = await this.KubernetesServiceService.create(headlessService);
+      try {
+        headlessService = await this.KubernetesServiceService.create(headlessService);
+      } catch (error) {
+        notifyError('Unable to create service', error);
+      }
       app.ServiceName = headlessService.metadata.name;
     } else {
       const claimPromises = _.map(claims, (item) => {
@@ -276,7 +285,11 @@ class KubernetesApplicationService {
     }
 
     if (newApp instanceof KubernetesStatefulSet) {
-      await this.KubernetesServiceService.patch(oldHeadlessService, newHeadlessService);
+      try {
+        await this.KubernetesServiceService.patch(oldHeadlessService, newHeadlessService);
+      } catch (error) {
+        notifyError('Unable to update service', error);
+      }
     } else {
       const claimPromises = _.map(newClaims, (newClaim) => {
         if (!newClaim.PreviousName && !newClaim.Id) {
@@ -294,7 +307,11 @@ class KubernetesApplicationService {
     // Create services
     if (oldServices.length === 0 && newServices.length !== 0) {
       newServices.forEach(async (service) => {
-        await this.KubernetesServiceService.create(service);
+        try {
+          await this.KubernetesServiceService.create(service);
+        } catch (error) {
+          notifyError('Unable to create service', error);
+        }
       });
     }
 
@@ -315,9 +332,17 @@ class KubernetesApplicationService {
       newServices.forEach(async (newService) => {
         const oldServiceMatched = _.find(oldServices, { Name: newService.Name });
         if (oldServiceMatched) {
-          await this.KubernetesServiceService.patch(oldServiceMatched, newService);
+          try {
+            await this.KubernetesServiceService.patch(oldServiceMatched, newService);
+          } catch (error) {
+            notifyError('Unable to update service', error);
+          }
         } else {
-          await this.KubernetesServiceService.create(newService);
+          try {
+            await this.KubernetesServiceService.create(newService);
+          } catch (error) {
+            notifyError('Unable to create service', error);
+          }
         }
       });
     }

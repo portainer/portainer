@@ -17,8 +17,7 @@
   background-color: var(--bg-hover-table-color);
 }
 
-.switch i,
-.bootbox-form .checkbox i {
+.switch i {
   background: var(--bg-switch-box-color);
 }
 
@@ -35,6 +34,10 @@
   color: var(--text-input-group-addon-color);
   background-color: var(--bg-input-group-addon-color);
   border: 1px solid var(--border-input-group-addon-color);
+}
+
+.input-group .form-control {
+  z-index: unset;
 }
 
 .text-danger {
@@ -75,25 +78,6 @@ fieldset[disabled] .form-control {
 
 .modal-content {
   background-color: var(--bg-modal-content-color);
-}
-
-.modal-header {
-  border-bottom: 1px solid var(--border-modal-header-color);
-}
-
-.modal-footer {
-  border-top: 1px solid var(--border-modal-header-color);
-}
-
-.close {
-  color: var(--button-close-color);
-  opacity: var(--button-opacity);
-}
-
-.close:hover,
-.close:focus {
-  color: var(--button-close-color);
-  opacity: var(--button-opacity-hover);
 }
 
 code {
@@ -168,50 +152,6 @@ code {
 .table-hover > tbody > tr:hover > .active,
 .table-hover > tbody > tr.active:hover > th {
   background-color: var(--bg-table-selected-color);
-}
-
-.CodeMirror-gutters {
-  background: var(--bg-codemirror-gutters-color);
-  border-right: 0px;
-}
-
-.CodeMirror-linenumber {
-  text-align: left;
-}
-
-.CodeMirror pre.CodeMirror-line,
-.CodeMirror pre.CodeMirror-line-like {
-  padding: 0 20px;
-}
-
-.CodeMirror {
-  background: var(--bg-codemirror-color);
-  color: var(--text-codemirror-color);
-  border-radius: 8px;
-}
-
-.CodeMirror-selected {
-  background: var(--bg-codemirror-selected-color) !important;
-}
-
-.CodeMirror-cursor {
-  border-left: 1px solid var(--border-codemirror-cursor-color);
-}
-
-.cm-s-default .cm-atom {
-  color: var(--text-cm-default-color);
-}
-
-.cm-s-default .cm-meta {
-  color: var(--text-cm-meta-color);
-}
-
-.cm-s-default .cm-string {
-  color: var(--text-cm-string-color);
-}
-
-.cm-s-default .cm-number {
-  color: var(--text-cm-number-color);
 }
 
 .dropdown-menu {
@@ -378,11 +318,6 @@ input:-webkit-autofill {
 }
 
 /* Overide Vendor CSS */
-
-.btn-link:hover {
-  color: var(--text-link-hover-color) !important;
-}
-
 .multiSelect.inlineBlock button {
   margin: 0;
 }
@@ -397,4 +332,51 @@ input:-webkit-autofill {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   padding: 5px;
+}
+
+/* Tippy */
+/* For triangle arrow (Sharp) */
+/* Tippy */
+/* For triangle arrow (Sharp) */
+.tippy-box[data-placement^='top'] > .tippy-arrow:before {
+  border-top: 8px solid var(--bg-tooltip-color);
+}
+
+.tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+  border-bottom: 8px solid var(--bg-tooltip-color);
+}
+
+.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--bg-tooltip-color);
+}
+
+.tippy-box[data-placement^='left'] > .tippy-arrow:before {
+  border-left: 8px solid var(--bg-tooltip-color);
+}
+
+/* Sidebar */
+.sidebar .tippy-box {
+  font-size: 12px;
+}
+
+.sidebar .tippy-box[data-placement^='right'] > .tippy-arrow {
+  width: 12px;
+  height: 12px;
+}
+
+.sidebar .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-gray-9);
+  border-width: 6px 8px 6px 0;
+}
+
+[theme='dark'] .sidebar .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-gray-true-9);
+}
+
+.sidebar .tippy-content {
+  white-space: nowrap;
+}
+
+.tippy-content {
+  padding: 0;
 }

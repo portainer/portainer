@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Icon } from 'react-feather';
+import { Icon } from 'lucide-react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -39,7 +39,7 @@ export function SidebarItem({
   );
 
   return (
-    <Wrapper label={label}>
+    <Wrapper label={label} className="sidebar">
       {children ? (
         <Menu head={head} openOnPaths={[...openOnPaths, ...childrenPath]}>
           {children}

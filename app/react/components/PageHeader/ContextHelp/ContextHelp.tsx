@@ -1,4 +1,4 @@
-import { HelpCircle } from 'react-feather';
+import { HelpCircle } from 'lucide-react';
 import clsx from 'clsx';
 
 import { getDocURL } from '@@/PageHeader/ContextHelp/docURLs';
@@ -18,13 +18,13 @@ export function ContextHelp() {
         className={clsx(
           headerStyles.menuIcon,
           'menu-icon',
-          'icon-badge text-lg !p-2 mr-1',
+          'icon-badge mr-1 !p-2 text-lg',
           'text-gray-8',
           'th-dark:text-gray-warm-7'
         )}
         title="Help"
       >
-        <HelpCircle className="feather" onClick={onHelpClick} />
+        <HelpCircle className="lucide" onClick={onHelpClick} />
       </div>
     </div>
   );

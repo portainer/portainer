@@ -11,7 +11,10 @@
     <div class="actionBar">
       <form class="form-horizontal" name="addUserHelmRepoForm">
         <div class="form-group">
-          <span class="col-sm-12 text-muted small"> Add a Helm repository. All Helm charts in the repository will be added to the list. </span>
+          <span class="col-sm-12 text-muted small">
+            <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+            Add a Helm repository. All Helm charts in the repository will be added to the list.
+          </span>
         </div>
 
         <div class="form-group mb-2">
@@ -32,7 +35,7 @@
           <div class="small">
             <div ng-messages="addUserHelmRepoForm.repo.$error">
               <p class="vertical-center text-warning" ng-message="pattern"
-                ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> A valid URL beginning with http(s) is required.</p
+                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> A valid URL beginning with http(s) is required.</p
               >
             </div>
           </div>
@@ -41,7 +44,7 @@
         <div class="form-group nomargin" ng-show="$ctrl.doesRepoExist()">
           <div class="small">
             <div ng-messages="addUserHelmRepoForm.repo.$error">
-              <p class="vertical-center text-warning"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Helm repository already exists.</p>
+              <p class="vertical-center text-warning"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Helm repository already exists.</p>
             </div>
           </div>
         </div>

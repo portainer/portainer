@@ -1,36 +1,25 @@
-import create from 'zustand';
-import { persist } from 'zustand/middleware';
-
-import { keyBuilder } from '@/portainer/hooks/useLocalStorage';
 import {
-  paginationSettings,
-  sortableSettings,
   refreshableSettings,
   hiddenColumnsSettings,
-  PaginationTableSettings,
   RefreshableTableSettings,
   SettableColumnsTableSettings,
-  SortableTableSettings,
+  createPersistedStore,
+  BasicTableSettings,
 } from '@/react/components/datatables/types';
 
 interface TableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings,
+  extends BasicTableSettings,
     SettableColumnsTableSettings,
     RefreshableTableSettings {}
 
 export function createStore(storageKey: string) {
-  return create<TableSettings>()(
-    persist(
-      (set) => ({
-        ...sortableSettings(set),
-        ...paginationSettings(set),
-        ...hiddenColumnsSettings(set),
-        ...refreshableSettings(set),
-      }),
-      {
-        name: keyBuilder(storageKey),
-      }
-    )
+  return createPersistedStore<TableSettings>(
+    storageKey,
+    'time',
+
+    (set) => ({
+      ...hiddenColumnsSettings(set),
+      ...refreshableSettings(set),
+    })
   );
 }

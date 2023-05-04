@@ -7,11 +7,11 @@ import {
   Slash,
   Square,
   Trash2,
-} from 'react-feather';
+} from 'lucide-react';
 
 import * as notifications from '@/portainer/services/notifications';
-import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
-import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
+import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
+import { confirmContainerDeletion } from '@/react/docker/containers/common/confirm-container-delete-modal';
 import { setPortainerAgentTargetHeader } from '@/portainer/services/http-request.helper';
 import {
   ContainerId,
@@ -27,7 +27,7 @@ import {
   startContainer,
   stopContainer,
 } from '@/react/docker/containers/containers.service';
-import type { EnvironmentId } from '@/portainer/environments/types';
+import type { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Link } from '@@/Link';
 import { ButtonGroup, Button } from '@@/buttons';
@@ -242,7 +242,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  function onRemoveClick(selectedItems: DockerContainer[]) {
+  async function onRemoveClick(selectedItems: DockerContainer[]) {
     const isOneContainerRunning = selectedItems.some(
       (container) => container.State === 'running'
     );
@@ -250,14 +250,13 @@ export function ContainersDatatableActions({
     const runningTitle = isOneContainerRunning ? 'running' : '';
     const title = `You are about to remove one or more ${runningTitle} containers.`;
 
-    confirmContainerDeletion(title, (result: string[]) => {
-      if (!result) {
-        return;
-      }
-      const cleanVolumes = !!result[0];
+    const result = await confirmContainerDeletion(title);
+    if (!result) {
+      return;
+    }
+    const { removeVolumes } = result;
 
-      removeSelectedContainers(selectedItems, cleanVolumes);
-    });
+    removeSelectedContainers(selectedItems, removeVolumes);
   }
 
   async function executeActionOnContainerList(

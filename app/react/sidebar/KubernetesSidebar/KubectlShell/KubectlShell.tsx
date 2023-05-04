@@ -2,15 +2,16 @@ import { Terminal } from 'xterm';
 import { fit } from 'xterm/lib/addons/fit/fit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { RotateCw, X, Terminal as TerminalIcon } from 'lucide-react';
 
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import {
   terminalClose,
   terminalResize,
 } from '@/portainer/services/terminal-window';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
@@ -127,7 +128,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     <div className={clsx(styles.root, { [styles.minimized]: shell.minimized })}>
       <div className={styles.header}>
         <div className={clsx(styles.title, 'vertical-center')}>
-          <Icon icon="terminal" feather />
+          <Icon icon={TerminalIcon} />
           kubectl shell
         </div>
         <div className={clsx(styles.actions, 'space-x-8')}>
@@ -136,7 +137,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
             onClick={clearScreen}
             data-cy="k8sShell-refreshButton"
           >
-            <Icon icon="rotate-cw" feather size="md" />
+            <Icon icon={RotateCw} size="md" />
           </Button>
           <Button
             color="link"
@@ -145,7 +146,6 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
           >
             <Icon
               icon={shell.minimized ? 'maximize-2' : 'minimize-2'}
-              feather
               size="md"
               data-cy={
                 shell.minimized ? 'k8sShell-restore' : 'k8sShell-minimise'
@@ -157,7 +157,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
             onClick={handleClose}
             data-cy="k8sShell-closeButton"
           >
-            <Icon icon="x" feather size="md" />
+            <Icon icon={X} size="md" />
           </Button>
         </div>
       </div>

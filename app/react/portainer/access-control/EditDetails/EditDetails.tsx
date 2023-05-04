@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
-import { useUser } from '@/portainer/hooks/useUser';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { useUser } from '@/react/hooks/useUser';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { BoxSelector } from '@@/BoxSelector';
 import { FormError } from '@@/form-components/FormError';
 
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
@@ -12,7 +11,7 @@ import { ResourceControlOwnership, AccessControlFormData } from '../types';
 import { UsersField } from './UsersField';
 import { TeamsField } from './TeamsField';
 import { useLoadState } from './useLoadState';
-import { useOptions } from './useOptions';
+import { AccessTypeSelector } from './AccessTypeSelector';
 
 interface Props {
   values: AccessControlFormData;
@@ -34,7 +33,6 @@ export function EditDetails({
   const { user, isAdmin } = useUser();
 
   const { users, teams, isLoading } = useLoadState(environmentId);
-  const options = useOptions(isAdmin, teams, isPublicVisible);
 
   const handleChange = useCallback(
     (partialValues: Partial<typeof values>) => {
@@ -50,11 +48,13 @@ export function EditDetails({
 
   return (
     <>
-      <BoxSelector
-        radioName={withNamespace('ownership')}
+      <AccessTypeSelector
+        onChange={handleChangeOwnership}
+        name={withNamespace('ownership')}
         value={values.ownership}
-        options={options}
-        onChange={(ownership) => handleChangeOwnership(ownership)}
+        isAdmin={isAdmin}
+        isPublicVisible={isPublicVisible}
+        teams={teams}
       />
 
       {values.ownership === ResourceControlOwnership.RESTRICTED && (
@@ -109,6 +109,12 @@ export function EditDetails({
     if (ownership === ResourceControlOwnership.RESTRICTED) {
       authorizedUsers = [];
       authorizedTeams = [];
+      // Non admin team leaders/members under only one team can
+      // automatically grant the resource access to all members
+      // under the team
+      if (!isAdmin && teams && teams.length === 1) {
+        authorizedTeams = teams.map((team) => team.Id);
+      }
     }
 
     handleChange({ ownership, authorizedTeams, authorizedUsers });

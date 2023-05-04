@@ -6,7 +6,6 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/demo"
@@ -62,20 +61,14 @@ func adminAccess(next http.Handler) http.Handler {
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user info from request context", err)
+			return
 		}
 
 		if !securityContext.IsAdmin {
 			httperror.WriteError(w, http.StatusUnauthorized, "User is not authorized to perform the action", nil)
+			return
 		}
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func systemWasInitialized(dataStore dataservices.DataStore) (bool, error) {
-	users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
-	if err != nil {
-		return false, err
-	}
-	return len(users) > 0, nil
 }

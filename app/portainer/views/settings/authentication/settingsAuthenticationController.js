@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
-import { options } from './options';
+import { options } from '@/react/portainer/settings/AuthenticationView/InternalAuth/options';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
@@ -166,6 +166,10 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     }
 
     settings.URLs = settings.URLs.map((url) => {
+      if (url === undefined || url === '') {
+        return;
+      }
+
       if (url.includes(':')) {
         return url;
       }

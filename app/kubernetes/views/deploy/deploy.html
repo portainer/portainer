@@ -11,20 +11,8 @@
         <rd-widget-body>
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0">
-              <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> Deploy </uib-tab-heading>
-              <div class="col-sm-12 form-section-title"> Namespace </div>
-              <form class="form-horizontal mt-3" name="deploymentForm">
-                <div class="form-group" ng-if="ctrl.formValues.Namespace">
-                  <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
-                  <div class="col-sm-8">
-                    <select
-                      ng-disabled="ctrl.formValues.namespace_toggle"
-                      class="form-control"
-                      ng-model="ctrl.formValues.Namespace"
-                      ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
-                    ></select>
-                  </div>
-                </div>
+              <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
+              <form class="form-horizontal mt-6" name="ctrl.deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
                     Use namespace(s) specified from manifest
@@ -40,15 +28,27 @@
                     <span class="ml-2 mb-1 switch-values" ng-if="!ctrl.formValues.namespace_toggle">No</span> -->
                   </div>
                 </div>
+                <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                  <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
+                  <div class="col-sm-8">
+                    <select
+                      ng-disabled="ctrl.formValues.namespace_toggle"
+                      class="form-control"
+                      ng-model="ctrl.formValues.Namespace"
+                      ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
+                    ></select>
+                  </div>
+                </div>
+
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
                   <div class="col-sm-12 small text-warning">
-                    <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                     You do not have access to any namespace. Contact your administrator to get access to a namespace.
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label text-left required">Name</label>
+                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label required text-left">Name</label>
                   <div class="col-sm-8">
                     <input type="text" class="form-control" ng-model="ctrl.formValues.StackName" id="stack_name" placeholder="my-app" auto-focus />
                   </div>
@@ -56,6 +56,7 @@
 
                 <div class="col-sm-12 form-section-title"> Build method </div>
                 <box-selector
+                  slim="true"
                   radio-name="'method'"
                   value="ctrl.state.BuildMethod"
                   options="ctrl.methodOptions"
@@ -77,14 +78,14 @@
                 <!-- repository -->
                 <git-form
                   ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT"
-                  model="ctrl.formValues"
+                  value="ctrl.formValues"
                   on-change="(ctrl.onChangeFormValues)"
-                  additional-file="true"
-                  auto-update="true"
-                  show-auth-explanation="true"
-                  path-text-title="Manifest path"
-                  path-placeholder="deployment.yml"
-                  deploy-method="{{ ctrl.DeployMethod }}"
+                  is-additional-files-field-visible="true"
+                  is-auth-explanation-visible="true"
+                  deploy-method="{{ ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ? 'compose' : 'manifest' }}"
+                  base-webhook-url="{{ ctrl.state.baseWebhookUrl }}"
+                  webhook-id="{{ ctrl.state.webhookId }}"
+                  webhooks-docs="https://docs.portainer.io/user/kubernetes/applications/webhooks"
                 ></git-form>
                 <!-- !repository -->
 
@@ -104,6 +105,16 @@
                   ></custom-templates-variables-field>
                 </div>
 
+                <span ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId && ctrl.state.templateLoadFailed">
+                  <p class="small vertical-center text-danger mb-5" ng-if="ctrl.currentUser.isAdmin || ctrl.currentUser.id === ctrl.state.template.CreatedByUserId">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
+                    <a ui-sref="kubernetes.templates.custom.edit({id: ctrl.state.templateId})">click here</a> for configuration.</p
+                  >
+                  <p class="small vertical-center text-danger mb-5" ng-if="!(ctrl.currentUser.isAdmin || ctrl.currentUser.id === ctrl.state.template.CreatedByUserId)">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
+                  >
+                </span>
+
                 <!-- editor -->
                 <div class="mt-4">
                   <web-editor-form
@@ -113,32 +124,18 @@
                     on-change="(ctrl.onChangeFileContent)"
                     ng-required="true"
                     yml="true"
-                    placeholder="# Define or paste the content of your manifest file here"
+                    placeholder="Define or paste the content of your manifest file here"
+                    read-only="ctrl.state.isEditorReadOnly"
                   >
                     <editor-description>
-                      <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
-                        <p class="vertical-center">
-                          <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
-                          <span>
-                            Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary
-                            that not all the Compose format options are supported by Kompose at the moment.
-                          </span>
-                        </p>
-                        <p>
-                          You can get more information about Compose file format in the
-                          <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-                        </p>
-                      </span>
-                      <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
-                        <p class="vertical-center">
-                          <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
-                          This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
-                        </p>
-                        <p>
-                          You can get more information about Kubernetes file format in the
-                          <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-                        </p>
-                      </span>
+                      <p class="vertical-center">
+                        <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                        This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
+                      </p>
+                      <p>
+                        You can get more information about Kubernetes file format in the
+                        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                      </p>
                     </editor-description>
                   </web-editor-form>
                 </div>
@@ -151,7 +148,7 @@
                     <span class="col-sm-12 text-muted small"> Indicate the URL to the manifest. </span>
                   </div>
                   <div class="form-group">
-                    <label for="manifest_url" class="col-sm-3 col-lg-2 control-label text-left required">URL</label>
+                    <label for="manifest_url" class="col-sm-3 col-lg-2 control-label required text-left">URL</label>
                     <div class="col-sm-8">
                       <input
                         type="text"
@@ -173,7 +170,7 @@
                     <button
                       type="button"
                       class="btn btn-primary btn-sm !ml-0"
-                      ng-disabled="!deploymentForm.$valid ||ctrl.disableDeploy()"
+                      ng-disabled="!ctrl.deploymentForm.$valid || ctrl.disableDeploy()"
                       ng-click="ctrl.deploy()"
                       button-spinner="ctrl.state.actionInProgress"
                       data-cy="k8sAppDeploy-deployButton"
@@ -192,7 +189,7 @@
             </uib-tab>
 
             <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
-              <uib-tab-heading> <pr-icon icon="'file-text'" feather="true"></pr-icon> Logs </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'file-text'"></pr-icon> Logs </uib-tab-heading>
               <form class="form-horizontal mt-3">
                 <div class="form-group" ng-if="ctrl.state.activeTab === 1">
                   <div class="col-sm-12">

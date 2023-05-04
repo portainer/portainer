@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { Info } from 'lucide-react';
 
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
-import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { NavTabs } from '@@/NavTabs';
+import { Icon } from '@@/Icon';
 
 const deployments = [
   {
@@ -97,17 +99,16 @@ function DeployCode({
     <>
       {showAgentSecretMessage && agentSecret && (
         <p className="text-muted small my-6">
-          <i
-            className="fa fa-info-circle blue-icon space-right"
-            aria-hidden="true"
-          />
+          <Icon icon={Info} mode="primary" className="mr-1" />
           Note that the environment variable AGENT_SECRET will need to be set to
           <code>{agentSecret}</code>. Please update the manifest that will be
           downloaded from the following script.
         </p>
       )}
       <Code>{code}</Code>
-      <CopyButton copyText={code}>Copy command</CopyButton>
+      <div className="mt-2">
+        <CopyButton copyText={code}>Copy command</CopyButton>
+      </div>
     </>
   );
 }

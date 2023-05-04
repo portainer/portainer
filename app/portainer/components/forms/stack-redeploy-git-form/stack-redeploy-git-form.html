@@ -1,43 +1,77 @@
 <form name="$ctrl.redeployGitForm" class="form-horizontal my-8">
   <div class="col-sm-12 form-section-title"> Redeploy from git repository </div>
+
   <git-form-info-panel
-    class-name="text-muted small"
+    class-name="'text-muted small'"
     url="$ctrl.model.URL"
-    type="stack"
+    type="'stack'"
     config-file-path="$ctrl.model.ConfigFilePath"
     additional-files="$ctrl.stack.AdditionalFiles"
   ></git-form-info-panel>
 
   <git-form-auto-update-fieldset
-    model="$ctrl.formValues.AutoUpdate"
+    value="$ctrl.formValues.AutoUpdate"
     on-change="($ctrl.onChangeAutoUpdate)"
-    show-force-pull-image="$ctrl.stack.Type !== 3"
+    environment-type="DOCKER"
+    is-force-pull-visible="$ctrl.stack.Type !== 3"
+    base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+    webhook-id="{{ $ctrl.state.webhookId }}"
+    webhooks-docs="https://docs.portainer.io/user/docker/stacks/webhooks"
   ></git-form-auto-update-fieldset>
+
   <div class="form-group">
     <div class="col-sm-12">
       <p>
         <a class="small interactive" ng-click="$ctrl.state.showConfig = !$ctrl.state.showConfig">
-          <i ng-class="{ 'fa fa-minus space-right': $ctrl.state.showConfig, 'fa fa-plus space-right': !$ctrl.state.showConfig }" aria-hidden="true"></i>
+          <pr-icon ng-if="$ctrl.state.showConfig" icon="'minus'" class-name="'mr-1'"></pr-icon>
+          <pr-icon ng-if="!$ctrl.state.showConfig" icon="'plus'" class-name="'mr-1'"></pr-icon>
           {{ $ctrl.state.showConfig ? 'Hide' : 'Advanced' }} configuration
         </a>
       </p>
     </div>
   </div>
-  <git-form-ref-field ng-if="$ctrl.state.showConfig" value="$ctrl.formValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
+
+  <git-form-ref-field
+    ng-if="$ctrl.state.showConfig"
+    value="$ctrl.formValues.RefName"
+    on-change="($ctrl.onChangeRef)"
+    model="$ctrl.formValues"
+    is-url-valid="true"
+    stack-id="$ctrl.gitStackId"
+  ></git-form-ref-field>
+
   <git-form-auth-fieldset
     ng-if="$ctrl.state.showConfig"
-    is-edit="$ctrl.state.isEdit"
-    model="$ctrl.formValues"
-    on-change="($ctrl.onChange)"
-    show-auth-explanation="true"
+    value="$ctrl.formValues"
+    on-change="($ctrl.onChangeGitAuth)"
+    is-auth-explanation-visible="true"
+    is-auth-edit="$ctrl.state.isAuthEdit"
   ></git-form-auth-fieldset>
+
+  <div class="form-group" ng-if="$ctrl.state.showConfig">
+    <div class="col-sm-12">
+      <por-switch-field
+        name="TLSSkipVerify"
+        checked="$ctrl.formValues.TLSSkipVerify"
+        tooltip="'Enabling this will allow skipping TLS validation for any self-signed certificate.'"
+        label-class="'col-sm-3 col-lg-2'"
+        label="'Skip TLS Verification'"
+        on-change="($ctrl.onChangeTLSSkipVerify)"
+      ></por-switch-field>
+    </div>
+  </div>
+
   <environment-variables-panel
     ng-model="$ctrl.formValues.Env"
     explanation="These values will be used as substitutions in the stack file"
     on-change="($ctrl.onChangeEnvVar)"
     show-help-message="true"
   ></environment-variables-panel>
+
   <option-panel ng-if="$ctrl.stack.Type === 1 && $ctrl.endpoint.apiVersion >= 1.27" ng-model="$ctrl.formValues.Option" on-change="($ctrl.onChangeOption)"></option-panel>
+
+  <div class="col-sm-12 form-section-title"> Actions </div>
+
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.submit()"
@@ -48,7 +82,10 @@
     analytics-event="docker-stack-pull-redeploy"
     analytics-category="docker"
   >
-    <span ng-hide="$ctrl.state.redeployInProgress"> <i class="fa fa-sync space-right" aria-hidden="true"></i> Pull and redeploy </span>
+    <span ng-hide="$ctrl.state.redeployInProgress">
+      <pr-icon icon="'refresh-cw'" class="!mr-1"></pr-icon>
+      Pull and redeploy
+    </span>
     <span ng-show="$ctrl.state.redeployInProgress">In progress...</span>
   </button>
 

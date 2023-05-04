@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
 import { RegistryCreateFormValues } from 'Portainer/models/registry';
-import { options } from './options';
+import { options } from '@/react/portainer/registries/CreateView/options';
 
 class CreateRegistryController {
   /* @ngInject */

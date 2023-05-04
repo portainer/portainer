@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -10,13 +9,12 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/git"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
 	k "github.com/portainer/portainer/api/kubernetes"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 type stackGitRedployPayload struct {
@@ -137,45 +135,41 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
-	err = filesystem.MoveDirectory(stack.ProjectPath, backupProjectPath)
-	if err != nil {
-		return httperror.InternalServerError("Unable to move git repository directory", err)
-	}
-
 	repositoryUsername := ""
 	repositoryPassword := ""
 	if payload.RepositoryAuthentication {
 		repositoryPassword = payload.RepositoryPassword
+
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
 		if repositoryPassword == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 			repositoryPassword = stack.GitConfig.Authentication.Password
 		}
 		repositoryUsername = payload.RepositoryUsername
 	}
 
-	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
-	if err != nil {
-		restoreError := filesystem.MoveDirectory(backupProjectPath, stack.ProjectPath)
-		if restoreError != nil {
-			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
-		}
-
-		return httperror.InternalServerError("Unable to clone git repository", err)
+	cloneOptions := git.CloneOptions{
+		ProjectPath:   stack.ProjectPath,
+		URL:           stack.GitConfig.URL,
+		ReferenceName: stack.GitConfig.ReferenceName,
+		Username:      repositoryUsername,
+		Password:      repositoryPassword,
+		TLSSkipVerify: stack.GitConfig.TLSSkipVerify,
 	}
 
-	defer func() {
-		err = handler.FileService.RemoveDirectory(backupProjectPath)
-		if err != nil {
-			log.Warn().Err(err).Msg("unable to remove git repository directory")
-		}
-	}()
+	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, cloneOptions)
+	if err != nil {
+		return httperror.InternalServerError("Unable to clone git repository directory", err)
+	}
+
+	defer clean()
 
 	httpErr := handler.deployStack(r, stack, payload.PullImage, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
 
-	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword, stack.GitConfig.TLSSkipVerify)
 	if err != nil {
 		return httperror.InternalServerError("Unable get latest commit id", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID))
 	}
@@ -203,49 +197,72 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	var (
+		deploymentConfiger deployments.StackDeploymentConfiger
+		err                error
+	)
+
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
 		prune := false
 		if stack.Option != nil {
 			prune = stack.Option.Prune
 		}
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune, pullImage)
-		if httpErr != nil {
-			return httpErr
+
+		// Create swarm deployment config
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
-		if err := handler.deploySwarmStack(config); err != nil {
+		deploymentConfiger, err = deployments.CreateSwarmStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, prune, pullImage)
+		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
 
 	case portainer.DockerComposeStack:
-		config, httpErr := handler.createComposeDeployConfig(r, stack, endpoint, pullImage)
-		if httpErr != nil {
-			return httpErr
+		// Create compose deployment config
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
-		if err := handler.deployComposeStack(config, true); err != nil {
+		deploymentConfiger, err = deployments.CreateComposeStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, pullImage, true)
+		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
-
 	case portainer.KubernetesStack:
+		handler.stackCreationMutex.Lock()
+		defer handler.stackCreationMutex.Unlock()
+
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
 			return httperror.BadRequest("Failed to retrieve user token data", err)
 		}
-		_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
+
+		user := &portainer.User{
+			ID:       tokenData.ID,
+			Username: tokenData.Username,
+		}
+
+		appLabel := k.KubeAppLabels{
 			StackID:   int(stack.ID),
 			StackName: stack.Name,
 			Owner:     tokenData.Username,
 			Kind:      "git",
-		})
-		if err != nil {
-			return httperror.InternalServerError("Unable to redeploy Kubernetes stack", errors.WithMessage(err, "failed to deploy kube application"))
 		}
 
+		deploymentConfiger, err = deployments.CreateKubernetesStackDeploymentConfig(stack, handler.KubernetesDeployer, appLabel, user, endpoint)
+		if err != nil {
+			return httperror.InternalServerError(err.Error(), err)
+		}
 	default:
 		return httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
 	}
 
+	err = deploymentConfiger.Deploy()
+	if err != nil {
+		return httperror.InternalServerError(err.Error(), err)
+	}
 	return nil
 }

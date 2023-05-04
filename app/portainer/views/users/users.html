@@ -3,12 +3,12 @@
 <div class="row" ng-if="isAdmin">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="plus" feather-icon="true" title-text="Add a new user"> </rd-widget-header>
+      <rd-widget-header icon="plus" title-text="Add a new user"> </rd-widget-header>
       <rd-widget-body>
         <form name="form" class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="username" class="col-sm-3 col-lg-2 control-label text-left required">
+            <label for="username" class="col-sm-3 col-lg-2 control-label required text-left">
               Username
               <portainer-tooltip ng-if="AuthenticationMethod === 2" message="'Username must exactly match username defined in external LDAP source.'"></portainer-tooltip>
             </label>
@@ -25,8 +25,8 @@
                   data-cy="user-usernameInput"
                 />
                 <span class="input-group-addon">
-                  <pr-icon class="fa green-icon" icon="'check'" feather="true" aria-hidden="true" ng-if="state.validUsername"></pr-icon>
-                  <pr-icon class="fa red-icon" icon="'x'" feather="true" aria-hidden="true" ng-if="!state.validUsername"></pr-icon>
+                  <pr-icon mode="'success'" icon="'check'" ng-if="state.validUsername"></pr-icon>
+                  <pr-icon mode="'danger'" icon="'x'" ng-if="!state.validUsername"></pr-icon>
                 </span>
               </div>
             </div>
@@ -34,7 +34,7 @@
           <!-- !name-input -->
           <!-- new-password-input -->
           <div class="form-group" ng-if="AuthenticationMethod === 1">
-            <label for="password" class="col-sm-3 col-lg-2 control-label text-left required">Password</label>
+            <label for="password" class="col-sm-3 col-lg-2 control-label required text-left">Password</label>
             <div class="col-sm-8">
               <input
                 type="password"
@@ -50,7 +50,7 @@
           <!-- !new-password-input -->
           <!-- confirm-password-input -->
           <div class="form-group" ng-if="AuthenticationMethod === 1">
-            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label text-left required">Confirm password</label>
+            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label required text-left">Confirm password</label>
             <div class="col-sm-8">
               <div class="input-group">
                 <input
@@ -62,16 +62,14 @@
                 />
                 <span class="input-group-addon">
                   <pr-icon
-                    class="fa green-icon"
+                    mode="'success'"
                     icon="'check'"
-                    feather="true"
                     aria-hidden="true"
                     ng-if="form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword"
                   ></pr-icon>
                   <pr-icon
-                    class="fa red-icon"
+                    mode="'danger'"
                     icon="'x'"
-                    feather="true"
                     aria-hidden="true"
                     ng-if="!(form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword)"
                   ></pr-icon>
@@ -118,16 +116,29 @@
                 data-cy="'user-teamSelect'"
                 on-change="(onChangeTeamIds)"
                 input-id="'teams-selector'"
+                disabled="teamSync"
               ></teams-selector>
+            </div>
+          </div>
+          <div class="form-group" ng-if="teamSync">
+            <div class="col-sm-12">
+              <span class="small">
+                <p class="small text-muted vertical-center">
+                  <pr-icon icon="'alert-circle'" class-name="'icon-warning =vertical-center'"></pr-icon>
+                  The team leader feature is disabled as external authentication is currently enabled with team sync.
+                </p>
+              </span>
             </div>
           </div>
           <!-- !teams -->
           <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
               <span class="small text-muted vertical-center">
-                <pr-icon class="vertical-center" icon="'alert-circle'" feather="true" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon>
-                Note: non-administrator users who aren't in a team don't have access to any environments by default. Head over to the
-                <a ui-sref="portainer.endpoints">Environments view</a> to manage their accesses.
+                <pr-icon class="vertical-center" icon="'alert-circle'" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon>
+                <span
+                  >Note: non-administrator users who aren't in a team don't have access to any environments by default. Head over to the
+                  <a ui-sref="portainer.endpoints">Environments view</a> to manage their accesses.</span
+                >
               </span>
             </div>
           </div>
@@ -135,19 +146,17 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && (!formValues.Password || form.$invalid || formValues.Password !== formValues.ConfirmPassword))"
                 ng-click="addUser()"
                 button-spinner="state.actionInProgress"
                 data-cy="user-createUserButton"
               >
-                <span ng-hide="state.actionInProgress" class="vertical-center icon-white">
-                  <pr-icon icon="'plus'" feather="true" aria-hidden="true" size="'md'"></pr-icon> Create user</span
-                >
+                <span ng-hide="state.actionInProgress" class="vertical-center icon-white"> <pr-icon icon="'plus'" aria-hidden="true" size="'md'"></pr-icon> Create user</span>
                 <span ng-show="state.actionInProgress">Creating user...</span>
               </button>
               <span class="text-danger" ng-if="state.userCreationError">
-                <pr-icon icon="'alert-circle'" feather="true" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon> {{ state.userCreationError }}
+                <pr-icon icon="'alert-circle'" aria-hidden="true" mode="'primary'" size="'md'"></pr-icon> {{ state.userCreationError }}
               </span>
             </div>
           </div>

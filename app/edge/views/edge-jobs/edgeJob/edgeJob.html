@@ -7,7 +7,7 @@
         <uib-tabset active="$ctrl.state.activeTab">
           <uib-tab index="0" select="$ctrl.showEditor()">
             <uib-tab-heading>
-              <span><pr-icon icon="'tool'" feather="true"></pr-icon></span> Configuration
+              <span><pr-icon icon="'wrench'"></pr-icon></span> Configuration
             </uib-tab-heading>
 
             <edge-job-form
@@ -16,6 +16,7 @@
               endpoints="endpoints"
               groups="$ctrl.groups"
               tags="$ctrl.tags"
+              edge-groups="$ctrl.edgeGroups"
               form-action="$ctrl.update"
               form-action-label="Update Edge job"
               action-in-progress="$ctrl.state.actionInProgress"
@@ -25,7 +26,7 @@
 
           <uib-tab index="1">
             <uib-tab-heading>
-              <span><pr-icon icon="'list'" feather="true"></pr-icon></span> Results
+              <span><pr-icon icon="'list'"></pr-icon></span> Results
             </uib-tab-heading>
 
             <edge-job-results-datatable

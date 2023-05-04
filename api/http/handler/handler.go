@@ -12,12 +12,12 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
-	"github.com/portainer/portainer/api/http/handler/edgeupdateschedules"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
@@ -30,8 +30,8 @@ import (
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
-	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/storybook"
+	"github.com/portainer/portainer/api/http/handler/system"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -44,47 +44,47 @@ import (
 
 // Handler is a collection of all the service handlers.
 type Handler struct {
-	AuthHandler               *auth.Handler
-	BackupHandler             *backup.Handler
-	CustomTemplatesHandler    *customtemplates.Handler
-	DockerHandler             *docker.Handler
-	EdgeGroupsHandler         *edgegroups.Handler
-	EdgeJobsHandler           *edgejobs.Handler
-	EdgeUpdateScheduleHandler *edgeupdateschedules.Handler
-	EdgeStacksHandler         *edgestacks.Handler
-	EdgeTemplatesHandler      *edgetemplates.Handler
-	EndpointEdgeHandler       *endpointedge.Handler
-	EndpointGroupHandler      *endpointgroups.Handler
-	EndpointHandler           *endpoints.Handler
-	EndpointHelmHandler       *helm.Handler
-	EndpointProxyHandler      *endpointproxy.Handler
-	HelmTemplatesHandler      *helm.Handler
-	KubernetesHandler         *kubernetes.Handler
-	FileHandler               *file.Handler
-	LDAPHandler               *ldap.Handler
-	MOTDHandler               *motd.Handler
-	RegistryHandler           *registries.Handler
-	ResourceControlHandler    *resourcecontrols.Handler
-	RoleHandler               *roles.Handler
-	SettingsHandler           *settings.Handler
-	SSLHandler                *ssl.Handler
-	OpenAMTHandler            *openamt.Handler
-	FDOHandler                *fdo.Handler
-	StackHandler              *stacks.Handler
-	StatusHandler             *status.Handler
-	StorybookHandler          *storybook.Handler
-	TagHandler                *tags.Handler
-	TeamMembershipHandler     *teammemberships.Handler
-	TeamHandler               *teams.Handler
-	TemplatesHandler          *templates.Handler
-	UploadHandler             *upload.Handler
-	UserHandler               *users.Handler
-	WebSocketHandler          *websocket.Handler
-	WebhookHandler            *webhooks.Handler
+	AuthHandler            *auth.Handler
+	BackupHandler          *backup.Handler
+	CustomTemplatesHandler *customtemplates.Handler
+	DockerHandler          *docker.Handler
+	EdgeGroupsHandler      *edgegroups.Handler
+	EdgeJobsHandler        *edgejobs.Handler
+	EdgeStacksHandler      *edgestacks.Handler
+	EdgeTemplatesHandler   *edgetemplates.Handler
+	EndpointEdgeHandler    *endpointedge.Handler
+	EndpointGroupHandler   *endpointgroups.Handler
+	EndpointHandler        *endpoints.Handler
+	EndpointHelmHandler    *helm.Handler
+	EndpointProxyHandler   *endpointproxy.Handler
+	GitOperationHandler    *gitops.Handler
+	HelmTemplatesHandler   *helm.Handler
+	KubernetesHandler      *kubernetes.Handler
+	FileHandler            *file.Handler
+	LDAPHandler            *ldap.Handler
+	MOTDHandler            *motd.Handler
+	RegistryHandler        *registries.Handler
+	ResourceControlHandler *resourcecontrols.Handler
+	RoleHandler            *roles.Handler
+	SettingsHandler        *settings.Handler
+	SSLHandler             *ssl.Handler
+	OpenAMTHandler         *openamt.Handler
+	FDOHandler             *fdo.Handler
+	StackHandler           *stacks.Handler
+	StorybookHandler       *storybook.Handler
+	SystemHandler          *system.Handler
+	TagHandler             *tags.Handler
+	TeamMembershipHandler  *teammemberships.Handler
+	TeamHandler            *teams.Handler
+	TemplatesHandler       *templates.Handler
+	UploadHandler          *upload.Handler
+	UserHandler            *users.Handler
+	WebSocketHandler       *websocket.Handler
+	WebhookHandler         *webhooks.Handler
 }
 
 // @title PortainerCE API
-// @version 2.16.0
+// @version 2.19.0
 // @description.markdown api-description.md
 // @termsOfService
 
@@ -99,7 +99,7 @@ type Handler struct {
 
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
+// @name x-api-key
 
 // @securitydefinitions.apikey jwt
 // @in header
@@ -109,6 +109,8 @@ type Handler struct {
 // @tag.description Authenticate against Portainer HTTP API
 // @tag.name custom_templates
 // @tag.description Manage Custom Templates
+// @tag.name edge
+// @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name edge_groups
 // @tag.description Manage Edge Groups
 // @tag.name edge_jobs
@@ -117,12 +119,12 @@ type Handler struct {
 // @tag.description Manage Edge Stacks
 // @tag.name edge_templates
 // @tag.description Manage Edge Templates
-// @tag.name edge
-// @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name endpoints
 // @tag.description Manage Docker environments(endpoints)
 // @tag.name endpoint_groups
 // @tag.description Manage environment(endpoint) groups
+// @tag.name gitops
+// @tag.description Operate git repository
 // @tag.name kubernetes
 // @tag.description Manage Kubernetes cluster
 // @tag.name motd
@@ -135,10 +137,14 @@ type Handler struct {
 // @tag.description Manage roles
 // @tag.name settings
 // @tag.description Manage Portainer settings
+// @tag.name ssl
+// @tag.description Manage ssl settings
+// @tag.name stacks
+// @tag.description Manage stacks
 // @tag.name status
 // @tag.description Information about the Portainer instance
-// @tag.name users
-// @tag.description Manage users
+// @tag.name system
+// @tag.description Manage Portainer system
 // @tag.name tags
 // @tag.description Manage tags
 // @tag.name teams
@@ -147,10 +153,8 @@ type Handler struct {
 // @tag.description Manage team memberships
 // @tag.name templates
 // @tag.description Manage App Templates
-// @tag.name stacks
-// @tag.description Manage stacks
-// @tag.name ssl
-// @tag.description Manage ssl settings
+// @tag.name users
+// @tag.description Manage users
 // @tag.name upload
 // @tag.description Upload files
 // @tag.name webhooks
@@ -161,6 +165,8 @@ type Handler struct {
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
+	case strings.HasPrefix(r.URL.Path, "/api/endpoints") && strings.Contains(r.URL.Path, "/edge/"):
+		h.EndpointEdgeHandler.ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/backup"):
@@ -169,16 +175,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):
 		http.StripPrefix("/api", h.CustomTemplatesHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/edge_update_schedules"):
-		http.StripPrefix("/api", h.EdgeUpdateScheduleHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
 		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_groups"):
 		http.StripPrefix("/api", h.EdgeGroupsHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_jobs"):
 		http.StripPrefix("/api", h.EdgeJobsHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
-		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_templates"):
 		http.StripPrefix("/api", h.EdgeTemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoint_groups"):
@@ -202,11 +204,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/agent/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
-		case strings.Contains(r.URL.Path, "/edge/"):
-			http.StripPrefix("/api/endpoints", h.EndpointEdgeHandler).ServeHTTP(w, r)
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
+	case strings.HasPrefix(r.URL.Path, "/api/gitops"):
+		http.StripPrefix("/api", h.GitOperationHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/ldap"):
 		http.StripPrefix("/api", h.LDAPHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):
@@ -222,7 +224,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/stacks"):
 		http.StripPrefix("/api", h.StackHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/status"):
-		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
+		http.StripPrefix("/api", h.SystemHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/system"):
+		http.StripPrefix("/api", h.SystemHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/tags"):
 		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates/helm"):

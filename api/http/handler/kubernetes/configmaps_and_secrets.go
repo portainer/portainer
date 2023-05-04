@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -9,24 +10,38 @@ import (
 )
 
 func (handler *Handler) getKubernetesConfigMaps(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid namespace identifier route variable",
-			Err:        err,
-		}
+		return httperror.BadRequest(
+			"Invalid namespace identifier route variable",
+			err,
+		)
 	}
 
 	configmaps, err := cli.GetConfigMapsAndSecrets(namespace)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError(
+			"Unable to retrieve configmaps and secrets",
+			err,
+		)
 	}
 
 	return response.JSON(w, configmaps)

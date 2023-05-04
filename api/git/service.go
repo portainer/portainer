@@ -2,21 +2,18 @@ package git
 
 import (
 	"context"
-	"errors"
-	"log"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/rs/zerolog/log"
 )
 
-var (
-	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
-	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
-
-	REPOSITORY_CACHE_SIZE = 4
-	REPOSITORY_CACHE_TTL  = 5 * time.Minute
+const (
+	repositoryCacheSize = 4
+	repositoryCacheTTL  = 5 * time.Minute
 )
 
 // baseOption provides a minimum group of information to operate a git repository, like git-remote
@@ -24,6 +21,7 @@ type baseOption struct {
 	repositoryUrl string
 	username      string
 	password      string
+	tlsSkipVerify bool
 }
 
 // fetchOption allows to specify the reference name of the target repository
@@ -62,7 +60,7 @@ type Service struct {
 
 // NewService initializes a new service.
 func NewService(ctx context.Context) *Service {
-	return newService(ctx, REPOSITORY_CACHE_SIZE, REPOSITORY_CACHE_TTL)
+	return newService(ctx, repositoryCacheSize, repositoryCacheTTL)
 }
 
 func newService(ctx context.Context, cacheSize int, cacheTTL time.Duration) *Service {
@@ -78,12 +76,12 @@ func newService(ctx context.Context, cacheSize int, cacheTTL time.Duration) *Ser
 		var err error
 		service.repoRefCache, err = lru.New(cacheSize)
 		if err != nil {
-			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
+			log.Debug().Err(err).Msg("failed to create ref cache")
 		}
 
 		service.repoFileCache, err = lru.New(cacheSize)
 		if err != nil {
-			log.Printf("[DEBUG] [git] [message: failed to create file cache: %v\n", err)
+			log.Debug().Err(err).Msg("failed to create file cache")
 		}
 
 		if cacheTTL > 0 {
@@ -123,13 +121,14 @@ func (service *Service) timerHasStopped() bool {
 
 // CloneRepository clones a git repository using the specified URL in the specified
 // destination folder.
-func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
+func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string, tlsSkipVerify bool) error {
 	options := cloneOption{
 		fetchOption: fetchOption{
 			baseOption: baseOption{
 				repositoryUrl: repositoryURL,
 				username:      username,
 				password:      password,
+				tlsSkipVerify: tlsSkipVerify,
 			},
 			referenceName: referenceName,
 		},
@@ -148,12 +147,13 @@ func (service *Service) cloneRepository(destination string, options cloneOption)
 }
 
 // LatestCommitID returns SHA1 of the latest commit of the specified reference
-func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
+func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error) {
 	options := fetchOption{
 		baseOption: baseOption{
 			repositoryUrl: repositoryURL,
 			username:      username,
 			password:      password,
+			tlsSkipVerify: tlsSkipVerify,
 		},
 		referenceName: referenceName,
 	}
@@ -166,10 +166,11 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 }
 
 // ListRefs will list target repository's references without cloning the repository
-func (service *Service) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
+func (service *Service) ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error) {
+	refCacheKey := generateCacheKey(repositoryURL, username, password, strconv.FormatBool(tlsSkipVerify))
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
-		service.repoRefCache.Remove(repositoryURL)
+		service.repoRefCache.Remove(refCacheKey)
 		// Remove file caches pointed to the same repository
 		for _, fileCacheKey := range service.repoFileCache.Keys() {
 			key, ok := fileCacheKey.(string)
@@ -183,7 +184,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 
 	if service.repoRefCache != nil {
 		// Lookup the refs cache first
-		cache, ok := service.repoRefCache.Get(repositoryURL)
+		cache, ok := service.repoRefCache.Get(refCacheKey)
 		if ok {
 			refs, success := cache.([]string)
 			if success {
@@ -196,6 +197,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
+		tlsSkipVerify: tlsSkipVerify,
 	}
 
 	var (
@@ -215,15 +217,15 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 	}
 
 	if service.cacheEnabled && service.repoRefCache != nil {
-		service.repoRefCache.Add(options.repositoryUrl, refs)
+		service.repoRefCache.Add(refCacheKey, refs)
 	}
 	return refs, nil
 }
 
 // ListFiles will list all the files of the target repository with specific extensions.
 // If extension is not provided, it will list all the files under the target repository
-func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
-	repoKey := generateCacheKey(repositoryURL, referenceName)
+func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
+	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify))
 
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
@@ -249,6 +251,7 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 			repositoryUrl: repositoryURL,
 			username:      username,
 			password:      password,
+			tlsSkipVerify: tlsSkipVerify,
 		},
 		referenceName: referenceName,
 	}

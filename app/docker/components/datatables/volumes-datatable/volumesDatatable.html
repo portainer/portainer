@@ -4,12 +4,12 @@
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
           </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -21,31 +21,31 @@
             data-cy="volume-searchInput"
           />
         </div>
-        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
+        <div class="actionBar !gap-3" authorization="DockerVolumeDelete, DockerVolumeCreate">
           <button
             type="button"
-            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
             authorization="DockerVolumeDelete"
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="volume-removeVolumeButton"
           >
-            <pr-icon icon="'trash-2'" feather="true" class="leading-none"></pr-icon>Remove
+            <pr-icon icon="'trash-2'" class="leading-none"></pr-icon>Remove
           </button>
           <button
             type="button"
-            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
             ui-sref="docker.volumes.new"
             authorization="DockerVolumeCreate"
             data-cy="volume-addVolumeButton"
           >
-            <pr-icon icon="'plus'" feather="true" class="leading-none"></pr-icon>Add volume
+            <pr-icon icon="'plus'" class="leading-none"></pr-icon>Add volume
           </button>
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle aria-label="Settings">
-              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+              <pr-icon icon="'more-vertical'"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -66,7 +66,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span class="inline-block w-3">
-                        <pr-icon id="refreshRateChange" icon="'check'" style="display: none" mode="'success'" feather="true"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" style="display: none" mode="'success'"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -80,11 +80,11 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover table-filters nowrap-cells">
+        <table class="table-hover table-filters nowrap-cells table">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" class="flex gap-1">
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
+                <span class="md-checkbox" authorization="DockerVolumeDelete, DockerVolumeCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -95,11 +95,9 @@
                   is-sorted-desc="$ctrl.state.orderBy === 'Id' && $ctrl.state.reverseOrder"
                   ng-click="$ctrl.changeOrderBy('Id')"
                 ></table-column-header>
-                <span uib-dropdown-toggle class="table-filter flex gap-1 self-end" ng-if="!$ctrl.filters.state.enabled"
-                  >Filter <pr-icon icon="'filter'" feather="true"></pr-icon
-                ></span>
+                <span uib-dropdown-toggle class="table-filter flex gap-1 self-end" ng-if="!$ctrl.filters.state.enabled">Filter <pr-icon icon="'filter'"></pr-icon></span>
                 <span uib-dropdown-toggle class="table-filter filter-active flex gap-1 self-end" ng-if="$ctrl.filters.state.enabled"
-                  >Filter <pr-icon icon="'check'" feather="true"></pr-icon
+                  >Filter <pr-icon icon="'check'"></pr-icon
                 ></span>
                 <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">
@@ -182,23 +180,20 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
+                <span class="md-checkbox" authorization="DockerVolumeDelete, DockerVolumeCreate">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{
-                  item.Id | truncate: 40
-                }}</a>
-                <span ng-if="$ctrl.offlineMode">{{ item.Id | truncate: 40 }}</span>
+                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate : 40 }}</a>
 
                 <button
-                  ng-if="$ctrl.showBrowseAction && !$ctrl.offlineMode"
+                  ng-if="$ctrl.showBrowseAction"
                   type="button"
                   ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })"
                   class="btn btn-xs btn-primary space-left"
                   authorization="DockerAgentBrowseList"
                 >
-                  <pr-icon icon="'search'" feather="true"></pr-icon> browse
+                  <pr-icon icon="'search'"></pr-icon> browse
                 </button>
 
                 <span style="margin-left: 10px" class="label label-warning image-tag space-left" ng-if="item.dangling">Unused</span>
@@ -216,10 +211,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="6" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="6" class="text-center text-muted">No volume available.</td>
+              <td colspan="6" class="text-muted text-center">No volume available.</td>
             </tr>
           </tbody>
         </table>

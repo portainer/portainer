@@ -1,20 +1,19 @@
 import angular from 'angular';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
-import { options } from './options';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { options } from '@/react/portainer/settings/SettingsView/backup-options';
 
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',
-  '$state',
   'Notifications',
   'SettingsService',
   'StateManager',
   'BackupService',
   'FileSaver',
-  'Blob',
-  function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
+  function ($scope, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
     $scope.customBannerFeatureId = FeatureId.CUSTOM_LOGIN_BANNER;
     $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
+    $scope.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;
 
     $scope.backupOptions = options;
 
@@ -52,6 +51,9 @@ angular.module('portainer.app').controller('SettingsController', [
 
     $scope.formValues = {
       customLogo: false,
+      KubeconfigExpiry: undefined,
+      HelmRepositoryURL: undefined,
+      BlackListedLabels: [],
       labelName: '',
       labelValue: '',
       enableTelemetry: false,
@@ -59,6 +61,8 @@ angular.module('portainer.app').controller('SettingsController', [
       password: '',
       backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
     };
+
+    $scope.initialFormValues = {};
 
     $scope.onToggleEnableTelemetry = function onToggleEnableTelemetry(checked) {
       $scope.$evalAsync(() => {
@@ -83,22 +87,28 @@ angular.module('portainer.app').controller('SettingsController', [
       $scope.state.featureLimited = limited;
     };
 
-    $scope.removeFilteredContainerLabel = function (index) {
-      var settings = $scope.settings;
-      settings.BlackListedLabels.splice(index, 1);
+    $scope.onChangeCheckInInterval = function (interval) {
+      $scope.$evalAsync(() => {
+        var settings = $scope.settings;
+        settings.EdgeAgentCheckinInterval = interval;
+      });
+    };
 
-      updateSettings(settings);
+    $scope.removeFilteredContainerLabel = function (index) {
+      const filteredSettings = $scope.formValues.BlackListedLabels.filter((_, i) => i !== index);
+      const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
+      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
     };
 
     $scope.addFilteredContainerLabel = function () {
-      var settings = $scope.settings;
       var label = {
         name: $scope.formValues.labelName,
         value: $scope.formValues.labelValue,
       };
-      settings.BlackListedLabels.push(label);
 
-      updateSettings(settings);
+      const filteredSettings = [...$scope.formValues.BlackListedLabels, label];
+      const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
+      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
     };
 
     $scope.downloadBackup = function () {
@@ -123,32 +133,47 @@ angular.module('portainer.app').controller('SettingsController', [
         });
     };
 
+    // only update the values from the app settings widget. In future separate the api endpoints
     $scope.saveApplicationSettings = function () {
-      var settings = $scope.settings;
-
-      if (!$scope.formValues.customLogo) {
-        settings.LogoURL = '';
-      }
-
-      settings.EnableTelemetry = $scope.formValues.enableTelemetry;
+      const appSettingsPayload = {
+        SnapshotInterval: $scope.settings.SnapshotInterval,
+        LogoURL: $scope.formValues.customLogo ? $scope.settings.LogoURL : '',
+        EnableTelemetry: $scope.formValues.enableTelemetry,
+        TemplatesURL: $scope.settings.TemplatesURL,
+        EdgeAgentCheckinInterval: $scope.settings.EdgeAgentCheckinInterval,
+      };
 
       $scope.state.actionInProgress = true;
-      updateSettings(settings);
+      updateSettings(appSettingsPayload, 'Application settings updated');
     };
 
-    function updateSettings(settings) {
+    // only update the values from the kube settings widget. In future separate the api endpoints
+    $scope.saveKubernetesSettings = function () {
+      const kubeSettingsPayload = {
+        KubeconfigExpiry: $scope.formValues.KubeconfigExpiry,
+        HelmRepositoryURL: $scope.formValues.HelmRepositoryURL,
+        GlobalDeploymentOptions: $scope.formValues.GlobalDeploymentOptions,
+      };
+
+      $scope.state.kubeSettingsActionInProgress = true;
+      updateSettings(kubeSettingsPayload, 'Kubernetes settings updated');
+    };
+
+    function updateSettings(settings, successMessage = 'Settings updated') {
       SettingsService.update(settings)
-        .then(function success() {
-          Notifications.success('Success', 'Settings updated');
+        .then(function success(response) {
+          Notifications.success('Success', successMessage);
           StateManager.updateLogo(settings.LogoURL);
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);
-          $state.reload();
+          $scope.initialFormValues.enableTelemetry = response.EnableTelemetry;
+          $scope.formValues.BlackListedLabels = response.BlackListedLabels;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update settings');
         })
         .finally(function final() {
+          $scope.state.kubeSettingsActionInProgress = false;
           $scope.state.actionInProgress = false;
         });
     }
@@ -165,7 +190,12 @@ angular.module('portainer.app').controller('SettingsController', [
           if (settings.LogoURL !== '') {
             $scope.formValues.customLogo = true;
           }
+
           $scope.formValues.enableTelemetry = settings.EnableTelemetry;
+          $scope.formValues.KubeconfigExpiry = settings.KubeconfigExpiry;
+          $scope.formValues.HelmRepositoryURL = settings.HelmRepositoryURL;
+          $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
+          $scope.initialFormValues.enableTelemetry = settings.EnableTelemetry;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

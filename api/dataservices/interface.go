@@ -6,30 +6,19 @@ import (
 	"io"
 	"time"
 
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/portainer/portainer/api/edgetypes"
 
 	portainer "github.com/portainer/portainer/api"
 )
 
 type (
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() (newStore bool, err error)
-		Init() error
-		Close() error
-		MigrateData() error
-		Rollback(force bool) error
-		CheckCurrentEdition() error
-		BackupTo(w io.Writer) error
-		Export(filename string) (err error)
+	DataStoreTx interface {
 		IsErrObjectNotFound(err error) bool
-
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
-		EdgeUpdateSchedule() EdgeUpdateScheduleService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
@@ -52,6 +41,22 @@ type (
 		Webhook() WebhookService
 	}
 
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() (newStore bool, err error)
+		Init() error
+		Close() error
+		UpdateTx(func(DataStoreTx) error) error
+		ViewTx(func(DataStoreTx) error) error
+		MigrateData() error
+		Rollback(force bool) error
+		CheckCurrentEdition() error
+		BackupTo(w io.Writer) error
+		Export(filename string) (err error)
+
+		DataStoreTx
+	}
+
 	// CustomTemplateService represents a service to manage custom templates
 	CustomTemplateService interface {
 		GetNextIdentifier() int
@@ -69,6 +74,7 @@ type (
 		EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error)
 		Create(group *portainer.EdgeGroup) error
 		UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error
+		UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFunc func(group *portainer.EdgeGroup)) error
 		DeleteEdgeGroup(ID portainer.EdgeGroupID) error
 		BucketName() string
 	}
@@ -79,19 +85,9 @@ type (
 		EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error)
 		Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
+		UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
-		BucketName() string
-	}
-
-	EdgeUpdateScheduleService interface {
-		ActiveSchedule(environmentID portainer.EndpointID) *edgetypes.EndpointUpdateScheduleRelation
-		ActiveSchedules(environmentIDs []portainer.EndpointID) []edgetypes.EndpointUpdateScheduleRelation
-		List() ([]edgetypes.UpdateSchedule, error)
-		Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error)
-		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
-		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
-		Delete(ID edgetypes.UpdateScheduleID) error
 		BucketName() string
 	}
 
@@ -99,8 +95,10 @@ type (
 	EdgeStackService interface {
 		EdgeStacks() ([]portainer.EdgeStack, error)
 		EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStack, error)
+		EdgeStackVersion(ID portainer.EdgeStackID) (int, bool)
 		Create(id portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
+		UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
 		DeleteEdgeStack(ID portainer.EdgeStackID) error
 		GetNextIdentifier() int
 		BucketName() string
@@ -109,6 +107,9 @@ type (
 	// EndpointService represents a service for managing environment(endpoint) data
 	EndpointService interface {
 		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
+		EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool)
+		Heartbeat(endpointID portainer.EndpointID) (int64, bool)
+		UpdateHeartbeat(endpointID portainer.EndpointID)
 		Endpoints() ([]portainer.Endpoint, error)
 		Create(endpoint *portainer.Endpoint) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
@@ -211,7 +212,6 @@ type (
 	SettingsService interface {
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
-		IsFeatureFlagEnabled(feature portainer.Feature) bool
 		BucketName() string
 	}
 
@@ -252,6 +252,7 @@ type (
 		Tag(ID portainer.TagID) (*portainer.Tag, error)
 		Create(tag *portainer.Tag) error
 		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
+		UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error
 		DeleteTag(ID portainer.TagID) error
 		BucketName() string
 	}
@@ -279,6 +280,7 @@ type (
 		DeleteTeamMembershipByUserID(userID portainer.UserID) error
 		DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error
 		BucketName() string
+		DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.TeamID, userID portainer.UserID) error
 	}
 
 	// TunnelServerService represents a service for managing data associated to the tunnel server
@@ -302,12 +304,11 @@ type (
 
 	// VersionService represents a service for managing version data
 	VersionService interface {
-		DBVersion() (int, error)
 		Edition() (portainer.SoftwareEdition, error)
 		InstanceID() (string, error)
-		StoreDBVersion(version int) error
-		StoreInstanceID(ID string) error
-		BucketName() string
+		UpdateInstanceID(ID string) error
+		Version() (*models.Version, error)
+		UpdateVersion(*models.Version) error
 	}
 
 	// WebhookService represents a service for managing webhook data.

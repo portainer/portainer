@@ -7,11 +7,11 @@ import {
 } from '@reach/menu-button';
 import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
-import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
+import { AlertCircle, Bell, CheckCircle, Trash2 } from 'lucide-react';
 
 import { AutomationTestingProps } from '@/types';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { ToastNotification } from '@/react/portainer/notifications/types';
 
 import { Icon } from '@@/Icon';
@@ -33,16 +33,7 @@ export function NotificationsMenu() {
     notificationsStore,
     (state) => state.userNotifications[user.Id]
   );
-
-  const [badge, setBadge] = useState(false);
-
-  useEffect(() => {
-    if (userNotifications?.length > 0) {
-      setBadge(true);
-    } else {
-      setBadge(false);
-    }
-  }, [userNotifications]);
+  const reducedNotifications = userNotifications?.slice(0, 50);
 
   return (
     <Menu>
@@ -57,28 +48,37 @@ export function NotificationsMenu() {
         <div
           className={clsx(
             headerStyles.menuIcon,
-            'icon-badge text-lg !p-2 mr-1',
+            'icon-badge mr-1 !p-2 text-lg',
             'text-gray-8',
             'th-dark:text-gray-warm-7'
           )}
         >
-          <Icon icon="bell" feather />
-          <span className={badge ? clsx(notificationStyles.badge) : ''} />
+          <Icon icon={Bell} />
+          <span
+            className={
+              reducedNotifications?.length > 0 ? notificationStyles.badge : ''
+            }
+          />
         </div>
       </MenuButton>
 
       <MenuList
-        className={headerStyles.menuList}
+        className={clsx(headerStyles.menuList, notificationStyles.root)}
         aria-label="Notifications Menu"
         data-cy="notificationsMenu"
       >
         <div>
-          <div className={clsx(notificationStyles.notificationContainer)}>
+          <div
+            className={clsx(
+              notificationStyles.notificationContainer,
+              'vertical-center'
+            )}
+          >
             <div>
               <h4>Notifications</h4>
             </div>
-            <div className={clsx(notificationStyles.itemLast)}>
-              {userNotifications?.length > 0 && (
+            <div className={notificationStyles.itemLast}>
+              {reducedNotifications?.length > 0 && (
                 <Button
                   color="none"
                   onClick={(e) => {
@@ -94,28 +94,28 @@ export function NotificationsMenu() {
             </div>
           </div>
         </div>
-        {userNotifications?.length > 0 ? (
+        {reducedNotifications?.length > 0 ? (
           <>
-            {userNotifications.map((notification) => (
-              <MenuLink
-                to="portainer.notifications"
-                params={{ notificationFrom: notification.timeStamp }}
-                notification={notification}
-                key={notification.id}
-                onDelete={() => onDelete(notification.id)}
-              />
-            ))}
+            <div className={notificationStyles.notifications}>
+              {reducedNotifications.map((notification) => (
+                <MenuLink
+                  to="portainer.notifications"
+                  params={{ id: notification.id }}
+                  notification={notification}
+                  key={notification.id}
+                  onDelete={() => onDelete(notification.id)}
+                />
+              ))}
+            </div>
 
-            <div className={clsx(notificationStyles.notificationLink)}>
+            <div className={notificationStyles.notificationLink}>
               <Link to="portainer.notifications">View all notifications</Link>
             </div>
           </>
         ) : (
-          <div>
-            <Icon icon="bell" feather size="xl" />
-            <div>
-              <p>You have no notifications yet.</p>
-            </div>
+          <div className="flex flex-col items-center">
+            <Icon icon={Bell} size="xl" />
+            <p className="my-5">You have no notifications yet.</p>
           </div>
         )}
       </MenuList>
@@ -136,35 +136,35 @@ interface MenuLinkProps extends AutomationTestingProps, UISrefProps {
   onDelete: () => void;
 }
 
-function MenuLink({
-  to,
-  params,
-  options,
-  notification,
-  onDelete,
-}: MenuLinkProps) {
-  const anchorProps = useSref(to, params, options);
+function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
+  const anchorProps = useSref(to, params);
 
   return (
-    <ReachMenuLink href={anchorProps.href} className={headerStyles.menuLink}>
-      <div className={clsx(notificationStyles.container)}>
-        <div className={clsx(notificationStyles.notificationIcon)}>
+    <ReachMenuLink
+      href={anchorProps.href}
+      onClick={anchorProps.onClick}
+      className={clsx(headerStyles.menuLink, notificationStyles.notification)}
+    >
+      <div className={notificationStyles.container}>
+        <div className={notificationStyles.notificationIcon}>
           {notification.type === 'success' ? (
-            <Icon icon="check-circle" feather size="lg" mode="success" />
+            <Icon icon={CheckCircle} size="lg" mode="success" />
           ) : (
-            <Icon icon="alert-circle" feather size="lg" mode="danger" />
+            <Icon icon={AlertCircle} size="lg" mode="danger" />
           )}
         </div>
-        <div className={clsx(notificationStyles.notificationBody)}>
-          <p className={clsx(notificationStyles.notificationTitle)}>
+        <div className={notificationStyles.notificationBody}>
+          <p className={notificationStyles.notificationTitle}>
             {notification.title}
           </p>
-          <p>{notification.details}</p>
+          <p className={notificationStyles.notificationDetails}>
+            {notification.details}
+          </p>
           <p className="small text-muted">
             {formatTime(notification.timeStamp)}
           </p>
         </div>
-        <div className={clsx(notificationStyles.deleteButton)}>
+        <div className={notificationStyles.deleteButton}>
           <Button
             color="none"
             onClick={(e) => {
@@ -174,9 +174,8 @@ function MenuLink({
             }}
             data-cy="notification-deleteButton"
             size="large"
-          >
-            <Icon icon="trash-2" feather />
-          </Button>
+            icon={Trash2}
+          />
         </div>
       </div>
     </ReachMenuLink>

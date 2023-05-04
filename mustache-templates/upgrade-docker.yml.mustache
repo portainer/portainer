@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  updater:
+    image: {{updater_image}}{{^updater_image}}portainer/portainer-updater:latest{{/updater_image}}
+    labels:
+      - io.portainer.hideStack=true 
+      - io.portainer.updater=true 
+    command: ["portainer", 
+      "--image", "{{image}}{{^image}}portainer/portainer-ee:latest{{/image}}",
+      "--env-type", "{{envType}}{{^envType}}standalone{{/envType}}",
+      "--license", "{{license}}"
+    ]
+    {{#skip_pull_image}}
+    environment:
+      - SKIP_PULL=1
+    {{/skip_pull_image}}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      {{! - \\.\pipe\docker_engine:\\.\pipe\docker_engine }}

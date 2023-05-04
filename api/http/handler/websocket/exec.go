@@ -8,11 +8,12 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/websocket"
 )
 
 type execStartOperationPayload struct {
@@ -72,7 +73,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 
 	err = handler.handleExecRequest(w, r, params)
 	if err != nil {
-		return httperror.InternalServerError("An error occured during websocket exec operation", err)
+		return httperror.InternalServerError("An error occurred during websocket exec operation", err)
 	}
 
 	return nil
@@ -120,12 +121,7 @@ func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer
 		return err
 	}
 
-	err = hijackRequest(websocketConn, httpConn, execStartRequest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return hijackRequest(websocketConn, httpConn, execStartRequest)
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {

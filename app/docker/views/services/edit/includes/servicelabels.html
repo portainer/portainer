@@ -1,10 +1,8 @@
 <div id="service-labels">
   <rd-widget>
-    <rd-widget-header icon="list" feather-icon="true" title-text="Service labels">
+    <rd-widget-header icon="list" title-text="Service labels">
       <div class="nopadding" authorization="DockerServiceUpdate">
-        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addLabel(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" feather="true"></pr-icon> label
-        </a>
+        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addLabel(service)" ng-disabled="isUpdating"> <pr-icon icon="'plus'"></pr-icon> label </a>
       </div>
     </rd-widget-header>
     <rd-widget-body ng-if="service.ServiceLabels.length === 0">
@@ -48,7 +46,7 @@
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-dangerlight" type="button" ng-click="removeLabel(service, $index)" ng-disabled="isUpdating">
-                    <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                    <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                   </button>
                 </span>
               </div>

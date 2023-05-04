@@ -13,7 +13,6 @@ angular.module('portainer.docker').component('imagesDatatable', {
     downloadAction: '<',
     forceRemoveAction: '<',
     exportInProgress: '<',
-    offlineMode: '<',
     refreshCallback: '<',
   },
 });

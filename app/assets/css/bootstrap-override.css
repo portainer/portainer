@@ -185,7 +185,7 @@ input:checked + .slider:before {
 /* Widget */
 
 .widget .widget-icon {
-  @apply text-lg !p-2 mr-1;
+  @apply mr-1 !p-2 text-lg;
   @apply bg-blue-3 text-blue-8;
   @apply th-dark:bg-gray-9 th-dark:text-blue-3;
 
@@ -284,65 +284,7 @@ input:checked + .slider:before {
   width: 450px;
 }
 
-.modal-content {
-  padding: 20px;
-}
-
-.background-error {
-  padding-top: 55px;
-  background-image: url(../images/icon-error.svg);
-  background-repeat: no-repeat;
-  background-position: top left;
-}
-
-.background-warning {
-  padding-top: 55px;
-  background-image: url(../images/icon-warning.svg);
-  background-repeat: no-repeat;
-  background-position: top left;
-}
-
-.modal-header {
-  margin-bottom: 10px;
-  padding: 0px;
-  border-bottom: none;
-}
-
-.modal-header .close {
-  margin-top: 0px;
-}
-
-.modal-header .modal-title {
-  font-weight: bold;
-}
-
-.modal-body {
-  padding: 10px 0px;
-  border-bottom: none;
-}
-
-.modal-body .bootbox-body {
-  font-size: 12px;
-  color: var(--text-bootbox);
-}
-
-.modal-footer {
-  padding: 10px 0px;
-  border-top: none;
-  display: flex;
-}
-
-.modal-footer .bootbox-cancel {
-  width: 100%;
-}
-
-.modal-footer .bootbox-accept {
-  width: 100%;
-}
-
-.bootbox-checkbox-list {
-  border: 0px;
-}
+/* !Modal */
 
 /* Status Indicator Inside Table Section Label Style */
 .table .label {
@@ -391,6 +333,10 @@ input:checked + .slider:before {
 /* Pagination */
 .datatable .footer .paginationControls .pagination {
   border: 1px solid var(--border-pagination-color);
+}
+
+.paginationControls > form {
+  @apply inline-flex items-center;
 }
 
 .pagination li button {

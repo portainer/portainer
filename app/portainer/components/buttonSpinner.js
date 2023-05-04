@@ -5,7 +5,7 @@ angular.module('portainer.app').directive('buttonSpinner', function buttonSpinne
       spinning: '=buttonSpinner',
     },
     transclude: true,
-    template: '<ng-transclude></ng-transclude><span ng-show="spinning"><i class="fa fa-circle-notch fa-spin" style="margin-left: 2px;"></i>&nbsp;</span>',
+    template: '<ng-transclude></ng-transclude><span ng-show="spinning"><pr-icon icon="\'loader-2\'" class-name="\'animate-spin-slow ml-0.5\'"></pr-icon>&nbsp;</span>',
   };
 
   return directive;

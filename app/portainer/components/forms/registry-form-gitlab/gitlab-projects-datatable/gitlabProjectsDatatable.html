@@ -3,16 +3,16 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-blue'"></pr-icon>
+          <pr-icon icon="$ctrl.titleIcon" class-name="'icon-blue'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+          <pr-icon icon="'search'" class="searchIcon"></pr-icon>
           <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus />
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table-hover nowrap-cells table">
           <thead>
             <tr>
               <th>
@@ -76,7 +76,7 @@
               </td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="3" class="text-center text-muted">No projects available.</td>
+              <td colspan="3" class="text-muted text-center">No projects available.</td>
             </tr>
           </tbody>
         </table>

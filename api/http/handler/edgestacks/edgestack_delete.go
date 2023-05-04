@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/edge"
 )
 
 // @id EdgeStackDelete
@@ -16,7 +15,7 @@ import (
 // @tags edge_stacks
 // @security ApiKeyAuth
 // @security jwt
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @success 204
 // @failure 500
 // @failure 400
@@ -35,33 +34,9 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
 	}
 
-	err = handler.DataStore.EdgeStack().DeleteEdgeStack(portainer.EdgeStackID(edgeStackID))
+	err = handler.edgeStacksService.DeleteEdgeStack(edgeStack.ID, edgeStack.EdgeGroups)
 	if err != nil {
-		return httperror.InternalServerError("Unable to remove the edge stack from the database", err)
-	}
-
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
-	}
-
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
-	}
-
-	for _, endpointID := range relatedEndpointIds {
-		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
-		if err != nil {
-			return httperror.InternalServerError("Unable to find environment relation in database", err)
-		}
-
-		delete(relation.EdgeStacks, edgeStack.ID)
-
-		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
-		if err != nil {
-			return httperror.InternalServerError("Unable to persist environment relation in database", err)
-		}
+		return httperror.InternalServerError("Unable to delete edge stack", err)
 	}
 
 	return response.Empty(w)

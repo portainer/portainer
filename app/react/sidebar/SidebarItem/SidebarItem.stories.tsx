@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { Clock, Icon } from 'react-feather';
+import { Clock, Icon } from 'lucide-react';
 
 import { SidebarItem } from '.';
 

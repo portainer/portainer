@@ -1,4 +1,4 @@
-import { User as UserIcon, Users as TeamIcon } from 'react-feather';
+import { User as UserIcon, Users as TeamIcon } from 'lucide-react';
 import { OptionProps, components, MultiValueGenericProps } from 'react-select';
 
 import { Select } from '@@/form-components/ReactSelect';
@@ -72,7 +72,7 @@ function Label({ option }: { option: Option }) {
   const Icon = option.Type === 'user' ? UserIcon : TeamIcon;
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className="flex items-center gap-1">
       <Icon />
       <span>{option.Name}</span>
       <span>|</span>

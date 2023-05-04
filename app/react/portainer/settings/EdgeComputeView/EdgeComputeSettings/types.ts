@@ -1,7 +1,8 @@
-export interface Settings {
-  EdgeAgentCheckinInterval: number;
+export interface FormValues {
   EnableEdgeComputeFeatures: boolean;
-  TrustOnFirstConnect: boolean;
-  EnforceEdgeID: boolean;
   EdgePortainerUrl: string;
+  EnforceEdgeID: boolean;
+  Edge: {
+    TunnelServerAddress: string;
+  };
 }

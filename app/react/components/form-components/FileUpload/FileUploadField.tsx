@@ -1,4 +1,5 @@
 import { ChangeEvent, createRef } from 'react';
+import { XCircle } from 'lucide-react';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -46,7 +47,7 @@ export function FileUploadField({
       </Button>
 
       <span className="vertical-center">
-        {value ? value.name : <Icon icon="x-circle" feather mode="danger" />}
+        {value ? value.name : <Icon icon={XCircle} mode="danger" />}
       </span>
     </div>
   );

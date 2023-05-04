@@ -11,22 +11,24 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"golang.org/x/exp/slices"
+	"github.com/portainer/portainer/api/internal/slices"
 )
 
 type EnvironmentsQuery struct {
-	search              string
-	types               []portainer.EndpointType
-	tagIds              []portainer.TagID
-	endpointIds         []portainer.EndpointID
-	tagsPartialMatch    bool
-	groupIds            []portainer.EndpointGroupID
-	status              []portainer.EndpointStatus
-	edgeDevice          *bool
-	edgeDeviceUntrusted bool
-	excludeSnapshots    bool
-	name                string
-	agentVersions       []string
+	search           string
+	types            []portainer.EndpointType
+	tagIds           []portainer.TagID
+	endpointIds      []portainer.EndpointID
+	tagsPartialMatch bool
+	groupIds         []portainer.EndpointGroupID
+	status           []portainer.EndpointStatus
+	// if edgeAsync not nil, will filter edge endpoints based on this value
+	edgeAsync                *bool
+	edgeDeviceUntrusted      bool
+	excludeSnapshots         bool
+	name                     string
+	agentVersions            []string
+	edgeCheckInPassedSeconds int
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -66,30 +68,32 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	name, _ := request.RetrieveQueryParameter(r, "name", true)
 
-	edgeDeviceParam, _ := request.RetrieveQueryParameter(r, "edgeDevice", true)
-
-	var edgeDevice *bool
-	if edgeDeviceParam != "" {
-		edgeDevice = BoolAddr(edgeDeviceParam == "true")
+	var edgeAsync *bool
+	edgeAsyncParam, _ := request.RetrieveQueryParameter(r, "edgeAsync", true)
+	if edgeAsyncParam != "" {
+		edgeAsync = BoolAddr(edgeAsyncParam == "true")
 	}
 
 	edgeDeviceUntrusted, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceUntrusted", true)
 
 	excludeSnapshots, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshots", true)
 
+	edgeCheckInPassedSeconds, _ := request.RetrieveNumericQueryParameter(r, "edgeCheckInPassedSeconds", true)
+
 	return EnvironmentsQuery{
-		search:              search,
-		types:               endpointTypes,
-		tagIds:              tagIDs,
-		endpointIds:         endpointIDs,
-		tagsPartialMatch:    tagsPartialMatch,
-		groupIds:            groupIDs,
-		status:              status,
-		edgeDevice:          edgeDevice,
-		edgeDeviceUntrusted: edgeDeviceUntrusted,
-		excludeSnapshots:    excludeSnapshots,
-		name:                name,
-		agentVersions:       agentVersions,
+		search:                   search,
+		types:                    endpointTypes,
+		tagIds:                   tagIDs,
+		endpointIds:              endpointIDs,
+		tagsPartialMatch:         tagsPartialMatch,
+		groupIds:                 groupIDs,
+		status:                   status,
+		edgeAsync:                edgeAsync,
+		edgeDeviceUntrusted:      edgeDeviceUntrusted,
+		excludeSnapshots:         excludeSnapshots,
+		name:                     name,
+		agentVersions:            agentVersions,
+		edgeCheckInPassedSeconds: edgeCheckInPassedSeconds,
 	}, nil
 }
 
@@ -108,12 +112,39 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 		filteredEndpoints = filterEndpointsByName(filteredEndpoints, query.name)
 	}
 
-	if query.edgeDevice != nil {
-		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, *query.edgeDevice, query.edgeDeviceUntrusted)
-	} else {
-		// If the edgeDevice parameter is not set, we need to filter out the untrusted edge devices
+	// filter async edge environments
+	if query.edgeAsync != nil {
 		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
-			return !endpoint.IsEdgeDevice || endpoint.UserTrusted
+			if !endpointutils.IsEdgeEndpoint(&endpoint) {
+				return true
+			}
+
+			return endpoint.Edge.AsyncMode == *query.edgeAsync
+		})
+	}
+
+	// filter edge environments by trusted/untrusted
+	filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+		if !endpointutils.IsEdgeEndpoint(&endpoint) {
+			return true
+		}
+
+		return endpoint.UserTrusted == !query.edgeDeviceUntrusted
+	})
+
+	if query.edgeCheckInPassedSeconds > 0 {
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			// ignore non-edge endpoints
+			if !endpointutils.IsEdgeEndpoint(&endpoint) {
+				return true
+			}
+
+			// filter out endpoints that have never checked in
+			if endpoint.LastCheckInDate == 0 {
+				return false
+			}
+
+			return time.Now().Unix()-endpoint.LastCheckInDate < int64(query.edgeCheckInPassedSeconds)
 		})
 	}
 
@@ -153,38 +184,39 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 }
 
 func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs []portainer.EndpointGroupID) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if slices.Contains(endpointGroupIDs, endpoint.GroupID) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 }
 
 func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, tagsMap map[portainer.TagID]string, searchCriteria string) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		endpointTags := convertTagIDsToTags(tagsMap, endpoint.TagIDs)
 		if endpointMatchSearchCriteria(&endpoint, endpointTags, searchCriteria) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
+
 			continue
 		}
 
 		if endpointGroupMatchSearchCriteria(&endpoint, endpointGroups, tagsMap, searchCriteria) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 }
 
 func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []portainer.EndpointStatus, settings *portainer.Settings) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		status := endpoint.Status
 		if endpointutils.IsEdgeEndpoint(&endpoint) {
@@ -205,11 +237,12 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []portai
 		}
 
 		if slices.Contains(statuses, status) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 }
 
 func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, searchCriteria string) bool {
@@ -226,6 +259,7 @@ func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, se
 	} else if endpoint.Status == portainer.EndpointStatusDown && searchCriteria == "down" {
 		return true
 	}
+
 	for _, tag := range tags {
 		if strings.Contains(strings.ToLower(tag), searchCriteria) {
 			return true
@@ -241,6 +275,7 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 			if strings.Contains(strings.ToLower(group.Name), searchCriteria) {
 				return true
 			}
+
 			tags := convertTagIDsToTags(tagsMap, group.TagIDs)
 			for _, tag := range tags {
 				if strings.Contains(strings.ToLower(tag), searchCriteria) {
@@ -254,58 +289,38 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 }
 
 func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []portainer.EndpointType) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointType := range endpointTypes {
 		typeSet[portainer.EndpointType(endpointType)] = true
 	}
 
+	n := 0
 	for _, endpoint := range endpoints {
 		if typeSet[endpoint.Type] {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
-}
 
-func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDevice bool, untrusted bool) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
-	for _, endpoint := range endpoints {
-		if shouldReturnEdgeDevice(endpoint, edgeDevice, untrusted) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-		}
-	}
-	return filteredEndpoints
-}
-
-func shouldReturnEdgeDevice(endpoint portainer.Endpoint, edgeDeviceParam bool, untrustedParam bool) bool {
-	if !endpointutils.IsEdgeEndpoint(&endpoint) {
-		return true
-	}
-
-	if !edgeDeviceParam {
-		return !endpoint.IsEdgeDevice
-	}
-
-	return endpoint.IsEdgeDevice && endpoint.UserTrusted == !untrustedParam
+	return endpoints[:n]
 }
 
 func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.TagID) []string {
-	tags := make([]string, 0)
+	tags := make([]string, 0, len(tagIDs))
+
 	for _, tagID := range tagIDs {
 		tags = append(tags, tagsMap[tagID])
 	}
+
 	return tags
 }
 
 func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup, partialMatch bool) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		endpointGroup := getEndpointGroup(endpoint.GroupID, endpointGroups)
 		endpointMatched := false
+
 		if partialMatch {
 			endpointMatched = endpointPartialMatchTags(endpoint, endpointGroup, tagIDs)
 		} else {
@@ -313,27 +328,33 @@ func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.
 		}
 
 		if endpointMatched {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func endpointPartialMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.EndpointGroup, tagIDs []portainer.TagID) bool {
-	tagSet := make(map[portainer.TagID]bool)
+	tagSet := make(map[portainer.TagID]bool, len(tagIDs))
+
 	for _, tagID := range tagIDs {
 		tagSet[tagID] = true
 	}
+
 	for _, tagID := range endpoint.TagIDs {
 		if tagSet[tagID] {
 			return true
 		}
 	}
+
 	for _, tagID := range endpointGroup.TagIDs {
 		if tagSet[tagID] {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -342,34 +363,37 @@ func endpointFullMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.
 	for _, tagID := range tagIDs {
 		missingTags[tagID] = true
 	}
+
 	for _, tagID := range endpoint.TagIDs {
 		if missingTags[tagID] {
 			delete(missingTags, tagID)
 		}
 	}
+
 	for _, tagID := range endpointGroup.TagIDs {
 		if missingTags[tagID] {
 			delete(missingTags, tagID)
 		}
 	}
+
 	return len(missingTags) == 0
 }
 
 func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.EndpointID) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
-	idsSet := make(map[portainer.EndpointID]bool)
+	idsSet := make(map[portainer.EndpointID]bool, len(ids))
 	for _, id := range ids {
 		idsSet[id] = true
 	}
 
+	n := 0
 	for _, endpoint := range endpoints {
 		if idsSet[endpoint.ID] {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
 
-	return filteredEndpoints
+	return endpoints[:n]
 
 }
 
@@ -378,25 +402,27 @@ func filterEndpointsByName(endpoints []portainer.Endpoint, name string) []portai
 		return endpoints
 	}
 
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if endpoint.Name == name {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func filter(endpoints []portainer.Endpoint, predicate func(endpoint portainer.Endpoint) bool) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
+	n := 0
 	for _, endpoint := range endpoints {
 		if predicate(endpoint) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
+			endpoints[n] = endpoint
+			n++
 		}
 	}
-	return filteredEndpoints
+
+	return endpoints[:n]
 }
 
 func getArrayQueryParameter(r *http.Request, parameter string) []string {

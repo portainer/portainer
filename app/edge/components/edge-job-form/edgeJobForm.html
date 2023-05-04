@@ -2,7 +2,7 @@
   <div class="col-sm-12 form-section-title"> Edge job configuration </div>
   <!-- name-input -->
   <div class="form-group mt-4">
-    <label for="edgejob_name" class="col-sm-2 control-label text-left required">Name </label>
+    <label for="edgejob_name" class="col-sm-2 control-label required text-left">Name </label>
     <div class="col-sm-10">
       <input
         type="text"
@@ -19,10 +19,10 @@
         <div class="small text-warning">
           <div ng-messages="edgeJobForm.edgejob_name.$error">
             <p ng-message="required" class="vertical-center">
-              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
             </p>
             <p ng-message="pattern" class="vertical-center">
-              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
+              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
             </p>
           </div>
         </div>
@@ -34,33 +34,9 @@
   <!-- cron-input -->
   <!-- edge-job-method-select -->
   <div class="col-sm-12 form-section-title"> Edge job configuration </div>
-  <div class="form-group"></div>
-  <div class="form-group">
-    <div class="col-sm-12">
-      <div class="boxselector_wrapper !mt-0">
-        <div>
-          <input type="radio" id="config_basic" ng-model="$ctrl.formValues.cronMethod" value="basic" />
-          <label for="config_basic">
-            <div class="boxselector_header vertical-center">
-              <pr-icon icon="'calendar'" feather="true"></pr-icon>
-              Basic configuration
-            </div>
-            <p>Select date from calendar</p>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="config_advanced" ng-model="$ctrl.formValues.cronMethod" value="advanced" />
-          <label for="config_advanced">
-            <div class="boxselector_header vertical-center">
-              <pr-icon icon="'edit'" feather="true"></pr-icon>
-              Advanced configuration
-            </div>
-            <p>Write your own cron rule</p>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
+
+  <box-selector slim="true" radio-name="'configuration'" value="$ctrl.formValues.cronMethod" options="$ctrl.cronMethods" on-change="($ctrl.onCronMethodChange)"></box-selector>
+
   <!-- !edge-job-method-select -->
   <!-- basic-edge-job -->
   <div ng-if="$ctrl.formValues.cronMethod === 'basic'">
@@ -82,7 +58,7 @@
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.datepicker.$error">
               <p ng-message="required" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
               </p>
             </div>
           </div>
@@ -108,7 +84,7 @@
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.edgejob_value.$error">
               <p ng-message="required" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
               </p>
             </div>
           </div>
@@ -137,10 +113,10 @@
           <div class="small text-warning">
             <div ng-messages="edgeJobForm.edgejob_cron.$error">
               <p ng-message="required" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field is required.
               </p>
               <p ng-message="pattern" class="vertical-center">
-                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field format is invalid.
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'"></pr-icon></span> This field format is invalid.
               </p>
             </div>
           </div>
@@ -154,42 +130,19 @@
   <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
     <div class="col-sm-12 form-section-title"> Job content </div>
-    <div class="form-group">
-      <div class="col-sm-12">
-        <div class="boxselector_wrapper">
-          <div>
-            <input type="radio" id="method_editor" ng-model="$ctrl.formValues.method" value="editor" />
-            <label for="method_editor">
-              <div class="boxselector_header vertical-center">
-                <pr-icon icon="'edit'" feather="true"></pr-icon>
-                Web editor
-              </div>
-              <p>Use our Web editor</p>
-            </label>
-          </div>
-          <div>
-            <input type="radio" id="method_upload" ng-model="$ctrl.formValues.method" value="upload" />
-            <label for="method_upload">
-              <div class="boxselector_header vertical-center">
-                <pr-icon icon="'upload'" feather="true"></pr-icon>
-                Upload
-              </div>
-              <p>Upload from your computer</p>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
+    <box-selector value="$ctrl.formValues.method" options="$ctrl.buildMethods" radio-name="buildMethod" on-change="($ctrl.onBuildMethodChange)" slim="true"></box-selector>
   </div>
   <!-- !execution-method -->
+
   <!-- web-editor -->
+  <!-- TODO use web-editor-form component -->
   <div ng-show="$ctrl.formValues.method === 'editor'">
     <div class="col-sm-12 form-section-title"> Web editor </div>
     <div class="form-group">
       <div class="col-sm-12">
         <code-editor
           identifier="execute-edge-job-editor"
-          placeholder="# Define or paste the content of your script file here"
+          placeholder="Define or paste the content of your script file here"
           on-change="($ctrl.editorUpdate)"
           value="$ctrl.model.FileContent"
         ></code-editor>
@@ -208,12 +161,23 @@
         <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
         <span class="space-left">
           {{ $ctrl.model.File.name }}
-          <span ng-if="!$ctrl.model.File"><pr-icon icon="'x'" class-name="'icon icon-danger'" feather="true"></pr-icon></span>
+          <span ng-if="!$ctrl.model.File"><pr-icon icon="'x'" class-name="'icon icon-danger'"></pr-icon></span>
         </span>
       </div>
     </div>
   </div>
   <!-- !upload -->
+
+  <div class="col-sm-12 form-section-title"> Edge Groups </div>
+  <div class="form-group" ng-if="$ctrl.edgeGroups">
+    <div class="col-sm-12">
+      <edge-groups-selector ng-if="!$ctrl.noGroups" value="$ctrl.model.EdgeGroups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
+    </div>
+    <div ng-if="$ctrl.noGroups" class="col-sm-12 small text-muted">
+      No Edge groups are available. Head over to the <a ui-sref="edge.groups">Edge groups view</a> to create one.
+    </div>
+  </div>
+
   <div class="col-sm-12 form-section-title"> Target environments </div>
   <!-- node-selection -->
   <associated-endpoints-selector
@@ -233,7 +197,7 @@
         type="button"
         class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !edgeJobForm.$valid
-        || $ctrl.model.Endpoints.length === 0
+        || ($ctrl.model.Endpoints.length === 0 && $ctrl.model.EdgeGroups.length === 0)
         || ($ctrl.formValues.method === 'upload' && !$ctrl.model.File)
         || ($ctrl.formValues.method === 'editor' && !$ctrl.model.FileContent)
         "

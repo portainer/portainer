@@ -1,20 +1,20 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer, useState } from 'react';
 import { object, SchemaOf, string } from 'yup';
+import { Network, Plug2 } from 'lucide-react';
 
-import { buildOption } from '@/portainer/components/BoxSelector';
-import { useCreateAzureEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { Environment } from '@/portainer/environments/types';
-import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
+import { Environment } from '@/react/portainer/environments/types';
+import { EnvironmentMetadata } from '@/react/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
-import { BoxSelector } from '@@/BoxSelector';
-import { Icon } from '@@/Icon';
+import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
+import { BadgeIcon } from '@@/BadgeIcon';
 
-import { NameField, nameValidation } from '../shared/NameField';
+import { NameField, useNameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
 import { metadataValidation } from '../shared/MetadataFieldset/validation';
 import { MoreSettingsSection } from '../shared/MoreSettingsSection';
@@ -38,7 +38,15 @@ const initialValues: FormValues = {
   },
 };
 
-const options = [buildOption('api', 'svg-api', 'API', '', 'api')];
+const options: Array<BoxSelectorOption<'api'>> = [
+  {
+    description: '',
+    icon: <BadgeIcon icon={Network} size="3xl" />,
+    id: 'api',
+    label: 'API',
+    value: 'api',
+  },
+];
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
@@ -49,6 +57,7 @@ export function WizardAzure({ onCreate }: Props) {
 
   const [creationType, setCreationType] = useState(options[0].id);
   const mutation = useCreateAzureEnvironmentMutation();
+  const validation = useValidation();
 
   return (
     <div className="form-horizontal">
@@ -64,7 +73,7 @@ export function WizardAzure({ onCreate }: Props) {
         onSubmit={handleSubmit}
         key={formKey}
         validateOnMount
-        validationSchema={validationSchema}
+        validationSchema={validation}
       >
         {({ errors, dirty, isValid }) => (
           <Form>
@@ -121,11 +130,8 @@ export function WizardAzure({ onCreate }: Props) {
                   loadingText="Connecting environment..."
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
+                  icon={Plug2}
                 >
-                  <Icon
-                    icon="svg-plug"
-                    className="icon icon-sm vertical-center"
-                  />{' '}
                   Connect
                 </LoadingButton>
               </div>
@@ -164,9 +170,9 @@ export function WizardAzure({ onCreate }: Props) {
   }
 }
 
-function validationSchema(): SchemaOf<FormValues> {
+function useValidation(): SchemaOf<FormValues> {
   return object({
-    name: nameValidation(),
+    name: useNameValidation(),
     applicationId: string().required('Application ID is required'),
     tenantId: string().required('Tenant ID is required'),
     authenticationKey: string().required('Authentication Key is required'),

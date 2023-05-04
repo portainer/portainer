@@ -1,21 +1,20 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
-import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useContainerGpus } from '@/react/docker/containers/queries/gpus';
 
-export const gpus: Column<DockerContainer> = {
-  Header: 'GPUs',
+import { columnHelper } from './helper';
+
+export const gpus = columnHelper.display({
+  header: 'GPUs',
   id: 'gpus',
-  disableFilters: true,
-  canHide: true,
-  Filter: () => null,
-  Cell: GpusCell,
-};
+  cell: GpusCell,
+});
 
 function GpusCell({
   row: { original: container },
-}: CellProps<DockerContainer>) {
+}: CellContext<DockerContainer, unknown>) {
   const containerId = container.Id;
   const environmentId = useEnvironmentId();
   const gpusQuery = useContainerGpus(environmentId, containerId);

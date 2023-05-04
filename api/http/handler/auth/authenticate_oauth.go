@@ -22,6 +22,7 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Code) {
 		return errors.New("Invalid OAuth authorization code")
 	}
+
 	return nil
 }
 

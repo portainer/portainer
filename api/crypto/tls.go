@@ -3,11 +3,11 @@ package crypto
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 )
 
-// CreateServerTLSConfiguration creates a basic tls.Config to be used by servers with recommended TLS settings
-func CreateServerTLSConfiguration() *tls.Config {
+// CreateTLSConfiguration creates a basic tls.Config with recommended TLS settings
+func CreateTLSConfiguration() *tls.Config {
 	return &tls.Config{
 		MinVersion: tls.VersionTLS12,
 		CipherSuites: []uint16{
@@ -27,7 +27,7 @@ func CreateServerTLSConfiguration() *tls.Config {
 // CreateTLSConfigurationFromBytes initializes a tls.Config using a CA certificate, a certificate and a key
 // loaded from memory.
 func CreateTLSConfigurationFromBytes(caCert, cert, key []byte, skipClientVerification, skipServerVerification bool) (*tls.Config, error) {
-	config := &tls.Config{}
+	config := CreateTLSConfiguration()
 	config.InsecureSkipVerify = skipServerVerification
 
 	if !skipClientVerification {
@@ -50,7 +50,7 @@ func CreateTLSConfigurationFromBytes(caCert, cert, key []byte, skipClientVerific
 // CreateTLSConfigurationFromDisk initializes a tls.Config using a CA certificate, a certificate and a key
 // loaded from disk.
 func CreateTLSConfigurationFromDisk(caCertPath, certPath, keyPath string, skipServerVerification bool) (*tls.Config, error) {
-	config := &tls.Config{}
+	config := CreateTLSConfiguration()
 	config.InsecureSkipVerify = skipServerVerification
 
 	if certPath != "" && keyPath != "" {
@@ -63,7 +63,7 @@ func CreateTLSConfigurationFromDisk(caCertPath, certPath, keyPath string, skipSe
 	}
 
 	if !skipServerVerification && caCertPath != "" {
-		caCert, err := ioutil.ReadFile(caCertPath)
+		caCert, err := os.ReadFile(caCertPath)
 		if err != nil {
 			return nil, err
 		}

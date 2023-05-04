@@ -1,31 +1,25 @@
-import { Cell, TableRowProps } from 'react-table';
+import { Cell, flexRender } from '@tanstack/react-table';
+import clsx from 'clsx';
 
-interface Props<D extends Record<string, unknown> = Record<string, unknown>>
-  extends Omit<TableRowProps, 'key'> {
-  cells: Cell<D>[];
+interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
+  cells: Cell<D, unknown>[];
+  className?: string;
+  onClick?: () => void;
 }
 
 export function TableRow<
   D extends Record<string, unknown> = Record<string, unknown>
->({ cells, className, role, style }: Props<D>) {
+>({ cells, className, onClick }: Props<D>) {
   return (
-    <tr className={className} role={role} style={style}>
-      {cells.map((cell) => {
-        const cellProps = cell.getCellProps({
-          className: cell.className,
-        });
-
-        return (
-          <td
-            className={cellProps.className}
-            role={cellProps.role}
-            style={cellProps.style}
-            key={cellProps.key}
-          >
-            {cell.render('Cell')}
-          </td>
-        );
-      })}
+    <tr
+      className={clsx(className, { 'cursor-pointer': !!onClick })}
+      onClick={onClick}
+    >
+      {cells.map((cell) => (
+        <td key={cell.id}>
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </td>
+      ))}
     </tr>
   );
 }

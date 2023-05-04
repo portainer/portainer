@@ -1,14 +1,17 @@
 import _ from 'lodash-es';
 
+import featureFlagModule from '@/react/portainer/feature-flags';
+
 import './rbac';
+
 import componentsModule from './components';
 import settingsModule from './settings';
-import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
+import { helpersModule } from './helpers';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -39,6 +42,7 @@ angular
     reactModule,
     sidebarModule,
     environmentsModule,
+    helpersModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -144,6 +148,7 @@ angular
           'sidebar@': {},
         },
       };
+
       const logout = {
         name: 'portainer.logout',
         url: '/logout',
@@ -166,15 +171,17 @@ angular
         url: '/endpoints',
         views: {
           'content@': {
-            templateUrl: './views/endpoints/endpoints.html',
-            controller: 'EndpointsController',
+            component: 'endpointsView',
           },
         },
       };
 
       var endpoint = {
         name: 'portainer.endpoints.endpoint',
-        url: '/:id',
+        url: '/:id?redirectTo',
+        params: {
+          redirectTo: '',
+        },
         views: {
           'content@': {
             templateUrl: './views/endpoints/edit/endpoint.html',
@@ -190,6 +197,16 @@ angular
           'content@': {
             templateUrl: './views/devices/import/importDevice.html',
             controller: 'ImportDeviceController',
+          },
+        },
+      };
+
+      const edgeAutoCreateScript = {
+        name: 'portainer.endpoints.edgeAutoCreateScript',
+        url: '/aeec',
+        views: {
+          'content@': {
+            component: 'edgeAutoCreateScriptView',
           },
         },
       };
@@ -283,7 +300,7 @@ angular
 
       var home = {
         name: 'portainer.home',
-        url: '/home',
+        url: '/home?redirect&environmentId&environmentName&route',
         views: {
           'content@': {
             component: 'homeView',
@@ -297,18 +314,6 @@ angular
         url: '/init',
         views: {
           'sidebar@': {},
-        },
-      };
-
-      var initEndpoint = {
-        name: 'portainer.init.endpoint',
-        url: '/endpoint',
-        views: {
-          'content@': {
-            templateUrl: './views/init/endpoint/initEndpoint.html',
-            controller: 'InitEndpointController',
-            controllerAs: 'ctrl',
-          },
         },
       };
 
@@ -430,6 +435,7 @@ angular
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
+      $stateRegistryProvider.register(edgeAutoCreateScript);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
@@ -439,7 +445,6 @@ angular
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
-      $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(registries);
       $stateRegistryProvider.register(registry);

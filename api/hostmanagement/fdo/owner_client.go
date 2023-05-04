@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rkl-/digest"
+	"github.com/portainer/portainer/third_party/digest"
 )
 
 type FDOOwnerClient struct {
@@ -113,7 +113,9 @@ func (c FDOOwnerClient) PutDeviceSVI(info ServiceInfo) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New(http.StatusText(resp.StatusCode))
@@ -132,7 +134,9 @@ func (c FDOOwnerClient) PutDeviceSVIRaw(info url.Values, body []byte) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New(http.StatusText(resp.StatusCode))
@@ -151,7 +155,9 @@ func (c FDOOwnerClient) GetVouchers() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New(http.StatusText(resp.StatusCode))
@@ -182,7 +188,9 @@ func (c FDOOwnerClient) DeleteVoucher(guid string) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New(http.StatusText(resp.StatusCode))
@@ -201,7 +209,9 @@ func (c FDOOwnerClient) GetDeviceSVI(guid string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -225,7 +235,9 @@ func (c FDOOwnerClient) DeleteDeviceSVI(id string) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New(http.StatusText(resp.StatusCode))

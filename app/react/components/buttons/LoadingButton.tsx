@@ -1,4 +1,7 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
+import { Loader2 } from 'lucide-react';
+
+import { Icon } from '@@/Icon';
 
 import { type Props as ButtonProps, Button } from './Button';
 
@@ -13,6 +16,7 @@ export function LoadingButton({
   disabled,
   type = 'submit',
   children,
+  icon,
   ...buttonProps
 }: PropsWithChildren<Props>) {
   return (
@@ -21,19 +25,22 @@ export function LoadingButton({
       {...buttonProps}
       type={type}
       disabled={disabled || isLoading}
+      icon={loadingButtonIcon(isLoading, icon)}
     >
-      {isLoading ? (
-        <>
-          <i
-            className="fa fa-circle-notch fa-spin space-right"
-            aria-label="loading"
-            aria-hidden="true"
-          />
-          {loadingText}
-        </>
-      ) : (
-        children
-      )}
+      {isLoading ? loadingText : children}
     </Button>
+  );
+}
+
+function loadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
+  if (!isLoading) {
+    return defaultIcon;
+  }
+  return (
+    <Icon
+      icon={Loader2}
+      className="ml-1 animate-spin-slow"
+      aria-label="loading"
+    />
   );
 }

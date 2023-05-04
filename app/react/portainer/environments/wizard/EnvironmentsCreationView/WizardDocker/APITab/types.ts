@@ -1,5 +1,4 @@
-import { Gpu } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
-import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
+import { EnvironmentMetadata } from '@/react/portainer/environments/environment.service/create';
 
 export interface FormValues {
   name: string;
@@ -10,5 +9,4 @@ export interface FormValues {
   certFile?: File;
   keyFile?: File;
   meta: EnvironmentMetadata;
-  gpus?: Gpu[];
 }

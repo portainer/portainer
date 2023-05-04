@@ -1,7 +1,5 @@
 import { PropsWithChildren } from 'react';
 
-import './DashboardGrid.css';
-
 export function DashboardGrid({ children }: PropsWithChildren<unknown>) {
-  return <div className="dashboard-grid">{children}</div>;
+  return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }

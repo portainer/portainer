@@ -8,7 +8,7 @@ export default function (formValues) {
   if (formValues.Kind === KubernetesConfigurationKinds.CONFIGMAP) {
     return [{ action, kind: KubernetesResourceTypes.CONFIGMAP, name: formValues.Name }];
   } else if (formValues.Kind === KubernetesConfigurationKinds.SECRET) {
-    let type = typeof formValues.Type === 'string' ? formValues.Type : formValues.Type.name;
+    let type = formValues.Type;
     if (formValues.customType) {
       type = formValues.customType;
     }

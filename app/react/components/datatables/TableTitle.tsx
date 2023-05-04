@@ -1,35 +1,37 @@
 import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import clsx from 'clsx';
 
 import { Icon } from '@@/Icon';
 
 interface Props {
   icon?: ReactNode | ComponentType<unknown>;
-  featherIcon?: boolean;
   label: string;
+  description?: ReactNode;
+  className?: string;
 }
 
 export function TableTitle({
   icon,
-  featherIcon,
   label,
   children,
+  description,
+  className,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="toolBar">
-      <div className="toolBarTitle">
-        {icon && (
-          <div className="widget-icon">
-            <Icon
-              icon={icon}
-              feather={featherIcon}
-              className="space-right feather"
-            />
-          </div>
-        )}
+    <div className={clsx('toolBar flex-col', className)}>
+      <div className="flex w-full items-center gap-1 p-0">
+        <div className="toolBarTitle">
+          {icon && (
+            <div className="widget-icon">
+              <Icon icon={icon} className="space-right" />
+            </div>
+          )}
 
-        {label}
+          {label}
+        </div>
+        {children}
       </div>
-      {children}
+      {description}
     </div>
   );
 }

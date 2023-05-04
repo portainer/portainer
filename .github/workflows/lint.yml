@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: '14'
           cache: 'yarn'
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.4
       - run: yarn --frozen-lockfile
 
       - name: Run linters
@@ -36,3 +39,9 @@ jobs:
           gofmt_dir: api/
       - name: Typecheck
         uses: icrawl/action-tsc@v1
+      - name: GolangCI-Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          working-directory: api
+          args: -c .golangci.yaml

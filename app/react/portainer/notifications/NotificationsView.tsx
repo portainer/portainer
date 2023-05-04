@@ -1,52 +1,59 @@
-import { Bell, Trash2 } from 'react-feather';
+import { Bell, Trash2 } from 'lucide-react';
 import { useStore } from 'zustand';
+import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { react2angular } from '@/react-tools/react2angular';
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/react/hooks/useUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { PageHeader } from '@@/PageHeader';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
+import { createPersistedStore } from '@@/datatables/types';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { notificationsStore } from './notifications-store';
 import { ToastNotification } from './types';
 import { columns } from './columns';
-import { createStore } from './datatable-store';
 
 const storageKey = 'notifications-list';
-const useSettingsStore = createStore(storageKey);
+const settingsStore = createPersistedStore(storageKey, {
+  id: 'time',
+  desc: true,
+});
 
 export function NotificationsView() {
-  const settingsStore = useSettingsStore();
   const { user } = useUser();
 
-  const userNotifications: ToastNotification[] = useStore(
-    notificationsStore,
-    (state) => state.userNotifications[user.Id]
-  );
+  const userNotifications: ToastNotification[] =
+    useStore(notificationsStore, (state) => state.userNotifications[user.Id]) ||
+    [];
 
   const breadcrumbs = 'Notifications';
+  const tableState = useTableState(settingsStore, storageKey);
+
+  const {
+    params: { id: activeItemId },
+  } = useCurrentStateAndParams();
 
   return (
     <>
       <PageHeader title="Notifications" breadcrumbs={breadcrumbs} reload />
       <Datatable
         columns={columns}
-        titleOptions={{
-          title: 'Notifications',
-          icon: Bell,
-        }}
+        title="Notifications"
+        titleIcon={Bell}
         dataset={userNotifications}
-        settingsStore={settingsStore}
-        storageKey="notifications"
+        settingsManager={tableState}
         emptyContentLabel="No notifications found"
         totalCount={userNotifications.length}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
+        getRowId={(row) => row.id}
+        highlightedItemId={activeItemId}
       />
     </>
   );

@@ -6,6 +6,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -53,7 +54,7 @@ func (store *Store) copyDBFile(from string, to string) error {
 
 // BackupOptions provide a helper to inject backup options
 type BackupOptions struct {
-	Version        int // I can't find this used for anything other than a filename
+	Version        string
 	BackupDir      string
 	BackupFileName string
 	BackupPath     string
@@ -70,26 +71,32 @@ func getBackupRestoreOptions(backupDir string) *BackupOptions {
 }
 
 // Backup current database with default options
-func (store *Store) Backup() (string, error) {
-	return store.backupWithOptions(nil)
+func (store *Store) Backup(version *models.Version) (string, error) {
+	if version == nil {
+		return store.backupWithOptions(nil)
+	}
+
+	return store.backupWithOptions(&BackupOptions{
+		Version: version.SchemaVersion,
+	})
 }
 
 func (store *Store) setupOptions(options *BackupOptions) *BackupOptions {
 	if options == nil {
 		options = &BackupOptions{}
 	}
-	if options.Version == 0 {
-		version, err := store.version()
+	if options.Version == "" {
+		v, err := store.VersionService.Version()
 		if err != nil {
-			version = 0
+			options.Version = ""
 		}
-		options.Version = version
+		options.Version = v.SchemaVersion
 	}
 	if options.BackupDir == "" {
 		options.BackupDir = store.commonBackupDir()
 	}
 	if options.BackupFileName == "" {
-		options.BackupFileName = fmt.Sprintf("%s.%s.%s", store.connection.GetDatabaseFileName(), fmt.Sprintf("%03d", options.Version), time.Now().Format("20060102150405"))
+		options.BackupFileName = fmt.Sprintf("%s.%s.%s", store.connection.GetDatabaseFileName(), options.Version, time.Now().Format("20060102150405"))
 	}
 	if options.BackupPath == "" {
 		options.BackupPath = path.Join(options.BackupDir, options.BackupFileName)
@@ -168,7 +175,6 @@ func (store *Store) removeWithOptions(options *BackupOptions) error {
 
 	if os.IsNotExist(err) {
 		log.Error().Str("path", options.BackupPath).Err(err).Msg("backup file to remove does not exist")
-
 		return err
 	}
 
@@ -176,7 +182,6 @@ func (store *Store) removeWithOptions(options *BackupOptions) error {
 	err = os.Remove(options.BackupPath)
 	if err != nil {
 		log.Error().Err(err).Msg("failed")
-
 		return err
 	}
 

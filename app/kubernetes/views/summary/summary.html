@@ -1,11 +1,11 @@
-<div class="flex justify-start items-center form-section-title interactive" ng-click="$ctrl.toggleSummary()" ng-if="$ctrl.state.resources.length > 0">
-  <pr-icon icon="$ctrl.state.expandedTemplate ? 'chevron-down' : 'chevron-right'" feather="true" class="!mr-1 vertical-center"></pr-icon>
+<div class="form-section-title interactive flex items-center justify-start" ng-click="$ctrl.toggleSummary()" ng-if="$ctrl.state.resources.length > 0">
+  <pr-icon icon="$ctrl.state.expandedTemplate ? 'chevron-down' : 'chevron-right'" class="vertical-center !mr-1"></pr-icon>
   Summary
 </div>
 
 <div class="form-group" ng-if="$ctrl.state.expandedTemplate">
   <div class="col-sm-12 small text-muted vertical-center">
-    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+    <pr-icon icon="'info'" mode="'primary'"></pr-icon>
     Portainer will execute the following Kubernetes actions.
   </div>
 

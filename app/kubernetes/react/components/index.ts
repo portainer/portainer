@@ -1,13 +1,32 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
+import { IngressClassDatatable } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable';
 import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessView/NamespacesSelector';
 import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceRegistriesSelector';
+import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
+import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
+import { ApplicationSummaryWidget } from '@/react/kubernetes/applications/DetailsView';
+import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
 
 export const componentsModule = angular
   .module('portainer.kubernetes.react.components', [])
+  .component(
+    'ingressClassDatatable',
+    r2a(IngressClassDatatable, [
+      'onChangeControllers',
+      'description',
+      'ingressControllers',
+      'allowNoneIngressClass',
+      'isLoading',
+      'noIngressControllerLabel',
+      'view',
+    ])
+  )
   .component(
     'namespacesSelector',
     r2a(NamespacesSelector, [
@@ -50,4 +69,28 @@ export const componentsModule = angular
       'options',
       'value',
     ])
+  )
+  .component(
+    'kubeApplicationAccessPolicySelector',
+    r2a(KubeApplicationAccessPolicySelector, [
+      'value',
+      'onChange',
+      'isEdit',
+      'persistedFoldersUseExistingVolumes',
+    ])
+  )
+  .component(
+    'kubeApplicationDeploymentTypeSelector',
+    r2a(KubeApplicationDeploymentTypeSelector, [
+      'value',
+      'onChange',
+      'supportGlobalDeployment',
+    ])
+  )
+  .component(
+    'applicationSummaryWidget',
+    r2a(
+      withUIRouter(withReactQuery(withUserProvider(ApplicationSummaryWidget))),
+      []
+    )
   ).name;

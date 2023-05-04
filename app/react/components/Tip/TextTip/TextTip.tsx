@@ -1,39 +1,37 @@
-import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
+import { AlertCircle } from 'lucide-react';
+import clsx from 'clsx';
 
-import { Icon } from '@@/Icon';
+import { Icon, IconMode } from '@@/Icon';
 
 type Color = 'orange' | 'blue';
 
 export interface Props {
+  icon?: React.ReactNode;
   color?: Color;
+  className?: string;
 }
 
 export function TextTip({
   color = 'orange',
+  icon = AlertCircle,
+  className,
   children,
 }: PropsWithChildren<Props>) {
-  let iconClass: string;
+  return (
+    <div className={clsx('small inline-flex items-center gap-1', className)}>
+      <Icon icon={icon} mode={getMode(color)} className="shrink-0" />
+      <span className="text-muted">{children}</span>
+    </div>
+  );
+}
 
+function getMode(color: Color): IconMode {
   switch (color) {
     case 'blue':
-      iconClass = 'icon-primary';
-      break;
+      return 'primary';
     case 'orange':
-      iconClass = 'icon-warning';
-      break;
     default:
-      iconClass = 'icon-warning';
+      return 'warning';
   }
-
-  return (
-    <p className="text-muted small vertical-center">
-      <Icon
-        icon="alert-circle"
-        feather
-        className={clsx(`${iconClass}`, 'space-right')}
-      />
-      {children}
-    </p>
-  );
 }

@@ -20,7 +20,7 @@ type edgeJobFileResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeJob Id"
+// @param id path int true "EdgeJob Id"
 // @success 200 {object} edgeJobFileResponse
 // @failure 500
 // @failure 400

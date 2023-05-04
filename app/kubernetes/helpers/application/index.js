@@ -147,7 +147,7 @@ class KubernetesApplicationHelper {
   /* #region  CONFIGURATIONS FV <> ENV & VOLUMES */
   static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations) {
     const finalRes = _.flatMap(configurations, (cfg) => {
-      const filterCondition = cfg.Type === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
+      const filterCondition = cfg.Kind === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
 
       const cfgEnv = _.filter(env, [filterCondition, cfg.Name]);
       const cfgVol = _.filter(volumes, { configurationName: cfg.Name });
@@ -207,7 +207,7 @@ class KubernetesApplicationHelper {
     let finalMounts = [];
 
     _.forEach(configurations, (config) => {
-      const isBasic = config.SelectedConfiguration.Type === KubernetesConfigurationKinds.CONFIGMAP;
+      const isBasic = config.SelectedConfiguration.Kind === KubernetesConfigurationKinds.CONFIGMAP;
 
       if (!config.Overriden) {
         const envKeys = _.keys(config.SelectedConfiguration.Data);
@@ -308,13 +308,17 @@ class KubernetesApplicationHelper {
             svcport.targetPort = port.targetPort;
 
             app.Ingresses.value.forEach((ingress) => {
-              const ingressMatched = _.find(ingress.Paths, { ServiceName: service.metadata.name });
-              if (ingressMatched) {
+              const ingressNameMatched = ingress.Paths.find((ingPath) => ingPath.ServiceName === service.metadata.name);
+              const ingressPortMatched = ingress.Paths.find((ingPath) => ingPath.Port === port.port);
+              // only add ingress info to the port if the ingress serviceport matches the port in the service
+              if (ingressPortMatched) {
                 svcport.ingress = {
-                  IngressName: ingressMatched.IngressName,
-                  Host: ingressMatched.Host,
-                  Path: ingressMatched.Path,
+                  IngressName: ingressPortMatched.IngressName,
+                  Host: ingressPortMatched.Host,
+                  Path: ingressPortMatched.Path,
                 };
+              }
+              if (ingressNameMatched) {
                 svc.Ingress = true;
               }
             });

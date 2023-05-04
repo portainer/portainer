@@ -27,130 +27,71 @@
             <div class="form-group">
               <div class="col-sm-12 text-muted small">
                 <p> Enabling the load balancer feature will allow users to expose application they deploy over an external IP address assigned by cloud provider. </p>
-                <p class="mt-1 vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                <p class="vertical-center mt-1">
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
                 </p>
               </div>
 
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Allow users to use external load balancer </label>
-                <label class="switch mb-0 col-sm-8">
+                <label class="control-label col-sm-5 col-lg-4 px-0 text-left"> Allow users to use external load balancer </label>
+                <label class="switch col-sm-8 mb-0">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
               </div>
             </div>
 
-            <div class="form-group">
-              <div class="col-sm-12 text-muted small mt-4">
-                <p> Configuring ingress controllers will allow users to expose application they deploy over a HTTP route. </p>
-                <p class="mt-1 vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
-                  Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
-                </p>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <label class="control-label text-left">Ingress controller</label>
-                <span class="label label-default interactive vertical-center" style="margin-left: 10px" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-congifIngressButton">
-                  <pr-icon icon="'plus'" feather="true" size="'sm'" class="vertical-center"></pr-icon> configure ingress controller
-                </span>
-              </div>
+            <ingress-class-datatable
+              on-change-controllers="(ctrl.onChangeControllers)"
+              allow-none-ingress-class="ctrl.formValues.AllowNoneIngressClass"
+              ingress-controllers="ctrl.originalIngressControllers"
+              is-loading="ctrl.isIngressControllersLoading"
+              description="'Enabling ingress controllers in your cluster allows them to be available in the Portainer UI for users to publish applications over HTTP/HTTPS. A controller must have a class name for it to be included here.'"
+              no-ingress-controller-label="'No supported ingress controllers found.'"
+              view="'cluster'"
+            ></ingress-class-datatable>
 
-              <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                <div ng-repeat-start="ingressClass in ctrl.formValues.IngressClasses" style="margin-top: 2px">
-                  <div class="col-sm-7 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
-                    <span class="input-group-addon">Ingress class</span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="ingress_class_name_{{ $index }}"
-                      ng-model="ingressClass.Name"
-                      placeholder="nginx"
-                      ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
-                      ng-change="ctrl.onChangeIngressClassName($index)"
-                      required
-                      data-cy="kubeSetup-ingressClassName"
-                    />
-                  </div>
-                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
-                    <span class="input-group-addon">Type</span>
-                    <select
-                      class="form-control"
-                      name="ingress_class_type_{{ $index }}"
-                      ng-model="ingressClass.Type"
-                      ng-options="value as value for (key, value) in ctrl.IngressClassTypes"
-                      required
-                      data-cy="kubeSetup-ingressType"
-                    >
-                      <option selected disabled hidden value="">Select a type</option>
-                    </select>
-                  </div>
-                  <div class="col-sm-1 input-group input-group-sm">
-                    <button
-                      ng-if="!ingressClass.NeedsDeletion"
-                      class="btn btn-dangerlight btn-only-icon"
-                      type="button"
-                      ng-click="ctrl.removeIngressClass($index)"
-                      data-cy="kubeSetup-deleteIngress"
-                    >
-                      <pr-icon icon="'trash-2'" feather="true"></pr-icon>
-                    </button>
-                    <button ng-if="ingressClass.NeedsDeletion" class="btn btn-only-icon btn-light" type="button" ng-click="ctrl.restoreIngressClass($index)">
-                      <pr-icon icon="'rotate-ccw'" feather="true"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-
-                <div
-                  ng-repeat-end
-                  ng-show="
-                    kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid ||
-                    kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid ||
-                    ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined
-                  "
-                >
-                  <div class="col-sm-7 input-group">
-                    <div
-                      class="small"
-                      style="margin-top: 5px"
-                      ng-if="kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid || ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined"
-                    >
-                      <div ng-messages="kubernetesClusterSetupForm['ingress_class_name_'+$index].$error">
-                        <p ng-message="required" class="vertical-center text-warning"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress class name is required.</p
-                        >
-                        <p ng-message="pattern" class="vertical-center text-warning"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of lower case alphanumeric characters or '-', start
-                          with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
-                        >
-                      </div>
-                      <p ng-if="ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined" class="vertical-center text-warning">
-                        <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This ingress class is already defined.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="col-sm-3 input-group">
-                    <div class="small" style="margin-top: 5px" ng-if="kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid">
-                      <div ng-messages="kubernetesClusterSetupForm['ingress_class_type_'+$index].$error">
-                        <p ng-message="required" class="vertical-center text-warning"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress class type is required.</p
-                        >
-                      </div>
-                    </div>
-                  </div>
+            <label htmlFor="foldingButtonIngControllerSettings" class="col-sm-12 form-section-title flex cursor-pointer items-center">
+              <button
+                id="foldingButtonIngControllerSettings"
+                type="button"
+                class="mx-2 !ml-0 inline-flex w-2 items-center justify-center border-0 bg-transparent"
+                ng-click="ctrl.toggleAdvancedIngSettings()"
+              >
+                <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" icon="'chevron-right'"></pr-icon>
+                <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" icon="'chevron-down'"></pr-icon>
+              </button>
+              More settings
+            </label>
+            <div ng-if="ctrl.state.isIngToggleSectionExpanded" class="ml-4">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <por-switch-field
+                    checked="ctrl.formValues.AllowNoneIngressClass"
+                    name="'allowNoIngressClass'"
+                    label="'Allow ingress class to be set to &quot;none&quot;'"
+                    tooltip="'This allows users setting up ingresses to select &quot;none&quot; as the ingress class.'"
+                    on-change="(ctrl.onToggleAllowNoneIngressClass)"
+                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                    switch-class="'col-sm-8'"
+                  >
+                  </por-switch-field>
                 </div>
               </div>
-            </div>
-
-            <div class="form-group" ng-if="ctrl.hasTraefikIngress()">
-              <span class="col-sm-12 text-muted small">
-                <p>
-                  <i class="fa fa-flask blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-                  Traefik support is experimental.
-                </p>
-              </span>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <por-switch-field
+                    checked="ctrl.formValues.IngressAvailabilityPerNamespace"
+                    name="'ingressAvailabilityPerNamespace'"
+                    label="'Configure ingress controller availability per namespace'"
+                    tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
+                    on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
+                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                    switch-class="'col-sm-8'"
+                  >
+                  </por-switch-field>
+                </div>
+              </div>
             </div>
 
             <!-- auto update window -->
@@ -163,7 +104,7 @@
                   name="'disableSysctlSettingForRegularUsers'"
                   label="'Enable Change Window'"
                   feature-id="ctrl.limitedFeatureAutoWindow"
-                  tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
+                  tooltip="'Automatic updates to stacks or applications outside the defined change window will not occur.'"
                   on-change="(ctrl.onToggleAutoUpdate)"
                   label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
                   switch-class="'col-sm-8 text-muted'"
@@ -177,6 +118,29 @@
             <!-- #region SECURITY -->
             <div class="col-sm-12 form-section-title"> Security </div>
 
+            <div
+              ng-if="!ctrl.isRBACEnabled"
+              class="small mt-1 mb-6 flex w-full gap-1 rounded-lg border border-solid border-warning-5 bg-warning-2 p-4 text-warning-8 th-highcontrast:bg-yellow-11 th-highcontrast:text-white th-dark:bg-yellow-11 th-dark:text-white"
+            >
+              <div class="mt-0.5">
+                <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
+              </div>
+              <div>
+                <p> Your cluster does not have Kubernetes role-based access control (RBAC) enabled. </p>
+                <p> This means you can't use Portainer RBAC functionality to regulate access to environment resources based on user roles. </p>
+                <p class="mb-0">
+                  To enable RBAC, start the&nbsp;<a
+                    class="th-highcontrast:text-blue-4 th-dark:text-blue-7"
+                    href="https://kubernetes.io/docs/concepts/overview/components/#kube-apiserver"
+                    target="_blank"
+                    >API server</a
+                  >&nbsp;with the&nbsp;<code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">--authorization-mode</code>&nbsp;flag set to a
+                  comma-separated list that includes&nbsp;<code class="bg-gray-4 th-highcontrast:bg-black th-dark:bg-black">RBAC</code>, for example:&nbsp;
+                  <code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
+                </p>
+              </div>
+            </div>
+
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 By default, all the users have access to the default namespace. Enable this option to set accesses on the default namespace.
@@ -185,10 +149,30 @@
 
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Restrict access to the default namespace </label>
-                <label class="switch col-sm-8">
-                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><span class="slider round" data-cy="kubeSetup-restrictDefaultNsToggle"></span>
-                </label>
+                <por-switch-field
+                  checked="ctrl.formValues.RestrictDefaultNamespace"
+                  name="'restrictDefaultNs'"
+                  label="'Restrict access to the default namespace'"
+                  on-change="(ctrl.onToggleRestrictNs)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictDefaultNsToggle"
+                  disabled="!ctrl.isRBACEnabled"
+                >
+                </por-switch-field>
+              </div>
+
+              <div class="col-sm-12 mt-5">
+                <por-switch-field
+                  name="'restrictStandardUserIngressW'"
+                  label="'Only allow admins to deploy ingresses'"
+                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
+                  feature-id="ctrl.limitedFeatureIngressDeploy"
+                  disabled="!ctrl.isRBACEnabled"
+                ></por-switch-field>
               </div>
             </div>
             <!-- #endregion -->
@@ -201,8 +185,8 @@
                   By ENABLING resource over-commit, you are able to assign more resources to namespaces than is physically available in the cluster. This may lead to unexpected
                   deployment failures if there is insufficient resource to service demand.
                 </p>
-                <p class="mt-1 vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                <p class="vertical-center mt-1">
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
                   minus any system resource reservation.
                 </p>
@@ -226,7 +210,7 @@
               <div class="col-sm-12 text-muted small">
                 <p> Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage. </p>
                 <p class="vertical-center mt-1">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
                   <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
                 </p>
@@ -234,27 +218,27 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Enable features using the metrics API </label>
+                <label class="control-label col-sm-5 col-lg-4 px-0 text-left"> Enable features using the metrics API </label>
                 <label class="switch col-sm-8">
                   <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" />
                   <span class="slider round" data-cy="kubeSetup-metricsToggle"></span>
                 </label>
               </div>
               <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px">
-                Checking metrics API... <pr-icon icon="'loader'" feather="true" class-name="'ml-0.5'"></pr-icon>
+                Checking metrics API... <pr-icon icon="'loader'" class-name="'ml-0.5'"></pr-icon>
               </div>
               <div
                 ng-if="!ctrl.state.metrics.pending && ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
                 class="col-sm-12 small text-muted vertical-center"
                 style="margin-top: 5px"
               >
-                <pr-icon icon="'check'" mode="'success'" feather="true"></pr-icon> Successfully reached metrics API
+                <pr-icon icon="'check'" mode="'success'"></pr-icon> Successfully reached metrics API
               </div>
               <div
                 ng-if="!ctrl.state.metrics.pending && !ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
                 class="col-sm-12 small text-muted vertical-center mt-2"
               >
-                <pr-icon icon="'x'" mode="'danger'" feather="true"></pr-icon> Unable to reach metrics API, make sure metrics server is properly deployed inside that cluster.
+                <pr-icon icon="'x'" mode="'danger'"></pr-icon> Unable to reach metrics API, make sure metrics server is properly deployed inside that cluster.
               </div>
             </div>
 
@@ -262,7 +246,7 @@
 
             <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
               <div class="col-sm-12 small text-muted vertical-center">
-                <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                 Unable to detect any storage class available to persist data. Users won't be able to persist application data inside this cluster.
               </div>
             </div>
@@ -291,7 +275,7 @@
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
-                        <div class="flex-row vertical-center">
+                        <div class="flex h-full flex-row items-center">
                           <label class="switch mr-2 mb-0">
                             <input type="checkbox" ng-model="class.selected" /><span class="slider round" data-cy="kubeSetup-storageToggle{{ class.Name }}"></span>
                           </label>
@@ -307,7 +291,7 @@
                         ></storage-access-mode-selector>
                       </td>
                       <td>
-                        <div style="margin: 5px">
+                        <div class="flex h-full flex-row items-center">
                           <label class="switch mr-2 mb-0"
                             ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><span
                               class="slider round"
@@ -322,7 +306,7 @@
               </div>
               <div class="col-sm-12">
                 <span ng-if="!ctrl.hasValidStorageConfiguration()" class="text-muted small vertical-center mt-2">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
                   Shared access policy configuration required
                 </span>
               </div>

@@ -7,8 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/portainer/portainer/api/internal/endpointutils"
-
 	"github.com/docker/docker/api/types"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -18,15 +16,11 @@ import (
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
-	"github.com/portainer/portainer/api/stacks"
-)
-
-var (
-	errStackAlreadyExists     = errors.New("A stack already exists with this name")
-	errWebhookIDAlreadyExists = errors.New("A webhook ID already exists")
-	errStackNotExternal       = errors.New("Not an external stack")
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 // Handler is the HTTP handler used to handle stack operations.
@@ -44,7 +38,7 @@ type Handler struct {
 	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
 	Scheduler               *scheduler.Scheduler
-	StackDeployer           stacks.StackDeployer
+	StackDeployer           deployments.StackDeployer
 }
 
 func stackExistsError(name string) *httperror.HandlerError {
@@ -61,7 +55,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
 	}
-	h.Handle("/stacks",
+
+	h.Handle("/stacks/create/{type}/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
 	h.Handle("/stacks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackList))).Methods(http.MethodGet)
@@ -106,7 +101,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 		return true, nil
 	}
 
-	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+	return stackutils.UserIsAdminOrEndpointAdmin(user, endpointID)
 }
 
 func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
@@ -120,23 +115,23 @@ func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
 	return isAdmin, nil
 }
 
-func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
-	isAdmin := user.Role == portainer.AdministratorRole
-
-	return isAdmin, nil
-}
-
 func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
 	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
 		return false, err
 	}
 
-	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+	return stackutils.UserIsAdminOrEndpointAdmin(user, endpointID)
 }
 
 // if stack management is disabled for non admins and the user isn't an admin, then return false. Otherwise return true
 func (handler *Handler) userCanManageStacks(securityContext *security.RestrictedRequestContext, endpoint *portainer.Endpoint) (bool, error) {
+	// When the endpoint is deleted, stacks that the deleted endpoint created will be tagged as an orphan stack
+	// An orphan stack can be adopted by admins
+	if endpoint == nil {
+		return true, nil
+	}
+
 	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
 		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpoint.ID))
 
@@ -236,27 +231,4 @@ func (handler *Handler) checkUniqueWebhookID(webhookID string) (bool, error) {
 		return true, nil
 	}
 	return false, err
-}
-
-func (handler *Handler) clone(projectPath, repositoryURL, refName string, auth bool, username, password string) error {
-	if !auth {
-		username = ""
-		password = ""
-	}
-
-	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
-	if err != nil {
-		return fmt.Errorf("unable to clone git repository: %w", err)
-	}
-
-	return nil
-}
-
-func (handler *Handler) latestCommitID(repositoryURL, refName string, auth bool, username, password string) (string, error) {
-	if !auth {
-		username = ""
-		password = ""
-	}
-
-	return handler.GitService.LatestCommitID(repositoryURL, refName, username, password)
 }

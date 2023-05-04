@@ -46,13 +46,17 @@
       },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
+      "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
+      "Heartbeat": false,
       "Id": 1,
       "IsEdgeDevice": false,
       "Kubernetes": {
         "Configuration": {
+          "AllowNoneIngressClass": false,
           "EnableResourceOverCommit": false,
+          "IngressAvailabilityPerNamespace": true,
           "IngressClasses": null,
           "ResourceOverCommitPercentage": 0,
           "RestrictDefaultNamespace": false,
@@ -60,10 +64,19 @@
           "UseLoadBalancer": false,
           "UseServerMetrics": false
         },
+        "Flags": {
+          "IsServerIngressClassDetected": false,
+          "IsServerMetricsDetected": false,
+          "IsServerStorageDetected": false
+        },
         "Snapshots": []
       },
       "LastCheckInDate": 0,
       "Name": "local",
+      "PostInitMigrations": {
+        "MigrateGPUs": true,
+        "MigrateIngresses": true
+      },
       "PublicURL": "",
       "QueryDate": 0,
       "SecuritySettings": {
@@ -635,6 +648,7 @@
       "Scopes": "",
       "UserIdentifier": ""
     },
+    "ShowKomposeBuildOption": false,
     "SnapshotInterval": "5m",
     "TemplatesURL": "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json",
     "TrustOnFirstConnect": false,
@@ -892,6 +906,9 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": ""
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "admin"
@@ -919,14 +936,15 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "ThemeSettings": {
+        "color": ""
+      },
       "TokenIssueAt": 0,
       "UserTheme": "",
       "Username": "prabhat"
     }
   ],
   "version": {
-    "DB_UPDATING": "false",
-    "DB_VERSION": "70",
-    "INSTANCE_ID": "null"
+    "VERSION": "{\"SchemaVersion\":\"2.19.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

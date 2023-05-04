@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.app').controller('UsersController', [
   '$q',
@@ -7,11 +8,10 @@ angular.module('portainer.app').controller('UsersController', [
   'UserService',
   'TeamService',
   'TeamMembershipService',
-  'ModalService',
   'Notifications',
   'Authentication',
   'SettingsService',
-  function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
+  function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, Notifications, Authentication, SettingsService) {
     $scope.state = {
       userCreationError: '',
       validUsername: false,
@@ -91,7 +91,7 @@ angular.module('portainer.app').controller('UsersController', [
     }
 
     $scope.removeAction = function (selectedItems) {
-      ModalService.confirmDeletion('Do you want to remove the selected users? They will not be able to login into Portainer anymore.', function onConfirm(confirmed) {
+      confirmDelete('Do you want to remove the selected users? They will not be able to login into Portainer anymore.').then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -131,6 +131,7 @@ angular.module('portainer.app').controller('UsersController', [
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
           $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
+          $scope.teamSync = data.settings.TeamSync;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve users and teams');

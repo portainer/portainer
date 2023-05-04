@@ -1,6 +1,8 @@
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
+
 export class CreateEdgeJobViewController {
   /* @ngInject */
-  constructor($async, $q, $state, $window, ModalService, EdgeJobService, GroupService, Notifications, TagService) {
+  constructor($async, $q, $state, $window, EdgeJobService, GroupService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
       isEditorDirty: false,
@@ -13,13 +15,13 @@ export class CreateEdgeJobViewController {
       Endpoints: [],
       FileContent: '',
       File: null,
+      EdgeGroups: [],
     };
 
     this.$async = $async;
     this.$q = $q;
     this.$state = $state;
     this.$window = $window;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.GroupService = GroupService;
     this.EdgeJobService = EdgeJobService;
@@ -58,7 +60,7 @@ export class CreateEdgeJobViewController {
 
   async uiCanExit() {
     if (this.model.FileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

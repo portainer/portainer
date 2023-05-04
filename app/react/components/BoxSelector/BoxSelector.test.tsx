@@ -1,20 +1,27 @@
+import { Rocket } from 'lucide-react';
+
 import { render, fireEvent } from '@/react-tools/test-utils';
 
-import { BoxSelector, Props } from './BoxSelector';
-import { BoxSelectorOption } from './types';
+import { BoxSelector } from './BoxSelector';
+import { BoxSelectorOption, Value } from './types';
 
-function renderDefault<T extends string | number>({
+function renderDefault<T extends Value>({
   options = [],
   onChange = () => {},
   radioName = 'radio',
   value,
-}: Partial<Props<T>> = {}) {
+}: {
+  options?: BoxSelectorOption<T>[];
+  onChange?: (value: T) => void;
+  radioName?: string;
+  value: T;
+}) {
   return render(
     <BoxSelector
       options={options}
       onChange={onChange}
       radioName={radioName}
-      value={value || 0}
+      value={value}
     />
   );
 }
@@ -23,14 +30,14 @@ test('should render with the initial value selected and call onChange when click
   const options: BoxSelectorOption<number>[] = [
     {
       description: 'description 1',
-      icon: 'fa fa-rocket',
+      icon: Rocket,
       id: '1',
       value: 3,
       label: 'option 1',
     },
     {
       description: 'description 2',
-      icon: 'fa fa-rocket',
+      icon: Rocket,
       id: '2',
       value: 4,
       label: 'option 2',

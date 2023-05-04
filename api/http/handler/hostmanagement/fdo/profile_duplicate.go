@@ -3,13 +3,14 @@ package fdo
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 // @id duplicate
@@ -19,6 +20,7 @@ import (
 // @tags intel
 // @security jwt
 // @produce json
+// @param id path int true "FDO Profile identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

@@ -3,10 +3,12 @@ package tags
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle tag operations.
@@ -28,4 +30,16 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.tagDelete))).Methods(http.MethodDelete)
 
 	return h
+}
+
+func txResponse(w http.ResponseWriter, r any, err error) *httperror.HandlerError {
+	if err != nil {
+		if httpErr, ok := err.(*httperror.HandlerError); ok {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	return response.JSON(w, r)
 }

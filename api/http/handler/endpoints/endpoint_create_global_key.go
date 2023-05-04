@@ -28,16 +28,10 @@ func (handler *Handler) endpointCreateGlobalKey(w http.ResponseWriter, r *http.R
 
 	// Search for existing endpoints for the given edgeID
 
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve the endpoints from the database", err)
+	endpointID, ok := handler.DataStore.Endpoint().EndpointIDByEdgeID(edgeID)
+	if ok {
+		return response.JSON(w, endpointCreateGlobalKeyResponse{endpointID})
 	}
 
-	for _, endpoint := range endpoints {
-		if endpoint.EdgeID == edgeID {
-			return response.JSON(w, endpointCreateGlobalKeyResponse{endpoint.ID})
-		}
-	}
-
-	return httperror.NotFound("Unable to find the endpoint in the database", err)
+	return httperror.NotFound("Unable to find the endpoint in the database", nil)
 }

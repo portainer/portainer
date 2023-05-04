@@ -15,5 +15,11 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     refreshCallback: '<',
     onPublishingModeClick: '<',
     isPrimary: '<',
+    namespaces: '<',
+    namespace: '<',
+    onChangeNamespaceDropdown: '<',
+    isAppsLoading: '<',
+    isSystemResources: '<',
+    setSystemResources: '<',
   },
 });

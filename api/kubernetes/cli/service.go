@@ -3,14 +3,15 @@ package cli
 import (
 	"context"
 
-	models "github.com/portainer/portainer/api/database/models"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	labels "k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // GetServices gets all the services for a given namespace in a k8s endpoint.
-func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, error) {
+func (kcl *KubeClient) GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error) {
 	client := kcl.cli.CoreV1().Services(namespace)
 
 	services, err := client.List(context.Background(), metav1.ListOptions{})
@@ -28,7 +29,7 @@ func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, e
 				NodePort:   int(port.NodePort),
 				Port:       int(port.Port),
 				Protocol:   string(port.Protocol),
-				TargetPort: port.TargetPort.IntValue(),
+				TargetPort: port.TargetPort.String(),
 			})
 		}
 
@@ -38,6 +39,11 @@ func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, e
 				IP:   status.IP,
 				Host: status.Hostname,
 			})
+		}
+
+		var applications []models.K8sApplication
+		if lookupApplications {
+			applications, _ = kcl.getOwningApplication(namespace, service.Spec.Selector)
 		}
 
 		result = append(result, models.K8sServiceInfo{
@@ -51,6 +57,10 @@ func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, e
 			IngressStatus:                 ingressStatus,
 			Labels:                        service.GetLabels(),
 			Annotations:                   service.GetAnnotations(),
+			ClusterIPs:                    service.Spec.ClusterIPs,
+			ExternalName:                  service.Spec.ExternalName,
+			ExternalIPs:                   service.Spec.ExternalIPs,
+			Applications:                  applications,
 		})
 	}
 
@@ -77,7 +87,7 @@ func (kcl *KubeClient) CreateService(namespace string, info models.K8sServiceInf
 		port.NodePort = int32(p.NodePort)
 		port.Port = int32(p.Port)
 		port.Protocol = v1.Protocol(p.Protocol)
-		port.TargetPort = intstr.FromInt(p.TargetPort)
+		port.TargetPort = intstr.FromString(p.TargetPort)
 		service.Spec.Ports = append(service.Spec.Ports, port)
 	}
 
@@ -133,7 +143,7 @@ func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInf
 		port.NodePort = int32(p.NodePort)
 		port.Port = int32(p.Port)
 		port.Protocol = v1.Protocol(p.Protocol)
-		port.TargetPort = intstr.FromInt(p.TargetPort)
+		port.TargetPort = intstr.FromString(p.TargetPort)
 		service.Spec.Ports = append(service.Spec.Ports, port)
 	}
 
@@ -150,4 +160,55 @@ func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInf
 
 	_, err := ServiceClient.Update(context.Background(), &service, metav1.UpdateOptions{})
 	return err
+}
+
+// getOwningApplication gets the application that owns the given service selector.
+func (kcl *KubeClient) getOwningApplication(namespace string, selector map[string]string) ([]models.K8sApplication, error) {
+	if len(selector) == 0 {
+		return nil, nil
+	}
+
+	selectorLabels := labels.SelectorFromSet(selector).String()
+
+	// look for replicasets first, limit 1 (we only support one owner)
+	replicasets, err := kcl.cli.AppsV1().ReplicaSets(namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: selectorLabels, Limit: 1})
+	if err != nil {
+		return nil, err
+	}
+
+	var meta metav1.Object
+	if replicasets != nil && len(replicasets.Items) > 0 {
+		meta = replicasets.Items[0].GetObjectMeta()
+	} else {
+		// otherwise look for matching pods, limit 1 (we only support one owner)
+		pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: selectorLabels, Limit: 1})
+		if err != nil {
+			return nil, err
+		}
+
+		if pods == nil || len(pods.Items) == 0 {
+			return nil, nil
+		}
+
+		meta = pods.Items[0].GetObjectMeta()
+	}
+
+	return makeApplication(meta), nil
+}
+
+func makeApplication(meta metav1.Object) []models.K8sApplication {
+	ownerReferences := meta.GetOwnerReferences()
+	if len(ownerReferences) == 0 {
+		return nil
+	}
+
+	// Currently, we only support one owner reference
+	ownerReference := ownerReferences[0]
+	return []models.K8sApplication{
+		{
+			// Only the name is used right now, but we can add more fields in the future
+			Name: ownerReference.Name,
+		},
+	}
+
 }

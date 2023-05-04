@@ -22,6 +22,7 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 			return err
 		}
 	}
+
 	return nil
 }
 

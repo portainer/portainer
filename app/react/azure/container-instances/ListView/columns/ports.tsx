@@ -1,22 +1,25 @@
-import { CellProps, Column } from 'react-table';
+import { ExternalLink } from 'lucide-react';
+import { CellContext } from '@tanstack/react-table';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { getPorts } from '@/react/azure/utils';
 
-export const ports: Column<ContainerGroup> = {
-  Header: 'Published Ports',
-  accessor: (container) => getPorts(container),
+import { Icon } from '@@/Icon';
+
+import { columnHelper } from './helper';
+
+export const ports = columnHelper.accessor(getPorts, {
+  header: 'Published Ports',
+  cell: PortsCell,
   id: 'ports',
-  disableFilters: true,
-  Filter: () => null,
-  canHide: true,
-  Cell: PortsCell,
-};
+});
 
 function PortsCell({
-  value: ports,
+  getValue,
   row: { original: container },
-}: CellProps<ContainerGroup, ReturnType<typeof getPorts>>) {
+}: CellContext<ContainerGroup, ReturnType<typeof getPorts>>) {
+  const ports = getValue();
+
   const ip = container.properties.ipAddress
     ? container.properties.ipAddress.ip
     : '';
@@ -26,8 +29,8 @@ function PortsCell({
 
   return ports.map((port) => (
     <a className="image-tag" href={`http://${ip}:${port.host}`} key={port.host}>
-      <i className="fa fa-external-link-alt" aria-hidden="true" /> {ip}:
-      {port.host}
+      <Icon icon={ExternalLink} className="mr-1" />
+      {ip}:{port.host}
     </a>
   ));
 }

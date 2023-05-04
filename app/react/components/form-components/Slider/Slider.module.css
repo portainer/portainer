@@ -1,32 +1,40 @@
 .root {
-  margin: 0 25px;
-}
-
-.slider {
   padding-top: 50px;
 }
 
-.slider :global .rc-slider-handle {
-  width: 32px;
-  height: 32px;
-  margin-top: -14px;
+.root :global .rc-slider .rc-slider-handle-dragging {
+  @apply border-2 border-blue-8;
+}
+
+.root :global .rc-slider-dot {
+  display: none;
+}
+
+.root :global .rc-slider-handle {
+  @apply border-2 border-blue-8;
+  width: 24px;
+  height: 24px;
+  margin-top: -8px;
   border-radius: 16px;
-  cursor: pointer;
-  background-color: #0db9f0;
+  opacity: 1;
+  background-color: #ffffff;
 }
 
-.slider :global .rc-slider-handle:after {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 8px;
+.root :global .rc-slider-track {
+  @apply bg-blue-8;
   height: 8px;
-  background: #ffffff;
-  border-radius: 4px;
-  content: '';
 }
 
-.slider :global .rc-slider-mark-text,
-.slider :global .rc-slider-tooltip-inner {
-  font-family: Inter, serif;
+.root :global .rc-slider-rail {
+  height: 8px;
+}
+
+.root :global .rc-slider-mark {
+  top: -28px;
+}
+
+.root :global .rc-slider-mark-text {
+  font-size: 14px;
+  color: var(--text-body-color);
+  user-select: none;
 }

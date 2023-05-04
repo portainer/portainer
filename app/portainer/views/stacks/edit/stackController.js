@@ -1,12 +1,16 @@
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { FeatureId } from 'Portainer/feature-flags/enums';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { StackStatus, StackType } from '@/react/docker/stacks/types';
+import { extractContainerNames } from '@/portainer/helpers/stackHelper';
+import { confirmStackUpdate } from '@/react/docker/stacks/common/confirm-stack-update';
+import { confirm, confirmDelete, confirmWebEditorDiscard } from '@@/modals/confirm';
+import { ModalType } from '@@/modals';
+import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.app').controller('StackController', [
   '$async',
-  '$compile',
   '$q',
   '$scope',
   '$state',
@@ -21,9 +25,7 @@ angular.module('portainer.app').controller('StackController', [
   'TaskHelper',
   'Notifications',
   'FormHelper',
-  'EndpointProvider',
   'GroupService',
-  'ModalService',
   'StackHelper',
   'ResourceControlService',
   'Authentication',
@@ -31,7 +33,6 @@ angular.module('portainer.app').controller('StackController', [
   'endpoint',
   function (
     $async,
-    $compile,
     $q,
     $scope,
     $state,
@@ -46,9 +47,7 @@ angular.module('portainer.app').controller('StackController', [
     TaskHelper,
     Notifications,
     FormHelper,
-    EndpointProvider,
     GroupService,
-    ModalService,
     StackHelper,
     ResourceControlService,
     Authentication,
@@ -112,16 +111,12 @@ angular.module('portainer.app').controller('StackController', [
     $scope.duplicateStack = function duplicateStack(name, targetEndpointId) {
       var stack = $scope.stack;
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      // sets the targetEndpointID as global for interceptors
-      EndpointProvider.setEndpointID(targetEndpointId);
 
       return StackService.duplicateStack(name, $scope.stackFileContent, env, targetEndpointId, stack.Type).then(onDuplicationSuccess).catch(notifyOnError);
 
       function onDuplicationSuccess() {
         Notifications.success('Success', 'Stack successfully duplicated');
         $state.go('docker.stacks', {}, { reload: true });
-        // sets back the original endpointID as global for interceptors
-        EndpointProvider.setEndpointID(stack.EndpointId);
       }
 
       function notifyOnError(err) {
@@ -134,29 +129,24 @@ angular.module('portainer.app').controller('StackController', [
     };
 
     $scope.migrateStack = function (name, endpointId) {
-      return $q(function (resolve) {
-        ModalService.confirmWarn({
+      return $q(async function (resolve) {
+        const confirmed = await confirm({
           title: 'Are you sure?',
+          modalType: ModalType.Warn,
           message:
             'This action will deploy a new instance of this stack on the target environment, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
-          buttons: {
-            confirm: {
-              label: 'Migrate',
-              className: 'btn-danger',
-            },
-          },
-          callback: function onConfirm(confirmed) {
-            if (!confirmed) {
-              return resolve();
-            }
-            return resolve(migrateStack(name, endpointId));
-          },
+          confirmButton: buildConfirmButton('Migrate', 'danger'),
         });
+
+        if (!confirmed) {
+          return resolve();
+        }
+        return resolve(migrateStack(name, endpointId));
       });
     };
 
     $scope.removeStack = function () {
-      ModalService.confirmDeletion('Do you want to remove the stack? Associated services will be removed as well.', function onConfirm(confirmed) {
+      confirmDelete('Do you want to remove the stack? Associated services will be removed as well').then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -165,10 +155,11 @@ angular.module('portainer.app').controller('StackController', [
     };
 
     $scope.detachStackFromGit = function () {
-      ModalService.confirmDetachment('Do you want to detach the stack from Git?', function onConfirm(confirmed) {
+      confirmDetachment().then(function onConfirm(confirmed) {
         if (!confirmed) {
           return;
         }
+
         $scope.deployStack();
       });
     };
@@ -245,7 +236,7 @@ angular.module('portainer.app').controller('StackController', [
     $scope.deployStack = function () {
       const stack = $scope.stack;
       const isSwarmStack = stack.Type === 1;
-      ModalService.confirmStackUpdate('Do you want to force an update of the stack?', isSwarmStack, null, function (result) {
+      confirmStackUpdate('Do you want to force an update of the stack?', isSwarmStack).then(function (result) {
         if (!result) {
           return;
         }
@@ -262,7 +253,7 @@ angular.module('portainer.app').controller('StackController', [
         }
 
         $scope.state.actionInProgress = true;
-        StackService.updateStack(stack, stackFile, env, prune, !!result[0])
+        StackService.updateStack(stack, stackFile, env, prune, result.pullImage)
           .then(function success() {
             Notifications.success('Success', 'Stack successfully deployed');
             $scope.state.isEditorDirty = false;
@@ -277,11 +268,11 @@ angular.module('portainer.app').controller('StackController', [
       });
     };
 
-    $scope.editorUpdate = function (cm) {
-      if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
+    $scope.editorUpdate = function (value) {
+      if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
         $scope.state.isEditorDirty = true;
-        $scope.stackFileContent = cm.getValue();
-        $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
+        $scope.stackFileContent = value;
+        $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames, $scope.state.originalContainerNames);
       }
     };
 
@@ -290,10 +281,11 @@ angular.module('portainer.app').controller('StackController', [
       return $async(stopStackAsync);
     }
     async function stopStackAsync() {
-      const confirmed = await ModalService.confirmAsync({
+      const confirmed = await confirm({
         title: 'Are you sure?',
+        modalType: ModalType.Warn,
         message: 'Are you sure you want to stop this stack?',
-        buttons: { confirm: { label: 'Stop', className: 'btn-danger' } },
+        confirmButton: buildConfirmButton('Stop', 'danger'),
       });
       if (!confirmed) {
         return;
@@ -371,8 +363,9 @@ angular.module('portainer.app').controller('StackController', [
             if (isSwarm && $scope.stack.Status === StackStatus.Active) {
               assignSwarmStackResources(data.resources, agentProxy);
             }
+            $scope.state.originalContainerNames = extractContainerNames($scope.stackFileContent);
 
-            $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
+            $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames, $scope.state.originalContainerNames);
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to retrieve stack details');
@@ -451,7 +444,7 @@ angular.module('portainer.app').controller('StackController', [
 
     this.uiCanExit = async function () {
       if ($scope.stackFileContent && $scope.state.isEditorDirty) {
-        return ModalService.confirmWebEditorDiscard();
+        return confirmWebEditorDiscard();
       }
     };
 
@@ -498,3 +491,12 @@ angular.module('portainer.app').controller('StackController', [
     initView();
   },
 ]);
+
+function confirmDetachment() {
+  return confirm({
+    modalType: ModalType.Warn,
+    title: 'Are you sure?',
+    message: 'Do you want to detach the stack from Git?',
+    confirmButton: buildConfirmButton('Detach', 'danger'),
+  });
+}

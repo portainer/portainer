@@ -3,7 +3,7 @@
 <information-panel title-text="Information" ng-if="!$ctrl.state.chart">
   <span class="small text-muted">
     <p class="inline-flex flex-row items-center">
-      <pr-icon icon="'info'" feather="true" class="mr-1 vertical-center" mode="'primary'"></pr-icon>
+      <pr-icon icon="'info'" class="vertical-center mr-1" mode="'primary'"></pr-icon>
       This is a first version for Helm charts, for more information see this&nbsp;<a
         class="hyperlink"
         href="https://www.portainer.io/blog/portainer-now-with-helm-support"
@@ -12,7 +12,7 @@
       >.</p
     >
     <p ng-if="$ctrl.state.globalRepository === ''" class="inline-flex items-center">
-      <pr-icon icon="'info'" feather="true"></pr-icon>
+      <pr-icon icon="'info'"></pr-icon>
       <span>The Global Helm Repository is not configured.</span>
       <a ng-if="$ctrl.state.isAdmin" ui-sref="portainer.settings">Configure Global Helm Repository in Settings</a>.
     </p>
@@ -23,14 +23,8 @@
   <!-- helmchart-form -->
   <div class="col-sm-12" ng-if="$ctrl.state.chart">
     <rd-widget>
-      <div class="toolBarTitle vertical-center pt-5 px-5 text-muted">
-        <fallback-image
-          src="$ctrl.state.chart.icon"
-          fallback-icon="'svg-helm'"
-          class-name="'h-8 w-8'"
-          fallback-class-name="'icon-nested-blue'"
-          fallback-mode="'primary'"
-        ></fallback-image>
+      <div class="toolBarTitle vertical-center text-muted px-5 pt-5">
+        <fallback-image src="$ctrl.state.chart.icon" fallback-icon="'svg-helm'" class-name="'h-8 w-8'" size="'lg'"></fallback-image>
         {{ $ctrl.state.chart.name }}
       </div>
       <rd-widget-body classes="padding">
@@ -40,7 +34,7 @@
             <div class="col-sm-12 form-section-title"> Description </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <div class="text-xs text-muted" ng-bind-html="$ctrl.state.chart.description"></div>
+                <div class="text-muted text-xs" ng-bind-html="$ctrl.state.chart.description"></div>
               </div>
             </div>
           </div>
@@ -62,14 +56,14 @@
           </div>
           <div class="form-group" ng-if="!$ctrl.state.resourcePool">
             <div class="col-sm-12 small text-warning vertical-center">
-              <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
               You do not have access to any namespace. Contact your administrator to get access to a namespace.
             </div>
           </div>
           <!-- !namespace-input -->
           <!-- name-input -->
           <div class="form-group mb-2">
-            <label for="release_name" class="col-sm-2 control-label text-left required">Name</label>
+            <label for="release_name" class="col-sm-2 control-label required text-left">Name</label>
             <div class="col-sm-10">
               <input
                 type="text"
@@ -87,11 +81,11 @@
               <div ng-messages="$ctrl.helmTemplateCreationForm.release_name.$error">
                 <div class="col-sm-2"></div>
                 <p class="vertical-center col-sm-10 text-warning" ng-message="required">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon>
                   This field is required.
                 </p>
                 <p class="vertical-center col-sm-10 text-warning" ng-message="pattern">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon>
                   This field must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name',
                   or 'abc-123').
                 </p>
@@ -106,15 +100,15 @@
                 class="btn btn-xs btn-default vertical-center mr-2 !ml-0"
                 ng-click="$ctrl.state.showCustomValues = true;"
               >
-                <pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon>
+                <pr-icon icon="'plus'" class="vertical-center"></pr-icon>
                 Show custom values
               </button>
               <span class="small interactive vertical-center" ng-if="$ctrl.state.loadingValues">
-                <pr-icon icon="'refresh-cw'" class="mr-1" feather="true"></pr-icon>
+                <pr-icon icon="'refresh-cw'" class="mr-1"></pr-icon>
                 Loading values.yaml...
               </span>
               <button ng-if="$ctrl.state.showCustomValues" class="btn btn-xs btn-default vertical-center mr-2 !ml-0" ng-click="$ctrl.state.showCustomValues = false;">
-                <pr-icon icon="'minus'" feather="true" class="vertical-center"></pr-icon>
+                <pr-icon icon="'minus'" class="vertical-center"></pr-icon>
                 Hide custom values
               </button>
             </div>
@@ -130,10 +124,10 @@
                     value="$ctrl.state.values"
                     on-change="($ctrl.editorUpdate)"
                     yml="true"
-                    placeholder="# Define or paste the content of your values yaml file here"
+                    placeholder="Define or paste the content of your values yaml file here"
                   >
                     <editor-description class="vertical-center">
-                      <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                       <span>
                         You can get more information about Helm values file format in the
                         <a href="https://helm.sh/docs/chart_template_guide/values_files/" target="_blank" class="text-blue-8 hover:text-blue-8 hover:underline"

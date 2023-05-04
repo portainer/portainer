@@ -1,7 +1,8 @@
 import clsx from 'clsx';
+import { BarChart, FileText, Info, Paperclip, Terminal } from 'lucide-react';
 
 import { ContainerStatus } from '@/react/docker/containers/types';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { Authorized } from '@/react/hooks/useUser';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
@@ -51,7 +52,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Logs"
           >
-            <Icon icon="file-text" feather className="space-right" />
+            <Icon icon={FileText} className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -63,7 +64,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Inspect"
           >
-            <Icon icon="info" feather className="space-right" />
+            <Icon icon={Info} className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -75,7 +76,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Stats"
           >
-            <Icon icon="bar-chart" feather className="space-right" />
+            <Icon icon={BarChart} className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -87,7 +88,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Exec Console"
           >
-            <Icon icon="terminal" feather className="space-right" />
+            <Icon icon={Terminal} className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -99,7 +100,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Attach Console"
           >
-            <Icon icon="paperclip" feather className="space-right" />
+            <Icon icon={Paperclip} className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -122,7 +123,7 @@ function TaskQuickActions({ taskId, state }: TaskProps) {
             params={{ id: taskId }}
             title="Logs"
           >
-            <Icon icon="file-text" feather className="space-right" />
+            <Icon icon={FileText} className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -130,7 +131,7 @@ function TaskQuickActions({ taskId, state }: TaskProps) {
       {state.showQuickActionInspect && (
         <Authorized authorizations="DockerTaskInspect">
           <Link to="docker.tasks.task" params={{ id: taskId }} title="Inspect">
-            <Icon icon="info" feather className="space-right" />
+            <Icon icon={Info} className="space-right" />
           </Link>
         </Authorized>
       )}

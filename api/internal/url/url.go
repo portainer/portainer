@@ -11,7 +11,6 @@ import (
 // to prevent an error when url has port but no protocol prefix
 // we add `//` prefix if needed
 func ParseURL(endpointURL string) (*url.URL, error) {
-
 	if !strings.HasPrefix(endpointURL, "http") &&
 		!strings.HasPrefix(endpointURL, "tcp") &&
 		!strings.HasPrefix(endpointURL, "//") &&

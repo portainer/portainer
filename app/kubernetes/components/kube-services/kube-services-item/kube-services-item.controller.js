@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesServicePort, KubernetesIngressServiceRoute } from 'Kubernetes/models/service/models';
+import { KubernetesServicePort } from 'Kubernetes/models/service/models';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
@@ -18,34 +18,17 @@ export default class KubeServicesItemViewController {
     port.port = '';
     port.targetPort = '';
     port.protocol = 'TCP';
-
-    if (this.ingressType) {
-      const route = new KubernetesIngressServiceRoute();
-      route.ServiceName = this.serviceName;
-
-      if (this.serviceType === KubernetesApplicationPublishingTypes.CLUSTER_IP && this.originalIngresses.length > 0) {
-        if (!route.IngressName) {
-          route.IngressName = this.originalIngresses[0].Name;
-        }
-
-        if (!route.Host) {
-          route.Host = this.originalIngresses[0].Hosts[0];
-        }
-      }
-
-      port.ingress = route;
-      port.Ingress = true;
-    }
-    this.servicePorts.push(port);
+    this.service.Ports.push(port);
   }
 
   removePort(index) {
-    this.servicePorts.splice(index, 1);
+    this.service.Ports.splice(index, 1);
   }
 
   servicePort(index) {
-    const targetPort = this.servicePorts[index].targetPort;
-    this.servicePorts[index].port = targetPort;
+    const targetPort = this.service.Ports[index].targetPort;
+    this.service.Ports[index].port = targetPort;
+    this.onChangeServicePort();
   }
 
   isAdmin() {
@@ -54,7 +37,7 @@ export default class KubeServicesItemViewController {
 
   onChangeContainerPort() {
     const state = this.state.duplicates.targetPort;
-    const source = _.map(this.servicePorts, (sp) => sp.targetPort);
+    const source = _.map(this.service.Ports, (sp) => sp.targetPort);
     const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
     state.refs = duplicates;
     state.hasRefs = Object.keys(duplicates).length > 0;
@@ -62,22 +45,41 @@ export default class KubeServicesItemViewController {
 
   onChangeServicePort() {
     const state = this.state.duplicates.servicePort;
-    const source = _.map(this.servicePorts, (sp) => sp.port);
+    const source = _.map(this.service.Ports, (sp) => sp.port);
     const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
     state.refs = duplicates;
     state.hasRefs = Object.keys(duplicates).length > 0;
+
+    this.service.servicePortError = state.hasRefs;
   }
 
   onChangeNodePort() {
     const state = this.state.duplicates.nodePort;
-    const source = _.map(this.servicePorts, (sp) => sp.nodePort);
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
+
+    // create a list of all the node ports (number[]) in the cluster and current form
+    const clusterNodePortsWithoutCurrentService = this.nodePortServices
+      .filter((npService) => npService.Name !== this.service.Name)
+      .map((npService) => npService.Ports)
+      .flat()
+      .map((npServicePorts) => npServicePorts.NodePort);
+    const formNodePortsWithoutCurrentService = this.formServices
+      .filter((formService) => formService.Type === KubernetesApplicationPublishingTypes.NODE_PORT && formService.Name !== this.service.Name)
+      .map((formService) => formService.Ports)
+      .flat()
+      .map((formServicePorts) => formServicePorts.nodePort);
+    const serviceNodePorts = this.service.Ports.map((sp) => sp.nodePort);
+    // getDuplicates cares about the index, so put the serviceNodePorts at the start
+    const allNodePortsWithoutCurrentService = [...clusterNodePortsWithoutCurrentService, ...formNodePortsWithoutCurrentService];
+
+    const duplicates = KubernetesFormValidationHelper.getDuplicateNodePorts(serviceNodePorts, allNodePortsWithoutCurrentService);
     state.refs = duplicates;
     state.hasRefs = Object.keys(duplicates).length > 0;
+
+    this.service.nodePortError = state.hasRefs;
   }
 
   $onInit() {
-    if (this.servicePorts.length === 0) {
+    if (this.service.Ports.length === 0) {
       this.addPort();
     }
 

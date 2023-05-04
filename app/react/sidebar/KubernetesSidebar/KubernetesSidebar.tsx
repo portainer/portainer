@@ -1,7 +1,7 @@
-import { Box, Edit, Layers, Lock, Server } from 'react-feather';
+import { Box, Edit, Layers, Lock, Server, Shuffle } from 'lucide-react';
 
-import { EnvironmentId } from '@/portainer/environments/types';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { EnvironmentId } from '@/react/portainer/environments/types';
+import { Authorized } from '@/react/hooks/useUser';
 import Helm from '@/assets/ico/vendor/helm.svg?c';
 import Route from '@/assets/ico/route.svg?c';
 
@@ -68,6 +68,14 @@ export function KubernetesSidebar({ environmentId }: Props) {
         icon={Box}
         label="Applications"
         data-cy="k8sSidebar-applications"
+      />
+
+      <SidebarItem
+        to="kubernetes.services"
+        params={{ endpointId: environmentId }}
+        label="Services"
+        data-cy="k8sSidebar-services"
+        icon={Shuffle}
       />
 
       <SidebarItem

@@ -1,4 +1,4 @@
-<page-header ng-if="ctrl.state.viewReady" title="'Namespace list'" breadcrumbs="['Namespaces']" reload="true"></page-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Namespace list'" breadcrumbs="['Namespaces']" on-reload="(ctrl.onReload)" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -6,7 +6,7 @@
   <div class="row">
     <div class="col-sm-12">
       <kubernetes-resource-pools-datatable
-        endpoint="ctrl.endpoint"
+        restrict-default-namespace="ctrl.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace"
         dataset="ctrl.resourcePools"
         table-key="kubernetes.resourcePools"
         order-by="Name"

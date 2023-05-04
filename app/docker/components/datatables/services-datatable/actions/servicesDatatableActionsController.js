@@ -1,13 +1,15 @@
+import { confirmDelete } from '@@/modals/confirm';
+import { confirmServiceForceUpdate } from '@/react/docker/services/common/update-service-modal';
+
 angular.module('portainer.docker').controller('ServicesDatatableActionsController', [
   '$q',
   '$state',
   'ServiceService',
   'ServiceHelper',
   'Notifications',
-  'ModalService',
   'ImageHelper',
   'WebhookService',
-  function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService) {
+  function ($q, $state, ServiceService, ServiceHelper, Notifications, ImageHelper, WebhookService) {
     const ctrl = this;
 
     this.scaleAction = function scaleService(service) {
@@ -26,29 +28,22 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
     };
 
     this.removeAction = function (selectedItems) {
-      ModalService.confirmDeletion(
-        'Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
-        function onConfirm(confirmed) {
-          if (!confirmed) {
-            return;
-          }
-          removeServices(selectedItems);
+      confirmDelete('Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.').then((confirmed) => {
+        if (!confirmed) {
+          return;
         }
-      );
+        removeServices(selectedItems);
+      });
     };
 
     this.updateAction = function (selectedItems) {
-      ModalService.confirmServiceForceUpdate(
-        'Do you want to force an update of the selected service(s)? All the tasks associated to the selected service(s) will be recreated.',
-        function (result) {
+      confirmServiceForceUpdate('Do you want to force an update of the selected service(s)? All the tasks associated to the selected service(s) will be recreated.').then(
+        (result) => {
           if (!result) {
             return;
           }
-          var pullImage = false;
-          if (result[0]) {
-            pullImage = true;
-          }
-          forceUpdateServices(selectedItems, pullImage);
+
+          forceUpdateServices(selectedItems, result.pullLatest);
         }
       );
     };

@@ -2,6 +2,7 @@ package testhelpers
 
 import (
 	"io"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -12,7 +13,6 @@ type testDatastore struct {
 	customTemplate          dataservices.CustomTemplateService
 	edgeGroup               dataservices.EdgeGroupService
 	edgeJob                 dataservices.EdgeJobService
-	edgeUpdateSchedule      dataservices.EdgeUpdateScheduleService
 	edgeStack               dataservices.EdgeStackService
 	endpoint                dataservices.EndpointService
 	endpointGroup           dataservices.EndpointGroupService
@@ -36,10 +36,13 @@ type testDatastore struct {
 	webhook                 dataservices.WebhookService
 }
 
-func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
-func (d *testDatastore) Open() (bool, error)                                { return false, nil }
-func (d *testDatastore) Init() error                                        { return nil }
-func (d *testDatastore) Close() error                                       { return nil }
+func (d *testDatastore) BackupTo(io.Writer) error                            { return nil }
+func (d *testDatastore) Open() (bool, error)                                 { return false, nil }
+func (d *testDatastore) Init() error                                         { return nil }
+func (d *testDatastore) Close() error                                        { return nil }
+func (d *testDatastore) UpdateTx(func(dataservices.DataStoreTx) error) error { return nil }
+func (d *testDatastore) ViewTx(func(dataservices.DataStoreTx) error) error   { return nil }
+
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
 func (d *testDatastore) MigrateData() error                                 { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }
@@ -49,9 +52,7 @@ func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { re
 func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
 func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
 func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
-func (d *testDatastore) EdgeUpdateSchedule() dataservices.EdgeUpdateScheduleService {
-	return d.edgeUpdateSchedule
-}
+
 func (d *testDatastore) FDOProfile() dataservices.FDOProfileService {
 	return d.fdoProfile
 }
@@ -117,9 +118,6 @@ func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error
 	s.settings = settings
 	return nil
 }
-func (s *stubSettingsService) IsFeatureFlagEnabled(feature portainer.Feature) bool {
-	return false
-}
 func WithSettingsService(settings *portainer.Settings) datastoreOption {
 	return func(d *testDatastore) {
 		d.settings = &stubSettingsService{
@@ -163,6 +161,9 @@ func (s *stubEdgeJobService) Create(ID portainer.EdgeJobID, edgeJob *portainer.E
 	return nil
 }
 func (s *stubEdgeJobService) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+	return nil
+}
+func (s *stubEdgeJobService) UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error {
 	return nil
 }
 func (s *stubEdgeJobService) DeleteEdgeJob(ID portainer.EdgeJobID) error { return nil }
@@ -229,6 +230,34 @@ func (s *stubEndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endp
 	}
 
 	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubEndpointService) EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool) {
+	for _, endpoint := range s.endpoints {
+		if endpoint.EdgeID == edgeID {
+			return endpoint.ID, true
+		}
+	}
+
+	return 0, false
+}
+
+func (s *stubEndpointService) Heartbeat(endpointID portainer.EndpointID) (int64, bool) {
+	for i, endpoint := range s.endpoints {
+		if endpoint.ID == endpointID {
+			return s.endpoints[i].LastCheckInDate, true
+		}
+	}
+
+	return 0, false
+}
+
+func (s *stubEndpointService) UpdateHeartbeat(endpointID portainer.EndpointID) {
+	for i, endpoint := range s.endpoints {
+		if endpoint.ID == endpointID {
+			s.endpoints[i].LastCheckInDate = time.Now().Unix()
+		}
+	}
 }
 
 func (s *stubEndpointService) Endpoints() ([]portainer.Endpoint, error) {

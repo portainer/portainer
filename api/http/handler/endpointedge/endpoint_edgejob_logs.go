@@ -25,8 +25,8 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 // @tags edge, endpoints
 // @accept json
 // @produce json
-// @param id path string true "environment(endpoint) Id"
-// @param jobID path string true "Job Id"
+// @param id path int true "environment(endpoint) Id"
+// @param jobID path int true "Job Id"
 // @success 200
 // @failure 500
 // @failure 400
@@ -65,14 +65,16 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 		return httperror.InternalServerError("Unable to save task log to the filesystem", err)
 	}
 
-	meta := edgeJob.Endpoints[endpoint.ID]
-	meta.CollectLogs = false
-	meta.LogsStatus = portainer.EdgeJobLogsStatusCollected
-	edgeJob.Endpoints[endpoint.ID] = meta
+	meta := portainer.EdgeJobEndpointMeta{CollectLogs: false, LogsStatus: portainer.EdgeJobLogsStatusCollected}
+	if _, ok := edgeJob.GroupLogsCollection[endpoint.ID]; ok {
+		edgeJob.GroupLogsCollection[endpoint.ID] = meta
+	} else {
+		edgeJob.Endpoints[endpoint.ID] = meta
+	}
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 
-	handler.ReverseTunnelService.AddEdgeJob(endpoint.ID, edgeJob)
+	handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist edge job changes to the database", err)

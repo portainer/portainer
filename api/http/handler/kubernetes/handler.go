@@ -3,6 +3,8 @@ package kubernetes
 import (
 	"errors"
 	"net/http"
+	"net/url"
+	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
@@ -23,11 +25,10 @@ import (
 type Handler struct {
 	*mux.Router
 	authorizationService     *authorization.Service
-	dataStore                dataservices.DataStore
-	jwtService               dataservices.JWTService
-	kubernetesClientFactory  *cli.ClientFactory
+	DataStore                dataservices.DataStore
+	KubernetesClientFactory  *cli.ClientFactory
+	JwtService               dataservices.JWTService
 	kubeClusterAccessService kubernetes.KubeClusterAccessService
-	KubernetesClient         portainer.KubeClient
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
@@ -35,11 +36,10 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	h := &Handler{
 		Router:                   mux.NewRouter(),
 		authorizationService:     authorizationService,
-		dataStore:                dataStore,
-		jwtService:               jwtService,
+		DataStore:                dataStore,
+		JwtService:               jwtService,
 		kubeClusterAccessService: kubeClusterAccessService,
-		kubernetesClientFactory:  kubernetesClientFactory,
-		KubernetesClient:         kubernetesClient,
+		KubernetesClientFactory:  kubernetesClientFactory,
 	}
 
 	kubeRouter := h.PathPrefix("/kubernetes").Subrouter()
@@ -58,10 +58,12 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllers)).Methods(http.MethodPut)
 	endpointRouter.Handle("/ingresses/delete", httperror.LoggerHandler(h.deleteKubernetesIngresses)).Methods(http.MethodPost)
 	endpointRouter.Handle("/services/delete", httperror.LoggerHandler(h.deleteKubernetesServices)).Methods(http.MethodPost)
+	endpointRouter.Path("/rbac_enabled").Handler(httperror.LoggerHandler(h.isRBACEnabled)).Methods(http.MethodGet)
 	endpointRouter.Path("/namespaces").Handler(httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
 	endpointRouter.Path("/namespaces").Handler(httperror.LoggerHandler(h.updateKubernetesNamespace)).Methods(http.MethodPut)
 	endpointRouter.Path("/namespaces").Handler(httperror.LoggerHandler(h.getKubernetesNamespaces)).Methods(http.MethodGet)
 	endpointRouter.Path("/namespace/{namespace}").Handler(httperror.LoggerHandler(h.deleteKubernetesNamespaces)).Methods(http.MethodDelete)
+	endpointRouter.Path("/namespaces/{namespace}").Handler(httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
 
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)
@@ -85,13 +87,19 @@ func kubeOnlyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, request *http.Request) {
 		endpoint, err := middlewares.FetchEndpoint(request)
 		if err != nil {
-			httperror.WriteError(rw, http.StatusInternalServerError, "Unable to find an environment on request context", err)
+			httperror.InternalServerError(
+				"Unable to find an environment on request context",
+				err,
+			)
 			return
 		}
 
 		if !endpointutils.IsKubernetesEndpoint(endpoint) {
-			errMessage := "Environment is not a kubernetes environment"
-			httperror.WriteError(rw, http.StatusBadRequest, errMessage, errors.New(errMessage))
+			errMessage := "environment is not a Kubernetes environment"
+			httperror.BadRequest(
+				errMessage,
+				errors.New(errMessage),
+			)
 			return
 		}
 
@@ -109,9 +117,10 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Invalid environment identifier route variable",
 				err,
 			)
+			return
 		}
 
-		endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 		if err == portainerDsErrors.ErrObjectNotFound {
 			httperror.WriteError(
 				w,
@@ -119,6 +128,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Unable to find an environment with the specified identifier inside the database",
 				err,
 			)
+			return
 		} else if err != nil {
 			httperror.WriteError(
 				w,
@@ -126,23 +136,101 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Unable to find an environment with the specified identifier inside the database",
 				err,
 			)
+			return
 		}
 
-		if handler.kubernetesClientFactory == nil {
+		if handler.KubernetesClientFactory == nil {
 			next.ServeHTTP(w, r)
 			return
 		}
-		kubeCli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
+		// Generate a proxied kubeconfig, then create a kubeclient using it.
+		tokenData, err := security.RetrieveTokenData(r)
+		if err != nil {
+			httperror.WriteError(
+				w,
+				http.StatusForbidden,
+				"Permission denied to access environment",
+				err,
+			)
+			return
+		}
+		bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
 		if err != nil {
 			httperror.WriteError(
 				w,
 				http.StatusInternalServerError,
-				"Unable to create Kubernetes client",
+				"Unable to create JWT token",
 				err,
 			)
-
+			return
 		}
-		handler.KubernetesClient = kubeCli
+		singleEndpointList := []portainer.Endpoint{
+			*endpoint,
+		}
+		config, handlerErr := handler.buildConfig(
+			r,
+			tokenData,
+			bearerToken,
+			singleEndpointList,
+		)
+		if err != nil {
+			httperror.WriteError(
+				w,
+				http.StatusInternalServerError,
+				"Unable to build endpoint kubeconfig",
+				handlerErr.Err,
+			)
+			return
+		}
+
+		if len(config.Clusters) == 0 {
+			httperror.WriteError(
+				w,
+				http.StatusInternalServerError,
+				"Unable build cluster kubeconfig",
+				errors.New("Unable build cluster kubeconfig"),
+			)
+			return
+		}
+
+		// Manually setting the localhost to route
+		// the request to proxy server
+		serverURL, err := url.Parse(config.Clusters[0].Cluster.Server)
+		if err != nil {
+			httperror.WriteError(
+				w,
+				http.StatusInternalServerError,
+				"Unable parse cluster's kubeconfig server URL",
+				nil,
+			)
+			return
+		}
+		serverURL.Scheme = "https"
+		serverURL.Host = "localhost" + handler.KubernetesClientFactory.AddrHTTPS
+		config.Clusters[0].Cluster.Server = serverURL.String()
+
+		yaml, err := cli.GenerateYAML(config)
+		if err != nil {
+			httperror.WriteError(
+				w,
+				http.StatusInternalServerError,
+				"Unable to generate yaml from endpoint kubeconfig",
+				err,
+			)
+			return
+		}
+		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, []byte(yaml))
+		if err != nil {
+			httperror.WriteError(
+				w,
+				http.StatusInternalServerError,
+				"Failed to create client from kubeconfig",
+				err,
+			)
+			return
+		}
+
+		handler.KubernetesClientFactory.SetProxyKubeClient(strconv.Itoa(int(endpoint.ID)), r.Header.Get("Authorization"), kubeCli)
 		next.ServeHTTP(w, r)
 	})
 }

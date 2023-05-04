@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
-import { ColumnInstance } from 'react-table';
+import { Column } from '@tanstack/react-table';
+import { Check, Filter } from 'lucide-react';
 
-export const DefaultFilter = filterHOC('Filter by state');
+import { Icon } from '@@/Icon';
 
 interface MultipleSelectionFilterProps {
   options: string[];
@@ -27,15 +28,10 @@ export function MultipleSelectionFilter({
         <MenuButton
           className={clsx('table-filter', { 'filter-active': enabled })}
         >
-          Filter
-          <i
-            className={clsx(
-              'fa',
-              'space-left',
-              enabled ? 'fa-check' : 'fa-filter'
-            )}
-            aria-hidden="true"
-          />
+          <div className="flex items-center gap-1">
+            Filter
+            <Icon icon={enabled ? Check : Filter} />
+          </div>
         </MenuButton>
         <MenuPopover className="dropdown-menu">
           <div className="tableMenu">
@@ -72,27 +68,54 @@ export function MultipleSelectionFilter({
   }
 }
 
-export function filterHOC(menuTitle: string) {
+export function filterHOC<TData extends Record<string, unknown>>(
+  menuTitle: string
+) {
   return function Filter({
-    column: { filterValue, setFilter, preFilteredRows, id },
+    column: { getFilterValue, setFilterValue, getFacetedRowModel, id },
   }: {
-    column: ColumnInstance;
+    column: Column<TData>;
   }) {
+    const { flatRows } = getFacetedRowModel();
+
     const options = useMemo(() => {
       const options = new Set<string>();
-      preFilteredRows.forEach((row) => {
-        options.add(row.values[id]);
+      flatRows.forEach(({ getValue }) => {
+        const value = getValue<string>(id);
+
+        options.add(value);
       });
       return Array.from(options);
-    }, [id, preFilteredRows]);
+    }, [flatRows, id]);
+
+    const value = getFilterValue();
+
+    const valueAsArray = getValueAsArrayOfStrings(value);
+
     return (
       <MultipleSelectionFilter
         options={options}
         filterKey={id}
-        value={filterValue}
-        onChange={setFilter}
+        value={valueAsArray}
+        onChange={setFilterValue}
         menuTitle={menuTitle}
       />
     );
   };
+}
+
+function getValueAsArrayOfStrings(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (!value || (typeof value !== 'string' && typeof value !== 'number')) {
+    return [];
+  }
+
+  if (typeof value === 'number') {
+    return [value.toString()];
+  }
+
+  return [value];
 }

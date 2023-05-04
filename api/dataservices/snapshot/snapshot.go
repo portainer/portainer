@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -30,6 +31,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
 func (service *Service) Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error) {
 	var snapshot portainer.Snapshot
 	identifier := service.connection.ConvertToKey(int(endpointID))
@@ -51,7 +59,7 @@ func (service *Service) Snapshots() ([]portainer.Snapshot, error) {
 		func(obj interface{}) (interface{}, error) {
 			snapshot, ok := obj.(*portainer.Snapshot)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Snapshot object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Snapshot object")
 				return nil, fmt.Errorf("failed to convert to Snapshot object: %s", obj)
 			}
 			snapshots = append(snapshots, *snapshot)

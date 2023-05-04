@@ -32,6 +32,10 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 			continue
 		}
 
+		if endpoint.URL == "" {
+			continue
+		}
+
 		snapshotError := handler.SnapshotService.SnapshotEndpoint(&endpoint)
 
 		latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)

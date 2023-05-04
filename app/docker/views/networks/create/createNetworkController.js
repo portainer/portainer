@@ -14,7 +14,10 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
   'ResourceControlService',
   'FormValidator',
   'HttpRequestHelper',
-  function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
+  'endpoint',
+  function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper, endpoint) {
+    $scope.endpoint = endpoint;
+
     $scope.formValues = {
       DriverOptions: [],
       IPV4: {
@@ -251,7 +254,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
           }
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'An error occured during network creation');
+          Notifications.error('Failure', err, 'An error occurred during network creation');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;

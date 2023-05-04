@@ -3,7 +3,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="settings" feather-icon="true" title-text="Application settings"></rd-widget-header>
+      <rd-widget-header icon="settings" title-text="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- snapshot-interval -->
@@ -14,6 +14,17 @@
             </div>
           </div>
           <!-- !snapshot-interval -->
+
+          <!-- checkin-interval -->
+          <edge-checkin-interval-field
+            size="'xsmall'"
+            value="settings.EdgeAgentCheckinInterval"
+            label="'Edge agent default poll frequency'"
+            is-default-hidden="true"
+            on-change="(onChangeCheckInInterval)"
+          ></edge-checkin-interval-field>
+          <!-- !checkin-interval -->
+
           <!-- logo -->
           <div class="form-group">
             <por-switch-field
@@ -61,7 +72,6 @@
               <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.
             </div>
           </div>
-
           <!-- login screen banner -->
           <div class="form-group">
             <por-switch-field
@@ -75,7 +85,6 @@
             ></por-switch-field>
           </div>
           <!-- !login screen banner -->
-
           <!-- templates -->
           <div class="col-sm-12 form-section-title"> App Templates </div>
           <div>
@@ -101,6 +110,35 @@
             </div>
           </div>
           <!-- !templates -->
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="saveApplicationSettings()"
+                ng-disabled="state.actionInProgress || !settings.TemplatesURL"
+                button-spinner="state.actionInProgress"
+                data-cy="settings-saveSettingsButton"
+              >
+                <span ng-hide="state.actionInProgress">Save application settings</span>
+                <span ng-show="state.actionInProgress">Saving...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="svg-kube" title-text="Kubernetes settings"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
           <!-- helm charts -->
           <div class="col-sm-12 form-section-title"> Helm Repository </div>
           <div>
@@ -118,34 +156,48 @@
             </div>
           </div>
           <!-- !helm charts -->
-          <!-- host-filesystem -->
           <!-- kube -->
-          <div class="col-sm-12 form-section-title"> Kubernetes </div>
+          <div class="col-sm-12 form-section-title"> Kubeconfig </div>
           <div class="form-group">
             <label for="kubeconfig_expiry" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
             <div class="col-sm-8">
               <select
                 id="kubeconfig_expiry"
                 class="form-control"
-                ng-model="settings.KubeconfigExpiry"
+                ng-model="formValues.KubeconfigExpiry"
                 ng-options="opt.value as opt.key for opt in state.availableKubeconfigExpiryOptions"
               ></select>
             </div>
           </div>
           <!-- ! kube  -->
+          <!-- deployment options -->
+          <div class="col-sm-12 form-section-title"> Deployment Options </div>
+          <div class="form-group">
+            <por-switch-field
+              label="'Enforce code-based deployment'"
+              name="'toggle_hideAddWithForm'"
+              feature-id="enforceDeploymentOptions"
+              disabled="true"
+              checked="false"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+              tooltip="'Hides the \'Add with form\' buttons and prevents adding/editing of resources via forms'"
+            ></por-switch-field>
+          </div>
+          <!-- !deployment options -->
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-click="saveApplicationSettings()"
-                ng-disabled="state.actionInProgress || !settings.TemplatesURL"
-                button-spinner="state.actionInProgress"
-                data-cy="settings-saveSettingsButton"
+                ng-click="saveKubernetesSettings()"
+                ng-disabled="state.kubeSettingsActionInProgress"
+                button-spinner="state.kubeSettingsActionInProgress"
+                data-cy="settings-saveKubeSettingsButton"
               >
-                <span ng-hide="state.actionInProgress">Save settings</span>
-                <span ng-show="state.actionInProgress">Saving...</span>
+                <span ng-hide="state.kubeSettingsActionInProgress">Save Kubernetes settings</span>
+                <span ng-show="state.kubeSettingsActionInProgress">Saving...</span>
               </button>
             </div>
           </div>
@@ -156,12 +208,13 @@
   </div>
 </div>
 
+<ssl-ca-file-settings></ssl-ca-file-settings>
 <ssl-certificate-settings ng-show="state.showHTTPS"></ssl-certificate-settings>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="box" feather-icon="true" title-text="Hidden containers"></rd-widget-header>
+      <rd-widget-header icon="box" title-text="Hidden containers"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
           <div class="form-group">
@@ -177,12 +230,12 @@
               <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar" />
             </div>
             <div class="col-sm-12 col-md-2">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><pr-icon icon="'plus'" class-name="'mr-1'"></pr-icon>Add filter</button>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12 table-responsive">
-              <table class="table table-hover">
+              <table class="table-hover table">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -191,20 +244,21 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="label in settings.BlackListedLabels">
+                  <tr ng-repeat="label in formValues.BlackListedLabels">
                     <td>{{ label.name }}</td>
                     <td>{{ label.value }}</td>
                     <td>
                       <button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)">
-                        <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
+                        <pr-icon icon="'trash-2'" class-name="'mr-1'"></pr-icon>
+                        Remove</button
                       >
                     </td>
                   </tr>
-                  <tr ng-if="settings.BlackListedLabels.length === 0">
-                    <td colspan="3" class="text-center text-muted">No filter available.</td>
+                  <tr ng-if="formValues.BlackListedLabels.length === 0">
+                    <td colspan="3" class="text-muted text-center">No filter available.</td>
                   </tr>
-                  <tr ng-if="!settings.BlackListedLabels">
-                    <td colspan="3" class="text-center text-muted">Loading...</td>
+                  <tr ng-if="!formValues.BlackListedLabels">
+                    <td colspan="3" class="text-muted text-center">Loading...</td>
                   </tr>
                 </tbody>
               </table>
@@ -220,12 +274,13 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="download" feather-icon="true" title-text="Backup Portainer"></rd-widget-header>
+      <rd-widget-header icon="download" title-text="Back up Portainer"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
           <div class="col-sm-12 form-section-title"> Backup configuration </div>
+          <div class="text-muted small mb-3">This will back up your Portainer server configuration and does not include containers.</div>
 
-          <box-selector options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
+          <box-selector slim="true" options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
 
           <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.S3">
             <!-- Schedule automatic backups -->
@@ -304,7 +359,7 @@
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="us-west-1"
+                  placeholder="default region is us-east-1 if left empty"
                   id="region"
                   name="region"
                   ng-model="formValues.region"
@@ -362,7 +417,7 @@
             <div class="form-group col-md-12" ng-show="backupPortainerForm.password_S3.$invalid">
               <div class="small text-warning">
                 <div ng-messages="backupPortainerForm.password_S3.$error">
-                  <p ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true"></pr-icon> This field is required.</p>
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
                 </div>
               </div>
             </div>
@@ -378,7 +433,10 @@
                   limited-feature-disabled
                   limited-feature-class="limited-be"
                 >
-                  <span> <i class="fa fa-upload" aria-hidden="true"></i> Export backup</span>
+                  <span>
+                    <pr-icon icon="'upload'" class-name="'mr-1'"></pr-icon>
+                    Export backup
+                  </span>
                 </button>
               </div>
             </div>
@@ -422,7 +480,7 @@
             <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
               <div class="small text-warning">
                 <div ng-messages="backupPortainerForm.password.$error">
-                  <p ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true"></pr-icon> This field is required.</p>
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
                 </div>
               </div>
             </div>

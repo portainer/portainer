@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path"
 	"regexp"
@@ -197,7 +197,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 
 		r.Method = http.MethodPost
 
-		r.Body = ioutil.NopCloser(bytes.NewReader(newBody))
+		r.Body = io.NopCloser(bytes.NewReader(newBody))
 		r.ContentLength = int64(len(newBody))
 	}
 
@@ -395,7 +395,7 @@ func (transport *Transport) updateDefaultGitBranch(request *http.Request) error 
 	remote := request.URL.Query().Get("remote")
 	if strings.HasSuffix(remote, ".git") {
 		repositoryURL := remote[:len(remote)-4]
-		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "")
+		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "", false)
 		if err != nil {
 			return err
 		}
@@ -471,7 +471,7 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 			return err
 		}
 
-		header := base64.StdEncoding.EncodeToString(headerData)
+		header := base64.URLEncoding.EncodeToString(headerData)
 
 		request.Header.Set("X-Registry-Auth", header)
 	}

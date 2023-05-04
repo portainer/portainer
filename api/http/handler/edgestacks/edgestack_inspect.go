@@ -16,7 +16,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeStack Id"
+// @param id path int true "EdgeStack Id"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
 // @failure 400
@@ -29,10 +29,8 @@ func (handler *Handler) edgeStackInspect(w http.ResponseWriter, r *http.Request)
 	}
 
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
+	if err != nil {
+		return handler.handlerDBErr(err, "Unable to find an edge stack with the specified identifier inside the database")
 	}
 
 	return response.JSON(w, edgeStack)

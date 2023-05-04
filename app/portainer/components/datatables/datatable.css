@@ -51,7 +51,7 @@
 
 .datatable .searchBar {
   border: 1px solid var(--border-searchbar);
-  background: var(--bg-searchbar) !important;
+  background: var(--bg-searchbar);
   border-radius: 5px;
   padding: 4px 10px;
   font-size: 14px;
@@ -64,10 +64,14 @@
 }
 
 .toolBar .searchBar {
-  flex: right;
   margin-right: 10px;
-  height: 30px;
   display: inline-flex;
+  flex-basis: 7rem;
+  flex-grow: 1;
+  flex-shrink: 1;
+  align-items: center;
+  min-width: 7rem;
+  max-width: 14rem;
 }
 
 .datatable .searchBar input[type='text'] {
@@ -112,12 +116,11 @@
 
 .datatable .footer .paginationControls {
   float: right;
-  margin: 10px 15px 5px 0;
+  margin: 10px 10px 5px 0;
 }
 
 .datatable .footer .paginationControls .limitSelector {
   font-size: 12px;
-  margin-right: 15px;
 }
 
 .datatable .footer .paginationControls .pagination {

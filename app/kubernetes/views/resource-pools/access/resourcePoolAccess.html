@@ -20,7 +20,7 @@
   <div class="row" ng-if="ctrl.pool">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="layers" feather-icon="true" title-text="Namespace"></rd-widget-header>
+        <rd-widget-header icon="layers" title-text="Namespace"></rd-widget-header>
         <rd-widget-body>
           <table class="table">
             <tbody>
@@ -40,13 +40,35 @@
   <div class="row">
     <div class="col-sm-12">
       <rd-widget ng-if="ctrl.availableUsersAndTeams">
-        <rd-widget-header icon="svg-userlock" title-text="Create access"></rd-widget-header>
+        <rd-widget-header icon="user-x" title-text="Create access"></rd-widget-header>
         <rd-widget-body>
           <form class="form-horizontal">
             <div class="form-group">
+              <div
+                ng-if="!ctrl.isRBACEnabled"
+                class="small mx-[15px] mb-6 flex gap-1 rounded-lg border border-solid border-warning-5 bg-warning-2 p-4 text-warning-8 th-highcontrast:bg-yellow-11 th-highcontrast:text-white th-dark:bg-yellow-11 th-dark:text-white"
+              >
+                <div class="mt-0.5">
+                  <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
+                </div>
+                <div>
+                  <p> Your cluster does not have Kubernetes role-based access control (RBAC) enabled. </p>
+                  <p> This means you can't use Portainer RBAC functionality to regulate access to environment resources based on user roles. </p>
+                  <p class="mb-0">
+                    To enable RBAC, start the&nbsp;<a
+                      class="th-highcontrast:text-blue-4 th-dark:text-blue-7"
+                      href="https://kubernetes.io/docs/concepts/overview/components/#kube-apiserver"
+                      target="_blank"
+                      >API server</a
+                    >&nbsp;with the&nbsp;<code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">--authorization-mode</code>&nbsp;flag set to a
+                    comma-separated list that includes&nbsp;<code class="bg-gray-4 th-highcontrast:bg-black th-dark:bg-black">RBAC</code>, for example:&nbsp;
+                    <code class="bg-gray-4 box-decoration-clone th-highcontrast:bg-black th-dark:bg-black">kube-apiserver --authorization-mode=Example1,RBAC,Example2</code>.
+                  </p>
+                </div>
+              </div>
               <span class="col-sm-12 small text-warning">
                 <p class="vertical-center">
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                   Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
                 </p>
               </span>
@@ -73,12 +95,12 @@
               <div class="col-sm-12">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-sm !ml-0 vertical-center"
+                  class="btn btn-primary btn-sm vertical-center !ml-0"
                   ng-disabled="ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
                   ng-click="ctrl.authorizeAccess()"
                   button-spinner="ctrl.actionInProgress"
                 >
-                  <span class="vertical-center" ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon> Create access</span>
+                  <span class="vertical-center" ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" class="vertical-center"></pr-icon> Create access</span>
                   <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
                 </button>
               </div>
@@ -95,7 +117,7 @@
       <access-datatable
         ng-if="ctrl.authorizedUsersAndTeams"
         title-text="Namespace access"
-        title-icon="svg-userlock"
+        title-icon="user-x"
         table-key="kubernetes_resourcepool_access"
         order-by="Name"
         dataset="ctrl.authorizedUsersAndTeams"
