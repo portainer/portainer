@@ -19,10 +19,12 @@
   line-height: 18px;
   padding: 8px 10px !important;
   font-size: 12px !important;
+  user-select: none;
 }
 
 .tooltip-centered .tooltip-container {
   text-align: center;
+  user-select: none;
 }
 
 .tooltip-message a {
