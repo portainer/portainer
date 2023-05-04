@@ -4,6 +4,7 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
 import { parseAutoUpdateResponse } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
+import { confirmEnableTLSVerify } from '@/react/portainer/gitops/utils';
 
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
@@ -71,6 +72,13 @@ class KubernetesRedeployAppGitFormController {
 
   onChangeTLSSkipVerify(value) {
     return this.$async(async () => {
+      if (this.stack.GitConfig.TLSSkipVerify && !value) {
+        const confirmed = await confirmEnableTLSVerify();
+
+        if (!confirmed) {
+          return;
+        }
+      }
       this.onChange({ TLSSkipVerify: value });
     });
   }
