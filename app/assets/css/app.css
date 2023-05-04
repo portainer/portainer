@@ -216,6 +216,14 @@ input[type='checkbox'] {
   color: var(--text-blocklist-item-selected-color);
 }
 
+.blocklist-item:not(.blocklist-item-not-interactive):hover {
+  @apply border border-blue-7;
+  cursor: pointer;
+
+  background-color: var(--bg-blocklist-hover-color);
+  color: var(--text-blocklist-hover-color);
+}
+
 .blocklist-item-box {
   display: flex;
 }
