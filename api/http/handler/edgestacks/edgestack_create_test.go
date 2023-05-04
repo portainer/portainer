@@ -146,7 +146,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 				DeploymentType:   edgeStack.DeploymentType,
 			},
 			Method:             "string",
-			ExpectedStatusCode: 500,
+			ExpectedStatusCode: http.StatusConflict,
 		},
 		{
 			Name: "Empty EdgeStack Groups",
