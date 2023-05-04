@@ -92,7 +92,10 @@ type customTemplateFromFileContentPayload struct {
 	// Valid values are: 1 - 'linux', 2 - 'windows'
 	// Required for Docker stacks
 	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
-	// Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)
+	// Type of created stack:
+	// * 1 - swarm
+	// * 2 - compose
+	// * 3 - kubernetes
 	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
 	// Content of stack file
 	FileContent string `validate:"required"`
@@ -189,7 +192,10 @@ type customTemplateFromGitRepositoryPayload struct {
 	// Valid values are: 1 - 'linux', 2 - 'windows'
 	// Required for Docker stacks
 	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
-	// Type of created stack (1 - swarm, 2 - compose)
+	// Type of created stack:
+	// * 1 - swarm
+	// * 2 - compose
+	// * 3 - kubernetes
 	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
 
 	// URL of a Git repository hosting the Stack file
@@ -350,6 +356,10 @@ type customTemplateFromFileUploadPayload struct {
 	Description string
 	Note        string
 	Platform    portainer.CustomTemplatePlatform
+	// Type of created stack:
+	// * 1 - swarm
+	// * 2 - compose
+	// * 3 - kubernetes
 	Type        portainer.StackType
 	FileContent []byte
 	// Definitions of variables in the stack file
@@ -420,12 +430,14 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 // @security jwt
 // @accept multipart/form-data
 // @produce json
-// @param Title formData string false "Title of the template"
-// @param Description formData string false "Description of the template"
-// @param Note formData string false "A note that will be displayed in the UI. Supports HTML content"
-// @param Platform formData int false "Platform associated to the template (1 - 'linux', 2 - 'windows')" Enums(1,2)
-// @param Type formData int false "Type of created stack (1 - swarm, 2 - compose)" Enums(1,2)
-// @param file formData file false "File"
+// @param Title formData string true "Title of the template"
+// @param Description formData string true "Description of the template"
+// @param Note formData string true "A note that will be displayed in the UI. Supports HTML content"
+// @param Platform formData int true "Platform associated to the template (1 - 'linux', 2 - 'windows')" Enums(1,2)
+// @param Type formData int true "Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)" Enums(1,2,3)
+// @param File formData file true "File"
+// @param Logo formData string false "URL of the template's logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"
+// @param Variables formData string false "A json array of variables definitions" example:"[{\"label\":\"image\",\"description\":\"Image name\",\"defaultValue\":\"nginx:latest\",\"name\":\"image\"}]"
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

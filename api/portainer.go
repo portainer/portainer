@@ -177,8 +177,11 @@ type (
 		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
 		// URL of the template's logo
 		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
-		// Type of created stack (1 - swarm, 2 - compose)
-		Type            StackType        `json:"Type" example:"1"`
+		// Type of created stack:
+		// * 1 - swarm
+		// * 2 - compose
+		// * 3 - kubernetes
+		Type            StackType        `json:"Type" example:"1" enums:"1,2,3"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
 		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
