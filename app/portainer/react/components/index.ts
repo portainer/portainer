@@ -190,6 +190,7 @@ export const componentsModule = angular
       'placeholder',
       'yaml',
       'dockerFile',
+      'shell',
       'readonly',
       'onChange',
       'value',

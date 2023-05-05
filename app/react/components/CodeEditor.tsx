@@ -2,6 +2,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage, LanguageSupport } from '@codemirror/language';
 import { yaml } from '@codemirror/legacy-modes/mode/yaml';
 import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
+import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { useMemo } from 'react';
 import { createTheme } from '@uiw/codemirror-themes';
 import { tags as highlightTags } from '@lezer/highlight';
@@ -14,6 +15,7 @@ interface Props {
   placeholder?: string;
   yaml?: boolean;
   dockerFile?: boolean;
+  shell?: boolean;
   readonly?: boolean;
   onChange: (value: string) => void;
   value: string;
@@ -47,6 +49,7 @@ const yamlLanguage = new LanguageSupport(StreamLanguage.define(yaml));
 const dockerFileLanguage = new LanguageSupport(
   StreamLanguage.define(dockerFile)
 );
+const shellLanguage = new LanguageSupport(StreamLanguage.define(shell));
 
 export function CodeEditor({
   id,
@@ -57,6 +60,7 @@ export function CodeEditor({
   height = '500px',
   yaml: isYaml,
   dockerFile: isDockerFile,
+  shell: isShell,
 }: Props) {
   const extensions = useMemo(() => {
     const extensions = [];
@@ -66,8 +70,11 @@ export function CodeEditor({
     if (isDockerFile) {
       extensions.push(dockerFileLanguage);
     }
+    if (isShell) {
+      extensions.push(shellLanguage);
+    }
     return extensions;
-  }, [isYaml, isDockerFile]);
+  }, [isYaml, isDockerFile, isShell]);
 
   return (
     <>
