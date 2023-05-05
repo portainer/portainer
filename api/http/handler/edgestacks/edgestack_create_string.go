@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type edgeStackFromStringPayload struct {
@@ -64,14 +66,14 @@ func (payload *edgeStackFromStringPayload) Validate(r *http.Request) error {
 // @failure 500 "Internal server error"
 // @failure 503 "Edge compute features are disabled"
 // @router /edge_stacks/create/string [post]
-func (handler *Handler) createEdgeStackFromFileContent(r *http.Request, dryrun bool) (*portainer.EdgeStack, error) {
+func (handler *Handler) createEdgeStackFromFileContent(r *http.Request, tx dataservices.DataStoreTx, dryrun bool) (*portainer.EdgeStack, error) {
 	var payload edgeStackFromStringPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return nil, err
 	}
 
-	stack, err := handler.edgeStacksService.BuildEdgeStack(payload.Name, payload.DeploymentType, payload.EdgeGroups, payload.Registries, payload.UseManifestNamespaces)
+	stack, err := handler.edgeStacksService.BuildEdgeStack(tx, payload.Name, payload.DeploymentType, payload.EdgeGroups, payload.Registries, payload.UseManifestNamespaces)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create Edge stack object")
 	}
@@ -80,14 +82,13 @@ func (handler *Handler) createEdgeStackFromFileContent(r *http.Request, dryrun b
 		return stack, nil
 	}
 
-	return handler.edgeStacksService.PersistEdgeStack(stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
-		return handler.storeFileContent(stackFolder, payload.DeploymentType, relatedEndpointIds, []byte(payload.StackFileContent))
+	return handler.edgeStacksService.PersistEdgeStack(tx, stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
+		return handler.storeFileContent(tx, stackFolder, payload.DeploymentType, relatedEndpointIds, []byte(payload.StackFileContent))
 	})
-
 }
 
-func (handler *Handler) storeFileContent(stackFolder string, deploymentType portainer.EdgeStackDeploymentType, relatedEndpointIds []portainer.EndpointID, fileContent []byte) (composePath, manifestPath, projectPath string, err error) {
-	hasWrongType, err := hasWrongEnvironmentType(handler.DataStore.Endpoint(), relatedEndpointIds, deploymentType)
+func (handler *Handler) storeFileContent(tx dataservices.DataStoreTx, stackFolder string, deploymentType portainer.EdgeStackDeploymentType, relatedEndpointIds []portainer.EndpointID, fileContent []byte) (composePath, manifestPath, projectPath string, err error) {
+	hasWrongType, err := hasWrongEnvironmentType(tx.Endpoint(), relatedEndpointIds, deploymentType)
 	if err != nil {
 		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
 	}

@@ -3,10 +3,12 @@ package edgestacks
 import (
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+
+	"github.com/pkg/errors"
 )
 
 type edgeStackFromFileUploadPayload struct {
@@ -87,14 +89,14 @@ func (payload *edgeStackFromFileUploadPayload) Validate(r *http.Request) error {
 // @failure 500 "Internal server error"
 // @failure 503 "Edge compute features are disabled"
 // @router /edge_stacks/create/file [post]
-func (handler *Handler) createEdgeStackFromFileUpload(r *http.Request, dryrun bool) (*portainer.EdgeStack, error) {
+func (handler *Handler) createEdgeStackFromFileUpload(r *http.Request, tx dataservices.DataStoreTx, dryrun bool) (*portainer.EdgeStack, error) {
 	payload := &edgeStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
 		return nil, err
 	}
 
-	stack, err := handler.edgeStacksService.BuildEdgeStack(payload.Name, payload.DeploymentType, payload.EdgeGroups, payload.Registries, payload.UseManifestNamespaces)
+	stack, err := handler.edgeStacksService.BuildEdgeStack(tx, payload.Name, payload.DeploymentType, payload.EdgeGroups, payload.Registries, payload.UseManifestNamespaces)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create edge stack object")
 	}
@@ -103,7 +105,7 @@ func (handler *Handler) createEdgeStackFromFileUpload(r *http.Request, dryrun bo
 		return stack, nil
 	}
 
-	return handler.edgeStacksService.PersistEdgeStack(stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
-		return handler.storeFileContent(stackFolder, payload.DeploymentType, relatedEndpointIds, payload.StackFileContent)
+	return handler.edgeStacksService.PersistEdgeStack(tx, stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
+		return handler.storeFileContent(tx, stackFolder, payload.DeploymentType, relatedEndpointIds, payload.StackFileContent)
 	})
 }

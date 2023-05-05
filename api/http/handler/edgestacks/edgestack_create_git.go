@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type edgeStackFromGitRepositoryPayload struct {
@@ -91,14 +93,14 @@ func (payload *edgeStackFromGitRepositoryPayload) Validate(r *http.Request) erro
 // @failure 500 "Internal server error"
 // @failure 503 "Edge compute features are disabled"
 // @router /edge_stacks/create/repository [post]
-func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, dryrun bool, userID portainer.UserID) (*portainer.EdgeStack, error) {
+func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, tx dataservices.DataStoreTx, dryrun bool, userID portainer.UserID) (*portainer.EdgeStack, error) {
 	var payload edgeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return nil, err
 	}
 
-	stack, err := handler.edgeStacksService.BuildEdgeStack(payload.Name, payload.DeploymentType, payload.EdgeGroups, payload.Registries, payload.UseManifestNamespaces)
+	stack, err := handler.edgeStacksService.BuildEdgeStack(tx, payload.Name, payload.DeploymentType, payload.EdgeGroups, payload.Registries, payload.UseManifestNamespaces)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create edge stack object")
 	}
@@ -121,13 +123,13 @@ func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, dryrun
 		}
 	}
 
-	return handler.edgeStacksService.PersistEdgeStack(stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
-		return handler.storeManifestFromGitRepository(stackFolder, relatedEndpointIds, payload.DeploymentType, userID, repoConfig)
+	return handler.edgeStacksService.PersistEdgeStack(tx, stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
+		return handler.storeManifestFromGitRepository(tx, stackFolder, relatedEndpointIds, payload.DeploymentType, userID, repoConfig)
 	})
 }
 
-func (handler *Handler) storeManifestFromGitRepository(stackFolder string, relatedEndpointIds []portainer.EndpointID, deploymentType portainer.EdgeStackDeploymentType, currentUserID portainer.UserID, repositoryConfig gittypes.RepoConfig) (composePath, manifestPath, projectPath string, err error) {
-	hasWrongType, err := hasWrongEnvironmentType(handler.DataStore.Endpoint(), relatedEndpointIds, deploymentType)
+func (handler *Handler) storeManifestFromGitRepository(tx dataservices.DataStoreTx, stackFolder string, relatedEndpointIds []portainer.EndpointID, deploymentType portainer.EdgeStackDeploymentType, currentUserID portainer.UserID, repositoryConfig gittypes.RepoConfig) (composePath, manifestPath, projectPath string, err error) {
+	hasWrongType, err := hasWrongEnvironmentType(tx.Endpoint(), relatedEndpointIds, deploymentType)
 	if err != nil {
 		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
 	}
