@@ -11,8 +11,8 @@ import (
 )
 
 // @id getKubernetesServices
-// @summary Gets a list of kubernetes services for a given namespace
-// @description Gets all ConfigMaps and Secrets for a given namespace
+// @summary Get a list of kubernetes services for a given namespace
+// @description Get a list of kubernetes services for a given namespace
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -73,8 +73,8 @@ func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Req
 }
 
 // @id createKubernetesService
-// @summary Creates a kubernetes service
-// @description Creates a kubernetes service within a given namespace
+// @summary Create a kubernetes service
+// @description Create a kubernetes service within a given namespace
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -136,7 +136,7 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 
 // @id deleteKubernetesServices
 // @summary Delete kubernetes services
-// @description Deletes the provided list of kubernetes services
+// @description Delete the provided list of kubernetes services
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -188,8 +188,8 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 }
 
 // @id updateKubernetesService
-// @summary Updates a kubernetes service
-// @description Updates a kubernetes service within a given namespace
+// @summary Update a kubernetes service
+// @description Update a kubernetes service within a given namespace
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth

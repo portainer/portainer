@@ -11,8 +11,8 @@ import (
 )
 
 // @id getKubernetesNamespaces
-// @summary Gets a list of kubernetes namespaces
-// @description Gets a list of all kubernetes namespaces in the cluster
+// @summary Get a list of kubernetes namespaces
+// @description Get a list of all kubernetes namespaces in the cluster
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -55,8 +55,8 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 }
 
 // @id getKubernetesNamespace
-// @summary Gets details a specific kubernetes namespace
-// @description Gets details for a specific kubernetes namespace for the given environment
+// @summary Get kubernetes namespace details
+// @description Get kubernetes namespace details for the provided namespace within the given environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -108,7 +108,7 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 
 // @id createKubernetesNamespace
 // @summary Create a kubernetes namespace
-// @description Creates a kubernetes namespace within the given environment
+// @description Create a kubernetes namespace within the given environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -160,9 +160,9 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 	return nil
 }
 
-// @id deleteKubernetesNamespaces
+// @id deleteKubernetesNamespace
 // @summary Delete kubernetes namespace
-// @description Deletes a kubernetes namespace within the given environment
+// @description Delete a kubernetes namespace within the given environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -175,7 +175,7 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace} [delete]
-func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return httperror.BadRequest(
@@ -214,8 +214,8 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 }
 
 // @id updateKubernetesNamespace
-// @summary Delete kubernetes namespace
-// @description Deletes a kubernetes namespace within the given environment
+// @summary Updates a kubernetes namespace
+// @description Update a kubernetes namespace within the given environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth

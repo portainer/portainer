@@ -10,8 +10,8 @@ import (
 )
 
 // @id getKubernetesConfigMapsAndSecrets
-// @summary Gets ConfigMaps and Secrets
-// @description Gets all ConfigMaps and Secrets for a given namespace
+// @summary Get ConfigMaps and Secrets
+// @description Get all ConfigMaps and Secrets for a given namespace
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth

@@ -14,7 +14,7 @@ import (
 
 // @id getKubernetesIngressControllers
 // @summary Get a list ingress controllers
-// @description Gets a list of ingress controllers for the given environment
+// @description Get a list of ingress controllers for the given environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -134,7 +134,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 
 // @id getKubernetesIngressControllersByNamespace
 // @summary Get a list ingress controllers by namespace
-// @description Gets a list of ingress controllers for the given environment in the provided namespace
+// @description Get a list of ingress controllers for the given environment in the provided namespace
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -146,7 +146,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 // @success 200 {object} models.K8sIngressControllers "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /kubernetes/{id}/namespaces/namespace/ingresscontrollers [get]
+// @router /kubernetes/{id}/namespaces/{namespace}/ingresscontrollers [get]
 func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -389,7 +389,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
 // @param body body []models.K8sIngressControllers true "Ingress controllers"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
@@ -522,7 +522,7 @@ PayloadLoop:
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
 // @param body body models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
@@ -576,7 +576,7 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
 // @param body body models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
@@ -635,8 +635,8 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 }
 
 // @id deleteKubernetesIngresses
-// @summary Create kubernetes ingresses
-// @description Create kubernetes ingresses for the provided environment
+// @summary Delete kubernetes ingresses
+// @description Delete kubernetes ingresses for the provided environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -685,8 +685,8 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 }
 
 // @id updateKubernetesIngress
-// @summary Update kubernetes ingresses
-// @description Update kubernetes ingresses for the provided environment
+// @summary Update kubernetes ingress rule
+// @description Update kubernetes ingress rule for the provided environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -694,12 +694,12 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
 // @param body body models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /kubernetes/{id}/namespaces/{namespace/ingresses [put]
+// @router /kubernetes/{id}/namespaces/{namespace}/ingresses [put]
 func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
