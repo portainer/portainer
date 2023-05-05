@@ -31,10 +31,9 @@ type edgeStackFromGitRepositoryPayload struct {
 	// List of identifiers of EdgeGroups
 	EdgeGroups []portainer.EdgeGroupID `example:"1"`
 	// Deployment type to deploy this stack
-	// Valid values are: 0 - 'compose', 1 - 'kubernetes', 2 - 'nomad'
-	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments(endpoints)
-	// kubernetes deploy type is enabled only for kubernetes environments(endpoints)
-	// nomad deploy type is enabled only for nomad environments(endpoints)
+	// Valid values are: 0 - 'compose', 1 - 'kubernetes'
+	// compose is enabled only for docker environments
+	// kubernetes is enabled only for kubernetes environments
 	DeploymentType portainer.EdgeStackDeploymentType `example:"0" enums:"0,1,2"`
 	// List of Registries to use for this stack
 	Registries []portainer.RegistryID
@@ -48,12 +47,19 @@ func (payload *edgeStackFromGitRepositoryPayload) Validate(r *http.Request) erro
 	if govalidator.IsNull(payload.Name) {
 		return httperrors.NewInvalidPayloadError("Invalid stack name")
 	}
+
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return httperrors.NewInvalidPayloadError("Invalid repository URL. Must correspond to a valid URL format")
 	}
+
 	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
 		return httperrors.NewInvalidPayloadError("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
+
+	if payload.DeploymentType != portainer.EdgeStackDeploymentCompose && payload.DeploymentType != portainer.EdgeStackDeploymentKubernetes {
+		return httperrors.NewInvalidPayloadError("Invalid deployment type")
+	}
+
 	if govalidator.IsNull(payload.FilePathInRepository) {
 		switch payload.DeploymentType {
 		case portainer.EdgeStackDeploymentCompose:
@@ -62,9 +68,11 @@ func (payload *edgeStackFromGitRepositoryPayload) Validate(r *http.Request) erro
 			payload.FilePathInRepository = filesystem.ManifestFileDefaultName
 		}
 	}
+
 	if len(payload.EdgeGroups) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid edge groups. At least one edge group must be specified")
 	}
+
 	return nil
 }
 
@@ -119,6 +127,14 @@ func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, dryrun
 }
 
 func (handler *Handler) storeManifestFromGitRepository(stackFolder string, relatedEndpointIds []portainer.EndpointID, deploymentType portainer.EdgeStackDeploymentType, currentUserID portainer.UserID, repositoryConfig gittypes.RepoConfig) (composePath, manifestPath, projectPath string, err error) {
+	hasWrongType, err := hasWrongEnvironmentType(handler.DataStore.Endpoint(), relatedEndpointIds, deploymentType)
+	if err != nil {
+		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
+	}
+	if hasWrongType {
+		return "", "", "", fmt.Errorf("edge stack with config do not match the environment type")
+	}
+
 	projectPath = handler.FileService.GetEdgeStackProjectPath(stackFolder)
 	repositoryUsername := ""
 	repositoryPassword := ""
@@ -133,14 +149,7 @@ func (handler *Handler) storeManifestFromGitRepository(stackFolder string, relat
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentCompose {
-		composePath := repositoryConfig.ConfigFilePath
-
-		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stackFolder, projectPath, composePath, relatedEndpointIds)
-		if err != nil {
-			return "", "", "", fmt.Errorf("Failed creating and storing kube manifest: %w", err)
-		}
-
-		return composePath, manifestPath, projectPath, nil
+		return repositoryConfig.ConfigFilePath, "", projectPath, nil
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentKubernetes {
