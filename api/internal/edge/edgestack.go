@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
-var ErrEdgeGroupNotFound = errors.New("Edge group was not found")
+var ErrEdgeGroupNotFound = errors.New("edge group was not found")
 
 // EdgeStackRelatedEndpoints returns a list of environments(endpoints) related to this Edge stack
 func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup) ([]portainer.EndpointID, error) {
@@ -42,18 +42,18 @@ type EndpointRelationsConfig struct {
 }
 
 // FetchEndpointRelationsConfig fetches config needed for Edge Stack related endpoints
-func FetchEndpointRelationsConfig(dataStore dataservices.DataStore) (*EndpointRelationsConfig, error) {
-	endpoints, err := dataStore.Endpoint().Endpoints()
+func FetchEndpointRelationsConfig(tx dataservices.DataStoreTx) (*EndpointRelationsConfig, error) {
+	endpoints, err := tx.Endpoint().Endpoints()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve environments from database: %w", err)
 	}
 
-	endpointGroups, err := dataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := tx.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve environment groups from database: %w", err)
 	}
 
-	edgeGroups, err := dataStore.EdgeGroup().EdgeGroups()
+	edgeGroups, err := tx.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve edge groups from database: %w", err)
 	}
