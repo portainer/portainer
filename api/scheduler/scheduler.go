@@ -55,7 +55,7 @@ func (s *Scheduler) Shutdown() error {
 	s.mu.Unlock()
 
 	err := ctx.Err()
-	if err == context.Canceled {
+	if errors.Is(err, context.Canceled) {
 		return nil
 	}
 	return err

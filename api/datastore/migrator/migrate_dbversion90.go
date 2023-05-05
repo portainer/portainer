@@ -4,7 +4,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	portainer "github.com/portainer/portainer/api"
-	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 func (m *Migrator) migrateDBVersionToDB90() error {
@@ -30,7 +30,7 @@ func (m *Migrator) updateEdgeStackStatusForDB90() error {
 	for _, edgeJob := range edgeJobs {
 		for endpointId := range edgeJob.Endpoints {
 			_, err := m.endpointService.Endpoint(endpointId)
-			if err == portainerDsErrors.ErrObjectNotFound {
+			if dataservices.IsErrObjectNotFound(err) {
 				delete(edgeJob.Endpoints, endpointId)
 
 				err = m.edgeJobService.UpdateEdgeJob(edgeJob.ID, &edgeJob)

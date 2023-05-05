@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/hostmanagement/openamt"
 
 	"github.com/docker/docker/api/types"
@@ -63,7 +62,7 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 	log.Info().Int("endpointID", endpointID).Msg("OpenAMTHostInfo")
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)

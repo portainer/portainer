@@ -53,7 +53,7 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
 		}
 
-		if err == gittypes.ErrAuthenticationFailure {
+		if errors.Is(err, gittypes.ErrAuthenticationFailure) {
 			return cleanFn, errors.WithMessage(err, ErrInvalidGitCredential.Error())
 		}
 

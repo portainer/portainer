@@ -29,7 +29,7 @@ type repositoryFilePreviewPayload struct {
 
 func (payload *repositoryFilePreviewPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Repository) || !govalidator.IsURL(payload.Repository) {
-		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
+		return errors.New("invalid repository URL. Must correspond to a valid URL format")
 	}
 
 	if govalidator.IsNull(payload.Reference) {
@@ -37,7 +37,7 @@ func (payload *repositoryFilePreviewPayload) Validate(r *http.Request) error {
 	}
 
 	if govalidator.IsNull(payload.TargetFile) {
-		return errors.New("Invalid target filename.")
+		return errors.New("invalid target filename")
 	}
 
 	return nil
@@ -70,11 +70,11 @@ func (handler *Handler) gitOperationRepoFilePreview(w http.ResponseWriter, r *ht
 
 	err = handler.gitService.CloneRepository(projectPath, payload.Repository, payload.Reference, payload.Username, payload.Password, payload.TLSSkipVerify)
 	if err != nil {
-		if err == gittypes.ErrAuthenticationFailure {
+		if errors.Is(err, gittypes.ErrAuthenticationFailure) {
 			return httperror.BadRequest("Invalid git credential", err)
 		}
 
-		newErr := fmt.Errorf("unable to clone git repository: %w", err)
+		newErr := fmt.Errorf("unable to clone git repository, error: %w", err)
 		return httperror.InternalServerError(newErr.Error(), newErr)
 	}
 

@@ -27,7 +27,7 @@ func DownloadGitRepository(config gittypes.RepoConfig, gitService portainer.GitS
 	projectPath := getProjectPath()
 	err := gitService.CloneRepository(projectPath, config.URL, config.ReferenceName, username, password, config.TLSSkipVerify)
 	if err != nil {
-		if err == gittypes.ErrAuthenticationFailure {
+		if errors.Is(err, gittypes.ErrAuthenticationFailure) {
 			newErr := ErrInvalidGitCredential
 			return "", newErr
 		}

@@ -2,10 +2,11 @@ package apikeyrepository
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -78,12 +79,12 @@ func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, err
 			return &portainer.APIKey{}, nil
 		})
 
-	if err == stop {
+	if errors.Is(err, stop) {
 		return k, nil
 	}
 
 	if err == nil {
-		return nil, errors.ErrObjectNotFound
+		return nil, dserrors.ErrObjectNotFound
 	}
 
 	return nil, err
