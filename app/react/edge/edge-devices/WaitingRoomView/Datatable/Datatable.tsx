@@ -6,12 +6,12 @@ import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/qu
 
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { Button } from '@@/buttons';
-import { TextTip } from '@@/Tip/TextTip';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 
@@ -26,7 +26,7 @@ const settingsStore = createPersistedStore(storageKey, 'Name');
 export function Datatable() {
   const associateMutation = useAssociateDeviceMutation();
   const removeMutation = useDeleteEnvironmentsMutation();
-  const licenseOverused = useLicenseOverused();
+  const { willExceed } = useLicenseOverused();
   const tableState = useTableState(settingsStore, storageKey);
   const { data: environments, totalCount, isLoading } = useEnvironments();
 
@@ -41,28 +41,34 @@ export function Datatable() {
         <>
           <Button
             onClick={() => handleRemoveDevice(selectedRows)}
-            disabled={selectedRows.length === 0 || licenseOverused}
+            disabled={selectedRows.length === 0}
             color="dangerlight"
             icon={Trash2}
           >
             Remove Device
           </Button>
 
-          <Button
-            onClick={() => handleAssociateDevice(selectedRows)}
-            disabled={selectedRows.length === 0 || licenseOverused}
+          <TooltipWithChildren
+            message={
+              willExceed(selectedRows.length) && (
+                <>
+                  Associating devices is disabled as your node count exceeds
+                  your license limit
+                </>
+              )
+            }
           >
-            Associate Device
-          </Button>
-
-          {licenseOverused ? (
-            <div className="ml-2 mt-2">
-              <TextTip color="orange">
-                Associating devices is disabled as your node count exceeds your
-                license limit
-              </TextTip>
-            </div>
-          ) : null}
+            <span>
+              <Button
+                onClick={() => handleAssociateDevice(selectedRows)}
+                disabled={
+                  selectedRows.length === 0 || willExceed(selectedRows.length)
+                }
+              >
+                Associate Device
+              </Button>
+            </span>
+          </TooltipWithChildren>
         </>
       )}
       isLoading={isLoading}

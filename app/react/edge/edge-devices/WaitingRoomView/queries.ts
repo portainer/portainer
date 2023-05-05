@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from 'react-query';
 
-import { EnvironmentId } from '@/react/portainer/environments/types';
+import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { useIntegratedLicenseInfo } from '@/react/portainer/licenses/use-license.service';
+import { useEnvironmentList } from '@/react/portainer/environments/queries';
 
 export function useAssociateDeviceMutation() {
   const queryClient = useQueryClient();
@@ -35,8 +36,23 @@ async function associateDevice(environmentId: EnvironmentId) {
 
 export function useLicenseOverused() {
   const integratedInfo = useIntegratedLicenseInfo();
-  if (integratedInfo && integratedInfo.licenseInfo.enforcedAt > 0) {
-    return true;
+  return {
+    willExceed,
+    isOverused: willExceed(0),
+  };
+
+  function willExceed(moreNodes: number) {
+    return (
+      !!integratedInfo &&
+      integratedInfo.usedNodes + moreNodes >= integratedInfo.licenseInfo.nodes
+    );
   }
-  return false;
+}
+
+export function useUntrustedCount() {
+  const query = useEnvironmentList({
+    edgeDeviceUntrusted: true,
+    types: EdgeTypes,
+  });
+  return query.totalCount;
 }
