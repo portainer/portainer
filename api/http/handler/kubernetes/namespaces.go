@@ -20,7 +20,7 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @success 200 {object} map[string]portaineree.K8sNamespaceInfo "Success"
+// @success 200 {object} map[string]portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces [get]
@@ -65,7 +65,7 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
 // @param namespace path string true "Environment (Endpoint) identifier"
-// @success 200 {object} portaineree.K8sNamespaceInfo "Success"
+// @success 200 {object} portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace} [get]
