@@ -2802,7 +2802,7 @@
     tabbable "^4.0.0"
     tslib "^2.3.0"
 
-"@reach/popover@0.18.0":
+"@reach/popover@0.18.0", "@reach/popover@^0.18.0":
   version "0.18.0"
   resolved "https://registry.yarnpkg.com/@reach/popover/-/popover-0.18.0.tgz#1eba3e9ed826ac69dfdf3b01a1dab15ca889b5fc"
   integrity sha512-mpnWWn4w74L2U7fcneVdA6Fz3yKWNdZIRMoK8s6H7F8U2dLM/qN7AjzjEBqi6LXKb3Uf1ge4KHSbMixW0BygJQ==
