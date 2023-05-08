@@ -33,14 +33,14 @@
       <!-- environments -->
       <div class="col-sm-12 form-section-title"> Associated environments </div>
       <div class="form-group">
-        <associated-endpoints-selector
+        <associated-edge-endpoints-selector
           endpoint-ids="$ctrl.model.Endpoints"
           tags="$ctrl.tags"
           groups="$ctrl.groups"
           has-backend-pagination="true"
           on-associate="($ctrl.associateEndpoint)"
           on-dissociate="($ctrl.dissociateEndpoint)"
-        ></associated-endpoints-selector>
+        ></associated-edge-endpoints-selector>
       </div>
     </div>
     <div class="form-group" ng-if="$ctrl.noEndpoints">
