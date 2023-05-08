@@ -35,7 +35,7 @@ func (payload *teamUpdatePayload) Validate(r *http.Request) error {
 // @failure 403 "Permission denied"
 // @failure 404 "Team not found"
 // @failure 500 "Server error"
-// @router /team/{id} [put]
+// @router /teams/{id} [put]
 func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
