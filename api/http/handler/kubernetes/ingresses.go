@@ -13,7 +13,7 @@ import (
 )
 
 // @id getKubernetesIngressControllers
-// @summary Get a list ingress controllers
+// @summary Get a list of ingress controllers
 // @description Get a list of ingress controllers for the given environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
@@ -567,8 +567,8 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 }
 
 // @id createKubernetesIngress
-// @summary Create kubernetes ingresses by namespace
-// @description Create kubernetes ingresses by namespace for the provided environment
+// @summary Create a kubernetes ingress by namespace
+// @description Create a kubernetes ingress by namespace for the provided environment
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth

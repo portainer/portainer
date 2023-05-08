@@ -64,7 +64,7 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
 // @success 200 {object} portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -116,7 +116,7 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
 // @param body body models.K8sNamespaceDetails true "Namespace configuration details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
@@ -170,7 +170,7 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -223,7 +223,7 @@ func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
 // @param body body models.K8sNamespaceDetails true "Namespace details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
