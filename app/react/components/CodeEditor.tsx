@@ -40,6 +40,10 @@ const theme = createTheme({
     { tag: highlightTags.number, color: 'var(--text-cm-number-color)' },
     { tag: highlightTags.keyword, color: 'var(--text-cm-keyword-color)' },
     { tag: highlightTags.comment, color: 'var(--text-cm-comment-color)' },
+    {
+      tag: highlightTags.variableName,
+      color: 'var(--text-cm-variable-name-color)',
+    },
   ],
 });
 
@@ -83,6 +87,7 @@ export function CodeEditor({
         height={height}
         basicSetup={{
           highlightSelectionMatches: false,
+          autocompletion: false,
         }}
       />
     </>
