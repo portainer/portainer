@@ -31,10 +31,11 @@ import { BasicTableSettings } from './types';
 import { DatatableContent } from './DatatableContent';
 import { createSelectColumn } from './select-column';
 import { TableRow } from './TableRow';
+import { type TableState as GlobalTableState } from './useTableState';
 
 export interface Props<
   D extends Record<string, unknown>,
-  TSettings extends BasicTableSettings = BasicTableSettings
+  TMeta extends TableMeta<D> = TableMeta<D>
 > extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
@@ -54,17 +55,17 @@ export interface Props<
   highlightedItemId?: string;
   onPageChange?(page: number): void;
 
-  settingsManager: TSettings & {
-    search: string;
-    setSearch: (value: string) => void;
-  };
+  settingsManager: GlobalTableState<BasicTableSettings>;
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
-  meta?: TableMeta<D>;
+  meta?: TMeta;
 }
 
-export function Datatable<D extends Record<string, unknown>>({
+export function Datatable<
+  D extends Record<string, unknown>,
+  TMeta extends TableMeta<D> = TableMeta<D>
+>({
   columns,
   dataset,
   renderTableSettings = () => null,
@@ -88,7 +89,7 @@ export function Datatable<D extends Record<string, unknown>>({
   getRowCanExpand,
   'data-cy': dataCy,
   meta,
-}: Props<D>) {
+}: Props<D, TMeta>) {
   const isServerSidePagination = typeof pageCount !== 'undefined';
   const enableRowSelection = getIsSelectionEnabled(
     disableSelect,

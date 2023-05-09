@@ -9,11 +9,6 @@ declare module '@tanstack/table-core' {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface TableMeta<TData extends RowData> {
-    isEdit(rowId): boolean;
-    setIsEdit(rowId, isEdit: boolean): void;
-    onRename: (oldName: string, newName: string) => void;
-    onBrowse: (name: string) => void;
-    onDownload: (fileName: string) => void;
-    onDelete: (fileName: string) => void;
+    table?: string;
   }
 }

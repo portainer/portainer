@@ -8,7 +8,7 @@ import { BasicTableSettings } from '@@/datatables/types';
 import { Button } from '@@/buttons';
 import { TableState } from '@@/datatables/useTableState';
 
-import { FileData } from './types';
+import { FileData, FilesTableMeta } from './types';
 import { columns } from './columns';
 
 interface Props {
@@ -72,7 +72,7 @@ export function FilesTable({
   }
 
   return (
-    <Datatable<FileData>
+    <Datatable<FileData, FilesTableMeta>
       title={title}
       titleIcon={FileIcon}
       dataset={isRoot ? dataset : [goToParent(onGoToParent), ...dataset]}
@@ -80,6 +80,7 @@ export function FilesTable({
       columns={columns}
       getRowId={(row) => row.Name}
       meta={{
+        table: 'files',
         isEdit,
         setIsEdit,
         onRename,

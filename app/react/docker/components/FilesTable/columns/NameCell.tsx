@@ -6,7 +6,7 @@ import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
 import { Input } from '@@/form-components/Input';
 
-import { FileData } from '../types';
+import { FileData, isFilesTableMeta } from '../types';
 
 export function NameCell({
   getValue,
@@ -14,7 +14,11 @@ export function NameCell({
   table,
 }: CellContext<FileData, string>) {
   const name = getValue();
-  const isEdit = table.options.meta?.isEdit(name);
+  const { meta } = table.options;
+  if (!isFilesTableMeta(meta)) {
+    throw new Error('Invalid table meta');
+  }
+  const isEdit = meta.isEdit(name);
 
   if (item.custom) {
     return item.custom;
@@ -25,7 +29,7 @@ export function NameCell({
       <EditForm
         originalName={name}
         onSave={handleRename}
-        onClose={() => table.options.meta?.setIsEdit(name, false)}
+        onClose={() => meta.setIsEdit(name, false)}
       />
     );
   }
@@ -36,7 +40,7 @@ export function NameCell({
         <Button
           color="link"
           className="!ml-0 p-0"
-          onClick={() => table.options.meta?.onBrowse(name)}
+          onClick={() => meta.onBrowse(name)}
           icon={Folder}
         >
           {name}
@@ -51,8 +55,12 @@ export function NameCell({
   );
 
   function handleRename(name: string) {
-    table.options.meta?.onRename(item.Name, name);
-    table.options.meta?.setIsEdit(name, false);
+    if (!isFilesTableMeta(meta)) {
+      throw new Error('Invalid table meta');
+    }
+
+    meta.onRename(item.Name, name);
+    meta.setIsEdit(name, false);
   }
 }
 
