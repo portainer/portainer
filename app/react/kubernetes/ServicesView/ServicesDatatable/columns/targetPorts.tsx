@@ -1,13 +1,12 @@
 import { columnHelper } from './helper';
 
 export const targetPorts = columnHelper.accessor(
-  (row) => row.Ports.map((port) => `${port.TargetPort}`),
+  (row) => row.Ports.map((port) => port.TargetPort).join(','),
   {
     header: 'Target Ports',
     id: 'targetPorts',
-    cell: ({ getValue }) => {
-      const ports = getValue();
-
+    cell: ({ row }) => {
+      const ports = row.original.Ports.map((port) => port.TargetPort);
       if (!ports.length) {
         return '-';
       }
