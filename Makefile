@@ -12,17 +12,14 @@ TAG=latest
 SWAG=go run github.com/swaggo/swag/cmd/swag@v1.8.11 
 GOTESTSUM=go run gotest.tools/gotestsum@latest
 
-# Don't change anything below unless you know what you're doing
-
+# Don't change anything below this line unless you know what you're doing
 .DEFAULT_GOAL := help
+
 
 ##@ Building
 .PHONY: init-dist build-storybook build build-client build-server build-image devops
 init-dist:
 	@mkdir -p dist
-
-build-storybook:
-	yarn storybook:build
 
 build: build-server build-client ## Build the server and client
 
@@ -32,18 +29,21 @@ build-client: init-dist client-deps ## Build the client
 build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
-build-image: deps build ## Build the Portainer image locally
+build-image: build ## Build the Portainer image locally
 	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
 
-devops: clean init-dist download-binaries build-client ## Build the server binary for CI
+devops: clean init-dist server-deps build-client ## Build the server binary for CI
 	echo "Building the devops binary..."
 	@./build/build_binary_azuredevops.sh "$(PLATFORM)" "$(ARCH)"
 
-##@ Dependencies
-.PHONY: deps download-binaries client-deps tidy
-deps: download-binaries client-deps ## Download all build and client dependancies
+build-storybook:
+	yarn storybook:build
 
-download-binaries: ## Download dependant binaries
+##@ Build dependencies
+.PHONY: deps server-deps client-deps tidy
+deps-all: server-deps client-deps ## Download all client and server build dependancies
+
+server-deps: ## Download dependant server binaries
 	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
 
 client-deps: ## Install client dependencies
@@ -58,6 +58,7 @@ tidy: ## Tidy up the go.mod file
 clean: ## Remove all build and download artifacts
 	@echo "Clearing the dist directory..."
 	@rm -rf dist/*
+
 
 ##@ Testing
 .PHONY: test test-client test-server
@@ -103,10 +104,12 @@ lint-client: ## Lint client code
 lint-server: ## Lint server code
 	cd api && go vet ./...
 
+
 ##@ Extension
 .PHONY: dev-extension
 dev-extension: build-server build-client ## Run the extension in development mode
 	make local -f build/docker-extension/Makefile
+
 
 ##@ Docs
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean
@@ -121,6 +124,7 @@ docs-clean: ## Clean docs
 	rm -rf api/docs
 
 docs-validate-clean: docs-validate docs-clean ## Validate and clean docs
+
 
 ##@ Helpers
 .PHONY: help
