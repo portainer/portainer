@@ -17,6 +17,8 @@ import { ReactNode, useMemo } from 'react';
 import clsx from 'clsx';
 import _ from 'lodash';
 
+import { AutomationTestingProps } from '@/types';
+
 import { IconProps } from '@@/Icon';
 
 import { DatatableHeader } from './DatatableHeader';
@@ -32,7 +34,7 @@ import { TableRow } from './TableRow';
 export interface Props<
   D extends Record<string, unknown>,
   TSettings extends BasicTableSettings = BasicTableSettings
-> {
+> extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
@@ -82,6 +84,7 @@ export function Datatable<D extends Record<string, unknown>>({
   highlightedItemId,
   noWidget,
   getRowCanExpand,
+  'data-cy': dataCy,
 }: Props<D>) {
   const isServerSidePagination = typeof pageCount !== 'undefined';
   const enableRowSelection = getIsSelectionEnabled(
@@ -156,6 +159,7 @@ export function Datatable<D extends Record<string, unknown>>({
         emptyContentLabel={emptyContentLabel}
         isLoading={isLoading}
         onSortChange={handleSortChange}
+        data-cy={dataCy}
       />
 
       <DatatableFooter
