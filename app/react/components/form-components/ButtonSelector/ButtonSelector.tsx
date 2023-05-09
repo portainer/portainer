@@ -64,9 +64,12 @@ function OptionItem({
       color="light"
       as="label"
       disabled={disabled || readOnly}
-      className={clsx({
-        active: selected,
-      })}
+      className={clsx(
+        {
+          active: selected,
+        },
+        '!static !z-auto'
+      )}
     >
       {children}
       <input
