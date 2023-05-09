@@ -3,16 +3,18 @@ import clsx from 'clsx';
 import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
 import { TableHeaderSortIcons } from '@@/datatables/TableHeaderSortIcons';
 
+import { SortType } from '../../environments/queries/useEnvironmentList';
+
 import styles from './SortbySelector.module.css';
 
 interface Props {
-  filterOptions: Option<string>[];
-  onChange: (value: string) => void;
+  filterOptions: Option<SortType>[];
+  onChange: (value: SortType) => void;
   onDescending: () => void;
   placeHolder: string;
   sortByDescending: boolean;
   sortByButton: boolean;
-  value: string;
+  value?: SortType;
 }
 
 export function SortbySelector({
@@ -30,7 +32,7 @@ export function SortbySelector({
       <PortainerSelect
         placeholder={placeHolder}
         options={filterOptions}
-        onChange={(option) => onChange(option || '')}
+        onChange={(option: SortType) => onChange(option || '')}
         isClearable
         value={value}
       />

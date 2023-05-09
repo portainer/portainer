@@ -11,7 +11,7 @@ import { Link } from '@@/Link';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { isBE } from '../../feature-flags/feature-flags.service';
-import { refetchIfAnyOffline } from '../queries/useEnvironmentList';
+import { isSortType, refetchIfAnyOffline } from '../queries/useEnvironmentList';
 
 import { columns } from './columns';
 import { EnvironmentListItem } from './types';
@@ -36,7 +36,7 @@ export function EnvironmentsDatatable({
       excludeSnapshots: true,
       page: page + 1,
       pageLimit: tableState.pageSize,
-      sort: tableState.sortBy.id,
+      sort: isSortType(tableState.sortBy.id) ? tableState.sortBy.id : undefined,
       order: tableState.sortBy.desc ? 'desc' : 'asc',
     },
     { enabled: groupsQuery.isSuccess, refetchInterval: refetchIfAnyOffline }
