@@ -8,14 +8,14 @@ import { columnHelper } from './helper';
 export const externalIP = columnHelper.accessor(
   (row) => {
     if (row.Type === 'ExternalName') {
-      return row.ExternalName;
+      return row.ExternalName || '';
     }
 
     if (row.ExternalIPs?.length) {
-      return row.ExternalIPs?.slice(0);
+      return row.ExternalIPs?.join(',') || '';
     }
 
-    return row.IngressStatus?.slice(0);
+    return row.IngressStatus?.map((status) => status.IP).join(',') || '';
   },
   {
     header: 'External IP',
