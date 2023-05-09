@@ -16,8 +16,8 @@ import (
 )
 
 // @id GetKubernetesConfig
-// @summary Generates kubeconfig file enabling client communication with k8s api server
-// @description Generates kubeconfig file enabling client communication with k8s api server
+// @summary Generate a kubeconfig file enabling client communication with k8s api server
+// @description Generate a kubeconfig file enabling client communication with k8s api server
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth

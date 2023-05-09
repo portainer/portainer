@@ -10,7 +10,7 @@ export async function getConfigurations(
 ) {
   try {
     const { data: configmaps } = await axios.get<Configuration[]>(
-      `kubernetes/${environmentId}/namespaces/${namespace}/configmaps`
+      `kubernetes/${environmentId}/namespaces/${namespace}/configuration`
     );
     return configmaps;
   } catch (e) {

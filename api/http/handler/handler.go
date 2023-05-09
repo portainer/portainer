@@ -99,7 +99,7 @@ type Handler struct {
 
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
-// @name x-api-key
+// @name X-API-KEY
 
 // @securitydefinitions.apikey jwt
 // @in header
