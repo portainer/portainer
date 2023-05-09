@@ -44,9 +44,14 @@ export async function patchPod(
     },
   ];
   try {
-    return await axios.put<Pod>(
+    return await axios.patch<Pod>(
       buildUrl(environmentId, namespace, name),
-      payload
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json-patch+json',
+        },
+      }
     );
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update pod');
