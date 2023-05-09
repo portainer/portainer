@@ -4,73 +4,89 @@
 PLATFORM=$(shell go env GOOS)
 ARCH=$(shell go env GOARCH)
 
-TAG=latest
-
 # build target, can be one of "production", "testing", "development"
 ENV=development
 WEBPACK_CONFIG=webpack/webpack.$(ENV).js
+TAG=latest
 
+SWAG=go run github.com/swaggo/swag/cmd/swag@v1.8.11 
+GOTESTSUM=go run gotest.tools/gotestsum@latest
+
+# Don't change anything below this line unless you know what you're doing
 .DEFAULT_GOAL := help
 
-.PHONY: help build-storybook build-client devops download-binaries tidy clean client-deps
 
 ##@ Building
-
+.PHONY: init-dist build-storybook build build-client build-server build-image devops
 init-dist:
-	mkdir -p dist
+	@mkdir -p dist
+
+build: build-server build-client ## Build the server and client
+
+build-client: init-dist client-deps ## Build the client
+	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
+
+build-server: init-dist ## Build the server binary
+	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
+
+build-image: build ## Build the Portainer image locally
+	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
+
+devops: clean init-dist server-deps build-client ## Build the server binary for CI
+	echo "Building the devops binary..."
+	@./build/build_binary_azuredevops.sh "$(PLATFORM)" "$(ARCH)"
 
 build-storybook:
 	yarn storybook:build
 
-build-client: init-dist ## Build the client
-	@export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
+##@ Build dependencies
+.PHONY: deps server-deps client-deps tidy
+deps-all: server-deps client-deps ## Download all client and server build dependancies
 
-build-server: init-dist ## Build the server binary
-	@./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
-
-build: build-server build-client ## Build the server and client
-
-build-image: build ## Build the Portainer image
-	docker build -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
-
-devops: clean init-dist download-binaries build-client ## Build the server binary for CI
-	echo "Building the devops binary..."
-	@./build/build_binary_azuredevops.sh "$(PLATFORM)" "$(ARCH)"
-
-##@ Dependencies
-
-download-binaries: ## Download dependant binaries
+server-deps: ## Download dependant server binaries
 	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
 
-tidy: ## Tidy up the go.mod file
-	cd api && go mod tidy
- 
 client-deps: ## Install client dependencies
 	yarn
 
-##@ Cleanup
+tidy: ## Tidy up the go.mod file
+	cd api && go mod tidy
 
+
+##@ Cleanup
+.PHONY: clean
 clean: ## Remove all build and download artifacts
 	@echo "Clearing the dist directory..."
 	@rm -rf dist/*
 
+
 ##@ Testing
+.PHONY: test test-client test-server
+test: test-server test-client ## Run all tests
 
 test-client: ## Run client tests
 	yarn test
 
 test-server:	## Run server tests
-	cd api && go test -v ./...
-
-test: test-client test-server ## Run all tests
+	cd api && $(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover  ./...
 
 ##@ Dev
+.PHONY: dev dev-client dev-server
+dev: ## Run both the client and server in development mode	
+	make dev-server
+	make dev-client
 
-dev-server: build-image ## Run the server in development mode
+dev-client: ## Run the client in development mode 
+	yarn dev
+
+dev-server: ## Run the server in development mode
 	@./dev/run_container.sh
 
 
 ##@ Format
+.PHONY: format format-client format-server
+
+format: format-client format-server ## Format all code
 
 format-client: ## Format client code
 	yarn format
@@ -78,9 +94,9 @@ format-client: ## Format client code
 format-server: ## Format server code
 	cd api && go fmt ./...
 
-format: format-client format-server ## Format all code
-
 ##@ Lint
+.PHONY: lint lint-client lint-server
+lint: lint-client lint-server ## Lint all code
 
 lint-client: ## Lint client code
 	yarn lint
@@ -88,20 +104,17 @@ lint-client: ## Lint client code
 lint-server: ## Lint server code
 	cd api && go vet ./...
 
-lint: lint-client lint-server ## Lint all code
 
 ##@ Extension
-
+.PHONY: dev-extension
 dev-extension: build-server build-client ## Run the extension in development mode
 	make local -f build/docker-extension/Makefile
 
+
 ##@ Docs
-
-docs-deps: ## Install docs dependencies
-	go install github.com/swaggo/swag/cmd/swag@v1.8.11
-
-docs-build: docs-deps ## Build docs
-	cd api && swag init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./
+.PHONY: docs-build docs-validate docs-clean docs-validate-clean
+docs-build: ## Build docs
+	cd api && $(SWAG) init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./
 
 docs-validate: docs-build ## Validate docs
 	yarn swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
@@ -112,7 +125,8 @@ docs-clean: ## Clean docs
 
 docs-validate-clean: docs-validate docs-clean ## Validate and clean docs
 
-##@ Helpers
 
+##@ Helpers
+.PHONY: help
 help:  ## Display this help
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
