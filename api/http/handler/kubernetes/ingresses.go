@@ -644,7 +644,7 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param body body models.K8sIngressInfo true "Ingress details"
+// @param body body models.K8sIngressDeleteRequests true "Ingress details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
