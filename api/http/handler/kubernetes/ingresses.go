@@ -523,7 +523,7 @@ PayloadLoop:
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
 // @param namespace path string true "Namespace name"
-// @param body body models.K8sIngressInfo true "Ingress details"
+// @param body body []models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
