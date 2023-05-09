@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { EndpointGroupDefaultModel } from '../../../models/group';
 
 angular.module('portainer.app').controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, Notifications) {
@@ -5,17 +6,14 @@ angular.module('portainer.app').controller('CreateGroupController', function Cre
     actionInProgress: false,
   };
 
+  $scope.onAssociate = onAssociate;
+  $scope.onDisassociate = onDisassociate;
+
   $scope.create = function () {
     var model = $scope.model;
 
-    var associatedEndpoints = [];
-    for (var i = 0; i < $scope.associatedEndpoints.length; i++) {
-      var endpoint = $scope.associatedEndpoints[i];
-      associatedEndpoints.push(endpoint.Id);
-    }
-
     $scope.state.actionInProgress = true;
-    GroupService.createGroup(model, associatedEndpoints)
+    GroupService.createGroup(model, $scope.associatedEndpoints)
       .then(function success() {
         Notifications.success('Success', 'Group successfully created');
         $state.go('portainer.groups', {}, { reload: true });
@@ -32,6 +30,14 @@ angular.module('portainer.app').controller('CreateGroupController', function Cre
     $scope.associatedEndpoints = [];
     $scope.model = new EndpointGroupDefaultModel();
     $scope.loaded = true;
+  }
+
+  function onAssociate(endpointId) {
+    $scope.associatedEndpoints = [...$scope.associatedEndpoints, endpointId];
+  }
+
+  function onDisassociate(endpointId) {
+    $scope.associatedEndpoints = _.without($scope.associatedEndpoints, endpointId);
   }
 
   initView();

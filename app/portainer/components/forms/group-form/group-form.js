@@ -15,5 +15,8 @@ angular.module('portainer.app').component('groupForm', {
     formAction: '<',
     formActionLabel: '@',
     actionInProgress: '<',
+
+    onAssociate: '<',
+    onDisassociate: '<',
   },
 });
