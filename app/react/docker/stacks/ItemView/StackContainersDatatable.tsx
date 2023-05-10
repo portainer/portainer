@@ -44,11 +44,12 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
 
   const containersQuery = useContainers(
     environment.Id,
-    true,
     {
-      label: [`com.docker.compose.project=${stackName}`],
+      filters: {
+        label: [`com.docker.compose.project=${stackName}`],
+      },
     },
-    tableState.autoRefreshRate * 1000
+    { autoRefreshRate: tableState.autoRefreshRate * 1000 }
   );
 
   return (

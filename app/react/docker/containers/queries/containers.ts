@@ -1,7 +1,10 @@
 import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  agentTargetHeader,
+  parseAxiosError,
+} from '@/portainer/services/axios';
 
 import { urlBuilder } from '../containers.service';
 import { DockerContainerResponse } from '../types/response';
@@ -12,13 +15,20 @@ import { queryKeys } from './query-keys';
 
 export function useContainers(
   environmentId: EnvironmentId,
-  all = true,
-  filters?: Filters,
-  autoRefreshRate?: number
+  {
+    all = true,
+    filters,
+    nodeName,
+  }: { all?: boolean; filters?: Filters; nodeName?: string } = {},
+  {
+    autoRefreshRate,
+  }: {
+    autoRefreshRate?: number;
+  } = {}
 ) {
   return useQuery(
-    queryKeys.filters(environmentId, all, filters),
-    () => getContainers(environmentId, all, filters),
+    queryKeys.filters(environmentId, { all, filters, nodeName }),
+    () => getContainers(environmentId, { all, filters, nodeName }),
     {
       meta: {
         title: 'Failure',
@@ -33,14 +43,22 @@ export function useContainers(
 
 async function getContainers(
   environmentId: EnvironmentId,
-  all = true,
-  filters?: Filters
+  {
+    all = true,
+    filters,
+    nodeName,
+  }: { all?: boolean; filters?: Filters; nodeName?: string } = {}
 ) {
   try {
     const { data } = await axios.get<DockerContainerResponse[]>(
       urlBuilder(environmentId, undefined, 'json'),
       {
         params: { all, filters: filters && JSON.stringify(filters) },
+        headers: nodeName
+          ? {
+              [agentTargetHeader]: nodeName,
+            }
+          : undefined,
       }
     );
     return data.map((c) => parseViewModel(c));
