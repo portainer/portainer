@@ -171,6 +171,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 			tokenData,
 			bearerToken,
 			singleEndpointList,
+			true,
 		)
 		if err != nil {
 			httperror.WriteError(
