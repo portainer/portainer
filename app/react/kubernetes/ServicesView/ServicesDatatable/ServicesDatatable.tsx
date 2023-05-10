@@ -21,6 +21,7 @@ import { useTableState } from '@@/datatables/useTableState';
 import { useMutationDeleteServices, useServices } from '../service';
 import { Service } from '../types';
 import { DefaultDatatableSettings } from '../../datatables/DefaultDatatableSettings';
+import { isSystemNamespace } from '../../namespaces/utils';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
@@ -40,7 +41,7 @@ export function ServicesDatatable() {
   const filteredServices = servicesQuery.data?.filter(
     (service) =>
       (isAdmin && tableState.showSystemResources) ||
-      !KubernetesNamespaceHelper.isSystemNamespace(service.Namespace)
+      !isSystemNamespace(service.Namespace)
   );
 
   return (

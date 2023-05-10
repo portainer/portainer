@@ -1,5 +1,4 @@
 import { Authorized } from '@/react/hooks/useUser';
-import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 
 import { columnHelper } from './helper';
@@ -10,13 +9,14 @@ export const name = columnHelper.accessor(
 
     const isExternal =
       !row.Labels || !row.Labels['io.portainer.kubernetes.application.owner'];
-    if (isExternal) {
-      name = `${name} (external)`;
+    const isSystem = isSystemNamespace(row.Namespace);
+
+    if (isExternal && !isSystem) {
+      name = `${name} external`;
     }
 
-    const isSystem = KubernetesNamespaceHelper.isSystemNamespace(row.Namespace);
     if (isSystem) {
-      name = `${name} (system)`;
+      name = `${name} system`;
     }
     return name;
   },

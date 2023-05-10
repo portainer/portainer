@@ -5,8 +5,11 @@ import { columnHelper } from './helper';
 export const ports = columnHelper.accessor(
   (row) =>
     row.Ports.map(
-      (port) => `${port.Port}:${port.NodePort}/${port.Protocol}`
-    ).join(','),
+      (port) =>
+        `${port.Port}${port.NodePort !== 0 ? `:${port.NodePort}` : ''}/${
+          port.Protocol
+        }`
+    ).join(',') || '-',
   {
     header: () => (
       <>
