@@ -9,7 +9,7 @@
       <p>There are no mounts for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.ServiceMounts.length > 0" classes="no-padding">
-      <table class="table mb-0">
+      <table class="mb-0 table">
         <thead>
           <tr>
             <th ng-if="isAdmin || allowBindMounts">Type</th>
@@ -21,7 +21,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="mount in service.ServiceMounts">
-            <td class="!align-top !pt-6" ng-if="isAdmin || allowBindMounts">
+            <td class="!pt-6 !align-top" ng-if="isAdmin || allowBindMounts">
               <select
                 name="mountType"
                 class="form-control"
@@ -34,7 +34,7 @@
                 <option value="bind">Bind</option>
               </select>
             </td>
-            <td class="!align-top !pt-6 !pb-0">
+            <td class="!pt-6 !pb-0 !align-top">
               <div class="mb-6">
                 <select
                   class="form-control"
@@ -61,7 +61,7 @@
                 <div class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Source is required. </div></div
               >
             </td>
-            <td class="!align-top !pt-6 !pb-0">
+            <td class="!pt-6 !pb-0 !align-top">
               <input
                 type="text"
                 class="form-control mb-6"
