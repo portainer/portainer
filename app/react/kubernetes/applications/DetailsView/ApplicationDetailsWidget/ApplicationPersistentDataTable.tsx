@@ -110,7 +110,7 @@ export function ApplicationPersistentDataTable({
                             namespace,
                           }}
                         >
-                          <Icon icon={Database} className="!mr-1" />
+                          <Icon icon={Database} className="!mr-1 shrink-0" />
                           {`${persistedFolder.volume.persistentVolumeClaim.claimName}-${persistedFolder.volumeMount?.pod?.metadata?.name}`}
                         </Link>
                       )}
@@ -147,7 +147,7 @@ export function ApplicationPersistentDataTable({
                             namespace,
                           }}
                         >
-                          <Icon icon={Database} className="!mr-1" />
+                          <Icon icon={Database} className="!mr-1 shrink-0" />
                           {
                             persistedFolder.volume.persistentVolumeClaim
                               .claimName
