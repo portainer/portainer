@@ -106,7 +106,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 
 	groupsIds := stack.EdgeGroups
 	if payload.EdgeGroups != nil {
-		newRelated, _, err := handler.handleChangeEdgeGroups(stack.ID, payload.EdgeGroups, relatedEndpointIds, relationConfig)
+		newRelated, _, err := handleChangeEdgeGroups(tx, stack.ID, payload.EdgeGroups, relatedEndpointIds, relationConfig)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to handle edge groups change", err)
 		}
@@ -193,7 +193,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 	return stack, nil
 }
 
-func (handler *Handler) handleChangeEdgeGroups(edgeStackID portainer.EdgeStackID, newEdgeGroupsIDs []portainer.EdgeGroupID, oldRelatedEnvironmentIDs []portainer.EndpointID, relationConfig *edge.EndpointRelationsConfig) ([]portainer.EndpointID, set.Set[portainer.EndpointID], error) {
+func handleChangeEdgeGroups(tx dataservices.DataStoreTx, edgeStackID portainer.EdgeStackID, newEdgeGroupsIDs []portainer.EdgeGroupID, oldRelatedEnvironmentIDs []portainer.EndpointID, relationConfig *edge.EndpointRelationsConfig) ([]portainer.EndpointID, set.Set[portainer.EndpointID], error) {
 	newRelatedEnvironmentIDs, err := edge.EdgeStackRelatedEndpoints(newEdgeGroupsIDs, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return nil, nil, errors.WithMessage(err, "Unable to retrieve edge stack related environments from database")
@@ -210,14 +210,14 @@ func (handler *Handler) handleChangeEdgeGroups(edgeStackID portainer.EdgeStackID
 	}
 
 	for endpointID := range endpointsToRemove {
-		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
+		relation, err := tx.EndpointRelation().EndpointRelation(endpointID)
 		if err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to find environment relation in database")
 		}
 
 		delete(relation.EdgeStacks, edgeStackID)
 
-		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
+		err = tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 		if err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to persist environment relation in database")
 		}
@@ -231,14 +231,14 @@ func (handler *Handler) handleChangeEdgeGroups(edgeStackID portainer.EdgeStackID
 	}
 
 	for endpointID := range endpointsToAdd {
-		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
+		relation, err := tx.EndpointRelation().EndpointRelation(endpointID)
 		if err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to find environment relation in database")
 		}
 
 		relation.EdgeStacks[edgeStackID] = true
 
-		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
+		err = tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 		if err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to persist environment relation in database")
 		}
