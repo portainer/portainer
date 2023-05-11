@@ -15,7 +15,7 @@ import { createStore } from './store';
 interface Props {
   dataset: Array<DockerConfig>;
   onRemoveClick: (configs: Array<DockerConfig>) => void;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void>;
 }
 
 const storageKey = 'docker_configs';
