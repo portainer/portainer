@@ -106,7 +106,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 
 	groupsIds := stack.EdgeGroups
 	if payload.EdgeGroups != nil {
-		newRelated, _, err := handleChangeEdgeGroups(tx, stack.ID, payload.EdgeGroups, relatedEndpointIds, relationConfig)
+		newRelated, _, err := handler.handleChangeEdgeGroups(tx, stack.ID, payload.EdgeGroups, relatedEndpointIds, relationConfig)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to handle edge groups change", err)
 		}
@@ -193,7 +193,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 	return stack, nil
 }
 
-func handleChangeEdgeGroups(tx dataservices.DataStoreTx, edgeStackID portainer.EdgeStackID, newEdgeGroupsIDs []portainer.EdgeGroupID, oldRelatedEnvironmentIDs []portainer.EndpointID, relationConfig *edge.EndpointRelationsConfig) ([]portainer.EndpointID, set.Set[portainer.EndpointID], error) {
+func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edgeStackID portainer.EdgeStackID, newEdgeGroupsIDs []portainer.EdgeGroupID, oldRelatedEnvironmentIDs []portainer.EndpointID, relationConfig *edge.EndpointRelationsConfig) ([]portainer.EndpointID, set.Set[portainer.EndpointID], error) {
 	newRelatedEnvironmentIDs, err := edge.EdgeStackRelatedEndpoints(newEdgeGroupsIDs, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return nil, nil, errors.WithMessage(err, "Unable to retrieve edge stack related environments from database")
