@@ -33,9 +33,9 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = handler.deleteEdgeStack(handler.DataStore, portainer.EdgeStackID(edgeStackID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.deleteEdgeStack(tx, portainer.EdgeStackID(edgeStackID))
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return handler.deleteEdgeStack(tx, portainer.EdgeStackID(edgeStackID))
+		// })
 	}
 
 	if err != nil {

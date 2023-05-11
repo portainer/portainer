@@ -181,10 +181,10 @@ type (
 		// * 1 - swarm
 		// * 2 - compose
 		// * 3 - kubernetes
-		Type              StackType                          `json:"Type" example:"1"`
-		ResourceControlID ResourceControlID                  `json:"ResourceControl" gorm:"foreignKey"`
-		Variables         []CustomTemplateVariableDefinition `json:"Variables" gorm:"serialize:json"`
-		GitConfig         *gittypes.RepoConfig               `json:"GitConfig" gorm:"serialize:json"`
+		Type            StackType                          `json:"Type" example:"1"`
+		ResourceControl *ResourceControl                   `json:"ResourceControl" gorm:"foreignKey"`
+		Variables       []CustomTemplateVariableDefinition `json:"Variables" gorm:"serialize:json"`
+		GitConfig       *gittypes.RepoConfig               `json:"GitConfig" gorm:"serialize:json"`
 		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
 	}

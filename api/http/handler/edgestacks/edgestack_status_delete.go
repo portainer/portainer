@@ -46,10 +46,10 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		stack, err = handler.deleteEdgeStackStatus(handler.DataStore, portainer.EdgeStackID(stackID), endpoint)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			stack, err = handler.deleteEdgeStackStatus(tx, portainer.EdgeStackID(stackID), endpoint)
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	stack, err = handler.deleteEdgeStackStatus(tx, portainer.EdgeStackID(stackID), endpoint)
+		// 	return err
+		// })
 	}
 	if err != nil {
 		var httpErr *httperror.HandlerError

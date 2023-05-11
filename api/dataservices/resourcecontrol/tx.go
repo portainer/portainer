@@ -21,12 +21,12 @@ func (service ServiceTx) BucketName() string {
 // ResourceControl returns a ResourceControl object by ID
 func (service ServiceTx) ResourceControl(ID portainer.ResourceControlID) (*portainer.ResourceControl, error) {
 	var resourceControl portainer.ResourceControl
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.GetObject(BucketName, identifier, &resourceControl)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &resourceControl)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &resourceControl, nil
 }
@@ -103,12 +103,14 @@ func (service ServiceTx) Create(resourceControl *portainer.ResourceControl) erro
 
 // UpdateResourceControl saves a ResourceControl object.
 func (service ServiceTx) UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.UpdateObject(BucketName, identifier, resourceControl)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.UpdateObject(BucketName, identifier, resourceControl)
+	return nil
 }
 
 // DeleteResourceControl deletes a ResourceControl object by ID
 func (service ServiceTx) DeleteResourceControl(ID portainer.ResourceControlID) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.DeleteObject(BucketName, identifier)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.DeleteObject(BucketName, identifier)
+	return nil
 }

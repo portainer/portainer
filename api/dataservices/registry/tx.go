@@ -19,12 +19,12 @@ func (service ServiceTx) BucketName() string {
 // Registry returns a registry by ID.
 func (service ServiceTx) Registry(ID portainer.RegistryID) (*portainer.Registry, error) {
 	var registry portainer.Registry
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.GetObject(BucketName, identifier, &registry)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &registry)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &registry, nil
 }
@@ -64,12 +64,14 @@ func (service ServiceTx) Create(registry *portainer.Registry) error {
 
 // UpdateRegistry updates a registry.
 func (service ServiceTx) UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.UpdateObject(BucketName, identifier, registry)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.UpdateObject(BucketName, identifier, registry)
+	return nil
 }
 
 // DeleteRegistry deletes a registry.
 func (service ServiceTx) DeleteRegistry(ID portainer.RegistryID) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.DeleteObject(BucketName, identifier)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.DeleteObject(BucketName, identifier)
+	return nil
 }

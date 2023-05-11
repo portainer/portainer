@@ -21,12 +21,12 @@ func (service ServiceTx) BucketName() string {
 // Role returns a Role by ID
 func (service ServiceTx) Role(ID portainer.RoleID) (*portainer.Role, error) {
 	var set portainer.Role
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.GetObject(BucketName, identifier, &set)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &set)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &set, nil
 }
@@ -66,6 +66,7 @@ func (service ServiceTx) Create(role *portainer.Role) error {
 
 // UpdateRole updates a role.
 func (service ServiceTx) UpdateRole(ID portainer.RoleID, role *portainer.Role) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.UpdateObject(BucketName, identifier, role)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.UpdateObject(BucketName, identifier, role)
+	return nil
 }

@@ -78,9 +78,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.
 		tlsConfiguration.TLS = true
 	}
 
-	endpointID := dataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:                 portainer.EndpointID(endpointID),
 		Name:               "primary",
 		URL:                *flags.EndpointURL,
 		GroupID:            portainer.EndpointGroupID(1),
@@ -143,9 +141,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStor
 		}
 	}
 
-	endpointID := dataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:                 portainer.EndpointID(endpointID),
 		Name:               "primary",
 		URL:                endpointURL,
 		GroupID:            portainer.EndpointGroupID(1),

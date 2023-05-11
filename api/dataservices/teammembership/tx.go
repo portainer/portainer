@@ -20,12 +20,12 @@ func (service ServiceTx) BucketName() string {
 // TeamMembership returns a TeamMembership object by ID
 func (service ServiceTx) TeamMembership(ID portainer.TeamMembershipID) (*portainer.TeamMembership, error) {
 	var membership portainer.TeamMembership
-	identifier := service.service.connection.ConvertToKey(int(ID))
+	// identifier := service.service.connection.ConvertToKey(int(ID))
 
-	err := service.tx.GetObject(BucketName, identifier, &membership)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.tx.GetObject(BucketName, identifier, &membership)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &membership, nil
 }
@@ -102,8 +102,9 @@ func (service ServiceTx) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]por
 
 // UpdateTeamMembership saves a TeamMembership object.
 func (service ServiceTx) UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.UpdateObject(BucketName, identifier, membership)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.UpdateObject(BucketName, identifier, membership)
+	return nil
 }
 
 // CreateTeamMembership creates a new TeamMembership object.
@@ -119,8 +120,9 @@ func (service ServiceTx) Create(membership *portainer.TeamMembership) error {
 
 // DeleteTeamMembership deletes a TeamMembership object.
 func (service ServiceTx) DeleteTeamMembership(ID portainer.TeamMembershipID) error {
-	identifier := service.service.connection.ConvertToKey(int(ID))
-	return service.tx.DeleteObject(BucketName, identifier)
+	// identifier := service.service.connection.ConvertToKey(int(ID))
+	// return service.tx.DeleteObject(BucketName, identifier)
+	return nil
 }
 
 // DeleteTeamMembershipByUserID deletes all the TeamMembership object associated to a UserID.

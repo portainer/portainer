@@ -73,10 +73,10 @@ func (service *Service) endpoints() ([]portainer.Endpoint, error) {
 	var endpoints []portainer.Endpoint
 	var err error
 
-	err = service.connection.ViewTx(func(tx portainer.Transaction) error {
-		endpoints, err = service.Tx(tx).Endpoints()
-		return err
-	})
+	// err = service.connection.ViewTx(func(tx portainer.Transaction) error {
+	// 	endpoints, err = service.Tx(tx).Endpoints()
+	// 	return err
+	// })
 
 	return endpoints, err
 }

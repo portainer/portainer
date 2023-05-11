@@ -29,10 +29,10 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		edgeStack, err = handler.createSwarmStack(handler.DataStore, method, dryrun, tokenData.ID, r)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			edgeStack, err = handler.createSwarmStack(tx, method, dryrun, tokenData.ID, r)
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	edgeStack, err = handler.createSwarmStack(tx, method, dryrun, tokenData.ID, r)
+		// 	return err
+		// })
 	}
 	if err != nil {
 		switch {

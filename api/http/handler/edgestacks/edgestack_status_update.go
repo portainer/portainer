@@ -65,10 +65,10 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		stack, err = handler.updateEdgeStackStatus(handler.DataStore, r, portainer.EdgeStackID(stackID), payload)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			stack, err = handler.updateEdgeStackStatus(tx, r, portainer.EdgeStackID(stackID), payload)
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	stack, err = handler.updateEdgeStackStatus(tx, r, portainer.EdgeStackID(stackID), payload)
+		// 	return err
+		// })
 	}
 
 	if err != nil {
