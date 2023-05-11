@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
+	"gorm.io/gorm"
 
 	"github.com/rs/zerolog/log"
 )
@@ -23,6 +24,7 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 
 // Open opens and initializes the BoltDB database.
 func (store *Store) Open() (newStore bool, err error) {
+
 	encryptionReq, err := store.connection.NeedsEncryptionMigration()
 	if err != nil {
 		return false, err
@@ -40,6 +42,10 @@ func (store *Store) Open() (newStore bool, err error) {
 		return false, err
 	}
 
+	// TODO: check if settings exists, if not, init or leave it as is
+	// Init auto migrates tables if needed
+	store.connection.Init()
+
 	err = store.initServices()
 	if err != nil {
 		return false, err
@@ -48,7 +54,7 @@ func (store *Store) Open() (newStore bool, err error) {
 	// If no settings object exists then assume we have a new store
 	_, err = store.SettingsService.Settings()
 	if err != nil {
-		if store.IsErrObjectNotFound(err) {
+		if store.IsErrObjectNotFound(err) { // || store.IsErrNoSuchTable(err)
 			return true, nil
 		}
 		return false, err
@@ -78,9 +84,13 @@ func (store *Store) edition() portainer.SoftwareEdition {
 	return edition
 }
 
+func (store *Store) IsErrNoSuchTable(e error) bool {
+	return errors.Is(e, portainerErrors.ErrNoSuchTable)
+}
+
 // TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
-	return errors.Is(e, portainerErrors.ErrObjectNotFound)
+	return errors.Is(e, gorm.ErrRecordNotFound)
 }
 
 func (store *Store) Connection() portainer.Connection {
