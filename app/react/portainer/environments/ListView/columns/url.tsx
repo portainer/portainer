@@ -1,16 +1,18 @@
 import { CellContext } from '@tanstack/react-table';
-import { AlertTriangle, Settings } from 'lucide-react';
+import { AlertCircle, HelpCircle, Settings } from 'lucide-react';
 
-import { stripProtocol } from '@/portainer/filters/filters';
 import {
   EnvironmentStatus,
+  EnvironmentStatusMessage,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
+import { notifySuccess } from '@/portainer/services/notifications';
 
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
-import { Icon } from '@@/Icon';
+import { Button } from '@@/buttons';
 
 import { EnvironmentListItem } from '../types';
+import { useUpdateEnvironmentMutation } from '../../queries/useUpdateEnvironmentMutation';
 
 import { columnHelper } from './helper';
 
@@ -20,43 +22,95 @@ export const url = columnHelper.accessor('URL', {
 });
 
 function Cell({
-  getValue,
   row: { original: environment },
 }: CellContext<EnvironmentListItem, string>) {
-  const url = getValue();
-  const cleanUrl = stripProtocol(url);
+  const mutation = useUpdateEnvironmentMutation();
 
   if (
     environment.Type !== EnvironmentType.EdgeAgentOnDocker &&
     environment.Status !== EnvironmentStatus.Provisioning
   ) {
-    return cleanUrl;
-  }
-
-  if (environment.Type === EnvironmentType.EdgeAgentOnDocker) {
-    return '-';
-  }
-
-  if (environment.Status === EnvironmentStatus.Provisioning) {
     return (
-      <TooltipWithChildren message={environment.StatusMessage?.Detail}>
-        <span className="flex items-center gap-1">
-          <Icon icon={Settings} className="animate-spin-slow" />
-          <span className="small">{environment.StatusMessage?.Summary}</span>
-        </span>
+      <>
+        {environment.URL}
+        {environment.StatusMessage.Summary &&
+          environment.StatusMessage.Detail && (
+            <div className="ml-2 inline-block">
+              <span className="text-danger vertical-center inline-flex">
+                <AlertCircle className="lucide" aria-hidden="true" />
+                <span>{environment.StatusMessage.Summary}</span>
+              </span>
+              <TooltipWithChildren
+                message={
+                  <div>
+                    {environment.StatusMessage.Detail}
+                    {environment.URL && (
+                      <div className="mt-2 text-right">
+                        <Button
+                          color="link"
+                          className="small !ml-0 p-0"
+                          onClick={handleDismissButton}
+                        >
+                          <span className="text-muted-light">
+                            Dismiss error (still visible in logs)
+                          </span>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                }
+                position="bottom"
+              >
+                <span className="vertical-center inline-flex text-base">
+                  <HelpCircle className="lucide ml-1" aria-hidden="true" />
+                </span>
+              </TooltipWithChildren>
+            </div>
+          )}
+      </>
+    );
+  }
+
+  if (environment.Type === 4) {
+    return <>-</>;
+  }
+
+  if (environment.Status === 3) {
+    const status = (
+      <span className="vertical-center inline-flex text-base">
+        <Settings className="lucide animate-spin-slow" />
+        {environment.StatusMessage.Summary}
+      </span>
+    );
+    if (!environment.StatusMessage.Detail) {
+      return status;
+    }
+    return (
+      <TooltipWithChildren
+        message={environment.StatusMessage.Detail}
+        position="bottom"
+      >
+        {status}
       </TooltipWithChildren>
     );
   }
 
-  return (
-    <>
-      {cleanUrl}
-      <TooltipWithChildren message={environment.StatusMessage?.Detail}>
-        <span className="text-danger flex items-center gap-1">
-          <Icon icon={AlertTriangle} mode="danger" />
-          <span className="small">{environment.StatusMessage?.Summary}</span>
-        </span>
-      </TooltipWithChildren>
-    </>
-  );
+  return <>-</>;
+
+  function handleDismissButton() {
+    mutation.mutate(
+      {
+        id: environment.Id,
+        payload: {
+          IsSetStatusMessage: true,
+          StatusMessage: {} as EnvironmentStatusMessage,
+        },
+      },
+      {
+        onSuccess: () => {
+          notifySuccess('Success', 'Error dismissed successfully');
+        },
+      }
+    );
+  }
 }

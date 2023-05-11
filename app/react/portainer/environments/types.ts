@@ -131,7 +131,7 @@ interface EndpointChangeWindow {
   StartTime: string;
   EndTime: string;
 }
-interface EndpointStatusMessage {
+export interface EnvironmentStatusMessage {
   Summary: string;
   Detail: string;
 }
@@ -170,7 +170,7 @@ export type Environment = {
   /**
    *  A message that describes the status. Should be included for Status Provisioning or Error.
    */
-  StatusMessage?: EndpointStatusMessage;
+  StatusMessage: EnvironmentStatusMessage;
 };
 
 /**
