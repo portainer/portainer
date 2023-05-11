@@ -222,7 +222,7 @@
               <td style="width: 25%">Container</td>
               <td style="width: 25%">Environment variable</td>
               <td style="width: 25%">Value</td>
-              <td style="width: 25%">Configuration</td>
+              <td style="width: 25%">ConfigMap or Secret</td>
             </tr>
             <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0">
               <tr ng-repeat="envvar in container.Env | orderBy: 'name'">

@@ -43,11 +43,11 @@ class KubernetesConfigurationsController {
     for (const configuration of selectedItems) {
       try {
         await this.KubernetesConfigurationService.delete(configuration);
-        this.Notifications.success('Configurations successfully removed', configuration.Name);
+        this.Notifications.success('ConfigMaps/Secrets successfully removed', configuration.Name);
         const index = this.configurations.indexOf(configuration);
         this.configurations.splice(index, 1);
       } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to remove ConfigMaps & Secrets');
+        this.Notifications.error('Failure', err, 'Unable to remove ConfigMaps/Secrets');
       } finally {
         --actionCount;
         if (actionCount === 0) {
