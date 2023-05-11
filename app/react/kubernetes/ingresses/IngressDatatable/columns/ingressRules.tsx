@@ -4,18 +4,28 @@ import { AlertTriangle, ArrowRight } from 'lucide-react';
 import { Icon } from '@@/Icon';
 import { Badge } from '@@/Badge';
 
-import { Ingress, TLS, Path } from '../../types';
+import { Ingress, TLS } from '../../types';
 
 import { columnHelper } from './helper';
 
-export const ingressRules = columnHelper.accessor('Paths', {
-  header: 'Rules and Paths',
-  id: 'ingressRules',
-  cell: Cell,
-});
+export const ingressRules = columnHelper.accessor(
+  ({ Paths, TLS }) =>
+    // return an accessor function with all the useful text to search for
+    Paths.map((path) => {
+      const isHttp = isHTTP(TLS || [], path.Host);
+      return `${isHttp ? 'http' : 'https'}://${path.Host}${path.Path}${
+        path.ServiceName
+      }:${path.Port} ${!path.HasService && "Service doesn't exist"}`;
+    }).join(','),
+  {
+    header: 'Rules and Paths',
+    id: 'ingressRules',
+    cell: Cell,
+  }
+);
 
-function Cell({ row, getValue }: CellContext<Ingress, Path[] | undefined>) {
-  const paths = getValue();
+function Cell({ row }: CellContext<Ingress, string>) {
+  const paths = row.original.Paths;
 
   if (!paths) {
     return <div />;
