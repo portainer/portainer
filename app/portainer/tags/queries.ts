@@ -17,10 +17,12 @@ export const tagKeys = {
 
 export function useTags<T = Tag[]>({
   select,
-}: { select?: (tags: Tag[]) => T } = {}) {
+  enabled = true,
+}: { select?: (tags: Tag[]) => T; enabled?: boolean } = {}) {
   return useQuery(tagKeys.all, () => getTags(), {
     staleTime: 50,
     select,
+    enabled,
     ...withError('Failed to retrieve tags'),
   });
 }

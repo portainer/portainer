@@ -14,6 +14,9 @@ export function createSelectColumn<T>(): ColumnDef<T> {
         indeterminate={table.getIsSomeRowsSelected()}
         onChange={table.getToggleAllRowsSelectedHandler()}
         disabled={table.getRowModel().rows.every((row) => !row.getCanSelect())}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       />
     ),
     cell: ({ row, table }) => (
@@ -24,6 +27,8 @@ export function createSelectColumn<T>(): ColumnDef<T> {
         onChange={row.getToggleSelectedHandler()}
         disabled={!row.getCanSelect()}
         onClick={(e) => {
+          e.stopPropagation();
+
           if (e.shiftKey) {
             const { rows, rowsById } = table.getRowModel();
             const rowsToToggle = getRowRange(rows, row.id, lastSelectedId);
