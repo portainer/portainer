@@ -1,82 +1,32 @@
-import angular from 'angular';
-import _ from 'lodash-es';
+import { queryClient } from '@/react-tools/react-query';
 
-import { getEnvironments } from '@/react/portainer/environments/environment.service';
-
-class AssoicatedEndpointsSelectorController {
+class AssociatedEndpointsSelectorController {
   /* @ngInject */
   constructor($async) {
     this.$async = $async;
 
     this.state = {
       available: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
+        query: {
+          groupIds: [1],
+        },
       },
       associated: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
+        query: {
+          endpointIds: [],
+        },
       },
     };
 
-    this.endpoints = {
-      associated: [],
-      available: null,
-    };
-
-    this.getAvailableEndpoints = this.getAvailableEndpoints.bind(this);
-    this.getAssociatedEndpoints = this.getAssociatedEndpoints.bind(this);
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
-    this.loadData = this.loadData.bind(this);
-  }
-
-  $onInit() {
-    this.loadData();
   }
 
   $onChanges({ endpointIds }) {
     if (endpointIds && endpointIds.currentValue) {
-      this.loadData();
+      queryClient.invalidateQueries(['environments']);
+      this.state.associated.query = { endpointIds: endpointIds.currentValue };
     }
-  }
-
-  loadData() {
-    this.getAvailableEndpoints();
-    this.getAssociatedEndpoints();
-  }
-
-  /* #region  internal queries to retrieve endpoints per "side" of the selector */
-  getAvailableEndpoints() {
-    return this.$async(async () => {
-      const { start, filter, limit } = this.getPaginationData('available');
-      const query = { search: filter, groupIds: [1] };
-
-      const response = await getEnvironments({ start, limit, query });
-
-      const endpoints = _.filter(response.value, (endpoint) => !_.includes(this.endpointIds, endpoint.Id));
-      this.setTableData('available', endpoints, response.totalCount);
-      this.noEndpoints = this.state.available.totalCount === 0;
-    });
-  }
-
-  getAssociatedEndpoints() {
-    return this.$async(async () => {
-      let response = { value: [], totalCount: 0 };
-      if (this.endpointIds.length > 0) {
-        // fetch only if already has associated endpoints
-        const { start, filter, limit } = this.getPaginationData('associated');
-        const query = { search: filter, endpointIds: this.endpointIds };
-
-        response = await getEnvironments({ start, limit, query });
-      }
-
-      this.setTableData('associated', response.value, response.totalCount);
-    });
   }
 
   /* #endregion */
@@ -91,20 +41,7 @@ class AssoicatedEndpointsSelectorController {
   }
   /* #endregion */
 
-  /* #region  Utils funcs */
-  getPaginationData(tableType) {
-    const { pageNumber, limit, filter } = this.state[tableType];
-    const start = (pageNumber - 1) * limit + 1;
-
-    return { start, filter, limit };
-  }
-
-  setTableData(tableType, endpoints, totalCount) {
-    this.endpoints[tableType] = endpoints;
-    this.state[tableType].totalCount = parseInt(totalCount, 10);
-  }
   /* #endregion */
 }
 
-angular.module('portainer.app').controller('AssoicatedEndpointsSelectorController', AssoicatedEndpointsSelectorController);
-export default AssoicatedEndpointsSelectorController;
+export default AssociatedEndpointsSelectorController;

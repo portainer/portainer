@@ -38,19 +38,13 @@
     ></associated-endpoints-selector>
   </div>
 
-  <div ng-if="$ctrl.model.Id === 1">
-    <div class="table-in-row">
-      <group-association-table
-        loaded="$ctrl.loaded"
-        page-type="$ctrl.pageType"
-        table-type="associated"
-        retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
-        dataset="$ctrl.associatedEndpoints"
-        pagination-state="$ctrl.state.associated"
-        empty-dataset-message="No environment available"
-        title="Unassociated environments"
-      ></group-association-table>
-    </div>
+  <div class="-mx-[15px]">
+    <group-association-table
+      ng-if="$ctrl.model.Id === 1"
+      title="'Unassociated environments'"
+      empty-content-message="'No environment available'"
+      query="$ctrl.unassociatedQuery"
+    ></group-association-table>
   </div>
 
   <!-- actions -->

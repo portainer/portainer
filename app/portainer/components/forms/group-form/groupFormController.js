@@ -9,6 +9,14 @@ class GroupFormController {
     this.Notifications = Notifications;
     this.Authentication = Authentication;
 
+    this.state = {
+      allowCreateTag: this.Authentication.isAdmin(),
+    };
+
+    this.unassociatedQuery = {
+      groupIds: [1],
+    };
+
     this.onChangeTags = this.onChangeTags.bind(this);
   }
 
@@ -16,24 +24,6 @@ class GroupFormController {
     return this.$scope.$evalAsync(() => {
       this.model.TagIds = value;
     });
-  }
-
-  $onInit() {
-    this.state = {
-      available: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
-      },
-      associated: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
-      },
-      allowCreateTag: this.Authentication.isAdmin(),
-    };
   }
 }
 

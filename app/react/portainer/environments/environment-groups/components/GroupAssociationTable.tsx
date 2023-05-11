@@ -30,7 +30,7 @@ export function GroupAssociationTable({
   title: string;
   query: EnvironmentsQueryParams;
   emptyContentLabel: string;
-  onClickRow: (env: Environment) => void;
+  onClickRow?: (env: Environment) => void;
 } & AutomationTestingProps) {
   const tableState = useTableStateWithoutStorage('Name');
   const [page, setPage] = useState(1);
@@ -56,7 +56,7 @@ export function GroupAssociationTable({
       renderRow={(row) => (
         <TableRow<Environment>
           cells={row.getVisibleCells()}
-          onClick={() => onClickRow(row.original)}
+          onClick={onClickRow ? () => onClickRow(row.original) : undefined}
         />
       )}
       emptyContentLabel={emptyContentLabel}
