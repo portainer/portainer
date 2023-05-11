@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { ExternalLink } from 'lucide-react';
 import { CellContext } from '@tanstack/react-table';
 
-import type { DockerContainer, Port } from '@/react/docker/containers/types';
+import type { DockerContainer } from '@/react/docker/containers/types';
 
 import { Icon } from '@@/Icon';
 
@@ -10,14 +10,20 @@ import { useRowContext } from '../RowContext';
 
 import { columnHelper } from './helper';
 
-export const ports = columnHelper.accessor('Ports', {
-  header: 'Published Ports',
-  id: 'ports',
-  cell: PortsCell,
-});
+export const ports = columnHelper.accessor(
+  (row) =>
+    _.uniqBy(row.Ports, 'public')
+      .map((port) => `${port.public}:${port.private}`)
+      .join(','),
+  {
+    header: 'Published Ports',
+    id: 'ports',
+    cell: Cell,
+  }
+);
 
-function PortsCell({ getValue }: CellContext<DockerContainer, Port[]>) {
-  const ports = getValue();
+function Cell({ row }: CellContext<DockerContainer, string>) {
+  const ports = row.original.Ports;
 
   const { environment } = useRowContext();
 
