@@ -3,7 +3,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { Pod } from 'kubernetes-types/core/v1';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { useStackFile } from '@/react/docker/stacks/stack.service';
+import { useStackFile } from '@/react/common/stacks/stack.service';
 
 import { Widget, WidgetBody } from '@@/Widget';
 import { Button } from '@@/buttons';

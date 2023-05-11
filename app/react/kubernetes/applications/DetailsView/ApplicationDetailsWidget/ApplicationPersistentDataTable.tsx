@@ -42,7 +42,7 @@ export function ApplicationPersistentDataTable({
   return (
     <>
       <div className="text-muted mb-4 mt-6 flex items-center">
-        <Icon icon={Database} className="!mr-2" />
+        <Icon icon={Database} className="!mr-2 !shrink-0" />
         Data persistence
       </div>
       {!persistedFolders.length && (

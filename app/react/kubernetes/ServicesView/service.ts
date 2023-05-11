@@ -14,13 +14,6 @@ import { Service } from './types';
 export const queryKeys = {
   clusterServices: (environmentId: EnvironmentId) =>
     ['environments', environmentId, 'kubernetes', 'services'] as const,
-  namespaceServices: (environmentId: EnvironmentId, namespace: string) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'services',
-    namespace,
-  ],
 };
 
 // get a list of services for a specific namespace from the Portainer API

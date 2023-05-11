@@ -13,7 +13,8 @@ import { RawExtension } from 'kubernetes-types/runtime';
 
 export type Application = Deployment | DaemonSet | StatefulSet | Pod;
 
-// Revisions are have the previous application state and are used for rolling back applications to their previous state. Deployments use ReplicaSets, StatefulSets and DaemonSets use ControllerRevisions
+// Revisions are have the previous application state and are used for rolling back applications to their previous state.
+// Deployments use ReplicaSets, StatefulSets and DaemonSets use ControllerRevisions, and Pods don't have revisions.
 export type Revision = ReplicaSet | ControllerRevision;
 
 export type ApplicationList =
