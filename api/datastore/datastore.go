@@ -7,6 +7,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/mattn/go-sqlite3"
 	portainer "github.com/portainer/portainer/api"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
 	"gorm.io/gorm"
@@ -44,7 +45,7 @@ func (store *Store) Open() (newStore bool, err error) {
 
 	// TODO: check if settings exists, if not, init or leave it as is
 	// Init auto migrates tables if needed
-	store.connection.Init()
+	//store.connection.Init()
 
 	err = store.initServices()
 	if err != nil {
@@ -90,7 +91,13 @@ func (store *Store) IsErrNoSuchTable(e error) bool {
 
 // TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
-	return errors.Is(e, gorm.ErrRecordNotFound)
+	var sqliteErr sqlite3.Error
+	errNotFound := false
+	if errors.As(e, &sqliteErr) {
+		errNotFound = sqliteErr.Code == sqlite3.ErrError
+	}
+
+	return errNotFound || errors.Is(e, gorm.ErrRecordNotFound)
 }
 
 func (store *Store) Connection() portainer.Connection {

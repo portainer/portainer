@@ -4,9 +4,10 @@ import (
 	"errors"
 	"time"
 
+	"github.com/mattn/go-sqlite3"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
+	"gorm.io/gorm"
 )
 
 type (
@@ -293,5 +294,11 @@ type (
 )
 
 func IsErrObjectNotFound(e error) bool {
-	return errors.Is(e, dserrors.ErrObjectNotFound)
+	var sqliteErr sqlite3.Error
+	errNotFound := false
+	if errors.As(e, &sqliteErr) {
+		errNotFound = sqliteErr.Code == sqlite3.ErrError
+	}
+
+	return errNotFound || errors.Is(e, gorm.ErrRecordNotFound)
 }
