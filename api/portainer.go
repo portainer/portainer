@@ -984,12 +984,15 @@ type (
 	// SoftwareEdition represents an edition of Portainer
 	SoftwareEdition int
 
+	SSHSettingsID int
+
 	// SSLSettings represents a pair of SSL certificate and key
 	SSLSettings struct {
-		CertPath    string `json:"certPath"`
-		KeyPath     string `json:"keyPath"`
-		SelfSigned  bool   `json:"selfSigned"`
-		HTTPEnabled bool   `json:"httpEnabled"`
+		ID          SSHSettingsID `json:"Id" gorm:"unique,primaryKey,autoIncrement"`
+		CertPath    string        `json:"certPath"`
+		KeyPath     string        `json:"keyPath"`
+		SelfSigned  bool          `json:"selfSigned"`
+		HTTPEnabled bool          `json:"httpEnabled"`
 	}
 
 	// Stack represents a Docker stack created via docker stack deploy

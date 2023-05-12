@@ -4,19 +4,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "ssl"
-	key        = "SSL"
-)
-
 // Service represents a service for managing ssl data.
 type Service struct {
 	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
 }
 
 // NewService creates a new instance of a service.
@@ -41,7 +31,8 @@ func (service *Service) Settings() (*portainer.SSLSettings, error) {
 // UpdateSettings persists a SSLSettings object.
 func (service *Service) UpdateSettings(settings *portainer.SSLSettings) error {
 	db := service.connection.GetDB()
-	tx := db.Model(&portainer.SSLSettings{}).Where(portainer.SSLSettings{}).FirstOrCreate(settings)
+	settings.ID = 1
+	tx := db.Save(settings)
 	if tx.Error != nil {
 		return tx.Error
 	}
