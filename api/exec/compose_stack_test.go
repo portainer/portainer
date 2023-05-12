@@ -39,8 +39,8 @@ func Test_createEnvFile(t *testing.T) {
 			stack: &portainer.Stack{
 				ProjectPath: dir,
 				Env: []portainer.Pair{
-					{Name: "var1", Value: "value1"},
-					{Name: "var2", Value: "value2"},
+					{Name: "var1", Value1: "value1"},
+					{Name: "var2", Value1: "value2"},
 				},
 			},
 			expected: "var1=value1\nvar2=value2\n",
@@ -71,8 +71,8 @@ func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 	stack := &portainer.Stack{
 		ProjectPath: dir,
 		Env: []portainer.Pair{
-			{Name: "VAR1", Value: "NEW_VAL1"},
-			{Name: "VAR3", Value: "VAL3"},
+			{Name: "VAR1", Value1: "NEW_VAL1"},
+			{Name: "VAR3", Value1: "VAL3"},
 		},
 	}
 	result, err := createEnvFile(stack)

@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -163,113 +162,113 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 }
 
 func (connection *DbConnection) Init() error {
-	err := connection.DB.AutoMigrate(&models.Version{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Version")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Settings{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Settings")
-	}
-	err = connection.DB.AutoMigrate(&portainer.APIKey{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate APIKey")
-	}
-	err = connection.DB.AutoMigrate(&portainer.User{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate User")
-	}
-	err = connection.DB.AutoMigrate(&portainer.CustomTemplate{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate CustomTemplate")
-	}
-	err = connection.DB.AutoMigrate(&portainer.DockerHub{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate DockerHub")
-	}
-	err = connection.DB.AutoMigrate(&portainer.EdgeGroup{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate EdgeGroup")
-	}
-	err = connection.DB.AutoMigrate(&portainer.EdgeJob{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate EdgeJob")
-	}
-	err = connection.DB.AutoMigrate(&portainer.EdgeStack{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate EdgeStack")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Endpoint{})
+	// err := connection.DB.AutoMigrate(&models.Version{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Version")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Settings{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Settings")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.APIKey{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate APIKey")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.User{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate User")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.CustomTemplate{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate CustomTemplate")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.DockerHub{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate DockerHub")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.EdgeGroup{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate EdgeGroup")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.EdgeJob{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate EdgeJob")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.EdgeStack{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate EdgeStack")
+	// }
+	err := connection.DB.AutoMigrate(&portainer.Endpoint{})
 	if err != nil {
 		log.Err(err).Msgf("failed to auto migrate Endpoint")
 	}
-	err = connection.DB.AutoMigrate(&portainer.EndpointGroup{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate EndpointGroup")
-	}
-	err = connection.DB.AutoMigrate(&portainer.EndpointRelation{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate EndpointRelation")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Extension{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Extension")
-	}
-	err = connection.DB.AutoMigrate(&portainer.FDOProfile{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate FDOProfile")
-	}
-	err = connection.DB.AutoMigrate(&portainer.HelmUserRepository{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate HelmUserRepository")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Registry{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Registry")
-	}
-	err = connection.DB.AutoMigrate(&portainer.ResourceControl{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate ResourceControl")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Role{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Role")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Schedule{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Schedule")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Snapshot{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Snapshot")
-	}
-	err = connection.DB.AutoMigrate(&portainer.SSLSettings{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate SSLSettings")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Stack{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Stack")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Tag{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Tag")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Team{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Team")
-	}
-	err = connection.DB.AutoMigrate(&portainer.TeamMembership{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate TeamMembership")
-	}
-	err = connection.DB.AutoMigrate(&portainer.TunnelServerInfo{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate TunnelServerInfo")
-	}
-	err = connection.DB.AutoMigrate(&portainer.Webhook{})
-	if err != nil {
-		log.Err(err).Msgf("failed to auto migrate Webhook")
-	}
+	// err = connection.DB.AutoMigrate(&portainer.EndpointGroup{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate EndpointGroup")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.EndpointRelation{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate EndpointRelation")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Extension{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Extension")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.FDOProfile{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate FDOProfile")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.HelmUserRepository{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate HelmUserRepository")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Registry{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Registry")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.ResourceControl{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate ResourceControl")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Role{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Role")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Schedule{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Schedule")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Snapshot{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Snapshot")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.SSLSettings{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate SSLSettings")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Stack{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Stack")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Tag{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Tag")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Team{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Team")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.TeamMembership{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate TeamMembership")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.TunnelServerInfo{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate TunnelServerInfo")
+	// }
+	// err = connection.DB.AutoMigrate(&portainer.Webhook{})
+	// if err != nil {
+	// 	log.Err(err).Msgf("failed to auto migrate Webhook")
+	// }
 	return nil
 }

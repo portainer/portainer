@@ -18,10 +18,10 @@ func (l *pairListBool) Set(value string) error {
 	parts := strings.SplitN(value, "=", 2)
 	if len(parts) != 2 {
 		p.Name = parts[0]
-		p.Value = "true"
+		p.Value1 = "true"
 	} else {
 		p.Name = parts[0]
-		p.Value = parts[1]
+		p.Value1 = parts[1]
 	}
 
 	*l = append(*l, *p)

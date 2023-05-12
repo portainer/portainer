@@ -2,6 +2,10 @@ package portainer
 
 import (
 	"context"
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"time"
 
@@ -250,8 +254,8 @@ type (
 		ID           EdgeGroupID  `json:"Id" example:"1" gorm:"unique,primaryKey,autoIncrement"`
 		Name         string       `json:"Name"`
 		Dynamic      bool         `json:"Dynamic"`
-		TagIDs       []TagID      `json:"TagIds" gorm:"serializable:json"`
-		Endpoints    []EndpointID `json:"Endpoints" gorm:"serializable:json"`
+		TagIDs       []TagID      `json:"TagIds" gorm:"serializer:json"`
+		Endpoints    []EndpointID `json:"Endpoints" gorm:"serializer:json"`
 		PartialMatch bool         `json:"PartialMatch"`
 	}
 
@@ -264,8 +268,8 @@ type (
 		ID             EdgeJobID                          `json:"Id" example:"1" gorm:"unique,primaryKey,autoIncrement"`
 		Created        int64                              `json:"Created"`
 		CronExpression string                             `json:"CronExpression"`
-		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints" gorm:"serializable:json"`
-		EdgeGroups     []EdgeGroupID                      `json:"EdgeGroups" gorm:"serializable:json"`
+		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints" gorm:"serializer:json"`
+		EdgeGroups     []EdgeGroupID                      `json:"EdgeGroups" gorm:"serializer:json"`
 		Name           string                             `json:"Name"`
 		ScriptPath     string                             `json:"ScriptPath"`
 		Recurring      bool                               `json:"Recurring"`
@@ -348,6 +352,8 @@ type (
 	//EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
+	GPUs []Pair
+
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
 	Endpoint struct {
@@ -363,19 +369,19 @@ type (
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
-		Gpus             []Pair           `json:"Gpus" gorm:"serializable:json"`
-		TLSConfig        TLSConfiguration `json:"TLSConfig" gorm:"serializable:json"`
-		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" gorm:"serializable:json"`
+		Gpus             GPUs             `json:"Gpus" gorm:"serializer:json"`
+		TLSConfig        TLSConfiguration `json:"TLSConfig" gorm:"serializer:json"`
+		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" gorm:"serializer:json"`
 		// List of tag identifiers to which this environment(endpoint) is associated
-		TagIDs []TagID `json:"TagIds" gorm:"serializable:json"`
+		TagIDs []TagID `json:"TagIds" gorm:"serializer:json"`
 		// The status of the environment(endpoint) (1 - up, 2 - down)
 		Status EndpointStatus `json:"Status" example:"1"`
 		// List of snapshots
-		Snapshots []DockerSnapshot `json:"Snapshots" gorm:"serializable:json"`
+		Snapshots []DockerSnapshot `json:"Snapshots" gorm:"serializer:json"`
 		// List of user identifiers authorized to connect to this environment(endpoint)
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" gorm:"serializable:json"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" gorm:"serializer:json"`
 		// List of team identifiers authorized to connect to this environment(endpoint)
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" gorm:"serializable:json"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" gorm:"serializer:json"`
 		// The identifier of the edge agent associated with this environment(endpoint)
 		EdgeID string `json:"EdgeID,omitempty"`
 		// The key which is used to map the agent to Portainer
@@ -383,11 +389,11 @@ type (
 		// The check in interval for edge agent (in seconds)
 		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5"`
 		// Associated Kubernetes data
-		Kubernetes KubernetesData `json:"Kubernetes" gorm:"serializable:json"`
+		Kubernetes KubernetesData `json:"Kubernetes" gorm:"serializer:json"`
 		// Maximum version of docker-compose
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
 		// Environment(Endpoint) specific security settings
-		SecuritySettings EndpointSecuritySettings `gorm:"serializable:json"`
+		SecuritySettings EndpointSecuritySettings `gorm:"serializer:json"`
 		// The identifier of the AMT Device associated with this environment(endpoint)
 		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
@@ -401,13 +407,13 @@ type (
 		UserTrusted bool
 
 		// Whether we need to run any "post init migrations".
-		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations" gorm:"serializable:json"`
+		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations" gorm:"serializer:json"`
 
-		Edge EnvironmentEdgeSettings `gorm:"serializable:json"`
+		Edge EnvironmentEdgeSettings `gorm:"serializer:json"`
 
 		Agent struct {
 			Version string `example:"1.0.0"`
-		} `json:"Agent" gorm:"serializable:json"`
+		} `json:"Agent" gorm:"serializer:json"`
 
 		EnableGPUManagement bool `json:"EnableGPUManagement"`
 
@@ -419,11 +425,11 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializable:json"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams" gorm:"serializable:json"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializer:json"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams" gorm:"serializer:json"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags" gorm:"serializable:json"`
+		Tags []string `json:"Tags" gorm:"serializer:json"`
 
 		// Deprecated v2.18
 		IsEdgeDevice bool
@@ -451,20 +457,20 @@ type (
 		Name string `json:"Name" example:"my-environment-group"`
 		// Description associated to the environment(endpoint) group
 		Description        string             `json:"Description" example:"Environment(Endpoint) group description"`
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" gorm:"serializable:json"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" gorm:"serializable:json"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" gorm:"serializer:json"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" gorm:"serializer:json"`
 		// List of tags associated to this environment(endpoint) group
-		TagIDs []TagID `json:"TagIds" gorm:"serializable:json"`
+		TagIDs []TagID `json:"TagIds" gorm:"serializer:json"`
 
 		// Deprecated fields
-		Labels []Pair `json:"Labels" gorm:"serializable:json"`
+		Labels []Pair `json:"Labels" gorm:"serializer:json"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializable:json"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams" gorm:"serializable:json"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializer:json"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams" gorm:"serializer:json"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags" gorm:"serializable:json"`
+		Tags []string `json:"Tags" gorm:"serializer:json"`
 	}
 
 	// EndpointGroupID represents an environment(endpoint) group identifier
@@ -530,11 +536,11 @@ type (
 		PriceDescription string             `json:"PriceDescription,omitempty"`
 		Deal             bool               `json:"Deal,omitempty"`
 		Available        bool               `json:"Available,omitempty"`
-		License          LicenseInformation `json:"License,omitempty" gorm:"serializable:json"`
+		License          LicenseInformation `json:"License,omitempty" gorm:"serializer:json"`
 		Version          string             `json:"Version"`
 		UpdateAvailable  bool               `json:"UpdateAvailable"`
 		ShopURL          string             `json:"ShopURL,omitempty"`
-		Images           []string           `json:"Images,omitempty" gorm:"serializable:json"`
+		Images           []string           `json:"Images,omitempty" gorm:"serializer:json"`
 		Logo             string             `json:"Logo,omitempty"`
 	}
 
@@ -732,8 +738,8 @@ type (
 
 	// Pair defines a key/value string pair
 	Pair struct {
-		Name  string `json:"name" example:"name"`
-		Value string `json:"value" example:"value"`
+		Name   string `json:"name" example:"name"`
+		Value1 string `json:"value" example:"value"`
 	}
 
 	// Registry represents a Docker registry with all the info required
@@ -755,22 +761,22 @@ type (
 		Username string `json:"Username" example:"registry user"`
 		// Password or SecretAccessKey used to authenticate against this registry
 		Password                string                           `json:"Password,omitempty" example:"registry_password"`
-		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration" gorm:"serializable:json"`
-		Gitlab                  GitlabRegistryData               `json:"Gitlab" gorm:"serializable:json"`
-		Quay                    QuayRegistryData                 `json:"Quay" gorm:"serializable:json"`
-		Ecr                     EcrData                          `json:"Ecr" gorm:"serializable:json"`
-		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses" gorm:"serializable:json"`
+		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration" gorm:"serializer:json"`
+		Gitlab                  GitlabRegistryData               `json:"Gitlab" gorm:"serializer:json"`
+		Quay                    QuayRegistryData                 `json:"Quay" gorm:"serializer:json"`
+		Ecr                     EcrData                          `json:"Ecr" gorm:"serializer:json"`
+		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses" gorm:"serializer:json"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 31
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" gorm:"serializable:json"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" gorm:"serializer:json"`
 		// Deprecated in DBVersion == 31
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" gorm:"serializable:json"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" gorm:"serializer:json"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializable:json"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializer:json"`
 		// Deprecated in DBVersion == 18
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams" gorm:"serializable:json"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams" gorm:"serializer:json"`
 
 		// Stores temporary access token
 		AccessToken       string `json:"AccessToken,omitempty"`
@@ -815,12 +821,12 @@ type (
 		// In the case of a resource control applied to a stack, use the stack name as identifier
 		ResourceID string `json:"ResourceId" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
 		// List of Docker resources that will inherit this access control
-		SubResourceIDs []string `json:"SubResourceIds" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08" gorm:"serializable:json"`
+		SubResourceIDs []string `json:"SubResourceIds" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08" gorm:"serializer:json"`
 		// Type of Docker resource. Valid values are: 1- container, 2 -service
 		// 3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template
 		Type         ResourceControlType  `json:"Type" example:"1"`
-		UserAccesses []UserResourceAccess `json:"UserAccesses" gorm:"serializable:json"`
-		TeamAccesses []TeamResourceAccess `json:"TeamAccesses" gorm:"serializable:json"`
+		UserAccesses []UserResourceAccess `json:"UserAccesses" gorm:"serializer:json"`
+		TeamAccesses []TeamResourceAccess `json:"TeamAccesses" gorm:"serializer:json"`
 		// Permit access to the associated resource to any user
 		Public bool `json:"Public" example:"true"`
 		// Permit access to resource only to admins
@@ -849,7 +855,7 @@ type (
 		// Role description
 		Description string `json:"Description" example:"Read-only access of all resources in an environment(endpoint)"`
 		// Authorizations associated to a role
-		Authorizations Authorizations `json:"Authorizations" gorm:"serializable:json"`
+		Authorizations Authorizations `json:"Authorizations" gorm:"serializer:json"`
 		Priority       int            `json:"Priority"`
 	}
 
@@ -864,10 +870,10 @@ type (
 		ID          APIKeyID `json:"id" example:"1" gorm:"unique,primaryKey,autoIncrement"`
 		UserID      UserID   `json:"userId" example:"1" gorm:"index,foreignKey=ID"`
 		Description string   `json:"description" example:"portainer-api-key"`
-		Prefix      string   `json:"prefix"`                                    // API key identifier (7 char prefix)
-		DateCreated int64    `json:"dateCreated"`                               // Unix timestamp (UTC) when the API key was created
-		LastUsed    int64    `json:"lastUsed"`                                  // Unix timestamp (UTC) when the API key was last used
-		Digest      []byte   `json:"digest,omitempty" gorm:"serializable:json"` // Digest represents SHA256 hash of the raw API key
+		Prefix      string   `json:"prefix"`                                  // API key identifier (7 char prefix)
+		DateCreated int64    `json:"dateCreated"`                             // Unix timestamp (UTC) when the API key was created
+		LastUsed    int64    `json:"lastUsed"`                                // Unix timestamp (UTC) when the API key was last used
+		Digest      []byte   `json:"digest,omitempty" gorm:"serializer:json"` // Digest represents SHA256 hash of the raw API key
 	}
 
 	// Schedule represents a scheduled job.
@@ -2020,3 +2026,49 @@ const (
 	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
 	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
 )
+
+func (Pair) GormDataType() string {
+	return "json"
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (j *Pair) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+
+	err := json.Unmarshal(bytes, &j)
+	return err
+}
+
+// Value return json value, implement driver.Valuer interface
+func (j Pair) Value() (driver.Value, error) {
+	if j.Name == "" && j.Value1 == "" {
+		return nil, nil
+	}
+	return json.Marshal(j)
+}
+
+func (GPUs) GormDataType() string {
+	return "json"
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (j *GPUs) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+
+	err := json.Unmarshal(bytes, &j)
+	return err
+}
+
+// Value return json value, implement driver.Valuer interface
+func (j GPUs) Value() (driver.Value, error) {
+	if len(j) == 0 {
+		return nil, nil
+	}
+	return json.Marshal(j)
+}

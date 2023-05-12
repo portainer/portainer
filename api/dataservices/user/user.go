@@ -2,7 +2,6 @@ package user
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 // Service represents a service for managing environment(endpoint) data.
@@ -39,10 +38,6 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 
 	if tx.Error != nil {
 		return nil, tx.Error
-	}
-
-	if tx.Error == nil {
-		return nil, dserrors.ErrObjectNotFound
 	}
 
 	return &u, nil

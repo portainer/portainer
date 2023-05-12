@@ -54,7 +54,7 @@ func (store *Store) Open() (newStore bool, err error) {
 	// If no settings object exists then assume we have a new store
 	_, err = store.SettingsService.Settings()
 	if err != nil {
-		if store.IsErrObjectNotFound(err) { // || store.IsErrNoSuchTable(err)
+		if store.IsErrObjectNotFound(err) || store.IsErrNoSuchTable(err) {
 			return true, nil
 		}
 		return false, err

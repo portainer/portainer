@@ -148,7 +148,7 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 		labelValue := value.(string)
 
 		for _, blackListedLabel := range labelBlackList {
-			if blackListedLabel.Name == labelName && blackListedLabel.Value == labelValue {
+			if blackListedLabel.Name == labelName && blackListedLabel.Value1 == labelValue {
 				return true
 			}
 		}

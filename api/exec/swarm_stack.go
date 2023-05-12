@@ -115,7 +115,7 @@ func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, pul
 
 	env := make([]string, 0)
 	for _, envvar := range stack.Env {
-		env = append(env, envvar.Name+"="+envvar.Value)
+		env = append(env, envvar.Name+"="+envvar.Value1)
 	}
 
 	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)

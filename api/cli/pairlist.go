@@ -19,7 +19,7 @@ func (l *pairList) Set(value string) error {
 	}
 	p := new(portainer.Pair)
 	p.Name = parts[0]
-	p.Value = parts[1]
+	p.Value1 = parts[1]
 	*l = append(*l, *p)
 	return nil
 }

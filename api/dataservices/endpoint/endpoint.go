@@ -7,19 +7,12 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// BucketName represents the name of the bucket where this service stores data.
-const BucketName = "endpoints"
-
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
 	mu         sync.RWMutex
 	idxEdgeID  map[string]portainer.EndpointID
 	heartbeats sync.Map
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
 }
 
 // NewService creates a new instance of a service.
@@ -56,16 +49,35 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var endpoint *portainer.Endpoint
 
+	db := service.connection.GetDB()
+
+	tx := db.First(&endpoint, `id = ?`, ID)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
 	return endpoint, nil
 }
 
 // UpdateEndpoint updates an environment(endpoint).
 func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
+	db := service.connection.GetDB()
+	tx := db.Model(&portainer.Endpoint{}).Where("id = ?", ID).UpdateColumns(&endpoint)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
 	return nil
 }
 
 // DeleteEndpoint deletes an environment(endpoint).
 func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
+	db := service.connection.GetDB()
+	tx := db.Model(&portainer.Endpoint{}).Delete("id = ?", ID)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
 	return nil
 }
 
@@ -73,10 +85,11 @@ func (service *Service) endpoints() ([]portainer.Endpoint, error) {
 	var endpoints []portainer.Endpoint
 	var err error
 
-	// err = service.connection.ViewTx(func(tx portainer.Transaction) error {
-	// 	endpoints, err = service.Tx(tx).Endpoints()
-	// 	return err
-	// })
+	db := service.connection.GetDB()
+	tx := db.Find(&endpoints)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return endpoints, err
 }

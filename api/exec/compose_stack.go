@@ -151,7 +151,7 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	copyDefaultEnvFile(stack, envfile)
 
 	for _, v := range stack.Env {
-		envfile.WriteString(fmt.Sprintf("%s=%s\n", v.Name, v.Value))
+		envfile.WriteString(fmt.Sprintf("%s=%s\n", v.Name, v.Value1))
 	}
 
 	return "stack.env", nil
