@@ -29,12 +29,21 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Settings retrieve the ssl settings object.
 func (service *Service) Settings() (*portainer.SSLSettings, error) {
 	var settings portainer.SSLSettings
+	db := service.connection.GetDB()
+	tx := db.Take(&settings)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return &settings, nil
 }
 
 // UpdateSettings persists a SSLSettings object.
 func (service *Service) UpdateSettings(settings *portainer.SSLSettings) error {
-	// return service.connection.UpdateObject(BucketName, []byte(key), settings)
+	db := service.connection.GetDB()
+	tx := db.Model(&portainer.SSLSettings{}).Where(portainer.SSLSettings{}).FirstOrCreate(settings)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
