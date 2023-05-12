@@ -24,7 +24,7 @@ type swarmStackFromFileContentPayload struct {
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment variables used during stack deployment
-	Env []portainer.Pair
+	Env portainer.MultiPair
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
 }
@@ -42,7 +42,7 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 	return nil
 }
 
-func createStackPayloadFromSwarmFileContentPayload(name string, swarmID string, fileContent string, env []portainer.Pair, fromAppTemplate bool) stackbuilders.StackPayload {
+func createStackPayloadFromSwarmFileContentPayload(name string, swarmID string, fileContent string, env portainer.MultiPair, fromAppTemplate bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name:             name,
 		SwarmID:          swarmID,
@@ -112,7 +112,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	// Swarm cluster identifier
 	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
 	// A list of environment variables used during stack deployment
-	Env []portainer.Pair
+	Env portainer.MultiPair
 
 	// URL of a Git repository hosting the Stack file
 	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
@@ -155,7 +155,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool, repoSkipSSLVerify bool) stackbuilders.StackPayload {
+func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env portainer.MultiPair, fromAppTemplate bool, repoSkipSSLVerify bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name:    name,
 		SwarmID: swarmID,
@@ -258,10 +258,10 @@ type swarmStackFromFileUploadPayload struct {
 	Name             string
 	SwarmID          string
 	StackFileContent []byte
-	Env              []portainer.Pair
+	Env              portainer.MultiPair
 }
 
-func createStackPayloadFromSwarmFileUploadPayload(name, swarmID string, fileContentBytes []byte, env []portainer.Pair) stackbuilders.StackPayload {
+func createStackPayloadFromSwarmFileUploadPayload(name, swarmID string, fileContentBytes []byte, env portainer.MultiPair) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name:                  name,
 		SwarmID:               swarmID,
@@ -289,7 +289,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	}
 	payload.StackFileContent = composeFileContent
 
-	var env []portainer.Pair
+	var env portainer.MultiPair
 	err = request.RetrieveMultiPartFormJSONValue(r, "Env", &env, true)
 	if err != nil {
 		return errors.New("Invalid Env parameter")

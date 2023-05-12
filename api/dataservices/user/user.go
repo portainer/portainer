@@ -73,7 +73,8 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
 
 	db := service.connection.GetDB()
-	tx := db.Model(&portainer.User{}).Where("id = ?", ID).UpdateColumns(&user)
+	user.ID = ID
+	tx := db.Save(&user)
 	if tx.Error != nil {
 		return tx.Error
 	}
@@ -84,7 +85,7 @@ func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) er
 // CreateUser creates a new user.
 func (service *Service) Create(user *portainer.User) error {
 	db := service.connection.GetDB()
-	tx := db.Model(&portainer.User{}).Create(&user)
+	tx := db.Create(&user)
 	if tx.Error != nil {
 		return tx.Error
 	}

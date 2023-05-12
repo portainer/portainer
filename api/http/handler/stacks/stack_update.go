@@ -23,7 +23,7 @@ type updateComposeStackPayload struct {
 	// New content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx"`
 	// A list of environment(endpoint) variables used during stack deployment
-	Env []portainer.Pair
+	Env portainer.MultiPair
 	// Force a pulling to current image with the original tag though the image is already the latest
 	PullImage bool `example:"false"`
 }
@@ -39,7 +39,7 @@ type updateSwarmStackPayload struct {
 	// New content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx"`
 	// A list of environment(endpoint) variables used during stack deployment
-	Env []portainer.Pair
+	Env portainer.MultiPair
 	// Prune services that are no longer referenced (only available for Swarm stacks)
 	Prune bool `example:"true"`
 	// Force a pulling to current image with the original tag though the image is already the latest

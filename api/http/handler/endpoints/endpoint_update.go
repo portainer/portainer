@@ -22,7 +22,7 @@ type endpointUpdatePayload struct {
 	// Defaults to URL if not specified
 	PublicURL *string `example:"docker.mydomain.tld:2375"`
 	// GPUs information
-	Gpus []portainer.Pair
+	Gpus portainer.MultiPair
 	// Group identifier
 	GroupID *int `example:"1"`
 	// Require TLS to connect against this environment(endpoint)

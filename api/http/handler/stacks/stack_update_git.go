@@ -19,7 +19,7 @@ import (
 
 type stackGitUpdatePayload struct {
 	AutoUpdate               *portainer.AutoUpdateSettings
-	Env                      []portainer.Pair
+	Env                      portainer.MultiPair
 	Prune                    bool
 	RepositoryReferenceName  string
 	RepositoryAuthentication bool

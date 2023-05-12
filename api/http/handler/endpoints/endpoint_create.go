@@ -25,7 +25,7 @@ type endpointCreatePayload struct {
 	URL                    string
 	EndpointCreationType   endpointCreationEnum
 	PublicURL              string
-	Gpus                   []portainer.Pair
+	Gpus                   portainer.MultiPair
 	GroupID                int
 	TLS                    bool
 	TLSSkipVerify          bool
@@ -153,7 +153,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		payload.PublicURL = publicURL
 	}
 
-	gpus := make([]portainer.Pair, 0)
+	gpus := make(portainer.MultiPair, 0)
 	err = request.RetrieveMultiPartFormJSONValue(r, "Gpus", &gpus, true)
 	if err != nil {
 		return errors.New("invalid Gpus parameter")

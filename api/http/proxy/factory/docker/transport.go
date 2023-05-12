@@ -56,7 +56,7 @@ type (
 
 	operationExecutor struct {
 		operationContext *restrictedDockerOperationContext
-		labelBlackList   []portainer.Pair
+		labelBlackList   portainer.MultiPair
 	}
 	restrictedOperationRequest func(*http.Response, *operationExecutor) error
 	operationRequest           func(*http.Request) error

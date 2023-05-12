@@ -8,7 +8,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-type pairListBool []portainer.Pair
+type pairListBool portainer.MultiPair
 
 // Set implementation for a list of portainer.Pair
 func (l *pairListBool) Set(value string) error {
@@ -38,8 +38,8 @@ func (l *pairListBool) IsCumulative() bool {
 	return true
 }
 
-func BoolPairs(s kingpin.Settings) (target *[]portainer.Pair) {
-	target = new([]portainer.Pair)
+func BoolPairs(s kingpin.Settings) (target *portainer.MultiPair) {
+	target = new(portainer.MultiPair)
 	s.SetValue((*pairListBool)(target))
 	return
 }

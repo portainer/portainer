@@ -23,7 +23,7 @@ type settingsUpdatePayload struct {
 	// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
 	LogoURL *string `example:"https://mycompany.mydomain.tld/logo.png"`
 	// A list of label name & value that will be used to hide containers when querying containers
-	BlackListedLabels []portainer.Pair
+	BlackListedLabels portainer.MultiPair
 	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 	AuthenticationMethod *int `example:"1"`
 	InternalAuthSettings *portainer.InternalAuthSettings

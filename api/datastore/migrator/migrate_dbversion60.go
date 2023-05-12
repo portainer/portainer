@@ -20,7 +20,7 @@ func (m *Migrator) addGpuInputFieldDB60() error {
 
 	for _, endpoint := range endpoints {
 		if endpoint.Gpus == nil {
-			endpoint.Gpus = []portainer.Pair{}
+			endpoint.Gpus = portainer.MultiPair{}
 			err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 			if err != nil {
 				return err

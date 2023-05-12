@@ -127,7 +127,7 @@ type (
 		DemoEnvironment           *bool
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
-		Labels                    *[]Pair
+		Labels                    *MultiPair
 		Logo                      *string
 		NoAnalytics               *bool
 		Templates                 *string
@@ -173,7 +173,7 @@ type (
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
 		// User identifier who created this template
-		CreatedByUserID UserID `json:"CreatedByUserId" example:"3"`
+		CreatedByUserID UserID `json:"CreatedByUserId" example:"3" gorm:"foreignKey=ID"`
 		// A note that will be displayed in the UI. Supports HTML content
 		Note string `json:"Note" example:"This is my <b>custom</b> template"`
 		// Platform associated to the template.
@@ -186,9 +186,9 @@ type (
 		// * 2 - compose
 		// * 3 - kubernetes
 		Type            StackType                          `json:"Type" example:"1"`
-		ResourceControl *ResourceControl                   `json:"ResourceControl" gorm:"foreignKey"`
-		Variables       []CustomTemplateVariableDefinition `json:"Variables" gorm:"serialize:json"`
-		GitConfig       *gittypes.RepoConfig               `json:"GitConfig" gorm:"serialize:json"`
+		ResourceControl *ResourceControl                   `json:"ResourceControl" gorm:"serializer:json"`
+		Variables       []CustomTemplateVariableDefinition `json:"Variables" gorm:"serializer:json"`
+		GitConfig       *gittypes.RepoConfig               `json:"GitConfig" gorm:"serializer:json"`
 		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
 	}
@@ -276,7 +276,7 @@ type (
 		Version        int                                `json:"Version"`
 
 		// Field used for log collection of Endpoints belonging to EdgeGroups
-		GroupLogsCollection map[EndpointID]EdgeJobEndpointMeta
+		GroupLogsCollection map[EndpointID]EdgeJobEndpointMeta `json:"GroupLogsCollection" gorm:"serializer:json"`
 	}
 
 	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment(Endpoint) relation
@@ -300,7 +300,7 @@ type (
 		CronExpression string       `json:"CronExpression"`
 		Script         string       `json:"Script"`
 		Version        int          `json:"Version"`
-		Endpoints      []EndpointID `json:"Endpoints" gorm:"serealize:json"`
+		Endpoints      []EndpointID `json:"Endpoints" gorm:"serializer:json"`
 	}
 
 	//EdgeStack represents an edge stack
@@ -308,9 +308,9 @@ type (
 		// EdgeStack Identifier
 		ID             EdgeStackID                    `json:"Id" example:"1" gorm:"unique,primaryKey,autoIncrement"`
 		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status" gorm:"serealize:json"`
+		Status         map[EndpointID]EdgeStackStatus `json:"Status" gorm:"serializer:json"`
 		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups" gorm:"serealize:json"`
+		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups" gorm:"serializer:json"`
 		ProjectPath    string                         `json:"ProjectPath"`
 		EntryPoint     string                         `json:"EntryPoint"`
 		Version        int                            `json:"Version"`
@@ -343,7 +343,7 @@ type (
 	EdgeStackStatus struct {
 		Details    EdgeStackStatusDetails `json:"Details"`
 		Error      string                 `json:"Error"`
-		EndpointID EndpointID             `json:"EndpointID"`
+		EndpointID EndpointID             `json:"EndpointID" gorm:"foreignKey=ID"`
 
 		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
@@ -352,7 +352,7 @@ type (
 	//EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
-	GPUs []Pair
+	MultiPair []Pair
 
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
@@ -369,7 +369,7 @@ type (
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
-		Gpus             GPUs             `json:"Gpus" gorm:"serializer:json"`
+		Gpus             MultiPair        `json:"Gpus" gorm:"serializer:json"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig" gorm:"serializer:json"`
 		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" gorm:"serializer:json"`
 		// List of tag identifiers to which this environment(endpoint) is associated
@@ -463,7 +463,7 @@ type (
 		TagIDs []TagID `json:"TagIds" gorm:"serializer:json"`
 
 		// Deprecated fields
-		Labels []Pair `json:"Labels" gorm:"serializer:json"`
+		Labels MultiPair `json:"Labels" gorm:"serializer:json"`
 
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers" gorm:"serializer:json"`
@@ -513,8 +513,8 @@ type (
 
 	// EndpointRelation represents a environment(endpoint) relation object
 	EndpointRelation struct {
-		EndpointID EndpointID
-		EdgeStacks map[EdgeStackID]bool
+		EndpointID EndpointID           `gorm:"foreignKey=ID"`
+		EdgeStacks map[EdgeStackID]bool `gorm:"serializer:json"`
 	}
 
 	// EndpointPostInitMigrations
@@ -889,7 +889,7 @@ type (
 		Recurring      bool
 		Created        int64
 		JobType        JobType
-		EdgeSchedule   *EdgeSchedule `json:"EdgeSchedule,omitempty" gorm:"foreignKey:ScheduleID"`
+		EdgeSchedule   *EdgeSchedule `json:"EdgeSchedule,omitempty" gorm:"serializer:json"`
 	}
 
 	// ScheduleID represents a schedule identifier.
@@ -911,7 +911,7 @@ type (
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
 		LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
 		// A list of label name & value that will be used to hide containers when querying containers
-		BlackListedLabels []Pair `json:"BlackListedLabels" gorm:"serializer:json"`
+		BlackListedLabels MultiPair `json:"BlackListedLabels" gorm:"serializer:json"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 		AuthenticationMethod AuthenticationMethod          `json:"AuthenticationMethod" example:"1"`
 		InternalAuthSettings InternalAuthSettings          `json:"InternalAuthSettings" gorm:"serializer:json"`
@@ -1001,13 +1001,13 @@ type (
 		// Stack type. 1 for a Swarm stack, 2 for a Compose stack
 		Type StackType `json:"Type" example:"2"`
 		// Environment(Endpoint) identifier. Reference the environment(endpoint) that will be used for deployment
-		EndpointID EndpointID `json:"EndpointId" example:"1"`
+		EndpointID EndpointID `json:"EndpointId" example:"1" gorm:"foreignKey=ID"`
 		// Cluster identifier of the Swarm cluster where the stack is deployed
 		SwarmID string `json:"SwarmId" example:"jpofkc0i9uo9wtx1zesuk649w"`
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
 		// A list of environment(endpoint) variables used during stack deployment
-		Env []Pair `json:"Env"`
+		Env MultiPair `json:"Env"`
 		//
 		ResourceControl *ResourceControl `json:"ResourceControl" gorm:"serializer:json"`
 		// Stack status (1 - active, 2 - inactive)
@@ -1023,7 +1023,7 @@ type (
 		// The username which last updated this stack
 		UpdatedBy string `example:"bob"`
 		// Only applies when deploying stack with multiple files
-		AdditionalFiles []string `json:"AdditionalFiles"`
+		AdditionalFiles []string `json:"AdditionalFiles" gorm:"serializer:json"`
 		// The auto update settings of a git stack
 		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate" gorm:"serializer:json"`
 		// The stack deployment option
@@ -1164,7 +1164,7 @@ type (
 		// A list of ports exposed by the container
 		Ports []string `json:"ports,omitempty" example:"8080:80/tcp" gorm:"serializer:json"`
 		// Container labels
-		Labels []Pair `json:"labels,omitempty" gorm:"serializer:json"`
+		Labels MultiPair `json:"labels,omitempty" gorm:"serializer:json"`
 		// Whether the container should be started in privileged mode
 		Privileged bool `json:"privileged,omitempty" example:"true"`
 		// Whether the container should be started in
@@ -1316,7 +1316,7 @@ type (
 		ID          WebhookID   `json:"Id" example:"1" gorm:"unique,primaryKey,autoIncrement"`
 		Token       string      `json:"Token"`
 		ResourceID  string      `json:"ResourceId"`
-		EndpointID  EndpointID  `json:"EndpointId"`
+		EndpointID  EndpointID  `json:"EndpointId" gorm:"foreignKey=ID"`
 		RegistryID  RegistryID  `json:"RegistryId"`
 		WebhookType WebhookType `json:"Type"`
 	}
@@ -1328,7 +1328,7 @@ type (
 	WebhookType int
 
 	Snapshot struct {
-		EndpointID EndpointID          `json:"EndpointId"`
+		EndpointID EndpointID          `json:"EndpointId" gorm:"foreignKey=ID"`
 		Docker     *DockerSnapshot     `json:"Docker" gorm:"serializer:json"`
 		Kubernetes *KubernetesSnapshot `json:"Kubernetes" gorm:"serializer:json"`
 	}
@@ -2050,12 +2050,12 @@ func (j Pair) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }
 
-func (GPUs) GormDataType() string {
+func (MultiPair) GormDataType() string {
 	return "json"
 }
 
 // Scan scan value into Jsonb, implements sql.Scanner interface
-func (j *GPUs) Scan(value interface{}) error {
+func (j *MultiPair) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
 		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
@@ -2066,7 +2066,7 @@ func (j *GPUs) Scan(value interface{}) error {
 }
 
 // Value return json value, implement driver.Valuer interface
-func (j GPUs) Value() (driver.Value, error) {
+func (j MultiPair) Value() (driver.Value, error) {
 	if len(j) == 0 {
 		return nil, nil
 	}

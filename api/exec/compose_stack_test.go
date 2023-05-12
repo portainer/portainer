@@ -30,7 +30,7 @@ func Test_createEnvFile(t *testing.T) {
 			name: "should not add env file option if stack's env variables are empty",
 			stack: &portainer.Stack{
 				ProjectPath: dir,
-				Env:         []portainer.Pair{},
+				Env:         portainer.MultiPair{},
 			},
 			expected: "",
 		},
@@ -38,7 +38,7 @@ func Test_createEnvFile(t *testing.T) {
 			name: "should add env file option if stack has env variables",
 			stack: &portainer.Stack{
 				ProjectPath: dir,
-				Env: []portainer.Pair{
+				Env: portainer.MultiPair{
 					{Name: "var1", Value1: "value1"},
 					{Name: "var2", Value1: "value2"},
 				},
@@ -70,7 +70,7 @@ func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 	os.WriteFile(path.Join(dir, ".env"), []byte("VAR1=VAL1\nVAR2=VAL2\n"), 0600)
 	stack := &portainer.Stack{
 		ProjectPath: dir,
-		Env: []portainer.Pair{
+		Env: portainer.MultiPair{
 			{Name: "VAR1", Value1: "NEW_VAL1"},
 			{Name: "VAR3", Value1: "VAL3"},
 		},

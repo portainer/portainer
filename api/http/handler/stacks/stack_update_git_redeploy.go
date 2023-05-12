@@ -22,7 +22,7 @@ type stackGitRedployPayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
-	Env                      []portainer.Pair
+	Env                      portainer.MultiPair
 	Prune                    bool
 	// Force a pulling to current image with the original tag though the image is already the latest
 	PullImage bool `example:"false"`

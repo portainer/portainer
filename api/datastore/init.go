@@ -37,7 +37,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 		defaultSettings := &portainer.Settings{
 			EnableTelemetry:      false,
 			AuthenticationMethod: portainer.AuthenticationInternal,
-			BlackListedLabels:    make([]portainer.Pair, 0),
+			BlackListedLabels:    make(portainer.MultiPair, 0),
 			InternalAuthSettings: portainer.InternalAuthSettings{
 				RequiredPasswordLength: 12,
 			},
@@ -102,7 +102,7 @@ func (store *Store) checkOrCreateDefaultData() error {
 		unassignedGroup := &portainer.EndpointGroup{
 			Name:               "Unassigned",
 			Description:        "Unassigned environments",
-			Labels:             []portainer.Pair{},
+			Labels:             portainer.MultiPair{},
 			UserAccessPolicies: portainer.UserAccessPolicies{},
 			TeamAccessPolicies: portainer.TeamAccessPolicies{},
 			TagIDs:             []portainer.TagID{},

@@ -62,7 +62,8 @@ func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, 
 // UpdateEndpoint updates an environment(endpoint).
 func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
 	db := service.connection.GetDB()
-	tx := db.Model(&portainer.Endpoint{}).Where("id = ?", ID).UpdateColumns(&endpoint)
+	endpoint.ID = ID
+	tx := db.Save(&endpoint)
 	if tx.Error != nil {
 		return tx.Error
 	}

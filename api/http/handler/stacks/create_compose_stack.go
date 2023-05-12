@@ -25,7 +25,7 @@ type composeStackFromFileContentPayload struct {
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment variables used during stack deployment
-	Env []portainer.Pair
+	Env portainer.MultiPair
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
 }
@@ -41,7 +41,7 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func createStackPayloadFromComposeFileContentPayload(name string, fileContent string, env []portainer.Pair, fromAppTemplate bool) stackbuilders.StackPayload {
+func createStackPayloadFromComposeFileContentPayload(name string, fileContent string, env portainer.MultiPair, fromAppTemplate bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name:             name,
 		StackFileContent: fileContent,
@@ -174,14 +174,14 @@ type composeStackFromGitRepositoryPayload struct {
 	// Optional auto update configuration
 	AutoUpdate *portainer.AutoUpdateSettings
 	// A list of environment variables used during stack deployment
-	Env []portainer.Pair
+	Env portainer.MultiPair
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
 	// TLSSkipVerify skips SSL verification when cloning the Git repository
 	TLSSkipVerify bool `example:"false"`
 }
 
-func createStackPayloadFromComposeGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool, repoSkipSSLVerify bool) stackbuilders.StackPayload {
+func createStackPayloadFromComposeGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env portainer.MultiPair, fromAppTemplate bool, repoSkipSSLVerify bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name: name,
 		RepositoryConfigPayload: stackbuilders.RepositoryConfigPayload{
@@ -314,10 +314,10 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 type composeStackFromFileUploadPayload struct {
 	Name             string
 	StackFileContent []byte
-	Env              []portainer.Pair
+	Env              portainer.MultiPair
 }
 
-func createStackPayloadFromComposeFileUploadPayload(name string, fileContentBytes []byte, env []portainer.Pair) stackbuilders.StackPayload {
+func createStackPayloadFromComposeFileUploadPayload(name string, fileContentBytes []byte, env portainer.MultiPair) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name:                  name,
 		StackFileContentBytes: fileContentBytes,
@@ -339,7 +339,7 @@ func decodeRequestForm(r *http.Request) (*composeStackFromFileUploadPayload, err
 	}
 	payload.StackFileContent = composeFileContent
 
-	var env []portainer.Pair
+	var env portainer.MultiPair
 	err = request.RetrieveMultiPartFormJSONValue(r, "Env", &env, true)
 	if err != nil {
 		return nil, errors.New("Invalid Env parameter")

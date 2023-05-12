@@ -31,7 +31,7 @@ type endpointSettingsUpdatePayload struct {
 
 	EnableGPUManagement *bool `json:"enableGPUManagement" example:"false"`
 
-	Gpus []portainer.Pair `json:"gpus"`
+	Gpus portainer.MultiPair `json:"gpus"`
 }
 
 func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
