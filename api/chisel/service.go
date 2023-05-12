@@ -3,6 +3,7 @@ package chisel
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -58,7 +59,11 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 	httpClient := &http.Client{
 		Timeout: 3 * time.Second,
 	}
-	_, err = httpClient.Do(req)
+
+	resp, err := httpClient.Do(req)
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+
 	return err
 }
 
