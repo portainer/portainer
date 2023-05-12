@@ -132,5 +132,10 @@ func (service *Service) UpdateHeartbeat(endpointID portainer.EndpointID) {
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
+	db := service.connection.GetDB()
+	tx := db.Model(&portainer.Endpoint{}).Create(&endpoint)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
