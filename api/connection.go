@@ -28,6 +28,9 @@ type Connection interface {
 	Init() error
 	GetDB() *gorm.DB
 
+	GetByID(ID int, obj interface{}) error
+	DeleteByID(ID int, obj interface{}) error
+
 	// TODO: this one is very database specific atm
 	GetDatabaseFileName() string
 	GetDatabaseFilePath() string

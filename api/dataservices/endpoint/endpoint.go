@@ -47,16 +47,14 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 
 // Endpoint returns an environment(endpoint) by ID.
 func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
-	var endpoint *portainer.Endpoint
+	var obj portainer.Endpoint
 
-	db := service.connection.GetDB()
-
-	tx := db.First(&endpoint, `id = ?`, ID)
-	if tx.Error != nil {
-		return nil, tx.Error
+	err := service.connection.GetByID(int(ID), &obj)
+	if err != nil {
+		return nil, err
 	}
 
-	return endpoint, nil
+	return &obj, nil
 }
 
 // UpdateEndpoint updates an environment(endpoint).

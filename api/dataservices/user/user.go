@@ -18,12 +18,11 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // User returns a user by ID
 func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
-	db := service.connection.GetDB()
 	obj := portainer.User{}
 
-	tx := db.First(&obj, `id = ?`, ID)
-	if tx.Error != nil {
-		return nil, tx.Error
+	err := service.connection.GetByID(int(ID), &obj)
+	if err != nil {
+		return nil, err
 	}
 
 	return &obj, nil
@@ -71,7 +70,6 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 
 // UpdateUser saves a user.
 func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
-
 	db := service.connection.GetDB()
 	user.ID = ID
 	tx := db.Save(&user)
@@ -94,10 +92,5 @@ func (service *Service) Create(user *portainer.User) error {
 
 // DeleteUser deletes a user.
 func (service *Service) DeleteUser(ID portainer.UserID) error {
-	db := service.connection.GetDB()
-	tx := db.Model(&portainer.User{}).Delete("id = ?", ID)
-	if tx.Error != nil {
-		return tx.Error
-	}
-	return nil
+	return service.connection.DeleteByID(int(ID), &portainer.User{})
 }

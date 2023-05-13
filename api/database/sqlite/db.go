@@ -162,6 +162,22 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 	return connection.EncryptionKey
 }
 
+func (connection *DbConnection) GetByID(ID int, obj interface{}) error {
+	tx := connection.DB.First(obj, `id = ?`, ID)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}
+
+func (connection *DbConnection) DeleteByID(ID int, obj interface{}) error {
+	tx := connection.DB.Model(obj).Delete(`id = ?`, ID)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}
+
 func (connection *DbConnection) Init() error {
 	err := connection.DB.AutoMigrate(&models.Version{})
 	if err != nil {

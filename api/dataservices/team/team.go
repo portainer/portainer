@@ -4,27 +4,13 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "teams"
-)
-
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
 }
 
-func (service *Service) BucketName() string {
-	return BucketName
-}
-
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	// err := connection.SetServiceName(BucketName)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -32,93 +18,69 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // Team returns a Team by ID
 func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
-	var team portainer.Team
-	// identifier := service.connection.ConvertToKey(int(ID))
+	var obj portainer.Team
 
-	// err := service.connection.GetObject(BucketName, identifier, &team)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := service.connection.GetByID(int(ID), &obj)
+	if err != nil {
+		return nil, err
+	}
 
-	return &team, nil
+	return &obj, nil
 }
 
 // TeamByName returns a team by name.
 func (service *Service) TeamByName(name string) (*portainer.Team, error) {
-	// var t *portainer.Team
+	var team *portainer.Team
 
-	// stop := fmt.Errorf("ok")
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Team{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		team, ok := obj.(*portainer.Team)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Team object")
-	// 			return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
-	// 		}
+	db := service.connection.GetDB()
+	tx := db.First(team, `name = ?`, name)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
-	// 		if strings.EqualFold(team.Name, name) {
-	// 			t = team
-	// 			return nil, stop
-	// 		}
-
-	// 		return &portainer.Team{}, nil
-	// 	})
-	// if errors.Is(err, stop) {
-	// 	return t, nil
-	// }
-	// if err == nil {
-	// 	return nil, dserrors.ErrObjectNotFound
-	// }
-
-	return nil, nil
+	return team, nil
 }
 
 // Teams return an array containing all the teams.
 func (service *Service) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Team{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		team, ok := obj.(*portainer.Team)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Team object")
-	// 			return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
-	// 		}
-
-	// 		teams = append(teams, *team)
-
-	// 		return &portainer.Team{}, nil
-	// 	})
+	db := service.connection.GetDB()
+	tx := db.Find(&teams)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return teams, nil
 }
 
 // UpdateTeam saves a Team.
 func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
-	// identifier := service.connection.ConvertToKey(int(ID))
-	// return service.connection.UpdateObject(BucketName, identifier, team)
+	db := service.connection.GetDB()
+	team.ID = ID
+	tx := db.Save(&team)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
 
 // CreateTeam creates a new Team.
 func (service *Service) Create(team *portainer.Team) error {
-	// return service.connection.CreateObject(
-	// 	BucketName,
-	// 	func(id uint64) (int, interface{}) {
-	// 		team.ID = portainer.TeamID(id)
-	// 		return int(team.ID), team
-	// 	},
-	// )
+	db := service.connection.GetDB()
+	tx := db.Create(&team)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
 
 // DeleteTeam deletes a Team.
 func (service *Service) DeleteTeam(ID portainer.TeamID) error {
-	// identifier := service.connection.ConvertToKey(int(ID))
-	// return service.connection.DeleteObject(BucketName, identifier)
+	db := service.connection.GetDB()
+	tx := db.Model(&portainer.Team{}).Delete("id = ?", ID)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }

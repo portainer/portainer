@@ -4,25 +4,13 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// BucketName represents the name of the bucket where this service stores data.
-const BucketName = "team_membership"
-
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
 }
 
-func (service *Service) BucketName() string {
-	return BucketName
-}
-
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	// err := connection.SetServiceName(BucketName)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -37,35 +25,25 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 
 // TeamMembership returns a TeamMembership object by ID
 func (service *Service) TeamMembership(ID portainer.TeamMembershipID) (*portainer.TeamMembership, error) {
-	var membership portainer.TeamMembership
-	// identifier := service.connection.ConvertToKey(int(ID))
+	var obj portainer.TeamMembership
 
-	// err := service.connection.GetObject(BucketName, identifier, &membership)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := service.connection.GetByID(int(ID), &obj)
+	if err != nil {
+		return nil, err
+	}
 
-	return &membership, nil
+	return &obj, nil
 }
 
 // TeamMemberships return an array containing all the TeamMembership objects.
 func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.TeamMembership{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		membership, ok := obj.(*portainer.TeamMembership)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-	// 			return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-	// 		}
-
-	// 		memberships = append(memberships, *membership)
-
-	// 		return &portainer.TeamMembership{}, nil
-	// 	})
+	db := service.connection.GetDB()
+	tx := db.Find(&memberships)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return memberships, nil
 }
@@ -74,22 +52,11 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.TeamMembership{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		membership, ok := obj.(*portainer.TeamMembership)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-	// 			return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-	// 		}
-
-	// 		if membership.UserID == userID {
-	// 			memberships = append(memberships, *membership)
-	// 		}
-
-	// 		return &portainer.TeamMembership{}, nil
-	// 	})
+	db := service.connection.GetDB()
+	tx := db.Find(&memberships, `user_id = ?`, userID)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return memberships, nil
 }
@@ -98,113 +65,56 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.TeamMembership{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		membership, ok := obj.(*portainer.TeamMembership)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-	// 			return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-	// 		}
-
-	// 		if membership.TeamID == teamID {
-	// 			memberships = append(memberships, *membership)
-	// 		}
-
-	// 		return &portainer.TeamMembership{}, nil
-	// 	})
+	db := service.connection.GetDB()
+	tx := db.Find(&memberships, `team_id = ?`, teamID)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return memberships, nil
 }
 
 // UpdateTeamMembership saves a TeamMembership object.
 func (service *Service) UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error {
-	// identifier := service.connection.ConvertToKey(int(ID))
-	// return service.connection.UpdateObject(BucketName, identifier, membership)
+	db := service.connection.GetDB()
+
+	membership.ID = ID
+	tx := db.Save(&membership)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
 	return nil
 }
 
 // CreateTeamMembership creates a new TeamMembership object.
 func (service *Service) Create(membership *portainer.TeamMembership) error {
-	// return service.connection.CreateObject(
-	// 	BucketName,
-	// 	func(id uint64) (int, interface{}) {
-	// 		membership.ID = portainer.TeamMembershipID(id)
-	// 		return int(membership.ID), membership
-	// 	},
-	// )
+	db := service.connection.GetDB()
+	tx := db.Create(&membership)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
 
 // DeleteTeamMembership deletes a TeamMembership object.
 func (service *Service) DeleteTeamMembership(ID portainer.TeamMembershipID) error {
-	// identifier := service.connection.ConvertToKey(int(ID))
-	// return service.connection.DeleteObject(BucketName, identifier)
-	return nil
+	return service.connection.DeleteByID(int(ID), &portainer.TeamMembership{})
 }
 
 // DeleteTeamMembershipByUserID deletes all the TeamMembership object associated to a UserID.
 func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) error {
-	// return service.connection.DeleteAllObjects(
-	// 	BucketName,
-	// 	&portainer.TeamMembership{},
-	// 	func(obj interface{}) (id int, ok bool) {
-	// 		membership, ok := obj.(portainer.TeamMembership)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-	// 			//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-	// 			return -1, false
-	// 		}
-
-	// 		if membership.UserID == userID {
-	// 			return int(membership.ID), true
-	// 		}
-
-	// 		return -1, false
-	// 	})
-	return nil
+	db := service.connection.GetDB()
+	return db.Model(&portainer.TeamMembership{}).Delete("user_id = ?", userID).Error
 }
 
 // DeleteTeamMembershipByTeamID deletes all the TeamMembership object associated to a TeamID.
 func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error {
-	// return service.connection.DeleteAllObjects(
-	// 	BucketName,
-	// 	&portainer.TeamMembership{},
-	// 	func(obj interface{}) (id int, ok bool) {
-	// 		membership, ok := obj.(portainer.TeamMembership)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-	// 			//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-	// 			return -1, false
-	// 		}
-
-	// 		if membership.TeamID == teamID {
-	// 			return int(membership.ID), true
-	// 		}
-
-	// 		return -1, false
-	// 	})
-	return nil
+	db := service.connection.GetDB()
+	return db.Model(&portainer.TeamMembership{}).Delete("team_id = ?", teamID).Error
 }
 
 func (service *Service) DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.TeamID, userID portainer.UserID) error {
-	// return service.connection.DeleteAllObjects(
-	// 	BucketName,
-	// 	&portainer.TeamMembership{},
-	// 	func(obj interface{}) (id int, ok bool) {
-	// 		membership, ok := obj.(portainer.TeamMembership)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-	// 			//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-	// 			return -1, false
-	// 		}
-
-	// 		if membership.TeamID == teamID && membership.UserID == userID {
-	// 			return int(membership.ID), true
-	// 		}
-
-	// 		return -1, false
-	// 	})
-	return nil
+	db := service.connection.GetDB()
+	return db.Model(&portainer.TeamMembership{}).Delete("team_id = ? AND user_id = ?", teamID, userID).Error
 }
