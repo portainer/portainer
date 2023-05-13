@@ -1,6 +1,8 @@
 package team
 
 import (
+	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 )
 
@@ -30,15 +32,15 @@ func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
 
 // TeamByName returns a team by name.
 func (service *Service) TeamByName(name string) (*portainer.Team, error) {
-	var team *portainer.Team
+	var team portainer.Team
 
 	db := service.connection.GetDB()
-	tx := db.First(team, `name = ?`, name)
+	tx := db.First(&team, `name = ?`, name)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
-	return team, nil
+	return &team, nil
 }
 
 // Teams return an array containing all the teams.
@@ -68,10 +70,13 @@ func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) er
 // CreateTeam creates a new Team.
 func (service *Service) Create(team *portainer.Team) error {
 	db := service.connection.GetDB()
+
 	tx := db.Create(&team)
 	if tx.Error != nil {
+		fmt.Println(tx.Error)
 		return tx.Error
 	}
+
 	return nil
 }
 

@@ -30,7 +30,7 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 
 // UserByUsername returns a user by username.
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
-	u := portainer.User{}
+	var u portainer.User
 
 	db := service.connection.GetDB()
 	tx := db.First(&u, `username = ?`, username)
