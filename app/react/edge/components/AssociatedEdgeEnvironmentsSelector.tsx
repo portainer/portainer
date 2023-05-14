@@ -3,12 +3,13 @@ import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
 import { EdgeGroupAssociationTable } from './EdgeGroupAssociationTable';
 
 export function AssociatedEdgeEnvironmentsSelector({
-  onAssociate,
-  onDissociate,
+  onChange,
   value,
 }: {
-  onAssociate: (endpointId: EnvironmentId) => void;
-  onDissociate: (endpointId: EnvironmentId) => void;
+  onChange: (
+    value: EnvironmentId[],
+    meta: { type: 'add' | 'remove'; value: EnvironmentId }
+  ) => void;
   value: EnvironmentId[];
 }) {
   return (
@@ -28,7 +29,11 @@ export function AssociatedEdgeEnvironmentsSelector({
               query={{
                 types: EdgeTypes,
               }}
-              onClickRow={(env) => onAssociate(env.Id)}
+              onClickRow={(env) => {
+                if (!value.includes(env.Id)) {
+                  onChange([...value, env.Id], { type: 'add', value: env.Id });
+                }
+              }}
               data-cy="edgeGroupCreate-availableEndpoints"
               hideEnvironmentIds={value}
             />
@@ -41,7 +46,14 @@ export function AssociatedEdgeEnvironmentsSelector({
                 types: EdgeTypes,
                 endpointIds: value,
               }}
-              onClickRow={(env) => onDissociate(env.Id)}
+              onClickRow={(env) => {
+                if (value.includes(env.Id)) {
+                  onChange(
+                    value.filter((id) => id !== env.Id),
+                    { type: 'remove', value: env.Id }
+                  );
+                }
+              }}
             />
           </div>
         </div>

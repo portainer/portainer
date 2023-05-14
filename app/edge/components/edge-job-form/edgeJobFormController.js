@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import moment from 'moment';
 import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
 
@@ -45,8 +44,7 @@ export class EdgeJobFormController {
 
     this.action = this.action.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
-    this.associateEndpoint = this.associateEndpoint.bind(this);
-    this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
+    this.onChangeEnvironments = this.onChangeEnvironments.bind(this);
     this.onChangeGroups = this.onChangeGroups.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onCronMethodChange = this.onCronMethodChange.bind(this);
@@ -115,17 +113,9 @@ export class EdgeJobFormController {
     this.isEditorDirty = true;
   }
 
-  associateEndpoint(endpointId) {
+  onChangeEnvironments(value) {
     return this.$scope.$evalAsync(() => {
-      if (!_.includes(this.model.Endpoints, endpointId)) {
-        this.model.Endpoints = [...this.model.Endpoints, endpointId];
-      }
-    });
-  }
-
-  dissociateEndpoint(endpointId) {
-    return this.$scope.$evalAsync(() => {
-      this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpointId);
+      this.model.Endpoints = value;
     });
   }
 

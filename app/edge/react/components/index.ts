@@ -93,8 +93,7 @@ export const componentsModule = angular
   .component(
     'associatedEdgeEnvironmentsSelector',
     r2a(withReactQuery(AssociatedEdgeEnvironmentsSelector), [
-      'onAssociate',
-      'onDissociate',
+      'onChange',
       'value',
     ])
   ).name;

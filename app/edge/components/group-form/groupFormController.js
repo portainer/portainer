@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import { confirmDestructive } from '@@/modals/confirm';
 import { EdgeTypes } from '@/react/portainer/environments/types';
 import { buildConfirmButton } from '@@/modals/utils';
@@ -20,8 +19,7 @@ export class EdgeGroupFormController {
       tagsPartialMatch: false,
     };
 
-    this.associateEndpoint = this.associateEndpoint.bind(this);
-    this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
+    this.onChangeEnvironments = this.onChangeEnvironments.bind(this);
     this.onChangeTags = this.onChangeTags.bind(this);
     this.onChangeDynamic = this.onChangeDynamic.bind(this);
     this.onChangeModel = this.onChangeModel.bind(this);
@@ -64,25 +62,21 @@ export class EdgeGroupFormController {
     this.onChangeModel({ TagIds: value });
   }
 
-  associateEndpoint(endpointId) {
-    if (!_.includes(this.model.Endpoints, endpointId)) {
-      this.onChangeModel({ Endpoints: [...this.model.Endpoints, endpointId] });
-    }
-  }
-
-  dissociateEndpoint(endpointId) {
+  onChangeEnvironments(value, meta) {
     return this.$async(async () => {
-      const confirmed = await confirmDestructive({
-        title: 'Confirm action',
-        message: 'Removing the environment from this group will remove its corresponding edge stacks',
-        confirmButton: buildConfirmButton('Confirm'),
-      });
+      if (meta.type === 'remove' && this.pageType === 'edit') {
+        const confirmed = await confirmDestructive({
+          title: 'Confirm action',
+          message: 'Removing the environment from this group will remove its corresponding edge stacks',
+          confirmButton: buildConfirmButton('Confirm'),
+        });
 
-      if (!confirmed) {
-        return;
+        if (!confirmed) {
+          return;
+        }
       }
 
-      this.onChangeModel({ Endpoints: this.model.Endpoints.filter((id) => id !== endpointId) });
+      this.onChangeModel({ Endpoints: value });
     });
   }
 
