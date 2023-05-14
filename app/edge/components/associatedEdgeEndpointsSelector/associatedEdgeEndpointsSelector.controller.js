@@ -1,111 +1,55 @@
-import angular from 'angular';
-import _ from 'lodash-es';
-
+import { queryClient } from '@/react-tools/react-query';
 import { EdgeTypes } from '@/react/portainer/environments/types';
-import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
-class AssoicatedEndpointsSelectorController {
+class AssociatedEndpointsSelectorController {
   /* @ngInject */
   constructor($async) {
     this.$async = $async;
 
     this.state = {
       available: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
+        query: {
+          types: EdgeTypes,
+        },
       },
       associated: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
+        query: {
+          endpointIds: [],
+          types: EdgeTypes,
+        },
       },
     };
 
-    this.endpoints = {
-      associated: [],
-      available: null,
-    };
-
-    this.getAvailableEndpoints = this.getAvailableEndpoints.bind(this);
-    this.getAssociatedEndpoints = this.getAssociatedEndpoints.bind(this);
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
-    this.loadData = this.loadData.bind(this);
-  }
-
-  $onInit() {
-    this.loadData();
+    this.showEnvironment = this.showEnvironment.bind(this);
   }
 
   $onChanges({ endpointIds }) {
     if (endpointIds && endpointIds.currentValue) {
-      this.loadData();
+      this.state.associated.query = { endpointIds: endpointIds.currentValue };
+      queryClient.invalidateQueries([['environments']]);
     }
   }
 
-  loadData() {
-    this.getAvailableEndpoints();
-    this.getAssociatedEndpoints();
-  }
-
-  /* #region  internal queries to retrieve endpoints per "side" of the selector */
-  getAvailableEndpoints() {
-    return this.$async(async () => {
-      const { start, filter, limit } = this.getPaginationData('available');
-      const query = { search: filter, types: EdgeTypes };
-
-      const response = await getEnvironments({ start, limit, query });
-
-      const endpoints = _.filter(response.value, (endpoint) => !_.includes(this.endpointIds, endpoint.Id));
-      this.setTableData('available', endpoints, response.totalCount);
-      this.noEndpoints = this.state.available.totalCount === 0;
-    });
-  }
-
-  getAssociatedEndpoints() {
-    return this.$async(async () => {
-      let response = { value: [], totalCount: 0 };
-      if (this.endpointIds.length > 0) {
-        // fetch only if already has associated endpoints
-        const { start, filter, limit } = this.getPaginationData('associated');
-        const query = { search: filter, types: EdgeTypes, endpointIds: this.endpointIds };
-
-        response = await getEnvironments({ start, limit, query });
-      }
-
-      this.setTableData('associated', response.value, response.totalCount);
-    });
-  }
-
   /* #endregion */
+
+  showEnvironment(environment) {
+    console.log('showEnvironment', environment.Id, this.endpointIds, this.endpointIds.includes(environment.Id));
+    return this.endpointIds.includes(environment.Id);
+  }
 
   /* #region  On endpoint click (either available or associated) */
   associateEndpoint(endpoint) {
-    this.onAssociate(endpoint);
+    this.onAssociate(endpoint.Id);
   }
 
   dissociateEndpoint(endpoint) {
-    this.onDissociate(endpoint);
+    this.onDissociate(endpoint.Id);
   }
   /* #endregion */
 
-  /* #region  Utils funcs */
-  getPaginationData(tableType) {
-    const { pageNumber, limit, filter } = this.state[tableType];
-    const start = (pageNumber - 1) * limit + 1;
-
-    return { start, filter, limit };
-  }
-
-  setTableData(tableType, endpoints, totalCount) {
-    this.endpoints[tableType] = endpoints;
-    this.state[tableType].totalCount = parseInt(totalCount, 10);
-  }
   /* #endregion */
 }
 
-angular.module('portainer.app').controller('AssoicatedEndpointsSelectorController', AssoicatedEndpointsSelectorController);
-export default AssoicatedEndpointsSelectorController;
+export default AssociatedEndpointsSelectorController;

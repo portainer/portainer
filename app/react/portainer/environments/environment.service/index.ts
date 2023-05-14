@@ -60,7 +60,10 @@ export async function getEnvironments(
     query = {},
   }: GetEnvironmentsOptions = { query: {} }
 ) {
-  if (query.tagIds && query.tagIds.length === 0) {
+  if (
+    (query.tagIds && query.tagIds.length === 0) ||
+    (query.endpointIds && query.endpointIds.length === 0)
+  ) {
     return {
       totalCount: 0,
       value: <Environment[]>[],

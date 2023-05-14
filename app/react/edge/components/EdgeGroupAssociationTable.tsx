@@ -3,7 +3,10 @@ import { truncate } from 'lodash';
 import { useMemo, useState } from 'react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  Environment,
+  EnvironmentId,
+} from '@/react/portainer/environments/types';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
@@ -44,13 +47,16 @@ export function EdgeGroupAssociationTable({
   emptyContentLabel,
   onClickRow,
   'data-cy': dataCy,
+  // showEnvironment = () => true,
+  hideEnvironmentIds = [],
 }: {
   title: string;
   query: EnvironmentsQueryParams;
   emptyContentLabel: string;
   onClickRow: (env: Environment) => void;
+  hideEnvironmentIds?: EnvironmentId[];
 } & AutomationTestingProps) {
-  const tableState = useTableStateWithoutStorage('name');
+  const tableState = useTableStateWithoutStorage('Name');
   const [page, setPage] = useState(1);
   const environmentsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
@@ -69,14 +75,22 @@ export function EdgeGroupAssociationTable({
 
   const environments: Array<DecoratedEnvironment> = useMemo(
     () =>
-      environmentsQuery.environments.map((env) => ({
-        ...env,
-        Group: groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name || '',
-        Tags: env.TagIds.map(
-          (tagId) => tagsQuery.data?.find((t) => t.ID === tagId)?.Name || ''
-        ),
-      })),
-    [environmentsQuery.environments, groupsQuery.data, tagsQuery.data]
+      environmentsQuery.environments
+        .filter((e) => !hideEnvironmentIds.includes(e.Id))
+        .map((env) => ({
+          ...env,
+          Group:
+            groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name || '',
+          Tags: env.TagIds.map(
+            (tagId) => tagsQuery.data?.find((t) => t.ID === tagId)?.Name || ''
+          ),
+        })),
+    [
+      environmentsQuery.environments,
+      groupsQuery.data,
+      hideEnvironmentIds,
+      tagsQuery.data,
+    ]
   );
 
   return (
@@ -86,7 +100,10 @@ export function EdgeGroupAssociationTable({
       settingsManager={tableState}
       dataset={environments}
       onPageChange={setPage}
-      pageCount={environmentsQuery.totalAvailable / tableState.pageSize}
+      pageCount={
+        (environmentsQuery.totalAvailable - hideEnvironmentIds.length) /
+        tableState.pageSize
+      }
       renderRow={(row) => (
         <TableRow<DecoratedEnvironment>
           cells={row.getVisibleCells()}

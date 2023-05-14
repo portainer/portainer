@@ -6,9 +6,6 @@ angular.module('portainer.app').component('associatedEdgeEndpointsSelector', {
   controller,
   bindings: {
     endpointIds: '<',
-    tags: '<',
-    groups: '<',
-    hasBackendPagination: '<',
 
     onAssociate: '<',
     onDissociate: '<',
