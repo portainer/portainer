@@ -27,27 +27,39 @@ angular.module('portainer.app').controller('GroupController', function GroupCont
 
   function onChangeEnvironments(value, meta) {
     return $async(async () => {
-      try {
-        if (meta.action === 'add') {
-          await onAssociate(meta.value);
-        } else if (meta.action === 'remove') {
-          await onDisassociate(meta.value);
-        }
+      let success = false;
+      if (meta.type === 'add') {
+        success = await onAssociate(meta.value);
+      } else if (meta.type === 'remove') {
+        success = await onDisassociate(meta.value);
+      }
 
+      if (success) {
         $scope.associatedEndpoints = value;
-        notifySuccess('Success', `Environment successfully ${meta.action === 'add' ? 'added' : 'removed'} to group`);
-      } catch (err) {
-        notifyError('Failure', err, `Unable to ${meta.action} environment to group`);
       }
     });
   }
 
-  function onAssociate(endpointId) {
-    return GroupService.addEndpoint($scope.group.Id, endpointId);
+  async function onAssociate(endpointId) {
+    try {
+      await GroupService.addEndpoint($scope.group.Id, endpointId);
+
+      notifySuccess('Success', `Environment successfully added to group`);
+      return true;
+    } catch (err) {
+      notifyError('Failure', err, `Unable to add environment to group`);
+    }
   }
 
-  function onDisassociate(endpointId) {
-    return GroupService.removeEndpoint($scope.group.Id, endpointId);
+  async function onDisassociate(endpointId) {
+    try {
+      await GroupService.removeEndpoint($scope.group.Id, endpointId);
+
+      notifySuccess('Success', `Environment successfully removed to group`);
+      return true;
+    } catch (err) {
+      notifyError('Failure', err, `Unable to remove environment to group`);
+    }
   }
 
   function initView() {
