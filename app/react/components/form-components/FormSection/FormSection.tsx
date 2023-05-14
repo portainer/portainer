@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, ReactNode, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
@@ -6,7 +6,7 @@ import { Icon } from '@@/Icon';
 import { FormSectionTitle } from '../FormSectionTitle';
 
 interface Props {
-  title: string;
+  title: ReactNode;
   isFoldable?: boolean;
 }
 

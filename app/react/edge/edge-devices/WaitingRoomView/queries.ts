@@ -5,6 +5,14 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { useIntegratedLicenseInfo } from '@/react/portainer/licenses/use-license.service';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
+import {
+  mutationOptions,
+  withError,
+  withInvalidate,
+} from '@/react-tools/react-query';
+import { queryKey as nodesCountQueryKey } from '@/react/portainer/system/useNodesCount';
+import { LicenseType } from '@/react/portainer/licenses/types';
+import { queryKeys } from '@/react/portainer/environments/queries/query-keys';
 
 export function useAssociateDeviceMutation() {
   const queryClient = useQueryClient();
@@ -12,17 +20,10 @@ export function useAssociateDeviceMutation() {
   return useMutation(
     (ids: EnvironmentId[]) =>
       promiseSequence(ids.map((id) => () => associateDevice(id))),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['environments']);
-      },
-      meta: {
-        error: {
-          title: 'Failure',
-          message: 'Failed to associate devices',
-        },
-      },
-    }
+    mutationOptions(
+      withError('Failed to associate devices'),
+      withInvalidate(queryClient, [queryKeys.base(), nodesCountQueryKey])
+    )
   );
 }
 
@@ -34,19 +35,14 @@ async function associateDevice(environmentId: EnvironmentId) {
   }
 }
 
-export function useLicenseOverused() {
+export function useLicenseOverused(moreNodes: number) {
   const integratedInfo = useIntegratedLicenseInfo();
-  return {
-    willExceed,
-    isOverused: willExceed(0),
-  };
 
-  function willExceed(moreNodes: number) {
-    return (
-      !!integratedInfo &&
-      integratedInfo.usedNodes + moreNodes >= integratedInfo.licenseInfo.nodes
-    );
-  }
+  return (
+    !!integratedInfo &&
+    integratedInfo.licenseInfo.type === LicenseType.Essentials &&
+    integratedInfo.usedNodes + moreNodes > integratedInfo.licenseInfo.nodes
+  );
 }
 
 export function useUntrustedCount() {

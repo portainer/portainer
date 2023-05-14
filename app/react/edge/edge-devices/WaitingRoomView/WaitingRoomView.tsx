@@ -13,7 +13,7 @@ export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
   const untrustedCount = useUntrustedCount();
-  const { willExceed } = useLicenseOverused();
+  const licenseOverused = useLicenseOverused(untrustedCount);
   return (
     <>
       <PageHeader
@@ -32,7 +32,7 @@ function WaitingRoomView() {
         </TextTip>
       </InformationPanel>
 
-      {willExceed(untrustedCount) && (
+      {licenseOverused && (
         <div className="row">
           <div className="col-sm-12">
             <Alert color="warn">

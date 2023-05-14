@@ -20,3 +20,27 @@ func IndexFunc[E any](s []E, f func(E) bool) int {
 	}
 	return -1
 }
+
+// RemoveItem removes the first element from the slice that satisfies the given predicate
+func RemoveItem[E comparable](s []E, predicate func(E) bool) []E {
+	index := IndexFunc(s, predicate)
+	if index == -1 {
+		return s
+	}
+
+	return RemoveIndex(s, index)
+}
+
+// RemoveIndex removes the element at the given index from the slice
+func RemoveIndex[T any](s []T, index int) []T {
+	if len(s) == 0 {
+		return s
+	}
+
+	if index < 0 || index >= len(s) {
+		return s
+	}
+
+	s[index] = s[len(s)-1]
+	return s[:len(s)-1]
+}

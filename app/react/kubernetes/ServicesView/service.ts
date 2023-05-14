@@ -4,7 +4,7 @@ import { compact } from 'lodash';
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { isFulfilled } from '@/react/utils';
+import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import { getNamespaces } from '../namespaces/service';
 

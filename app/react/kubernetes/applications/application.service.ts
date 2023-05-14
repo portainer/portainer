@@ -9,7 +9,7 @@ import {
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { isFulfilled } from '@/react/utils';
+import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import { getPod, getPods, patchPod } from './pod.service';
 import { getNakedPods } from './utils';

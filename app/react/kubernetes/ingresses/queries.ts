@@ -7,7 +7,7 @@ import {
   withInvalidate,
 } from '@/react-tools/react-query';
 import { getServices } from '@/react/kubernetes/networks/services/service';
-import { isFulfilled } from '@/react/utils';
+import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import {
   getIngresses,

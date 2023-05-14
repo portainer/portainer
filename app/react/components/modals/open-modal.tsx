@@ -6,7 +6,9 @@ import { OnSubmit } from './Modal/types';
 
 let counter = 0;
 export async function openModal<TProps, TResult>(
-  Modal: ComponentType<{ onSubmit: OnSubmit<TResult> } & TProps>,
+  Modal: ComponentType<
+    { onSubmit: OnSubmit<TResult> } & Omit<TProps, 'onSubmit'>
+  >,
   props: TProps = {} as TProps
 ) {
   const modal = document.createElement('div');
