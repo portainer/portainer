@@ -31,7 +31,7 @@
 
   <div class="form-group" ng-if="$ctrl.model.Id !== 1">
     <associated-endpoints-selector
-      endpoint-ids="$ctrl.associatedEndpoints"
+      value="$ctrl.associatedEndpoints"
       has-backend-pagination="true"
       on-associate="($ctrl.onAssociate)"
       on-dissociate="($ctrl.onDisassociate)"
