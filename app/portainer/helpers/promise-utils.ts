@@ -3,10 +3,10 @@
  *
  * @param promises a list of functions that return promises
  */
-export function promiseSequence<T>(promises: (() => Promise<T>)[]) {
+export function promiseSequence(promises: (() => Promise<unknown>)[]) {
   return promises.reduce(
-    (promise, nextPromise) => promise.then(() => nextPromise()),
-    Promise.resolve<T>(undefined as unknown as T)
+    (promise, nextPromise) => promise.then(nextPromise),
+    Promise.resolve(undefined as unknown)
   );
 }
 

@@ -10,7 +10,7 @@ export function withFeatureFlag<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     const featureFlagQuery = useFeatureFlag(flag);
 
     if (!featureFlagQuery.data) {

@@ -13,12 +13,12 @@ export type ZustandSetFunc<T> = (
   replace?: boolean | undefined
 ) => void;
 
-export function paginationSettings(
-  set: ZustandSetFunc<PaginationTableSettings>
+export function paginationSettings<T extends PaginationTableSettings>(
+  set: ZustandSetFunc<T>
 ): PaginationTableSettings {
   return {
     pageSize: 10,
-    setPageSize: (pageSize: number) => set({ pageSize }),
+    setPageSize: (pageSize: number) => set((s) => ({ ...s, pageSize })),
   };
 }
 
@@ -27,8 +27,8 @@ export interface SortableTableSettings {
   setSortBy: (id: string, desc: boolean) => void;
 }
 
-export function sortableSettings(
-  set: ZustandSetFunc<SortableTableSettings>,
+export function sortableSettings<T extends SortableTableSettings>(
+  set: ZustandSetFunc<T>,
   initialSortBy: string | { id: string; desc: boolean }
 ): SortableTableSettings {
   return {
@@ -36,7 +36,8 @@ export function sortableSettings(
       typeof initialSortBy === 'string'
         ? { id: initialSortBy, desc: false }
         : initialSortBy,
-    setSortBy: (id: string, desc: boolean) => set({ sortBy: { id, desc } }),
+    setSortBy: (id: string, desc: boolean) =>
+      set((s) => ({ ...s, sortBy: { id, desc } })),
   };
 }
 
@@ -45,12 +46,13 @@ export interface SettableColumnsTableSettings {
   setHiddenColumns: (hiddenColumns: string[]) => void;
 }
 
-export function hiddenColumnsSettings(
-  set: ZustandSetFunc<SettableColumnsTableSettings>
+export function hiddenColumnsSettings<T extends SettableColumnsTableSettings>(
+  set: ZustandSetFunc<T>
 ): SettableColumnsTableSettings {
   return {
     hiddenColumns: [],
-    setHiddenColumns: (hiddenColumns: string[]) => set({ hiddenColumns }),
+    setHiddenColumns: (hiddenColumns: string[]) =>
+      set((s) => ({ ...s, hiddenColumns })),
   };
 }
 
@@ -59,12 +61,13 @@ export interface RefreshableTableSettings {
   setAutoRefreshRate: (autoRefreshRate: number) => void;
 }
 
-export function refreshableSettings(
-  set: ZustandSetFunc<RefreshableTableSettings>
+export function refreshableSettings<T extends RefreshableTableSettings>(
+  set: ZustandSetFunc<T>
 ): RefreshableTableSettings {
   return {
     autoRefreshRate: 0,
-    setAutoRefreshRate: (autoRefreshRate: number) => set({ autoRefreshRate }),
+    setAutoRefreshRate: (autoRefreshRate: number) =>
+      set((s) => ({ ...s, autoRefreshRate })),
   };
 }
 
