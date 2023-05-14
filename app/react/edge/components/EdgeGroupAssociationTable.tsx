@@ -92,6 +92,8 @@ export function EdgeGroupAssociationTable({
     ]
   );
 
+  const totalCount = environmentsQuery.totalCount - hideEnvironmentIds.length;
+
   return (
     <Datatable<DecoratedEnvironment>
       title={title}
@@ -99,10 +101,7 @@ export function EdgeGroupAssociationTable({
       settingsManager={tableState}
       dataset={environments}
       onPageChange={setPage}
-      pageCount={
-        (environmentsQuery.totalAvailable - hideEnvironmentIds.length) /
-        tableState.pageSize
-      }
+      pageCount={Math.ceil(totalCount / tableState.pageSize)}
       renderRow={(row) => (
         <TableRow<DecoratedEnvironment>
           cells={row.getVisibleCells()}
@@ -112,6 +111,7 @@ export function EdgeGroupAssociationTable({
       emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
       disableSelect
+      totalCount={totalCount}
     />
   );
 }

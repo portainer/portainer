@@ -52,7 +52,7 @@ export function GroupAssociationTable({
       settingsManager={tableState}
       dataset={environments}
       onPageChange={setPage}
-      pageCount={environmentsQuery.totalAvailable / tableState.pageSize}
+      pageCount={Math.ceil(environmentsQuery.totalCount / tableState.pageSize)}
       renderRow={(row) => (
         <TableRow<Environment>
           cells={row.getVisibleCells()}
@@ -62,6 +62,7 @@ export function GroupAssociationTable({
       emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
       disableSelect
+      totalCount={environmentsQuery.totalCount}
     />
   );
 }
