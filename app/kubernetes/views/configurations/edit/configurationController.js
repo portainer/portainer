@@ -125,8 +125,9 @@ class KubernetesConfigurationController {
   updateConfiguration() {
     if (this.configuration.Used) {
       const plural = this.configuration.Applications.length > 1 ? 's' : '';
+      const thisorthese = this.configuration.Applications.length > 1 ? 'these' : 'this';
       confirmUpdate(
-        `The changes will be propagated to ${this.configuration.Applications.length} running application${plural}. Are you sure you want to update this configuration?`,
+        `The changes will be propagated to ${this.configuration.Applications.length} running application${plural}. Are you sure you want to update ${thisorthese} ConfigMap${plural} or Secret${plural}?`,
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateConfigurationAsync);
