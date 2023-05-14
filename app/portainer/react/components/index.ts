@@ -219,11 +219,7 @@ export const ngModule = angular
   .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []))
   .component(
     'associatedEndpointsSelector',
-    r2a(withReactQuery(AssociatedEnvironmentsSelector), [
-      'onAssociate',
-      'onDissociate',
-      'value',
-    ])
+    r2a(withReactQuery(AssociatedEnvironmentsSelector), ['onChange', 'value'])
   );
 
 export const componentsModule = ngModule.name;

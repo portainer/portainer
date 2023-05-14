@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { EndpointGroupDefaultModel } from '../../../models/group';
 
 angular.module('portainer.app').controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, Notifications) {
@@ -6,8 +5,7 @@ angular.module('portainer.app').controller('CreateGroupController', function Cre
     actionInProgress: false,
   };
 
-  $scope.onAssociate = onAssociate;
-  $scope.onDisassociate = onDisassociate;
+  $scope.onChangeEnvironments = onChangeEnvironments;
 
   $scope.create = function () {
     var model = $scope.model;
@@ -32,12 +30,10 @@ angular.module('portainer.app').controller('CreateGroupController', function Cre
     $scope.loaded = true;
   }
 
-  function onAssociate(endpointId) {
-    $scope.associatedEndpoints = [...$scope.associatedEndpoints, endpointId];
-  }
-
-  function onDisassociate(endpointId) {
-    $scope.associatedEndpoints = _.without($scope.associatedEndpoints, endpointId);
+  function onChangeEnvironments(value) {
+    return $scope.$evalAsync(() => {
+      $scope.associatedEndpoints = value;
+    });
   }
 
   initView();

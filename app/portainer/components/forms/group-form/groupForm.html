@@ -30,7 +30,7 @@
   <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)" allow-create="$ctrl.state.allowCreateTag"> </tag-selector>
 
   <div class="form-group" ng-if="$ctrl.model.Id !== 1">
-    <associated-endpoints-selector value="$ctrl.associatedEndpoints" on-associate="($ctrl.onAssociate)" on-dissociate="($ctrl.onDisassociate)"></associated-endpoints-selector>
+    <associated-endpoints-selector value="$ctrl.associatedEndpoints" on-change="($ctrl.onChangeEnvironments)"></associated-endpoints-selector>
   </div>
 
   <div class="-mx-[15px]">

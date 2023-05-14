@@ -3,12 +3,13 @@ import { EnvironmentId } from '../../types';
 import { GroupAssociationTable } from './GroupAssociationTable';
 
 export function AssociatedEnvironmentsSelector({
-  onAssociate,
-  onDissociate,
+  onChange,
   value,
 }: {
-  onAssociate: (endpointId: EnvironmentId) => void;
-  onDissociate: (endpointId: EnvironmentId) => void;
+  onChange: (
+    value: EnvironmentId[],
+    meta: { type: 'add' | 'remove'; value: EnvironmentId }
+  ) => void;
   value: EnvironmentId[];
 }) {
   return (
@@ -28,7 +29,11 @@ export function AssociatedEnvironmentsSelector({
               query={{
                 groupIds: [1],
               }}
-              onClickRow={(env) => onAssociate(env.Id)}
+              onClickRow={(env) => {
+                if (!value.includes(env.Id)) {
+                  onChange([...value, env.Id], { type: 'add', value: env.Id });
+                }
+              }}
               data-cy="edgeGroupCreate-availableEndpoints"
             />
           </div>
@@ -39,7 +44,14 @@ export function AssociatedEnvironmentsSelector({
               query={{
                 endpointIds: value,
               }}
-              onClickRow={(env) => onDissociate(env.Id)}
+              onClickRow={(env) => {
+                if (value.includes(env.Id)) {
+                  onChange(
+                    value.filter((id) => id !== env.Id),
+                    { type: 'remove', value: env.Id }
+                  );
+                }
+              }}
             />
           </div>
         </div>

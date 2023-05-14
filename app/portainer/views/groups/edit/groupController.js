@@ -1,12 +1,11 @@
-import _ from 'lodash';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 
-angular.module('portainer.app').controller('GroupController', function GroupController($q, $scope, $state, $transition$, GroupService, Notifications) {
+angular.module('portainer.app').controller('GroupController', function GroupController($async, $q, $scope, $state, $transition$, GroupService, Notifications) {
   $scope.state = {
     actionInProgress: false,
   };
-  $scope.onAssociate = onAssociate;
-  $scope.onDisassociate = onDisassociate;
+  $scope.onChangeEnvironments = onChangeEnvironments;
   $scope.associatedEndpoints = [];
 
   $scope.update = function () {
@@ -26,22 +25,29 @@ angular.module('portainer.app').controller('GroupController', function GroupCont
       });
   };
 
+  function onChangeEnvironments(value, meta) {
+    return $async(async () => {
+      try {
+        if (meta.action === 'add') {
+          await onAssociate(meta.value);
+        } else if (meta.action === 'remove') {
+          await onDisassociate(meta.value);
+        }
+
+        $scope.associatedEndpoints = value;
+        notifySuccess('Success', `Environment successfully ${meta.action === 'add' ? 'added' : 'removed'} to group`);
+      } catch (err) {
+        notifyError('Failure', err, `Unable to ${meta.action} environment to group`);
+      }
+    });
+  }
+
   function onAssociate(endpointId) {
-    return GroupService.addEndpoint($scope.group.Id, endpointId)
-      .then(() => {
-        $scope.associatedEndpoints = [...$scope.associatedEndpoints, endpointId];
-        Notifications.success('Success', 'Environment successfully added to group');
-      })
-      .catch((err) => Notifications.error('Error', err, 'Unable to add environment to group'));
+    return GroupService.addEndpoint($scope.group.Id, endpointId);
   }
 
   function onDisassociate(endpointId) {
-    return GroupService.removeEndpoint($scope.group.Id, endpointId)
-      .then(() => {
-        $scope.associatedEndpoints = _.without($scope.associatedEndpoints, endpointId);
-        Notifications.success('Success', 'Environment successfully removed from group');
-      })
-      .catch((err) => Notifications.error('Error', err, 'Unable to remove environment from group'));
+    return GroupService.removeEndpoint($scope.group.Id, endpointId);
   }
 
   function initView() {
