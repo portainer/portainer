@@ -18,6 +18,7 @@ import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { useContainers } from '../../containers/queries/containers';
+import { RowProvider } from '../../containers/ListView/ContainersDatatable/RowContext';
 
 const storageKey = 'stack-containers';
 const settingsStore = createStore(storageKey);
@@ -51,53 +52,57 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
   );
 
   return (
-    <TableSettingsProvider settings={settingsStore}>
-      <Datatable
-        title="Containers"
-        titleIcon={Box}
-        settingsManager={tableState}
-        columns={columns}
-        renderTableActions={(selectedRows) => (
-          <ContainersDatatableActions
-            selectedItems={selectedRows}
-            isAddActionVisible={false}
-            endpointId={environment.Id}
-          />
-        )}
-        initialTableState={{
-          columnVisibility: Object.fromEntries(
-            tableState.hiddenColumns.map((col) => [col, false])
-          ),
-        }}
-        renderTableSettings={(tableInstance) => {
-          const columnsToHide = tableInstance
-            .getAllColumns()
-            .filter((col) => col.getCanHide());
+    <RowProvider context={{ environment }}>
+      <TableSettingsProvider settings={settingsStore}>
+        <Datatable
+          title="Containers"
+          titleIcon={Box}
+          settingsManager={tableState}
+          columns={columns}
+          renderTableActions={(selectedRows) => (
+            <ContainersDatatableActions
+              selectedItems={selectedRows}
+              isAddActionVisible={false}
+              endpointId={environment.Id}
+            />
+          )}
+          initialTableState={{
+            columnVisibility: Object.fromEntries(
+              tableState.hiddenColumns.map((col) => [col, false])
+            ),
+          }}
+          renderTableSettings={(tableInstance) => {
+            const columnsToHide = tableInstance
+              .getAllColumns()
+              .filter((col) => col.getCanHide());
 
-          return (
-            <>
-              <ColumnVisibilityMenu<DockerContainer>
-                columns={columnsToHide}
-                onChange={(hiddenColumns) => {
-                  tableState.setHiddenColumns(hiddenColumns);
-                  tableInstance.setColumnVisibility(
-                    Object.fromEntries(hiddenColumns.map((col) => [col, false]))
-                  );
-                }}
-                value={tableState.hiddenColumns}
-              />
-              <Table.SettingsMenu
-                quickActions={<QuickActionsSettings actions={actions} />}
-              >
-                <ContainersDatatableSettings settings={tableState} />
-              </Table.SettingsMenu>
-            </>
-          );
-        }}
-        dataset={containersQuery.data || []}
-        isLoading={containersQuery.isLoading}
-        emptyContentLabel="No containers found"
-      />
-    </TableSettingsProvider>
+            return (
+              <>
+                <ColumnVisibilityMenu<DockerContainer>
+                  columns={columnsToHide}
+                  onChange={(hiddenColumns) => {
+                    tableState.setHiddenColumns(hiddenColumns);
+                    tableInstance.setColumnVisibility(
+                      Object.fromEntries(
+                        hiddenColumns.map((col) => [col, false])
+                      )
+                    );
+                  }}
+                  value={tableState.hiddenColumns}
+                />
+                <Table.SettingsMenu
+                  quickActions={<QuickActionsSettings actions={actions} />}
+                >
+                  <ContainersDatatableSettings settings={tableState} />
+                </Table.SettingsMenu>
+              </>
+            );
+          }}
+          dataset={containersQuery.data || []}
+          isLoading={containersQuery.isLoading}
+          emptyContentLabel="No containers found"
+        />
+      </TableSettingsProvider>
+    </RowProvider>
   );
 }
