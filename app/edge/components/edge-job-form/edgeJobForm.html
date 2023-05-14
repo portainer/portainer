@@ -173,14 +173,11 @@
 
   <div class="col-sm-12 form-section-title"> Target environments </div>
   <!-- node-selection -->
-  <associated-edge-endpoints-selector
-    endpoint-ids="$ctrl.model.Endpoints"
-    tags="$ctrl.tags"
-    groups="$ctrl.groups"
-    has-backend-pagination="true"
+  <associated-edge-environments-selector
+    value="$ctrl.model.Endpoints"
     on-associate="($ctrl.associateEndpoint)"
     on-dissociate="($ctrl.dissociateEndpoint)"
-  ></associated-edge-endpoints-selector>
+  ></associated-edge-environments-selector>
   <!-- !node-selection -->
   <!-- actions -->
   <div class="col-sm-12 form-section-title"> Actions </div>

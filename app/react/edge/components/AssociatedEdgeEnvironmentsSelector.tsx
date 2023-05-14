@@ -19,32 +19,30 @@ export function AssociatedEdgeEnvironmentsSelector({
         environment entry to move it from one table to the other.
       </div>
 
-      <div className="-mx-[15px]">
-        <div className="col-sm-12 mt-4">
-          <div className="flex">
-            <div className="w-1/2">
-              <EdgeGroupAssociationTable
-                title="Available environments"
-                emptyContentLabel="No environment available"
-                query={{
-                  types: EdgeTypes,
-                }}
-                onClickRow={(env) => onAssociate(env.Id)}
-                data-cy="edgeGroupCreate-availableEndpoints"
-                hideEnvironmentIds={value}
-              />
-            </div>
-            <div className="w-1/2">
-              <EdgeGroupAssociationTable
-                title="Associated environments"
-                emptyContentLabel="No associated environment'"
-                query={{
-                  types: EdgeTypes,
-                  endpointIds: value,
-                }}
-                onClickRow={(env) => onDissociate(env.Id)}
-              />
-            </div>
+      <div className="col-sm-12 mt-4">
+        <div className="flex">
+          <div className="w-1/2">
+            <EdgeGroupAssociationTable
+              title="Available environments"
+              emptyContentLabel="No environment available"
+              query={{
+                types: EdgeTypes,
+              }}
+              onClickRow={(env) => onAssociate(env.Id)}
+              data-cy="edgeGroupCreate-availableEndpoints"
+              hideEnvironmentIds={value}
+            />
+          </div>
+          <div className="w-1/2">
+            <EdgeGroupAssociationTable
+              title="Associated environments"
+              emptyContentLabel="No associated environment'"
+              query={{
+                types: EdgeTypes,
+                endpointIds: value,
+              }}
+              onClickRow={(env) => onDissociate(env.Id)}
+            />
           </div>
         </div>
       </div>

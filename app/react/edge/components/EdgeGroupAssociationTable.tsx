@@ -47,7 +47,6 @@ export function EdgeGroupAssociationTable({
   emptyContentLabel,
   onClickRow,
   'data-cy': dataCy,
-  // showEnvironment = () => true,
   hideEnvironmentIds = [],
 }: {
   title: string;
@@ -112,6 +111,7 @@ export function EdgeGroupAssociationTable({
       )}
       emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
+      disableSelect
     />
   );
 }

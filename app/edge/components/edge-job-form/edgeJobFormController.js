@@ -115,14 +115,18 @@ export class EdgeJobFormController {
     this.isEditorDirty = true;
   }
 
-  associateEndpoint(endpoint) {
-    if (!_.includes(this.model.Endpoints, endpoint.Id)) {
-      this.model.Endpoints = [...this.model.Endpoints, endpoint.Id];
-    }
+  associateEndpoint(endpointId) {
+    return this.$scope.$evalAsync(() => {
+      if (!_.includes(this.model.Endpoints, endpointId)) {
+        this.model.Endpoints = [...this.model.Endpoints, endpointId];
+      }
+    });
   }
 
-  dissociateEndpoint(endpoint) {
-    this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
+  dissociateEndpoint(endpointId) {
+    return this.$scope.$evalAsync(() => {
+      this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpointId);
+    });
   }
 
   $onInit() {
