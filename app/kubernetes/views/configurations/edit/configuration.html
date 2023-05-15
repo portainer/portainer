@@ -1,6 +1,6 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Configuration details'"
+  title="'ConfigMap or Secret details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
     {
@@ -46,7 +46,7 @@
                       </td>
                     </tr>
                     <tr>
-                      <td class="!pl-0">Configuration kind</td>
+                      <td class="!pl-0">Kind</td>
                       <td>
                         {{ ctrl.configuration.Kind | kubernetesConfigurationKindText }}
                       </td>

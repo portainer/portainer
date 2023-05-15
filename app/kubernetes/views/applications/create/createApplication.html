@@ -414,7 +414,8 @@
                     <div class="row clearfix" ng-if="config.SelectedConfiguration && !config.Overriden">
                       <div class="col-sm-9 small text-muted !mt-2 !p-0">
                         The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code>
-                        configuration as environment variables:
+                        <span ng-if="config.SelectedConfiguration.Kind === 1">ConfigMap</span><span ng-if="config.SelectedConfiguration.Kind === 2">Secret</span> as environment
+                        variables:
                         <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
                           <code>{{ key }}</code
                           >{{ $last ? '' : ', ' }}

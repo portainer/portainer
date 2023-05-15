@@ -209,12 +209,12 @@
           <!-- CONFIGURATIONS -->
           <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px">
             <pr-icon icon="'file'" class="mr-1"></pr-icon>
-            Configuration
+            ConfigMap or Secret
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px">
             <pr-icon icon="'info'" mode="'primary'" class="mr-1"></pr-icon>
-            This application is not using any environment variable or configuration.
+            This application is not using any environment variable, ConfigMap or Secret.
           </div>
 
           <table class="table" ng-if="ctrl.application.Env.length > 0">
@@ -222,7 +222,7 @@
               <td style="width: 25%">Container</td>
               <td style="width: 25%">Environment variable</td>
               <td style="width: 25%">Value</td>
-              <td style="width: 25%">Configuration</td>
+              <td style="width: 25%">ConfigMap or Secret</td>
             </tr>
             <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0">
               <tr ng-repeat="envvar in container.Env | orderBy: 'name'">
