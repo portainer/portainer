@@ -282,10 +282,17 @@ export async function getApplicationRevisionList(
           replicaSetsWithOwnerId.filter(
             (rs) => !!rs.metadata?.annotations?.[appRevisionAnnotation]
           );
+        // sort replicaset(s) from oldest to newest
+        const replicaSetsFromOldestToNewest =
+          replicaSetsWithRevisionAnnotations.sort(
+            (a, b) =>
+              new Date(a.metadata?.creationTimestamp || 0).getTime() -
+              new Date(b.metadata?.creationTimestamp || 0).getTime()
+          );
 
         return {
           ...replicaSetList,
-          items: replicaSetsWithRevisionAnnotations,
+          items: replicaSetsFromOldestToNewest,
         } as ReplicaSetList;
       }
       case 'DaemonSet':

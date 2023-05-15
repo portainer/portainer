@@ -178,9 +178,8 @@ function getDataAccessPolicy(app?: Application) {
   return 'shared';
 }
 
-function getPodMatchingContainer(pods: Pod[], container: Container) {
-  // find the first pod that matches the container
-  const matchingPod = pods.find((pod) => {
+function getPodsMatchingContainer(pods: Pod[], container: Container) {
+  const matchingPods = pods.filter((pod) => {
     const podContainers = pod.spec?.containers || [];
     const podInitContainers = pod.spec?.initContainers || [];
     const podAllContainers = [...podContainers, ...podInitContainers];
@@ -190,7 +189,7 @@ function getPodMatchingContainer(pods: Pod[], container: Container) {
         podContainer.image === container.image
     );
   });
-  return matchingPod;
+  return matchingPods;
 }
 
 function getPersistedFolders(app?: Application, pods?: Pod[]) {
@@ -210,36 +209,34 @@ function getPersistedFolders(app?: Application, pods?: Pod[]) {
   const appInitContainers = podSpec?.initContainers || [];
   const appAllContainers = [...appContainers, ...appInitContainers];
 
+  // for each volume, find the volumeMounts that match it
   const persistedFolders = appAllVolumes.flatMap((volume) => {
     if (volume.persistentVolumeClaim || volume.hostPath) {
-      const volumeMounts = appAllContainers
-        .flatMap(
-          (container) =>
-            container.volumeMounts?.map((cm) => ({
-              ...cm,
-              container,
-              pod: getPodMatchingContainer(pods, container),
-            })) || []
-        )
-        .filter(
-          // remove volumeMounts with duplicate names
-          (volumeMount, index, self) => self.indexOf(volumeMount) === index
+      const volumeMounts = appAllContainers.flatMap((container) => {
+        const matchingPods = getPodsMatchingContainer(pods, container);
+        return (
+          container.volumeMounts?.flatMap(
+            (containerVolumeMount) =>
+              matchingPods.map((pod) => ({
+                ...containerVolumeMount,
+                container,
+                pod,
+              })) || []
+          ) || []
         );
-      const matchingVolumeMount = volumeMounts.find(
-        (volumeMount) => volumeMount.name === volume.name
+      });
+      const uniqueMatchingVolumeMounts = volumeMounts.filter(
+        (volumeMount, index, self) =>
+          self.indexOf(volumeMount) === index && // remove volumeMounts with duplicate names
+          volumeMount.name === volume.name // remove volumeMounts that don't match the volume
       );
-      if (matchingVolumeMount) {
-        return [
-          {
-            volume,
-            volumeMount: matchingVolumeMount,
-            isContainerInit: appInitContainers.some(
-              (container) =>
-                container.name === matchingVolumeMount.container.name
-            ),
-          },
-        ];
-      }
+      return uniqueMatchingVolumeMounts.map((volumeMount) => ({
+        volume,
+        volumeMount,
+        isContainerInit: appInitContainers.some(
+          (container) => container.name === volumeMount.container.name
+        ),
+      }));
     }
     return [];
   });
