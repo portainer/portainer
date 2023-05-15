@@ -1,5 +1,6 @@
 import { RotateCw } from 'lucide-react';
 import { Pod } from 'kubernetes-types/core/v1';
+import { useRouter } from '@uirouter/react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { notifySuccess, notifyError } from '@/portainer/services/notifications';
@@ -31,6 +32,7 @@ export function RedeployApplicationButton({
   appName,
   app,
 }: Props) {
+  const router = useRouter();
   const redeployAppMutation = useRedeployApplicationMutation(
     environmentId,
     namespace,
@@ -91,6 +93,7 @@ export function RedeployApplicationButton({
       {
         onSuccess: () => {
           notifySuccess('Success', 'Application successfully redeployed');
+          router.stateService.reload();
         },
       }
     );

@@ -1,5 +1,6 @@
 import { Pod } from 'kubernetes-types/core/v1';
 import { RotateCcw } from 'lucide-react';
+import { useRouter } from '@uirouter/react';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { notifySuccess, notifyError } from '@/portainer/services/notifications';
@@ -36,6 +37,7 @@ export function RollbackApplicationButton({
   appName,
   app,
 }: Props) {
+  const router = useRouter();
   const labelSelector = applicationIsKind<Pod>('Pod', app)
     ? ''
     : matchLabelsToLabelSelectorValue(app?.spec?.selector?.matchLabels);
@@ -109,8 +111,10 @@ export function RollbackApplicationButton({
       patchAppMutation.mutateAsync(
         { appKind: app.kind, patch },
         {
-          onSuccess: () =>
-            notifySuccess('Success', 'Application successfully rolled back'),
+          onSuccess: () => {
+            notifySuccess('Success', 'Application successfully rolled back');
+            router.stateService.reload();
+          },
           onError: (error) =>
             notifyError(
               'Failure',
