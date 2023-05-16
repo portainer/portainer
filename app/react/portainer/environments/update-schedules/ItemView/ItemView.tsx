@@ -77,7 +77,10 @@ function ItemView() {
         ]}
       />
 
-      <BetaAlert />
+      <BetaAlert
+        className="ml-[15px] mb-2"
+        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+      />
 
       <div className="row">
         <div className="col-sm-12">

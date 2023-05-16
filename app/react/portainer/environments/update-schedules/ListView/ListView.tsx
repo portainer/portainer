@@ -40,7 +40,10 @@ export function ListView() {
         breadcrumbs="Update and rollback"
       />
 
-      <BetaAlert />
+      <BetaAlert
+        className="ml-[15px] mb-2"
+        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+      />
 
       <Datatable
         dataset={listQuery.data}
