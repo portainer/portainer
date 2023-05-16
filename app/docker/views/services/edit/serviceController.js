@@ -238,6 +238,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.toggleMountReadOnly = function toggleMountReadOnly(isReadOnly, index) {
       $scope.$evalAsync(function () {
+        updateServiceArray($scope.service, 'ServiceMounts', $scope.service.ServiceMounts);
         $scope.service.ServiceMounts[index].ReadOnly = isReadOnly;
       });
     };
