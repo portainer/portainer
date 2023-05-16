@@ -1,9 +1,13 @@
 package authorization
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+)
 
 // CleanNAPWithOverridePolicies Clean Namespace Access Policies with override policies
 func (service *Service) CleanNAPWithOverridePolicies(
+	tx dataservices.DataStoreTx,
 	endpoint *portainer.Endpoint,
 	endpointGroup *portainer.EndpointGroup,
 ) error {
@@ -21,10 +25,11 @@ func (service *Service) CleanNAPWithOverridePolicies(
 
 	for namespace, policy := range accessPolicies {
 		for teamID := range policy.TeamAccessPolicies {
-			access, err := service.getTeamEndpointAccessWithPolicies(teamID, endpoint, endpointGroup)
+			access, err := service.getTeamEndpointAccessWithPolicies(tx, teamID, endpoint, endpointGroup)
 			if err != nil {
 				return err
 			}
+
 			if !access {
 				delete(accessPolicies[namespace].TeamAccessPolicies, teamID)
 				hasChange = true
@@ -32,10 +37,11 @@ func (service *Service) CleanNAPWithOverridePolicies(
 		}
 
 		for userID := range policy.UserAccessPolicies {
-			access, err := service.getUserEndpointAccessWithPolicies(userID, endpoint, endpointGroup)
+			access, err := service.getUserEndpointAccessWithPolicies(tx, userID, endpoint, endpointGroup)
 			if err != nil {
 				return err
 			}
+
 			if !access {
 				delete(accessPolicies[namespace].UserAccessPolicies, userID)
 				hasChange = true
@@ -51,27 +57,28 @@ func (service *Service) CleanNAPWithOverridePolicies(
 }
 
 func (service *Service) getUserEndpointAccessWithPolicies(
+	tx dataservices.DataStoreTx,
 	userID portainer.UserID,
 	endpoint *portainer.Endpoint,
 	endpointGroup *portainer.EndpointGroup,
 ) (bool, error) {
-	memberships, err := service.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
+	memberships, err := tx.TeamMembership().TeamMembershipsByUserID(userID)
 	if err != nil {
 		return false, err
 	}
 
 	if endpointGroup == nil {
-		endpointGroup, err = service.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		endpointGroup, err = tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
 		if err != nil {
 			return false, err
 		}
 	}
 
-	if userAccess(userID, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies, memberships) {
+	if userAccess(tx, userID, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies, memberships) {
 		return true, nil
 	}
 
-	if userAccess(userID, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies, memberships) {
+	if userAccess(tx, userID, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies, memberships) {
 		return true, nil
 	}
 
@@ -80,6 +87,7 @@ func (service *Service) getUserEndpointAccessWithPolicies(
 }
 
 func userAccess(
+	tx dataservices.DataStoreTx,
 	userID portainer.UserID,
 	userAccessPolicies portainer.UserAccessPolicies,
 	teamAccessPolicies portainer.TeamAccessPolicies,
@@ -99,13 +107,14 @@ func userAccess(
 }
 
 func (service *Service) getTeamEndpointAccessWithPolicies(
+	tx dataservices.DataStoreTx,
 	teamID portainer.TeamID,
 	endpoint *portainer.Endpoint,
 	endpointGroup *portainer.EndpointGroup,
 ) (bool, error) {
 	if endpointGroup == nil {
 		var err error
-		endpointGroup, err = service.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		endpointGroup, err = tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
 		if err != nil {
 			return false, err
 		}
