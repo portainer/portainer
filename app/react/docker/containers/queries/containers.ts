@@ -5,6 +5,7 @@ import axios, {
   agentTargetHeader,
   parseAxiosError,
 } from '@/portainer/services/axios';
+import { withGlobalError } from '@/react-tools/react-query';
 
 import { urlBuilder } from '../containers.service';
 import { DockerContainerResponse } from '../types/response';
@@ -30,10 +31,7 @@ export function useContainers(
     queryKeys.filters(environmentId, { all, filters, nodeName }),
     () => getContainers(environmentId, { all, filters, nodeName }),
     {
-      meta: {
-        title: 'Failure',
-        message: 'Unable to retrieve containers',
-      },
+      ...withGlobalError('Unable to retrieve containers'),
       refetchInterval() {
         return autoRefreshRate ?? false;
       },
