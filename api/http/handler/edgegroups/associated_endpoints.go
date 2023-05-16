@@ -2,16 +2,17 @@ package edgegroups
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type endpointSetType map[portainer.EndpointID]bool
 
-func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
+func getEndpointsByTags(tx dataservices.DataStoreTx, tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
 	if len(tagIDs) == 0 {
 		return []portainer.EndpointID{}, nil
 	}
 
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
+	endpoints, err := tx.Endpoint().Endpoints()
 	if err != nil {
 		return nil, err
 	}
@@ -20,10 +21,11 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 	tags := []portainer.Tag{}
 	for _, tagID := range tagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
+		tag, err := tx.Tag().Tag(tagID)
 		if err != nil {
 			return nil, err
 		}
+
 		tags = append(tags, *tag)
 	}
 
@@ -48,25 +50,31 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 func mapEndpointGroupToEndpoints(endpoints []portainer.Endpoint) map[portainer.EndpointGroupID]endpointSetType {
 	groupEndpoints := map[portainer.EndpointGroupID]endpointSetType{}
+
 	for _, endpoint := range endpoints {
 		groupID := endpoint.GroupID
 		if groupEndpoints[groupID] == nil {
 			groupEndpoints[groupID] = endpointSetType{}
 		}
+
 		groupEndpoints[groupID][endpoint.ID] = true
 	}
+
 	return groupEndpoints
 }
 
 func mapTagsToEndpoints(tags []portainer.Tag, groupEndpoints map[portainer.EndpointGroupID]endpointSetType) []endpointSetType {
 	sets := []endpointSetType{}
+
 	for _, tag := range tags {
 		set := tag.Endpoints
+
 		for groupID := range tag.EndpointGroups {
 			for endpointID := range groupEndpoints[groupID] {
 				set[endpointID] = true
 			}
 		}
+
 		sets = append(sets, set)
 	}
 
