@@ -11,8 +11,9 @@ import { Switch } from './Switch';
 export interface Props {
   label: string;
   checked: boolean;
-  onChange(value: boolean): void;
+  onChange(value: boolean, index?: number): void;
 
+  index?: number;
   name?: string;
   tooltip?: ComponentProps<typeof Tooltip>['message'];
   setTooltipHtmlMessage?: ComponentProps<typeof Tooltip>['setHtmlMessage'];
@@ -28,6 +29,7 @@ export function SwitchField({
   tooltip,
   checked,
   label,
+  index,
   name,
   labelClass,
   fieldClass,
@@ -39,6 +41,8 @@ export function SwitchField({
   setTooltipHtmlMessage,
 }: Props) {
   const toggleName = name ? `toggle_${name}` : '';
+
+  console.log('SwitchField', index, onChange);
 
   return (
     <label className={clsx(styles.root, fieldClass)}>
@@ -57,6 +61,7 @@ export function SwitchField({
         checked={checked}
         disabled={disabled}
         onChange={onChange}
+        index={index}
         featureId={featureId}
         dataCy={dataCy}
       />

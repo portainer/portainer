@@ -236,6 +236,12 @@ angular.module('portainer.docker').controller('ServiceController', [
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
 
+    $scope.toggleMountReadOnly = function toggleMountReadOnly(isReadOnly, index) {
+      $scope.$evalAsync(function () {
+        $scope.service.ServiceMounts[index].ReadOnly = isReadOnly;
+      });
+    };
+
     $scope.addNetwork = function addNetwork(service) {
       if (!service.Networks) {
         service.Networks = [];
@@ -337,6 +343,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       $scope.$evalAsync(() => {
         $scope.updateWebhook($scope.service);
         $scope.WebhookExists = enabled;
+        updateServiceAttribute($scope.service, 'Webhooks', enabled);
       });
     };
 
