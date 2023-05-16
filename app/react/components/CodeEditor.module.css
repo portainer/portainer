@@ -4,8 +4,8 @@
   --text-cm-string-color: var(--red-3);
   --text-cm-number-color: var(--green-1);
   --text-cm-keyword-color: var(--ui-blue-dark-9);
-  --text-cm-comment-color: var(--orange-2);
-  --text-cm-variable-name-color: var(--green-2);
+  --text-cm-comment-color: var(--ui-orange-6);
+  --text-cm-variable-name-color: var(--ui-green-8);
   --text-codemirror-color: var(--black-color);
   --bg-codemirror-color: var(--white-color);
   --bg-codemirror-gutters-color: var(--grey-17);
