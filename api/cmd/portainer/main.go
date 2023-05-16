@@ -429,7 +429,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed initializing key pair")
 	}
 
-	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
+	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx, fileService)
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
 	kubernetesClientFactory, err := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, dataStore, instanceID, *flags.AddrHTTPS, settings.UserSessionTimeout)

@@ -1,6 +1,6 @@
 module github.com/portainer/portainer/api
 
-go 1.19
+go 1.20
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -85,7 +85,7 @@ require (
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.1.0 // indirect
@@ -160,3 +160,6 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+// Remove below line when the "determinstic key" patch for Chisel merged
+replace github.com/jpillora/chisel => github.com/portainer/chisel v0.0.0-20230704222304-426f515c6c25
