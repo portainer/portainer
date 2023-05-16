@@ -14,7 +14,8 @@ import { Application, ApplicationPatch, Revision } from './types';
 import {
   appOwnerLabel,
   defaultDeploymentUniqueLabel,
-  unchangedAnnotationsForRollbackPatch,
+  unchangedAnnotationKeysForRollbackPatch,
+  appRevisionAnnotation,
 } from './constants';
 
 // naked pods are pods which are not owned by a deployment, daemonset, statefulset or replicaset
@@ -221,6 +222,7 @@ export function getRollbackPatchPayload(
       const previousRevision = getPreviousReplicaSetRevision(
         revisionList.items
       );
+
       // remove hash label before patching back into the deployment
       const revisionTemplate = previousRevision.spec?.template;
       if (revisionTemplate?.metadata?.labels) {
@@ -231,7 +233,7 @@ export function getRollbackPatchPayload(
       // keep the annotations to skip from the deployment, in the patch
       const applicationAnnotations = application.metadata?.annotations || {};
       const applicationAnnotationsInPatch =
-        unchangedAnnotationsForRollbackPatch.reduce((acc, annotationKey) => {
+        unchangedAnnotationKeysForRollbackPatch.reduce((acc, annotationKey) => {
           if (applicationAnnotations[annotationKey]) {
             acc[annotationKey] = applicationAnnotations[annotationKey];
           }
@@ -243,7 +245,7 @@ export function getRollbackPatchPayload(
       const revisionAnnotationsInPatch = Object.entries(
         revisionAnnotations
       ).reduce((acc, [annotationKey, annotationValue]) => {
-        if (!unchangedAnnotationsForRollbackPatch.includes(annotationKey)) {
+        if (!unchangedAnnotationKeysForRollbackPatch.includes(annotationKey)) {
           acc[annotationKey] = annotationValue;
         }
         return acc;
@@ -268,6 +270,7 @@ export function getRollbackPatchPayload(
         },
       ].filter((p) => !!p.value); // remove any patch that has no value
 
+      console.log(patchAnnotations);
       return deploymentRollbackPatch;
     }
     default:
@@ -276,14 +279,15 @@ export function getRollbackPatchPayload(
 }
 
 function getPreviousReplicaSetRevision(replicaSets: ReplicaSet[]) {
-  // sort the list of ReplicaSet by creation timestamp in descending order, using the names as a tie breaker (old to new)
+  // sort replicaset(s) using the revision annotation number (old to new).
+  // Kubectl uses the same revision annotation key to determine the previous version
+  // (see the Revision function, and where it's used https://github.com/kubernetes/kubectl/blob/27ec3dafa658d8873b3d9287421d636048b51921/pkg/util/deployment/deployment.go#LL70C11-L70C11)
   const sortedReplicaSets = replicaSets.sort((a, b) => {
-    const timeA = new Date(a.metadata?.creationTimestamp || '');
-    const timeB = new Date(b.metadata?.creationTimestamp || '');
-    if (timeA.getTime() === timeB.getTime()) {
-      return a.metadata?.name?.localeCompare(b.metadata?.name || '') || 0;
-    }
-    return timeA.getTime() - timeB.getTime();
+    const aRevision =
+      Number(a.metadata?.annotations?.[appRevisionAnnotation]) || 0;
+    const bRevision =
+      Number(b.metadata?.annotations?.[appRevisionAnnotation]) || 0;
+    return aRevision - bRevision;
   });
 
   // if there are less than 2 revisions, there is no previous revision to rollback to

@@ -10,7 +10,9 @@ export const defaultDeploymentUniqueLabel = 'pod-template-hash';
 
 export const appRevisionAnnotation = 'deployment.kubernetes.io/revision';
 
-export const unchangedAnnotationsForRollbackPatch = [
+// unchangedAnnotationKeysForRollbackPatch lists the annotations that should be preserved from the deployment and not
+// copied from the replicaset when rolling a deployment back
+export const unchangedAnnotationKeysForRollbackPatch = [
   'kubectl.kubernetes.io/last-applied-configuration',
   appRevisionAnnotation,
   'deployment.kubernetes.io/revision-history',
