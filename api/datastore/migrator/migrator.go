@@ -211,6 +211,8 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.17", m.migrateDBVersionToDB80)
 	m.addMigrations("2.18", m.migrateDBVersionToDB90)
 
+	m.addMigrations("2.19", m.migrateDockerDesktopExtentionSetting)
+
 	// Add new migrations below...
 	// One function per migration, each versions migration funcs in the same file.
 }
