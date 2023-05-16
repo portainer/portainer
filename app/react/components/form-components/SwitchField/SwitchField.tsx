@@ -42,8 +42,6 @@ export function SwitchField({
 }: Props) {
   const toggleName = name ? `toggle_${name}` : '';
 
-  console.log('SwitchField', index, onChange);
-
   return (
     <label className={clsx(styles.root, fieldClass)}>
       <span
