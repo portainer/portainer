@@ -10,7 +10,6 @@ import { insightStore } from './insights-store';
 export type Props = {
   header?: string;
   content?: ReactNode;
-  setHtmlContent?: boolean;
   insightCloseId?: string; // set if you want to be able to close the box and not show it again
   type?: 'default' | 'slim';
   className?: string;

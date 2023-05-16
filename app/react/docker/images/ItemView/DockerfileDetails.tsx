@@ -47,11 +47,7 @@ export function DockerfileDetails({ image }: Props) {
           <DetailsTable.Row label="VOLUME">
             <div className="flex flex-wrap gap-1">
               {image.Volumes.map((volume, index) => (
-                <span
-                  key={index}
-                  className="label label-default space-right"
-                  ng-repeat="volume in image.Volumes"
-                >
+                <span key={index} className="label label-default space-right">
                   {volume}
                 </span>
               ))}

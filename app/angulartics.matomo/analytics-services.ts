@@ -9,7 +9,7 @@ const categories = [
   'portainer',
   'edge',
 ] as const;
-type Category = typeof categories[number];
+type Category = (typeof categories)[number];
 
 enum DimensionConfig {
   PortainerVersion = 1,

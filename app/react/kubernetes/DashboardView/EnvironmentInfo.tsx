@@ -31,7 +31,7 @@ export function EnvironmentInfo() {
                   {environmentData.Name}
                 </td>
               </tr>
-              <tr ng-if="ctrl.showEnvUrl">
+              <tr>
                 <td className="!border-t !pl-0">URL</td>
                 <td className="!border-t" data-cy="dashboard-environmenturl">
                   {stripProtocol(environmentData.URL) || '-'}
