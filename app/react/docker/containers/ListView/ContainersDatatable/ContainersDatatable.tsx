@@ -45,7 +45,7 @@ export function ContainersDatatable({
   const columns = useColumns(isHostColumnVisible, isGPUsColumnVisible);
   const tableState = useTableState(settingsStore, storageKey);
 
-  const containersQuery = useContainers(environment.Id, undefined, {
+  const containersQuery = useContainers(environment.Id, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
 
