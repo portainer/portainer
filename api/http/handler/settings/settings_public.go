@@ -50,7 +50,7 @@ type publicSettingsResponse struct {
 		CheckinInterval int `example:"60"`
 	}
 
-	IsDockerDesktopExtention bool `json:"IsDockerDesktopExtention" example:"false"`
+	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
 }
 
 // @id SettingsPublic
@@ -91,7 +91,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 	publicSettings.Edge.CommandInterval = appSettings.Edge.CommandInterval
 	publicSettings.Edge.CheckinInterval = appSettings.EdgeAgentCheckinInterval
 
-	publicSettings.IsDockerDesktopExtention = appSettings.IsDockerDesktopExtention
+	publicSettings.IsDockerDesktopExtension = appSettings.IsDockerDesktopExtension
 
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
