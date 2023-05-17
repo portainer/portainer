@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/agent"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/pkg/featureflags"
 
 	"github.com/rs/zerolog/log"
 )
@@ -49,15 +50,18 @@ func parseSnapshotFrequency(snapshotInterval string, dataStore dataservices.Data
 		if err != nil {
 			return 0, err
 		}
+
 		snapshotInterval = settings.SnapshotInterval
 		if snapshotInterval == "" {
 			snapshotInterval = portainer.DefaultSnapshotInterval
 		}
 	}
+
 	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
 		return 0, err
 	}
+
 	return snapshotFrequency.Seconds(), nil
 }
 
@@ -85,6 +89,7 @@ func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
 	case portainer.EdgeAgentOnDockerEnvironment, portainer.EdgeAgentOnKubernetesEnvironment, portainer.AzureEnvironment:
 		return false
 	}
+
 	return true
 }
 
@@ -127,9 +132,9 @@ func (service *Service) FillSnapshotData(endpoint *portainer.Endpoint) error {
 	return FillSnapshotData(service.dataStore, endpoint)
 }
 
-func FillSnapshotData(dataStore dataservices.DataStore, endpoint *portainer.Endpoint) error {
-	snapshot, err := dataStore.Snapshot().Snapshot(endpoint.ID)
-	if dataStore.IsErrObjectNotFound(err) {
+func FillSnapshotData(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) error {
+	snapshot, err := tx.Snapshot().Snapshot(endpoint.ID)
+	if tx.IsErrObjectNotFound(err) {
 		endpoint.Snapshots = []portainer.DockerSnapshot{}
 		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
 
@@ -213,50 +218,55 @@ func (service *Service) snapshotEndpoints() error {
 	}
 
 	for _, endpoint := range endpoints {
-		if !SupportDirectSnapshot(&endpoint) {
-			continue
-		}
-
-		if endpoint.URL == "" {
+		if !SupportDirectSnapshot(&endpoint) || endpoint.URL == "" {
 			continue
 		}
 
 		snapshotError := service.SnapshotEndpoint(&endpoint)
 
-		latestEndpointReference, err := service.dataStore.Endpoint().Endpoint(endpoint.ID)
-		if latestEndpointReference == nil {
-			log.Debug().
-				Str("endpoint", endpoint.Name).
-				Str("URL", endpoint.URL).Err(err).
-				Msg("background schedule error (environment snapshot), environment not found inside the database anymore")
-
-			continue
-		}
-
-		latestEndpointReference.Status = portainer.EndpointStatusUp
-		if snapshotError != nil {
-			log.Debug().
-				Str("endpoint", endpoint.Name).
-				Str("URL", endpoint.URL).Err(err).
-				Msg("background schedule error (environment snapshot), unable to create snapshot")
-
-			latestEndpointReference.Status = portainer.EndpointStatusDown
-		}
-
-		latestEndpointReference.Agent.Version = endpoint.Agent.Version
-
-		err = service.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
-		if err != nil {
-			log.Debug().
-				Str("endpoint", endpoint.Name).
-				Str("URL", endpoint.URL).Err(err).
-				Msg("background schedule error (environment snapshot), unable to update environment")
-
-			continue
+		if featureflags.IsEnabled(portainer.FeatureNoTx) {
+			updateEndpointStatus(service.dataStore, &endpoint, snapshotError)
+		} else {
+			service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+				updateEndpointStatus(tx, &endpoint, snapshotError)
+				return nil
+			})
 		}
 	}
 
 	return nil
+}
+
+func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, snapshotError error) {
+	latestEndpointReference, err := tx.Endpoint().Endpoint(endpoint.ID)
+	if latestEndpointReference == nil {
+		log.Debug().
+			Str("endpoint", endpoint.Name).
+			Str("URL", endpoint.URL).Err(err).
+			Msg("background schedule error (environment snapshot), environment not found inside the database anymore")
+
+		return
+	}
+
+	latestEndpointReference.Status = portainer.EndpointStatusUp
+	if snapshotError != nil {
+		log.Debug().
+			Str("endpoint", endpoint.Name).
+			Str("URL", endpoint.URL).Err(err).
+			Msg("background schedule error (environment snapshot), unable to create snapshot")
+
+		latestEndpointReference.Status = portainer.EndpointStatusDown
+	}
+
+	latestEndpointReference.Agent.Version = endpoint.Agent.Version
+
+	err = tx.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+	if err != nil {
+		log.Debug().
+			Str("endpoint", endpoint.Name).
+			Str("URL", endpoint.URL).Err(err).
+			Msg("background schedule error (environment snapshot), unable to update environment")
+	}
 }
 
 // FetchDockerID fetches info.Swarm.Cluster.ID if environment(endpoint) is swarm and info.ID otherwise
