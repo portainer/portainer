@@ -128,18 +128,23 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 	registry.ManagementConfiguration = &portainer.RegistryManagementConfiguration{
 		Type: registry.Type,
 	}
+	registry.ManagementConfiguration = syncConfig(registry)
 
 	if payload.Authentication {
+		registry.Authentication = true
 		registry.ManagementConfiguration.Authentication = true
+
+		registry.Username = payload.Username
 		registry.ManagementConfiguration.Username = payload.Username
-		if payload.Username == registry.Username && payload.Password == "" {
-			registry.ManagementConfiguration.Password = registry.Password
-		} else {
+
+		if payload.Password != "" {
 			registry.ManagementConfiguration.Password = payload.Password
+			registry.Password = payload.Password
 		}
 
 		if payload.Region != "" {
 			registry.ManagementConfiguration.Ecr.Region = payload.Region
+			registry.Ecr.Region = payload.Region
 		}
 	}
 
