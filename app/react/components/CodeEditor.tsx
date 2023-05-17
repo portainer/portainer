@@ -1,6 +1,8 @@
 import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage, LanguageSupport } from '@codemirror/language';
 import { yaml } from '@codemirror/legacy-modes/mode/yaml';
+import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
+import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { useMemo } from 'react';
 import { createTheme } from '@uiw/codemirror-themes';
 import { tags as highlightTags } from '@lezer/highlight';
@@ -12,6 +14,8 @@ interface Props {
   id: string;
   placeholder?: string;
   yaml?: boolean;
+  dockerFile?: boolean;
+  shell?: boolean;
   readonly?: boolean;
   onChange: (value: string) => void;
   value: string;
@@ -37,10 +41,19 @@ const theme = createTheme({
     },
     { tag: highlightTags.number, color: 'var(--text-cm-number-color)' },
     { tag: highlightTags.keyword, color: 'var(--text-cm-keyword-color)' },
+    { tag: highlightTags.comment, color: 'var(--text-cm-comment-color)' },
+    {
+      tag: highlightTags.variableName,
+      color: 'var(--text-cm-variable-name-color)',
+    },
   ],
 });
 
 const yamlLanguage = new LanguageSupport(StreamLanguage.define(yaml));
+const dockerFileLanguage = new LanguageSupport(
+  StreamLanguage.define(dockerFile)
+);
+const shellLanguage = new LanguageSupport(StreamLanguage.define(shell));
 
 export function CodeEditor({
   id,
@@ -50,8 +63,22 @@ export function CodeEditor({
   value,
   height = '500px',
   yaml: isYaml,
+  dockerFile: isDockerFile,
+  shell: isShell,
 }: Props) {
-  const extensions = useMemo(() => (isYaml ? [yamlLanguage] : []), [isYaml]);
+  const extensions = useMemo(() => {
+    const extensions = [];
+    if (isYaml) {
+      extensions.push(yamlLanguage);
+    }
+    if (isDockerFile) {
+      extensions.push(dockerFileLanguage);
+    }
+    if (isShell) {
+      extensions.push(shellLanguage);
+    }
+    return extensions;
+  }, [isYaml, isDockerFile, isShell]);
 
   return (
     <>
@@ -67,6 +94,7 @@ export function CodeEditor({
         height={height}
         basicSetup={{
           highlightSelectionMatches: false,
+          autocompletion: false,
         }}
       />
     </>
