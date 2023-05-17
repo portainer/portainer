@@ -311,6 +311,7 @@ angular.module('portainer.docker').controller('ContainerController', [
       return pullImageIfNeeded()
         .then(stopContainerIfNeeded)
         .then(renameContainer)
+        .then(disconnectNetworksFromOldContainer)
         .then(setMainNetworkAndCreateContainer)
         .then(connectContainerToOtherNetworks)
         .then(startContainerIfNeeded)
@@ -339,12 +340,23 @@ angular.module('portainer.docker').controller('ContainerController', [
         });
       }
 
+      function disconnectNetworksFromOldContainer() {
+        var networks = config.NetworkingConfig.EndpointsConfig;
+        var networksNames = Object.keys(networks);
+        var disconnectionPromises = networksNames.map(function disconnectFromNetwork(name) {
+          NetworkService.disconnectContainer(name, container.Id);
+        });
+        return $q.all(disconnectionPromises).then(function onDisconnectFromNetworkSuccess() {
+          return networks;
+        });
+      }
+
       function setMainNetworkAndCreateContainer() {
         var networks = config.NetworkingConfig.EndpointsConfig;
         var networksNames = Object.keys(networks);
-        if (networksNames.length > 1) {
+        if (networksNames.length >= 1) {
           config.NetworkingConfig.EndpointsConfig = {};
-          config.NetworkingConfig.EndpointsConfig[networksNames[0]] = networks[0];
+          config.NetworkingConfig.EndpointsConfig[networksNames[0]] = networks[networksNames[0]];
         }
         return $q.all([ContainerService.createContainer(config), networks]);
       }
@@ -353,8 +365,8 @@ angular.module('portainer.docker').controller('ContainerController', [
         var newContainer = createContainerData[0];
         var networks = createContainerData[1];
         var networksNames = Object.keys(networks);
-        var connectionPromises = networksNames.map(function connectToNetwork(name) {
-          NetworkService.connectContainer(name, newContainer.Id);
+        var connectionPromises = networksNames.slice(1).map(function connectToNetwork(name) {
+          NetworkService.connectContainer(name, newContainer.Id, networks[name].IPAMConfig);
         });
         return $q.all(connectionPromises).then(function onConnectToNetworkSuccess() {
           return newContainer;

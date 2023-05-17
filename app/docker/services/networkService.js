@@ -74,13 +74,14 @@ angular.module('portainer.docker').factory('NetworkService', [
       return Network.disconnect({ id: networkId }, { Container: containerId, Force: force }).$promise;
     };
 
-    service.connectContainer = function (networkId, containerId, aliases) {
+    // @https://docs.docker.com/engine/api/v1.42/#tag/Network/operation/NetworkConnect
+    service.connectContainer = function (networkId, containerId, ipamConfig) {
       var payload = {
         Container: containerId,
       };
-      if (aliases) {
+      if (ipamConfig) {
         payload.EndpointConfig = {
-          Aliases: aliases,
+          IPAMConfig: ipamConfig,
         };
       }
       return Network.connect({ id: networkId }, payload).$promise;
