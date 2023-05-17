@@ -967,6 +967,8 @@ type (
 		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
 		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
 		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
+
+		IsDockerDesktopExtention bool `json:"IsDockerDesktopExtention"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
