@@ -49,15 +49,12 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
     columns.filter((col) => col.canHide).map((col) => col.id)
   );
 
-  const containersQuery = useContainers(
-    environment.Id,
-    {
-      filters: {
-        label: [`com.docker.compose.project=${stackName}`],
-      },
+  const containersQuery = useContainers(environment.Id, {
+    filters: {
+      label: [`com.docker.compose.project=${stackName}`],
     },
-    { autoRefreshRate: settings.autoRefreshRate * 1000 }
-  );
+    autoRefreshRate: settings.autoRefreshRate * 1000,
+  });
 
   return (
     <RowProvider context={{ environment }}>

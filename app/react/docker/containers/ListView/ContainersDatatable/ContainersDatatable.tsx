@@ -52,7 +52,7 @@ export function ContainersDatatable({
 
   const [search, setSearch] = useSearchBarState(storageKey);
 
-  const containersQuery = useContainers(environment.Id, undefined, {
+  const containersQuery = useContainers(environment.Id, {
     autoRefreshRate: settings.autoRefreshRate * 1000,
   });
 
