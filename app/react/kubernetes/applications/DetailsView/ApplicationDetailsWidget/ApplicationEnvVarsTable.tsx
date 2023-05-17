@@ -106,7 +106,7 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                     </span>
                   )}
                   {envVar.valueFrom?.secretKeyRef && (
-                    <span ng-if="envvar.valueFrom.secretKeyRef">
+                    <span>
                       <Link
                         to="kubernetes.configurations.configuration"
                         params={{

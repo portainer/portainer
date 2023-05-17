@@ -43,7 +43,7 @@ export function ApplicationVolumeConfigsTable({ namespace, app }: Props) {
               <td>
                 {containerName}
                 {isInitContainer && (
-                  <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT">
+                  <span>
                     <Icon icon={Asterisk} />(
                     <a
                       href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"

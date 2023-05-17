@@ -270,7 +270,6 @@ export function getRollbackPatchPayload(
         },
       ].filter((p) => !!p.value); // remove any patch that has no value
 
-      console.log(patchAnnotations);
       return deploymentRollbackPatch;
     }
     default:
