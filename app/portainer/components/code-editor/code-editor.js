@@ -7,6 +7,7 @@ angular.module('portainer.app').component('codeEditor', {
     identifier: '@',
     placeholder: '@',
     yml: '<',
+    dockerFile: '<',
     readOnly: '<',
     onChange: '<',
     value: '<',
