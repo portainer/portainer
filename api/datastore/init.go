@@ -60,7 +60,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,
 			KubectlShellImage:        portainer.DefaultKubectlShellImage,
 
-			IsDockerDesktopExtention: isDDExtention,
+			IsDockerDesktopExtension: isDDExtention,
 		}
 
 		return store.SettingsService.UpdateSettings(defaultSettings)

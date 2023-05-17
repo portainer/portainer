@@ -9,9 +9,9 @@ import (
 func (m *Migrator) migrateDockerDesktopExtentionSetting() error {
 	log.Info().Msg("updating docker desktop extention flag in settings")
 
-	isDDExtention := false
+	isDDExtension := false
 	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
-		isDDExtention = true
+		isDDExtension = true
 	}
 
 	settings, err := m.settingsService.Settings()
@@ -19,7 +19,7 @@ func (m *Migrator) migrateDockerDesktopExtentionSetting() error {
 		return err
 	}
 
-	settings.IsDockerDesktopExtention = isDDExtention
+	settings.IsDockerDesktopExtension = isDDExtension
 	err = m.settingsService.UpdateSettings(settings)
 	if err != nil {
 		return err

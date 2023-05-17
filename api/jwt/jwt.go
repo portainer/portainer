@@ -173,7 +173,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		return "", fmt.Errorf("failed fetching settings from db: %w", err)
 	}
 
-	if settings.IsDockerDesktopExtention {
+	if settings.IsDockerDesktopExtension {
 		// Set expiration to 99 years for docker desktop extension.
 		log.Info().Msg("detected docker desktop extension mode")
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()

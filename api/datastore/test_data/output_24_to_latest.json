@@ -606,7 +606,7 @@
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
     },
-    "IsDockerDesktopExtention": false,
+    "IsDockerDesktopExtension": false,
     "KubeconfigExpiry": "0",
     "KubectlShellImage": "portainer/kubectl-shell",
     "LDAPSettings": {
