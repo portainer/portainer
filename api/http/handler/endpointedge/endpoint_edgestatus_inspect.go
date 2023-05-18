@@ -17,7 +17,9 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge/cache"
+	"github.com/portainer/portainer/pkg/featureflags"
 )
 
 type stackStatusResponse struct {
@@ -96,6 +98,34 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
+	var statusResponse *endpointEdgeStatusInspectResponse
+	if featureflags.IsEnabled(portainer.FeatureNoTx) {
+		statusResponse, err = handler.inspectStatus(handler.DataStore, r, portainer.EndpointID(endpointID))
+	} else {
+		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID))
+			return err
+		})
+	}
+
+	if err != nil {
+		var httpErr *httperror.HandlerError
+		if errors.As(err, &httpErr) {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	return cacheResponse(w, endpoint.ID, *statusResponse)
+}
+
+func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID) (*endpointEdgeStatusInspectResponse, error) {
+	endpoint, err := tx.Endpoint().Endpoint(endpointID)
+	if err != nil {
+		return nil, err
+	}
+
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
 		endpoint.EdgeID = edgeIdentifier
@@ -103,7 +133,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
 	if agentPlatformErr != nil {
-		return httperror.BadRequest("agent platform header is not valid", err)
+		return nil, httperror.BadRequest("agent platform header is not valid", err)
 	}
 	endpoint.Type = agentPlatform
 
@@ -112,21 +142,21 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	endpoint.LastCheckInDate = time.Now().Unix()
 
-	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return httperror.InternalServerError("Unable to Unable to persist environment changes inside the database", err)
+		return nil, httperror.InternalServerError("Unable to Unable to persist environment changes inside the database", err)
 	}
 
-	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(endpoint)
+	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(tx, endpoint)
 	if err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	checkinInterval := endpoint.EdgeCheckinInterval
 	if endpoint.EdgeCheckinInterval == 0 {
-		settings, err := handler.DataStore.Settings().Settings()
+		settings, err := tx.Settings().Settings()
 		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve settings from the database", err)
+			return nil, httperror.InternalServerError("Unable to retrieve settings from the database", err)
 		}
 		checkinInterval = settings.EdgeAgentCheckinInterval
 	}
@@ -142,7 +172,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
 	if handlerErr != nil {
-		return handlerErr
+		return nil, handlerErr
 	}
 	statusResponse.Schedules = schedules
 
@@ -150,13 +180,13 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
 
-	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(endpoint.ID)
+	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(tx, endpoint.ID)
 	if handlerErr != nil {
-		return handlerErr
+		return nil, handlerErr
 	}
 	statusResponse.Stacks = edgeStacksStatus
 
-	return cacheResponse(w, endpoint.ID, statusResponse)
+	return &statusResponse, nil
 }
 
 func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
@@ -210,15 +240,15 @@ func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel p
 	return schedules, nil
 }
 
-func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stackStatusResponse, *httperror.HandlerError) {
-	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
+func (handler *Handler) buildEdgeStacks(tx dataservices.DataStoreTx, endpointID portainer.EndpointID) ([]stackStatusResponse, *httperror.HandlerError) {
+	relation, err := tx.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve relation object from the database", err)
 	}
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
-		version, ok := handler.DataStore.EdgeStack().EdgeStackVersion(stackID)
+		version, ok := tx.EdgeStack().EdgeStackVersion(stackID)
 		if !ok {
 			return nil, httperror.InternalServerError("Unable to retrieve edge stack from the database", err)
 		}
