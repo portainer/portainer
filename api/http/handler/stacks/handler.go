@@ -136,7 +136,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpoint.ID))
 
 		if err != nil {
-			return false, fmt.Errorf("Failed to get user from the database: %w", err)
+			return false, fmt.Errorf("failed to get user from the database: %w", err)
 		}
 
 		return canCreate, nil
