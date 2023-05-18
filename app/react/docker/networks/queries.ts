@@ -14,10 +14,21 @@ import {
 } from './network.service';
 import { NetworkId } from './types';
 
-export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
+export function useNetwork(
+  environmentId: EnvironmentId,
+  networkId: NetworkId,
+  { nodeName }: { nodeName?: string } = {}
+) {
   return useQuery(
-    ['environments', environmentId, 'docker', 'networks', networkId],
-    () => getNetwork(environmentId, networkId),
+    [
+      'environments',
+      environmentId,
+      'docker',
+      'networks',
+      networkId,
+      { nodeName },
+    ],
+    () => getNetwork(environmentId, networkId, { nodeName }),
     {
       onError: (err) => {
         notifyError('Failure', err as Error, 'Unable to get network');

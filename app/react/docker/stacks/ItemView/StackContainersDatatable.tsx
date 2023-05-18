@@ -42,14 +42,12 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
   const isGPUsColumnVisible = useShowGPUsColumn(environment.Id);
   const columns = useColumns(false, isGPUsColumnVisible);
 
-  const containersQuery = useContainers(
-    environment.Id,
-    true,
-    {
+  const containersQuery = useContainers(environment.Id, {
+    filters: {
       label: [`com.docker.compose.project=${stackName}`],
     },
-    tableState.autoRefreshRate * 1000
-  );
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
 
   return (
     <RowProvider context={{ environment }}>

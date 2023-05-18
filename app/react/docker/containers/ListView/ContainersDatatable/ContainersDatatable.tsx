@@ -45,12 +45,9 @@ export function ContainersDatatable({
   const columns = useColumns(isHostColumnVisible, isGPUsColumnVisible);
   const tableState = useTableState(settingsStore, storageKey);
 
-  const containersQuery = useContainers(
-    environment.Id,
-    true,
-    undefined,
-    tableState.autoRefreshRate * 1000
-  );
+  const containersQuery = useContainers(environment.Id, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
 
   return (
     <RowProvider context={{ environment }}>
