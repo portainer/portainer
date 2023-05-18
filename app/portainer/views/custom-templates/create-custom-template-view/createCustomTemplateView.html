@@ -10,6 +10,7 @@
             show-platform-field="true"
             show-type-field="true"
             name-regex="$ctrl.state.templateNameRegex"
+            name-regex-error="'This field must consist of lower-case alphanumeric characters, \'_\' or \'-\' (e.g. \'my-name\', or \'abc-123\').'"
           ></custom-template-common-fields>
 
           <!-- build-method -->
@@ -34,14 +35,14 @@
             on-change="($ctrl.editorUpdate)"
             ng-required="true"
             yml="true"
-            placeholder="# Define or paste the content of your docker compose file here"
+            placeholder="Define or paste the content of your docker compose file here"
           >
             <editor-description>
-              <span class="col-sm-12 text-muted">
+              <p>
                 You can get more information about Compose file format in the
                 <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
                 .
-              </span>
+              </p>
             </editor-description>
           </web-editor-form>
           <!-- !web-editor -->

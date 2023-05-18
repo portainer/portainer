@@ -13,10 +13,8 @@
 }
 
 .image-container {
-  margin-bottom: 20px;
-  text-align: left;
-
   margin-bottom: 0;
+  text-align: left;
 }
 
 .icon,
@@ -43,8 +41,8 @@
 .box-selector-item.limited.business label,
 .box-selector-item.limited.business input:checked + label {
   @apply border-warning-7 bg-warning-1 text-black;
-  @apply th-dark:bg-warning-8 th-dark:bg-opacity-10;
-  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10;
+  @apply th-dark:bg-warning-8 th-dark:bg-opacity-10 th-dark:text-white;
+  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10 th-highcontrast:text-white;
 
   filter: none;
 }

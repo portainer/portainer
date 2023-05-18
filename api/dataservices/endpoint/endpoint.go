@@ -34,7 +34,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 		idxEdgeID:  make(map[string]portainer.EndpointID),
 	}
 
-	es, err := s.Endpoints()
+	es, err := s.endpoints()
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +89,7 @@ func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 	})
 }
 
-// Endpoints return an array containing all the environments(endpoints).
-func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
+func (service *Service) endpoints() ([]portainer.Endpoint, error) {
 	var endpoints []portainer.Endpoint
 	var err error
 
@@ -99,8 +98,14 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 		return err
 	})
 
+	return endpoints, err
+}
+
+// Endpoints return an array containing all the environments(endpoints).
+func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
+	endpoints, err := service.endpoints()
 	if err != nil {
-		return endpoints, err
+		return nil, err
 	}
 
 	for i, e := range endpoints {

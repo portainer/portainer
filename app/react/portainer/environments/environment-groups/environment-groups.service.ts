@@ -1,5 +1,6 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
+import { buildUrl } from './queries/build-url';
 import { EnvironmentGroup, EnvironmentGroupId } from './types';
 
 export async function getGroup(id: EnvironmentGroupId) {
@@ -18,18 +19,4 @@ export async function getGroups() {
   } catch (e) {
     throw parseAxiosError(e as Error, '');
   }
-}
-
-function buildUrl(id?: EnvironmentGroupId, action?: string) {
-  let url = '/endpoint_groups';
-
-  if (id) {
-    url += `/${id}`;
-  }
-
-  if (action) {
-    url += `/${action}`;
-  }
-
-  return url;
 }

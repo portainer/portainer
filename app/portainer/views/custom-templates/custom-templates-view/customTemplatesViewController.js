@@ -44,10 +44,10 @@ class CustomTemplatesViewController {
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
-      isEditorVisible: false,
       deployable: false,
       templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
       templateContent: '',
+      templateLoadFailed: false,
     };
 
     this.currentUser = {
@@ -204,6 +204,13 @@ class CustomTemplatesViewController {
 
     template.Selected = true;
 
+    try {
+      this.state.templateContent = this.formValues.fileContent = await this.CustomTemplateService.customTemplateFile(template.Id, template.GitConfig !== null);
+    } catch (err) {
+      this.state.templateLoadFailed = true;
+      this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
+    }
+
     this.formValues.network = _.find(this.availableNetworks, function (o) {
       return o.Name === 'bridge';
     });
@@ -213,9 +220,6 @@ class CustomTemplatesViewController {
     this.$anchorScroll('view-top');
     const applicationState = this.StateManager.getState();
     this.state.deployable = this.isDeployable(applicationState.endpoint, template.Type);
-    const file = await this.CustomTemplateService.customTemplateFile(template.Id);
-    this.state.templateContent = file;
-    this.formValues.fileContent = file;
 
     if (template.Variables && template.Variables.length > 0) {
       const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));

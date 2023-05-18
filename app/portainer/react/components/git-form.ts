@@ -9,6 +9,7 @@ import { GitForm } from '@/react/portainer/gitops/GitForm';
 import { AuthFieldset } from '@/react/portainer/gitops/AuthFieldset';
 import { InfoPanel } from '@/react/portainer/gitops/InfoPanel';
 import { RefField } from '@/react/portainer/gitops/RefField';
+import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
 
 export const gitFormModule = angular
   .module('portainer.app.components.forms.git', [])
@@ -17,6 +18,7 @@ export const gitFormModule = angular
     r2a(withUIRouter(withReactQuery(withCurrentUser(GitForm))), [
       'value',
       'onChange',
+      'environmentType',
       'isDockerStandalone',
       'deployMethod',
       'isAdditionalFilesFieldVisible',
@@ -24,6 +26,8 @@ export const gitFormModule = angular
       'isAuthExplanationVisible',
       'errors',
       'baseWebhookUrl',
+      'webhookId',
+      'webhooksDocs',
     ])
   )
   .component(
@@ -45,13 +49,15 @@ export const gitFormModule = angular
       'isForcePullVisible',
       'errors',
       'baseWebhookUrl',
+      'webhookId',
+      'webhooksDocs',
     ])
   )
   .component(
     'reactGitFormAuthFieldset',
     r2a(withUIRouter(withReactQuery(withCurrentUser(AuthFieldset))), [
       'value',
-      'isExplanationVisible',
+      'isAuthExplanationVisible',
       'onChange',
       'errors',
     ])
@@ -66,4 +72,8 @@ export const gitFormModule = angular
       'value',
       'isUrlValid',
     ])
+  )
+  .component(
+    'timeWindowDisplay',
+    r2a(withReactQuery(withUIRouter(TimeWindowDisplay)), [])
   ).name;

@@ -1,33 +1,33 @@
 import clsx from 'clsx';
-import { PropsWithChildren, ReactNode } from 'react';
-import { TableHeaderProps } from 'react-table';
+import { CSSProperties, PropsWithChildren, ReactNode } from 'react';
 
-import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 import styles from './TableHeaderCell.module.css';
+import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
 interface Props {
-  canFilter: boolean;
   canSort: boolean;
-  headerProps: TableHeaderProps;
   isSorted: boolean;
   isSortedDesc?: boolean;
   onSortClick: (desc: boolean) => void;
   render: () => ReactNode;
-  renderFilter: () => ReactNode;
+  renderFilter?: () => ReactNode;
+  className?: string;
+  style?: CSSProperties;
 }
 
 export function TableHeaderCell({
-  headerProps: { className, role, style },
   canSort,
   render,
   onSortClick,
   isSorted,
   isSortedDesc = true,
-  canFilter,
+
   renderFilter,
+  className,
+  style,
 }: Props) {
   return (
-    <th role={role} style={style} className={className}>
+    <th style={style} className={className}>
       <div className="flex h-full flex-row flex-nowrap items-center gap-1">
         <SortWrapper
           canSort={canSort}
@@ -37,7 +37,7 @@ export function TableHeaderCell({
         >
           {render()}
         </SortWrapper>
-        {canFilter ? renderFilter() : null}
+        {renderFilter ? renderFilter() : null}
       </div>
     </th>
   );
@@ -76,7 +76,6 @@ function SortWrapper({
         <TableHeaderSortIcons
           sorted={isSorted}
           descending={isSorted && !!isSortedDesc}
-          className="ml-1"
         />
       </div>
     </button>

@@ -16,8 +16,8 @@ import (
 )
 
 // @id GetKubernetesConfig
-// @summary Generates kubeconfig file enabling client communication with k8s api server
-// @description Generates kubeconfig file enabling client communication with k8s api server
+// @summary Generate a kubeconfig file enabling client communication with k8s api server
+// @description Generate a kubeconfig file enabling client communication with k8s api server
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth
@@ -51,7 +51,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return httperror.BadRequest("empty endpoints list", errors.New("empty endpoints list"))
 	}
 
-	config, handlerErr := handler.buildConfig(r, tokenData, bearerToken, endpoints)
+	config, handlerErr := handler.buildConfig(r, tokenData, bearerToken, endpoints, false)
 	if handlerErr != nil {
 		return handlerErr
 	}
@@ -115,7 +115,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	return filteredEndpoints, nil
 }
 
-func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenData, bearerToken string, endpoints []portainer.Endpoint) (*clientV1.Config, *httperror.HandlerError) {
+func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenData, bearerToken string, endpoints []portainer.Endpoint, isInternal bool) (*clientV1.Config, *httperror.HandlerError) {
 	configClusters := make([]clientV1.NamedCluster, len(endpoints))
 	configContexts := make([]clientV1.NamedContext, len(endpoints))
 	var configAuthInfos []clientV1.NamedAuthInfo
@@ -125,7 +125,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 		instanceID := handler.KubernetesClientFactory.GetInstanceID()
 		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
-		configClusters[idx] = handler.buildCluster(r, endpoint)
+		configClusters[idx] = handler.buildCluster(r, endpoint, isInternal)
 		configContexts[idx] = buildContext(serviceAccountName, endpoint)
 		if !authInfosSet[serviceAccountName] {
 			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccountName, bearerToken))
@@ -143,8 +143,9 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	}, nil
 }
 
-func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
+// buildCluster builds a Kubernetes cluster configuration based on the endpoint and if it's used internally or externally.
+func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint, isInternal bool) clientV1.NamedCluster {
+	kubeConfigInternal := handler.kubeClusterAccessService.GetClusterDetails(r.Host, endpoint.ID, isInternal)
 
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),

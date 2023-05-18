@@ -178,6 +178,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 			} else {
 				var gpuOptions *_container.DeviceRequest = nil
 				for _, deviceRequest := range response.HostConfig.Resources.DeviceRequests {
+					deviceRequest := deviceRequest
 					if deviceRequest.Driver == "nvidia" || deviceRequest.Capabilities[0][0] == "gpu" {
 						gpuOptions = &deviceRequest
 					}
@@ -220,7 +221,9 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	snapshot.HealthyContainerCount = healthyContainers
 	snapshot.UnhealthyContainerCount = unhealthyContainers
 	snapshot.StackCount += len(stacks)
-	snapshot.SnapshotRaw.Containers = containers
+	for _, container := range containers {
+		snapshot.SnapshotRaw.Containers = append(snapshot.SnapshotRaw.Containers, portainer.DockerContainerSnapshot{Container: container})
+	}
 	return nil
 }
 

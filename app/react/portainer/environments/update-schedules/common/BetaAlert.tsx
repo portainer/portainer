@@ -1,13 +1,24 @@
-import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 
-export function BetaAlert() {
+interface Props {
+  message: string;
+  className?: string;
+  isHtml?: boolean;
+}
+
+export function BetaAlert({ message, className, isHtml }: Props) {
   return (
-    <InformationPanel title="Limited Feature">
-      <TextTip>
-        This feature is currently in beta and is limited to standalone linux
-        edge devices.
-      </TextTip>
-    </InformationPanel>
+    <TextTip
+      icon="svg-beta"
+      className={className}
+      childrenWrapperClassName="text-warning"
+    >
+      {!isHtml ? (
+        message
+      ) : (
+        // eslint-disable-next-line react/no-danger
+        <span dangerouslySetInnerHTML={{ __html: message }} />
+      )}
+    </TextTip>
   );
 }

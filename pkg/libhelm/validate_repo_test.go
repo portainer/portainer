@@ -37,7 +37,7 @@ func Test_ValidateHelmRepositoryURL(t *testing.T) {
 		func(tc testCase) {
 			t.Run(tc.name, func(t *testing.T) {
 				t.Parallel()
-				err := ValidateHelmRepositoryURL(tc.url)
+				err := ValidateHelmRepositoryURL(tc.url, nil)
 				if tc.invalid {
 					is.Errorf(err, "error expected: %s", tc.url)
 				} else {

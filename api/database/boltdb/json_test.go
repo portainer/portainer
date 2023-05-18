@@ -129,7 +129,7 @@ func Test_UnMarshalObjectUnencrypted(t *testing.T) {
 			var object string
 			err := conn.UnmarshalObject(test.object, &object)
 			is.NoError(err)
-			is.Equal(test.expected, string(object))
+			is.Equal(test.expected, object)
 		})
 	}
 }

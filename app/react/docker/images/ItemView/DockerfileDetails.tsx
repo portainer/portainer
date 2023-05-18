@@ -7,7 +7,7 @@ import { TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 
 interface DockerImage {
-  Command: Array<string>;
+  Command: null | Array<string>;
   Entrypoint: Array<string>;
   ExposedPorts: Array<number>;
   Volumes: Array<string>;
@@ -24,7 +24,7 @@ export function DockerfileDetails({ image }: Props) {
       <TableTitle label="Dockerfile details" icon={List} />
       <DetailsTable>
         <DetailsTable.Row label="CMD">
-          <code>{joinCommand(image.Command)}</code>
+          <code>{image.Command ? joinCommand(image.Command) : '-'}</code>
         </DetailsTable.Row>
 
         {image.Entrypoint && (
@@ -47,11 +47,7 @@ export function DockerfileDetails({ image }: Props) {
           <DetailsTable.Row label="VOLUME">
             <div className="flex flex-wrap gap-1">
               {image.Volumes.map((volume, index) => (
-                <span
-                  key={index}
-                  className="label label-default space-right"
-                  ng-repeat="volume in image.Volumes"
-                >
+                <span key={index} className="label label-default space-right">
                   {volume}
                 </span>
               ))}

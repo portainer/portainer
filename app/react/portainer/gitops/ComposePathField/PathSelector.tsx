@@ -7,11 +7,10 @@ import {
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
 import { ChangeEvent } from 'react';
+import clsx from 'clsx';
 
 import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
 import { useDebounce } from '@/react/hooks/useDebounce';
-
-import { useCaretPosition } from '@@/form-components/useCaretPosition';
 
 import { getAuthentication } from '../utils';
 import { GitFormModel } from '../types';
@@ -29,20 +28,20 @@ export function PathSelector({
   placeholder: string;
   model: GitFormModel;
 }) {
-  const [searchTerm, setSearchTerm] = useDebounce('', () => {});
+  const [searchTerm, setSearchTerm] = useDebounce(value, onChange);
 
   const creds = getAuthentication(model);
   const payload = {
     repository: model.RepositoryURL,
     keyword: searchTerm,
     reference: model.RepositoryReferenceName,
+    tlsSkipVerify: model.TLSSkipVerify,
     ...creds,
   };
   const enabled = Boolean(
     model.RepositoryURL && model.RepositoryURLValid && searchTerm
   );
-  const { data: searchResult } = useSearch(payload, enabled);
-  const { ref, updateCaret } = useCaretPosition();
+  const { data: searchResults } = useSearch(payload, enabled);
 
   return (
     <Combobox
@@ -52,20 +51,23 @@ export function PathSelector({
       data-cy="component-gitComposeInput"
     >
       <ComboboxInput
-        ref={ref}
         className="form-control"
         onChange={handleChange}
         placeholder={placeholder}
-        value={value}
+        value={searchTerm}
       />
-      {searchResult && searchResult.length > 0 && searchTerm !== '' && (
+      {searchResults && searchResults.length > 0 && (
         <ComboboxPopover>
           <ComboboxList>
-            {searchResult.map((result: string, index: number) => (
+            {searchResults.map((result: string, index: number) => (
               <ComboboxOption
                 key={index}
                 value={result}
-                className={`[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`}
+                className={clsx(
+                  `[&[aria-selected="true"]]:th-highcontrast:!bg-black [&[aria-selected="true"]]:th-dark:!bg-black`,
+                  `hover:th-highcontrast:!bg-black hover:th-dark:!bg-black`,
+                  'th-highcontrast:bg-gray-10 th-dark:bg-gray-10 '
+                )}
               />
             ))}
           </ComboboxList>
@@ -76,12 +78,9 @@ export function PathSelector({
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setSearchTerm(e.target.value);
-    onChange(e.target.value);
-    updateCaret();
   }
 
   function onSelect(value: string) {
-    setSearchTerm('');
     onChange(value);
   }
 }

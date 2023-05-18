@@ -19,7 +19,6 @@ export interface SystemInfoResponse {
   platform: ContainerPlatform;
   agents: number;
   edgeAgents: number;
-  edgeDevices: number;
 }
 
 async function getSystemInfo() {

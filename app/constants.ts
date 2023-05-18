@@ -28,3 +28,5 @@ export const PREDEFINED_NETWORKS = ['host', 'bridge', 'ingress', 'nat', 'none'];
 export const PORTAINER_FADEOUT = 1500;
 export const STACK_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
 export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
+export const KUBE_TEMPLATE_NAME_VALIDATION_REGEX =
+  '^(([a-z0-9](?:(?:[-a-z0-9_.]){0,61}[a-z0-9])?))$'; // alphanumeric, lowercase, can contain dashes, dots and underscores, max 63 characters

@@ -15,8 +15,6 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	gittypes "github.com/portainer/portainer/api/git/types"
 
-	"github.com/go-git/go-git/v5/plumbing/transport/client"
-	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
 )
 
@@ -51,21 +49,21 @@ type azureItem struct {
 }
 
 type azureClient struct {
-	client  *http.Client
 	baseUrl string
 }
 
 func NewAzureClient() *azureClient {
-	httpsCli := newHttpClientForAzure()
 	return &azureClient{
-		client:  httpsCli,
 		baseUrl: "https://dev.azure.com",
 	}
 }
 
-func newHttpClientForAzure() *http.Client {
+func newHttpClientForAzure(insecureSkipVerify bool) *http.Client {
 	tlsConfig := crypto.CreateTLSConfiguration()
-	tlsConfig.InsecureSkipVerify = true
+
+	if insecureSkipVerify {
+		tlsConfig.InsecureSkipVerify = true
+	}
 
 	httpsCli := &http.Client{
 		Transport: &http.Transport{
@@ -75,7 +73,6 @@ func newHttpClientForAzure() *http.Client {
 		Timeout: 300 * time.Second,
 	}
 
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 	return httpsCli
 }
 
@@ -99,14 +96,17 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to parse url")
 	}
+
 	downloadUrl, err := a.buildDownloadUrl(config, opt.referenceName)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to build download url")
 	}
+
 	zipFile, err := os.CreateTemp("", "azure-git-repo-*.zip")
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create temp file")
 	}
+
 	defer zipFile.Close()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", downloadUrl, nil)
@@ -120,10 +120,14 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 		return "", errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	res, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	res, err := client.Do(req)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to make an HTTP request")
 	}
+
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
@@ -134,6 +138,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to save HTTP response to a file")
 	}
+
 	return zipFile.Name(), nil
 }
 
@@ -142,6 +147,7 @@ func (a *azureClient) latestCommitID(ctx context.Context, opt fetchOption) (stri
 	if err != nil {
 		return "", err
 	}
+
 	return rootItem.CommitId, nil
 }
 
@@ -167,7 +173,10 @@ func (a *azureClient) getRootItem(ctx context.Context, opt fetchOption) (*azureI
 		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	resp, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
@@ -188,6 +197,7 @@ func (a *azureClient) getRootItem(ctx context.Context, opt fetchOption) (*azureI
 	if len(items.Value) == 0 || items.Value[0].CommitId == "" {
 		return nil, errors.Errorf("failed to get latest commitID in the repository")
 	}
+
 	return &items.Value[0], nil
 }
 
@@ -206,7 +216,7 @@ func parseUrl(rawUrl string) (*azureOptions, error) {
 	return nil, errors.Errorf("supported url schemes are https and ssh; recevied URL %s rawUrl", rawUrl)
 }
 
-var expectedSshUrl = "git@ssh.dev.azure.com:v3/Organisation/Project/Repository"
+const expectedSshUrl = "git@ssh.dev.azure.com:v3/Organisation/Project/Repository"
 
 func parseSshUrl(rawUrl string) (*azureOptions, error) {
 	path := strings.Split(rawUrl, "/")
@@ -344,6 +354,7 @@ func (a *azureClient) buildTreeUrl(config *azureOptions, rootObjectHash string) 
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to parse list tree url path %s", rawUrl)
 	}
+
 	q := u.Query()
 	// projectId={projectId}&recursive=true&fileName={fileName}&$format={$format}&api-version=6.0
 	q.Set("recursive", "true")
@@ -362,9 +373,11 @@ func formatReferenceName(name string) string {
 	if strings.HasPrefix(name, branchPrefix) {
 		return strings.TrimPrefix(name, branchPrefix)
 	}
+
 	if strings.HasPrefix(name, tagPrefix) {
 		return strings.TrimPrefix(name, tagPrefix)
 	}
+
 	return name
 }
 
@@ -372,9 +385,11 @@ func getVersionType(name string) string {
 	if strings.HasPrefix(name, branchPrefix) {
 		return "branch"
 	}
+
 	if strings.HasPrefix(name, tagPrefix) {
 		return "tag"
 	}
+
 	return "commit"
 }
 
@@ -400,7 +415,10 @@ func (a *azureClient) listRefs(ctx context.Context, opt baseOption) ([]string, e
 		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	resp, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
@@ -457,7 +475,10 @@ func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string,
 		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
-	resp, err := a.client.Do(req)
+	client := newHttpClientForAzure(opt.tlsSkipVerify)
+	defer client.CloseIdleConnections()
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
@@ -491,5 +512,6 @@ func checkAzureStatusCode(err error, code int) error {
 	} else if code == http.StatusUnauthorized || code == http.StatusNonAuthoritativeInfo {
 		return gittypes.ErrAuthenticationFailure
 	}
+
 	return err
 }

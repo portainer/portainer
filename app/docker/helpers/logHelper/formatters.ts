@@ -49,7 +49,12 @@ export function formatTime(
   if (time) {
     let date = '';
     if (typeof time === 'number') {
-      date = format(new Date(time * 1000), 'Y/MM/dd hh:mmaa');
+      // time is a number, so it is the number of seconds OR milliseconds since Unix Epoch (1970-01-01T00:00:00.000Z)
+      // we need to know if time's unit is second or millisecond
+      // 253402214400 is the numer of seconds between Unix Epoch and 9999-12-31T00:00:00.000Z
+      // if time is greater than 253402214400, then time unit cannot be second, so it is millisecond
+      const timestampInMilliseconds = time > 253402214400 ? time : time * 1000;
+      date = format(new Date(timestampInMilliseconds), 'Y/MM/dd hh:mmaa');
     } else {
       date = time;
     }
@@ -119,15 +124,17 @@ export function formatKeyValuePair(
 ) {
   let nl = line;
 
+  const strValue = typeof value !== 'string' ? JSON.stringify(value) : value;
+
   spans.push(
     { fgColor: Colors.Blue, text: `${key}=` },
     {
       fgColor: key === 'error' || key === 'ERR' ? Colors.Red : Colors.Magenta,
-      text: value as string,
+      text: strValue,
     }
   );
   if (!isLastKey) spans.push(spaceSpan);
-  nl += `${key}=${value}${!isLastKey ? ' ' : ''}`;
+  nl += `${key}=${strValue}${!isLastKey ? ' ' : ''}`;
 
   return nl;
 }

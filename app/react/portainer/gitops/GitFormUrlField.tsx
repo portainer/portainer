@@ -16,6 +16,8 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
 import { useCachedValidation } from '@@/form-components/useCachedTest';
 
+import { isBE } from '../feature-flags/feature-flags.service';
+
 import { GitFormModel } from './types';
 import { getAuthentication } from './utils';
 
@@ -38,12 +40,18 @@ export function GitFormUrlField({
 
   const creds = getAuthentication(model);
   const [force, setForce] = useState(false);
-  const repoStatusQuery = useCheckRepo(value, creds, force, {
-    onSettled(isValid) {
-      onChangeRepositoryValid(!!isValid);
-      setForce(false);
-    },
-  });
+  const repoStatusQuery = useCheckRepo(
+    value,
+    { creds, force, tlsSkipVerify: model.TLSSkipVerify },
+    {
+      onSettled(isValid) {
+        onChangeRepositoryValid(!!isValid);
+        setForce(false);
+      },
+      // disabled check on CE since it's not supported
+      enabled: isBE,
+    }
+  );
 
   const [debouncedValue, debouncedOnChange] = useDebounce(value, onChange);
 
@@ -111,7 +119,7 @@ export function useUrlValidation(force: boolean) {
       const model = context.parent as GitFormModel;
 
       const creds = getAuthentication(model);
-      return checkRepo(url, creds, force);
+      return checkRepo(url, { creds, force });
     }
   );
 

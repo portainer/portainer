@@ -1,6 +1,5 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
-import { useStore } from 'zustand';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
@@ -12,12 +11,12 @@ import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { createPersistedStore } from '@@/datatables/types';
-import { useSearchBarState } from '@@/datatables/SearchBar';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 
 import '../style.css';
 
@@ -38,15 +37,14 @@ export function IngressDatatable() {
     Object.keys(nsResult?.data || {})
   );
 
-  const columns = useColumns();
   const deleteIngressesMutation = useDeleteIngresses();
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
 
   const router = useRouter();
 
   return (
     <Datatable
+      settingsManager={tableState}
       dataset={ingressesQuery.data || []}
       columns={columns}
       isLoading={ingressesQuery.isLoading}
@@ -56,12 +54,6 @@ export function IngressDatatable() {
       getRowId={(row) => row.Name + row.Type + row.Namespace}
       renderTableActions={tableActions}
       disableSelect={useCheckboxes()}
-      initialPageSize={settings.pageSize}
-      onPageSizeChange={settings.setPageSize}
-      initialSortBy={settings.sortBy}
-      onSortByChange={settings.setSortBy}
-      searchValue={search}
-      onSearchChange={setSearch}
     />
   );
 
@@ -95,7 +87,11 @@ export function IngressDatatable() {
           </Link>
         </Authorized>
         <Authorized authorizations="K8sIngressesW">
-          <Link to="kubernetes.deploy" className="space-left no-decoration">
+          <Link
+            to="kubernetes.deploy"
+            className="space-left no-decoration"
+            params={{ referrer: 'kubernetes.ingresses' }}
+          >
             <Button icon={Plus} className="btn-wrapper">
               Create from manifest
             </Button>

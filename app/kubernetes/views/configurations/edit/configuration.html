@@ -1,6 +1,6 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Configuration details'"
+  title="'ConfigMap or Secret details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
     {
@@ -46,7 +46,7 @@
                       </td>
                     </tr>
                     <tr>
-                      <td class="!pl-0">Configuration kind</td>
+                      <td class="!pl-0">Kind</td>
                       <td>
                         {{ ctrl.configuration.Kind | kubernetesConfigurationKindText }}
                       </td>
@@ -102,6 +102,10 @@
       <rd-widget>
         <rd-widget-body>
           <form ng-if="!ctrl.isSystemConfig()" class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <div class="col-sm-12 !p-0">
+              <annotations-be-teaser></annotations-be-teaser>
+            </div>
+
             <kubernetes-configuration-data
               ng-if="ctrl.formValues"
               form-values="ctrl.formValues"

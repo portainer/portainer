@@ -20,9 +20,9 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
-// @param namespace query string true "specify an optional namespace"
-// @param filter query string true "specify an optional filter"
-// @param selector query string true "specify an optional selector"
+// @param namespace query string false "specify an optional namespace"
+// @param filter query string false "specify an optional filter"
+// @param selector query string false "specify an optional selector"
 // @success 200 {array} release.ReleaseElement "Success"
 // @failure 400 "Invalid environment(endpoint) identifier"
 // @failure 401 "Unauthorized"

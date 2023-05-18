@@ -7,17 +7,23 @@ import (
 
 type (
 	K8sServiceInfo struct {
-		Name                          string              `json:"Name"`
-		UID                           string              `json:"UID"`
-		Type                          string              `json:"Type"`
-		Namespace                     string              `json:"Namespace"`
-		Annotations                   map[string]string   `json:"Annotations"`
-		CreationTimestamp             string              `json:"CreationTimestamp"`
-		Labels                        map[string]string   `json:"Labels"`
-		AllocateLoadBalancerNodePorts *bool               `json:"AllocateLoadBalancerNodePorts,omitempty"`
-		Ports                         []K8sServicePort    `json:"Ports"`
-		Selector                      map[string]string   `json:"Selector"`
-		IngressStatus                 []K8sServiceIngress `json:"IngressStatus"`
+		Name                          string
+		UID                           string
+		Type                          string
+		Namespace                     string
+		Annotations                   map[string]string
+		CreationTimestamp             string
+		Labels                        map[string]string
+		AllocateLoadBalancerNodePorts *bool `json:",omitempty"`
+		Ports                         []K8sServicePort
+		Selector                      map[string]string
+		IngressStatus                 []K8sServiceIngress `json:",omitempty"`
+
+		// serviceList screen
+		Applications []K8sApplication `json:",omitempty"`
+		ClusterIPs   []string         `json:",omitempty"`
+		ExternalName string           `json:",omitempty"`
+		ExternalIPs  []string         `json:",omitempty"`
 	}
 
 	K8sServicePort struct {
@@ -25,7 +31,7 @@ type (
 		NodePort   int    `json:"NodePort"`
 		Port       int    `json:"Port"`
 		Protocol   string `json:"Protocol"`
-		TargetPort int    `json:"TargetPort"`
+		TargetPort string `json:"TargetPort"`
 	}
 
 	K8sServiceIngress struct {

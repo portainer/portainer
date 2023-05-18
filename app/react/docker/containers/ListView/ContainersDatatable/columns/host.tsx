@@ -1,13 +1,6 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
-
-export const host: Column<DockerContainer> = {
-  Header: 'Host',
-  accessor: (row) => row.NodeName || '-',
+export const host = columnHelper.accessor((row) => row.NodeName || '-', {
+  header: 'Host',
   id: 'host',
-  disableFilters: true,
-  canHide: true,
-  sortType: 'string',
-  Filter: () => null,
-};
+});

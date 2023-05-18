@@ -6,9 +6,10 @@ import { ButtonOptions } from './types';
 
 export function buildConfirmButton(
   label = 'Confirm',
-  color: ComponentProps<typeof Button>['color'] = 'primary'
+  color: ComponentProps<typeof Button>['color'] = 'primary',
+  timeout = 0
 ): ButtonOptions<true> {
-  return { label, color, value: true };
+  return { label, color, value: true, timeout };
 }
 
 export function buildCancelButton(label = 'Cancel'): ButtonOptions<false> {

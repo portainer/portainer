@@ -1,23 +1,19 @@
-import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
-import { EdgeTypes } from '@/react/portainer/environments/types';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 import { PageHeader } from '@@/PageHeader';
+import { Link } from '@@/Link';
+import { Alert } from '@@/Alert';
 
 import { Datatable } from './Datatable';
+import { useLicenseOverused, useUntrustedCount } from './queries';
 
 export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
-  const { environments, isLoading, totalCount } = useEnvironmentList({
-    edgeDevice: true,
-    edgeDeviceUntrusted: true,
-    excludeSnapshots: true,
-    types: EdgeTypes,
-  });
-
+  const untrustedCount = useUntrustedCount();
+  const licenseOverused = useLicenseOverused(untrustedCount);
   return (
     <>
       <PageHeader
@@ -36,11 +32,20 @@ function WaitingRoomView() {
         </TextTip>
       </InformationPanel>
 
-      <Datatable
-        devices={environments}
-        totalCount={totalCount}
-        isLoading={isLoading}
-      />
+      {licenseOverused && (
+        <div className="row">
+          <div className="col-sm-12">
+            <Alert color="warn">
+              Associating all nodes in waiting room will exceed the node limit
+              of your current license. Go to{' '}
+              <Link to="portainer.licenses">Licenses</Link> page to view the
+              current usage.
+            </Alert>
+          </div>
+        </div>
+      )}
+
+      <Datatable />
     </>
   );
 }

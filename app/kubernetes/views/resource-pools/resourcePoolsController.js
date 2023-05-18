@@ -17,6 +17,11 @@ class KubernetesResourcePoolsController {
     this.getResourcePoolsAsync = this.getResourcePoolsAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
+    this.onReload = this.onReload.bind(this);
+  }
+
+  async onReload() {
+    this.$state.reload(this.$state.current);
   }
 
   async removeActionAsync(selectedItems) {

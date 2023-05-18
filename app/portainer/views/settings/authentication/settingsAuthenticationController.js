@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
-import { options } from './options';
+import { options } from '@/react/portainer/settings/AuthenticationView/InternalAuth/options';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 

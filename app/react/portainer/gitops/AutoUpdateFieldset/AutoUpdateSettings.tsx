@@ -19,6 +19,8 @@ export function AutoUpdateSettings({
   showForcePullImage,
   errors,
   baseWebhookUrl,
+  webhookId,
+  webhookDocs,
 }: {
   value: AutoUpdateModel;
   onChange: (value: Partial<AutoUpdateModel>) => void;
@@ -26,10 +28,12 @@ export function AutoUpdateSettings({
   showForcePullImage: boolean;
   errors?: FormikErrors<AutoUpdateModel>;
   baseWebhookUrl: string;
+  webhookId: string;
+  webhookDocs?: string;
 }) {
   return (
     <>
-      <TextTip color="orange">
+      <TextTip color="orange" className="mb-2">
         Any changes to this stack or application that have been made locally via
         Portainer or directly in the cluster will be overwritten by the git
         repository content, which may cause service interruption.
@@ -50,12 +54,8 @@ export function AutoUpdateSettings({
       {value.RepositoryMechanism === 'Webhook' && (
         <WebhookSettings
           baseUrl={baseWebhookUrl}
-          value={value.RepositoryWebhookId || ''}
-          docsLink={
-            environmentType === 'KUBERNETES'
-              ? 'https://docs.portainer.io/user/kubernetes/applications/webhooks'
-              : 'https://docs.portainer.io/user/docker/stacks/webhooks'
-          }
+          value={webhookId}
+          docsLink={webhookDocs}
         />
       )}
 

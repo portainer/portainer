@@ -26,6 +26,7 @@ func (transport *Transport) applyPortainerContainers(resources []interface{}) ([
 		responseObject, _ = transport.applyPortainerContainer(responseObject)
 		decoratedResourceData = append(decoratedResourceData, responseObject)
 	}
+
 	return decoratedResourceData, nil
 }
 
@@ -34,8 +35,10 @@ func (transport *Transport) applyPortainerContainer(resourceObject map[string]in
 	if !ok {
 		return resourceObject, nil
 	}
+
 	if len(resourceId) >= 12 && resourceId[0:12] == portainerContainerId {
 		resourceObject["IsPortainer"] = true
 	}
+
 	return resourceObject, nil
 }

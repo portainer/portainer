@@ -28,9 +28,10 @@ func NewGitClient(preserveGitDir bool) *gitClient {
 
 func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) error {
 	gitOptions := git.CloneOptions{
-		URL:   opt.repositoryUrl,
-		Depth: opt.depth,
-		Auth:  getAuth(opt.username, opt.password),
+		URL:             opt.repositoryUrl,
+		Depth:           opt.depth,
+		InsecureSkipTLS: opt.tlsSkipVerify,
+		Auth:            getAuth(opt.username, opt.password),
 	}
 
 	if opt.referenceName != "" {
@@ -60,7 +61,8 @@ func (c *gitClient) latestCommitID(ctx context.Context, opt fetchOption) (string
 	})
 
 	listOptions := &git.ListOptions{
-		Auth: getAuth(opt.username, opt.password),
+		Auth:            getAuth(opt.username, opt.password),
+		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
 	refs, err := remote.List(listOptions)
@@ -110,7 +112,8 @@ func (c *gitClient) listRefs(ctx context.Context, opt baseOption) ([]string, err
 	})
 
 	listOptions := &git.ListOptions{
-		Auth: getAuth(opt.username, opt.password),
+		Auth:            getAuth(opt.username, opt.password),
+		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
 	refs, err := rem.List(listOptions)
@@ -132,12 +135,13 @@ func (c *gitClient) listRefs(ctx context.Context, opt baseOption) ([]string, err
 // listFiles list all filenames under the specific repository
 func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, error) {
 	cloneOption := &git.CloneOptions{
-		URL:           opt.repositoryUrl,
-		NoCheckout:    true,
-		Depth:         1,
-		SingleBranch:  true,
-		ReferenceName: plumbing.ReferenceName(opt.referenceName),
-		Auth:          getAuth(opt.username, opt.password),
+		URL:             opt.repositoryUrl,
+		NoCheckout:      true,
+		Depth:           1,
+		SingleBranch:    true,
+		ReferenceName:   plumbing.ReferenceName(opt.referenceName),
+		Auth:            getAuth(opt.username, opt.password),
+		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
 	repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)

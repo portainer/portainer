@@ -270,7 +270,7 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     };
 
-    service.updateKubeStack = function (stack, stackFile, gitConfig) {
+    service.updateKubeStack = function (stack, { stackFile, gitConfig, webhookId }) {
       let payload = {};
 
       if (stackFile) {
@@ -279,11 +279,12 @@ angular.module('portainer.app').factory('StackService', [
         };
       } else {
         payload = {
-          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate),
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
           RepositoryPassword: gitConfig.RepositoryPassword,
+          TLSSkipVerify: gitConfig.TLSSkipVerify,
         };
       }
 
@@ -317,7 +318,7 @@ angular.module('portainer.app').factory('StackService', [
         StackFileContent: stackFileContent,
         Env: env,
       };
-      return Stack.create({ method: 'string', type: 2, endpointId: endpointId }, payload).$promise;
+      return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'standalone', ...payload }).$promise;
     };
 
     service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
@@ -331,7 +332,7 @@ angular.module('portainer.app').factory('StackService', [
             StackFileContent: stackFileContent,
             Env: env,
           };
-          return Stack.create({ method: 'string', type: 1, endpointId: endpointId }, payload).$promise;
+          return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'swarm', ...payload }).$promise;
         })
         .then(function success(data) {
           deferred.resolve(data);
@@ -355,13 +356,14 @@ angular.module('portainer.app').factory('StackService', [
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
         FromAppTemplate: repositoryOptions.FromAppTemplate,
+        TLSSkipVerify: repositoryOptions.TLSSkipVerify,
       };
 
       if (repositoryOptions.AutoUpdate) {
         payload.AutoUpdate = repositoryOptions.AutoUpdate;
       }
 
-      return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
+      return Stack.create({ endpointId: endpointId }, { method: 'repository', type: 'standalone', ...payload }).$promise;
     };
 
     service.createSwarmStackFromGitRepository = function (name, repositoryOptions, env, endpointId) {
@@ -382,13 +384,14 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
             FromAppTemplate: repositoryOptions.FromAppTemplate,
+            TLSSkipVerify: repositoryOptions.TLSSkipVerify,
           };
 
           if (repositoryOptions.AutoUpdate) {
             payload.AutoUpdate = repositoryOptions.AutoUpdate;
           }
 
-          return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
+          return Stack.create({ endpointId: endpointId }, { method: 'repository', type: 'swarm', ...payload }).$promise;
         })
         .then(function success(data) {
           deferred.resolve(data);
@@ -407,7 +410,7 @@ angular.module('portainer.app').factory('StackService', [
 
     async function kubernetesDeployAsync(endpointId, method, payload) {
       try {
-        await Stack.create({ endpointId: endpointId, method: method, type: 3 }, payload).$promise;
+        await Stack.create({ endpointId: endpointId }, { method, type: 'kubernetes', ...payload }).$promise;
       } catch (err) {
         throw { err: err };
       }
@@ -455,17 +458,18 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     }
 
-    service.updateGitStackSettings = function (id, endpointId, env, gitConfig) {
+    service.updateGitStackSettings = function (id, endpointId, env, gitConfig, webhookId) {
       return Stack.updateGitStackSettings(
         { endpointId, id },
         {
-          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate),
+          AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           Env: env,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
           RepositoryPassword: gitConfig.RepositoryPassword,
           Prune: gitConfig.Option.Prune,
+          TLSSkipVerify: gitConfig.TLSSkipVerify,
         }
       ).$promise;
     };

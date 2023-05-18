@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -10,14 +9,12 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/git"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
-
-	"github.com/rs/zerolog/log"
 )
 
 type stackGitRedployPayload struct {
@@ -138,45 +135,41 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
-	err = filesystem.MoveDirectory(stack.ProjectPath, backupProjectPath)
-	if err != nil {
-		return httperror.InternalServerError("Unable to move git repository directory", err)
-	}
-
 	repositoryUsername := ""
 	repositoryPassword := ""
 	if payload.RepositoryAuthentication {
 		repositoryPassword = payload.RepositoryPassword
+
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
 		if repositoryPassword == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 			repositoryPassword = stack.GitConfig.Authentication.Password
 		}
 		repositoryUsername = payload.RepositoryUsername
 	}
 
-	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
-	if err != nil {
-		restoreError := filesystem.MoveDirectory(backupProjectPath, stack.ProjectPath)
-		if restoreError != nil {
-			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
-		}
-
-		return httperror.InternalServerError("Unable to clone git repository", err)
+	cloneOptions := git.CloneOptions{
+		ProjectPath:   stack.ProjectPath,
+		URL:           stack.GitConfig.URL,
+		ReferenceName: stack.GitConfig.ReferenceName,
+		Username:      repositoryUsername,
+		Password:      repositoryPassword,
+		TLSSkipVerify: stack.GitConfig.TLSSkipVerify,
 	}
 
-	defer func() {
-		err = handler.FileService.RemoveDirectory(backupProjectPath)
-		if err != nil {
-			log.Warn().Err(err).Msg("unable to remove git repository directory")
-		}
-	}()
+	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, cloneOptions)
+	if err != nil {
+		return httperror.InternalServerError("Unable to clone git repository directory", err)
+	}
+
+	defer clean()
 
 	httpErr := handler.deployStack(r, stack, payload.PullImage, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
 
-	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword, stack.GitConfig.TLSSkipVerify)
 	if err != nil {
 		return httperror.InternalServerError("Unable get latest commit id", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID))
 	}

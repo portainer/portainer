@@ -1,7 +1,7 @@
 import angular from 'angular';
 
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
-import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -9,7 +9,7 @@ import { renderTemplate } from '@/react/portainer/custom-templates/components/ut
 import { editor, upload, git, customTemplate } from '@@/BoxSelector/common-options/build-methods';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 
 angular
   .module('portainer.app')
@@ -39,7 +39,6 @@ angular
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.buildMethods = [editor, upload, git, customTemplate];
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
-      $scope.isAdmin = Authentication.isAdmin();
 
       $scope.formValues = {
         Name: '',
@@ -57,6 +56,7 @@ angular
         EnableWebhook: false,
         Variables: {},
         AutoUpdate: parseAutoUpdateResponse(),
+        TLSSkipVerify: false,
       };
 
       $scope.state = {
@@ -70,6 +70,14 @@ angular
         selectedTemplate: null,
         selectedTemplateId: null,
         baseWebhookUrl: baseStackWebhookUrl(),
+        webhookId: createWebhookId(),
+        templateLoadFailed: false,
+        isEditorReadOnly: false,
+      };
+
+      $scope.currentUser = {
+        isAdmin: false,
+        id: null,
       };
 
       $window.onbeforeunload = () => {
@@ -153,6 +161,7 @@ angular
       function createSwarmStack(name, method) {
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         const endpointId = +$state.params.endpointId;
+
         if (method === 'template' || method === 'editor') {
           var stackFileContent = $scope.formValues.StackFileContent;
           return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
@@ -172,7 +181,8 @@ angular
             RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
             RepositoryUsername: $scope.formValues.RepositoryUsername,
             RepositoryPassword: $scope.formValues.RepositoryPassword,
-            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate),
+            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate, $scope.state.webhookId),
+            TLSSkipVerify: $scope.formValues.TLSSkipVerify,
           };
 
           return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
@@ -198,7 +208,8 @@ angular
             RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
             RepositoryUsername: $scope.formValues.RepositoryUsername,
             RepositoryPassword: $scope.formValues.RepositoryPassword,
-            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate),
+            AutoUpdate: transformAutoUpdateViewModel($scope.formValues.AutoUpdate, $scope.state.webhookId),
+            TLSSkipVerify: $scope.formValues.TLSSkipVerify,
           };
 
           return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
@@ -291,9 +302,15 @@ angular
             $scope.state.selectedTemplateId = templateId;
             $scope.state.selectedTemplate = template;
 
-            const fileContent = await CustomTemplateService.customTemplateFile(templateId);
-            $scope.state.templateContent = fileContent;
-            onChangeFileContent(fileContent);
+            try {
+              $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
+              onChangeFileContent($scope.state.templateContent);
+
+              $scope.state.isEditorReadOnly = true;
+            } catch (err) {
+              $scope.state.templateLoadFailed = true;
+              throw err;
+            }
 
             if (template.Variables && template.Variables.length > 0) {
               const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
@@ -316,6 +333,9 @@ angular
       }
 
       async function initView() {
+        $scope.currentUser.isAdmin = Authentication.isAdmin();
+        $scope.currentUser.id = Authentication.getUserDetails().ID;
+
         var endpointMode = $scope.applicationState.endpoint.mode;
         $scope.state.StackType = 2;
         $scope.isDockerStandalone = endpointMode.provider === 'DOCKER_STANDALONE';

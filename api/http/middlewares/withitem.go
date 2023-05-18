@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type ItemContextKey string
@@ -31,7 +31,7 @@ func WithItem[TId ~int, TObject any](getter ItemGetter[TId, TObject], idParam st
 			item, err := getter(TId(itemId))
 			if err != nil {
 				statusCode := http.StatusInternalServerError
-				if err == bolterrors.ErrObjectNotFound {
+				if dataservices.IsErrObjectNotFound(err) {
 					statusCode = http.StatusNotFound
 				}
 				httperror.WriteError(rw, statusCode, "Unable to find a object with the specified identifier inside the database", err)

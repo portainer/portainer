@@ -1,8 +1,3 @@
-// theme icons
-import automode from '@/assets/ico/theme/auto.svg?c';
-import darkmode from '@/assets/ico/theme/darkmode.svg?c';
-import lightmode from '@/assets/ico/theme/lightmode.svg?c';
-import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
 // general icons
 import heartbeatup from '@/assets/ico/heartbeat-up.svg?c';
 import heartbeatdown from '@/assets/ico/heartbeat-down.svg?c';
@@ -41,16 +36,13 @@ import nomadicon from '@/assets/ico/vendor/nomad-icon.svg?c';
 import openldap from '@/assets/ico/vendor/openldap.svg?c';
 import proget from '@/assets/ico/vendor/proget.svg?c';
 import quay from '@/assets/ico/vendor/quay.svg?c';
+import beta from '@/assets/ico/beta.svg?c';
 
 const placeholder = Placeholder;
 
 export const SvgIcons = {
   heartbeatup,
   heartbeatdown,
-  automode,
-  darkmode,
-  lightmode,
-  highcontrastmode,
   dataflow,
   dockericon,
   git,
@@ -85,6 +77,7 @@ export const SvgIcons = {
   proget,
   quay,
   kube,
+  beta,
 };
 
 interface SvgProps {

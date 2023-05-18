@@ -10,10 +10,9 @@ import (
 )
 
 type systemInfoResponse struct {
-	Platform    plf.ContainerPlatform `json:"platform"`
-	EdgeAgents  int                   `json:"edgeAgents"`
-	EdgeDevices int                   `json:"edgeDevices"`
-	Agents      int                   `json:"agents"`
+	Platform   plf.ContainerPlatform `json:"platform"`
+	EdgeAgents int                   `json:"edgeAgents"`
+	Agents     int                   `json:"agents"`
 }
 
 // @id systemInfo
@@ -34,7 +33,6 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 
 	agents := 0
 	edgeAgents := 0
-	edgeDevices := 0
 
 	for _, environment := range environments {
 		if endpointutils.IsAgentEndpoint(&environment) {
@@ -45,9 +43,6 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 			edgeAgents++
 		}
 
-		if environment.IsEdgeDevice {
-			edgeDevices++
-		}
 	}
 
 	platform, err := plf.DetermineContainerPlatform()
@@ -56,9 +51,8 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	return response.JSON(w, &systemInfoResponse{
-		EdgeAgents:  edgeAgents,
-		EdgeDevices: edgeDevices,
-		Agents:      agents,
-		Platform:    platform,
+		EdgeAgents: edgeAgents,
+		Agents:     agents,
+		Platform:   platform,
 	})
 }

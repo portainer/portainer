@@ -3,11 +3,11 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { confirmStackUpdate } from '@/react/docker/stacks/common/confirm-stack-update';
 
 import { parseAutoUpdateResponse } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 
 class StackRedeployGitFormController {
   /* @ngInject */
-  constructor($async, $state, $compile, $scope, StackService, ModalService, Notifications, FormHelper) {
+  constructor($async, $state, $compile, $scope, StackService, Notifications, FormHelper) {
     this.$async = $async;
     this.$state = $state;
     this.$compile = $compile;
@@ -21,8 +21,18 @@ class StackRedeployGitFormController {
       redeployInProgress: false,
       showConfig: false,
       isEdit: false,
+
+      // isAuthEdit is used to preserve the editing state of the AuthFieldset component.
+      // Within the stack editing page, users have the option to turn the AuthFieldset on or off
+      // and save the stack setting. If the user enables the AuthFieldset, it implies that they
+      // must input new Git authentication, rather than edit existing authentication. Thus,
+      // a dedicated state tracker is required to differentiate between the editing state of
+      // AuthFieldset component and the whole stack
+      // When isAuthEdit is true, PAT field needs to be validated.
+      isAuthEdit: false,
       hasUnsavedChanges: false,
       baseWebhookUrl: baseStackWebhookUrl(),
+      webhookId: createWebhookId(),
     };
 
     this.formValues = {
@@ -45,6 +55,7 @@ class StackRedeployGitFormController {
     this.onChangeEnvVar = this.onChangeEnvVar.bind(this);
     this.onChangeOption = this.onChangeOption.bind(this);
     this.onChangeGitAuth = this.onChangeGitAuth.bind(this);
+    this.onChangeTLSSkipVerify = this.onChangeTLSSkipVerify.bind(this);
   }
 
   buildAnalyticsProperties() {
@@ -82,6 +93,10 @@ class StackRedeployGitFormController {
 
   onChangeEnvVar(value) {
     this.onChange({ Env: value });
+  }
+
+  onChangeTLSSkipVerify(value) {
+    this.onChange({ TLSSkipVerify: value });
   }
 
   onChangeOption(values) {
@@ -132,12 +147,19 @@ class StackRedeployGitFormController {
           this.stack.Id,
           this.stack.EndpointId,
           this.FormHelper.removeInvalidEnvVars(this.formValues.Env),
-          this.formValues
+          this.formValues,
+          this.state.webhookId
         );
         this.savedFormValues = angular.copy(this.formValues);
         this.state.hasUnsavedChanges = false;
         this.Notifications.success('Success', 'Save stack settings successfully');
 
+        if (!(this.stack.GitConfig && this.stack.GitConfig.Authentication)) {
+          // update the AuthFieldset setting
+          this.state.isAuthEdit = false;
+          this.formValues.RepositoryUsername = '';
+          this.formValues.RepositoryPassword = '';
+        }
         this.stack = stack;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save stack settings');
@@ -172,6 +194,7 @@ class StackRedeployGitFormController {
 
   async $onInit() {
     this.formValues.RefName = this.model.ReferenceName;
+    this.formValues.TLSSkipVerify = this.model.TLSSkipVerify;
     this.formValues.Env = this.stack.Env;
 
     if (this.stack.Option) {
@@ -180,10 +203,16 @@ class StackRedeployGitFormController {
 
     this.formValues.AutoUpdate = parseAutoUpdateResponse(this.stack.AutoUpdate);
 
+    if (this.stack.AutoUpdate && this.stack.AutoUpdate.Webhook) {
+      this.state.webhookId = this.stack.AutoUpdate.Webhook;
+    }
+
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
+      this.formValues.RepositoryPassword = this.stack.GitConfig.Authentication.Password;
       this.formValues.RepositoryAuthentication = true;
       this.state.isEdit = true;
+      this.state.isAuthEdit = true;
     }
 
     this.savedFormValues = angular.copy(this.formValues);

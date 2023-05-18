@@ -28,6 +28,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
@@ -105,6 +106,7 @@ type Server struct {
 	StackDeployer               deployments.StackDeployer
 	DemoService                 *demo.Service
 	UpgradeService              upgrade.Service
+	AdminCreationDone           chan struct{}
 }
 
 // Start starts the HTTP server
@@ -143,10 +145,7 @@ func (server *Server) Start() error {
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
 
-	var customTemplatesHandler = customtemplates.NewHandler(requestBouncer)
-	customTemplatesHandler.DataStore = server.DataStore
-	customTemplatesHandler.FileService = server.FileService
-	customTemplatesHandler.GitService = server.GitService
+	var customTemplatesHandler = customtemplates.NewHandler(requestBouncer, server.DataStore, server.FileService, server.GitService)
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
@@ -195,6 +194,8 @@ func (server *Server) Start() error {
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
+
+	var gitOperationHandler = gitops.NewHandler(requestBouncer, server.DataStore, server.GitService, server.FileService)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
@@ -271,6 +272,7 @@ func (server *Server) Start() error {
 	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService, server.DemoService, passwordStrengthChecker)
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
+	userHandler.AdminCreationDone = server.AdminCreationDone
 
 	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore
@@ -297,6 +299,7 @@ func (server *Server) Start() error {
 		EndpointHelmHandler:    endpointHelmHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
+		GitOperationHandler:    gitOperationHandler,
 		FileHandler:            fileHandler,
 		LDAPHandler:            ldapHandler,
 		HelmTemplatesHandler:   helmTemplatesHandler,

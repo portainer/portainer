@@ -1,33 +1,40 @@
-import { CellProps, Column, Row } from 'react-table';
+import { CellContext, Row } from '@tanstack/react-table';
 
-import { filterHOC } from '@/react/components/datatables/Filter';
-
+import { filterHOC } from '@@/datatables/Filter';
 import { Link } from '@@/Link';
 
 import { Ingress } from '../../types';
 
-export const namespace: Column<Ingress> = {
-  Header: 'Namespace',
-  accessor: 'Namespace',
-  Cell: ({ row }: CellProps<Ingress>) => (
+import { columnHelper } from './helper';
+
+export const namespace = columnHelper.accessor('Namespace', {
+  header: 'Namespace',
+  id: 'namespace',
+  cell: Cell,
+  filterFn: (row: Row<Ingress>, columnId: string, filterValue: string[]) => {
+    if (filterValue.length === 0) {
+      return true;
+    }
+    return filterValue.includes(row.original.Namespace);
+  },
+
+  meta: {
+    filter: filterHOC('Filter by namespace'),
+  },
+  enableColumnFilter: true,
+});
+
+function Cell({ getValue }: CellContext<Ingress, string>) {
+  const namespace = getValue();
+  return (
     <Link
       to="kubernetes.resourcePools.resourcePool"
       params={{
-        id: row.original.Namespace,
+        id: namespace,
       }}
-      title={row.original.Namespace}
+      title={namespace}
     >
-      {row.original.Namespace}
+      {namespace}
     </Link>
-  ),
-  id: 'namespace',
-  disableFilters: false,
-  canHide: true,
-  Filter: filterHOC('Filter by namespace'),
-  filter: (rows: Row<Ingress>[], filterValue, filters) => {
-    if (filters.length === 0) {
-      return rows;
-    }
-    return rows.filter((r) => filters.includes(r.original.Namespace));
-  },
-};
+  );
+}

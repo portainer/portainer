@@ -32,6 +32,20 @@ type (
 	// Authorizations represents a set of authorizations associated to a role
 	Authorizations map[Authorization]bool
 
+	//AutoUpdateSettings represents the git auto sync config for stack deployment
+	AutoUpdateSettings struct {
+		// Auto update interval
+		Interval string `example:"1m30s"`
+		// A UUID generated from client
+		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
+		// Autoupdate job id
+		JobID string `example:"15"`
+		// Force update ignores repo changes
+		ForceUpdate bool `example:"false"`
+		// Pull latest image
+		ForcePullImage bool `example:"false"`
+	}
+
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment(endpoint).
 	AzureCredentials struct {
@@ -163,10 +177,16 @@ type (
 		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
 		// URL of the template's logo
 		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
-		// Type of created stack (1 - swarm, 2 - compose)
-		Type            StackType        `json:"Type" example:"1"`
+		// Type of created stack:
+		// * 1 - swarm
+		// * 2 - compose
+		// * 3 - kubernetes
+		Type            StackType        `json:"Type" example:"1" enums:"1,2,3"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
+		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
+		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
+		IsComposeFormat bool `example:"false"`
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -207,15 +227,21 @@ type (
 		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
-	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	// DockerContainerSnapshot is an extent of Docker's Container struct
+	// It contains some information of Docker's ContainerJSON struct
+	DockerContainerSnapshot struct {
+		types.Container
+		Env []string `json:"Env,omitempty"` // EE-5240
+	}
 
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
-		Containers []types.Container       `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody `json:"Volumes" swaggerignore:"true"`
-		Networks   []types.NetworkResource `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary    `json:"Images" swaggerignore:"true"`
-		Info       types.Info              `json:"Info" swaggerignore:"true"`
-		Version    types.Version           `json:"Version" swaggerignore:"true"`
+		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
+		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
+		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
+		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -368,28 +394,22 @@ type (
 		LastCheckInDate int64
 		// QueryDate of each query with the endpoints list
 		QueryDate int64
-		// IsEdgeDevice marks if the environment was created as an EdgeDevice
-		IsEdgeDevice bool
+		// Heartbeat indicates the heartbeat status of an edge environment
+		Heartbeat bool `json:"Heartbeat" example:"true"`
+
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
 
-		Edge struct {
-			// Whether the device has been started in edge async mode
-			AsyncMode bool
-			// The ping interval for edge agent - used in edge async mode [seconds]
-			PingInterval int `json:"PingInterval" example:"60"`
-			// The snapshot interval for edge agent - used in edge async mode [seconds]
-			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
-			// The command list interval for edge agent - used in edge async mode [seconds]
-			CommandInterval int `json:"CommandInterval" example:"60"`
-		}
+		Edge EnvironmentEdgeSettings
 
 		Agent struct {
 			Version string `example:"1.0.0"`
 		}
+
+		EnableGPUManagement bool `json:"EnableGPUManagement"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -404,6 +424,20 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+
+		// Deprecated v2.18
+		IsEdgeDevice bool
+	}
+
+	EnvironmentEdgeSettings struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -480,6 +514,7 @@ type (
 	// EndpointPostInitMigrations
 	EndpointPostInitMigrations struct {
 		MigrateIngresses bool `json:"MigrateIngresses"`
+		MigrateGPUs      bool `json:"MigrateGPUs"`
 	}
 
 	// Extension represents a deprecated Portainer extension
@@ -563,9 +598,12 @@ type (
 		Flags         KubernetesFlags         `json:"Flags"`
 	}
 
+	// KubernetesFlags are used to detect if we need to run initial cluster
+	// detection again.
 	KubernetesFlags struct {
-		IsServerMetricsDetected bool `json:"IsServerMetricsDetected"`
-		IsServerStorageDetected bool `json:"IsServerStorageDetected"`
+		IsServerMetricsDetected      bool `json:"IsServerMetricsDetected"`
+		IsServerIngressClassDetected bool `json:"IsServerIngressClassDetected"`
+		IsServerStorageDetected      bool `json:"IsServerStorageDetected"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
@@ -911,7 +949,8 @@ type (
 			PingInterval int `json:"PingInterval" example:"5"`
 			// The snapshot interval for edge agent - used in edge async mode (in seconds)
 			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-			// EdgeAsyncMode enables edge async mode by default
+
+			// Deprecated 2.18
 			AsyncMode bool
 		}
 
@@ -928,6 +967,8 @@ type (
 		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
 		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
 		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
+
+		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
@@ -977,7 +1018,7 @@ type (
 		// Only applies when deploying stack with multiple files
 		AdditionalFiles []string `json:"AdditionalFiles"`
 		// The auto update settings of a git stack
-		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
+		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`
 		// The git config of this stack
@@ -988,16 +1029,6 @@ type (
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
-	}
-
-	//StackAutoUpdate represents the git auto sync config for stack deployment
-	StackAutoUpdate struct {
-		// Auto update interval
-		Interval string `example:"1m30s"`
-		// A UUID generated from client
-		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
-		// Autoupdate job id
-		JobID string `example:"15"`
 	}
 
 	// StackOption represents the options for stack deployment
@@ -1270,8 +1301,6 @@ type (
 	UserThemeSettings struct {
 		// Color represents the color theme of the UI
 		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
-		// SubtleUpgradeButton indicates if the upgrade banner should be displayed in a subtle way
-		SubtleUpgradeButton bool `json:"subtleUpgradeButton"`
 	}
 
 	// Webhook represents a url webhook that can be used to update a service
@@ -1307,7 +1336,7 @@ type (
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
@@ -1376,10 +1405,10 @@ type (
 
 	// GitService represents a service for managing Git
 	GitService interface {
-		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
-		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
-		ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error)
-		ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includeExts []string) ([]string, error)
+		CloneRepository(destination string, repositoryURL, referenceName, username, password string, tlsSkipVerify bool) error
+		LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error)
+		ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error)
+		ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includeExts []string, tlsSkipVerify bool) ([]string, error)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT
@@ -1416,7 +1445,7 @@ type (
 		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
 		CreateService(namespace string, service models.K8sServiceInfo) error
 		UpdateService(namespace string, service models.K8sServiceInfo) error
-		GetServices(namespace string) ([]models.K8sServiceInfo, error)
+		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
@@ -1494,7 +1523,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.18.0"
+	APIVersion = "2.19.0"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1541,7 +1570,15 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []featureflags.Feature{}
+const (
+	FeatureFdo  = "fdo"
+	FeatureNoTx = "noTx"
+)
+
+var SupportedFeatureFlags = []featureflags.Feature{
+	FeatureFdo,
+	FeatureNoTx,
+}
 
 const (
 	_ AuthenticationMethod = iota

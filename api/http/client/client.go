@@ -16,11 +16,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var errInvalidResponseStatus = errors.New("Invalid response status (expecting 200)")
+var errInvalidResponseStatus = errors.New("invalid response status (expecting 200)")
 
-const (
-	defaultHTTPTimeout = 5
-)
+const defaultHTTPTimeout = 5
 
 // HTTPClient represents a client to send HTTP requests.
 type HTTPClient struct {
@@ -53,17 +51,18 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 		"resource":      {"https://management.azure.com/"},
 	}
 
-	response, err := client.PostForm(loginURL, params)
+	resp, err := client.PostForm(loginURL, params)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
-		return nil, errors.New("Invalid Azure credentials")
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("invalid Azure credentials")
 	}
 
 	var token AzureAuthenticationResponse
-	err = json.NewDecoder(response.Body).Decode(&token)
+	err = json.NewDecoder(resp.Body).Decode(&token)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +74,6 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 // the content of the response body. Timeout can be specified via the timeout parameter,
 // will default to defaultHTTPTimeout if set to 0.
 func Get(url string, timeout int) ([]byte, error) {
-
 	if timeout == 0 {
 		timeout = defaultHTTPTimeout
 	}
@@ -128,13 +126,16 @@ func ExecutePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
 func pingOperation(client *http.Client, target string) (bool, error) {
 	pingOperationURL := target + "/_ping"
 
-	response, err := client.Get(pingOperationURL)
+	resp, err := client.Get(pingOperationURL)
 	if err != nil {
 		return false, err
 	}
 
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+
 	agentOnDockerEnvironment := false
-	if response.Header.Get(portainer.PortainerAgentHeader) != "" {
+	if resp.Header.Get(portainer.PortainerAgentHeader) != "" {
 		agentOnDockerEnvironment = true
 	}
 

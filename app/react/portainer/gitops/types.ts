@@ -31,7 +31,6 @@ export interface RepoConfigResponse {
 export type AutoUpdateModel = {
   RepositoryAutomaticUpdates: boolean;
   RepositoryMechanism: AutoUpdateMechanism;
-  RepositoryWebhookId: string;
   RepositoryFetchInterval: string;
   ForcePullImage: boolean;
   RepositoryAutomaticUpdatesForce: boolean;
@@ -61,6 +60,7 @@ export interface GitFormModel extends GitAuthModel {
 
   SaveCredential?: boolean;
   NewCredentialName?: string;
+  TLSSkipVerify: boolean;
 
   /**
    * Auto update

@@ -50,7 +50,7 @@
             edge-info="{ key: endpoint.EdgeKey, id: endpoint.EdgeID }"
             commands="state.edgeScriptCommands"
             is-nomad-token-visible="state.showNomad"
-            hide-async-mode="!endpoint.IsEdgeDevice"
+            async-mode="endpoint.Edge.AsyncMode"
           ></edge-script-form>
 
           <edge-key-display edge-key="endpoint.EdgeKey"> </edge-key-display>
@@ -210,14 +210,15 @@
           </div>
           <!-- !open-amt info -->
           <!-- gpus info -->
-          <div class="col-sm-12 form-section-title">Hardware acceleration</div>
-          <gpus-list ng-if="endpoint && endpoint.Gpus" value="endpoint.Gpus" on-change="(onGpusChange)"></gpus-list>
+          <div class="mb-4" ng-if="isDockerStandaloneEnv">
+            <gpus-insights></gpus-insights>
+          </div>
           <!-- gpus info -->
           <div class="form-group">
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))"
                 ng-click="updateEndpoint()"
                 button-spinner="state.actionInProgress"

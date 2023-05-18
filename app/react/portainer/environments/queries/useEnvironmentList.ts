@@ -8,6 +8,8 @@ import {
   getEnvironments,
 } from '../environment.service';
 
+import { queryKeys } from './query-keys';
+
 export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
 export interface Query extends EnvironmentsQueryParams {
@@ -46,7 +48,7 @@ export function useEnvironmentList(
 ) {
   const { isLoading, data } = useQuery(
     [
-      'environments',
+      ...queryKeys.base(),
       {
         page,
         pageLimit,

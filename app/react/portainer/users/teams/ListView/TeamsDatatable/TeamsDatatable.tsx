@@ -1,7 +1,6 @@
-import { Column } from 'react-table';
 import { useMutation, useQueryClient } from 'react-query';
 import { Trash2, Users } from 'lucide-react';
-import { useStore } from 'zustand';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
@@ -13,13 +12,13 @@ import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { buildNameColumn } from '@@/datatables/NameCell';
 import { createPersistedStore } from '@@/datatables/types';
-import { useSearchBarState } from '@@/datatables/SearchBar';
+import { useTableState } from '@@/datatables/useTableState';
 
 const storageKey = 'teams';
 
-const columns: readonly Column<Team>[] = [
-  buildNameColumn('Name', 'Id', 'portainer.teams.team'),
-] as const;
+const columns: ColumnDef<Team>[] = [
+  buildNameColumn<Team>('Name', 'Id', 'portainer.teams.team'),
+];
 
 interface Props {
   teams: Team[];
@@ -30,19 +29,13 @@ const settingsStore = createPersistedStore(storageKey);
 
 export function TeamsDatatable({ teams, isAdmin }: Props) {
   const { handleRemove } = useRemoveMutation();
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
 
   return (
-    <Datatable
+    <Datatable<Team>
       dataset={teams}
       columns={columns}
-      initialPageSize={settings.pageSize}
-      onPageSizeChange={settings.setPageSize}
-      initialSortBy={settings.sortBy}
-      onSortByChange={settings.setSortBy}
-      searchValue={search}
-      onSearchChange={setSearch}
+      settingsManager={tableState}
       title="Teams"
       titleIcon={Users}
       renderTableActions={(selectedRows) =>

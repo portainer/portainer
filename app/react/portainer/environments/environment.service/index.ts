@@ -22,13 +22,14 @@ export interface EnvironmentsQueryParams {
   tagsPartialMatch?: boolean;
   groupIds?: EnvironmentGroupId[];
   status?: EnvironmentStatus[];
-  edgeDevice?: boolean;
+  edgeAsync?: boolean;
   edgeDeviceUntrusted?: boolean;
   excludeSnapshots?: boolean;
   provisioned?: boolean;
   name?: string;
   agentVersions?: string[];
   updateInformation?: boolean;
+  edgeCheckInPassedSeconds?: number;
 }
 
 export interface GetEnvironmentsOptions {
@@ -136,75 +137,6 @@ export async function disassociateEndpoint(id: EnvironmentId) {
     await axios.delete(buildUrl(id, 'association'));
   } catch (e) {
     throw parseAxiosError(e as Error);
-  }
-}
-
-interface UpdatePayload {
-  TLSCACert?: File;
-  TLSCert?: File;
-  TLSKey?: File;
-
-  Name: string;
-  PublicURL: string;
-  GroupID: EnvironmentGroupId;
-  TagIds: TagId[];
-
-  EdgeCheckinInterval: number;
-
-  TLS: boolean;
-  TLSSkipVerify: boolean;
-  TLSSkipClientVerify: boolean;
-  AzureApplicationID: string;
-  AzureTenantID: string;
-  AzureAuthenticationKey: string;
-}
-
-async function uploadTLSFilesForEndpoint(
-  id: EnvironmentId,
-  tlscaCert?: File,
-  tlsCert?: File,
-  tlsKey?: File
-) {
-  await Promise.all([
-    uploadCert('ca', tlscaCert),
-    uploadCert('cert', tlsCert),
-    uploadCert('key', tlsKey),
-  ]);
-
-  function uploadCert(type: 'ca' | 'cert' | 'key', cert?: File) {
-    if (!cert) {
-      return null;
-    }
-    try {
-      return axios.post<void>(`upload/tls/${type}`, cert, {
-        params: { folder: id },
-      });
-    } catch (e) {
-      throw parseAxiosError(e as Error);
-    }
-  }
-}
-
-export async function updateEndpoint(
-  id: EnvironmentId,
-  payload: UpdatePayload
-) {
-  try {
-    await uploadTLSFilesForEndpoint(
-      id,
-      payload.TLSCACert,
-      payload.TLSCert,
-      payload.TLSKey
-    );
-
-    const { data: endpoint } = await axios.put<Environment>(
-      buildUrl(id),
-      payload
-    );
-
-    return endpoint;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to update environment');
   }
 }
 

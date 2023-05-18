@@ -1,5 +1,3 @@
-import { Check, Minus } from 'lucide-react';
-
 import styles from './BoxSelector.module.css';
 import { BoxSelectorItem } from './BoxSelectorItem';
 import { BoxSelectorOption, Value } from './types';
@@ -22,16 +20,18 @@ export type Props<T extends Value> = Union<T> & {
   radioName: string;
   options: ReadonlyArray<BoxSelectorOption<T>> | Array<BoxSelectorOption<T>>;
   slim?: boolean;
+  hiddenSpacingCount?: number;
 };
 
 export function BoxSelector<T extends Value>({
   radioName,
   options,
   slim = false,
+  hiddenSpacingCount,
   ...props
 }: Props<T>) {
   return (
-    <div className="form-group">
+    <div className='form-group after:clear-both after:table after:content-[""]'>
       <div className="col-sm-12">
         <div className={styles.root} role="radiogroup">
           {options
@@ -47,8 +47,11 @@ export function BoxSelector<T extends Value>({
                 type={props.isMulti ? 'checkbox' : 'radio'}
                 isSelected={isSelected}
                 slim={slim}
-                checkIcon={props.isMulti ? Minus : Check}
               />
+            ))}
+          {hiddenSpacingCount &&
+            Array.from(Array(hiddenSpacingCount)).map((_, index) => (
+              <div key={index} className="flex-1" />
             ))}
         </div>
       </div>

@@ -18,7 +18,7 @@ func TestGet(t *testing.T) {
 			return
 		}
 		result := Get(data, "data.yesterday", "sunrise")
-		fmt.Printf("result: %s", result)
+		fmt.Printf("result: %s\n", result)
 		expected := "06:19"
 		assert.Equal(t, expected, result)
 	})
@@ -31,7 +31,7 @@ func TestGet(t *testing.T) {
 			return
 		}
 		result := Get(data, "data.yesterday", "sunrise")
-		fmt.Printf("result: %s", result)
+		fmt.Printf("result: %s\n", result)
 		expected := ""
 		assert.Equal(t, expected, result)
 	})

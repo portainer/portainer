@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
 import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
 import KubernetesConfigMapHelper from 'Kubernetes/helpers/configMapHelper';
-import { getIsRBACEnabled } from '@/react/kubernetes/cluster/service';
+import { getIsRBACEnabled } from '@/react/kubernetes/cluster/getIsRBACEnabled';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */

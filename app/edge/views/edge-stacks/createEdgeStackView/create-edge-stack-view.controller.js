@@ -1,6 +1,7 @@
 import { EditorType } from '@/react/edge/edge-stacks/types';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
+import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 export default class CreateEdgeStackViewController {
@@ -22,6 +23,7 @@ export default class CreateEdgeStackViewController {
       Groups: [],
       DeploymentType: 0,
       UseManifestNamespaces: false,
+      TLSSkipVerify: false,
     };
 
     this.EditorType = EditorType;
@@ -37,6 +39,8 @@ export default class CreateEdgeStackViewController {
     };
 
     this.edgeGroups = null;
+
+    $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
 
     this.createStack = this.createStack.bind(this);
     this.validateForm = this.validateForm.bind(this);
@@ -83,7 +87,6 @@ export default class CreateEdgeStackViewController {
   async $onInit() {
     try {
       this.edgeGroups = await this.EdgeGroupService.groups();
-      this.noGroups = this.edgeGroups.length === 0;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
     }
@@ -213,6 +216,7 @@ export default class CreateEdgeStackViewController {
       RepositoryAuthentication: this.formValues.RepositoryAuthentication,
       RepositoryUsername: this.formValues.RepositoryUsername,
       RepositoryPassword: this.formValues.RepositoryPassword,
+      TLSSkipVerify: this.formValues.TLSSkipVerify,
     };
     return this.EdgeStackService.createStackFromGitRepository(
       {

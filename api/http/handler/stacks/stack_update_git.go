@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/git/update"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -17,17 +18,18 @@ import (
 )
 
 type stackGitUpdatePayload struct {
-	AutoUpdate               *portainer.StackAutoUpdate
+	AutoUpdate               *portainer.AutoUpdateSettings
 	Env                      []portainer.Pair
 	Prune                    bool
 	RepositoryReferenceName  string
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
+	TLSSkipVerify            bool
 }
 
 func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
-	if err := stackutils.ValidateStackAutoUpdate(payload.AutoUpdate); err != nil {
+	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
 	return nil
@@ -137,6 +139,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	//update retrieved stack data based on the payload
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
+	stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
 	stack.AutoUpdate = payload.AutoUpdate
 	stack.Env = payload.Env
 	stack.UpdatedBy = user.Username
@@ -150,6 +153,9 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	if payload.RepositoryAuthentication {
 		password := payload.RepositoryPassword
+
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
 		if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 			password = stack.GitConfig.Authentication.Password
 		}
@@ -157,7 +163,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 			Username: payload.RepositoryUsername,
 			Password: password,
 		}
-		_, err = handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
+		_, err = handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password, stack.GitConfig.TLSSkipVerify)
 		if err != nil {
 			return httperror.InternalServerError("Unable to fetch git repository", err)
 		}

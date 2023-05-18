@@ -1,12 +1,12 @@
-import { Column } from 'react-table';
-
-import { NomadEvent } from '@/react/nomad/types';
 import { isoDate } from '@/portainer/filters/filters';
 
-export const date: Column<NomadEvent> = {
-  Header: 'Date',
-  accessor: (row) => (row.Date ? isoDate(row.Date) : '-'),
+import { columnHelper } from './helper';
+
+export const date = columnHelper.accessor('Date', {
+  header: 'Date',
   id: 'date',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ getValue }) => {
+    const date = getValue();
+    return date ? isoDate(date) : '-';
+  },
+});

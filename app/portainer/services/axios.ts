@@ -27,6 +27,8 @@ axios.interceptors.request.use(async (config) => {
   return newConfig;
 });
 
+export const agentTargetHeader = 'X-PortainerAgent-Target';
+
 export function agentInterceptor(config: AxiosRequestConfig) {
   if (!config.url || !config.url.includes('/docker/')) {
     return config;
@@ -35,7 +37,7 @@ export function agentInterceptor(config: AxiosRequestConfig) {
   const newConfig = { headers: config.headers || {}, ...config };
   const target = portainerAgentTargetHeader();
   if (target) {
-    newConfig.headers['X-PortainerAgent-Target'] = target;
+    newConfig.headers[agentTargetHeader] = target;
   }
 
   if (portainerAgentManagerOperation()) {

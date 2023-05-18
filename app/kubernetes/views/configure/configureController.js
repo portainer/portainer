@@ -7,9 +7,10 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
-import { getIsRBACEnabled } from '@/react/kubernetes/cluster/service';
 import { buildConfirmButton } from '@@/modals/utils';
 import { confirm } from '@@/modals/confirm';
+import { getIsRBACEnabled } from '@/react/kubernetes/cluster/getIsRBACEnabled';
+import { ModalType } from '@@/modals/Modal/types';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
@@ -165,7 +166,10 @@ class KubernetesConfigureController {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
       const resourcePools = _.filter(
         allResourcePools,
-        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+        (resourcePool) =>
+          !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) &&
+          !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name) &&
+          resourcePool.Namespace.Status === 'Active'
       );
 
       ingressesToDel.forEach((ingress) => {
@@ -389,6 +393,7 @@ class KubernetesConfigureController {
       return confirm({
         title: 'Are you sure?',
         message: 'You currently have unsaved changes in the cluster setup view. Are you sure you want to leave?',
+        modalType: ModalType.Warn,
         confirmButton: buildConfirmButton('Yes', 'danger'),
       });
     }

@@ -10,6 +10,7 @@ export interface Props {
   icon?: React.ReactNode;
   color?: Color;
   className?: string;
+  childrenWrapperClassName?: string;
 }
 
 export function TextTip({
@@ -17,12 +18,14 @@ export function TextTip({
   icon = AlertCircle,
   className,
   children,
+  childrenWrapperClassName = 'text-muted',
 }: PropsWithChildren<Props>) {
   return (
-    <p className={clsx('small inline-flex items-center gap-1', className)}>
-      <Icon icon={icon} mode={getMode(color)} />
-      <span className="text-muted">{children}</span>
-    </p>
+    <div className={clsx('small inline-flex gap-1', className)}>
+      <Icon icon={icon} mode={getMode(color)} className="!mt-[2px]" />
+
+      <span className={childrenWrapperClassName}>{children}</span>
+    </div>
   );
 }
 

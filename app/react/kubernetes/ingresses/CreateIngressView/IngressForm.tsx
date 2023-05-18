@@ -10,6 +10,7 @@ import { FormError } from '@@/form-components/FormError';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import { Annotations } from './Annotations';
 import { Rule, ServicePorts } from './types';
@@ -115,7 +116,7 @@ export function IngressForm({
           <div className="form-horizontal">
             <div className="form-group">
               <label
-                className="control-label text-muted col-sm-3 col-lg-2 required"
+                className="control-label text-muted col-sm-3 col-lg-2"
                 htmlFor="namespace"
               >
                 Namespace
@@ -199,27 +200,32 @@ export function IngressForm({
             </div>
 
             <div className="col-sm-12 text-muted !mb-0 px-0">
-              <div className="mb-2">Annotations</div>
-              <p className="vertical-center text-muted small">
-                <Icon icon={Info} mode="primary" />
-                <span>
-                  You can specify{' '}
-                  <a
-                    href="https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
-                    target="_black"
-                  >
-                    annotations
-                  </a>{' '}
-                  for the object. See further Kubernetes documentation on{' '}
-                  <a
-                    href="https://kubernetes.io/docs/reference/labels-annotations-taints/"
-                    target="_black"
-                  >
-                    well-known annotations
-                  </a>
-                  .
-                </span>
-              </p>
+              <div className="control-label !mb-3 text-left font-medium">
+                Annotations
+                <Tooltip
+                  message={
+                    <div className="vertical-center">
+                      <span>
+                        Allows specifying of{' '}
+                        <a
+                          href="https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
+                          target="_black"
+                        >
+                          annotations
+                        </a>{' '}
+                        for the object. See further Kubernetes documentation on{' '}
+                        <a
+                          href="https://kubernetes.io/docs/reference/labels-annotations-taints/"
+                          target="_black"
+                        >
+                          well-known annotations
+                        </a>
+                        .
+                      </span>
+                    </div>
+                  }
+                />
+              </div>
             </div>
 
             {rule?.Annotations && (
@@ -233,38 +239,46 @@ export function IngressForm({
             )}
 
             <div className="col-sm-12 anntation-actions p-0">
-              <Button
-                className="btn btn-sm btn-light mb-2 !ml-0"
-                onClick={() => addNewAnnotation()}
-                icon={Plus}
-                title="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type."
-              >
-                {' '}
-                add annotation
-              </Button>
+              <TooltipWithChildren message="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type.">
+                <span>
+                  <Button
+                    className="btn btn-sm btn-light mb-2 !ml-0"
+                    onClick={() => addNewAnnotation()}
+                    icon={Plus}
+                  >
+                    {' '}
+                    Add annotation
+                  </Button>
+                </span>
+              </TooltipWithChildren>
 
               {rule.IngressType === 'nginx' && (
                 <>
-                  <Button
-                    className="btn btn-sm btn-light mb-2 ml-2"
-                    onClick={() => addNewAnnotation('rewrite')}
-                    icon={Plus}
-                    title="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
-                    data-cy="add-rewrite-annotation"
-                  >
-                    {' '}
-                    Add rewrite annotation
-                  </Button>
+                  <TooltipWithChildren message="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to.">
+                    <span>
+                      <Button
+                        className="btn btn-sm btn-light mb-2 ml-2"
+                        onClick={() => addNewAnnotation('rewrite')}
+                        icon={Plus}
+                        data-cy="add-rewrite-annotation"
+                      >
+                        Add rewrite annotation
+                      </Button>
+                    </span>
+                  </TooltipWithChildren>
 
-                  <Button
-                    className="btn btn-sm btn-light mb-2 ml-2"
-                    onClick={() => addNewAnnotation('regex')}
-                    icon={Plus}
-                    title="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
-                    data-cy="add-regex-annotation"
-                  >
-                    Add regular expression annotation
-                  </Button>
+                  <TooltipWithChildren message="Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account.">
+                    <span>
+                      <Button
+                        className="btn btn-sm btn-light mb-2 ml-2"
+                        onClick={() => addNewAnnotation('regex')}
+                        icon={Plus}
+                        data-cy="add-regex-annotation"
+                      >
+                        Add regular expression annotation
+                      </Button>
+                    </span>
+                  </TooltipWithChildren>
                 </>
               )}
 
@@ -476,9 +490,7 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">
-                          Path type
-                        </span>
+                        <span className="input-group-addon">Path type</span>
                         <Select
                           key={servicePorts.toString() + path.PathType}
                           name={`ingress_pathType_${hostIndex}_${pathIndex}`}

@@ -3,7 +3,7 @@ import { boolean, number, object, SchemaOf, string } from 'yup';
 
 import { GitAuthModel } from '@/react/portainer/gitops/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
-import { GitCredential } from '@/portainer/views/account/git-credential/types';
+import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 import { Input } from '@@/form-components/Input';
@@ -18,14 +18,14 @@ import { NewCredentialForm } from './NewCredentialForm';
 interface Props {
   value: GitAuthModel;
   onChange: (value: Partial<GitAuthModel>) => void;
-  isExplanationVisible?: boolean;
+  isAuthExplanationVisible?: boolean;
   errors?: FormikErrors<GitAuthModel>;
 }
 
 export function AuthFieldset({
   value,
   onChange,
-  isExplanationVisible,
+  isAuthExplanationVisible,
   errors,
 }: Props) {
   const [username, setUsername] = useDebounce(
@@ -56,8 +56,8 @@ export function AuthFieldset({
 
       {value.RepositoryAuthentication && (
         <>
-          {isExplanationVisible && (
-            <TextTip color="orange">
+          {isAuthExplanationVisible && (
+            <TextTip color="orange" className="mb-2">
               Enabling authentication will store the credentials and it is
               advisable to use a git service account
             </TextTip>
@@ -143,7 +143,8 @@ export function AuthFieldset({
 }
 
 export function gitAuthValidation(
-  gitCredentials: Array<GitCredential>
+  gitCredentials: Array<GitCredential>,
+  isAuthEdit: boolean
 ): SchemaOf<GitAuthModel> {
   return object({
     RepositoryAuthentication: boolean().default(false),
@@ -156,7 +157,7 @@ export function gitAuthValidation(
       .default(''),
     RepositoryPassword: string()
       .when(['RepositoryAuthentication', 'RepositoryGitCredentialID'], {
-        is: (auth: boolean, id: number) => auth && !id,
+        is: (auth: boolean, id: number) => auth && !id && !isAuthEdit,
         then: string().required('Password is required'),
       })
       .default(''),

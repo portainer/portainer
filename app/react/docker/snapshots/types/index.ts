@@ -1,7 +1,11 @@
 import { DockerContainer } from '@/react/docker/containers/types';
 
+export type DockerContainerSnapshot = DockerContainer & {
+  Env?: string[];
+};
+
 export type DockerSnapshotRaw = {
-  Containers: DockerContainer[];
+  Containers: DockerContainerSnapshot[];
   SnapshotTime: string;
 };
 

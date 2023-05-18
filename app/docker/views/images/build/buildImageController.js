@@ -1,12 +1,12 @@
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
-import { options } from './options';
+import { editor, upload, url } from '@@/BoxSelector/common-options/build-methods';
 
 angular.module('portainer.docker').controller('BuildImageController', BuildImageController);
 
 /* @ngInject */
 function BuildImageController($scope, $async, $window, BuildService, Notifications, HttpRequestHelper, endpoint) {
   $scope.endpoint = endpoint;
-  $scope.options = options;
+  $scope.options = [editor, upload, url];
 
   $scope.state = {
     BuildType: 'editor',
@@ -60,7 +60,7 @@ function BuildImageController($scope, $async, $window, BuildService, Notificatio
     // Validation
     const parts = item.Name.split('/');
     const repository = parts[parts.length - 1];
-    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
+    const repositoryRegExp = RegExp('^[a-z0-9-_.]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
     item.Valid = repositoryRegExp.test(repository);
   };
 

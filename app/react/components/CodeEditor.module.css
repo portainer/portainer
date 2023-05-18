@@ -1,0 +1,119 @@
+.root {
+  --text-cm-default-color: var(--blue-1);
+  --text-cm-meta-color: var(--black-color);
+  --text-cm-string-color: var(--red-3);
+  --text-cm-number-color: var(--green-1);
+  --text-cm-keyword-color: var(--ui-blue-dark-9);
+  --text-cm-comment-color: var(--ui-orange-6);
+  --text-cm-variable-name-color: var(--ui-green-8);
+  --text-codemirror-color: var(--black-color);
+  --bg-codemirror-color: var(--white-color);
+  --bg-codemirror-gutters-color: var(--grey-17);
+  --bg-codemirror-selected-color: var(--grey-22);
+  --border-codemirror-cursor-color: var(--black-color);
+}
+
+:global([theme='dark']) .root {
+  --text-cm-default-color: var(--blue-10);
+  --text-cm-meta-color: var(--white-color);
+  --text-cm-string-color: var(--red-5);
+  --text-cm-number-color: var(--green-2);
+  --text-cm-keyword-color: var(--ui-purple-6);
+  --text-codemirror-color: var(--white-color);
+  --bg-codemirror-color: var(--grey-2);
+  --bg-codemirror-gutters-color: var(--grey-3);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --border-codemirror-cursor-color: var(--white-color);
+}
+
+:global([theme='highcontrast']) .root {
+  --text-cm-default-color: var(--blue-9);
+  --text-cm-meta-color: var(--white-color);
+  --text-cm-string-color: var(--red-7);
+  --text-cm-number-color: var(--green-2);
+  --text-cm-keyword-color: var(--ui-purple-6);
+  --text-codemirror-color: var(--white-color);
+  --bg-codemirror-color: var(--black-color);
+  --bg-codemirror-gutters-color: var(--ui-gray-warm-11);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --border-codemirror-cursor-color: var(--white-color);
+}
+
+.root :global(.cm-editor .cm-gutters) {
+  border-right: 0px;
+}
+
+.root :global(.cm-editor .cm-gutters .cm-lineNumbers .cm-gutterElement) {
+  text-align: left;
+}
+
+.root :global(.cm-editor),
+.root :global(.cm-editor .cm-scroller) {
+  border-radius: 8px;
+}
+
+/*  Search Panel  */
+/* Ideally we would use a react component for that, but this is the easy solution for onw */
+
+.root :global(.cm-panels.cm-panels-bottom) {
+  background-color: var(--bg-codemirror-gutters-color);
+  border-top-color: transparent;
+  color: var(--text-codemirror-color);
+}
+
+.root :global(.cm-button) {
+  background-image: none;
+  border-radius: 4px;
+  gap: 5px;
+}
+
+.root :global(.cm-button[name='next']),
+.root :global(.cm-button[name='replace']) {
+  @apply border-blue-8 bg-blue-8 text-white;
+  @apply hover:border-blue-9 hover:bg-blue-9 hover:text-white;
+  @apply th-dark:hover:border-blue-7 th-dark:hover:bg-blue-7;
+}
+
+.root :global(.cm-button[name='prev']),
+.root :global(.cm-button[name='replaceAll']) {
+  @apply border border-solid;
+
+  @apply border-blue-8 bg-blue-2 text-blue-9;
+  @apply hover:bg-blue-3;
+
+  @apply th-dark:border-blue-7 th-dark:bg-gray-10 th-dark:text-blue-3;
+  @apply th-dark:hover:bg-blue-11;
+}
+
+.root :global(.cm-button[name='select']) {
+  @apply border-gray-5 bg-white text-gray-9;
+  @apply hover:border-gray-5 hover:bg-gray-3 hover:text-gray-10;
+
+  /* dark mode */
+  @apply th-dark:border-gray-warm-7 th-dark:bg-gray-iron-10 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:border-gray-6 th-dark:hover:bg-gray-iron-9 th-dark:hover:text-gray-warm-4;
+
+  @apply th-highcontrast:border-gray-2 th-highcontrast:bg-black th-highcontrast:text-white;
+  @apply th-highcontrast:hover:border-gray-6 th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:text-gray-warm-4;
+}
+
+.root :global(.cm-search) label {
+  font-weight: 400;
+  @apply text-gray-7;
+  @apply th-dark:text-gray-warm-3;
+  @apply th-highcontrast:text-white;
+}
+
+.root :global(.cm-search) input {
+  border-radius: 4px;
+}
+
+.root :global(.cm-textfield) {
+  border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-inputbox);
+  color: var(--text-form-control-color);
+}
+
+.root :global(.cm-content[contenteditable='true']) {
+  min-height: 100%;
+}

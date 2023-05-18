@@ -37,7 +37,7 @@ import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateV
 import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
-import { placementOptions } from './placementTypes';
+import { placementOptions } from '@/react/kubernetes/applications/CreateView/placementTypes';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -199,7 +199,7 @@ class KubernetesCreateApplicationController {
         }
 
         this.state.updateWebEditorInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, { stackFile: this.stackFileContent });
         this.state.isEditorDirty = false;
         await this.$state.reload(this.$state.current);
       } catch (err) {
@@ -1044,7 +1044,7 @@ class KubernetesCreateApplicationController {
       this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
       _.remove(this.formValues.Configurations, (item) => item.SelectedConfiguration === undefined);
       await this.KubernetesApplicationService.create(this.formValues);
-      this.Notifications.success('Application successfully deployed', this.formValues.Name);
+      this.Notifications.success('Request to deploy application successfully submitted', this.formValues.Name);
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create application');
@@ -1066,7 +1066,7 @@ class KubernetesCreateApplicationController {
     try {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues);
-      this.Notifications.success('Success', 'Application successfully updated');
+      this.Notifications.success('Success', 'Request to update application successfully submitted');
       this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update application');
@@ -1208,22 +1208,31 @@ class KubernetesCreateApplicationController {
         ]);
         this.nodesLimits = nodesLimits;
 
-        const nonSystemNamespaces = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+        const nonSystemNamespaces = _.filter(
+          resourcePools,
+          (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && resourcePool.Namespace.Status === 'Active'
+        );
 
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
         this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
 
-        const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
-        this.formValues.ResourcePool = this.resourcePools[0];
-        this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
-        if (!this.formValues.ResourcePool) {
-          return;
-        }
-
+        // this.state.nodes.memory and this.state.nodes.cpu are used to calculate the slider limits, so set them before calling updateSliders()
         _.forEach(nodes, (item) => {
           this.state.nodes.memory += filesizeParser(item.Memory);
           this.state.nodes.cpu += item.CPU;
         });
+
+        if (this.resourcePools.length) {
+          const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+          this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
+          this.updateNamespaceLimits(namespaceWithQuota);
+          this.updateSliders(namespaceWithQuota);
+        }
+        this.formValues.ResourcePool = this.resourcePools[0];
+        if (!this.formValues.ResourcePool) {
+          return;
+        }
+
         this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
         this.nodeNumber = nodes.length;
 
@@ -1281,9 +1290,6 @@ class KubernetesCreateApplicationController {
         this.formValues.IsPublishingService = this.formValues.PublishedPorts.length > 0;
 
         this.oldFormValues = angular.copy(this.formValues);
-
-        this.updateNamespaceLimits(namespaceWithQuota);
-        this.updateSliders(namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

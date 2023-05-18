@@ -14,6 +14,8 @@ export function AutoUpdateFieldset({
   isForcePullVisible = true,
   errors,
   baseWebhookUrl,
+  webhookId,
+  webhooksDocs,
 }: {
   value: AutoUpdateModel;
   onChange: (value: AutoUpdateModel) => void;
@@ -21,12 +23,14 @@ export function AutoUpdateFieldset({
   isForcePullVisible?: boolean;
   errors?: FormikErrors<AutoUpdateModel>;
   baseWebhookUrl: string;
+  webhookId: string;
+  webhooksDocs?: string;
 }) {
   return (
     <>
       <div className="form-group">
         <div className="col-sm-12">
-          <TextTip color="blue">
+          <TextTip color="blue" className="mb-2">
             When enabled, at each polling interval or webhook invocation, if the
             git repo differs from what was stored locally on the last git pull,
             the changes are deployed.
@@ -45,12 +49,14 @@ export function AutoUpdateFieldset({
 
       {value.RepositoryAutomaticUpdates && (
         <AutoUpdateSettings
+          webhookId={webhookId}
           baseWebhookUrl={baseWebhookUrl}
           value={value}
           onChange={handleChange}
           environmentType={environmentType}
           showForcePullImage={isForcePullVisible}
           errors={errors}
+          webhookDocs={webhooksDocs}
         />
       )}
     </>

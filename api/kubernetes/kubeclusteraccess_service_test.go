@@ -91,21 +91,21 @@ func TestKubeClusterAccessService_IsSecure(t *testing.T) {
 func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 	is := assert.New(t)
 
-	t.Run("GetData contains host address", func(t *testing.T) {
+	t.Run("GetClusterDetails contains host address", func(t *testing.T) {
 		kcs := NewKubeClusterAccessService("/", "", "")
-		clusterAccessDetails := kcs.GetData("mysite.com", 1)
+		clusterAccessDetails := kcs.GetClusterDetails("mysite.com", 1, true)
 		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "https://mysite.com"), "should contain host address")
 	})
 
-	t.Run("GetData contains environment proxy url", func(t *testing.T) {
+	t.Run("GetClusterDetails contains environment proxy url", func(t *testing.T) {
 		kcs := NewKubeClusterAccessService("/", "", "")
-		clusterAccessDetails := kcs.GetData("mysite.com", 100)
+		clusterAccessDetails := kcs.GetClusterDetails("mysite.com", 100, true)
 		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "api/endpoints/100/kubernetes"), "should contain environment proxy url")
 	})
 
-	t.Run("GetData returns insecure cluster access config", func(t *testing.T) {
+	t.Run("GetClusterDetails returns insecure cluster access config", func(t *testing.T) {
 		kcs := NewKubeClusterAccessService("/", ":9443", "")
-		clusterAccessDetails := kcs.GetData("mysite.com", 1)
+		clusterAccessDetails := kcs.GetClusterDetails("mysite.com", 1, true)
 
 		wantClusterAccessDetails := kubernetesClusterAccessData{
 			ClusterServerURL:         "https://mysite.com/api/endpoints/1/kubernetes",
@@ -113,14 +113,14 @@ func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 			CertificateAuthorityData: "",
 		}
 
-		is.Equal(clusterAccessDetails, wantClusterAccessDetails)
+		is.Equal(wantClusterAccessDetails, clusterAccessDetails)
 	})
 
-	t.Run("GetData returns secure cluster access config", func(t *testing.T) {
+	t.Run("GetClusterDetails returns secure cluster access config", func(t *testing.T) {
 		filePath := createTempFile("valid-cert.crt", certData, t)
 
 		kcs := NewKubeClusterAccessService("/", "", filePath)
-		clusterAccessDetails := kcs.GetData("localhost", 1)
+		clusterAccessDetails := kcs.GetClusterDetails("localhost", 1, true)
 
 		wantClusterAccessDetails := kubernetesClusterAccessData{
 			ClusterServerURL:         "https://localhost/api/endpoints/1/kubernetes",
@@ -128,6 +128,6 @@ func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 			CertificateAuthorityData: certDataString,
 		}
 
-		is.Equal(clusterAccessDetails, wantClusterAccessDetails)
+		is.Equal(wantClusterAccessDetails, clusterAccessDetails)
 	})
 }

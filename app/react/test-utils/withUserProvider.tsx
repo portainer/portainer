@@ -10,7 +10,6 @@ const mockUser: User = {
   Username: 'mock',
   ThemeSettings: {
     color: 'auto',
-    subtleUpgradeButton: false,
   },
 };
 
@@ -22,7 +21,7 @@ export function withUserProvider<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     const state = useMemo(() => ({ user }), []);
 
     return (

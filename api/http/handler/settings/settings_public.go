@@ -40,8 +40,6 @@ type publicSettingsResponse struct {
 	IsAMTEnabled bool
 
 	Edge struct {
-		// Whether the device has been started in edge async mode
-		AsyncMode bool
 		// The ping interval for edge agent - used in edge async mode [seconds]
 		PingInterval int `json:"PingInterval" example:"60"`
 		// The snapshot interval for edge agent - used in edge async mode [seconds]
@@ -51,6 +49,8 @@ type publicSettingsResponse struct {
 		// The check in interval for edge agent (in seconds) - used in non async mode [seconds]
 		CheckinInterval int `example:"60"`
 	}
+
+	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
 }
 
 // @id SettingsPublic
@@ -86,11 +86,12 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
 
-	publicSettings.Edge.AsyncMode = appSettings.Edge.AsyncMode
 	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval
 	publicSettings.Edge.SnapshotInterval = appSettings.Edge.SnapshotInterval
 	publicSettings.Edge.CommandInterval = appSettings.Edge.CommandInterval
 	publicSettings.Edge.CheckinInterval = appSettings.EdgeAgentCheckinInterval
+
+	publicSettings.IsDockerDesktopExtension = appSettings.IsDockerDesktopExtension
 
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {

@@ -130,7 +130,7 @@ class AuthenticationController {
   async checkForEndpointsAsync() {
     try {
       const isAdmin = this.Authentication.isAdmin();
-      const endpoints = await getEnvironments({ limit: 1 });
+      const endpoints = await getEnvironments({ limit: 1, query: { excludeSnapshots: true } });
 
       if (this.Authentication.getUserDetails().forceChangePassword) {
         return this.$state.go('portainer.account');

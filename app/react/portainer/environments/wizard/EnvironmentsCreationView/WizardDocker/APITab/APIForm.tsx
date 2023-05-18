@@ -3,7 +3,6 @@ import { useReducer } from 'react';
 import { Plug2 } from 'lucide-react';
 
 import { useCreateRemoteEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
-import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
   Environment,
@@ -13,6 +12,7 @@ import {
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+import { InsightsBox } from '@@/InsightsBox';
 
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
@@ -23,9 +23,10 @@ import { TLSFieldset } from './TLSFieldset';
 
 interface Props {
   onCreate(environment: Environment): void;
+  isDockerStandalone?: boolean;
 }
 
-export function APIForm({ onCreate }: Props) {
+export function APIForm({ onCreate, isDockerStandalone }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const initialValues: FormValues = {
     url: '',
@@ -35,7 +36,6 @@ export function APIForm({ onCreate }: Props) {
       groupId: 1,
       tagIds: [],
     },
-    gpus: [],
   };
 
   const mutation = useCreateRemoteEnvironmentMutation(
@@ -73,7 +73,33 @@ export function APIForm({ onCreate }: Props) {
           <TLSFieldset />
 
           <MoreSettingsSection>
-            <Hardware />
+            {isDockerStandalone && (
+              <InsightsBox
+                content={
+                  <>
+                    <p>
+                      From 2.18 on, the set-up of available GPUs for a Docker
+                      Standalone environment has been shifted from Add
+                      environment and Environment details to Host -&gt; Setup,
+                      so as to align with other settings.
+                    </p>
+                    <p>
+                      A toggle has been introduced for enabling/disabling
+                      management of GPU settings in the Portainer UI - to
+                      alleviate the performance impact of showing those
+                      settings.
+                    </p>
+                    <p>
+                      The UI has been updated to clarify that GPU settings
+                      support is only for Docker Standalone (and not Docker
+                      Swarm, which was never supported in the UI).
+                    </p>
+                  </>
+                }
+                header="GPU settings update"
+                insightCloseId="gpu-settings-update-closed"
+              />
+            )}
           </MoreSettingsSection>
 
           <div className="form-group">
@@ -104,7 +130,6 @@ export function APIForm({ onCreate }: Props) {
         options: {
           tls,
           meta: values.meta,
-          gpus: values.gpus,
         },
       },
       {

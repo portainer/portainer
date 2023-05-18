@@ -2,6 +2,7 @@ package boltdb
 
 import (
 	"bytes"
+	"fmt"
 
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
@@ -24,7 +25,7 @@ func (tx *DbTransaction) GetObject(bucketName string, key []byte, object interfa
 
 	value := bucket.Get(key)
 	if value == nil {
-		return dserrors.ErrObjectNotFound
+		return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 	}
 
 	data := make([]byte, len(value))
@@ -74,7 +75,6 @@ func (tx *DbTransaction) GetNextIdentifier(bucketName string) int {
 	id, err := bucket.NextSequence()
 	if err != nil {
 		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifer")
-
 		return 0
 	}
 
@@ -92,7 +92,7 @@ func (tx *DbTransaction) CreateObject(bucketName string, fn func(uint64) (int, i
 		return err
 	}
 
-	return bucket.Put(tx.conn.ConvertToKey(int(id)), data)
+	return bucket.Put(tx.conn.ConvertToKey(id), data)
 }
 
 func (tx *DbTransaction) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
