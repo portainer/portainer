@@ -44,7 +44,7 @@ func (tx *StoreTx) FDOProfile() dataservices.FDOProfileService                 {
 func (tx *StoreTx) HelmUserRepository() dataservices.HelmUserRepositoryService { return nil }
 
 func (tx *StoreTx) Registry() dataservices.RegistryService {
-	return nil
+	return tx.store.RegistryService.Tx(tx.tx)
 }
 
 func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService {
@@ -56,7 +56,10 @@ func (tx *StoreTx) Role() dataservices.RoleService {
 }
 
 func (tx *StoreTx) APIKeyRepository() dataservices.APIKeyRepository { return nil }
-func (tx *StoreTx) Settings() dataservices.SettingsService          { return nil }
+
+func (tx *StoreTx) Settings() dataservices.SettingsService {
+	return tx.store.SettingsService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) Snapshot() dataservices.SnapshotService {
 	return tx.store.SnapshotService.Tx(tx.tx)
