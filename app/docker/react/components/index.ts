@@ -15,6 +15,7 @@ import { HealthStatus } from '@/react/docker/containers/ItemView/HealthStatus';
 import { GpusList } from '@/react/docker/host/SetupView/GpusList';
 import { GpusInsights } from '@/react/docker/host/SetupView/GpusInsights';
 import { InsightsBox } from '@/react/components/InsightsBox';
+import { BetaAlert } from '@/react/portainer/environments/update-schedules/common/BetaAlert';
 
 export const componentsModule = angular
   .module('portainer.docker.react.components', [])
@@ -64,4 +65,5 @@ export const componentsModule = angular
       'className',
     ])
   )
+  .component('betaAlert', r2a(BetaAlert, ['className', 'message', 'isHtml']))
   .component('gpusInsights', r2a(GpusInsights, [])).name;
