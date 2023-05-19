@@ -3,7 +3,7 @@ package images
 import (
 	"testing"
 
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,7 +12,7 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 
 	t.Run("", func(t *testing.T) {
 		image := "USERNAME/nginx:latest"
-		registries := []portaineree.Registry{createNewRegistry("docker.io", "USERNAME", false),
+		registries := []portainer.Registry{createNewRegistry("docker.io", "USERNAME", false),
 			createNewRegistry("hub-mirror.c.163.com", "", false)}
 		r, err := findBestMatchRegistry(image, registries)
 		is.NoError(err, "")
@@ -23,7 +23,7 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 
 	t.Run("", func(t *testing.T) {
 		image := "USERNAME/nginx:latest"
-		registries := []portaineree.Registry{createNewRegistry("docker.io", "", false),
+		registries := []portainer.Registry{createNewRegistry("docker.io", "", false),
 			createNewRegistry("hub-mirror.c.163.com", "USERNAME", false)}
 		r, err := findBestMatchRegistry(image, registries)
 		is.NoError(err, "")
@@ -34,7 +34,7 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 
 	t.Run("", func(t *testing.T) {
 		image := "docker.io/<USERNAME>/nginx:latest"
-		registries := []portaineree.Registry{createNewRegistry("docker.io", "USERNAME", true),
+		registries := []portainer.Registry{createNewRegistry("docker.io", "USERNAME", true),
 			createNewRegistry("hub-mirror.c.163.com", "", false)}
 		r, err := findBestMatchRegistry(image, registries)
 		is.NoError(err, "")
@@ -45,7 +45,7 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 
 	t.Run("", func(t *testing.T) {
 		image := "portainer/portainer-ee:latest"
-		registries := []portaineree.Registry{createNewRegistry("docker.io", "", true)}
+		registries := []portainer.Registry{createNewRegistry("docker.io", "", true)}
 		r, err := findBestMatchRegistry(image, registries)
 		is.NoError(err, "")
 		is.NotNil(r, "")
@@ -54,15 +54,15 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 	})
 }
 
-func createNewRegistry(domain, username string, auth bool) portaineree.Registry {
-	registry := portaineree.Registry{
+func createNewRegistry(domain, username string, auth bool) portainer.Registry {
+	registry := portainer.Registry{
 		URL:            domain,
 		Authentication: auth,
 		Username:       username,
 	}
 
 	if domain == "docker.io" {
-		registry.Type = portaineree.DockerHubRegistry
+		registry.Type = portainer.DockerHubRegistry
 	}
 
 	return registry

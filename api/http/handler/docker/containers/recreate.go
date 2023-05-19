@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/docker/images"
 	"github.com/portainer/portainer/api/http/middlewares"
@@ -45,7 +45,7 @@ func (handler *Handler) recreate(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.Forbidden("Permission denied to force update service", err)
 	}
 
-	agentTargetHeader := r.Header.Get(portaineree.PortainerAgentTargetHeader)
+	agentTargetHeader := r.Header.Get(portainer.PortainerAgentTargetHeader)
 
 	//ctx.
 	newContainer, err := handler.containerService.Recreate(r.Context(), endpoint, containerID, payload.PullImage, "", agentTargetHeader)
@@ -71,7 +71,7 @@ func (handler *Handler) createResourceControl(oldContainerId string, newContaine
 		return
 	}
 
-	resourceControl := authorization.GetResourceControlByResourceIDAndType(oldContainerId, portaineree.ContainerResourceControl, resourceControls)
+	resourceControl := authorization.GetResourceControlByResourceIDAndType(oldContainerId, portainer.ContainerResourceControl, resourceControls)
 	if resourceControl == nil {
 		return
 	}

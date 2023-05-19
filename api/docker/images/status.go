@@ -9,7 +9,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/opencontainers/go-digest"
 	"github.com/patrickmn/go-cache"
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	consts "github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/internal/slices"
 
@@ -36,7 +36,7 @@ var (
 // Status holds Docker image  analysis
 type Status string
 
-func (c *DigestClient) ContainersImageStatus(ctx context.Context, containers []types.Container, endpoint *portaineree.Endpoint) Status {
+func (c *DigestClient) ContainersImageStatus(ctx context.Context, containers []types.Container, endpoint *portainer.Endpoint) Status {
 	cli, err := c.clientFactory.CreateClient(endpoint, "", nil)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot create docker client")
@@ -98,7 +98,7 @@ func FigureOut(statuses []Status) Status {
 	return Updated
 }
 
-func (c *DigestClient) ContainerImageStatus(ctx context.Context, containerID string, endpoint *portaineree.Endpoint, nodeName string) (Status, error) {
+func (c *DigestClient) ContainerImageStatus(ctx context.Context, containerID string, endpoint *portainer.Endpoint, nodeName string) (Status, error) {
 	cli, err := c.clientFactory.CreateClient(endpoint, nodeName, nil)
 	if err != nil {
 		log.Warn().Str("swarmNodeId", nodeName).Msg("Cannot create new docker client.")
@@ -150,7 +150,7 @@ func (c *DigestClient) ContainerImageStatus(ctx context.Context, containerID str
 	return s, err
 }
 
-func (c *DigestClient) ServiceImageStatus(ctx context.Context, serviceID string, endpoint *portaineree.Endpoint) (Status, error) {
+func (c *DigestClient) ServiceImageStatus(ctx context.Context, serviceID string, endpoint *portainer.Endpoint) (Status, error) {
 	cli, err := c.clientFactory.CreateClient(endpoint, "", nil)
 	if err != nil {
 		return Error, nil

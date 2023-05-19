@@ -6,7 +6,7 @@ import (
 
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/registryutils"
 )
@@ -43,7 +43,7 @@ func (c *RegistryClient) RegistryAuth(image Image) (string, string, error) {
 	return c.CertainRegistryAuth(registry)
 }
 
-func (c *RegistryClient) CertainRegistryAuth(registry *portaineree.Registry) (string, string, error) {
+func (c *RegistryClient) CertainRegistryAuth(registry *portainer.Registry) (string, string, error) {
 	err := registryutils.EnsureRegTokenValid(c.dataStore, registry)
 	if err != nil {
 		return "", "", err
@@ -74,7 +74,7 @@ func (c *RegistryClient) EncodedRegistryAuth(image Image) (string, error) {
 	return c.EncodedCertainRegistryAuth(registry)
 }
 
-func (c *RegistryClient) EncodedCertainRegistryAuth(registry *portaineree.Registry) (string, error) {
+func (c *RegistryClient) EncodedCertainRegistryAuth(registry *portainer.Registry) (string, error) {
 	err := registryutils.EnsureRegTokenValid(c.dataStore, registry)
 	if err != nil {
 		return "", err
@@ -88,16 +88,16 @@ func (c *RegistryClient) EncodedCertainRegistryAuth(registry *portaineree.Regist
 // 1. both domain name and username matched (for dockerhub only)
 // 2. only URL matched
 // 3. pick up the first dockerhub registry
-func findBestMatchRegistry(repository string, registries []portaineree.Registry) (*portaineree.Registry, error) {
+func findBestMatchRegistry(repository string, registries []portainer.Registry) (*portainer.Registry, error) {
 	cachedRegistry, err := cachedRegistry(repository)
 	if err == nil {
 		return cachedRegistry, nil
 	}
 
-	var match1, match2, match3 *portaineree.Registry
+	var match1, match2, match3 *portainer.Registry
 	for i := 0; i < len(registries); i++ {
 		registry := registries[i]
-		if registry.Type == portaineree.DockerHubRegistry {
+		if registry.Type == portainer.DockerHubRegistry {
 
 			// try to match repository examples:
 			//   <USERNAME>/nginx:latest
@@ -134,10 +134,10 @@ func findBestMatchRegistry(repository string, registries []portaineree.Registry)
 	return match, nil
 }
 
-func cachedRegistry(cacheKey string) (*portaineree.Registry, error) {
+func cachedRegistry(cacheKey string) (*portainer.Registry, error) {
 	r, ok := _registriesCache.Get(cacheKey)
 	if ok {
-		registry, ok := r.(portaineree.Registry)
+		registry, ok := r.(portainer.Registry)
 		if ok {
 			return &registry, nil
 		}
