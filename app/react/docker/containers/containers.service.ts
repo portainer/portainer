@@ -23,6 +23,16 @@ export async function stopContainer(
   await axios.post<void>(urlBuilder(endpointId, id, 'stop'), {});
 }
 
+export async function recreateContainer(
+  endpointId: EnvironmentId,
+  id: ContainerId,
+  pullImage: boolean
+) {
+  await axios.post<void>(`/docker/${endpointId}/containers/${id}/recreate`, {
+    PullImage: pullImage,
+  });
+}
+
 export async function restartContainer(
   endpointId: EnvironmentId,
   id: ContainerId

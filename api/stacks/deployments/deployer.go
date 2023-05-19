@@ -8,7 +8,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/client"
 	k "github.com/portainer/portainer/api/kubernetes"
 )
 
@@ -28,13 +28,13 @@ type stackDeployer struct {
 	swarmStackManager   portainer.SwarmStackManager
 	composeStackManager portainer.ComposeStackManager
 	kubernetesDeployer  portainer.KubernetesDeployer
-	ClientFactory       *docker.ClientFactory
+	ClientFactory       *client.ClientFactory
 	dataStore           dataservices.DataStore
 }
 
 // NewStackDeployer inits a stackDeployer struct with a SwarmStackManager, a ComposeStackManager and a KubernetesDeployer
 func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStackManager portainer.ComposeStackManager,
-	kubernetesDeployer portainer.KubernetesDeployer, clientFactory *docker.ClientFactory, dataStore dataservices.DataStore) *stackDeployer {
+	kubernetesDeployer portainer.KubernetesDeployer, clientFactory *client.ClientFactory, dataStore dataservices.DataStore) *stackDeployer {
 	return &stackDeployer{
 		lock:                &sync.Mutex{},
 		swarmStackManager:   swarmStackManager,

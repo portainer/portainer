@@ -15,7 +15,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -34,7 +34,7 @@ type (
 		dataStore            dataservices.DataStore
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
-		dockerClientFactory  *docker.ClientFactory
+		dockerClientFactory  *client.ClientFactory
 		gitService           portainer.GitService
 	}
 
@@ -44,7 +44,7 @@ type (
 		DataStore            dataservices.DataStore
 		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
-		DockerClientFactory  *docker.ClientFactory
+		DockerClientFactory  *client.ClientFactory
 	}
 
 	restrictedDockerOperationContext struct {

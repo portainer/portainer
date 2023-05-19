@@ -304,96 +304,9 @@ angular.module('portainer.docker').controller('ContainerController', [
 
     function recreateContainer(pullImage) {
       var container = $scope.container;
-      var config = ContainerHelper.configFromContainer(container.Model);
       $scope.state.recreateContainerInProgress = true;
-      var isRunning = container.State.Running;
 
-      return pullImageIfNeeded()
-        .then(stopContainerIfNeeded)
-        .then(renameContainer)
-        .then(disconnectNetworksFromOldContainer)
-        .then(setMainNetworkAndCreateContainer)
-        .then(connectContainerToOtherNetworks)
-        .then(startContainerIfNeeded)
-        .then(createResourceControl)
-        .then(deleteOldContainer)
-        .then(notifyAndChangeView)
-        .catch(notifyOnError);
-
-      function stopContainerIfNeeded() {
-        if (!isRunning) {
-          return $q.when();
-        }
-        return ContainerService.stopContainer(container.Id);
-      }
-
-      function renameContainer() {
-        return ContainerService.renameContainer(container.Id, container.Name + '-old');
-      }
-
-      function pullImageIfNeeded() {
-        if (!pullImage) {
-          return $q.when();
-        }
-        return RegistryService.retrievePorRegistryModelFromRepository(container.Config.Image, endpoint.Id).then((registryModel) => {
-          return ImageService.pullImage(registryModel, false);
-        });
-      }
-
-      function disconnectNetworksFromOldContainer() {
-        var networks = config.NetworkingConfig.EndpointsConfig;
-        var networksNames = Object.keys(networks);
-        var disconnectionPromises = networksNames.map(function disconnectFromNetwork(name) {
-          NetworkService.disconnectContainer(name, container.Id);
-        });
-        return $q.all(disconnectionPromises).then(function onDisconnectFromNetworkSuccess() {
-          return networks;
-        });
-      }
-
-      function setMainNetworkAndCreateContainer() {
-        var networks = config.NetworkingConfig.EndpointsConfig;
-        var networksNames = Object.keys(networks);
-        if (networksNames.length >= 1) {
-          config.NetworkingConfig.EndpointsConfig = {};
-          config.NetworkingConfig.EndpointsConfig[networksNames[0]] = networks[networksNames[0]];
-        }
-        return $q.all([ContainerService.createContainer(config), networks]);
-      }
-
-      function connectContainerToOtherNetworks(createContainerData) {
-        var newContainer = createContainerData[0];
-        var networks = createContainerData[1];
-        var networksNames = Object.keys(networks);
-        var connectionPromises = networksNames.slice(1).map(function connectToNetwork(name) {
-          NetworkService.connectContainer(name, newContainer.Id, networks[name].IPAMConfig);
-        });
-        return $q.all(connectionPromises).then(function onConnectToNetworkSuccess() {
-          return newContainer;
-        });
-      }
-
-      function deleteOldContainer(newContainer) {
-        return ContainerService.remove(container, true).then(function onRemoveSuccess() {
-          return newContainer;
-        });
-      }
-
-      function startContainerIfNeeded(newContainer) {
-        if (!isRunning) {
-          return $q.when(newContainer);
-        }
-        return ContainerService.startContainer(newContainer.Id).then(function onStartSuccess() {
-          return newContainer;
-        });
-      }
-
-      function createResourceControl(newContainer) {
-        const userId = Authentication.getUserDetails().ID;
-        const oldResourceControl = container.ResourceControl;
-        const newResourceControl = newContainer.Portainer.ResourceControl;
-        return ResourceControlService.duplicateResourceControl(userId, oldResourceControl, newResourceControl);
-      }
+      return ContainerService.recreateContainer(container.Id, pullImage).then(notifyAndChangeView).catch(notifyOnError);
 
       function notifyAndChangeView() {
         Notifications.success('Success', 'Container successfully re-created');

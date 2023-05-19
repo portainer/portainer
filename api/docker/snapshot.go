@@ -5,22 +5,22 @@ import (
 	"strings"
 	"time"
 
-	portainer "github.com/portainer/portainer/api"
-
 	"github.com/docker/docker/api/types"
 	_container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	portainer "github.com/portainer/portainer/api"
+	portainerdocker "github.com/portainer/portainer/api/docker/client"
 	"github.com/rs/zerolog/log"
 )
 
 // Snapshotter represents a service used to create environment(endpoint) snapshots
 type Snapshotter struct {
-	clientFactory *ClientFactory
+	clientFactory *portainerdocker.ClientFactory
 }
 
 // NewSnapshotter returns a new Snapshotter instance
-func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
+func NewSnapshotter(clientFactory *portainerdocker.ClientFactory) *Snapshotter {
 	return &Snapshotter{
 		clientFactory: clientFactory,
 	}

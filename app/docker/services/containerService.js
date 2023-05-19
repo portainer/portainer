@@ -8,6 +8,7 @@ import {
   resumeContainer,
   startContainer,
   stopContainer,
+  recreateContainer,
 } from '@/react/docker/containers/containers.service';
 import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel } from '../models/container';
 import { formatLogs } from '../helpers/logHelper';
@@ -24,6 +25,7 @@ function ContainerServiceFactory($q, Container, $timeout, EndpointProvider) {
     resumeContainer: withEndpointId(resumeContainer),
     startContainer: withEndpointId(startContainer),
     stopContainer: withEndpointId(stopContainer),
+    recreateContainer: withEndpointId(recreateContainer),
     remove: withEndpointId(removeContainer),
     updateRestartPolicy,
     updateLimits,

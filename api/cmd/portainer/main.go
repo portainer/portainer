@@ -24,6 +24,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
@@ -233,8 +234,8 @@ func initSSLService(addr, certPath, keyPath string, fileService portainer.FileSe
 	return sslService, nil
 }
 
-func initDockerClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *docker.ClientFactory {
-	return docker.NewClientFactory(signatureService, reverseTunnelService)
+func initDockerClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *client.ClientFactory {
+	return client.NewClientFactory(signatureService, reverseTunnelService)
 }
 
 func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, dataStore dataservices.DataStore, instanceID, addrHTTPS, userSessionTimeout string) (*kubecli.ClientFactory, error) {
@@ -244,7 +245,7 @@ func initKubernetesClientFactory(signatureService portainer.DigitalSignatureServ
 func initSnapshotService(
 	snapshotIntervalFromFlag string,
 	dataStore dataservices.DataStore,
-	dockerClientFactory *docker.ClientFactory,
+	dockerClientFactory *client.ClientFactory,
 	kubernetesClientFactory *kubecli.ClientFactory,
 	shutdownCtx context.Context,
 ) (portainer.SnapshotService, error) {
