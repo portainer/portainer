@@ -2,6 +2,7 @@
 
 <application-settings-panel ng-if="settings" settings="settings" on-submit="(updateSettings)"></application-settings-panel>
 
+<!-- kube settings -->
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
@@ -80,6 +81,7 @@
 <ssl-ca-file-settings></ssl-ca-file-settings>
 <ssl-certificate-settings ng-show="state.showHTTPS"></ssl-certificate-settings>
 
+<!-- hidden containers -->
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
@@ -140,6 +142,7 @@
   </div>
 </div>
 
+<!-- backup -->
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
