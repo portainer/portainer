@@ -107,8 +107,12 @@ type Handler struct {
 
 // @tag.name auth
 // @tag.description Authenticate against Portainer HTTP API
+// @tag.name backup
+// @tag.description Manage backups
 // @tag.name custom_templates
 // @tag.description Manage Custom Templates
+// @tag.name docker
+// @tag.description Manage Docker resources
 // @tag.name edge
 // @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name edge_groups
@@ -119,14 +123,20 @@ type Handler struct {
 // @tag.description Manage Edge Stacks
 // @tag.name edge_templates
 // @tag.description Manage Edge Templates
-// @tag.name endpoints
-// @tag.description Manage Docker environments(endpoints)
 // @tag.name endpoint_groups
 // @tag.description Manage environment(endpoint) groups
+// @tag.name endpoints
+// @tag.description Manage Docker environments(endpoints)
 // @tag.name gitops
 // @tag.description Operate git repository
+// @tag.name helm
+// @tag.description Manage Helm charts
+// @tag.name intel
+// @tag.description Manage Intel AMT settings
 // @tag.name kubernetes
 // @tag.description Manage Kubernetes cluster
+// @tag.name ldap
+// @tag.description Manage LDAP settings
 // @tag.name motd
 // @tag.description Fetch the message of the day
 // @tag.name registries
@@ -147,16 +157,16 @@ type Handler struct {
 // @tag.description Manage Portainer system
 // @tag.name tags
 // @tag.description Manage tags
-// @tag.name teams
-// @tag.description Manage teams
 // @tag.name team_memberships
 // @tag.description Manage team memberships
+// @tag.name teams
+// @tag.description Manage teams
 // @tag.name templates
 // @tag.description Manage App Templates
-// @tag.name users
-// @tag.description Manage users
 // @tag.name upload
 // @tag.description Upload files
+// @tag.name users
+// @tag.description Manage users
 // @tag.name webhooks
 // @tag.description Manage webhooks
 // @tag.name websocket
