@@ -1,8 +1,7 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
-import { ModalType } from '@@/modals';
 import { confirmImageExport } from '@/react/docker/images/common/ConfirmExportModal';
-import { confirm } from '@@/modals/confirm';
+import { confirmDestructive } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.docker').controller('ImagesController', [
@@ -15,7 +14,8 @@ angular.module('portainer.docker').controller('ImagesController', [
   'FileSaver',
   'Blob',
   'endpoint',
-  function ($scope, $state, Authentication, ImageService, Notifications, HttpRequestHelper, FileSaver, Blob, endpoint) {
+  '$async',
+  function ($scope, $state, Authentication, ImageService, Notifications, HttpRequestHelper, FileSaver, Blob, endpoint, $async) {
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
 
@@ -54,14 +54,39 @@ angular.module('portainer.docker').controller('ImagesController', [
         });
     };
 
-    $scope.confirmRemovalAction = function (selectedItems, force) {
-      confirmImageForceRemoval().then((confirmed) => {
+    $scope.confirmForceRemove = confirmForceRemove;
+    function confirmForceRemove(selectedItems, force) {
+      return $async(async () => {
+        const confirmed = await confirmDestructive({
+          title: 'Are you sure?',
+          message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
+          confirmButton: buildConfirmButton('Remove the image', 'danger'),
+        });
+
         if (!confirmed) {
           return;
         }
+
         $scope.removeAction(selectedItems, force);
       });
-    };
+    }
+
+    $scope.confirmRemove = confirmRemove;
+    function confirmRemove(selectedItems) {
+      return $async(async () => {
+        const confirmed = await confirmDestructive({
+          title: 'Are you sure?',
+          message: 'Removing the image will remove all tags associated to that image. Are you sure you want to remove the image?',
+          confirmButton: buildConfirmButton('Remove the image', 'danger'),
+        });
+
+        if (!confirmed) {
+          return;
+        }
+
+        $scope.removeAction(selectedItems, false);
+      });
+    }
 
     function isAuthorizedToDownload(selectedItems) {
       for (var i = 0; i < selectedItems.length; i++) {
@@ -161,12 +186,3 @@ angular.module('portainer.docker').controller('ImagesController', [
     initView();
   },
 ]);
-
-function confirmImageForceRemoval() {
-  return confirm({
-    title: 'Are you sure?',
-    modalType: ModalType.Destructive,
-    message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
-    confirmButton: buildConfirmButton('Remove the image', 'danger'),
-  });
-}
