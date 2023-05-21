@@ -4,8 +4,11 @@ import { compact } from 'lodash';
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import { getNamespaces } from '../namespaces/service';
+
+import { Service } from './types';
 
 export const queryKeys = {
   list: (environmentId: EnvironmentId) =>
@@ -18,7 +21,7 @@ async function getServices(
   lookupApps: boolean
 ) {
   try {
-    const { data: services } = await axios.get(
+    const { data: services } = await axios.get<Array<Service>>(
       `kubernetes/${environmentId}/namespaces/${namespace}/services`,
       {
         params: {
@@ -48,12 +51,6 @@ export function useServices(environmentId: EnvironmentId) {
     },
     withError('Unable to get services.')
   );
-}
-
-function isFulfilled<T>(
-  input: PromiseSettledResult<T>
-): input is PromiseFulfilledResult<T> {
-  return input.status === 'fulfilled';
 }
 
 export function useMutationDeleteServices(environmentId: EnvironmentId) {

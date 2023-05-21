@@ -4,9 +4,9 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
-	"fmt"
+	"net/url"
 	"os"
-	"strings"
+	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 
@@ -17,7 +17,7 @@ import (
 // KubeClusterAccessService represents a service that is responsible for centralizing kube cluster access data
 type KubeClusterAccessService interface {
 	IsSecure() bool
-	GetData(hostURL string, endpointId portainer.EndpointID) kubernetesClusterAccessData
+	GetClusterDetails(hostURL string, endpointId portainer.EndpointID, isInternal bool) kubernetesClusterAccessData
 }
 
 // KubernetesClusterAccess represents core details which can be used to generate KubeConfig file/data
@@ -89,21 +89,20 @@ func (service *kubeClusterAccessService) IsSecure() bool {
 	return service.certificateAuthorityData != ""
 }
 
-// GetData returns K8s cluster access details for the specified environment(endpoint).
+// GetClusterDetails returns K8s cluster access details for the specified environment(endpoint).
 // The struct can be used to:
 // - generate a kubeconfig file
 // - pass down params to binaries
-func (service *kubeClusterAccessService) GetData(hostURL string, endpointID portainer.EndpointID) kubernetesClusterAccessData {
-	baseURL := service.baseURL
-
-	// When the api call is internal, the baseURL should not be used.
+// - isInternal is used to determine whether the kubeclient is accessed internally (for example using the kube client for backend calls) or externally (for example downloading the kubeconfig file)
+func (service *kubeClusterAccessService) GetClusterDetails(hostURL string, endpointID portainer.EndpointID, isInternal bool) kubernetesClusterAccessData {
 	if hostURL == "localhost" {
 		hostURL += service.httpsBindAddr
-		baseURL = "/"
 	}
 
-	if baseURL != "/" {
-		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	baseURL := service.baseURL
+	// When the kubeclient call is internal, the baseURL should not be used.
+	if isInternal {
+		baseURL = ""
 	}
 
 	log.Debug().
@@ -112,9 +111,10 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 		Str("base_URL", baseURL).
 		Msg("kubeconfig")
 
-	clusterURL := hostURL + baseURL
-
-	clusterServerURL := fmt.Sprintf("https://%sapi/endpoints/%d/kubernetes", clusterURL, endpointID)
+	clusterServerURL, err := url.JoinPath("https://", hostURL, baseURL, "/api/endpoints/", strconv.Itoa(int(endpointID)), "/kubernetes")
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create Kubeconfig cluster URL")
+	}
 
 	return kubernetesClusterAccessData{
 		ClusterServerURL:         clusterServerURL,

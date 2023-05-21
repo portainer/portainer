@@ -1,27 +1,26 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 
 import { EdgeUpdateListItemResponse } from '../../queries/list';
 import { StatusType } from '../../types';
 
-export const scheduleStatus: Column<EdgeUpdateListItemResponse> = {
-  Header: 'Status',
-  accessor: (row) => row.status,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  Cell: StatusCell,
-  disableSortBy: true,
-};
+import { columnHelper } from './helper';
+
+export const scheduleStatus = columnHelper.accessor('status', {
+  header: 'Status',
+  cell: StatusCell,
+});
 
 function StatusCell({
-  value: status,
+  getValue,
   row: {
     original: { statusMessage },
   },
-}: CellProps<
+}: CellContext<
   EdgeUpdateListItemResponse,
   EdgeUpdateListItemResponse['status']
 >) {
+  const status = getValue();
+
   switch (status) {
     case StatusType.Failed:
       return statusMessage;

@@ -1,6 +1,7 @@
 package security
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -37,6 +38,8 @@ func TestLimitAccess(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 
 		if status := resp.StatusCode; status != http.StatusForbidden {
 			t.Errorf("handler returned wrong status code: got %v want %v",

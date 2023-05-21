@@ -49,6 +49,8 @@ type publicSettingsResponse struct {
 		// The check in interval for edge agent (in seconds) - used in non async mode [seconds]
 		CheckinInterval int `example:"60"`
 	}
+
+	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
 }
 
 // @id SettingsPublic
@@ -88,6 +90,8 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 	publicSettings.Edge.SnapshotInterval = appSettings.Edge.SnapshotInterval
 	publicSettings.Edge.CommandInterval = appSettings.Edge.CommandInterval
 	publicSettings.Edge.CheckinInterval = appSettings.EdgeAgentCheckinInterval
+
+	publicSettings.IsDockerDesktopExtension = appSettings.IsDockerDesktopExtension
 
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {

@@ -1,6 +1,8 @@
 package datastore
 
 import (
+	"os"
+
 	portainer "github.com/portainer/portainer/api"
 )
 
@@ -20,6 +22,12 @@ func (store *Store) Init() error {
 }
 
 func (store *Store) checkOrCreateDefaultSettings() error {
+
+	isDDExtention := false
+	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
+		isDDExtention = true
+	}
+
 	// TODO: these need to also be applied when importing
 	settings, err := store.SettingsService.Settings()
 	if store.IsErrObjectNotFound(err) {
@@ -51,6 +59,8 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
 			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,
 			KubectlShellImage:        portainer.DefaultKubectlShellImage,
+
+			IsDockerDesktopExtension: isDDExtention,
 		}
 
 		return store.SettingsService.UpdateSettings(defaultSettings)

@@ -19,7 +19,7 @@ export function DetailsRow({
       <td className={clsx(colClassName, 'min-w-[150px] !break-normal')}>
         {label}
       </td>
-      {children && (
+      {!!children && (
         <td className={colClassName} data-cy={`detailsTable-${label}Value`}>
           {children}
         </td>

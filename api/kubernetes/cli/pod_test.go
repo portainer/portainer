@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -30,7 +31,7 @@ func Test_waitForPodStatus(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.TODO())
 		cancel()
 		err := k.waitForPodStatus(ctx, v1.PodRunning, podSpec)
-		if err != context.Canceled {
+		if !errors.Is(err, context.Canceled) {
 			t.Errorf("waitForPodStatus should throw context cancellation error; err=%s", err)
 		}
 	})
@@ -59,7 +60,7 @@ func Test_waitForPodStatus(t *testing.T) {
 		ctx, cancelFunc := context.WithTimeout(context.TODO(), 0*time.Second)
 		defer cancelFunc()
 		err = k.waitForPodStatus(ctx, v1.PodRunning, podSpec)
-		if err != context.DeadlineExceeded {
+		if !errors.Is(err, context.DeadlineExceeded) {
 			t.Errorf("waitForPodStatus should throw deadline exceeded error; err=%s", err)
 		}
 	})

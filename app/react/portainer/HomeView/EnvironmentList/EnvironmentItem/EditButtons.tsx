@@ -23,7 +23,9 @@ export function EditButtons({ environment }: { environment: Environment }) {
 
   const buttonsClasses = clsx(
     'w-full h-full !ml-0 !rounded-none',
-    'hover:bg-gray-3 th-dark:hover:bg-gray-9 th-highcontrast:hover:bg-white'
+    'hover:bg-gray-3',
+    'th-dark:hover:bg-gray-9',
+    'th-highcontrast:hover:bg-white th-highcontrast:hover:text-black'
   );
 
   return (
@@ -85,8 +87,13 @@ function ButtonsGrid({
   return (
     <div
       className={clsx(
-        'grid rounded-r-lg border border-solid',
-        'border-gray-5 th-highcontrast:border-white th-dark:border-gray-9',
+        'grid',
+        // trace borders but make them transparent so
+        // * hovering the env item won't make env box borders clip with the grid borders
+        // * hovering the buttons won't make the button's icon flicker
+        'rounded-r-lg border border-solid',
+        'border-y-transparent border-r-transparent',
+        'border-l-gray-5 th-highcontrast:border-l-white th-dark:border-l-gray-9',
         'overflow-hidden',
         className
       )}
@@ -95,7 +102,7 @@ function ButtonsGrid({
         <div
           key={index}
           className={clsx({
-            'border-0 border-b border-solid border-b-inherit':
+            'border-0 border-b border-solid border-b-gray-5 th-highcontrast:border-b-white th-dark:border-b-gray-9':
               index < children.length - 1,
           })}
         >

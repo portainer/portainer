@@ -160,8 +160,12 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	}
 	payload.Gpus = gpus
 
-	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
-	payload.EdgeCheckinInterval = checkinInterval
+	edgeCheckinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "EdgeCheckinInterval", true)
+	if edgeCheckinInterval == 0 {
+		// deprecated CheckinInterval
+		edgeCheckinInterval, _ = request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
+	}
+	payload.EdgeCheckinInterval = edgeCheckinInterval
 
 	return nil
 }

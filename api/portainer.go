@@ -177,8 +177,11 @@ type (
 		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
 		// URL of the template's logo
 		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
-		// Type of created stack (1 - swarm, 2 - compose)
-		Type            StackType        `json:"Type" example:"1"`
+		// Type of created stack:
+		// * 1 - swarm
+		// * 2 - compose
+		// * 3 - kubernetes
+		Type            StackType        `json:"Type" example:"1" enums:"1,2,3"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
 		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
@@ -964,6 +967,8 @@ type (
 		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
 		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
 		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
+
+		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
@@ -1331,7 +1336,7 @@ type (
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}

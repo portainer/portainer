@@ -12,7 +12,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { createPersistedStore } from '@@/datatables/types';
-import { useSearchBarState } from '@@/datatables/SearchBar';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { notificationsStore } from './notifications-store';
 import { ToastNotification } from './types';
@@ -32,8 +32,7 @@ export function NotificationsView() {
     [];
 
   const breadcrumbs = 'Notifications';
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
 
   const {
     params: { id: activeItemId },
@@ -47,17 +46,12 @@ export function NotificationsView() {
         title="Notifications"
         titleIcon={Bell}
         dataset={userNotifications}
+        settingsManager={tableState}
         emptyContentLabel="No notifications found"
         totalCount={userNotifications.length}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
-        initialPageSize={settings.pageSize}
-        onPageSizeChange={settings.setPageSize}
-        initialSortBy={settings.sortBy}
-        onSortByChange={settings.setSortBy}
-        searchValue={search}
-        onSearchChange={setSearch}
         getRowId={(row) => row.id}
         highlightedItemId={activeItemId}
       />

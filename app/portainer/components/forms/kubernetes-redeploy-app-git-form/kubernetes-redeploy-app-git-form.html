@@ -9,6 +9,7 @@
     value="$ctrl.formValues.AutoUpdate"
     on-change="($ctrl.onChangeAutoUpdate)"
     environment-type="KUBERNETES"
+    is-force-pull-visible="false"
     base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
     webhook-id="{{ $ctrl.state.webhookId }}"
     webhooks-docs="https://docs.portainer.io/user/kubernetes/applications/webhooks"

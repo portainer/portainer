@@ -1,5 +1,3 @@
-import _ from 'lodash';
-import { useStore } from 'zustand';
 import { Box } from 'lucide-react';
 
 import { DockerContainer } from '@/react/docker/containers/types';
@@ -10,14 +8,14 @@ import { ContainersDatatableActions } from '@/react/docker/containers/ListView/C
 import { ContainersDatatableSettings } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableSettings';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
 
-import { Datatable, TableSettingsMenu } from '@@/datatables';
+import { Datatable, Table } from '@@/datatables';
 import {
   buildAction,
   QuickActionsSettings,
 } from '@@/datatables/QuickActionsSettings';
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
-import { useSearchBarState } from '@@/datatables/SearchBar';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { useContainers } from '../../containers/queries/containers';
 import { RowProvider } from '../../containers/ListView/ContainersDatatable/RowContext';
@@ -39,24 +37,17 @@ export interface Props {
 }
 
 export function StackContainersDatatable({ environment, stackName }: Props) {
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
 
   const isGPUsColumnVisible = useShowGPUsColumn(environment.Id);
   const columns = useColumns(false, isGPUsColumnVisible);
 
-  const hidableColumns = _.compact(
-    columns.filter((col) => col.canHide).map((col) => col.id)
-  );
-
-  const containersQuery = useContainers(
-    environment.Id,
-    true,
-    {
+  const containersQuery = useContainers(environment.Id, {
+    filters: {
       label: [`com.docker.compose.project=${stackName}`],
     },
-    settings.autoRefreshRate * 1000
-  );
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
 
   return (
     <RowProvider context={{ environment }}>
@@ -64,12 +55,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
         <Datatable
           title="Containers"
           titleIcon={Box}
-          initialPageSize={settings.pageSize}
-          onPageSizeChange={settings.setPageSize}
-          initialSortBy={settings.sortBy}
-          onSortByChange={settings.setSortBy}
-          searchValue={search}
-          onSearchChange={setSearch}
+          settingsManager={tableState}
           columns={columns}
           renderTableActions={(selectedRows) => (
             <ContainersDatatableActions
@@ -78,27 +64,35 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
               endpointId={environment.Id}
             />
           )}
-          initialTableState={{ hiddenColumns: settings.hiddenColumns }}
+          initialTableState={{
+            columnVisibility: Object.fromEntries(
+              tableState.hiddenColumns.map((col) => [col, false])
+            ),
+          }}
           renderTableSettings={(tableInstance) => {
-            const columnsToHide = tableInstance.allColumns.filter(
-              (colInstance) => hidableColumns?.includes(colInstance.id)
-            );
+            const columnsToHide = tableInstance
+              .getAllColumns()
+              .filter((col) => col.getCanHide());
 
             return (
               <>
                 <ColumnVisibilityMenu<DockerContainer>
                   columns={columnsToHide}
                   onChange={(hiddenColumns) => {
-                    settings.setHiddenColumns(hiddenColumns);
-                    tableInstance.setHiddenColumns(hiddenColumns);
+                    tableState.setHiddenColumns(hiddenColumns);
+                    tableInstance.setColumnVisibility(
+                      Object.fromEntries(
+                        hiddenColumns.map((col) => [col, false])
+                      )
+                    );
                   }}
-                  value={settings.hiddenColumns}
+                  value={tableState.hiddenColumns}
                 />
-                <TableSettingsMenu
+                <Table.SettingsMenu
                   quickActions={<QuickActionsSettings actions={actions} />}
                 >
-                  <ContainersDatatableSettings settings={settings} />
-                </TableSettingsMenu>
+                  <ContainersDatatableSettings settings={tableState} />
+                </Table.SettingsMenu>
               </>
             );
           }}

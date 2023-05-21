@@ -5,15 +5,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/libhelm"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type settingsUpdatePayload struct {
@@ -58,21 +61,26 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.AuthenticationMethod != nil && *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
 		return errors.New("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
+
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
 		return errors.New("Invalid logo URL. Must correspond to a valid URL format")
 	}
+
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return errors.New("Invalid external templates URL. Must correspond to a valid URL format")
 	}
+
 	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" && !govalidator.IsURL(*payload.HelmRepositoryURL) {
 		return errors.New("Invalid Helm repository URL. Must correspond to a valid URL format")
 	}
+
 	if payload.UserSessionTimeout != nil {
 		_, err := time.ParseDuration(*payload.UserSessionTimeout)
 		if err != nil {
 			return errors.New("Invalid user session timeout")
 		}
 	}
+
 	if payload.KubeconfigExpiry != nil {
 		_, err := time.ParseDuration(*payload.KubeconfigExpiry)
 		if err != nil {
@@ -111,9 +119,33 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
+	var settings *portainer.Settings
+	if featureflags.IsEnabled(portainer.FeatureNoTx) {
+		settings, err = handler.updateSettings(handler.DataStore, payload)
+	} else {
+		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			settings, err = handler.updateSettings(tx, payload)
+			return err
+		})
+	}
+
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve the settings from the database", err)
+		var httpErr *httperror.HandlerError
+		if errors.As(err, &httpErr) {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	hideFields(settings)
+	return response.JSON(w, settings)
+}
+
+func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload settingsUpdatePayload) (*portainer.Settings, error) {
+	settings, err := tx.Settings().Settings()
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve the settings from the database", err)
 	}
 
 	if handler.demoService.IsDemo() {
@@ -145,7 +177,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
 				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL, nil)
 				if err != nil {
-					return httperror.BadRequest("Invalid Helm repository URL. Must correspond to a valid URL format", err)
+					return nil, httperror.BadRequest("Invalid Helm repository URL. Must correspond to a valid URL format", err)
 				}
 			}
 
@@ -185,6 +217,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		if clientSecret == "" {
 			clientSecret = settings.OAuthSettings.ClientSecret
 		}
+
 		kubeSecret := payload.OAuthSettings.KubeSecretKey
 		if kubeSecret == nil {
 			kubeSecret = settings.OAuthSettings.KubeSecretKey
@@ -213,7 +246,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
 		if err != nil {
-			return httperror.InternalServerError("Unable to update snapshot interval", err)
+			return nil, httperror.InternalServerError("Unable to update snapshot interval", err)
 		}
 	}
 
@@ -237,21 +270,21 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EnableTelemetry = *payload.EnableTelemetry
 	}
 
-	tlsError := handler.updateTLS(settings)
-	if tlsError != nil {
-		return tlsError
+	err = handler.updateTLS(settings)
+	if err != nil {
+		return nil, err
 	}
 
 	if payload.KubectlShellImage != nil {
 		settings.KubectlShellImage = *payload.KubectlShellImage
 	}
 
-	err = handler.DataStore.Settings().UpdateSettings(settings)
+	err = tx.Settings().UpdateSettings(settings)
 	if err != nil {
-		return httperror.InternalServerError("Unable to persist settings changes inside the database", err)
+		return nil, httperror.InternalServerError("Unable to persist settings changes inside the database", err)
 	}
 
-	return response.JSON(w, settings)
+	return settings, nil
 }
 
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
@@ -260,16 +293,19 @@ func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, sna
 	return handler.SnapshotService.SetSnapshotInterval(snapshotInterval)
 }
 
-func (handler *Handler) updateTLS(settings *portainer.Settings) *httperror.HandlerError {
+func (handler *Handler) updateTLS(settings *portainer.Settings) error {
 	if (settings.LDAPSettings.TLSConfig.TLS || settings.LDAPSettings.StartTLS) && !settings.LDAPSettings.TLSConfig.TLSSkipVerify {
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(filesystem.LDAPStorePath, portainer.TLSFileCA)
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
-	} else {
-		settings.LDAPSettings.TLSConfig.TLSCACertPath = ""
-		err := handler.FileService.DeleteTLSFiles(filesystem.LDAPStorePath)
-		if err != nil {
-			return httperror.InternalServerError("Unable to remove TLS files from disk", err)
-		}
+
+		return nil
 	}
+
+	settings.LDAPSettings.TLSConfig.TLSCACertPath = ""
+	err := handler.FileService.DeleteTLSFiles(filesystem.LDAPStorePath)
+	if err != nil {
+		return httperror.InternalServerError("Unable to remove TLS files from disk", err)
+	}
+
 	return nil
 }

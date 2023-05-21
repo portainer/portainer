@@ -1,6 +1,7 @@
 package edgejobs
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -83,8 +84,9 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 	})
 
 	if err != nil {
-		if httpErr, ok := err.(*httperror.HandlerError); ok {
-			return httpErr
+		var handlerError *httperror.HandlerError
+		if errors.As(err, &handlerError) {
+			return handlerError
 		}
 
 		return httperror.InternalServerError("Unexpected error", err)

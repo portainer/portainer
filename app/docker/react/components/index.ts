@@ -59,7 +59,6 @@ export const componentsModule = angular
     r2a(InsightsBox, [
       'header',
       'content',
-      'setHtmlContent',
       'insightCloseId',
       'type',
       'className',

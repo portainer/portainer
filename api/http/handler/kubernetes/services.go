@@ -10,6 +10,22 @@ import (
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 )
 
+// @id getKubernetesServices
+// @summary Get a list of kubernetes services for a given namespace
+// @description Get a list of kubernetes services for a given namespace
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
+// @param lookupapplications query boolean false "Lookup applications associated with each service"
+// @success 200 {array} models.K8sServiceInfo "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace}/services [get]
 func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
@@ -56,6 +72,22 @@ func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Req
 	return response.JSON(w, services)
 }
 
+// @id createKubernetesService
+// @summary Create a kubernetes service
+// @description Create a kubernetes service within a given namespace
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
+// @param body body models.K8sServiceInfo true "Service definition"
+// @success 200  "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace}/services [post]
 func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
@@ -102,6 +134,21 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 	return nil
 }
 
+// @id deleteKubernetesServices
+// @summary Delete kubernetes services
+// @description Delete the provided list of kubernetes services
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param body body models.K8sServiceDeleteRequests true "A map where the key is the namespace and the value is an array of services to delete"
+// @success 200  "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/services/delete [post]
 func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -140,6 +187,22 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 	return nil
 }
 
+// @id updateKubernetesService
+// @summary Update a kubernetes service
+// @description Update a kubernetes service within a given namespace
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
+// @param body body models.K8sServiceInfo true "Service definition"
+// @success 200  "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace}/services [put]
 func (handler *Handler) updateKubernetesService(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {

@@ -211,7 +211,7 @@ async function createEnvironment(
       PublicURL: options.publicUrl,
       GroupID: groupId,
       TagIds: arrayToJson(tagIds),
-      CheckinInterval: options.pollFrequency,
+      EdgeCheckinInterval: options.pollFrequency,
     };
 
     const { tls, azure } = options;

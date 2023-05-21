@@ -30,10 +30,6 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 		return errors.New("tagIDs is mandatory for a dynamic Edge group")
 	}
 
-	if !payload.Dynamic && len(payload.Endpoints) == 0 {
-		return errors.New("environment is mandatory for a static Edge group")
-	}
-
 	return nil
 }
 

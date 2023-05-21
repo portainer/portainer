@@ -42,3 +42,8 @@ func SanitizeLabel(value string) string {
 	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
 	return re.ReplaceAllString(value, ".")
 }
+
+// IsGitStack checks if the stack is a git stack or not
+func IsGitStack(stack *portainer.Stack) bool {
+	return stack.GitConfig != nil && len(stack.GitConfig.URL) != 0
+}

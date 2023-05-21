@@ -8,6 +8,10 @@ import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/Acce
 import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceRegistriesSelector';
 import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
 import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
+import { ApplicationSummaryWidget } from '@/react/kubernetes/applications/DetailsView';
+import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
 
 export const componentsModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -82,4 +86,11 @@ export const componentsModule = angular
       'onChange',
       'supportGlobalDeployment',
     ])
+  )
+  .component(
+    'applicationSummaryWidget',
+    r2a(
+      withUIRouter(withReactQuery(withUserProvider(ApplicationSummaryWidget))),
+      []
+    )
   ).name;

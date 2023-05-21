@@ -55,7 +55,7 @@ export function useEnvironments() {
   const envs: Array<WaitingRoomEnvironment> =
     environmentsQuery.environments.map((env) => ({
       ...env,
-      Group: groupsQuery.data?.[env.GroupId] || '',
+      Group: (env.GroupId !== 1 && groupsQuery.data?.[env.GroupId]) || '',
       EdgeGroups:
         environmentEdgeGroupsQuery.data?.[env.Id]?.map((env) => env.group) ||
         [],

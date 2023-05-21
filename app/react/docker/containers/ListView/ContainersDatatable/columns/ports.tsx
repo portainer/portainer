@@ -1,29 +1,30 @@
-import { Column } from 'react-table';
 import _ from 'lodash';
 import { ExternalLink } from 'lucide-react';
+import { CellContext } from '@tanstack/react-table';
 
-import type { DockerContainer, Port } from '@/react/docker/containers/types';
+import type { DockerContainer } from '@/react/docker/containers/types';
 
 import { Icon } from '@@/Icon';
 
 import { useRowContext } from '../RowContext';
 
-export const ports: Column<DockerContainer> = {
-  Header: 'Published Ports',
-  accessor: 'Ports',
-  id: 'ports',
-  Cell: PortsCell,
-  disableSortBy: true,
-  disableFilters: true,
-  canHide: true,
-  Filter: () => null,
-};
+import { columnHelper } from './helper';
 
-interface Props {
-  value: Port[];
-}
+export const ports = columnHelper.accessor(
+  (row) =>
+    _.uniqBy(row.Ports, 'public')
+      .map((port) => `${port.public}:${port.private}`)
+      .join(','),
+  {
+    header: 'Published Ports',
+    id: 'ports',
+    cell: Cell,
+  }
+);
 
-function PortsCell({ value: ports }: Props) {
+function Cell({ row }: CellContext<DockerContainer, string>) {
+  const ports = row.original.Ports;
+
   const { environment } = useRowContext();
 
   if (ports.length === 0) {

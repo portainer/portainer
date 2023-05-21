@@ -10,7 +10,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { createTag, getTags } from './tags.service';
 import { Tag, TagId } from './types';
 
-const tagKeys = {
+export const tagKeys = {
   all: ['tags'] as const,
   tag: (id: TagId) => [...tagKeys.all, id] as const,
 };

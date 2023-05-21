@@ -16,15 +16,16 @@ export interface TableSettings
     RefreshableTableSettings,
     SystemResourcesTableSettings {}
 
-export function systemResourcesSettings(
-  set: ZustandSetFunc<SystemResourcesTableSettings>
+export function systemResourcesSettings<T extends SystemResourcesTableSettings>(
+  set: ZustandSetFunc<T>
 ): SystemResourcesTableSettings {
   return {
     showSystemResources: false,
     setShowSystemResources(showSystemResources: boolean) {
-      set({
+      set((s) => ({
+        ...s,
         showSystemResources,
-      });
+      }));
     },
   };
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
-import { Laptop } from 'lucide-react';
+import { FlaskConical, Laptop } from 'lucide-react';
 
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
 import {
@@ -38,7 +38,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
     return (
       <Widget>
         <Widget.Body>
-          <TextTip color="blue">
+          <TextTip color="blue" icon={FlaskConical}>
             Since FDO is still an experimental feature that requires additional
             infrastructure, it has been temporarily hidden in the UI.
           </TextTip>

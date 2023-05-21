@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from 'react-query';
-import _ from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
@@ -15,7 +13,7 @@ import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
-import { DockerNetwork, NetworkContainer } from '../types';
+import { NetworkResponseContainers } from '../types';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
@@ -25,28 +23,18 @@ export function ItemView() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const [networkContainers, setNetworkContainers] = useState<
-    NetworkContainer[]
-  >([]);
   const {
     params: { id: networkId, nodeName },
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
-
-  const networkQuery = useNetwork(environmentId, networkId);
+  const networkQuery = useNetwork(environmentId, networkId, { nodeName });
   const deleteNetworkMutation = useDeleteNetwork();
-  const filters = {
-    network: [networkId],
-  };
-  const containersQuery = useContainers(environmentId, true, filters);
-
-  useEffect(() => {
-    if (networkQuery.data && containersQuery.data) {
-      setNetworkContainers(
-        filterContainersInNetwork(networkQuery.data, containersQuery.data)
-      );
-    }
-  }, [networkQuery.data, containersQuery.data]);
+  const containersQuery = useContainers(environmentId, {
+    filters: {
+      network: [networkId],
+    },
+    nodeName,
+  });
 
   if (!networkQuery.data) {
     return null;
@@ -54,6 +42,10 @@ export function ItemView() {
 
   const network = networkQuery.data;
 
+  const networkContainers = filterContainersInNetwork(
+    network.Containers,
+    containersQuery.data
+  );
   const resourceControl = network.Portainer?.ResourceControl
     ? new ResourceControlViewModel(network.Portainer.ResourceControl)
     : undefined;
@@ -116,24 +108,20 @@ export function ItemView() {
       );
     }
   }
+}
 
-  function filterContainersInNetwork(
-    network: DockerNetwork,
-    containers: DockerContainer[]
-  ) {
-    const containersInNetwork = _.compact(
-      containers.map((container) => {
-        const containerInNetworkResponse = network.Containers[container.Id];
-        if (containerInNetworkResponse) {
-          const containerInNetwork: NetworkContainer = {
-            ...containerInNetworkResponse,
-            Id: container.Id,
-          };
-          return containerInNetwork;
-        }
-        return null;
-      })
-    );
-    return containersInNetwork;
+function filterContainersInNetwork(
+  networkContainers?: NetworkResponseContainers,
+  containers: DockerContainer[] = []
+) {
+  if (!networkContainers) {
+    return [];
   }
+
+  return containers
+    .filter((container) => networkContainers[container.Id])
+    .map((container) => ({
+      ...networkContainers[container.Id],
+      Id: container.Id,
+    }));
 }

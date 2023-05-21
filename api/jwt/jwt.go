@@ -3,7 +3,6 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -169,7 +168,12 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		return "", fmt.Errorf("invalid scope: %v", scope)
 	}
 
-	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
+	settings, err := service.dataStore.Settings().Settings()
+	if err != nil {
+		return "", fmt.Errorf("failed fetching settings from db: %w", err)
+	}
+
+	if settings.IsDockerDesktopExtension {
 		// Set expiration to 99 years for docker desktop extension.
 		log.Info().Msg("detected docker desktop extension mode")
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   forwardRef,
   useRef,
@@ -16,11 +17,21 @@ interface Props extends HTMLProps<HTMLInputElement> {
   className?: string;
   role?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
+  bold?: boolean;
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, Props>(
   (
-    { indeterminate, title, label, id, checked, onChange, ...props }: Props,
+    {
+      indeterminate,
+      title,
+      label,
+      id,
+      checked,
+      onChange,
+      bold = true,
+      ...props
+    }: Props,
     ref
   ) => {
     const defaultRef = useRef<HTMLInputElement>(null);
@@ -50,7 +61,9 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...props}
         />
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={id} className={clsx({ '!font-normal': !bold })}>
+          {label}
+        </label>
       </div>
     );
   }

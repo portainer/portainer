@@ -1,15 +1,13 @@
 package dataservices
 
-// 	"github.com/portainer/portainer/api/dataservices"
-
 import (
+	"errors"
 	"io"
 	"time"
 
-	"github.com/portainer/portainer/api/database/models"
-	"github.com/portainer/portainer/api/dataservices/errors"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database/models"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 type (
@@ -325,5 +323,5 @@ type (
 )
 
 func IsErrObjectNotFound(e error) bool {
-	return e == errors.ErrObjectNotFound
+	return errors.Is(e, dserrors.ErrObjectNotFound)
 }

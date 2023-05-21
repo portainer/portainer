@@ -40,8 +40,9 @@ export function DifferentTheme() {
             {themes.map((theme) => (
               <td
                 key={theme}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment,
                 // @ts-ignore
+                // eslint-disable-next-line react/no-unknown-property
                 theme={theme}
                 className="p-5"
                 style={{ background: 'var(--bg-body-color)' }}

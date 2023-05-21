@@ -1,45 +1,53 @@
-import { CellProps, Column } from 'react-table';
-
 import { Authorized } from '@/react/hooks/useUser';
-import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 
-import { Service } from '../../types';
+import { columnHelper } from './helper';
 
-export const name: Column<Service> = {
-  Header: 'Name',
-  id: 'Name',
-  accessor: (row) => row.Name,
-  Cell: ({ row }: CellProps<Service>) => {
-    const isSystem = KubernetesNamespaceHelper.isSystemNamespace(
-      row.original.Namespace
-    );
+export const name = columnHelper.accessor(
+  (row) => {
+    let name = row.Name;
 
     const isExternal =
-      !row.original.Labels ||
-      !row.original.Labels['io.portainer.kubernetes.application.owner'];
+      !row.Labels || !row.Labels['io.portainer.kubernetes.application.owner'];
+    const isSystem = isSystemNamespace(row.Namespace);
 
-    return (
-      <Authorized
-        authorizations="K8sServiceW"
-        childrenUnauthorized={row.original.Name}
-      >
-        {row.original.Name}
+    if (isExternal && !isSystem) {
+      name = `${name} external`;
+    }
 
-        {isSystem && (
-          <span className="label label-info image-tag label-margins">
-            system
-          </span>
-        )}
-
-        {isExternal && !isSystem && (
-          <span className="label label-primary image-tag label-margins">
-            external
-          </span>
-        )}
-      </Authorized>
-    );
+    if (isSystem) {
+      name = `${name} system`;
+    }
+    return name;
   },
+  {
+    header: 'Name',
+    id: 'Name',
+    cell: ({ row }) => {
+      const name = row.original.Name;
+      const isSystem = isSystemNamespace(row.original.Namespace);
 
-  disableFilters: true,
-  canHide: true,
-};
+      const isExternal =
+        !row.original.Labels ||
+        !row.original.Labels['io.portainer.kubernetes.application.owner'];
+
+      return (
+        <Authorized authorizations="K8sServiceW" childrenUnauthorized={name}>
+          {name}
+
+          {isSystem && (
+            <span className="label label-info image-tag label-margins">
+              system
+            </span>
+          )}
+
+          {isExternal && !isSystem && (
+            <span className="label label-primary image-tag label-margins">
+              external
+            </span>
+          )}
+        </Authorized>
+      );
+    },
+  }
+);

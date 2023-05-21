@@ -229,7 +229,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
               ))
             )}
           </div>
-          <TableFooter>
+          <TableFooter className="!border-t-0">
             <PaginationControls
               className="!mr-0"
               showAll={totalCount <= 100}

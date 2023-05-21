@@ -1,6 +1,7 @@
 package tags
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -34,8 +35,9 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 
 func txResponse(w http.ResponseWriter, r any, err error) *httperror.HandlerError {
 	if err != nil {
-		if httpErr, ok := err.(*httperror.HandlerError); ok {
-			return httpErr
+		var handlerError *httperror.HandlerError
+		if errors.As(err, &handlerError) {
+			return handlerError
 		}
 
 		return httperror.InternalServerError("Unexpected error", err)

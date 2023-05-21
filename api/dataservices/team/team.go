@@ -1,11 +1,12 @@
 package team
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -71,11 +72,11 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 
 			return &portainer.Team{}, nil
 		})
-	if err == stop {
+	if errors.Is(err, stop) {
 		return t, nil
 	}
 	if err == nil {
-		return nil, errors.ErrObjectNotFound
+		return nil, dserrors.ErrObjectNotFound
 	}
 
 	return nil, err
