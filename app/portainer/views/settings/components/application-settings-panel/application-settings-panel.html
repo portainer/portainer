@@ -1,0 +1,148 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="settings" title-text="Application settings"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- snapshot-interval -->
+          <div class="form-group">
+            <label for="snapshot_interval" class="col-sm-2 control-label text-left">Snapshot interval</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" ng-model="$ctrl.formValues.snapshotInterval" id="snapshot_interval" placeholder="e.g. 15m" />
+            </div>
+          </div>
+          <!-- !snapshot-interval -->
+
+          <!-- checkin-interval -->
+          <edge-checkin-interval-field
+            size="'xsmall'"
+            value="$ctrl.formValues.edgeAgentCheckinInterval"
+            label="'Edge agent default poll frequency'"
+            is-default-hidden="true"
+            on-change="($ctrl.onChangeCheckInInterval)"
+          ></edge-checkin-interval-field>
+          <!-- !checkin-interval -->
+
+          <!-- logo -->
+          <div class="form-group">
+            <por-switch-field
+              label="'Use custom logo'"
+              checked="$ctrl.formValues.logoEnabled"
+              name="'toggle_logo'"
+              disabled="$ctrl.state.isDemo"
+              on-change="($ctrl.onToggleCustomLogo)"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+            ></por-switch-field>
+            <div class="col-sm-12" ng-if="$ctrl.state.isDemo" style="margin-top: 10px">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
+            </div>
+          </div>
+
+          <div ng-if="$ctrl.formValues.logoEnabled">
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small"> You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px. </span>
+            </div>
+            <div class="form-group">
+              <label for="logo_url" class="col-sm-2 control-label text-left"> URL </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="$ctrl.formValues.logoUrl" id="logo_url" placeholder="https://mycompany.com/logo.png" />
+              </div>
+            </div>
+          </div>
+          <!-- !logo -->
+
+          <div class="form-group">
+            <por-switch-field
+              label="'Allow the collection of anonymous statistics'"
+              checked="$ctrl.formValues.enableTelemetry"
+              name="'toggle_enableTelemetry'"
+              on-change="($ctrl.onToggleEnableTelemetry)"
+              disabled="$ctrl.state.isDemo"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+            ></por-switch-field>
+            <div class="col-sm-12" ng-if="$ctrl.state.isDemo" style="margin-top: 10px">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
+            </div>
+            <div class="col-sm-12 text-muted small" style="margin-top: 10px">
+              You can find more information about this in our
+              <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.
+            </div>
+          </div>
+
+          <!-- login screen banner -->
+          <div class="form-group">
+            <por-switch-field
+              label="'Login screen banner'"
+              checked="$ctrl.formValues.customLoginBannerEnabled"
+              name="'toggle_login_banner'"
+              disabled="$ctrl.state.isDemo"
+              feature-id="$ctrl.customBannerFeatureId"
+              on-change="($ctrl.onToggleCustomLoginBanner)"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+            ></por-switch-field>
+            <div class="col-sm-12" ng-if="$ctrl.state.isDemo" style="margin-top: 10px">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
+            </div>
+            <div class="col-sm-12 text-muted small" style="margin-top: 10px"> You can set a custom banner that will be shown to all users during login. </div>
+          </div>
+
+          <div ng-if="$ctrl.formValues.customLoginBannerEnabled">
+            <div class="form-group">
+              <label for="custom_login_banner" class="col-sm-2 control-label required text-left">Details</label>
+              <div class="col-sm-10">
+                <textarea class="form-control" rows="5" ng-model="$ctrl.formValues.customLoginBanner" id="custom_login_banner" placeholder="Banner details"></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- !login screen banner -->
+
+          <!-- templates -->
+          <div class="col-sm-12 form-section-title"> App Templates </div>
+          <div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can specify the URL to your own template definitions file here. See
+                <a href="https://docs.portainer.io/advanced/app-templates/build" target="_blank">Portainer documentation</a> for more details.
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="templates_url" class="col-sm-2 control-label text-left"> URL </label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="$ctrl.formValues.templatesUrl"
+                  id="templates_url"
+                  placeholder="https://myserver.mydomain/templates.json"
+                  required
+                  data-cy="settings-templateUrl"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- !templates -->
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm !ml-0"
+                ng-click="$ctrl.saveApplicationSettings()"
+                ng-disabled="$ctrl.state.actionInProgress || !$ctrl.formValues.templatesUrl || ($ctrl.formValues.customLoginBannerEnabled && !$ctrl.formValues.customLoginBanner)"
+                button-spinner="$ctrl.state.actionInProgress"
+                data-cy="settings-saveSettingsButton"
+              >
+                <span ng-hide="$ctrl.state.actionInProgress">Save application settings</span>
+                <span ng-show="$ctrl.state.actionInProgress">Saving...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
