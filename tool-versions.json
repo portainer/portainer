@@ -1,0 +1,6 @@
+{
+  "description": "This file contains current tool versions",
+  "go_version": "v1.17.6",
+  "node_version": "12.x",
+  "yarn_version": "1.x"
+}
