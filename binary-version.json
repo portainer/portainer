@@ -1,6 +1,0 @@
-{
-  "docker": "v20.10.21",
-  "dockerCompose": "v2.17.2",
-  "helm": "v3.11.0",
-  "kubectl": "v1.24.1"
-}
