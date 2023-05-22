@@ -5658,7 +5658,7 @@ acorn-import-assertions@^1.7.6:
 acorn-jsx@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-3.0.1.tgz#afdf9488fb1ecefc8348f6fb22f464e32a58b36b"
-  integrity sha512-AU7pnZkguthwBjKgCg6998ByQNIMjbuDQZ8bb78QAFZwPfmKia8AIzgY/gWgqCjnht8JLdXmB4YxA0KaV60ncQ==
+  integrity sha1-r9+UiPsezvyDSPb7IvRk4ypYs2s=
   dependencies:
     acorn "^3.0.4"
 
@@ -5689,7 +5689,7 @@ acorn-walk@^8.0.0:
 acorn@^3.0.4:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-3.3.0.tgz#45e37fb39e8da3f25baee3ff5369e2bb5f22017a"
-  integrity sha512-OLUyIIZ7mF5oaAUT1w0TFqQS81q3saT46x8t7ukpPjMNk+nbs4ZHhs7ToV8EWnLYLepjETXd4XaCE4uxkMeqUw==
+  integrity sha1-ReN/s56No/JbruP/U2niu18iAXo=
 
 acorn@^5.5.0:
   version "5.7.4"
@@ -5774,7 +5774,7 @@ ajv-formats@^2.1.1:
 ajv-keywords@^1.0.0:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-1.5.1.tgz#314dd0a4b3368fad3dfcdc54ede6171b886daf3c"
-  integrity sha512-vuBv+fm2s6cqUyey2A7qYcvsik+GMDJsw8BARP2sDE76cqmaZVarsvHf7Vx6VJ0Xk8gLl+u3MoAPf6gKzJefeA==
+  integrity sha1-MU3QpLM2j609/NxU7eYXG4htrzw=
 
 ajv-keywords@^3.1.0, ajv-keywords@^3.4.1, ajv-keywords@^3.5.2:
   version "3.5.2"
@@ -5791,11 +5791,11 @@ ajv-keywords@^5.0.0:
 ajv@^4.7.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.11.8.tgz#82ffb02b29e662ae53bdc20af15947706739c536"
+<<<<<<< HEAD
   integrity sha512-I/bSHSNEcFFqXLf91nchoNB9D1Kie3QKcWdchYUaoIg1+1bdWDkdfdlvdIOJbi9U8xR0y+MWc5D+won9v95WlQ==
-  dependencies:
-    co "^4.6.0"
+=======
+  integrity sha1-gv+wKynmYq5TvcIK8VlHcGc5xTY=
     json-stable-stringify "^1.0.1"
-
 ajv@^6.1.0, ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.2, ajv@^6.12.4, ajv@^6.12.5:
   version "6.12.6"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
@@ -5922,7 +5922,11 @@ ansi-colors@^3.0.0:
 ansi-escapes@^1.1.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-1.4.0.tgz#d3a8a83b319aa67793662b13e761c7911422306e"
+<<<<<<< HEAD
   integrity sha512-wiXutNjDUlNEDWHcYH3jtZUhd3c4/VojassD8zHdHCY13xbZy2XbW+NKQwA0tWGBVzDA9qEzYwfoSsWmviidhw==
+=======
+  integrity sha1-06ioOzGapneTZisT52HHkRQiMG4=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 ansi-escapes@^4.2.1, ansi-escapes@^4.3.0:
   version "4.3.2"
@@ -5942,9 +5946,15 @@ ansi-regex@^2.0.0:
   integrity sha1-w7M6te42DYbg5ijwRorn7yfWVN8=
 
 ansi-regex@^3.0.0:
+<<<<<<< HEAD
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
+=======
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.0.tgz#ed0317c322064f79466c02966bddb605ab37d998"
+  integrity sha1-7QMXwyIGT3lGbAKWa922Bas32Zg=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 ansi-regex@^4.1.0:
   version "4.1.0"
@@ -6021,7 +6031,11 @@ app-root-dir@^1.0.2:
 applause@1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/applause/-/applause-1.2.2.tgz#a8468579e81f67397bb5634c29953bedcd0f56c0"
+<<<<<<< HEAD
   integrity sha512-p6bdj/JHjkj30VMNQvjFcGhmpQcPAKsP11k3Uy/ifngi08XjRmROcekjteXZGAU7ij+5Jh5r0CtcFAXzL4ZqSA==
+=======
+  integrity sha1-qEaFeegfZzl7tWNMKZU77c0PVsA=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     cson-parser "^1.1.0"
     js-yaml "^3.3.0"
@@ -6088,7 +6102,11 @@ arr-union@^3.1.0:
 array-differ@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/array-differ/-/array-differ-1.0.0.tgz#eff52e3758249d33be402b8bb8e564bb2b5d4031"
+<<<<<<< HEAD
   integrity sha512-LeZY+DZDRnvP7eMuQ6LHfCzUGxAAIViUBliK24P3hWXL6y4SortgR6Nim6xrkfSLlmH0+k+9NYNwVC2s53ZrYQ==
+=======
+  integrity sha1-7/UuN1gknTO+QCuLuOVkuytdQDE=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 array-each@^1.0.1:
   version "1.0.1"
@@ -6185,7 +6203,11 @@ array.prototype.map@^1.0.4:
 arrify@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
+<<<<<<< HEAD
   integrity sha512-3CYzex9M9FGQjCGMGyi6/31c8GJbgb0qGyrx5HWxPd0aCwh4cB2YjMb2Xf9UuoogrMrlO9cTqnB5rI5GHZTcUA==
+=======
+  integrity sha1-iYUI2iIm84DfkEcoRWhJwVAaSw0=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 arrify@^2.0.1:
   version "2.0.1"
@@ -6242,14 +6264,14 @@ async-each@^1.0.1:
   resolved "https://registry.yarnpkg.com/async-each/-/async-each-1.0.3.tgz#b727dbf87d7651602f06f4d4ac387f47d91b0cbf"
   integrity sha512-z/WhQ5FPySLdvREByI2vZiTWwCnF0moMJ1hK9YQwDTHKh6I7/uSckMetoRGb5UBZPC1z0jlw+n/XCgjeH7y1AQ==
 
-async@^2.6.2:
+async@^2.6.1, async@^2.6.2:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/async/-/async-2.6.3.tgz#d72625e2344a3656e3a3ad4fa749fa83299d82ff"
   integrity sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==
   dependencies:
     lodash "^4.17.14"
 
-async@^3.2.3:
+async@^3.2.3, async@~3.2.0:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.3.tgz#ac53dafd3f4720ee9e8a160628f18ea91df196c9"
   integrity sha512-spZRyzKL5l5BZQrr/6m/SqFdBN0q3OCI0f9rjfBzCMBIP4p75P620rR3gTmaksNOhmzgdxcaxdNfMy6anrbM0g==
@@ -6340,7 +6362,11 @@ axobject-query@^2.2.0:
 babel-code-frame@^6.16.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-code-frame/-/babel-code-frame-6.26.0.tgz#63fd43f7dc1e3bb7ce35947db8fe369a3f58c74b"
+<<<<<<< HEAD
   integrity sha512-XqYMR2dfdGMW+hd0IUZ2PwK+fGeFkOxZJ0wY+JaQAHzt1Zx8LcvpiZD2NiGkEG8qx0CfkAOr5xt76d1e8vG90g==
+=======
+  integrity sha1-Y/1D99weO7fONZR9uP42mj9Yx0s=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     chalk "^1.1.3"
     esutils "^2.0.2"
@@ -7076,14 +7102,22 @@ call-me-maybe@^1.0.1:
 caller-path@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/caller-path/-/caller-path-0.1.0.tgz#94085ef63581ecd3daa92444a8fe94e82577751f"
+<<<<<<< HEAD
   integrity sha512-UJiE1otjXPF5/x+T3zTnSFiTOEmJoGTD9HmBoxnCUwho61a2eSNn/VwtwuIBDAo2SEOv1AJ7ARI5gCmohFLu/g==
+=======
+  integrity sha1-lAhe9jWB7NPaqSREqP6U6CV3dR8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     callsites "^0.2.0"
 
 callsites@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-0.2.0.tgz#afab96262910a7f33c19a5775825c69f34e350ca"
+<<<<<<< HEAD
   integrity sha512-Zv4Dns9IbXXmPkgRRUjAaJQgfN4xX5p6+RQFhWUqscdvvK2xK/ZL8b3IXIJsj+4sD+f24NwnWy2BY8AJ82JB0A==
+=======
+  integrity sha1-r6uWJikQp/M8GaV3WCXGnzTjUMo=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 callsites@^3.0.0:
   version "3.1.0"
@@ -7441,7 +7475,11 @@ cli-boxes@^2.2.1:
 cli-cursor@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/cli-cursor/-/cli-cursor-1.0.2.tgz#64da3f7d56a54412e59794bd62dc35295e8f2987"
+<<<<<<< HEAD
   integrity sha512-25tABq090YNKkF6JH7lcwO0zFJTRke4Jcq9iX2nr/Sz0Cjjv4gckmwlW6Ty/aoyFd6z3ysR2hMGC2GFugmBo6A==
+=======
+  integrity sha1-ZNo/fValRBLll5S9Ytw1KV6PKYc=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     restore-cursor "^1.0.1"
 
@@ -7558,7 +7596,11 @@ co@^4.6.0:
 code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
+<<<<<<< HEAD
   integrity sha512-RpAVKQA5T63xEj6/giIbUEtZwJ4UFIc3ZtvEkiaUERylqe8xb5IvqcgOurZLahv93CLKfxcw5YI+DZcUBRyLXA==
+=======
+  integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 codemirror@^6.0.0, codemirror@^6.0.1:
   version "6.0.1"
@@ -7664,7 +7706,11 @@ colors@1.4.0:
 colors@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
+<<<<<<< HEAD
   integrity sha512-ENwblkFQpqqia6b++zLD/KUWafYlVY/UNnAp7oz7LY7E924wmpye416wBOmvv/HMWzl8gL1kJlfvId/1Dg176w==
+=======
+  integrity sha1-FopHAXVran9RoSzgyXv6KMCE7WM=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 colorspace@1.1.x:
   version "1.1.4"
@@ -7821,12 +7867,16 @@ content-type@~1.0.4:
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
+<<<<<<< HEAD
 convert-source-map@^1.0.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-1.9.0.tgz#7faae62353fb4213366d0ca98358d22e8368b05f"
   integrity sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==
 
 convert-source-map@^1.4.0, convert-source-map@^1.5.0, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
+=======
+convert-source-map@^1.0.0, convert-source-map@^1.4.0, convert-source-map@^1.5.0, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-1.8.0.tgz#f3373c32d21b4d780dd8004514684fb791ca4369"
   integrity sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==
@@ -8067,7 +8117,11 @@ crypto-browserify@^3.11.0:
 cson-parser@^1.1.0:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/cson-parser/-/cson-parser-1.3.5.tgz#7ec675e039145533bf2a6a856073f1599d9c2d24"
+<<<<<<< HEAD
   integrity sha512-Pchz4dDkyafUL4V3xBuP9Os8Hu9VU96R+MxuTKh7NR+D866UiWrhBiSLbfuvwApEaJzpXhXTr3iPe4lFtXLzcQ==
+=======
+  integrity sha1-fsZ14DkUVTO/KmqFYHPxWZ2cLSQ=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     coffee-script "^1.10.0"
 
@@ -8276,10 +8330,17 @@ date-fns@^2.29.3:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
   integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
 
+<<<<<<< HEAD
 dateformat@~4.6.2:
   version "4.6.3"
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-4.6.3.tgz#556fa6497e5217fedb78821424f8a1c22fa3f4b5"
   integrity sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==
+=======
+dateformat@~3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
+  integrity sha512-jyCETtSl3VMZMWeRo7iY1FL19ges1t55hMo5yaam4Jrsm5EPL89UQkoQRyiI+Yf4k8r2ZpdngkV8hr1lIdjb3Q==
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 debug@2.6.9, debug@^2.1.1, debug@^2.1.3, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.9:
   version "2.6.9"
@@ -8839,7 +8900,11 @@ duplexify@^3.4.2, duplexify@^3.6.0:
 each-async@^0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/each-async/-/each-async-0.1.3.tgz#b436025b08da2f86608025519e3096763dedfca3"
+<<<<<<< HEAD
   integrity sha512-jQsP5Ou1Eh2tfsNv7giHTzkfUao7fkoTcNh9NLgLcJyGNTgy28SQWqi31QvWLCvvv6NOKHoaAJ/kaYxDfRNRCQ==
+=======
+  integrity sha1-tDYCWwjaL4ZggCVRnjCWdj3t/KM=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 eastasianwidth@^0.2.0:
   version "0.2.0"
@@ -9064,6 +9129,7 @@ es-to-primitive@^1.2.1:
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
 
+<<<<<<< HEAD
 es5-ext@^0.10.35, es5-ext@^0.10.46, es5-ext@^0.10.50, es5-ext@^0.10.62, es5-ext@~0.10.14:
   version "0.10.62"
   resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.62.tgz#5e6adc19a6da524bf3d1e02bbc8960e5eb49a9a5"
@@ -9072,6 +9138,16 @@ es5-ext@^0.10.35, es5-ext@^0.10.46, es5-ext@^0.10.50, es5-ext@^0.10.62, es5-ext@
     es6-iterator "^2.0.3"
     es6-symbol "^3.1.3"
     next-tick "^1.1.0"
+=======
+es5-ext@^0.10.35, es5-ext@^0.10.46, es5-ext@^0.10.50, es5-ext@~0.10.14:
+  version "0.10.53"
+  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.53.tgz#93c5a3acfdbef275220ad72644ad02ee18368de1"
+  integrity sha512-Xs2Stw6NiNHWypzRTY1MtaG/uJlwCk8kH81920ma8mvN8Xq1gsfhZvpkImLQArw8AHnv8MT2I45J3c0R8slE+Q==
+  dependencies:
+    es6-iterator "~2.0.3"
+    es6-symbol "~3.1.3"
+    next-tick "~1.0.0"
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 es5-shim@^4.5.13:
   version "4.6.5"
@@ -9081,7 +9157,11 @@ es5-shim@^4.5.13:
 es6-iterator@^2.0.3, es6-iterator@~2.0.1, es6-iterator@~2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/es6-iterator/-/es6-iterator-2.0.3.tgz#a7de889141a05a94b0854403b2d0a0fbfa98f3b7"
+<<<<<<< HEAD
   integrity sha512-zw4SRzoUkd+cl+ZoE15A9o1oQd920Bb0iOJMQkQhl3jNc03YqVjAhG7scf9C5KWRU/R13Orf588uCC6525o02g==
+=======
+  integrity sha1-p96IkUGgWpSwhUQDstCg+/qY87c=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     d "1"
     es5-ext "^0.10.35"
@@ -9090,7 +9170,11 @@ es6-iterator@^2.0.3, es6-iterator@~2.0.1, es6-iterator@~2.0.3:
 es6-map@^0.1.3:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/es6-map/-/es6-map-0.1.5.tgz#9136e0503dcc06a301690f0bb14ff4e364e949f0"
+<<<<<<< HEAD
   integrity sha512-mz3UqCh0uPCIqsw1SSAkB/p0rOzF/M0V++vyN7JqlPtSW/VsYgQBvVvqMLmfBuyMzTpLnNqi6JmcSizs4jy19A==
+=======
+  integrity sha1-kTbgUD3MBqMBaQ8LsU/042TpSfA=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     d "1"
     es5-ext "~0.10.14"
@@ -9105,6 +9189,7 @@ es6-promise@^3.2.1:
   integrity sha1-oIzd6EzNvzTQJ6FFG8kdS80ophM=
 
 es6-set@~0.1.5:
+<<<<<<< HEAD
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/es6-set/-/es6-set-0.1.6.tgz#5669e3b2aa01d61a50ba79964f733673574983b8"
   integrity sha512-TE3LgGLDIBX332jq3ypv6bcOpkLO0AslAQo7p2VqX/1N46YNsvIWgvjojjSEnWEGWMhr1qUbYeTSir5J6mFHOw==
@@ -9115,13 +9200,36 @@ es6-set@~0.1.5:
     es6-symbol "^3.1.3"
     event-emitter "^0.3.5"
     type "^2.7.2"
+=======
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/es6-set/-/es6-set-0.1.5.tgz#d2b3ec5d4d800ced818db538d28974db0a73ccb1"
+  integrity sha1-0rPsXU2ADO2BjbU40ol02wpzzLE=
+  dependencies:
+    d "1"
+    es5-ext "~0.10.14"
+    es6-iterator "~2.0.1"
+    es6-symbol "3.1.1"
+    event-emitter "~0.3.5"
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 es6-shim@^0.35.5:
   version "0.35.6"
   resolved "https://registry.yarnpkg.com/es6-shim/-/es6-shim-0.35.6.tgz#d10578301a83af2de58b9eadb7c2c9945f7388a0"
   integrity sha512-EmTr31wppcaIAgblChZiuN/l9Y7DPyw8Xtbg7fIVngn6zMW+IEBJDJngeKC3x6wr0V/vcA2wqeFnaw1bFJbDdA==
 
+<<<<<<< HEAD
 es6-symbol@^3.1.1, es6-symbol@^3.1.3, es6-symbol@~3.1.1:
+=======
+es6-symbol@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/es6-symbol/-/es6-symbol-3.1.1.tgz#bf00ef4fdab6ba1b46ecb7b629b4c7ed5715cc77"
+  integrity sha1-vwDvT9q2uhtG7Le2KbTH7VcVzHc=
+  dependencies:
+    d "1"
+    es5-ext "~0.10.14"
+
+es6-symbol@^3.1.1, es6-symbol@~3.1.1, es6-symbol@~3.1.3:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/es6-symbol/-/es6-symbol-3.1.3.tgz#bad5d3c1bcdac28269f4cb331e431c78ac705d18"
   integrity sha512-NJ6Yn3FuDinBaBRWl/q5X/s4koRHBrgKAu+yGI6JCBeiu3qrcbJhwT2GeR/EXVfylRk8dpQVJoLEFhK+Mu31NA==
@@ -9187,7 +9295,11 @@ escodegen@^2.0.0:
 escope@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/escope/-/escope-3.6.0.tgz#e01975e812781a163a6dadfdd80398dc64c889c3"
+<<<<<<< HEAD
   integrity sha512-75IUQsusDdalQEW/G/2esa87J7raqdJF+Ca0/Xm5C3Q58Nr4yVYjZGp/P1+2xiEVgXRrA39dpRb8LcshajbqDQ==
+=======
+  integrity sha1-4Bl16BJ4GhY6ba392AOY3GTIicM=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     es6-map "^0.1.3"
     es6-weak-map "^2.0.1"
@@ -9398,7 +9510,11 @@ eslint-webpack-plugin@^3.1.1:
 eslint@^3.0.0:
   version "3.19.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-3.19.0.tgz#c8fc6201c7f40dd08941b87c085767386a679acc"
+<<<<<<< HEAD
   integrity sha512-x6LJGXWCGB/4YOBhL48yeppZTo+YQUNC37N5qqCpC1b1kkNzydlQHQAtPuUSFoZSxgIadrysQoW2Hq602P+uEA==
+=======
+  integrity sha1-yPxiAcf0DdCJQbh8CFdnOGpnmsw=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     babel-code-frame "^6.16.0"
     chalk "^1.1.3"
@@ -9504,6 +9620,7 @@ esprima@~3.1.0:
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.3.tgz#fdca51cee6133895e3c88d535ce49dbff62a4633"
   integrity sha1-/cpRzuYTOJXjyI1TXOSdv/YqRjM=
 
+<<<<<<< HEAD
 esquery@^1.0.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/esquery/-/esquery-1.5.0.tgz#6ce17738de8577694edd7361c57182ac8cb0db0b"
@@ -9512,6 +9629,9 @@ esquery@^1.0.0:
     estraverse "^5.1.0"
 
 esquery@^1.4.0:
+=======
+esquery@^1.0.0, esquery@^1.4.0:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/esquery/-/esquery-1.4.0.tgz#2148ffc38b82e8c7057dfed48425b3e61f0f24a5"
   integrity sha512-cCDispWt5vHHtwMY2YrAQ4ibFkAL8RbH5YGBnZBc90MolvvfkkQcJro/aZiAQUlQ3qgrYS6D6v8Gc5G5CQsc9w==
@@ -9554,10 +9674,17 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
+<<<<<<< HEAD
 event-emitter@^0.3.5, event-emitter@~0.3.5:
   version "0.3.5"
   resolved "https://registry.yarnpkg.com/event-emitter/-/event-emitter-0.3.5.tgz#df8c69eef1647923c7157b9ce83840610b02cc39"
   integrity sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==
+=======
+event-emitter@~0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/event-emitter/-/event-emitter-0.3.5.tgz#df8c69eef1647923c7157b9ce83840610b02cc39"
+  integrity sha1-34xp7vFkeSPHFXuc6DhAYQsCzDk=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     d "1"
     es5-ext "~0.10.14"
@@ -9565,7 +9692,11 @@ event-emitter@^0.3.5, event-emitter@~0.3.5:
 eventemitter2@~0.4.13:
   version "0.4.14"
   resolved "https://registry.yarnpkg.com/eventemitter2/-/eventemitter2-0.4.14.tgz#8f61b75cde012b2e9eb284d4545583b5643b61ab"
+<<<<<<< HEAD
   integrity sha512-K7J4xq5xAD5jHsGM5ReWXRTFa3JRGofHiMcVgQ8PRwgWxzjHpMWCIzsmyf60+mh8KLsqYPcjUMa0AC4hd6lPyQ==
+=======
+  integrity sha1-j2G3XN4BKy6esoTUVFWDtWQ7Yas=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 eventemitter3@^4.0.0:
   version "4.0.7"
@@ -9621,7 +9752,11 @@ execa@^5.0.0, execa@^5.1.1:
 exit-hook@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/exit-hook/-/exit-hook-1.1.1.tgz#f05ca233b48c05d54fff07765df8507e95c02ff8"
+<<<<<<< HEAD
   integrity sha512-MsG3prOVw1WtLXAZbM3KiYtooKR1LvxHh3VHsVtIy0uiUu8usxgB/94DP2HxtD/661lLdB6yzQ09lGJSQr6nkg==
+=======
+  integrity sha1-8FyiM7SMBdVP/wd2XfhQfpXAL/g=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 exit@^0.1.2, exit@~0.1.2:
   version "0.1.2"
@@ -9695,11 +9830,19 @@ express@^4.17.1:
     vary "~1.1.2"
 
 ext@^1.1.2:
+<<<<<<< HEAD
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/ext/-/ext-1.7.0.tgz#0ea4383c0103d60e70be99e9a7f11027a33c4f5f"
   integrity sha512-6hxeJYaL110a9b5TEJSj0gojyHQAmA2ch5Os+ySCiA1QGdS697XWY1pzsrSjqA9LDEEgdB/KypIlR59RcLuHYw==
   dependencies:
     type "^2.7.2"
+=======
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/ext/-/ext-1.6.0.tgz#3871d50641e874cc172e2b53f919842d19db4c52"
+  integrity sha512-sdBImtzkq2HpkdRLtlLWDa6w4DX22ijZLKx8BMPUuKe1c5lbN6xwQDQCxSfxBQnHZ13ls/FH0MQZx/q/gr6FQg==
+  dependencies:
+    type "^2.5.0"
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 extend-shallow@^2.0.1:
   version "2.0.1"
@@ -9865,7 +10008,11 @@ figgy-pudding@^3.5.1:
 figures@^1.3.5:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/figures/-/figures-1.7.0.tgz#cbe1e3affcf1cd44b80cadfed28dc793a9701d2e"
+<<<<<<< HEAD
   integrity sha512-UxKlfCRuCBxSXU4C6t9scbDyWZ4VlaFFdojKtzJuSkuOBQ5CNFum+zZXFwHjo+CxBC1t6zlYPgHIgFjL8ggoEQ==
+=======
+  integrity sha1-y+Hjr/zxzUS4DK3+0o3Hk6lwHS4=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     escape-string-regexp "^1.0.5"
     object-assign "^4.1.0"
@@ -9880,7 +10027,11 @@ figures@^3.0.0:
 file-entry-cache@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/file-entry-cache/-/file-entry-cache-2.0.0.tgz#c392990c3e684783d838b8c84a45d8a048458361"
+<<<<<<< HEAD
   integrity sha512-uXP/zGzxxFvFfcZGgBIwotm+Tdc55ddPAzF7iHshP4YGaXMww7rSF9peD9D1sui5ebONg5UobsZv+FfgEpGv/w==
+=======
+  integrity sha1-w5KZDD5oR4PYOLjISkXYoEhFg2E=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     flat-cache "^1.2.1"
     object-assign "^4.0.1"
@@ -9913,7 +10064,11 @@ file-saver@^2.0.5:
 file-sync-cmp@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/file-sync-cmp/-/file-sync-cmp-0.1.1.tgz#a5e7a8ffbfa493b43b923bbd4ca89a53b63b612b"
+<<<<<<< HEAD
   integrity sha512-0k45oWBokCqh2MOexeYKpyqmGKG+8mQ2Wd8iawx+uWd/weWJQAZ6SoPybagdCI4xFisag8iAR77WPm4h3pTfxA==
+=======
+  integrity sha1-peeo/7+kk7Q7kju9TKiaU7Y7YSs=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 file-system-cache@^1.0.5:
   version "1.0.5"
@@ -10072,6 +10227,7 @@ findup-sync@^4.0.0:
     micromatch "^4.0.2"
     resolve-dir "^1.0.1"
 
+<<<<<<< HEAD
 findup-sync@~5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-5.0.0.tgz#54380ad965a7edca00cc8f63113559aadc541bd2"
@@ -10081,6 +10237,14 @@ findup-sync@~5.0.0:
     is-glob "^4.0.3"
     micromatch "^4.0.4"
     resolve-dir "^1.0.1"
+=======
+findup-sync@~0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-0.3.0.tgz#37930aa5d816b777c03445e1966cc6790a4c0b16"
+  integrity sha1-N5MKpdgWt3fANEXhlmzGeQpMCxY=
+  dependencies:
+    glob "~5.0.0"
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 fined@^1.0.1, fined@^1.2.0:
   version "1.2.0"
@@ -10383,7 +10547,11 @@ generate-function@^2.0.0:
 generate-object-property@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/generate-object-property/-/generate-object-property-1.2.0.tgz#9c0e1c40308ce804f4783618b937fa88f99d50d0"
+<<<<<<< HEAD
   integrity sha512-TuOwZWgJ2VAMEGJvAyPWvpqxSANF0LDpmyHauMjFYzaACvn+QTT/AZomvPCzVBV7yDN3OmwHQ5OvHaeLKre3JQ==
+=======
+  integrity sha1-nA4cQDCM6AT0eDYYuTf6iPmdUNA=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     is-property "^1.0.0"
 
@@ -10526,6 +10694,7 @@ glob-to-regexp@^0.4.1:
   resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.4.1.tgz#c75297087c851b9a578bd217dd59a92f59fe546e"
   integrity sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==
 
+<<<<<<< HEAD
 glob@^7.0.0:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
@@ -10539,6 +10708,9 @@ glob@^7.0.0:
     path-is-absolute "^1.0.0"
 
 glob@^7.0.3, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4:
+=======
+glob@^7.0.0, glob@^7.0.3, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "7.1.6"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
   integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
@@ -10562,6 +10734,20 @@ glob@^7.1.6:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
+<<<<<<< HEAD
+=======
+glob@~5.0.0:
+  version "5.0.15"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-5.0.15.tgz#1bc936b9e02f4a603fcc222ecf7633d30b8b93b1"
+  integrity sha1-G8k2ueAvSmA/zCIuz3Yz0wuLk7E=
+  dependencies:
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "2 || 3"
+    once "^1.3.0"
+    path-is-absolute "^1.0.0"
+
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 glob@~7.1.6:
   version "7.1.7"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.7.tgz#3b193e9233f01d42d0b3f78294bbeeb418f94a90"
@@ -10716,7 +10902,11 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha1-8QdIy+dq+WS3yWyTxrzCivEgwIE=
 
+<<<<<<< HEAD
 grunt-cli@^1.4.3, grunt-cli@~1.4.3:
+=======
+grunt-cli@^1.4.3, grunt-cli@~1.4.2:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "1.4.3"
   resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.4.3.tgz#22c9f1a3d2780bf9b0d206e832e40f8f499175ff"
   integrity sha512-9Dtx/AhVeB4LYzsViCjUQkd0Kw0McN2gYpdmGYKtE2a5Yt7v1Q+HYZVWhqXc/kGnxlMtqKDxSwotiGeFmkrCoQ==
@@ -10728,17 +10918,29 @@ grunt-cli@^1.4.3, grunt-cli@~1.4.3:
     v8flags "~3.2.0"
 
 grunt-contrib-clean@^2.0.0:
+<<<<<<< HEAD
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/grunt-contrib-clean/-/grunt-contrib-clean-2.0.1.tgz#062e8019d31bfca35af8929a2ee1063c6c46dd2d"
   integrity sha512-uRvnXfhiZt8akb/ZRDHJpQQtkkVkqc/opWO4Po/9ehC2hPxgptB9S6JHDC/Nxswo4CJSM0iFPT/Iym3cEMWzKA==
   dependencies:
     async "^3.2.3"
+=======
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/grunt-contrib-clean/-/grunt-contrib-clean-2.0.0.tgz#3be7ca480da4b740aa5e9d863e2f7e8b24f8a68b"
+  integrity sha512-g5ZD3ORk6gMa5ugZosLDQl3dZO7cI3R14U75hTM+dVLVxdMNJCPVmwf9OUt4v4eWgpKKWWoVK9DZc1amJp4nQw==
+  dependencies:
+    async "^2.6.1"
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
     rimraf "^2.6.2"
 
 grunt-contrib-copy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/grunt-contrib-copy/-/grunt-contrib-copy-1.0.0.tgz#7060c6581e904b8ab0d00f076e0a8f6e3e7c3573"
+<<<<<<< HEAD
   integrity sha512-gFRFUB0ZbLcjKb67Magz1yOHGBkyU6uL29hiEW1tdQ9gQt72NuMKIy/kS6dsCbV0cZ0maNCb0s6y+uT1FKU7jA==
+=======
+  integrity sha1-cGDGWB6QS4qw0A8HbgqPbj58NXM=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     chalk "^1.1.1"
     file-sync-cmp "^0.1.0"
@@ -10746,7 +10948,11 @@ grunt-contrib-copy@^1.0.0:
 grunt-env@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/grunt-env/-/grunt-env-0.4.4.tgz#3b38843a8d737177ddc9f893879fb69ce1a0bc2f"
+<<<<<<< HEAD
   integrity sha512-Sm7edLjXyN8YroVPckd1o55lm11J6lCyWOHRvDzIDpUMMFGPB3cp9NEgo0/HPGd3OzSOZ6jUd+Wyn0CYBeLHCg==
+=======
+  integrity sha1-OziEOo1zcXfdyfiTh5+2nOGgvC8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     ini "~1.3.0"
     lodash "~2.4.1"
@@ -10754,7 +10960,11 @@ grunt-env@^0.4.4:
 grunt-filerev@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/grunt-filerev/-/grunt-filerev-2.3.1.tgz#2990210f0b5a9edc5e7198987fd1c029c6d5f4df"
+<<<<<<< HEAD
   integrity sha512-1NpLhL2LQZpdn0AvpWyQpmNAm0eqITvy2ySBqH7SO8MEp/yQKjNADhi45okK9zQ9HIdcGQEOB6sRrX1yJjZ9sQ==
+=======
+  integrity sha1-KZAhDwtantxecZiYf9HAKcbV9N8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     chalk "^1.0.0"
     convert-source-map "^1.0.0"
@@ -10799,7 +11009,11 @@ grunt-legacy-util@~2.0.1:
 grunt-replace@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/grunt-replace/-/grunt-replace-1.0.1.tgz#90a79532fb89041fe427c87d425238b0f886651a"
+<<<<<<< HEAD
   integrity sha512-cnKv/mYkZ6NidBSD88fjzwhom8VmOvH8CSTxvzBAAGV6y5WhOTx2IQ/uiinUkaj71rXsQC9V1VfBBwn4U8ur6Q==
+=======
+  integrity sha1-kKeVMvuJBB/kJ8h9QlI4sPiGZRo=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     applause "1.2.2"
     chalk "^1.1.0"
@@ -10816,7 +11030,11 @@ grunt-shell-spawn@^0.4.0:
 grunt-usemin@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/grunt-usemin/-/grunt-usemin-3.1.1.tgz#5ab679510d672cea566cc717abe8b8a009f641c2"
+<<<<<<< HEAD
   integrity sha512-73g3KOfB2gAxPk5qV1dgfcw/H6cg2S2YPHzt5ssPCiaNXOrN15HzGzP31il+tQymyP/MYYhRAOR+o7F5UGny/A==
+=======
+  integrity sha1-WrZ5UQ1nLOpWbMcXq+i4oAn2QcI=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     chalk "^1.1.1"
     debug "^2.1.3"
@@ -10832,6 +11050,7 @@ grunt-webpack@^5.0.0:
     lodash "^4.17.19"
 
 grunt@>=0.4.x, grunt@^1.4.1:
+<<<<<<< HEAD
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.6.1.tgz#0b4dd1524f26676dcf45d8f636b8d9061a8ede16"
   integrity sha512-/ABUy3gYWu5iBmrUSRBP97JLpQUm0GgVveDCp6t3yRNIoltIYw7rEj3g5y1o2PGPR2vfTRGa7WC/LZHLTXnEzA==
@@ -10849,11 +11068,36 @@ grunt@>=0.4.x, grunt@^1.4.1:
     js-yaml "~3.14.0"
     minimatch "~3.0.4"
     nopt "~3.0.6"
+=======
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.4.1.tgz#7d1e17db1f9c8108777f7273d6b9359755576f50"
+  integrity sha512-ZXIYXTsAVrA7sM+jZxjQdrBOAg7DyMUplOMhTaspMRExei+fD0BTwdWXnn0W5SXqhb/Q/nlkzXclSi3IH55PIA==
+  dependencies:
+    dateformat "~3.0.3"
+    eventemitter2 "~0.4.13"
+    exit "~0.1.2"
+    findup-sync "~0.3.0"
+    glob "~7.1.6"
+    grunt-cli "~1.4.2"
+    grunt-known-options "~2.0.0"
+    grunt-legacy-log "~3.0.0"
+    grunt-legacy-util "~2.0.1"
+    iconv-lite "~0.4.13"
+    js-yaml "~3.14.0"
+    minimatch "~3.0.4"
+    mkdirp "~1.0.4"
+    nopt "~3.0.6"
+    rimraf "~3.0.2"
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 gruntify-eslint@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/gruntify-eslint/-/gruntify-eslint-3.1.0.tgz#2c777fb388637fe447f8c56cd253caef6c8795e7"
+<<<<<<< HEAD
   integrity sha512-9z31cbAvNJ3mvMz2MYhSTl1B+1HXbXqnTtAQrrJ/e5/rrUKsz4n/wD+GTjGuaE99RsDFlBnjh1uVbYyetfRv3g==
+=======
+  integrity sha1-LHd/s4hjf+RH+MVs0lPK72yHlec=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     eslint "^3.0.0"
 
@@ -11113,7 +11357,11 @@ homedir-polyfill@^1.0.1:
 hooker@~0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/hooker/-/hooker-0.2.3.tgz#b834f723cc4a242aa65963459df6d984c5d3d959"
+<<<<<<< HEAD
   integrity sha512-t+UerCsQviSymAInD01Pw+Dn/usmz1sRO+3Zk1+lx8eg+WKpD2ulcwWqHHL0+aseRBr+3+vIhiG1K1JTwaIcTA==
+=======
+  integrity sha1-uDT3I8xKJCqmWWNFnfbZhMXT2Vk=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 hosted-git-info@^2.1.4:
   version "2.8.9"
@@ -11394,7 +11642,7 @@ i18next@^21.3.3:
   dependencies:
     "@babel/runtime" "^7.12.0"
 
-iconv-lite@0.4.24, iconv-lite@^0.4.24:
+iconv-lite@0.4.24, iconv-lite@^0.4.24, iconv-lite@~0.4.13:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
   integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
@@ -11530,7 +11778,11 @@ inline-style-parser@0.1.1:
 inquirer@^0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-0.12.0.tgz#1ef2bfd63504df0bc75785fff8c2c41df12f077e"
+<<<<<<< HEAD
   integrity sha512-bOetEz5+/WpgaW4D1NYOk1aD+JCqRjqu/FwRFgnIfiP7FC/zinsrfyO1vlS3nyH/R7S0IH3BIHBu4DBIDSqiGQ==
+=======
+  integrity sha1-HvK/1jUE3wvHV4X/+MLEHfEvB34=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     ansi-escapes "^1.1.0"
     ansi-regex "^2.0.0"
@@ -11607,7 +11859,11 @@ interpret@^2.2.0:
 interpret@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
+<<<<<<< HEAD
   integrity sha512-CLM8SNMDu7C5psFCn6Wg/tgpj/bKAg7hc2gWqcuR9OD5Ft9PhBpIu8PLicPeis+xDd6YX2ncI8MCA64I9tftIA==
+=======
+  integrity sha1-ftGxQQxqDg94z5XTuEQMY/eLhhQ=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 invariant@^2.2.4:
   version "2.2.4"
@@ -11853,14 +12109,22 @@ is-finite@^1.0.0:
 is-fullwidth-code-point@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-fullwidth-code-point/-/is-fullwidth-code-point-1.0.0.tgz#ef9e31386f031a7f0d643af82fde50c457ef00cb"
+<<<<<<< HEAD
   integrity sha512-1pqUqRjkhPJ9miNq9SwMfdvi6lBJcd6eFxvfaivQhaH3SgisfiuudvFntdKOmxuee/77l+FPjKrQjWvmPjWrRw==
+=======
+  integrity sha1-754xOG8DGn8NZDr4L95QxFfvAMs=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     number-is-nan "^1.0.0"
 
 is-fullwidth-code-point@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz#a3b30a5c4f199183167aaab93beefae3ddfb654f"
+<<<<<<< HEAD
   integrity sha512-VHskAKYM8RfSFXwee5t5cbN5PZeq1Wrh6qd5bkyiXIf6UQcN6w/A0eXM9r6t8d+GYOh+o6ZhiEnb88LN/Y8m2w==
+=======
+  integrity sha1-o7MKXE8ZkYMWeqq5O+764937ZU8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 is-fullwidth-code-point@^3.0.0:
   version "3.0.0"
@@ -11926,9 +12190,15 @@ is-map@^2.0.2:
   integrity sha512-cOZFQQozTha1f4MxLFzlgKYPTyj26picdZTx82hbc/Xf4K/tZOOXSCkMvU4pKioRXGDLJRn0GM7Upe7kR721yg==
 
 is-my-ip-valid@^1.0.0:
+<<<<<<< HEAD
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-my-ip-valid/-/is-my-ip-valid-1.0.1.tgz#f7220d1146257c98672e6fba097a9f3f2d348442"
   integrity sha512-jxc8cBcOWbNK2i2aTkCZP6i7wkHF1bqKFrwEHuN5Jtg5BSaZHUZQ/JTOJwoV41YvHnOaRyWWh72T/KvfNz9DJg==
+=======
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/is-my-ip-valid/-/is-my-ip-valid-1.0.0.tgz#7b351b8e8edd4d3995d4d066680e664d94696824"
+  integrity sha512-gmh/eWXROncUzRnIa1Ubrt5b8ep/MGSnfAUI3aRp+sqTCs1tv1Isl8d8F6JmkN3dXKc3ehZMrtiPN9eL03NuaQ==
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 is-my-json-valid@^2.10.0:
   version "2.20.6"
@@ -12034,7 +12304,11 @@ is-potential-custom-element-name@^1.0.1:
 is-property@^1.0.0, is-property@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-property/-/is-property-1.0.2.tgz#57fe1c4e48474edd65b09911f26b1cd4095dda84"
+<<<<<<< HEAD
   integrity sha512-Ks/IoX00TtClbGQr4TWXemAnktAQvYB7HzcCxDGqEZU6oCmb2INHuOoKxbtR+HFkmYWBKv/dOZtGRiAjDhj92g==
+=======
+  integrity sha1-V/4cTkhHTt1lsJkR8msc1Ald2oQ=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 is-regex@^1.0.4, is-regex@^1.1.2, is-regex@^1.1.4:
   version "1.1.4"
@@ -12762,7 +13036,11 @@ js-string-escape@^1.0.1:
 js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
+<<<<<<< HEAD
   integrity sha512-RjTcuD4xjtthQkaWH7dFlH85L+QaVtSoOyGdZ3g6HFhS9dFNDfLyqgm2NFe2X6cQpeFmt0452FJjFG5UameExg==
+=======
+  integrity sha1-mGbfOVECEw449/mWvOtlRDIJwls=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 js-yaml@^3.13.1, js-yaml@^3.14.0, js-yaml@^3.3.0, js-yaml@^3.5.1, js-yaml@^4.1.0, js-yaml@~3.14.0:
   version "3.14.1"
@@ -12840,6 +13118,7 @@ json-stable-stringify-without-jsonify@^1.0.1:
   resolved "https://registry.yarnpkg.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz#9db7b59496ad3f3cfef30a75142d2d930ad72651"
   integrity sha1-nbe1lJatPzz+8wp1FC0tkwrXJlE=
 
+<<<<<<< HEAD
 json-stable-stringify@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-stable-stringify/-/json-stable-stringify-1.0.2.tgz#e06f23128e0bbe342dc996ed5a19e28b57b580e0"
@@ -12848,6 +13127,9 @@ json-stable-stringify@^1.0.0:
     jsonify "^0.0.1"
 
 json-stable-stringify@^1.0.1:
+=======
+json-stable-stringify@^1.0.0, json-stable-stringify@^1.0.1:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/json-stable-stringify/-/json-stable-stringify-1.0.1.tgz#9a759d39c5f2ff503fd5300646ed445f88c4f9af"
   integrity sha1-mnWdOcXy/1A/1TAGRu1EX4jE+a8=
@@ -12900,9 +13182,15 @@ jsonify@~0.0.0:
   integrity sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM=
 
 jsonpointer@^5.0.0:
+<<<<<<< HEAD
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/jsonpointer/-/jsonpointer-5.0.1.tgz#2110e0af0900fd37467b5907ecd13a7884a1b559"
   integrity sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==
+=======
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/jsonpointer/-/jsonpointer-5.0.0.tgz#f802669a524ec4805fa7389eadbc9921d5dc8072"
+  integrity sha512-PNYZIdMjVIvVgDSYKTT63Y+KZ6IZvGRNNWcxwD+GNnUz1MKPfv30J8ueCjdwcN0nDx2SlshgyB7Oy0epAzVRRg==
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 "jsx-ast-utils@^2.4.1 || ^3.0.0", jsx-ast-utils@^3.2.1:
   version "3.2.1"
@@ -13106,7 +13394,11 @@ listr2@^4.0.1:
 load-grunt-tasks@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/load-grunt-tasks/-/load-grunt-tasks-3.5.2.tgz#0728561180fd20ff8a6927505852fc58aaea0c88"
+<<<<<<< HEAD
   integrity sha512-dwBbJ+Fmf1IrtASRdgT/KJNtczdlm+R3iLSi8KOGdCGl4V05uA055JHtafIXTyk5EJ1zDZbmEHndOQwU6uj8Jw==
+=======
+  integrity sha1-ByhWEYD9IP+KaSdQWFL8WKrqDIg=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     arrify "^1.0.0"
     multimatch "^2.0.0"
@@ -13212,7 +13504,11 @@ lodash.isequal@^4.5.0:
 lodash.isplainobject@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
+<<<<<<< HEAD
   integrity sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==
+=======
+  integrity sha1-fFJqUtibRcRcxpC4gWO+BJf1UMs=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 lodash.memoize@^4.1.1, lodash.memoize@^4.1.2:
   version "4.1.2"
@@ -13667,6 +13963,7 @@ minimalistic-crypto-utils@^1.0.1:
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
   integrity sha1-9sAMHAsIIkblxNmd+4x8CDsrWCo=
 
+<<<<<<< HEAD
 minimatch@^3.0.0, minimatch@^3.0.4, minimatch@^3.1.1:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
@@ -13678,6 +13975,19 @@ minimatch@^3.0.2:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
+=======
+"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2:
+  version "3.0.5"
+  resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.0.5.tgz#4da8f1290ee0f0f8e83d60ca69f8f134068604a3"
+  integrity sha512-tUpxzX0VAzJHjLu0xUfFv1gwVp9ba3IOuRAVH2EGuRW8a5emA2FlACLqiT/lDVtS1W+TGNwqz3sWaNyLgDJWuw==
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
+  dependencies:
+    brace-expansion "^1.1.7"
+
+minimatch@~3.0.4:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.8.tgz#5e6a59bd11e2ab0de1cfb843eb2d82e546c321c1"
+  integrity sha512-6FsRAQsxQ61mw+qP1ZzbL9Bc78x2p5OqNgNpnoAFLTrX8n5Kxph0CsnhmKKNXTWjXqU5L0pGPR7hYk+XWZr60Q==
   dependencies:
     brace-expansion "^1.1.7"
 
@@ -13753,6 +14063,7 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
+<<<<<<< HEAD
 mkdirp@^0.5.0:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.6.tgz#7def03d2432dcae4ba1d611445c48396062255f6"
@@ -13761,13 +14072,16 @@ mkdirp@^0.5.0:
     minimist "^1.2.6"
 
 mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@^0.5.5:
+=======
+mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@^0.5.5:
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.5.tgz#d91cefd62d1436ca0f41620e251288d420099def"
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
   dependencies:
     minimist "^1.2.5"
 
-mkdirp@^1.0.3, mkdirp@^1.0.4:
+mkdirp@^1.0.3, mkdirp@^1.0.4, mkdirp@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
@@ -13870,7 +14184,11 @@ multicast-dns@^6.0.1:
 multimatch@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/multimatch/-/multimatch-2.1.0.tgz#9c7906a22fb4c02919e2f5f75161b4cdbd4b2a2b"
+<<<<<<< HEAD
   integrity sha512-0mzK8ymiWdehTBiJh0vClAzGyQbdtyWqzSVx//EK4N/D+599RFlGfTAsKw2zMSABtDG9C6Ul2+t8f2Lbdjf5mA==
+=======
+  integrity sha1-nHkGoi+0wCkZ4vX3UWG0zb1LKis=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     array-differ "^1.0.0"
     array-union "^1.0.1"
@@ -13885,7 +14203,11 @@ mustache@^4.2.0:
 mute-stream@0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.5.tgz#8fbfabb0a98a253d3184331f9e8deb7372fac6c0"
+<<<<<<< HEAD
   integrity sha512-EbrziT4s8cWPmzr47eYVW3wimS4HsvlnV5ri1xw1aR6JQo/OrJX5rkl32K/QQHdxeabJETtfeaROGhd8W7uBgg==
+=======
+  integrity sha1-j7+rsKmKJT0xhDMfno3rc3L6xsA=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 mute-stream@0.0.8:
   version "0.0.8"
@@ -13961,10 +14283,17 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
+<<<<<<< HEAD
 next-tick@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
   integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
+=======
+next-tick@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
+  integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 ng-file-upload@~12.2.13:
   version "12.2.13"
@@ -14126,7 +14455,11 @@ node-releases@^2.0.5:
 nopt@~3.0.6:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/nopt/-/nopt-3.0.6.tgz#c6465dbf08abcd4db359317f79ac68a646b28ff9"
+<<<<<<< HEAD
   integrity sha512-4GUt3kSEYmk4ITxzB/b9vaIDfUVWN/Ml1Fwl11IlnIG2iaJ9O6WXZ9SrYM9NLI8OCBieN2Y8SWC2oJV0RQ7qYg==
+=======
+  integrity sha1-xkZdvwirzU2zWTF/eaxopkayj/k=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     abbrev "1"
 
@@ -14209,7 +14542,11 @@ num2fraction@^1.2.2:
 number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
+<<<<<<< HEAD
   integrity sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ==
+=======
+  integrity sha1-CXtgK1NCKlIsGvuHkDGDNpQaAR0=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 nwsapi@^2.2.0:
   version "2.2.0"
@@ -14434,7 +14771,11 @@ one-time@^1.0.0:
 onetime@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/onetime/-/onetime-1.1.0.tgz#a1f7838f8314c516f05ecefcbc4ccfe04b4ed789"
+<<<<<<< HEAD
   integrity sha512-GZ+g4jayMqzCRMgB2sol7GiCLjKfS1PINkjmx8spcKce1LiVqcbQreXwqs2YAFXC6R03VIG28ZS31t8M866v6A==
+=======
+  integrity sha1-ofeDj4MUxRbwXs78vEzP4EtO14k=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 onetime@^2.0.0:
   version "2.0.1"
@@ -14846,7 +15187,11 @@ path-dirname@^1.0.0:
 path-exists@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-1.0.0.tgz#d5a8998eb71ef37a74c34eb0d9eba6e878eea081"
+<<<<<<< HEAD
   integrity sha512-BD2vrQBPFI3VkVKzTrOmaG2WtPQoduNXu1A5tLYMOW8RN6G9CdhdSkmw+ljxUkJcj4pbXQGw0lzl7MFLnhba9Q==
+=======
+  integrity sha1-1aiZjrce83p0w06w2eum6HjuoIE=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 path-exists@^2.0.0:
   version "2.1.0"
@@ -15020,7 +15365,11 @@ pkg-dir@^5.0.0:
 pkg-up@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/pkg-up/-/pkg-up-1.0.0.tgz#3e08fb461525c4421624a33b9f7e6d0af5b05a26"
+<<<<<<< HEAD
   integrity sha512-L+d849d9lz20hnRpUnWBRXOh+mAvygQpK7UuXiw+6QbPwL55RVgl+G+V936wCzs/6J7fj0pvgLY9OknZ+FqaNA==
+=======
+  integrity sha1-Pgj7RhUlxEIWJKM7n35tCvWwWiY=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     find-up "^1.0.0"
 
@@ -15048,7 +15397,11 @@ plop@^2.6.0:
 pluralize@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
+<<<<<<< HEAD
   integrity sha512-TH+BeeL6Ct98C7as35JbZLf8lgsRzlNJb5gklRIGHKaPkGl1esOKBc5ALUMd+q08Sr6tiEKM+Icbsxg5vuhMKQ==
+=======
+  integrity sha1-0aIUg/0iu0HlihL6NCGCMUCJfEU=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 pnp-webpack-plugin@1.6.4:
   version "1.6.4"
@@ -15517,7 +15870,11 @@ process@^0.11.10:
 progress@^1.1.8:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/progress/-/progress-1.1.8.tgz#e260c78f6161cdd9b0e56cc3e0a85de17c7a57be"
+<<<<<<< HEAD
   integrity sha512-UdA8mJ4weIkUBO224tIarHzuHs4HuYiJvsuGT7j/SPQiUJVjYvNDBIPa0hAorduOfjGohB/qHWRa/lrrWX/mXw==
+=======
+  integrity sha1-4mDHj2Fhzdmw5WzD4Khd4Xx6V74=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 promise-inflight@^1.0.1:
   version "1.0.1"
@@ -16158,7 +16515,11 @@ readdirp@~3.6.0:
 readline2@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/readline2/-/readline2-1.0.1.tgz#41059608ffc154757b715d9989d199ffbf372e35"
+<<<<<<< HEAD
   integrity sha512-8/td4MmwUB6PkZUbV25uKz7dfrmjYWxsW8DVfibWdlHRk/l/DfHKn4pU+dfcoGLFgWOdyGCzINRQD7jn+Bv+/g==
+=======
+  integrity sha1-QQWWCP/BVHV7cV2ZidGZ/783LjU=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     code-point-at "^1.0.0"
     is-fullwidth-code-point "^1.0.0"
@@ -16466,7 +16827,11 @@ require-package-name@^2.0.1:
 require-uncached@^1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/require-uncached/-/require-uncached-1.0.3.tgz#4e0d56d6c9662fd31e43011c4b95aa49955421d3"
+<<<<<<< HEAD
   integrity sha512-Xct+41K3twrbBHdxAgMoOS+cNcoqIjfM2/VxBF4LL2hVph7YsF8VSKyQ3BDFZwEVbok9yeDl2le/qo0S77WG2w==
+=======
+  integrity sha1-Tg1W1slmL9MeQwEcS5WqSZVUIdM=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     caller-path "^0.1.0"
     resolve-from "^1.0.0"
@@ -16504,12 +16869,20 @@ resolve-dir@^1.0.0, resolve-dir@^1.0.1:
 resolve-from@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-1.0.1.tgz#26cbfe935d1aeeeabb29bc3fe5aeb01e93d44226"
+<<<<<<< HEAD
   integrity sha512-kT10v4dhrlLNcnO084hEjvXCI1wUG9qZLoz2RogxqDQQYy7IxjI/iMUkOtQTNEh6rzHxvdQWHsJyel1pKOVCxg==
+=======
+  integrity sha1-Jsv+k10a7uq7Kbw/5a6wHpPUQiY=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 resolve-from@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-2.0.0.tgz#9480ab20e94ffa1d9e80a804c7ea147611966b57"
+<<<<<<< HEAD
   integrity sha512-qpFcKaXsq8+oRoLilkwyc7zHGF5i9Q2/25NIgLQQ/+VVv9rU4qvr6nXVAw1DsnXJyQkZsR4Ytfbtg5ehfcUssQ==
+=======
+  integrity sha1-lICrIOlP+h2egKgEx+oUdhGWa1c=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 resolve-from@^4.0.0:
   version "4.0.0"
@@ -16524,7 +16897,11 @@ resolve-from@^5.0.0:
 resolve-pkg@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/resolve-pkg/-/resolve-pkg-0.1.0.tgz#02cc993410e2936962bd97166a1b077da9725531"
+<<<<<<< HEAD
   integrity sha512-x11rPP22t6W9p+eSOhDeT6whjFGmsZQf76rDq5gtbgh9UdBxZeR1PuW6sYkCyN/IrD2hpJ0yYn0hE1toHAadEw==
+=======
+  integrity sha1-AsyZNBDik2livZcWahsHfalyVTE=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     resolve-from "^2.0.0"
 
@@ -16558,7 +16935,11 @@ resolve@^2.0.0-next.3:
 restore-cursor@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/restore-cursor/-/restore-cursor-1.0.1.tgz#34661f46886327fed2991479152252df92daa541"
+<<<<<<< HEAD
   integrity sha512-reSjH4HuiFlxlaBaFCiS6O76ZGG2ygKoSlCsipKdaZuKSPx/+bt9mULkn4l0asVzbEfQQmXRg6Wp6gv6m0wElw==
+=======
+  integrity sha1-NGYfRohjJ/7SmRR5FSJS35LapUE=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     exit-hook "^1.0.0"
     onetime "^1.0.0"
@@ -16599,7 +16980,7 @@ rfdc@^1.3.0:
   resolved "https://registry.yarnpkg.com/rfdc/-/rfdc-1.3.0.tgz#d0b7c441ab2720d05dc4cf26e01c89631d9da08b"
   integrity sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==
 
-rimraf@3.0.2, rimraf@^3.0.0, rimraf@^3.0.2:
+rimraf@3.0.2, rimraf@^3.0.0, rimraf@^3.0.2, rimraf@~3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
   integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
@@ -16636,7 +17017,11 @@ rsvp@^4.8.4:
 run-async@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-0.1.0.tgz#c8ad4a5e110661e402a7d21b530e009f25f8e389"
+<<<<<<< HEAD
   integrity sha512-qOX+w+IxFgpUpJfkv2oGN0+ExPs68F4sZHfaRRx4dDexAQkG83atugKVEylyT5ARees3HBbfmuvnjbrd8j9Wjw==
+=======
+  integrity sha1-yK1KXhEGYeQCp9IbUw4AnyX444k=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     once "^1.3.0"
 
@@ -16662,7 +17047,11 @@ run-queue@^1.0.0, run-queue@^1.0.3:
 rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
+<<<<<<< HEAD
   integrity sha512-1I1+G2gteLB8Tkt8YI1sJvSIfa0lWuRtC8GjvtyPBcLSF5jBCCJJqKrpER5JU5r6Bhe+i9/pK3VMuUcXu0kdwQ==
+=======
+  integrity sha1-Gc5QLKVyZl87ZHsQk5+X/RYV8QI=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 rxjs@^6.4.0, rxjs@^6.6.0:
   version "6.6.7"
@@ -17027,7 +17416,11 @@ shebang-regex@^3.0.0:
 shelljs@^0.7.5:
   version "0.7.8"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.7.8.tgz#decbcf874b0d1e5fb72e14b164a9683048e9acb3"
+<<<<<<< HEAD
   integrity sha512-/YF5Uk8hcwi7ima04ppkbA4RaRMdPMBfwAvAf8sufYOxsJRtbdoBsT8vGvlb+799BrlGdYrd+oczIA2eN2JdWA==
+=======
+  integrity sha1-3svPh0sNHl+3LhSxZKloMEjprLM=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     glob "^7.0.0"
     interpret "^1.0.0"
@@ -17140,7 +17533,11 @@ slash@^4.0.0:
 slice-ansi@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-0.0.4.tgz#edbf8903f66f7ce2f8eafd6ceed65e264c831b35"
+<<<<<<< HEAD
   integrity sha512-up04hB2hR92PgjpyU3y/eg91yIBILyjVY26NvvciY3EVVPjybkMszMpXQ9QAkcS3I5rtJBDLoTxxg+qvW8c7rw==
+=======
+  integrity sha1-7b+JA/ZvfOL46v1s7tZeJkyDGzU=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 slice-ansi@^3.0.0:
   version "3.0.0"
@@ -17486,7 +17883,11 @@ string-length@^4.0.1:
 string-width@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-1.0.2.tgz#118bdf5b8cdc51a2a7e70d211e07e2b0b9b107d3"
+<<<<<<< HEAD
   integrity sha512-0XsVpQLnVCXHJfyEs8tC0zpTVIr5PKKsQtkT29IwupnPTjtPmQ3xT/4yCREF9hYkV/3M3kzcUTSAZT6a6h81tw==
+=======
+  integrity sha1-EYvfW4zcUaKn5w0hHgfisLmxB9M=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     code-point-at "^1.0.0"
     is-fullwidth-code-point "^1.0.0"
@@ -17590,7 +17991,11 @@ strip-ansi@^3.0.0, strip-ansi@^3.0.1:
 strip-ansi@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-4.0.0.tgz#a8479022eb1ac368a871389b635262c505ee368f"
+<<<<<<< HEAD
   integrity sha512-4XaJ2zQdCzROZDivEVIDPkcQn8LMFSa8kj8Gxb/Lnwzv9A8VctNZ+lfivC/sV3ivW8ElJTERXZoPBRrZKkNKow==
+=======
+  integrity sha1-qEeQIusaw2iocTibY1JixQXuNo8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     ansi-regex "^3.0.0"
 
@@ -17671,7 +18076,11 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
 strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
+<<<<<<< HEAD
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
+=======
+  integrity sha1-PFMZQukIwml8DsNEhYwobHygpgo=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 style-loader@^1.3.0:
   version "1.3.0"
@@ -17855,7 +18264,11 @@ tabbable@^5.3.3:
 table@^3.7.8:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/table/-/table-3.8.3.tgz#2bbc542f0fda9861a755d3947fefd8b3f513855f"
+<<<<<<< HEAD
   integrity sha512-RZuzIOtzFbprLCE0AXhkI0Xi42ZJLZhCC+qkwuMLf/Vjz3maWpA8gz1qMdbmNoI9cOROT2Am/DxeRyXenrL11g==
+=======
+  integrity sha1-K7xULw/amGGnVdOUf+/Ys/UThV8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     ajv "^4.7.0"
     ajv-keywords "^1.0.0"
@@ -18331,10 +18744,17 @@ type@^1.0.1:
   resolved "https://registry.yarnpkg.com/type/-/type-1.2.0.tgz#848dd7698dafa3e54a6c479e759c4bc3f18847a0"
   integrity sha512-+5nt5AAniqsCnu2cEQQdpzCAh33kVx8n0VoFidKpB1dVVLAN/F+bgVOqOJqOnEnrhp222clB5p3vUlD+1QAnfg==
 
+<<<<<<< HEAD
 type@^2.7.2:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/type/-/type-2.7.2.tgz#2376a15a3a28b1efa0f5350dcf72d24df6ef98d0"
   integrity sha512-dzlvlNlt6AXU7EBSfpAscydQ7gXB+pPGsPnfJnZpiNJBDj7IaJzQlBZYGdEi4R9HmPdBv2XmWJ6YUtoTa7lmCw==
+=======
+type@^2.5.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/type/-/type-2.6.0.tgz#3ca6099af5981d36ca86b78442973694278a219f"
+  integrity sha512-eiDBDOmkih5pMbo9OqsqPRGMljLodLcwd5XD5JbtNB0o89xZAwynY9EdCDsJU7LtcVCClu9DvM7/0Ep1hYX3EQ==
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
 
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"
@@ -18662,7 +19082,11 @@ user-home@^1.1.1:
 user-home@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/user-home/-/user-home-2.0.0.tgz#9c70bfd8169bc1dcbf48604e0f04b8b49cde9e9f"
+<<<<<<< HEAD
   integrity sha512-KMWqdlOcjCYdtIJpicDSFBQ8nFwS2i9sslAd6f4+CBGcU4gist2REnr2fxj2YocvJFxSF3ZOHLYLVZnUxv4BZQ==
+=======
+  integrity sha1-nHC/2Babwdy/SGBODwS4tJzenp8=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     os-homedir "^1.0.0"
 
@@ -19366,7 +19790,11 @@ write-file-atomic@^3.0.0:
 write@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/write/-/write-0.2.1.tgz#5fc03828e264cea3fe91455476f7a3c566cb0757"
+<<<<<<< HEAD
   integrity sha512-CJ17OoULEKXpA5pef3qLj5AxTJ6mSt7g84he2WIskKwqFO4T97d5V7Tadl0DYDk7qyUOQD5WlUlOMChaYrhxeA==
+=======
+  integrity sha1-X8A4KOJkzqP+kUVUdvejxWbLB1c=
+>>>>>>> 37f9cd22f (Revert "chore(build): remove grunt and add makefile [EE-4824] (#8803)")
   dependencies:
     mkdirp "^0.5.1"
 
