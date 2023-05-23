@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	portainerdocker "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/rs/zerolog/log"
 )
 
@@ -202,7 +203,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 		}
 
 		for k, v := range container.Labels {
-			if k == ComposeStackNameLabel {
+			if k == consts.ComposeStackNameLabel {
 				stacks[v] = struct{}{}
 			}
 		}
