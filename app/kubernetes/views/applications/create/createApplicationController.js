@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import * as JsonPatch from 'fast-json-patch';
 import { RegistryTypes } from '@/portainer/models/registryTypes';
+import { getServices } from '@/react/kubernetes/networks/services/service';
 
 import {
   KubernetesApplicationDataAccessPolicies,
@@ -133,6 +134,7 @@ class KubernetesCreateApplicationController {
       isEdit: this.$state.params.namespace && this.$state.params.name,
       persistedFoldersUseExistingVolumes: false,
       pullImageValidity: false,
+      nodePortServices: [],
     };
 
     this.isAdmin = this.Authentication.isAdmin();
@@ -156,6 +158,7 @@ class KubernetesCreateApplicationController {
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
     this.supportGlobalDeployment = this.supportGlobalDeployment.bind(this);
     this.onChangePlacementType = this.onChangePlacementType.bind(this);
+    this.onServicesChange = this.onServicesChange.bind(this);
   }
   /* #endregion */
 
@@ -453,6 +456,12 @@ class KubernetesCreateApplicationController {
   /* #endregion */
 
   /* #region  PUBLISHED PORTS UI MANAGEMENT */
+  onServicesChange(services) {
+    return this.$async(async () => {
+      this.formValues.Services = services;
+    });
+  }
+
   onServicePublishChange() {
     // enable publishing with no previous ports exposed
     if (this.formValues.IsPublishingService && !this.formValues.PublishedPorts.length) {
@@ -1295,6 +1304,14 @@ class KubernetesCreateApplicationController {
       } finally {
         this.state.viewReady = true;
       }
+      // get all nodeport services in the cluster, to validate unique nodeports in the form
+      // this is below the try catch, to not block the page rendering
+      const allSettledServices = await Promise.allSettled(this.resourcePools.map((namespace) => getServices(this.state.endpointId, namespace)));
+      const allServices = allSettledServices
+        .filter((settledService) => settledService.status === 'fulfilled' && settledService.value)
+        .map((fulfilledService) => fulfilledService.value)
+        .flat();
+      this.state.nodePortServices = allServices.filter((service) => service.Type === 'NodePort');
     });
   }
 

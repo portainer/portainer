@@ -127,7 +127,7 @@ export class KubernetesIngressConverter {
   static newApplicationFormValuesToIngresses(formValues, serviceName, servicePorts) {
     const ingresses = angular.copy(formValues.OriginalIngresses);
     servicePorts.forEach((port) => {
-      const ingress = _.find(ingresses, { Name: port.ingress.IngressName });
+      const ingress = port.ingress && _.find(ingresses, { Name: port.ingress.IngressName });
       if (ingress) {
         const rule = new KubernetesIngressRule();
         rule.ServiceName = serviceName;

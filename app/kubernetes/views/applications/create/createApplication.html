@@ -1144,13 +1144,14 @@
                 </div>
 
                 <!-- kubernetes services options -->
-                <kube-services-view
-                  form-values="ctrl.formValues"
-                  is-edit="ctrl.state.isEdit"
-                  namespaces="ctrl.allNamespaces"
-                  configurations="ctrl.configurations"
-                  loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
-                ></kube-services-view>
+                <kube-services-form
+                  on-change="(ctrl.onServicesChange)"
+                  values="ctrl.formValues.Services"
+                  load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+                  app-name="ctrl.formValues.Name"
+                  selector="ctrl.formValues.Selector"
+                  validation-context="{nodePortServices: ctrl.state.nodePortServices}"
+                ></kube-services-form>
                 <!-- kubernetes services options -->
 
                 <!-- summary -->
@@ -1192,19 +1193,21 @@
                 </div>
               </div>
               <!-- kubernetes services options -->
-              <kube-services-view
-                namespaces="ctrl.allNamespaces"
-                form-values="ctrl.formValues"
-                is-edit="ctrl.state.isEdit"
-                loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
-              ></kube-services-view>
+              <kube-services-form
+                on-change="(ctrl.onServicesChange)"
+                values="ctrl.formValues.Services"
+                load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+                app-name="ctrl.formValues.Name"
+                selector="ctrl.formValues.Selector"
+                validation-context="{nodePortServices: ctrl.state.nodePortServices}"
+              ></kube-services-form>
               <!-- kubernetes services options -->
             </div>
 
             <!-- kubernetes summary for external application -->
             <kubernetes-summary-view ng-if="ctrl.isExternalApplication()" form-values="ctrl.formValues" old-form-values="ctrl.savedFormValues"></kubernetes-summary-view>
             <!-- kubernetes summary for external application -->
-            <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
+            <div class="col-sm-12 form-section-title !mt-6" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
             <!-- #region ACTIONS -->
             <div class="form-group" ng-hide="ctrl.stack.IsComposeFormat">
               <div class="col-sm-12">

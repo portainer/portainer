@@ -303,9 +303,11 @@ class KubernetesApplicationHelper {
             const svcport = new KubernetesServicePort();
             svcport.name = port.name;
             svcport.port = port.port;
-            svcport.nodePort = port.nodePort;
+            svcport.nodePort = port.nodePort || 0;
             svcport.protocol = port.protocol;
             svcport.targetPort = port.targetPort;
+            svcport.serviceName = service.metadata.name;
+            svcport.ingress = {};
 
             app.Ingresses.value.forEach((ingress) => {
               const ingressNameMatched = ingress.Paths.find((ingPath) => ingPath.ServiceName === service.metadata.name);

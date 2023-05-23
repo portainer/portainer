@@ -13,7 +13,7 @@ export function FormError({ children, className }: PropsWithChildren<Props>) {
     <p
       className={clsx(`text-muted small vertical-center help-block`, className)}
     >
-      <Icon icon={AlertTriangle} className="icon-warning" />
+      <Icon icon={AlertTriangle} className="icon-warning shrink-0" />
       <span className="text-warning">{children}</span>
     </p>
   );
