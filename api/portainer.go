@@ -1306,11 +1306,12 @@ type (
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
 		// Webhook Identifier
-		ID          WebhookID   `json:"Id" example:"1"`
-		Token       string      `json:"Token"`
-		ResourceID  string      `json:"ResourceId"`
-		EndpointID  EndpointID  `json:"EndpointId"`
-		RegistryID  RegistryID  `json:"RegistryId"`
+		ID         WebhookID  `json:"Id" example:"1"`
+		Token      string     `json:"Token"`
+		ResourceID string     `json:"ResourceId"`
+		EndpointID EndpointID `json:"EndpointId"`
+		RegistryID RegistryID `json:"RegistryId"`
+		// Type of webhook (1 - service)
 		WebhookType WebhookType `json:"Type"`
 	}
 
