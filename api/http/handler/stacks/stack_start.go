@@ -25,6 +25,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
+// @param endpointId query int true "Environment identifier"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -53,7 +54,12 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return httperror.BadRequest("Starting a kubernetes stack is not supported", err)
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: endpointId", err)
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
