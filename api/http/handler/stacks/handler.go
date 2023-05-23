@@ -13,7 +13,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -30,7 +30,7 @@ type Handler struct {
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
 	DataStore               dataservices.DataStore
-	DockerClientFactory     *docker.ClientFactory
+	DockerClientFactory     *client.ClientFactory
 	FileService             portainer.FileService
 	GitService              portainer.GitService
 	SwarmStackManager       portainer.SwarmStackManager

@@ -6,20 +6,20 @@ import (
 	"github.com/docker/docker/api/types"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/rs/zerolog/log"
 )
 
 type PostInitMigrator struct {
 	kubeFactory   *cli.ClientFactory
-	dockerFactory *docker.ClientFactory
+	dockerFactory *client.ClientFactory
 	dataStore     dataservices.DataStore
 }
 
 func NewPostInitMigrator(
 	kubeFactory *cli.ClientFactory,
-	dockerFactory *docker.ClientFactory,
+	dockerFactory *client.ClientFactory,
 	dataStore dataservices.DataStore,
 ) *PostInitMigrator {
 	return &PostInitMigrator{

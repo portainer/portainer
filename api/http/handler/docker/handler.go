@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	"github.com/gorilla/mux"
@@ -21,12 +21,12 @@ type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
 	dataStore            dataservices.DataStore
-	dockerClientFactory  *docker.ClientFactory
+	dockerClientFactory  *client.ClientFactory
 	authorizationService *authorization.Service
 }
 
 // NewHandler creates a handler to process non-proxied requests to docker APIs directly.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, dockerClientFactory *docker.ClientFactory) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, dockerClientFactory *client.ClientFactory) *Handler {
 	h := &Handler{
 		Router:               mux.NewRouter(),
 		requestBouncer:       bouncer,

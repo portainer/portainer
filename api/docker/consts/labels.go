@@ -1,4 +1,4 @@
-package docker
+package consts
 
 const (
 	ComposeStackNameLabel = "com.docker.compose.project"
