@@ -30,9 +30,6 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.BACKUP_FORM_TYPES = { S3: 's3', FILE: 'file' };
 
     $scope.formValues = {
-      BlackListedLabels: [],
-      labelName: '',
-      labelValue: '',
       passwordProtect: false,
       password: '',
       backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
@@ -47,23 +44,6 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.onBackupOptionsChange = function (type, limited) {
       $scope.formValues.backupFormType = type;
       $scope.state.featureLimited = limited;
-    };
-
-    $scope.removeFilteredContainerLabel = function (index) {
-      const filteredSettings = $scope.formValues.BlackListedLabels.filter((_, i) => i !== index);
-      const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
-      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
-    };
-
-    $scope.addFilteredContainerLabel = function () {
-      var label = {
-        name: $scope.formValues.labelName,
-        value: $scope.formValues.labelValue,
-      };
-
-      const filteredSettings = [...$scope.formValues.BlackListedLabels, label];
-      const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
-      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
     };
 
     $scope.downloadBackup = function () {
@@ -135,12 +115,11 @@ angular.module('portainer.app').controller('SettingsController', [
       // which may override the cloud provider API keys
       settings.CloudApiKeys = undefined;
       return SettingsService.update(settings)
-        .then(function success(response) {
+        .then(function success() {
           Notifications.success('Success', successMessage);
           StateManager.updateLogo(settings.LogoURL);
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);
-          $scope.formValues.BlackListedLabels = response.BlackListedLabels;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update settings');
@@ -152,11 +131,8 @@ angular.module('portainer.app').controller('SettingsController', [
 
     function initView() {
       SettingsService.settings()
-        .then(function success(data) {
-          var settings = data;
+        .then(function success(settings) {
           $scope.settings = settings;
-
-          $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
