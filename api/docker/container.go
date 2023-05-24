@@ -4,16 +4,15 @@ import (
 	"context"
 	"strings"
 
-	portainer "github.com/portainer/portainer/api"
-	dockerclient "github.com/portainer/portainer/api/docker/client"
-
-	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker/images"
-
 	"github.com/docker/docker/api/types"
+	dockercontainer "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/docker/images"
 	"github.com/rs/zerolog/log"
 )
 
@@ -79,7 +78,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 
 	// 2. stop the current container
 	log.Debug().Str("container_id", containerId).Msg("starting to stop the container")
-	err = cli.ContainerStop(ctx, containerId, nil)
+	err = cli.ContainerStop(ctx, containerId, dockercontainer.StopOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "stop container error")
 	}
@@ -136,7 +135,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 
 	c.sr.push(func() {
 		log.Debug().Str("container_id", create.ID).Msg("removing the new container")
-		cli.ContainerStop(ctx, create.ID, nil)
+		cli.ContainerStop(ctx, create.ID, dockercontainer.StopOptions{})
 		cli.ContainerRemove(ctx, create.ID, types.ContainerRemoveOptions{})
 	})
 
