@@ -6,6 +6,7 @@ import { FormikErrors } from 'formik';
 
 import DataFlow from '@/assets/ico/dataflow-1.svg?c';
 import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
 import { TextTip } from '@@/Tip/TextTip';
@@ -13,6 +14,7 @@ import { Select } from '@@/form-components/ReactSelect';
 import { Button } from '@@/buttons';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 import { Icon } from '@@/Icon';
+import { FormError } from '@@/form-components/FormError';
 
 import { ServiceFormValues, ServicePort, ServiceTypeValue } from './types';
 import { LoadBalancerForm } from './LoadBalancerForm';
@@ -66,6 +68,7 @@ export function KubeServicesForm({
   appName,
   selector,
 }: Props) {
+  const { isAdmin } = useCurrentUser();
   const [selectedServiceTypeOption, setSelectedServiceTypeOption] = useState<
     SingleValue<ServiceTypeOption>
   >(serviceTypeOptions[0]); // ClusterIP is the default value
@@ -114,6 +117,11 @@ export function KubeServicesForm({
               color="default"
               icon={Plus}
               size="medium"
+              disabled={
+                selectedServiceTypeOption?.value ===
+                  KubernetesApplicationPublishingTypes.LOAD_BALANCER &&
+                !loadBalancerEnabled
+              }
               onClick={() => {
                 // create a new service form value and add it to the list of services
                 const newService = structuredClone(serviceFormDefaultValues);
@@ -134,6 +142,31 @@ export function KubeServicesForm({
         </TooltipWithChildren>
       </div>
       <div className="flex w-full flex-col">
+        {selectedServiceTypeOption?.value ===
+          KubernetesApplicationPublishingTypes.LOAD_BALANCER &&
+          isAdmin &&
+          !loadBalancerEnabled && (
+            <FormError className="mt-2">
+              No Load balancer is available in this cluster, click{' '}
+              <Link
+                to="kubernetes.cluster.setup"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                here
+              </Link>{' '}
+              to configure load balancer.
+            </FormError>
+          )}
+        {selectedServiceTypeOption?.value ===
+          KubernetesApplicationPublishingTypes.LOAD_BALANCER &&
+          !isAdmin &&
+          !loadBalancerEnabled && (
+            <FormError className="mt-2">
+              No Load balancer is available in this cluster, contact your
+              administrator.
+            </FormError>
+          )}
         {services.map((service, index) => (
           <div key={index} className="border-bottom py-6">
             {service.Type ===

@@ -1,15 +1,11 @@
 import { FormikErrors } from 'formik';
 import { ChangeEvent } from 'react';
-import { AlertTriangle, Plus, Trash2 } from 'lucide-react';
-
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { Plus, Trash2 } from 'lucide-react';
 
 import { InputGroup } from '@@/form-components/InputGroup';
 import { FormError } from '@@/form-components/FormError';
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 import { Button } from '@@/buttons';
-import { Icon } from '@@/Icon';
-import { Link } from '@@/Link';
 
 import { isServicePortError, newPort } from './utils';
 import { ContainerPortInput } from './ContainerPortInput';
@@ -32,33 +28,8 @@ export function LoadBalancerForm({
   errors,
 }: Props) {
   const newLoadBalancerPort = newPort(serviceName);
-  const { isAdmin } = useCurrentUser();
   return (
     <>
-      {isAdmin && !loadBalancerEnabled && (
-        <div className="small">
-          <p className="text-warning vertical-center mt-2">
-            <Icon icon={AlertTriangle} mode="warning" /> No Load balancer is
-            available in this cluster, click
-            <Link
-              to="kubernetes.cluster.setup"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              here
-            </Link>{' '}
-            to configure load balancer.
-          </p>
-        </div>
-      )}
-      {!isAdmin && !loadBalancerEnabled && (
-        <div className="small">
-          <p className="text-warning vertical-center mt-2">
-            <Icon icon={AlertTriangle} mode="warning" /> No Load balancer is
-            available in this cluster, contact your administrator.
-          </p>
-        </div>
-      )}
       {loadBalancerEnabled && (
         <>
           <div className="control-label !mb-2 !pt-0 text-left">
