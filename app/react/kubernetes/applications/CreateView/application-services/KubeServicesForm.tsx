@@ -4,10 +4,6 @@ import { SingleValue } from 'react-select';
 import { List, Plus, Trash2 } from 'lucide-react';
 import { FormikErrors } from 'formik';
 
-// import { Annotations } from '@/react/kubernetes/annotations';
-// import { Annotation } from '@/react/kubernetes/annotations/types';
-// import { AnnotationErrors } from '@/react/kubernetes/annotations/AnnotationsForm';
-// import KubernetesAnnotationsUtils from '@/kubernetes/converters/annotations';
 import DataFlow from '@/assets/ico/dataflow-1.svg?c';
 import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
 
@@ -73,9 +69,6 @@ export function KubeServicesForm({
   const [selectedServiceTypeOption, setSelectedServiceTypeOption] = useState<
     SingleValue<ServiceTypeOption>
   >(serviceTypeOptions[0]); // ClusterIP is the default value
-  // const [annotationsErrors, setAnnotationsErrors] = useState<
-  //   AnnotationErrors[]
-  // >([]);
 
   return (
     <>
@@ -132,7 +125,6 @@ export function KubeServicesForm({
                 newService.Ports = [newServicePort];
                 newService.Selector = selector;
                 onChange([...services, newService]);
-                // setAnnotationsErrors([...annotationsErrors, {}]);
               }}
               data-cy="k8sAppCreate-createServiceButton"
             >
@@ -213,12 +205,6 @@ export function KubeServicesForm({
                   ...services.slice(index + 1),
                 ];
                 onChange(newServices);
-                // // update the annotation errors
-                // const newAnnotationErrors = [
-                //   ...annotationsErrors.slice(0, index),
-                //   ...annotationsErrors.slice(index + 1),
-                // ];
-                // setAnnotationsErrors(newAnnotationErrors);
               }}
             >
               Remove
