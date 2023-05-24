@@ -21,28 +21,7 @@ angular.module('portainer.app').controller('SettingsController', [
 
     $scope.state = {
       actionInProgress: false,
-      availableKubeconfigExpiryOptions: [
-        {
-          key: '1 day',
-          value: '24h',
-        },
-        {
-          key: '7 days',
-          value: `${24 * 7}h`,
-        },
-        {
-          key: '30 days',
-          value: `${24 * 30}h`,
-        },
-        {
-          key: '1 year',
-          value: `${24 * 30 * 12}h`,
-        },
-        {
-          key: 'No expiry',
-          value: '0',
-        },
-      ],
+
       backupInProgress: false,
       featureLimited: false,
       showHTTPS: !window.ddExtension,
@@ -51,8 +30,6 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.BACKUP_FORM_TYPES = { S3: 's3', FILE: 'file' };
 
     $scope.formValues = {
-      KubeconfigExpiry: undefined,
-      HelmRepositoryURL: undefined,
       BlackListedLabels: [],
       labelName: '',
       labelValue: '',
@@ -111,17 +88,45 @@ angular.module('portainer.app').controller('SettingsController', [
         });
     };
 
-    // only update the values from the kube settings widget. In future separate the api endpoints
-    $scope.saveKubernetesSettings = function () {
-      const kubeSettingsPayload = {
-        KubeconfigExpiry: $scope.formValues.KubeconfigExpiry,
-        HelmRepositoryURL: $scope.formValues.HelmRepositoryURL,
-        GlobalDeploymentOptions: $scope.formValues.GlobalDeploymentOptions,
-      };
-
-      $scope.state.kubeSettingsActionInProgress = true;
-      updateSettings(kubeSettingsPayload, 'Kubernetes settings updated');
+    $scope.saveS3BackupSettings = function () {
+      const payload = getS3SettingsPayload();
+      BackupService.saveS3Settings(payload)
+        .then(function success() {
+          Notifications.success('Success', 'S3 Backup settings successfully saved');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to save S3 backup settings');
+        })
+        .finally(function final() {
+          $scope.state.backupInProgress = false;
+        });
     };
+
+    $scope.exportBackup = function () {
+      const payload = getS3SettingsPayload();
+      BackupService.exportBackup(payload)
+        .then(function success() {
+          Notifications.success('Success', 'Exported backup to S3 successfully');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to export backup to S3');
+        })
+        .finally(function final() {
+          $scope.state.backupInProgress = false;
+        });
+    };
+
+    function getS3SettingsPayload() {
+      return {
+        Password: $scope.formValues.passwordProtectS3 ? $scope.formValues.passwordS3 : '',
+        CronRule: $scope.formValues.scheduleAutomaticBackups ? $scope.formValues.cronRule : '',
+        AccessKeyID: $scope.formValues.accessKeyId,
+        SecretAccessKey: $scope.formValues.secretAccessKey,
+        Region: $scope.formValues.region,
+        BucketName: $scope.formValues.bucketName,
+        S3CompatibleHost: $scope.formValues.s3CompatibleHost,
+      };
+    }
 
     function updateSettings(settings, successMessage = 'Settings updated') {
       // ignore CloudApiKeys to avoid overriding them
@@ -141,7 +146,6 @@ angular.module('portainer.app').controller('SettingsController', [
           Notifications.error('Failure', err, 'Unable to update settings');
         })
         .finally(function final() {
-          $scope.state.kubeSettingsActionInProgress = false;
           $scope.state.actionInProgress = false;
         });
     }
@@ -152,8 +156,6 @@ angular.module('portainer.app').controller('SettingsController', [
           var settings = data;
           $scope.settings = settings;
 
-          $scope.formValues.KubeconfigExpiry = settings.KubeconfigExpiry;
-          $scope.formValues.HelmRepositoryURL = settings.HelmRepositoryURL;
           $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
         })
         .catch(function error(err) {

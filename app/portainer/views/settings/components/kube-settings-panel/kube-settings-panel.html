@@ -1,0 +1,103 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="svg-kube" title-text="Kubernetes settings"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- helm charts -->
+          <div class="col-sm-12 form-section-title"> Helm Repository </div>
+          <div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can specify the URL to your own helm repository here. See the
+                <a href="https://helm.sh/docs/topics/chart_repository/" target="_blank">official documentation</a> for more details.
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="helmrepository_url" class="col-sm-2 control-label text-left"> URL </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="$ctrl.formValues.HelmRepositoryURL" id="helmrepository_url" placeholder="https://charts.bitnami.com/bitnami" />
+              </div>
+            </div>
+          </div>
+          <!-- !helm charts -->
+          <!-- kubeconfig -->
+          <div class="col-sm-12 form-section-title"> Kubeconfig </div>
+          <div class="form-group">
+            <label for="kubeconfig_expiry" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
+            <div class="col-sm-10">
+              <select
+                id="kubeconfig_expiry"
+                class="form-control"
+                ng-model="$ctrl.formValues.KubeconfigExpiry"
+                ng-options="opt.value as opt.key for opt in $ctrl.state.availableKubeconfigExpiryOptions"
+              ></select>
+            </div>
+          </div>
+          <!-- !kubeconfig -->
+          <!-- deployment options -->
+          <div class="col-sm-12 form-section-title"> Deployment Options </div>
+          <div class="form-group">
+            <por-switch-field
+              label="'Enforce code-based deployment'"
+              checked="$ctrl.formValues.GlobalDeploymentOptions.hideAddWithForm"
+              name="'toggle_hideAddWithForm'"
+              feature-id="$ctrl.enforceDeploymentOptions"
+              on-change="($ctrl.onToggleAddWithForm)"
+              field-class="'col-sm-10'"
+              label-class="'col-sm-2'"
+              tooltip="'Hides the \'Add with form\' buttons and prevents adding/editing of resources via forms'"
+            ></por-switch-field>
+          </div>
+          <div class="form-group flex flex-col gap-y-1" ng-if="$ctrl.formValues.GlobalDeploymentOptions.hideAddWithForm">
+            <por-switch-field
+              label="'Allow web editor and custom template use'"
+              checked="!$ctrl.formValues.GlobalDeploymentOptions.hideWebEditor"
+              name="'toggle_hideWebEditor'"
+              on-change="($ctrl.onToggleHideWebEditor)"
+              field-class="'col-sm-10'"
+              label-class="'col-sm-2 !pl-4'"
+            ></por-switch-field>
+            <por-switch-field
+              label="'Allow specifying of a manifest via a URL'"
+              checked="!$ctrl.formValues.GlobalDeploymentOptions.hideFileUpload"
+              name="'toggle_hideFileUpload'"
+              on-change="($ctrl.onToggleHideFileUpload)"
+              field-class="'col-sm-10'"
+              label-class="'col-sm-2 !pl-4'"
+            ></por-switch-field>
+          </div>
+          <div class="form-group" limited-feature-dir="{{::$ctrl.enforceDeploymentOptions}}" limited-feature-class="hidden">
+            <por-switch-field
+              label="'Allow per environment override'"
+              checked="$ctrl.formValues.GlobalDeploymentOptions.perEnvOverride"
+              name="'toggle_perEnvOverride'"
+              on-change="($ctrl.onTogglePerEnvOverride)"
+              field-class="'col-sm-10'"
+              label-class="'col-sm-2'"
+              tooltip="'Allows overriding of deployment options in the Cluster setup screen of each environment'"
+            ></por-switch-field>
+          </div>
+          <!-- ! deployment options  -->
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm !ml-0"
+                ng-click="$ctrl.saveKubernetesSettings()"
+                ng-disabled="$ctrl.state.actionInProgress"
+                button-spinner="$ctrl.state.actionInProgress"
+                data-cy="settings-saveKubeSettingsButton"
+              >
+                <span ng-hide="$ctrl.state.actionInProgress">Save Kubernetes settings</span>
+                <span ng-show="$ctrl.state.actionInProgress">Saving...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
