@@ -22,6 +22,7 @@ import { ServiceFormValues, ServicePort, ServiceTypeValue } from './types';
 import { LoadBalancerForm } from './LoadBalancerForm';
 import { ClusterIpForm } from './ClusterIpForm';
 import { NodePortForm } from './NodePortForm';
+import { newPort } from './utils';
 
 type ServiceTypeLabel = 'ClusterIP' | 'NodePort' | 'LoadBalancer';
 type ServiceTypeOption = { value: ServiceTypeValue; label: ServiceTypeLabel };
@@ -37,7 +38,7 @@ const serviceTypeOptions: ServiceTypeOption[] = [
   },
 ];
 
-const serviceFormValues: ServiceFormValues = {
+const serviceFormDefaultValues: ServiceFormValues = {
   Headless: false,
   Namespace: '',
   Name: '',
@@ -50,16 +51,6 @@ const serviceFormValues: ServiceFormValues = {
   Note: '',
   Ingress: false,
   Selector: {},
-};
-
-const newServicePort = {
-  port: 0,
-  targetPort: 0,
-  name: '',
-  protocol: 'TCP',
-  nodePort: 0,
-  ingress: undefined,
-  serviceName: '',
 };
 
 interface Props {
@@ -132,12 +123,12 @@ export function KubeServicesForm({
               size="medium"
               onClick={() => {
                 // create a new service form value and add it to the list of services
-                const newService = { ...serviceFormValues };
+                const newService = structuredClone(serviceFormDefaultValues);
                 newService.Name = getUniqName(appName, services);
                 newService.Type =
                   selectedServiceTypeOption?.value ||
                   KubernetesApplicationPublishingTypes.CLUSTER_IP;
-                newServicePort.serviceName = newService.Name;
+                const newServicePort = newPort(newService.Name);
                 newService.Ports = [newServicePort];
                 newService.Selector = selector;
                 onChange([...services, newService]);
