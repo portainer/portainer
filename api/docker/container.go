@@ -125,11 +125,10 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	log.Debug().Str("container", strings.Split(container.Name, "/")[1]).Msg("starting to create a new container")
 
 	// 6. create a new container
-	// It is important to attach a network to a container during its creation if the network has a
-	// static IP address set. By doing this, the new container can inherit the static IP address, which
-	// is particularly beneficial when the container is connected to multiple networks, each with
-	// its own static IP address. If you were to attach all of the networks after the container
-	// has been created, one of the static IP addresses could be overwritten with a random IP address.
+	// when a container is created without a network, docker connected it by default to the
+	// bridge network with a random IP, also it can only connect to one network on creation.
+	// to retain the same network settings we have to connect on creation to one of the old
+	// container's networks, and connect to the other networks after creation.
 	// see: https://portainer.atlassian.net/browse/EE-5448
 	create, err := cli.ContainerCreate(ctx, container.Config, container.HostConfig, &networkWithCreation, nil, container.Name)
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer/api/docker/client"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 
 	"github.com/containers/image/v5/docker"
 	imagetypes "github.com/containers/image/v5/types"
@@ -22,13 +22,13 @@ type Options struct {
 }
 
 type DigestClient struct {
-	clientFactory  *client.ClientFactory
+	clientFactory  *dockerclient.ClientFactory
 	opts           Options
 	sysCtx         *imagetypes.SystemContext
 	registryClient *RegistryClient
 }
 
-func NewClientWithRegistry(registryClient *RegistryClient, clientFactory *client.ClientFactory) *DigestClient {
+func NewClientWithRegistry(registryClient *RegistryClient, clientFactory *dockerclient.ClientFactory) *DigestClient {
 	return &DigestClient{
 		clientFactory:  clientFactory,
 		registryClient: registryClient,

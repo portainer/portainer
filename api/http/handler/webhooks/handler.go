@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker/client"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/http/security"
@@ -17,7 +17,7 @@ type Handler struct {
 	*mux.Router
 	requestBouncer      *security.RequestBouncer
 	DataStore           dataservices.DataStore
-	DockerClientFactory *client.ClientFactory
+	DockerClientFactory *dockerclient.ClientFactory
 }
 
 // NewHandler creates a handler to manage webhooks operations.
