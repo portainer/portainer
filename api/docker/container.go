@@ -4,18 +4,15 @@ import (
 	"context"
 	"strings"
 
-	dockerclient "github.com/portainer/portainer/api/docker/client"
-
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
-
-	"github.com/portainer/portainer/api/docker/images"
-
 	"github.com/docker/docker/api/types"
-	dcontainer "github.com/docker/docker/api/types/container"
+	dockercontainer "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/docker/images"
 	"github.com/rs/zerolog/log"
 )
 
@@ -81,7 +78,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 
 	// 2. stop the current container
 	log.Debug().Str("container_id", containerId).Msg("starting to stop the container")
-	err = cli.ContainerStop(ctx, containerId, dcontainer.StopOptions{})
+	err = cli.ContainerStop(ctx, containerId, dockercontainer.StopOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "stop container error")
 	}
@@ -128,17 +125,16 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	log.Debug().Str("container", strings.Split(container.Name, "/")[1]).Msg("starting to create a new container")
 
 	// 6. create a new container
-	// It is important to attach a network to a container during its creation if the network has a
-	// static IP address set. By doing this, the new container can inherit the static IP address, which
-	// is particularly beneficial when the container is connected to multiple networks, each with
-	// its own static IP address. If you were to attach all of the networks after the container
-	// has been created, one of the static IP addresses could be overwritten with a random IP address.
+	// when a container is created without a network, docker connected it by default to the
+	// bridge network with a random IP, also it can only connect to one network on creation.
+	// to retain the same network settings we have to connect on creation to one of the old
+	// container's networks, and connect to the other networks after creation.
 	// see: https://portainer.atlassian.net/browse/EE-5448
 	create, err := cli.ContainerCreate(ctx, container.Config, container.HostConfig, &networkWithCreation, nil, container.Name)
 
 	c.sr.push(func() {
 		log.Debug().Str("container_id", create.ID).Msg("removing the new container")
-		cli.ContainerStop(ctx, create.ID, dcontainer.StopOptions{})
+		cli.ContainerStop(ctx, create.ID, dockercontainer.StopOptions{})
 		cli.ContainerRemove(ctx, create.ID, types.ContainerRemoveOptions{})
 	})
 

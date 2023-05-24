@@ -7,20 +7,20 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
-	"github.com/portainer/portainer/api/docker/client"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type Handler struct {
 	*mux.Router
-	dockerClientFactory *client.ClientFactory
+	dockerClientFactory *dockerclient.ClientFactory
 	dataStore           dataservices.DataStore
 	containerService    *docker.ContainerService
 	bouncer             *security.RequestBouncer
 }
 
 // NewHandler creates a handler to process non-proxied requests to docker APIs directly.
-func NewHandler(routePrefix string, bouncer *security.RequestBouncer, dataStore dataservices.DataStore, dockerClientFactory *client.ClientFactory, containerService *docker.ContainerService) *Handler {
+func NewHandler(routePrefix string, bouncer *security.RequestBouncer, dataStore dataservices.DataStore, dockerClientFactory *dockerclient.ClientFactory, containerService *docker.ContainerService) *Handler {
 	h := &Handler{
 		Router:              mux.NewRouter(),
 		dataStore:           dataStore,

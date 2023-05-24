@@ -14,7 +14,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
-	"github.com/portainer/portainer/api/docker/client"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
@@ -96,7 +96,7 @@ type Server struct {
 	KubeClusterAccessService    k8s.KubeClusterAccessService
 	Handler                     *handler.Handler
 	SSLService                  *ssl.Service
-	DockerClientFactory         *client.ClientFactory
+	DockerClientFactory         *dockerclient.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
 	HelmPackageManager          libhelm.HelmPackageManager
