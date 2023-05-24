@@ -14,28 +14,7 @@ angular.module('portainer.app').controller('SettingsController', [
       showHTTPS: !window.ddExtension,
     };
 
-    $scope.formValues = {
-      BlackListedLabels: [],
-      labelName: '',
-      labelValue: '',
-    };
-
-    $scope.removeFilteredContainerLabel = function (index) {
-      const filteredSettings = $scope.formValues.BlackListedLabels.filter((_, i) => i !== index);
-      const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
-      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
-    };
-
-    $scope.addFilteredContainerLabel = function () {
-      var label = {
-        name: $scope.formValues.labelName,
-        value: $scope.formValues.labelValue,
-      };
-
-      const filteredSettings = [...$scope.formValues.BlackListedLabels, label];
-      const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
-      updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
-    };
+    $scope.formValues = {};
 
     function updateSettings(settings, successMessage = 'Settings updated') {
       return SettingsService.update(settings)
@@ -56,17 +35,13 @@ angular.module('portainer.app').controller('SettingsController', [
         StateManager.updateLogo(settings.LogoURL);
         StateManager.updateSnapshotInterval(settings.SnapshotInterval);
         StateManager.updateEnableTelemetry(settings.EnableTelemetry);
-        $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
       }
     }
 
     function initView() {
       SettingsService.settings()
-        .then(function success(data) {
-          var settings = data;
+        .then(function success(settings) {
           $scope.settings = settings;
-
-          $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
