@@ -1,0 +1,320 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="download" title-text="Back up Portainer"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" ng-submit="$ctrl.backupPortainer()" name="$ctrl.backupPortainerForm">
+          <div class="col-sm-12 form-section-title"> Backup configuration </div>
+          <div class="text-muted small mb-3">This will back up your Portainer server configuration and does not include containers.</div>
+
+          <box-selector
+            slim="true"
+            options="$ctrl.backupOptions"
+            value="$ctrl.formValues.backupFormType"
+            on-change="($ctrl.onBackupOptionsChange)"
+            radio-name="'backupOptions'"
+          ></box-selector>
+
+          <div ng-if="$ctrl.formValues.backupFormType === $ctrl.BACKUP_FORM_TYPES.S3">
+            <!-- Schedule automatic backups -->
+            <div class="form-group mt-3">
+              <por-switch-field
+                label="'Schedule automatic backups'"
+                name="'s3-backup-setting'"
+                feature-id="s3BackupFeatureId"
+                checked="$ctrl.formValues.scheduleAutomaticBackups"
+                field-class="'col-sm-10'"
+                label-class="'col-sm-2'"
+                on-change="($ctrl.onToggleAutoBackups)"
+              ></por-switch-field>
+            </div>
+            <!-- !Schedule automatic backups -->
+            <!-- Cron rule  -->
+            <div class="form-group" ng-if="$ctrl.formValues.scheduleAutomaticBackups">
+              <label for="cron_rule" class="col-sm-2 control-label text-left">Cron rule</label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="0 2 * * *"
+                  id="cron_rule"
+                  name="cron_rule"
+                  ng-model="$ctrl.formValues.cronRule"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  required
+                  cronRule
+                  data-cy="settings-backupCronRuleInput"
+                />
+              </div>
+            </div>
+            <!-- !Cron rule  -->
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.cron_rule.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.backupPortainerForm.cron_rule.$error">
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
+                  <p ng-message="invalidCron">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                    Please enter a valid cron rule.</p
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Access key id  -->
+            <div class="form-group">
+              <label for="access_key_id" class="col-sm-2 control-label text-left">Access key ID</label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="access_key_id"
+                  name="access_key_id"
+                  ng-model="$ctrl.formValues.accessKeyId"
+                  ng-required="$ctrl.formValues.scheduleAutomaticBackups"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  data-cy="settings-accessKeyIdInput"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.access_key_id.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.backupPortainerForm.access_key_id.$error">
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Access key id  -->
+            <!-- Secret access key -->
+            <div class="form-group">
+              <label for="secret_access_key" class="col-sm-2 control-label text-left">Secret access key</label>
+              <div class="col-sm-10">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="secret_access_key"
+                  name="secret_access_key"
+                  ng-model="$ctrl.formValues.secretAccessKey"
+                  ng-required="$ctrl.formValues.scheduleAutomaticBackups"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  data-cy="settings-secretAccessKeyInput"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.secret_access_key.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.backupPortainerForm.secret_access_key.$error">
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Secret access key -->
+            <!-- Region -->
+            <div class="form-group">
+              <label for="region" class="col-sm-2 control-label text-left">Region</label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="default region is us-east-1 if left empty"
+                  id="region"
+                  name="region"
+                  ng-model="$ctrl.formValues.region"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  data-cy="settings-backupRegionInput"
+                />
+              </div>
+            </div>
+            <!-- !Region -->
+            <!-- Bucket name -->
+            <div class="form-group">
+              <label for="bucket_name" class="col-sm-2 control-label text-left">Bucket name</label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="bucket_name"
+                  name="bucket_name"
+                  ng-model="$ctrl.formValues.bucketName"
+                  ng-required="$ctrl.formValues.scheduleAutomaticBackups"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  data-cy="settings-backupBucketNameInput"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.bucket_name.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.backupPortainerForm.bucket_name.$error">
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Bucket name -->
+            <!-- S3 compatible host -->
+            <div class="form-group">
+              <label for="s3_compatible_host" class="col-sm-2 control-label text-left">
+                S3 compatible host
+                <portainer-tooltip message="'Hostname of a S3 service'"></portainer-tooltip>
+              </label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="leave empty for AWS S3"
+                  id="s3_compatible_host"
+                  name="s3_compatible_host"
+                  ng-model="$ctrl.formValues.s3CompatibleHost"
+                  ng-pattern="/^https?://.+/"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-class="limited-be"
+                  data-cy="settings-backupS3CompatibleHostInput"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.s3_compatible_host.$invalid">
+              <div class="small text-warning">
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'"></pr-icon>
+                  <span>S3 host must begin with http:// or https://</span>
+                </p>
+              </div>
+            </div>
+            <!-- !S3 compatible host -->
+            <div class="col-sm-12 form-section-title"> Security settings </div>
+            <!-- Password protect S3 -->
+            <div class="form-group">
+              <label for="password_protect" class="col-sm-2 control-label text-left">Password protect</label>
+              <div class="col-sm-10">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="password_protect_s3"
+                    name="password_protect_s3"
+                    ng-model="$ctrl.formValues.passwordProtectS3"
+                    data-cy="settings-passwordProtectToggleS3"
+                    limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                    limited-feature-disabled
+                  /><span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <!-- !Password protect S3 -->
+            <!-- Password S3 -->
+            <div class="form-group" ng-if="$ctrl.formValues.passwordProtectS3">
+              <label for="password" class="col-sm-2 control-label text-left">Password</label>
+              <div class="col-sm-3">
+                <input type="password" class="form-control" ng-model="$ctrl.formValues.passwordS3" id="password_S3" name="password_S3" required data-cy="settings-backups3pw" />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.password_S3.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.backupPortainerForm.password_S3.$error">
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Password S3 -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="$ctrl.backupPortainerForm.$invalid"
+                  ng-click="$ctrl.exportBackup()"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  data-cy="settings-exportBackupS3Button"
+                >
+                  <span>
+                    <pr-icon icon="'upload'" class-name="'mr-1'"></pr-icon>
+                    Export backup
+                  </span>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <hr />
+              <div class="col-sm-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="$ctrl.backupPortainerForm.$invalid || $ctrl.state.backupInProgress"
+                  ng-click="$ctrl.saveS3BackupSettings()"
+                  limited-feature-dir="{{::$ctrl.s3BackupFeatureId}}"
+                  limited-feature-disabled
+                  limited-feature-class="limited-be"
+                  data-cy="settings-saveBackupSettingsButton"
+                >
+                  <span>Save backup settings</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div ng-if="$ctrl.formValues.backupFormType === $ctrl.BACKUP_FORM_TYPES.FILE">
+            <div class="col-sm-12 form-section-title"> Security settings </div>
+            <!-- Password protect -->
+            <div class="form-group">
+              <label for="password_protect" class="col-sm-2 control-label text-left">Password protect</label>
+              <div class="col-sm-2">
+                <label class="switch" data-cy="settings-passwordProtectLocal">
+                  <input type="checkbox" id="password_protect" name="password_protect" ng-model="$ctrl.formValues.passwordProtect" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <!-- !Password protect -->
+
+            <!-- Password -->
+            <div class="form-group" ng-if="$ctrl.formValues.passwordProtect">
+              <label for="password" class="col-sm-2 control-label text-left">Password</label>
+              <div class="col-sm-3">
+                <input type="password" class="form-control" ng-model="$ctrl.formValues.password" id="password" name="password" required data-cy="settings-backupLocalPassword" />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.backupPortainerForm.password.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.backupPortainerForm.password.$error">
+                  <p ng-message="required"> <pr-icon icon="'alert-triangle'"></pr-icon> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Password -->
+
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm !ml-0"
+                  ng-click="$ctrl.downloadBackup()"
+                  ng-disabled="$ctrl.backupPortainerForm.$invalid || $ctrl.state.backupInProgress || $ctrl.state.featureLimited"
+                  button-spinner="$ctrl.state.backupInProgress"
+                  data-cy="settings-downloadLocalBackup"
+                >
+                  <span ng-hide="$ctrl.state.backupInProgress">
+                    <pr-icon icon="'download'"></pr-icon>
+                    Download backup
+                  </span>
+                  <span ng-show="$ctrl.state.backupInProgress">
+                    <pr-icon icon="'download'"></pr-icon>
+                    Downloading backup
+                  </span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
