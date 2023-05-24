@@ -11,7 +11,7 @@ type Props = {
 export function ContainerPortInput({ index, value, onChange }: Props) {
   return (
     <InputGroup size="small">
-      <InputGroup.Addon required>Service port</InputGroup.Addon>
+      <InputGroup.Addon required>Container port</InputGroup.Addon>
       <InputGroup.Input
         type="number"
         className="form-control min-w-max"
