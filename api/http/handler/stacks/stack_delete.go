@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
 )
 
 // @id StackDelete
@@ -28,7 +29,7 @@ import (
 // @security jwt
 // @param id path int true "Stack identifier"
 // @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"
-// @param endpointId query int false "Environment(Endpoint) identifier used to remove an external stack (required when external is set to true)"
+// @param endpointId query int true "Environment identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -108,7 +109,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
 	}
 	if !canManage {
-		errMsg := "Stack deletion is disabled for non-admin users"
+		errMsg := "stack deletion is disabled for non-admin users"
 		return httperror.Forbidden(errMsg, fmt.Errorf(errMsg))
 	}
 
@@ -136,7 +137,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to remove stack files from disk", err)
+		log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 	}
 
 	return response.Empty(w)
@@ -187,11 +188,25 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 
 func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	if stack.Type == portainer.DockerSwarmStack {
+		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
+
+		if stackutils.IsGitStack(stack) {
+			return handler.StackDeployer.UndeployRemoteSwarmStack(stack, endpoint)
+		}
+
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
+
 	if stack.Type == portainer.DockerComposeStack {
+		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
+
+		if stackutils.IsGitStack(stack) {
+			return handler.StackDeployer.UndeployRemoteComposeStack(stack, endpoint)
+		}
+
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	}
+
 	if stack.Type == portainer.KubernetesStack {
 		var manifestFiles []string
 
@@ -203,6 +218,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 			if err != nil {
 				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
 			}
+
 			defer os.RemoveAll(tmpDir)
 
 			for _, fileName := range fileNames {
@@ -226,8 +242,11 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		} else {
 			manifestFiles = stackutils.GetStackFilePaths(stack, true)
 		}
+
 		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
+
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
 	}
+
 	return fmt.Errorf("unsupported stack type: %v", stack.Type)
 }

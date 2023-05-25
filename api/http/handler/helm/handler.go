@@ -110,7 +110,7 @@ func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.Kubernet
 		hostURL = r.Host
 	}
 
-	kubeConfigInternal := handler.kubeClusterAccessService.GetData(hostURL, endpoint.ID)
+	kubeConfigInternal := handler.kubeClusterAccessService.GetClusterDetails(hostURL, endpoint.ID, true)
 	return &options.KubernetesClusterAccess{
 		ClusterServerURL:         kubeConfigInternal.ClusterServerURL,
 		CertificateAuthorityFile: kubeConfigInternal.CertificateAuthorityFile,

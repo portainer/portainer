@@ -6,6 +6,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -40,10 +41,12 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 	if podmanModeEnvVar == "1" {
 		return PlatformPodman, nil
 	}
+
 	serviceHostKubernetesEnvVar := os.Getenv(KubernetesServiceHost)
 	if serviceHostKubernetesEnvVar != "" {
 		return PlatformKubernetes, nil
 	}
+
 	nomadJobName := os.Getenv(NomadJobName)
 	if nomadJobName != "" {
 		return PlatformNomad, nil
@@ -53,7 +56,7 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 		return "", nil
 	}
 
-	dockerCli, err := client.NewClientWithOpts()
+	dockerCli, err := docker.CreateSimpleClient()
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to create docker client")
 	}

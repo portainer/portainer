@@ -3,12 +3,8 @@
     <rd-widget-header icon="sliders" title-text="User theme"></rd-widget-header>
     <rd-widget-body>
       <form class="form-horizontal">
-        <box-selector radio-name="'theme'" value="$ctrl.state.userTheme" options="$ctrl.state.availableThemes" on-change="($ctrl.setTheme)"></box-selector>
+        <box-selector radio-name="'theme'" value="$ctrl.state.themeColor" options="$ctrl.state.availableThemes" on-change="($ctrl.setThemeColor)"></box-selector>
       </form>
-      <p class="mt-2 vertical-center">
-        <pr-icon icon="'alert-circle'" class-name="'icon-primary'"></pr-icon>
-        Dark and High-contrast theme are experimental. Some UI components might not display properly.
-      </p>
     </rd-widget-body>
   </rd-widget>
 </div>

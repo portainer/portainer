@@ -1,12 +1,12 @@
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { confirmDeleteAccess } from '@/react/kubernetes/cluster/RegistryAccessView/ConfirmDeleteAccess';
 
 export default class KubernetesRegistryAccessController {
   /* @ngInject */
-  constructor($async, $scope, $state, ModalService, EndpointService, Notifications, RegistryService, KubernetesResourcePoolService) {
+  constructor($async, $scope, $state, EndpointService, Notifications, RegistryService, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.RegistryService = RegistryService;
@@ -32,9 +32,7 @@ export default class KubernetesRegistryAccessController {
     const removeNamespaces = namespaces.map(({ value }) => value);
     const nsToUpdate = this.savedResourcePools.map(({ value }) => value).filter((value) => !removeNamespaces.includes(value));
 
-    const displayedMessage =
-      'This registry might be used by one or more applications inside this environment. Removing the registry access could lead to a service interruption for these applications.<br/><br/>Do you wish to continue?';
-    this.ModalService.confirmDeletion(displayedMessage, (confirmed) => {
+    confirmDeleteAccess().then((confirmed) => {
       if (confirmed) {
         return this.updateNamespaces(nsToUpdate);
       }
@@ -48,6 +46,7 @@ export default class KubernetesRegistryAccessController {
           namespaces,
         });
         this.$state.reload(this.$state.current);
+        this.Notifications.success('Success', 'Registry access updated');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed saving registry access');
       }

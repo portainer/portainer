@@ -1,13 +1,30 @@
+import { tlsOptions } from '@/react/portainer/environments/ItemView/tls-options';
+
 angular.module('portainer.app').controller('porEndpointSecurityController', [
   '$scope',
   function ($scope) {
     var ctrl = this;
 
-    ctrl.onToggleTLS = function (newValue) {
+    this.tlsOptions = tlsOptions;
+
+    function onChange(values) {
       $scope.$evalAsync(() => {
-        ctrl.formData.TLS = newValue;
+        ctrl.formData = {
+          ...ctrl.formData,
+          ...values,
+        };
       });
-    };
+    }
+
+    ctrl.onChangeTLSMode = onChangeTLSMode;
+    function onChangeTLSMode(mode) {
+      onChange({ TLSMode: mode });
+    }
+
+    ctrl.onToggleTLS = onToggleTLS;
+    function onToggleTLS(newValue) {
+      onChange({ TLS: newValue });
+    }
 
     this.$onInit = $onInit;
     function $onInit() {

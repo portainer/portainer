@@ -1,19 +1,18 @@
 import clsx from 'clsx';
 
-import { Select } from '@@/form-components/ReactSelect';
+import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
 import { TableHeaderSortIcons } from '@@/datatables/TableHeaderSortIcons';
 
-import { Filter } from './types';
 import styles from './SortbySelector.module.css';
 
 interface Props {
-  filterOptions: Filter[];
-  onChange: (filterOptions: Filter) => void;
+  filterOptions: Option<string>[];
+  onChange: (value: string) => void;
   onDescending: () => void;
   placeHolder: string;
   sortByDescending: boolean;
   sortByButton: boolean;
-  value?: Filter;
+  value: string;
 }
 
 export function SortbySelector({
@@ -27,17 +26,17 @@ export function SortbySelector({
 }: Props) {
   const sorted = sortByButton && !!value;
   return (
-    <div className="flex items-center gap-1 justify-end">
-      <Select
+    <div className="flex items-center justify-end gap-1">
+      <PortainerSelect
         placeholder={placeHolder}
         options={filterOptions}
-        onChange={(option) => onChange(option as Filter)}
+        onChange={(option) => onChange(option || '')}
         isClearable
         value={value}
       />
 
       <button
-        className={clsx(styles.sortButton, 'h-[34px] !m-0')}
+        className={clsx(styles.sortButton, '!m-0 h-[34px]')}
         type="button"
         disabled={!sorted}
         onClick={(e) => {

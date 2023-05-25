@@ -1,14 +1,10 @@
-import { CellProps, Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import type { IngressControllerClassMap } from '../../types';
-
-export const type: Column<IngressControllerClassMap> = {
-  Header: 'Ingress controller type',
-  accessor: 'Type',
-  Cell: ({ row }: CellProps<IngressControllerClassMap>) =>
-    row.original.Type || '-',
+export const type = columnHelper.accessor('Type', {
+  header: 'Ingress controller type',
+  cell: ({ getValue }) => {
+    const type = getValue();
+    return type || '-';
+  },
   id: 'type',
-  disableFilters: true,
-  canHide: true,
-  Filter: () => null,
-};
+});

@@ -94,9 +94,11 @@ export function CreateAccessToken({
               </Trans>
             </TextTip>
             <Code>{accessToken}</Code>
-            <CopyButton copyText={accessToken}>
-              <Trans ns={translationNS}>Copy access token</Trans>
-            </CopyButton>
+            <div className="mt-2">
+              <CopyButton copyText={accessToken}>
+                <Trans ns={translationNS}>Copy access token</Trans>
+              </CopyButton>
+            </div>
             <hr />
             <Button
               type="button"

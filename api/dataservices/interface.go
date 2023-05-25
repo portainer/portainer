@@ -1,28 +1,17 @@
 package dataservices
 
-// 	"github.com/portainer/portainer/api/dataservices"
-
 import (
+	"errors"
 	"io"
 	"time"
 
-	"github.com/portainer/portainer/api/database/models"
-	"github.com/portainer/portainer/api/dataservices/errors"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database/models"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 type (
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() (newStore bool, err error)
-		Init() error
-		Close() error
-		MigrateData() error
-		Rollback(force bool) error
-		CheckCurrentEdition() error
-		BackupTo(w io.Writer) error
-		Export(filename string) (err error)
+	DataStoreTx interface {
 		IsErrObjectNotFound(err error) bool
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
@@ -48,6 +37,22 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+	}
+
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() (newStore bool, err error)
+		Init() error
+		Close() error
+		UpdateTx(func(DataStoreTx) error) error
+		ViewTx(func(DataStoreTx) error) error
+		MigrateData() error
+		Rollback(force bool) error
+		CheckCurrentEdition() error
+		BackupTo(w io.Writer) error
+		Export(filename string) (err error)
+
+		DataStoreTx
 	}
 
 	// CustomTemplateService represents a service to manage custom templates
@@ -205,7 +210,6 @@ type (
 	SettingsService interface {
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
-		IsFeatureFlagEnabled(feature portainer.Feature) bool
 		BucketName() string
 	}
 
@@ -319,5 +323,5 @@ type (
 )
 
 func IsErrObjectNotFound(e error) bool {
-	return e == errors.ErrObjectNotFound
+	return errors.Is(e, dserrors.ErrObjectNotFound)
 }

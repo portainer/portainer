@@ -25,7 +25,7 @@ Each commit message should include a **type**, a **scope** and a **subject**:
  <type>(<scope>): <subject>
 ```
 
-Lines should not exceed 100 characters. This allows the message to be easier to read on github as well as in various git tools and produces a nice, neat commit log ie:
+Lines should not exceed 100 characters. This allows the message to be easier to read on GitHub as well as in various git tools and produces a nice, neat commit log ie:
 
 ```
  #271 feat(containers): add exposed ports in the containers view
@@ -63,7 +63,7 @@ The subject contains succinct description of the change:
 
 ## Contribution process
 
-Our contribution process is described below. Some of the steps can be visualized inside Github via specific `status/` labels, such as `status/1-functional-review` or `status/2-technical-review`.
+Our contribution process is described below. Some of the steps can be visualized inside GitHub via specific `status/` labels, such as `status/1-functional-review` or `status/2-technical-review`.
 
 ### Bug report
 
@@ -93,7 +93,7 @@ $ yarn start
 
 Portainer can now be accessed at <https://localhost:9443>.
 
-Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
+Find more detailed steps at <https://docs.portainer.io/contribute/build>.
 
 ### Build customisation
 
@@ -102,6 +102,10 @@ You can customise the following settings:
 - `PORTAINER_DATA`: The host dir or volume name used by portainer (default is `/tmp/portainer`, which won't persist over reboots).
 - `PORTAINER_PROJECT`: The root dir of the repository - `${portainerRoot}/dist/` is imported into the container to get the build artifacts and external tools (defaults to `your current dir`).
 - `PORTAINER_FLAGS`: a list of flags to be used on the portainer commandline, in the form `--admin-password=<pwd hash> --feat fdo=false --feat open-amt` (default: `""`).
+
+## Testing your build
+
+The `--log-level=DEBUG` flag can be passed to the Portainer container in order to provide additional debug output which may be useful when troubleshooting your builds. Please note that this flag was originally intended for internal use and as such the format, functionality and output may change between releases without warning.
 
 ## Adding api docs
 

@@ -23,6 +23,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
+// @param endpointId query int true "Environment identifier"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -51,7 +52,12 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.BadRequest("Stopping a kubernetes stack is not supported", err)
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: endpointId", err)
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -81,7 +87,7 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
 	}
 	if !canManage {
-		errMsg := "Stack management is disabled for non-admin users"
+		errMsg := "stack management is disabled for non-admin users"
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
@@ -117,9 +123,22 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 func (handler *Handler) stopStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
+		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
+
+		if stackutils.IsGitStack(stack) {
+			return handler.StackDeployer.StopRemoteComposeStack(stack, endpoint)
+		}
+
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	case portainer.DockerSwarmStack:
+		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
+
+		if stackutils.IsGitStack(stack) {
+			return handler.StackDeployer.StopRemoteSwarmStack(stack, endpoint)
+		}
+
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
+
 	return nil
 }

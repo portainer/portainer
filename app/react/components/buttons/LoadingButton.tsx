@@ -39,7 +39,7 @@ function loadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
   return (
     <Icon
       icon={Loader2}
-      className="animate-spin-slow ml-1"
+      className="ml-1 animate-spin-slow"
       aria-label="loading"
     />
   );

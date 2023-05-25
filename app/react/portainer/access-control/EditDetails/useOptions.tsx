@@ -70,9 +70,17 @@ function nonAdminOptions(teams?: Team[]) {
         'access_restricted',
         <BadgeIcon icon={ownershipIcon('restricted')} />,
         'Restricted',
-        teams.length === 1
-          ? `I want any member of my team (${teams[0].Name})  to be able to manage this resource`
-          : 'I want to restrict the management of this resource to one or more of my teams',
+        teams.length === 1 ? (
+          <>
+            I want any member of my team (<b>{teams[0].Name}</b>) to be able to
+            manage this resource
+          </>
+        ) : (
+          <>
+            I want to restrict the management of this resource to one or more of
+            my teams
+          </>
+        ),
         ResourceControlOwnership.RESTRICTED
       ),
   ]);

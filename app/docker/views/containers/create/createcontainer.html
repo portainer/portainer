@@ -17,8 +17,8 @@
         <form class="form-horizontal" autocomplete="off">
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-10">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-8">
               <input type="text" class="form-control" ng-model="config.name" id="container_name" placeholder="e.g. myContainer" />
             </div>
           </div>
@@ -37,8 +37,6 @@
               model="formValues.RegistryModel"
               ng-if="formValues.RegistryModel.Registry"
               auto-complete="true"
-              label-class="col-sm-1"
-              input-class="col-sm-11"
               endpoint="endpoint"
               is-admin="isAdmin"
               check-rate-limits="formValues.alwaysPull"
@@ -169,7 +167,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)
                    || (fromContainer.IsPortainer && fromContainer.Name === '/' + config.name)"
                 ng-click="create()"
@@ -403,7 +401,7 @@
                         <span class="input-group-addon">volume</span>
                         <select class="form-control" ng-model="volume.name">
                           <option selected disabled hidden value="">Select a volume</option>
-                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
+                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate : 30 }} - {{ vol.Driver | truncate : 30 }}</option>
                         </select>
                       </div>
                       <!-- !volume -->
@@ -701,24 +699,27 @@
               </div>
               <!-- !shm-size-input -->
               <!-- #region GPU -->
-              <div class="col-sm-12 form-section-title"> GPU </div>
+              <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
+                <div class="col-sm-12 form-section-title"> GPU </div>
 
-              <gpu
-                ng-if="applicationState.endpoint.apiVersion >= 1.4"
-                values="formValues.GPU"
-                on-change="(onGpuChange)"
-                gpus="endpoint.Gpus"
-                used-gpus="gpuUseList"
-                used-all-gpus="gpuUseAll"
-              >
-              </gpu>
+                <gpu
+                  ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                  values="formValues.GPU"
+                  on-change="(onGpuChange)"
+                  gpus="endpoint.Gpus"
+                  used-gpus="gpuUseList"
+                  used-all-gpus="gpuUseAll"
+                  enable-gpu-management="endpoint.EnableGPUManagement"
+                >
+                </gpu>
+              </div>
 
               <!-- #endregion GPU -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->
                 <div class="form-group flex">
-                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory reservation (MB) </label>
+                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory reservation (MB) </label>
                   <div class="col-sm-6">
                     <slider
                       on-change="(handleResourceChange)"
@@ -755,7 +756,7 @@
                 <!-- !memory-reservation-input -->
                 <!-- memory-limit-input -->
                 <div class="form-group flex">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit (MB) </label>
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory limit (MB) </label>
                   <div class="col-sm-6">
                     <slider
                       on-change="(handleResourceChange)"
@@ -792,7 +793,7 @@
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
                 <div class="form-group flex">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Maximum CPU usage </label>
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Maximum CPU usage </label>
                   <div class="col-sm-8">
                     <slider
                       on-change="(handleResourceChange)"

@@ -25,7 +25,7 @@ export function PageInput({ onChange, totalPages }: Props) {
 
   return (
     <form className="mx-3" onSubmit={handleSubmit}>
-      <label className="m-0 mr-2 font-normal small" htmlFor="go-to-page-input">
+      <label className="small m-0 mr-2 font-normal" htmlFor="go-to-page-input">
         Go to page
       </label>
       <Input

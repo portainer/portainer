@@ -1,13 +1,6 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
-
-export const stack: Column<DockerContainer> = {
-  Header: 'Stack',
-  accessor: (row) => row.StackName || '-',
+export const stack = columnHelper.accessor((row) => row.StackName || '-', {
+  header: 'Stack',
   id: 'stack',
-  sortType: 'string',
-  disableFilters: true,
-  canHide: true,
-  Filter: () => null,
-};
+});

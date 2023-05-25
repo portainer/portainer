@@ -36,7 +36,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Data:                      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		DemoEnvironment:           kingpin.Flag("demo", "Demo environment").Bool(),
 		EndpointURL:               kingpin.Flag("host", "Environment URL").Short('H').String(),
-		FeatureFlags:              BoolPairs(kingpin.Flag("feat", "List of feature flags").Hidden()),
+		FeatureFlags:              kingpin.Flag("feat", "List of feature flags").Strings(),
 		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
 		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
 		TLS:                       kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
@@ -72,6 +72,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		if err != nil {
 			panic(err)
 		}
+
 		*flags.Assets = filepath.Join(filepath.Dir(ex), *flags.Assets)
 	}
 
@@ -80,7 +81,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 
 // ValidateFlags validates the values of the flags.
 func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
-
 	displayDeprecationWarnings(flags)
 
 	err := validateEndpointURL(*flags.EndpointURL)
@@ -111,31 +111,38 @@ func displayDeprecationWarnings(flags *portainer.CLIFlags) {
 }
 
 func validateEndpointURL(endpointURL string) error {
-	if endpointURL != "" {
-		if !strings.HasPrefix(endpointURL, "unix://") && !strings.HasPrefix(endpointURL, "tcp://") && !strings.HasPrefix(endpointURL, "npipe://") {
-			return errInvalidEndpointProtocol
-		}
+	if endpointURL == "" {
+		return nil
+	}
 
-		if strings.HasPrefix(endpointURL, "unix://") || strings.HasPrefix(endpointURL, "npipe://") {
-			socketPath := strings.TrimPrefix(endpointURL, "unix://")
-			socketPath = strings.TrimPrefix(socketPath, "npipe://")
-			if _, err := os.Stat(socketPath); err != nil {
-				if os.IsNotExist(err) {
-					return errSocketOrNamedPipeNotFound
-				}
-				return err
+	if !strings.HasPrefix(endpointURL, "unix://") && !strings.HasPrefix(endpointURL, "tcp://") && !strings.HasPrefix(endpointURL, "npipe://") {
+		return errInvalidEndpointProtocol
+	}
+
+	if strings.HasPrefix(endpointURL, "unix://") || strings.HasPrefix(endpointURL, "npipe://") {
+		socketPath := strings.TrimPrefix(endpointURL, "unix://")
+		socketPath = strings.TrimPrefix(socketPath, "npipe://")
+		if _, err := os.Stat(socketPath); err != nil {
+			if os.IsNotExist(err) {
+				return errSocketOrNamedPipeNotFound
 			}
+
+			return err
 		}
 	}
+
 	return nil
 }
 
 func validateSnapshotInterval(snapshotInterval string) error {
-	if snapshotInterval != "" {
-		_, err := time.ParseDuration(snapshotInterval)
-		if err != nil {
-			return errInvalidSnapshotInterval
-		}
+	if snapshotInterval == "" {
+		return nil
 	}
+
+	_, err := time.ParseDuration(snapshotInterval)
+	if err != nil {
+		return errInvalidSnapshotInterval
+	}
+
 	return nil
 }

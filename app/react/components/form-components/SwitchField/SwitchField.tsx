@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { ComponentProps } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -10,23 +11,25 @@ import { Switch } from './Switch';
 export interface Props {
   label: string;
   checked: boolean;
-  onChange(value: boolean): void;
+  onChange(value: boolean, index?: number): void;
 
+  index?: number;
   name?: string;
-  tooltip?: string;
+  tooltip?: ComponentProps<typeof Tooltip>['message'];
+  setTooltipHtmlMessage?: ComponentProps<typeof Tooltip>['setHtmlMessage'];
   labelClass?: string;
   switchClass?: string;
   fieldClass?: string;
   dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
-  setTooltipHtmlMessage?: boolean;
 }
 
 export function SwitchField({
   tooltip,
   checked,
   label,
+  index,
   name,
   labelClass,
   fieldClass,
@@ -42,7 +45,7 @@ export function SwitchField({
   return (
     <label className={clsx(styles.root, fieldClass)}>
       <span
-        className={clsx('text-left space-right control-label !p-0', labelClass)}
+        className={clsx('space-right control-label !p-0 text-left', labelClass)}
       >
         {label}
         {tooltip && (
@@ -56,6 +59,7 @@ export function SwitchField({
         checked={checked}
         disabled={disabled}
         onChange={onChange}
+        index={index}
         featureId={featureId}
         dataCy={dataCy}
       />

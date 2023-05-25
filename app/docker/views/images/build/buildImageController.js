@@ -1,8 +1,12 @@
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
+import { editor, upload, url } from '@@/BoxSelector/common-options/build-methods';
+
 angular.module('portainer.docker').controller('BuildImageController', BuildImageController);
 
 /* @ngInject */
-function BuildImageController($scope, $async, $window, ModalService, BuildService, Notifications, HttpRequestHelper, endpoint) {
+function BuildImageController($scope, $async, $window, BuildService, Notifications, HttpRequestHelper, endpoint) {
   $scope.endpoint = endpoint;
+  $scope.options = [editor, upload, url];
 
   $scope.state = {
     BuildType: 'editor',
@@ -31,6 +35,12 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     $scope.state.isEditorDirty = false;
   });
 
+  $scope.onChangeBuildType = function (type) {
+    $scope.$evalAsync(() => {
+      $scope.state.BuildType = type;
+    });
+  };
+
   $scope.checkName = function (index) {
     var item = $scope.formValues.ImageNames[index];
     item.Valid = true;
@@ -50,7 +60,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     // Validation
     const parts = item.Name.split('/');
     const repository = parts[parts.length - 1];
-    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
+    const repositoryRegExp = RegExp('^[a-z0-9-_.]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
     item.Valid = repositoryRegExp.test(repository);
   };
 
@@ -138,14 +148,14 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     return true;
   };
 
-  $scope.editorUpdate = function (cm) {
-    $scope.formValues.DockerFileContent = cm.getValue();
+  $scope.editorUpdate = function (value) {
+    $scope.formValues.DockerFileContent = value;
     $scope.state.isEditorDirty = true;
   };
 
   this.uiCanExit = async function () {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
-      return ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   };
 

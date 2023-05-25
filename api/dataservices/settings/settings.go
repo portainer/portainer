@@ -31,6 +31,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
 // Settings retrieve the settings object.
 func (service *Service) Settings() (*portainer.Settings, error) {
 	var settings portainer.Settings
@@ -46,18 +53,4 @@ func (service *Service) Settings() (*portainer.Settings, error) {
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
 	return service.connection.UpdateObject(BucketName, []byte(settingsKey), settings)
-}
-
-func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {
-	settings, err := service.Settings()
-	if err != nil {
-		return false
-	}
-
-	featureFlagSetting, ok := settings.FeatureFlagSettings[feature]
-	if ok {
-		return featureFlagSetting
-	}
-
-	return false
 }

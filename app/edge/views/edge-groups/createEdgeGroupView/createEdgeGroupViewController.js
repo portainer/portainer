@@ -21,7 +21,6 @@ export class CreateEdgeGroupController {
     };
 
     this.createGroup = this.createGroup.bind(this);
-    this.createGroupAsync = this.createGroupAsync.bind(this);
   }
 
   async $onInit() {
@@ -31,20 +30,18 @@ export class CreateEdgeGroupController {
     this.state.loaded = true;
   }
 
-  createGroup() {
-    return this.$async(this.createGroupAsync);
-  }
-
-  async createGroupAsync() {
-    this.state.actionInProgress = true;
-    try {
-      await this.EdgeGroupService.create(this.model);
-      this.Notifications.success('Success', 'Edge group successfully created');
-      this.$state.go('edge.groups');
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to create edge group');
-    } finally {
-      this.state.actionInProgress = false;
-    }
+  async createGroup(model) {
+    return this.$async(async () => {
+      this.state.actionInProgress = true;
+      try {
+        await this.EdgeGroupService.create(model);
+        this.Notifications.success('Success', 'Edge group successfully created');
+        this.$state.go('edge.groups');
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create edge group');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
   }
 }

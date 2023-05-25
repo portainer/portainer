@@ -53,7 +53,7 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Deploy(ctx, filePaths, libstack.DeployOptions{
 		Options: libstack.Options{
 			WorkingDir:  stack.ProjectPath,
@@ -66,7 +66,7 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 	return errors.Wrap(err, "failed to deploy a stack")
 }
 
-// Down stops and removes containers, networks, images, and volumes. Wraps `docker-compose down --remove-orphans` command
+// Down stops and removes containers, networks, images, and volumes
 func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
@@ -81,14 +81,12 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
-
-	err = manager.deployer.Remove(ctx, filePaths, libstack.Options{
+	err = manager.deployer.Remove(ctx, stack.Name, nil, libstack.Options{
 		WorkingDir:  stack.ProjectPath,
 		EnvFilePath: envFilePath,
 		Host:        url,
-		ProjectName: stack.Name,
 	})
+
 	return errors.Wrap(err, "failed to remove a stack")
 }
 
@@ -108,7 +106,7 @@ func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.S
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Pull(ctx, filePaths, libstack.Options{
 		WorkingDir:  stack.ProjectPath,
 		EnvFilePath: envFilePath,

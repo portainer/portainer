@@ -5,13 +5,15 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
-import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructive } from '@@/modals/confirm';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
-import { GpusListAngular } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
+import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
+import { buildConfirmButton } from '@@/modals/utils';
+import { getInfo } from '@/docker/services/system.service';
 
-angular.module('portainer.app').component('gpusList', GpusListAngular).controller('EndpointController', EndpointController);
+angular.module('portainer.app').controller('EndpointController', EndpointController);
 
 /* @ngInject */
 function EndpointController(
@@ -26,8 +28,7 @@ function EndpointController(
 
   Notifications,
   Authentication,
-  SettingsService,
-  ModalService
+  SettingsService
 ) {
   $scope.onChangeCheckInInterval = onChangeCheckInInterval;
   $scope.setFieldValue = setFieldValue;
@@ -102,19 +103,8 @@ function EndpointController(
     SecurityFormData: new EndpointSecurityFormData(),
   };
 
-  $scope.copyEdgeAgentKey = function () {
-    clipboard.copyText($scope.endpoint.EdgeKey);
-    $('#copyNotificationEdgeKey').show().fadeOut(2500);
-  };
-
-  $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
-    return $scope.$evalAsync(() => {
-      $scope.state.allowSelfSignedCerts = checked;
-    });
-  };
-
   $scope.onDisassociateEndpoint = async function () {
-    ModalService.confirmDisassociate((confirmed) => {
+    confirmDisassociate().then((confirmed) => {
       if (confirmed) {
         disassociateEndpoint();
       }
@@ -153,8 +143,6 @@ function EndpointController(
     });
   }
 
-  $scope.onGpusChange = onGpusChange;
-
   Array.prototype.indexOf = function (val) {
     for (var i = 0; i < this.length; i++) {
       if (this[i] == val) return i;
@@ -168,21 +156,6 @@ function EndpointController(
     }
   };
 
-  function onGpusChange(value) {
-    return $async(async () => {
-      $scope.endpoint.Gpus = value;
-    });
-  }
-
-  function verifyGpus() {
-    var i = ($scope.endpoint.Gpus || []).length;
-    while (i--) {
-      if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null) {
-        $scope.endpoint.Gpus.splice(i, 1);
-      }
-    }
-  }
-
   $scope.updateEndpoint = async function () {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
@@ -192,19 +165,10 @@ function EndpointController(
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
     if (isEdgeEnvironment(endpoint.Type) && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
-      let confirmed = await confirmDestructiveAsync({
+      let confirmed = await confirmDestructive({
         title: 'Confirm action',
         message: 'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
-        buttons: {
-          cancel: {
-            label: 'Cancel',
-            className: 'btn-default',
-          },
-          confirm: {
-            label: 'Confirm',
-            className: 'btn-primary',
-          },
-        },
+        confirmButton: buildConfirmButton(),
       });
 
       if (!confirmed) {
@@ -212,7 +176,6 @@ function EndpointController(
       }
     }
 
-    verifyGpus();
     var payload = {
       Name: endpoint.Name,
       PublicURL: endpoint.PublicURL,
@@ -308,6 +271,18 @@ function EndpointController(
     return $async(async () => {
       try {
         const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
+
+        // Check if the environment is docker standalone, to decide whether to show the GPU insights box
+        const isDockerEnvironment = endpoint.Type === PortainerEndpointTypes.DockerEnvironment;
+        if (isDockerEnvironment) {
+          try {
+            const dockerInfo = await getInfo(endpoint.Id);
+            const isDockerSwarmEnv = dockerInfo.Swarm && dockerInfo.Swarm.NodeID;
+            $scope.isDockerStandaloneEnv = !isDockerSwarmEnv;
+          } catch (err) {
+            // $scope.isDockerStandaloneEnv is only used to show the "GPU insights box", so fail quietly on error
+          }
+        }
 
         if (endpoint.URL.indexOf('unix://') === 0 || endpoint.URL.indexOf('npipe://') === 0) {
           $scope.endpointType = 'local';

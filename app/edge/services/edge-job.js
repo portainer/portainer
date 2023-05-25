@@ -1,4 +1,5 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 import { ScheduleCreateRequest, ScheduleUpdateRequest } from '@/portainer/models/schedule';
 
@@ -26,7 +27,9 @@ function EdgeJobService(EdgeJobs, EdgeJobResults, FileUploadService) {
   service.jobResults = jobResults;
   async function jobResults(edgeJobId) {
     try {
-      return await EdgeJobResults.query({ id: edgeJobId }).$promise;
+      const results = await EdgeJobResults.query({ id: edgeJobId }).$promise;
+
+      return _.sortBy(results, ['Id']);
     } catch (err) {
       throw { msg: 'Unable to retrieve results associated to the edgeJob', err: err };
     }
@@ -49,7 +52,7 @@ function EdgeJobService(EdgeJobs, EdgeJobResults, FileUploadService) {
 
   service.createEdgeJobFromFileContent = function (model) {
     var payload = new ScheduleCreateRequest(model);
-    return EdgeJobs.create({ method: 'string' }, payload).$promise;
+    return EdgeJobs.create({}, { method: 'string', ...payload }).$promise;
   };
 
   service.createEdgeJobFromFileUpload = function (model) {

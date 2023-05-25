@@ -22,6 +22,7 @@ type Color =
   | 'light'
   | 'dangerlight'
   | 'warninglight'
+  | 'warning'
   | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
@@ -62,7 +63,11 @@ export function Button<TasProps = unknown>({
       type={type}
       disabled={disabled}
       className={clsx(`btn btn-${color}`, sizeClass(size), className)}
-      onClick={onClick}
+      onClick={(e) => {
+        if (!disabled) {
+          onClick?.(e);
+        }
+      }}
       title={title}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...ariaProps}

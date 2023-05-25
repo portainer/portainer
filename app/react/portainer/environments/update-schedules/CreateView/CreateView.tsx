@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Settings } from 'lucide-react';
 import { Formik, Form as FormikForm } from 'formik';
 import { useRouter } from '@uirouter/react';
@@ -25,13 +26,16 @@ import { defaultValue } from '../common/ScheduledTimeField';
 export default withLimitToBE(CreateView);
 
 function CreateView() {
-  const initialValues: FormValues = {
-    name: '',
-    groupIds: [],
-    type: ScheduleType.Update,
-    version: '',
-    scheduledTime: defaultValue(),
-  };
+  const initialValues = useMemo<FormValues>(
+    () => ({
+      name: '',
+      groupIds: [],
+      type: ScheduleType.Update,
+      version: '',
+      scheduledTime: defaultValue(),
+    }),
+    []
+  );
 
   const schedulesQuery = useList();
 
@@ -51,14 +55,17 @@ function CreateView() {
         breadcrumbs="Edge agent update and rollback"
       />
 
-      <BetaAlert />
+      <BetaAlert
+        className="ml-[15px] mb-2"
+        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+      />
 
       <div className="row">
         <div className="col-sm-12">
           <Widget>
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
-              <TextTip color="blue">
+              <TextTip color="blue" className="mb-2">
                 Devices need to be allocated to an Edge group, visit the{' '}
                 <Link to="edge.groups">Edge Groups</Link> page to assign
                 environments and create groups.
@@ -87,7 +94,9 @@ function CreateView() {
                       for 2.15.0+ only.
                     </TextTip>
 
-                    <ScheduleTypeSelector />
+                    <div className="mt-2">
+                      <ScheduleTypeSelector />
+                    </div>
 
                     <div className="form-group">
                       <div className="col-sm-12">

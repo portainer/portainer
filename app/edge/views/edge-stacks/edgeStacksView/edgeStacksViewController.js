@@ -1,4 +1,6 @@
 import _ from 'lodash-es';
+import { confirmDestructive } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
 
 export class EdgeStacksViewController {
   /* @ngInject */
@@ -25,6 +27,16 @@ export class EdgeStacksViewController {
   }
 
   async removeActionAsync(stacks) {
+    const confirmed = await confirmDestructive({
+      title: 'Are you sure?',
+      message: 'Are you sure you want to remove the selected Edge stack(s)?',
+      confirmButton: buildConfirmButton('Remove', 'danger'),
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     for (let stack of stacks) {
       try {
         await this.EdgeStackService.remove(stack.Id);

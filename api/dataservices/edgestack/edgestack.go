@@ -9,10 +9,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "edge_stack"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "edge_stack"
 
 // Service represents a service for managing Edge stack data.
 type Service struct {
@@ -53,6 +51,13 @@ func NewService(connection portainer.Connection, cacheInvalidationFn func(portai
 	}
 
 	return s, nil
+}
+
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
 }
 
 // EdgeStacks returns an array containing all edge stacks
@@ -152,6 +157,11 @@ func (service *Service) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc
 		service.idxVersion[ID] = edgeStack.Version
 		service.cacheInvalidationFn(ID)
 	})
+}
+
+// UpdateEdgeStackFuncTx is a helper function used to call UpdateEdgeStackFunc inside a transaction.
+func (service *Service) UpdateEdgeStackFuncTx(tx portainer.Transaction, ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error {
+	return service.Tx(tx).UpdateEdgeStackFunc(ID, updateFunc)
 }
 
 // DeleteEdgeStack deletes an Edge stack.

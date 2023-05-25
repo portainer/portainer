@@ -25,7 +25,7 @@ type addHelmRepoUrlPayload struct {
 }
 
 func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
-	return libhelm.ValidateHelmRepositoryURL(p.URL)
+	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
 // @id HelmUserRepositoryCreate

@@ -24,14 +24,14 @@ export function Header({ logo: customLogo }: Props) {
         <Link
           to="portainer.home"
           data-cy="portainerSidebar-homeImage"
-          className="text-2xl text-white no-underline hover:no-underline hover:text-white focus:no-underline focus:text-white focus:outline-none"
+          className="text-2xl text-white no-underline hover:text-white hover:no-underline focus:text-white focus:no-underline focus:outline-none"
         >
           <Logo customLogo={customLogo} isOpen={isOpen} />
         </Link>
         {isOpen && customLogo && (
           <div
             className={clsx(
-              'uppercase text-[9.4px] space-x-1 tracking-[.28em] pt-3',
+              'space-x-1 pt-3 text-[9.4px] uppercase tracking-[.28em]',
               'text-gray-3',
               'th-dark:text-gray-warm-6'
             )}
@@ -62,9 +62,9 @@ export function Header({ logo: customLogo }: Props) {
         onClick={() => toggle()}
         className={clsx(
           styles.collapseBtn,
-          'w-6 h-6 flex justify-center items-center border-0 rounded',
+          'flex h-6 w-6 items-center justify-center rounded border-0',
           'transition-all duration-200',
-          'text-sm text-gray-4 be:text-gray-5 hover:text-white be:hover:text-white',
+          'text-sm text-gray-4 hover:text-white be:text-gray-5 be:hover:text-white',
           'bg-blue-11 be:bg-gray-10',
           'th-dark:bg-gray-warm-11',
           'absolute',

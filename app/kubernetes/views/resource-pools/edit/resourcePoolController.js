@@ -14,6 +14,8 @@ import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuot
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { updateIngressControllerClassMap, getIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
+import { confirmUpdate } from '@@/modals/confirm';
+import { confirmUpdateNamespace } from '@/react/kubernetes/namespaces/ItemView/ConfirmUpdateNamespace';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -26,7 +28,6 @@ class KubernetesResourcePoolController {
     Notifications,
     LocalStorage,
     EndpointService,
-    ModalService,
     KubernetesNodeService,
     KubernetesMetricsService,
     KubernetesResourceQuotaService,
@@ -35,7 +36,8 @@ class KubernetesResourcePoolController {
     KubernetesPodService,
     KubernetesApplicationService,
     KubernetesIngressService,
-    KubernetesVolumeService
+    KubernetesVolumeService,
+    KubernetesNamespaceService
   ) {
     Object.assign(this, {
       $async,
@@ -45,7 +47,6 @@ class KubernetesResourcePoolController {
       Notifications,
       LocalStorage,
       EndpointService,
-      ModalService,
       KubernetesNodeService,
       KubernetesMetricsService,
       KubernetesResourceQuotaService,
@@ -55,6 +56,7 @@ class KubernetesResourcePoolController {
       KubernetesApplicationService,
       KubernetesIngressService,
       KubernetesVolumeService,
+      KubernetesNamespaceService,
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
@@ -177,19 +179,8 @@ class KubernetesResourcePoolController {
       registries: registriesToDelete.length !== 0,
     };
 
-    if (warnings.quota || warnings.ingress || warnings.registries) {
-      const messages = {
-        quota:
-          'Reducing the quota assigned to an "in-use" namespace may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
-        ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
-        registries:
-          'Some registries you removed might be used by one or more applications inside this environment. Removing the registries access could lead to a service interruption for these applications.',
-      };
-      const displayedMessage = `${warnings.quota ? messages.quota + '<br/><br/>' : ''}
-      ${warnings.ingress ? messages.ingress + '<br/><br/>' : ''}
-      ${warnings.registries ? messages.registries + '<br/><br/>' : ''}
-      Do you wish to continue?`;
-      this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
+    if (warnings.quota || warnings.registries) {
+      confirmUpdateNamespace(warnings.quota, warnings.ingress, warnings.registries).then((confirmed) => {
         if (confirmed) {
           return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }
@@ -205,7 +196,7 @@ class KubernetesResourcePoolController {
       : 'Marking this namespace as a system namespace will prevent non administrator users from managing it and the resources it contains. Are you sure?';
 
     return new Promise((resolve) => {
-      this.ModalService.confirmUpdate(message, resolve);
+      confirmUpdate(message, resolve);
     });
   }
 
@@ -378,7 +369,7 @@ class KubernetesResourcePoolController {
 
         const name = this.$state.params.id;
 
-        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
+        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get('', { getQuota: true })]);
 
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {

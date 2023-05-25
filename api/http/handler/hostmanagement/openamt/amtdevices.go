@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -33,7 +32,7 @@ func (handler *Handler) openAMTDevices(w http.ResponseWriter, r *http.Request) *
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)
@@ -80,6 +79,8 @@ func (payload *deviceActionPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
+// @param id path int true "Environment identifier"
+// @param deviceId path int true "Device identifier"
 // @param body body deviceActionPayload true "Device Action"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
@@ -140,6 +141,8 @@ type AuthorizationResponse struct {
 // @security jwt
 // @accept json
 // @produce json
+// @param id path int true "Environment identifier"
+// @param deviceId path int true "Device identifier"
 // @param body body deviceFeaturesPayload true "Device Features"
 // @success 204 "Success"
 // @failure 400 "Invalid request"

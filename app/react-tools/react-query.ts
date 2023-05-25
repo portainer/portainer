@@ -64,7 +64,7 @@ function mergeOptions<T>(options: T[]) {
       ...acc,
       ...option,
     }),
-    {}
+    {} as T
   );
 }
 

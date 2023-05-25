@@ -8,7 +8,7 @@ export function withEdition<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     if (process.env.PORTAINER_EDITION !== edition) {
       return null;
     }

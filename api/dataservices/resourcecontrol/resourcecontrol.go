@@ -1,6 +1,7 @@
 package resourcecontrol
 
 import (
+	"errors"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
@@ -8,10 +9,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "resource_control"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "resource_control"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
@@ -32,6 +31,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	return &Service{
 		connection: connection,
 	}, nil
+}
+
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
 }
 
 // ResourceControl returns a ResourceControl object by ID
@@ -77,7 +83,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 
 			return &portainer.ResourceControl{}, nil
 		})
-	if err == stop {
+	if errors.Is(err, stop) {
 		return resourceControl, nil
 	}
 

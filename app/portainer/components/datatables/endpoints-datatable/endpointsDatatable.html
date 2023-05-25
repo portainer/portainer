@@ -33,14 +33,28 @@
             <pr-icon icon="'trash-2'" class-name="'icon-white'"></pr-icon>
             <span>Remove</span>
           </button>
-          <button type="button" class="btn btn-sm btn-primary h-fit" ng-click="$ctrl.setReferrer()" ui-sref="portainer.wizard.endpoints" data-cy="endpoint-addEndpointButton">
+
+          <import-fdo-device-button></import-fdo-device-button>
+
+          <button ng-if="$ctrl.isBE" type="button" class="btn btn-sm btn-secondary vertical-center" ui-sref="portainer.endpoints.edgeAutoCreateScript">
+            <pr-icon icon="'plus'"></pr-icon>
+            <span>Generate AEEC script</span>
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-sm btn-primary vertical-center"
+            ng-click="$ctrl.setReferrer()"
+            ui-sref="portainer.wizard.endpoints"
+            data-cy="endpoint-addEndpointButton"
+          >
             <pr-icon icon="'plus'" class-name="'icon-white'"></pr-icon>
             <span>Add environment</span>
           </button>
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="endpoint-endpointTable">
+        <table class="table-hover nowrap-cells table" data-cy="endpoint-endpointTable">
           <thead>
             <tr>
               <th>
@@ -122,10 +136,10 @@
               </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="!$ctrl.state.loading && $ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No environment available.</td>
+              <td colspan="5" class="text-muted text-center">No environment available.</td>
             </tr>
           </tbody>
         </table>

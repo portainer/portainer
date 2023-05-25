@@ -10,6 +10,20 @@ import (
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 )
 
+// @id getKubernetesNamespaces
+// @summary Get a list of kubernetes namespaces
+// @description Get a list of all kubernetes namespaces in the cluster
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @success 200 {object} map[string]portainer.K8sNamespaceInfo "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces [get]
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -40,6 +54,21 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 	return response.JSON(w, namespaces)
 }
 
+// @id getKubernetesNamespace
+// @summary Get kubernetes namespace details
+// @description Get kubernetes namespace details for the provided namespace within the given environment
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
+// @success 200 {object} portainer.K8sNamespaceInfo "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace} [get]
 func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -77,6 +106,22 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, namespace)
 }
 
+// @id createKubernetesNamespace
+// @summary Create a kubernetes namespace
+// @description Create a kubernetes namespace within the given environment
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
+// @param body body models.K8sNamespaceDetails true "Namespace configuration details"
+// @success 200 {string} string "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace} [post]
 func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -115,7 +160,22 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 	return nil
 }
 
-func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// @id deleteKubernetesNamespace
+// @summary Delete kubernetes namespace
+// @description Delete a kubernetes namespace within the given environment
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
+// @success 200 {string} string "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace} [delete]
+func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return httperror.BadRequest(
@@ -153,6 +213,22 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 	return nil
 }
 
+// @id updateKubernetesNamespace
+// @summary Updates a kubernetes namespace
+// @description Update a kubernetes namespace within the given environment
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace"
+// @param body body models.K8sNamespaceDetails true "Namespace details"
+// @success 200 {string} string "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace} [put]
 func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

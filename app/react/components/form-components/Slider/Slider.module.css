@@ -1,58 +1,40 @@
 .root {
-  margin: 0 25px;
-}
-
-.slider {
   padding-top: 50px;
 }
 
-.slider :global .rc-slider-handle {
-  @apply border-blue-8 border-2;
+.root :global .rc-slider .rc-slider-handle-dragging {
+  @apply border-2 border-blue-8;
+}
+
+.root :global .rc-slider-dot {
+  display: none;
+}
+
+.root :global .rc-slider-handle {
+  @apply border-2 border-blue-8;
   width: 24px;
   height: 24px;
   margin-top: -8px;
   border-radius: 16px;
-  cursor: pointer;
+  opacity: 1;
   background-color: #ffffff;
 }
 
-.slider :global .rc-slider-track {
+.root :global .rc-slider-track {
   @apply bg-blue-8;
+  height: 8px;
 }
 
-.slider :global .rc-slider-handle:after {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 9px;
-  height: 9px;
-  background: #ffffff;
-  border-radius: 5px;
-  content: '';
+.root :global .rc-slider-rail {
+  height: 8px;
 }
 
-.slider :global .rc-slider-mark-text {
+.root :global .rc-slider-mark {
+  top: -28px;
+}
+
+.root :global .rc-slider-mark-text {
   font-size: 14px;
   color: var(--text-body-color);
-}
-
-.slider :global .rc-slider-tooltip-arrow {
-  bottom: 2px;
-  border-top-color: var(--bg-tooltip-color);
-}
-
-.slider :global .rc-slider-tooltip-placement-top {
-  padding: 6px 0px;
-}
-
-.slider :global .rc-slider-tooltip-inner {
-  font-size: 14px;
-  color: var(--text-tooltip-color);
-  height: fit-content;
-  background-color: var(--bg-tooltip-color);
-  box-shadow: 0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%);
-  padding: 8px 12px;
-  text-align: center;
   user-select: none;
-  cursor: pointer;
 }

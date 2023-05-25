@@ -55,7 +55,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
 	}
-	h.Handle("/stacks",
+
+	h.Handle("/stacks/create/{type}/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
 	h.Handle("/stacks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackList))).Methods(http.MethodGet)
@@ -135,7 +136,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpoint.ID))
 
 		if err != nil {
-			return false, fmt.Errorf("Failed to get user from the database: %w", err)
+			return false, fmt.Errorf("failed to get user from the database: %w", err)
 		}
 
 		return canCreate, nil

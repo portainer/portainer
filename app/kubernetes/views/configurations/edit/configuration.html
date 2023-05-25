@@ -1,6 +1,6 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Configuration details'"
+  title="'ConfigMap or Secret details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
     {
@@ -32,7 +32,7 @@
                 <table class="table" data-cy="k8sConfigDetail-configTable">
                   <tbody>
                     <tr>
-                      <td class="!pl-0 !border-none w-[40%]">Name</td>
+                      <td class="w-[40%] !border-none !pl-0">Name</td>
                       <td class="!border-none">
                         {{ ctrl.configuration.Name }}
                         <span style="margin-left: 5px" class="label label-info image-tag" ng-if="ctrl.configuration.IsRegistrySecret">system</span>
@@ -46,7 +46,7 @@
                       </td>
                     </tr>
                     <tr>
-                      <td class="!pl-0">Configuration kind</td>
+                      <td class="!pl-0">Kind</td>
                       <td>
                         {{ ctrl.configuration.Kind | kubernetesConfigurationKindText }}
                       </td>
@@ -87,7 +87,7 @@
                 <pr-icon icon="'code'"></pr-icon>
                 YAML
               </uib-tab-heading>
-              <div class="!pt-5 px-5" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5 !pt-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml"> </kubernetes-yaml-inspector>
               </div>
             </uib-tab>
@@ -102,6 +102,10 @@
       <rd-widget>
         <rd-widget-body>
           <form ng-if="!ctrl.isSystemConfig()" class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <div class="col-sm-12 !p-0">
+              <annotations-be-teaser></annotations-be-teaser>
+            </div>
+
             <kubernetes-configuration-data
               ng-if="ctrl.formValues"
               form-values="ctrl.formValues"

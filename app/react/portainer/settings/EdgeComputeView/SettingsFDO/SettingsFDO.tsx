@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
-import { Laptop } from 'lucide-react';
+import { FlaskConical, Laptop } from 'lucide-react';
 
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
+import {
+  FeatureFlag,
+  useFeatureFlag,
+} from '@/react/portainer/feature-flags/useFeatureFlag';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -28,6 +32,25 @@ interface Props {
 }
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
+  const flagEnabledQuery = useFeatureFlag(FeatureFlag.FDO);
+
+  if (!flagEnabledQuery.data) {
+    return (
+      <Widget>
+        <Widget.Body>
+          <TextTip color="blue" icon={FlaskConical}>
+            Since FDO is still an experimental feature that requires additional
+            infrastructure, it has been temporarily hidden in the UI.
+          </TextTip>
+        </Widget.Body>
+      </Widget>
+    );
+  }
+
+  return <SettingsFDOForm settings={settings} onSubmit={onSubmit} />;
+}
+
+export function SettingsFDOForm({ settings, onSubmit }: Props) {
   const fdoConfiguration = settings ? settings.fdoConfiguration : null;
   const initialFDOEnabled = fdoConfiguration ? fdoConfiguration.enabled : false;
 
@@ -86,7 +109,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
-                <TextTip color="blue">
+                <TextTip color="blue" className="mb-2">
                   When enabled, this will allow Portainer to interact with FDO
                   Services.
                 </TextTip>
@@ -162,7 +185,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
           {edgeComputeFeaturesEnabled && isFDOEnabled && (
             <div className={styles.fdoTable}>
               <FormSectionTitle>Device Profiles</FormSectionTitle>
-              <TextTip color="blue">
+              <TextTip color="blue" className="mb-2">
                 Add, Edit and Manage the list of device profiles available
                 during FDO device setup
               </TextTip>

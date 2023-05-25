@@ -1,9 +1,10 @@
 import _ from 'lodash-es';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 export class EdgeJobController {
   /* @ngInject */
-  constructor($async, $q, $state, $window, ModalService, EdgeJobService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
+  constructor($async, $q, $state, $window, EdgeJobService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
       showEditorTab: false,
@@ -14,7 +15,6 @@ export class EdgeJobController {
     this.$q = $q;
     this.$state = $state;
     this.$window = $window;
-    this.ModalService = ModalService;
     this.EdgeJobService = EdgeJobService;
     this.FileSaver = FileSaver;
     this.GroupService = GroupService;
@@ -127,7 +127,7 @@ export class EdgeJobController {
 
   async uiCanExit() {
     if (this.edgeJob && this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

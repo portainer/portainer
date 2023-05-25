@@ -47,7 +47,7 @@ export function AccessControlPanelDetails({
     <table className="table">
       <tbody>
         <tr data-cy="access-ownership">
-          <td>Ownership</td>
+          <td className="w-1/5">Ownership</td>
           <td>
             <i
               className={clsx(ownershipIcon(ownership), 'space-right')}

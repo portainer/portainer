@@ -1,16 +1,16 @@
 import angular from 'angular';
+import { confirmDelete } from '@@/modals/confirm';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesConfigurationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesApplicationService, ModalService) {
+  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesApplicationService = KubernetesApplicationService;
-    this.ModalService = ModalService;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurations = this.getConfigurations.bind(this);
@@ -28,7 +28,7 @@ class KubernetesConfigurationsController {
       this.configurations = await this.KubernetesConfigurationService.get();
       KubernetesConfigurationHelper.setConfigurationsUsed(this.configurations, this.applications);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
+      this.Notifications.error('Failure', err, 'Unable to retrieve ConfigMaps & Secrets');
     } finally {
       this.state.configurationsLoading = false;
     }
@@ -43,11 +43,11 @@ class KubernetesConfigurationsController {
     for (const configuration of selectedItems) {
       try {
         await this.KubernetesConfigurationService.delete(configuration);
-        this.Notifications.success('Configurations successfully removed', configuration.Name);
+        this.Notifications.success('ConfigMaps/Secrets successfully removed', configuration.Name);
         const index = this.configurations.indexOf(configuration);
         this.configurations.splice(index, 1);
       } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to remove configuration');
+        this.Notifications.error('Failure', err, 'Unable to remove ConfigMaps/Secrets');
       } finally {
         --actionCount;
         if (actionCount === 0) {
@@ -58,7 +58,7 @@ class KubernetesConfigurationsController {
   }
 
   removeAction(selectedItems) {
-    this.ModalService.confirmDeletion('Do you want to remove the selected configuration(s)?', (confirmed) => {
+    confirmDelete('Do you want to remove the selected ConfigMap(s) & Secret(s)?').then((confirmed) => {
       if (confirmed) {
         return this.$async(this.removeActionAsync, selectedItems);
       }

@@ -1,12 +1,12 @@
-import { PropsWithChildren, useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { PropsWithChildren, ReactNode, useState } from 'react';
+import { ChevronUp, ChevronRight } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 
 import { FormSectionTitle } from '../FormSectionTitle';
 
 interface Props {
-  title: string;
+  title: ReactNode;
   isFoldable?: boolean;
 }
 
@@ -24,11 +24,15 @@ export function FormSection({
           <button
             id={`foldingButton${title}`}
             type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="border-0 mx-2 !ml-0 bg-transparent inline-flex justify-center items-center w-2"
+            onClick={(e) => {
+              setIsExpanded(!isExpanded);
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            className="mx-2 !ml-0 inline-flex w-2 items-center justify-center border-0 bg-transparent"
           >
             <Icon
-              icon={isExpanded ? ChevronDown : ChevronRight}
+              icon={isExpanded ? ChevronUp : ChevronRight}
               className="shrink-0"
             />
           </button>

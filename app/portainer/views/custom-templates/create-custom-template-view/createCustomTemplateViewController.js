@@ -3,16 +3,18 @@ import { AccessControlFormData } from 'Portainer/components/accessControlForm/po
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { editor, upload, git } from '@@/BoxSelector/common-options/build-methods';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, $window, Authentication, ModalService, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
+  constructor($async, $state, $scope, $window, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
     Object.assign(this, {
       $async,
       $state,
       $window,
+      $scope,
       Authentication,
-      ModalService,
       CustomTemplateService,
       FormValidator,
       Notifications,
@@ -20,6 +22,8 @@ class CreateCustomTemplateViewController {
       StackService,
       StateManager,
     });
+
+    this.buildMethods = [editor, upload, git];
 
     this.isTemplateVariablesEnabled = isBE;
 
@@ -40,6 +44,7 @@ class CreateCustomTemplateViewController {
       Type: 1,
       AccessControlData: new AccessControlFormData(),
       Variables: [],
+      TLSSkipVerify: false,
     };
 
     this.state = {
@@ -85,10 +90,13 @@ class CreateCustomTemplateViewController {
     return this.$async(this.createCustomTemplateAsync);
   }
 
-  onChangeMethod() {
-    this.formValues.FileContent = '';
-    this.formValues.Variables = [];
-    this.selectedTemplate = null;
+  onChangeMethod(method) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.FileContent = '';
+      this.formValues.Variables = [];
+      this.selectedTemplate = null;
+      this.state.Method = method;
+    });
   }
 
   async createCustomTemplateAsync() {
@@ -199,6 +207,7 @@ class CreateCustomTemplateViewController {
     this.state.endpointMode = applicationState.endpoint.mode;
     let stackType = 0;
     if (this.state.endpointMode.provider === 'DOCKER_STANDALONE') {
+      this.isDockerStandalone = true;
       stackType = 2;
     } else if (this.state.endpointMode.provider === 'DOCKER_SWARM_MODE') {
       stackType = 1;
@@ -233,7 +242,7 @@ class CreateCustomTemplateViewController {
 
   async uiCanExit() {
     if (this.state.Method === 'editor' && this.formValues.FileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 }

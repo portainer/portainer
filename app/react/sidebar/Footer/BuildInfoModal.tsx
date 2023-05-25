@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Database, Hash, Server, Tag, Wrench } from 'lucide-react';
-import { DialogOverlay } from '@reach/dialog';
 
 import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
 
+import { Modal } from '@@/modals';
 import { Button } from '@@/buttons';
 
 import styles from './Footer.module.css';
@@ -48,77 +48,66 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
   const { ServerVersion, DatabaseVersion, Build } = versionQuery.data;
 
   return (
-    <DialogOverlay className={styles.dialog} isOpen>
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="close" onClick={closeModal}>
-              ×
-            </button>
-            <h5 className="modal-title">Portainer {Edition}</h5>
-          </div>
-          <div className="modal-body">
-            <div className={styles.versionInfo}>
-              <table>
-                <tbody>
-                  <tr>
-                    <td>
-                      <span className="inline-flex items-center">
-                        <Server size="13" className="space-right" />
-                        Server Version: {ServerVersion}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="inline-flex items-center">
-                        <Database size="13" className="space-right" />
-                        Database Version: {DatabaseVersion}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span className="inline-flex items-center">
-                        <Hash size="13" className="space-right" />
-                        CI Build Number: {Build.BuildNumber}
-                      </span>
-                    </td>
-                    <td>
-                      <span>
-                        <Tag size="13" className="space-right" />
-                        Image Tag: {Build.ImageTag}
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className={styles.toolsList}>
-              <span className="inline-flex items-center">
-                <Wrench size="13" className="space-right" />
-                Compilation tools:
-              </span>
+    <Modal onDismiss={closeModal} aria-label="build-info-modal">
+      <Modal.Header title={`Portainer ${Edition}`} />
+      <Modal.Body>
+        <div className={styles.versionInfo}>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <span className="inline-flex items-center">
+                    <Server size="13" className="space-right" />
+                    Server Version: {ServerVersion}
+                  </span>
+                </td>
+                <td>
+                  <span className="inline-flex items-center">
+                    <Database size="13" className="space-right" />
+                    Database Version: {DatabaseVersion}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className="inline-flex items-center">
+                    <Hash size="13" className="space-right" />
+                    CI Build Number: {Build.BuildNumber}
+                  </span>
+                </td>
+                <td>
+                  <span>
+                    <Tag size="13" className="space-right" />
+                    Image Tag: {Build.ImageTag}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className={styles.toolsList}>
+          <span className="inline-flex items-center">
+            <Wrench size="13" className="space-right" />
+            Compilation tools:
+          </span>
 
-              <div className={styles.tools}>
-                <span className="text-muted small">
-                  Nodejs v{Build.NodejsVersion}
-                </span>
-                <span className="text-muted small">
-                  Yarn v{Build.YarnVersion}
-                </span>
-                <span className="text-muted small">
-                  Webpack v{Build.WebpackVersion}
-                </span>
-                <span className="text-muted small">Go v{Build.GoVersion}</span>
-              </div>
-            </div>
-          </div>
-          <div className="modal-footer">
-            <Button className="bootbox-accept" onClick={closeModal}>
-              Ok
-            </Button>
+          <div className={styles.tools}>
+            <span className="text-muted small">
+              Nodejs v{Build.NodejsVersion}
+            </span>
+            <span className="text-muted small">Yarn v{Build.YarnVersion}</span>
+            <span className="text-muted small">
+              Webpack v{Build.WebpackVersion}
+            </span>
+            <span className="text-muted small">Go v{Build.GoVersion}</span>
           </div>
         </div>
-      </div>
-    </DialogOverlay>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button className="w-full" onClick={closeModal}>
+          Ok
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }

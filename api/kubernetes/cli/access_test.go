@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -40,7 +39,6 @@ func Test_NamespaceAccessPoliciesDeleteNamespace_updatesPortainerConfig_whenConf
 			k := &KubeClient{
 				cli:        kfake.NewSimpleClientset(),
 				instanceID: "instance",
-				lock:       &sync.Mutex{},
 			}
 
 			config := &ktypes.ConfigMap{

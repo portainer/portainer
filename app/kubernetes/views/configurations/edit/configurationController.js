@@ -8,6 +8,7 @@ import KubernetesConfigurationConverter from 'Kubernetes/converters/configuratio
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
+import { confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { isConfigurationFormValid } from '../validation';
 
 class KubernetesConfigurationController {
@@ -23,7 +24,6 @@ class KubernetesConfigurationController {
     KubernetesConfigMapService,
     KubernetesSecretService,
     KubernetesResourcePoolService,
-    ModalService,
     KubernetesApplicationService,
     KubernetesEventService
   ) {
@@ -33,7 +33,6 @@ class KubernetesConfigurationController {
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
-    this.ModalService = ModalService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -88,6 +87,11 @@ class KubernetesConfigurationController {
   // It looks like we're still doing a create/delete process but we've decided to get rid of this
   // approach.
   async updateConfigurationAsync() {
+    let kind = 'ConfigMap';
+    if (this.formValues.Kind === KubernetesConfigurationKinds.SECRET) {
+      kind = 'Secret';
+    }
+
     try {
       this.state.actionInProgress = true;
       if (
@@ -97,7 +101,7 @@ class KubernetesConfigurationController {
       ) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
-        this.Notifications.success('Success', 'Configuration succesfully updated');
+        this.Notifications.success('Success', `${kind} successfully updated`);
         this.$state.go(
           'kubernetes.configurations.configuration',
           {
@@ -108,11 +112,11 @@ class KubernetesConfigurationController {
         );
       } else {
         await this.KubernetesConfigurationService.update(this.formValues, this.configuration);
-        this.Notifications.success('Success', 'Configuration succesfully updated');
+        this.Notifications.success('Success', `${kind} successfully updated`);
         this.$state.reload(this.$state.current);
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to update configuration');
+      this.Notifications.error('Failure', err, `Unable to update ${kind}`);
     } finally {
       this.state.actionInProgress = false;
     }
@@ -121,8 +125,9 @@ class KubernetesConfigurationController {
   updateConfiguration() {
     if (this.configuration.Used) {
       const plural = this.configuration.Applications.length > 1 ? 's' : '';
-      this.ModalService.confirmUpdate(
-        `The changes will be propagated to ${this.configuration.Applications.length} running application${plural}. Are you sure you want to update this configuration?`,
+      const thisorthese = this.configuration.Applications.length > 1 ? 'these' : 'this';
+      confirmUpdate(
+        `The changes will be propagated to ${this.configuration.Applications.length} running application${plural}. Are you sure you want to update ${thisorthese} ConfigMap${plural} or Secret${plural}?`,
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateConfigurationAsync);
@@ -240,7 +245,7 @@ class KubernetesConfigurationController {
 
   async uiCanExit() {
     if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

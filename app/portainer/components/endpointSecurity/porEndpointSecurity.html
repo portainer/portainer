@@ -22,55 +22,16 @@
       </span>
     </div>
   </div>
-  <div class="form-group"></div>
-  <!-- endpoint-tls-mode -->
-  <div class="form-group" ng-if="$ctrl.formData.TLS">
-    <div class="col-sm-12">
-      <div class="boxselector_wrapper">
-        <div>
-          <input type="radio" id="tls_client_ca" ng-model="$ctrl.formData.TLSMode" value="tls_client_ca" />
-          <label for="tls_client_ca">
-            <div class="boxselector_header">
-              <pr-icon icon="'shield'"></pr-icon>
-              TLS with server and client verification
-            </div>
-            <p>Use client certificates and server verification</p>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="tls_client_noca" ng-model="$ctrl.formData.TLSMode" value="tls_client_noca" />
-          <label for="tls_client_noca">
-            <div class="boxselector_header">
-              <pr-icon icon="'shield'"></pr-icon>
-              TLS with client verification only
-            </div>
-            <p>Use client certificates without server verification</p>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="tls_ca" ng-model="$ctrl.formData.TLSMode" value="tls_ca" />
-          <label for="tls_ca">
-            <div class="boxselector_header">
-              <pr-icon icon="'shield'"></pr-icon>
-              TLS with server verification only
-            </div>
-            <p>Only verify the server certificate</p>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="tls_only" ng-model="$ctrl.formData.TLSMode" value="tls_only" />
-          <label for="tls_only">
-            <div class="boxselector_header">
-              <pr-icon icon="'shield'"></pr-icon>
-              TLS only
-            </div>
-            <p>No server/client verification</p>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- !endpoint-tls-mode -->
+
+  <box-selector
+    ng-if="$ctrl.formData.TLS"
+    slim="true"
+    radio-name="'tls_mode'"
+    options="$ctrl.tlsOptions"
+    value="$ctrl.formData.TLSMode"
+    on-change="($ctrl.onChangeTLSMode)"
+  ></box-selector>
+
   <div class="col-sm-12 form-section-title" ng-if="$ctrl.formData.TLS && $ctrl.formData.TLSMode !== 'tls_only'"> Required TLS files </div>
   <!-- tls-file-upload -->
   <div ng-if="$ctrl.formData.TLS">

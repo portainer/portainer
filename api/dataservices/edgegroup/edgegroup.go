@@ -1,11 +1,7 @@
 package edgegroup
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -32,47 +28,46 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
-// EdgeGroups return an array containing all the Edge groups.
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
+// EdgeGroups return a slice containing all the Edge groups.
 func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
-	var groups = make([]portainer.EdgeGroup, 0)
+	var groups []portainer.EdgeGroup
+	var err error
 
-	err := service.connection.GetAllWithJsoniter(
-		BucketName,
-		&portainer.EdgeGroup{},
-		func(obj interface{}) (interface{}, error) {
-			group, ok := obj.(*portainer.EdgeGroup)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeGroup object")
-				return nil, fmt.Errorf("Failed to convert to EdgeGroup object: %s", obj)
-			}
-			groups = append(groups, *group)
-
-			return &portainer.EdgeGroup{}, nil
-		})
+	err = service.connection.ViewTx(func(tx portainer.Transaction) error {
+		groups, err = service.Tx(tx).EdgeGroups()
+		return err
+	})
 
 	return groups, err
 }
 
 // EdgeGroup returns an Edge group by ID.
 func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error) {
-	var group portainer.EdgeGroup
-	identifier := service.connection.ConvertToKey(int(ID))
+	var group *portainer.EdgeGroup
+	var err error
 
-	err := service.connection.GetObject(BucketName, identifier, &group)
-	if err != nil {
-		return nil, err
-	}
+	err = service.connection.ViewTx(func(tx portainer.Transaction) error {
+		group, err = service.Tx(tx).EdgeGroup(ID)
+		return err
+	})
 
-	return &group, nil
+	return group, err
 }
 
-// Deprecated: Use UpdateEdgeGroupFunc instead.
+// UpdateEdgeGroup updates an edge group.
 func (service *Service) UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, group)
 }
 
-// UpdateEdgeGroupFunc updates an edge group inside a transaction avoiding data races.
+// Deprecated: UpdateEdgeGroupFunc updates an edge group inside a transaction avoiding data races.
 func (service *Service) UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFunc func(edgeGroup *portainer.EdgeGroup)) error {
 	id := service.connection.ConvertToKey(int(ID))
 	edgeGroup := &portainer.EdgeGroup{}
@@ -84,17 +79,14 @@ func (service *Service) UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFunc
 
 // DeleteEdgeGroup deletes an Edge group.
 func (service *Service) DeleteEdgeGroup(ID portainer.EdgeGroupID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).DeleteEdgeGroup(ID)
+	})
 }
 
 // CreateEdgeGroup assign an ID to a new Edge group and saves it.
 func (service *Service) Create(group *portainer.EdgeGroup) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			group.ID = portainer.EdgeGroupID(id)
-			return int(group.ID), group
-		},
-	)
+	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).Create(group)
+	})
 }

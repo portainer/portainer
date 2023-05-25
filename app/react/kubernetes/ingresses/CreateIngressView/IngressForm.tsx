@@ -10,6 +10,7 @@ import { FormError } from '@@/form-components/FormError';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import { Annotations } from './Annotations';
 import { Rule, ServicePorts } from './types';
@@ -115,7 +116,7 @@ export function IngressForm({
           <div className="form-horizontal">
             <div className="form-group">
               <label
-                className="control-label text-muted col-sm-3 col-lg-2 required"
+                className="control-label text-muted col-sm-3 col-lg-2"
                 htmlFor="namespace"
               >
                 Namespace
@@ -164,7 +165,7 @@ export function IngressForm({
                     />
                   )}
                   {errors.ingressName && !isEdit && (
-                    <FormError className="mt-1 error-inline">
+                    <FormError className="error-inline mt-1">
                       {errors.ingressName}
                     </FormError>
                   )}
@@ -190,7 +191,7 @@ export function IngressForm({
                     options={ingressClassOptions}
                   />
                   {errors.className && (
-                    <FormError className="mt-1 error-inline">
+                    <FormError className="error-inline mt-1">
                       {errors.className}
                     </FormError>
                   )}
@@ -198,28 +199,33 @@ export function IngressForm({
               </div>
             </div>
 
-            <div className="col-sm-12 px-0 text-muted !mb-0">
-              <div className="mb-2">Annotations</div>
-              <p className="vertical-center text-muted small">
-                <Icon icon={Info} mode="primary" />
-                <span>
-                  You can specify{' '}
-                  <a
-                    href="https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
-                    target="_black"
-                  >
-                    annotations
-                  </a>{' '}
-                  for the object. See further Kubernetes documentation on{' '}
-                  <a
-                    href="https://kubernetes.io/docs/reference/labels-annotations-taints/"
-                    target="_black"
-                  >
-                    well-known annotations
-                  </a>
-                  .
-                </span>
-              </p>
+            <div className="col-sm-12 text-muted !mb-0 px-0">
+              <div className="control-label !mb-3 text-left font-medium">
+                Annotations
+                <Tooltip
+                  message={
+                    <div className="vertical-center">
+                      <span>
+                        Allows specifying of{' '}
+                        <a
+                          href="https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
+                          target="_black"
+                        >
+                          annotations
+                        </a>{' '}
+                        for the object. See further Kubernetes documentation on{' '}
+                        <a
+                          href="https://kubernetes.io/docs/reference/labels-annotations-taints/"
+                          target="_black"
+                        >
+                          well-known annotations
+                        </a>
+                        .
+                      </span>
+                    </div>
+                  }
+                />
+              </div>
             </div>
 
             {rule?.Annotations && (
@@ -232,39 +238,47 @@ export function IngressForm({
               />
             )}
 
-            <div className="col-sm-12 p-0 anntation-actions">
-              <Button
-                className="btn btn-sm btn-light mb-2 !ml-0"
-                onClick={() => addNewAnnotation()}
-                icon={Plus}
-                title="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type."
-              >
-                {' '}
-                add annotation
-              </Button>
+            <div className="col-sm-12 anntation-actions p-0">
+              <TooltipWithChildren message="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type.">
+                <span>
+                  <Button
+                    className="btn btn-sm btn-light mb-2 !ml-0"
+                    onClick={() => addNewAnnotation()}
+                    icon={Plus}
+                  >
+                    {' '}
+                    Add annotation
+                  </Button>
+                </span>
+              </TooltipWithChildren>
 
               {rule.IngressType === 'nginx' && (
                 <>
-                  <Button
-                    className="btn btn-sm btn-light mb-2 ml-2"
-                    onClick={() => addNewAnnotation('rewrite')}
-                    icon={Plus}
-                    title="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
-                    data-cy="add-rewrite-annotation"
-                  >
-                    {' '}
-                    Add rewrite annotation
-                  </Button>
+                  <TooltipWithChildren message="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to.">
+                    <span>
+                      <Button
+                        className="btn btn-sm btn-light mb-2 ml-2"
+                        onClick={() => addNewAnnotation('rewrite')}
+                        icon={Plus}
+                        data-cy="add-rewrite-annotation"
+                      >
+                        Add rewrite annotation
+                      </Button>
+                    </span>
+                  </TooltipWithChildren>
 
-                  <Button
-                    className="btn btn-sm btn-light mb-2 ml-2"
-                    onClick={() => addNewAnnotation('regex')}
-                    icon={Plus}
-                    title="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
-                    data-cy="add-regex-annotation"
-                  >
-                    Add regular expression annotation
-                  </Button>
+                  <TooltipWithChildren message="Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account.">
+                    <span>
+                      <Button
+                        className="btn btn-sm btn-light mb-2 ml-2"
+                        onClick={() => addNewAnnotation('regex')}
+                        icon={Plus}
+                        data-cy="add-regex-annotation"
+                      >
+                        Add regular expression annotation
+                      </Button>
+                    </span>
+                  </TooltipWithChildren>
                 </>
               )}
 
@@ -280,15 +294,15 @@ export function IngressForm({
               )}
             </div>
 
-            <div className="col-sm-12 px-0 text-muted">Rules</div>
+            <div className="col-sm-12 text-muted px-0">Rules</div>
           </div>
         )}
 
         {namespace &&
           rule?.Hosts?.map((host, hostIndex) => (
-            <div className="row mb-5 rule bordered" key={host.Key}>
+            <div className="row rule bordered mb-5" key={host.Key}>
               <div className="col-sm-12">
-                <div className="row mt-5 rule-actions">
+                <div className="row rule-actions mt-5">
                   <div className="col-sm-3 p-0">
                     {!host.NoHost ? 'Rule' : 'Fallback rule'}
                   </div>
@@ -318,7 +332,7 @@ export function IngressForm({
                 </div>
                 {!host.NoHost && (
                   <div className="row">
-                    <div className="form-group !pl-0 col-sm-6 col-lg-4 !pr-2">
+                    <div className="form-group col-sm-6 col-lg-4 !pl-0 !pr-2">
                       <div className="input-group input-group-sm">
                         <span className="input-group-addon required">
                           Hostname
@@ -341,7 +355,7 @@ export function IngressForm({
                       )}
                     </div>
 
-                    <div className="form-group !pr-0 col-sm-6 col-lg-4 !pl-2">
+                    <div className="form-group col-sm-6 col-lg-4 !pr-0 !pl-2">
                       <div className="input-group input-group-sm">
                         <span className="input-group-addon">TLS secret</span>
                         <Select
@@ -356,7 +370,7 @@ export function IngressForm({
                       </div>
                     </div>
 
-                    <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
+                    <p className="vertical-center text-muted small col-sm-12 whitespace-nowrap !p-0">
                       <Icon icon={Info} mode="primary" size="md" />
                       <span>
                         Add a secret via{' '}
@@ -376,7 +390,7 @@ export function IngressForm({
                   </div>
                 )}
                 {host.NoHost && (
-                  <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
+                  <p className="vertical-center text-muted small col-sm-12 whitespace-nowrap !p-0">
                     <Icon icon={Info} mode="primary" size="md" />A fallback rule
                     has no host specified. This rule only applies when an
                     inbound request has a hostname that does not match with any
@@ -385,16 +399,16 @@ export function IngressForm({
                 )}
 
                 <div className="row">
-                  <div className="col-sm-12 px-0 !mb-0 mt-2 text-muted">
+                  <div className="col-sm-12 text-muted !mb-0 mt-2 px-0">
                     Paths
                   </div>
                 </div>
                 {host.Paths.map((path, pathIndex) => (
                   <div
-                    className="mt-5 !mb-5 row path"
+                    className="row path mt-5 !mb-5"
                     key={`path_${path.Key}}`}
                   >
-                    <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">
+                    <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
                         <span className="input-group-addon required">
                           Service
@@ -417,7 +431,7 @@ export function IngressForm({
                       {errors[
                         `hosts[${hostIndex}].paths[${pathIndex}].servicename`
                       ] && (
-                        <FormError className="mt-1 !mb-0 error-inline">
+                        <FormError className="error-inline mt-1 !mb-0">
                           {
                             errors[
                               `hosts[${hostIndex}].paths[${pathIndex}].servicename`
@@ -427,7 +441,7 @@ export function IngressForm({
                       )}
                     </div>
 
-                    <div className="form-group !pl-0 col-sm-2 col-xl-2 !m-0">
+                    <div className="form-group col-sm-2 col-xl-2 !m-0 !pl-0">
                       {servicePorts && (
                         <>
                           <div className="input-group input-group-sm">
@@ -474,11 +488,9 @@ export function IngressForm({
                       )}
                     </div>
 
-                    <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">
+                    <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">
-                          Path type
-                        </span>
+                        <span className="input-group-addon">Path type</span>
                         <Select
                           key={servicePorts.toString() + path.PathType}
                           name={`ingress_pathType_${hostIndex}_${pathIndex}`}
@@ -514,7 +526,7 @@ export function IngressForm({
                       )}
                     </div>
 
-                    <div className="form-group !pl-0 col-sm-3 col-xl-3 !m-0">
+                    <div className="form-group col-sm-3 col-xl-3 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
                         <span className="input-group-addon required">Path</span>
                         <input
@@ -547,9 +559,9 @@ export function IngressForm({
                       )}
                     </div>
 
-                    <div className="form-group !pl-0 col-sm-1 !m-0">
+                    <div className="form-group col-sm-1 !m-0 !pl-0">
                       <Button
-                        className="btn btn-sm btn-only-icon !ml-0 vertical-center"
+                        className="btn btn-sm btn-only-icon vertical-center !ml-0"
                         color="dangerlight"
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
@@ -576,8 +588,8 @@ export function IngressForm({
           ))}
 
         {namespace && (
-          <div className="row p-0 rules-action">
-            <div className="col-sm-12 p-0 vertical-center">
+          <div className="row rules-action p-0">
+            <div className="col-sm-12 vertical-center p-0">
               <Button
                 className="btn btn-sm btn-light !ml-0"
                 type="button"

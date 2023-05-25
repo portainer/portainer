@@ -1,10 +1,9 @@
-import { LicenseType } from '@/portainer/license-management/types';
-import { useLicenseInfo } from '@/portainer/license-management/use-license.service';
-
 import { TextTip } from '@@/Tip/TextTip';
 import { InformationPanel } from '@@/InformationPanel';
 
 import { useNodesCount } from '../system/useNodesCount';
+import { useLicenseInfo } from '../licenses/use-license.service';
+import { LicenseType } from '../licenses/types';
 
 export function LicenseNodePanel() {
   const nodesValid = useNodesValid();

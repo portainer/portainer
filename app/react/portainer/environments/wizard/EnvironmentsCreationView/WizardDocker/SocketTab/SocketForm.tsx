@@ -3,7 +3,6 @@ import { useReducer } from 'react';
 import { Plug2 } from 'lucide-react';
 
 import { useCreateLocalDockerEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
-import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
 
@@ -11,6 +10,7 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
+import { InsightsBox } from '@@/InsightsBox';
 
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
@@ -20,16 +20,16 @@ import { FormValues } from './types';
 
 interface Props {
   onCreate(environment: Environment): void;
+  isDockerStandalone?: boolean;
 }
 
-export function SocketForm({ onCreate }: Props) {
+export function SocketForm({ onCreate, isDockerStandalone }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const initialValues: FormValues = {
     name: '',
     socketPath: '',
     overridePath: false,
     meta: { groupId: 1, tagIds: [] },
-    gpus: [],
   };
 
   const mutation = useCreateLocalDockerEnvironmentMutation();
@@ -50,7 +50,33 @@ export function SocketForm({ onCreate }: Props) {
           <OverrideSocketFieldset />
 
           <MoreSettingsSection>
-            <Hardware />
+            {isDockerStandalone && (
+              <InsightsBox
+                content={
+                  <>
+                    <p>
+                      From 2.18 on, the set-up of available GPUs for a Docker
+                      Standalone environment has been shifted from Add
+                      environment and Environment details to Host -&gt; Setup,
+                      so as to align with other settings.
+                    </p>
+                    <p>
+                      A toggle has been introduced for enabling/disabling
+                      management of GPU settings in the Portainer UI - to
+                      alleviate the performance impact of showing those
+                      settings.
+                    </p>
+                    <p>
+                      The UI has been updated to clarify that GPU settings
+                      support is only for Docker Standalone (and not Docker
+                      Swarm, which was never supported in the UI).
+                    </p>
+                  </>
+                }
+                header="GPU settings update"
+                insightCloseId="gpu-settings-update-closed"
+              />
+            )}
           </MoreSettingsSection>
 
           <div className="form-group">
@@ -76,7 +102,6 @@ export function SocketForm({ onCreate }: Props) {
       {
         name: values.name,
         socketPath: values.overridePath ? values.socketPath : '',
-        gpus: values.gpus,
         meta: values.meta,
       },
       {

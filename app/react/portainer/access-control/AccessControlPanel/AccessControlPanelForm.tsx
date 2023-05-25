@@ -4,12 +4,14 @@ import { useMutation } from 'react-query';
 import { object } from 'yup';
 
 import { useUser } from '@/react/hooks/useUser';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
+import { confirm } from '@@/modals/confirm';
 import { Button } from '@@/buttons';
 import { LoadingButton } from '@@/buttons/LoadingButton';
+import { buildConfirmButton } from '@@/modals/utils';
+import { ModalType } from '@@/modals';
 
 import { EditDetails } from '../EditDetails';
 import { parseAccessControlFormData } from '../utils';
@@ -128,15 +130,11 @@ export function AccessControlPanelForm({
 }
 
 function confirmAccessControlUpdate() {
-  return confirmAsync({
+  return confirm({
+    modalType: ModalType.Warn,
     title: 'Are you sure?',
     message:
       'Changing the ownership of this resource will potentially restrict its management to some users.',
-    buttons: {
-      confirm: {
-        label: 'Change ownership',
-        className: 'btn-primary',
-      },
-    },
+    confirmButton: buildConfirmButton('Change ownership'),
   });
 }

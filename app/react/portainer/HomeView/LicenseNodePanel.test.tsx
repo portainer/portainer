@@ -1,6 +1,7 @@
 import { server, rest } from '@/setup-tests/server';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { LicenseType } from '@/portainer/license-management/types';
+
+import { LicenseType } from '../licenses/types';
 
 import { LicenseNodePanel } from './LicenseNodePanel';
 

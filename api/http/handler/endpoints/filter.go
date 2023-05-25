@@ -15,18 +15,20 @@ import (
 )
 
 type EnvironmentsQuery struct {
-	search              string
-	types               []portainer.EndpointType
-	tagIds              []portainer.TagID
-	endpointIds         []portainer.EndpointID
-	tagsPartialMatch    bool
-	groupIds            []portainer.EndpointGroupID
-	status              []portainer.EndpointStatus
-	edgeDevice          *bool
-	edgeDeviceUntrusted bool
-	excludeSnapshots    bool
-	name                string
-	agentVersions       []string
+	search           string
+	types            []portainer.EndpointType
+	tagIds           []portainer.TagID
+	endpointIds      []portainer.EndpointID
+	tagsPartialMatch bool
+	groupIds         []portainer.EndpointGroupID
+	status           []portainer.EndpointStatus
+	// if edgeAsync not nil, will filter edge endpoints based on this value
+	edgeAsync                *bool
+	edgeDeviceUntrusted      bool
+	excludeSnapshots         bool
+	name                     string
+	agentVersions            []string
+	edgeCheckInPassedSeconds int
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -66,30 +68,32 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	name, _ := request.RetrieveQueryParameter(r, "name", true)
 
-	edgeDeviceParam, _ := request.RetrieveQueryParameter(r, "edgeDevice", true)
-
-	var edgeDevice *bool
-	if edgeDeviceParam != "" {
-		edgeDevice = BoolAddr(edgeDeviceParam == "true")
+	var edgeAsync *bool
+	edgeAsyncParam, _ := request.RetrieveQueryParameter(r, "edgeAsync", true)
+	if edgeAsyncParam != "" {
+		edgeAsync = BoolAddr(edgeAsyncParam == "true")
 	}
 
 	edgeDeviceUntrusted, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceUntrusted", true)
 
 	excludeSnapshots, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshots", true)
 
+	edgeCheckInPassedSeconds, _ := request.RetrieveNumericQueryParameter(r, "edgeCheckInPassedSeconds", true)
+
 	return EnvironmentsQuery{
-		search:              search,
-		types:               endpointTypes,
-		tagIds:              tagIDs,
-		endpointIds:         endpointIDs,
-		tagsPartialMatch:    tagsPartialMatch,
-		groupIds:            groupIDs,
-		status:              status,
-		edgeDevice:          edgeDevice,
-		edgeDeviceUntrusted: edgeDeviceUntrusted,
-		excludeSnapshots:    excludeSnapshots,
-		name:                name,
-		agentVersions:       agentVersions,
+		search:                   search,
+		types:                    endpointTypes,
+		tagIds:                   tagIDs,
+		endpointIds:              endpointIDs,
+		tagsPartialMatch:         tagsPartialMatch,
+		groupIds:                 groupIDs,
+		status:                   status,
+		edgeAsync:                edgeAsync,
+		edgeDeviceUntrusted:      edgeDeviceUntrusted,
+		excludeSnapshots:         excludeSnapshots,
+		name:                     name,
+		agentVersions:            agentVersions,
+		edgeCheckInPassedSeconds: edgeCheckInPassedSeconds,
 	}, nil
 }
 
@@ -108,12 +112,39 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 		filteredEndpoints = filterEndpointsByName(filteredEndpoints, query.name)
 	}
 
-	if query.edgeDevice != nil {
-		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, *query.edgeDevice, query.edgeDeviceUntrusted)
-	} else {
-		// If the edgeDevice parameter is not set, we need to filter out the untrusted edge devices
+	// filter async edge environments
+	if query.edgeAsync != nil {
 		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
-			return !endpoint.IsEdgeDevice || endpoint.UserTrusted
+			if !endpointutils.IsEdgeEndpoint(&endpoint) {
+				return true
+			}
+
+			return endpoint.Edge.AsyncMode == *query.edgeAsync
+		})
+	}
+
+	// filter edge environments by trusted/untrusted
+	filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+		if !endpointutils.IsEdgeEndpoint(&endpoint) {
+			return true
+		}
+
+		return endpoint.UserTrusted == !query.edgeDeviceUntrusted
+	})
+
+	if query.edgeCheckInPassedSeconds > 0 {
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			// ignore non-edge endpoints
+			if !endpointutils.IsEdgeEndpoint(&endpoint) {
+				return true
+			}
+
+			// filter out endpoints that have never checked in
+			if endpoint.LastCheckInDate == 0 {
+				return false
+			}
+
+			return time.Now().Unix()-endpoint.LastCheckInDate < int64(query.edgeCheckInPassedSeconds)
 		})
 	}
 
@@ -272,30 +303,6 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []port
 	}
 
 	return endpoints[:n]
-}
-
-func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDevice bool, untrusted bool) []portainer.Endpoint {
-	n := 0
-	for _, endpoint := range endpoints {
-		if shouldReturnEdgeDevice(endpoint, edgeDevice, untrusted) {
-			endpoints[n] = endpoint
-			n++
-		}
-	}
-
-	return endpoints[:n]
-}
-
-func shouldReturnEdgeDevice(endpoint portainer.Endpoint, edgeDeviceParam bool, untrustedParam bool) bool {
-	if !endpointutils.IsEdgeEndpoint(&endpoint) {
-		return true
-	}
-
-	if !edgeDeviceParam {
-		return !endpoint.IsEdgeDevice
-	}
-
-	return endpoint.IsEdgeDevice && endpoint.UserTrusted == !untrustedParam
 }
 
 func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.TagID) []string {

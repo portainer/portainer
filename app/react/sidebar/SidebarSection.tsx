@@ -45,7 +45,7 @@ export function SidebarSectionTitle({
   }
 
   return (
-    <li className="ml-3 text-sm text-gray-3 be:text-gray-6 transition-all duration-500 ease-in-out">
+    <li className="ml-3 text-sm text-gray-3 transition-all duration-500 ease-in-out be:text-gray-6">
       {children}
     </li>
   );

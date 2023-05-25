@@ -99,6 +99,8 @@ func backup(t *testing.T, h *Handler, password string) []byte {
 
 	response := w.Result()
 	archive, _ := io.ReadAll(response.Body)
+	response.Body.Close()
+
 	return archive
 }
 

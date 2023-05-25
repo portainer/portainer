@@ -21,7 +21,7 @@ import (
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int true "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
+// @param endpointId query int true "Environment identifier"
 // @param swarmId query int true "Swarm identifier"
 // @param orphanedRunning query boolean true "Indicates whether the stack is orphaned"
 // @success 200 {object} portainer.Stack "Success"

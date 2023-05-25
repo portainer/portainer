@@ -1,18 +1,22 @@
 import _ from 'lodash';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
-export function useDebounce(
-  defaultValue: string,
-  onChange: (value: string) => void
-) {
-  const [searchValue, setSearchValue] = useState(defaultValue);
+export function useDebounce(value: string, onChange: (value: string) => void) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
 
   const onChangeDebounces = useRef(_.debounce(onChange, 300));
 
-  return [searchValue, handleChange] as const;
+  const handleChange = useCallback(
+    (value: string) => {
+      setDebouncedValue(value);
+      onChangeDebounces.current(value);
+    },
+    [onChangeDebounces, setDebouncedValue]
+  );
 
-  function handleChange(value: string) {
-    setSearchValue(value);
-    onChangeDebounces.current(value);
-  }
+  useEffect(() => {
+    setDebouncedValue(value);
+  }, [value]);
+
+  return [debouncedValue, handleChange] as const;
 }

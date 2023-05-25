@@ -121,12 +121,13 @@ func getResource(token string, configuration *portainer.OAuthSettings) (map[stri
 
 	client := &http.Client{}
 	req.Header.Set("Authorization", "Bearer "+token)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-
 	defer resp.Body.Close()
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

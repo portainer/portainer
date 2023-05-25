@@ -2,12 +2,13 @@ package deployments
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -36,6 +37,11 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 		return nil // do nothing if it isn't a git-based stack
 	}
 
+	endpoint, err := datastore.Endpoint().Endpoint(stack.EndpointID)
+	if err != nil {
+		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
+	}
+
 	author := stack.UpdatedBy
 	if author == "" {
 		author = stack.CreatedBy
@@ -48,44 +54,27 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 			Str("author", author).
 			Str("stack", stack.Name).
 			Int("endpoint_id", int(stack.EndpointID)).
-			Msg("cannot autoupdate a stack, stack author user is missing")
+			Msg("cannot auto update a stack, stack author user is missing")
 
 		return &StackAuthorMissingErr{int(stack.ID), author}
 	}
 
-	username, password := "", ""
-	if stack.GitConfig.Authentication != nil {
-		username, password = stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password
-	}
+	var gitCommitChangedOrForceUpdate bool
+	if !stack.FromAppTemplate {
+		updated, newHash, err := update.UpdateGitObject(gitService, fmt.Sprintf("stack:%d", stackID), stack.GitConfig, false, stack.ProjectPath)
+		if err != nil {
+			return err
+		}
 
-	newHash, err := gitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, username, password)
-	if err != nil {
-		return errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID)
-	}
-
-	if strings.EqualFold(newHash, string(stack.GitConfig.ConfigHash)) {
-		return nil
-	}
-
-	cloneParams := &cloneRepositoryParameters{
-		url:   stack.GitConfig.URL,
-		ref:   stack.GitConfig.ReferenceName,
-		toDir: stack.ProjectPath,
-	}
-	if stack.GitConfig.Authentication != nil {
-		cloneParams.auth = &gitAuth{
-			username: username,
-			password: password,
+		if updated {
+			stack.GitConfig.ConfigHash = newHash
+			stack.UpdateDate = time.Now().Unix()
+			gitCommitChangedOrForceUpdate = updated
 		}
 	}
 
-	if err := cloneGitRepository(gitService, cloneParams); err != nil {
-		return errors.WithMessagef(err, "failed to do a fresh clone of the stack %v", stack.ID)
-	}
-
-	endpoint, err := datastore.Endpoint().Endpoint(stack.EndpointID)
-	if err != nil {
-		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
+	if !gitCommitChangedOrForceUpdate {
+		return nil
 	}
 
 	registries, err := getUserRegistries(datastore, user, endpoint.ID)
@@ -95,12 +84,22 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		err := deployer.DeployComposeStack(stack, endpoint, registries, true, false)
+
+		if stackutils.IsGitStack(stack) {
+			err = deployer.DeployRemoteComposeStack(stack, endpoint, registries, true, false)
+		} else {
+			err = deployer.DeployComposeStack(stack, endpoint, registries, true, false)
+		}
+
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
 	case portainer.DockerSwarmStack:
-		err := deployer.DeploySwarmStack(stack, endpoint, registries, true, true)
+		if stackutils.IsGitStack(stack) {
+			err = deployer.DeployRemoteSwarmStack(stack, endpoint, registries, true, true)
+		} else {
+			err = deployer.DeploySwarmStack(stack, endpoint, registries, true, true)
+		}
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
@@ -111,14 +110,12 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 		err := deployer.DeployKubernetesStack(stack, endpoint, user)
 		if err != nil {
-			return errors.WithMessagef(err, "failed to deploy a kubternetes app stack %v", stackID)
+			return errors.WithMessagef(err, "failed to deploy a kubernetes app stack %v", stackID)
 		}
 	default:
 		return errors.Errorf("cannot update stack, type %v is unsupported", stack.Type)
 	}
 
-	stack.UpdateDate = time.Now().Unix()
-	stack.GitConfig.ConfigHash = newHash
 	if err := datastore.Stack().UpdateStack(stack.ID, stack); err != nil {
 		return errors.WithMessagef(err, "failed to update the stack %v", stack.ID)
 	}
@@ -149,23 +146,4 @@ func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, e
 	}
 
 	return filteredRegistries, nil
-}
-
-type cloneRepositoryParameters struct {
-	url   string
-	ref   string
-	toDir string
-	auth  *gitAuth
-}
-
-type gitAuth struct {
-	username string
-	password string
-}
-
-func cloneGitRepository(gitService portainer.GitService, cloneParams *cloneRepositoryParameters) error {
-	if cloneParams.auth != nil {
-		return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, cloneParams.auth.username, cloneParams.auth.password)
-	}
-	return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, "", "")
 }

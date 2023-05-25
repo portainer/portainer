@@ -18,8 +18,11 @@ import { Button } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
 import { Icon } from '@@/Icon';
 
-import { environmentTypes } from '../EnvironmentTypeSelectView/environment-types';
-import { EnvironmentSelectorValue } from '../EnvironmentTypeSelectView/EnvironmentSelector';
+import {
+  EnvironmentOptionValue,
+  environmentTypes,
+  formTitles,
+} from '../EnvironmentTypeSelectView/environment-types';
 
 import { WizardDocker } from './WizardDocker';
 import { WizardAzure } from './WizardAzure';
@@ -77,10 +80,7 @@ export function EnvironmentCreationView() {
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 
             <div className="mt-12">
-              <FormSection
-                title={`Connect to your ${currentStep.title}
-                    environment`}
-              >
+              <FormSection title={formTitles[currentStep.id]}>
                 <Component
                   onCreate={handleCreateEnvironment}
                   isDockerStandalone={isDockerStandalone}
@@ -138,7 +138,7 @@ export function EnvironmentCreationView() {
   }
 }
 
-function useParamEnvironmentTypes(): EnvironmentSelectorValue[] {
+function useParamEnvironmentTypes(): EnvironmentOptionValue[] {
   const {
     params: { envType },
   } = useCurrentStateAndParams();
@@ -154,7 +154,7 @@ function useParamEnvironmentTypes(): EnvironmentSelectorValue[] {
 }
 
 function useStepper(
-  steps: typeof environmentTypes[number][],
+  steps: (typeof environmentTypes)[number][],
   onFinish: () => void
 ) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -185,7 +185,7 @@ function useStepper(
     setCurrentStepIndex(currentStepIndex - 1);
   }
 
-  function getComponent(id: EnvironmentSelectorValue) {
+  function getComponent(id: EnvironmentOptionValue) {
     switch (id) {
       case 'dockerStandalone':
       case 'dockerSwarm':
@@ -205,12 +205,14 @@ function useAnalyticsState() {
     dockerAgent: 0,
     dockerApi: 0,
     kubernetesAgent: 0,
-    kubernetesEdgeAgent: 0,
+    kubernetesEdgeAgentAsync: 0,
+    kubernetesEdgeAgentStandard: 0,
     kaasAgent: 0,
     aciApi: 0,
     localEndpoint: 0,
-    nomadEdgeAgent: 0,
-    dockerEdgeAgent: 0,
+    nomadEdgeAgentStandard: 0,
+    dockerEdgeAgentAsync: 0,
+    dockerEdgeAgentStandard: 0,
   });
 
   return { analytics, setAnalytics };

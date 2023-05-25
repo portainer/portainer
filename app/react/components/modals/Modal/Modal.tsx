@@ -39,7 +39,7 @@ export function Modal({
         isOpen
         className={clsx(
           styles.overlay,
-          'flex items-center justify-center z-50'
+          'z-50 flex items-center justify-center'
         )}
         onDismiss={onDismiss}
         role="dialog"
@@ -47,7 +47,7 @@ export function Modal({
         <DialogContent
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
-          className={clsx(styles.modalDialog, 'p-0 bg-transparent', {
+          className={clsx(styles.modalDialog, 'bg-transparent p-0', {
             'w-[450px]': size === 'md',
             'w-[700px]': size === 'lg',
           })}

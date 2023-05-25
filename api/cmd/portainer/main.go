@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"crypto/sha256"
-	"fmt"
 	"math/rand"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -31,12 +29,12 @@ import (
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http"
-	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/edgestacks"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/internal/upgrade"
@@ -47,6 +45,7 @@ import (
 	"github.com/portainer/portainer/api/oauth"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/libhelm"
 
 	"github.com/gofrs/uuid"
@@ -318,45 +317,6 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	return dataStore.SSLSettings().UpdateSettings(sslSettings)
 }
 
-// enableFeaturesFromFlags turns on or off feature flags
-// e.g.  portainer --feat open-amt --feat fdo=true ... (defaults to true)
-// note, settings are persisted to the DB. To turn off `--feat open-amt=false`
-func enableFeaturesFromFlags(dataStore dataservices.DataStore, flags *portainer.CLIFlags) error {
-	settings, err := dataStore.Settings().Settings()
-	if err != nil {
-		return err
-	}
-
-	if settings.FeatureFlagSettings == nil {
-		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
-	}
-
-	// loop through feature flags to check if they are supported
-	for _, feat := range *flags.FeatureFlags {
-		var correspondingFeature *portainer.Feature
-		for i, supportedFeat := range portainer.SupportedFeatureFlags {
-			if strings.EqualFold(feat.Name, string(supportedFeat)) {
-				correspondingFeature = &portainer.SupportedFeatureFlags[i]
-			}
-		}
-
-		if correspondingFeature == nil {
-			return fmt.Errorf("unknown feature flag '%s'", feat.Name)
-		}
-
-		featureState, err := strconv.ParseBool(feat.Value)
-		if err != nil {
-			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
-		}
-
-		log.Info().Str("feature", string(*correspondingFeature)).Bool("state", featureState).Msg("")
-
-		settings.FeatureFlagSettings[*correspondingFeature] = featureState
-	}
-
-	return dataStore.Settings().UpdateSettings(settings)
-}
-
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
 	private, public, err := fileService.LoadKeyPair()
 	if err != nil {
@@ -386,147 +346,6 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
-func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
-	tlsConfiguration := portainer.TLSConfiguration{
-		TLS:           *flags.TLS,
-		TLSSkipVerify: *flags.TLSSkipVerify,
-	}
-
-	if *flags.TLS {
-		tlsConfiguration.TLSCACertPath = *flags.TLSCacert
-		tlsConfiguration.TLSCertPath = *flags.TLSCert
-		tlsConfiguration.TLSKeyPath = *flags.TLSKey
-	} else if !*flags.TLS && *flags.TLSSkipVerify {
-		tlsConfiguration.TLS = true
-	}
-
-	endpointID := dataStore.Endpoint().GetNextIdentifier()
-	endpoint := &portainer.Endpoint{
-		ID:                 portainer.EndpointID(endpointID),
-		Name:               "primary",
-		URL:                *flags.EndpointURL,
-		GroupID:            portainer.EndpointGroupID(1),
-		Type:               portainer.DockerEnvironment,
-		TLSConfig:          tlsConfiguration,
-		UserAccessPolicies: portainer.UserAccessPolicies{},
-		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		TagIDs:             []portainer.TagID{},
-		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.DockerSnapshot{},
-		Kubernetes:         portainer.KubernetesDefault(),
-
-		SecuritySettings: portainer.EndpointSecuritySettings{
-			AllowVolumeBrowserForRegularUsers: false,
-			EnableHostManagementFeatures:      false,
-
-			AllowSysctlSettingForRegularUsers:         true,
-			AllowBindMountsForRegularUsers:            true,
-			AllowPrivilegedModeForRegularUsers:        true,
-			AllowHostNamespaceForRegularUsers:         true,
-			AllowContainerCapabilitiesForRegularUsers: true,
-			AllowDeviceMappingForRegularUsers:         true,
-			AllowStackManagementForRegularUsers:       true,
-		},
-	}
-
-	if strings.HasPrefix(endpoint.URL, "tcp://") {
-		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(tlsConfiguration.TLSCACertPath, tlsConfiguration.TLSCertPath, tlsConfiguration.TLSKeyPath, tlsConfiguration.TLSSkipVerify)
-		if err != nil {
-			return err
-		}
-
-		agentOnDockerEnvironment, err := client.ExecutePingOperation(endpoint.URL, tlsConfig)
-		if err != nil {
-			return err
-		}
-
-		if agentOnDockerEnvironment {
-			endpoint.Type = portainer.AgentOnDockerEnvironment
-		}
-	}
-
-	err := snapshotService.SnapshotEndpoint(endpoint)
-	if err != nil {
-		log.Error().
-			Str("endpoint", endpoint.Name).
-			Str("URL", endpoint.URL).
-			Err(err).
-			Msg("environment snapshot error")
-	}
-
-	return dataStore.Endpoint().Create(endpoint)
-}
-
-func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
-	if strings.HasPrefix(endpointURL, "tcp://") {
-		_, err := client.ExecutePingOperation(endpointURL, nil)
-		if err != nil {
-			return err
-		}
-	}
-
-	endpointID := dataStore.Endpoint().GetNextIdentifier()
-	endpoint := &portainer.Endpoint{
-		ID:                 portainer.EndpointID(endpointID),
-		Name:               "primary",
-		URL:                endpointURL,
-		GroupID:            portainer.EndpointGroupID(1),
-		Type:               portainer.DockerEnvironment,
-		TLSConfig:          portainer.TLSConfiguration{},
-		UserAccessPolicies: portainer.UserAccessPolicies{},
-		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		TagIDs:             []portainer.TagID{},
-		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.DockerSnapshot{},
-		Kubernetes:         portainer.KubernetesDefault(),
-
-		SecuritySettings: portainer.EndpointSecuritySettings{
-			AllowVolumeBrowserForRegularUsers: false,
-			EnableHostManagementFeatures:      false,
-
-			AllowSysctlSettingForRegularUsers:         true,
-			AllowBindMountsForRegularUsers:            true,
-			AllowPrivilegedModeForRegularUsers:        true,
-			AllowHostNamespaceForRegularUsers:         true,
-			AllowContainerCapabilitiesForRegularUsers: true,
-			AllowDeviceMappingForRegularUsers:         true,
-			AllowStackManagementForRegularUsers:       true,
-		},
-	}
-
-	err := snapshotService.SnapshotEndpoint(endpoint)
-	if err != nil {
-		log.Error().
-			Str("endpoint", endpoint.Name).
-			Str("URL", endpoint.URL).Err(err).
-			Msg("environment snapshot error")
-	}
-
-	return dataStore.Endpoint().Create(endpoint)
-}
-
-func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
-	if *flags.EndpointURL == "" {
-		return nil
-	}
-
-	endpoints, err := dataStore.Endpoint().Endpoints()
-	if err != nil {
-		return err
-	}
-
-	if len(endpoints) > 0 {
-		log.Info().Msg("instance already has defined environments, skipping the environment defined via CLI")
-
-		return nil
-	}
-
-	if *flags.TLS || *flags.TLSSkipVerify {
-		return createTLSSecuredEndpoint(flags, dataStore, snapshotService)
-	}
-	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
-}
-
 func loadEncryptionSecretKey(keyfilename string) []byte {
 	content, err := os.ReadFile(path.Join("/run/secrets", keyfilename))
 	if err != nil {
@@ -546,6 +365,10 @@ func loadEncryptionSecretKey(keyfilename string) []byte {
 
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
+
+	if flags.FeatureFlags != nil {
+		featureflags.Parse(*flags.FeatureFlags, portainer.SupportedFeatureFlags)
+	}
 
 	fileService := initFileService(*flags.Data)
 	encryptionKey := loadEncryptionSecretKey(*flags.SecretKeyName)
@@ -574,11 +397,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	jwtService, err := initJWTService(settings.UserSessionTimeout, dataStore)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing JWT service")
-	}
-
-	err = enableFeaturesFromFlags(dataStore, flags)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed enabling feature flag")
 	}
 
 	ldapService := initLDAPService()
@@ -668,10 +486,10 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	}
 
-	err = initEndpoint(flags, dataStore, snapshotService)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed initializing environment")
-	}
+	// channel to control when the admin user is created
+	adminCreationDone := make(chan struct{}, 1)
+
+	go endpointutils.InitEndpoint(shutdownCtx, adminCreationDone, flags, dataStore, snapshotService)
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
@@ -706,6 +524,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed creating admin user")
 			}
+
+			// notify the admin user is created, the endpoint initialization can start
+			adminCreationDone <- struct{}{}
 		} else {
 			log.Info().Msg("instance already has an administrator user defined, skipping admin password related flags.")
 		}
@@ -717,7 +538,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
-	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
+	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer, dockerClientFactory, dataStore)
 	deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
@@ -725,25 +546,21 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Msg("failed to fetch SSL settings from DB")
 	}
 
-	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer)
+	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer, kubernetesClientFactory)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing upgrade service")
 	}
 
-	// FIXME: In 2.16 we changed the way ingress controller permissions are
-	// stored. Instead of being stored as annotation on an ingress rule, we keep
-	// them in our database. However, in order to run the migration we need an
-	// admin kube client to run lookup the old ingress rules and compare them
-	// with the current existing ingress classes.
-	//
-	// Unfortunately, our migrations run as part of the database initialization
-	// and our kubeclients require an initialized database. So it is not
-	// possible to do this migration as part of our normal flow. We DO have a
-	// migration which toggles a boolean in kubernetes configuration that
-	// indicated that this "post init" migration should be run. If/when this is
-	// resolved we can remove this function.
-	err = kubernetesClientFactory.PostInitMigrateIngresses()
-	if err != nil {
+	// Our normal migrations run as part of the database initialization
+	// but some more complex migrations require access to a kubernetes or docker
+	// client. Therefore we run a separate migration process just before
+	// starting the server.
+	postInitMigrator := datastore.NewPostInitMigrator(
+		kubernetesClientFactory,
+		dockerClientFactory,
+		dataStore,
+	)
+	if err := postInitMigrator.PostInitMigrate(); err != nil {
 		log.Fatal().Err(err).Msg("failure during post init migrations")
 	}
 
@@ -783,6 +600,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		StackDeployer:               stackDeployer,
 		DemoService:                 demoService,
 		UpgradeService:              upgradeService,
+		AdminCreationDone:           adminCreationDone,
 	}
 }
 

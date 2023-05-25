@@ -1,15 +1,21 @@
 import _ from 'lodash-es';
-import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructive } from '@@/modals/confirm';
 import { EdgeTypes } from '@/react/portainer/environments/types';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { getTags } from '@/portainer/tags/tags.service';
 import { notifyError } from '@/portainer/services/notifications';
+import { buildConfirmButton } from '@@/modals/utils';
+import { tagOptions } from '@/react/edge/edge-groups/CreateView/tag-options';
+import { groupTypeOptions } from '@/react/edge/edge-groups/CreateView/group-type-options';
 
 export class EdgeGroupFormController {
   /* @ngInject */
   constructor($async, $scope) {
     this.$async = $async;
     this.$scope = $scope;
+
+    this.groupTypeOptions = groupTypeOptions;
+    this.tagOptions = tagOptions;
 
     this.endpoints = {
       state: {
@@ -28,6 +34,10 @@ export class EdgeGroupFormController {
     this.getDynamicEndpointsAsync = this.getDynamicEndpointsAsync.bind(this);
     this.getDynamicEndpoints = this.getDynamicEndpoints.bind(this);
     this.onChangeTags = this.onChangeTags.bind(this);
+    this.onChangeDynamic = this.onChangeDynamic.bind(this);
+    this.onChangeModel = this.onChangeModel.bind(this);
+    this.onChangePartialMatch = this.onChangePartialMatch.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 
     $scope.$watch(
       () => this.model,
@@ -40,10 +50,25 @@ export class EdgeGroupFormController {
     );
   }
 
-  onChangeTags(value) {
+  onChangeModel(model) {
     return this.$scope.$evalAsync(() => {
-      this.model.TagIds = value;
+      this.model = {
+        ...this.model,
+        ...model,
+      };
     });
+  }
+
+  onChangePartialMatch(value) {
+    return this.onChangeModel({ PartialMatch: value });
+  }
+
+  onChangeDynamic(value) {
+    this.onChangeModel({ Dynamic: value });
+  }
+
+  onChangeTags(value) {
+    this.onChangeModel({ TagIds: value });
   }
 
   associateEndpoint(endpoint) {
@@ -54,19 +79,10 @@ export class EdgeGroupFormController {
 
   dissociateEndpoint(endpoint) {
     return this.$async(async () => {
-      const confirmed = await confirmDestructiveAsync({
+      const confirmed = await confirmDestructive({
         title: 'Confirm action',
         message: 'Removing the environment from this group will remove its corresponding edge stacks',
-        buttons: {
-          cancel: {
-            label: 'Cancel',
-            className: 'btn-default',
-          },
-          confirm: {
-            label: 'Confirm',
-            className: 'btn-primary',
-          },
-        },
+        confirmButton: buildConfirmButton('Confirm'),
       });
 
       if (!confirmed) {
@@ -101,6 +117,10 @@ export class EdgeGroupFormController {
         notifyError('Failure', err, 'Unable to retrieve tags');
       }
     });
+  }
+
+  handleSubmit() {
+    this.formAction(this.model);
   }
 
   $onInit() {

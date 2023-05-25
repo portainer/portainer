@@ -36,10 +36,13 @@ type testDatastore struct {
 	webhook                 dataservices.WebhookService
 }
 
-func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
-func (d *testDatastore) Open() (bool, error)                                { return false, nil }
-func (d *testDatastore) Init() error                                        { return nil }
-func (d *testDatastore) Close() error                                       { return nil }
+func (d *testDatastore) BackupTo(io.Writer) error                            { return nil }
+func (d *testDatastore) Open() (bool, error)                                 { return false, nil }
+func (d *testDatastore) Init() error                                         { return nil }
+func (d *testDatastore) Close() error                                        { return nil }
+func (d *testDatastore) UpdateTx(func(dataservices.DataStoreTx) error) error { return nil }
+func (d *testDatastore) ViewTx(func(dataservices.DataStoreTx) error) error   { return nil }
+
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
 func (d *testDatastore) MigrateData() error                                 { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }
@@ -114,9 +117,6 @@ func (s *stubSettingsService) Settings() (*portainer.Settings, error) {
 func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error {
 	s.settings = settings
 	return nil
-}
-func (s *stubSettingsService) IsFeatureFlagEnabled(feature portainer.Feature) bool {
-	return false
 }
 func WithSettingsService(settings *portainer.Settings) datastoreOption {
 	return func(d *testDatastore) {

@@ -8,6 +8,7 @@ import { UISrefProps, useSref } from '@uirouter/react';
 import clsx from 'clsx';
 import { User, ChevronDown } from 'lucide-react';
 
+import { queryClient } from '@/react-tools/react-query';
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/react/hooks/useUser';
 
@@ -29,7 +30,7 @@ export function UserMenu() {
         <div
           className={clsx(
             styles.menuIcon,
-            'icon-badge text-lg !p-2 mr-1',
+            'icon-badge mr-1 !p-2 text-lg',
             'text-gray-8',
             'th-dark:text-gray-warm-7'
           )}
@@ -78,7 +79,10 @@ function MenuLink({
   return (
     <ReachMenuLink
       href={anchorProps.href}
-      onClick={anchorProps.onClick}
+      onClick={(e) => {
+        queryClient.clear();
+        anchorProps.onClick(e);
+      }}
       className={styles.menuLink}
       aria-label={label}
       data-cy={dataCy}

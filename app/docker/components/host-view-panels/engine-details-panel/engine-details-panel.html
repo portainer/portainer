@@ -25,15 +25,15 @@
             </tr>
             <tr>
               <td>Volume Plugins</td>
-              <td>{{ $ctrl.engine.volumePlugins | arraytostr: ', ' }}</td>
+              <td>{{ $ctrl.engine.volumePlugins | arraytostr : ', ' }}</td>
             </tr>
             <tr>
               <td>Network Plugins</td>
-              <td>{{ $ctrl.engine.networkPlugins | arraytostr: ', ' }}</td>
+              <td>{{ $ctrl.engine.networkPlugins | arraytostr : ', ' }}</td>
             </tr>
             <tr ng-if="$ctrl.engine.engineLabels.length">
               <td>Engine Labels</td>
-              <td>{{ $ctrl.engine.engineLabels | labelsToStr: ', ' }}</td>
+              <td>{{ $ctrl.engine.engineLabels | labelsToStr : ', ' }}</td>
             </tr>
           </tbody>
         </table>

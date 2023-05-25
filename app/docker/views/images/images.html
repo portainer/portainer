@@ -54,8 +54,8 @@
       order-by="RepoTags"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
       download-action="downloadAction"
-      remove-action="removeAction"
-      force-remove-action="confirmRemovalAction"
+      remove-action="confirmRemove"
+      force-remove-action="confirmForceRemove"
       export-in-progress="state.exportInProgress"
       refresh-callback="getImages"
     ></images-datatable>

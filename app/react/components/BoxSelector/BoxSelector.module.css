@@ -1,4 +1,16 @@
 .root {
   width: 100%;
   overflow: auto;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 10px;
+  overflow: hidden !important;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+@media only screen and (max-width: 700px) {
+  .root {
+    flex-direction: column;
+  }
 }

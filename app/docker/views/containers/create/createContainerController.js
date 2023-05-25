@@ -2,8 +2,11 @@ import _ from 'lodash-es';
 
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
+import { confirmDestructive } from '@@/modals/confirm';
 import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { buildConfirmButton } from '@@/modals/utils';
+
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
@@ -18,6 +21,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   '$timeout',
   '$transition$',
   '$filter',
+  '$analytics',
   'Container',
   'ContainerHelper',
   'Image',
@@ -30,9 +34,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'ContainerService',
   'ImageService',
   'FormValidator',
-  'ModalService',
   'RegistryService',
   'SystemService',
+  'SettingsService',
   'PluginService',
   'HttpRequestHelper',
   'endpoint',
@@ -44,6 +48,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $timeout,
     $transition$,
     $filter,
+    $analytics,
     Container,
     ContainerHelper,
     Image,
@@ -56,9 +61,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     ContainerService,
     ImageService,
     FormValidator,
-    ModalService,
     RegistryService,
     SystemService,
+    SettingsService,
     PluginService,
     HttpRequestHelper,
     endpoint
@@ -338,7 +343,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       var container = $scope.formValues.NetworkContainer;
       var containerName = container;
       if (container && typeof container === 'object') {
-        containerName = $filter('trimcontainername')(container.Names[0]);
+        containerName = container.Names[0];
       }
       var networkMode = mode;
       if (containerName) {
@@ -497,7 +502,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       deviceRequest.Capabilities = [gpuOptions.capabilities];
 
-      config.HostConfig.DeviceRequests.push(deviceRequest);
+      if (config.HostConfig.DeviceRequests) {
+        config.HostConfig.DeviceRequests.push(deviceRequest);
+      } else {
+        config.HostConfig.DeviceRequests = [deviceRequest];
+      }
     }
 
     function prepareConfiguration() {
@@ -987,7 +996,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         if (!oldContainer) {
           return;
         }
-        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1));
+        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0]);
       }
 
       function confirmCreateContainer(container) {
@@ -1000,18 +1009,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         function showConfirmationModal() {
           var deferred = $q.defer();
 
-          ModalService.confirmDestructive({
-            title: 'Are you sure ?',
+          confirmDestructive({
+            title: 'Are you sure?',
             message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
-            buttons: {
-              confirm: {
-                label: 'Replace',
-                className: 'btn-danger',
-              },
-            },
-            callback: function onConfirm(confirmed) {
-              deferred.resolve(confirmed);
-            },
+            confirmButton: buildConfirmButton('Replace', 'danger'),
+          }).then(function onConfirm(confirmed) {
+            deferred.resolve(confirmed);
           });
 
           return deferred.promise;
@@ -1033,7 +1036,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
 
       function renameContainer() {
-        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1) + '-old');
+        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0] + '-old');
       }
 
       function pullImageIfNeeded() {
@@ -1045,6 +1048,18 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           const config = prepareConfiguration();
           return await ContainerService.createAndStartContainer(config);
         });
+      }
+
+      async function sendAnalytics() {
+        const publicSettings = await SettingsService.publicSettings();
+        const analyticsAllowed = publicSettings.EnableTelemetry;
+        const image = `${$scope.formValues.RegistryModel.Registry.URL}/${$scope.formValues.RegistryModel.Image}`;
+        if (analyticsAllowed && $scope.formValues.GPU.enabled) {
+          $analytics.eventTrack('gpuContainerCreated', {
+            category: 'docker',
+            metadata: { gpu: $scope.formValues.GPU, containerImage: image },
+          });
+        }
       }
 
       function applyResourceControl(newContainer) {
@@ -1106,7 +1121,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         return validateForm(accessControlData, $scope.isAdmin);
       }
 
-      function onSuccess() {
+      async function onSuccess() {
+        await sendAnalytics();
         Notifications.success('Success', 'Container successfully created');
         $state.go('docker.containers', {}, { reload: true });
       }

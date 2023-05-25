@@ -8,14 +8,13 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	gittypes "github.com/portainer/portainer/api/git/types"
+
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	privateAzureRepoURL = "https://portainer.visualstudio.com/gitops-test/_git/gitops-test"
-)
+const privateAzureRepoURL = "https://portainer.visualstudio.com/gitops-test/_git/gitops-test"
 
 func TestService_ClonePublicRepository_Azure(t *testing.T) {
 	ensureIntegrationTest(t)
@@ -59,7 +58,7 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dst := t.TempDir()
 			repositoryUrl := fmt.Sprintf(tt.args.repositoryURLFormat, tt.args.password)
-			err := service.CloneRepository(dst, repositoryUrl, tt.args.referenceName, "", "")
+			err := service.CloneRepository(dst, repositoryUrl, tt.args.referenceName, "", "", false)
 			assert.NoError(t, err)
 			assert.FileExists(t, filepath.Join(dst, "README.md"))
 		})
@@ -74,7 +73,7 @@ func TestService_ClonePrivateRepository_Azure(t *testing.T) {
 
 	dst := t.TempDir()
 
-	err := service.CloneRepository(dst, privateAzureRepoURL, "refs/heads/main", "", pat)
+	err := service.CloneRepository(dst, privateAzureRepoURL, "refs/heads/main", "", pat, false)
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dst, "README.md"))
 }
@@ -85,7 +84,7 @@ func TestService_LatestCommitID_Azure(t *testing.T) {
 	pat := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	service := NewService(context.TODO())
 
-	id, err := service.LatestCommitID(privateAzureRepoURL, "refs/heads/main", "", pat)
+	id, err := service.LatestCommitID(privateAzureRepoURL, "refs/heads/main", "", pat, false)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, id, "cannot guarantee commit id, but it should be not empty")
 }
@@ -97,7 +96,7 @@ func TestService_ListRefs_Azure(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := NewService(context.TODO())
 
-	refs, err := service.ListRefs(privateAzureRepoURL, username, accessToken, false)
+	refs, err := service.ListRefs(privateAzureRepoURL, username, accessToken, false, false)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
@@ -107,10 +106,10 @@ func TestService_ListRefs_Azure_Concurrently(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
-	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
+	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
-	go service.ListRefs(privateAzureRepoURL, username, accessToken, false)
-	service.ListRefs(privateAzureRepoURL, username, accessToken, false)
+	go service.ListRefs(privateAzureRepoURL, username, accessToken, false, false)
+	service.ListRefs(privateAzureRepoURL, username, accessToken, false, false)
 
 	time.Sleep(2 * time.Second)
 }
@@ -248,7 +247,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, false, tt.extensions)
+			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, false, tt.extensions, false)
 			if tt.expect.shouldFail {
 				assert.Error(t, err)
 				if tt.expect.err != nil {
@@ -269,10 +268,10 @@ func TestService_ListFiles_Azure_Concurrently(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
-	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
+	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
-	go service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{})
-	service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{})
+	go service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{}, false)
+	service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{}, false)
 
 	time.Sleep(2 * time.Second)
 }

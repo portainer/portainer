@@ -3,6 +3,7 @@ import { object, SchemaOf, string } from 'yup';
 
 import { useUpgradeEditionMutation } from '@/react/portainer/system/useUpgradeEditionMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Button, LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
@@ -30,6 +31,7 @@ export function UploadLicenseDialog({
   isGetLicenseSubmitted: boolean;
 }) {
   const upgradeMutation = useUpgradeEditionMutation();
+  const { trackEvent } = useAnalytics();
 
   return (
     <Modal
@@ -37,7 +39,7 @@ export function UploadLicenseDialog({
       aria-label="Upgrade Portainer to Business Edition"
     >
       <Modal.Header
-        title={<h4 className="font-medium text-xl">Upgrade Portainer</h4>}
+        title={<h4 className="text-xl font-medium">Upgrade Portainer</h4>}
       />
       <Formik
         initialValues={initialValues}
@@ -71,7 +73,7 @@ export function UploadLicenseDialog({
               </FormControl>
             </Modal.Body>
             <Modal.Footer>
-              <div className="flex gap-2 [&>*]:w-1/2 w-full">
+              <div className="flex w-full gap-2 [&>*]:w-1/2">
                 <Button
                   color="default"
                   size="medium"
@@ -99,6 +101,13 @@ export function UploadLicenseDialog({
   function handleSubmit(values: FormValues) {
     upgradeMutation.mutate(values, {
       onSuccess() {
+        trackEvent('portainer-upgrade-license-key-provided', {
+          category: 'portainer',
+          metadata: {
+            Upgrade: 'true',
+          },
+        });
+
         notifySuccess('Starting upgrade', 'License validated successfully');
         goToLoading();
       },

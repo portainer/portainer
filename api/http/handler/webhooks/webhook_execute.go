@@ -20,11 +20,11 @@ import (
 // @description Acts on a passed in token UUID to restart the docker service
 // @description **Access policy**: public
 // @tags webhooks
-// @param token path string true "Webhook token"
+// @param id path string true "Webhook token"
 // @success 202 "Webhook executed"
 // @failure 400
 // @failure 500
-// @router /webhooks/{token} [post]
+// @router /webhooks/{id} [post]
 func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 
 	webhookToken, err := request.RetrieveRouteVariableValue(r, "token")

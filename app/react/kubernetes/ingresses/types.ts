@@ -33,6 +33,8 @@ export type Ingress = {
   Paths: Path[];
   TLS?: TLS[];
   Type?: string;
+  Labels?: Record<string, string>;
+  CreationDate?: string;
 };
 
 export interface DeleteIngressesRequest {

@@ -7,7 +7,6 @@ import {
 } from '@reach/menu-button';
 import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
-import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import { AlertCircle, Bell, CheckCircle, Trash2 } from 'lucide-react';
 
@@ -34,23 +33,7 @@ export function NotificationsMenu() {
     notificationsStore,
     (state) => state.userNotifications[user.Id]
   );
-
-  if (userNotifications && userNotifications.length > 1) {
-    userNotifications.sort(
-      (a, b) =>
-        new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime()
-    );
-  }
-
-  const [badge, setBadge] = useState(false);
-
-  useEffect(() => {
-    if (userNotifications?.length > 0) {
-      setBadge(true);
-    } else {
-      setBadge(false);
-    }
-  }, [userNotifications]);
+  const reducedNotifications = userNotifications?.slice(0, 50);
 
   return (
     <Menu>
@@ -65,13 +48,17 @@ export function NotificationsMenu() {
         <div
           className={clsx(
             headerStyles.menuIcon,
-            'icon-badge text-lg !p-2 mr-1',
+            'icon-badge mr-1 !p-2 text-lg',
             'text-gray-8',
             'th-dark:text-gray-warm-7'
           )}
         >
           <Icon icon={Bell} />
-          <span className={badge ? notificationStyles.badge : ''} />
+          <span
+            className={
+              reducedNotifications?.length > 0 ? notificationStyles.badge : ''
+            }
+          />
         </div>
       </MenuButton>
 
@@ -91,7 +78,7 @@ export function NotificationsMenu() {
               <h4>Notifications</h4>
             </div>
             <div className={notificationStyles.itemLast}>
-              {userNotifications?.length > 0 && (
+              {reducedNotifications?.length > 0 && (
                 <Button
                   color="none"
                   onClick={(e) => {
@@ -107,10 +94,10 @@ export function NotificationsMenu() {
             </div>
           </div>
         </div>
-        {userNotifications?.length > 0 ? (
+        {reducedNotifications?.length > 0 ? (
           <>
             <div className={notificationStyles.notifications}>
-              {userNotifications.map((notification) => (
+              {reducedNotifications.map((notification) => (
                 <MenuLink
                   to="portainer.notifications"
                   params={{ id: notification.id }}

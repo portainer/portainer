@@ -76,6 +76,16 @@ func EndpointSet(endpointIDs []portainer.EndpointID) map[portainer.EndpointID]bo
 }
 
 func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
+	if endpoint.Kubernetes.Flags.IsServerIngressClassDetected {
+		return
+	}
+	defer func() {
+		endpoint.Kubernetes.Flags.IsServerIngressClassDetected = true
+		endpointService.UpdateEndpoint(
+			portainer.EndpointID(endpoint.ID),
+			endpoint,
+		)
+	}()
 	cli, err := factory.GetKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create kubernetes client for ingress class detection")
@@ -107,6 +117,16 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 }
 
 func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
+	if endpoint.Kubernetes.Flags.IsServerMetricsDetected {
+		return
+	}
+	defer func() {
+		endpoint.Kubernetes.Flags.IsServerMetricsDetected = true
+		endpointService.UpdateEndpoint(
+			portainer.EndpointID(endpoint.ID),
+			endpoint,
+		)
+	}()
 	cli, err := factory.GetKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create kubernetes client for initial metrics detection")
@@ -118,11 +138,6 @@ func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService datas
 		return
 	}
 	endpoint.Kubernetes.Configuration.UseServerMetrics = true
-	endpoint.Kubernetes.Flags.IsServerMetricsDetected = true
-	err = endpointService.UpdateEndpoint(
-		portainer.EndpointID(endpoint.ID),
-		endpoint,
-	)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to enable UseServerMetrics inside the database")
 		return
@@ -158,6 +173,16 @@ func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.En
 }
 
 func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
+	if endpoint.Kubernetes.Flags.IsServerStorageDetected {
+		return
+	}
+	defer func() {
+		endpoint.Kubernetes.Flags.IsServerStorageDetected = true
+		endpointService.UpdateEndpoint(
+			portainer.EndpointID(endpoint.ID),
+			endpoint,
+		)
+	}()
 	log.Info().Msg("attempting to detect storage classes in the cluster")
 	err := storageDetect(endpoint, endpointService, factory)
 	if err == nil {
@@ -171,4 +196,40 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 		err := storageDetect(endpoint, endpointService, factory)
 		log.Err(err).Msg("final error while detecting storage classes")
 	}()
+}
+
+func UpdateEdgeEndpointHeartbeat(endpoint *portainer.Endpoint, settings *portainer.Settings) {
+	if IsEdgeEndpoint(endpoint) {
+		checkInInterval := getEndpointCheckinInterval(endpoint, settings)
+		endpoint.Heartbeat = endpoint.QueryDate-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
+	}
+}
+
+func getEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portainer.Settings) int {
+	if endpoint.Edge.AsyncMode {
+		defaultInterval := 60
+		intervals := [][]int{
+			{endpoint.Edge.PingInterval, settings.Edge.PingInterval},
+			{endpoint.Edge.CommandInterval, settings.Edge.CommandInterval},
+			{endpoint.Edge.SnapshotInterval, settings.Edge.SnapshotInterval},
+		}
+
+		for i := 0; i < len(intervals); i++ {
+			effectiveInterval := intervals[i][0]
+			if effectiveInterval <= 0 {
+				effectiveInterval = intervals[i][1]
+			}
+			if effectiveInterval > 0 && effectiveInterval < defaultInterval {
+				defaultInterval = effectiveInterval
+			}
+		}
+
+		return defaultInterval
+	}
+
+	if endpoint.EdgeCheckinInterval > 0 {
+		return endpoint.EdgeCheckinInterval
+	}
+
+	return settings.EdgeAgentCheckinInterval
 }

@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -9,7 +10,6 @@ import (
 	"github.com/portainer/portainer/api/stacks/deployments"
 
 	"github.com/gofrs/uuid"
-	"github.com/rs/zerolog/log"
 )
 
 // @id WebhookInvoke
@@ -39,11 +39,10 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if err = deployments.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-		if _, ok := err.(*deployments.StackAuthorMissingErr); ok {
+		var StackAuthorMissingErr *deployments.StackAuthorMissingErr
+		if errors.As(err, &StackAuthorMissingErr) {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Autoupdate for the stack isn't available", Err: err}
 		}
-
-		log.Error().Err(err).Msg("failed to update the stack")
 
 		return httperror.InternalServerError("Failed to update the stack", err)
 	}

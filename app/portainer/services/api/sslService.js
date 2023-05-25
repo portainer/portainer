@@ -13,7 +13,7 @@ function SSLServiceFactory(SSL) {
     return SSL.get().$promise;
   }
 
-  function upload(httpEnabled, cert, key) {
-    return SSL.upload({ httpEnabled, cert, key }).$promise;
+  function upload(SSLPayload) {
+    return SSL.upload(SSLPayload).$promise;
   }
 }

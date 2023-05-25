@@ -1,7 +1,7 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Create configuration'"
-  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations' }, 'Create a configuration']"
+  title="'Create ConfigMap or Secret'"
+  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations' }, 'Create a ConfigMap or Secret']"
   reload="true"
 ></page-header>
 
@@ -13,9 +13,38 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <!-- resource-pool -->
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
+              <label for="resource-pool-selector" class="col-sm-3 col-lg-2 control-label text-left">Namespace</label>
+              <div class="col-sm-8 col-lg-9">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
+                  data-cy="k8sConfigCreate-namespaceDropdown"
+                ></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-warning vertical-center">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
+                namespace.
+              </div>
+            </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-warning vertical-center">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                You do not have access to any namespace. Contact your administrator to get access to a namespace.
+              </div>
+            </div>
+            <!-- !resource-pool -->
+
             <!-- name -->
-            <div class="form-group mb-0">
-              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+            <div class="form-group">
+              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
               <div class="col-sm-8 col-lg-9 mb-0">
                 <input
                   type="text"
@@ -24,7 +53,7 @@
                   ng-model="ctrl.formValues.Name"
                   ng-pattern="/^[a-z0-9]([a-z0-9-.]{0,61}[a-z0-9])?$/"
                   ng-change="ctrl.onChangeName()"
-                  placeholder="my-configuration"
+                  placeholder="my-configmap-or-secret"
                   auto-focus
                   required
                   data-cy="k8sConfigCreate-nameInput"
@@ -47,70 +76,18 @@
             </div>
             <!-- !name -->
 
-            <div class="col-sm-12 form-section-title"> Namespace </div>
-
-            <!-- resource-pool -->
-            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
-              <label for="resource-pool-selector" class="col-sm-3 col-lg-2 control-label text-left">Namespace</label>
-              <div class="col-sm-8 col-lg-9">
-                <select
-                  class="form-control"
-                  id="resource-pool-selector"
-                  ng-model="ctrl.formValues.ResourcePool"
-                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                  ng-change="ctrl.onResourcePoolSelectionChange()"
-                  data-cy="k8sConfigCreate-namespaceDropdown"
-                ></select>
-              </div>
+            <div class="col-sm-12 !p-0">
+              <annotations-be-teaser></annotations-be-teaser>
             </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-warning vertical-center">
-                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
-                namespace.
-              </div>
-            </div>
-            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
-              <div class="col-sm-12 small text-warning vertical-center">
-                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                You do not have access to any namespace. Contact your administrator to get access to a namespace.
-              </div>
-            </div>
-            <!-- !resource-pool -->
 
             <div ng-if="ctrl.formValues.ResourcePool">
-              <div class="col-sm-12 form-section-title"> Configuration kind </div>
+              <div class="col-sm-12 form-section-title"> Kind </div>
 
               <div class="form-group">
-                <div class="col-sm-12 small text-muted"> Select the kind of data that you want to save in the configuration. </div>
+                <div class="col-sm-12 small text-muted"> Select the kind of data that you want to save. </div>
               </div>
 
-              <!-- type options -->
-              <div class="form-group px-[15px] mb-0">
-                <div class="boxselector_wrapper">
-                  <div>
-                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationKinds.CONFIGMAP" ng-model="ctrl.formValues.Kind" ng-change="ctrl.onChangeKind()" />
-                    <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'file-code'"></pr-icon>
-                        ConfigMap
-                      </div>
-                      <p>This configuration holds non-sensitive information</p>
-                    </label>
-                  </div>
-                  <div>
-                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationKinds.SECRET" ng-model="ctrl.formValues.Kind" ng-change="ctrl.onChangeKind()" />
-                    <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'lock'"></pr-icon>
-                        Secret
-                      </div>
-                      <p>This configuration holds sensitive information</p>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <!-- !type options -->
+              <box-selector options="ctrl.typeOptions" value="ctrl.formValues.Kind" on-change="(ctrl.onChangeKind)" radio-name="'Kind'" slim="true"> </box-selector>
 
               <div ng-if="ctrl.formValues.Kind === ctrl.KubernetesConfigurationKinds.SECRET">
                 <div class="col-sm-12 form-section-title"> Information </div>
@@ -168,7 +145,7 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypeOptions.CUSTOM.value">
-                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label text-left required">Custom Type</label>
+                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label required text-left">Custom Type</label>
                   <div class="col-sm-8 col-lg-9">
                     <input
                       type="text"
@@ -193,7 +170,7 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypeOptions.SERVICEACCOUNTTOKEN.value">
-                  <label for="service_account" class="col-sm-3 col-lg-2 control-label text-left required">Service Account</label>
+                  <label for="service_account" class="col-sm-3 col-lg-2 control-label required text-left">Service Account</label>
                   <div class="col-sm-8 col-lg-9">
                     <select
                       class="form-control"

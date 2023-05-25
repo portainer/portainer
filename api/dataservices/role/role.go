@@ -8,10 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "roles"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "roles"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
@@ -34,6 +32,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		service: service,
+		tx:      tx,
+	}
+}
+
 // Role returns a Role by ID
 func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 	var set portainer.Role
@@ -47,7 +52,7 @@ func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 	return &set, nil
 }
 
-// Roles return an array containing all the sets.
+// Roles returns an array containing all the sets.
 func (service *Service) Roles() ([]portainer.Role, error) {
 	var sets = make([]portainer.Role, 0)
 
@@ -58,7 +63,7 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 			set, ok := obj.(*portainer.Role)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Role object")
-				return nil, fmt.Errorf("Failed to convert to Role object: %s", obj)
+				return nil, fmt.Errorf("failed to convert to Role object: %s", obj)
 			}
 
 			sets = append(sets, *set)

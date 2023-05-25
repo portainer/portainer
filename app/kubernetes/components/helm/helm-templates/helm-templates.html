@@ -1,16 +1,11 @@
 <page-header title="'Helm'" breadcrumbs="['Charts']" reload="true"></page-header>
 
 <information-panel title-text="Information" ng-if="!$ctrl.state.chart">
+  <beta-alert
+    is-html="true"
+    message="'Beta feature - initial version of Helm charts functionality, for more information see this <a href=\'https://www.portainer.io/blog/portainer-now-with-helm-support\' target=\'_blank\' class=\'hyperlink\'>blog post</a>.'"
+  ></beta-alert>
   <span class="small text-muted">
-    <p class="inline-flex flex-row items-center">
-      <pr-icon icon="'info'" class="mr-1 vertical-center" mode="'primary'"></pr-icon>
-      This is a first version for Helm charts, for more information see this&nbsp;<a
-        class="hyperlink"
-        href="https://www.portainer.io/blog/portainer-now-with-helm-support"
-        target="_blank"
-        >blog post</a
-      >.</p
-    >
     <p ng-if="$ctrl.state.globalRepository === ''" class="inline-flex items-center">
       <pr-icon icon="'info'"></pr-icon>
       <span>The Global Helm Repository is not configured.</span>
@@ -23,7 +18,7 @@
   <!-- helmchart-form -->
   <div class="col-sm-12" ng-if="$ctrl.state.chart">
     <rd-widget>
-      <div class="toolBarTitle vertical-center pt-5 px-5 text-muted">
+      <div class="toolBarTitle vertical-center px-5 pt-5 text-[16px] font-medium">
         <fallback-image src="$ctrl.state.chart.icon" fallback-icon="'svg-helm'" class-name="'h-8 w-8'" size="'lg'"></fallback-image>
         {{ $ctrl.state.chart.name }}
       </div>
@@ -34,7 +29,7 @@
             <div class="col-sm-12 form-section-title"> Description </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <div class="text-xs text-muted" ng-bind-html="$ctrl.state.chart.description"></div>
+                <div class="text-muted text-xs" ng-bind-html="$ctrl.state.chart.description"></div>
               </div>
             </div>
           </div>
@@ -63,7 +58,7 @@
           <!-- !namespace-input -->
           <!-- name-input -->
           <div class="form-group mb-2">
-            <label for="release_name" class="col-sm-2 control-label text-left required">Name</label>
+            <label for="release_name" class="col-sm-2 control-label required text-left">Name</label>
             <div class="col-sm-10">
               <input
                 type="text"
@@ -124,7 +119,7 @@
                     value="$ctrl.state.values"
                     on-change="($ctrl.editorUpdate)"
                     yml="true"
-                    placeholder="# Define or paste the content of your values yaml file here"
+                    placeholder="Define or paste the content of your values yaml file here"
                   >
                     <editor-description class="vertical-center">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>

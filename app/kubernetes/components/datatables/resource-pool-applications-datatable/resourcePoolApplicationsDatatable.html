@@ -56,7 +56,7 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table-hover nowrap-cells table">
           <thead>
             <tr>
               <th>
@@ -116,16 +116,16 @@
               </td>
               <td>{{ item.StackName || '-' }}</td>
               <td title="{{ item.Image }}"
-                >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+                >{{ item.Image | truncate : 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
               >
               <td>{{ item.CPU | kubernetesApplicationCPUValue }}</td>
               <td>{{ item.Memory | humansize }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-muted text-center">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No application available.</td>
+              <td colspan="5" class="text-muted text-center">No application available.</td>
             </tr>
           </tbody>
         </table>

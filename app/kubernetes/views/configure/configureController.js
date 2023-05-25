@@ -7,7 +7,10 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
-import { getIsRBACEnabled } from '@/react/kubernetes/cluster/service';
+import { buildConfirmButton } from '@@/modals/utils';
+import { confirm } from '@@/modals/confirm';
+import { getIsRBACEnabled } from '@/react/kubernetes/cluster/getIsRBACEnabled';
+import { ModalType } from '@@/modals/Modal/types';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
@@ -21,7 +24,6 @@ class KubernetesConfigureController {
     KubernetesStorageService,
     EndpointService,
     EndpointProvider,
-    ModalService,
     KubernetesResourcePoolService,
     KubernetesIngressService,
     KubernetesMetricsService
@@ -33,7 +35,6 @@ class KubernetesConfigureController {
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
-    this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesMetricsService = KubernetesMetricsService;
@@ -165,7 +166,10 @@ class KubernetesConfigureController {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
       const resourcePools = _.filter(
         allResourcePools,
-        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+        (resourcePool) =>
+          !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) &&
+          !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name) &&
+          resourcePool.Namespace.Status === 'Active'
       );
 
       ingressesToDel.forEach((ingress) => {
@@ -386,15 +390,11 @@ class KubernetesConfigureController {
 
   uiCanExit() {
     if (!this.state.isSaving && (this.areControllersChanged() || this.areFormValuesChanged() || this.areStorageClassesChanged()) && !this.isIngressControllersLoading) {
-      return this.ModalService.confirmAsync({
+      return confirm({
         title: 'Are you sure?',
         message: 'You currently have unsaved changes in the cluster setup view. Are you sure you want to leave?',
-        buttons: {
-          confirm: {
-            label: 'Yes',
-            className: 'btn-danger',
-          },
-        },
+        modalType: ModalType.Warn,
+        confirmButton: buildConfirmButton('Yes', 'danger'),
       });
     }
   }

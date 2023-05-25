@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
@@ -42,8 +43,9 @@ const (
 // @param endpointIds query []int false "will return only these environments(endpoints)"
 // @param provisioned query bool false "If true, will return environment(endpoint) that were provisioned"
 // @param agentVersions query []string false "will return only environments with on of these agent versions"
-// @param edgeDevice query bool false "if exists true show only edge devices, false show only regular edge endpoints. if missing, will show both types (relevant only for edge endpoints)"
-// @param edgeDeviceUntrusted query bool false "if true, show only untrusted endpoints, if false show only trusted (relevant only for edge devices, and if edgeDevice is true)"
+// @param edgeAsync query bool false "if exists true show only edge async agents, false show only standard edge agents. if missing, will show both types (relevant only for edge agents)"
+// @param edgeDeviceUntrusted query bool false "if true, show only untrusted edge agents, if false show only trusted edge agents (relevant only for edge agents)"
+// @param edgeCheckInPassedSeconds query number false "if bigger then zero, show only edge agents that checked-in in the last provided seconds (relevant only for edge agents)"
 // @param name query string false "will return only environments(endpoints) with this name"
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
@@ -103,6 +105,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
 		paginatedEndpoints[idx].QueryDate = time.Now().Unix()
+		endpointutils.UpdateEdgeEndpointHeartbeat(&paginatedEndpoints[idx], settings)
 		if !query.excludeSnapshots {
 			err = handler.SnapshotService.FillSnapshotData(&paginatedEndpoints[idx])
 			if err != nil {

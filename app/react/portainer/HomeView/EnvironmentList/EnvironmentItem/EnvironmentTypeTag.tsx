@@ -31,12 +31,10 @@ export function EnvironmentTypeTag({
 }
 
 function getTypeLabel(environment: Environment) {
-  if (environment.IsEdgeDevice) {
-    return 'Edge Device';
-  }
-
   if (isEdgeEnvironment(environment.Type)) {
-    return 'Edge Agent';
+    return environment.Edge.AsyncMode
+      ? 'Edge Agent Async'
+      : 'Edge Agent Standard';
   }
 
   if (isLocalEnvironment(environment)) {

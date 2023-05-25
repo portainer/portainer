@@ -1,24 +1,37 @@
-import { Column } from 'react-table';
+import moment from 'moment';
+import { createColumnHelper } from '@tanstack/react-table';
 
-import { Environment } from '@/react/portainer/environments/types';
+import { WaitingRoomEnvironment } from '../types';
 
-export const columns: readonly Column<Environment>[] = [
-  {
-    Header: 'Name',
-    accessor: (row) => row.Name,
+const columnHelper = createColumnHelper<WaitingRoomEnvironment>();
+
+export const columns = [
+  columnHelper.accessor('Name', {
+    header: 'Name',
     id: 'name',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-  {
-    Header: 'Edge ID',
-    accessor: (row) => row.EdgeID,
+  }),
+  columnHelper.accessor('EdgeID', {
+    header: 'Edge ID',
     id: 'edge-id',
-    disableFilters: true,
-    Filter: () => null,
-    canHide: false,
-    sortType: 'string',
-  },
-] as const;
+  }),
+  columnHelper.accessor((row) => row.EdgeGroups.join(', ') || '-', {
+    header: 'Edge Groups',
+    id: 'edge-groups',
+  }),
+  columnHelper.accessor((row) => row.Group || '-', {
+    header: 'Group',
+    id: 'group',
+  }),
+  columnHelper.accessor((row) => row.Tags.join(', ') || '-', {
+    header: 'Tags',
+    id: 'tags',
+  }),
+  columnHelper.accessor((row) => row.LastCheckInDate, {
+    header: 'Last Check-in',
+    id: 'last-check-in',
+    cell: ({ getValue }) => {
+      const value = getValue();
+      return value ? moment(value * 1000).fromNow() : '-';
+    },
+  }),
+];

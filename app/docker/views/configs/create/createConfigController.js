@@ -1,14 +1,14 @@
 import _ from 'lodash-es';
 import angular from 'angular';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class CreateConfigController {
   /* @ngInject */
-  constructor($async, $state, $transition$, $window, ModalService, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
+  constructor($async, $state, $transition$, $window, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
     this.$state = $state;
     this.$transition$ = $transition$;
     this.$window = $window;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.ConfigService = ConfigService;
     this.Authentication = Authentication;
@@ -47,7 +47,7 @@ class CreateConfigController {
     try {
       let data = await this.ConfigService.config(this.$transition$.params().id);
       this.formValues.Name = data.Name + '_copy';
-      this.formValues.Data = data.Data;
+      this.formValues.ConfigContent = data.Data;
       let labels = _.keys(data.Labels);
       for (let i = 0; i < labels.length; i++) {
         let labelName = labels[i];
@@ -67,7 +67,7 @@ class CreateConfigController {
 
   async uiCanExit() {
     if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 

@@ -164,6 +164,12 @@ const docURLs = [
     examples: ['#!/1/kubernetes/applications', '#!/1/kubernetes/applications/new', '#!/1/kubernetes/deploy?templateId=', '#!/1/kubernetes/applications/metallb-system/controller'],
   },
   {
+    desc: 'Kubernetes / Services',
+    docURL: 'https://docs.portainer.io/user/kubernetes/services',
+    locationRegex: /#!\/\d+\/kubernetes\/services/,
+    examples: ['#!/1/kubernetes/services'],
+  },
+  {
     desc: 'Kubernetes / Ingresses',
     docURL: 'https://docs.portainer.io/user/kubernetes/ingresses',
     locationRegex: /#!\/\d+\/kubernetes\/ingresses/,

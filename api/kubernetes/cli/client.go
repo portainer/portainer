@@ -7,15 +7,18 @@ import (
 	"sync"
 	"time"
 
-	cmap "github.com/orcaman/concurrent-map"
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+)
+
+const (
+	DefaultKubeClientQPS   = 30
+	DefaultKubeClientBurst = 100
 )
 
 type (
@@ -25,16 +28,17 @@ type (
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
-		endpointClients      cmap.ConcurrentMap
+		endpointClients      map[string]*KubeClient
 		endpointProxyClients *cache.Cache
 		AddrHTTPS            string
+		mu                   sync.Mutex
 	}
 
 	// KubeClient represent a service used to execute Kubernetes operations
 	KubeClient struct {
 		cli        kubernetes.Interface
 		instanceID string
-		lock       *sync.Mutex
+		mu         sync.Mutex
 	}
 )
 
@@ -53,7 +57,7 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 		signatureService:     signatureService,
 		reverseTunnelService: reverseTunnelService,
 		instanceID:           instanceID,
-		endpointClients:      cmap.New(),
+		endpointClients:      make(map[string]*KubeClient),
 		endpointProxyClients: cache.New(timeout, timeout),
 		AddrHTTPS:            addrHTTPS,
 	}, nil
@@ -65,82 +69,87 @@ func (factory *ClientFactory) GetInstanceID() (instanceID string) {
 
 // Remove the cached kube client so a new one can be created
 func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
-	factory.endpointClients.Remove(strconv.Itoa(int(endpointID)))
+	factory.mu.Lock()
+	delete(factory.endpointClients, strconv.Itoa(int(endpointID)))
+	factory.mu.Unlock()
 }
 
 // GetKubeClient checks if an existing client is already registered for the environment(endpoint) and returns it if one is found.
 // If no client is registered, it will create a new client, register it, and returns it.
-func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
+func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (*KubeClient, error) {
+	factory.mu.Lock()
+	defer factory.mu.Unlock()
+
 	key := strconv.Itoa(int(endpoint.ID))
-	client, ok := factory.endpointClients.Get(key)
+	client, ok := factory.endpointClients[key]
 	if !ok {
-		client, err := factory.createCachedAdminKubeClient(endpoint)
+		var err error
+
+		client, err = factory.createCachedAdminKubeClient(endpoint)
 		if err != nil {
 			return nil, err
 		}
 
-		factory.endpointClients.Set(key, client)
-		return client, nil
+		factory.endpointClients[key] = client
 	}
 
-	return client.(portainer.KubeClient), nil
+	return client, nil
 }
 
 // GetProxyKubeClient retrieves a KubeClient from the cache. You should be
 // calling SetProxyKubeClient before first. It is normally, called the
 // kubernetes middleware.
-func (factory *ClientFactory) GetProxyKubeClient(endpointID, token string) (portainer.KubeClient, bool) {
+func (factory *ClientFactory) GetProxyKubeClient(endpointID, token string) (*KubeClient, bool) {
 	client, ok := factory.endpointProxyClients.Get(endpointID + "." + token)
 	if !ok {
 		return nil, false
 	}
-	return client.(portainer.KubeClient), true
+
+	return client.(*KubeClient), true
 }
 
 // SetProxyKubeClient stores a kubeclient in the cache.
-func (factory *ClientFactory) SetProxyKubeClient(endpointID, token string, cli portainer.KubeClient) {
+func (factory *ClientFactory) SetProxyKubeClient(endpointID, token string, cli *KubeClient) {
 	factory.endpointProxyClients.Set(endpointID+"."+token, cli, 0)
 }
 
 // CreateKubeClientFromKubeConfig creates a KubeClient from a clusterID, and
 // Kubernetes config.
-func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte) (portainer.KubeClient, error) {
+func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte) (*KubeClient, error) {
 	config, err := clientcmd.NewClientConfigFromBytes([]byte(kubeConfig))
 	if err != nil {
 		return nil, err
 	}
+
 	cliConfig, err := config.ClientConfig()
 	if err != nil {
 		return nil, err
 	}
+
+	cliConfig.QPS = DefaultKubeClientQPS
+	cliConfig.Burst = DefaultKubeClientBurst
 
 	cli, err := kubernetes.NewForConfig(cliConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	kubecli := &KubeClient{
+	return &KubeClient{
 		cli:        cli,
 		instanceID: factory.instanceID,
-		lock:       &sync.Mutex{},
-	}
-
-	return kubecli, nil
+	}, nil
 }
 
-func (factory *ClientFactory) createCachedAdminKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
+func (factory *ClientFactory) createCachedAdminKubeClient(endpoint *portainer.Endpoint) (*KubeClient, error) {
 	cli, err := factory.CreateClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	kubecli := &KubeClient{
+	return &KubeClient{
 		cli:        cli,
 		instanceID: factory.instanceID,
-		lock:       &sync.Mutex{},
-	}
-
-	return kubecli, nil
+	}, nil
 }
 
 // CreateClient returns a pointer to a new Clientset instance
@@ -199,7 +208,10 @@ func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernete
 	if err != nil {
 		return nil, err
 	}
+
 	config.Insecure = true
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
 
 	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
 		return &agentHeaderRoundTripper{
@@ -218,30 +230,13 @@ func buildLocalClient() (*kubernetes.Clientset, error) {
 		return nil, err
 	}
 
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
+
 	return kubernetes.NewForConfig(config)
 }
 
-func (factory *ClientFactory) PostInitMigrateIngresses() error {
-	endpoints, err := factory.dataStore.Endpoint().Endpoints()
-	if err != nil {
-		return err
-	}
-	for i := range endpoints {
-		// Early exit if we do not need to migrate!
-		if endpoints[i].PostInitMigrations.MigrateIngresses == false {
-			return nil
-		}
-
-		err := factory.migrateEndpointIngresses(&endpoints[i])
-		if err != nil {
-			log.Debug().Err(err).Msg("failure migrating endpoint ingresses")
-		}
-	}
-
-	return nil
-}
-
-func (factory *ClientFactory) migrateEndpointIngresses(e *portainer.Endpoint) error {
+func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint) error {
 	// classes is a list of controllers which have been manually added to the
 	// cluster setup view. These need to all be allowed globally, but then
 	// blocked in specific namespaces which they were not previously allowed in.

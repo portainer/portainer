@@ -63,7 +63,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
+// @param endpointId query int true "Environment identifier"
 // @param body body updateSwarmStackPayload true "Stack details"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -85,9 +85,9 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API environment(endpoint)
+	// The EndpointID property is not available for these stacks, this API endpoint
 	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
-	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: endpointId", err)
 	}
@@ -166,8 +166,12 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 
 func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	if stack.Type == portainer.DockerSwarmStack {
+		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
+
 		return handler.updateSwarmStack(r, stack, endpoint)
 	} else if stack.Type == portainer.DockerComposeStack {
+		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
+
 		return handler.updateComposeStack(r, stack, endpoint)
 	} else if stack.Type == portainer.KubernetesStack {
 		return handler.updateKubernetesStack(r, stack, endpoint)

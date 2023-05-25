@@ -5,17 +5,19 @@ import { KubernetesConfigurationKinds, KubernetesSecretTypeOptions } from 'Kuber
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { getServiceAccounts } from 'Kubernetes/rest/serviceAccount';
+import { typeOptions } from '@/react/kubernetes/configs/CreateView/options';
 
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { isConfigurationFormValid } from '../validation';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, EndpointProvider) {
+  constructor($async, $state, $scope, $window, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
+    this.$scope = $scope;
     this.$window = $window;
     this.EndpointProvider = EndpointProvider;
-    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
@@ -23,11 +25,14 @@ class KubernetesCreateConfigurationController {
     this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
     this.KubernetesSecretTypeOptions = KubernetesSecretTypeOptions;
 
+    this.typeOptions = typeOptions;
+
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
     this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
     this.onResourcePoolSelectionChangeAsync = this.onResourcePoolSelectionChangeAsync.bind(this);
     this.onSecretTypeChange = this.onSecretTypeChange.bind(this);
+    this.onChangeKind = this.onChangeKind.bind(this);
   }
 
   onChangeName() {
@@ -38,18 +43,21 @@ class KubernetesCreateConfigurationController {
     this.state.alreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
   }
 
-  onChangeKind() {
-    this.onChangeName();
-    // if there is no data field, add one
-    if (this.formValues.Data.length === 0) {
-      this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
-    }
-    // if changing back to a secret, that is a service account token, remove the data field
-    if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
-      this.onSecretTypeChange();
-    } else {
-      this.isDockerConfig = false;
-    }
+  onChangeKind(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.Kind = value;
+      this.onChangeName();
+      // if there is no data field, add one
+      if (this.formValues.Data.length === 0) {
+        this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
+      }
+      // if changing back to a secret, that is a service account token, remove the data field
+      if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
+        this.onSecretTypeChange();
+      } else {
+        this.isDockerConfig = false;
+      }
+    });
   }
 
   async onResourcePoolSelectionChangeAsync() {
@@ -132,6 +140,11 @@ class KubernetesCreateConfigurationController {
   }
 
   async createConfigurationAsync() {
+    let kind = 'ConfigMap';
+    if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
+      kind = 'Secret';
+    }
+
     try {
       this.state.actionInProgress = true;
       this.formValues.ConfigurationOwner = this.Authentication.getUserDetails().username;
@@ -140,11 +153,12 @@ class KubernetesCreateConfigurationController {
       }
 
       await this.KubernetesConfigurationService.create(this.formValues);
-      this.Notifications.success('Success', 'Configuration succesfully created');
+
+      this.Notifications.success('Success', `${kind} successfully created`);
       this.state.isEditorDirty = false;
       this.$state.go('kubernetes.configurations');
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to create configuration');
+      this.Notifications.error('Failure', err, `Unable to create ${kind}`);
     } finally {
       this.state.actionInProgress = false;
     }
@@ -158,7 +172,7 @@ class KubernetesCreateConfigurationController {
     try {
       this.configurations = await this.KubernetesConfigurationService.get();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
+      this.Notifications.error('Failure', err, 'Unable to retrieve ConfigMaps and Secrets');
     }
   }
 
@@ -168,7 +182,7 @@ class KubernetesCreateConfigurationController {
 
   async uiCanExit() {
     if (!this.formValues.IsSimple && this.formValues.DataYaml && this.state.isEditorDirty) {
-      return this.ModalService.confirmWebEditorDiscard();
+      return confirmWebEditorDiscard();
     }
   }
 
@@ -188,7 +202,10 @@ class KubernetesCreateConfigurationController {
 
     try {
       const resourcePools = await this.KubernetesResourcePoolService.get();
-      this.resourcePools = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+      this.resourcePools = _.filter(
+        resourcePools,
+        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && resourcePool.Namespace.Status === 'Active'
+      );
 
       this.formValues.ResourcePool = this.resourcePools[0];
       await this.getConfigurations();

@@ -15,21 +15,27 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
+type themePayload struct {
+	// Color represents the color theme of the UI
+	Color *string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
+}
+
 type userUpdatePayload struct {
-	Username  string `validate:"required" example:"bob"`
-	Password  string `validate:"required" example:"cg9Wgky3"`
-	UserTheme string `example:"dark"`
+	Username string `validate:"required" example:"bob"`
+	Password string `validate:"required" example:"cg9Wgky3"`
+	Theme    *themePayload
+
 	// User role (1 for administrator account and 2 for regular account)
 	Role int `validate:"required" enums:"1,2" example:"2"`
 }
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.Contains(payload.Username, " ") {
-		return errors.New("Invalid username. Must not contain any whitespace")
+		return errors.New("invalid username. Must not contain any whitespace")
 	}
 
 	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
-		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+		return errors.New("invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
 	return nil
 }
@@ -108,8 +114,10 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.TokenIssueAt = time.Now().Unix()
 	}
 
-	if payload.UserTheme != "" {
-		user.UserTheme = payload.UserTheme
+	if payload.Theme != nil {
+		if payload.Theme.Color != nil {
+			user.ThemeSettings.Color = *payload.Theme.Color
+		}
 	}
 
 	if payload.Role != 0 {
@@ -124,6 +132,9 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	// remove all of the users persisted API keys
 	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
+
+	// hide the password field in the response payload
+	user.Password = ""
 
 	return response.JSON(w, user)
 }

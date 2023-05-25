@@ -1,7 +1,6 @@
 angular.module('portainer.app').service('ThemeManager', ThemeManager);
 
 /* @ngInject */
-
 export function ThemeManager(StateManager) {
   return {
     setTheme,

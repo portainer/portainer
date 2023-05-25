@@ -11,10 +11,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
-	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -30,7 +30,8 @@ type kubernetesGitStackUpdatePayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
-	AutoUpdate               *portainer.StackAutoUpdate
+	AutoUpdate               *portainer.AutoUpdateSettings
+	TLSSkipVerify            bool
 }
 
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
@@ -41,7 +42,7 @@ func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error
 }
 
 func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error {
-	if err := stackutils.ValidateStackAutoUpdate(payload.AutoUpdate); err != nil {
+	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
 	return nil
@@ -62,6 +63,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		}
 
 		stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
+		stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
 		stack.AutoUpdate = payload.AutoUpdate
 
 		if payload.RepositoryAuthentication {
@@ -73,7 +75,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 				Username: payload.RepositoryUsername,
 				Password: password,
 			}
-			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
+			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password, stack.GitConfig.TLSSkipVerify)
 			if err != nil {
 				return httperror.InternalServerError("Unable to fetch git repository", err)
 			}

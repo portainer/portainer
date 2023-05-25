@@ -21,7 +21,7 @@
         />
       </div>
       <div class="actionBar !gap-3" ng-if="$ctrl.showAddAction">
-        <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="docker.templates.new" data-cy="template-addTemplateButton">
+        <button type="button" class="btn btn-sm btn-primary vertical-center !ml-0 h-fit" ui-sref="docker.templates.new" data-cy="template-addTemplateButton">
           <pr-icon icon="'plus'"></pr-icon>Add template
         </button>
       </div>
@@ -58,7 +58,7 @@
           </div>
         </div>
       </div>
-      <div class="blocklist !px-[20px] gap-y-2 !pb-[20px]">
+      <div class="blocklist gap-y-2 !px-[20px] !pb-[20px]">
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByTemplateType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
           model="template"
@@ -69,10 +69,10 @@
             <button ng-click="$event.stopPropagation(); $ctrl.duplicateTemplate(template)" class="btn btn-primary btn-xs"> Copy as Custom </button>
           </template-item-actions>
         </template-item>
-        <div ng-if="!$ctrl.templates" class="text-center text-muted"> Loading... </div>
+        <div ng-if="!$ctrl.templates" class="text-muted text-center"> Loading... </div>
         <div
-          ng-if="($ctrl.templates | filter: $ctrl.filterByTemplateType | filter: $ctrl.filterByCategory | filter: $ctrl.state.textFilter).length === 0"
-          class="text-center text-muted"
+          ng-if="($ctrl.templates | filter : $ctrl.filterByTemplateType | filter : $ctrl.filterByCategory | filter : $ctrl.state.textFilter).length === 0"
+          class="text-muted text-center"
         >
           No templates available.
         </div>

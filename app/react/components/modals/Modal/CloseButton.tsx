@@ -15,7 +15,7 @@ export function CloseButton({
       className={clsx(
         styles.close,
         className,
-        'absolute top-4 right-5 close-button'
+        'close-button absolute top-4 right-5'
       )}
       onClick={() => onClose()}
     >

@@ -4,3 +4,14 @@ export interface Namespaces {
     IsSystem: boolean;
   };
 }
+
+export interface SelfSubjectAccessReviewResponse {
+  status: {
+    allowed: boolean;
+  };
+  spec: {
+    resourceAttributes: {
+      namespace: string;
+    };
+  };
+}

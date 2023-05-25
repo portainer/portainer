@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/featureflags"
 )
 
 type publicSettingsResponse struct {
@@ -21,7 +22,7 @@ type publicSettingsResponse struct {
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// Supported feature flags
-	Features map[portainer.Feature]bool `json:"Features"`
+	Features map[featureflags.Feature]bool `json:"Features"`
 	// The URL used for oauth login
 	OAuthLoginURI string `json:"OAuthLoginURI" example:"https://gitlab.com/oauth"`
 	// The URL used for oauth logout
@@ -39,8 +40,6 @@ type publicSettingsResponse struct {
 	IsAMTEnabled bool
 
 	Edge struct {
-		// Whether the device has been started in edge async mode
-		AsyncMode bool
 		// The ping interval for edge agent - used in edge async mode [seconds]
 		PingInterval int `json:"PingInterval" example:"60"`
 		// The snapshot interval for edge agent - used in edge async mode [seconds]
@@ -50,6 +49,8 @@ type publicSettingsResponse struct {
 		// The check in interval for edge agent (in seconds) - used in non async mode [seconds]
 		CheckinInterval int `example:"60"`
 	}
+
+	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
 }
 
 // @id SettingsPublic
@@ -80,16 +81,17 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		ShowKomposeBuildOption:    appSettings.ShowKomposeBuildOption,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
-		Features:                  appSettings.FeatureFlagSettings,
+		Features:                  featureflags.FeatureFlags(),
 		IsFDOEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.FDOConfiguration.Enabled,
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
 
-	publicSettings.Edge.AsyncMode = appSettings.Edge.AsyncMode
 	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval
 	publicSettings.Edge.SnapshotInterval = appSettings.Edge.SnapshotInterval
 	publicSettings.Edge.CommandInterval = appSettings.Edge.CommandInterval
 	publicSettings.Edge.CheckinInterval = appSettings.EdgeAgentCheckinInterval
+
+	publicSettings.IsDockerDesktopExtension = appSettings.IsDockerDesktopExtension
 
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
