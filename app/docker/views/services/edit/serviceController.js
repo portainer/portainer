@@ -341,6 +341,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     $scope.onWebhookChange = function (enabled) {
+      enabled = enabled | '';
       $scope.$evalAsync(() => {
         $scope.updateWebhook($scope.service);
         $scope.WebhookExists = enabled;
@@ -732,6 +733,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
           $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');
+          $scope.WebhookExists = false;
 
           const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks || []), 'Target');
           const networks = _.filter(
