@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { QueryKey, useQuery } from 'react-query';
 
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -6,15 +6,35 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { Registry, RegistryTypes } from '../types/registry';
 import { usePublicSettings } from '../../settings/queries';
 
-export function useRegistries<T = Registry[]>({
-  enabled,
-  select,
-  onSuccess,
-}: {
-  enabled?: boolean;
-  select?: (registries: Registry[]) => T;
-  onSuccess?: (data: T) => void;
-} = {}) {
+import { queryKeys } from './query-keys';
+
+export function useRegistries<T = Registry[]>(
+  queryOptions: {
+    enabled?: boolean;
+    select?: (registries: Registry[]) => T;
+    onSuccess?: (data: T) => void;
+  } = {}
+) {
+  return useGenericRegistriesQuery(
+    queryKeys.base(),
+    getRegistries,
+    queryOptions
+  );
+}
+
+export function useGenericRegistriesQuery<T = Registry[]>(
+  queryKey: QueryKey,
+  fetcher: () => Promise<Array<Registry>>,
+  {
+    enabled,
+    select,
+    onSuccess,
+  }: {
+    enabled?: boolean;
+    select?: (registries: Registry[]) => T;
+    onSuccess?: (data: T) => void;
+  } = {}
+) {
   const hideDefaultRegistryQuery = usePublicSettings({
     select: (settings) => settings.DefaultRegistry.Hide,
     enabled,
@@ -23,9 +43,9 @@ export function useRegistries<T = Registry[]>({
   const hideDefault = !!hideDefaultRegistryQuery.data;
 
   return useQuery(
-    ['registries'],
+    queryKey,
     async () => {
-      const registries = await getRegistries();
+      const registries = await fetcher();
 
       if (
         hideDefault ||

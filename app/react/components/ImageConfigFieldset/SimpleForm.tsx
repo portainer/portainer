@@ -1,4 +1,4 @@
-import { FormikErrors } from 'formik';
+import { useFormikContext } from 'formik';
 import _ from 'lodash';
 import { useMemo } from 'react';
 
@@ -28,17 +28,9 @@ import { Values } from './types';
 import { InputSearch } from './InputSearch';
 import { getIsDockerHubRegistry } from './utils';
 
-export function SimpleForm({
-  values,
-  onChange,
-  errors,
-  autoComplete,
-}: {
-  values: Values;
-  onChange: (values: Values) => void;
-  errors?: FormikErrors<Values>;
-  autoComplete?: boolean;
-}) {
+export function SimpleForm({ autoComplete }: { autoComplete?: boolean }) {
+  const { setFieldValue, values, errors } = useFormikContext<Values>();
+
   const registryQuery = useRegistry(values.registryId);
 
   const registry = registryQuery.data;
@@ -54,7 +46,7 @@ export function SimpleForm({
         errors={errors?.registryId}
       >
         <RegistrySelector
-          onChange={(value) => handleChange({ registryId: value })}
+          onChange={(value) => setFieldValue('registryId', value)}
           value={values.registryId}
           inputId="registry-field"
         />
@@ -65,7 +57,7 @@ export function SimpleForm({
           <InputGroup.Addon>{registryUrl}</InputGroup.Addon>
 
           <ImageField
-            onChange={(value) => handleChange({ image: value })}
+            onChange={(value) => setFieldValue('image', value)}
             value={values.image}
             registry={registry}
             autoComplete={autoComplete}
@@ -93,10 +85,6 @@ export function SimpleForm({
       </FormControl>
     </>
   );
-
-  function handleChange(newValues: Partial<Values>) {
-    onChange({ ...values, ...newValues });
-  }
 }
 
 function getImagesForRegistry(

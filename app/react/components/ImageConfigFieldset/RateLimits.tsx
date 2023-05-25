@@ -46,7 +46,7 @@ export function RateLimits({
 
   return (
     <RateLimitsInner
-      isAuthenticated={registry?.Authentication || false}
+      isAuthenticated={registry?.Authentication}
       registryId={registryId}
       setValidity={setValidity}
       environment={environmentQuery.data}
@@ -60,7 +60,7 @@ function RateLimitsInner({
   setValidity,
   environment,
 }: {
-  isAuthenticated: boolean;
+  isAuthenticated?: boolean;
   registryId?: RegistryId;
   setValidity: (error?: string) => void;
   environment: Environment;
