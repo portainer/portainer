@@ -1,5 +1,5 @@
 import { Database, Globe } from 'lucide-react';
-import { useFormikContext } from 'formik';
+import { FormikErrors, useFormikContext } from 'formik';
 import { PropsWithChildren } from 'react';
 
 import { Button } from '@@/buttons';
@@ -14,18 +14,29 @@ export function ImageConfigFieldset({
   children,
   autoComplete,
   setValidity,
+  fieldNamespace,
+  values,
+  errors,
 }: PropsWithChildren<{
+  values: Values;
+  errors?: FormikErrors<Values>;
+  fieldNamespace?: string;
   checkRateLimits?: boolean;
   autoComplete?: boolean;
   setValidity: (error?: string) => void;
 }>) {
-  const { setFieldValue, values } = useFormikContext<Values>();
+  const { setFieldValue } = useFormikContext<Values>();
 
   const Component = values.useRegistry ? SimpleForm : AdvancedForm;
 
   return (
     <div className="row">
-      <Component autoComplete={autoComplete} />
+      <Component
+        autoComplete={autoComplete}
+        fieldNamespace={fieldNamespace}
+        values={values}
+        errors={errors}
+      />
 
       <div className="form-group">
         <div className="col-sm-12">
@@ -35,7 +46,7 @@ export function ImageConfigFieldset({
               color="link"
               icon={Globe}
               className="!ml-0 p-0 hover:no-underline"
-              onClick={() => setFieldValue('useRegistry', false)}
+              onClick={() => setFieldValue(namespaced('useRegistry'), false)}
             >
               Advanced mode
             </Button>
@@ -45,7 +56,7 @@ export function ImageConfigFieldset({
               color="link"
               icon={Database}
               className="!ml-0 p-0 hover:no-underline"
-              onClick={() => setFieldValue('useRegistry', true)}
+              onClick={() => setFieldValue(namespaced('useRegistry'), true)}
             >
               Simple mode
             </Button>
@@ -60,4 +71,8 @@ export function ImageConfigFieldset({
       )}
     </div>
   );
+
+  function namespaced(field: string) {
+    return fieldNamespace ? `${fieldNamespace}.${field}` : field;
+  }
 }

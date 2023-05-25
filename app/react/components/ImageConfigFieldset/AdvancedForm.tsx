@@ -1,4 +1,4 @@
-import { useFormikContext } from 'formik';
+import { FormikErrors, useFormikContext } from 'formik';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -6,8 +6,16 @@ import { TextTip } from '@@/Tip/TextTip';
 
 import { Values } from './types';
 
-export function AdvancedForm() {
-  const { setFieldValue, values, errors } = useFormikContext<Values>();
+export function AdvancedForm({
+  values,
+  errors,
+  fieldNamespace,
+}: {
+  values: Values;
+  errors?: FormikErrors<Values>;
+  fieldNamespace?: string;
+}) {
+  const { setFieldValue } = useFormikContext<Values>();
 
   return (
     <>
@@ -19,11 +27,15 @@ export function AdvancedForm() {
         <Input
           id="image-field"
           value={values.image}
-          onChange={(e) => setFieldValue('image', e.target.value)}
+          onChange={(e) => setFieldValue(namespaced('image'), e.target.value)}
           placeholder="e.g. registry:port/my-image:my-tag"
           required
         />
       </FormControl>
     </>
   );
+
+  function namespaced(field: string) {
+    return fieldNamespace ? `${fieldNamespace}.${field}` : field;
+  }
 }

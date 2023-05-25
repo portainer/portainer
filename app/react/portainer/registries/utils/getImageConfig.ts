@@ -7,6 +7,14 @@ import { Registry, RegistryId } from '../types/registry';
 import { findBestMatchRegistry } from './findRegistryMatch';
 import { getURL } from './getUrl';
 
+export function getDefaultImageConfig(): ImageConfigValues {
+  return {
+    registryId: 0,
+    image: '',
+    useRegistry: true,
+  };
+}
+
 export function getImageConfig(
   repository: string,
   registries: Registry[],
