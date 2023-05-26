@@ -92,7 +92,6 @@ export function NodePortForm({
                       };
                       onChange(newServicePorts);
                     }}
-                    required
                     data-cy={`k8sAppCreate-nodePort_${index}`}
                   />
                 </InputGroup>

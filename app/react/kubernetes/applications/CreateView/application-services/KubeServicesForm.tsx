@@ -1,5 +1,5 @@
 import { SchemaOf, array, boolean, mixed, number, object, string } from 'yup';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SingleValue } from 'react-select';
 import { List, Plus, Trash2 } from 'lucide-react';
 import { FormikErrors } from 'formik';
@@ -72,6 +72,21 @@ export function KubeServicesForm({
   const [selectedServiceTypeOption, setSelectedServiceTypeOption] = useState<
     SingleValue<ServiceTypeOption>
   >(serviceTypeOptions[0]); // ClusterIP is the default value
+
+  // when the appName changes, update the names for each service
+  // and the serviceNames for each service port
+  useEffect(() => {
+    const newServices = services.map((service) => {
+      const newServiceName = getUniqName(appName, services);
+      const newServicePorts = service.Ports.map((port) => ({
+        ...port,
+        serviceName: newServiceName,
+      }));
+      return { ...service, Name: newServiceName, Ports: newServicePorts };
+    });
+    onChange(newServices);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appName]);
 
   return (
     <>
@@ -356,7 +371,6 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
           serviceName: string().required(),
           protocol: string(),
           nodePort: number()
-            .required('Node port number is required.')
             .test(
               'node-port-is-unique-in-service',
               'Node port is already used in this service.',
