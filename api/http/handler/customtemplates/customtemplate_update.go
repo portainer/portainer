@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -15,6 +14,8 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type customTemplateUpdatePayload struct {
@@ -53,6 +54,8 @@ type customTemplateUpdatePayload struct {
 	FileContent string `validate:"required"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 	IsComposeFormat bool `example:"false"`
 }
@@ -167,6 +170,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 			URL:            payload.RepositoryURL,
 			ReferenceName:  payload.RepositoryReferenceName,
 			ConfigFilePath: payload.ComposeFilePathInRepository,
+			TLSSkipVerify:  payload.TLSSkipVerify,
 		}
 
 		if payload.RepositoryAuthentication {
