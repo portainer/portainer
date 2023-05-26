@@ -2,13 +2,14 @@ import { FormikErrors } from 'formik';
 import { ChangeEvent } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
-import { InputGroup } from '@@/form-components/InputGroup';
 import { FormError } from '@@/form-components/FormError';
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 import { Button } from '@@/buttons';
 
 import { isServicePortError, newPort } from './utils';
 import { ServicePort } from './types';
+import { ServicePortInput } from './ServicePortInput';
+import { ContainerPortInput } from './ContainerPortInput';
 
 interface Props {
   values: ServicePort[];
@@ -37,57 +38,37 @@ export function ClusterIpForm({
           return (
             <div key={index} className="flex flex-grow flex-wrap gap-2">
               <div className="flex w-1/3 min-w-min flex-col">
-                <InputGroup size="small">
-                  <InputGroup.Addon required>Container port</InputGroup.Addon>
-                  <InputGroup.Input
-                    type="number"
-                    className="form-control min-w-max"
-                    name={`container_port_${index}`}
-                    placeholder="80"
-                    min="1"
-                    max="65535"
-                    value={servicePort.targetPort || ''}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      const newServicePorts = [...servicePorts];
-                      newServicePorts[index] = {
-                        ...newServicePorts[index],
-                        targetPort: Number(e.target.value),
-                        port: Number(e.target.value),
-                      };
-                      onChange(newServicePorts);
-                    }}
-                    required
-                    data-cy={`k8sAppCreate-containerPort_${index}`}
-                  />
-                </InputGroup>
+                <ContainerPortInput
+                  index={index}
+                  value={servicePort.targetPort}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    const newServicePorts = [...servicePorts];
+                    newServicePorts[index] = {
+                      ...newServicePorts[index],
+                      targetPort: Number(e.target.value),
+                      port: Number(e.target.value),
+                    };
+                    onChange(newServicePorts);
+                  }}
+                />
                 {servicePortError?.targetPort && (
                   <FormError>{servicePortError.targetPort}</FormError>
                 )}
               </div>
 
               <div className="flex w-1/3 min-w-min flex-col">
-                <InputGroup size="small">
-                  <InputGroup.Addon required>Service port</InputGroup.Addon>
-                  <InputGroup.Input
-                    type="number"
-                    className="form-control min-w-max"
-                    name={`service_port_${index}`}
-                    placeholder="80"
-                    min="1"
-                    max="65535"
-                    value={servicePort.port || ''}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      const newServicePorts = [...servicePorts];
-                      newServicePorts[index] = {
-                        ...newServicePorts[index],
-                        port: Number(e.target.value),
-                      };
-                      onChange(newServicePorts);
-                    }}
-                    required
-                    data-cy={`k8sAppCreate-servicePort_${index}`}
-                  />
-                </InputGroup>
+                <ServicePortInput
+                  index={index}
+                  value={servicePort.port}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    const newServicePorts = [...servicePorts];
+                    newServicePorts[index] = {
+                      ...newServicePorts[index],
+                      port: Number(e.target.value),
+                    };
+                    onChange(newServicePorts);
+                  }}
+                />
                 {servicePortError?.port && (
                   <FormError>{servicePortError.port}</FormError>
                 )}

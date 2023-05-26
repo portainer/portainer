@@ -83,7 +83,7 @@ export function NodePortForm({
                     placeholder="30080"
                     min="30000"
                     max="32767"
-                    value={nodePort.nodePort || ''}
+                    value={nodePort.nodePort ?? ''}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const newServicePorts = [...nodePorts];
                       newServicePorts[index] = {

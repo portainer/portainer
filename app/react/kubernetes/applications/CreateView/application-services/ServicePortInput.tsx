@@ -4,7 +4,7 @@ import { InputGroup } from '@@/form-components/InputGroup';
 
 type Props = {
   index: number;
-  value: number;
+  value?: number;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -19,7 +19,7 @@ export function ServicePortInput({ index, value, onChange }: Props) {
         placeholder="80"
         min="1"
         max="65535"
-        value={value || ''}
+        value={value ?? ''}
         onChange={onChange}
         required
         data-cy={`k8sAppCreate-servicePort_${index}`}

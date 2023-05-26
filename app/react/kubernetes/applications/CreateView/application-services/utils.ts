@@ -8,11 +8,11 @@ export function isServicePortError<T>(
 
 export function newPort(serviceName?: string) {
   return {
-    port: 0,
-    targetPort: 0,
+    port: undefined,
+    targetPort: undefined,
     name: '',
     protocol: 'TCP',
-    nodePort: 0,
+    nodePort: undefined,
     serviceName,
   };
 }

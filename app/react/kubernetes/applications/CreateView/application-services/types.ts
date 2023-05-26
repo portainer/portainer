@@ -1,7 +1,7 @@
 export interface ServicePort {
-  port: number;
-  targetPort: number;
-  nodePort: number;
+  port?: number;
+  targetPort?: number;
+  nodePort?: number;
   serviceName?: string;
   name?: string;
   protocol?: string;
