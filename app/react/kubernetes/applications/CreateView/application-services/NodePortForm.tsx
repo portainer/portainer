@@ -44,10 +44,14 @@ export function NodePortForm({
                   value={nodePort.targetPort}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const newServicePorts = [...nodePorts];
+                    const newValue =
+                      e.target.value === ''
+                        ? undefined
+                        : Number(e.target.value);
                     newServicePorts[index] = {
                       ...newServicePorts[index],
-                      targetPort: Number(e.target.value),
-                      port: Number(e.target.value),
+                      targetPort: newValue,
+                      port: newValue,
                     };
                     onChange(newServicePorts);
                   }}
@@ -64,7 +68,10 @@ export function NodePortForm({
                     const newServicePorts = [...nodePorts];
                     newServicePorts[index] = {
                       ...newServicePorts[index],
-                      port: Number(e.target.value),
+                      port:
+                        e.target.value === ''
+                          ? undefined
+                          : Number(e.target.value),
                     };
                     onChange(newServicePorts);
                   }}
@@ -75,7 +82,7 @@ export function NodePortForm({
               </div>
               <div className="flex w-1/4 min-w-min flex-col">
                 <InputGroup size="small">
-                  <InputGroup.Addon required>Nodeport</InputGroup.Addon>
+                  <InputGroup.Addon>Nodeport</InputGroup.Addon>
                   <InputGroup.Input
                     type="number"
                     className="form-control min-w-max"
@@ -88,7 +95,10 @@ export function NodePortForm({
                       const newServicePorts = [...nodePorts];
                       newServicePorts[index] = {
                         ...newServicePorts[index],
-                        nodePort: Number(e.target.value),
+                        nodePort:
+                          e.target.value === ''
+                            ? undefined
+                            : Number(e.target.value),
                       };
                       onChange(newServicePorts);
                     }}

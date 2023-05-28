@@ -43,10 +43,14 @@ export function ClusterIpForm({
                   value={servicePort.targetPort}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const newServicePorts = [...servicePorts];
+                    const newValue =
+                      e.target.value === ''
+                        ? undefined
+                        : Number(e.target.value);
                     newServicePorts[index] = {
                       ...newServicePorts[index],
-                      targetPort: Number(e.target.value),
-                      port: Number(e.target.value),
+                      targetPort: newValue,
+                      port: newValue,
                     };
                     onChange(newServicePorts);
                   }}
@@ -64,7 +68,10 @@ export function ClusterIpForm({
                     const newServicePorts = [...servicePorts];
                     newServicePorts[index] = {
                       ...newServicePorts[index],
-                      port: Number(e.target.value),
+                      port:
+                        e.target.value === ''
+                          ? undefined
+                          : Number(e.target.value),
                     };
                     onChange(newServicePorts);
                   }}

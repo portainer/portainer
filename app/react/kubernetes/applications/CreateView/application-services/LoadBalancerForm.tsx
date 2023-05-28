@@ -50,10 +50,14 @@ export function LoadBalancerForm({
                       value={lbPort.targetPort}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         const newServicePorts = [...loadBalancerPorts];
+                        const newValue =
+                          e.target.value === ''
+                            ? undefined
+                            : Number(e.target.value);
                         newServicePorts[index] = {
                           ...newServicePorts[index],
-                          targetPort: Number(e.target.value),
-                          port: Number(e.target.value),
+                          targetPort: newValue,
+                          port: newValue,
                         };
                         onChange(newServicePorts);
                       }}
@@ -70,7 +74,10 @@ export function LoadBalancerForm({
                         const newServicePorts = [...loadBalancerPorts];
                         newServicePorts[index] = {
                           ...newServicePorts[index],
-                          port: Number(e.target.value),
+                          port:
+                            e.target.value === ''
+                              ? undefined
+                              : Number(e.target.value),
                         };
                         onChange(newServicePorts);
                       }}
@@ -96,7 +103,10 @@ export function LoadBalancerForm({
                           const newServicePorts = [...loadBalancerPorts];
                           newServicePorts[index] = {
                             ...newServicePorts[index],
-                            port: Number(e.target.value),
+                            port:
+                              e.target.value === ''
+                                ? undefined
+                                : Number(e.target.value),
                           };
                           onChange(newServicePorts);
                         }}
