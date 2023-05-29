@@ -82,7 +82,7 @@ Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versi
 Install dependencies:
 
 ```sh
-$ make deps-all
+$ make deps
 ```
 
 Then build and run the project in a Docker container:
