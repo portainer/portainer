@@ -19,28 +19,25 @@ import (
 )
 
 // Helpers
-func setupHandler(t *testing.T) (*Handler, string, func()) {
+func setupHandler(t *testing.T) (*Handler, string) {
 	t.Helper()
 
-	_, store, storeTeardown := datastore.MustNewTestStore(t, true, true)
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	jwtService, err := jwt.NewService("1h", store)
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 
 	user := &portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole}
 	err = store.User().Create(user)
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	rawAPIKey, _, err := apiKeyService.GenerateApiKey(*user, "test")
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 
@@ -56,7 +53,6 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 	handler.FileService = fs
@@ -74,7 +70,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 
 	handler.GitService = testhelpers.NewGitService(errors.New("Clone error"), "git-service-id")
 
-	return handler, rawAPIKey, storeTeardown
+	return handler, rawAPIKey
 }
 
 func createEndpointWithId(t *testing.T, store dataservices.DataStore, endpointID portainer.EndpointID) portainer.Endpoint {

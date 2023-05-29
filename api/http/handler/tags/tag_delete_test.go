@@ -17,8 +17,7 @@ import (
 func TestTagDeleteEdgeGroupsConcurrently(t *testing.T) {
 	const tagsCount = 100
 
-	_, store, teardown := datastore.MustNewTestStore(t, true, false)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, false)
 
 	user := &portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole}
 	err := store.User().Create(user)

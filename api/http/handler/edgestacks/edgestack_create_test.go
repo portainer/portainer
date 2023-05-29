@@ -13,8 +13,7 @@ import (
 
 // Create
 func TestCreateAndInspect(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	// Create Endpoint, EdgeGroup and EndpointRelation
 	endpoint := createEndpoint(t, handler.DataStore)
@@ -100,8 +99,7 @@ func TestCreateAndInspect(t *testing.T) {
 }
 
 func TestCreateWithInvalidPayload(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)

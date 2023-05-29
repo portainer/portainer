@@ -12,8 +12,7 @@ import (
 
 // Delete
 func TestDeleteAndInspect(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	// Create
 	endpoint := createEndpoint(t, handler.DataStore)
@@ -73,8 +72,7 @@ func TestDeleteAndInspect(t *testing.T) {
 }
 
 func TestDeleteInvalidEdgeStack(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	cases := []struct {
 		Name               string

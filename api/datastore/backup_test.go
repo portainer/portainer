@@ -11,8 +11,7 @@ import (
 )
 
 func TestCreateBackupFolders(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := MustNewTestStore(t, true, true)
 
 	connection := store.GetConnection()
 	backupPath := path.Join(connection.GetStorePath(), backupDefaults.backupDir)
@@ -28,9 +27,7 @@ func TestCreateBackupFolders(t *testing.T) {
 }
 
 func TestStoreCreation(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, true, true)
-	defer teardown()
-
+	_, store := MustNewTestStore(t, true, true)
 	if store == nil {
 		t.Error("Expect to create a store")
 	}
@@ -41,9 +38,8 @@ func TestStoreCreation(t *testing.T) {
 }
 
 func TestBackup(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, true, true)
+	_, store := MustNewTestStore(t, true, true)
 	connection := store.GetConnection()
-	defer teardown()
 
 	t.Run("Backup should create default db backup", func(t *testing.T) {
 		v := models.Version{
@@ -71,8 +67,7 @@ func TestBackup(t *testing.T) {
 }
 
 func TestRemoveWithOptions(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := MustNewTestStore(t, true, true)
 
 	t.Run("successfully removes file if existent", func(t *testing.T) {
 		store.createBackupFolders()
