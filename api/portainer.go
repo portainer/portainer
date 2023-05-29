@@ -176,7 +176,7 @@ type (
 		// Valid values are: 1 - 'linux', 2 - 'windows'
 		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
 		// URL of the template's logo
-		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		Logo string `json:"Logo" example:"https://portainer.io/img/logo.svg"`
 		// Type of created stack:
 		// * 1 - swarm
 		// * 2 - compose
@@ -1134,7 +1134,7 @@ type (
 		// Default name for the stack/container to be used on deployment
 		Name string `json:"name,omitempty" example:"mystackname"`
 		// URL of the template's logo
-		Logo string `json:"logo,omitempty" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		Logo string `json:"logo,omitempty" example:"https://portainer.io/img/logo.svg"`
 		// A list of environment(endpoint) variables used during the template deployment
 		Env []TemplateEnv `json:"env,omitempty"`
 		// A note that will be displayed in the UI. Supports HTML content
