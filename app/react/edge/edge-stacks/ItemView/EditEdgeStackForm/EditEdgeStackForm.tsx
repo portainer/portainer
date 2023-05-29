@@ -157,6 +157,7 @@ function InnerForm({
                 <SwitchField
                   label="Create an Edge stack webhook"
                   checked={values.webhookEnabled}
+                  labelClass="col-sm-3 col-lg-2"
                   onChange={(value) => setFieldValue('webhookEnabled', value)}
                   tooltip="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
                 />

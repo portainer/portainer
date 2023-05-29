@@ -66,6 +66,7 @@ export function PrivateRegistryFieldset({
             onChange={(value) => setChecked(value)}
             tooltip={tooltipMessage}
             label="Use Credentials"
+            labelClass="col-sm-3 col-lg-2"
             disabled={formInvalid}
           />
         </div>
