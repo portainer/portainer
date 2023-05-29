@@ -11,6 +11,10 @@ export function getAuthentication(
     | 'RepositoryGitCredentialID'
   >
 ) {
+  if (!model.RepositoryAuthentication) {
+    return undefined;
+  }
+
   if (model.RepositoryGitCredentialID) {
     return { gitCredentialId: model.RepositoryGitCredentialID };
   }
