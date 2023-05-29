@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -17,7 +17,7 @@ type Handler struct {
 	*mux.Router
 	OpenAMTService      portainer.OpenAMTService
 	DataStore           dataservices.DataStore
-	DockerClientFactory *docker.ClientFactory
+	DockerClientFactory *dockerclient.ClientFactory
 }
 
 // NewHandler returns a new Handler
