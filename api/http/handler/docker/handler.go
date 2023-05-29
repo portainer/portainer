@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/docker"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	"github.com/gorilla/mux"
@@ -21,18 +22,20 @@ type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
 	dataStore            dataservices.DataStore
-	dockerClientFactory  *docker.ClientFactory
+	dockerClientFactory  *dockerclient.ClientFactory
 	authorizationService *authorization.Service
+	containerService     *docker.ContainerService
 }
 
 // NewHandler creates a handler to process non-proxied requests to docker APIs directly.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, dockerClientFactory *docker.ClientFactory) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, dockerClientFactory *dockerclient.ClientFactory, containerService *docker.ContainerService) *Handler {
 	h := &Handler{
 		Router:               mux.NewRouter(),
 		requestBouncer:       bouncer,
 		authorizationService: authorizationService,
 		dataStore:            dataStore,
 		dockerClientFactory:  dockerClientFactory,
+		containerService:     containerService,
 	}
 
 	// endpoints
@@ -40,7 +43,7 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 	endpointRouter.Use(dockerOnlyMiddleware)
 
-	containersHandler := containers.NewHandler("/{id}/containers", bouncer, dockerClientFactory)
+	containersHandler := containers.NewHandler("/{id}/containers", bouncer, dataStore, dockerClientFactory, containerService)
 	endpointRouter.PathPrefix("/containers").Handler(containersHandler)
 	return h
 }

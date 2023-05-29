@@ -713,8 +713,6 @@
               "ID": ""
             },
             "Isolation": "",
-            "KernelMemory": false,
-            "KernelMemoryTCP": false,
             "KernelVersion": "",
             "Labels": null,
             "LiveRestoreEnabled": false,

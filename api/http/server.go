@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
@@ -95,7 +96,7 @@ type Server struct {
 	KubeClusterAccessService    k8s.KubeClusterAccessService
 	Handler                     *handler.Handler
 	SSLService                  *ssl.Service
-	DockerClientFactory         *docker.ClientFactory
+	DockerClientFactory         *dockerclient.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
 	HelmPackageManager          libhelm.HelmPackageManager
@@ -190,7 +191,9 @@ func (server *Server) Start() error {
 
 	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory, nil)
 
-	var dockerHandler = dockerhandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.DockerClientFactory)
+	containerService := docker.NewContainerService(server.DockerClientFactory, server.DataStore)
+
+	var dockerHandler = dockerhandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.DockerClientFactory, containerService)
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
