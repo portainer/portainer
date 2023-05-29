@@ -26,7 +26,8 @@
     "sb": "yarn storybook",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook -o ./dist/storybook",
-    "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js"
+    "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js",
+    "prepare": "husky install"
   },
   "engines": {
     "node": ">= 14"
@@ -186,10 +187,10 @@
     "eslint-webpack-plugin": "^4.0.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^5.5.0",
-    "husky": "4.2.5",
+    "husky": "^8.0.0",
     "jest": "^27.4.3",
     "kubernetes-types": "^1.26.0",
-    "lint-staged": ">=10",
+    "lint-staged": "^13.2.2",
     "lodash-webpack-plugin": "^0.11.6",
     "mini-css-extract-plugin": "^2.5.3",
     "msw-storybook-addon": "^1.8.0",
@@ -227,11 +228,6 @@
     "**/@uirouter/angularjs": "1.0.11",
     "**/css-loader": "^6.6.0",
     "**/moment": "^2.21.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "browserslist": "last 2 versions"
 }
