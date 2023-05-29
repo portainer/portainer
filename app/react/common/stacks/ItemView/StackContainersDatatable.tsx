@@ -17,8 +17,8 @@ import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useContainers } from '../../containers/queries/containers';
-import { RowProvider } from '../../containers/ListView/ContainersDatatable/RowContext';
+import { useContainers } from '../../../docker/containers/queries/containers';
+import { RowProvider } from '../../../docker/containers/ListView/ContainersDatatable/RowContext';
 
 const storageKey = 'stack-containers';
 const settingsStore = createStore(storageKey);

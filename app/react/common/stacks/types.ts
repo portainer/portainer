@@ -23,3 +23,7 @@ export enum StackStatus {
   Active = 1,
   Inactive,
 }
+
+export type StackFile = {
+  StackFileContent: string;
+};

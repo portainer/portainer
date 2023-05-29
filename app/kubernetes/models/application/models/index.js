@@ -35,8 +35,6 @@ const _KubernetesApplication = Object.freeze({
   TotalPodsCount: 0,
   Yaml: '',
   Note: '',
-  Revisions: undefined,
-  CurrentRevision: undefined,
   Raw: undefined, // only filled when inspecting app details / create / edit view (never filled in multiple-apps views)
   AutoScaler: undefined, // only filled if the application has an HorizontalPodAutoScaler bound to it
 });

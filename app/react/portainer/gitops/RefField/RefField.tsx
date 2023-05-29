@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactNode } from 'react';
 import { SchemaOf, string } from 'yup';
 
-import { StackId } from '@/react/docker/stacks/types';
+import { StackId } from '@/react/common/stacks/types';
 import { useStateWrapper } from '@/react/hooks/useStateWrapper';
 
 import { FormControl } from '@@/form-components/FormControl';
