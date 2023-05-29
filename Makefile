@@ -23,7 +23,7 @@ init-dist:
 
 build: build-server build-client ## Build the server and client
 
-build-client: init-dist client-deps ## Build the client
+build-client: init-dist ## Build the client
 	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
 
 build-server: init-dist ## Build the server binary
@@ -32,7 +32,7 @@ build-server: init-dist ## Build the server binary
 build-image: build ## Build the Portainer image locally
 	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
 
-devops: clean init-dist server-deps build-client ## Build the server binary for CI
+devops: clean init-dist deps build-client ## Build the server binary for CI
 	echo "Building the devops binary..."
 	@./build/build_binary_azuredevops.sh "$(PLATFORM)" "$(ARCH)"
 
@@ -41,7 +41,7 @@ build-storybook:
 
 ##@ Build dependencies
 .PHONY: deps server-deps client-deps tidy
-deps-all: server-deps client-deps ## Download all client and server build dependancies
+deps: server-deps client-deps ## Download all client and server build dependancies
 
 server-deps: ## Download dependant server binaries
 	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
@@ -79,7 +79,7 @@ dev: ## Run both the client and server in development mode
 dev-client: ## Run the client in development mode 
 	yarn dev
 
-dev-server: ## Run the server in development mode
+dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh
 
 
