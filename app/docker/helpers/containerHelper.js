@@ -116,6 +116,7 @@ angular.module('portainer.docker').factory('ContainerHelper', [
           }
         }
       }
+      config.HostConfig.Mounts = null;
       config.HostConfig.Binds = binds;
       config.Volumes = volumes;
       return config;

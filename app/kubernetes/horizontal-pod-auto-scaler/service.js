@@ -112,23 +112,6 @@ class KubernetesHorizontalPodAutoScalerService {
   delete(horizontalPodAutoScaler) {
     return this.$async(this.deleteAsync, horizontalPodAutoScaler);
   }
-
-  // /**
-  //  * ROLLBACK
-  //  */
-  // async rollbackAsync(namespace, name, payload) {
-  //   try {
-  //     const params = new KubernetesCommonParams();
-  //     params.id = name;
-  //     await this.KubernetesHorizontalPodAutoScalers(namespace).rollback(params, payload).$promise;
-  //   } catch (err) {
-  //     throw new PortainerError('Unable to rollback horizontalPodAutoScaler', err);
-  //   }
-  // }
-
-  // rollback(namespace, name, payload) {
-  //   return this.$async(this.rollbackAsync, namespace, name, payload);
-  // }
 }
 
 export default KubernetesHorizontalPodAutoScalerService;

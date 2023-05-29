@@ -15,9 +15,6 @@ import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { confirmUpdate, confirm } from '@@/modals/confirm';
-import { buildConfirmButton } from '@@/modals/utils';
-import { ModalType } from '@@/modals';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -146,11 +143,6 @@ class KubernetesApplicationController {
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-    this.updateApplicationKindText = this.updateApplicationKindText.bind(this);
-    this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
-    this.redeployApplicationAsync = this.redeployApplicationAsync.bind(this);
-    this.rollbackApplicationAsync = this.rollbackApplicationAsync.bind(this);
-    this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
   selectTab(index) {
@@ -166,126 +158,8 @@ class KubernetesApplicationController {
     return KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
   }
 
-  isExternalApplication() {
-    return KubernetesApplicationHelper.isExternalApplication(this.application);
-  }
-
-  copyLoadBalancerIP() {
-    this.clipboard.copyText(this.application.LoadBalancerIPAddress);
-    $('#copyNotificationLB').show().fadeOut(2500);
-  }
-
-  copyApplicationName() {
-    this.clipboard.copyText(this.application.Name);
-    $('#copyNotificationApplicationName').show().fadeOut(2500);
-  }
-
-  hasPersistedFolders() {
-    return this.application && this.application.PersistedFolders.length;
-  }
-
-  hasVolumeConfiguration() {
-    return this.application && this.application.ConfigurationVolumes.length;
-  }
-
   hasEventWarnings() {
     return this.state.eventWarningCount;
-  }
-
-  buildIngressRuleURL(rule) {
-    const hostname = rule.Host ? rule.Host : rule.IP;
-    return 'http://' + hostname + rule.Path;
-  }
-
-  portHasIngressRules(port) {
-    return port.IngressRules.length > 0;
-  }
-
-  ruleCanBeDisplayed(rule) {
-    return !rule.Host && !rule.IP ? false : true;
-  }
-
-  isStack() {
-    return this.application.StackId;
-  }
-
-  /**
-   * ROLLBACK
-   */
-  async rollbackApplicationAsync() {
-    try {
-      // await this.KubernetesApplicationService.rollback(this.application, this.formValues.SelectedRevision);
-      const revision = _.nth(this.application.Revisions, -2);
-      await this.KubernetesApplicationService.rollback(this.application, revision);
-      this.Notifications.success('Success', 'Application successfully rolled back');
-      this.$state.reload(this.$state.current);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to rollback the application');
-    }
-  }
-
-  rollbackApplication() {
-    confirmUpdate('Rolling back the application to a previous configuration may cause service interruption. Do you wish to continue?', (confirmed) => {
-      if (confirmed) {
-        return this.$async(this.rollbackApplicationAsync);
-      }
-    });
-  }
-  /**
-   * REDEPLOY
-   */
-  async redeployApplicationAsync() {
-    const confirmed = await confirm({
-      modalType: ModalType.Warn,
-      title: 'Are you sure?',
-      message: 'Redeploying the application may cause a service interruption. Do you wish to continue?',
-      confirmButton: buildConfirmButton('Redeploy'),
-    });
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      const promises = _.map(this.application.Pods, (item) => this.KubernetesPodService.delete(item));
-      await Promise.all(promises);
-      this.Notifications.success('Success', 'Application successfully redeployed');
-      this.$state.reload(this.$state.current);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to redeploy the application');
-    }
-  }
-
-  redeployApplication() {
-    return this.$async(this.redeployApplicationAsync);
-  }
-
-  /**
-   * UPDATE
-   */
-  async updateApplicationAsync() {
-    try {
-      const application = angular.copy(this.application);
-      application.Note = this.formValues.Note;
-      await this.KubernetesApplicationService.patch(this.application, application, true);
-      this.Notifications.success('Success', 'Application successfully updated');
-      this.$state.reload(this.$state.current);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to update application');
-    }
-  }
-
-  updateApplication() {
-    return this.$async(this.updateApplicationAsync);
-  }
-
-  updateApplicationKindText() {
-    if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
-      this.state.appType = `git repository`;
-    } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
-      this.state.appType = `manifest`;
-    } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.URL) {
-      this.state.appType = `manifest`;
-    }
   }
 
   /**
@@ -325,22 +199,7 @@ class KubernetesApplicationController {
         this.KubernetesNodeService.get(),
       ]);
       this.application = application;
-      if (this.application.StackId) {
-        this.stack = await this.StackService.stack(application.StackId);
-      }
       this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
-      this.formValues.Note = this.application.Note;
-      this.formValues.Services = this.application.Services;
-      if (this.application.Note) {
-        this.state.expandedNote = true;
-      }
-      if (this.application.CurrentRevision) {
-        this.formValues.SelectedRevision = _.find(this.application.Revisions, { revision: this.application.CurrentRevision.revision });
-      }
-
-      this.state.useIngress = _.find(application.PublishedPorts, (p) => {
-        return this.portHasIngressRules(p);
-      });
 
       this.placements = computePlacements(nodes, this.application);
       this.state.placementWarning = _.find(this.placements, { AcceptsApplication: true }) ? false : true;
@@ -379,7 +238,6 @@ class KubernetesApplicationController {
       eventWarningCount: 0,
       placementWarning: false,
       expandedNote: false,
-      useIngress: false,
       useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
       publicUrl: this.endpoint.PublicURL,
     };
@@ -391,12 +249,8 @@ class KubernetesApplicationController {
       SelectedRevision: undefined,
     };
 
-    const resourcePools = await this.KubernetesResourcePoolService.get();
-    this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
-
     await this.getApplication();
     await this.getEvents();
-    this.updateApplicationKindText();
     this.state.viewReady = true;
   }
 

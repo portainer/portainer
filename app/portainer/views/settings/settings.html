@@ -9,7 +9,7 @@
           <!-- snapshot-interval -->
           <div class="form-group">
             <label for="snapshot_interval" class="col-sm-2 control-label text-left">Snapshot interval</label>
-            <div class="col-sm-8">
+            <div class="col-sm-10">
               <input type="text" class="form-control" ng-model="settings.SnapshotInterval" id="snapshot_interval" placeholder="e.g. 15m" />
             </div>
           </div>
@@ -47,7 +47,7 @@
             </div>
             <div class="form-group">
               <label for="logo_url" class="col-sm-2 control-label text-left"> URL </label>
-              <div class="col-sm-8">
+              <div class="col-sm-10">
                 <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png" />
               </div>
             </div>
@@ -96,7 +96,7 @@
             </div>
             <div class="form-group">
               <label for="templates_url" class="col-sm-2 control-label text-left"> URL </label>
-              <div class="col-sm-8">
+              <div class="col-sm-10">
                 <input
                   type="text"
                   class="form-control"
@@ -150,7 +150,7 @@
             </div>
             <div class="form-group">
               <label for="helmrepository_url" class="col-sm-2 control-label text-left"> URL </label>
-              <div class="col-sm-8">
+              <div class="col-sm-10">
                 <input type="text" class="form-control" ng-model="settings.HelmRepositoryURL" id="helmrepository_url" placeholder="https://charts.bitnami.com/bitnami" />
               </div>
             </div>
@@ -160,7 +160,7 @@
           <div class="col-sm-12 form-section-title"> Kubeconfig </div>
           <div class="form-group">
             <label for="kubeconfig_expiry" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
-            <div class="col-sm-8">
+            <div class="col-sm-10">
               <select
                 id="kubeconfig_expiry"
                 class="form-control"
@@ -179,7 +179,7 @@
               feature-id="enforceDeploymentOptions"
               disabled="true"
               checked="false"
-              field-class="'col-sm-12'"
+              field-class="'col-sm-10'"
               label-class="'col-sm-2'"
               tooltip="'Hides the \'Add with form\' buttons and prevents adding/editing of resources via forms'"
             ></por-switch-field>
@@ -290,7 +290,7 @@
                 name="'s3-backup-setting'"
                 feature-id="s3BackupFeatureId"
                 checked="formValues.scheduleAutomaticBackups"
-                field-class="'col-sm-12'"
+                field-class="'col-sm-10'"
                 label-class="'col-sm-2'"
                 on-change="(onToggleAutoBackups)"
               ></por-switch-field>
@@ -298,8 +298,8 @@
             <!-- !Schedule automatic backups -->
             <!-- Cron rule  -->
             <div class="form-group" ng-if="formValues.scheduleAutomaticBackups">
-              <label for="cron_rule" class="col-sm-2 col-lg-2 control-label text-left">Cron rule</label>
-              <div class="col-sm-10 col-lg-10">
+              <label for="cron_rule" class="col-sm-2 control-label text-left">Cron rule</label>
+              <div class="col-sm-10">
                 <input
                   type="text"
                   class="form-control"
@@ -318,8 +318,8 @@
             <!-- !Cron rule  -->
             <!-- Access key id  -->
             <div class="form-group">
-              <label for="access_key_id" class="col-sm-2 col-lg-2 control-label text-left">Access Key ID</label>
-              <div class="col-sm-9 col-lg-10">
+              <label for="access_key_id" class="col-sm-2 control-label text-left">Access Key ID</label>
+              <div class="col-sm-10">
                 <input
                   type="text"
                   class="form-control"
@@ -336,8 +336,8 @@
             <!-- !Access key id  -->
             <!-- Secret access key -->
             <div class="form-group">
-              <label for="secret_access_key" class="col-sm-3 col-lg-2 control-label text-left">Secret Access Key</label>
-              <div class="col-sm-9 col-lg-10">
+              <label for="secret_access_key" class="col-sm-2 control-label text-left">Secret Access Key</label>
+              <div class="col-sm-10">
                 <input
                   type="password"
                   class="form-control"
@@ -354,8 +354,8 @@
             <!-- !Secret access key -->
             <!-- Region -->
             <div class="form-group">
-              <label for="region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
-              <div class="col-sm-9 col-lg-10">
+              <label for="region" class="col-sm-2 control-label text-left">Region</label>
+              <div class="col-sm-10">
                 <input
                   type="text"
                   class="form-control"
@@ -373,8 +373,8 @@
             <!-- !Region -->
             <!-- Bucket name -->
             <div class="form-group">
-              <label for="bucket_name" class="col-sm-3 col-lg-2 control-label text-left">Bucket name</label>
-              <div class="col-sm-9 col-lg-10">
+              <label for="bucket_name" class="col-sm-2 control-label text-left">Bucket name</label>
+              <div class="col-sm-10">
                 <input
                   type="text"
                   class="form-control"
@@ -393,7 +393,7 @@
             <!-- Password protect S3 -->
             <div class="form-group">
               <label for="password_protect" class="col-sm-2 control-label text-left">Password protect</label>
-              <div class="col-sm-8">
+              <div class="col-sm-10">
                 <label class="switch">
                   <input
                     type="checkbox"

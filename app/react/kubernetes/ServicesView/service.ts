@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { compact } from 'lodash';
+import { ServiceList } from 'kubernetes-types/core/v1';
 
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -11,10 +12,11 @@ import { getNamespaces } from '../namespaces/service';
 import { Service } from './types';
 
 export const queryKeys = {
-  list: (environmentId: EnvironmentId) =>
+  clusterServices: (environmentId: EnvironmentId) =>
     ['environments', environmentId, 'kubernetes', 'services'] as const,
 };
 
+// get a list of services for a specific namespace from the Portainer API
 async function getServices(
   environmentId: EnvironmentId,
   namespace: string,
@@ -37,7 +39,7 @@ async function getServices(
 
 export function useServices(environmentId: EnvironmentId) {
   return useQuery(
-    queryKeys.list(environmentId),
+    queryKeys.clusterServices(environmentId),
     async () => {
       const namespaces = await getNamespaces(environmentId);
       const settledServicesPromise = await Promise.allSettled(
@@ -53,12 +55,26 @@ export function useServices(environmentId: EnvironmentId) {
   );
 }
 
+// getNamespaceServices is used to get a list of services for a specific namespace directly from the Kubernetes API
+export async function getNamespaceServices(
+  environmentId: EnvironmentId,
+  namespace: string,
+  queryParams?: Record<string, string>
+) {
+  const { data: services } = await axios.get<ServiceList>(
+    `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/services`,
+    {
+      params: queryParams,
+    }
+  );
+  return services.items;
+}
+
 export function useMutationDeleteServices(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
   return useMutation(deleteServices, {
     onSuccess: () =>
-      // use the exact same query keys as the useServices hook to invalidate the services list
-      queryClient.invalidateQueries(queryKeys.list(environmentId)),
+      queryClient.invalidateQueries(queryKeys.clusterServices(environmentId)),
     ...withError('Unable to delete service(s)'),
   });
 }

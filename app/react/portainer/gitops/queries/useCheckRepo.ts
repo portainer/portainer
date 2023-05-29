@@ -51,7 +51,7 @@ export async function checkRepo(
       const { creds = {} } = options;
       // If no credentials were provided alter error from git to indicate repository is not found or is private
       if (
-        !(creds.username && creds.password) &&
+        (!(creds.username && creds.password) || !creds.gitCredentialId) &&
         details ===
           'authentication failed, please ensure that the git credentials are correct'
       ) {

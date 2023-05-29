@@ -2,7 +2,7 @@ import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
 import { withControlledInput } from '@/react-tools/withControlledInput';
-import { StackContainersDatatable } from '@/react/docker/stacks/ItemView/StackContainersDatatable';
+import { StackContainersDatatable } from '@/react/common/stacks/ItemView/StackContainersDatatable';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
 import { TemplateListDropdownAngular } from '@/react/docker/app-templates/TemplateListDropdown';
 import { TemplateListSortAngular } from '@/react/docker/app-templates/TemplateListSort';
