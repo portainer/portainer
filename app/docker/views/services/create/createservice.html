@@ -396,11 +396,13 @@
           <!-- !tab-network -->
           <!-- tab-env -->
           <div class="tab-pane" id="env">
-            <environment-variables-panel
-              values="formValues.Env"
-              explanation="'These values will be applied to the service when created'"
-              on-change="(handleEnvVarChange)"
-            ></environment-variables-panel>
+            <div class="form-horizontal">
+              <environment-variables-panel
+                values="formValues.Env"
+                explanation="'These values will be applied to the service when created'"
+                on-change="(handleEnvVarChange)"
+              ></environment-variables-panel>
+            </div>
           </div>
           <!-- !tab-env -->
           <!-- tab-labels -->
