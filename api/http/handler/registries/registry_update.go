@@ -190,10 +190,13 @@ func syncConfig(registry *portainer.Registry) *portainer.RegistryManagementConfi
 	if config == nil {
 		config = &portainer.RegistryManagementConfiguration{}
 	}
+
 	config.Authentication = registry.Authentication
 	config.Username = registry.Username
 	config.Password = registry.Password
 	config.Ecr = registry.Ecr
+	config.Type = registry.Type
+
 	return config
 }
 
