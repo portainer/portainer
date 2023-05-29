@@ -5,6 +5,8 @@ import { object, SchemaOf } from 'yup';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
+import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
+import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -32,6 +34,7 @@ function ItemView() {
   } = useCurrentStateAndParams();
 
   const id = parseInt(idParam, 10);
+  const edgeGroupsQuery = useEdgeGroups();
 
   if (!idParam || Number.isNaN(id)) {
     throw new Error('id is a required path param');
@@ -113,7 +116,12 @@ function ItemView() {
                 }}
                 validateOnMount
                 validationSchema={() =>
-                  updateValidation(item.id, schedules, isScheduleActive)
+                  updateValidation(
+                    item.id,
+                    schedules,
+                    edgeGroupsQuery.data,
+                    isScheduleActive
+                  )
                 }
               >
                 {({ isValid, setFieldValue, values, handleBlur, errors }) => (
@@ -171,9 +179,10 @@ function ItemView() {
 function updateValidation(
   itemId: EdgeUpdateSchedule['id'],
   schedules: EdgeUpdateSchedule[],
+  edgeGroups: Array<EdgeGroup> | undefined,
   isScheduleActive: boolean
 ): SchemaOf<{ name: string } | FormValues> {
   return !isScheduleActive
-    ? validation(schedules, itemId)
+    ? validation(schedules, edgeGroups, itemId)
     : object({ name: nameValidation(schedules, itemId) });
 }
