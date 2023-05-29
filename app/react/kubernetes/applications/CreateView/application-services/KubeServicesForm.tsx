@@ -76,8 +76,9 @@ export function KubeServicesForm({
   // when the appName changes, update the names for each service
   // and the serviceNames for each service port
   useEffect(() => {
-    const newServices = services.map((service) => {
-      const newServiceName = getUniqName(appName, services);
+    const newServiceNames = getUniqNames(appName, services);
+    const newServices = services.map((service, index) => {
+      const newServiceName = newServiceNames[index];
       const newServicePorts = service.Ports.map((port) => ({
         ...port,
         serviceName: newServiceName,
@@ -140,7 +141,10 @@ export function KubeServicesForm({
               onClick={() => {
                 // create a new service form value and add it to the list of services
                 const newService = structuredClone(serviceFormDefaultValues);
-                newService.Name = getUniqName(appName, services);
+                newService.Name = generateUniqueName(
+                  appName,
+                  services.length + 1
+                );
                 newService.Type =
                   selectedServiceTypeOption?.value ||
                   KubernetesApplicationPublishingTypes.CLUSTER_IP;
@@ -264,25 +268,28 @@ export function KubeServicesForm({
   );
 }
 
-function getUniqName(appName: string, services: ServiceFormValues[]) {
-  // services appName will follow thia patten: service, service-2, service-3...
-  let nameIndex = 2;
-  let UniqName = appName;
+function generateUniqueName(appName: string, index: number) {
+  return index === 0 ? appName : `${appName}-${index}`;
+}
 
-  const sortedServices = services.sort((a, b) => {
-    if (!a.Name || !b.Name) return 0;
-    return a.Name.localeCompare(b.Name);
-  });
+function getUniqNames(appName: string, services: ServiceFormValues[]) {
+  const sortedServices = [...services].sort((a, b) =>
+    a.Name && b.Name ? a.Name.localeCompare(b.Name) : 0
+  );
 
-  if (sortedServices.length !== 0) {
-    sortedServices.forEach((service) => {
-      if (service.Name === UniqName) {
-        UniqName = `${appName}-${nameIndex}`;
-        nameIndex += 1;
-      }
-    });
-  }
-  return UniqName;
+  const uniqueNames = sortedServices.reduce(
+    (acc: string[]) => {
+      const newIndex =
+        acc.findIndex((existingName) => existingName === appName) + 1;
+      const uniqName = acc.includes(appName)
+        ? generateUniqueName(appName, newIndex)
+        : appName;
+      return [...acc, uniqName];
+    },
+    [appName]
+  );
+
+  return uniqueNames;
 }
 
 // values returned from the angular parent component (pascal case instead of camel case keys),
@@ -357,7 +364,7 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
                 const duplicateServicePortCount = servicePorts.filter(
                   (port) => port.port === servicePort
                 ).length;
-                return duplicateServicePortCount === 1;
+                return duplicateServicePortCount <= 1;
               }
             ),
           targetPort: number()
@@ -394,7 +401,7 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
                 const duplicateNodePortCount = servicePorts.filter(
                   (port) => port.nodePort === nodePort
                 ).length;
-                return duplicateNodePortCount === 1;
+                return duplicateNodePortCount <= 1;
               }
             )
             .test(

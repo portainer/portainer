@@ -1306,7 +1306,7 @@ class KubernetesCreateApplicationController {
       }
       // get all nodeport services in the cluster, to validate unique nodeports in the form
       // this is below the try catch, to not block the page rendering
-      const allSettledServices = await Promise.allSettled(this.resourcePools.map((namespace) => getServices(this.state.endpointId, namespace)));
+      const allSettledServices = await Promise.allSettled(this.resourcePools.map((namespace) => getServices(this.endpoint.Id, namespace.Namespace.Name)));
       const allServices = allSettledServices
         .filter((settledService) => settledService.status === 'fulfilled' && settledService.value)
         .map((fulfilledService) => fulfilledService.value)
