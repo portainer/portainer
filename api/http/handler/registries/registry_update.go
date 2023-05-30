@@ -140,6 +140,8 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	registry.ManagementConfiguration = syncConfig(registry)
+
 	if payload.URL != nil {
 		shouldUpdateSecrets = shouldUpdateSecrets || (*payload.URL != registry.URL)
 
@@ -181,6 +183,21 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, registry)
+}
+
+func syncConfig(registry *portainer.Registry) *portainer.RegistryManagementConfiguration {
+	config := registry.ManagementConfiguration
+	if config == nil {
+		config = &portainer.RegistryManagementConfiguration{}
+	}
+
+	config.Authentication = registry.Authentication
+	config.Username = registry.Username
+	config.Password = registry.Password
+	config.Ecr = registry.Ecr
+	config.Type = registry.Type
+
+	return config
 }
 
 func (handler *Handler) updateEndpointRegistryAccess(endpoint *portainer.Endpoint, registry *portainer.Registry, endpointAccess portainer.RegistryAccessPolicies) error {
