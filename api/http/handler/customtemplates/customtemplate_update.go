@@ -20,7 +20,7 @@ import (
 
 type customTemplateUpdatePayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer.io/img/logo.svg"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template

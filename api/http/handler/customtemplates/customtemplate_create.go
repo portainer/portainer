@@ -81,7 +81,7 @@ func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*p
 
 type customTemplateFromFileContentPayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer.io/img/logo.svg"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template
@@ -181,7 +181,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 
 type customTemplateFromGitRepositoryPayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer.io/img/logo.svg"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template
@@ -437,7 +437,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 // @param Platform formData int true "Platform associated to the template (1 - 'linux', 2 - 'windows')" Enums(1,2)
 // @param Type formData int true "Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)" Enums(1,2,3)
 // @param File formData file true "File"
-// @param Logo formData string false "URL of the template's logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"
+// @param Logo formData string false "URL of the template's logo" example:"https://portainer.io/img/logo.svg"
 // @param Variables formData string false "A json array of variables definitions" example:"[{\"label\":\"image\",\"description\":\"Image name\",\"defaultValue\":\"nginx:latest\",\"name\":\"image\"}]"
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
