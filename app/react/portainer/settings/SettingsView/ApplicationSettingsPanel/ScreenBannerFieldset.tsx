@@ -1,16 +1,17 @@
 import { useField, Field } from 'formik';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { useIsDemo } from '@/react/portainer/system/useSystemStatus';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { TextArea } from '@@/form-components/Input/Textarea';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 export function ScreenBannerFieldset() {
+  const isDemoQuery = useIsDemo();
   const [{ name }, { error }] = useField<string>('loginBanner');
   const [, { value: isEnabled }, { setValue: setIsEnabled }] =
     useField<boolean>('loginBannerEnabled');
-  const isDemo = false;
 
   return (
     <>
@@ -21,13 +22,13 @@ export function ScreenBannerFieldset() {
             label="Login screen banner"
             checked={isEnabled}
             name="toggle_login_banner"
-            disabled={isDemo}
+            disabled={isDemoQuery.data}
             onChange={(checked) => setIsEnabled(checked)}
             featureId={FeatureId.CUSTOM_LOGIN_BANNER}
           />
         </div>
 
-        {isDemo && (
+        {isDemoQuery.data && (
           <div className="col-sm-12 mt-2">
             <span className="small text-muted">
               You cannot use this feature in the demo version of Portainer.

@@ -7,6 +7,7 @@ import {
   useUpdateSettingsMutation,
 } from '@/react/portainer/settings/queries';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useIsDemo } from '@/react/portainer/system/useSystemStatus';
 
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
@@ -81,7 +82,8 @@ export function ApplicationSettingsPanel({ onSuccess }: { onSuccess(): void }) {
 
 function InnerForm({ isLoading }: { isLoading: boolean }) {
   const { values, setFieldValue, isValid, errors } = useFormikContext<Values>();
-  const isDemo = false;
+  const isDemoQuery = useIsDemo();
+
   return (
     <Form className="form-horizontal">
       <FormControl
@@ -117,11 +119,11 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
             checked={values.enableTelemetry}
             name="toggle_enableTelemetry"
             onChange={(checked) => setFieldValue('enableTelemetry', checked)}
-            disabled={isDemo}
+            disabled={isDemoQuery.data}
           />
         </div>
 
-        {isDemo && (
+        {isDemoQuery.data && (
           <div className="col-sm-12 mt-2">
             <span className="small text-muted">
               You cannot use this feature in the demo version of Portainer.
