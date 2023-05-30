@@ -70,10 +70,8 @@ func Test_updateEdgeGroups(t *testing.T) {
 	}
 
 	testFn := func(t *testing.T, testCase testCase) {
-
 		is := assert.New(t)
-		_, store, teardown := datastore.MustNewTestStore(t, true, true)
-		defer teardown()
+		_, store := datastore.MustNewTestStore(t, true, true)
 
 		err := store.Endpoint().Create(testCase.endpoint)
 		is.NoError(err)

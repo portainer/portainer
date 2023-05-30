@@ -27,8 +27,7 @@ const (
 // TestStoreFull an eventually comprehensive set of tests for the Store.
 // The idea is what we write to the store, we should read back.
 func TestStoreFull(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := MustNewTestStore(t, true, true)
 
 	testCases := map[string]func(t *testing.T){
 		"User Accounts": func(t *testing.T) {

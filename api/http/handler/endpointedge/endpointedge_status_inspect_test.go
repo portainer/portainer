@@ -73,42 +73,35 @@ var endpointTestCases = []endpointTestCase{
 	},
 }
 
-func setupHandler(t *testing.T) (*Handler, func(), error) {
+func mustSetupHandler(t *testing.T) *Handler {
 	tmpDir := t.TempDir()
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {
-		return nil, nil, fmt.Errorf("could not start a new filesystem service: %w", err)
+		t.Fatalf("could not start a new filesystem service: %s", err)
 	}
 
-	_, store, storeTeardown := datastore.MustNewTestStore(t, true, true)
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	ctx := context.Background()
 	shutdownCtx, cancelFn := context.WithCancel(ctx)
-
-	teardown := func() {
-		cancelFn()
-		storeTeardown()
-	}
+	t.Cleanup(cancelFn)
 
 	jwtService, err := jwt.NewService("1h", store)
 	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not start a new jwt service: %w", err)
+		t.Fatalf("could not start a new JWT service: %s", err)
 	}
 
 	apiKeyService := apikey.NewAPIKeyService(nil, nil)
 
 	settings, err := store.Settings().Settings()
 	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not create new settings: %w", err)
+		t.Fatalf("could not create new settings: %s", err)
 	}
 	settings.TrustOnFirstConnect = true
 
 	err = store.Settings().UpdateSettings(settings)
 	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not update settings: %w", err)
+		t.Fatalf("could not update settings: %s", err)
 	}
 
 	handler := NewHandler(
@@ -120,7 +113,7 @@ func setupHandler(t *testing.T) (*Handler, func(), error) {
 
 	handler.ReverseTunnelService = chisel.NewService(store, shutdownCtx)
 
-	return handler, teardown, nil
+	return handler
 }
 
 func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelation portainer.EndpointRelation) (err error) {
@@ -138,22 +131,16 @@ func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelat
 }
 
 func TestMissingEdgeIdentifier(t *testing.T) {
-	handler, teardown, err := setupHandler(t)
-	defer teardown()
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	handler := mustSetupHandler(t)
 	endpointID := portainer.EndpointID(45)
-	err = createEndpoint(handler, portainer.Endpoint{
+
+	err := createEndpoint(handler, portainer.Endpoint{
 		ID:     endpointID,
 		Name:   "endpoint-id-45",
 		Type:   portainer.EdgeAgentOnDockerEnvironment,
 		URL:    "https://portainer.io:9443",
 		EdgeID: "edge-id",
 	}, portainer.EndpointRelation{EndpointID: endpointID})
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,15 +159,10 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 }
 
 func TestWithEndpoints(t *testing.T) {
-	handler, teardown, err := setupHandler(t)
-	defer teardown()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	handler := mustSetupHandler(t)
 
 	for _, test := range endpointTestCases {
-		err = createEndpoint(handler, test.endpoint, test.endpointRelation)
+		err := createEndpoint(handler, test.endpoint, test.endpointRelation)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -203,12 +185,7 @@ func TestWithEndpoints(t *testing.T) {
 }
 
 func TestLastCheckInDateIncreases(t *testing.T) {
-	handler, teardown, err := setupHandler(t)
-	defer teardown()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	handler := mustSetupHandler(t)
 
 	endpointID := portainer.EndpointID(56)
 	endpoint := portainer.Endpoint{
@@ -224,7 +201,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err = createEndpoint(handler, endpoint, endpointRelation)
+	err := createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,12 +231,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 }
 
 func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
-	handler, teardown, err := setupHandler(t)
-	defer teardown()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	handler := mustSetupHandler(t)
 
 	endpointID := portainer.EndpointID(44)
 	edgeId := "edge-id"
@@ -274,7 +246,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err = createEndpoint(handler, endpoint, endpointRelation)
+	err := createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -302,12 +274,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 }
 
 func TestEdgeStackStatus(t *testing.T) {
-	handler, teardown, err := setupHandler(t)
-	defer teardown()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	handler := mustSetupHandler(t)
 
 	endpointID := portainer.EndpointID(7)
 	endpoint := portainer.Endpoint{
@@ -343,7 +310,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	}
 	handler.DataStore.EdgeStack().Create(edgeStack.ID, &edgeStack)
 
-	err = createEndpoint(handler, endpoint, endpointRelation)
+	err := createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -374,12 +341,7 @@ func TestEdgeStackStatus(t *testing.T) {
 }
 
 func TestEdgeJobsResponse(t *testing.T) {
-	handler, teardown, err := setupHandler(t)
-	defer teardown()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	handler := mustSetupHandler(t)
 
 	endpointID := portainer.EndpointID(77)
 	endpoint := portainer.Endpoint{
@@ -395,7 +357,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err = createEndpoint(handler, endpoint, endpointRelation)
+	err := createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}

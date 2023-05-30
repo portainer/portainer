@@ -14,27 +14,19 @@ const dummyLogoURL = "example.com"
 // for unit testing usage only since using NewStore will cause cycle import inside migrator pkg
 func initTestingSettingsService(dbConn portainer.Connection, preSetObj map[string]interface{}) error {
 	//insert a obj
-	if err := dbConn.UpdateObject("settings", []byte("SETTINGS"), preSetObj); err != nil {
-		return err
-	}
-	return nil
+	return dbConn.UpdateObject("settings", []byte("SETTINGS"), preSetObj)
 }
 
 func setup(store *Store) error {
-	var err error
 	dummySettingsObj := map[string]interface{}{
 		"LogoURL": dummyLogoURL,
 	}
-	err = initTestingSettingsService(store.connection, dummySettingsObj)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return initTestingSettingsService(store.connection, dummySettingsObj)
 }
 
 func TestMigrateSettings(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, false, true)
-	defer teardown()
+	_, store := MustNewTestStore(t, false, true)
 
 	err := setup(store)
 	if err != nil {
@@ -46,9 +38,11 @@ func TestMigrateSettings(t *testing.T) {
 	if updatedSettings.LogoURL != dummyLogoURL { // ensure a pre-migrate setting isn't unset
 		t.Errorf("unexpected value changes in the updated settings, want LogoURL value: %s, got LogoURL value: %s", dummyLogoURL, updatedSettings.LogoURL)
 	}
+
 	if updatedSettings.OAuthSettings.SSO != false { // I recon golang defaulting will make this false
 		t.Errorf("unexpected default OAuth SSO setting, want: false, got: %t", updatedSettings.OAuthSettings.SSO)
 	}
+
 	if updatedSettings.OAuthSettings.LogoutURI != "" {
 		t.Errorf("unexpected default OAuth HideInternalAuth setting, want:, got: %s", updatedSettings.OAuthSettings.LogoutURI)
 	}
@@ -72,18 +66,23 @@ func TestMigrateSettings(t *testing.T) {
 		DockerhubService:        store.DockerHubService,
 		AuthorizationService:    authorization.NewService(store),
 	})
+
 	if err := m.MigrateSettingsToDB30(); err != nil {
 		t.Errorf("failed to update settings: %v", err)
 	}
+
 	if err != nil {
 		t.Errorf("failed to retrieve the updated settings: %v", err)
 	}
+
 	if updatedSettings.LogoURL != dummyLogoURL {
 		t.Errorf("unexpected value changes in the updated settings, want LogoURL value: %s, got LogoURL value: %s", dummyLogoURL, updatedSettings.LogoURL)
 	}
+
 	if updatedSettings.OAuthSettings.SSO != false {
 		t.Errorf("unexpected default OAuth SSO setting, want: false, got: %t", updatedSettings.OAuthSettings.SSO)
 	}
+
 	if updatedSettings.OAuthSettings.LogoutURI != "" {
 		t.Errorf("unexpected default OAuth HideInternalAuth setting, want:, got: %s", updatedSettings.OAuthSettings.LogoutURI)
 	}

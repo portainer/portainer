@@ -13,8 +13,7 @@ import (
 )
 
 func TestHandler_webhookInvoke(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	webhookID := newGuidString(t)
 	store.StackService.Create(&portainer.Stack{

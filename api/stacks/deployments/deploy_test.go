@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 
-	portainer "github.com/portainer/portainer/api"
-	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,8 +55,7 @@ func (s *noopDeployer) StopRemoteSwarmStack(stack *portainer.Stack, endpoint *po
 }
 
 func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	err := RedeployWhenChanged(1, nil, store, nil)
 	assert.Error(t, err)
@@ -64,8 +63,7 @@ func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
 	err := store.User().Create(admin)
@@ -79,8 +77,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	tmpDir := t.TempDir()
 
@@ -110,8 +107,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	cloneErr := errors.New("failed to clone")
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
 	err := store.User().Create(admin)
@@ -138,8 +134,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 }
 
 func Test_redeployWhenChanged(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	tmpDir := t.TempDir()
 
@@ -191,8 +186,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 }
 
 func Test_getUserRegistries(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	endpointID := 123
 

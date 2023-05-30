@@ -10,8 +10,7 @@ import (
 )
 
 func TestDeleteStatus(t *testing.T) {
-	handler, _, teardown := setupHandler(t)
-	defer teardown()
+	handler, _ := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)

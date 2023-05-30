@@ -39,9 +39,7 @@ func Test_Filter_AgentVersion(t *testing.T) {
 		notAgentEnvironments,
 	}
 
-	handler, teardown := setupFilterTest(t, endpoints)
-
-	defer teardown()
+	handler := setupFilterTest(t, endpoints)
 
 	tests := []filterTest{
 		{
@@ -89,9 +87,7 @@ func Test_Filter_edgeFilter(t *testing.T) {
 		regularEndpoint,
 	}
 
-	handler, teardown := setupFilterTest(t, endpoints)
-
-	defer teardown()
+	handler := setupFilterTest(t, endpoints)
 
 	tests := []filterTest{
 		{
@@ -155,9 +151,9 @@ func runTest(t *testing.T, test filterTest, handler *Handler, endpoints []portai
 
 }
 
-func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
+func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) *Handler {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)
@@ -168,9 +164,9 @@ func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Han
 	is.NoError(err, "error creating a user")
 
 	bouncer := testhelpers.NewTestRequestBouncer()
-	handler = NewHandler(bouncer, nil)
+	handler := NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
 
-	return handler, teardown
+	return handler
 }
