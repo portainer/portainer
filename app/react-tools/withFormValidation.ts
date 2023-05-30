@@ -119,15 +119,10 @@ export function createFormValidatorController<TFormModel, TData = never>(
       });
     }
 
-    async $onInit() {
-      // this should never happen, but just in case
-      if (!this.values) {
-        throw new Error(
-          'FormValidatorController: values parameter is required'
-        );
+    async $onChanges(changes: { values?: { currentValue: TFormModel } }) {
+      if (changes.values) {
+        await this.runValidation(changes.values.currentValue);
       }
-
-      await this.runValidation(this.values);
     }
   };
 }
