@@ -58,6 +58,7 @@ interface Props {
   loadBalancerEnabled: boolean;
   appName: string;
   selector: Record<string, string>;
+  isEditMode: boolean;
 }
 
 export function KubeServicesForm({
@@ -67,6 +68,7 @@ export function KubeServicesForm({
   loadBalancerEnabled,
   appName,
   selector,
+  isEditMode,
 }: Props) {
   const { isAdmin } = useCurrentUser();
   const [selectedServiceTypeOption, setSelectedServiceTypeOption] = useState<
@@ -76,16 +78,18 @@ export function KubeServicesForm({
   // when the appName changes, update the names for each service
   // and the serviceNames for each service port
   useEffect(() => {
-    const newServiceNames = getUniqNames(appName, services);
-    const newServices = services.map((service, index) => {
-      const newServiceName = newServiceNames[index];
-      const newServicePorts = service.Ports.map((port) => ({
-        ...port,
-        serviceName: newServiceName,
-      }));
-      return { ...service, Name: newServiceName, Ports: newServicePorts };
-    });
-    onChange(newServices);
+    if (!isEditMode) {
+      const newServiceNames = getUniqNames(appName, services);
+      const newServices = services.map((service, index) => {
+        const newServiceName = newServiceNames[index];
+        const newServicePorts = service.Ports.map((port) => ({
+          ...port,
+          serviceName: newServiceName,
+        }));
+        return { ...service, Name: newServiceName, Ports: newServicePorts };
+      });
+      onChange(newServices);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appName]);
 
@@ -143,7 +147,8 @@ export function KubeServicesForm({
                 const newService = structuredClone(serviceFormDefaultValues);
                 newService.Name = generateUniqueName(
                   appName,
-                  services.length + 1
+                  services.length + 1,
+                  services
                 );
                 newService.Type =
                   selectedServiceTypeOption?.value ||
@@ -268,8 +273,28 @@ export function KubeServicesForm({
   );
 }
 
-function generateUniqueName(appName: string, index: number) {
+function generateIndexedName(appName: string, index: number) {
   return index === 0 ? appName : `${appName}-${index}`;
+}
+
+function isNameUnique(name: string, services: ServiceFormValues[]) {
+  return services.findIndex((service) => service.Name === name) === -1;
+}
+
+function generateUniqueName(
+  appName: string,
+  index: number,
+  services: ServiceFormValues[]
+) {
+  let initialIndex = index;
+  let uniqueName = appName;
+
+  while (!isNameUnique(uniqueName, services)) {
+    uniqueName = generateIndexedName(appName, initialIndex);
+    initialIndex++;
+  }
+
+  return uniqueName;
 }
 
 function getUniqNames(appName: string, services: ServiceFormValues[]) {
@@ -282,7 +307,7 @@ function getUniqNames(appName: string, services: ServiceFormValues[]) {
       const newIndex =
         acc.findIndex((existingName) => existingName === appName) + 1;
       const uniqName = acc.includes(appName)
-        ? generateUniqueName(appName, newIndex)
+        ? generateUniqueName(appName, newIndex, services)
         : appName;
       return [...acc, uniqName];
     },
