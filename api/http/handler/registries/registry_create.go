@@ -119,6 +119,8 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Ecr:              payload.Ecr,
 	}
 
+	registry.ManagementConfiguration = syncConfig(registry)
+
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
