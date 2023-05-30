@@ -8,10 +8,10 @@ angular.module('portainer.docker').factory('BuildService', [
     'use strict';
     var service = {};
 
-    service.buildImageFromUpload = function (names, file, path) {
+    service.buildImageFromUpload = function (endpointID, names, file, path) {
       var deferred = $q.defer();
 
-      FileUploadService.buildImage(names, file, path)
+      FileUploadService.buildImage(endpointID, names, file, path)
         .then(function success(response) {
           var model = new ImageBuildModel(response.data);
           deferred.resolve(model);
@@ -23,8 +23,9 @@ angular.module('portainer.docker').factory('BuildService', [
       return deferred.promise;
     };
 
-    service.buildImageFromURL = function (names, url, path) {
+    service.buildImageFromURL = function (endpointId, names, url, path) {
       var params = {
+        endpointId,
         t: names,
         remote: url,
         dockerfile: path,
@@ -44,8 +45,9 @@ angular.module('portainer.docker').factory('BuildService', [
       return deferred.promise;
     };
 
-    service.buildImageFromDockerfileContent = function (names, content) {
+    service.buildImageFromDockerfileContent = function (endpointId, names, content) {
       var params = {
+        endpointId,
         t: names,
       };
       var payload = {
@@ -66,13 +68,13 @@ angular.module('portainer.docker').factory('BuildService', [
       return deferred.promise;
     };
 
-    service.buildImageFromDockerfileContentAndFiles = function (names, content, files) {
+    service.buildImageFromDockerfileContentAndFiles = function (endpointID, names, content, files) {
       var dockerfile = new Blob([content], { type: 'text/plain' });
       var uploadFiles = [dockerfile].concat(files);
 
       var deferred = $q.defer();
 
-      FileUploadService.buildImageFromFiles(names, uploadFiles)
+      FileUploadService.buildImageFromFiles(endpointID, names, uploadFiles)
         .then(function success(response) {
           var model = new ImageBuildModel(response.data);
           deferred.resolve(model);
