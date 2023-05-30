@@ -5,13 +5,13 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 var (
 	ErrStackAlreadyExists     = errors.New("A stack already exists with this name")
 	ErrWebhookIDAlreadyExists = errors.New("A webhook ID already exists")
-	ErrInvalidGitCredential   = errors.New("Invalid git credential")
 )
 
 // DownloadGitRepository downloads the target git repository on the disk
@@ -28,7 +28,7 @@ func DownloadGitRepository(config gittypes.RepoConfig, gitService portainer.GitS
 	err := gitService.CloneRepository(projectPath, config.URL, config.ReferenceName, username, password, config.TLSSkipVerify)
 	if err != nil {
 		if errors.Is(err, gittypes.ErrAuthenticationFailure) {
-			newErr := ErrInvalidGitCredential
+			newErr := git.ErrInvalidGitCredential
 			return "", newErr
 		}
 

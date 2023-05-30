@@ -13,7 +13,11 @@ export async function createGitCredential(
   gitCredential: CreateGitCredentialPayload
 ) {
   try {
-    await axios.post(buildGitUrl(gitCredential.userId), gitCredential);
+    const { data } = await axios.post<{ gitCredential: GitCredential }>(
+      buildGitUrl(gitCredential.userId),
+      gitCredential
+    );
+    return data.gitCredential;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to create git credential');
   }

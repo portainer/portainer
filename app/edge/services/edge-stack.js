@@ -65,9 +65,5 @@ angular.module('portainer.edge').factory('EdgeStackService', function EdgeStackS
     }
   };
 
-  service.update = function update(stack) {
-    return EdgeStacks.update(stack).$promise;
-  };
-
   return service;
 });

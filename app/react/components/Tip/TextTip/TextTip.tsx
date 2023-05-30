@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 import { Icon, IconMode } from '@@/Icon';
 
-type Color = 'orange' | 'blue';
+type Color = 'orange' | 'blue' | 'red' | 'green';
 
 export interface Props {
   icon?: React.ReactNode;
@@ -33,6 +33,10 @@ function getMode(color: Color): IconMode {
   switch (color) {
     case 'blue':
       return 'primary';
+    case 'red':
+      return 'danger';
+    case 'green':
+      return 'success';
     case 'orange':
     default:
       return 'warning';

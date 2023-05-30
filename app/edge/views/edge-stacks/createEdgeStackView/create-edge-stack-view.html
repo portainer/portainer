@@ -39,12 +39,18 @@
           </div>
           <!-- !name-input -->
 
-          <edge-groups-selector value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
+          <edge-groups-selector ng-if="$ctrl.formValues.Groups" value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)"></edge-groups-selector>
+
+          <p class="col-sm-12 vertical-center help-block small text-warning" ng-if="$ctrl.formValues.DeploymentType === undefined">
+            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no available deployment types when there is more than one type of environment in your edge group
+            selection (e.g. Kubernetes and Docker environments). Please select edge groups that have environments of the same type.
+          </p>
 
           <edge-stack-deployment-type-selector
             value="$ctrl.formValues.DeploymentType"
-            has-docker-endpoint="$ctrl.hasDockerEndpoint()"
-            has-kube-endpoint="$ctrl.hasKubeEndpoint()"
+            has-docker-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnDocker)"
+            has-kube-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnKubernetes)"
+            has-nomad-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnNomad)"
             on-change="($ctrl.onChangeDeploymentType)"
           ></edge-stack-deployment-type-selector>
 

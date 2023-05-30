@@ -1,8 +1,9 @@
 import { EditorType } from '@/react/edge/edge-stacks/types';
-import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
 import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
+import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -27,6 +28,7 @@ export default class CreateEdgeStackViewController {
     };
 
     this.EditorType = EditorType;
+    this.EnvironmentType = EnvironmentType;
 
     this.state = {
       Method: 'editor',
@@ -36,6 +38,7 @@ export default class CreateEdgeStackViewController {
       isEditorDirty: false,
       hasKubeEndpoint: false,
       endpointTypes: [],
+      baseWebhookUrl: baseEdgeStackWebhookUrl(),
     };
 
     this.edgeGroups = null;
@@ -49,8 +52,7 @@ export default class CreateEdgeStackViewController {
     this.createStackFromFileUpload = this.createStackFromFileUpload.bind(this);
     this.createStackFromGitRepository = this.createStackFromGitRepository.bind(this);
     this.onChangeGroups = this.onChangeGroups.bind(this);
-    this.hasDockerEndpoint = this.hasDockerEndpoint.bind(this);
-    this.hasKubeEndpoint = this.hasKubeEndpoint.bind(this);
+    this.hasType = this.hasType.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
   }
 
@@ -139,9 +141,11 @@ export default class CreateEdgeStackViewController {
   }
 
   checkIfEndpointTypes(groups) {
-    const edgeGroups = groups.map((id) => this.edgeGroups.find((e) => e.Id === id));
-    this.state.endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
-    this.selectValidDeploymentType();
+    return this.$scope.$evalAsync(() => {
+      const edgeGroups = groups.map((id) => this.edgeGroups.find((e) => e.Id === id));
+      this.state.endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
+      this.selectValidDeploymentType();
+    });
   }
 
   selectValidDeploymentType() {
@@ -152,12 +156,8 @@ export default class CreateEdgeStackViewController {
     }
   }
 
-  hasKubeEndpoint() {
-    return this.state.endpointTypes.includes(PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment);
-  }
-
-  hasDockerEndpoint() {
-    return this.state.endpointTypes.includes(PortainerEndpointTypes.EdgeAgentOnDockerEnvironment);
+  hasType(envType) {
+    return this.state.endpointTypes.includes(envType);
   }
 
   validateForm(method) {

@@ -1,6 +1,7 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { UserId } from '@/portainer/users/types';
+import { RegistryId, Registry } from '@/react/portainer/registries/types';
 
 import { EnvironmentId } from '../types';
 
@@ -13,12 +14,6 @@ interface AccessPolicy {
 
 type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
 type TeamAccessPolicies = Record<TeamId, AccessPolicy>;
-
-export type RegistryId = number;
-export interface Registry {
-  Id: RegistryId;
-  Name: string;
-}
 
 interface RegistryAccess {
   UserAccessPolicies: UserAccessPolicies;

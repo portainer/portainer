@@ -21,7 +21,14 @@
   <file-upload-description> You can upload a Compose file from your computer. </file-upload-description>
 </file-upload-form>
 
-<git-form ng-if="$ctrl.state.Method === 'repository'" value="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+<git-form
+  ng-if="$ctrl.state.Method === 'repository'"
+  value="$ctrl.formValues"
+  on-change="($ctrl.onChangeFormValues)"
+  base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+  webhook-id="{{ $ctrl.state.webhookId }}"
+  docs-links
+></git-form>
 
 <!-- template -->
 <div ng-if="$ctrl.state.Method === 'template'">

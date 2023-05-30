@@ -32,4 +32,11 @@
   </file-upload-description>
 </file-upload-form>
 
-<git-form ng-if="$ctrl.state.Method === 'repository'" deploy-method="kubernetes" value="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+<git-form
+  ng-if="$ctrl.state.Method === 'repository'"
+  deploy-method="kubernetes"
+  value="$ctrl.formValues"
+  on-change="($ctrl.onChangeFormValues)"
+  base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+  webhook-id="{{ $ctrl.state.webhookId }}"
+></git-form>

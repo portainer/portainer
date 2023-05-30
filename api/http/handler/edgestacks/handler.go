@@ -25,6 +25,8 @@ type Handler struct {
 	KubernetesDeployer portainer.KubernetesDeployer
 }
 
+const contextKey = "edgeStack_item"
+
 // NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
 	h := &Handler{
