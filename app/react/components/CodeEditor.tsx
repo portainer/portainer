@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import { createTheme } from '@uiw/codemirror-themes';
 import { tags as highlightTags } from '@lezer/highlight';
 
+import { CopyButton } from '@@/buttons/CopyButton';
+
 import styles from './CodeEditor.module.css';
 import { TextTip } from './Tip/TextTip';
 
@@ -82,7 +84,24 @@ export function CodeEditor({
 
   return (
     <>
-      {!!placeholder && <TextTip color="blue">{placeholder}</TextTip>}
+      <div className="mb-2 flex flex-col">
+        <div className="flex">
+          <div className="flex-1">
+            {!!placeholder && <TextTip color="blue">{placeholder}</TextTip>}
+          </div>
+
+          <div className="ml-auto">
+            <CopyButton
+              copyText={value}
+              color="none"
+              className="!text-sm !font-medium text-blue-9 hover:!text-blue-11 th-highcontrast:text-blue-7 hover:th-highcontrast:!text-blue-6 th-dark:text-blue-7 hover:th-dark:!text-blue-6"
+              indicatorPosition="left"
+            >
+              Copy to clipboard
+            </CopyButton>
+          </div>
+        </div>
+      </div>
       <CodeMirror
         className={styles.root}
         theme={theme}
