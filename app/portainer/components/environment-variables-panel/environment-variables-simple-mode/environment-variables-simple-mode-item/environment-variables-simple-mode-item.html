@@ -29,15 +29,7 @@
     <div class="env-item-value w-full">
       <div class="input-group input-group-sm">
         <span class="input-group-addon">value</span>
-        <input
-          type="text"
-          class="form-control"
-          ng-model="$ctrl.variable.value"
-          placeholder="e.g. bar"
-          ng-trim="false"
-          name="value"
-          ng-change="$ctrl.onChangeValue($ctrl.variable.value)"
-        />
+        <textarea class="form-control env-item-textarea" rows="1" ng-model="$ctrl.variable.value" placeholder="e.g. bar" ng-trim="false" name="value"> </textarea>
       </div>
     </div>
     <div class="form-group" ng-show="$ctrl[$ctrl.formName].value.$invalid">
