@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, ReactNode, useCallback } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
-import { debounce } from 'lodash';
+import { debounce, groupBy, forOwn } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
@@ -133,18 +133,23 @@ export function CreateIngressView() {
     }
   });
 
-  const clusterIpServices = useMemo(
-    () => servicesResults.data?.filter((s) => s.Type === 'ClusterIP'),
-    [servicesResults.data]
-  );
-  const servicesOptions = useMemo(
-    () =>
-      clusterIpServices?.map((service) => ({
-        label: service.Name,
-        value: service.Name,
-      })),
-    [clusterIpServices]
-  );
+  const clusterIpServices = servicesResults.data;
+  const servicesOptions: Option<string>[] = useMemo(() => {
+    const options: Option<string>[] = [];
+    forOwn(
+      groupBy(clusterIpServices, (s) => s.Type),
+      (services, type) => {
+        options.push({ label: `--- ${type} ---`, value: type, disabled: true });
+        services.forEach((service) => {
+          options.push({
+            label: service.Name,
+            value: service.Name,
+          });
+        });
+      }
+    );
+    return options;
+  }, [clusterIpServices]);
 
   const serviceOptions = [
     { label: 'Select a service', value: '' },

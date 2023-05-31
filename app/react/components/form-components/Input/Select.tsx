@@ -4,6 +4,7 @@ import { SelectHTMLAttributes } from 'react';
 export interface Option<T extends string | number> {
   value: T;
   label: string;
+  disabled?: boolean;
 }
 
 interface Props<T extends string | number> {
@@ -22,7 +23,7 @@ export function Select<T extends number | string>({
       className={clsx('form-control', className)}
     >
       {options.map((item) => (
-        <option value={item.value} key={item.value}>
+        <option value={item.value} key={item.value} disabled={item.disabled}>
           {item.label}
         </option>
       ))}
