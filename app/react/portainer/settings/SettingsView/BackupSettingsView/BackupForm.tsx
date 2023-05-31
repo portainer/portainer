@@ -4,6 +4,7 @@ import { Download, Upload } from 'lucide-react';
 import * as Yup from 'yup';
 
 import * as notifications from '@/portainer/services/notifications';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { FormControl } from '@@/form-components/FormControl';
@@ -14,9 +15,13 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { useDownloadBackupMutation } from '../../queries/useBackupSettingsMutation';
 
-import { options } from './backup-options';
-import { FormValues, DownloadBackupPayload } from './types';
-import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { backupFormType, options } from './backup-options';
+import {
+  FormValues,
+  DownloadBackupPayload,
+  ExportS3BackupPayload,
+} from './types';
+import { useExportS3BackupMutation } from './useBackupSettings';
 
 const buildBackupValidationSchema = Yup.object().shape({
   PasswordProtect: Yup.boolean(),
@@ -68,7 +73,11 @@ interface Props {
 export function BackupForm({ settings }: Props) {
   const [backupType, setBackupType] = useState(options[0].value);
 
-  const { mutate, isError } = useDownloadBackupMutation();
+  const { mutate: downloadMutate, isError: isDownloadError } =
+    useDownloadBackupMutation();
+
+  const { mutate: exportS3Mutate, isError: isExportS3Error } =
+    useExportS3BackupMutation();
 
   return (
     <Formik
@@ -257,24 +266,24 @@ export function BackupForm({ settings }: Props) {
                 inputId="password-s3-switch"
                 label="Password Protect"
                 size="small"
-                errors={errors.PasswordProtect}
+                errors={errors.PasswordProtectS3}
               >
                 <Switch
                   id="password-s3-switch"
                   name="password-s3-switch"
                   className="space-right"
-                  checked={values.PasswordProtect}
+                  checked={values.PasswordProtectS3}
                   data-cy="settings-passwordProtectToggleS3"
-                  onChange={(e) => setFieldValue('PasswordProtect', e)}
+                  onChange={(e) => setFieldValue('PasswordProtectS3', e)}
                 />
               </FormControl>
 
-              {values.PasswordProtect && (
+              {values.PasswordProtectS3 && (
                 <FormControl
                   inputId="password-s3"
                   label="Password"
                   size="small"
-                  errors={errors.Password}
+                  errors={errors.PasswordS3}
                 >
                   <Field
                     id="password-s3"
@@ -283,9 +292,9 @@ export function BackupForm({ settings }: Props) {
                     as={Input}
                     data-cy="settings-backups3pw"
                     required
-                    value={values.Password}
+                    value={values.PasswordS3}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      setFieldValue('Password', e.target.value)
+                      setFieldValue('PasswordS3', e.target.value)
                     }
                   />
                 </FormControl>
@@ -294,8 +303,8 @@ export function BackupForm({ settings }: Props) {
               <div className="form-group">
                 <div className="col-sm-12">
                   <LoadingButton
-                    // isLoading={mutation.isLoading}
-                    disabled={!isValid}
+                    isLoading={isSubmitting}
+                    disabled={!isValid || isExportS3Error}
                     className="!ml-0"
                     data-cy="settings-exportBackupS3Button"
                     limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
@@ -312,8 +321,8 @@ export function BackupForm({ settings }: Props) {
                 <div className="col-sm-12">
                   <LoadingButton
                     loadingText="Saving settings..."
-                    // isLoading={mutation.isLoading}
-                    // disabled={!isValid || !dirty}
+                    // isLoading={isSubmitting}
+                    // disabled={!isValid || isExportS3Error}
                     className="!ml-0"
                     limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
                     limited-feature-disabled
@@ -371,7 +380,7 @@ export function BackupForm({ settings }: Props) {
                   <LoadingButton
                     loadingText="Downloading settings..."
                     isLoading={isSubmitting}
-                    disabled={!isValid || isError}
+                    disabled={!isValid || isDownloadError}
                     className="!ml-0"
                     icon={Download}
                   >
@@ -388,8 +397,17 @@ export function BackupForm({ settings }: Props) {
 
   async function onSubmit(values: FormValues) {
     try {
-      if (backupType === 's3') {
-        // await mutateAsync(values);
+      if (backupType === backupFormType.S3) {
+        const payload: ExportS3BackupPayload = {
+          Password: values.PasswordProtectS3 ? values.PasswordS3 : '',
+          CronRule: values.ScheduleAutomaticBackup ? values.CronRule : '',
+          AccessKeyID: values.AccessKeyID,
+          SecretAccessKey: values.SecretAccessKey,
+          Region: values.Region,
+          BucketName: values.BucketName,
+          S3CompatibleHost: values.S3CompatibleHost,
+        };
+        exportS3Mutate(payload);
       } else {
         const payload: DownloadBackupPayload = {
           password: '',
@@ -397,10 +415,18 @@ export function BackupForm({ settings }: Props) {
         if (values.PasswordProtect) {
           payload.password = values.Password;
         }
-        mutate(payload);
+        downloadMutate(payload);
       }
     } catch (e) {
-      notifications.error('Failure', e as Error, 'Unable to download backup');
+      if (backupType === backupFormType.S3) {
+        notifications.error(
+          'Failure',
+          e as Error,
+          'Unable to export S3 backup'
+        );
+      } else {
+        notifications.error('Failure', e as Error, 'Unable to download backup');
+      }
     }
   }
 }
