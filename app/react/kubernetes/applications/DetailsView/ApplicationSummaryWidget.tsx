@@ -267,7 +267,7 @@ export function ApplicationSummaryWidget() {
       {
         op: 'replace',
         path: `/metadata/annotations/${appNoteAnnotation}`,
-        value: 'applicationNoteFormValues',
+        value: applicationNoteFormValues,
       },
     ];
     if (application?.kind) {
