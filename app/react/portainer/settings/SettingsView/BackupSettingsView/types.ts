@@ -1,6 +1,6 @@
 export interface BackupS3Model {
   CronRule: string;
-  AccessKeyId: string;
+  AccessKeyID: string;
   SecretAccessKey: string;
   Region: string;
   BucketName: string;

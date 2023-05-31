@@ -17,9 +17,9 @@ export function BackupSettingsView() {
   const settings: FormValues = {
     Password: settingsQuery.data.Password,
     PasswordProtect: false,
-    ScheduleAutomaticBackup: true,
+    ScheduleAutomaticBackup: false,
     CronRule: settingsQuery.data.CronRule,
-    AccessKeyId: settingsQuery.data.AccessKeyId,
+    AccessKeyID: settingsQuery.data.AccessKeyID,
     SecretAccessKey: settingsQuery.data.SecretAccessKey,
     Region: settingsQuery.data.Region,
     BucketName: settingsQuery.data.BucketName,
