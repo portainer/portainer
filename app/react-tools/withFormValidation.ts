@@ -13,6 +13,7 @@ interface FormFieldProps<TValue> {
   onChange(values: TValue): void;
   values: TValue;
   errors?: FormikErrors<TValue> | ArrayError<TValue>;
+  validationContext?: object; // optional context to pass to yup validation, for example, external data
 }
 
 type WithFormFieldProps<TProps, TValue> = TProps & FormFieldProps<TValue>;
@@ -37,7 +38,13 @@ export function withFormValidation<TProps, TValue, TData = never>(
   ngModule
     .component(
       reactComponentName,
-      r2a(Component, ['errors', 'onChange', 'values', ...propNames])
+      r2a(Component, [
+        'errors',
+        'onChange',
+        'values',
+        'validationContext',
+        ...propNames,
+      ])
     )
     .component(
       componentName,
@@ -68,7 +75,12 @@ export function createFormValidationComponent<TFormModel, TData = never>(
     </ng-form>`,
     controller: createFormValidatorController(schemaBuilder),
     bindings: Object.fromEntries(
-      [...propsWithErrors, 'validationData', 'onChange'].map((p) => [p, '<'])
+      [
+        ...propsWithErrors,
+        'validationData',
+        'onChange',
+        'validationContext',
+      ].map((p) => [p, '<'])
     ),
   };
 }
@@ -87,6 +99,8 @@ export function createFormValidatorController<TFormModel, TData = never>(
 
     validationData?: TData;
 
+    validationContext?: object;
+
     onChange?: (value: TFormModel) => void;
 
     /* @ngInject */
@@ -100,17 +114,18 @@ export function createFormValidatorController<TFormModel, TData = never>(
     async handleChange(newValues: TFormModel) {
       return this.$async(async () => {
         this.onChange?.(newValues);
-        await this.runValidation(newValues);
+        await this.runValidation(newValues, this.validationContext);
       });
     }
 
-    async runValidation(value: TFormModel) {
+    async runValidation(value: TFormModel, validationContext?: object) {
       return this.$async(async () => {
         this.form?.$setValidity('form', true, this.form);
 
         this.errors = await validateForm<TFormModel>(
           () => schemaBuilder(this.validationData),
-          value
+          value,
+          validationContext
         );
 
         if (this.errors && Object.keys(this.errors).length > 0) {
@@ -121,7 +136,10 @@ export function createFormValidatorController<TFormModel, TData = never>(
 
     async $onChanges(changes: { values?: { currentValue: TFormModel } }) {
       if (changes.values) {
-        await this.runValidation(changes.values.currentValue);
+        await this.runValidation(
+          changes.values.currentValue,
+          this.validationContext
+        );
       }
     }
   };
