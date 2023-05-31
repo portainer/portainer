@@ -1,4 +1,4 @@
-<ng-form ng-if="service.EnvironmentVariables" id="service-env-variables" name="serviceEnvForm">
+<ng-form ng-if="service.EnvironmentVariables" id="service-env-variables" name="serviceEnvForm" class="form-horizontal">
   <rd-widget>
     <rd-widget-header icon="list" title-text="Environment variables">
       <div class="nopadding" authorization="DockerServiceUpdate">
@@ -11,7 +11,9 @@
       <p>There are no environment variables for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.EnvironmentVariables.length > 0">
-      <environment-variables-panel is-name-disabled="true" ng-model="service.EnvironmentVariables" on-change="(onChangeEnvVars)"></environment-variables-panel>
+      <div class="form-group">
+        <environment-variables-fieldset values="service.EnvironmentVariables" on-change="(onChangeEnvVars)"></environment-variables-fieldset>
+      </div>
     </rd-widget-body>
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">

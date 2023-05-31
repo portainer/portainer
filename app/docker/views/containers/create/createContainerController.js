@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
 
+import * as envVarsUtils from '@/react/components/form-components/EnvironmentVariablesFieldset/utils';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 import { confirmDestructive } from '@@/modals/confirm';
-import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { buildConfirmButton } from '@@/modals/utils';
 

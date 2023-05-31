@@ -19,8 +19,8 @@ require('./includes/updateconfig.html');
 
 import _ from 'lodash-es';
 
+import * as envVarsUtils from '@/react/components/form-components/EnvironmentVariablesFieldset/utils';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
-import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { confirmServiceForceUpdate } from '@/react/docker/services/common/update-service-modal';
 import { confirm, confirmDelete } from '@@/modals/confirm';
@@ -125,8 +125,10 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     $scope.addEnvironmentVariable = function addEnvironmentVariable(service) {
-      service.EnvironmentVariables.push({ name: '', value: '' });
-      updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
+      $scope.$evalAsync(() => {
+        service.EnvironmentVariables = service.EnvironmentVariables.concat({ name: '', value: '' });
+        updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
+      });
     };
 
     $scope.onChangeEnvVars = onChangeEnvVars;

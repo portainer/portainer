@@ -24,7 +24,7 @@ function toProps(
   );
 }
 
-type PropNames<T> = Exclude<keyof T, number | symbol>;
+export type PropNames<T> = Exclude<keyof T, number | symbol>;
 
 /**
  * react2angular is used to bind a React component to an AngularJS component

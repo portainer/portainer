@@ -62,8 +62,8 @@
   </div>
 
   <environment-variables-panel
-    ng-model="$ctrl.formValues.Env"
-    explanation="These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’."
+    values="$ctrl.formValues.Env"
+    explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
     on-change="($ctrl.onChangeEnvVar)"
     show-help-message="true"
   ></environment-variables-panel>
