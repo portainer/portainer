@@ -21,7 +21,7 @@ GOTESTSUM=go run gotest.tools/gotestsum@latest
 init-dist:
 	@mkdir -p dist
 
-build-all: deps build-server build-client ## Build the client, server and download external dependancies
+build-all: deps build-server build-client ## Build the client, server and download external dependancies (doesn't build an image)
 
 build-client: init-dist ## Build the client
 	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
