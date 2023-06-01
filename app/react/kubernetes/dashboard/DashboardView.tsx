@@ -10,7 +10,6 @@ import { PageHeader } from '@@/PageHeader';
 
 import { useNamespaces } from '../namespaces/queries';
 import { useApplicationsForCluster } from '../applications/application.queries';
-import { useConfigurationsForCluster } from '../configs/queries';
 import { usePVCsForCluster } from '../volumes/queries';
 import { useServicesForCluster } from '../services/service';
 import { useIngresses } from '../ingresses/queries';
@@ -26,8 +25,6 @@ export function DashboardView() {
   const namespaceNames = namespaces && Object.keys(namespaces);
   const { data: applications, ...applicationsQuery } =
     useApplicationsForCluster(environmentId, namespaceNames);
-  const { data: configurations, ...configurationsQuery } =
-    useConfigurationsForCluster(environmentId, namespaceNames);
   const { data: pvcs, ...pvcsQuery } = usePVCsForCluster(
     environmentId,
     namespaceNames
@@ -83,31 +80,6 @@ export function DashboardView() {
             dataCy="dashboard-application"
           />
           <DashboardItem
-            value={configurations?.length}
-            isLoading={
-              configurationsQuery.isLoading || namespacesQuery.isLoading
-            }
-            isRefetching={
-              configurationsQuery.isRefetching || namespacesQuery.isRefetching
-            }
-            icon={Lock}
-            to="kubernetes.configurations"
-            type="ConfigMaps & Secrets"
-            pluralType="ConfigMaps & Secrets"
-            dataCy="dashboard-config"
-          />
-          <DashboardItem
-            value={pvcs?.length}
-            isLoading={pvcsQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              pvcsQuery.isRefetching || namespacesQuery.isRefetching
-            }
-            icon={Database}
-            to="kubernetes.volumes"
-            type="Volume"
-            dataCy="dashboard-volume"
-          />
-          <DashboardItem
             value={services?.length}
             isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
             isRefetching={
@@ -153,6 +125,17 @@ export function DashboardView() {
             params={{ tab: 'secrets' }}
             type="Secret"
             dataCy="dashboard-secrets"
+          />
+          <DashboardItem
+            value={pvcs?.length}
+            isLoading={pvcsQuery.isLoading || namespacesQuery.isLoading}
+            isRefetching={
+              pvcsQuery.isRefetching || namespacesQuery.isRefetching
+            }
+            icon={Database}
+            to="kubernetes.volumes"
+            type="Volume"
+            dataCy="dashboard-volume"
           />
         </DashboardGrid>
       </div>
