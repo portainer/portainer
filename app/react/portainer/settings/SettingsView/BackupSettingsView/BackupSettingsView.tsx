@@ -3,7 +3,7 @@ import { Download } from 'lucide-react';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import { BackupForm } from './BackupForm';
-import { useBackupS3Settings } from './useBackupSettings';
+import { useBackupS3Settings } from './queries';
 import { FormValues } from './types';
 
 export function BackupSettingsView() {
