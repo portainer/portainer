@@ -15,10 +15,6 @@ type Service struct {
 	connection portainer.Connection
 }
 
-func (service *Service) BucketName() string {
-	return BucketName
-}
-
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
 	return &Service{
@@ -35,11 +31,11 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 
 // Settings retrieve the settings object.
 func (service *Service) Settings() (*portainer.Settings, error) {
-	var settings portainer.Settings
-	db := service.connection.GetDB()
-	tx := db.First(&settings, `id = ?`, 1)
-	if tx.Error != nil {
-		return nil, tx.Error
+	settings := portainer.Settings{ID: 1}
+
+	err := service.connection.GetByID(1, &settings)
+	if err != nil {
+		return nil, err
 	}
 
 	return &settings, nil

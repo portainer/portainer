@@ -9,7 +9,7 @@ import (
 
 // NewDatabase should use config options to return a connection to the requested database
 func NewDatabase(storeType, storePath string, encryptionKey []byte) (connection portainer.Connection, err error) {
-	if storeType == "boltdb" {
+	if storeType == "sqlite" {
 		return &sqlite.DbConnection{
 			Path:          storePath,
 			EncryptionKey: encryptionKey,

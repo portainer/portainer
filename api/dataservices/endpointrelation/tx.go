@@ -1,8 +1,6 @@
 package endpointrelation
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 
@@ -14,30 +12,26 @@ type ServiceTx struct {
 	tx      portainer.Transaction
 }
 
-func (service ServiceTx) BucketName() string {
-	return BucketName
-}
-
 // EndpointRelations returns an array of all EndpointRelations
 func (service ServiceTx) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	var all = make([]portainer.EndpointRelation, 0)
 
-	err := service.tx.GetAll(
-		BucketName,
-		&portainer.EndpointRelation{},
-		func(obj interface{}) (interface{}, error) {
-			r, ok := obj.(*portainer.EndpointRelation)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
-				return nil, fmt.Errorf("failed to convert to EndpointRelation object: %s", obj)
-			}
+	// err := service.tx.GetAll(
+	// 	BucketName,
+	// 	&portainer.EndpointRelation{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		r, ok := obj.(*portainer.EndpointRelation)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
+	// 			return nil, fmt.Errorf("failed to convert to EndpointRelation object: %s", obj)
+	// 		}
 
-			all = append(all, *r)
+	// 		all = append(all, *r)
 
-			return &portainer.EndpointRelation{}, nil
-		})
+	// 		return &portainer.EndpointRelation{}, nil
+	// 	})
 
-	return all, err
+	return all, nil
 }
 
 // EndpointRelation returns an Environment(Endpoint) relation object by EndpointID
@@ -55,10 +49,10 @@ func (service ServiceTx) EndpointRelation(endpointID portainer.EndpointID) (*por
 
 // CreateEndpointRelation saves endpointRelation
 func (service ServiceTx) Create(endpointRelation *portainer.EndpointRelation) error {
-	err := service.tx.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
-	cache.Del(endpointRelation.EndpointID)
+	// err := service.tx.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
+	// cache.Del(endpointRelation.EndpointID)
 
-	return err
+	return nil
 }
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object

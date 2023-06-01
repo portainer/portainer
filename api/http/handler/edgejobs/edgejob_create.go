@@ -95,6 +95,8 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		edgeJob, err = handler.createEdgeJob(handler.DataStore, &payload.edgeJobBasePayload, []byte(payload.FileContent))
 	} else {
+		// QUESTION: why is this wrapped in a transaction when only one operation is performed?
+
 		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		// 	edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, []byte(payload.FileContent))
 
@@ -204,6 +206,8 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		edgeJob, err = handler.createEdgeJob(handler.DataStore, &payload.edgeJobBasePayload, payload.File)
 	} else {
+		// QUESTION: why is this wrapped in a transaction when only one operation is performed?
+
 		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		// 	edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, payload.File)
 
@@ -235,7 +239,7 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 	edgeJob.CronExpression = strings.Join(edgeCronExpression, " ")
 
 	for ID := range edgeJob.Endpoints {
-		endpoint, err := tx.Endpoint().Endpoint(ID)
+		endpoint, err := tx.Endpoint().Endpoint(ID) // QUESTION: why reading is transactional?
 		if err != nil {
 			return err
 		}

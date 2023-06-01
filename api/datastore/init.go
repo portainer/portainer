@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"fmt"
 	"os"
 
 	portainer "github.com/portainer/portainer/api"
@@ -9,7 +10,9 @@ import (
 // Init creates the default data set.
 func (store *Store) Init() error {
 
-	store.connection.Init()
+	if err := store.connection.Init(); err != nil {
+		fmt.Errorf("connection init returned error: %s\n", err.Error())
+	}
 
 	err := store.checkOrCreateDefaultSettings()
 	if err != nil {

@@ -4,18 +4,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "endpoint_groups"
-)
-
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
 }
 
 // NewService creates a new instance of a service.

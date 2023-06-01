@@ -31,6 +31,8 @@ func (store *Store) Open() (newStore bool, err error) {
 		return false, err
 	}
 
+	fmt.Println("encryptionReq:", encryptionReq)
+
 	if encryptionReq {
 		err = store.encryptDB()
 		if err != nil {
@@ -40,12 +42,14 @@ func (store *Store) Open() (newStore bool, err error) {
 
 	err = store.connection.Open()
 	if err != nil {
+		fmt.Printf("connection open returned error: %s\n", err.Error())
+		if store.IsErrObjectNotFound(err) || store.IsErrNoSuchTable(err) {
+			return true, nil
+		}
 		return false, err
 	}
 
-	// TODO: check if settings exists, if not, init or leave it as is
-	// Init auto migrates tables if needed
-	//store.connection.Init()
+	fmt.Println("connection openned")
 
 	err = store.initServices()
 	if err != nil {

@@ -9,10 +9,6 @@ type ServiceTx struct {
 	tx      portainer.Transaction
 }
 
-func (service ServiceTx) BucketName() string {
-	return BucketName
-}
-
 // EndpointGroup returns an environment(endpoint) group by ID.
 func (service ServiceTx) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.EndpointGroup, error) {
 	var endpointGroup portainer.EndpointGroup

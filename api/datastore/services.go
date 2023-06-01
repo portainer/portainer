@@ -125,9 +125,9 @@ func (store *Store) initServices() error {
 	store.EndpointGroupService = endpointgroupService
 
 	endpointService, err := endpoint.NewService(store.connection)
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 	store.EndpointService = endpointService
 
 	extensionService, err := extension.NewService(store.connection)

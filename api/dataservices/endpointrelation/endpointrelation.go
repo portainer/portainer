@@ -7,18 +7,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// BucketName represents the name of the bucket where this service stores data.
-const BucketName = "endpoint_relations"
-
 // Service represents a service for managing environment(endpoint) relation data.
 type Service struct {
 	connection      portainer.Connection
 	updateStackFn   func(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
 	updateStackFnTx func(tx portainer.Transaction, ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
 }
 
 func (service *Service) RegisterUpdateStackFunction(
