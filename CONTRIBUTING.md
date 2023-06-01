@@ -96,7 +96,7 @@ Portainer server can now be accessed at <https://localhost:9443>. and UI dev ser
 if you want to build the project you can run:
 
 ```sh
-make build
+make build-all
 ```
 
 For additional make commands, run `make help`.

@@ -17,5 +17,6 @@ docker run -d \
 -v /var/run/docker.sock:/var/run/alternative.sock:z \
 -v /tmp:/tmp \
 --name portainer \
+--rm \
 portainer/base \
 /app/portainer ${PORTAINER_FLAGS}

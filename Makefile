@@ -21,7 +21,7 @@ GOTESTSUM=go run gotest.tools/gotestsum@latest
 init-dist:
 	@mkdir -p dist
 
-build: build-server build-client ## Build the server and client
+build-all: deps build-server build-client ## Build the client, server and download external dependancies (doesn't build an image)
 
 build-client: init-dist ## Build the client
 	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
@@ -29,21 +29,21 @@ build-client: init-dist ## Build the client
 build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
-build-image: build ## Build the Portainer image locally
+build-image: build-all ## Build the Portainer image locally
 	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
 
-devops: clean init-dist deps build-client ## Build the server binary for CI
+build-storybook: ## Build and serve the storybook files
+	yarn storybook:build
+
+devops: clean deps build-client ## Build the everything target specifically for CI
 	echo "Building the devops binary..."
 	@./build/build_binary_azuredevops.sh "$(PLATFORM)" "$(ARCH)"
-
-build-storybook:
-	yarn storybook:build
 
 ##@ Build dependencies
 .PHONY: deps server-deps client-deps tidy
 deps: server-deps client-deps ## Download all client and server build dependancies
 
-server-deps: ## Download dependant server binaries
+server-deps: init-dist ## Download dependant server binaries
 	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
 
 client-deps: ## Install client dependencies
