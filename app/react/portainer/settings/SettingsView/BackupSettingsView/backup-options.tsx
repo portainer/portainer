@@ -11,13 +11,13 @@ export const backupFormType = {
 
 export const options = [
   {
-    id: 'backup_file_1',
+    id: 'backup_file',
     icon: <BadgeIcon icon={DownloadCloud} />,
     label: 'Download backup file',
     value: backupFormType.File,
   },
   {
-    id: 'backup_s3_1',
+    id: 'backup_s3',
     icon: <BadgeIcon icon={UploadCloud} />,
     label: 'Store in S3',
     description: 'Define a cron schedule',

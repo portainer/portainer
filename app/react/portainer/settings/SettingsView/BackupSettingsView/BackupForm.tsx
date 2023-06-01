@@ -27,6 +27,11 @@ const buildBackupValidationSchema = Yup.object().shape({
     is: true,
     then: (schema) => schema.required('This field is required.'),
   }),
+  PasswordProtectS3: Yup.boolean(),
+  PasswordS3: Yup.string().when('PasswordProtectS3', {
+    is: true,
+    then: (schema) => schema.required('This field is required.'),
+  }),
   ScheduleAutomaticBackup: Yup.boolean(),
   CronRule: Yup.string().when('ScheduleAutomaticBackup', {
     is: true,
@@ -109,7 +114,6 @@ export function BackupForm({ settings }: Props) {
           />
 
           {backupType === 's3' ? (
-            // <BackupFormS3 />
             <>
               <FormControl
                 inputId="schedule-backups"
@@ -142,7 +146,7 @@ export function BackupForm({ settings }: Props) {
                     placeholder="0 2 * * *"
                     data-cy="settings-backupCronRuleInput"
                     limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
-                    limited-feature-disabled
+                    limited-feature-disabled="true"
                     limited-feature-class="limited-be"
                     required
                     value={values.CronRule}
@@ -163,10 +167,9 @@ export function BackupForm({ settings }: Props) {
                   name="access_key_id"
                   type="text"
                   as={Input}
-                  required
                   data-cy="settings-accessKeyIdInput"
                   limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
-                  limited-feature-disabled
+                  limited-feature-disabled="true"
                   limited-feature-class="limited-be"
                   value={values.AccessKeyID}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -185,10 +188,9 @@ export function BackupForm({ settings }: Props) {
                   name="secret_access_key"
                   type="password"
                   as={Input}
-                  required
                   data-cy="settings-secretAccessKeyInput"
                   limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
-                  limited-feature-disabled
+                  limited-feature-disabled="true"
                   limited-feature-class="limited-be"
                   value={values.SecretAccessKey}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -210,7 +212,7 @@ export function BackupForm({ settings }: Props) {
                   placeholder="default region is us-east-1 if left empty"
                   data-cy="settings-backupRegionInput"
                   limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
-                  limited-feature-disabled
+                  limited-feature-disabled="true"
                   limited-feature-class="limited-be"
                   value={values.Region}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -229,7 +231,6 @@ export function BackupForm({ settings }: Props) {
                   name="bucket_name"
                   type="text"
                   as={Input}
-                  required
                   data-cy="settings-backupBucketNameInput"
                   limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
                   limited-feature-class="limited-be"
@@ -310,7 +311,7 @@ export function BackupForm({ settings }: Props) {
                     className="!ml-0"
                     data-cy="settings-exportBackupS3Button"
                     limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
-                    limited-feature-disabled
+                    limited-feature-disabled="true"
                     limited-feature-class="limited-be"
                     icon={Upload}
                     value="export"
@@ -331,10 +332,10 @@ export function BackupForm({ settings }: Props) {
                     isLoading={isSubmitting}
                     disabled={!isValid || isUpdateS3Error}
                     className="!ml-0"
-                    limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
-                    limited-feature-disabled
-                    limited-feature-class="limited-be"
                     data-cy="settings-saveBackupSettingsButton"
+                    limited-feature-dir={FeatureId.S3_BACKUP_SETTING}
+                    limited-feature-disabled="true"
+                    limited-feature-class="limited-be"
                     value="save"
                     onClick={() => {
                       setFieldValue('submitButton', 'save');
