@@ -1,5 +1,5 @@
 import { EnvVar, Pod } from 'kubernetes-types/core/v1';
-import { Asterisk, File, Key } from 'lucide-react';
+import { Asterisk, File, FileCode, Key, Lock } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
 import { TextTip } from '@@/Tip/TextTip';
@@ -93,14 +93,14 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                   {envVar.valueFrom?.configMapKeyRef && (
                     <span>
                       <Link
-                        to="kubernetes.configurations.configuration"
+                        to="kubernetes.configmaps.configmap"
                         params={{
                           name: envVar.valueFrom.configMapKeyRef.name,
                           namespace,
                         }}
                         className="flex items-center"
                       >
-                        <Icon icon={File} className="!mr-1" />
+                        <Icon icon={FileCode} className="!mr-1" />
                         {envVar.valueFrom.configMapKeyRef.name}
                       </Link>
                     </span>
@@ -108,14 +108,14 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                   {envVar.valueFrom?.secretKeyRef && (
                     <span>
                       <Link
-                        to="kubernetes.configurations.configuration"
+                        to="kubernetes.secrets.secret"
                         params={{
                           name: envVar.valueFrom.secretKeyRef.name,
                           namespace,
                         }}
                         className="flex items-center"
                       >
-                        <Icon icon={File} className="!mr-1" />
+                        <Icon icon={Lock} className="!mr-1" />
                         {envVar.valueFrom.secretKeyRef.name}
                       </Link>
                     </span>

@@ -4,6 +4,7 @@ import filesizeParser from 'filesize-parser';
 import * as JsonPatch from 'fast-json-patch';
 import { RegistryTypes } from '@/portainer/models/registryTypes';
 import { getServices } from '@/react/kubernetes/networks/services/service';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
 import {
   KubernetesApplicationDataAccessPolicies,
@@ -240,20 +241,20 @@ class KubernetesCreateApplicationController {
   }
   /* #endregion */
 
-  /* #region  CONFIGURATION UI MANAGEMENT */
-  addConfiguration() {
+  /* #region CONFIGMAP UI MANAGEMENT */
+  addConfigMap() {
     let config = new KubernetesApplicationConfigurationFormValue();
-    config.SelectedConfiguration = this.configurations[0];
-    this.formValues.Configurations.push(config);
+    config.SelectedConfiguration = this.configMaps[0];
+    this.formValues.ConfigMaps.push(config);
   }
 
-  removeConfiguration(index) {
-    this.formValues.Configurations.splice(index, 1);
-    this.onChangeConfigurationPath();
+  removeConfigMap(index) {
+    this.formValues.ConfigMaps.splice(index, 1);
+    this.onChangeConfigMapPath();
   }
 
-  overrideConfiguration(index) {
-    const config = this.formValues.Configurations[index];
+  overrideConfigMap(index) {
+    const config = this.formValues.ConfigMaps[index];
     config.Overriden = true;
     config.OverridenKeys = _.map(_.keys(config.SelectedConfiguration.Data), (key) => {
       const res = new KubernetesApplicationConfigurationFormValueOverridenKey();
@@ -262,22 +263,22 @@ class KubernetesCreateApplicationController {
     });
   }
 
-  resetConfiguration(index) {
-    const config = this.formValues.Configurations[index];
+  resetConfigMap(index) {
+    const config = this.formValues.ConfigMaps[index];
     config.Overriden = false;
     config.OverridenKeys = [];
-    this.onChangeConfigurationPath();
+    this.onChangeConfigMapPath();
   }
 
-  clearConfigurations() {
-    this.formValues.Configurations = [];
+  clearConfigMaps() {
+    this.formValues.ConfigMaps = [];
   }
 
-  onChangeConfigurationPath() {
+  onChangeConfigMapPath() {
     this.state.duplicates.configurationPaths.refs = [];
 
     const paths = _.reduce(
-      this.formValues.Configurations,
+      this.formValues.ConfigMaps,
       (result, config) => {
         const uniqOverridenKeysPath = _.uniq(_.map(config.OverridenKeys, 'Path'));
         return _.concat(result, uniqOverridenKeysPath);
@@ -287,8 +288,68 @@ class KubernetesCreateApplicationController {
 
     const duplicatePaths = KubernetesFormValidationHelper.getDuplicates(paths);
 
-    _.forEach(this.formValues.Configurations, (config, index) => {
+    _.forEach(this.formValues.ConfigMaps, (config, index) => {
       _.forEach(config.OverridenKeys, (overridenKey, keyIndex) => {
+        const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
+        if (findPath) {
+          this.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] = findPath;
+        }
+      });
+    });
+
+    this.state.duplicates.configurationPaths.hasRefs = Object.keys(this.state.duplicates.configurationPaths.refs).length > 0;
+  }
+  /* #endregion */
+
+  /* #region SECRET UI MANAGEMENT */
+  addSecret() {
+    let secret = new KubernetesApplicationConfigurationFormValue();
+    secret.SelectedConfiguration = this.secrets[0];
+    this.formValues.Secrets.push(secret);
+  }
+
+  removeSecret(index) {
+    this.formValues.Secrets.splice(index, 1);
+    this.onChangeSecretPath();
+  }
+
+  overrideSecret(index) {
+    const secret = this.formValues.Secrets[index];
+    secret.Overriden = true;
+    secret.OverridenKeys = _.map(_.keys(secret.SelectedConfiguration.Data), (key) => {
+      const res = new KubernetesApplicationConfigurationFormValueOverridenKey();
+      res.Key = key;
+      return res;
+    });
+  }
+
+  resetSecret(index) {
+    const secret = this.formValues.Secrets[index];
+    secret.Overriden = false;
+    secret.OverridenKeys = [];
+    this.onChangeSecretPath();
+  }
+
+  clearSecrets() {
+    this.formValues.Secrets = [];
+  }
+
+  onChangeSecretPath() {
+    this.state.duplicates.configurationPaths.refs = [];
+
+    const paths = _.reduce(
+      this.formValues.Secrets,
+      (result, secret) => {
+        const uniqOverridenKeysPath = _.uniq(_.map(secret.OverridenKeys, 'Path'));
+        return _.concat(result, uniqOverridenKeysPath);
+      },
+      []
+    );
+
+    const duplicatePaths = KubernetesFormValidationHelper.getDuplicates(paths);
+
+    _.forEach(this.formValues.Secrets, (secret, index) => {
+      _.forEach(secret.OverridenKeys, (overridenKey, keyIndex) => {
         const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
         if (findPath) {
           this.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] = findPath;
@@ -959,6 +1020,8 @@ class KubernetesCreateApplicationController {
     return this.$async(async () => {
       try {
         this.configurations = await this.KubernetesConfigurationService.get(namespace);
+        this.configMaps = this.configurations.filter((configuration) => configuration.Kind === KubernetesConfigurationKinds.CONFIGMAP);
+        this.secrets = this.configurations.filter((configuration) => configuration.Kind === KubernetesConfigurationKinds.SECRET);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
       }
@@ -1029,7 +1092,8 @@ class KubernetesCreateApplicationController {
   }
 
   resetFormValues() {
-    this.clearConfigurations();
+    this.clearConfigMaps();
+    this.clearSecrets();
     this.resetPersistedFolders();
     this.resetPublishedPorts();
   }
@@ -1051,6 +1115,8 @@ class KubernetesCreateApplicationController {
     this.state.actionInProgress = true;
     try {
       this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
+      // combine the secrets and configmap form values when submitting the form
+      this.formValues.Configurations = [...this.formValues.ConfigMaps, ...this.formValues.Secrets];
       _.remove(this.formValues.Configurations, (item) => item.SelectedConfiguration === undefined);
       await this.KubernetesApplicationService.create(this.formValues);
       this.Notifications.success('Request to deploy application successfully submitted', this.formValues.Name);

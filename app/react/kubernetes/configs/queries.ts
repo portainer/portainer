@@ -23,7 +23,11 @@ export function useConfigurations(
     () => (namespace ? getConfigurations(environmentId, namespace) : []),
     {
       onError: (err) => {
-        notifyError('Failure', err as Error, 'Unable to get configurations');
+        notifyError(
+          'Failure',
+          err as Error,
+          `Unable to get configurations for namespace ${namespace}`
+        );
       },
       enabled: !!namespace,
     }
@@ -35,10 +39,10 @@ export function useConfigurationsForCluster(
   namespaces?: string[]
 ) {
   return useQuery(
-    ['environments', environemtId, 'kubernetes', 'configmaps'],
+    ['environments', environemtId, 'kubernetes', 'configurations'],
     () => namespaces && getConfigMapsForCluster(environemtId, namespaces),
     {
-      ...withError('Unable to retrieve applications'),
+      ...withError('Unable to retrieve configurations for cluster'),
       enabled: !!namespaces,
     }
   );

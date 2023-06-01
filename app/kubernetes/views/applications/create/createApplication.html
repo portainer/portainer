@@ -349,28 +349,28 @@
                   </div>
                   <!-- #endregion -->
 
-                  <!-- #region CONFIGURATIONS -->
+                  <!-- #region CONFIGMAPS -->
                   <div class="form-group">
                     <div class="col-sm-12 vertical-center">
-                      <label class="control-label !pt-0 text-left">ConfigMap or Secret</label>
+                      <label class="control-label !pt-0 text-left">ConfigMap</label>
                     </div>
-                    <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
+                    <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.ConfigMaps.length">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      Portainer will automatically expose all the keys of a ConfigMap or Secret as environment variables. This behavior can be overridden to filesystem mounts for
-                      each key via the override option.
+                      Portainer will automatically expose all the keys of a ConfigMap as environment variables. This behavior can be overridden to filesystem mounts for each key
+                      via the override option.
                     </div>
                   </div>
 
                   <!-- config-element -->
-                  <div class="form-inline clearfix" ng-repeat="(index, config) in ctrl.formValues.Configurations">
+                  <div class="form-inline clearfix" ng-repeat="(index, config) in ctrl.formValues.ConfigMaps">
                     <div class="col-sm-12 !p-0">
                       <div class="input-group input-group-sm !mr-1">
                         <span class="input-group-addon">name</span>
                         <select
                           class="form-control col-sm-6"
                           ng-model="config.SelectedConfiguration"
-                          ng-options="c as c.Name for c in ctrl.configurations track by c.Name"
-                          ng-change="ctrl.resetConfiguration(index)"
+                          ng-options="c as c.Name for c in ctrl.configMaps track by c.Name"
+                          ng-change="ctrl.resetConfigMap(index)"
                           ng-disabled="ctrl.formValues.Containers.length > 1"
                           data-cy="k8sAppCreate-addConfigSelect_{{ $index }}"
                         ></select>
@@ -380,7 +380,7 @@
                         <label
                           class="btn btn-md btn-light vertical-center !ml-0"
                           type="button"
-                          ng-click="ctrl.resetConfiguration(index)"
+                          ng-click="ctrl.resetConfigMap(index)"
                           ng-disabled="ctrl.formValues.Containers.length > 1"
                           data-cy="k8sAppCreate-configAutoButton_{{ $index }}"
                           uib-btn-radio="false"
@@ -390,7 +390,7 @@
                         </label>
                         <label
                           class="btn btn-md btn-light vertical-center !ml-0"
-                          ng-click="ctrl.overrideConfiguration(index)"
+                          ng-click="ctrl.overrideConfigMap(index)"
                           ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
                           data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
                           uib-btn-radio="true"
@@ -403,7 +403,7 @@
                       <button
                         class="btn btn-md btn-dangerlight btn-only-icon vertical-center"
                         type="button"
-                        ng-click="ctrl.removeConfiguration(index)"
+                        ng-click="ctrl.removeConfigMap(index)"
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         data-cy="k8sAppCreate-configRemoveButton"
                       >
@@ -414,8 +414,7 @@
                     <div class="row clearfix" ng-if="config.SelectedConfiguration && !config.Overriden">
                       <div class="col-sm-9 small text-muted !mt-2 !p-0">
                         The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code>
-                        <span ng-if="config.SelectedConfiguration.Kind === 1">ConfigMap</span><span ng-if="config.SelectedConfiguration.Kind === 2">Secret</span> as environment
-                        variables:
+                        ConfigMap as environment variables:
                         <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
                           <code>{{ key }}</code
                           >{{ $last ? '' : ', ' }}
@@ -451,7 +450,7 @@
                             name="overriden_key_path_{{ index }}_{{ keyIndex }}"
                             ng-disabled="ctrl.formValues.Containers.length > 1"
                             required
-                            ng-change="ctrl.onChangeConfigurationPath()"
+                            ng-change="ctrl.onChangeConfigMapPath()"
                             data-cy="k8sAppCreate-pathOnDiskInput"
                           />
                         </div>
@@ -486,11 +485,154 @@
                   <div class="col-sm-12 !p-0">
                     <span
                       class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
-                      ng-click="ctrl.addConfiguration()"
+                      ng-click="ctrl.addConfigMap()"
                       ng-if="ctrl.formValues.Containers.length <= 1"
                       data-cy="k8sAppCreate-addConfigButton"
                     >
-                      <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add ConfigMap and Secret
+                      <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add ConfigMap
+                    </span>
+                  </div>
+
+                  <!-- #region SECRETS -->
+                  <div class="form-group">
+                    <div class="col-sm-12 vertical-center">
+                      <label class="control-label !pt-0 text-left">Secret</label>
+                    </div>
+                    <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                      Portainer will automatically expose all the keys of a Secret as environment variables. This behavior can be overridden to filesystem mounts for each key via
+                      the override option.
+                    </div>
+                  </div>
+
+                  <!-- config-element -->
+                  <div class="form-inline clearfix" ng-repeat="(index, config) in ctrl.formValues.Secrets">
+                    <div class="col-sm-12 !p-0">
+                      <div class="input-group input-group-sm !mr-1">
+                        <span class="input-group-addon">name</span>
+                        <select
+                          class="form-control col-sm-6"
+                          ng-model="config.SelectedConfiguration"
+                          ng-options="c as c.Name for c in ctrl.secrets track by c.Name"
+                          ng-change="ctrl.resetSecret(index)"
+                          ng-disabled="ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-addSecretSelect_{{ $index }}"
+                        ></select>
+                      </div>
+
+                      <div class="input-group btn-group btn-group-sm">
+                        <label
+                          class="btn btn-md btn-light vertical-center !ml-0"
+                          type="button"
+                          ng-click="ctrl.resetSecret(index)"
+                          ng-disabled="ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-secretAutoButton_{{ $index }}"
+                          uib-btn-radio="false"
+                          ng-model="config.Overriden"
+                        >
+                          <pr-icon icon="'rotate-cw'" size="'md'"></pr-icon> Auto
+                        </label>
+                        <label
+                          class="btn btn-md btn-light vertical-center !ml-0"
+                          ng-click="ctrl.overrideSecret(index)"
+                          ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-secretOverrideButton_{{ $index }}"
+                          uib-btn-radio="true"
+                          ng-model="config.Overriden"
+                        >
+                          <pr-icon icon="'list'" size="'md'"></pr-icon> Override
+                        </label>
+                      </div>
+
+                      <button
+                        class="btn btn-md btn-dangerlight btn-only-icon vertical-center"
+                        type="button"
+                        ng-click="ctrl.removeSecret(index)"
+                        ng-if="ctrl.formValues.Containers.length <= 1"
+                        data-cy="k8sAppCreate-secretRemoveButton"
+                      >
+                        <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+                      </button>
+                    </div>
+                    <!-- no-override -->
+                    <div class="row clearfix" ng-if="config.SelectedConfiguration && !config.Overriden">
+                      <div class="col-sm-9 small text-muted !mt-2 !p-0">
+                        The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> Secret as environment variables:
+                        <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
+                          <code>{{ key }}</code
+                          >{{ $last ? '' : ', ' }}
+                        </span>
+                      </div>
+                    </div>
+                    <!-- !no-override -->
+
+                    <!-- has-override -->
+                    <div class="col-sm-12 !mt-2 !mb-4 !p-0" ng-if="config.Overriden" ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
+                      <div class="input-group input-group-sm !mr-1">
+                        <span class="input-group-addon">key</span>
+                        <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
+                      </div>
+
+                      <div class="input-group btn-group btn-group-sm !mr-1">
+                        <label class="btn btn-light" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
+                          <pr-icon icon="'list'"></pr-icon> Environment
+                        </label>
+                        <label class="btn btn-light" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                          <pr-icon icon="'file-text'"></pr-icon> Filesystem
+                        </label>
+                      </div>
+
+                      <div class="form-group !ml-0 !mr-0 !align-top" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon required">path on disk</span>
+                          <input
+                            type="text"
+                            class="form-control"
+                            ng-model="overridenKey.Path"
+                            placeholder="/etc/myapp/conf.d"
+                            name="overriden_key_path_{{ index }}_{{ keyIndex }}"
+                            ng-disabled="ctrl.formValues.Containers.length > 1"
+                            required
+                            ng-change="ctrl.onChangeSecretPath()"
+                            data-cy="k8sAppCreate-secretPathOnDiskInput"
+                          />
+                        </div>
+                        <div
+                          class="small"
+                          ng-show="
+                            kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
+                            ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                          "
+                        >
+                          <div class="text-warning" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                            <div
+                              ng-show="
+                                kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
+                                ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                              "
+                            >
+                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
+                                <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
+                              </ng-messages>
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.</p
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- !has-override -->
+                  </div>
+                  <!-- !config-element -->
+                  <div class="col-sm-12 !p-0">
+                    <span
+                      class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                      ng-click="ctrl.addSecret()"
+                      ng-if="ctrl.formValues.Containers.length <= 1"
+                      data-cy="k8sAppCreate-addSecretButton"
+                    >
+                      <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add Secret
                     </span>
                   </div>
                   <!-- #endregion -->

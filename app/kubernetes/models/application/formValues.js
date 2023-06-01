@@ -22,7 +22,8 @@ export function KubernetesApplicationFormValues() {
   this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
   this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
   this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
-  this.Configurations = []; // KubernetesApplicationConfigurationFormValue lis;
+  this.ConfigMaps = []; // KubernetesApplicationConfigurationFormValue lis;
+  this.Secrets = []; // KubernetesApplicationConfigurationFormValue lis;
   this.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
   this.PublishedPorts = []; // KubernetesApplicationPublishedPortFormValue lis;
   this.PlacementType = KubernetesApplicationPlacementTypes.PREFERRED;

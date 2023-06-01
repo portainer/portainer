@@ -127,6 +127,7 @@ export const ngModule = angular
       'type',
       'value',
       'to',
+      'params',
       'children',
       'pluralType',
       'isLoading',

@@ -55,7 +55,7 @@ export function useIngress(
 
 export function useIngresses(
   environmentId: EnvironmentId,
-  namespaces: string[]
+  namespaces?: string[]
 ) {
   return useQuery(
     [
@@ -67,6 +67,9 @@ export function useIngresses(
       'ingress',
     ],
     async () => {
+      if (!namespaces?.length) {
+        return [];
+      }
       const settledIngressesPromise = await Promise.allSettled(
         namespaces.map((namespace) => getIngresses(environmentId, namespace))
       );
@@ -110,7 +113,7 @@ export function useIngresses(
       return filteredIngresses;
     },
     {
-      enabled: namespaces.length > 0,
+      enabled: !!namespaces?.length,
       ...withError('Unable to get ingresses'),
     }
   );
