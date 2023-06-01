@@ -13,18 +13,20 @@ export function validation(): SchemaOf<Values> {
       .default('')
       .when('loginBannerEnabled', {
         is: true,
-        then: string().required('Login banner is required when enabled'),
+        then: (schema) =>
+          schema.required('Login banner is required when enabled'),
       }),
     logoEnabled: boolean().default(false),
     logo: string()
       .default('')
       .when('logoEnabled', {
         is: true,
-        then: string()
-          .required('Logo url is required when enabled')
-          .test('valid-url', 'Must be a valid URL', (value) =>
-            isValidUrl(value)
-          ),
+        then: (schema) =>
+          schema
+            .required('Logo url is required when enabled')
+            .test('valid-url', 'Must be a valid URL', (value) =>
+              isValidUrl(value)
+            ),
       }),
     snapshotInterval: string().required('Snapshot interval is required'),
     templatesUrl: string()

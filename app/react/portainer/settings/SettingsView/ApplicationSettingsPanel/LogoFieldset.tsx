@@ -6,11 +6,13 @@ import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
+import { useToggledValue } from './useToggledValue';
+
 export function LogoFieldset() {
   const [{ name }, { error }] = useField<string>('logo');
-  const [, { value: isEnabled }, { setValue: setIsEnabled }] =
-    useField<boolean>('logoEnabled');
   const isDemoQuery = useIsDemo();
+
+  const [isEnabled, setIsEnabled] = useToggledValue('logo');
 
   return (
     <>

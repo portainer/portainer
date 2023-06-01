@@ -7,11 +7,12 @@ import { FormControl } from '@@/form-components/FormControl';
 import { TextArea } from '@@/form-components/Input/Textarea';
 import { SwitchField } from '@@/form-components/SwitchField';
 
+import { useToggledValue } from './useToggledValue';
+
 export function ScreenBannerFieldset() {
   const isDemoQuery = useIsDemo();
   const [{ name }, { error }] = useField<string>('loginBanner');
-  const [, { value: isEnabled }, { setValue: setIsEnabled }] =
-    useField<boolean>('loginBannerEnabled');
+  const [isEnabled, setIsEnabled] = useToggledValue('loginBanner');
 
   return (
     <>
