@@ -23,7 +23,7 @@ init-dist:
 
 build-all: deps build-server build-client ## Build the client, server and download external dependancies (doesn't build an image)
 
-build-client: init-dist client-deps ## Build the client
+build-client: init-dist ## Build the client
 	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
 
 build-server: init-dist ## Build the server binary
@@ -41,7 +41,7 @@ devops: clean deps build-client ## Build the everything target specifically for 
 
 ##@ Build dependencies
 .PHONY: deps server-deps client-deps tidy
-deps-all: server-deps client-deps ## Download all client and server build dependancies
+deps: server-deps client-deps ## Download all client and server build dependancies
 
 server-deps: init-dist ## Download dependant server binaries
 	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
@@ -79,7 +79,7 @@ dev: ## Run both the client and server in development mode
 dev-client: ## Run the client in development mode 
 	yarn dev
 
-dev-server: ## Run the server in development mode
+dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh
 
 
@@ -113,18 +113,12 @@ dev-extension: build-server build-client ## Run the extension in development mod
 
 ##@ Docs
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean
-docs-build: ## Build docs
-	cd api && $(SWAG) init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./
+docs-build: init-dist ## Build docs
+	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./
 
 docs-validate: docs-build ## Validate docs
-	yarn swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
-	yarn swagger-cli validate api/docs/openapi.yaml
-
-docs-clean: ## Clean docs
-	rm -rf api/docs
-
-docs-validate-clean: docs-validate docs-clean ## Validate and clean docs
-
+	yarn swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml
+	yarn swagger-cli validate dist/docs/openapi.yaml
 
 ##@ Helpers
 .PHONY: help
