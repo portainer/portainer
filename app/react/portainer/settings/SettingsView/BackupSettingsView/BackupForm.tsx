@@ -1,7 +1,6 @@
 import { useState, ChangeEvent } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Download, Upload } from 'lucide-react';
-import * as Yup from 'yup';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -20,54 +19,7 @@ import {
 
 import { backupFormType, options } from './backup-options';
 import { FormValues, DownloadBackupPayload, BackupS3Model } from './types';
-
-const buildBackupValidationSchema = Yup.object().shape({
-  PasswordProtect: Yup.boolean(),
-  Password: Yup.string().when('PasswordProtect', {
-    is: true,
-    then: (schema) => schema.required('This field is required.'),
-  }),
-  PasswordProtectS3: Yup.boolean(),
-  PasswordS3: Yup.string().when('PasswordProtectS3', {
-    is: true,
-    then: (schema) => schema.required('This field is required.'),
-  }),
-  ScheduleAutomaticBackup: Yup.boolean(),
-  CronRule: Yup.string().when('ScheduleAutomaticBackup', {
-    is: true,
-    then: (schema) =>
-      schema.required('This field is required.').when('CronRule', {
-        is: (val) => val !== '',
-        then: (schema) =>
-          schema.matches(
-            /^(\*(\/[1-9][0-9]*)?|([0-5]?[0-9]|6[0-9]|7[0-9])(-[0-5]?[0-9])?)(\s+(\*(\/[1-9][0-9]*)?|([0-5]?[0-9]|6[0-9]|7[0-9])(-[0-5]?[0-9])?)){4}$/,
-            'Please enter a valid cron rule.'
-          ),
-      }),
-  }),
-  AccessKeyID: Yup.string().when('ScheduleAutomaticBackup', {
-    is: true,
-    then: (schema) => schema.required('This field is required.'),
-  }),
-  SecretAccessKey: Yup.string().when('ScheduleAutomaticBackup', {
-    is: true,
-    then: (schema) => schema.required('This field is required.'),
-  }),
-  BucketName: Yup.string().when('ScheduleAutomaticBackup', {
-    is: true,
-    then: (schema) => schema.required('This field is required.'),
-  }),
-  S3CompatibleHost: Yup.string()
-    .nullable()
-    .when({
-      is: (val) => val !== '',
-      then: (schema) =>
-        schema.matches(
-          /^https?:\/\//,
-          'S3 host must begin with http:// or https://.'
-        ),
-    }),
-});
+import { validationSchema as buildBackupValidationSchema } from './BackupForm.validation';
 
 interface Props {
   settings: FormValues;
