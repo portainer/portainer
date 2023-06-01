@@ -1,28 +1,28 @@
 export interface BackupS3Model {
-  CronRule: string;
-  AccessKeyID: string;
-  SecretAccessKey: string;
-  Region: string;
-  BucketName: string;
-  Password: string;
-  S3CompatibleHost: string;
+  cronRule: string;
+  accessKeyID: string;
+  secretAccessKey: string;
+  region: string;
+  bucketName: string;
+  password: string;
+  s3CompatibleHost: string;
 }
 
 export interface BackupS3Settings {
-  PasswordProtectS3: boolean;
-  PasswordS3: string;
-  ScheduleAutomaticBackup: boolean;
-  CronRule: string;
-  AccessKeyID: string;
-  SecretAccessKey: string;
-  Region: string;
-  BucketName: string;
-  S3CompatibleHost: string;
+  passwordProtectS3: boolean;
+  passwordS3: string;
+  scheduleAutomaticBackup: boolean;
+  cronRule: string;
+  accessKeyID: string;
+  secretAccessKey: string;
+  region: string;
+  bucketName: string;
+  s3CompatibleHost: string;
 }
 
 export interface BackupFileSettings {
-  PasswordProtect: boolean;
-  Password: string;
+  passwordProtect: boolean;
+  password: string;
 }
 
 export interface FormValues extends BackupFileSettings, BackupS3Settings {

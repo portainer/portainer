@@ -74,24 +74,24 @@ export function BackupForm({ settings }: Props) {
                 inputId="schedule-backups"
                 label="Schedule automatic backups"
                 size="small"
-                errors={errors.ScheduleAutomaticBackup}
+                errors={errors.scheduleAutomaticBackup}
               >
                 <Switch
                   id="schedule-backups"
-                  name="s3-backup-setting"
+                  name="schedule-automatic-backup"
                   featureId={FeatureId.S3_BACKUP_SETTING}
                   className="space-right"
-                  checked={values.ScheduleAutomaticBackup}
-                  onChange={(e) => setFieldValue('ScheduleAutomaticBackup', e)}
+                  checked={values.scheduleAutomaticBackup}
+                  onChange={(e) => setFieldValue('scheduleAutomaticBackup', e)}
                 />
               </FormControl>
 
-              {values.ScheduleAutomaticBackup && (
+              {values.scheduleAutomaticBackup && (
                 <FormControl
                   inputId="cron_rule"
                   label="Cron rule"
                   size="small"
-                  errors={errors.CronRule}
+                  errors={errors.cronRule}
                 >
                   <Field
                     id="cron_rule"
@@ -102,8 +102,8 @@ export function BackupForm({ settings }: Props) {
                     data-cy="settings-backupCronRuleInput"
                     className={clsx({ 'limited-be': limitedToBE })}
                     disabled={limitedToBE}
-                    value={values.CronRule}
-                    onChange={(e) => setFieldValue('CronRule', e.target.value)}
+                    value={values.cronRule}
+                    onChange={(e) => setFieldValue('cronRule', e.target.value)}
                   />
                 </FormControl>
               )}
@@ -111,7 +111,7 @@ export function BackupForm({ settings }: Props) {
               <FormControl
                 label="Access key ID"
                 inputId="access_key_id"
-                errors={errors.AccessKeyID}
+                errors={errors.accessKeyID}
               >
                 <Field
                   id="access_key_id"
@@ -121,15 +121,15 @@ export function BackupForm({ settings }: Props) {
                   data-cy="settings-accessKeyIdInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.AccessKeyID}
-                  onChange={(e) => setFieldValue('AccessKeyID', e.target.value)}
+                  value={values.accessKeyID}
+                  onChange={(e) => setFieldValue('accessKeyID', e.target.value)}
                 />
               </FormControl>
 
               <FormControl
                 label="Secret access key"
                 inputId="secret_access_key"
-                errors={errors.SecretAccessKey}
+                errors={errors.secretAccessKey}
               >
                 <Field
                   id="secret_access_key"
@@ -139,9 +139,9 @@ export function BackupForm({ settings }: Props) {
                   data-cy="settings-secretAccessKeyInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.SecretAccessKey}
+                  value={values.secretAccessKey}
                   onChange={(e) =>
-                    setFieldValue('SecretAccessKey', e.target.value)
+                    setFieldValue('secretAccessKey', e.target.value)
                   }
                 />
               </FormControl>
@@ -149,7 +149,7 @@ export function BackupForm({ settings }: Props) {
               <FormControl
                 label="Region"
                 inputId="region"
-                errors={errors.Region}
+                errors={errors.region}
               >
                 <Field
                   id="region"
@@ -160,15 +160,15 @@ export function BackupForm({ settings }: Props) {
                   data-cy="settings-backupRegionInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.Region}
-                  onChange={(e) => setFieldValue('Region', e.target.value)}
+                  value={values.region}
+                  onChange={(e) => setFieldValue('region', e.target.value)}
                 />
               </FormControl>
 
               <FormControl
                 label="Bucket name"
                 inputId="bucket_name"
-                errors={errors.BucketName}
+                errors={errors.bucketName}
               >
                 <Field
                   id="bucket_name"
@@ -178,8 +178,8 @@ export function BackupForm({ settings }: Props) {
                   data-cy="settings-backupBucketNameInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.BucketName}
-                  onChange={(e) => setFieldValue('BucketName', e.target.value)}
+                  value={values.bucketName}
+                  onChange={(e) => setFieldValue('bucketName', e.target.value)}
                 />
               </FormControl>
 
@@ -187,7 +187,7 @@ export function BackupForm({ settings }: Props) {
                 label="S3 compatible host"
                 inputId="s3_compatible_host"
                 tooltip="Hostname of a S3 service"
-                errors={errors.S3CompatibleHost}
+                errors={errors.s3CompatibleHost}
               >
                 <Field
                   id="s3_compatible_host"
@@ -198,9 +198,9 @@ export function BackupForm({ settings }: Props) {
                   data-cy="settings-backupS3CompatibleHostInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.S3CompatibleHost}
+                  value={values.s3CompatibleHost}
                   onChange={(e) =>
-                    setFieldValue('S3CompatibleHost', e.target.value)
+                    setFieldValue('s3CompatibleHost', e.target.value)
                   }
                 />
               </FormControl>
@@ -210,24 +210,24 @@ export function BackupForm({ settings }: Props) {
                 inputId="password-s3-switch"
                 label="Password Protect"
                 size="small"
-                errors={errors.PasswordProtectS3}
+                errors={errors.passwordProtectS3}
               >
                 <Switch
                   id="password-s3-switch"
                   name="password-s3-switch"
                   className="space-right"
-                  checked={values.PasswordProtectS3}
+                  checked={values.passwordProtectS3}
                   data-cy="settings-passwordProtectToggleS3"
-                  onChange={(e) => setFieldValue('PasswordProtectS3', e)}
+                  onChange={(e) => setFieldValue('passwordProtectS3', e)}
                 />
               </FormControl>
 
-              {values.PasswordProtectS3 && (
+              {values.passwordProtectS3 && (
                 <FormControl
                   inputId="password-s3"
                   label="Password"
                   size="small"
-                  errors={errors.PasswordS3}
+                  errors={errors.passwordS3}
                 >
                   <Field
                     id="password-s3"
@@ -236,9 +236,9 @@ export function BackupForm({ settings }: Props) {
                     as={Input}
                     data-cy="settings-backups3pw"
                     required
-                    value={values.PasswordS3}
+                    value={values.passwordS3}
                     onChange={(e) =>
-                      setFieldValue('PasswordS3', e.target.value)
+                      setFieldValue('passwordS3', e.target.value)
                     }
                   />
                 </FormControl>
@@ -289,24 +289,24 @@ export function BackupForm({ settings }: Props) {
                 inputId="password-switch"
                 label="Password Protect"
                 size="small"
-                errors={errors.PasswordProtect}
+                errors={errors.passwordProtect}
               >
                 <Switch
                   id="password-switch"
                   name="password-switch"
                   className="space-right"
-                  checked={values.PasswordProtect}
+                  checked={values.passwordProtect}
                   data-cy="settings-passwordProtectLocal"
-                  onChange={(e) => setFieldValue('PasswordProtect', e)}
+                  onChange={(e) => setFieldValue('passwordProtect', e)}
                 />
               </FormControl>
 
-              {values.PasswordProtect && (
+              {values.passwordProtect && (
                 <FormControl
                   inputId="password"
                   label="Password"
                   size="small"
-                  errors={errors.Password}
+                  errors={errors.password}
                 >
                   <Field
                     id="password"
@@ -315,8 +315,8 @@ export function BackupForm({ settings }: Props) {
                     as={Input}
                     data-cy="settings-backupLocalPassword"
                     required
-                    value={values.Password}
-                    onChange={(e) => setFieldValue('Password', e.target.value)}
+                    value={values.password}
+                    onChange={(e) => setFieldValue('password', e.target.value)}
                   />
                 </FormControl>
               )}
@@ -349,13 +349,13 @@ export function BackupForm({ settings }: Props) {
   async function onSubmit(values: FormValues) {
     if (backupType === backupFormType.S3) {
       const payload: BackupS3Model = {
-        Password: values.PasswordProtectS3 ? values.PasswordS3 : '',
-        CronRule: values.ScheduleAutomaticBackup ? values.CronRule : '',
-        AccessKeyID: values.AccessKeyID,
-        SecretAccessKey: values.SecretAccessKey,
-        Region: values.Region,
-        BucketName: values.BucketName,
-        S3CompatibleHost: values.S3CompatibleHost,
+        password: values.passwordProtectS3 ? values.passwordS3 : '',
+        cronRule: values.scheduleAutomaticBackup ? values.cronRule : '',
+        accessKeyID: values.accessKeyID,
+        secretAccessKey: values.secretAccessKey,
+        region: values.region,
+        bucketName: values.bucketName,
+        s3CompatibleHost: values.s3CompatibleHost,
       };
 
       if (values.submitButton === 'save') {
@@ -367,8 +367,8 @@ export function BackupForm({ settings }: Props) {
       const payload: DownloadBackupPayload = {
         password: '',
       };
-      if (values.PasswordProtect) {
-        payload.password = values.Password;
+      if (values.passwordProtect) {
+        payload.password = values.password;
       }
       downloadMutate(payload);
     }

@@ -2,21 +2,21 @@ import { object, string, boolean } from 'yup';
 
 export function validationSchema() {
   return object().shape({
-    PasswordProtect: boolean(),
-    Password: string().when('PasswordProtect', {
+    passwordProtect: boolean(),
+    password: string().when('passwordProtect', {
       is: true,
       then: (schema) => schema.required('This field is required.'),
     }),
-    PasswordProtectS3: boolean(),
-    PasswordS3: string().when('PasswordProtectS3', {
+    passwordProtectS3: boolean(),
+    passwordS3: string().when('passwordProtectS3', {
       is: true,
       then: (schema) => schema.required('This field is required.'),
     }),
-    ScheduleAutomaticBackup: boolean(),
-    CronRule: string().when('ScheduleAutomaticBackup', {
+    scheduleAutomaticBackup: boolean(),
+    cronRule: string().when('scheduleAutomaticBackup', {
       is: true,
       then: (schema) =>
-        schema.required('This field is required.').when('CronRule', {
+        schema.required('This field is required.').when('cronRule', {
           is: (val) => val !== '',
           then: (schema) =>
             schema.matches(
@@ -25,19 +25,19 @@ export function validationSchema() {
             ),
         }),
     }),
-    AccessKeyID: string().when('ScheduleAutomaticBackup', {
+    accessKeyID: string().when('scheduleAutomaticBackup', {
       is: true,
       then: (schema) => schema.required('This field is required.'),
     }),
-    SecretAccessKey: string().when('ScheduleAutomaticBackup', {
+    secretAccessKey: string().when('scheduleAutomaticBackup', {
       is: true,
       then: (schema) => schema.required('This field is required.'),
     }),
-    BucketName: string().when('ScheduleAutomaticBackup', {
+    bucketName: string().when('scheduleAutomaticBackup', {
       is: true,
       then: (schema) => schema.required('This field is required.'),
     }),
-    S3CompatibleHost: string()
+    s3CompatibleHost: string()
       .nullable()
       .when({
         is: (val) => val !== '',

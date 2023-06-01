@@ -14,19 +14,19 @@ export function BackupSettingsView() {
   }
 
   const settings: FormValues = {
-    PasswordS3: settingsQuery.data.Password,
-    CronRule: settingsQuery.data.CronRule,
-    AccessKeyID: settingsQuery.data.AccessKeyID,
-    SecretAccessKey: settingsQuery.data.SecretAccessKey,
-    Region: settingsQuery.data.Region,
-    BucketName: settingsQuery.data.BucketName,
-    S3CompatibleHost: settingsQuery.data.S3CompatibleHost,
-    Password: '',
-    PasswordProtect: false,
+    passwordS3: settingsQuery.data.password,
+    cronRule: settingsQuery.data.cronRule,
+    accessKeyID: settingsQuery.data.accessKeyID,
+    secretAccessKey: settingsQuery.data.secretAccessKey,
+    region: settingsQuery.data.region,
+    bucketName: settingsQuery.data.bucketName,
+    s3CompatibleHost: settingsQuery.data.s3CompatibleHost,
+    password: '',
+    passwordProtect: false,
   };
 
-  settings.ScheduleAutomaticBackup = !!settings.CronRule;
-  settings.PasswordProtectS3 = !!settings.PasswordS3;
+  settings.scheduleAutomaticBackup = !!settings.cronRule;
+  settings.passwordProtectS3 = !!settings.passwordS3;
 
   return (
     <div className="row">
