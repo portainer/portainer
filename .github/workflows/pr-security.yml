@@ -12,6 +12,7 @@ on:
       - 'build/linux/Dockerfile'
       - 'build/linux/alpine.Dockerfile'
       - 'build/windows/Dockerfile'
+      - '.github/workflows/pr-security.yml'
 
 jobs:
   client-dependencies:
@@ -23,7 +24,8 @@ jobs:
     outputs:
       jsdiff: ${{ steps.set-diff-matrix.outputs.js_diff_result }}
     steps:
-      - uses: actions/checkout@master
+      - name: checkout repository
+        uses: actions/checkout@master
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
@@ -153,7 +155,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: build
-        run: make build
+        run: make build-all
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1

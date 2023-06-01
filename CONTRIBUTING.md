@@ -91,7 +91,15 @@ Then build and run the project in a Docker container:
 $ yarn start
 ```
 
-Portainer can now be accessed at <https://localhost:9443>.
+Portainer server can now be accessed at <https://localhost:9443>. and UI dev server runs on <http://localhost:8999>.
+
+if you want to build the project you can run:
+
+```sh
+make build-all
+```
+
+For additional make commands, run `make help`.
 
 Find more detailed steps at <https://docs.portainer.io/contribute/build>.
 
