@@ -36,6 +36,7 @@ type testDatastore struct {
 	webhook                 dataservices.WebhookService
 }
 
+func (d *testDatastore) Init() error              { return nil }
 func (d *testDatastore) BackupTo(io.Writer) error { return nil }
 func (d *testDatastore) Open() (bool, error)      { return false, nil }
 
