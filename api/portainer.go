@@ -870,6 +870,24 @@ type (
 		Digest      []byte   `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
 	}
 
+	// S3BackupSettings represents when and where to backup
+	S3BackupSettings struct {
+		// Crontab rule to make periodical backups
+		CronRule string `json:"cronRule"`
+		// AWS access key id
+		AccessKeyID string `json:"accessKeyID"`
+		// AWS secret access key
+		SecretAccessKey string `json:"secretAccessKey"`
+		// AWS S3 region. Default to "us-east-1"
+		Region string `json:"region" example:"us-east-1"`
+		// AWS S3 bucket name
+		BucketName string `json:"bucketName"`
+		// Password to encrypt the backup with
+		Password string `json:"password"`
+		// S3 compatible host
+		S3CompatibleHost string `json:"s3CompatibleHost"`
+	}
+
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.

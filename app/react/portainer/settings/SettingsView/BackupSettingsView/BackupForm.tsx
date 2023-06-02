@@ -5,6 +5,7 @@ import clsx from 'clsx';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { success as notifySuccess } from '@/portainer/services/notifications';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { FormControl } from '@@/form-components/FormControl';
@@ -31,20 +32,19 @@ export function BackupForm({ settings }: Props) {
 
   const limitedToBE = isLimitedToBE(FeatureId.S3_BACKUP_SETTING);
 
-  const { mutate: downloadMutate, isError: isDownloadError } =
-    useDownloadBackupMutation();
+  const downloadMutate = useDownloadBackupMutation();
 
-  const { mutate: exportS3Mutate, isError: isExportS3Error } =
-    useExportS3BackupMutation();
+  const exportS3Mutate = useExportS3BackupMutation();
 
-  const { mutate: updateS3Mutate, isError: isUpdateS3Error } =
-    useBackupS3SettingsMutation();
+  const updateS3Mutate = useBackupS3SettingsMutation();
 
   return (
     <Formik
       initialValues={settings}
       validationSchema={buildBackupValidationSchema}
       onSubmit={onSubmit}
+      validateOnMount
+      validateOnChange
     >
       {({
         values,
@@ -68,7 +68,7 @@ export function BackupForm({ settings }: Props) {
             radioName="backup-type"
           />
 
-          {backupType === 's3' ? (
+          {backupType === backupFormType.S3 ? (
             <>
               <FormControl
                 inputId="schedule-backups"
@@ -95,15 +95,13 @@ export function BackupForm({ settings }: Props) {
                 >
                   <Field
                     id="cron_rule"
-                    name="cron_rule"
+                    name="cronRule"
                     type="text"
                     as={Input}
                     placeholder="0 2 * * *"
                     data-cy="settings-backupCronRuleInput"
                     className={clsx({ 'limited-be': limitedToBE })}
                     disabled={limitedToBE}
-                    value={values.cronRule}
-                    onChange={(e) => setFieldValue('cronRule', e.target.value)}
                   />
                 </FormControl>
               )}
@@ -115,14 +113,12 @@ export function BackupForm({ settings }: Props) {
               >
                 <Field
                   id="access_key_id"
-                  name="access_key_id"
+                  name="accessKeyID"
                   type="text"
                   as={Input}
                   data-cy="settings-accessKeyIdInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.accessKeyID}
-                  onChange={(e) => setFieldValue('accessKeyID', e.target.value)}
                 />
               </FormControl>
 
@@ -133,16 +129,12 @@ export function BackupForm({ settings }: Props) {
               >
                 <Field
                   id="secret_access_key"
-                  name="secret_access_key"
+                  name="secretAccessKey"
                   type="password"
                   as={Input}
                   data-cy="settings-secretAccessKeyInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.secretAccessKey}
-                  onChange={(e) =>
-                    setFieldValue('secretAccessKey', e.target.value)
-                  }
                 />
               </FormControl>
 
@@ -160,8 +152,6 @@ export function BackupForm({ settings }: Props) {
                   data-cy="settings-backupRegionInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.region}
-                  onChange={(e) => setFieldValue('region', e.target.value)}
                 />
               </FormControl>
 
@@ -172,14 +162,12 @@ export function BackupForm({ settings }: Props) {
               >
                 <Field
                   id="bucket_name"
-                  name="bucket_name"
+                  name="bucketName"
                   type="text"
                   as={Input}
                   data-cy="settings-backupBucketNameInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.bucketName}
-                  onChange={(e) => setFieldValue('bucketName', e.target.value)}
                 />
               </FormControl>
 
@@ -191,17 +179,13 @@ export function BackupForm({ settings }: Props) {
               >
                 <Field
                   id="s3_compatible_host"
-                  name="s3_compatible_host"
+                  name="s3CompatibleHost"
                   type="text"
                   as={Input}
                   placeholder="leave empty for AWS S3"
                   data-cy="settings-backupS3CompatibleHostInput"
                   className={clsx({ 'limited-be': limitedToBE })}
                   disabled={limitedToBE}
-                  value={values.s3CompatibleHost}
-                  onChange={(e) =>
-                    setFieldValue('s3CompatibleHost', e.target.value)
-                  }
                 />
               </FormControl>
 
@@ -231,15 +215,11 @@ export function BackupForm({ settings }: Props) {
                 >
                   <Field
                     id="password-s3"
-                    name="password-s3"
+                    name="passwordS3"
                     type="password"
                     as={Input}
                     data-cy="settings-backups3pw"
                     required
-                    value={values.passwordS3}
-                    onChange={(e) =>
-                      setFieldValue('passwordS3', e.target.value)
-                    }
                   />
                 </FormControl>
               )}
@@ -250,7 +230,7 @@ export function BackupForm({ settings }: Props) {
                     name="submitButton"
                     isLoading={isSubmitting}
                     className={clsx('!ml-0', { 'limited-be': limitedToBE })}
-                    disabled={!isValid || isExportS3Error || limitedToBE}
+                    disabled={!isValid || exportS3Mutate.isError || limitedToBE}
                     data-cy="settings-exportBackupS3Button"
                     icon={Upload}
                     value="export"
@@ -270,7 +250,7 @@ export function BackupForm({ settings }: Props) {
                     loadingText="Saving settings..."
                     isLoading={isSubmitting}
                     className={clsx('!ml-0', { 'limited-be': limitedToBE })}
-                    disabled={!isValid || isUpdateS3Error || limitedToBE}
+                    disabled={!isValid || updateS3Mutate.isError || limitedToBE}
                     data-cy="settings-saveBackupSettingsButton"
                     value="save"
                     onClick={() => {
@@ -315,8 +295,6 @@ export function BackupForm({ settings }: Props) {
                     as={Input}
                     data-cy="settings-backupLocalPassword"
                     required
-                    value={values.password}
-                    onChange={(e) => setFieldValue('password', e.target.value)}
                   />
                 </FormControl>
               )}
@@ -327,7 +305,7 @@ export function BackupForm({ settings }: Props) {
                     name="submitButton"
                     loadingText="Downloading settings..."
                     isLoading={isSubmitting}
-                    disabled={!isValid || isDownloadError}
+                    disabled={!isValid || downloadMutate.isError}
                     className="!ml-0"
                     icon={Download}
                     value="download"
@@ -359,9 +337,17 @@ export function BackupForm({ settings }: Props) {
       };
 
       if (values.submitButton === 'save') {
-        updateS3Mutate(payload);
+        updateS3Mutate.mutate(payload, {
+          onSuccess() {
+            notifySuccess('Success', 'S3 backup settings saved successfully');
+          },
+        });
       } else if (values.submitButton === 'export') {
-        exportS3Mutate(payload);
+        exportS3Mutate.mutate(payload, {
+          onSuccess() {
+            notifySuccess('Success', 'Exported backup to S3 successfully');
+          },
+        });
       }
     } else {
       const payload: DownloadBackupPayload = {
@@ -370,7 +356,12 @@ export function BackupForm({ settings }: Props) {
       if (values.passwordProtect) {
         payload.password = values.password;
       }
-      downloadMutate(payload);
+
+      downloadMutate.mutate(payload, {
+        onSuccess() {
+          notifySuccess('Success', 'Downloaded backup successfully');
+        },
+      });
     }
   }
 }

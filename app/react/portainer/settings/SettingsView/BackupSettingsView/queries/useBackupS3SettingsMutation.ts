@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { success as notifySuccess } from '@/portainer/services/notifications';
 import { withGlobalError } from '@/react-tools/react-query';
 
 import { BackupS3Model } from '../types';
@@ -9,15 +8,12 @@ import { queryKeys } from '../../../queries/queryKeys';
 
 import { buildUrl } from './backupSettings.service';
 
-
 export function useBackupS3SettingsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(updateBackupS3Settings, {
-    onSuccess: () => {
-      notifySuccess('Success', 'S3 Backup settings successfully saved');
-      return queryClient.invalidateQueries(queryKeys.backupS3Settings());
-    },
+    onSuccess: () =>
+      queryClient.invalidateQueries(queryKeys.backupS3Settings()),
     ...withGlobalError('Unable to save s3 backup settings'),
   });
 }
