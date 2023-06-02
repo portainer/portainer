@@ -25,10 +25,6 @@ export interface BackupFileSettings {
   password: string;
 }
 
-export interface FormValues extends BackupFileSettings, BackupS3Settings {
-  submitButton: string;
-}
-
 export interface DownloadBackupPayload {
   password: string;
 }
