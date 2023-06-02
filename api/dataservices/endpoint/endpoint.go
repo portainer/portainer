@@ -22,19 +22,6 @@ func NewService(connection portainer.Connection) (*Service, error) {
 		idxEdgeID:  make(map[string]portainer.EndpointID),
 	}
 
-	es, err := s.endpoints()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, e := range es {
-		if len(e.EdgeID) > 0 {
-			s.idxEdgeID[e.EdgeID] = e.ID
-		}
-
-		s.heartbeats.Store(e.ID, e.LastCheckInDate)
-	}
-
 	return s, nil
 }
 

@@ -44,7 +44,7 @@ func (service *Service) Settings() (*portainer.Settings, error) {
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
 	db := service.connection.GetDB()
-	tx := db.Model(&portainer.Settings{}).Where(portainer.Settings{ID: 1}).FirstOrCreate(settings)
+	tx := db.Model(&portainer.Settings{}).Where(portainer.Settings{ID: 1}).Save(settings)
 	if tx.Error != nil {
 		return tx.Error
 	}

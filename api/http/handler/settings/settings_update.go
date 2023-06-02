@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -119,15 +120,16 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
+	fmt.Println(featureflags.IsEnabled(portainer.FeatureNoTx), "********************************")
 	var settings *portainer.Settings
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		settings, err = handler.updateSettings(handler.DataStore, payload)
-	} else {
-		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		// 	settings, err = handler.updateSettings(tx, payload)
-		// 	return err
-		// })
-	}
+	//if featureflags.IsEnabled(portainer.FeatureNoTx) {
+	settings, err = handler.updateSettings(handler.DataStore, payload)
+	//} else {
+	// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	// 	settings, err = handler.updateSettings(tx, payload)
+	// 	return err
+	// })
+	//}
 
 	if err != nil {
 		var httpErr *httperror.HandlerError
