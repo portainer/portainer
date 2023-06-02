@@ -31,8 +31,8 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/joho/godotenv v1.4.0
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
-	github.com/json-iterator/go v1.1.12
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
+	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -113,6 +113,7 @@ require (
 	github.com/jpillora/ansi v1.0.2 // indirect
 	github.com/jpillora/requestlog v1.0.0 // indirect
 	github.com/jpillora/sizestr v1.0.0 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/klauspost/pgzip v1.2.6-0.20220930104621-17e8dac29df8 // indirect
