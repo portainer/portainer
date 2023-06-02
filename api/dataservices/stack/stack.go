@@ -4,27 +4,13 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "stacks"
-)
-
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
 }
 
-func (service *Service) BucketName() string {
-	return BucketName
-}
-
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	// err := connection.SetServiceName(BucketName)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -32,69 +18,39 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // Stack returns a stack object by ID.
 func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
-	var stack portainer.Stack
-	// identifier := service.connection.ConvertToKey(int(ID))
+	var obj portainer.Stack
 
-	// err := service.connection.GetObject(BucketName, identifier, &stack)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := service.connection.GetByID(int(ID), &obj)
+	if err != nil {
+		return nil, err
+	}
 
-	return &stack, nil
+	return &obj, nil
 }
 
 // StackByName returns a stack object by name.
 func (service *Service) StackByName(name string) (*portainer.Stack, error) {
-	// var s *portainer.Stack
+	var s portainer.Stack
 
-	// stop := fmt.Errorf("ok")
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Stack{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		stack, ok := obj.(*portainer.Stack)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
-	// 			return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
-	// 		}
+	db := service.connection.GetDB()
+	tx := db.First(&s, `name = ?`, name)
 
-	// 		if stack.Name == name {
-	// 			s = stack
-	// 			return nil, stop
-	// 		}
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
-	// 		return &portainer.Stack{}, nil
-	// 	})
-	// if errors.Is(err, stop) {
-	// 	return s, nil
-	// }
-	// if err == nil {
-	// 	return nil, dserrors.ErrObjectNotFound
-	// }
-
-	return nil, nil
+	return &s, nil
 }
 
 // Stacks returns an array containing all the stacks with same name
 func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Stack{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		stack, ok := obj.(portainer.Stack)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
-	// 			return nil, fmt.Errorf("failed to convert to Stack object: %s", obj)
-	// 		}
-
-	// 		if stack.Name == name {
-	// 			stacks = append(stacks, stack)
-	// 		}
-
-	// 		return &portainer.Stack{}, nil
-	// 	})
+	db := service.connection.GetDB()
+	tx := db.Find(&stacks, `name = ?`, name)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return stacks, nil
 }
@@ -103,100 +59,78 @@ func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 func (service *Service) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Stack{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		stack, ok := obj.(*portainer.Stack)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
-	// 			return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
-	// 		}
-
-	// 		stacks = append(stacks, *stack)
-
-	// 		return &portainer.Stack{}, nil
-	// 	})
+	db := service.connection.GetDB()
+	tx := db.Find(&stacks)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
 	return stacks, nil
 }
 
 // CreateStack creates a new stack.
 func (service *Service) Create(stack *portainer.Stack) error {
-	// return service.connection.CreateObjectWithId(BucketName, int(stack.ID), stack)
+	db := service.connection.GetDB()
+	tx := db.Create(&stack)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
 
 // UpdateStack updates a stack.
 func (service *Service) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
-	// identifier := service.connection.ConvertToKey(int(ID))
-	// return service.connection.UpdateObject(BucketName, identifier, stack)
+	db := service.connection.GetDB()
+	stack.ID = ID
+	tx := db.Save(&stack)
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
 
 // DeleteStack deletes a stack.
 func (service *Service) DeleteStack(ID portainer.StackID) error {
-	// identifier := service.connection.ConvertToKey(int(ID))
-	// return service.connection.DeleteObject(BucketName, identifier)
-	return nil
+	return service.connection.DeleteByID(int(ID), &portainer.Stack{})
 }
 
 // StackByWebhookID returns a pointer to a stack object by webhook ID.
 // It returns nil, errors.ErrObjectNotFound if there's no stack associated with the webhook ID.
 func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
-	// var s *portainer.Stack
-	// stop := fmt.Errorf("ok")
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Stack{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		var ok bool
-	// 		s, ok = obj.(*portainer.Stack)
+	db := service.connection.GetDB()
 
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
+	var stacks = make([]portainer.Stack, 0)
+	tx := db.Find(&stacks)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
-	// 			return &portainer.Stack{}, nil
-	// 		}
-
-	// 		if s.AutoUpdate != nil && strings.EqualFold(s.AutoUpdate.Webhook, id) {
-	// 			return nil, stop
-	// 		}
-
-	// 		return &portainer.Stack{}, nil
-	// 	})
-	// if errors.Is(err, stop) {
-	// 	return s, nil
-	// }
-	// if err == nil {
-	// 	return nil, dserrors.ErrObjectNotFound
-	// }
-
-	// return nil, err
+	for _, stack := range stacks {
+		if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != "" && stack.AutoUpdate.Webhook == id {
+			return &stack, nil
+		}
+	}
 
 	return nil, nil
 }
 
 // RefreshableStacks returns stacks that are configured for a periodic update
 func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
-	stacks := make([]portainer.Stack, 0)
 
-	// err := service.connection.GetAll(
-	// 	BucketName,
-	// 	&portainer.Stack{},
-	// 	func(obj interface{}) (interface{}, error) {
-	// 		stack, ok := obj.(*portainer.Stack)
-	// 		if !ok {
-	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
-	// 			return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
-	// 		}
+	db := service.connection.GetDB()
 
-	// 		if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
-	// 			stacks = append(stacks, *stack)
-	// 		}
+	var stacks = make([]portainer.Stack, 0)
+	var stacksRes = make([]portainer.Stack, 0)
+	tx := db.Find(&stacks)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
-	// 		return &portainer.Stack{}, nil
-	// 	})
+	for _, stack := range stacks {
+		if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
+			stacksRes = append(stacksRes, stack)
+		}
+	}
 
-	return stacks, nil
+	return stacksRes, nil
 }
