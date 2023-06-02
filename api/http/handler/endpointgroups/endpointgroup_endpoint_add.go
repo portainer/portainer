@@ -40,9 +40,9 @@ func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = handler.addEndpoint(handler.DataStore, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.addEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return handler.addEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
+		// })
 	}
 
 	if err != nil {

@@ -61,10 +61,10 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		endpointGroup, err = handler.createEndpointGroup(handler.DataStore, payload)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			endpointGroup, err = handler.createEndpointGroup(tx, payload)
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	endpointGroup, err = handler.createEndpointGroup(tx, payload)
+		// 	return err
+		// })
 	}
 
 	if err != nil {

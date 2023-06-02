@@ -32,10 +32,10 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		edgeGroup, err = getEdgeGroup(handler.DataStore, portainer.EdgeGroupID(edgeGroupID))
 	} else {
-		err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-			edgeGroup, err = getEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
-			return err
-		})
+		// err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		// 	edgeGroup, err = getEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
+		// 	return err
+		// })
 	}
 
 	return txResponse(w, edgeGroup, err)

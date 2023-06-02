@@ -102,10 +102,10 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		statusResponse, err = handler.inspectStatus(handler.DataStore, r, portainer.EndpointID(endpointID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID))
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID))
+		// 	return err
+		// })
 	}
 
 	if err != nil {

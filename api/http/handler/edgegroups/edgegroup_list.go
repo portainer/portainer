@@ -36,10 +36,10 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		decoratedEdgeGroups, err = getEdgeGroupList(handler.DataStore)
 	} else {
-		err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-			decoratedEdgeGroups, err = getEdgeGroupList(tx)
-			return err
-		})
+		// err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		// 	decoratedEdgeGroups, err = getEdgeGroupList(tx)
+		// 	return err
+		// })
 	}
 
 	return txResponse(w, decoratedEdgeGroups, err)

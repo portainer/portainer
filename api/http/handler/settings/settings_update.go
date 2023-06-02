@@ -123,10 +123,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		settings, err = handler.updateSettings(handler.DataStore, payload)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			settings, err = handler.updateSettings(tx, payload)
-			return err
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	settings, err = handler.updateSettings(tx, payload)
+		// 	return err
+		// })
 	}
 
 	if err != nil {

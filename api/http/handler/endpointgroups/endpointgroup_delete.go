@@ -38,9 +38,9 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = handler.deleteEndpointGroup(handler.DataStore, portainer.EndpointGroupID(endpointGroupID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.deleteEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID))
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return handler.deleteEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID))
+		// })
 	}
 
 	if err != nil {

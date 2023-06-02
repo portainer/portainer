@@ -59,9 +59,9 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = handler.getEdgeJobLobs(handler.DataStore, endpoint.ID, portainer.EdgeJobID(edgeJobID), payload)
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.getEdgeJobLobs(tx, endpoint.ID, portainer.EdgeJobID(edgeJobID), payload)
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return handler.getEdgeJobLobs(tx, endpoint.ID, portainer.EdgeJobID(edgeJobID), payload)
+		// })
 	}
 
 	if err != nil {

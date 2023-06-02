@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -129,18 +128,18 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.TagIDs != nil {
-		err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 
-			tagsChanged, err := updateEnvironmentTags(tx, payload.TagIDs, endpoint.TagIDs, endpoint.ID)
-			if err != nil {
-				return err
-			}
+		// 	tagsChanged, err := updateEnvironmentTags(tx, payload.TagIDs, endpoint.TagIDs, endpoint.ID)
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			endpoint.TagIDs = payload.TagIDs
-			updateRelations = updateRelations || tagsChanged
+		// 	endpoint.TagIDs = payload.TagIDs
+		// 	updateRelations = updateRelations || tagsChanged
 
-			return nil
-		})
+		// 	return nil
+		// })
 
 		if err != nil {
 			httperror.InternalServerError("Unable to update environment tags", err)
@@ -269,9 +268,9 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if updateRelations {
-		err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.updateEdgeRelations(tx, endpoint)
-		})
+		// err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return handler.updateEdgeRelations(tx, endpoint)
+		// })
 
 		if err != nil {
 			return httperror.InternalServerError("Unable to update environment relations", err)

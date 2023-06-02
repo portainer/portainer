@@ -227,10 +227,10 @@ func (service *Service) snapshotEndpoints() error {
 		if featureflags.IsEnabled(portainer.FeatureNoTx) {
 			updateEndpointStatus(service.dataStore, &endpoint, snapshotError)
 		} else {
-			service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-				updateEndpointStatus(tx, &endpoint, snapshotError)
-				return nil
-			})
+			// service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			// 	updateEndpointStatus(tx, &endpoint, snapshotError)
+			// 	return nil
+			// })
 		}
 	}
 

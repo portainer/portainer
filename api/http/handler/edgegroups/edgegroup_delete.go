@@ -32,9 +32,9 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = deleteEdgeGroup(handler.DataStore, portainer.EdgeGroupID(edgeGroupID))
 	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return deleteEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
-		})
+		// err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// 	return deleteEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
+		// })
 	}
 
 	if err != nil {
