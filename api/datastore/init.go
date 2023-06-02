@@ -27,6 +27,11 @@ func (store *Store) Init() error {
 	return store.checkOrCreateDefaultData()
 }
 
+func (store *Store) PostInit() error {
+	store.EndpointService.Init()
+	return nil
+}
+
 func (store *Store) checkOrCreateDefaultSettings() error {
 
 	isDDExtention := false

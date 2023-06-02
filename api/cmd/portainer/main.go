@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto/sha256"
-	"fmt"
 	"math/rand"
 	"os"
 	"path"
@@ -106,8 +105,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		log.Fatal().Err(err).Msg("failed initializing data store")
 	}
 
-	fmt.Println("IsNew:", isNew)
-
 	if isNew {
 		instanceId, err := uuid.NewV4()
 		if err != nil {
@@ -134,6 +131,11 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		// if err != nil {
 		// 	log.Fatal().Err(err).Msg("failed migration")
 		// }
+
+		err := store.PostInit()
+		if err != nil {
+			log.Fatal().Err(err).Msg("postinit failed")
+		}
 	}
 
 	err = updateSettingsFromFlags(store, flags)

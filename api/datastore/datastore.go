@@ -31,8 +31,6 @@ func (store *Store) Open() (newStore bool, err error) {
 		return false, err
 	}
 
-	fmt.Println("encryptionReq:", encryptionReq)
-
 	if encryptionReq {
 		err = store.encryptDB()
 		if err != nil {
@@ -48,8 +46,6 @@ func (store *Store) Open() (newStore bool, err error) {
 		}
 		return false, err
 	}
-
-	fmt.Println("connection openned")
 
 	err = store.initServices()
 	if err != nil {

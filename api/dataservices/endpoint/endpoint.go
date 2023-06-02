@@ -38,6 +38,23 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	return s, nil
 }
 
+func (service *Service) Init() error {
+	es, err := service.endpoints()
+	if err != nil {
+		return err
+	}
+
+	for _, e := range es {
+		if len(e.EdgeID) > 0 {
+			service.idxEdgeID[e.EdgeID] = e.ID
+		}
+
+		service.heartbeats.Store(e.ID, e.LastCheckInDate)
+	}
+
+	return nil
+}
+
 func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 	return ServiceTx{
 		service: service,
