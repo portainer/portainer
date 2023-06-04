@@ -1,10 +1,10 @@
 import { StorybookConfig } from '@storybook/react-webpack5';
 
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
-import { Configuration, RuleSetRule } from 'webpack';
+import { Configuration } from 'webpack';
 import postcss from 'postcss';
 const config: StorybookConfig = {
-  stories: ['../app/**/*.stories.mdx', '../app/**/*.stories.@(ts|tsx)'],
+  stories: ['../app/**/*.stories.@(ts|tsx)'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
