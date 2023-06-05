@@ -3,6 +3,8 @@ package endpointedge
 import (
 	"errors"
 	"net/http"
+	"os"
+	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -14,8 +16,9 @@ import (
 )
 
 type configResponse struct {
-	StackFileContent string
-	Name             string
+	StackFileContent  string
+	DotEnvFileContent string
+	Name              string
 	// Namespace to use for Kubernetes manifests, leave empty to use the namespaces defined in the manifest
 	Namespace string
 }
@@ -81,9 +84,18 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
 	}
 
+	var dotEnvFileContent []byte
+	if _, err = os.Stat(path.Join(edgeStack.ProjectPath, ".env")); err == nil {
+		dotEnvFileContent, err = handler.FileService.GetFileContent(edgeStack.ProjectPath, ".env")
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve .env file from disk", err)
+		}
+	}
+
 	return response.JSON(w, configResponse{
-		StackFileContent: string(stackFileContent),
-		Name:             edgeStack.Name,
-		Namespace:        namespace,
+		StackFileContent:  string(stackFileContent),
+		DotEnvFileContent: string(dotEnvFileContent),
+		Name:              edgeStack.Name,
+		Namespace:         namespace,
 	})
 }
