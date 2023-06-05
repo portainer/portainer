@@ -8,6 +8,7 @@ import { TextArea } from '@@/form-components/Input/Textarea';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { useToggledValue } from './useToggledValue';
+import { DemoAlert } from './DemoAlert';
 
 export function ScreenBannerFieldset() {
   const isDemoQuery = useIsDemo();
@@ -29,13 +30,8 @@ export function ScreenBannerFieldset() {
           />
         </div>
 
-        {isDemoQuery.data && (
-          <div className="col-sm-12 mt-2">
-            <span className="small text-muted">
-              You cannot use this feature in the demo version of Portainer.
-            </span>
-          </div>
-        )}
+        <DemoAlert />
+
         <div className="col-sm-12 text-muted small mt-2">
           You can set a custom banner that will be shown to all users during
           login.

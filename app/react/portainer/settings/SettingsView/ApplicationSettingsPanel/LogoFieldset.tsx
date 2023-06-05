@@ -7,6 +7,7 @@ import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { useToggledValue } from './useToggledValue';
+import { DemoAlert } from './DemoAlert';
 
 export function LogoFieldset() {
   const [{ name }, { error }] = useField<string>('logo');
@@ -28,13 +29,7 @@ export function LogoFieldset() {
           />
         </div>
 
-        {isDemoQuery.data && (
-          <div className="col-sm-12 mt-2">
-            <span className="small text-muted">
-              You cannot use this feature in the demo version of Portainer.
-            </span>
-          </div>
-        )}
+        <DemoAlert />
       </div>
 
       {isEnabled && (

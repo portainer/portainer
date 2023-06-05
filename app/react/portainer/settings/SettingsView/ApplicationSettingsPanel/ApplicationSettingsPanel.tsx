@@ -20,6 +20,7 @@ import { Values } from './types';
 import { LogoFieldset } from './LogoFieldset';
 import { ScreenBannerFieldset } from './ScreenBannerFieldset';
 import { TemplatesUrlSection } from './TemplatesUrlSection';
+import { DemoAlert } from './DemoAlert';
 
 export function ApplicationSettingsPanel({ onSuccess }: { onSuccess(): void }) {
   const settingsQuery = useSettings();
@@ -124,21 +125,15 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
           />
         </div>
 
-        {isDemoQuery.data && (
-          <div className="col-sm-12 mt-2">
-            <span className="small text-muted">
-              You cannot use this feature in the demo version of Portainer.
-            </span>
-          </div>
-        )}
+        <DemoAlert />
+
         <div className="col-sm-12 text-muted small mt-2">
-          You can find more information about this in our
+          You can find more information about this in our{' '}
           <a
             href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/"
             target="_blank"
             rel="noreferrer"
           >
-            {' '}
             privacy policy
           </a>
           .
