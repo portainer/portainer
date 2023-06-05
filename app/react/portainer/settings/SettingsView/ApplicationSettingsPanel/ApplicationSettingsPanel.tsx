@@ -51,6 +51,7 @@ export function ApplicationSettingsPanel({ onSuccess }: { onSuccess(): void }) {
               initialValues={initialValues}
               onSubmit={handleSubmit}
               validationSchema={validation}
+              validateOnMount
             >
               <InnerForm isLoading={mutation.isLoading} />
             </Formik>
