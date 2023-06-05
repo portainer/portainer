@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react';
+import { Settings as SettingsIcon } from 'lucide-react';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
@@ -15,6 +15,8 @@ import { SwitchField } from '@@/form-components/SwitchField';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
+import { type Settings } from '../../types';
+
 import { validation } from './validation';
 import { Values } from './types';
 import { LogoFieldset } from './LogoFieldset';
@@ -22,7 +24,11 @@ import { ScreenBannerFieldset } from './ScreenBannerFieldset';
 import { TemplatesUrlSection } from './TemplatesUrlSection';
 import { DemoAlert } from './DemoAlert';
 
-export function ApplicationSettingsPanel({ onSuccess }: { onSuccess(): void }) {
+export function ApplicationSettingsPanel({
+  onSuccess,
+}: {
+  onSuccess(settings: Settings): void;
+}) {
   const settingsQuery = useSettings();
   const mutation = useUpdateSettingsMutation();
 
@@ -46,7 +52,7 @@ export function ApplicationSettingsPanel({ onSuccess }: { onSuccess(): void }) {
     <div className="row">
       <div className="col-sm-12">
         <Widget>
-          <Widget.Title icon={Settings} title="Application settings" />
+          <Widget.Title icon={SettingsIcon} title="Application settings" />
           <Widget.Body>
             <Formik
               initialValues={initialValues}
@@ -73,9 +79,9 @@ export function ApplicationSettingsPanel({ onSuccess }: { onSuccess(): void }) {
         EdgeAgentCheckinInterval: values.edgeAgentCheckinInterval,
       },
       {
-        onSuccess() {
+        onSuccess(settings) {
           notifySuccess('Success', 'Application settings updated');
-          onSuccess();
+          onSuccess(settings);
         },
       }
     );

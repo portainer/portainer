@@ -34,7 +34,8 @@ type OptionalSettings = Omit<Partial<Settings>, 'Edge'> & {
 
 export async function updateSettings(settings: OptionalSettings) {
   try {
-    await axios.put(buildUrl(), settings);
+    const { data } = await axios.put<Settings>(buildUrl(), settings);
+    return data;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update application settings');
   }
