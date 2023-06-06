@@ -11,7 +11,7 @@ export function TemplatesUrlSection() {
       <div className="form-group">
         <span className="col-sm-12 text-muted small">
           You can specify the URL to your own template definitions file here.
-          See
+          See{' '}
           <a
             href="https://docs.portainer.io/advanced/app-templates/build"
             target="_blank"
