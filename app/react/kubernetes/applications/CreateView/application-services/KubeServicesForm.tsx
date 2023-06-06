@@ -340,7 +340,9 @@ type NodePortValidationContext = {
   formServices: ServiceFormValues[];
 };
 
-export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
+export function kubeServicesValidation(
+  validationData?: NodePortValidationContext
+): SchemaOf<ServiceFormValues[]> {
   return array(
     object({
       Headless: boolean().required(),
@@ -367,20 +369,20 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
             .test(
               'service-port-is-unique',
               'Service port number must be unique.',
-              // eslint-disable-next-line func-names
-              function (servicePort, context) {
+              (servicePort, context) => {
                 // test for duplicate service ports within this service.
                 // yup gives access to context.parent which gives one ServicePort object.
                 // yup also gives access to all form values through this.options.context.
                 // Unfortunately, it doesn't give direct access to all Ports within the current service.
                 // To find all ports in the service for validation, I'm filtering the services by the service name,
                 // that's stored in the ServicePort object, then getting all Ports in the service.
-                if (servicePort === undefined) {
+                if (servicePort === undefined || validationData === undefined) {
                   return true;
                 }
+                const { formServices } = validationData;
                 const matchingService = getServiceForPort(
                   context.parent as ServicePort,
-                  this.options.context?.formValues as ServiceFormValues[]
+                  formServices
                 );
                 if (matchingService === undefined) {
                   return true;
@@ -406,14 +408,14 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
             .test(
               'node-port-is-unique-in-service',
               'Node port is already used in this service.',
-              // eslint-disable-next-line func-names
-              function (nodePort, context) {
-                if (nodePort === undefined) {
+              (nodePort, context) => {
+                if (nodePort === undefined || validationData === undefined) {
                   return true;
                 }
+                const { formServices } = validationData;
                 const matchingService = getServiceForPort(
                   context.parent as ServicePort,
-                  this.options.context?.formValues as ServiceFormValues[]
+                  formServices
                 );
                 if (
                   matchingService === undefined ||
@@ -432,15 +434,11 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
             .test(
               'node-port-is-unique-in-cluster',
               'Node port is already used.',
-              // eslint-disable-next-line func-names
-              function (nodePort, context) {
-                if (nodePort === undefined) {
+              (nodePort, context) => {
+                if (nodePort === undefined || validationData === undefined) {
                   return true;
                 }
-                const { nodePortServices } = this.options.context
-                  ?.validationContext as NodePortValidationContext;
-                const formServices = this.options.context
-                  ?.formValues as ServiceFormValues[];
+                const { formServices, nodePortServices } = validationData;
                 const matchingService = getServiceForPort(
                   context.parent as ServicePort,
                   formServices
@@ -476,21 +474,21 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
                   .map((formServicePorts) => formServicePorts.nodePort);
                 return (
                   !clusterNodePortsWithoutFormServices.includes(nodePort) && // node port is not in the cluster services that aren't in the application form
-                  !formNodePortsWithoutCurrentService.includes(nodePort) // node port is not in the current form, excluding the current service
+                  !formNodePortsWithoutCurrentService.includes(nodePort) // and the node port is not in the current form, excluding the current service
                 );
               }
             )
             .test(
               'node-port-minimum',
               'Nodeport number must be inside the range 30000-32767 or blank for system allocated.',
-              // eslint-disable-next-line func-names
-              function (nodePort, context) {
-                if (nodePort === undefined) {
+              (nodePort, context) => {
+                if (nodePort === undefined || validationData === undefined) {
                   return true;
                 }
+                const { formServices } = validationData;
                 const matchingService = getServiceForPort(
                   context.parent as ServicePort,
-                  this.options.context?.formValues as ServiceFormValues[]
+                  formServices
                 );
                 if (
                   !matchingService ||
@@ -505,14 +503,14 @@ export function kubeServicesValidation(): SchemaOf<ServiceFormValues[]> {
             .test(
               'node-port-maximum',
               'Nodeport number must be inside the range 30000-32767 or blank for system allocated.',
-              // eslint-disable-next-line func-names
-              function (nodePort, context) {
-                if (nodePort === undefined) {
+              (nodePort, context) => {
+                if (nodePort === undefined || validationData === undefined) {
                   return true;
                 }
+                const { formServices } = validationData;
                 const matchingService = getServiceForPort(
                   context.parent as ServicePort,
-                  this.options.context?.formValues as ServiceFormValues[]
+                  formServices
                 );
                 if (
                   !matchingService ||
