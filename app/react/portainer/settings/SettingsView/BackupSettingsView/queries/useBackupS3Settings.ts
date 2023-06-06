@@ -3,19 +3,25 @@ import { useQuery } from 'react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
-import { queryKeys } from '../../../queries/queryKeys';
 import { BackupS3Model } from '../types';
 
 import { buildUrl } from './backupSettings.service';
+import { queryKeys } from './queryKeys';
 
-export function useBackupS3Settings<T = BackupS3Model>(
-  select?: (settings: BackupS3Model) => T,
-  enabled = true
-) {
+export function useBackupS3Settings<T = BackupS3Model>({
+  select,
+  enabled,
+  onSuccess,
+}: {
+  select?: (settings: BackupS3Model) => T;
+  enabled?: boolean;
+  onSuccess?: (data: T) => void;
+} = {}) {
   return useQuery(queryKeys.backupS3Settings(), getBackupS3Settings, {
     select,
     enabled,
     ...withError('Unable to retrieve s3 backup settings'),
+    onSuccess,
   });
 }
 

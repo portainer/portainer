@@ -4,9 +4,9 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
 
 import { BackupS3Model } from '../types';
-import { queryKeys } from '../../../queries/queryKeys';
 
 import { buildUrl } from './backupSettings.service';
+import { queryKeys } from './queryKeys';
 
 export function useExportS3BackupMutation() {
   const queryClient = useQueryClient();

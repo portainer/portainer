@@ -4,9 +4,9 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
 
 import { BackupS3Model } from '../types';
-import { queryKeys } from '../../../queries/queryKeys';
 
 import { buildUrl } from './backupSettings.service';
+import { queryKeys } from './queryKeys';
 
 export function useBackupS3SettingsMutation() {
   const queryClient = useQueryClient();
@@ -20,7 +20,7 @@ export function useBackupS3SettingsMutation() {
 
 async function updateBackupS3Settings(payload: BackupS3Model) {
   try {
-    const response = await axios.post(buildUrl('s3', 'settings'), payload, {});
+    const response = await axios.post(buildUrl('s3', 'settings'), payload);
 
     return response.data;
   } catch (e) {

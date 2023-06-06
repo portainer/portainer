@@ -13,18 +13,27 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Input } from '@@/form-components/Input';
 
-import { BackupS3Settings } from './types';
 import {
+  useBackupS3Settings,
   useExportS3BackupMutation,
   useBackupS3SettingsMutation,
 } from './queries';
+import { BackupS3Model } from './types';
 import { validationSchema } from './BackupFormS3.validation';
 
-interface Props {
-  settings: BackupS3Settings;
+interface BackupS3Settings {
+  passwordProtectS3: boolean;
+  passwordS3: string;
+  scheduleAutomaticBackup: boolean;
+  cronRule: string;
+  accessKeyID: string;
+  secretAccessKey: string;
+  region: string;
+  bucketName: string;
+  s3CompatibleHost: string;
 }
 
-export function BackupFormS3({ settings }: Props) {
+export function BackupFormS3() {
   const [isExport, setIsExport] = useState(false);
   const limitedToBE = isLimitedToBE(FeatureId.S3_BACKUP_SETTING);
 
@@ -32,14 +41,29 @@ export function BackupFormS3({ settings }: Props) {
 
   const updateS3Mutate = useBackupS3SettingsMutation();
 
+  const settingsQuery = useBackupS3Settings();
+  if (!settingsQuery.data) {
+    return null;
+  }
+
+  const backupS3Settings: BackupS3Settings = {
+    passwordS3: settingsQuery.data.password,
+    cronRule: settingsQuery.data.cronRule,
+    accessKeyID: settingsQuery.data.accessKeyID,
+    secretAccessKey: settingsQuery.data.secretAccessKey,
+    region: settingsQuery.data.region,
+    bucketName: settingsQuery.data.bucketName,
+    s3CompatibleHost: settingsQuery.data.s3CompatibleHost,
+    scheduleAutomaticBackup: !!settingsQuery.data.cronRule,
+    passwordProtectS3: !!settingsQuery.data.password,
+  };
+
   return (
     <Formik
-      initialValues={settings}
+      initialValues={backupS3Settings}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
       validateOnMount
-      validateOnChange
-      validateOnBlur
     >
       {({
         values,
@@ -203,6 +227,7 @@ export function BackupFormS3({ settings }: Props) {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
+                loadingText="Exporting..."
                 isLoading={isSubmitting}
                 className={clsx('!ml-0', { 'limited-be': limitedToBE })}
                 disabled={!isValid || limitedToBE}
