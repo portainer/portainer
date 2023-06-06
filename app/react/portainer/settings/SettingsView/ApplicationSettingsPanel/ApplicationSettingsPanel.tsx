@@ -99,7 +99,6 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
       >
         <Field
           as={Input}
-          value={values.snapshotInterval}
           id="snapshot_interval"
           placeholder="e.g. 15m"
           name="snapshotInterval"
