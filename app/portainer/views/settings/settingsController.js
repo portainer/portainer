@@ -160,7 +160,6 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.KubeconfigExpiry = settings.KubeconfigExpiry;
           $scope.formValues.HelmRepositoryURL = settings.HelmRepositoryURL;
           $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
-          $scope.initialFormValues.enableTelemetry = settings.EnableTelemetry;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
