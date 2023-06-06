@@ -15,6 +15,7 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
     $scope.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;
     $scope.updateSettings = updateSettings;
+    $scope.handleSuccess = handleSuccess;
 
     $scope.backupOptions = options;
 
@@ -124,12 +125,9 @@ angular.module('portainer.app').controller('SettingsController', [
 
     function updateSettings(settings, successMessage = 'Settings updated') {
       return SettingsService.update(settings)
-        .then(function success(response) {
+        .then(function success(settings) {
           Notifications.success('Success', successMessage);
-          StateManager.updateLogo(settings.LogoURL);
-          StateManager.updateSnapshotInterval(settings.SnapshotInterval);
-          StateManager.updateEnableTelemetry(settings.EnableTelemetry);
-          $scope.formValues.BlackListedLabels = response.BlackListedLabels;
+          handleSuccess(settings);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update settings');
@@ -138,6 +136,19 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.state.kubeSettingsActionInProgress = false;
           $scope.state.actionInProgress = false;
         });
+    }
+
+    function handleSuccess(settings) {
+      if (settings) {
+        StateManager.updateLogo(settings.LogoURL);
+        StateManager.updateSnapshotInterval(settings.SnapshotInterval);
+        StateManager.updateEnableTelemetry(settings.EnableTelemetry);
+        $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
+      }
+
+      // trigger an event to update the deployment options for the react based sidebar
+      const event = new CustomEvent('portainer:deploymentOptionsUpdated');
+      document.dispatchEvent(event);
     }
 
     function initView() {
