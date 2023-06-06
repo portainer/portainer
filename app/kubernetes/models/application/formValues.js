@@ -1,5 +1,5 @@
 import { PorImageRegistryModel } from '@/docker/models/porImageRegistry';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationPlacementTypes } from './models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
@@ -22,9 +22,8 @@ export function KubernetesApplicationFormValues() {
   this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
   this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
   this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
-  this.ConfigMaps = []; // KubernetesApplicationConfigurationFormValue lis;
-  this.Secrets = []; // KubernetesApplicationConfigurationFormValue lis;
-  this.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
+  this.ConfigMaps = [];
+  this.Secrets = [];
   this.PublishedPorts = []; // KubernetesApplicationPublishedPortFormValue lis;
   this.PlacementType = KubernetesApplicationPlacementTypes.PREFERRED;
   this.Placements = []; // KubernetesApplicationPlacementFormValue lis;
