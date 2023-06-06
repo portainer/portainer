@@ -299,6 +299,12 @@ type (
 		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
+	// StackDeploymentInfo records the information of a deployed stack
+	StackDeploymentInfo struct {
+		Version     string `json:"Version"`
+		ProjectPath string `json:"ProjectPath"`
+	}
+
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
@@ -315,6 +321,8 @@ type (
 		DeploymentType EdgeStackDeploymentType
 		// Uses the manifest's namespaces instead of the default one
 		UseManifestNamespaces bool
+
+		PreviousDeploymentInfo StackDeploymentInfo `json:"PreviousDeploymentInfo"`
 
 		// Deprecated
 		Prune bool `json:"Prune"`
@@ -337,9 +345,10 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Details    EdgeStackStatusDetails `json:"Details"`
-		Error      string                 `json:"Error"`
-		EndpointID EndpointID             `json:"EndpointID"`
+		Details        EdgeStackStatusDetails `json:"Details"`
+		Error          string                 `json:"Error"`
+		EndpointID     EndpointID             `json:"EndpointID"`
+		DeploymentInfo StackDeploymentInfo    `json:"DeploymentInfo"`
 
 		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
