@@ -189,40 +189,41 @@ export function BackupFormS3() {
             />
           </FormControl>
 
-          <FormSection title="Security settings" />
-          <FormControl
-            inputId="password-s3-switch"
-            label="Password Protect"
-            size="small"
-            errors={errors.passwordProtectS3}
-          >
-            <Switch
-              id="password-s3-switch"
-              name="password-s3-switch"
-              className="space-right"
-              checked={values.passwordProtectS3}
-              data-cy="settings-passwordProtectToggleS3"
-              onChange={(e) => setFieldValue('passwordProtectS3', e)}
-            />
-          </FormControl>
-
-          {values.passwordProtectS3 && (
+          <FormSection title="Security settings">
             <FormControl
-              inputId="password-s3"
-              label="Password"
+              inputId="password-s3-switch"
+              label="Password Protect"
               size="small"
-              errors={errors.passwordS3}
+              errors={errors.passwordProtectS3}
             >
-              <Field
-                id="password-s3"
-                name="passwordS3"
-                type="password"
-                as={Input}
-                data-cy="settings-backups3pw"
-                required
+              <Switch
+                id="password-s3-switch"
+                name="password-s3-switch"
+                className="space-right"
+                checked={values.passwordProtectS3}
+                data-cy="settings-passwordProtectToggleS3"
+                onChange={(e) => setFieldValue('passwordProtectS3', e)}
               />
             </FormControl>
-          )}
+
+            {values.passwordProtectS3 && (
+              <FormControl
+                inputId="password-s3"
+                label="Password"
+                size="small"
+                errors={errors.passwordS3}
+              >
+                <Field
+                  id="password-s3"
+                  name="passwordS3"
+                  type="password"
+                  as={Input}
+                  data-cy="settings-backups3pw"
+                  required
+                />
+              </FormControl>
+            )}
+          </FormSection>
 
           <div className="form-group">
             <div className="col-sm-12">
