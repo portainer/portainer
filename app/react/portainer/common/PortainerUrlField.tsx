@@ -3,6 +3,7 @@ import { string } from 'yup';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+import { isValidUrl } from '@@/form-components/validate-url';
 
 interface Props {
   fieldName: string;
@@ -47,18 +48,11 @@ export function validation() {
     .test(
       'valid API server URL',
       'The API server URL must be a valid URL (localhost cannot be used)',
-      (value) => {
-        if (!value) {
-          return false;
-        }
-
-        try {
-          const url = new URL(value);
-          return !!url.hostname && url.hostname !== 'localhost';
-        } catch {
-          return false;
-        }
-      }
+      (value) =>
+        isValidUrl(
+          value,
+          (url) => !!url.hostname && url.hostname !== 'localhost'
+        )
     );
 }
 

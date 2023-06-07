@@ -95,6 +95,7 @@ export interface DefaultRegistry {
 
 export interface Settings {
   LogoURL: string;
+  CustomLoginBanner: string;
   BlackListedLabels: Pair[];
   AuthenticationMethod: AuthenticationMethod;
   InternalAuthSettings: { RequiredPasswordLength: number };

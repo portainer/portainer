@@ -6,6 +6,7 @@ import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/Inte
 import { r2a } from '@/react-tools/react2angular';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { ApplicationSettingsPanel } from '@/react/portainer/settings/SettingsView/ApplicationSettingsPanel';
 
 export const settingsModule = angular
   .module('portainer.app.react.components.settings', [])
@@ -17,4 +18,8 @@ export const settingsModule = angular
   .component(
     'internalAuth',
     r2a(InternalAuth, ['onSaveSettings', 'isLoading', 'value', 'onChange'])
+  )
+  .component(
+    'applicationSettingsPanel',
+    r2a(withReactQuery(ApplicationSettingsPanel), ['onSuccess'])
   ).name;
