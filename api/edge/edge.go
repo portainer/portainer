@@ -4,12 +4,18 @@ type (
 
 	// StackPayload represents the payload sent to the agent
 	StackPayload struct {
-		Name        string
+		// ID of the stack
+		ID int
+		// Name of the stack
+		Name string
+		// Content of the stack file
 		FileContent string
 		// Namespace to use for kubernetes stack. Keep empty to use the manifest namespace.
 		Namespace string
-		ID        int
-		Version   int
+		// Version of the stack file
+		Version int
+		// Content of the .env file
+		DotEnvFileContent string
 
 		// Used only for EE
 		RegistryCredentials []RegistryCredentials

@@ -16,12 +16,6 @@ import (
 	"github.com/portainer/portainer/api/kubernetes"
 )
 
-type configResponse struct {
-	edge.StackPayload
-
-	DotEnvFileContent string
-}
-
 // @summary Inspect an Edge Stack for an Environment(Endpoint)
 // @description **Access policy**: public
 // @tags edge, endpoints, edge_stacks
@@ -29,7 +23,7 @@ type configResponse struct {
 // @produce json
 // @param id path int true "environment(endpoint) Id"
 // @param stackId path int true "EdgeStack Id"
-// @success 200 {object} configResponse
+// @success 200 {object} edge.StackPayload
 // @failure 500
 // @failure 400
 // @failure 404
@@ -91,12 +85,10 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		}
 	}
 
-	return response.JSON(w, configResponse{
+	return response.JSON(w, edge.StackPayload{
 		DotEnvFileContent: string(dotEnvFileContent),
-		StackPayload: edge.StackPayload{
-			FileContent: string(stackFileContent),
-			Name:        edgeStack.Name,
-			Namespace:   namespace,
-		},
+		FileContent:       string(stackFileContent),
+		Name:              edgeStack.Name,
+		Namespace:         namespace,
 	})
 }
