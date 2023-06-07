@@ -426,8 +426,8 @@ angular.module('portainer.app').factory('StackService', [
     }
 
     service.stop = stop;
-    function stop(id) {
-      return Stack.stop({ id }).$promise;
+    function stop(endpointId, id) {
+      return Stack.stop({ endpointId, id }).$promise;
     }
 
     function updateGit(id, endpointId, env, prune, gitConfig, pullImage) {
