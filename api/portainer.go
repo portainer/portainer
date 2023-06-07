@@ -301,7 +301,7 @@ type (
 
 	// StackDeploymentInfo records the information of a deployed stack
 	StackDeploymentInfo struct {
-		Version     string `json:"Version"`
+		Version     int    `json:"Version"`
 		ProjectPath string `json:"ProjectPath"`
 	}
 
