@@ -50,7 +50,7 @@ angular.module('portainer.app').factory('StackService', [
     service.migrateSwarmStack = function (stack, targetEndpointId, newName) {
       var deferred = $q.defer();
 
-      SwarmService.swarm()
+      SwarmService.swarm(targetEndpointId)
         .then(function success(data) {
           var swarm = data;
           if (swarm.Id === stack.SwarmId) {
@@ -324,7 +324,7 @@ angular.module('portainer.app').factory('StackService', [
     service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
       var deferred = $q.defer();
 
-      SwarmService.swarm()
+      SwarmService.swarm(endpointId)
         .then(function success(swarm) {
           var payload = {
             Name: name,
