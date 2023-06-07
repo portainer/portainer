@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
@@ -6,13 +6,9 @@ import { withGlobalError } from '@/react-tools/react-query';
 import { BackupS3Model } from '../types';
 
 import { buildUrl } from './backupSettings.service';
-import { queryKeys } from './queryKeys';
 
 export function useExportS3BackupMutation() {
-  const queryClient = useQueryClient();
-
   return useMutation(exportS3Backup, {
-    onSuccess: () => queryClient.invalidateQueries(queryKeys.exportS3Backup()),
     ...withGlobalError('Unable to export backup to S3'),
   });
 }

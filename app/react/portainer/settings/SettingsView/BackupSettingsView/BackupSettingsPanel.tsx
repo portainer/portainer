@@ -6,10 +6,10 @@ import { FormSection } from '@@/form-components/FormSection';
 import { BoxSelector } from '@@/BoxSelector';
 
 import { BackupFormType, options } from './backup-options';
-import { BackupFormFile } from './BackupFormFile';
-import { BackupFormS3 } from './BackupFormS3';
+import { BackupFileForm } from './BackupFileForm';
+import { BackupS3Form } from './BackupS3Form';
 
-export function BackupSettingsView() {
+export function BackupSettingsPanel() {
   const [backupType, setBackupType] = useState(options[0].value);
 
   return (
@@ -33,9 +33,9 @@ export function BackupSettingsView() {
                 />
 
                 {backupType === BackupFormType.S3 ? (
-                  <BackupFormS3 />
+                  <BackupS3Form />
                 ) : (
-                  <BackupFormFile />
+                  <BackupFileForm />
                 )}
               </FormSection>
             </div>

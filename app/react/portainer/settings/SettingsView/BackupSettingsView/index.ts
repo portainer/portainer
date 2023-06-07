@@ -1,1 +1,1 @@
-export { BackupSettingsView } from './BackupSettingsView';
+export { BackupSettingsPanel } from './BackupSettingsPanel';

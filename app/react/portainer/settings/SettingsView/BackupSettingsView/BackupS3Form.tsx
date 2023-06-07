@@ -16,10 +16,10 @@ import { Input } from '@@/form-components/Input';
 import {
   useBackupS3Settings,
   useExportS3BackupMutation,
-  useBackupS3SettingsMutation,
+  useUpdateBackupS3SettingsMutation,
 } from './queries';
 import { BackupS3Model } from './types';
-import { validationSchema } from './BackupFormS3.validation';
+import { validationSchema } from './BackupS3Form.validation';
 
 interface BackupS3Settings {
   passwordProtectS3: boolean;
@@ -33,13 +33,13 @@ interface BackupS3Settings {
   s3CompatibleHost: string;
 }
 
-export function BackupFormS3() {
+export function BackupS3Form() {
   const [isExport, setIsExport] = useState(false);
   const limitedToBE = isLimitedToBE(FeatureId.S3_BACKUP_SETTING);
 
   const exportS3Mutate = useExportS3BackupMutation();
 
-  const updateS3Mutate = useBackupS3SettingsMutation();
+  const updateS3Mutate = useUpdateBackupS3SettingsMutation();
 
   const settingsQuery = useBackupS3Settings();
   if (!settingsQuery.data) {
@@ -96,6 +96,7 @@ export function BackupFormS3() {
               label="Cron rule"
               size="small"
               errors={errors.cronRule}
+              required
             >
               <Field
                 id="cron_rule"
@@ -212,6 +213,7 @@ export function BackupFormS3() {
                 label="Password"
                 size="small"
                 errors={errors.passwordS3}
+                required
               >
                 <Field
                   id="password-s3"

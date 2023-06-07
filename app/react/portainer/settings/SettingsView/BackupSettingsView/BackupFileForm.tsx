@@ -11,14 +11,14 @@ import { Switch } from '@@/form-components/SwitchField/Switch';
 
 import { DownloadBackupPayload } from './queries/useDownloadBackupMutation';
 import { useDownloadBackupMutation } from './queries';
-import { validationSchema } from './BackupFormFile.validation';
+import { validationSchema } from './BackupFileForm.validation';
 
 interface BackupFileSettings {
   passwordProtect: boolean;
   password: string;
 }
 
-export function BackupFormFile() {
+export function BackupFileForm() {
   const downloadMutate = useDownloadBackupMutation();
 
   const settings: BackupFileSettings = {
@@ -65,6 +65,7 @@ export function BackupFormFile() {
                 label="Password"
                 size="small"
                 errors={errors.password}
+                required
               >
                 <Field
                   id="password"

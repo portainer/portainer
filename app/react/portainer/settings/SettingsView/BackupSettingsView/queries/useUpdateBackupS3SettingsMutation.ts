@@ -8,7 +8,7 @@ import { BackupS3Model } from '../types';
 import { buildUrl } from './backupSettings.service';
 import { queryKeys } from './queryKeys';
 
-export function useBackupS3SettingsMutation() {
+export function useUpdateBackupS3SettingsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(updateBackupS3Settings, {

@@ -1,21 +1,17 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation } from 'react-query';
 import { saveAs } from 'file-saver';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
 
 import { buildUrl } from './backupSettings.service';
-import { queryKeys } from './queryKeys';
 
 export interface DownloadBackupPayload {
   password: string;
 }
 
 export function useDownloadBackupMutation() {
-  const queryClient = useQueryClient();
-
   return useMutation(downloadBackup, {
-    onSuccess: () => queryClient.invalidateQueries(queryKeys.downloadBackup()),
     ...withGlobalError('Unable to download backup'),
   });
 }
