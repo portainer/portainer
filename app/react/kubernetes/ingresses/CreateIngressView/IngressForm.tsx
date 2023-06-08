@@ -408,9 +408,7 @@ export function IngressForm({
                   >
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">
-                          Service
-                        </span>
+                        <span className="input-group-addon">Service</span>
                         <Select
                           key={serviceOptions.toString() + path.ServiceName}
                           name={`ingress_service_${hostIndex}_${pathIndex}`}
@@ -443,7 +441,7 @@ export function IngressForm({
                       {servicePorts && (
                         <>
                           <div className="input-group input-group-sm">
-                            <span className="input-group-addon required">
+                            <span className="input-group-addon">
                               Service port
                             </span>
                             <Select
@@ -526,7 +524,7 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-3 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">Path</span>
+                        <span className="input-group-addon">Path</span>
                         <input
                           className="form-control"
                           name={`ingress_route_${hostIndex}-${pathIndex}`}
