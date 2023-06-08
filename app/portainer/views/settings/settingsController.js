@@ -15,6 +15,7 @@ angular.module('portainer.app').controller('SettingsController', [
     $scope.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;
     $scope.updateSettings = updateSettings;
     $scope.handleSuccess = handleSuccess;
+    $scope.requireNoteOnApplications = FeatureId.K8S_REQUIRE_NOTE_ON_APPLICATIONS;
 
     $scope.backupOptions = options;
 
