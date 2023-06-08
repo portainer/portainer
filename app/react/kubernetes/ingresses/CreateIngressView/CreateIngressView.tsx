@@ -10,7 +10,6 @@ import { useServices } from '@/react/kubernetes/networks/services/queries';
 import { notifySuccess, notifyError } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
 
-import { Link } from '@@/Link';
 import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
@@ -31,7 +30,6 @@ import {
   preparePaths,
   prepareAnnotations,
   prepareRuleFromIngress,
-  checkIfPathExistsWithHost,
 } from './utils';
 
 export function CreateIngressView() {
@@ -82,44 +80,37 @@ export function CreateIngressView() {
       ingressControllersResults.isLoading) ||
     (isEdit && !ingressRule.IngressName);
 
-  const [ingressNames, ingresses, ruleCounterByNamespace, hostWithTLS] =
-    useMemo((): [
-      string[],
-      Ingress[],
-      Record<string, number>,
-      Record<string, string>
-    ] => {
-      const ruleCounterByNamespace: Record<string, number> = {};
-      const hostWithTLS: Record<string, string> = {};
-      ingressesResults.data?.forEach((ingress) => {
-        ingress.TLS?.forEach((tls) => {
-          tls.Hosts.forEach((host) => {
-            hostWithTLS[host] = tls.SecretName;
-          });
+  const [ingressNames, ruleCounterByNamespace, hostWithTLS] = useMemo((): [
+    string[],
+    Record<string, number>,
+    Record<string, string>
+  ] => {
+    const ruleCounterByNamespace: Record<string, number> = {};
+    const hostWithTLS: Record<string, string> = {};
+    ingressesResults.data?.forEach((ingress) => {
+      ingress.TLS?.forEach((tls) => {
+        tls.Hosts.forEach((host) => {
+          hostWithTLS[host] = tls.SecretName;
         });
       });
-      const ingressNames: string[] = [];
-      ingressesResults.data?.forEach((ing) => {
-        ruleCounterByNamespace[ing.Namespace] =
-          ruleCounterByNamespace[ing.Namespace] || 0;
-        const n = ing.Name.match(/^(.*)-(\d+)$/);
-        if (n?.length === 3) {
-          ruleCounterByNamespace[ing.Namespace] = Math.max(
-            ruleCounterByNamespace[ing.Namespace],
-            Number(n[2])
-          );
-        }
-        if (ing.Namespace === namespace) {
-          ingressNames.push(ing.Name);
-        }
-      });
-      return [
-        ingressNames || [],
-        ingressesResults.data || [],
-        ruleCounterByNamespace,
-        hostWithTLS,
-      ];
-    }, [ingressesResults.data, namespace]);
+    });
+    const ingressNames: string[] = [];
+    ingressesResults.data?.forEach((ing) => {
+      ruleCounterByNamespace[ing.Namespace] =
+        ruleCounterByNamespace[ing.Namespace] || 0;
+      const n = ing.Name.match(/^(.*)-(\d+)$/);
+      if (n?.length === 3) {
+        ruleCounterByNamespace[ing.Namespace] = Math.max(
+          ruleCounterByNamespace[ing.Namespace],
+          Number(n[2])
+        );
+      }
+      if (ing.Namespace === namespace) {
+        ingressNames.push(ing.Name);
+      }
+    });
+    return [ingressNames || [], ruleCounterByNamespace, hostWithTLS];
+  }, [ingressesResults.data, namespace]);
 
   const namespacesOptions: Option<string>[] = [
     { label: 'Select a namespace', value: '' },
@@ -389,64 +380,6 @@ export function CreateIngressView() {
           }
           duplicatedHosts.push(host.Host);
         }
-
-        // Validate service
-        host.Paths?.forEach((path, pi) => {
-          if (!path.ServiceName) {
-            errors[`hosts[${hi}].paths[${pi}].servicename`] =
-              'Service name is required';
-          }
-
-          if (
-            isEdit &&
-            path.ServiceName &&
-            !serviceOptions.find((s) => s.value === path.ServiceName)
-          ) {
-            errors[`hosts[${hi}].paths[${pi}].servicename`] = (
-              <span>
-                Currently set to {path.ServiceName}, which does not exist. You
-                can create a service with this name for a particular deployment
-                via{' '}
-                <Link
-                  to="kubernetes.applications"
-                  params={{ id: environmentId }}
-                  className="text-primary"
-                  target="_blank"
-                >
-                  Applications
-                </Link>
-                , and on returning here it will be picked up.
-              </span>
-            );
-          }
-
-          if (!path.ServicePort) {
-            errors[`hosts[${hi}].paths[${pi}].serviceport`] =
-              'Service port is required';
-          }
-        });
-        // Validate paths
-        const paths = host.Paths.map((path) => path.Route);
-        paths.forEach((item, idx) => {
-          if (!item) {
-            errors[`hosts[${hi}].paths[${idx}].path`] = 'Path cannot be empty';
-          } else if (paths.indexOf(item) !== idx) {
-            errors[`hosts[${hi}].paths[${idx}].path`] =
-              'Paths cannot be duplicated';
-          } else {
-            // Validate host and path combination globally
-            const isExists = checkIfPathExistsWithHost(
-              ingresses,
-              host.Host,
-              item,
-              params.name
-            );
-            if (isExists) {
-              errors[`hosts[${hi}].paths[${idx}].path`] =
-                'Path is already in use with the same host';
-            }
-          }
-        });
       });
 
       setErrors(errors);
@@ -455,7 +388,7 @@ export function CreateIngressView() {
       }
       return true;
     },
-    [ingresses, environmentId, isEdit, params.name]
+    [isEdit]
   );
 
   const debouncedValidate = useMemo(() => debounce(validate, 300), [validate]);

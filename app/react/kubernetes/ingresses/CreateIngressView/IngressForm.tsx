@@ -308,16 +308,6 @@ export function IngressForm({
                     {!host.NoHost ? 'Rule' : 'Fallback rule'}
                   </div>
                   <div className="col-sm-9 p-0 text-right">
-                    {!host.NoHost && (
-                      <Button
-                        className="btn btn-light btn-sm"
-                        onClick={() => reloadTLSCerts()}
-                        icon={RefreshCw}
-                      >
-                        Reload TLS secrets
-                      </Button>
-                    )}
-
                     <Button
                       className="btn btn-sm ml-2"
                       color="dangerlight"
@@ -367,11 +357,21 @@ export function IngressForm({
                             handleTLSChange(hostIndex, e.target.value)
                           }
                           defaultValue={host.Secret}
+                          className="!rounded-r-none"
                         />
+                        {!host.NoHost && (
+                          <div className="input-group-btn">
+                            <Button
+                              className="btn btn-light btn-sm !ml-0 !rounded-l-none"
+                              onClick={() => reloadTLSCerts()}
+                              icon={RefreshCw}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="col-sm-12 p-0">
+                    <div className="col-sm-12 col-lg-4 flex h-[30px] items-center pl-2">
                       <TextTip color="blue">
                         You may also use the{' '}
                         <Link
@@ -564,7 +564,6 @@ export function IngressForm({
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
                         onClick={() => removeIngressRoute(hostIndex, pathIndex)}
-                        disabled={host.Paths.length === 1}
                         icon={Trash2}
                       />
                     </div>
