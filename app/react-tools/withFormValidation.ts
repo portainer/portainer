@@ -29,11 +29,11 @@ type WithFormFieldProps<TProps, TValue> = TProps & FormFieldProps<TValue>;
  *
  * @example
  * // Usage in Angular view
- * <react-component
+ * <component
  *   values="ctrl.values"
  *   on-change="ctrl.handleChange"
  *   validation-data="ctrl.validationData">
- * </react-component>
+ * </component>
  */
 export function withFormValidation<TProps, TValue, TData = never>(
   ngModule: IModule,
