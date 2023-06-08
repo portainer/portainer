@@ -401,6 +401,13 @@ export function IngressForm({
                     Paths
                   </div>
                 </div>
+
+                <p className="small text-muted mt-4">
+                  By leaving service/path details blank, you can setup{' '}
+                  <span>ingress defaults</span> that a user may select from via
+                  the hostname dropdown in Create/Edit Application.
+                </p>
+
                 {host.Paths.map((path, pathIndex) => (
                   <div
                     className="row path mt-5 !mb-5"
