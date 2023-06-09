@@ -564,12 +564,13 @@ export function IngressForm({
 
                     <div className="form-group col-sm-1 !m-0 !pl-0">
                       <Button
-                        className="btn btn-sm btn-only-icon vertical-center !ml-0"
+                        className="btn-only-icon vertical-center !ml-0"
                         color="dangerlight"
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
                         onClick={() => removeIngressRoute(hostIndex, pathIndex)}
                         icon={Trash2}
+                        size="small"
                       />
                     </div>
                   </div>
@@ -577,10 +578,12 @@ export function IngressForm({
 
                 <div className="row mt-5">
                   <Button
-                    className="btn btn-sm btn-light !ml-0"
+                    className="!ml-0"
                     type="button"
                     onClick={() => addNewIngressRoute(hostIndex)}
                     icon={Plus}
+                    size="small"
+                    color="default"
                   >
                     Add path
                   </Button>
@@ -593,20 +596,24 @@ export function IngressForm({
           <div className="row rules-action p-0">
             <div className="col-sm-12 vertical-center p-0">
               <Button
-                className="btn btn-sm btn-light !ml-0"
+                className="!ml-0"
                 type="button"
                 onClick={() => addNewIngressHost()}
                 icon={Plus}
+                color="default"
+                size="small"
               >
                 Add new host
               </Button>
 
               <Button
-                className="btn btn-sm btn-light ml-2"
+                className="ml-2"
                 type="button"
                 onClick={() => addNewIngressHost(true)}
                 disabled={hasNoHostRule}
                 icon={Plus}
+                color="default"
+                size="small"
               >
                 Add fallback rule
               </Button>
