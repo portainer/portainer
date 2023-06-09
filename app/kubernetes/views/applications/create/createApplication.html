@@ -1339,7 +1339,6 @@
               <kube-services-form
                 on-change="(ctrl.onServicesChange)"
                 values="ctrl.formValues.Services"
-                load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
                 app-name="ctrl.formValues.Name"
                 selector="ctrl.formValues.Selector"
                 validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services}"

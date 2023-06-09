@@ -1,61 +1,37 @@
 import { SchemaOf, array, boolean, mixed, number, object, string } from 'yup';
-import { useEffect, useState } from 'react';
-import { SingleValue } from 'react-select';
-import { List, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormikErrors } from 'formik';
 
-import DataFlow from '@/assets/ico/dataflow-1.svg?c';
 import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
-import { useCurrentUser } from '@/react/hooks/useUser';
 
-import { Link } from '@@/Link';
-import { TextTip } from '@@/Tip/TextTip';
-import { Select } from '@@/form-components/ReactSelect';
-import { Button } from '@@/buttons';
-import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
-import { Icon } from '@@/Icon';
-import { FormError } from '@@/form-components/FormError';
+import { Badge } from '@@/Badge';
 
-import { ServiceFormValues, ServicePort, ServiceTypeValue } from './types';
-import { LoadBalancerForm } from './LoadBalancerForm';
-import { ClusterIpForm } from './ClusterIpForm';
-import { NodePortForm } from './NodePortForm';
-import { newPort } from './utils';
+import {
+  ServiceFormValues,
+  ServicePort,
+  ServiceTypeAngularEnum,
+  ServiceTypeOption,
+  ServiceTypeValue,
+} from './types';
+import { generateUniqueName } from './utils';
+import { ClusterIpServicesForm } from './ClusterIpServicesForm';
+import { ServiceTabs } from './ServiceTabs';
+import { NodePortServicesForm } from './NodePortServicesForm';
+import { LoadBalancerServicesForm } from './LoadBalancerServicesForm';
 
-type ServiceTypeLabel = 'ClusterIP' | 'NodePort' | 'LoadBalancer';
-type ServiceTypeOption = { value: ServiceTypeValue; label: ServiceTypeLabel };
-const serviceTypeOptions: ServiceTypeOption[] = [
-  {
-    value: KubernetesApplicationPublishingTypes.CLUSTER_IP,
-    label: 'ClusterIP',
-  },
-  { value: KubernetesApplicationPublishingTypes.NODE_PORT, label: 'NodePort' },
-  {
-    value: KubernetesApplicationPublishingTypes.LOAD_BALANCER,
-    label: 'LoadBalancer',
-  },
-];
-
-const serviceFormDefaultValues: ServiceFormValues = {
-  Headless: false,
-  Namespace: '',
-  Name: '',
-  StackName: '',
-  Ports: [],
-  Type: 1, // clusterip type as default
-  ClusterIP: '',
-  ApplicationName: '',
-  ApplicationOwner: '',
-  Note: '',
-  Ingress: false,
-  Selector: {},
+const serviceTypeEnumsToValues: Record<
+  ServiceTypeAngularEnum,
+  ServiceTypeValue
+> = {
+  [KubernetesApplicationPublishingTypes.CLUSTER_IP]: 'ClusterIP',
+  [KubernetesApplicationPublishingTypes.NODE_PORT]: 'NodePort',
+  [KubernetesApplicationPublishingTypes.LOAD_BALANCER]: 'LoadBalancer',
 };
 
 interface Props {
   values: ServiceFormValues[];
-  onChange: (loadBalancerPorts: ServiceFormValues[]) => void;
+  onChange: (services: ServiceFormValues[]) => void;
   errors?: FormikErrors<ServiceFormValues[]>;
-  loadBalancerEnabled: boolean;
   appName: string;
   selector: Record<string, string>;
   isEditMode: boolean;
@@ -65,15 +41,12 @@ export function KubeServicesForm({
   values: services,
   onChange,
   errors,
-  loadBalancerEnabled,
   appName,
   selector,
   isEditMode,
 }: Props) {
-  const { isAdmin } = useCurrentUser();
-  const [selectedServiceTypeOption, setSelectedServiceTypeOption] = useState<
-    SingleValue<ServiceTypeOption>
-  >(serviceTypeOptions[0]); // ClusterIP is the default value
+  const [selectedServiceType, setSelectedServiceType] =
+    useState<ServiceTypeValue>('ClusterIP');
 
   // when the appName changes, update the names for each service
   // and the serviceNames for each service port
@@ -93,208 +66,91 @@ export function KubeServicesForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appName]);
 
+  const serviceTypeCounts = useMemo(
+    () => getServiceTypeCounts(services),
+    [services]
+  );
+  const serviceTypeOptions: ServiceTypeOption[] = [
+    {
+      value: 'ClusterIP',
+      label: (
+        <div className="inline-flex items-center">
+          ClusterIP services
+          {serviceTypeCounts.ClusterIP && (
+            <Badge className="ml-2 flex-none">
+              {serviceTypeCounts.ClusterIP}
+            </Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      value: 'NodePort',
+      label: (
+        <div className="inline-flex items-center">
+          NodePort services
+          {serviceTypeCounts.NodePort && (
+            <Badge className="ml-2 flex-none">
+              {serviceTypeCounts.NodePort}
+            </Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      value: 'LoadBalancer',
+      label: (
+        <div className="inline-flex items-center">
+          LoadBalancer services
+          {serviceTypeCounts.LoadBalancer && (
+            <Badge className="ml-2 flex-none">
+              {serviceTypeCounts.LoadBalancer}
+            </Badge>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <>
+    <div className="flex flex-col">
       <div className="col-sm-12 form-section-title">
         Publishing the application
       </div>
-      <div className="col-sm-12 !p-0">
-        <div className="row">
-          <TextTip color="blue">
-            Publish your application by creating a ClusterIP service for it,
-            which you may then expose via{' '}
-            <Link
-              target="_blank"
-              to="kubernetes.ingresses"
-              rel="noopener noreferrer"
-            >
-              an ingress
-            </Link>
-            .
-          </TextTip>
-        </div>
-      </div>
-      <div className="flex w-full">
-        <Select<ServiceTypeOption>
-          options={serviceTypeOptions}
-          value={selectedServiceTypeOption}
-          className="w-1/4"
-          data-cy="k8sAppCreate-publishingModeDropdown"
-          onChange={(val) => {
-            setSelectedServiceTypeOption(val);
-          }}
+      <ServiceTabs
+        serviceTypeOptions={serviceTypeOptions}
+        selectedServiceType={selectedServiceType}
+        setSelectedServiceType={setSelectedServiceType}
+      />
+      {selectedServiceType === 'ClusterIP' && (
+        <ClusterIpServicesForm
+          services={services}
+          onChangeService={onChange}
+          errors={errors}
+          appName={appName}
+          selector={selector}
         />
-        <TooltipWithChildren
-          position="top"
-          className="portainer-tooltip"
-          message="Different service types expose the application in alternate ways.
-          ClusterIP exposes it within the cluster (for internal access only).
-          NodePort exposes it (on a high port) across all nodes.
-          LoadBalancer exposes it via an external load balancer."
-        >
-          <span>
-            <Button
-              color="default"
-              icon={Plus}
-              size="medium"
-              disabled={
-                selectedServiceTypeOption?.value ===
-                  KubernetesApplicationPublishingTypes.LOAD_BALANCER &&
-                !loadBalancerEnabled
-              }
-              onClick={() => {
-                // create a new service form value and add it to the list of services
-                const newService = structuredClone(serviceFormDefaultValues);
-                newService.Name = generateUniqueName(
-                  appName,
-                  services.length + 1,
-                  services
-                );
-                newService.Type =
-                  selectedServiceTypeOption?.value ||
-                  KubernetesApplicationPublishingTypes.CLUSTER_IP;
-                const newServicePort = newPort(newService.Name);
-                newService.Ports = [newServicePort];
-                newService.Selector = selector;
-                onChange([...services, newService]);
-              }}
-              data-cy="k8sAppCreate-createServiceButton"
-            >
-              Create service
-            </Button>
-          </span>
-        </TooltipWithChildren>
-      </div>
-      <div className="flex w-full flex-col">
-        {selectedServiceTypeOption?.value ===
-          KubernetesApplicationPublishingTypes.LOAD_BALANCER &&
-          isAdmin &&
-          !loadBalancerEnabled && (
-            <FormError className="mt-2">
-              No Load balancer is available in this cluster, click{' '}
-              <Link
-                to="kubernetes.cluster.setup"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                here
-              </Link>{' '}
-              to configure load balancer.
-            </FormError>
-          )}
-        {selectedServiceTypeOption?.value ===
-          KubernetesApplicationPublishingTypes.LOAD_BALANCER &&
-          !isAdmin &&
-          !loadBalancerEnabled && (
-            <FormError className="mt-2">
-              No Load balancer is available in this cluster, contact your
-              administrator.
-            </FormError>
-          )}
-        {services.map((service, index) => (
-          <div key={index} className="border-bottom py-6">
-            {service.Type ===
-              KubernetesApplicationPublishingTypes.CLUSTER_IP && (
-              <>
-                <div className="text-muted vertical-center w-full">
-                  <Icon icon={List} />
-                  ClusterIP
-                </div>
-                <ClusterIpForm
-                  serviceName={service.Name}
-                  values={service.Ports}
-                  errors={errors?.[index]?.Ports}
-                  onChange={(servicePorts: ServicePort[]) => {
-                    const newServices = [...services];
-                    newServices[index].Ports = servicePorts;
-                    onChange(newServices);
-                  }}
-                />
-              </>
-            )}
-            {service.Type ===
-              KubernetesApplicationPublishingTypes.NODE_PORT && (
-              <>
-                <div className="text-muted vertical-center w-full">
-                  <Icon icon={List} />
-                  NodePort
-                </div>
-                <NodePortForm
-                  serviceName={service.Name}
-                  values={service.Ports}
-                  errors={errors?.[index]?.Ports}
-                  onChange={(servicePorts: ServicePort[]) => {
-                    const newServices = [...services];
-                    newServices[index].Ports = servicePorts;
-                    onChange(newServices);
-                  }}
-                />
-              </>
-            )}
-            {service.Type ===
-              KubernetesApplicationPublishingTypes.LOAD_BALANCER && (
-              <>
-                <div className="text-muted vertical-center w-full">
-                  <Icon icon={DataFlow} />
-                  LoadBalancer
-                </div>
-                <LoadBalancerForm
-                  serviceName={service.Name}
-                  values={service.Ports}
-                  errors={errors?.[index]?.Ports}
-                  onChange={(servicePorts: ServicePort[]) => {
-                    const newServices = [...services];
-                    newServices[index].Ports = servicePorts;
-                    onChange(newServices);
-                  }}
-                  loadBalancerEnabled={loadBalancerEnabled}
-                />
-              </>
-            )}
-            <Button
-              icon={Trash2}
-              color="danger"
-              className="!ml-0 mt-2"
-              onClick={() => {
-                // remove the service at index in an immutable way
-                const newServices = [
-                  ...services.slice(0, index),
-                  ...services.slice(index + 1),
-                ];
-                onChange(newServices);
-              }}
-            >
-              Remove
-            </Button>
-          </div>
-        ))}
-      </div>
-    </>
+      )}
+      {selectedServiceType === 'NodePort' && (
+        <NodePortServicesForm
+          services={services}
+          onChangeService={onChange}
+          errors={errors}
+          appName={appName}
+          selector={selector}
+        />
+      )}
+      {selectedServiceType === 'LoadBalancer' && (
+        <LoadBalancerServicesForm
+          services={services}
+          onChangeService={onChange}
+          errors={errors}
+          appName={appName}
+          selector={selector}
+        />
+      )}
+    </div>
   );
-}
-
-function generateIndexedName(appName: string, index: number) {
-  return index === 0 ? appName : `${appName}-${index}`;
-}
-
-function isNameUnique(name: string, services: ServiceFormValues[]) {
-  return services.findIndex((service) => service.Name === name) === -1;
-}
-
-function generateUniqueName(
-  appName: string,
-  index: number,
-  services: ServiceFormValues[]
-) {
-  let initialIndex = index;
-  let uniqueName = appName;
-
-  while (!isNameUnique(uniqueName, services)) {
-    uniqueName = generateIndexedName(appName, initialIndex);
-    initialIndex++;
-  }
-
-  return uniqueName;
 }
 
 function getUniqNames(appName: string, services: ServiceFormValues[]) {
@@ -315,6 +171,22 @@ function getUniqNames(appName: string, services: ServiceFormValues[]) {
   );
 
   return uniqueNames;
+}
+
+/**
+ * getServiceTypeCounts returns a map of service types to the number of services of that type
+ */
+function getServiceTypeCounts(
+  services: ServiceFormValues[]
+): Record<ServiceTypeValue, number> {
+  return services.reduce((acc, service) => {
+    const type = serviceTypeEnumsToValues[service.Type];
+    const count = acc[type];
+    return {
+      ...acc,
+      [type]: count ? count + 1 : 1,
+    };
+  }, {} as Record<ServiceTypeValue, number>);
 }
 
 // values returned from the angular parent component (pascal case instead of camel case keys),
@@ -525,6 +397,7 @@ export function kubeServicesValidation(
           ingress: object(),
         })
       ),
+      Annotations: array(),
     })
   );
 }
