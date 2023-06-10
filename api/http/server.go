@@ -327,13 +327,16 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
+	errorLogger := NewHTTPLogger()
+
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 	if server.HTTPEnabled {
 		go func() {
 			log.Info().Str("bind_address", server.BindAddress).Msg("starting HTTP server")
 			httpServer := &http.Server{
-				Addr:    server.BindAddress,
-				Handler: handler,
+				Addr:     server.BindAddress,
+				Handler:  handler,
+				ErrorLog: errorLogger,
 			}
 
 			go shutdown(server.ShutdownCtx, httpServer)
@@ -349,6 +352,7 @@ func (server *Server) Start() error {
 	httpsServer := &http.Server{
 		Addr:         server.BindAddressHTTPS,
 		Handler:      handler,
+		ErrorLog:     errorLogger,
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)), // Disable HTTP/2
 	}
 
