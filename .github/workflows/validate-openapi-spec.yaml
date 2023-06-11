@@ -21,7 +21,7 @@ jobs:
         run: cd ./api && go get -t -v -d ./...
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
           cache: 'yarn'
       - run: yarn --frozen-lockfile
 
