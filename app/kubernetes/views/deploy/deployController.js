@@ -284,6 +284,11 @@ class KubernetesDeployController {
       this.Notifications.success('Success', 'Request to deploy manifest successfully submitted');
       this.state.isEditorDirty = false;
 
+      if (this.$state.params.referrer && this.$state.params.tab) {
+        this.$state.go(this.$state.params.referrer, { tab: this.$state.params.tab });
+        return;
+      }
+
       if (this.$state.params.referrer) {
         this.$state.go(this.$state.params.referrer);
         return;

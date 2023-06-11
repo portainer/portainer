@@ -13,6 +13,7 @@ export function createSelectColumn<T>(): ColumnDef<T> {
         checked={table.getIsAllRowsSelected()}
         indeterminate={table.getIsSomeRowsSelected()}
         onChange={table.getToggleAllRowsSelectedHandler()}
+        disabled={table.getRowModel().rows.every((row) => !row.getCanSelect())}
       />
     ),
     cell: ({ row, table }) => (
@@ -21,6 +22,7 @@ export function createSelectColumn<T>(): ColumnDef<T> {
         checked={row.getIsSelected()}
         indeterminate={row.getIsSomeSelected()}
         onChange={row.getToggleSelectedHandler()}
+        disabled={!row.getCanSelect()}
         onClick={(e) => {
           if (e.shiftKey) {
             const { rows, rowsById } = table.getRowModel();

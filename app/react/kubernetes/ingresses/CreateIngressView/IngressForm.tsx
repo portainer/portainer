@@ -373,18 +373,16 @@ export function IngressForm({
 
                     <div className="col-sm-12 p-0">
                       <TextTip color="blue">
-                        Add a secret via{' '}
+                        You may also use the{' '}
                         <Link
-                          to="kubernetes.configurations"
+                          to="kubernetes.secrets.new"
                           params={{ id: environmentID }}
                           className="text-primary"
                           target="_blank"
                         >
-                          ConfigMaps &amp; Secrets
-                        </Link>
-                        {', '}
-                        then select &apos;Reload TLS secrets&apos; above to
-                        populate the dropdown with your changes.
+                          Create secret
+                        </Link>{' '}
+                        function, and reload the dropdown.
                       </TextTip>
                     </div>
                   </div>

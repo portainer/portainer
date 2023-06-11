@@ -1,17 +1,13 @@
+import { IngressClassList } from 'kubernetes-types/networking/v1';
+
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import {
-  KubernetesApiListResponse,
-  V1IngressClass,
-} from '@/react/kubernetes/services/types';
 
 export async function getAllIngressClasses(environmentId: EnvironmentId) {
   try {
     const {
       data: { items },
-    } = await axios.get<KubernetesApiListResponse<V1IngressClass[]>>(
-      urlBuilder(environmentId)
-    );
+    } = await axios.get<IngressClassList>(urlBuilder(environmentId));
     return items;
   } catch (error) {
     throw parseAxiosError(error as Error);

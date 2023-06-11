@@ -1,0 +1,1 @@
+export { ConfigMapsDatatable } from './ConfigMapsDatatable';

@@ -4,7 +4,7 @@ import { Pod } from 'kubernetes-types/core/v1';
 import { queryClient, withError } from '@/react-tools/react-query';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { getNamespaceServices } from '../ServicesView/service';
+import { getNamespaceServices } from '../services/service';
 
 import {
   getApplicationsForCluster,
@@ -112,10 +112,10 @@ export function useApplicationsForCluster(
 ) {
   return useQuery(
     queryKeys.applicationsForCluster(environemtId),
-    () => namespaces && getApplicationsForCluster(environemtId, namespaces),
+    () => getApplicationsForCluster(environemtId, namespaces),
     {
       ...withError('Unable to retrieve applications'),
-      enabled: !!namespaces,
+      enabled: !!namespaces?.length,
     }
   );
 }

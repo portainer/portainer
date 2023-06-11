@@ -28,6 +28,9 @@ export async function getPVCs(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve deployments');
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve persistent volume claims'
+    );
   }
 }
