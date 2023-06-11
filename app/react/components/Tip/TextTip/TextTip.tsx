@@ -30,12 +30,7 @@ export function TextTip({
         inline ? 'inline-flex' : 'flex'
       )}
     >
-      <Icon
-        icon={icon}
-        mode={getMode(color)}
-        size="sm"
-        className="!mt-0.5 flex-none"
-      />
+      <Icon icon={icon} mode={getMode(color)} className="!mt-0.5 flex-none" />
 
       <span className={childrenWrapperClassName}>{children}</span>
     </div>

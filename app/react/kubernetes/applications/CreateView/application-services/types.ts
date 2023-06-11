@@ -1,3 +1,7 @@
+import { ReactNode } from 'react';
+
+import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
+
 export interface ServicePort {
   port?: number;
   targetPort?: number;
@@ -8,12 +12,13 @@ export interface ServicePort {
   ingress?: object;
 }
 
-export type ServiceTypeValue = 1 | 2 | 3;
+export type ServiceTypeAngularEnum =
+  (typeof KubernetesApplicationPublishingTypes)[keyof typeof KubernetesApplicationPublishingTypes];
 
 export type ServiceFormValues = {
   Headless: boolean;
   Ports: ServicePort[];
-  Type: ServiceTypeValue;
+  Type: ServiceTypeAngularEnum;
   Ingress: boolean;
   ClusterIP?: string;
   ApplicationName?: string;
@@ -23,4 +28,10 @@ export type ServiceFormValues = {
   StackName?: string;
   Selector?: Record<string, string>;
   Namespace?: string;
+};
+
+export type ServiceTypeValue = 'ClusterIP' | 'NodePort' | 'LoadBalancer';
+export type ServiceTypeOption = {
+  value: ServiceTypeValue;
+  label: ReactNode;
 };
