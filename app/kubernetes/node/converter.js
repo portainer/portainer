@@ -15,7 +15,9 @@ class KubernetesNodeConverter {
     const hostName = _.find(data.status.addresses, { type: 'Hostname' });
     res.Name = data.metadata.name ? data.metadata.name : hostName.address;
     res.Labels = data.metadata.labels;
-    res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Master' : 'Worker';
+    // most kube clusters set control-plane label, older clusters set master, microk8s doesn't have either but instead sets microk8s-controlplane
+    let masters = ['node-role.kubernetes.io/control-plane', 'node-role.kubernetes.io/master', 'node.kubernetes.io/microk8s-controlplane'];
+    res.Role = _.some(masters, (master) => _.has(data.metadata.labels, master)) ? 'Master' : 'Worker';
 
     const ready = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.READY });
     const memoryPressure = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.MEMORY_PRESSURE });
