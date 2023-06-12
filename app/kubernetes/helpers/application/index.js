@@ -145,10 +145,8 @@ class KubernetesApplicationHelper {
   /* #endregion */
 
   /* #region  CONFIGURATIONS FV <> ENV & VOLUMES */
-  static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations) {
+  static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations, filterCondition) {
     const finalRes = _.flatMap(configurations, (cfg) => {
-      const filterCondition = cfg.Kind === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
-
       const cfgEnv = _.filter(env, [filterCondition, cfg.Name]);
       const cfgVol = _.filter(volumes, { configurationName: cfg.Name });
       if (!cfgEnv.length && !cfgVol.length) {
