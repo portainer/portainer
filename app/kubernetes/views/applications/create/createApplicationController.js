@@ -1136,6 +1136,7 @@ class KubernetesCreateApplicationController {
 
     try {
       this.state.actionInProgress = true;
+      this.formValues.Configurations = [...this.formValues.ConfigMaps, ...this.formValues.Secrets];
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues);
       this.Notifications.success('Success', 'Request to update application successfully submitted');
       this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });

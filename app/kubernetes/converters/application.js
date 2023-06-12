@@ -294,7 +294,13 @@ class KubernetesApplicationConverter {
     res.DataAccessPolicy = app.DataAccessPolicy;
     res.EnvironmentVariables = KubernetesApplicationHelper.generateEnvVariablesFromEnv(app.Env);
     res.PersistedFolders = KubernetesApplicationHelper.generatePersistedFoldersFormValuesFromPersistedFolders(app.PersistedFolders, persistentVolumeClaims); // generate from PVC and app.PersistedFolders
-    res.Configurations = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations);
+    res.Secrets = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations, 'valueFrom.secretKeyRef.name');
+    res.ConfigMaps = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(
+      app.Env,
+      app.ConfigurationVolumes,
+      configurations,
+      'valueFrom.configMapKeyRef.name'
+    );
     res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler, res.ReplicaCount);
     res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts, ingresses);
     res.Containers = app.Containers;
