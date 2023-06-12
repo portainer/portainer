@@ -1388,7 +1388,9 @@ type (
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
+		GetEdgeStackProjectPathByVersion(edgeStackIdentifier, version string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
+		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, version, fileName string, data []byte) (string, error)
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
