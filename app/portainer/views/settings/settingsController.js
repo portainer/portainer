@@ -4,7 +4,8 @@ angular.module('portainer.app').controller('SettingsController', [
   '$scope',
   'Notifications',
   'SettingsService',
-  function ($scope, Notifications, SettingsService) {
+  'StateManager',
+  function ($scope, Notifications, SettingsService, StateManager) {
     $scope.updateSettings = updateSettings;
     $scope.handleSuccess = handleSuccess;
     $scope.requireNoteOnApplications = FeatureId.K8S_REQUIRE_NOTE_ON_APPLICATIONS;
@@ -273,10 +274,20 @@ angular.module('portainer.app').controller('SettingsController', [
         });
     }
 
-    function initView() {
-      const state = StateManager.getState();
-      $scope.state.isDemo = state.application.demoEnvironment.enabled;
+    function handleSuccess(settings) {
+      if (settings) {
+        StateManager.updateLogo(settings.LogoURL);
+        StateManager.updateSnapshotInterval(settings.SnapshotInterval);
+        StateManager.updateEnableTelemetry(settings.EnableTelemetry);
+        $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
+      }
 
+      // trigger an event to update the deployment options for the react based sidebar
+      const event = new CustomEvent('portainer:deploymentOptionsUpdated');
+      document.dispatchEvent(event);
+    }
+
+    function initView() {
       SettingsService.settings()
         .then(function success(data) {
           var settings = data;
@@ -288,10 +299,6 @@ angular.module('portainer.app').controller('SettingsController', [
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
-        })
-        .finally(function final() {
-          $scope.state.kubeSettingsActionInProgress = false;
-          $scope.state.actionInProgress = false;
         });
     }
 
