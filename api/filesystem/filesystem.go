@@ -296,10 +296,36 @@ func (service *Service) GetEdgeStackProjectPath(edgeStackIdentifier string) stri
 	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier)
 }
 
+// GetEdgeStackProjectPathByVersion returns the absolute path on the FS for a edge stack based
+// on its identifier and version.
+func (service *Service) GetEdgeStackProjectPathByVersion(edgeStackIdentifier, version string) string {
+	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier, version)
+}
+
 // StoreEdgeStackFileFromBytes creates a subfolder in the EdgeStackStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error) {
 	stackStorePath := JoinPaths(EdgeStackStorePath, edgeStackIdentifier)
+	err := service.createDirectoryInStore(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
+// StoreEdgeStackFileFromBytesByVersion creates a subfolder in the EdgeStackStorePath with version and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, version, fileName string, data []byte) (string, error) {
+	stackStorePath := JoinPaths(EdgeStackStorePath, edgeStackIdentifier, version)
 	err := service.createDirectoryInStore(stackStorePath)
 	if err != nil {
 		return "", err
