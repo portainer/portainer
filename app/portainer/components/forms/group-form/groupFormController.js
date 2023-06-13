@@ -40,10 +40,15 @@ class GroupFormController {
       },
       allowCreateTag: this.Authentication.isAdmin(),
     };
+
+    this.associatedEndpoints = [];
+    this.availableEndpoints = [];
   }
+
   associateEndpoint(endpoint) {
     if (this.pageType === 'create' && !_.includes(this.associatedEndpoints, endpoint)) {
       this.associatedEndpoints.push(endpoint);
+      this.reloadEndpoints();
     } else if (this.pageType === 'edit') {
       this.GroupService.addEndpoint(this.model.Id, endpoint)
         .then(() => {
@@ -57,6 +62,7 @@ class GroupFormController {
   dissociateEndpoint(endpoint) {
     if (this.pageType === 'create') {
       _.remove(this.associatedEndpoints, (item) => item.Id === endpoint.Id);
+      this.reloadEndpoints();
     } else if (this.pageType === 'edit') {
       this.GroupService.removeEndpoint(this.model.Id, endpoint.Id)
         .then(() => {
@@ -67,9 +73,13 @@ class GroupFormController {
     }
   }
 
-  reloadTablesContent() {
+  reloadEndpoints() {
     this.getPaginatedEndpointsByGroup(this.pageType, 'available');
     this.getPaginatedEndpointsByGroup(this.pageType, 'associated');
+  }
+
+  reloadTablesContent() {
+    this.reloadEndpoints();
     this.GroupService.group(this.model.Id).then((data) => {
       this.model = data;
     });
@@ -82,7 +92,9 @@ class GroupFormController {
           const context = this.state.available;
           const start = (context.pageNumber - 1) * context.limit + 1;
           const data = await endpointsByGroup(1, start, context.limit, { search: context.filter });
-          this.availableEndpoints = data.value;
+          this.availableEndpoints = data.value.filter(
+            (availableEndpoint) => !this.associatedEndpoints.map((associatedEndpoint) => associatedEndpoint.Id).includes(availableEndpoint.Id)
+          );
           this.state.available.totalCount = data.totalCount;
         } else if (tableType === 'associated' && pageType === 'edit') {
           const groupId = this.model.Id ? this.model.Id : 1;
