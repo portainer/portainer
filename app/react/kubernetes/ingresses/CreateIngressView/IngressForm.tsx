@@ -308,16 +308,6 @@ export function IngressForm({
                     {!host.NoHost ? 'Rule' : 'Fallback rule'}
                   </div>
                   <div className="col-sm-9 p-0 text-right">
-                    {!host.NoHost && (
-                      <Button
-                        className="btn btn-light btn-sm"
-                        onClick={() => reloadTLSCerts()}
-                        icon={RefreshCw}
-                      >
-                        Reload TLS secrets
-                      </Button>
-                    )}
-
                     <Button
                       className="btn btn-sm ml-2"
                       color="dangerlight"
@@ -367,11 +357,21 @@ export function IngressForm({
                             handleTLSChange(hostIndex, e.target.value)
                           }
                           defaultValue={host.Secret}
+                          className="!rounded-r-none"
                         />
+                        {!host.NoHost && (
+                          <div className="input-group-btn">
+                            <Button
+                              className="btn btn-light btn-sm !ml-0 !rounded-l-none"
+                              onClick={() => reloadTLSCerts()}
+                              icon={RefreshCw}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="col-sm-12 p-0">
+                    <div className="col-sm-12 col-lg-4 flex h-[30px] items-center pl-2">
                       <TextTip color="blue">
                         You may also use the{' '}
                         <Link
@@ -401,6 +401,13 @@ export function IngressForm({
                     Paths
                   </div>
                 </div>
+
+                <p className="small text-muted mt-4">
+                  By leaving service/path details blank, you can setup{' '}
+                  <span>ingress defaults</span> that a user may select from via
+                  the hostname dropdown in Create/Edit Application.
+                </p>
+
                 {host.Paths.map((path, pathIndex) => (
                   <div
                     className="row path mt-5 !mb-5"
@@ -408,9 +415,7 @@ export function IngressForm({
                   >
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">
-                          Service
-                        </span>
+                        <span className="input-group-addon">Service</span>
                         <Select
                           key={serviceOptions.toString() + path.ServiceName}
                           name={`ingress_service_${hostIndex}_${pathIndex}`}
@@ -443,7 +448,7 @@ export function IngressForm({
                       {servicePorts && (
                         <>
                           <div className="input-group input-group-sm">
-                            <span className="input-group-addon required">
+                            <span className="input-group-addon">
                               Service port
                             </span>
                             <Select
@@ -526,7 +531,7 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-3 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon required">Path</span>
+                        <span className="input-group-addon">Path</span>
                         <input
                           className="form-control"
                           name={`ingress_route_${hostIndex}-${pathIndex}`}
@@ -559,13 +564,13 @@ export function IngressForm({
 
                     <div className="form-group col-sm-1 !m-0 !pl-0">
                       <Button
-                        className="btn btn-sm btn-only-icon vertical-center !ml-0"
+                        className="btn-only-icon vertical-center !ml-0"
                         color="dangerlight"
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
                         onClick={() => removeIngressRoute(hostIndex, pathIndex)}
-                        disabled={host.Paths.length === 1}
                         icon={Trash2}
+                        size="small"
                       />
                     </div>
                   </div>
@@ -573,10 +578,12 @@ export function IngressForm({
 
                 <div className="row mt-5">
                   <Button
-                    className="btn btn-sm btn-light !ml-0"
+                    className="!ml-0"
                     type="button"
                     onClick={() => addNewIngressRoute(hostIndex)}
                     icon={Plus}
+                    size="small"
+                    color="default"
                   >
                     Add path
                   </Button>
@@ -589,20 +596,24 @@ export function IngressForm({
           <div className="row rules-action p-0">
             <div className="col-sm-12 vertical-center p-0">
               <Button
-                className="btn btn-sm btn-light !ml-0"
+                className="!ml-0"
                 type="button"
                 onClick={() => addNewIngressHost()}
                 icon={Plus}
+                color="default"
+                size="small"
               >
                 Add new host
               </Button>
 
               <Button
-                className="btn btn-sm btn-light ml-2"
+                className="ml-2"
                 type="button"
                 onClick={() => addNewIngressHost(true)}
                 disabled={hasNoHostRule}
                 icon={Plus}
+                color="default"
+                size="small"
               >
                 Add fallback rule
               </Button>
