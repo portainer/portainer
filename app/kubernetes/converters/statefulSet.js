@@ -33,7 +33,7 @@ class KubernetesStatefulSetConverter {
     res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
     KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
-    KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
+    KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.ConfigMaps, formValues.Secrets);
     KubernetesApplicationHelper.generateAffinityFromPlacements(res, formValues);
     return res;
   }
