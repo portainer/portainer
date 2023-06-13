@@ -10,18 +10,11 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edge"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes"
 )
-
-type configResponse struct {
-	StackFileContent  string
-	DotEnvFileContent string
-	Name              string
-	// Namespace to use for Kubernetes manifests, leave empty to use the namespaces defined in the manifest
-	Namespace string
-}
 
 // @summary Inspect an Edge Stack for an Environment(Endpoint)
 // @description **Access policy**: public
@@ -30,7 +23,7 @@ type configResponse struct {
 // @produce json
 // @param id path int true "environment(endpoint) Id"
 // @param stackId path int true "EdgeStack Id"
-// @success 200 {object} configResponse
+// @success 200 {object} edge.StackPayload
 // @failure 500
 // @failure 400
 // @failure 404
@@ -92,9 +85,9 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		}
 	}
 
-	return response.JSON(w, configResponse{
-		StackFileContent:  string(stackFileContent),
+	return response.JSON(w, edge.StackPayload{
 		DotEnvFileContent: string(dotEnvFileContent),
+		FileContent:       string(stackFileContent),
 		Name:              edgeStack.Name,
 		Namespace:         namespace,
 	})
