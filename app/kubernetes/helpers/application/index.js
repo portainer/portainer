@@ -199,7 +199,8 @@ class KubernetesApplicationHelper {
     return _.without(finalRes, undefined);
   }
 
-  static generateEnvOrVolumesFromConfigurations(app, configurations) {
+  static generateEnvOrVolumesFromConfigurations(app, configMaps, secrets) {
+    const configurations = [...configMaps, ...secrets];
     let finalEnv = [];
     let finalVolumes = [];
     let finalMounts = [];
