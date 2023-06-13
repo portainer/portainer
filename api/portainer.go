@@ -322,8 +322,6 @@ type (
 		// Uses the manifest's namespaces instead of the default one
 		UseManifestNamespaces bool
 
-		PreviousDeploymentInfo StackDeploymentInfo `json:"PreviousDeploymentInfo"`
-
 		// Deprecated
 		Prune bool `json:"Prune"`
 	}
