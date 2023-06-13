@@ -2,7 +2,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { HardDrive } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
+import { StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { useParamState } from '@/react/hooks/useParamState';
@@ -12,6 +12,7 @@ import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import { useEdgeStack } from '../../queries/useEdgeStack';
+import { uniqueStatus } from '../../utils/uniqueStatus';
 
 import { EdgeStackEnvironment } from './types';
 import { columns } from './columns';
@@ -42,23 +43,18 @@ export function EnvironmentsDatatable() {
     () =>
       endpointsQuery.environments.map((env) => ({
         ...env,
-        StackStatus:
-          edgeStackQuery.data?.Status[env.Id] ||
-          ({
-            Details: {
-              Pending: true,
-              Acknowledged: false,
-              ImagesPulled: false,
-              Error: false,
-              Ok: false,
-              RemoteUpdateSuccess: false,
-              Remove: false,
+        StackStatus: uniqueStatus(
+          edgeStackQuery.data?.StatusArray[env.Id] || [
+            {
+              Type: StatusType.Pending,
+              EndpointID: env.Id,
+              Error: '',
+              Time: new Date().valueOf() / 1000,
             },
-            EndpointID: env.Id,
-            Error: '',
-          } satisfies EdgeStackStatus),
+          ]
+        ),
       })),
-    [edgeStackQuery.data?.Status, endpointsQuery.environments]
+    [edgeStackQuery.data?.StatusArray, endpointsQuery.environments]
   );
 
   return (
@@ -81,11 +77,11 @@ export function EnvironmentsDatatable() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e || undefined)}
               options={[
-                { value: 'Pending', label: 'Pending' },
-                { value: 'Acknowledged', label: 'Acknowledged' },
-                { value: 'ImagesPulled', label: 'Images pre-pulled' },
-                { value: 'Ok', label: 'Deployed' },
-                { value: 'Error', label: 'Failed' },
+                { value: StatusType.Pending, label: 'Pending' },
+                { value: StatusType.Acknowledged, label: 'Acknowledged' },
+                { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
+                { value: StatusType.Ok, label: 'Deployed' },
+                { value: StatusType.Error, label: 'Failed' },
               ]}
             />
           </div>
@@ -98,15 +94,15 @@ export function EnvironmentsDatatable() {
 function parseStatusFilter(status: string | undefined): StatusType | undefined {
   switch (status) {
     case 'Pending':
-      return 'Pending';
+      return StatusType.Pending;
     case 'Acknowledged':
-      return 'Acknowledged';
+      return StatusType.Acknowledged;
     case 'ImagesPulled':
-      return 'ImagesPulled';
+      return StatusType.ImagesPulled;
     case 'Ok':
-      return 'Ok';
+      return StatusType.Ok;
     case 'Error':
-      return 'Error';
+      return StatusType.Error;
     default:
       return undefined;
   }

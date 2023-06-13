@@ -4,7 +4,7 @@ import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { useEdgeStacks } from '../../queries/useEdgeStacks';
-import { EdgeStack } from '../../types';
+import { EdgeStack, StatusType } from '../../types';
 
 import { createStore } from './store';
 import { columns } from './columns';
@@ -22,7 +22,7 @@ export function EdgeStacksDatatable() {
     select: (edgeStacks) =>
       edgeStacks.map((edgeStack) => ({
         ...edgeStack,
-        aggregatedStatus: aggregateStackStatus(edgeStack.Status),
+        aggregatedStatus: aggregateStackStatus(edgeStack.StatusArray),
       })),
     refetchInterval: tableState.autoRefreshRate * 1000,
   });
@@ -49,13 +49,15 @@ export function EdgeStacksDatatable() {
   );
 }
 
-function aggregateStackStatus(stackStatus: EdgeStack['Status']) {
+function aggregateStackStatus(stackStatus: EdgeStack['StatusArray']) {
   const aggregateStatus = { ok: 0, error: 0, acknowledged: 0, imagesPulled: 0 };
-  return Object.values(stackStatus).reduce((acc, envStatus) => {
-    acc.ok += Number(envStatus.Details.Ok);
-    acc.error += Number(envStatus.Details.Error);
-    acc.acknowledged += Number(envStatus.Details.Acknowledged);
-    acc.imagesPulled += Number(envStatus.Details.ImagesPulled);
-    return acc;
-  }, aggregateStatus);
+  return Object.values(stackStatus)
+    .flat()
+    .reduce((acc, envStatus) => {
+      acc.ok += Number(envStatus.Type === StatusType.Ok);
+      acc.error += Number(envStatus.Type === StatusType.Error);
+      acc.acknowledged += Number(envStatus.Type === StatusType.Acknowledged);
+      acc.imagesPulled += Number(envStatus.Type === StatusType.ImagesPulled);
+      return acc;
+    }, aggregateStatus);
 }

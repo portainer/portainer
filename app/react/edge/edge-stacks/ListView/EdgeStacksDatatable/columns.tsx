@@ -6,6 +6,8 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { buildNameColumn } from '@@/datatables/NameCell';
 
+import { StatusType } from '../../types';
+
 import { DecoratedEdgeStack } from './types';
 import { DeploymentCounter, DeploymentCounterLink } from './DeploymentCounter';
 
@@ -25,7 +27,7 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type="Acknowledged"
+        type={StatusType.Acknowledged}
         stackId={row.original.Id}
       />
     ),
@@ -39,7 +41,7 @@ export const columns = _.compact([
       cell: ({ getValue, row }) => (
         <DeploymentCounterLink
           count={getValue()}
-          type="ImagesPulled"
+          type={StatusType.ImagesPulled}
           stackId={row.original.Id}
         />
       ),
@@ -54,7 +56,7 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type="Ok"
+        type={StatusType.Ok}
         stackId={row.original.Id}
       />
     ),
@@ -69,7 +71,7 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type="Error"
+        type={StatusType.Error}
         stackId={row.original.Id}
       />
     ),

@@ -9,22 +9,28 @@ import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { EdgeGroup } from '../edge-groups/types';
 
-interface EdgeStackStatusDetails {
-  Pending: boolean;
-  Ok: boolean;
-  Error: boolean;
-  Acknowledged: boolean;
-  Remove: boolean;
-  RemoteUpdateSuccess: boolean;
-  ImagesPulled: boolean;
+export enum StatusType {
+  /** Pending represents a pending edge stack */
+  Pending,
+  /** Ok represents a successfully deployed edge stack */
+  Ok,
+  /** Error represents an edge environment which failed to deploy its edge stack */
+  Error,
+  /** Acknowledged represents an acknowledged edge stack */
+  Acknowledged,
+  /** Remove represents a removed edge stack */
+  Remove,
+  /** StatusRemoteUpdateSuccess represents a successfully updated edge stack */
+  RemoteUpdateSuccess,
+  /** ImagesPulled represents a successfully images-pulling */
+  ImagesPulled,
 }
 
-export type StatusType = keyof EdgeStackStatusDetails;
-
 export interface EdgeStackStatus {
-  Details: EdgeStackStatusDetails;
+  Type: StatusType;
   Error: string;
   EndpointID: EnvironmentId;
+  Time: number;
 }
 
 export enum DeploymentType {
@@ -39,7 +45,7 @@ export enum DeploymentType {
 export type EdgeStack = {
   Id: number;
   Name: string;
-  Status: { [key: EnvironmentId]: EdgeStackStatus };
+  StatusArray: { [key: EnvironmentId]: Array<EdgeStackStatus> };
   CreationDate: number;
   EdgeGroups: Array<EdgeGroup['Id']>;
   Registries: RegistryId[];

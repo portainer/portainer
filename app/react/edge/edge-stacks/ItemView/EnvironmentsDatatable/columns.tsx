@@ -2,13 +2,14 @@ import { CellContext, createColumnHelper } from '@tanstack/react-table';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useState } from 'react';
+import _ from 'lodash';
 
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 
-import { EdgeStackStatus } from '../../types';
+import { EdgeStackStatus, StatusType } from '../../types';
 
 import { EnvironmentActions } from './EnvironmentActions';
 import { ActionStatus } from './ActionStatus';
@@ -21,15 +22,24 @@ export const columns = [
     id: 'name',
     header: 'Name',
   }),
-  columnHelper.accessor((env) => endpointStatusLabel(env.StackStatus), {
-    id: 'status',
-    header: 'Status',
-  }),
-  columnHelper.accessor((env) => env.StackStatus.Error, {
-    id: 'error',
-    header: 'Error',
-    cell: ErrorCell,
-  }),
+  columnHelper.accessor(
+    (env) => env.StackStatus.map((s) => StatusType[s.Type]).join(','),
+    {
+      id: 'status',
+      header: 'Status',
+      cell({ row: { original: env } }) {
+        return endpointStatusLabel(env.StackStatus);
+      },
+    }
+  ),
+  columnHelper.accessor(
+    (env) => env.StackStatus.find((s) => s.Type === StatusType.Error)?.Error,
+    {
+      id: 'error',
+      header: 'Error',
+      cell: ErrorCell,
+    }
+  ),
   ...(isBE
     ? [
         columnHelper.display({
@@ -77,30 +87,27 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
   );
 }
 
-function endpointStatusLabel(status: EdgeStackStatus) {
-  const details = (status && status.Details) || {};
-
+function endpointStatusLabel(statusArray: Array<EdgeStackStatus>) {
   const labels = [];
 
-  if (details.Acknowledged) {
-    labels.push('Acknowledged');
-  }
-
-  if (details.ImagesPulled) {
-    labels.push('Images pre-pulled');
-  }
-
-  if (details.Ok) {
-    labels.push('Deployed');
-  }
-
-  if (details.Error) {
-    labels.push('Failed');
-  }
+  statusArray.forEach((status) => {
+    if (status.Type === StatusType.Acknowledged) {
+      labels.push('Acknowledged');
+    }
+    if (status.Type === StatusType.ImagesPulled) {
+      labels.push('Images pre-pulled');
+    }
+    if (status.Type === StatusType.Ok) {
+      labels.push('Deployed');
+    }
+    if (status.Type === StatusType.Error) {
+      labels.push('Failed');
+    }
+  });
 
   if (!labels.length) {
     labels.push('Pending');
   }
 
-  return labels.join(', ');
+  return _.uniq(labels).join(', ');
 }
