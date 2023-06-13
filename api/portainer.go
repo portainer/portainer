@@ -1017,7 +1017,7 @@ type (
 		UpdatedBy string `example:"bob"`
 		// Only applies when deploying stack with multiple files
 		AdditionalFiles []string `json:"AdditionalFiles"`
-		// The auto update settings of a git stack
+		// The GitOps update settings of a git stack
 		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`

@@ -124,7 +124,7 @@ export type DeploymentOptions = {
 };
 
 /**
- *  EndpointChangeWindow determine when automatic stack/app updates may occur
+ *  EndpointChangeWindow determine when GitOps stack/app updates may occur
  */
 interface EndpointChangeWindow {
   Enabled: boolean;
@@ -161,7 +161,7 @@ export type Environment = {
   EnableImageNotification: boolean;
   LocalTimeZone?: string;
 
-  /** Automatic update change window restriction for stacks and apps */
+  /** GitOps update change window restriction for stacks and apps */
   ChangeWindow: EndpointChangeWindow;
 };
 
