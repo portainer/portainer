@@ -95,12 +95,14 @@ export function PrivateRegistryFieldset({
                   onChange={(value) => onSelect(value?.Id)}
                   className="w-full"
                 />
-                <Button
-                  onClick={reload}
-                  title="Reload"
-                  icon={RefreshCw}
-                  color="light"
-                />
+                {method !== 'repository' && (
+                  <Button
+                    onClick={reload}
+                    title="Reload"
+                    icon={RefreshCw}
+                    color="light"
+                  />
+                )}
               </div>
             </FormControl>
           ) : (
