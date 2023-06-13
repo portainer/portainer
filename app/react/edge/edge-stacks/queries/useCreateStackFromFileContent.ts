@@ -31,9 +31,13 @@ export async function createStackFromFileContent({
   ...payload
 }: FileContentPayload) {
   try {
-    const { data } = await axios.post<EdgeStack>(buildUrl(), payload, {
-      params: { method: 'string', dryrun: dryRun ? 'true' : 'false' },
-    });
+    const { data } = await axios.post<EdgeStack>(
+      buildUrl(undefined, 'create/string'),
+      payload,
+      {
+        params: { dryrun: dryRun ? 'true' : 'false' },
+      }
+    );
     return data;
   } catch (e) {
     throw parseAxiosError(e as Error);
