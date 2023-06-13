@@ -14,7 +14,7 @@ export function EnableTelemetryField() {
     <div className="form-group">
       <div className="col-sm-12">
         <SwitchField
-          labelClass="col-sm-2"
+          labelClass="col-sm-3 col-lg-2"
           label="Allow the collection of anonymous statistics"
           checked={value}
           name="toggle_enableTelemetry"

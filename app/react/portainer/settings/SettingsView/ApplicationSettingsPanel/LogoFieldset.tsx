@@ -23,7 +23,7 @@ export function LogoFieldset() {
             label="Use custom logo"
             checked={isEnabled}
             name="toggle_logo"
-            labelClass="col-sm-2"
+            labelClass="col-sm-3 col-lg-2"
             disabled={isDemoQuery.data}
             onChange={(checked) => setIsEnabled(checked)}
           />

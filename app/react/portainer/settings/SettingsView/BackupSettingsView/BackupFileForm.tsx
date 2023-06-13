@@ -1,17 +1,14 @@
 import { Download } from 'lucide-react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 
 import { success as notifySuccess } from '@/portainer/services/notifications';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { FormSection } from '@@/form-components/FormSection';
-import { FormControl } from '@@/form-components/FormControl';
-import { Input } from '@@/form-components/Input';
-import { Switch } from '@@/form-components/SwitchField/Switch';
 
 import { DownloadBackupPayload } from './queries/useDownloadBackupMutation';
 import { useDownloadBackupMutation } from './queries';
 import { validationSchema } from './BackupFileForm.validation';
+import { SecurityFieldset } from './SecurityFieldset';
 
 interface BackupFileSettings {
   passwordProtect: boolean;
@@ -27,71 +24,32 @@ export function BackupFileForm() {
   };
 
   return (
-    <Formik
+    <Formik<BackupFileSettings>
       initialValues={settings}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
       validateOnMount
     >
-      {({
-        values,
-        errors,
-        handleSubmit,
-        isSubmitting,
-        setFieldValue,
-        isValid,
-      }) => (
+      {({ handleSubmit, isSubmitting, isValid }) => (
         <Form className="form-horizontal" onSubmit={handleSubmit}>
-          <FormSection title="Security settings">
-            <FormControl
-              inputId="password-switch"
-              label="Password Protect"
-              size="small"
-              errors={errors.passwordProtect}
-            >
-              <Switch
-                id="password-switch"
-                name="password-switch"
-                className="space-right"
-                checked={values.passwordProtect}
-                data-cy="settings-passwordProtectLocal"
-                onChange={(e) => setFieldValue('passwordProtect', e)}
-              />
-            </FormControl>
+          <SecurityFieldset
+            switchDataCy="settings-passwordProtectLocal"
+            inputDataCy="settings-backupLocalPassword"
+          />
 
-            {values.passwordProtect && (
-              <FormControl
-                inputId="password"
-                label="Password"
-                size="small"
-                errors={errors.password}
-                required
+          <div className="form-group">
+            <div className="col-sm-12">
+              <LoadingButton
+                loadingText="Downloading settings..."
+                isLoading={isSubmitting}
+                disabled={!isValid}
+                className="!ml-0"
+                icon={Download}
               >
-                <Field
-                  id="password"
-                  name="password"
-                  type="password"
-                  as={Input}
-                  data-cy="settings-backupLocalPassword"
-                  required
-                />
-              </FormControl>
-            )}
-
-            <div className="form-group">
-              <div className="col-sm-12">
-                <LoadingButton
-                  loadingText="Downloading settings..."
-                  isLoading={isSubmitting}
-                  disabled={!isValid}
-                  className="!ml-0"
-                  icon={Download}
-                >
-                  Download backup
-                </LoadingButton>
-              </div>
+                Download backup
+              </LoadingButton>
             </div>
-          </FormSection>
+          </div>
         </Form>
       )}
     </Formik>

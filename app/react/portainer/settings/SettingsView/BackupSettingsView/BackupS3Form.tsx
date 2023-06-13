@@ -7,11 +7,10 @@ import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.ser
 import { success as notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
-import { FormSection } from '@@/form-components/FormSection';
 import { FormControl } from '@@/form-components/FormControl';
 import { LoadingButton } from '@@/buttons/LoadingButton';
-import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Input } from '@@/form-components/Input';
+import { SwitchField } from '@@/form-components/SwitchField';
 
 import {
   useBackupS3Settings,
@@ -20,10 +19,11 @@ import {
 } from './queries';
 import { BackupS3Model } from './types';
 import { validationSchema } from './BackupS3Form.validation';
+import { SecurityFieldset } from './SecurityFieldset';
 
 interface BackupS3Settings {
-  passwordProtectS3: boolean;
-  passwordS3: string;
+  passwordProtect: boolean;
+  password: string;
   scheduleAutomaticBackup: boolean;
   cronRule: string;
   accessKeyID: string;
@@ -47,7 +47,7 @@ export function BackupS3Form() {
   }
 
   const backupS3Settings: BackupS3Settings = {
-    passwordS3: settingsQuery.data.password,
+    password: settingsQuery.data.password,
     cronRule: settingsQuery.data.cronRule,
     accessKeyID: settingsQuery.data.accessKeyID,
     secretAccessKey: settingsQuery.data.secretAccessKey,
@@ -55,11 +55,11 @@ export function BackupS3Form() {
     bucketName: settingsQuery.data.bucketName,
     s3CompatibleHost: settingsQuery.data.s3CompatibleHost,
     scheduleAutomaticBackup: !!settingsQuery.data.cronRule,
-    passwordProtectS3: !!settingsQuery.data.password,
+    passwordProtect: !!settingsQuery.data.password,
   };
 
   return (
-    <Formik
+    <Formik<BackupS3Settings>
       initialValues={backupS3Settings}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
@@ -74,21 +74,18 @@ export function BackupS3Form() {
         isValid,
       }) => (
         <Form className="form-horizontal" onSubmit={handleSubmit}>
-          <FormControl
-            inputId="schedule-backups"
-            label="Schedule automatic backups"
-            size="small"
-            errors={errors.scheduleAutomaticBackup}
-          >
-            <Switch
-              id="schedule-backups"
-              name="schedule-automatic-backup"
-              featureId={FeatureId.S3_BACKUP_SETTING}
-              className="space-right"
-              checked={values.scheduleAutomaticBackup}
-              onChange={(e) => setFieldValue('scheduleAutomaticBackup', e)}
-            />
-          </FormControl>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <SwitchField
+                name="schedule-automatic-backup"
+                labelClass="col-sm-3 col-lg-2"
+                label="Schedule automatic backups"
+                checked={values.scheduleAutomaticBackup}
+                featureId={FeatureId.S3_BACKUP_SETTING}
+                onChange={(e) => setFieldValue('scheduleAutomaticBackup', e)}
+              />
+            </div>
+          </div>
 
           {values.scheduleAutomaticBackup && (
             <FormControl
@@ -190,42 +187,10 @@ export function BackupS3Form() {
             />
           </FormControl>
 
-          <FormSection title="Security settings">
-            <FormControl
-              inputId="password-s3-switch"
-              label="Password Protect"
-              size="small"
-              errors={errors.passwordProtectS3}
-            >
-              <Switch
-                id="password-s3-switch"
-                name="password-s3-switch"
-                className="space-right"
-                checked={values.passwordProtectS3}
-                data-cy="settings-passwordProtectToggleS3"
-                onChange={(e) => setFieldValue('passwordProtectS3', e)}
-              />
-            </FormControl>
-
-            {values.passwordProtectS3 && (
-              <FormControl
-                inputId="password-s3"
-                label="Password"
-                size="small"
-                errors={errors.passwordS3}
-                required
-              >
-                <Field
-                  id="password-s3"
-                  name="passwordS3"
-                  type="password"
-                  as={Input}
-                  data-cy="settings-backups3pw"
-                  required
-                />
-              </FormControl>
-            )}
-          </FormSection>
+          <SecurityFieldset
+            switchDataCy="settings-passwordProtectToggleS3"
+            inputDataCy="settings-backups3pw"
+          />
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -268,7 +233,7 @@ export function BackupS3Form() {
 
   async function onSubmit(values: BackupS3Settings) {
     const payload: BackupS3Model = {
-      password: values.passwordProtectS3 ? values.passwordS3 : '',
+      password: values.passwordProtect ? values.password : '',
       cronRule: values.scheduleAutomaticBackup ? values.cronRule : '',
       accessKeyID: values.accessKeyID,
       secretAccessKey: values.secretAccessKey,

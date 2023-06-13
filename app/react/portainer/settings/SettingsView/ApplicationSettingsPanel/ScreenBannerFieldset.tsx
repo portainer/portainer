@@ -20,7 +20,7 @@ export function ScreenBannerFieldset() {
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
-            labelClass="col-sm-2"
+            labelClass="col-sm-3 col-lg-2"
             label="Login screen banner"
             checked={isEnabled}
             name="toggle_login_banner"
