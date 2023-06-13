@@ -38,7 +38,7 @@ export function AutoUpdateFieldset({
           <SwitchField
             name="autoUpdate"
             checked={!!value.RepositoryAutomaticUpdates}
-            label="Automatic updates"
+            label="GitOps updates"
             labelClass="col-sm-3 col-lg-2"
             onChange={(value) =>
               handleChange({ RepositoryAutomaticUpdates: value })

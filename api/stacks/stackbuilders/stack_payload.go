@@ -17,7 +17,7 @@ type StackPayload struct {
 	Webhook          string
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
-	// Optional auto update configuration
+	// Optional GitOps update configuration
 	AutoUpdate *portainer.AutoUpdateSettings
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
