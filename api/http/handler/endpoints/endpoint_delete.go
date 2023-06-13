@@ -97,8 +97,8 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 
 	for idx := range edgeStacks {
 		edgeStack := &edgeStacks[idx]
-		if _, ok := edgeStack.Status[endpoint.ID]; ok {
-			delete(edgeStack.Status, endpoint.ID)
+		if _, ok := edgeStack.StatusArray[endpoint.ID]; ok {
+			delete(edgeStack.StatusArray, endpoint.ID)
 			err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
 			if err != nil {
 				log.Warn().Err(err).Msgf("Unable to update edge stack")

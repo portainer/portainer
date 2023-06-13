@@ -2,8 +2,9 @@ package migrator
 
 import (
 	"os"
+	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/chisel/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/rs/zerolog/log"
@@ -72,4 +73,80 @@ func (m *Migrator) convertSeedToPrivateKeyForDB100() error {
 		log.Info().Msg("Success to migrate private key seed to private key file")
 	}
 	return err
+}
+
+func (m *Migrator) updateEdgeStackStatusForDB100() error {
+	edgeStacks, err := m.edgeStackService.EdgeStacks()
+	if err != nil {
+		return err
+	}
+
+	for _, edgeStack := range edgeStacks {
+		statusArray := edgeStack.StatusArray
+		if statusArray == nil {
+			statusArray = make(map[portainer.EndpointID][]portainer.EdgeStackStatus)
+		}
+		for endpointID, endpointOldStatus := range edgeStack.Status {
+			endpointStatusArray := statusArray[endpointID]
+			if endpointOldStatus.Details.Pending {
+				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
+					Type:       portainer.EdgeStackStatusPending,
+					EndpointID: portainer.EndpointID(endpointID),
+					Time:       time.Now().Unix(),
+				})
+			}
+
+			if endpointOldStatus.Details.Acknowledged {
+				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
+					Type:       portainer.EdgeStackStatusAcknowledged,
+					EndpointID: portainer.EndpointID(endpointID),
+					Time:       time.Now().Unix(),
+				})
+			}
+
+			if endpointOldStatus.Details.Error {
+				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
+					Type:       portainer.EdgeStackStatusError,
+					EndpointID: portainer.EndpointID(endpointID),
+					Error:      endpointOldStatus.Error,
+					Time:       time.Now().Unix(),
+				})
+			}
+
+			if endpointOldStatus.Details.Ok {
+				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
+					Type:       portainer.EdgeStackStatusOk,
+					EndpointID: portainer.EndpointID(endpointID),
+					Time:       time.Now().Unix(),
+				})
+			}
+
+			if endpointOldStatus.Details.ImagesPulled {
+				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
+					Type:       portainer.EdgeStackStatusImagesPulled,
+					EndpointID: portainer.EndpointID(endpointID),
+					Time:       time.Now().Unix(),
+				})
+			}
+
+			if endpointOldStatus.Details.Remove {
+				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
+					Type:       portainer.EdgeStackStatusRemove,
+					EndpointID: portainer.EndpointID(endpointID),
+					Time:       time.Now().Unix(),
+				})
+			}
+
+			statusArray[endpointID] = endpointStatusArray
+		}
+
+		edgeStack.StatusArray = statusArray
+
+		err = m.edgeStackService.UpdateEdgeStack(edgeStack.ID, &edgeStack)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

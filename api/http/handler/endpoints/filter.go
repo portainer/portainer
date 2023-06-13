@@ -17,18 +17,6 @@ import (
 	"github.com/portainer/portainer/api/internal/unique"
 )
 
-type EdgeStackStatusFilter string
-
-const (
-	statusFilterPending             EdgeStackStatusFilter = "Pending"
-	statusFilterOk                  EdgeStackStatusFilter = "Ok"
-	statusFilterError               EdgeStackStatusFilter = "Error"
-	statusFilterAcknowledged        EdgeStackStatusFilter = "Acknowledged"
-	statusFilterRemove              EdgeStackStatusFilter = "Remove"
-	statusFilterRemoteUpdateSuccess EdgeStackStatusFilter = "RemoteUpdateSuccess"
-	statusFilterImagesPulled        EdgeStackStatusFilter = "ImagesPulled"
-)
-
 type EnvironmentsQuery struct {
 	search           string
 	types            []portainer.EndpointType
@@ -45,7 +33,7 @@ type EnvironmentsQuery struct {
 	agentVersions            []string
 	edgeCheckInPassedSeconds int
 	edgeStackId              portainer.EdgeStackID
-	edgeStackStatus          EdgeStackStatusFilter
+	edgeStackStatus          portainer.EdgeStackStatusType
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -99,7 +87,10 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	edgeStackId, _ := request.RetrieveNumericQueryParameter(r, "edgeStackId", true)
 
-	edgeStackStatus, _ := request.RetrieveQueryParameter(r, "edgeStackStatus", true)
+	edgeStackStatus, _ := request.RetrieveNumericQueryParameter(r, "edgeStackStatus", true)
+	if edgeStackStatus < 0 || edgeStackStatus > 6 {
+		return EnvironmentsQuery{}, errors.New("invalid edgeStackStatus parameter")
+	}
 
 	return EnvironmentsQuery{
 		search:                   search,
@@ -116,7 +107,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		agentVersions:            agentVersions,
 		edgeCheckInPassedSeconds: edgeCheckInPassedSeconds,
 		edgeStackId:              portainer.EdgeStackID(edgeStackId),
-		edgeStackStatus:          EdgeStackStatusFilter(edgeStackStatus),
+		edgeStackStatus:          portainer.EdgeStackStatusType(edgeStackStatus),
 	}, nil
 }
 
@@ -213,30 +204,21 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 	return filteredEndpoints, totalAvailableEndpoints, nil
 }
 
-func endpointStatusInStackMatchesFilter(stackStatus map[portainer.EndpointID]portainer.EdgeStackStatus, envId portainer.EndpointID, statusFilter EdgeStackStatusFilter) bool {
+func endpointStatusInStackMatchesFilter(stackStatus map[portainer.EndpointID][]portainer.EdgeStackStatus, envId portainer.EndpointID, statusFilter portainer.EdgeStackStatusType) bool {
 	status, ok := stackStatus[envId]
 
 	// consider that if the env has no status in the stack it is in Pending state
 	// workaround because Stack.Status[EnvId].Details.Pending is never set to True in the codebase
-	if !ok && statusFilter == statusFilterPending {
+	if !ok && statusFilter == portainer.EdgeStackStatusPending {
 		return true
 	}
 
-	valueMap := map[EdgeStackStatusFilter]bool{
-		statusFilterPending:             status.Details.Pending,
-		statusFilterOk:                  status.Details.Ok,
-		statusFilterError:               status.Details.Error,
-		statusFilterAcknowledged:        status.Details.Acknowledged,
-		statusFilterRemove:              status.Details.Remove,
-		statusFilterRemoteUpdateSuccess: status.Details.RemoteUpdateSuccess,
-		statusFilterImagesPulled:        status.Details.ImagesPulled,
-	}
-
-	currentStatus, ok := valueMap[statusFilter]
-	return ok && currentStatus
+	return slices.ContainsFunc(status, func(s portainer.EdgeStackStatus) bool {
+		return s.Type == statusFilter
+	})
 }
 
-func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId portainer.EdgeStackID, statusFilter EdgeStackStatusFilter, datastore dataservices.DataStore) ([]portainer.Endpoint, error) {
+func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId portainer.EdgeStackID, statusFilter portainer.EdgeStackStatusType, datastore dataservices.DataStore) ([]portainer.Endpoint, error) {
 	stack, err := datastore.EdgeStack().EdgeStack(edgeStackId)
 	if err != nil {
 		return nil, errors.WithMessage(err, "Unable to retrieve edge stack from the database")
@@ -258,10 +240,10 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		envIds = append(envIds, edgeGroup.Endpoints...)
 	}
 
-	if statusFilter != "" {
+	if statusFilter >= 0 && statusFilter <= 6 {
 		n := 0
 		for _, envId := range envIds {
-			if endpointStatusInStackMatchesFilter(stack.Status, envId, statusFilter) {
+			if endpointStatusInStackMatchesFilter(stack.StatusArray, envId, statusFilter) {
 				envIds[n] = envId
 				n++
 			}

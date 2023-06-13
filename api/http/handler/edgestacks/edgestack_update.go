@@ -174,7 +174,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 	err = tx.EdgeStack().UpdateEdgeStackFunc(stack.ID, func(edgeStack *portainer.EdgeStack) {
 		edgeStack.NumDeployments = len(relatedEndpointIds)
 		if payload.UpdateVersion {
-			edgeStack.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+			edgeStack.StatusArray = make(map[portainer.EndpointID][]portainer.EdgeStackStatus)
 			edgeStack.Version++
 		}
 

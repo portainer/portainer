@@ -3,6 +3,7 @@ package edgestacks
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -69,7 +70,18 @@ func (handler *Handler) deleteEdgeStackStatus(tx dataservices.DataStoreTx, stack
 		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
-	delete(stack.Status, endpoint.ID)
+	endpointStatus, ok := stack.StatusArray[endpoint.ID]
+	if !ok {
+		endpointStatus = []portainer.EdgeStackStatus{}
+	}
+
+	endpointStatus = append(endpointStatus, portainer.EdgeStackStatus{
+		Time:       time.Now().Unix(),
+		Type:       portainer.EdgeStackStatusRemove,
+		EndpointID: portainer.EndpointID(endpoint.ID),
+	})
+
+	stack.StatusArray[endpoint.ID] = endpointStatus
 
 	err = tx.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {

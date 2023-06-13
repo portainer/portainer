@@ -215,6 +215,7 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.19",
 		m.convertSeedToPrivateKeyForDB100,
 		m.migrateDockerDesktopExtentionSetting,
+		m.updateEdgeStackStatusForDB100,
 	)
 
 	// Add new migrations below...
