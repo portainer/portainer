@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Upload } from 'lucide-react';
 import clsx from 'clsx';
@@ -34,7 +33,6 @@ interface BackupS3Settings {
 }
 
 export function BackupS3Form() {
-  const [isExport, setIsExport] = useState(false);
   const limitedToBE = isLimitedToBE(FeatureId.S3_BACKUP_SETTING);
 
   const exportS3Mutate = useExportS3BackupMutation();
@@ -195,6 +193,7 @@ export function BackupS3Form() {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
+                type="button"
                 loadingText="Exporting..."
                 isLoading={isSubmitting}
                 className={clsx('!ml-0', { 'limited-be': limitedToBE })}
@@ -202,7 +201,7 @@ export function BackupS3Form() {
                 data-cy="settings-exportBackupS3Button"
                 icon={Upload}
                 onClick={() => {
-                  setIsExport(true);
+                  handleExport(values);
                 }}
               >
                 Export backup
@@ -218,9 +217,6 @@ export function BackupS3Form() {
                 className={clsx('!ml-0', { 'limited-be': limitedToBE })}
                 disabled={!isValid || limitedToBE}
                 data-cy="settings-saveBackupSettingsButton"
-                onClick={() => {
-                  setIsExport(false);
-                }}
               >
                 Save backup settings
               </LoadingButton>
@@ -230,6 +226,23 @@ export function BackupS3Form() {
       )}
     </Formik>
   );
+
+  function handleExport(values: BackupS3Settings) {
+    const payload: BackupS3Model = {
+      password: values.passwordProtect ? values.password : '',
+      cronRule: values.scheduleAutomaticBackup ? values.cronRule : '',
+      accessKeyID: values.accessKeyID,
+      secretAccessKey: values.secretAccessKey,
+      region: values.region,
+      bucketName: values.bucketName,
+      s3CompatibleHost: values.s3CompatibleHost,
+    };
+    exportS3Mutate.mutate(payload, {
+      onSuccess() {
+        notifySuccess('Success', 'Exported backup to S3 successfully');
+      },
+    });
+  }
 
   async function onSubmit(values: BackupS3Settings) {
     const payload: BackupS3Model = {
@@ -242,18 +255,10 @@ export function BackupS3Form() {
       s3CompatibleHost: values.s3CompatibleHost,
     };
 
-    if (isExport) {
-      exportS3Mutate.mutate(payload, {
-        onSuccess() {
-          notifySuccess('Success', 'Exported backup to S3 successfully');
-        },
-      });
-    } else {
-      updateS3Mutate.mutate(payload, {
-        onSuccess() {
-          notifySuccess('Success', 'S3 backup settings saved successfully');
-        },
-      });
-    }
+    updateS3Mutate.mutate(payload, {
+      onSuccess() {
+        notifySuccess('Success', 'S3 backup settings saved successfully');
+      },
+    });
   }
 }

@@ -33,7 +33,7 @@ export function validationSchema() {
       then: (schema) => schema.required('This field is required.'),
     }),
     s3CompatibleHost: string()
-      .nullable()
+      .default('')
       .when({
         is: (val: string) => val !== '',
         then: (schema) =>
