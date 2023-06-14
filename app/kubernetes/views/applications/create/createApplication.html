@@ -447,7 +447,7 @@
                             class="form-control"
                             ng-model="overridenKey.Path"
                             placeholder="/etc/myapp/conf.d"
-                            name="overriden_key_path_{{ index }}_{{ keyIndex }}"
+                            name="overriden_key_configmap_path_{{ index }}_{{ keyIndex }}"
                             ng-disabled="ctrl.formValues.Containers.length > 1"
                             required
                             ng-change="ctrl.onChangeConfigMapPath()"
@@ -457,21 +457,21 @@
                         <div
                           class="small"
                           ng-show="
-                            kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                            ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                            kubernetesApplicationCreationForm['overriden_key_configmap_path_' + index + '_' + keyIndex].$invalid ||
+                            ctrl.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] !== undefined
                           "
                         >
                           <div class="text-warning" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                             <div
                               ng-show="
-                                kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                                ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                                kubernetesApplicationCreationForm['overriden_key_configmap_path_' + index + '_' + keyIndex].$invalid ||
+                                ctrl.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] !== undefined
                               "
                             >
-                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
+                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_configmap_path_' + index + '_' + keyIndex].$error">
                                 <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
                               </ng-messages>
-                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined">
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] !== undefined">
                                 <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.
                               </p>
                             </div>
@@ -597,7 +597,7 @@
                             class="form-control"
                             ng-model="overridenKey.Path"
                             placeholder="/etc/myapp/conf.d"
-                            name="overriden_key_path_{{ index }}_{{ keyIndex }}"
+                            name="overriden_key_secret_path_{{ index }}_{{ keyIndex }}"
                             ng-disabled="ctrl.formValues.Containers.length > 1"
                             required
                             ng-change="ctrl.onChangeSecretPath()"
@@ -607,21 +607,21 @@
                         <div
                           class="small"
                           ng-show="
-                            kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                            ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                            kubernetesApplicationCreationForm['overriden_key_secret_path_' + index + '_' + keyIndex].$invalid ||
+                            ctrl.state.duplicates.secretPaths.refs[index + '_' + keyIndex] !== undefined
                           "
                         >
                           <div class="text-warning" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                             <div
                               ng-show="
-                                kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                                ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                                kubernetesApplicationCreationForm['overriden_key_secret_path_' + index + '_' + keyIndex].$invalid ||
+                                ctrl.state.duplicates.secretPaths.refs[index + '_' + keyIndex] !== undefined
                               "
                             >
-                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
+                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_secret_path_' + index + '_' + keyIndex].$error">
                                 <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
                               </ng-messages>
-                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.secretPaths.refs[index + '_' + keyIndex] !== undefined"
                                 ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.</p
                               >
                             </div>

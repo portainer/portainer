@@ -122,7 +122,8 @@ class KubernetesCreateApplicationController {
       duplicates: {
         environmentVariables: new KubernetesFormValidationReferences(),
         persistedFolders: new KubernetesFormValidationReferences(),
-        configurationPaths: new KubernetesFormValidationReferences(),
+        configMapPaths: new KubernetesFormValidationReferences(),
+        secretPaths: new KubernetesFormValidationReferences(),
         existingVolumes: new KubernetesFormValidationReferences(),
         publishedPorts: {
           containerPorts: new KubernetesFormValidationReferences(),
@@ -275,7 +276,7 @@ class KubernetesCreateApplicationController {
   }
 
   onChangeConfigMapPath() {
-    this.state.duplicates.configurationPaths.refs = [];
+    this.state.duplicates.configMapPaths.refs = [];
 
     const paths = _.reduce(
       this.formValues.ConfigMaps,
@@ -292,12 +293,12 @@ class KubernetesCreateApplicationController {
       _.forEach(config.OverridenKeys, (overridenKey, keyIndex) => {
         const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
         if (findPath) {
-          this.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] = findPath;
+          this.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] = findPath;
         }
       });
     });
 
-    this.state.duplicates.configurationPaths.hasRefs = Object.keys(this.state.duplicates.configurationPaths.refs).length > 0;
+    this.state.duplicates.configMapPaths.hasRefs = Object.keys(this.state.duplicates.configMapPaths.refs).length > 0;
   }
   /* #endregion */
 
@@ -335,7 +336,7 @@ class KubernetesCreateApplicationController {
   }
 
   onChangeSecretPath() {
-    this.state.duplicates.configurationPaths.refs = [];
+    this.state.duplicates.secretPaths.refs = [];
 
     const paths = _.reduce(
       this.formValues.Secrets,
@@ -352,12 +353,12 @@ class KubernetesCreateApplicationController {
       _.forEach(secret.OverridenKeys, (overridenKey, keyIndex) => {
         const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
         if (findPath) {
-          this.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] = findPath;
+          this.state.duplicates.secretPaths.refs[index + '_' + keyIndex] = findPath;
         }
       });
     });
 
-    this.state.duplicates.configurationPaths.hasRefs = Object.keys(this.state.duplicates.configurationPaths.refs).length > 0;
+    this.state.duplicates.secretPaths.hasRefs = Object.keys(this.state.duplicates.secretPaths.refs).length > 0;
   }
   /* #endregion */
 
@@ -672,7 +673,8 @@ class KubernetesCreateApplicationController {
       !this.state.alreadyExists &&
       !this.state.duplicates.environmentVariables.hasRefs &&
       !this.state.duplicates.persistedFolders.hasRefs &&
-      !this.state.duplicates.configurationPaths.hasRefs &&
+      !this.state.duplicates.configMapPaths.hasRefs &&
+      !this.state.duplicates.secretPaths.hasRefs &&
       !this.state.duplicates.existingVolumes.hasRefs &&
       !this.state.duplicates.publishedPorts.containerPorts.hasRefs &&
       !this.state.duplicates.publishedPorts.nodePorts.hasRefs &&
