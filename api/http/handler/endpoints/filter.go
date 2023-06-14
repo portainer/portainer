@@ -15,13 +15,24 @@ import (
 	"github.com/portainer/portainer/api/internal/slices"
 )
 
+type EdgeStackStatusFilter string
+
+const (
+	statusFilterPending             EdgeStackStatusFilter = "Pending"
+	statusFilterOk                  EdgeStackStatusFilter = "Ok"
+	statusFilterError               EdgeStackStatusFilter = "Error"
+	statusFilterAcknowledged        EdgeStackStatusFilter = "Acknowledged"
+	statusFilterRemove              EdgeStackStatusFilter = "Remove"
+	statusFilterRemoteUpdateSuccess EdgeStackStatusFilter = "RemoteUpdateSuccess"
+	statusFilterImagesPulled        EdgeStackStatusFilter = "ImagesPulled"
+)
+
 type edgeStackQueryParam struct {
 	// edge stack ID
 	Id portainer.EdgeStackID `json:"id" validate:"required" example:"1"`
 	// Filter returned environments based on their status
-	// values are keys of EdgeStackStatusDetails
-	// [Pending, Ok, Error, Acknowledged, Remove, RemoteUpdateSuccess, ImagesPulled]
-	StatusFilter string `json:"statusFilter" example:"ok"`
+	// Accepted values are [Pending, Ok, Error, Acknowledged, Remove, RemoteUpdateSuccess, ImagesPulled]
+	StatusFilter EdgeStackStatusFilter `json:"statusFilter" example:"Ok"`
 }
 
 type EnvironmentsQuery struct {
@@ -220,7 +231,30 @@ func unique(intSlice []portainer.EndpointID) []portainer.EndpointID {
 	return list
 }
 
-func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId portainer.EdgeStackID, filterStatus string, datastore dataservices.DataStore) ([]portainer.Endpoint, error) {
+func endpointStatusInStackMatchesFilter(stackStatus map[portainer.EndpointID]portainer.EdgeStackStatus, envId portainer.EndpointID, statusFilter EdgeStackStatusFilter) bool {
+	status, ok := stackStatus[envId]
+
+	// consider that if the env has no status in the stack it is in Pending state
+	// workaround because Stack.Status[EnvId].Details.Pending is never set to True in the codebase
+	if !ok && statusFilter == statusFilterPending {
+		return true
+	}
+
+	valueMap := map[EdgeStackStatusFilter]bool{
+		statusFilterPending:             status.Details.Pending,
+		statusFilterOk:                  status.Details.Ok,
+		statusFilterError:               status.Details.Error,
+		statusFilterAcknowledged:        status.Details.Acknowledged,
+		statusFilterRemove:              status.Details.Remove,
+		statusFilterRemoteUpdateSuccess: status.Details.RemoteUpdateSuccess,
+		statusFilterImagesPulled:        status.Details.ImagesPulled,
+	}
+
+	currentStatus, ok := valueMap[statusFilter]
+	return ok && currentStatus
+}
+
+func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId portainer.EdgeStackID, statusFilter EdgeStackStatusFilter, datastore dataservices.DataStore) ([]portainer.Endpoint, error) {
 	stack, err := datastore.EdgeStack().EdgeStack(edgeStackId)
 	if err != nil {
 		return nil, errors.WithMessage(err, "Unable to retrieve edge stack from the database")
@@ -239,7 +273,18 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		}
 	}
 
+	if statusFilter != "" {
+		n := 0
+		for _, envId := range envIds {
+			if endpointStatusInStackMatchesFilter(stack.Status, envId, statusFilter) {
+				envIds[n] = envId
+				n++
+			}
+		}
+		envIds = envIds[:n]
+	}
 	filteredEndpoints := filteredEndpointsByIds(endpoints, unique(envIds))
+
 	return filteredEndpoints, nil
 }
 
