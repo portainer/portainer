@@ -18,15 +18,16 @@ export function KubeNoteMinimumCharacters() {
   return (
     <>
       <div className="form-group">
-        <SwitchField
-          label="Require a note on applications"
-          checked={isEnabled}
-          name="toggle_requireNoteOnApplications"
-          onChange={(value) => setIsEnabled(value)}
-          fieldClass="col-sm-12"
-          labelClass="col-sm-2"
-          tooltip="Using this will enforce entry of a note in Add/Edit application (and prevent complete clearing of it in Application details)."
-        />
+        <div className="col-sm-12">
+          <SwitchField
+            label="Require a note on applications"
+            checked={isEnabled}
+            name="toggle_requireNoteOnApplications"
+            onChange={(value) => setIsEnabled(value)}
+            labelClass="col-sm-3 col-lg-2"
+            tooltip="Using this will enforce entry of a note in Add/Edit application (and prevent complete clearing of it in Application details)."
+          />
+        </div>
       </div>
       {isEnabled && (
         <FormControl
