@@ -14,6 +14,7 @@ import { HelmSection } from './HelmSection';
 import { KubeConfigSection } from './KubeConfigSection';
 import { FormValues } from './types';
 import { DeploymentOptionsSection } from './DeploymentOptionsSection';
+import { validation } from './validation';
 
 export function KubeSettingsPanel() {
   const settingsQuery = useSettings();
@@ -37,7 +38,12 @@ export function KubeSettingsPanel() {
         <Widget>
           <Widget.Title icon={SettingsIcon} title="Kubernetes settings" />
           <Widget.Body>
-            <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+            <Formik
+              initialValues={initialValues}
+              onSubmit={handleSubmit}
+              validationSchema={validation}
+              validateOnMount
+            >
               {() => (
                 <Form className="form-horizontal">
                   <HelmSection />
@@ -46,7 +52,11 @@ export function KubeSettingsPanel() {
 
                   <div className="form-group">
                     <div className="col-sm-12">
-                      <LoadingButton isLoading={false} loadingText="Saving">
+                      <LoadingButton
+                        isLoading={mutation.isLoading}
+                        loadingText="Saving"
+                        className="!ml-0"
+                      >
                         Save Kubernetes Settings
                       </LoadingButton>
                     </div>
