@@ -1,5 +1,7 @@
 import { useField } from 'formik';
 
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
+
 import { FormControl } from '@@/form-components/FormControl';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { Input } from '@@/form-components/Input';
@@ -24,6 +26,7 @@ export function KubeNoteMinimumCharacters() {
             checked={isEnabled}
             name="toggle_requireNoteOnApplications"
             onChange={(value) => setIsEnabled(value)}
+            featureId={FeatureId.K8S_REQUIRE_NOTE_ON_APPLICATIONS}
             labelClass="col-sm-3 col-lg-2"
             tooltip="Using this will enforce entry of a note in Add/Edit application (and prevent complete clearing of it in Application details)."
           />
