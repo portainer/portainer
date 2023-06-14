@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { EnvironmentType } from '@/react/portainer/environments/types';
@@ -30,7 +29,6 @@ export class EditEdgeStackViewController {
     this.deployStack = this.deployStack.bind(this);
     this.deployStackAsync = this.deployStackAsync.bind(this);
     this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
-    this.getPaginatedEndpointsAsync = this.getPaginatedEndpointsAsync.bind(this);
     this.onEditorChange = this.onEditorChange.bind(this);
     this.isEditorDirty = this.isEditorDirty.bind(this);
   }
@@ -44,7 +42,6 @@ export class EditEdgeStackViewController {
 
         this.edgeGroups = edgeGroups;
         this.stack = model;
-        this.stackEndpointIds = this.filterStackEndpoints(model.EdgeGroups, edgeGroups);
         this.originalFileContent = file;
         this.formValues = {
           content: file,
@@ -88,15 +85,6 @@ export class EditEdgeStackViewController {
     return !this.state.isStackDeployed && this.formValues.content.replace(/(\r\n|\n|\r)/gm, '') !== this.originalFileContent.replace(/(\r\n|\n|\r)/gm, '');
   }
 
-  filterStackEndpoints(groupIds, groups) {
-    return _.flatten(
-      _.map(groupIds, (Id) => {
-        const group = _.find(groups, { Id });
-        return group.Endpoints;
-      })
-    );
-  }
-
   deployStack(values) {
     return this.deployStackAsync(values);
   }
@@ -123,22 +111,21 @@ export class EditEdgeStackViewController {
     }
   }
 
-  getPaginatedEndpoints(...args) {
-    return this.$async(this.getPaginatedEndpointsAsync, ...args);
-  }
+  getPaginatedEndpoints(lastId, limit, search) {
+    return this.$async(async () => {
+      try {
+        const query = {
+          search,
+          edgeStack: {
+            id: this.stack.Id,
+          },
+        };
+        const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
 
-  async getPaginatedEndpointsAsync(lastId, limit, search) {
-    try {
-      if (this.stackEndpointIds.length === 0) {
-        return { endpoints: [], totalCount: 0 };
+        return { endpoints: value, totalCount };
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
       }
-
-      const query = { search, endpointIds: this.stackEndpointIds };
-      const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
-
-      return { endpoints: value, totalCount };
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
-    }
+    });
   }
 }

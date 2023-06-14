@@ -5,6 +5,12 @@ import (
 	"sort"
 	"strconv"
 
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+
+	"github.com/portainer/libhttp/request"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -46,6 +52,7 @@ const (
 // @param edgeCheckInPassedSeconds query number false "if bigger then zero, show only edge agents that checked-in in the last provided seconds (relevant only for edge agents)"
 // @param excludeSnapshots query bool false "if true, the snapshot data won't be retrieved"
 // @param name query string false "will return only environments(endpoints) with this name"
+// @param edgeStack edgeStackQueryParam false "will return the environements of the specified edge stack. If statusFilter is present, will filter the returned environments based on their deployment status in the stack (not the environment status!)"
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
 // @router /endpoints [get]
