@@ -57,22 +57,25 @@ export function DeploymentOptionsSection() {
         </div>
       )}
       {!limitedFeature && (
-        <div className="form-group">
-          <div className="col-sm-12">
-            <SwitchField
-              label="Allow per environment override"
-              checked={values.perEnvOverride}
-              onChange={(value) =>
-                setFieldValue('globalDeploymentOptions.perEnvOverride', value)
-              }
-              name="toggle_perEnvOverride"
-              labelClass="col-sm-3 col-lg-2"
-              tooltip="Allows overriding of deployment options in the Cluster setup screen of each environment"
-            />
+        <>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <SwitchField
+                label="Allow per environment override"
+                checked={values.perEnvOverride}
+                onChange={(value) =>
+                  setFieldValue('globalDeploymentOptions.perEnvOverride', value)
+                }
+                name="toggle_perEnvOverride"
+                labelClass="col-sm-3 col-lg-2"
+                tooltip="Allows overriding of deployment options in the Cluster setup screen of each environment"
+              />
+            </div>
           </div>
-        </div>
+
+          <KubeNoteMinimumCharacters />
+        </>
       )}
-      <KubeNoteMinimumCharacters />
     </FormSection>
   );
 
