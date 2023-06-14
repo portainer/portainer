@@ -2,8 +2,7 @@
 
 <application-settings-panel on-success="(handleSuccess)"></application-settings-panel>
 
-<kube-settings-panel ng-if="settings" settings="settings" on-submit="(updateSettings)"></kube-settings-panel>
-<old-kube-settings-panel ng-if="settings" settings="settings" on-submit="(updateSettings)"></old-kube-settings-panel>
+<kube-settings-panel></kube-settings-panel>
 
 <ssl-ca-file-settings></ssl-ca-file-settings>
 <ssl-certificate-settings ng-show="state.showHTTPS"></ssl-certificate-settings>
