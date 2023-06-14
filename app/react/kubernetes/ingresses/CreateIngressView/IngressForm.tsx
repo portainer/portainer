@@ -388,7 +388,7 @@ export function IngressForm({
                   </div>
                 )}
                 {host.NoHost && (
-                  <p className="vertical-center text-muted small col-sm-12 whitespace-nowrap !p-0">
+                  <p className="vertical-center text-muted small col-sm-12 !p-0">
                     <Icon icon={Info} mode="primary" size="md" />A fallback rule
                     has no host specified. This rule only applies when an
                     inbound request has a hostname that does not match with any
@@ -402,11 +402,13 @@ export function IngressForm({
                   </div>
                 </div>
 
-                <p className="small text-muted mt-4">
-                  By leaving service/path details blank, you can setup{' '}
-                  <span>ingress defaults</span> that a user may select from via
-                  the hostname dropdown in Create/Edit Application.
-                </p>
+                {!host.Paths.length && (
+                  <p className="small text-muted mt-4">
+                    You may save the ingress without a path and it will then be
+                    an <b>ingress default</b> that a user may select via the
+                    hostname dropdown in Create/Edit application.
+                  </p>
+                )}
 
                 {host.Paths.map((path, pathIndex) => (
                   <div
@@ -415,7 +417,9 @@ export function IngressForm({
                   >
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon">Service</span>
+                        <span className="input-group-addon required">
+                          Service
+                        </span>
                         <Select
                           key={serviceOptions.toString() + path.ServiceName}
                           name={`ingress_service_${hostIndex}_${pathIndex}`}
@@ -448,7 +452,7 @@ export function IngressForm({
                       {servicePorts && (
                         <>
                           <div className="input-group input-group-sm">
-                            <span className="input-group-addon">
+                            <span className="input-group-addon required">
                               Service port
                             </span>
                             <Select
@@ -531,7 +535,7 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-3 !m-0 !pl-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon">Path</span>
+                        <span className="input-group-addon required">Path</span>
                         <input
                           className="form-control"
                           name={`ingress_route_${hostIndex}-${pathIndex}`}
@@ -571,6 +575,7 @@ export function IngressForm({
                         onClick={() => removeIngressRoute(hostIndex, pathIndex)}
                         icon={Trash2}
                         size="small"
+                        disabled={host.Paths.length === 1 && host.NoHost}
                       />
                     </div>
                   </div>
