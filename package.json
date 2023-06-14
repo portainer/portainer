@@ -30,7 +30,7 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^2.0.0",
