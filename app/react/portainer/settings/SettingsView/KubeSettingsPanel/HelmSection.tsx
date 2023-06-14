@@ -1,0 +1,38 @@
+import { useField } from 'formik';
+
+import { TextTip } from '@@/Tip/TextTip';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSection } from '@@/form-components/FormSection';
+import { Input } from '@@/form-components/Input';
+
+export function HelmSection() {
+  const [{ value, onChange, name, onBlur }, { error }] =
+    useField<string>('helmRepositoryURL');
+
+  return (
+    <FormSection title="Helm Repository">
+      <TextTip color="blue">
+        You can specify the URL to your own helm repository here. See the{' '}
+        <a
+          href="https://helm.sh/docs/topics/chart_repository/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          official documentation
+        </a>{' '}
+        for more details.
+      </TextTip>
+
+      <FormControl label="URL" errors={error} inputId="helm-repo-url">
+        <Input
+          id="helm-repo-url"
+          name={name}
+          placeholder="https://charts.bitnami.com/bitnami"
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </FormControl>
+    </FormSection>
+  );
+}
