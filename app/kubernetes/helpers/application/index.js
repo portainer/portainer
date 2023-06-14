@@ -149,7 +149,6 @@ class KubernetesApplicationHelper {
     const filterCondition = configurationKind === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
     const finalRes = _.flatMap(configurations, (cfg) => {
       const cfgEnv = _.filter(env, [filterCondition, cfg.Name]);
-      // const cfgVol = _.filter(volumes, { configurationName: cfg.Name });
       const cfgVol = volumes.filter((volume) => volume.configurationName === cfg.Name && volume.configurationType === configurationKind);
       if (!cfgEnv.length && !cfgVol.length) {
         return;
