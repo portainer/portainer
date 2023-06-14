@@ -35,6 +35,7 @@ export function BackupFileForm() {
           <SecurityFieldset
             switchDataCy="settings-passwordProtectLocal"
             inputDataCy="settings-backupLocalPassword"
+            disabled={false}
           />
 
           <div className="form-group">
