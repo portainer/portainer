@@ -30,6 +30,7 @@ import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/pers
 import PortainerError from 'Portainer/error';
 import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
 function _apiPortsToPublishedPorts(pList, pRefs) {
   const ports = _.map(pList, (item) => {
@@ -213,6 +214,7 @@ class KubernetesApplicationConverter {
               configurationVolume.fileMountPath = matchingVolumeMount.mountPath;
               configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
               configurationVolume.configurationName = configurationName;
+              configurationVolume.configurationType = volume.configMap ? KubernetesConfigurationKinds.CONFIGMAP : KubernetesConfigurationKinds.SECRET;
 
               acc.push(configurationVolume);
             } else {
@@ -222,6 +224,7 @@ class KubernetesApplicationConverter {
                 configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
                 configurationVolume.configurationKey = item.key;
                 configurationVolume.configurationName = configurationName;
+                configurationVolume.configurationType = volume.configMap ? KubernetesConfigurationKinds.CONFIGMAP : KubernetesConfigurationKinds.SECRET;
 
                 acc.push(configurationVolume);
               });
@@ -294,12 +297,17 @@ class KubernetesApplicationConverter {
     res.DataAccessPolicy = app.DataAccessPolicy;
     res.EnvironmentVariables = KubernetesApplicationHelper.generateEnvVariablesFromEnv(app.Env);
     res.PersistedFolders = KubernetesApplicationHelper.generatePersistedFoldersFormValuesFromPersistedFolders(app.PersistedFolders, persistentVolumeClaims); // generate from PVC and app.PersistedFolders
-    res.Secrets = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations, 'valueFrom.secretKeyRef.name');
+    res.Secrets = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(
+      app.Env,
+      app.ConfigurationVolumes,
+      configurations,
+      KubernetesConfigurationKinds.SECRET
+    );
     res.ConfigMaps = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(
       app.Env,
       app.ConfigurationVolumes,
       configurations,
-      'valueFrom.configMapKeyRef.name'
+      KubernetesConfigurationKinds.CONFIGMAP
     );
     res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler, res.ReplicaCount);
     res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts, ingresses);

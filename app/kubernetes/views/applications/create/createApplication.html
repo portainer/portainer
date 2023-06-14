@@ -483,14 +483,21 @@
                   </div>
                   <!-- !config-element -->
                   <div class="col-sm-12 !p-0">
-                    <span
+                    <button
+                      type="button"
                       class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                      ng-disabled="ctrl.configMaps.length === 0"
                       ng-click="ctrl.addConfigMap()"
                       ng-if="ctrl.formValues.Containers.length <= 1"
                       data-cy="k8sAppCreate-addConfigButton"
                     >
                       <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add ConfigMap
-                    </span>
+                    </button>
+                  </div>
+                  <div class="my-2 w-full">
+                    <p class="vertical-center text-warning text-xs" ng-if="ctrl.configMaps.length === 0"
+                      ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no ConfigMaps available in this namespace.</p
+                    >
                   </div>
 
                   <!-- #region SECRETS -->
@@ -626,14 +633,21 @@
                   </div>
                   <!-- !config-element -->
                   <div class="col-sm-12 !p-0">
-                    <span
+                    <button
+                      type="button"
+                      ng-disabled="ctrl.secrets.length === 0"
                       class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
                       ng-click="ctrl.addSecret()"
                       ng-if="ctrl.formValues.Containers.length <= 1"
                       data-cy="k8sAppCreate-addSecretButton"
                     >
                       <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add Secret
-                    </span>
+                    </button>
+                  </div>
+                  <div class="my-2 w-full">
+                    <p class="vertical-center text-warning text-xs" ng-if="ctrl.secrets.length === 0"
+                      ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no secrets available in this namespace.</p
+                    >
                   </div>
                   <!-- #endregion -->
 
