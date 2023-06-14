@@ -1,10 +1,13 @@
 import { useField } from 'formik';
 import { useState } from 'react';
 
-export function useToggledValue(fieldName: string) {
+export function useToggledValue(
+  fieldName: string,
+  toggleFieldName = `${fieldName}Enabled`
+) {
   const [, { value }, { setValue }] = useField<string>(fieldName);
   const [, { value: isEnabled }, { setValue: setIsEnabled }] =
-    useField<boolean>(`${fieldName}Enabled`);
+    useField<boolean>(toggleFieldName);
   const [oldValue, setOldValue] = useState(value);
 
   async function handleIsEnabledChange(enabled: boolean) {

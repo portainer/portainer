@@ -7,6 +7,7 @@ export default function KubeSettingsPanelController($scope, $async) {
   this.onToggleHideFileUpload = onToggleHideFileUpload.bind(this);
   this.onTogglePerEnvOverride = onTogglePerEnvOverride.bind(this);
   this.saveKubernetesSettings = saveKubernetesSettings.bind(this);
+  this.onToggleNoteOnApplications = onToggleNoteOnApplications.bind(this);
   this.$onInit = $onInit.bind(this);
 
   this.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;
@@ -51,8 +52,12 @@ export default function KubeSettingsPanelController($scope, $async) {
   function onToggleAddWithForm(checked) {
     $scope.$evalAsync(() => {
       this.formValues.GlobalDeploymentOptions.hideAddWithForm = checked;
-      this.formValues.GlobalDeploymentOptions.hideWebEditor = checked;
-      this.formValues.GlobalDeploymentOptions.hideFileUpload = checked;
+      this.formValues.GlobalDeploymentOptions.hideWebEditor = false;
+      this.formValues.GlobalDeploymentOptions.hideFileUpload = false;
+      if (checked) {
+        this.formValues.GlobalDeploymentOptions.hideWebEditor = true;
+        this.formValues.GlobalDeploymentOptions.hideFileUpload = true;
+      }
     });
   }
 
@@ -71,6 +76,12 @@ export default function KubeSettingsPanelController($scope, $async) {
   function onTogglePerEnvOverride(checked) {
     $scope.$evalAsync(() => {
       this.formValues.GlobalDeploymentOptions.perEnvOverride = checked;
+    });
+  }
+
+  function onToggleNoteOnApplications(checked) {
+    $scope.$evalAsync(() => {
+      this.formValues.GlobalDeploymentOptions.requireNoteOnApplications = checked;
     });
   }
 

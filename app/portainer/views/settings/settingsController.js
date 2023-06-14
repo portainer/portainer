@@ -58,10 +58,6 @@ angular.module('portainer.app').controller('SettingsController', [
         StateManager.updateEnableTelemetry(settings.EnableTelemetry);
         $scope.formValues.BlackListedLabels = settings.BlackListedLabels;
       }
-
-      // trigger an event to update the deployment options for the react based sidebar
-      const event = new CustomEvent('portainer:deploymentOptionsUpdated');
-      document.dispatchEvent(event);
     }
 
     function initView() {
