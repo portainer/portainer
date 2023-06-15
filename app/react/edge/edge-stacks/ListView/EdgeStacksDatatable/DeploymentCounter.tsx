@@ -38,7 +38,7 @@ export function DeploymentCounter({
   return (
     <span
       className={clsx(styles.root, {
-        [styles.statusOk]: type === StatusType.Ok,
+        [styles.statusOk]: type === StatusType.Running,
         [styles.statusError]: type === StatusType.Error,
         [styles.statusAcknowledged]: type === StatusType.Acknowledged,
         [styles.statusImagesPulled]: type === StatusType.ImagesPulled,

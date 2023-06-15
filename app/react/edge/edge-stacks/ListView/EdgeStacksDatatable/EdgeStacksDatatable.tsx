@@ -54,7 +54,7 @@ function aggregateStackStatus(stackStatus: EdgeStack['StatusArray']) {
   return Object.values(stackStatus)
     .flat()
     .reduce((acc, envStatus) => {
-      acc.ok += Number(envStatus.Type === StatusType.Ok);
+      acc.ok += Number(envStatus.Type === StatusType.Running);
       acc.error += Number(envStatus.Type === StatusType.Error);
       acc.acknowledged += Number(envStatus.Type === StatusType.Acknowledged);
       acc.imagesPulled += Number(envStatus.Type === StatusType.ImagesPulled);

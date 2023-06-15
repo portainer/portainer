@@ -56,7 +56,7 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type={StatusType.Ok}
+        type={StatusType.Running}
         stackId={row.original.Id}
       />
     ),
