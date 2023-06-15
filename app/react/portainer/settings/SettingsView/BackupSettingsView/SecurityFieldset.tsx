@@ -8,7 +8,7 @@ import { SwitchField } from '@@/form-components/SwitchField';
 interface Props {
   switchDataCy: string;
   inputDataCy: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 export function SecurityFieldset({
