@@ -2,7 +2,10 @@ import { Formik, Form, Field } from 'formik';
 import { Upload } from 'lucide-react';
 import clsx from 'clsx';
 
-import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import {
+  isLimitedToBE,
+  isBE,
+} from '@/react/portainer/feature-flags/feature-flags.service';
 import { success as notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -39,21 +42,23 @@ export function BackupS3Form() {
 
   const updateS3Mutate = useUpdateBackupS3SettingsMutation();
 
-  const settingsQuery = useBackupS3Settings();
-  if (!settingsQuery.data) {
+  const settingsQuery = useBackupS3Settings({ enabled: isBE });
+  if (settingsQuery.isLoading) {
     return null;
   }
 
-  const backupS3Settings: BackupS3Settings = {
-    password: settingsQuery.data.password,
-    cronRule: settingsQuery.data.cronRule,
-    accessKeyID: settingsQuery.data.accessKeyID,
-    secretAccessKey: settingsQuery.data.secretAccessKey,
-    region: settingsQuery.data.region,
-    bucketName: settingsQuery.data.bucketName,
-    s3CompatibleHost: settingsQuery.data.s3CompatibleHost,
-    scheduleAutomaticBackup: !!settingsQuery.data.cronRule,
-    passwordProtect: !!settingsQuery.data.password,
+  const settings = settingsQuery.data;
+
+  const backupS3Settings = {
+    password: settings?.password || '',
+    cronRule: settings?.cronRule || '',
+    accessKeyID: settings?.accessKeyID || '',
+    secretAccessKey: settings?.secretAccessKey || '',
+    region: settings?.region || '',
+    bucketName: settings?.bucketName || '',
+    s3CompatibleHost: settings?.s3CompatibleHost || '',
+    scheduleAutomaticBackup: !!settings?.cronRule,
+    passwordProtect: !!settings?.password,
   };
 
   return (
@@ -63,15 +68,8 @@ export function BackupS3Form() {
       onSubmit={onSubmit}
       validateOnMount
     >
-      {({
-        values,
-        errors,
-        handleSubmit,
-        isSubmitting,
-        setFieldValue,
-        isValid,
-      }) => (
-        <Form className="form-horizontal" onSubmit={handleSubmit}>
+      {({ values, errors, isSubmitting, setFieldValue, isValid }) => (
+        <Form className="form-horizontal">
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
@@ -188,6 +186,7 @@ export function BackupS3Form() {
           <SecurityFieldset
             switchDataCy="settings-passwordProtectToggleS3"
             inputDataCy="settings-backups3pw"
+            disabled={limitedToBE}
           />
 
           <div className="form-group">

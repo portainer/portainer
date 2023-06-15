@@ -30,11 +30,12 @@ export function BackupFileForm() {
       onSubmit={onSubmit}
       validateOnMount
     >
-      {({ handleSubmit, isSubmitting, isValid }) => (
-        <Form className="form-horizontal" onSubmit={handleSubmit}>
+      {({ isSubmitting, isValid }) => (
+        <Form className="form-horizontal">
           <SecurityFieldset
             switchDataCy="settings-passwordProtectLocal"
             inputDataCy="settings-backupLocalPassword"
+            disabled={false}
           />
 
           <div className="form-group">
