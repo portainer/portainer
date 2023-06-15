@@ -27,14 +27,6 @@ const (
 	statusFilterImagesPulled        EdgeStackStatusFilter = "ImagesPulled"
 )
 
-type edgeStackQueryParam struct {
-	// edge stack ID
-	Id portainer.EdgeStackID `json:"id" validate:"required" example:"1"`
-	// Filter returned environments based on their status
-	// Accepted values are [Pending, Ok, Error, Acknowledged, Remove, RemoteUpdateSuccess, ImagesPulled]
-	StatusFilter EdgeStackStatusFilter `json:"statusFilter" example:"Ok"`
-}
-
 type EnvironmentsQuery struct {
 	search           string
 	types            []portainer.EndpointType
@@ -50,7 +42,8 @@ type EnvironmentsQuery struct {
 	name                     string
 	agentVersions            []string
 	edgeCheckInPassedSeconds int
-	edgeStack                edgeStackQueryParam
+	edgeStackId              portainer.EdgeStackID
+	edgeStackStatus          EdgeStackStatusFilter
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -102,11 +95,9 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	edgeCheckInPassedSeconds, _ := request.RetrieveNumericQueryParameter(r, "edgeCheckInPassedSeconds", true)
 
-	var edgeStack edgeStackQueryParam
-	err = request.RetrieveJSONQueryParameter(r, "edgeStack", &edgeStack, true)
-	if err != nil {
-		return EnvironmentsQuery{}, err
-	}
+	edgeStackId, _ := request.RetrieveNumericQueryParameter(r, "edgeStackId", true)
+
+	edgeStackStatus, _ := request.RetrieveQueryParameter(r, "edgeStackStatus", true)
 
 	return EnvironmentsQuery{
 		search:                   search,
@@ -122,7 +113,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		name:                     name,
 		agentVersions:            agentVersions,
 		edgeCheckInPassedSeconds: edgeCheckInPassedSeconds,
-		edgeStack:                edgeStack,
+		edgeStackId:              portainer.EdgeStackID(edgeStackId),
+		edgeStackStatus:          EdgeStackStatusFilter(edgeStackStatus),
 	}, nil
 }
 
@@ -208,8 +200,8 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 			return !endpointutils.IsAgentEndpoint(&endpoint) || contains(query.agentVersions, endpoint.Agent.Version)
 		})
 	}
-	if query.edgeStack.Id != 0 {
-		f, err := filterEndpointsByEdgeStack(filteredEndpoints, query.edgeStack.Id, query.edgeStack.StatusFilter, handler.DataStore)
+	if query.edgeStackId != 0 {
+		f, err := filterEndpointsByEdgeStack(filteredEndpoints, query.edgeStackId, query.edgeStackStatus, handler.DataStore)
 		if err != nil {
 			return nil, 0, err
 		}

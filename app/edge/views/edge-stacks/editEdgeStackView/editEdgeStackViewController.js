@@ -116,9 +116,7 @@ export class EditEdgeStackViewController {
       try {
         const query = {
           search,
-          edgeStack: {
-            id: this.stack.Id,
-          },
+          edgeStackId: this.stack.Id,
         };
         const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
 
