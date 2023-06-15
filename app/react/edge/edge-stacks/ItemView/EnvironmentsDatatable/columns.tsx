@@ -6,9 +6,11 @@ import _ from 'lodash';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { getDashboardRoute } from '@/react/portainer/environments/utils';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
+import { Link } from '@@/Link';
 
 import { EdgeStackStatus, StatusType } from '../../types';
 
@@ -22,6 +24,14 @@ export const columns = _.compact([
   columnHelper.accessor('Name', {
     id: 'name',
     header: 'Name',
+    cell({ row: { original: env } }) {
+      const { to, params } = getDashboardRoute(env);
+      return (
+        <Link to={to} params={params}>
+          {env.Name}
+        </Link>
+      );
+    },
   }),
   columnHelper.accessor(
     (env) => env.StackStatus.map((s) => StatusType[s.Type]).join(','),
