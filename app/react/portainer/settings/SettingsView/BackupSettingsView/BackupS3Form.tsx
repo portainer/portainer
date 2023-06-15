@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react';
 import clsx from 'clsx';
 
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { success as notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -10,6 +11,13 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
+import {
+  useBackupS3Settings,
+  useExportS3BackupMutation,
+  useUpdateBackupS3SettingsMutation,
+} from './queries';
+import { BackupS3Model } from './types';
+import { validationSchema } from './BackupS3Form.validation';
 import { SecurityFieldset } from './SecurityFieldset';
 
 interface BackupS3Settings {
@@ -27,25 +35,43 @@ interface BackupS3Settings {
 export function BackupS3Form() {
   const limitedToBE = isLimitedToBE(FeatureId.S3_BACKUP_SETTING);
 
+  const exportS3Mutate = useExportS3BackupMutation();
+
+  const updateS3Mutate = useUpdateBackupS3SettingsMutation();
+
+  const settingsQuery = useBackupS3Settings();
+  if (!settingsQuery.data) {
+    return null;
+  }
+
   const backupS3Settings: BackupS3Settings = {
-    passwordProtect: false,
-    password: '',
-    scheduleAutomaticBackup: false,
-    cronRule: '',
-    accessKeyID: '',
-    secretAccessKey: '',
-    region: '',
-    bucketName: '',
-    s3CompatibleHost: '',
+    password: settingsQuery.data.password,
+    cronRule: settingsQuery.data.cronRule,
+    accessKeyID: settingsQuery.data.accessKeyID,
+    secretAccessKey: settingsQuery.data.secretAccessKey,
+    region: settingsQuery.data.region,
+    bucketName: settingsQuery.data.bucketName,
+    s3CompatibleHost: settingsQuery.data.s3CompatibleHost,
+    scheduleAutomaticBackup: !!settingsQuery.data.cronRule,
+    passwordProtect: !!settingsQuery.data.password,
   };
 
   return (
     <Formik<BackupS3Settings>
       initialValues={backupS3Settings}
+      validationSchema={validationSchema}
       onSubmit={onSubmit}
+      validateOnMount
     >
-      {({ values, errors, isSubmitting, setFieldValue, isValid }) => (
-        <Form className="form-horizontal">
+      {({
+        values,
+        errors,
+        handleSubmit,
+        isSubmitting,
+        setFieldValue,
+        isValid,
+      }) => (
+        <Form className="form-horizontal" onSubmit={handleSubmit}>
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
@@ -162,7 +188,6 @@ export function BackupS3Form() {
           <SecurityFieldset
             switchDataCy="settings-passwordProtectToggleS3"
             inputDataCy="settings-backups3pw"
-            disabled={limitedToBE}
           />
 
           <div className="form-group">
@@ -175,6 +200,9 @@ export function BackupS3Form() {
                 disabled={!isValid || limitedToBE}
                 data-cy="settings-exportBackupS3Button"
                 icon={Upload}
+                onClick={() => {
+                  handleExport(values);
+                }}
               >
                 Export backup
               </LoadingButton>
@@ -199,5 +227,38 @@ export function BackupS3Form() {
     </Formik>
   );
 
-  function onSubmit() {}
+  function handleExport(values: BackupS3Settings) {
+    const payload: BackupS3Model = {
+      password: values.passwordProtect ? values.password : '',
+      cronRule: values.scheduleAutomaticBackup ? values.cronRule : '',
+      accessKeyID: values.accessKeyID,
+      secretAccessKey: values.secretAccessKey,
+      region: values.region,
+      bucketName: values.bucketName,
+      s3CompatibleHost: values.s3CompatibleHost,
+    };
+    exportS3Mutate.mutate(payload, {
+      onSuccess() {
+        notifySuccess('Success', 'Exported backup to S3 successfully');
+      },
+    });
+  }
+
+  async function onSubmit(values: BackupS3Settings) {
+    const payload: BackupS3Model = {
+      password: values.passwordProtect ? values.password : '',
+      cronRule: values.scheduleAutomaticBackup ? values.cronRule : '',
+      accessKeyID: values.accessKeyID,
+      secretAccessKey: values.secretAccessKey,
+      region: values.region,
+      bucketName: values.bucketName,
+      s3CompatibleHost: values.s3CompatibleHost,
+    };
+
+    updateS3Mutate.mutate(payload, {
+      onSuccess() {
+        notifySuccess('Success', 'S3 backup settings saved successfully');
+      },
+    });
+  }
 }

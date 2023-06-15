@@ -8,14 +8,9 @@ import { SwitchField } from '@@/form-components/SwitchField';
 interface Props {
   switchDataCy: string;
   inputDataCy: string;
-  disabled: boolean;
 }
 
-export function SecurityFieldset({
-  switchDataCy,
-  inputDataCy,
-  disabled,
-}: Props) {
+export function SecurityFieldset({ switchDataCy, inputDataCy }: Props) {
   const [{ value: passwordProtect }, , { setValue: setPasswordProtect }] =
     useField<boolean>('passwordProtect');
 
@@ -32,7 +27,6 @@ export function SecurityFieldset({
             checked={passwordProtect}
             data-cy={switchDataCy}
             onChange={(checked) => setPasswordProtect(checked)}
-            disabled={disabled}
           />
         </div>
       </div>
