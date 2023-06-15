@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import _ from 'lodash';
 
+import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Button } from '@@/buttons';
@@ -17,7 +18,7 @@ import { EdgeStackEnvironment } from './types';
 
 const columnHelper = createColumnHelper<EdgeStackEnvironment>();
 
-export const columns = [
+export const columns = _.compact([
   columnHelper.accessor('Name', {
     id: 'name',
     header: 'Name',
@@ -28,10 +29,34 @@ export const columns = [
       id: 'status',
       header: 'Status',
       cell({ row: { original: env } }) {
-        return endpointStatusLabel(env.StackStatus);
+        return isBE ? (
+          <ul className="list-none space-y-2">
+            {env.StackStatus.map((s) => (
+              <li>
+                <Status value={s.Type} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          endpointStatusLabel(env.StackStatus)
+        );
       },
     }
   ),
+  isBE &&
+    columnHelper.accessor((env) => _.last(env.StackStatus)?.Time, {
+      id: 'statusDate',
+      header: 'Time',
+      cell({ row: { original: env } }) {
+        return (
+          <ul className="list-none space-y-2">
+            {env.StackStatus.map((s) => (
+              <li>{isoDateFromTimestamp(s.Time)}</li>
+            ))}
+          </ul>
+        );
+      },
+    }),
   columnHelper.accessor(
     (env) => env.StackStatus.find((s) => s.Type === StatusType.Error)?.Error,
     {
@@ -58,7 +83,7 @@ export const columns = [
         }),
       ]
     : []),
-];
+]);
 
 function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -110,4 +135,41 @@ function endpointStatusLabel(statusArray: Array<EdgeStackStatus>) {
   }
 
   return _.uniq(labels).join(', ');
+}
+
+function Status({ value }: { value: StatusType }) {
+  const color = getStateColor(value);
+
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={clsx('h-2 w-2 rounded-full', {
+          'bg-orange-5': color === 'orange',
+          'bg-green-5': color === 'green',
+          'bg-error-5': color === 'red',
+        })}
+      />
+
+      <span>{_.startCase(StatusType[value])}</span>
+    </div>
+  );
+}
+
+function getStateColor(type: StatusType): 'orange' | 'green' | 'red' {
+  switch (type) {
+    case StatusType.Acknowledged:
+    case StatusType.ImagesPulled:
+    case StatusType.DeploymentReceived:
+    case StatusType.Running:
+    case StatusType.RemoteUpdateSuccess:
+    case StatusType.Removed:
+      return 'green';
+    case StatusType.Error:
+      return 'red';
+    case StatusType.Pending:
+    case StatusType.Deploying:
+    case StatusType.Removing:
+    default:
+      return 'orange';
+  }
 }
