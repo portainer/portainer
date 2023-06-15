@@ -7,7 +7,7 @@ import (
 
 type endpointSetType map[portainer.EndpointID]bool
 
-func getEndpointsByTags(tx dataservices.DataStoreTx, tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
+func GetEndpointsByTags(tx dataservices.DataStoreTx, tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
 	if len(tagIDs) == 0 {
 		return []portainer.EndpointID{}, nil
 	}

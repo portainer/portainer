@@ -11,8 +11,10 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/slices"
+	"github.com/portainer/portainer/api/internal/unique"
 )
 
 type EdgeStackStatusFilter string
@@ -211,18 +213,6 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 	return filteredEndpoints, totalAvailableEndpoints, nil
 }
 
-func unique(intSlice []portainer.EndpointID) []portainer.EndpointID {
-	keys := make(map[portainer.EndpointID]bool)
-	list := []portainer.EndpointID{}
-	for _, entry := range intSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
-}
-
 func endpointStatusInStackMatchesFilter(stackStatus map[portainer.EndpointID]portainer.EdgeStackStatus, envId portainer.EndpointID, statusFilter EdgeStackStatusFilter) bool {
 	status, ok := stackStatus[envId]
 
@@ -259,10 +249,13 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 			return nil, errors.WithMessage(err, "Unable to retrieve edge group from the database")
 		}
 		if edgeGroup.Dynamic {
-			// TODO
-		} else {
-			envIds = append(envIds, edgeGroup.Endpoints...)
+			endpointIDs, err := edgegroups.GetEndpointsByTags(datastore, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+			if err != nil {
+				return nil, errors.WithMessage(err, "Unable to retrieve environments and environment groups for Edge group")
+			}
+			edgeGroup.Endpoints = endpointIDs
 		}
+		envIds = append(envIds, edgeGroup.Endpoints...)
 	}
 
 	if statusFilter != "" {
@@ -275,7 +268,9 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		}
 		envIds = envIds[:n]
 	}
-	filteredEndpoints := filteredEndpointsByIds(endpoints, unique(envIds))
+
+	uniqueIds := unique.Unique(envIds)
+	filteredEndpoints := filteredEndpointsByIds(endpoints, uniqueIds)
 
 	return filteredEndpoints, nil
 }

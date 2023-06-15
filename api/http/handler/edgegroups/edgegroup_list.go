@@ -84,7 +84,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 			EndpointTypes: []portainer.EndpointType{},
 		}
 		if edgeGroup.Dynamic {
-			endpointIDs, err := getEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+			endpointIDs, err := GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
 				return nil, httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
 			}
