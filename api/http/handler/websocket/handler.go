@@ -18,13 +18,13 @@ type Handler struct {
 	SignatureService            portainer.DigitalSignatureService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	KubernetesClientFactory     *cli.ClientFactory
-	requestBouncer              *security.RequestBouncer
+	requestBouncer              security.BouncerService
 	connectionUpgrader          websocket.Upgrader
 	kubernetesTokenCacheManager *kubernetes.TokenCacheManager
 }
 
 // NewHandler creates a handler to manage websocket operations.
-func NewHandler(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, bouncer *security.RequestBouncer) *Handler {
+func NewHandler(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:                      mux.NewRouter(),
 		connectionUpgrader:          websocket.Upgrader{},

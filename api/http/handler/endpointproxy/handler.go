@@ -13,13 +13,13 @@ import (
 type Handler struct {
 	*mux.Router
 	DataStore            dataservices.DataStore
-	requestBouncer       *security.RequestBouncer
+	requestBouncer       security.BouncerService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewHandler creates a handler to proxy requests to external APIs.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,

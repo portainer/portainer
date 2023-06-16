@@ -16,11 +16,11 @@ type Handler struct {
 	dockerClientFactory *dockerclient.ClientFactory
 	dataStore           dataservices.DataStore
 	containerService    *docker.ContainerService
-	bouncer             *security.RequestBouncer
+	bouncer             security.BouncerService
 }
 
 // NewHandler creates a handler to process non-proxied requests to docker APIs directly.
-func NewHandler(routePrefix string, bouncer *security.RequestBouncer, dataStore dataservices.DataStore, dockerClientFactory *dockerclient.ClientFactory, containerService *docker.ContainerService) *Handler {
+func NewHandler(routePrefix string, bouncer security.BouncerService, dataStore dataservices.DataStore, dockerClientFactory *dockerclient.ClientFactory, containerService *docker.ContainerService) *Handler {
 	h := &Handler{
 		Router:              mux.NewRouter(),
 		dataStore:           dataStore,

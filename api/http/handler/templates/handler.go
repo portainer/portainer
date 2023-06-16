@@ -19,7 +19,7 @@ type Handler struct {
 }
 
 // NewHandler returns a new instance of Handler.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}
