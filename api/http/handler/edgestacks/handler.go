@@ -17,7 +17,7 @@ import (
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer     *security.RequestBouncer
+	requestBouncer     security.BouncerService
 	DataStore          dataservices.DataStore
 	FileService        portainer.FileService
 	GitService         portainer.GitService
@@ -28,7 +28,7 @@ type Handler struct {
 const contextKey = "edgeStack_item"
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
 	h := &Handler{
 		Router:            mux.NewRouter(),
 		requestBouncer:    bouncer,

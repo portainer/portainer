@@ -21,7 +21,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, gitService portainer.GitService) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, fileService portainer.FileService, gitService portainer.GitService) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		DataStore:      dataStore,
