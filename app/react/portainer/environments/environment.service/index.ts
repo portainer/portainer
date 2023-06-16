@@ -15,12 +15,14 @@ import type {
 
 import { buildUrl } from './utils';
 
-export interface EdgeStackEnvironmentsQueryParams {
-  edgeStack?: {
-    id: EdgeStack['Id'];
-    statusFilter?: keyof EdgeStackStatus['Details'];
-  };
-}
+export type EdgeStackEnvironmentsQueryParams =
+  | {
+      edgeStackId?: EdgeStack['Id'];
+    }
+  | {
+      edgeStackId: EdgeStack['Id'];
+      edgeStackStatus?: keyof EdgeStackStatus['Details'];
+    };
 
 export interface BaseEnvironmentsQueryParams {
   search?: string;

@@ -12,12 +12,12 @@ import { queryKeys } from './query-keys';
 
 export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
-export interface Query extends EnvironmentsQueryParams {
+export type Query = EnvironmentsQueryParams & {
   page?: number;
   pageLimit?: number;
   sort?: string;
   order?: 'asc' | 'desc';
-}
+};
 
 type GetEndpointsResponse = Awaited<ReturnType<typeof getEnvironments>>;
 
