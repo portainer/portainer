@@ -19,7 +19,7 @@ import {
   useExportS3BackupMutation,
   useUpdateBackupS3SettingsMutation,
 } from './queries';
-import { BackupS3Model , BackupS3Settings } from './types';
+import { BackupS3Model, BackupS3Settings } from './types';
 import { validationSchema } from './BackupS3Form.validation';
 import { SecurityFieldset } from './SecurityFieldset';
 
