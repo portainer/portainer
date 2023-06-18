@@ -3,7 +3,9 @@ package edgestacks
 import (
 	"errors"
 	"net/http"
+	"time"
 
+	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
@@ -11,7 +13,6 @@ import (
 	"github.com/portainer/portainer/pkg/featureflags"
 
 	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
 )
 
 type updateStatusPayload struct {
@@ -84,6 +85,16 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 }
 
 func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *http.Request, stackID portainer.EdgeStackID, payload updateStatusPayload) (*portainer.EdgeStack, error) {
+	stack, err := tx.EdgeStack().EdgeStack(stackID)
+	if err != nil {
+		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
+	}
+
+	environmentStatus, ok := stack.StatusArray[payload.EndpointID]
+	if !ok {
+		environmentStatus = make([]portainer.EdgeStackStatus, 0)
+	}
+
 	endpoint, err := tx.Endpoint().Endpoint(payload.EndpointID)
 	if err != nil {
 		return nil, handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
@@ -94,66 +105,40 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	var stack *portainer.EdgeStack
+	status := *payload.Status
 
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = tx.EdgeStack().UpdateEdgeStackFunc(portainer.EdgeStackID(stackID), func(edgeStack *portainer.EdgeStack) {
-			details := edgeStack.Status[payload.EndpointID].Details
-			details.Pending = false
+		err = tx.EdgeStack().UpdateEdgeStackFunc(stackID, func(edgeStack *portainer.EdgeStack) {
 
-			switch *payload.Status {
-			case portainer.EdgeStackStatusOk:
-				details.Ok = true
-			case portainer.EdgeStackStatusError:
-				details.Error = true
-			case portainer.EdgeStackStatusAcknowledged:
-				details.Acknowledged = true
-			case portainer.EdgeStackStatusRemove:
-				details.Remove = true
-			case portainer.EdgeStackStatusImagesPulled:
-				details.ImagesPulled = true
-			}
-
-			edgeStack.Status[payload.EndpointID] = portainer.EdgeStackStatus{
-				Details:    details,
+			environmentStatus = append(environmentStatus, portainer.EdgeStackStatus{
+				Type:       status,
 				Error:      payload.Error,
-				EndpointID: payload.EndpointID,
-			}
+				EndpointID: portainer.EndpointID(payload.EndpointID),
+				Time:       time.Now().Unix(),
+			})
+
+			stack.StatusArray[payload.EndpointID] = environmentStatus
 
 			stack = edgeStack
 		})
-	} else {
-		stack, err = tx.EdgeStack().EdgeStack(stackID)
 		if err != nil {
-			return nil, err
+			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
 		}
+	} else {
 
-		details := stack.Status[payload.EndpointID].Details
-		details.Pending = false
-
-		switch *payload.Status {
-		case portainer.EdgeStackStatusOk:
-			details.Ok = true
-		case portainer.EdgeStackStatusError:
-			details.Error = true
-		case portainer.EdgeStackStatusAcknowledged:
-			details.Acknowledged = true
-		case portainer.EdgeStackStatusRemove:
-			details.Remove = true
-		case portainer.EdgeStackStatusImagesPulled:
-			details.ImagesPulled = true
-		}
-
-		stack.Status[payload.EndpointID] = portainer.EdgeStackStatus{
-			Details:    details,
+		environmentStatus = append(environmentStatus, portainer.EdgeStackStatus{
+			Type:       status,
 			Error:      payload.Error,
-			EndpointID: payload.EndpointID,
-		}
+			EndpointID: portainer.EndpointID(payload.EndpointID),
+			Time:       time.Now().Unix(),
+		})
+
+		stack.StatusArray[payload.EndpointID] = environmentStatus
 
 		err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
-	}
-	if err != nil {
-		return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
+		if err != nil {
+			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
+		}
 	}
 
 	return stack, nil

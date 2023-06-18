@@ -310,15 +310,15 @@ type (
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
-		ID             EdgeStackID                    `json:"Id" example:"1"`
-		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
-		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
-		ProjectPath    string                         `json:"ProjectPath"`
-		EntryPoint     string                         `json:"EntryPoint"`
-		Version        int                            `json:"Version"`
-		NumDeployments int                            `json:"NumDeployments"`
+		ID             EdgeStackID                      `json:"Id" example:"1"`
+		Name           string                           `json:"Name"`
+		StatusArray    map[EndpointID][]EdgeStackStatus `json:"StatusArray"`
+		CreationDate   int64                            `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID                    `json:"EdgeGroups"`
+		ProjectPath    string                           `json:"ProjectPath"`
+		EntryPoint     string                           `json:"EntryPoint"`
+		Version        int                              `json:"Version"`
+		NumDeployments int                              `json:"NumDeployments"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
 		// Uses the manifest's namespaces instead of the default one
@@ -326,6 +326,8 @@ type (
 
 		// Deprecated
 		Prune bool `json:"Prune"`
+		// Deprecated
+		Status map[EndpointID]EdgeStackStatus `json:"Status"`
 	}
 
 	EdgeStackDeploymentType int
@@ -345,14 +347,15 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Details    EdgeStackStatusDetails `json:"Details"`
-		Error      string                 `json:"Error"`
-		EndpointID EndpointID             `json:"EndpointID"`
+		Time       int64               `json:"Time"`
+		Type       EdgeStackStatusType `json:"Type"`
+		Error      string              `json:"Error"`
+		EndpointID EndpointID          `json:"EndpointID"`
 		// EE only feature
 		DeploymentInfo StackDeploymentInfo `json:"DeploymentInfo"`
 
 		// Deprecated
-		Type EdgeStackStatusType `json:"Type"`
+		Details EdgeStackStatusDetails `json:"Details"`
 	}
 
 	//EdgeStackStatusType represents an edge stack status type
