@@ -10,6 +10,7 @@ import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeV
 import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 import { EdgeAutoCreateScriptView } from '@/react/portainer/environments/EdgeAutoCreateScriptView';
 import { ListView as EnvironmentsListView } from '@/react/portainer/environments/ListView';
+import { BackupSettingsPanel } from '@/react/portainer/settings/SettingsView/BackupSettingsView/BackupSettingsPanel';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -49,4 +50,8 @@ export const viewsModule = angular
   .component(
     'environmentsListView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(EnvironmentsListView))), [])
+  )
+  .component(
+    'backupSettingsPanel',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(BackupSettingsPanel))), [])
   ).name;

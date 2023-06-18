@@ -1,23 +1,16 @@
 import angular from 'angular';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { options } from '@/react/portainer/settings/SettingsView/backup-options';
 
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',
   'Notifications',
   'SettingsService',
   'StateManager',
-  'BackupService',
-  'FileSaver',
-  function ($scope, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
-    $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
-    $scope.enforceDeploymentOptions = FeatureId.ENFORCE_DEPLOYMENT_OPTIONS;
+  function ($scope, Notifications, SettingsService, StateManager) {
     $scope.updateSettings = updateSettings;
     $scope.handleSuccess = handleSuccess;
     $scope.requireNoteOnApplications = FeatureId.K8S_REQUIRE_NOTE_ON_APPLICATIONS;
-
-    $scope.backupOptions = options;
 
     $scope.state = {
       actionInProgress: false,
@@ -48,28 +41,12 @@ angular.module('portainer.app').controller('SettingsController', [
       showHTTPS: !window.ddExtension,
     };
 
-    $scope.BACKUP_FORM_TYPES = { S3: 's3', FILE: 'file' };
-
     $scope.formValues = {
       KubeconfigExpiry: undefined,
       HelmRepositoryURL: undefined,
       BlackListedLabels: [],
       labelName: '',
       labelValue: '',
-      passwordProtect: false,
-      password: '',
-      backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
-    };
-
-    $scope.onToggleAutoBackups = function onToggleAutoBackups(checked) {
-      $scope.$evalAsync(() => {
-        $scope.formValues.scheduleAutomaticBackups = checked;
-      });
-    };
-
-    $scope.onBackupOptionsChange = function (type, limited) {
-      $scope.formValues.backupFormType = type;
-      $scope.state.featureLimited = limited;
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -87,28 +64,6 @@ angular.module('portainer.app').controller('SettingsController', [
       const filteredSettings = [...$scope.formValues.BlackListedLabels, label];
       const filteredSettingsPayload = { BlackListedLabels: filteredSettings };
       updateSettings(filteredSettingsPayload, 'Hidden container settings updated');
-    };
-
-    $scope.downloadBackup = function () {
-      const payload = {};
-      if ($scope.formValues.passwordProtect) {
-        payload.password = $scope.formValues.password;
-      }
-
-      $scope.state.backupInProgress = true;
-
-      BackupService.downloadBackup(payload)
-        .then(function success(data) {
-          const downloadData = new Blob([data.file], { type: 'application/gzip' });
-          FileSaver.saveAs(downloadData, data.name);
-          Notifications.success('Success', 'Backup successfully downloaded');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to download backup');
-        })
-        .finally(function final() {
-          $scope.state.backupInProgress = false;
-        });
     };
 
     // only update the values from the kube settings widget. In future separate the api endpoints
