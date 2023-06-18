@@ -130,7 +130,7 @@ export interface Settings {
   AllowStackManagementForRegularUsers: boolean;
   AllowDeviceMappingForRegularUsers: boolean;
   AllowContainerCapabilitiesForRegularUsers: boolean;
-  GlobalDeploymentOptions: GlobalDeploymentOptions;
+  GlobalDeploymentOptions?: GlobalDeploymentOptions;
   Edge: {
     PingInterval: number;
     SnapshotInterval: number;
