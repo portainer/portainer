@@ -19,21 +19,9 @@ import {
   useExportS3BackupMutation,
   useUpdateBackupS3SettingsMutation,
 } from './queries';
-import { BackupS3Model } from './types';
+import { BackupS3Model , BackupS3Settings } from './types';
 import { validationSchema } from './BackupS3Form.validation';
 import { SecurityFieldset } from './SecurityFieldset';
-
-interface BackupS3Settings {
-  passwordProtect: boolean;
-  password: string;
-  scheduleAutomaticBackup: boolean;
-  cronRule: string;
-  accessKeyID: string;
-  secretAccessKey: string;
-  region: string;
-  bucketName: string;
-  s3CompatibleHost: string;
-}
 
 export function BackupS3Form() {
   const limitedToBE = isLimitedToBE(FeatureId.S3_BACKUP_SETTING);

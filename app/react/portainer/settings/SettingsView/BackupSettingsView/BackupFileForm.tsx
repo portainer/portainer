@@ -9,11 +9,7 @@ import { DownloadBackupPayload } from './queries/useDownloadBackupMutation';
 import { useDownloadBackupMutation } from './queries';
 import { validationSchema } from './BackupFileForm.validation';
 import { SecurityFieldset } from './SecurityFieldset';
-
-interface BackupFileSettings {
-  passwordProtect: boolean;
-  password: string;
-}
+import { BackupFileSettings } from './types';
 
 export function BackupFileForm() {
   const downloadMutate = useDownloadBackupMutation();
