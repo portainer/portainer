@@ -66,7 +66,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
     autoUpdate: parseAutoUpdateResponse(stack.AutoUpdate),
     refName: stack.GitConfig.ReferenceName,
     authentication: parseAuthResponse(stack.GitConfig.Authentication),
-    envVars: stack.EnvVars,
+    envVars: stack.EnvVars || [],
   };
 
   const webhookId = stack.AutoUpdate?.Webhook || createWebhookId();

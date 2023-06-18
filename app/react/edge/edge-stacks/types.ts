@@ -59,7 +59,7 @@ export type EdgeStack = {
   Prune: boolean;
   RetryDeploy: boolean;
   Webhook?: string;
-  EnvVars: EnvVar[];
+  EnvVars?: EnvVar[];
 };
 
 export enum EditorType {

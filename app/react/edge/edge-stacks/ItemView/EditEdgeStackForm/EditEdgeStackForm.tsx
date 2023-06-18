@@ -65,7 +65,7 @@ export function EditEdgeStackForm({
     prePullImage: edgeStack.PrePullImage,
     retryDeploy: edgeStack.RetryDeploy,
     webhookEnabled: !!edgeStack.Webhook,
-    envVars: edgeStack.EnvVars,
+    envVars: edgeStack.EnvVars || [],
   };
 
   return (
