@@ -9,6 +9,7 @@ import { CreateAccessToken } from '@/react/portainer/account/CreateAccessTokenVi
 import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeView/EdgeComputeSettingsView';
 import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 import { EdgeAutoCreateScriptView } from '@/react/portainer/environments/EdgeAutoCreateScriptView';
+import { ListView as EnvironmentsListView } from '@/react/portainer/environments/ListView';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -44,4 +45,8 @@ export const viewsModule = angular
       withUIRouter(withReactQuery(withCurrentUser(EdgeComputeSettingsView))),
       ['onSubmit', 'settings']
     )
+  )
+  .component(
+    'environmentsListView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(EnvironmentsListView))), [])
   ).name;

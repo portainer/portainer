@@ -1,21 +1,23 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useQueryClient, useMutation } from 'react-query';
 
+import { withError, withInvalidate } from '@/react-tools/react-query';
+import {
+  EnvironmentId,
+  EnvironmentStatusMessage,
+  Environment,
+} from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { TagId } from '@/portainer/tags/types';
-import { withError } from '@/react-tools/react-query';
 
 import { EnvironmentGroupId } from '../environment-groups/types';
 import { buildUrl } from '../environment.service/utils';
-import { EnvironmentId, Environment } from '../types';
 
 import { queryKeys } from './query-keys';
 
 export function useUpdateEnvironmentMutation() {
   const queryClient = useQueryClient();
   return useMutation(updateEnvironment, {
-    onSuccess(data, { id }) {
-      queryClient.invalidateQueries(queryKeys.item(id));
-    },
+    ...withInvalidate(queryClient, [queryKeys.base()]),
     ...withError('Unable to update environment'),
   });
 }
@@ -38,6 +40,9 @@ export interface UpdatePayload {
   AzureApplicationID: string;
   AzureTenantID: string;
   AzureAuthenticationKey: string;
+
+  IsSetStatusMessage: boolean;
+  StatusMessage: Partial<EnvironmentStatusMessage>;
 }
 
 async function updateEnvironment({

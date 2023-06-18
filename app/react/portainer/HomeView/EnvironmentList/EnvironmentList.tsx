@@ -126,7 +126,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
       pageLimit,
       ...queryWithSort,
     },
-    refetchIfAnyOffline
+    { refetchInterval: refetchIfAnyOffline }
   );
 
   useEffect(() => {

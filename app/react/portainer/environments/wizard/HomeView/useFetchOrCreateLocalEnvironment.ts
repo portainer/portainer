@@ -76,8 +76,10 @@ function useFetchLocalEnvironment() {
       pageLimit: 1,
       types: [EnvironmentType.Docker, EnvironmentType.KubernetesLocal],
     },
-    false,
-    Infinity
+    {
+      refetchInterval: false,
+      staleTime: Infinity,
+    }
   );
 
   return {

@@ -28,19 +28,21 @@ interface Props {
 export function WizardEndpointsList({ environmentIds }: Props) {
   const { environments } = useEnvironmentList(
     { endpointIds: environmentIds },
-    (environments) => {
-      if (!environments) {
-        return false;
-      }
+    {
+      refetchInterval: (environments) => {
+        if (!environments) {
+          return false;
+        }
 
-      if (!environments.value.some(isUnassociatedEdgeEnvironment)) {
-        return false;
-      }
+        if (!environments.value.some(isUnassociatedEdgeEnvironment)) {
+          return false;
+        }
 
-      return ENVIRONMENTS_POLLING_INTERVAL;
-    },
-    0,
-    environmentIds.length > 0
+        return ENVIRONMENTS_POLLING_INTERVAL;
+      },
+
+      enabled: environmentIds.length > 0,
+    }
   );
 
   return (
