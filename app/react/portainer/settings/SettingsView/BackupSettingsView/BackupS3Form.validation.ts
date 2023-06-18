@@ -2,8 +2,8 @@ import { object, string, boolean } from 'yup';
 
 export function validationSchema() {
   return object().shape({
-    passwordProtectS3: boolean(),
-    passwordS3: string().when('passwordProtectS3', {
+    passwordProtect: boolean(),
+    password: string().when('passwordProtect', {
       is: true,
       then: (schema) => schema.required('This field is required.'),
     }),
