@@ -17,6 +17,8 @@ interface EdgeStackStatusDetails {
   ImagesPulled: boolean;
 }
 
+export type StatusType = keyof EdgeStackStatusDetails;
+
 export interface EdgeStackStatus {
   Details: EdgeStackStatusDetails;
   Error: string;
