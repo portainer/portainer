@@ -12,18 +12,24 @@ import { EdgeGroup } from '../edge-groups/types';
 export enum StatusType {
   /** Pending represents a pending edge stack */
   Pending,
-  /** Ok represents a successfully deployed edge stack */
-  Ok,
+  /** DeploymentReceived represents an edge environment which received the edge stack deployment */
+  DeploymentReceived,
   /** Error represents an edge environment which failed to deploy its edge stack */
   Error,
   /** Acknowledged represents an acknowledged edge stack */
   Acknowledged,
-  /** Remove represents a removed edge stack */
-  Remove,
+  /** Removed represents a removed edge stack */
+  Removed,
   /** StatusRemoteUpdateSuccess represents a successfully updated edge stack */
   RemoteUpdateSuccess,
   /** ImagesPulled represents a successfully images-pulling */
   ImagesPulled,
+  /** Deploying represents an Edge stack which is being deployed */
+  Deploying,
+  /** Running represents a running Edge stack */
+  Running,
+  /** Removing represents an Edge stack which is being removed */
+  Removing,
 }
 
 export interface EdgeStackStatus {

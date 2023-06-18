@@ -1650,18 +1650,24 @@ const (
 const (
 	// EdgeStackStatusPending represents a pending edge stack
 	EdgeStackStatusPending EdgeStackStatusType = iota
-	//EdgeStackStatusOk represents a successfully deployed edge stack
-	EdgeStackStatusOk
-	//EdgeStackStatusError represents an edge environment(endpoint) which failed to deploy its edge stack
+	//EdgeStackStatusDeploymentReceived represents an edge environment which received the edge stack deployment
+	EdgeStackStatusDeploymentReceived
+	//EdgeStackStatusError represents an edge environment which failed to deploy its edge stack
 	EdgeStackStatusError
 	//EdgeStackStatusAcknowledged represents an acknowledged edge stack
 	EdgeStackStatusAcknowledged
-	//EdgeStackStatusRemove represents a removed edge stack (status isn't persisted)
-	EdgeStackStatusRemove
+	//EdgeStackStatusRemoved represents a removed edge stack
+	EdgeStackStatusRemoved
 	// StatusRemoteUpdateSuccess represents a successfully updated edge stack
 	EdgeStackStatusRemoteUpdateSuccess
 	// EdgeStackStatusImagesPulled represents a successfully images-pulling
 	EdgeStackStatusImagesPulled
+	// EdgeStackStatusRunning represents a running Edge stack
+	EdgeStackStatusRunning
+	// EdgeStackStatusDeploying represents an Edge stack which is being deployed
+	EdgeStackStatusDeploying
+	// EdgeStackStatusRemoving represents an Edge stack which is being removed
+	EdgeStackStatusRemoving
 )
 
 const (

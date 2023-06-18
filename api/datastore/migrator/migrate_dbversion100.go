@@ -115,7 +115,7 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 
 			if endpointOldStatus.Details.Ok {
 				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusOk,
+					Type:       portainer.EdgeStackStatusDeploymentReceived,
 					EndpointID: portainer.EndpointID(endpointID),
 					Time:       time.Now().Unix(),
 				})
@@ -131,7 +131,7 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 
 			if endpointOldStatus.Details.Remove {
 				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusRemove,
+					Type:       portainer.EdgeStackStatusRemoving,
 					EndpointID: portainer.EndpointID(endpointID),
 					Time:       time.Now().Unix(),
 				})

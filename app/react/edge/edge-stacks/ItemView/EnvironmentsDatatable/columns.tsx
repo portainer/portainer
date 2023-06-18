@@ -97,7 +97,7 @@ function endpointStatusLabel(statusArray: Array<EdgeStackStatus>) {
     if (status.Type === StatusType.ImagesPulled) {
       labels.push('Images pre-pulled');
     }
-    if (status.Type === StatusType.Ok) {
+    if (status.Type === StatusType.Running) {
       labels.push('Deployed');
     }
     if (status.Type === StatusType.Error) {

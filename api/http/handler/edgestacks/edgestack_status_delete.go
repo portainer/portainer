@@ -77,7 +77,7 @@ func (handler *Handler) deleteEdgeStackStatus(tx dataservices.DataStoreTx, stack
 
 	endpointStatus = append(endpointStatus, portainer.EdgeStackStatus{
 		Time:       time.Now().Unix(),
-		Type:       portainer.EdgeStackStatusRemove,
+		Type:       portainer.EdgeStackStatusRemoved,
 		EndpointID: portainer.EndpointID(endpoint.ID),
 	})
 

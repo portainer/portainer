@@ -80,7 +80,7 @@ export function EnvironmentsDatatable() {
                 { value: StatusType.Pending, label: 'Pending' },
                 { value: StatusType.Acknowledged, label: 'Acknowledged' },
                 { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
-                { value: StatusType.Ok, label: 'Deployed' },
+                { value: StatusType.Running, label: 'Deployed' },
                 { value: StatusType.Error, label: 'Failed' },
               ]}
             />
@@ -99,8 +99,8 @@ function parseStatusFilter(status: string | undefined): StatusType | undefined {
       return StatusType.Acknowledged;
     case 'ImagesPulled':
       return StatusType.ImagesPulled;
-    case 'Ok':
-      return StatusType.Ok;
+    case 'Running':
+      return StatusType.Running;
     case 'Error':
       return StatusType.Error;
     default:
