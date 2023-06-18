@@ -17,10 +17,11 @@ export function validation(): SchemaOf<FormValues> {
       hideFileUpload: boolean().required(),
       requireNoteOnApplications: boolean().required(),
       minApplicationNoteLength: number()
+        .typeError('Must be a number')
         .default(0)
         .when('requireNoteOnApplications', {
           is: true,
-          then: number().required(),
+          then: (schema) => schema.required().min(1, 'Minimum value is 1'),
         }),
     }),
   });

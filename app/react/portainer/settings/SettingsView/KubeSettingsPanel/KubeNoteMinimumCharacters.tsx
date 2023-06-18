@@ -11,7 +11,7 @@ import { useToggledValue } from '../useToggledValue';
 
 export function KubeNoteMinimumCharacters() {
   const [{ value }, { error }, { setValue }] = useField<number>(
-    'minApplicationNoteLength'
+    'globalDeploymentOptions.minApplicationNoteLength'
   );
   const [isEnabled, setIsEnabled] = useToggledValue(
     'globalDeploymentOptions.minApplicationNoteLength',
