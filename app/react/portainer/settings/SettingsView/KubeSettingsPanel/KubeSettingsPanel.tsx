@@ -27,7 +27,7 @@ export function KubeSettingsPanel() {
   }
 
   const initialValues: FormValues = {
-    helmRepositoryURL: settingsQuery.data.HelmRepositoryURL || '',
+    helmRepositoryUrl: settingsQuery.data.HelmRepositoryURL || '',
     kubeconfigExpiry: settingsQuery.data.KubeconfigExpiry || '0',
     globalDeploymentOptions: settingsQuery.data.GlobalDeploymentOptions || {
       requireNoteOnApplications: false,
@@ -80,7 +80,7 @@ export function KubeSettingsPanel() {
   function handleSubmit(values: FormValues) {
     mutation.mutate(
       {
-        HelmRepositoryURL: values.helmRepositoryURL,
+        HelmRepositoryURL: values.helmRepositoryUrl,
         KubeconfigExpiry: values.kubeconfigExpiry,
         GlobalDeploymentOptions: {
           ...values.globalDeploymentOptions,

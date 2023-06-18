@@ -1,4 +1,4 @@
-import { useField } from 'formik';
+import { Field, useField } from 'formik';
 
 import { TextTip } from '@@/Tip/TextTip';
 import { FormControl } from '@@/form-components/FormControl';
@@ -6,8 +6,7 @@ import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
 
 export function HelmSection() {
-  const [{ value, onChange, name, onBlur }, { error }] =
-    useField<string>('helmRepositoryURL');
+  const [{ name }, { error }] = useField<string>('helmRepositoryUrl');
 
   return (
     <FormSection title="Helm Repository">
@@ -26,13 +25,11 @@ export function HelmSection() {
       </div>
 
       <FormControl label="URL" errors={error} inputId="helm-repo-url">
-        <Input
+        <Field
+          as={Input}
           id="helm-repo-url"
           name={name}
           placeholder="https://charts.bitnami.com/bitnami"
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
         />
       </FormControl>
     </FormSection>

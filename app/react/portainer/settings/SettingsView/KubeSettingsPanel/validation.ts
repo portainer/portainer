@@ -6,7 +6,7 @@ import { FormValues } from './types';
 
 export function validation(): SchemaOf<FormValues> {
   return object().shape({
-    helmRepositoryURL: string()
+    helmRepositoryUrl: string()
       .default('')
       .test('valid-url', 'Invalid URL', (value) => !value || isValidUrl(value)),
     kubeconfigExpiry: string().required(),

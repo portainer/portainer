@@ -1,5 +1,5 @@
 export interface FormValues {
-  helmRepositoryURL: string;
+  helmRepositoryUrl: string;
   kubeconfigExpiry: string;
   globalDeploymentOptions: {
     hideAddWithForm: boolean;
