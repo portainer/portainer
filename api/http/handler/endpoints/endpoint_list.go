@@ -46,6 +46,8 @@ const (
 // @param edgeCheckInPassedSeconds query number false "if bigger then zero, show only edge agents that checked-in in the last provided seconds (relevant only for edge agents)"
 // @param excludeSnapshots query bool false "if true, the snapshot data won't be retrieved"
 // @param name query string false "will return only environments(endpoints) with this name"
+// @param edgeStackId query portainer.EdgeStackID false "will return the environements of the specified edge stack"
+// @param edgeStackStatus query string false "only applied when edgeStackId exists. Filter the returned environments based on their deployment status in the stack (not the environment status!)" Enum("Pending", "Ok", "Error", "Acknowledged", "Remove", "RemoteUpdateSuccess", "ImagesPulled")
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
 // @router /endpoints [get]

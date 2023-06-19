@@ -17,7 +17,7 @@ interface EdgeStackStatusDetails {
   ImagesPulled: boolean;
 }
 
-interface EdgeStackStatus {
+export interface EdgeStackStatus {
   Details: EdgeStackStatusDetails;
   Error: string;
   EndpointID: EnvironmentId;
