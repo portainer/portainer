@@ -403,7 +403,8 @@ export function IngressForm({
                 </div>
 
                 {!host.Paths.length && (
-                  <p className="small text-muted mt-4">
+                  <p className="small text-muted vertical-center mt-4 gap-1">
+                    <Icon icon={Info} mode="primary" size="md" />
                     You may save the ingress without a path and it will then be
                     an <b>ingress default</b> that a user may select via the
                     hostname dropdown in Create/Edit application.
