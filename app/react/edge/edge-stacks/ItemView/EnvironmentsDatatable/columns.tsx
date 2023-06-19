@@ -41,8 +41,8 @@ export const columns = _.compact([
       cell({ row: { original: env } }) {
         return isBE ? (
           <ul className="list-none space-y-2">
-            {env.StackStatus.map((s) => (
-              <li>
+            {env.StackStatus.map((s, index) => (
+              <li key={index}>
                 <Status value={s.Type} />
               </li>
             ))}
@@ -60,8 +60,8 @@ export const columns = _.compact([
       cell({ row: { original: env } }) {
         return (
           <ul className="list-none space-y-2">
-            {env.StackStatus.map((s) => (
-              <li>{isoDateFromTimestamp(s.Time)}</li>
+            {env.StackStatus.map((s, index) => (
+              <li key={index}>{isoDateFromTimestamp(s.Time)}</li>
             ))}
           </ul>
         );
