@@ -24,10 +24,10 @@ export enum StatusType {
   RemoteUpdateSuccess,
   /** ImagesPulled represents a successfully images-pulling */
   ImagesPulled,
-  /** Deploying represents an Edge stack which is being deployed */
-  Deploying,
   /** Running represents a running Edge stack */
   Running,
+  /** Deploying represents an Edge stack which is being deployed */
+  Deploying,
   /** Removing represents an Edge stack which is being removed */
   Removing,
 }
