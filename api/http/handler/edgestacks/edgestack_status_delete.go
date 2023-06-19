@@ -26,6 +26,7 @@ import (
 // @failure 400
 // @failure 404
 // @failure 403
+// @deprecated
 // @router /edge_stacks/{id}/status/{environmentId} [delete]
 func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
