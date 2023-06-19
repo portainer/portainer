@@ -91,7 +91,7 @@ export function EnvironmentsDatatable({
 
           <Button
             as={Link}
-            props={{ to: 'portainer.environments.new' }}
+            props={{ to: 'portainer.wizard.endpoints' }}
             icon={Plus}
             className="!m-0"
           >
