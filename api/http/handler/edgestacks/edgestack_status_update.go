@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/pkg/featureflags"
+	"github.com/rs/zerolog/log"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -19,6 +20,7 @@ type updateStatusPayload struct {
 	Error      string
 	Status     *portainer.EdgeStackStatusType
 	EndpointID portainer.EndpointID
+	Time       int64
 }
 
 func (payload *updateStatusPayload) Validate(r *http.Request) error {
@@ -34,6 +36,10 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 		return errors.New("error message is mandatory when status is error")
 	}
 
+	if payload.Time == 0 {
+		payload.Time = time.Now().Unix()
+	}
+
 	return nil
 }
 
@@ -44,6 +50,7 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "EdgeStack Id"
+// @param body body updateStatusPayload true "EdgeStack status payload"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
 // @failure 400
@@ -87,7 +94,14 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *http.Request, stackID portainer.EdgeStackID, payload updateStatusPayload) (*portainer.EdgeStack, error) {
 	stack, err := tx.EdgeStack().EdgeStack(stackID)
 	if err != nil {
-		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
+		// skip error because agent tries to report on deleted stack
+		log.Warn().
+			Err(err).
+			Int("stackID", int(stackID)).
+			Int("status", int(*payload.Status)).
+			Msg("Unable to find a stack inside the database, skipping error")
+
+		return nil, nil
 	}
 
 	environmentStatus, ok := stack.StatusArray[payload.EndpointID]
@@ -107,6 +121,11 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 
 	status := *payload.Status
 
+	log.Debug().
+		Int("stackID", int(stackID)).
+		Int("status", int(status)).
+		Msg("Updating stack status")
+
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = tx.EdgeStack().UpdateEdgeStackFunc(stackID, func(edgeStack *portainer.EdgeStack) {
 
@@ -114,7 +133,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 				Type:       status,
 				Error:      payload.Error,
 				EndpointID: portainer.EndpointID(payload.EndpointID),
-				Time:       time.Now().Unix(),
+				Time:       payload.Time,
 			})
 
 			stack.StatusArray[payload.EndpointID] = environmentStatus
