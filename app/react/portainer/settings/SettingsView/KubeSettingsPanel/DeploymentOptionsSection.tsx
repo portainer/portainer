@@ -26,7 +26,7 @@ export function DeploymentOptionsSection() {
             featureId={FeatureId.ENFORCE_DEPLOYMENT_OPTIONS}
             onChange={(value) => handleToggleAddWithForm(value)}
             labelClass="col-sm-3 col-lg-2"
-            tooltip="'Hides the 'Add with form' buttons and prevents adding/editing of resources via forms'"
+            tooltip="Hides the 'Add with form' buttons and prevents adding/editing of resources via forms"
           />
         </div>
       </div>

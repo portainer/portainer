@@ -1,7 +1,7 @@
 import { Form, Formik } from 'formik';
-import { Settings as SettingsIcon } from 'lucide-react';
 import { useQueryClient } from 'react-query';
 
+import kubeIcon from '@/assets/ico/kube.svg?c';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -43,7 +43,7 @@ export function KubeSettingsPanel() {
     <div className="row">
       <div className="col-sm-12">
         <Widget>
-          <Widget.Title icon={SettingsIcon} title="Kubernetes settings" />
+          <Widget.Title icon={kubeIcon} title="Kubernetes settings" />
           <Widget.Body>
             <Formik
               initialValues={initialValues}

@@ -21,7 +21,11 @@ export function validation(): SchemaOf<FormValues> {
         .default(0)
         .when('requireNoteOnApplications', {
           is: true,
-          then: (schema) => schema.required().min(1, 'Minimum value is 1'),
+          then: (schema) =>
+            schema
+              .required()
+              .min(1, 'Value should be between 1 to 9999')
+              .max(9999, 'Value should be between 1 to 9999'),
         }),
     }),
   });
