@@ -1,10 +1,11 @@
 package user
 
 import (
+	"errors"
 	"strings"
 
-	"github.com/portainer/portainer/api/dataservices"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
@@ -57,7 +58,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 		}),
 	)
 
-	if err == dataservices.ErrStop {
+	if errors.Is(err, dataservices.ErrStop) {
 		return &u, nil
 	}
 

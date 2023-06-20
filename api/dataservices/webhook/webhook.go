@@ -1,8 +1,10 @@
 package webhook
 
 import (
-	"github.com/portainer/portainer/api/dataservices"
+	"errors"
+
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
@@ -66,7 +68,7 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 		}),
 	)
 
-	if err == dataservices.ErrStop {
+	if errors.Is(err, dataservices.ErrStop) {
 		return &w, nil
 	}
 
@@ -89,7 +91,7 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 		}),
 	)
 
-	if err == dataservices.ErrStop {
+	if errors.Is(err, dataservices.ErrStop) {
 		return &w, nil
 	}
 

@@ -1,6 +1,7 @@
 package stack
 
 import (
+	"errors"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -57,7 +58,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 		}),
 	)
 
-	if err == dataservices.ErrStop {
+	if errors.Is(err, dataservices.ErrStop) {
 		return &s, nil
 	}
 
@@ -127,7 +128,7 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 		}),
 	)
 
-	if err == dataservices.ErrStop {
+	if errors.Is(err, dataservices.ErrStop) {
 		return &s, nil
 	}
 
