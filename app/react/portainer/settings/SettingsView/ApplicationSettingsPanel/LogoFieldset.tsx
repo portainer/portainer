@@ -6,7 +6,8 @@ import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
-import { useToggledValue } from './useToggledValue';
+import { useToggledValue } from '../useToggledValue';
+
 import { DemoAlert } from './DemoAlert';
 
 export function LogoFieldset() {

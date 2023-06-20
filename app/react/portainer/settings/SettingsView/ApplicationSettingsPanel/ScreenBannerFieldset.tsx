@@ -7,7 +7,8 @@ import { FormControl } from '@@/form-components/FormControl';
 import { TextArea } from '@@/form-components/Input/Textarea';
 import { SwitchField } from '@@/form-components/SwitchField';
 
-import { useToggledValue } from './useToggledValue';
+import { useToggledValue } from '../useToggledValue';
+
 import { DemoAlert } from './DemoAlert';
 
 export function ScreenBannerFieldset() {

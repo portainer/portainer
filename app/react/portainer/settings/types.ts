@@ -130,6 +130,7 @@ export interface Settings {
   AllowStackManagementForRegularUsers: boolean;
   AllowDeviceMappingForRegularUsers: boolean;
   AllowContainerCapabilitiesForRegularUsers: boolean;
+  GlobalDeploymentOptions?: GlobalDeploymentOptions;
   Edge: {
     PingInterval: number;
     SnapshotInterval: number;
@@ -148,6 +149,9 @@ interface GlobalDeploymentOptions {
   hideWebEditor: boolean;
   /** Hide the file upload option in the remaining visible forms */
   hideFileUpload: boolean;
+  /** Make note on application add/edit screen required */
+  requireNoteOnApplications: boolean;
+  minApplicationNoteLength: number;
 }
 
 export interface PublicSettingsResponse {
