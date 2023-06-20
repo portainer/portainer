@@ -24,18 +24,15 @@ export function EnvironmentsDatatable() {
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<StatusType>();
   const tableState = useTableStateWithoutStorage('name');
-  const endpointsQuery = useEnvironmentList(
-    {
-      pageLimit: tableState.pageSize,
-      page,
-      search: tableState.search,
-      sort: tableState.sortBy.id as 'Group' | 'Name',
-      order: tableState.sortBy.desc ? 'desc' : 'asc',
-      edgeStackId: stackId,
-      edgeStackStatus: statusFilter,
-    },
-    { enabled: !!edgeStackQuery.data }
-  );
+  const endpointsQuery = useEnvironmentList({
+    pageLimit: tableState.pageSize,
+    page,
+    search: tableState.search,
+    sort: tableState.sortBy.id as 'Group' | 'Name',
+    order: tableState.sortBy.desc ? 'desc' : 'asc',
+    edgeStackId: stackId,
+    edgeStackStatus: statusFilter,
+  });
 
   const environments: Array<EdgeStackEnvironment> = useMemo(
     () =>
