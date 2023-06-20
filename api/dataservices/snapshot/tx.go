@@ -1,8 +1,8 @@
 package snapshot
 
 import (
-	"github.com/portainer/portainer/api/dataservices"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type ServiceTx struct {
