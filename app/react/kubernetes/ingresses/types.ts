@@ -30,7 +30,7 @@ export type Ingress = {
   ClassName: string;
   Annotations?: Record<string, string>;
   Hosts?: string[];
-  Paths: Path[];
+  Paths: Path[] | null;
   TLS?: TLS[];
   Type?: string;
   Labels?: Record<string, string>;

@@ -7,10 +7,8 @@ import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureV
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceRegistriesSelector';
 import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
-import {
-  KubeServicesForm,
-  kubeServicesValidation,
-} from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
+import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
+import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
 import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
@@ -117,6 +115,6 @@ withFormValidation(
   ngModule,
   withUIRouter(withCurrentUser(withReactQuery(KubeServicesForm))),
   'kubeServicesForm',
-  ['values', 'onChange', 'appName', 'selector', 'isEditMode'],
+  ['values', 'onChange', 'appName', 'selector', 'isEditMode', 'namespace'],
   kubeServicesValidation
 );

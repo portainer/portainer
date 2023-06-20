@@ -64,6 +64,7 @@ export interface KubernetesConfiguration {
   EnableResourceOverCommit?: boolean;
   ResourceOverCommitPercentage?: number;
   RestrictDefaultNamespace?: boolean;
+  RestrictStandardUserIngressW?: boolean;
   IngressClasses: IngressClass[];
   IngressAvailabilityPerNamespace: boolean;
   AllowNoneIngressClass: boolean;

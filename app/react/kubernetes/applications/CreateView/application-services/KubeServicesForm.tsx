@@ -1,23 +1,23 @@
-import { SchemaOf, array, boolean, mixed, number, object, string } from 'yup';
 import { useEffect, useMemo, useState } from 'react';
 import { FormikErrors } from 'formik';
 
 import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
 
-import { Badge } from '@@/Badge';
+import { FormSection } from '@@/form-components/FormSection';
 
 import {
   ServiceFormValues,
-  ServicePort,
   ServiceTypeAngularEnum,
   ServiceTypeOption,
   ServiceTypeValue,
 } from './types';
 import { generateUniqueName } from './utils';
-import { ClusterIpServicesForm } from './ClusterIpServicesForm';
-import { ServiceTabs } from './ServiceTabs';
-import { NodePortServicesForm } from './NodePortServicesForm';
-import { LoadBalancerServicesForm } from './LoadBalancerServicesForm';
+import { ClusterIpServicesForm } from './cluster-ip/ClusterIpServicesForm';
+import { ServiceTabs } from './components/ServiceTabs';
+import { NodePortServicesForm } from './node-port/NodePortServicesForm';
+import { LoadBalancerServicesForm } from './load-balancer/LoadBalancerServicesForm';
+import { ServiceTabLabel } from './components/ServiceTabLabel';
+import { PublishingExplaination } from './PublishingExplaination';
 
 const serviceTypeEnumsToValues: Record<
   ServiceTypeAngularEnum,
@@ -35,6 +35,7 @@ interface Props {
   appName: string;
   selector: Record<string, string>;
   isEditMode: boolean;
+  namespace?: string;
 }
 
 export function KubeServicesForm({
@@ -44,15 +45,19 @@ export function KubeServicesForm({
   appName,
   selector,
   isEditMode,
+  namespace,
 }: Props) {
   const [selectedServiceType, setSelectedServiceType] =
     useState<ServiceTypeValue>('ClusterIP');
 
   // when the appName changes, update the names for each service
   // and the serviceNames for each service port
+  const newServiceNames = useMemo(
+    () => getUniqNames(appName, services),
+    [appName, services]
+  );
   useEffect(() => {
     if (!isEditMode) {
-      const newServiceNames = getUniqNames(appName, services);
       const newServices = services.map((service, index) => {
         const newServiceName = newServiceNames[index];
         const newServicePorts = service.Ports.map((port) => ({
@@ -70,53 +75,49 @@ export function KubeServicesForm({
     () => getServiceTypeCounts(services),
     [services]
   );
+
+  const serviceTypeHasErrors = useMemo(
+    () => getServiceTypeHasErrors(services, errors),
+    [services, errors]
+  );
+
   const serviceTypeOptions: ServiceTypeOption[] = [
     {
       value: 'ClusterIP',
       label: (
-        <div className="inline-flex items-center">
-          ClusterIP services
-          {serviceTypeCounts.ClusterIP && (
-            <Badge className="ml-2 flex-none">
-              {serviceTypeCounts.ClusterIP}
-            </Badge>
-          )}
-        </div>
+        <ServiceTabLabel
+          serviceTypeLabel="ClusterIP services"
+          serviceTypeCount={serviceTypeCounts.ClusterIP}
+          serviceTypeHasErrors={serviceTypeHasErrors.ClusterIP}
+        />
       ),
     },
     {
       value: 'NodePort',
       label: (
-        <div className="inline-flex items-center">
-          NodePort services
-          {serviceTypeCounts.NodePort && (
-            <Badge className="ml-2 flex-none">
-              {serviceTypeCounts.NodePort}
-            </Badge>
-          )}
-        </div>
+        <ServiceTabLabel
+          serviceTypeLabel="NodePort services"
+          serviceTypeCount={serviceTypeCounts.NodePort}
+          serviceTypeHasErrors={serviceTypeHasErrors.NodePort}
+        />
       ),
     },
     {
       value: 'LoadBalancer',
       label: (
-        <div className="inline-flex items-center">
-          LoadBalancer services
-          {serviceTypeCounts.LoadBalancer && (
-            <Badge className="ml-2 flex-none">
-              {serviceTypeCounts.LoadBalancer}
-            </Badge>
-          )}
-        </div>
+        <ServiceTabLabel
+          serviceTypeLabel="LoadBalancer services"
+          serviceTypeCount={serviceTypeCounts.LoadBalancer}
+          serviceTypeHasErrors={serviceTypeHasErrors.LoadBalancer}
+        />
       ),
     },
   ];
 
   return (
     <div className="flex flex-col">
-      <div className="col-sm-12 form-section-title">
-        Publishing the application
-      </div>
+      <FormSection title="Publishing the application" />
+      <PublishingExplaination />
       <ServiceTabs
         serviceTypeOptions={serviceTypeOptions}
         selectedServiceType={selectedServiceType}
@@ -129,6 +130,8 @@ export function KubeServicesForm({
           errors={errors}
           appName={appName}
           selector={selector}
+          namespace={namespace}
+          isEditMode={isEditMode}
         />
       )}
       {selectedServiceType === 'NodePort' && (
@@ -138,6 +141,8 @@ export function KubeServicesForm({
           errors={errors}
           appName={appName}
           selector={selector}
+          namespace={namespace}
+          isEditMode={isEditMode}
         />
       )}
       {selectedServiceType === 'LoadBalancer' && (
@@ -147,6 +152,8 @@ export function KubeServicesForm({
           errors={errors}
           appName={appName}
           selector={selector}
+          namespace={namespace}
+          isEditMode={isEditMode}
         />
       )}
     </div>
@@ -189,222 +196,22 @@ function getServiceTypeCounts(
   }, {} as Record<ServiceTypeValue, number>);
 }
 
-// values returned from the angular parent component (pascal case instead of camel case keys),
-// these should match the form values, but don't. Future tech debt work to update this would be nice
-// to make the converted values and formValues objects to be the same
-interface NodePortValues {
-  Port: number;
-  TargetPort: number;
-  NodePort: number;
-  Name?: string;
-  Protocol?: string;
-  Ingress?: string;
-}
-
-type ServiceValues = {
-  Type: number;
-  Name: string;
-  Ports: NodePortValues[];
-};
-
-type NodePortValidationContext = {
-  nodePortServices: ServiceValues[];
-  formServices: ServiceFormValues[];
-};
-
-export function kubeServicesValidation(
-  validationData?: NodePortValidationContext
-): SchemaOf<ServiceFormValues[]> {
-  return array(
-    object({
-      Headless: boolean().required(),
-      Namespace: string(),
-      Name: string(),
-      StackName: string(),
-      Type: mixed().oneOf([
-        KubernetesApplicationPublishingTypes.CLUSTER_IP,
-        KubernetesApplicationPublishingTypes.NODE_PORT,
-        KubernetesApplicationPublishingTypes.LOAD_BALANCER,
-      ]),
-      ClusterIP: string(),
-      ApplicationName: string(),
-      ApplicationOwner: string(),
-      Note: string(),
-      Ingress: boolean().required(),
-      Selector: object(),
-      Ports: array(
-        object({
-          port: number()
-            .required('Service port number is required.')
-            .min(1, 'Service port number must be inside the range 1-65535.')
-            .max(65535, 'Service port number must be inside the range 1-65535.')
-            .test(
-              'service-port-is-unique',
-              'Service port number must be unique.',
-              (servicePort, context) => {
-                // test for duplicate service ports within this service.
-                // yup gives access to context.parent which gives one ServicePort object.
-                // yup also gives access to all form values through this.options.context.
-                // Unfortunately, it doesn't give direct access to all Ports within the current service.
-                // To find all ports in the service for validation, I'm filtering the services by the service name,
-                // that's stored in the ServicePort object, then getting all Ports in the service.
-                if (servicePort === undefined || validationData === undefined) {
-                  return true;
-                }
-                const { formServices } = validationData;
-                const matchingService = getServiceForPort(
-                  context.parent as ServicePort,
-                  formServices
-                );
-                if (matchingService === undefined) {
-                  return true;
-                }
-                const servicePorts = matchingService.Ports;
-                const duplicateServicePortCount = servicePorts.filter(
-                  (port) => port.port === servicePort
-                ).length;
-                return duplicateServicePortCount <= 1;
-              }
-            ),
-          targetPort: number()
-            .required('Container port number is required.')
-            .min(1, 'Container port number must be inside the range 1-65535.')
-            .max(
-              65535,
-              'Container port number must be inside the range 1-65535.'
-            ),
-          name: string(),
-          serviceName: string().required(),
-          protocol: string(),
-          nodePort: number()
-            .test(
-              'node-port-is-unique-in-service',
-              'Node port is already used in this service.',
-              (nodePort, context) => {
-                if (nodePort === undefined || validationData === undefined) {
-                  return true;
-                }
-                const { formServices } = validationData;
-                const matchingService = getServiceForPort(
-                  context.parent as ServicePort,
-                  formServices
-                );
-                if (
-                  matchingService === undefined ||
-                  matchingService.Type !==
-                    KubernetesApplicationPublishingTypes.NODE_PORT // ignore validation unless the service is of type nodeport
-                ) {
-                  return true;
-                }
-                const servicePorts = matchingService.Ports;
-                const duplicateNodePortCount = servicePorts.filter(
-                  (port) => port.nodePort === nodePort
-                ).length;
-                return duplicateNodePortCount <= 1;
-              }
-            )
-            .test(
-              'node-port-is-unique-in-cluster',
-              'Node port is already used.',
-              (nodePort, context) => {
-                if (nodePort === undefined || validationData === undefined) {
-                  return true;
-                }
-                const { formServices, nodePortServices } = validationData;
-                const matchingService = getServiceForPort(
-                  context.parent as ServicePort,
-                  formServices
-                );
-
-                if (
-                  matchingService === undefined ||
-                  matchingService.Type !==
-                    KubernetesApplicationPublishingTypes.NODE_PORT // ignore validation unless the service is of type nodeport
-                ) {
-                  return true;
-                }
-
-                // create a list of all the node ports (number[]) in the cluster, from services that aren't in the application form
-                const formServiceNames = formServices.map(
-                  (formService) => formService.Name
-                );
-                const clusterNodePortsWithoutFormServices = nodePortServices
-                  .filter(
-                    (npService) => !formServiceNames.includes(npService.Name)
-                  )
-                  .flatMap((npService) => npService.Ports)
-                  .map((npServicePorts) => npServicePorts.NodePort);
-                // node ports in the current form, excluding the current service
-                const formNodePortsWithoutCurrentService = formServices
-                  .filter(
-                    (formService) =>
-                      formService.Type ===
-                        KubernetesApplicationPublishingTypes.NODE_PORT &&
-                      formService.Name !== matchingService.Name
-                  )
-                  .flatMap((formService) => formService.Ports)
-                  .map((formServicePorts) => formServicePorts.nodePort);
-                return (
-                  !clusterNodePortsWithoutFormServices.includes(nodePort) && // node port is not in the cluster services that aren't in the application form
-                  !formNodePortsWithoutCurrentService.includes(nodePort) // and the node port is not in the current form, excluding the current service
-                );
-              }
-            )
-            .test(
-              'node-port-minimum',
-              'Nodeport number must be inside the range 30000-32767 or blank for system allocated.',
-              (nodePort, context) => {
-                if (nodePort === undefined || validationData === undefined) {
-                  return true;
-                }
-                const { formServices } = validationData;
-                const matchingService = getServiceForPort(
-                  context.parent as ServicePort,
-                  formServices
-                );
-                if (
-                  !matchingService ||
-                  matchingService.Type !==
-                    KubernetesApplicationPublishingTypes.NODE_PORT
-                ) {
-                  return true;
-                }
-                return nodePort >= 30000;
-              }
-            )
-            .test(
-              'node-port-maximum',
-              'Nodeport number must be inside the range 30000-32767 or blank for system allocated.',
-              (nodePort, context) => {
-                if (nodePort === undefined || validationData === undefined) {
-                  return true;
-                }
-                const { formServices } = validationData;
-                const matchingService = getServiceForPort(
-                  context.parent as ServicePort,
-                  formServices
-                );
-                if (
-                  !matchingService ||
-                  matchingService.Type !==
-                    KubernetesApplicationPublishingTypes.NODE_PORT
-                ) {
-                  return true;
-                }
-                return nodePort <= 32767;
-              }
-            ),
-          ingress: object(),
-        })
-      ),
-      Annotations: array(),
-    })
-  );
-}
-
-function getServiceForPort(
-  servicePort: ServicePort,
-  services: ServiceFormValues[]
-) {
-  return services.find((service) => service.Name === servicePort.serviceName);
+/**
+ * getServiceTypeHasErrors returns a map of service types to whether or not they have errors
+ */
+function getServiceTypeHasErrors(
+  services: ServiceFormValues[],
+  errors: FormikErrors<ServiceFormValues[] | undefined>
+): Record<ServiceTypeValue, boolean> {
+  return services.reduce((acc, service, index) => {
+    const type = serviceTypeEnumsToValues[service.Type];
+    const serviceHasErrors = !!errors?.[index];
+    // if the service type already has an error, don't overwrite it
+    if (acc[type] === true) return acc;
+    // otherwise, set the error to the value of serviceHasErrors
+    return {
+      ...acc,
+      [type]: serviceHasErrors,
+    };
+  }, {} as Record<ServiceTypeValue, boolean>);
 }

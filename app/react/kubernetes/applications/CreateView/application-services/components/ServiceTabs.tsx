@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { ServiceTypeOption, ServiceTypeValue } from './types';
+import { ServiceTypeOption, ServiceTypeValue } from '../types';
 
 type Props = {
   serviceTypeOptions: ServiceTypeOption[];

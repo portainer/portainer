@@ -3,26 +3,32 @@ import { ChangeEvent } from 'react';
 import { InputGroup } from '@@/form-components/InputGroup';
 
 type Props = {
-  index: number;
+  serviceIndex: number;
+  portIndex: number;
   value?: number;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function ContainerPortInput({ index, value, onChange }: Props) {
+export function ServicePortInput({
+  serviceIndex,
+  portIndex,
+  value,
+  onChange,
+}: Props) {
   return (
     <InputGroup size="small">
-      <InputGroup.Addon required>Container port</InputGroup.Addon>
+      <InputGroup.Addon required>Service port</InputGroup.Addon>
       <InputGroup.Input
         type="number"
         className="form-control min-w-max"
-        name={`container_port_${index}`}
+        name={`service_port_${portIndex}`}
         placeholder="80"
         min="1"
         max="65535"
         value={value ?? ''}
         onChange={onChange}
         required
-        data-cy={`k8sAppCreate-containerPort_${index}`}
+        data-cy={`k8sAppCreate-servicePort-${serviceIndex}-${portIndex}`}
       />
     </InputGroup>
   );

@@ -9,11 +9,17 @@ export interface ServicePort {
   serviceName?: string;
   name?: string;
   protocol?: string;
-  ingress?: object;
+  ingressPaths?: ServicePortIngressPath[];
 }
 
 export type ServiceTypeAngularEnum =
   (typeof KubernetesApplicationPublishingTypes)[keyof typeof KubernetesApplicationPublishingTypes];
+
+export type ServicePortIngressPath = {
+  IngressName?: string;
+  Host?: string;
+  Path?: string;
+};
 
 export type ServiceFormValues = {
   Headless: boolean;
@@ -34,4 +40,10 @@ export type ServiceTypeValue = 'ClusterIP' | 'NodePort' | 'LoadBalancer';
 export type ServiceTypeOption = {
   value: ServiceTypeValue;
   label: ReactNode;
+};
+
+export type IngressOption = {
+  label: string;
+  value: string;
+  ingressName: string;
 };

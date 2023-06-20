@@ -7,11 +7,13 @@ import { FormSectionTitle } from '../FormSectionTitle';
 
 interface Props {
   title: ReactNode;
+  titleSize?: 'sm' | 'md' | 'lg';
   isFoldable?: boolean;
 }
 
 export function FormSection({
   title,
+  titleSize = 'md',
   children,
   isFoldable = false,
 }: PropsWithChildren<Props>) {
@@ -19,7 +21,10 @@ export function FormSection({
 
   return (
     <>
-      <FormSectionTitle htmlFor={isFoldable ? `foldingButton${title}` : ''}>
+      <FormSectionTitle
+        htmlFor={isFoldable ? `foldingButton${title}` : ''}
+        titleSize={titleSize}
+      >
         {isFoldable && (
           <button
             id={`foldingButton${title}`}

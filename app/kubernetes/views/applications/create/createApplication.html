@@ -1306,8 +1306,9 @@
                   load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
                   app-name="ctrl.formValues.Name"
                   selector="ctrl.formValues.Selector"
-                  validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services}"
+                  validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
                   is-edit-mode="ctrl.state.isEdit"
+                  namespace="ctrl.formValues.ResourcePool.Namespace.Name"
                 ></kube-services-form>
                 <!-- kubernetes services options -->
 
@@ -1355,8 +1356,9 @@
                 values="ctrl.formValues.Services"
                 app-name="ctrl.formValues.Name"
                 selector="ctrl.formValues.Selector"
-                validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services}"
+                validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
                 is-edit-mode="ctrl.state.isEdit"
+                namespace="ctrl.formValues.ResourcePool.Namespace.Name"
               ></kube-services-form>
               <!-- kubernetes services options -->
             </div>

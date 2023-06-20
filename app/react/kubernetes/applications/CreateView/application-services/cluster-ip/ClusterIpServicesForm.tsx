@@ -7,8 +7,13 @@ import { Card } from '@@/Card';
 import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
 
-import { generateUniqueName, newPort, serviceFormDefaultValues } from './utils';
-import { ServiceFormValues, ServicePort } from './types';
+import {
+  generateUniqueName,
+  newPort,
+  serviceFormDefaultValues,
+} from '../utils';
+import { ServiceFormValues, ServicePort } from '../types';
+
 import { ClusterIpServiceForm } from './ClusterIpServiceForm';
 
 interface Props {
@@ -17,6 +22,8 @@ interface Props {
   errors?: FormikErrors<ServiceFormValues[]>;
   appName: string;
   selector: Record<string, string>;
+  namespace?: string;
+  isEditMode?: boolean;
 }
 
 export function ClusterIpServicesForm({
@@ -25,6 +32,8 @@ export function ClusterIpServicesForm({
   errors,
   appName,
   selector,
+  namespace,
+  isEditMode,
 }: Props) {
   const clusterIPServiceCount = services.filter(
     (service) =>
@@ -56,6 +65,8 @@ export function ClusterIpServicesForm({
                   services={services}
                   serviceIndex={index}
                   onChangeService={onChangeService}
+                  namespace={namespace}
+                  isEditMode={isEditMode}
                 />
               ) : null
             )}

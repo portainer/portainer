@@ -41,7 +41,7 @@ export function ApplicationIngressesTable({
           <td className="w-[10%]">Path</td>
           <td className="w-[15%]">HTTP Route</td>
         </tr>
-        {ingressPathsForAppServices.map((ingressPath, index) => (
+        {ingressPathsForAppServices?.map((ingressPath, index) => (
           <tr key={index}>
             <td>
               <Authorized authorizations="K8sIngressesW">
@@ -94,7 +94,10 @@ function getIngressPathsForAppServices(
   }
   const matchingIngressesPaths = ingresses.flatMap((ingress) => {
     // for each ingress get an array of ingress paths that match the app services
-    const matchingIngressPaths = ingress.Paths.filter((path) =>
+    if (!ingress.Paths) {
+      return [];
+    }
+    const matchingIngressPaths = ingress.Paths?.filter((path) =>
       services?.some((service) => {
         const servicePorts = service.spec?.ports?.map((port) => port.port);
         // include the ingress if the ingress path has a matching service name and port
