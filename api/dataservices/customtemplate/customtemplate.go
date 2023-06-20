@@ -1,17 +1,12 @@
 package customtemplate
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "customtemplates"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "customtemplates"
 
 // Service represents a service for managing custom template data.
 type Service struct {
@@ -38,22 +33,11 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 	var customTemplates = make([]portainer.CustomTemplate, 0)
 
-	err := service.connection.GetAll(
+	return customTemplates, service.connection.GetAll(
 		BucketName,
 		&portainer.CustomTemplate{},
-		func(obj interface{}) (interface{}, error) {
-			//var tag portainer.Tag
-			customTemplate, ok := obj.(*portainer.CustomTemplate)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to CustomTemplate object")
-				return nil, fmt.Errorf("Failed to convert to CustomTemplate object: %s", obj)
-			}
-			customTemplates = append(customTemplates, *customTemplate)
-
-			return &portainer.CustomTemplate{}, nil
-		})
-
-	return customTemplates, err
+		dataservices.AppendFn(&customTemplates),
+	)
 }
 
 // CustomTemplate returns an custom template by ID.

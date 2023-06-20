@@ -1,13 +1,11 @@
 package dataservices
 
 import (
-	"errors"
 	"io"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
-	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 type (
@@ -322,7 +320,3 @@ type (
 		BucketName() string
 	}
 )
-
-func IsErrObjectNotFound(e error) bool {
-	return errors.Is(e, dserrors.ErrObjectNotFound)
-}

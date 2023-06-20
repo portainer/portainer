@@ -1,17 +1,12 @@
 package schedule
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "schedules"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "schedules"
 
 // Service represents a service for managing schedule data.
 type Service struct {
@@ -63,22 +58,11 @@ func (service *Service) DeleteSchedule(ID portainer.ScheduleID) error {
 func (service *Service) Schedules() ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.connection.GetAll(
+	return schedules, service.connection.GetAll(
 		BucketName,
 		&portainer.Schedule{},
-		func(obj interface{}) (interface{}, error) {
-			schedule, ok := obj.(*portainer.Schedule)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
-				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
-			}
-
-			schedules = append(schedules, *schedule)
-
-			return &portainer.Schedule{}, nil
-		})
-
-	return schedules, err
+		dataservices.AppendFn(&schedules),
+	)
 }
 
 // SchedulesByJobType return a array containing all the schedules
@@ -86,24 +70,13 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.connection.GetAll(
+	return schedules, service.connection.GetAll(
 		BucketName,
 		&portainer.Schedule{},
-		func(obj interface{}) (interface{}, error) {
-			schedule, ok := obj.(*portainer.Schedule)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
-				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
-			}
-
-			if schedule.JobType == jobType {
-				schedules = append(schedules, *schedule)
-			}
-
-			return &portainer.Schedule{}, nil
-		})
-
-	return schedules, err
+		dataservices.FilterFn(&schedules, func(e portainer.Schedule) bool {
+			return e.JobType == jobType
+		}),
+	)
 }
 
 // Create assign an ID to a new schedule and saves it.

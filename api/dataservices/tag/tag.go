@@ -1,11 +1,8 @@
 package tag
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 const (
@@ -45,22 +42,11 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
 
-	err := service.connection.GetAll(
+	return tags, service.connection.GetAll(
 		BucketName,
 		&portainer.Tag{},
-		func(obj interface{}) (interface{}, error) {
-			tag, ok := obj.(*portainer.Tag)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Tag object")
-				return nil, fmt.Errorf("Failed to convert to Tag object: %s", obj)
-			}
-
-			tags = append(tags, *tag)
-
-			return &portainer.Tag{}, nil
-		})
-
-	return tags, err
+		dataservices.AppendFn(&tags),
+	)
 }
 
 // Tag returns a tag by ID.

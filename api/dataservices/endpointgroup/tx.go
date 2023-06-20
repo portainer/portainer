@@ -1,11 +1,8 @@
 package endpointgroup
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type ServiceTx struct {
@@ -46,22 +43,11 @@ func (service ServiceTx) DeleteEndpointGroup(ID portainer.EndpointGroupID) error
 func (service ServiceTx) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	var endpointGroups = make([]portainer.EndpointGroup, 0)
 
-	err := service.tx.GetAll(
+	return endpointGroups, service.tx.GetAll(
 		BucketName,
 		&portainer.EndpointGroup{},
-		func(obj interface{}) (interface{}, error) {
-			endpointGroup, ok := obj.(*portainer.EndpointGroup)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointGroup object")
-				return nil, fmt.Errorf("failed to convert to EndpointGroup object: %s", obj)
-			}
-
-			endpointGroups = append(endpointGroups, *endpointGroup)
-
-			return &portainer.EndpointGroup{}, nil
-		})
-
-	return endpointGroups, err
+		dataservices.AppendFn(&endpointGroups),
+	)
 }
 
 // CreateEndpointGroup assign an ID to a new environment(endpoint) group and saves it.

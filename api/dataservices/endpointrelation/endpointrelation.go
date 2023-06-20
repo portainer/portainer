@@ -1,9 +1,8 @@
 package endpointrelation
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 
 	"github.com/rs/zerolog/log"
@@ -54,22 +53,11 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	var all = make([]portainer.EndpointRelation, 0)
 
-	err := service.connection.GetAll(
+	return all, service.connection.GetAll(
 		BucketName,
 		&portainer.EndpointRelation{},
-		func(obj interface{}) (interface{}, error) {
-			r, ok := obj.(*portainer.EndpointRelation)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
-				return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
-			}
-
-			all = append(all, *r)
-
-			return &portainer.EndpointRelation{}, nil
-		})
-
-	return all, err
+		dataservices.AppendFn(&all),
+	)
 }
 
 // EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
