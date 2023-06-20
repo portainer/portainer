@@ -12,8 +12,24 @@ export function PublishingExplaination() {
           width={646}
           className="flex w-full max-w-2xl basis-1/2 flex-col object-contain lg:w-1/2"
         />
-        <div className="ml-8 mt-4 basis-1/2">
-          Expose the application workload:
+        <div className="ml-8 basis-1/2">
+          Expose the application workload via{' '}
+          <a
+            href="https://kubernetes.io/docs/concepts/services-networking/service/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            services
+          </a>{' '}
+          and{' '}
+          <a
+            href="https://kubernetes.io/docs/concepts/services-networking/ingress/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ingresses
+          </a>
+          :
           <ul className="mt-3 ml-5 [&>li]:mb-3 [&>li>ul>li]:ml-5">
             <li>
               <b>Inside</b> the cluster{' '}
