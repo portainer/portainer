@@ -28,10 +28,7 @@ func (tx *DbTransaction) GetObject(bucketName string, key []byte, object interfa
 		return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 	}
 
-	data := make([]byte, len(value))
-	copy(data, value)
-
-	return tx.conn.UnmarshalObjectWithJsoniter(data, object)
+	return tx.conn.UnmarshalObjectWithJsoniter(value, object)
 }
 
 func (tx *DbTransaction) UpdateObject(bucketName string, key []byte, object interface{}) error {
