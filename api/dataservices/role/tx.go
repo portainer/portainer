@@ -1,11 +1,8 @@
 package role
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // Service represents a service for managing environment(endpoint) data.
@@ -35,22 +32,11 @@ func (service ServiceTx) Role(ID portainer.RoleID) (*portainer.Role, error) {
 func (service ServiceTx) Roles() ([]portainer.Role, error) {
 	var sets = make([]portainer.Role, 0)
 
-	err := service.tx.GetAll(
+	return sets, service.tx.GetAll(
 		BucketName,
 		&portainer.Role{},
-		func(obj interface{}) (interface{}, error) {
-			set, ok := obj.(*portainer.Role)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Role object")
-				return nil, fmt.Errorf("failed to convert to Role object: %s", obj)
-			}
-
-			sets = append(sets, *set)
-
-			return &portainer.Role{}, nil
-		})
-
-	return sets, err
+		dataservices.AppendFn(&sets),
+	)
 }
 
 // CreateRole creates a new Role.

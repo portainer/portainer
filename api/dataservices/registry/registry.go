@@ -1,11 +1,8 @@
 package registry
 
 import (
-	"fmt"
-
+	"github.com/portainer/portainer/api/dataservices"
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -56,22 +53,11 @@ func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, 
 func (service *Service) Registries() ([]portainer.Registry, error) {
 	var registries = make([]portainer.Registry, 0)
 
-	err := service.connection.GetAll(
+	return registries, service.connection.GetAll(
 		BucketName,
 		&portainer.Registry{},
-		func(obj interface{}) (interface{}, error) {
-			registry, ok := obj.(*portainer.Registry)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Registry object")
-				return nil, fmt.Errorf("Failed to convert to Registry object: %s", obj)
-			}
-
-			registries = append(registries, *registry)
-
-			return &portainer.Registry{}, nil
-		})
-
-	return registries, err
+		dataservices.AppendFn(&registries),
+	)
 }
 
 // Create creates a new registry.

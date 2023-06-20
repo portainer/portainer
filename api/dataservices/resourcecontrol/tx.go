@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/rs/zerolog/log"
 )
@@ -72,22 +73,11 @@ func (service ServiceTx) ResourceControlByResourceIDAndType(resourceID string, r
 func (service ServiceTx) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
 
-	err := service.tx.GetAll(
+	return rcs, service.tx.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},
-		func(obj interface{}) (interface{}, error) {
-			rc, ok := obj.(*portainer.ResourceControl)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to ResourceControl object")
-				return nil, fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
-			}
-
-			rcs = append(rcs, *rc)
-
-			return &portainer.ResourceControl{}, nil
-		})
-
-	return rcs, err
+		dataservices.AppendFn(&rcs),
+	)
 }
 
 // CreateResourceControl creates a new ResourceControl object

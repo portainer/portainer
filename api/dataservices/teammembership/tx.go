@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/rs/zerolog/log"
 )
@@ -34,70 +35,37 @@ func (service ServiceTx) TeamMembership(ID portainer.TeamMembershipID) (*portain
 func (service ServiceTx) TeamMemberships() ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.tx.GetAll(
+	return memberships, service.tx.GetAll(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (interface{}, error) {
-			membership, ok := obj.(*portainer.TeamMembership)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-				return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-			}
-
-			memberships = append(memberships, *membership)
-
-			return &portainer.TeamMembership{}, nil
-		})
-
-	return memberships, err
+		dataservices.AppendFn(&memberships),
+	)
 }
 
 // TeamMembershipsByUserID return an array containing all the TeamMembership objects where the specified userID is present.
 func (service ServiceTx) TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.tx.GetAll(
+	return memberships, service.tx.GetAll(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (interface{}, error) {
-			membership, ok := obj.(*portainer.TeamMembership)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-				return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-			}
-
-			if membership.UserID == userID {
-				memberships = append(memberships, *membership)
-			}
-
-			return &portainer.TeamMembership{}, nil
-		})
-
-	return memberships, err
+		dataservices.FilterFn(&memberships, func(e portainer.TeamMembership) bool {
+			return e.UserID == userID
+		}),
+	)
 }
 
 // TeamMembershipsByTeamID return an array containing all the TeamMembership objects where the specified teamID is present.
 func (service ServiceTx) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.tx.GetAll(
+	return memberships, service.tx.GetAll(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (interface{}, error) {
-			membership, ok := obj.(*portainer.TeamMembership)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
-				return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
-			}
-
-			if membership.TeamID == teamID {
-				memberships = append(memberships, *membership)
-			}
-
-			return &portainer.TeamMembership{}, nil
-		})
-
-	return memberships, err
+		dataservices.FilterFn(&memberships, func(e portainer.TeamMembership) bool {
+			return e.TeamID == teamID
+		}),
+	)
 }
 
 // UpdateTeamMembership saves a TeamMembership object.

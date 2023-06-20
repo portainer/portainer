@@ -1,17 +1,12 @@
 package helmuserrepository
 
 import (
-	"fmt"
-
+	"github.com/portainer/portainer/api/dataservices"
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "helm_user_repository"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "helm_user_repository"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
@@ -38,46 +33,24 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) HelmUserRepositories() ([]portainer.HelmUserRepository, error) {
 	var repos = make([]portainer.HelmUserRepository, 0)
 
-	err := service.connection.GetAll(
+	return repos, service.connection.GetAll(
 		BucketName,
 		&portainer.HelmUserRepository{},
-		func(obj interface{}) (interface{}, error) {
-			r, ok := obj.(*portainer.HelmUserRepository)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to HelmUserRepository object")
-				return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
-			}
-
-			repos = append(repos, *r)
-
-			return &portainer.HelmUserRepository{}, nil
-		})
-
-	return repos, err
+		dataservices.AppendFn(&repos),
+	)
 }
 
 // HelmUserRepositoryByUserID return an array containing all the HelmUserRepository objects where the specified userID is present.
 func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error) {
 	var result = make([]portainer.HelmUserRepository, 0)
 
-	err := service.connection.GetAll(
+	return result, service.connection.GetAll(
 		BucketName,
 		&portainer.HelmUserRepository{},
-		func(obj interface{}) (interface{}, error) {
-			record, ok := obj.(*portainer.HelmUserRepository)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to HelmUserRepository object")
-				return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
-			}
-
-			if record.UserID == userID {
-				result = append(result, *record)
-			}
-
-			return &portainer.HelmUserRepository{}, nil
-		})
-
-	return result, err
+		dataservices.FilterFn(&result, func(e portainer.HelmUserRepository) bool {
+			return e.UserID == userID
+		}),
+	)
 }
 
 // CreateHelmUserRepository creates a new HelmUserRepository object.

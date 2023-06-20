@@ -1,9 +1,8 @@
 package endpoint
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 
 	"github.com/rs/zerolog/log"
@@ -80,22 +79,11 @@ func (service ServiceTx) DeleteEndpoint(ID portainer.EndpointID) error {
 func (service ServiceTx) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	err := service.tx.GetAllWithJsoniter(
+	return endpoints, service.tx.GetAllWithJsoniter(
 		BucketName,
 		&portainer.Endpoint{},
-		func(obj interface{}) (interface{}, error) {
-			endpoint, ok := obj.(*portainer.Endpoint)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Endpoint object")
-				return nil, fmt.Errorf("failed to convert to Endpoint object: %s", obj)
-			}
-
-			endpoints = append(endpoints, *endpoint)
-
-			return &portainer.Endpoint{}, nil
-		})
-
-	return endpoints, err
+		dataservices.AppendFn(&endpoints),
+	)
 }
 
 func (service ServiceTx) EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool) {

@@ -1,19 +1,13 @@
 package webhook
 
 import (
-	"errors"
-	"fmt"
-
+	"github.com/portainer/portainer/api/dataservices"
 	portainer "github.com/portainer/portainer/api"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
-
-	"github.com/rs/zerolog/log"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "webhooks"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "webhooks"
 
 // Service represents a service for managing webhook data.
 type Service struct {
@@ -40,22 +34,11 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 	var webhooks = make([]portainer.Webhook, 0)
 
-	err := service.connection.GetAll(
+	return webhooks, service.connection.GetAll(
 		BucketName,
 		&portainer.Webhook{},
-		func(obj interface{}) (interface{}, error) {
-			webhook, ok := obj.(*portainer.Webhook)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Webhook object")
-				return nil, fmt.Errorf("Failed to convert to Webhook object: %s", obj)
-			}
-
-			webhooks = append(webhooks, *webhook)
-
-			return &portainer.Webhook{}, nil
-		})
-
-	return webhooks, err
+		dataservices.AppendFn(&webhooks),
+	)
 }
 
 // Webhook returns a webhook by ID.
@@ -73,29 +56,18 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 
 // WebhookByResourceID returns a webhook by the ResourceID it is associated with.
 func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, error) {
-	var w *portainer.Webhook
-	stop := fmt.Errorf("ok")
+	var w portainer.Webhook
+
 	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Webhook{},
-		func(obj interface{}) (interface{}, error) {
-			webhook, ok := obj.(*portainer.Webhook)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Webhook object")
+		dataservices.FirstFn(&w, func(e portainer.Webhook) bool {
+			return e.ResourceID == ID
+		}),
+	)
 
-				return nil, fmt.Errorf("Failed to convert to Webhook object: %s", obj)
-			}
-
-			if webhook.ResourceID == ID {
-				w = webhook
-				return nil, stop
-			}
-
-			return &portainer.Webhook{}, nil
-		})
-
-	if errors.Is(err, stop) {
-		return w, nil
+	if err == dataservices.ErrStop {
+		return &w, nil
 	}
 
 	if err == nil {
@@ -107,29 +79,18 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 
 // WebhookByToken returns a webhook by the random token it is associated with.
 func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error) {
-	var w *portainer.Webhook
-	stop := fmt.Errorf("ok")
+	var w portainer.Webhook
+
 	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Webhook{},
-		func(obj interface{}) (interface{}, error) {
-			webhook, ok := obj.(*portainer.Webhook)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Webhook object")
+		dataservices.FirstFn(&w, func(e portainer.Webhook) bool {
+			return e.Token == token
+		}),
+	)
 
-				return nil, fmt.Errorf("Failed to convert to Webhook object: %s", obj)
-			}
-
-			if webhook.Token == token {
-				w = webhook
-				return nil, stop
-			}
-
-			return &portainer.Webhook{}, nil
-		})
-
-	if errors.Is(err, stop) {
-		return w, nil
+	if err == dataservices.ErrStop {
+		return &w, nil
 	}
 
 	if err == nil {
