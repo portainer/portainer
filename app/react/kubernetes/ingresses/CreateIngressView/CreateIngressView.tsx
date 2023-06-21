@@ -646,10 +646,18 @@ export function CreateIngressView() {
   function addNewIngressHost(noHost = false) {
     const rule = { ...ingressRule };
 
+    const path: Path = {
+      Key: uuidv4(),
+      ServiceName: '',
+      ServicePort: 0,
+      Route: '',
+      PathType: 'Prefix',
+    };
+
     const host: Host = {
       Host: '',
       Secret: '',
-      Paths: [],
+      Paths: noHost ? [path] : [],
       NoHost: noHost,
       Key: uuidv4(),
     };
