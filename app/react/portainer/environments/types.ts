@@ -170,7 +170,7 @@ export type Environment = {
   /**
    *  A message that describes the status. Should be included for Status Provisioning or Error.
    */
-  StatusMessage: EnvironmentStatusMessage;
+  StatusMessage?: EnvironmentStatusMessage;
 };
 
 /**
