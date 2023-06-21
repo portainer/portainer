@@ -38,12 +38,12 @@ function Cell({
             <div className="ml-2 inline-block">
               <span className="text-danger vertical-center inline-flex">
                 <AlertCircle className="lucide" aria-hidden="true" />
-                <span>{environment.StatusMessage?.Summary}</span>
+                <span>{environment.StatusMessage.Summary}</span>
               </span>
               <TooltipWithChildren
                 message={
                   <div>
-                    {environment.StatusMessage?.Detail}
+                    {environment.StatusMessage.Detail}
                     {environment.URL && (
                       <div className="mt-2 text-right">
                         <Button
