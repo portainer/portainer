@@ -2,7 +2,6 @@ import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
 
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
-import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmDestructive } from '@@/modals/confirm';
@@ -103,7 +102,6 @@ function EndpointController(
   };
 
   $scope.formValues = {
-    SecurityFormData: new EndpointSecurityFormData(),
     tlsConfig: {
       tls: false,
       skipVerify: false,

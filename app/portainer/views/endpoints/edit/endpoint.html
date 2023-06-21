@@ -149,12 +149,6 @@
 
           <tag-selector ng-if="endpoint" value="endpoint.TagIds" allow-create="state.allowCreate" on-change="(onChangeTags)"></tag-selector>
 
-          <!-- endpoint-security -->
-          <div ng-if="endpointType === 'remote' && !state.azureEndpoint && !state.kubernetesEndpoint && !state.edgeEndpoint && endpoint.Type !== 6">
-            <div class="col-sm-12 form-section-title"> Security </div>
-            <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
-          </div>
-          <!-- !endpoint-security -->
           <!-- open-amt info -->
           <div ng-if="state.showAMTInfo">
             <div class="col-sm-12 form-section-title"> Open Active Management Technology </div>
