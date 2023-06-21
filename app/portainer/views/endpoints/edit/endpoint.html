@@ -220,7 +220,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm !ml-0"
-                ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey)))) || (formValues.tlsConfig.tls && (formValues.tlsConfig.skipVerify || (!formValues.tlsConfig.skipVerify && (!formValues.tlsConfig.caCertFile || !formValues.tlsConfig.certFile || !formValues.tlsConfig.keyFile)))) "
+                ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey)))) || (formValues.tlsConfig.tls && !formValues.tlsConfig.skipVerify && (!formValues.tlsConfig.caCertFile || !formValues.tlsConfig.certFile || !formValues.tlsConfig.keyFile)) "
                 ng-click="updateEndpoint()"
                 button-spinner="state.actionInProgress"
               >
