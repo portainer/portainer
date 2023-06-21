@@ -33,8 +33,8 @@ function Cell({
     return (
       <>
         {environment.URL}
-        {environment.StatusMessage.Summary &&
-          environment.StatusMessage.Detail && (
+        {environment.StatusMessage?.Summary &&
+          environment.StatusMessage?.Detail && (
             <div className="ml-2 inline-block">
               <span className="text-danger vertical-center inline-flex">
                 <AlertCircle className="lucide" aria-hidden="true" />
@@ -79,15 +79,15 @@ function Cell({
     const status = (
       <span className="vertical-center inline-flex text-base">
         <Settings className="lucide animate-spin-slow" />
-        {environment.StatusMessage.Summary}
+        {environment.StatusMessage?.Summary}
       </span>
     );
-    if (!environment.StatusMessage.Detail) {
+    if (!environment.StatusMessage?.Detail) {
       return status;
     }
     return (
       <TooltipWithChildren
-        message={environment.StatusMessage.Detail}
+        message={environment.StatusMessage?.Detail}
         position="bottom"
       >
         {status}
