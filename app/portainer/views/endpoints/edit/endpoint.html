@@ -124,6 +124,13 @@
           </div>
 
           <!-- !endpoint-public-url-input -->
+
+          <tls-fieldset
+            ng-if="!state.edgeEndpoint && endpoint.Status !== 4 && state.showTLSConfig"
+            values="formValues.tlsConfig"
+            on-change="(onChangeTLSConfigFormValues)"
+          ></tls-fieldset>
+
           <azure-endpoint-config
             ng-if="state.azureEndpoint"
             application-id="endpoint.AzureCredentials.ApplicationID"
@@ -219,7 +226,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm !ml-0"
-                ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))"
+                ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey)))) || (formValues.tlsConfig.tls && (formValues.tlsConfig.skipVerify || (!formValues.tlsConfig.skipVerify && (!formValues.tlsConfig.caCertFile || !formValues.tlsConfig.certFile || !formValues.tlsConfig.keyFile)))) "
                 ng-click="updateEndpoint()"
                 button-spinner="state.actionInProgress"
               >
