@@ -24,7 +24,6 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
             labelClass="col-sm-3 col-lg-2"
             checked={values.tls}
             onChange={(checked) => handleChange({ tls: checked })}
-            labelClass="col-sm-3 col-lg-2"
           />
         </div>
       </div>
