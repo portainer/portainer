@@ -75,6 +75,8 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		return httperror.InternalServerError("Unable to load repository", err)
 	}
 
+	dirEntries = filesystem.FilterDirForEntryFile(dirEntries, fileName)
+
 	return response.JSON(w, edge.StackPayload{
 		DirEntries:    dirEntries,
 		EntryFileName: fileName,

@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type DirEntry struct {
@@ -11,6 +12,38 @@ type DirEntry struct {
 	Content     string
 	IsFile      bool
 	Permissions os.FileMode
+}
+
+// FilterDirForEntryFile filers the given dirEntries, returns entries of the entryFile and .env file
+func FilterDirForEntryFile(dirEntries []DirEntry, entryFile string) []DirEntry {
+	var filteredDirEntries []DirEntry
+
+	dotEnvFile := filepath.Join(filepath.Dir(entryFile), ".env")
+	filters := []string{entryFile, dotEnvFile}
+
+	for _, dirEntry := range dirEntries {
+		match := false
+		if dirEntry.IsFile {
+			for _, filter := range filters {
+				if filter == dirEntry.Name {
+					match = true
+					break
+				}
+			}
+		} else {
+			for _, filter := range filters {
+				if strings.HasPrefix(filter, dirEntry.Name) {
+					match = true
+					break
+				}
+			}
+		}
+		if match {
+			filteredDirEntries = append(filteredDirEntries, dirEntry)
+		}
+	}
+
+	return filteredDirEntries
 }
 
 // LoadDir reads all files and folders recursively from the given directory
@@ -50,7 +83,7 @@ func LoadDir(dir string) ([]DirEntry, error) {
 					return err
 				}
 
-				dirEntry.Content = string(base64.StdEncoding.EncodeToString(fileContent))
+				dirEntry.Content = base64.StdEncoding.EncodeToString(fileContent)
 				dirEntry.IsFile = true
 			}
 
