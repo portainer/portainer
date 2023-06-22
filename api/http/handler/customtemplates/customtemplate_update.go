@@ -2,6 +2,7 @@ package customtemplates
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,10 +11,10 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -173,18 +174,34 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 			TLSSkipVerify:  payload.TLSSkipVerify,
 		}
 
+		repositoryUsername := ""
+		repositoryPassword := ""
 		if payload.RepositoryAuthentication {
+			repositoryUsername = payload.RepositoryUsername
+			repositoryPassword = payload.RepositoryPassword
 			gitConfig.Authentication = &gittypes.GitAuthentication{
 				Username: payload.RepositoryUsername,
 				Password: payload.RepositoryPassword,
 			}
 		}
 
-		commitHash, err := stackutils.DownloadGitRepository(*gitConfig, handler.GitService, func() string {
-			return customTemplate.ProjectPath
+		cleanBackup, err := git.CloneWithBackup(handler.GitService, handler.FileService, git.CloneOptions{
+			ProjectPath:   customTemplate.ProjectPath,
+			URL:           gitConfig.URL,
+			ReferenceName: gitConfig.ReferenceName,
+			Username:      repositoryUsername,
+			Password:      repositoryPassword,
+			TLSSkipVerify: gitConfig.TLSSkipVerify,
 		})
 		if err != nil {
-			return httperror.InternalServerError(err.Error(), err)
+			return httperror.InternalServerError("Unable to clone git repository directory", err)
+		}
+
+		defer cleanBackup()
+
+		commitHash, err := handler.GitService.LatestCommitID(gitConfig.URL, gitConfig.ReferenceName, repositoryUsername, repositoryPassword, gitConfig.TLSSkipVerify)
+		if err != nil {
+			return httperror.InternalServerError("Unable get latest commit id", fmt.Errorf("failed to fetch latest commit id of the template %v: %w", customTemplate.ID, err))
 		}
 
 		gitConfig.ConfigHash = commitHash
