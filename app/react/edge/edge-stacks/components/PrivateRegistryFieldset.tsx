@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
 
 import { Registry } from '@/react/portainer/registries/types';
 
@@ -75,26 +76,34 @@ export function PrivateRegistryFieldset({
       {checked && (
         <>
           {method !== 'repository' && (
-            <>
-              <TextTip color="blue">
-                If you make any changes to the image urls in your yaml, please
-                reload or select registry manually
-              </TextTip>
-
-              <Button onClick={reload}>Reload</Button>
-            </>
+            <TextTip color="blue">
+              If you make any changes to the image urls in your yaml, please
+              reload or select registry manually
+            </TextTip>
           )}
+
           {!errorMessage ? (
             <FormControl label="Registry" inputId="users-selector">
-              <Select
-                value={registries.filter(
-                  (registry) => registry.Id === selected
+              <div className="flex">
+                <Select
+                  value={registries.filter(
+                    (registry) => registry.Id === selected
+                  )}
+                  options={registries}
+                  getOptionLabel={(registry) => registry.Name}
+                  getOptionValue={(registry) => registry.Id.toString()}
+                  onChange={(value) => onSelect(value?.Id)}
+                  className="w-full"
+                />
+                {method !== 'repository' && (
+                  <Button
+                    onClick={reload}
+                    title="Reload"
+                    icon={RefreshCw}
+                    color="light"
+                  />
                 )}
-                options={registries}
-                getOptionLabel={(registry) => registry.Name}
-                getOptionValue={(registry) => registry.Id.toString()}
-                onChange={(value) => onSelect(value?.Id)}
-              />
+              </div>
             </FormControl>
           ) : (
             <FormError>{errorMessage}</FormError>
