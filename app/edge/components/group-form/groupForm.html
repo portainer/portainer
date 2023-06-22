@@ -33,14 +33,7 @@
       <!-- environments -->
       <div class="col-sm-12 form-section-title"> Associated environments </div>
       <div class="form-group">
-        <associated-endpoints-selector
-          endpoint-ids="$ctrl.model.Endpoints"
-          tags="$ctrl.tags"
-          groups="$ctrl.groups"
-          has-backend-pagination="true"
-          on-associate="($ctrl.associateEndpoint)"
-          on-dissociate="($ctrl.dissociateEndpoint)"
-        ></associated-endpoints-selector>
+        <associated-edge-environments-selector value="$ctrl.model.Endpoints" on-change="($ctrl.onChangeEnvironments)"></associated-edge-environments-selector>
       </div>
     </div>
     <div class="form-group" ng-if="$ctrl.noEndpoints">
@@ -59,23 +52,11 @@
 
     <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)"> </tag-selector>
 
-    <div class="table-in-row">
-      <group-association-table
-        loaded="$ctrl.loaded"
-        page-type="$ctrl.pageType"
-        table-type="associated"
-        retrieve-page="$ctrl.getDynamicEndpoints"
-        dataset="$ctrl.endpoints.value"
-        pagination-state="$ctrl.endpoints.state"
-        empty-dataset-message="No associated endpoint"
-        tags="$ctrl.tags"
-        show-tags="true"
-        groups="$ctrl.groups"
-        show-groups="true"
-        has-backend-pagination="true"
-        title="Associated environments by tags"
-      ></group-association-table>
-    </div>
+    <edge-group-association-table
+      title="'Associated environments by tags'"
+      empty-content-message="'No associated available'"
+      query="$ctrl.dynamicQuery"
+    ></edge-group-association-table>
   </div>
   <!-- !DynamicGroup -->
 

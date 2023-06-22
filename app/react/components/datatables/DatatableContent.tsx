@@ -1,8 +1,11 @@
 import { Row, Table as TableInstance } from '@tanstack/react-table';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Table } from './Table';
 
-interface Props<D extends Record<string, unknown>> {
+interface Props<D extends Record<string, unknown>>
+  extends AutomationTestingProps {
   tableInstance: TableInstance<D>;
   renderRow(row: Row<D>): React.ReactNode;
   onSortChange?(colId: string, desc: boolean): void;
@@ -16,12 +19,13 @@ export function DatatableContent<D extends Record<string, unknown>>({
   onSortChange,
   isLoading,
   emptyContentLabel,
+  'data-cy': dataCy,
 }: Props<D>) {
   const headerGroups = tableInstance.getHeaderGroups();
   const pageRowModel = tableInstance.getPaginationRowModel();
 
   return (
-    <Table>
+    <Table data-cy={dataCy}>
       <thead>
         {headerGroups.map((headerGroup) => (
           <Table.HeaderRow<D>

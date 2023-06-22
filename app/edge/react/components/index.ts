@@ -10,6 +10,8 @@ import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/compon
 import { EditEdgeStackForm } from '@/react/edge/edge-stacks/ItemView/EditEdgeStackForm/EditEdgeStackForm';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
+import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
 
 export const componentsModule = angular
   .module('portainer.edge.react.components', [])
@@ -75,5 +77,23 @@ export const componentsModule = angular
       'onEditorChange',
       'onSubmit',
       'allowKubeToSelectCompose',
+    ])
+  )
+  .component(
+    'edgeGroupAssociationTable',
+    r2a(withReactQuery(EdgeGroupAssociationTable), [
+      'emptyContentLabel',
+      'onClickRow',
+      'query',
+      'title',
+      'data-cy',
+      'hideEnvironmentIds',
+    ])
+  )
+  .component(
+    'associatedEdgeEnvironmentsSelector',
+    r2a(withReactQuery(AssociatedEdgeEnvironmentsSelector), [
+      'onChange',
+      'value',
     ])
   ).name;

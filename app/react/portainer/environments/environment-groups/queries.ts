@@ -8,9 +8,11 @@ import { queryKeys } from './queries/query-keys';
 
 export function useGroups<T = EnvironmentGroup[]>({
   select,
-}: { select?: (group: EnvironmentGroup[]) => T } = {}) {
+  enabled = true,
+}: { select?: (group: EnvironmentGroup[]) => T; enabled?: boolean } = {}) {
   return useQuery(queryKeys.base(), getGroups, {
     select,
+    enabled,
   });
 }
 

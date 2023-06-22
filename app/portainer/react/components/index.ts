@@ -6,6 +6,8 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
 import { withFormValidation } from '@/react-tools/withFormValidation';
+import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
+import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
 
 import {
   EnvironmentVariablesFieldset,
@@ -204,7 +206,21 @@ export const ngModule = angular
       'height',
     ])
   )
-  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []));
+  .component(
+    'groupAssociationTable',
+    r2a(withReactQuery(GroupAssociationTable), [
+      'emptyContentLabel',
+      'onClickRow',
+      'query',
+      'title',
+      'data-cy',
+    ])
+  )
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []))
+  .component(
+    'associatedEndpointsSelector',
+    r2a(withReactQuery(AssociatedEnvironmentsSelector), ['onChange', 'value'])
+  );
 
 export const componentsModule = ngModule.name;
 

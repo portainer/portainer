@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { TableContainer } from './TableContainer';
 import { TableActions } from './TableActions';
 import { TableFooter } from './TableFooter';
@@ -12,14 +14,19 @@ import { TableHeaderCell } from './TableHeaderCell';
 import { TableHeaderRow } from './TableHeaderRow';
 import { TableRow } from './TableRow';
 
-interface Props {
+interface Props extends AutomationTestingProps {
   className?: string;
 }
 
-function MainComponent({ children, className }: PropsWithChildren<Props>) {
+function MainComponent({
+  children,
+  className,
+  'data-cy': dataCy,
+}: PropsWithChildren<Props>) {
   return (
     <div className="table-responsive">
       <table
+        data-cy={dataCy}
         className={clsx(
           'table-hover table-filters nowrap-cells table',
           className
