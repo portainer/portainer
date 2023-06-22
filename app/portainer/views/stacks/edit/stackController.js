@@ -293,7 +293,7 @@ angular.module('portainer.app').controller('StackController', [
 
       $scope.state.actionInProgress = true;
       try {
-        await StackService.stop($scope.stack.Id);
+        await StackService.stop(endpoint.Id, $scope.stack.Id);
         $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to stop stack');
@@ -309,7 +309,7 @@ angular.module('portainer.app').controller('StackController', [
       $scope.state.actionInProgress = true;
       const id = $scope.stack.Id;
       try {
-        await StackService.start(id);
+        await StackService.start(endpoint.Id, id);
         $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to start stack');
