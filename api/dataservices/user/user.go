@@ -14,11 +14,7 @@ const BucketName = "users"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
+	dataservices.BaseDataService[portainer.User, portainer.UserID]
 }
 
 // NewService creates a new instance of a service.
@@ -29,28 +25,18 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		connection: connection,
+		BaseDataService: dataservices.BaseDataService[portainer.User, portainer.UserID]{
+			Bucket:     BucketName,
+			Connection: connection,
+		},
 	}, nil
-}
-
-// User returns a user by ID
-func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
-	var user portainer.User
-	identifier := service.connection.ConvertToKey(int(ID))
-
-	err := service.connection.GetObject(BucketName, identifier, &user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
 }
 
 // UserByUsername returns a user by username.
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
 	var u portainer.User
 
-	err := service.connection.GetAll(
+	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.User{},
 		dataservices.FirstFn(&u, func(e portainer.User) bool {
@@ -69,22 +55,11 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 	return nil, err
 }
 
-// Users return an array containing all the users.
-func (service *Service) Users() ([]portainer.User, error) {
-	var users = make([]portainer.User, 0)
-
-	return users, service.connection.GetAll(
-		BucketName,
-		&portainer.User{},
-		dataservices.AppendFn(&users),
-	)
-}
-
 // UsersByRole return an array containing all the users with the specified role.
 func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
 
-	return users, service.connection.GetAll(
+	return users, service.Connection.GetAll(
 		BucketName,
 		&portainer.User{},
 		dataservices.FilterFn(&users, func(e portainer.User) bool {
@@ -93,16 +68,9 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 	)
 }
 
-// UpdateUser saves a user.
-func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	user.Username = strings.ToLower(user.Username)
-	return service.connection.UpdateObject(BucketName, identifier, user)
-}
-
 // CreateUser creates a new user.
 func (service *Service) Create(user *portainer.User) error {
-	return service.connection.CreateObject(
+	return service.Connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			user.ID = portainer.UserID(id)
@@ -111,10 +79,4 @@ func (service *Service) Create(user *portainer.User) error {
 			return int(user.ID), user
 		},
 	)
-}
-
-// DeleteUser deletes a user.
-func (service *Service) DeleteUser(ID portainer.UserID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
 }

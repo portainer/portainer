@@ -37,7 +37,6 @@ type (
 		Webhook() WebhookService
 	}
 
-	// DataStore defines the interface to manage the data
 	DataStore interface {
 		Open() (newStore bool, err error)
 		Init() error
@@ -55,36 +54,22 @@ type (
 
 	// CustomTemplateService represents a service to manage custom templates
 	CustomTemplateService interface {
+		BaseCRUD[portainer.CustomTemplate, portainer.CustomTemplateID]
 		GetNextIdentifier() int
-		CustomTemplates() ([]portainer.CustomTemplate, error)
-		CustomTemplate(ID portainer.CustomTemplateID) (*portainer.CustomTemplate, error)
-		Create(customTemplate *portainer.CustomTemplate) error
-		UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error
-		DeleteCustomTemplate(ID portainer.CustomTemplateID) error
-		BucketName() string
 	}
 
 	// EdgeGroupService represents a service to manage Edge groups
 	EdgeGroupService interface {
-		EdgeGroups() ([]portainer.EdgeGroup, error)
-		EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error)
-		Create(group *portainer.EdgeGroup) error
-		UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error
+		BaseCRUD[portainer.EdgeGroup, portainer.EdgeGroupID]
 		UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFunc func(group *portainer.EdgeGroup)) error
-		DeleteEdgeGroup(ID portainer.EdgeGroupID) error
-		BucketName() string
 	}
 
 	// EdgeJobService represents a service to manage Edge jobs
 	EdgeJobService interface {
-		EdgeJobs() ([]portainer.EdgeJob, error)
-		EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error)
-		Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
-		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
+		BaseCRUD[portainer.EdgeJob, portainer.EdgeJobID]
+		CreateWithID(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error
-		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
-		BucketName() string
 	}
 
 	// EdgeStackService represents a service to manage Edge stacks
@@ -117,12 +102,7 @@ type (
 
 	// EndpointGroupService represents a service for managing environment(endpoint) group data
 	EndpointGroupService interface {
-		EndpointGroup(ID portainer.EndpointGroupID) (*portainer.EndpointGroup, error)
-		EndpointGroups() ([]portainer.EndpointGroup, error)
-		Create(group *portainer.EndpointGroup) error
-		UpdateEndpointGroup(ID portainer.EndpointGroupID, group *portainer.EndpointGroup) error
-		DeleteEndpointGroup(ID portainer.EndpointGroupID) error
-		BucketName() string
+		BaseCRUD[portainer.EndpointGroup, portainer.EndpointGroupID]
 	}
 
 	// EndpointRelationService represents a service for managing environment(endpoint) relations data
@@ -137,23 +117,14 @@ type (
 
 	// FDOProfileService represents a service to manage FDO Profiles
 	FDOProfileService interface {
-		FDOProfiles() ([]portainer.FDOProfile, error)
-		FDOProfile(ID portainer.FDOProfileID) (*portainer.FDOProfile, error)
-		Create(FDOProfile *portainer.FDOProfile) error
-		Update(ID portainer.FDOProfileID, FDOProfile *portainer.FDOProfile) error
-		Delete(ID portainer.FDOProfileID) error
+		BaseCRUD[portainer.FDOProfile, portainer.FDOProfileID]
 		GetNextIdentifier() int
-		BucketName() string
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
-		HelmUserRepositories() ([]portainer.HelmUserRepository, error)
+		BaseCRUD[portainer.HelmUserRepository, portainer.HelmUserRepositoryID]
 		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
-		Create(record *portainer.HelmUserRepository) error
-		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error
-		DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error
-		BucketName() string
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -167,40 +138,23 @@ type (
 
 	// RegistryService represents a service for managing registry data
 	RegistryService interface {
-		Registry(ID portainer.RegistryID) (*portainer.Registry, error)
-		Registries() ([]portainer.Registry, error)
-		Create(registry *portainer.Registry) error
-		UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error
-		DeleteRegistry(ID portainer.RegistryID) error
-		BucketName() string
+		BaseCRUD[portainer.Registry, portainer.RegistryID]
 	}
 
 	// ResourceControlService represents a service for managing resource control data
 	ResourceControlService interface {
-		ResourceControl(ID portainer.ResourceControlID) (*portainer.ResourceControl, error)
+		BaseCRUD[portainer.ResourceControl, portainer.ResourceControlID]
 		ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error)
-		ResourceControls() ([]portainer.ResourceControl, error)
-		Create(rc *portainer.ResourceControl) error
-		UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error
-		DeleteResourceControl(ID portainer.ResourceControlID) error
-		BucketName() string
 	}
 
 	// RoleService represents a service for managing user roles
 	RoleService interface {
-		Role(ID portainer.RoleID) (*portainer.Role, error)
-		Roles() ([]portainer.Role, error)
-		Create(role *portainer.Role) error
-		UpdateRole(ID portainer.RoleID, role *portainer.Role) error
-		BucketName() string
+		BaseCRUD[portainer.Role, portainer.RoleID]
 	}
 
 	// APIKeyRepositoryService
 	APIKeyRepository interface {
-		CreateAPIKey(key *portainer.APIKey) error
-		GetAPIKey(keyID portainer.APIKeyID) (*portainer.APIKey, error)
-		UpdateAPIKey(key *portainer.APIKey) error
-		DeleteAPIKey(ID portainer.APIKeyID) error
+		BaseCRUD[portainer.APIKey, portainer.APIKeyID]
 		GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error)
 		GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error)
 	}
@@ -213,12 +167,7 @@ type (
 	}
 
 	SnapshotService interface {
-		Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error)
-		Snapshots() ([]portainer.Snapshot, error)
-		UpdateSnapshot(snapshot *portainer.Snapshot) error
-		DeleteSnapshot(endpointID portainer.EndpointID) error
-		Create(snapshot *portainer.Snapshot) error
-		BucketName() string
+		BaseCRUD[portainer.Snapshot, portainer.EndpointID]
 	}
 
 	// SSLSettingsService represents a service for managing application settings
@@ -230,53 +179,33 @@ type (
 
 	// StackService represents a service for managing stack data
 	StackService interface {
-		Stack(ID portainer.StackID) (*portainer.Stack, error)
+		BaseCRUD[portainer.Stack, portainer.StackID]
 		StackByName(name string) (*portainer.Stack, error)
 		StacksByName(name string) ([]portainer.Stack, error)
-		Stacks() ([]portainer.Stack, error)
-		Create(stack *portainer.Stack) error
-		UpdateStack(ID portainer.StackID, stack *portainer.Stack) error
-		DeleteStack(ID portainer.StackID) error
 		GetNextIdentifier() int
 		StackByWebhookID(ID string) (*portainer.Stack, error)
 		RefreshableStacks() ([]portainer.Stack, error)
-		BucketName() string
 	}
 
 	// TagService represents a service for managing tag data
 	TagService interface {
-		Tags() ([]portainer.Tag, error)
-		Tag(ID portainer.TagID) (*portainer.Tag, error)
-		Create(tag *portainer.Tag) error
-		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
+		BaseCRUD[portainer.Tag, portainer.TagID]
 		UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error
-		DeleteTag(ID portainer.TagID) error
-		BucketName() string
 	}
 
 	// TeamService represents a service for managing user data
 	TeamService interface {
-		Team(ID portainer.TeamID) (*portainer.Team, error)
+		BaseCRUD[portainer.Team, portainer.TeamID]
 		TeamByName(name string) (*portainer.Team, error)
-		Teams() ([]portainer.Team, error)
-		Create(team *portainer.Team) error
-		UpdateTeam(ID portainer.TeamID, team *portainer.Team) error
-		DeleteTeam(ID portainer.TeamID) error
-		BucketName() string
 	}
 
 	// TeamMembershipService represents a service for managing team membership data
 	TeamMembershipService interface {
-		TeamMembership(ID portainer.TeamMembershipID) (*portainer.TeamMembership, error)
-		TeamMemberships() ([]portainer.TeamMembership, error)
+		BaseCRUD[portainer.TeamMembership, portainer.TeamMembershipID]
 		TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error)
 		TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error)
-		Create(membership *portainer.TeamMembership) error
-		UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error
-		DeleteTeamMembership(ID portainer.TeamMembershipID) error
 		DeleteTeamMembershipByUserID(userID portainer.UserID) error
 		DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error
-		BucketName() string
 		DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.TeamID, userID portainer.UserID) error
 	}
 
@@ -289,34 +218,24 @@ type (
 
 	// UserService represents a service for managing user data
 	UserService interface {
-		User(ID portainer.UserID) (*portainer.User, error)
+		BaseCRUD[portainer.User, portainer.UserID]
 		UserByUsername(username string) (*portainer.User, error)
-		Users() ([]portainer.User, error)
 		UsersByRole(role portainer.UserRole) ([]portainer.User, error)
-		Create(user *portainer.User) error
-		UpdateUser(ID portainer.UserID, user *portainer.User) error
-		DeleteUser(ID portainer.UserID) error
-		BucketName() string
 	}
 
 	// VersionService represents a service for managing version data
 	VersionService interface {
-		Edition() (portainer.SoftwareEdition, error)
 		InstanceID() (string, error)
 		UpdateInstanceID(ID string) error
+		Edition() (portainer.SoftwareEdition, error)
 		Version() (*models.Version, error)
 		UpdateVersion(*models.Version) error
 	}
 
 	// WebhookService represents a service for managing webhook data.
 	WebhookService interface {
-		Webhooks() ([]portainer.Webhook, error)
-		Webhook(ID portainer.WebhookID) (*portainer.Webhook, error)
-		Create(portainer *portainer.Webhook) error
-		UpdateWebhook(ID portainer.WebhookID, webhook *portainer.Webhook) error
+		BaseCRUD[portainer.Webhook, portainer.WebhookID]
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)
-		DeleteWebhook(ID portainer.WebhookID) error
-		BucketName() string
 	}
 )

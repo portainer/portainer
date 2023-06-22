@@ -24,7 +24,7 @@ import (
 // @failure 500 "Server error"
 // @router /teams [get]
 func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	teams, err := handler.DataStore.Team().Teams()
+	teams, err := handler.DataStore.Team().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve teams from the database", err)
 	}
@@ -54,7 +54,7 @@ func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
 	}
 
-	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.DataStore.EndpointGroup().Read(endpoint.GroupID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

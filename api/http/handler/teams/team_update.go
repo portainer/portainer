@@ -48,7 +48,7 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
+	team, err := handler.DataStore.Team().Read(portainer.TeamID(teamID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a team with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -59,7 +59,7 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 		team.Name = payload.Name
 	}
 
-	err = handler.DataStore.Team().UpdateTeam(team.ID, team)
+	err = handler.DataStore.Team().Update(team.ID, team)
 	if err != nil {
 		return httperror.NotFound("Unable to persist team changes inside the database", err)
 	}

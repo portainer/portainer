@@ -37,7 +37,7 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
+	profile, err := handler.DataStore.FDOProfile().Read(portainer.FDOProfileID(id))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	} else if err != nil {

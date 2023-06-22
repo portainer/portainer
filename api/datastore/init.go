@@ -22,7 +22,6 @@ func (store *Store) Init() error {
 }
 
 func (store *Store) checkOrCreateDefaultSettings() error {
-
 	isDDExtention := false
 	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
 		isDDExtention = true
@@ -73,6 +72,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 		settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
 		return store.Settings().UpdateSettings(settings)
 	}
+
 	return nil
 }
 
@@ -90,7 +90,7 @@ func (store *Store) checkOrCreateDefaultSSLSettings() error {
 }
 
 func (store *Store) checkOrCreateDefaultData() error {
-	groups, err := store.EndpointGroupService.EndpointGroups()
+	groups, err := store.EndpointGroupService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -110,5 +110,6 @@ func (store *Store) checkOrCreateDefaultData() error {
 			return err
 		}
 	}
+
 	return nil
 }

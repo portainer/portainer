@@ -285,5 +285,5 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 		handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 	}
 
-	return tx.EdgeJob().Create(edgeJob.ID, edgeJob)
+	return tx.EdgeJob().CreateWithID(edgeJob.ID, edgeJob)
 }

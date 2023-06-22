@@ -46,13 +46,13 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to retrieve environments from database", err)
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	stacks, err := handler.DataStore.Stack().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve stacks from the database", err)
 	}
 	stacks = filterStacks(stacks, &filters, endpoints)
 
-	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
+	resourceControls, err := handler.DataStore.ResourceControl().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
 	}
@@ -69,7 +69,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			return httperror.Forbidden("Permission denied to access orphaned stacks", httperrors.ErrUnauthorized)
 		}
 
-		user, err := handler.DataStore.User().User(securityContext.UserID)
+		user, err := handler.DataStore.User().Read(securityContext.UserID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
 		}

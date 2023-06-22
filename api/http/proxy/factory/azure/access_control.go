@@ -18,7 +18,7 @@ func (transport *Transport) createAzureRequestContext(request *http.Request) (*a
 		return nil, err
 	}
 
-	resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (transport *Transport) removeResourceControl(containerGroup map[string]inte
 	if ok {
 		resourceControl := transport.findResourceControl(containerGroupID, context)
 		if resourceControl != nil {
-			err := transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+			err := transport.dataStore.ResourceControl().Delete(resourceControl.ID)
 			return err
 		}
 	} else {

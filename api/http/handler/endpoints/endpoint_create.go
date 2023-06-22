@@ -222,12 +222,12 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
-	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.DataStore.EndpointGroup().Read(endpoint.GroupID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to find an environment group inside the database", err)
 	}
 
-	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge groups from the database", err)
 	}

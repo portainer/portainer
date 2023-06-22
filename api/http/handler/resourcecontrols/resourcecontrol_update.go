@@ -63,7 +63,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControl(portainer.ResourceControlID(resourceControlID))
+	resourceControl, err := handler.DataStore.ResourceControl().Read(portainer.ResourceControlID(resourceControlID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a resource control with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -106,7 +106,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.Forbidden("Permission denied to update the resource control", httperrors.ErrResourceAccessDenied)
 	}
 
-	err = handler.DataStore.ResourceControl().UpdateResourceControl(resourceControl.ID, resourceControl)
+	err = handler.DataStore.ResourceControl().Update(resourceControl.ID, resourceControl)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist resource control changes inside the database", err)
 	}

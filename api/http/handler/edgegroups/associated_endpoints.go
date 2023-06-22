@@ -21,7 +21,7 @@ func GetEndpointsByTags(tx dataservices.DataStoreTx, tagIDs []portainer.TagID, p
 
 	tags := []portainer.Tag{}
 	for _, tagID := range tagIDs {
-		tag, err := tx.Tag().Tag(tagID)
+		tag, err := tx.Tag().Read(tagID)
 		if err != nil {
 			return nil, err
 		}

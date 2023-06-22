@@ -10,11 +10,7 @@ const BucketName = "helm_user_repository"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
+	dataservices.BaseDataService[portainer.HelmUserRepository, portainer.HelmUserRepositoryID]
 }
 
 // NewService creates a new instance of a service.
@@ -25,26 +21,18 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		connection: connection,
+		BaseDataService: dataservices.BaseDataService[portainer.HelmUserRepository, portainer.HelmUserRepositoryID]{
+			Bucket:     BucketName,
+			Connection: connection,
+		},
 	}, nil
-}
-
-// HelmUserRepository returns an array of all HelmUserRepository
-func (service *Service) HelmUserRepositories() ([]portainer.HelmUserRepository, error) {
-	var repos = make([]portainer.HelmUserRepository, 0)
-
-	return repos, service.connection.GetAll(
-		BucketName,
-		&portainer.HelmUserRepository{},
-		dataservices.AppendFn(&repos),
-	)
 }
 
 // HelmUserRepositoryByUserID return an array containing all the HelmUserRepository objects where the specified userID is present.
 func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error) {
 	var result = make([]portainer.HelmUserRepository, 0)
 
-	return result, service.connection.GetAll(
+	return result, service.Connection.GetAll(
 		BucketName,
 		&portainer.HelmUserRepository{},
 		dataservices.FilterFn(&result, func(e portainer.HelmUserRepository) bool {
@@ -55,23 +43,11 @@ func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]p
 
 // CreateHelmUserRepository creates a new HelmUserRepository object.
 func (service *Service) Create(record *portainer.HelmUserRepository) error {
-	return service.connection.CreateObject(
+	return service.Connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			record.ID = portainer.HelmUserRepositoryID(id)
 			return int(record.ID), record
 		},
 	)
-}
-
-// UpdateHelmUserRepostory updates an registry.
-func (service *Service) UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, registry *portainer.HelmUserRepository) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, registry)
-}
-
-// DeleteHelmUserRepository deletes an registry.
-func (service *Service) DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
 }

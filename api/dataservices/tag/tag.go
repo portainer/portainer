@@ -12,11 +12,7 @@ const (
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
+	dataservices.BaseDataService[portainer.Tag, portainer.TagID]
 }
 
 // NewService creates a new instance of a service.
@@ -27,44 +23,26 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		connection: connection,
+		BaseDataService: dataservices.BaseDataService[portainer.Tag, portainer.TagID]{
+			Bucket:     BucketName,
+			Connection: connection,
+		},
 	}, nil
 }
 
 func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 	return ServiceTx{
-		service: service,
-		tx:      tx,
+		BaseDataServiceTx: dataservices.BaseDataServiceTx[portainer.Tag, portainer.TagID]{
+			Bucket:     BucketName,
+			Connection: service.Connection,
+			Tx:         tx,
+		},
 	}
-}
-
-// Tags return an array containing all the tags.
-func (service *Service) Tags() ([]portainer.Tag, error) {
-	var tags = make([]portainer.Tag, 0)
-
-	return tags, service.connection.GetAll(
-		BucketName,
-		&portainer.Tag{},
-		dataservices.AppendFn(&tags),
-	)
-}
-
-// Tag returns a tag by ID.
-func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
-	var tag portainer.Tag
-	identifier := service.connection.ConvertToKey(int(ID))
-
-	err := service.connection.GetObject(BucketName, identifier, &tag)
-	if err != nil {
-		return nil, err
-	}
-
-	return &tag, nil
 }
 
 // CreateTag creates a new tag.
 func (service *Service) Create(tag *portainer.Tag) error {
-	return service.connection.CreateObject(
+	return service.Connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			tag.ID = portainer.TagID(id)
@@ -73,24 +51,12 @@ func (service *Service) Create(tag *portainer.Tag) error {
 	)
 }
 
-// Deprecated: Use UpdateTagFunc instead.
-func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, tag)
-}
-
 // UpdateTagFunc updates a tag inside a transaction avoiding data races.
 func (service *Service) UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error {
-	id := service.connection.ConvertToKey(int(ID))
+	id := service.Connection.ConvertToKey(int(ID))
 	tag := &portainer.Tag{}
 
-	return service.connection.UpdateObjectFunc(BucketName, id, tag, func() {
+	return service.Connection.UpdateObjectFunc(BucketName, id, tag, func() {
 		updateFunc(tag)
 	})
-}
-
-// DeleteTag deletes a tag.
-func (service *Service) DeleteTag(ID portainer.TagID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
 }

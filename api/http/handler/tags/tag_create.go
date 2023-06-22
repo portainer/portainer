@@ -59,7 +59,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 }
 
 func createTag(tx dataservices.DataStoreTx, payload tagCreatePayload) (*portainer.Tag, error) {
-	tags, err := tx.Tag().Tags()
+	tags, err := tx.Tag().ReadAll()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve tags from the database", err)
 	}

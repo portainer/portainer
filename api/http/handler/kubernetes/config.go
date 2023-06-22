@@ -75,7 +75,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

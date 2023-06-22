@@ -9,7 +9,7 @@ import (
 )
 
 func updateEnvironmentEdgeGroups(tx dataservices.DataStoreTx, newEdgeGroups []portainer.EdgeGroupID, environmentID portainer.EndpointID) (bool, error) {
-	edgeGroups, err := tx.EdgeGroup().EdgeGroups()
+	edgeGroups, err := tx.EdgeGroup().ReadAll()
 	if err != nil {
 		return false, errors.WithMessage(err, "Unable to retrieve edge groups from the database")
 	}
@@ -34,14 +34,14 @@ func updateEnvironmentEdgeGroups(tx dataservices.DataStoreTx, newEdgeGroups []po
 
 	updateSet := func(groupIDs set.Set[portainer.EdgeGroupID], updateItem func(*portainer.EdgeGroup)) error {
 		for groupID := range groupIDs {
-			group, err := tx.EdgeGroup().EdgeGroup(groupID)
+			group, err := tx.EdgeGroup().Read(groupID)
 			if err != nil {
 				return errors.WithMessage(err, "Unable to find a Edge group inside the database")
 			}
 
 			updateItem(group)
 
-			err = tx.EdgeGroup().UpdateEdgeGroup(groupID, group)
+			err = tx.EdgeGroup().Update(groupID, group)
 			if err != nil {
 				return errors.WithMessage(err, "Unable to persist Edge group changes inside the database")
 			}

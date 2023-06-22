@@ -156,7 +156,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
@@ -213,7 +213,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
@@ -291,7 +291,7 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}

@@ -74,7 +74,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -97,7 +97,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	user.TokenIssueAt = time.Now().Unix()
 
-	err = handler.DataStore.User().UpdateUser(user.ID, user)
+	err = handler.DataStore.User().Update(user.ID, user)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist user changes inside the database", err)
 	}

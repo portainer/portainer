@@ -31,7 +31,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve user from the database", err)
 	}
@@ -50,7 +50,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 
 	isAdmin := securityContext.IsAdmin
 
-	registries, err := handler.DataStore.Registry().Registries()
+	registries, err := handler.DataStore.Registry().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}

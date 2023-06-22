@@ -42,7 +42,7 @@ func (handler *Handler) teamInspect(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.Forbidden("Access denied to team", errors.ErrResourceAccessDenied)
 	}
 
-	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
+	team, err := handler.DataStore.Team().Read(portainer.TeamID(teamID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a team with the specified identifier inside the database", err)
 	} else if err != nil {

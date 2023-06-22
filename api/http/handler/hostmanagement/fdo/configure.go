@@ -78,7 +78,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(payload.ProfileID))
+	profile, err := handler.DataStore.FDOProfile().Read(portainer.FDOProfileID(payload.ProfileID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	} else if err != nil {

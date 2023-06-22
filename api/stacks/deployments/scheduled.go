@@ -26,7 +26,7 @@ func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDepl
 		})
 
 		stack.AutoUpdate.JobID = jobID
-		if err := datastore.Stack().UpdateStack(stack.ID, &stack); err != nil {
+		if err := datastore.Stack().Update(stack.ID, &stack); err != nil {
 			return errors.Wrap(err, "failed to update stack job id")
 		}
 	}

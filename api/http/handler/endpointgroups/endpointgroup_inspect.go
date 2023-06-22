@@ -29,7 +29,7 @@ func (handler *Handler) endpointGroupInspect(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("Invalid environment group identifier route variable", err)
 	}
 
-	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
+	endpointGroup, err := handler.DataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", err)
 	} else if err != nil {

@@ -61,13 +61,13 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
-	err = handler.DataStore.Stack().DeleteStack(stack.ID)
+	err = handler.DataStore.Stack().Delete(stack.ID)
 	if err != nil {
 		return err
 	}
 
 	if resourceControl != nil {
-		err = handler.DataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+		err = handler.DataStore.ResourceControl().Delete(resourceControl.ID)
 		if err != nil {
 			log.Error().
 				Str("stack", fmt.Sprintf("%+v", stack)).

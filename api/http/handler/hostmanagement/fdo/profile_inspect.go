@@ -33,7 +33,7 @@ func (handler *Handler) fdoProfileInspect(w http.ResponseWriter, r *http.Request
 		return httperror.BadRequest("Bad request", errors.New("missing 'id' query parameter"))
 	}
 
-	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
+	profile, err := handler.DataStore.FDOProfile().Read(portainer.FDOProfileID(id))
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve Profile", err)
 	}

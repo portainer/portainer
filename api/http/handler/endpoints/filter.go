@@ -176,7 +176,7 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 	}
 
 	if query.search != "" {
-		tags, err := handler.DataStore.Tag().Tags()
+		tags, err := handler.DataStore.Tag().ReadAll()
 		if err != nil {
 			return nil, 0, errors.WithMessage(err, "Unable to retrieve tags from the database")
 		}
@@ -244,7 +244,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 
 	envIds := make([]portainer.EndpointID, 0)
 	for _, edgeGroupdId := range stack.EdgeGroups {
-		edgeGroup, err := datastore.EdgeGroup().EdgeGroup(edgeGroupdId)
+		edgeGroup, err := datastore.EdgeGroup().Read(edgeGroupdId)
 		if err != nil {
 			return nil, errors.WithMessage(err, "Unable to retrieve edge group from the database")
 		}

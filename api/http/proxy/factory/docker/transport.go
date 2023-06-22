@@ -179,7 +179,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 		}
 
 		if registryID != 0 {
-			registry, err = transport.dataStore.Registry().Registry(portainer.RegistryID(registryID))
+			registry, err = transport.dataStore.Registry().Read(portainer.RegistryID(registryID))
 			if err != nil {
 				return nil, fmt.Errorf("failed fetching registry: %w", err)
 			}
@@ -507,7 +507,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
+		resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
 		if err != nil {
 			return nil, err
 		}
@@ -654,7 +654,7 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 		}
 
 		if resourceControl != nil {
-			err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+			err = transport.dataStore.ResourceControl().Delete(resourceControl.ID)
 			if err != nil {
 				return response, err
 			}
@@ -702,13 +702,13 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 		endpointID: transport.endpoint.ID,
 	}
 
-	user, err := transport.dataStore.User().User(tokenData.ID)
+	user, err := transport.dataStore.User().Read(tokenData.ID)
 	if err != nil {
 		return nil, err
 	}
 	accessContext.user = user
 
-	registries, err := transport.dataStore.Registry().Registries()
+	registries, err := transport.dataStore.Registry().ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -735,7 +735,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 		return nil, err
 	}
 
-	resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
 	if err != nil {
 		return nil, err
 	}
