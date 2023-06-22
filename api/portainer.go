@@ -301,8 +301,8 @@ type (
 
 	// StackDeploymentInfo records the information of a deployed stack
 	StackDeploymentInfo struct {
-		Version     int    `json:"Version"`
-		ProjectPath string `json:"ProjectPath"`
+		Version    int    `json:"Version"`
+		ConfigHash string `json:"ConfigHash"`
 	}
 
 	//EdgeStack represents an edge stack
@@ -343,10 +343,11 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Details        EdgeStackStatusDetails `json:"Details"`
-		Error          string                 `json:"Error"`
-		EndpointID     EndpointID             `json:"EndpointID"`
-		DeploymentInfo StackDeploymentInfo    `json:"DeploymentInfo"`
+		Details    EdgeStackStatusDetails `json:"Details"`
+		Error      string                 `json:"Error"`
+		EndpointID EndpointID             `json:"EndpointID"`
+		// EE only feature
+		DeploymentInfo StackDeploymentInfo `json:"DeploymentInfo"`
 
 		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
