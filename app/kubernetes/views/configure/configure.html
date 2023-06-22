@@ -56,7 +56,7 @@
                 id="foldingButtonIngControllerSettings"
                 type="button"
                 class="mx-2 !ml-0 inline-flex w-2 items-center justify-center border-0 bg-transparent"
-                ng-click="ctrl.toggleAdvancedIngSettings()"
+                ng-click="ctrl.toggleAdvancedIngSettings($event)"
               >
                 <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" icon="'chevron-right'"></pr-icon>
                 <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" icon="'chevron-down'"></pr-icon>
