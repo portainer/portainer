@@ -2,18 +2,17 @@ package endpointedge
 
 import (
 	"errors"
-	"net/http"
-	"os"
-	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edge"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes"
+	"net/http"
 )
 
 // @summary Inspect an Edge Stack for an Environment(Endpoint)
@@ -69,26 +68,19 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		if fileName == "" {
 			return httperror.BadRequest("Kubernetes is not supported by this stack", errors.New("Kubernetes is not supported by this stack"))
 		}
-
 	}
 
-	stackFileContent, err := handler.FileService.GetFileContent(edgeStack.ProjectPath, fileName)
+	dirEntries, err := filesystem.LoadDir(edgeStack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
+		return httperror.InternalServerError("Unable to load repository", err)
 	}
 
-	var dotEnvFileContent []byte
-	if _, err = os.Stat(path.Join(edgeStack.ProjectPath, ".env")); err == nil {
-		dotEnvFileContent, err = handler.FileService.GetFileContent(edgeStack.ProjectPath, ".env")
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve .env file from disk", err)
-		}
-	}
+	dirEntries = filesystem.FilterDirForEntryFile(dirEntries, fileName)
 
 	return response.JSON(w, edge.StackPayload{
-		DotEnvFileContent: string(dotEnvFileContent),
-		FileContent:       string(stackFileContent),
-		Name:              edgeStack.Name,
-		Namespace:         namespace,
+		DirEntries:    dirEntries,
+		EntryFileName: fileName,
+		Name:          edgeStack.Name,
+		Namespace:     namespace,
 	})
 }
