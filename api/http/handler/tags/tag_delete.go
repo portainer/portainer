@@ -54,7 +54,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 }
 
 func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
-	tag, err := tx.Tag().Tag(tagID)
+	tag, err := tx.Tag().Read(tagID)
 	if tx.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a tag with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -75,13 +75,13 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 	}
 
 	for endpointGroupID := range tag.EndpointGroups {
-		endpointGroup, err := tx.EndpointGroup().EndpointGroup(endpointGroupID)
+		endpointGroup, err := tx.EndpointGroup().Read(endpointGroupID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve environment group from the database", err)
 		}
 
 		endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagID)
-		err = tx.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+		err = tx.EndpointGroup().Update(endpointGroup.ID, endpointGroup)
 		if err != nil {
 			return httperror.InternalServerError("Unable to update environment group", err)
 		}
@@ -92,7 +92,7 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 		return httperror.InternalServerError("Unable to retrieve environments from the database", err)
 	}
 
-	edgeGroups, err := tx.EdgeGroup().EdgeGroups()
+	edgeGroups, err := tx.EdgeGroup().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge groups from the database", err)
 	}
@@ -124,14 +124,14 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 		for _, edgeGroup := range edgeGroups {
 			edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagID)
 
-			err = tx.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, &edgeGroup)
+			err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
 			if err != nil {
 				return httperror.InternalServerError("Unable to update edge group", err)
 			}
 		}
 	}
 
-	err = tx.Tag().DeleteTag(tagID)
+	err = tx.Tag().Delete(tagID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the tag from the database", err)
 	}
@@ -145,7 +145,7 @@ func updateEndpointRelations(tx dataservices.DataStoreTx, endpoint portainer.End
 		return err
 	}
 
-	endpointGroup, err := tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := tx.EndpointGroup().Read(endpoint.GroupID)
 	if err != nil {
 		return err
 	}

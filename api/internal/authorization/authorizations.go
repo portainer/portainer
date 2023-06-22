@@ -432,7 +432,7 @@ func DefaultPortainerAuthorizations() portainer.Authorizations {
 
 // UpdateUsersAuthorizations will trigger an update of the authorizations for all the users.
 func (service *Service) UpdateUsersAuthorizations() error {
-	users, err := service.dataStore.User().Users()
+	users, err := service.dataStore.User().ReadAll()
 	if err != nil {
 		return err
 	}
@@ -448,7 +448,7 @@ func (service *Service) UpdateUsersAuthorizations() error {
 }
 
 func (service *Service) updateUserAuthorizations(userID portainer.UserID) error {
-	user, err := service.dataStore.User().User(userID)
+	user, err := service.dataStore.User().Read(userID)
 	if err != nil {
 		return err
 	}
@@ -460,7 +460,7 @@ func (service *Service) updateUserAuthorizations(userID portainer.UserID) error 
 
 	user.EndpointAuthorizations = endpointAuthorizations
 
-	return service.dataStore.User().UpdateUser(userID, user)
+	return service.dataStore.User().Update(userID, user)
 }
 
 func (service *Service) getAuthorizations(user *portainer.User) (portainer.EndpointAuthorizations, error) {
@@ -479,12 +479,12 @@ func (service *Service) getAuthorizations(user *portainer.User) (portainer.Endpo
 		return endpointAuthorizations, err
 	}
 
-	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := service.dataStore.EndpointGroup().ReadAll()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	roles, err := service.dataStore.Role().Roles()
+	roles, err := service.dataStore.Role().ReadAll()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
@@ -605,7 +605,7 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 }
 
 func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
-	user, err := service.dataStore.User().User(userID)
+	user, err := service.dataStore.User().Read(userID)
 	if err != nil {
 		return false, err
 	}

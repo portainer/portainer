@@ -68,7 +68,7 @@ func (service *Service) getUserEndpointAccessWithPolicies(
 	}
 
 	if endpointGroup == nil {
-		endpointGroup, err = tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		endpointGroup, err = tx.EndpointGroup().Read(endpoint.GroupID)
 		if err != nil {
 			return false, err
 		}
@@ -114,7 +114,7 @@ func (service *Service) getTeamEndpointAccessWithPolicies(
 ) (bool, error) {
 	if endpointGroup == nil {
 		var err error
-		endpointGroup, err = tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		endpointGroup, err = tx.EndpointGroup().Read(endpoint.GroupID)
 		if err != nil {
 			return false, err
 		}

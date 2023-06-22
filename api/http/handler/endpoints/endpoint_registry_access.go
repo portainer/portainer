@@ -69,7 +69,7 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 		return httperror.Forbidden("User is not authorized", err)
 	}
 
-	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Read(portainer.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -106,7 +106,7 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 
 	registry.RegistryAccesses[portainer.EndpointID(endpointID)] = registryAccess
 
-	handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
+	handler.DataStore.Registry().Update(registry.ID, registry)
 
 	return response.Empty(w)
 }

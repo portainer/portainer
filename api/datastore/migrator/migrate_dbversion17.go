@@ -9,7 +9,7 @@ import (
 func (m *Migrator) updateUsersToDBVersion18() error {
 	log.Info().Msg("updating users")
 
-	legacyUsers, err := m.userService.Users()
+	legacyUsers, err := m.userService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (m *Migrator) updateUsersToDBVersion18() error {
 			portainer.OperationPortainerUserMemberships:         true,
 		}
 
-		err = m.userService.UpdateUser(user.ID, &user)
+		err = m.userService.Update(user.ID, &user)
 		if err != nil {
 			return err
 		}
@@ -77,7 +77,7 @@ func (m *Migrator) updateEndpointsToDBVersion18() error {
 func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
 	log.Info().Msg("updating endpoint groups")
 
-	legacyEndpointGroups, err := m.endpointGroupService.EndpointGroups()
+	legacyEndpointGroups, err := m.endpointGroupService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
 			}
 		}
 
-		err = m.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		err = m.endpointGroupService.Update(endpointGroup.ID, &endpointGroup)
 		if err != nil {
 			return err
 		}
@@ -109,7 +109,7 @@ func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
 func (m *Migrator) updateRegistriesToDBVersion18() error {
 	log.Info().Msg("updating registries")
 
-	legacyRegistries, err := m.registryService.Registries()
+	legacyRegistries, err := m.registryService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (m *Migrator) updateRegistriesToDBVersion18() error {
 			registry.TeamAccessPolicies[teamID] = portainer.AccessPolicy{}
 		}
 
-		err = m.registryService.UpdateRegistry(registry.ID, &registry)
+		err = m.registryService.Update(registry.ID, &registry)
 		if err != nil {
 			return err
 		}

@@ -30,12 +30,12 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 		return httperror.BadRequest("Invalid Custom template type", err)
 	}
 
-	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
+	customTemplates, err := handler.DataStore.CustomTemplate().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 	}
 
-	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
+	resourceControls, err := handler.DataStore.ResourceControl().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
 	}
@@ -48,7 +48,7 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 	}
 
 	if !securityContext.IsAdmin {
-		user, err := handler.DataStore.User().User(securityContext.UserID)
+		user, err := handler.DataStore.User().Read(securityContext.UserID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
 		}

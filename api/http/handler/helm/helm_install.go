@@ -151,7 +151,7 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to retrieve user details from authentication token")
 	}
-	user, err := handler.dataStore.User().User(tokenData.ID)
+	user, err := handler.dataStore.User().Read(tokenData.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to load user information from the database")
 	}

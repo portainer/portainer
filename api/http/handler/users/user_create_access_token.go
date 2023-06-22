@@ -79,7 +79,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return httperror.Forbidden("Permission denied to create user access token", httperrors.ErrUnauthorized)
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if err != nil {
 		return httperror.BadRequest("Unable to find a user", err)
 	}

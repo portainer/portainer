@@ -14,7 +14,7 @@ func (m *Migrator) migrateDBVersionToDB34() error {
 
 // MigrateStackEntryPoint exported for testing
 func MigrateStackEntryPoint(stackService dataservices.StackService) error {
-	stacks, err := stackService.Stacks()
+	stacks, err := stackService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func MigrateStackEntryPoint(stackService dataservices.StackService) error {
 		}
 
 		stack.GitConfig.ConfigFilePath = stack.EntryPoint
-		if err := stackService.UpdateStack(stack.ID, stack); err != nil {
+		if err := stackService.Update(stack.ID, stack); err != nil {
 			return err
 		}
 	}

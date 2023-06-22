@@ -31,7 +31,7 @@ func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *ht
 		return httperror.Forbidden("Permission denied to list registries, use /endpoints/:endpointId/registries route instead", httperrors.ErrResourceAccessDenied)
 	}
 
-	registries, err := handler.DataStore.Registry().Registries()
+	registries, err := handler.DataStore.Registry().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}

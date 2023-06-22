@@ -26,7 +26,7 @@ import (
 // @failure 500 "Server error"
 // @router /users [get]
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	users, err := handler.DataStore.User().Users()
+	users, err := handler.DataStore.User().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
@@ -52,7 +52,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
 	}
 
-	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.DataStore.EndpointGroup().Read(endpoint.GroupID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

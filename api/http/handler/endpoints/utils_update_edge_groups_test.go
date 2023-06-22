@@ -34,7 +34,7 @@ func Test_updateEdgeGroups(t *testing.T) {
 
 	checkGroups := func(store *datastore.Store, is *assert.Assertions, groupIDs []portainer.EdgeGroupID, endpointID portainer.EndpointID) {
 		for _, groupID := range groupIDs {
-			group, err := store.EdgeGroup().EdgeGroup(groupID)
+			group, err := store.EdgeGroup().Read(groupID)
 			is.NoError(err)
 
 			for _, endpoint := range group.Endpoints {
@@ -83,7 +83,7 @@ func Test_updateEdgeGroups(t *testing.T) {
 		for _, group := range endpointGroups {
 			group.Endpoints = append(group.Endpoints, testCase.endpoint.ID)
 
-			err = store.EdgeGroup().UpdateEdgeGroup(group.ID, &group)
+			err = store.EdgeGroup().Update(group.ID, &group)
 			is.NoError(err)
 		}
 

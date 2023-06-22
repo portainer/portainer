@@ -77,7 +77,7 @@ func TestTagDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	// Check that the edge group is consistent
 
-	edgeGroup, err := handler.DataStore.EdgeGroup().EdgeGroup(1)
+	edgeGroup, err := handler.DataStore.EdgeGroup().Read(1)
 	if err != nil {
 		t.Fatal("could not retrieve the edge group:", err)
 	}

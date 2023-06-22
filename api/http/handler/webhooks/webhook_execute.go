@@ -100,7 +100,7 @@ func (handler *Handler) executeServiceWebhook(
 	}
 
 	if registryID != 0 {
-		registry, err := handler.DataStore.Registry().Registry(registryID)
+		registry, err := handler.DataStore.Registry().Read(registryID)
 		if err != nil {
 			return httperror.InternalServerError("Error getting registry", err)
 		}

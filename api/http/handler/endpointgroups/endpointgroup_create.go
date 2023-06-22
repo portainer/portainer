@@ -133,14 +133,14 @@ func (handler *Handler) createEndpointGroup(tx dataservices.DataStoreTx, payload
 			continue
 		}
 
-		tag, err := tx.Tag().Tag(tagID)
+		tag, err := tx.Tag().Read(tagID)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to find a tag inside the database", err)
 		}
 
 		tag.EndpointGroups[endpointGroup.ID] = true
 
-		err = tx.Tag().UpdateTag(tagID, tag)
+		err = tx.Tag().Update(tagID, tag)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to persist tag changes inside the database", err)
 		}

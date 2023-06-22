@@ -125,7 +125,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
 
-			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
+			user, err := service.dataStore.User().Read(portainer.UserID(cl.UserID))
 			if err != nil {
 				return nil, errInvalidJWTToken
 			}

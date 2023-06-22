@@ -22,7 +22,7 @@ import (
 // @router /endpoints/agent_versions [get]
 
 func (handler *Handler) agentVersions(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

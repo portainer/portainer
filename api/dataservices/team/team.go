@@ -14,11 +14,7 @@ const BucketName = "teams"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
+	dataservices.BaseDataService[portainer.Team, portainer.TeamID]
 }
 
 // NewService creates a new instance of a service.
@@ -29,28 +25,18 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		connection: connection,
+		BaseDataService: dataservices.BaseDataService[portainer.Team, portainer.TeamID]{
+			Bucket:     BucketName,
+			Connection: connection,
+		},
 	}, nil
-}
-
-// Team returns a Team by ID
-func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
-	var team portainer.Team
-	identifier := service.connection.ConvertToKey(int(ID))
-
-	err := service.connection.GetObject(BucketName, identifier, &team)
-	if err != nil {
-		return nil, err
-	}
-
-	return &team, nil
 }
 
 // TeamByName returns a team by name.
 func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 	var t portainer.Team
 
-	err := service.connection.GetAll(
+	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.Team{},
 		dataservices.FirstFn(&t, func(e portainer.Team) bool {
@@ -69,36 +55,13 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 	return nil, err
 }
 
-// Teams return an array containing all the teams.
-func (service *Service) Teams() ([]portainer.Team, error) {
-	var teams = make([]portainer.Team, 0)
-
-	return teams, service.connection.GetAll(
-		BucketName,
-		&portainer.Team{},
-		dataservices.AppendFn(&teams),
-	)
-}
-
-// UpdateTeam saves a Team.
-func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, team)
-}
-
 // CreateTeam creates a new Team.
 func (service *Service) Create(team *portainer.Team) error {
-	return service.connection.CreateObject(
+	return service.Connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			team.ID = portainer.TeamID(id)
 			return int(team.ID), team
 		},
 	)
-}
-
-// DeleteTeam deletes a Team.
-func (service *Service) DeleteTeam(ID portainer.TeamID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
 }

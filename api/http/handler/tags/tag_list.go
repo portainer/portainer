@@ -19,7 +19,7 @@ import (
 // @failure 500 "Server error"
 // @router /tags [get]
 func (handler *Handler) tagList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	tags, err := handler.DataStore.Tag().Tags()
+	tags, err := handler.DataStore.Tag().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve tags from the database", err)
 	}

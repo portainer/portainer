@@ -64,7 +64,7 @@ func (handler *Handler) recreate(w http.ResponseWriter, r *http.Request) *httper
 }
 
 func (handler *Handler) createResourceControl(oldContainerId string, newContainerId string) {
-	resourceControls, err := handler.dataStore.ResourceControl().ResourceControls()
+	resourceControls, err := handler.dataStore.ResourceControl().ReadAll()
 	if err != nil {
 		log.Error().Err(err).Msg("Exporting Resource Controls")
 		return
@@ -90,7 +90,7 @@ func (handler *Handler) updateWebhook(oldContainerId string, newContainerId stri
 	}
 
 	webhook.ResourceID = newContainerId
-	err = handler.dataStore.Webhook().UpdateWebhook(webhook.ID, webhook)
+	err = handler.dataStore.Webhook().Update(webhook.ID, webhook)
 	if err != nil {
 		log.Error().Err(err).Int("webhookId", int(webhook.ID)).Msg("cannot update webhook")
 	}

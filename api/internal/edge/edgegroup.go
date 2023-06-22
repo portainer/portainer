@@ -51,14 +51,14 @@ func GetEndpointsFromEdgeGroups(edgeGroupIDs []portainer.EdgeGroupID, datastore 
 		return nil, err
 	}
 
-	endpointGroups, err := datastore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := datastore.EndpointGroup().ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
 	var response []portainer.EndpointID
 	for _, edgeGroupID := range edgeGroupIDs {
-		edgeGroup, err := datastore.EdgeGroup().EdgeGroup(edgeGroupID)
+		edgeGroup, err := datastore.EdgeGroup().Read(edgeGroupID)
 		if err != nil {
 			return nil, err
 		}

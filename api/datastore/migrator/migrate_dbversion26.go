@@ -11,7 +11,7 @@ import (
 func (m *Migrator) updateStackResourceControlToDB27() error {
 	log.Info().Msg("updating stack resource controls")
 
-	resourceControls, err := m.resourceControlService.ResourceControls()
+	resourceControls, err := m.resourceControlService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func (m *Migrator) updateStackResourceControlToDB27() error {
 
 		resource.ResourceID = stackutils.ResourceControlID(stack.EndpointID, stack.Name)
 
-		err = m.resourceControlService.UpdateResourceControl(resource.ID, &resource)
+		err = m.resourceControlService.Update(resource.ID, &resource)
 		if err != nil {
 			return err
 		}

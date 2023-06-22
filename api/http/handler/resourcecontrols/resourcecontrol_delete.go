@@ -28,14 +28,14 @@ func (handler *Handler) resourceControlDelete(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid resource control identifier route variable", err)
 	}
 
-	_, err = handler.DataStore.ResourceControl().ResourceControl(portainer.ResourceControlID(resourceControlID))
+	_, err = handler.DataStore.ResourceControl().Read(portainer.ResourceControlID(resourceControlID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a resource control with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find a resource control with with the specified identifier inside the database", err)
 	}
 
-	err = handler.DataStore.ResourceControl().DeleteResourceControl(portainer.ResourceControlID(resourceControlID))
+	err = handler.DataStore.ResourceControl().Delete(portainer.ResourceControlID(resourceControlID))
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the resource control from the database", err)
 	}

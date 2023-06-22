@@ -22,7 +22,7 @@ import (
 // @router /fdo/profiles [get]
 func (handler *Handler) fdoProfileList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 
-	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	profiles, err := handler.DataStore.FDOProfile().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}

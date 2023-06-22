@@ -34,7 +34,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		return httperror.BadRequest("Invalid Custom template identifier route variable", err)
 	}
 
-	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
+	customTemplate, err := handler.DataStore.CustomTemplate().Read(portainer.CustomTemplateID(customTemplateID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a custom template with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -78,7 +78,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 	if customTemplate.GitConfig.ConfigHash != commitHash {
 		customTemplate.GitConfig.ConfigHash = commitHash
 
-		err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
+		err = handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate)
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
 		}

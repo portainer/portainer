@@ -37,7 +37,7 @@ func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *h
 		return httperror.Forbidden("Not authorized to delete a webhook", errors.New("not authorized to delete a webhook"))
 	}
 
-	err = handler.DataStore.Webhook().DeleteWebhook(portainer.WebhookID(id))
+	err = handler.DataStore.Webhook().Delete(portainer.WebhookID(id))
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the webhook from the database", err)
 	}

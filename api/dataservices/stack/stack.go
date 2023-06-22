@@ -14,11 +14,7 @@ const BucketName = "stacks"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
-}
-
-func (service *Service) BucketName() string {
-	return BucketName
+	dataservices.BaseDataService[portainer.Stack, portainer.StackID]
 }
 
 // NewService creates a new instance of a service.
@@ -29,28 +25,18 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		connection: connection,
+		BaseDataService: dataservices.BaseDataService[portainer.Stack, portainer.StackID]{
+			Bucket:     BucketName,
+			Connection: connection,
+		},
 	}, nil
-}
-
-// Stack returns a stack object by ID.
-func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
-	var stack portainer.Stack
-	identifier := service.connection.ConvertToKey(int(ID))
-
-	err := service.connection.GetObject(BucketName, identifier, &stack)
-	if err != nil {
-		return nil, err
-	}
-
-	return &stack, nil
 }
 
 // StackByName returns a stack object by name.
 func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 	var s portainer.Stack
 
-	err := service.connection.GetAll(
+	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		dataservices.FirstFn(&s, func(e portainer.Stack) bool {
@@ -73,7 +59,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	return stacks, service.connection.GetAll(
+	return stacks, service.Connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		dataservices.FilterFn(&stacks, func(e portainer.Stack) bool {
@@ -82,37 +68,14 @@ func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 	)
 }
 
-// Stacks returns an array containing all the stacks.
-func (service *Service) Stacks() ([]portainer.Stack, error) {
-	var stacks = make([]portainer.Stack, 0)
-
-	return stacks, service.connection.GetAll(
-		BucketName,
-		&portainer.Stack{},
-		dataservices.AppendFn(&stacks),
-	)
-}
-
 // GetNextIdentifier returns the next identifier for a stack.
 func (service *Service) GetNextIdentifier() int {
-	return service.connection.GetNextIdentifier(BucketName)
+	return service.Connection.GetNextIdentifier(BucketName)
 }
 
 // CreateStack creates a new stack.
 func (service *Service) Create(stack *portainer.Stack) error {
-	return service.connection.CreateObjectWithId(BucketName, int(stack.ID), stack)
-}
-
-// UpdateStack updates a stack.
-func (service *Service) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, stack)
-}
-
-// DeleteStack deletes a stack.
-func (service *Service) DeleteStack(ID portainer.StackID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	return service.Connection.CreateObjectWithId(BucketName, int(stack.ID), stack)
 }
 
 // StackByWebhookID returns a pointer to a stack object by webhook ID.
@@ -120,7 +83,7 @@ func (service *Service) DeleteStack(ID portainer.StackID) error {
 func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 	var s portainer.Stack
 
-	err := service.connection.GetAll(
+	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		dataservices.FirstFn(&s, func(e portainer.Stack) bool {
@@ -144,7 +107,7 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 	stacks := make([]portainer.Stack, 0)
 
-	return stacks, service.connection.GetAll(
+	return stacks, service.Connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		dataservices.FilterFn(&stacks, func(e portainer.Stack) bool {

@@ -46,7 +46,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 }
 
 func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error) {
-	edgeGroups, err := tx.EdgeGroup().EdgeGroups()
+	edgeGroups, err := tx.EdgeGroup().ReadAll()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
 	}
@@ -64,7 +64,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 		}
 	}
 
-	edgeJobs, err := tx.EdgeJob().EdgeJobs()
+	edgeJobs, err := tx.EdgeJob().ReadAll()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
 	}

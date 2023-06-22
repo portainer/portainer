@@ -9,7 +9,7 @@ import (
 func (m *Migrator) updateTagsToDBVersion23() error {
 	log.Info().Msg("updating tags")
 
-	tags, err := m.tagService.Tags()
+	tags, err := m.tagService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -17,7 +17,7 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 	for _, tag := range tags {
 		tag.EndpointGroups = make(map[portainer.EndpointGroupID]bool)
 		tag.Endpoints = make(map[portainer.EndpointID]bool)
-		err = m.tagService.UpdateTag(tag.ID, &tag)
+		err = m.tagService.Update(tag.ID, &tag)
 		if err != nil {
 			return err
 		}
@@ -29,7 +29,7 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 	log.Info().Msg("updating endpoints and endpoint groups")
 
-	tags, err := m.tagService.Tags()
+	tags, err := m.tagService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 		}
 	}
 
-	endpointGroups, err := m.endpointGroupService.EndpointGroups()
+	endpointGroups, err := m.endpointGroupService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -85,14 +85,14 @@ func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 			}
 		}
 		endpointGroup.TagIDs = endpointGroupTags
-		err = m.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		err = m.endpointGroupService.Update(endpointGroup.ID, &endpointGroup)
 		if err != nil {
 			return err
 		}
 	}
 
 	for _, tag := range tagsNameMap {
-		err = m.tagService.UpdateTag(tag.ID, &tag)
+		err = m.tagService.Update(tag.ID, &tag)
 		if err != nil {
 			return err
 		}
