@@ -293,18 +293,19 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpointUpdatePayload) bool {
 	// When updating Docker API environment, as long as TLS is true and TLSSkipVerify is false,
 	// we assume that new TLS files have been uploaded and we need to reload the TLS configuration.
-	if endpoint.Type != portainer.DockerEnvironment || !strings.HasPrefix(*payload.URL, "tcp://") || payload.TLS == nil {
+	if endpoint.Type != portainer.DockerEnvironment ||
+		!strings.HasPrefix(*payload.URL, "tcp://") ||
+		payload.TLS == nil ||
+		(payload.TLS != nil && !*payload.TLS) {
 		return false
 	}
 
-	if *payload.TLS {
-		if payload.TLSSkipVerify != nil && !*payload.TLSSkipVerify {
-			return true
-		}
+	if payload.TLSSkipVerify != nil && !*payload.TLSSkipVerify {
+		return true
+	}
 
-		if payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify {
-			return true
-		}
+	if payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify {
+		return true
 	}
 	return false
 }
