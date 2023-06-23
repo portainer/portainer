@@ -97,18 +97,12 @@ function certValidation() {
   });
 }
 
-function validation() {
-  return {
-    caCertFile: certValidation(),
-    certFile: certValidation(),
-    keyFile: certValidation(),
-  };
-}
-
 export function tlsConfigValidation(): SchemaOf<TLSConfig> {
   return object({
     tls: boolean().default(false),
     skipVerify: boolean().default(false),
-    ...validation(),
+    caCertFile: certValidation(),
+    certFile: certValidation(),
+    keyFile: certValidation(),
   });
 }

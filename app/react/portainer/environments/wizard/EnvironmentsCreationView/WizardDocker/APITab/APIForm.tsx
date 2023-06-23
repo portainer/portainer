@@ -8,6 +8,7 @@ import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
+import { TLSFieldset } from '@/react/components/TLSFieldset/TLSFieldset';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -19,7 +20,6 @@ import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { useValidation } from './APIForm.validation';
 import { FormValues } from './types';
-import { TLSFieldset } from './TLSFieldset';
 
 interface Props {
   onCreate(environment: Environment): void;

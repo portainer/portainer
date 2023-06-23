@@ -5,7 +5,7 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmDestructive } from '@@/modals/confirm';
-import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
+import { isEdgeEnvironment, isDockerAPIEnvironment } from '@/react/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
@@ -301,13 +301,13 @@ function EndpointController(
       try {
         const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
 
+        if (isDockerAPIEnvironment(endpoint)) {
+          $scope.state.showTLSConfig = true;
+        }
+
         // Check if the environment is docker standalone, to decide whether to show the GPU insights box
         const isDockerEnvironment = endpoint.Type === PortainerEndpointTypes.DockerEnvironment;
         if (isDockerEnvironment) {
-          if (endpoint.URL.indexOf('tcp://') === 0) {
-            $scope.state.showTLSConfig = true;
-          }
-
           try {
             const dockerInfo = await getInfo(endpoint.Id);
             const isDockerSwarmEnv = dockerInfo.Swarm && dockerInfo.Swarm.NodeID;

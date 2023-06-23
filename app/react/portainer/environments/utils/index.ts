@@ -67,6 +67,13 @@ export function isLocalEnvironment(environment: Environment) {
   );
 }
 
+export function isDockerAPIEnvironment(environment: Environment) {
+  return (
+    environment.URL.startsWith('tcp://') &&
+    isDockerEnvironment(environment.Type)
+  );
+}
+
 export function getDashboardRoute(environment: Environment) {
   if (isEdgeEnvironment(environment.Type)) {
     if (!environment.EdgeID) {
