@@ -303,6 +303,7 @@ type (
 	StackDeploymentInfo struct {
 		Version    int    `json:"Version"`
 		ConfigHash string `json:"ConfigHash"`
+		EnvVars    []Pair `json:"EnvVars"`
 	}
 
 	//EdgeStack represents an edge stack
