@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/portainer/docker-compose-wrapper/compose"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/pkg/libstack/compose"
 
 	"github.com/rs/zerolog/log"
 )

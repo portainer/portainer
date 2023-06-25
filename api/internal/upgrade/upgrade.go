@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	libstack "github.com/portainer/docker-compose-wrapper"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/platform"
+	"github.com/portainer/portainer/pkg/libstack"
 )
 
 const (

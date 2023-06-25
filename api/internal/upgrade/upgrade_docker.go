@@ -11,8 +11,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/pkg/libstack"
 
 	"github.com/cbroglie/mustache"
 	"github.com/pkg/errors"
