@@ -1,0 +1,7 @@
+version: '3'
+services:
+  web:
+    image: nginx:latest
+  slow-service:
+    image: busybox
+    command: sh -c "sleep 100s"
