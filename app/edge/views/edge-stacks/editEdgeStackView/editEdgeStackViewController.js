@@ -1,4 +1,3 @@
-import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { createWebhookId } from '@/portainer/helpers/webhookHelper';
@@ -28,7 +27,6 @@ export class EditEdgeStackViewController {
 
     this.deployStack = this.deployStack.bind(this);
     this.deployStackAsync = this.deployStackAsync.bind(this);
-    this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
     this.onEditorChange = this.onEditorChange.bind(this);
     this.isEditorDirty = this.isEditorDirty.bind(this);
   }
@@ -36,7 +34,7 @@ export class EditEdgeStackViewController {
   async $onInit() {
     return this.$async(async () => {
       const { stackId, tab } = this.$state.params;
-      this.state.activeTab = tab;
+      this.state.activeTab = tab ? parseInt(tab, 10) : 0;
       try {
         const [edgeGroups, model, file] = await Promise.all([this.EdgeGroupService.groups(), this.EdgeStackService.stack(stackId), this.EdgeStackService.stackFile(stackId)]);
 
@@ -109,21 +107,5 @@ export class EditEdgeStackViewController {
     } finally {
       this.state.actionInProgress = false;
     }
-  }
-
-  getPaginatedEndpoints(lastId, limit, search) {
-    return this.$async(async () => {
-      try {
-        const query = {
-          search,
-          edgeStackId: this.stack.Id,
-        };
-        const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
-
-        return { endpoints: value, totalCount };
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
-      }
-    });
   }
 }

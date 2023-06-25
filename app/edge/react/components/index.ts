@@ -12,9 +12,14 @@ import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
+import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
 
 export const componentsModule = angular
   .module('portainer.edge.react.components', [])
+  .component(
+    'edgeStackEnvironmentsDatatable',
+    r2a(withUIRouter(withReactQuery(EnvironmentsDatatable)), [])
+  )
   .component(
     'edgeGroupsSelector',
     r2a(withUIRouter(withReactQuery(EdgeGroupsSelector)), [
