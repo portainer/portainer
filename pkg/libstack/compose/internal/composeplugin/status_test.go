@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	libstack "github.com/portainer/docker-compose-wrapper"
+	"github.com/portainer/portainer/pkg/libstack"
 )
 
 /*

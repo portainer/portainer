@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	libstack "github.com/portainer/docker-compose-wrapper"
-	"github.com/portainer/docker-compose-wrapper/compose"
+	"github.com/portainer/portainer/pkg/libstack"
+	"github.com/portainer/portainer/pkg/libstack/compose"
 )
 
 func checkPrerequisites(t *testing.T) {

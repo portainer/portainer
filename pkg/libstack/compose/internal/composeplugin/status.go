@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	libstack "github.com/portainer/docker-compose-wrapper"
+	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/rs/zerolog/log"
 )
 
