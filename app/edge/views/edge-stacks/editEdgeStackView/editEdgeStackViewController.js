@@ -34,7 +34,7 @@ export class EditEdgeStackViewController {
   async $onInit() {
     return this.$async(async () => {
       const { stackId, tab } = this.$state.params;
-      this.state.activeTab = tab;
+      this.state.activeTab = tab ? parseInt(tab, 10) : 0;
       try {
         const [edgeGroups, model, file] = await Promise.all([this.EdgeGroupService.groups(), this.EdgeStackService.stack(stackId), this.EdgeStackService.stackFile(stackId)]);
 

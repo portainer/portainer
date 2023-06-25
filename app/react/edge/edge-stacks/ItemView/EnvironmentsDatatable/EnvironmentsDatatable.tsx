@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { useParamState } from '@/react/hooks/useParamState';
 
 import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
@@ -22,7 +23,10 @@ export function EnvironmentsDatatable() {
   const edgeStackQuery = useEdgeStack(stackId);
 
   const [page, setPage] = useState(0);
-  const [statusFilter, setStatusFilter] = useState<StatusType>();
+  const [statusFilter, setStatusFilter] = useParamState<StatusType>(
+    'status',
+    parseStatusFilter
+  );
   const tableState = useTableStateWithoutStorage('name');
   const endpointsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
@@ -38,7 +42,21 @@ export function EnvironmentsDatatable() {
     () =>
       endpointsQuery.environments.map((env) => ({
         ...env,
-        StackStatus: edgeStackQuery.data?.Status[env.Id] as EdgeStackStatus,
+        StackStatus:
+          edgeStackQuery.data?.Status[env.Id] ||
+          ({
+            Details: {
+              Pending: true,
+              Acknowledged: false,
+              ImagesPulled: false,
+              Error: false,
+              Ok: false,
+              RemoteUpdateSuccess: false,
+              Remove: false,
+            },
+            EndpointID: env.Id,
+            Error: '',
+          } satisfies EdgeStackStatus),
       })),
     [edgeStackQuery.data?.Status, endpointsQuery.environments]
   );
@@ -75,4 +93,21 @@ export function EnvironmentsDatatable() {
       }
     />
   );
+}
+
+function parseStatusFilter(status: string | undefined): StatusType | undefined {
+  switch (status) {
+    case 'Pending':
+      return 'Pending';
+    case 'Acknowledged':
+      return 'Acknowledged';
+    case 'ImagesPulled':
+      return 'ImagesPulled';
+    case 'Ok':
+      return 'Ok';
+    case 'Error':
+      return 'Error';
+    default:
+      return undefined;
+  }
 }
