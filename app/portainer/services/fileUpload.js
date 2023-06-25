@@ -14,10 +14,9 @@ angular.module('portainer.app').factory('FileUploadService', [
       return Upload.upload({ url: url, data: { file: file } });
     }
 
-    service.buildImage = function (names, file, path) {
-      var endpointID = EndpointProvider.endpointID();
+    service.buildImage = function (endpointID, names, file, path) {
       return Upload.http({
-        url: 'api/endpoints/' + endpointID + '/docker/build',
+        url: `api/endpoints/${endpointID}/docker/build`,
         headers: {
           'Content-Type': file.type,
         },
@@ -33,10 +32,9 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.buildImageFromFiles = function (names, files) {
-      var endpointID = EndpointProvider.endpointID();
+    service.buildImageFromFiles = function (endpointID, names, files) {
       return Upload.upload({
-        url: 'api/endpoints/' + endpointID + '/docker/build',
+        url: `api/endpoints/${endpointID}/docker/build`,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
