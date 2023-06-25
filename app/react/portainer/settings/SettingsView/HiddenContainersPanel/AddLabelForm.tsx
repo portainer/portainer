@@ -3,18 +3,18 @@ import { Plus } from 'lucide-react';
 import { SchemaOf, object, string } from 'yup';
 import { useReducer } from 'react';
 
-import { notifySuccess } from '@/portainer/services/notifications';
-
-import { LoadingButton } from '@@/buttons';
+import { Button } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
-import { useUpdateSettingsMutation } from '../../queries';
-import { Pair } from '../../types';
-
-export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
+export function AddLabelForm({
+  onSubmit,
+  isLoading,
+}: {
+  onSubmit: (name: string, value: string) => void;
+  isLoading: boolean;
+}) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
-  const mutation = useUpdateSettingsMutation();
 
   const initialValues = {
     name: '',
@@ -28,7 +28,7 @@ export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
       validationSchema={validation}
       key={formKey}
     >
-      {({ errors, isValid }) => (
+      {({ errors, isValid, dirty }) => (
         <Form className="form-horizontal">
           <div className="flex w-full items-start gap-4">
             <FormControl label="Name" errors={errors.name} className="flex-1">
@@ -43,14 +43,13 @@ export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
               <Field as={Input} name="value" placeholder="e.g. bar" />
             </FormControl>
 
-            <LoadingButton
+            <Button
+              type="submit"
               icon={Plus}
-              loadingText="Adding"
-              isLoading={mutation.isLoading}
-              disabled={!isValid}
+              disabled={!dirty || !isValid || isLoading}
             >
               Add filter
-            </LoadingButton>
+            </Button>
           </div>
         </Form>
       )}
@@ -58,20 +57,8 @@ export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
   );
 
   function handleSubmit(values: typeof initialValues) {
-    mutation.mutate(
-      {
-        BlackListedLabels: [
-          ...existingLabels,
-          { name: values.name, value: values.value },
-        ],
-      },
-      {
-        onSuccess: () => {
-          notifySuccess('Success', 'Hidden container settings updated');
-          clearForm();
-        },
-      }
-    );
+    clearForm();
+    onSubmit(values.name, values.value);
   }
 }
 
