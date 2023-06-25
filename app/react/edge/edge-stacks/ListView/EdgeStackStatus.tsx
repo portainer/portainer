@@ -19,22 +19,37 @@ export function EdgeStackStatus({ edgeStack }: { edgeStack: EdgeStack }) {
   const status = Object.values(edgeStack.StatusArray);
   const lastStatus = _.compact(status.map((s) => _.last(s)));
 
-  const { icon, label, mode, spin } = getStatus(lastStatus);
+  const { icon, label, mode, spin } = getStatus(
+    edgeStack.NumDeployments,
+    lastStatus
+  );
 
   return (
     <div className="mx-auto inline-flex items-center gap-2">
-      <Icon icon={icon} spin={spin} mode={mode} />
+      {icon && <Icon icon={icon} spin={spin} mode={mode} />}
       {label}
     </div>
   );
 }
 
-function getStatus(envStatus: Array<EdgeStackStatusType>): {
+function getStatus(
+  numDeployments: number,
+  envStatus: Array<EdgeStackStatusType>
+): {
   label: string;
-  icon: IconType;
+  icon?: IconType;
   spin?: boolean;
-  mode: IconMode;
+  mode?: IconMode;
 } {
+  if (envStatus.length < numDeployments) {
+    return {
+      label: 'Deploying',
+      icon: Loader2,
+      spin: true,
+      mode: 'primary',
+    };
+  }
+
   const allFailed = envStatus.every((s) => s.Type === StatusType.Error);
 
   if (allFailed) {
