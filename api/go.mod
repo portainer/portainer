@@ -42,7 +42,7 @@ require (
 	github.com/portainer/libhttp v0.0.0-20230615144939-a999f666d9a9
 	github.com/portainer/portainer/pkg/featureflags v0.0.0-20230209201943-d73622ed9cd4
 	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230410231754-96474a42eacb
-	github.com/portainer/portainer/pkg/libstack v0.0.0-00010101000000-000000000000
+	github.com/portainer/portainer/pkg/libstack v0.0.0-20230625201041-1e05c996ee92
 	github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.29.0
