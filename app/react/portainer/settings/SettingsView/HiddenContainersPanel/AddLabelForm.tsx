@@ -1,6 +1,7 @@
 import { Formik, Form, Field } from 'formik';
 import { Plus } from 'lucide-react';
 import { SchemaOf, object, string } from 'yup';
+import { useReducer } from 'react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 
@@ -12,6 +13,7 @@ import { useUpdateSettingsMutation } from '../../queries';
 import { Pair } from '../../types';
 
 export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
+  const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const mutation = useUpdateSettingsMutation();
 
   const initialValues = {
@@ -24,6 +26,7 @@ export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validationSchema={validation}
+      key={formKey}
     >
       {({ errors, isValid }) => (
         <Form className="form-horizontal">
@@ -65,6 +68,7 @@ export function AddLabelForm({ existingLabels }: { existingLabels: Pair[] }) {
       {
         onSuccess: () => {
           notifySuccess('Success', 'Hidden container settings updated');
+          clearForm();
         },
       }
     );
