@@ -13,21 +13,7 @@ type Deployer interface {
 	Remove(ctx context.Context, projectName string, filePaths []string, options Options) error
 	Pull(ctx context.Context, filePaths []string, options Options) error
 	Validate(ctx context.Context, filePaths []string, options Options) error
-	// Status returns the status of the stack
-	Status(ctx context.Context, projectName string) (Status, string, error)
 }
-
-type Status string
-
-const (
-	StatusUnknown  Status = "unknown"
-	StatusStarting Status = "starting"
-	StatusRunning  Status = "running"
-	StatusStopped  Status = "stopped"
-	StatusError    Status = "error"
-	StatusRemoving Status = "removing"
-	StatusRemoved  Status = "removed"
-)
 
 type Options struct {
 	WorkingDir  string
