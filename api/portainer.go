@@ -1388,6 +1388,10 @@ type (
 		RollbackStackFile(stackIdentifier, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
+		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int) string
+		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error)
+		FormProjectPathByVersion(projectIdentifier string, version int) string
+		SafeMoveDirectory(src, dst string) error
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
