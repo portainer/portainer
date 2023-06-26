@@ -299,6 +299,12 @@ type (
 		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
+	// StackDeploymentInfo records the information of a deployed stack
+	StackDeploymentInfo struct {
+		Version    int    `json:"Version"`
+		ConfigHash string `json:"ConfigHash"`
+	}
+
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
@@ -340,6 +346,8 @@ type (
 		Details    EdgeStackStatusDetails `json:"Details"`
 		Error      string                 `json:"Error"`
 		EndpointID EndpointID             `json:"EndpointID"`
+		// EE only feature
+		DeploymentInfo StackDeploymentInfo `json:"DeploymentInfo"`
 
 		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
@@ -1380,6 +1388,10 @@ type (
 		RollbackStackFile(stackIdentifier, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
+		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int) string
+		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error)
+		FormProjectPathByVersion(projectIdentifier string, version int) string
+		SafeMoveDirectory(src, dst string) error
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error

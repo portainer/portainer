@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 
 	"io"
 	"os"
@@ -314,6 +315,43 @@ func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileNam
 	}
 
 	return service.wrapFileStore(stackStorePath), nil
+}
+
+// GetEdgeStackProjectPathByVersion returns the absolute path on the FS for a edge stack based
+// on its identifier and version.
+// EE only feature
+func (service *Service) GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int) string {
+	versionStr := fmt.Sprintf("v%d", version)
+	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier, versionStr)
+}
+
+// StoreEdgeStackFileFromBytesByVersion creates a subfolder in the EdgeStackStorePath with version and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+// EE only feature
+func (service *Service) StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error) {
+	versionStr := fmt.Sprintf("v%d", version)
+	stackStorePath := JoinPaths(EdgeStackStorePath, edgeStackIdentifier, versionStr)
+
+	err := service.createDirectoryInStore(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
+// FormProjectPathByVersion returns the absolute path on the FS for a project based with version
+func (service *Service) FormProjectPathByVersion(path string, version int) string {
+	versionStr := fmt.Sprintf("v%d", version)
+	return JoinPaths(path, versionStr)
 }
 
 // StoreRegistryManagementFileFromBytes creates a subfolder in the
@@ -732,6 +770,56 @@ func FileExists(filePath string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// SafeCopyDirectory copies a directory from src to dst in a safe way.
+func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
+	// 1. Backup the source directory to a different folder
+	backupDir := fmt.Sprintf("%s-%s", filepath.Dir(originalPath), "backup")
+	err := MoveDirectory(originalPath, backupDir)
+	if err != nil {
+		return fmt.Errorf("failed to backup source directory: %w", err)
+	}
+
+	defer func() {
+		if err != nil {
+			// If an error occurred, rollback the backup directory
+			restoreErr := restoreBackup(originalPath, backupDir)
+			if restoreErr != nil {
+				log.Warn().Err(restoreErr).Msg("failed to restore backup during creating versioning folder")
+			}
+		}
+	}()
+
+	// 2. Copy the backup directory to the destination directory
+	err = CopyDir(backupDir, newPath, false)
+	if err != nil {
+		return fmt.Errorf("failed to copy backup directory to destination directory: %w", err)
+	}
+
+	// 3. Delete the backup directory
+	err = os.RemoveAll(backupDir)
+	if err != nil {
+		return fmt.Errorf("failed to delete backup directory: %w", err)
+	}
+
+	return nil
+}
+
+func restoreBackup(src, backupDir string) error {
+	// Rollback by deleting the original directory and copying the
+	// backup direcotry back to the source directory, and then deleting
+	// the backup directory
+	err := os.RemoveAll(src)
+	if err != nil {
+		return fmt.Errorf("failed to delete destination directory: %w", err)
+	}
+
+	err = MoveDirectory(backupDir, src)
+	if err != nil {
+		return fmt.Errorf("failed to restore backup directory: %w", err)
+	}
+	return nil
 }
 
 func MoveDirectory(originalPath, newPath string) error {
