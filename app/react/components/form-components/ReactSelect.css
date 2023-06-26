@@ -19,6 +19,14 @@
   overflow: hidden;
 }
 
+.portainer-selector-root.sm .portainer-selector__placeholder {
+  @apply text-xs;
+}
+
+.portainer-selector-root.md .portainer-selector__placeholder {
+  @apply text-sm;
+}
+
 .portainer-selector__indicator-separator {
   display: none;
 }
@@ -27,6 +35,29 @@
 .portainer-selector-root .portainer-selector__control {
   border-color: var(--border-form-control-color);
   background-color: var(--bg-inputbox);
+  box-shadow: none;
+}
+
+/* Match the same box shadow styles as the other portainer inputs, which are inherited from the bootstrap form-control class */
+.portainer-selector-root .portainer-selector__control--is-focused {
+  border-color: #66afe9;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+}
+
+.portainer-selector-root .portainer-selector__control--is-focused:hover {
+  border-color: #66afe9;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+}
+
+.portainer-selector-root.sm .portainer-selector__control {
+  min-height: 30px;
+}
+
+.portainer-selector-root.md .portainer-selector__control {
   min-height: 34px;
 }
 
@@ -36,6 +67,11 @@
 
 .portainer-selector-root .portainer-selector__input-container {
   color: var(--text-form-control-color);
+}
+
+.portainer-selector-root.sm .portainer-selector__input-container {
+  height: 20px;
+  @apply text-xs;
 }
 
 .portainer-selector-root .portainer-selector__dropdown-indicator {
@@ -54,6 +90,14 @@
 
 .portainer-selector-root .portainer-selector__single-value {
   color: var(--single-value-option-text-color);
+}
+
+.portainer-selector-root.sm .portainer-selector__single-value {
+  @apply text-xs;
+}
+
+.portainer-selector-root.md .portainer-selector__single-value {
+  @apply text-sm;
 }
 
 /* Menu colors */
@@ -98,6 +142,10 @@
 .portainer-selector-root .portainer-selector__menu .portainer-selector__option {
   background-color: var(--bg-multiselect-color);
   border-radius: 5px;
+}
+
+.portainer-selector-root.sm .portainer-selector__menu .portainer-selector__option {
+  @apply text-xs;
 }
 
 .portainer-selector__menu-portal .portainer-selector__menu .portainer-selector__option:active,

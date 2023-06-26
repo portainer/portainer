@@ -11,7 +11,7 @@ import { columnHelper } from './helper';
 export const ingressRules = columnHelper.accessor(
   ({ Paths, TLS }) =>
     // return an accessor function with all the useful text to search for
-    Paths.map((path) => {
+    Paths?.map((path) => {
       const isHttp = isHTTP(TLS || [], path.Host);
       return `${isHttp ? 'http' : 'https'}://${path.Host}${path.Path}${
         path.ServiceName

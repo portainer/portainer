@@ -92,25 +92,27 @@ export function useIngresses(
         .flat();
 
       // check if each ingress path service has a service that still exists
-      filteredIngresses.forEach((ing, iIndex) => {
-        const servicesInNamespace = services?.filter(
-          (service) => service?.Namespace === ing?.Namespace
-        );
-        const serviceNamesInNamespace = servicesInNamespace?.map(
-          (service) => service.Name
-        );
-        ing.Paths?.forEach((path, pIndex) => {
-          if (
-            !serviceNamesInNamespace?.includes(path.ServiceName) &&
-            filteredIngresses[iIndex].Paths
-          ) {
-            filteredIngresses[iIndex].Paths[pIndex].HasService = false;
-          } else {
-            filteredIngresses[iIndex].Paths[pIndex].HasService = true;
-          }
-        });
-      });
-      return filteredIngresses;
+      const updatedFilteredIngresses: Ingress[] = filteredIngresses.map(
+        (ing) => {
+          const servicesInNamespace = services?.filter(
+            (service) => service?.Namespace === ing?.Namespace
+          );
+          const serviceNamesInNamespace = servicesInNamespace?.map(
+            (service) => service.Name
+          );
+
+          const updatedPaths =
+            ing.Paths?.map((path) => {
+              const hasService = serviceNamesInNamespace?.includes(
+                path.ServiceName
+              );
+              return { ...path, HasService: hasService };
+            }) || null;
+
+          return { ...ing, Paths: updatedPaths };
+        }
+      );
+      return updatedFilteredIngresses;
     },
     {
       enabled: !!namespaces?.length,
@@ -175,7 +177,7 @@ export function useDeleteIngresses() {
  */
 export function useIngressControllers(
   environmentId: EnvironmentId,
-  namespace: string
+  namespace?: string
 ) {
   return useQuery(
     [
@@ -186,10 +188,8 @@ export function useIngressControllers(
       namespace,
       'ingresscontrollers',
     ],
-    async () => {
-      const ing = await getIngressControllers(environmentId, namespace);
-      return ing;
-    },
+    async () =>
+      namespace ? getIngressControllers(environmentId, namespace) : [],
     {
       enabled: !!namespace,
       cacheTime: 0,

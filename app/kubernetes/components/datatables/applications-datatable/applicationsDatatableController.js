@@ -50,7 +50,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.isExpandable = function (item) {
-      return item.KubernetesApplications || this.hasConfigurationSecrets(item) || !!this.getPublishedUrl(item).length;
+      return item.KubernetesApplications || this.hasConfigurationSecrets(item) || !!this.getPublishedUrls(item).length;
     };
 
     this.expandItem = function (item, expanded) {
@@ -100,7 +100,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
     };
 
-    this.getPublishedUrl = function (item) {
+    this.getPublishedUrls = function (item) {
       // Map all ingress rules in published ports to their respective URLs
       const ingressUrls = item.PublishedPorts.flatMap((pp) => pp.IngressRules)
         .filter(({ Host, IP }) => Host || IP)
@@ -119,7 +119,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       const publishedUrls = [...ingressUrls, ...loadBalancerURLs];
 
       // Return the first URL - priority given to ingress urls, then services (load balancers)
-      return publishedUrls.length > 0 ? publishedUrls[0] : '';
+      return publishedUrls.length > 0 ? publishedUrls : '';
     };
 
     this.hasConfigurationSecrets = function (item) {

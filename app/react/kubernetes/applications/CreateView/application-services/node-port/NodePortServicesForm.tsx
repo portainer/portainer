@@ -7,8 +7,13 @@ import { Card } from '@@/Card';
 import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
 
-import { serviceFormDefaultValues, generateUniqueName, newPort } from './utils';
-import { ServiceFormValues, ServicePort } from './types';
+import {
+  serviceFormDefaultValues,
+  generateUniqueName,
+  newPort,
+} from '../utils';
+import { ServiceFormValues, ServicePort } from '../types';
+
 import { NodePortServiceForm } from './NodePortServiceForm';
 
 interface Props {
@@ -17,6 +22,8 @@ interface Props {
   errors?: FormikErrors<ServiceFormValues[]>;
   appName: string;
   selector: Record<string, string>;
+  namespace?: string;
+  isEditMode?: boolean;
 }
 
 export function NodePortServicesForm({
@@ -25,6 +32,8 @@ export function NodePortServicesForm({
   errors,
   appName,
   selector,
+  namespace,
+  isEditMode,
 }: Props) {
   const nodePortServiceCount = services.filter(
     (service) => service.Type === KubernetesApplicationPublishingTypes.NODE_PORT
@@ -54,6 +63,8 @@ export function NodePortServicesForm({
                   services={services}
                   serviceIndex={index}
                   onChangeService={onChangeService}
+                  namespace={namespace}
+                  isEditMode={isEditMode}
                 />
               ) : null
             )}
