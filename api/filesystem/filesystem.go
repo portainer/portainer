@@ -320,8 +320,11 @@ func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileNam
 // GetEdgeStackProjectPathByVersion returns the absolute path on the FS for a edge stack based
 // on its identifier and version.
 // EE only feature
-func (service *Service) GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int) string {
+func (service *Service) GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string {
 	versionStr := fmt.Sprintf("v%d", version)
+	if commitHash != "" {
+		versionStr = fmt.Sprintf("%s-%s", versionStr, commitHash)
+	}
 	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier, versionStr)
 }
 
@@ -349,8 +352,11 @@ func (service *Service) StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier
 }
 
 // FormProjectPathByVersion returns the absolute path on the FS for a project based with version
-func (service *Service) FormProjectPathByVersion(path string, version int) string {
+func (service *Service) FormProjectPathByVersion(path string, version int, commitHash string) string {
 	versionStr := fmt.Sprintf("v%d", version)
+	if commitHash != "" {
+		versionStr = fmt.Sprintf("%s-%s", versionStr, commitHash)
+	}
 	return JoinPaths(path, versionStr)
 }
 
