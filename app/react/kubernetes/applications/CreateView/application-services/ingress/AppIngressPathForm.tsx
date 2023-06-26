@@ -35,7 +35,7 @@ export function AppIngressPathForm({
   isEditMode,
 }: Props) {
   const [selectedIngress, setSelectedIngress] = useState<IngressOption | null>(
-    ingressHostOptions[0]
+    ingressHostOptions[0] ?? null
   );
 
   // if editing allow the current value as an option,
@@ -72,7 +72,7 @@ export function AppIngressPathForm({
         IngressName: ingressHostOptionsWithCurrentValue[0]?.ingressName,
       };
       onChangeIngressPath(newIngressPath);
-      setSelectedIngress(ingressHostOptionsWithCurrentValue[0]);
+      setSelectedIngress(ingressHostOptionsWithCurrentValue[0] ?? null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ingressHostOptionsWithCurrentValue]);

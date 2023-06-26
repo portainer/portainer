@@ -232,7 +232,7 @@ class KubernetesApplicationService {
           await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, newIngresses));
         }
       } catch (error) {
-        notifyError('Unable to create service', error);
+        notifyError('Unable to update service', error);
       }
     }
 
@@ -372,7 +372,7 @@ class KubernetesApplicationService {
           await Promise.all(this._generateIngressPatchPromises(newFormValues.OriginalIngresses, newIngresses));
         }
       } catch (error) {
-        notifyError('Unable to create service', error);
+        notifyError('Unable to update service', error);
       }
     }
 

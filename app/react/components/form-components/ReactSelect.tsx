@@ -59,7 +59,7 @@ export function Select<
 
   return (
     <Component
-      className={clsx(className, 'portainer-selector-root', `${size}`)}
+      className={clsx(className, 'portainer-selector-root', size)}
       classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
