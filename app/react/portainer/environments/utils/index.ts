@@ -70,7 +70,7 @@ export function isLocalEnvironment(environment: Environment) {
 export function isDockerAPIEnvironment(environment: Environment) {
   return (
     environment.URL.startsWith('tcp://') &&
-    isDockerEnvironment(environment.Type)
+    environment.Type === EnvironmentType.Docker
   );
 }
 

@@ -295,8 +295,7 @@ func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpoin
 	// we assume that new TLS files have been uploaded and we need to reload the TLS configuration.
 	if endpoint.Type != portainer.DockerEnvironment ||
 		!strings.HasPrefix(*payload.URL, "tcp://") ||
-		payload.TLS == nil ||
-		(payload.TLS != nil && !*payload.TLS) {
+		payload.TLS == nil || !*payload.TLS {
 		return false
 	}
 
