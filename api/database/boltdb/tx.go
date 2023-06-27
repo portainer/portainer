@@ -47,6 +47,8 @@ func (tx *DbTransaction) DeleteObject(bucketName string, key []byte) error {
 }
 
 func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, matchingFn func(o interface{}) (id int, ok bool)) error {
+	var ids []int
+
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
 	cursor := bucket.Cursor()
@@ -57,10 +59,13 @@ func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, ma
 		}
 
 		if id, ok := matchingFn(obj); ok {
-			err := bucket.Delete(tx.conn.ConvertToKey(id))
-			if err != nil {
-				return err
-			}
+			ids = append(ids, id)
+		}
+	}
+
+	for _, id := range ids {
+		if err := bucket.Delete(tx.conn.ConvertToKey(id)); err != nil {
+			return err
 		}
 	}
 
