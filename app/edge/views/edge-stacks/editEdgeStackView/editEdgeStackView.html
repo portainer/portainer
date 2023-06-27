@@ -12,7 +12,7 @@
 
             <div style="padding: 20px">
               <edit-edge-stack-form
-                ng-if="$ctrl.edgeGroups && $ctrl.stack && $ctrl.formValues.content"
+                ng-if="$ctrl.edgeGroups && $ctrl.stack && $ctrl.formValues.content !== null"
                 edge-groups="$ctrl.edgeGroups"
                 edge-stack="$ctrl.stack"
                 is-submitting="$ctrl.state.actionInProgress"
