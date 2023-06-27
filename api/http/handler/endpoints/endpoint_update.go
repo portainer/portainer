@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -246,7 +247,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if (payload.URL != nil && *payload.URL != endpoint.URL) || (payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS) || endpoint.Type == portainer.AzureEnvironment {
+	if (payload.URL != nil && *payload.URL != endpoint.URL) ||
+		(payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS) ||
+		endpoint.Type == portainer.AzureEnvironment ||
+		shouldReloadTLSConfiguration(endpoint, &payload) {
 		handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
@@ -284,4 +288,23 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, endpoint)
+}
+
+func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpointUpdatePayload) bool {
+	// When updating Docker API environment, as long as TLS is true and TLSSkipVerify is false,
+	// we assume that new TLS files have been uploaded and we need to reload the TLS configuration.
+	if endpoint.Type != portainer.DockerEnvironment ||
+		!strings.HasPrefix(*payload.URL, "tcp://") ||
+		payload.TLS == nil || !*payload.TLS {
+		return false
+	}
+
+	if payload.TLSSkipVerify != nil && !*payload.TLSSkipVerify {
+		return true
+	}
+
+	if payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify {
+		return true
+	}
+	return false
 }

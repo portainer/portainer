@@ -1,15 +1,20 @@
-import { useFormikContext } from 'formik';
+import { FormikErrors } from 'formik';
+import { SchemaOf, boolean, object } from 'yup';
 
 import { file, withFileSize } from '@@/form-components/yup-file-validation';
 import { FileUploadField } from '@@/form-components/FileUpload';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { FormControl } from '@@/form-components/FormControl';
 
-import { FormValues } from './types';
+import { TLSConfig } from './types';
 
-export function TLSFieldset() {
-  const { values, setFieldValue, errors } = useFormikContext<FormValues>();
+interface Props {
+  values: TLSConfig;
+  onChange: (value: Partial<TLSConfig>) => void;
+  errors?: FormikErrors<TLSConfig>;
+}
 
+export function TLSFieldset({ values, onChange, errors }: Props) {
   return (
     <>
       <div className="form-group">
@@ -18,7 +23,7 @@ export function TLSFieldset() {
             label="TLS"
             labelClass="col-sm-3 col-lg-2"
             checked={values.tls}
-            onChange={(checked) => setFieldValue('tls', checked)}
+            onChange={(checked) => handleChange({ tls: checked })}
           />
         </div>
       </div>
@@ -30,7 +35,8 @@ export function TLSFieldset() {
               <SwitchField
                 label="Skip Certification Verification"
                 checked={!!values.skipVerify}
-                onChange={(checked) => setFieldValue('skipVerify', checked)}
+                onChange={(checked) => handleChange({ skipVerify: checked })}
+                labelClass="col-sm-3 col-lg-2"
               />
             </div>
           </div>
@@ -40,33 +46,33 @@ export function TLSFieldset() {
               <FormControl
                 label="TLS CA certificate"
                 inputId="ca-cert-field"
-                errors={errors.caCertFile}
+                errors={errors?.caCertFile}
               >
                 <FileUploadField
                   inputId="ca-cert-field"
-                  onChange={(file) => setFieldValue('caCertFile', file)}
+                  onChange={(file) => handleChange({ caCertFile: file })}
                   value={values.caCertFile}
                 />
               </FormControl>
               <FormControl
                 label="TLS certificate"
                 inputId="cert-field"
-                errors={errors.certFile}
+                errors={errors?.certFile}
               >
                 <FileUploadField
                   inputId="cert-field"
-                  onChange={(file) => setFieldValue('certFile', file)}
+                  onChange={(file) => handleChange({ certFile: file })}
                   value={values.certFile}
                 />
               </FormControl>
               <FormControl
                 label="TLS key"
                 inputId="tls-key-field"
-                errors={errors.keyFile}
+                errors={errors?.keyFile}
               >
                 <FileUploadField
                   inputId="tls-key-field"
-                  onChange={(file) => setFieldValue('keyFile', file)}
+                  onChange={(file) => handleChange({ keyFile: file })}
                   value={values.keyFile}
                 />
               </FormControl>
@@ -76,21 +82,29 @@ export function TLSFieldset() {
       )}
     </>
   );
+
+  function handleChange(partialValue: Partial<TLSConfig>) {
+    onChange(partialValue);
+  }
 }
 
 const MAX_FILE_SIZE = 5_242_880; // 5MB
 
-function certValidation() {
+function certValidation(optional?: boolean) {
   return withFileSize(file(), MAX_FILE_SIZE).when(['tls', 'skipVerify'], {
-    is: (tls: boolean, skipVerify: boolean) => tls && !skipVerify,
+    is: (tls: boolean, skipVerify: boolean) => tls && !skipVerify && !optional,
     then: (schema) => schema.required('File is required'),
   });
 }
 
-export function validation() {
-  return {
-    caCertFile: certValidation(),
-    certFile: certValidation(),
-    keyFile: certValidation(),
-  };
+export function tlsConfigValidation({
+  optionalCert,
+}: { optionalCert?: boolean } = {}): SchemaOf<TLSConfig> {
+  return object({
+    tls: boolean().default(false),
+    skipVerify: boolean().default(false),
+    caCertFile: certValidation(optionalCert),
+    certFile: certValidation(optionalCert),
+    keyFile: certValidation(optionalCert),
+  });
 }

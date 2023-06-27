@@ -126,6 +126,7 @@ function OverrideSocketFieldset() {
             checked={values.overridePath}
             onChange={(checked) => setFieldValue('overridePath', checked)}
             label="Override default socket path"
+            labelClass="col-sm-3 col-lg-2"
           />
         </div>
       </div>
