@@ -59,7 +59,6 @@ function EndpointController(
       linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux, isBE && commandsTabs.nomadLinux]),
       win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
     },
-    allowOptionalCertValidation: true,
   };
 
   $scope.selectAll = function () {
