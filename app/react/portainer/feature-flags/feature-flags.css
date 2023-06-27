@@ -45,7 +45,7 @@ div.limited-be {
   border-bottom-left-radius: 8px;
 
   @apply bg-warning-5 text-warning-9;
-  @apply th-dark:bg-[--bg-BE-only] th-dark:text-blue-8;
+  @apply th-dark:bg-[color:var(--bg-BE-only)] th-dark:text-blue-8;
 
   padding: 5px 10px;
   touch-action: auto;
@@ -71,7 +71,7 @@ div.limited-be {
 .limited-be input,
 .limited-be .widget-body {
   background: rgba(247, 144, 9, 0.05);
-  @apply th-dark:bg-[--bg-BE-only];
+  @apply th-dark:bg-[color:var(--bg-BE-only)];
 }
 
 .form-control.limited-be[disabled] {
