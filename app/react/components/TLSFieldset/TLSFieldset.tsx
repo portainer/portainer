@@ -90,19 +90,29 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
 
 const MAX_FILE_SIZE = 5_242_880; // 5MB
 
-function certValidation() {
+type CertValidationContext = {
+  optionalCertValidation: boolean;
+};
+
+function certValidation(certValidation?: CertValidationContext) {
   return withFileSize(file(), MAX_FILE_SIZE).when(['tls', 'skipVerify'], {
-    is: (tls: boolean, skipVerify: boolean) => tls && !skipVerify,
+    is: (tls: boolean, skipVerify: boolean) =>
+      tls &&
+      !skipVerify &&
+      certValidation &&
+      !certValidation.optionalCertValidation,
     then: (schema) => schema.required('File is required'),
   });
 }
 
-export function tlsConfigValidation(): SchemaOf<TLSConfig> {
+export function tlsConfigValidation(
+  validationData?: CertValidationContext
+): SchemaOf<TLSConfig> {
   return object({
     tls: boolean().default(false),
     skipVerify: boolean().default(false),
-    caCertFile: certValidation(),
-    certFile: certValidation(),
-    keyFile: certValidation(),
+    caCertFile: certValidation(validationData),
+    certFile: certValidation(validationData),
+    keyFile: certValidation(validationData),
   });
 }

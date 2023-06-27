@@ -129,6 +129,7 @@
             ng-if="!state.edgeEndpoint && endpoint.Status !== 4 && state.showTLSConfig"
             values="formValues.tlsConfig"
             on-change="(onChangeTLSConfigFormValues)"
+            validation-data="{optionalCertValidation: state.allowOptionalCertValidation}"
           ></tls-fieldset>
 
           <azure-endpoint-config
