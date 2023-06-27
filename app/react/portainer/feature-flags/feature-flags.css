@@ -44,8 +44,8 @@ div.limited-be {
   border-top-right-radius: 8px;
   border-bottom-left-radius: 8px;
 
-  @apply text-warning-9 bg-warning-5;
-  @apply th-dark:bg-[color:var(--bg-BE-only)] th-dark:text-blue-8;
+  @apply bg-warning-5 text-warning-9;
+  @apply th-dark:bg-[--bg-BE-only] th-dark:text-blue-8;
 
   padding: 5px 10px;
   touch-action: auto;
@@ -54,12 +54,12 @@ div.limited-be {
 }
 
 .limited-be-link a {
-  @apply cursor-pointer pointer-events-auto;
+  @apply pointer-events-auto cursor-pointer;
   @apply text-warning-9 th-dark:text-blue-8;
 }
 
 .limited-be-link a:hover {
-  @apply underline text-warning-9 th-dark:text-blue-8;
+  @apply text-warning-9 underline th-dark:text-blue-8;
 }
 
 .overlay {
@@ -71,7 +71,7 @@ div.limited-be {
 .limited-be input,
 .limited-be .widget-body {
   background: rgba(247, 144, 9, 0.05);
-  @apply th-dark:bg-[color:var(--bg-BE-only)];
+  @apply th-dark:bg-[--bg-BE-only];
 }
 
 .form-control.limited-be[disabled] {
