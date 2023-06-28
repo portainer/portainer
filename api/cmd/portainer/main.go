@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	libstack "github.com/portainer/docker-compose-wrapper"
-	"github.com/portainer/docker-compose-wrapper/compose"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/build"
@@ -48,6 +46,8 @@ import (
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/libhelm"
+	"github.com/portainer/portainer/pkg/libstack"
+	"github.com/portainer/portainer/pkg/libstack/compose"
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
