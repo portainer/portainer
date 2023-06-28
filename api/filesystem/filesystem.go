@@ -323,7 +323,7 @@ func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileNam
 func (service *Service) GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string {
 	versionStr := fmt.Sprintf("v%d", version)
 	if commitHash != "" {
-		versionStr = fmt.Sprintf("%s-%s", versionStr, commitHash)
+		versionStr = fmt.Sprintf("%s", commitHash)
 	}
 	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier, versionStr)
 }
@@ -355,7 +355,7 @@ func (service *Service) StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier
 func (service *Service) FormProjectPathByVersion(path string, version int, commitHash string) string {
 	versionStr := fmt.Sprintf("v%d", version)
 	if commitHash != "" {
-		versionStr = fmt.Sprintf("%s-%s", versionStr, commitHash)
+		versionStr = fmt.Sprintf("%s", commitHash)
 	}
 	return JoinPaths(path, versionStr)
 }
