@@ -57,14 +57,14 @@ axios.interceptors.request.use(agentInterceptor);
  * @returns A PortainerError with the parsed error message and details.
  */
 export function parseAxiosError(
-  err: Error,
+  err: unknown,
   msg = '',
   parseError = defaultErrorParser
 ) {
   let resultErr = err;
   let resultMsg = msg;
 
-  if ('isAxiosError' in err) {
+  if (isAxiosError(err)) {
     const { error, details } = parseError(err as AxiosError);
     resultErr = error;
     if (msg && details) {

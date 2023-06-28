@@ -22,3 +22,24 @@ export function withFileSize(fileValidation: FileSchema, maxSize: number) {
     return file.size <= maxSize;
   }
 }
+
+export function withFileExtension(
+  fileValidation: FileSchema,
+  allowedExtensions: string[]
+) {
+  return fileValidation.test(
+    'fileExtension',
+    'Selected file has invalid extension.',
+    validateFileExtension
+  );
+
+  function validateFileExtension(file?: File) {
+    if (!file) {
+      return true;
+    }
+
+    const fileExtension = file.name.split('.').pop();
+
+    return allowedExtensions.includes(fileExtension || '');
+  }
+}
