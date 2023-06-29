@@ -13,7 +13,7 @@ import (
 )
 
 // UpdateGitObject updates a git object based on its config
-func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *gittypes.RepoConfig, forceUpdate bool, projectPath string) (bool, string, error) {
+func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *gittypes.RepoConfig, forceUpdate, enableVersionFolder bool, projectPath string) (bool, string, error) {
 	if gitConfig == nil {
 		return false, "", nil
 	}
@@ -47,12 +47,15 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 		return false, newHash, nil
 	}
 
-	projectVersionFolder := filesystem.JoinPaths(projectPath, newHash)
+	toDir := projectPath
+	if enableVersionFolder {
+		toDir = filesystem.JoinPaths(projectPath, newHash)
+	}
 
 	cloneParams := &cloneRepositoryParameters{
 		url:           gitConfig.URL,
 		ref:           gitConfig.ReferenceName,
-		toDir:         projectVersionFolder,
+		toDir:         toDir,
 		tlsSkipVerify: gitConfig.TLSSkipVerify,
 	}
 	if gitConfig.Authentication != nil {
