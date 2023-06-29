@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/rs/zerolog/log"
@@ -46,10 +47,12 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 		return false, newHash, nil
 	}
 
+	projectVersionFolder := filesystem.JoinPaths(projectPath, newHash)
+
 	cloneParams := &cloneRepositoryParameters{
 		url:           gitConfig.URL,
 		ref:           gitConfig.ReferenceName,
-		toDir:         projectPath,
+		toDir:         projectVersionFolder,
 		tlsSkipVerify: gitConfig.TLSSkipVerify,
 	}
 	if gitConfig.Authentication != nil {
