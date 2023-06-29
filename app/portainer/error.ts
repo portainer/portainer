@@ -1,9 +1,9 @@
 export default class PortainerError extends Error {
-  err?: Error;
+  err?: unknown;
 
   isPortainerError = true;
 
-  constructor(msg: string, err?: Error) {
+  constructor(msg: string, err?: unknown) {
     super(msg);
     this.err = err;
   }

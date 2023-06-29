@@ -14,6 +14,7 @@ export interface Props {
   required?: boolean;
   inputId: string;
   color?: ComponentProps<typeof Button>['color'];
+  name?: string;
 }
 
 export function FileUploadField({
@@ -24,6 +25,7 @@ export function FileUploadField({
   required = false,
   inputId,
   color = 'primary',
+  name,
 }: Props) {
   const fileRef = createRef<HTMLInputElement>();
 
@@ -38,6 +40,7 @@ export function FileUploadField({
         className={styles.fileInput}
         onChange={changeHandler}
         aria-label="file-input"
+        name={name}
       />
       <Button
         size="small"

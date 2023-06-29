@@ -8,6 +8,7 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { ApplicationSettingsPanel } from '@/react/portainer/settings/SettingsView/ApplicationSettingsPanel';
 import { KubeSettingsPanel } from '@/react/portainer/settings/SettingsView/KubeSettingsPanel';
+import { HelmCertPanel } from '@/react/portainer/settings/SettingsView/HelmCertPanel';
 
 export const settingsModule = angular
   .module('portainer.app.react.components.settings', [])
@@ -24,6 +25,7 @@ export const settingsModule = angular
     'applicationSettingsPanel',
     r2a(withReactQuery(ApplicationSettingsPanel), ['onSuccess'])
   )
+  .component('helmCertPanel', r2a(withReactQuery(HelmCertPanel), []))
   .component(
     'kubeSettingsPanel',
     r2a(withUIRouter(withReactQuery(KubeSettingsPanel)), [])
