@@ -63,9 +63,8 @@ div.limited-be {
 }
 
 .overlay {
-  background-image: url(~@/assets/ico/lock.svg);
-  background-repeat: no-repeat;
-  background-position: center;
+  @apply bg-center bg-no-repeat;
+  @apply bg-[url(~@/assets/ico/lock.svg)] th-dark:bg-[url(~@/assets/ico/lock-2.svg)];
 }
 
 .limited-be input,
