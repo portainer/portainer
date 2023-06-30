@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/slices"
+	"github.com/portainer/portainer/api/internal/unique"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -125,7 +126,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
-		endpointsToUpdate := append(newRelatedEndpoints, oldRelatedEndpoints...)
+		endpointsToUpdate := unique.Unique(append(newRelatedEndpoints, oldRelatedEndpoints...))
 
 		edgeJobs, err := tx.EdgeJob().ReadAll()
 		if err != nil {
