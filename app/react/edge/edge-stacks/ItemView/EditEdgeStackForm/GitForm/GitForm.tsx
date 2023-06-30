@@ -257,7 +257,7 @@ function InnerForm({
 
       <FormSection title="Actions">
         <LoadingButton
-          disabled={!dirty || !isValid || isLoading}
+          disabled={dirty || !isValid || isLoading}
           isLoading={isUpdateVersion && isLoading}
           loadingText="updating stack..."
         >
