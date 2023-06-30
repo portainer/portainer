@@ -6,13 +6,14 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/rs/zerolog/log"
 )
 
 // UpdateGitObject updates a git object based on its config
-func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *gittypes.RepoConfig, forceUpdate bool, projectPath string) (bool, string, error) {
+func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *gittypes.RepoConfig, forceUpdate, enableVersionFolder bool, projectPath string) (bool, string, error) {
 	if gitConfig == nil {
 		return false, "", nil
 	}
@@ -46,10 +47,15 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 		return false, newHash, nil
 	}
 
+	toDir := projectPath
+	if enableVersionFolder {
+		toDir = filesystem.JoinPaths(projectPath, newHash)
+	}
+
 	cloneParams := &cloneRepositoryParameters{
 		url:           gitConfig.URL,
 		ref:           gitConfig.ReferenceName,
-		toDir:         projectPath,
+		toDir:         toDir,
 		tlsSkipVerify: gitConfig.TLSSkipVerify,
 	}
 	if gitConfig.Authentication != nil {
