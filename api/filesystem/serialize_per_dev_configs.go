@@ -5,17 +5,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-)
 
-type FilterType string
-
-const (
-	FilterTypeFile FilterType = "file"
-	FilterTypeDir  FilterType = "dir"
+	"github.com/portainer/portainer/api"
 )
 
 // FilterDirForPerDevConfigs filers the given dirEntries, returns entries for the given device
-func FilterDirForPerDevConfigs(dirEntries []DirEntry, deviceName, configPath string, filterType FilterType) []DirEntry {
+// For given configPath A/B/C, return entries:
+//  1. all entries outside of dir A
+//  2. dir entries A, A/B, A/B/C
+//  3. For filterType file:
+//     file entries: A/B/C/<deviceName> and A/B/C/<deviceName>.*
+//  4. For filterType dir:
+//     dir entry:   A/B/C/<deviceName>
+//     all entries: A/B/C/<deviceName>/*
+func FilterDirForPerDevConfigs(dirEntries []DirEntry, deviceName, configPath string, filterType portainer.PerDevConfigsFilterType) []DirEntry {
 	var filteredDirEntries []DirEntry
 
 	for _, dirEntry := range dirEntries {
@@ -27,12 +30,44 @@ func FilterDirForPerDevConfigs(dirEntries []DirEntry, deviceName, configPath str
 	return filteredDirEntries
 }
 
+func shouldIncludeEntry(dirEntry DirEntry, deviceName, configPath string, filterType portainer.PerDevConfigsFilterType) bool {
+
+	// Include all entries outside of dir A
+	if !isInConfigRootDir(dirEntry, configPath) {
+		return true
+	}
+
+	// Include dir entries A, A/B, A/B/C
+	if isParentDir(dirEntry, configPath) {
+		return true
+	}
+
+	if filterType == portainer.PerDevConfigsTypeFile {
+		// Include file entries A/B/C/<deviceName> or A/B/C/<deviceName>.*
+		return shouldIncludeFile(dirEntry, deviceName, configPath)
+	}
+
+	// Include:
+	// dir entry A/B/C/<deviceName>
+	// all entries A/B/C/<deviceName>/*
+	return shouldIncludeDir(dirEntry, deviceName, configPath)
+}
+
+func isInConfigRootDir(dirEntry DirEntry, configPath string) bool {
+	// get the first element of the configPath
+	rootDir := strings.Split(configPath, string(os.PathSeparator))[0]
+
+	// return true if entry name starts with "A/"
+	return strings.HasPrefix(dirEntry.Name, appendTailSeparator(rootDir))
+}
+
 func isParentDir(dirEntry DirEntry, configPath string) bool {
 	if dirEntry.IsFile {
 		return false
 	}
 
-	return strings.HasPrefix(configPath, appendTailSeparator(dirEntry.Name))
+	// return true for dir entries A, A/B, A/B/C
+	return strings.HasPrefix(appendTailSeparator(configPath), appendTailSeparator(dirEntry.Name))
 }
 
 func shouldIncludeFile(dirEntry DirEntry, deviceName, configPath string) bool {
@@ -40,47 +75,30 @@ func shouldIncludeFile(dirEntry DirEntry, deviceName, configPath string) bool {
 		return false
 	}
 
+	// example: A/B/C/<deviceName>
 	filterEqual := filepath.Join(configPath, deviceName)
+
+	// example: A/B/C/<deviceName>/
 	filterPrefix := fmt.Sprintf("%s.", filterEqual)
 
-	// include file: <configPath>/<deviceName> or <configPath>/<deviceName>.*
+	// include file entries: A/B/C/<deviceName> or A/B/C/<deviceName>.*
 	return dirEntry.Name == filterEqual || strings.HasPrefix(dirEntry.Name, filterPrefix)
 }
 
 func shouldIncludeDir(dirEntry DirEntry, deviceName, configPath string) bool {
+	// example: A/B/C/'/<deviceName>
 	filterEqual := filepath.Join(configPath, deviceName)
+
+	// example: A/B/C/<deviceName>/
 	filterPrefix := appendTailSeparator(filterEqual)
 
-	// include dir: <configPath>/<deviceName>
+	// include dir entry: A/B/C/<deviceName>
 	if !dirEntry.IsFile && dirEntry.Name == filterEqual {
 		return true
 	}
 
-	// include file and dir: <configPath>/<deviceName>/*
+	// include all entries A/B/C/<deviceName>/*
 	return strings.HasPrefix(dirEntry.Name, filterPrefix)
-}
-
-func isInConfigRootDir(dirEntry DirEntry, configPath string) bool {
-	// get the first element of the configPath
-	rootDir := strings.Split(configPath, string(os.PathSeparator))[0]
-
-	return strings.HasPrefix(dirEntry.Name, appendTailSeparator(rootDir))
-}
-
-func shouldIncludeEntry(dirEntry DirEntry, deviceName, configPath string, filterType FilterType) bool {
-	if !isInConfigRootDir(dirEntry, configPath) {
-		return true
-	}
-
-	if isParentDir(dirEntry, configPath) {
-		return true
-	}
-
-	if filterType == FilterTypeFile {
-		return shouldIncludeFile(dirEntry, deviceName, configPath)
-	}
-
-	return shouldIncludeDir(dirEntry, deviceName, configPath)
 }
 
 func appendTailSeparator(path string) string {

@@ -28,6 +28,7 @@ type baseOption struct {
 type fetchOption struct {
 	baseOption
 	referenceName string
+	dirOnly       bool
 }
 
 // cloneOption allows to add a history truncated to the specified number of commits
@@ -224,8 +225,8 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 
 // ListFiles will list all the files of the target repository with specific extensions.
 // If extension is not provided, it will list all the files under the target repository
-func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
-	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify))
+func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, dirOnly, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
+	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify), strconv.FormatBool(dirOnly))
 
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
@@ -254,6 +255,7 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 			tlsSkipVerify: tlsSkipVerify,
 		},
 		referenceName: referenceName,
+		dirOnly:       dirOnly,
 	}
 
 	var (
