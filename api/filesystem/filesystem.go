@@ -239,10 +239,57 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 	return service.wrapFileStore(stackStorePath), nil
 }
 
+// StoreStackFileFromBytesByVersion creates a version subfolder in the ComposeStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error) {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
+	err := service.createDirectoryInStore(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
 // UpdateStoreStackFileFromBytes makes stack file backup and updates a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	err := service.createBackupFileInStore(composeFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
+// UpdateStoreStackFileFromBytesByVersion makes stack file backup and updates a new file from bytes.
+// It returns the path to the version folder where the file is stored.
+func (service *Service) UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error) {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	err := service.createBackupFileInStore(composeFilePath)
 	if err != nil {
