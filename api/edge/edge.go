@@ -1,6 +1,9 @@
 package edge
 
-import "github.com/portainer/portainer/api/filesystem"
+import (
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+)
 
 type (
 
@@ -40,6 +43,9 @@ type (
 		SupportRelativePath bool
 		// Mount point for relative path
 		FilesystemPath string
+		// Used only for EE
+		// EnvVars is a list of environment variables to inject into the stack
+		EnvVars []portainer.Pair
 	}
 
 	// RegistryCredentials holds the credentials for a Docker registry.

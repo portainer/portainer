@@ -66,6 +66,10 @@
             state="$ctrl.state"
           ></edge-stacks-kube-manifest-form>
 
+          <div ng-if="$ctrl.isBE">
+            <environment-variables-panel values="$ctrl.formValues.envVars" on-change="($ctrl.onEnvVarChange)"></environment-variables-panel>
+          </div>
+
           <!-- actions -->
           <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">

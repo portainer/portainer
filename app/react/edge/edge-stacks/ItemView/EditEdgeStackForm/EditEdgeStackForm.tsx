@@ -15,6 +15,10 @@ import { TextTip } from '@@/Tip/TextTip';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { LoadingButton } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
+import {
+  EnvironmentVariablesPanel,
+  envVarValidation,
+} from '@@/form-components/EnvironmentVariablesFieldset';
 
 import { PrivateRegistryFieldsetWrapper } from './PrivateRegistryFieldsetWrapper';
 import { FormValues } from './types';
@@ -61,6 +65,7 @@ export function EditEdgeStackForm({
     prePullImage: edgeStack.PrePullImage,
     retryDeploy: edgeStack.RetryDeploy,
     webhookEnabled: !!edgeStack.Webhook,
+    envVars: edgeStack.EnvVars || [],
   };
 
   return (
@@ -181,6 +186,13 @@ function InnerForm({
             onFieldError={(error) => setFieldError('privateRegistryId', error)}
             error={errors.privateRegistryId}
           />
+
+          <EnvironmentVariablesPanel
+            onChange={(value) => setFieldValue('envVars', value)}
+            values={values.envVars}
+            errors={errors.envVars}
+          />
+
           {values.deploymentType === DeploymentType.Compose && (
             <>
               <div className="form-group">
@@ -271,5 +283,6 @@ function formValidation(): SchemaOf<FormValues> {
       .required()
       .min(1, 'At least one edge group is required'),
     webhookEnabled: boolean().default(false),
+    envVars: envVarValidation(),
   });
 }

@@ -31,6 +31,8 @@ import { LoadingButton } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
 import { FormError } from '@@/form-components/FormError';
+import { EnvironmentVariablesPanel } from '@@/form-components/EnvironmentVariablesFieldset';
+import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { useValidateEnvironmentTypes } from '../useEdgeGroupHasType';
 import { atLeastTwo } from '../atLeastTwo';
@@ -43,6 +45,7 @@ interface FormValues {
   autoUpdate: AutoUpdateModel;
   refName: string;
   authentication: GitAuthModel;
+  envVars: EnvVar[];
 }
 
 export function GitForm({ stack }: { stack: EdgeStack }) {
@@ -63,6 +66,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
     autoUpdate: parseAutoUpdateResponse(stack.AutoUpdate),
     refName: stack.GitConfig.ReferenceName,
     authentication: parseAuthResponse(stack.GitConfig.Authentication),
+    envVars: stack.EnvVars || [],
   };
 
   const webhookId = stack.AutoUpdate?.Webhook || createWebhookId();
@@ -252,6 +256,12 @@ function InnerForm({
             })
           }
           errors={errors.authentication}
+        />
+
+        <EnvironmentVariablesPanel
+          onChange={(value) => setFieldValue('envVars', value)}
+          values={values.envVars}
+          errors={errors.envVars}
         />
       </FormSection>
 
