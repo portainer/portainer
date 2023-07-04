@@ -347,9 +347,11 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 		return nil
 	}
 
-	// update the last used time of the key
-	apiKey.LastUsed = time.Now().UTC().Unix()
-	bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
+		// update the last used time of the key
+		apiKey.LastUsed = now
+		bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+	}
 
 	return tokenData
 }
