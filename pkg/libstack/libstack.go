@@ -13,7 +13,7 @@ type Deployer interface {
 	Remove(ctx context.Context, projectName string, filePaths []string, options Options) error
 	Pull(ctx context.Context, filePaths []string, options Options) error
 	Validate(ctx context.Context, filePaths []string, options Options) error
-	Status(ctx context.Context, projectName string) (Status, string, error)
+	WaitForStatus(ctx context.Context, name string, status Status) (<-chan string, <-chan error)
 }
 
 type Status string

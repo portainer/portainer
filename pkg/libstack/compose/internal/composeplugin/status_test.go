@@ -25,32 +25,19 @@ func TestComposeProjectStatus(t *testing.T) {
 		ExpectedStatus        libstack.Status
 		ExpectedStatusMessage bool
 	}{
-		// {
-		// 	TestName:              "starting",
-		// 	ComposeFile:           "status_test_files/starting.yml",
-		// 	ExpectedStatus:        libstack.StatusStarting,
-		// },
+
 		{
 			TestName:       "running",
 			ComposeFile:    "status_test_files/running.yml",
 			ExpectedStatus: libstack.StatusRunning,
 		},
-		// {
-		// 	TestName:              "removing",
-		// 	ComposeFile:           "status_test_files/removing.yml",
-		// 	ExpectedStatus:        libstack.StatusRemoving,
-		// },
+
 		{
 			TestName:              "failed",
 			ComposeFile:           "status_test_files/failed.yml",
 			ExpectedStatus:        libstack.StatusError,
 			ExpectedStatusMessage: true,
 		},
-		// {
-		// 	TestName:              "removed",
-		// 	ComposeFile:           "status_test_files/removed.yml",
-		// 	ExpectedStatus:        libstack.StatusRemoved,
-		// },
 	}
 
 	w := setup(t)
@@ -70,7 +57,7 @@ func TestComposeProjectStatus(t *testing.T) {
 
 			time.Sleep(5 * time.Second)
 
-			status, statusMessage, err := w.Status(ctx, projectName)
+			status, statusMessage, err := waitForStatus(w, ctx, projectName, libstack.StatusRunning)
 			if err != nil {
 				t.Fatalf("[test: %s] Failed to get compose project status: %v", testCase.TestName, err)
 			}
@@ -90,7 +77,7 @@ func TestComposeProjectStatus(t *testing.T) {
 
 			time.Sleep(20 * time.Second)
 
-			status, statusMessage, err = w.Status(ctx, projectName)
+			status, statusMessage, err = waitForStatus(w, ctx, projectName, libstack.StatusRemoved)
 			if err != nil {
 				t.Fatalf("[test: %s] Failed to get compose project status: %v", testCase.TestName, err)
 			}
@@ -103,5 +90,20 @@ func TestComposeProjectStatus(t *testing.T) {
 				t.Fatalf("[test: %s] Expected empty status message: %s, got: %s", "", testCase.TestName, statusMessage)
 			}
 		})
+	}
+}
+
+func waitForStatus(deployer libstack.Deployer, ctx context.Context, stackName string, requiredStatus libstack.Status) (libstack.Status, string, error) {
+	statusCh, errCh := deployer.WaitForStatus(ctx, stackName, requiredStatus)
+	select {
+	case result := <-statusCh:
+		if result == "" {
+			return requiredStatus, "", nil
+		}
+
+		return libstack.StatusError, result, nil
+
+	case err := <-errCh:
+		return "", "", err
 	}
 }

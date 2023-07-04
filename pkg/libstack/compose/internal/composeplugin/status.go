@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/rs/zerolog/log"
@@ -101,21 +102,71 @@ func aggregateStatuses(services []service) (libstack.Status, string) {
 
 }
 
-func (wrapper *PluginWrapper) Status(ctx context.Context, projectName string) (libstack.Status, string, error) {
-	output, err := wrapper.command(newCommand([]string{"ps", "-a", "--format", "json"}, nil), libstack.Options{
-		ProjectName: projectName,
-	})
-	if len(output) == 0 || err != nil {
-		return "", "", err
-	}
+func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, status libstack.Status) (<-chan string, <-chan error) {
+	resultCh := make(chan string)
+	errCh := make(chan error)
 
-	var services []service
-	err = json.Unmarshal(output, &services)
-	if err != nil {
-		return "", "", fmt.Errorf("failed to parse docker compose output: %w", err)
-	}
+	go func() {
+		timeout := time.After(5 * time.Minute)
+		for {
+			output, err := wrapper.command(newCommand([]string{"ps", "-a", "--format", "json"}, nil), libstack.Options{
+				ProjectName: name,
+			})
+			if len(output) == 0 {
+				log.Debug().
+					Str("project_name", name).
+					Msg("no output from docker compose ps")
+				continue
+			}
 
-	aggregateStatus, statusMessage := aggregateStatuses(services)
-	return aggregateStatus, statusMessage, nil
+			if err != nil {
+				log.Debug().
+					Str("project_name", name).
+					Err(err).
+					Msg("error from docker compose ps")
+				continue
+			}
 
+			var services []service
+			err = json.Unmarshal(output, &services)
+			if err != nil {
+				log.Debug().
+					Str("project_name", name).
+					Err(err).
+					Msg("failed to parse docker compose output")
+				continue
+			}
+
+			if len(services) == 0 && status == libstack.StatusRemoved {
+				resultCh <- ""
+				errCh <- nil
+				return
+			}
+
+			aggregateStatus, errorMessage := aggregateStatuses(services)
+			if aggregateStatus == status {
+				resultCh <- ""
+				errCh <- nil
+				return
+			}
+
+			if errorMessage != "" {
+				resultCh <- errorMessage
+				return
+			}
+
+			select {
+			case <-timeout:
+				errCh <- fmt.Errorf("timeout waiting for status %s", status)
+			case <-ctx.Done():
+				errCh <- ctx.Err()
+				return
+			default:
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	return resultCh, errCh
 }
