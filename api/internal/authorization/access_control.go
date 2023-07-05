@@ -187,15 +187,17 @@ func UserCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 // GetResourceControlByResourceIDAndType retrieves the first matching resource control in a set of resource controls
 // based on the specified id and resource type parameters.
 func GetResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
-	for _, resourceControl := range resourceControls {
-		if resourceID == resourceControl.ResourceID && resourceType == resourceControl.Type {
-			return &resourceControl
+	for i := range resourceControls {
+		if resourceID == resourceControls[i].ResourceID && resourceType == resourceControls[i].Type {
+			return &resourceControls[i]
 		}
-		for _, subResourceID := range resourceControl.SubResourceIDs {
-			if resourceID == subResourceID {
-				return &resourceControl
+
+		for j := range resourceControls[i].SubResourceIDs {
+			if resourceID == resourceControls[i].SubResourceIDs[j] {
+				return &resourceControls[i]
 			}
 		}
 	}
+
 	return nil
 }
