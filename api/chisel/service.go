@@ -271,14 +271,7 @@ func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tun
 		return err
 	}
 
-	endpointURL := endpoint.URL
-
 	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
-	err = service.snapshotService.SnapshotEndpoint(endpoint)
-	if err != nil {
-		return err
-	}
 
-	endpoint.URL = endpointURL
-	return service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	return service.snapshotService.SnapshotEndpoint(endpoint)
 }
