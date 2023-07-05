@@ -102,13 +102,22 @@ func aggregateStatuses(services []service) (libstack.Status, string) {
 
 }
 
-func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, status libstack.Status) (<-chan string, <-chan error) {
-	resultCh := make(chan string)
-	errCh := make(chan error)
+func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, status libstack.Status) <-chan string {
+	errorMessageCh := make(chan string)
 
 	go func() {
 		timeout := time.After(5 * time.Minute)
 		for {
+			select {
+			case <-timeout:
+				return
+			case <-ctx.Done():
+				return
+			default:
+			}
+
+			time.Sleep(1 * time.Second)
+
 			output, err := wrapper.command(newCommand([]string{"ps", "-a", "--format", "json"}, nil), libstack.Options{
 				ProjectName: name,
 			})
@@ -138,35 +147,28 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 			}
 
 			if len(services) == 0 && status == libstack.StatusRemoved {
-				resultCh <- ""
-				errCh <- nil
+				errorMessageCh <- ""
 				return
 			}
 
 			aggregateStatus, errorMessage := aggregateStatuses(services)
 			if aggregateStatus == status {
-				resultCh <- ""
-				errCh <- nil
+				errorMessageCh <- ""
 				return
 			}
 
 			if errorMessage != "" {
-				resultCh <- errorMessage
+				errorMessageCh <- errorMessage
 				return
 			}
 
-			select {
-			case <-timeout:
-				errCh <- fmt.Errorf("timeout waiting for status %s", status)
-			case <-ctx.Done():
-				errCh <- ctx.Err()
-				return
-			default:
-			}
+			log.Debug().
+				Str("project_name", name).
+				Str("status", string(aggregateStatus)).
+				Msg("waiting for status")
 
-			time.Sleep(1 * time.Second)
 		}
 	}()
 
-	return resultCh, errCh
+	return errorMessageCh
 }

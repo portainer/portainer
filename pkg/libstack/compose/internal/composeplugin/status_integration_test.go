@@ -2,6 +2,7 @@ package composeplugin
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -18,7 +19,15 @@ import (
 
 */
 
+func ensureIntegrationTest(t *testing.T) {
+	if _, ok := os.LookupEnv("INTEGRATION_TEST"); !ok {
+		t.Skip("skip an integration test")
+	}
+}
+
 func TestComposeProjectStatus(t *testing.T) {
+	ensureIntegrationTest(t)
+
 	testCases := []struct {
 		TestName              string
 		ComposeFile           string
@@ -94,7 +103,10 @@ func TestComposeProjectStatus(t *testing.T) {
 }
 
 func waitForStatus(deployer libstack.Deployer, ctx context.Context, stackName string, requiredStatus libstack.Status) (libstack.Status, string, error) {
-	statusCh, errCh := deployer.WaitForStatus(ctx, stackName, requiredStatus)
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
+	defer cancel()
+
+	statusCh := deployer.WaitForStatus(ctx, stackName, requiredStatus)
 	select {
 	case result := <-statusCh:
 		if result == "" {
@@ -102,8 +114,7 @@ func waitForStatus(deployer libstack.Deployer, ctx context.Context, stackName st
 		}
 
 		return libstack.StatusError, result, nil
-
-	case err := <-errCh:
-		return "", "", err
+	case <-ctx.Done():
+		return libstack.StatusError, "", ctx.Err()
 	}
 }
