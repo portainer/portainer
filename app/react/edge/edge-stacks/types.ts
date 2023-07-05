@@ -32,11 +32,15 @@ export enum StatusType {
   Removing,
 }
 
-export interface EdgeStackStatus {
+export interface DeploymentStatus {
   Type: StatusType;
   Error: string;
-  EndpointID: EnvironmentId;
   Time: number;
+}
+
+export interface EdgeStackStatus {
+  Status: Array<DeploymentStatus>;
+  EndpointID: EnvironmentId;
 }
 
 export enum DeploymentType {
@@ -51,7 +55,7 @@ export enum DeploymentType {
 export type EdgeStack = {
   Id: number;
   Name: string;
-  StatusArray: { [key: EnvironmentId]: Array<EdgeStackStatus> };
+  Status: { [key: EnvironmentId]: EdgeStackStatus };
   CreationDate: number;
   EdgeGroups: Array<EdgeGroup['Id']>;
   Registries: RegistryId[];

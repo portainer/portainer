@@ -290,7 +290,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	edgeStack := portainer.EdgeStack{
 		ID:   edgeStackID,
 		Name: "test-edge-stack-17",
-		StatusArray: map[portainer.EndpointID][]portainer.EdgeStackStatus{
+		Status: map[portainer.EndpointID]portainer.EdgeStackStatus{
 			endpointID: {},
 		},
 		CreationDate:   time.Now().Unix(),

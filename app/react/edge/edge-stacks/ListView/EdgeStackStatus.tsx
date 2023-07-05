@@ -9,15 +9,11 @@ import {
 
 import { Icon, IconMode } from '@@/Icon';
 
-import {
-  EdgeStack,
-  EdgeStackStatus as EdgeStackStatusType,
-  StatusType,
-} from '../types';
+import { DeploymentStatus, EdgeStack, StatusType } from '../types';
 
 export function EdgeStackStatus({ edgeStack }: { edgeStack: EdgeStack }) {
-  const status = Object.values(edgeStack.StatusArray);
-  const lastStatus = _.compact(status.map((s) => _.last(s)));
+  const status = Object.values(edgeStack.Status);
+  const lastStatus = _.compact(status.map((s) => _.last(s.Status)));
 
   const { icon, label, mode, spin } = getStatus(
     edgeStack.NumDeployments,
@@ -34,7 +30,7 @@ export function EdgeStackStatus({ edgeStack }: { edgeStack: EdgeStack }) {
 
 function getStatus(
   numDeployments: number,
-  envStatus: Array<EdgeStackStatusType>
+  envStatus: Array<DeploymentStatus>
 ): {
   label: string;
   icon?: IconType;

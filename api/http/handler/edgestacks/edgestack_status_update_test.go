@@ -65,14 +65,14 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 		t.Fatal("error decoding response:", err)
 	}
 
-	endpointStatus, ok := updatedStack.StatusArray[payload.EndpointID]
+	endpointStatus, ok := updatedStack.Status[payload.EndpointID]
 	if !ok {
 		t.Fatal("Missing status")
 	}
 
-	lastStatus := endpointStatus[len(endpointStatus)-1]
+	lastStatus := endpointStatus.Status[len(endpointStatus.Status)-1]
 
-	if len(endpointStatus) == len(edgeStack.StatusArray[payload.EndpointID]) {
+	if len(endpointStatus.Status) == len(edgeStack.Status[payload.EndpointID].Status) {
 		t.Fatal("expected status array to be updated")
 	}
 
@@ -80,8 +80,8 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 		t.Fatalf("expected EdgeStackStatusType %d, found %d", *payload.Status, lastStatus.Type)
 	}
 
-	if lastStatus.EndpointID != portainer.EndpointID(payload.EndpointID) {
-		t.Fatalf("expected EndpointID %d, found %d", payload.EndpointID, lastStatus.EndpointID)
+	if endpointStatus.EndpointID != portainer.EndpointID(payload.EndpointID) {
+		t.Fatalf("expected EndpointID %d, found %d", payload.EndpointID, endpointStatus.EndpointID)
 	}
 
 }

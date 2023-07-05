@@ -3,6 +3,7 @@ package edgestacks
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
@@ -174,7 +175,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 	err = tx.EdgeStack().UpdateEdgeStackFunc(stack.ID, func(edgeStack *portainer.EdgeStack) {
 		edgeStack.NumDeployments = len(relatedEndpointIds)
 		if payload.UpdateVersion {
-			edgeStack.StatusArray = make(map[portainer.EndpointID][]portainer.EdgeStackStatus)
+			edgeStack.Status = newStatus(edgeStack.Status, relatedEndpointIds)
 			edgeStack.Version++
 		}
 
@@ -245,4 +246,27 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 	}
 
 	return newRelatedEnvironmentIDs, endpointsToAdd, nil
+}
+
+func newStatus(oldStatus map[portainer.EndpointID]portainer.EdgeStackStatus, relatedEnvironmentIds []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeStackStatus {
+	newStatus := make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+	for _, endpointID := range relatedEnvironmentIds {
+		newEnvStatus := portainer.EdgeStackStatus{}
+
+		oldEnvStatus, ok := oldStatus[endpointID]
+		if ok {
+			newEnvStatus = oldEnvStatus
+		}
+
+		newEnvStatus.Status = []portainer.EdgeStackDeploymentStatus{
+			{
+				Time: time.Now().Unix(),
+				Type: portainer.EdgeStackStatusPending,
+			},
+		}
+
+		newStatus[endpointID] = newEnvStatus
+	}
+
+	return newStatus
 }

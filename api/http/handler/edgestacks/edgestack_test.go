@@ -121,7 +121,7 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 	edgeStack := portainer.EdgeStack{
 		ID:             edgeStackID,
 		Name:           "test-edge-stack-" + strconv.Itoa(int(edgeStackID)),
-		StatusArray:    map[portainer.EndpointID][]portainer.EdgeStackStatus{},
+		Status:         map[portainer.EndpointID]portainer.EdgeStackStatus{},
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     []portainer.EdgeGroupID{edgeGroup.ID},
 		ProjectPath:    "tmpDir",

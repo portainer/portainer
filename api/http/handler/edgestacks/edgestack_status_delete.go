@@ -71,18 +71,17 @@ func (handler *Handler) deleteEdgeStackStatus(tx dataservices.DataStoreTx, stack
 		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
-	endpointStatus, ok := stack.StatusArray[endpoint.ID]
+	endpointStatus, ok := stack.Status[endpoint.ID]
 	if !ok {
-		endpointStatus = []portainer.EdgeStackStatus{}
+		endpointStatus = portainer.EdgeStackStatus{}
 	}
 
-	endpointStatus = append(endpointStatus, portainer.EdgeStackStatus{
-		Time:       time.Now().Unix(),
-		Type:       portainer.EdgeStackStatusRemoved,
-		EndpointID: portainer.EndpointID(endpoint.ID),
+	endpointStatus.Status = append(endpointStatus.Status, portainer.EdgeStackDeploymentStatus{
+		Time: time.Now().Unix(),
+		Type: portainer.EdgeStackStatusRemoved,
 	})
 
-	stack.StatusArray[endpoint.ID] = endpointStatus
+	stack.Status[endpoint.ID] = endpointStatus
 
 	err = tx.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {

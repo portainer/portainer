@@ -49,7 +49,7 @@ func (service *Service) BuildEdgeStack(
 		DeploymentType:        deploymentType,
 		CreationDate:          time.Now().Unix(),
 		EdgeGroups:            edgeGroups,
-		StatusArray:           make(map[portainer.EndpointID][]portainer.EdgeStackStatus, 0),
+		Status:                make(map[portainer.EndpointID]portainer.EdgeStackStatus, 0),
 		Version:               1,
 		UseManifestNamespaces: useManifestNamespaces,
 	}, nil

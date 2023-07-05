@@ -12,7 +12,7 @@ import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
-import { EdgeStackStatus, StatusType } from '../../types';
+import { DeploymentStatus, StatusType } from '../../types';
 
 import { EnvironmentActions } from './EnvironmentActions';
 import { ActionStatus } from './ActionStatus';
@@ -122,7 +122,7 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
   );
 }
 
-function endpointStatusLabel(statusArray: Array<EdgeStackStatus>) {
+function endpointStatusLabel(statusArray: Array<DeploymentStatus>) {
   const labels = [];
 
   statusArray.forEach((status) => {

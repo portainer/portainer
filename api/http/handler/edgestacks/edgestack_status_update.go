@@ -104,9 +104,12 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		return nil, nil
 	}
 
-	environmentStatus, ok := stack.StatusArray[payload.EndpointID]
+	environmentStatus, ok := stack.Status[payload.EndpointID]
 	if !ok {
-		environmentStatus = make([]portainer.EdgeStackStatus, 0)
+		environmentStatus = portainer.EdgeStackStatus{
+			EndpointID: payload.EndpointID,
+			Status:     []portainer.EdgeStackDeploymentStatus{},
+		}
 	}
 
 	endpoint, err := tx.Endpoint().Endpoint(payload.EndpointID)
@@ -129,14 +132,13 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = tx.EdgeStack().UpdateEdgeStackFunc(stackID, func(edgeStack *portainer.EdgeStack) {
 
-			environmentStatus = append(environmentStatus, portainer.EdgeStackStatus{
-				Type:       status,
-				Error:      payload.Error,
-				EndpointID: portainer.EndpointID(payload.EndpointID),
-				Time:       payload.Time,
+			environmentStatus.Status = append(environmentStatus.Status, portainer.EdgeStackDeploymentStatus{
+				Type:  status,
+				Error: payload.Error,
+				Time:  payload.Time,
 			})
 
-			stack.StatusArray[payload.EndpointID] = environmentStatus
+			stack.Status[payload.EndpointID] = environmentStatus
 
 			stack = edgeStack
 		})
@@ -145,14 +147,13 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		}
 	} else {
 
-		environmentStatus = append(environmentStatus, portainer.EdgeStackStatus{
-			Type:       status,
-			Error:      payload.Error,
-			EndpointID: portainer.EndpointID(payload.EndpointID),
-			Time:       time.Now().Unix(),
+		environmentStatus.Status = append(environmentStatus.Status, portainer.EdgeStackDeploymentStatus{
+			Type:  status,
+			Error: payload.Error,
+			Time:  payload.Time,
 		})
 
-		stack.StatusArray[payload.EndpointID] = environmentStatus
+		stack.Status[payload.EndpointID] = environmentStatus
 
 		err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
 		if err != nil {

@@ -1,6 +1,7 @@
 package endpoints
 
+func ptr[T any](i T) *T { return &i }
+
 func BoolAddr(b bool) *bool {
-	boolVar := b
-	return &boolVar
+	return ptr(b)
 }

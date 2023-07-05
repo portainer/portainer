@@ -82,65 +82,54 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 	}
 
 	for _, edgeStack := range edgeStacks {
-		statusArray := edgeStack.StatusArray
-		if statusArray == nil {
-			statusArray = make(map[portainer.EndpointID][]portainer.EdgeStackStatus)
+
+		for _, endpointStatus := range edgeStack.Status {
+			statusArray := []portainer.EdgeStackDeploymentStatus{}
+			if endpointStatus.Details.Pending {
+				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
+					Type: portainer.EdgeStackStatusPending,
+					Time: time.Now().Unix(),
+				})
+			}
+
+			if endpointStatus.Details.Acknowledged {
+				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
+					Type: portainer.EdgeStackStatusAcknowledged,
+					Time: time.Now().Unix(),
+				})
+			}
+
+			if endpointStatus.Details.Error {
+				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
+					Type:  portainer.EdgeStackStatusError,
+					Error: endpointStatus.Error,
+					Time:  time.Now().Unix(),
+				})
+			}
+
+			if endpointStatus.Details.Ok {
+				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
+					Type: portainer.EdgeStackStatusRunning,
+					Time: time.Now().Unix(),
+				})
+			}
+
+			if endpointStatus.Details.ImagesPulled {
+				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
+					Type: portainer.EdgeStackStatusImagesPulled,
+					Time: time.Now().Unix(),
+				})
+			}
+
+			if endpointStatus.Details.Remove {
+				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
+					Type: portainer.EdgeStackStatusRemoving,
+					Time: time.Now().Unix(),
+				})
+			}
+
+			endpointStatus.Status = statusArray
 		}
-		for endpointID, endpointOldStatus := range edgeStack.Status {
-			endpointStatusArray := statusArray[endpointID]
-			if endpointOldStatus.Details.Pending {
-				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusPending,
-					EndpointID: portainer.EndpointID(endpointID),
-					Time:       time.Now().Unix(),
-				})
-			}
-
-			if endpointOldStatus.Details.Acknowledged {
-				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusAcknowledged,
-					EndpointID: portainer.EndpointID(endpointID),
-					Time:       time.Now().Unix(),
-				})
-			}
-
-			if endpointOldStatus.Details.Error {
-				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusError,
-					EndpointID: portainer.EndpointID(endpointID),
-					Error:      endpointOldStatus.Error,
-					Time:       time.Now().Unix(),
-				})
-			}
-
-			if endpointOldStatus.Details.Ok {
-				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusDeploymentReceived,
-					EndpointID: portainer.EndpointID(endpointID),
-					Time:       time.Now().Unix(),
-				})
-			}
-
-			if endpointOldStatus.Details.ImagesPulled {
-				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusImagesPulled,
-					EndpointID: portainer.EndpointID(endpointID),
-					Time:       time.Now().Unix(),
-				})
-			}
-
-			if endpointOldStatus.Details.Remove {
-				endpointStatusArray = append(endpointStatusArray, portainer.EdgeStackStatus{
-					Type:       portainer.EdgeStackStatusRemoving,
-					EndpointID: portainer.EndpointID(endpointID),
-					Time:       time.Now().Unix(),
-				})
-			}
-
-			statusArray[endpointID] = endpointStatusArray
-		}
-
-		edgeStack.StatusArray = statusArray
 
 		err = m.edgeStackService.UpdateEdgeStack(edgeStack.ID, &edgeStack)
 		if err != nil {

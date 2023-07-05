@@ -31,7 +31,7 @@ export function EnvironmentsDatatable() {
   const tableState = useTableStateWithoutStorage('name');
   const endpointsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
-    page,
+    page: page + 1,
     search: tableState.search,
     sort: tableState.sortBy.id as 'Group' | 'Name',
     order: tableState.sortBy.desc ? 'desc' : 'asc',
@@ -44,17 +44,16 @@ export function EnvironmentsDatatable() {
       endpointsQuery.environments.map((env) => ({
         ...env,
         StackStatus: uniqueStatus(
-          edgeStackQuery.data?.StatusArray[env.Id] || [
+          edgeStackQuery.data?.Status[env.Id]?.Status || [
             {
               Type: StatusType.Pending,
-              EndpointID: env.Id,
               Error: '',
               Time: new Date().valueOf() / 1000,
             },
           ]
         ),
       })),
-    [edgeStackQuery.data?.StatusArray, endpointsQuery.environments]
+    [edgeStackQuery.data?.Status, endpointsQuery.environments]
   );
 
   return (
