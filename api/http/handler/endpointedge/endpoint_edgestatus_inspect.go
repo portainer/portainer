@@ -83,13 +83,13 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 
 	if _, ok := handler.DataStore.Endpoint().Heartbeat(portainer.EndpointID(endpointID)); !ok {
-		// EE-5910
+		// EE-5190
 		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		// EE-5910
+		// EE-5190
 		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
 	}
 
@@ -126,6 +126,11 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 		return nil, err
 	}
 
+	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(tx, endpoint)
+	if err != nil {
+		return nil, httperror.Forbidden("Permission denied to access environment", err)
+	}
+
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
 		endpoint.EdgeID = edgeIdentifier
@@ -144,12 +149,7 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 
 	err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return nil, httperror.InternalServerError("Unable to Unable to persist environment changes inside the database", err)
-	}
-
-	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(tx, endpoint)
-	if err != nil {
-		return nil, httperror.Forbidden("Permission denied to access environment", err)
+		return nil, httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 
 	checkinInterval := endpoint.EdgeCheckinInterval
@@ -237,6 +237,7 @@ func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel p
 
 		schedules = append(schedules, schedule)
 	}
+
 	return schedules, nil
 }
 
