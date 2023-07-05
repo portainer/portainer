@@ -512,6 +512,17 @@ class KubernetesCreateApplicationController {
   /* #region SERVICES UI MANAGEMENT */
   onServicesChange(services) {
     return this.$async(async () => {
+      // if the ingress isn't found in the currently loaded ingresses, then refresh the ingresses
+      const ingressNamesUsed = services.flatMap((s) => s.Ports.flatMap((p) => (p.ingressPaths ? p.ingressPaths.flatMap((ip) => ip.IngressName || []) : [])));
+      if (ingressNamesUsed.length) {
+        const uniqueIngressNamesUsed = Array.from(new Set(ingressNamesUsed)); // get the unique ingress names used
+        const ingressNamesLoaded = this.ingresses.map((i) => i.Name);
+        const areAllIngressesLoaded = uniqueIngressNamesUsed.every((ingressNameUsed) => ingressNamesLoaded.includes(ingressNameUsed));
+        if (!areAllIngressesLoaded) {
+          this.refreshIngresses();
+        }
+      }
+      // update the services
       this.formValues.Services = services;
     });
   }
@@ -1127,7 +1138,6 @@ class KubernetesCreateApplicationController {
             this.nodesLabels,
             this.ingresses
           );
-
           this.originalServicePorts = structuredClone(this.formValues.Services.flatMap((service) => service.Ports));
           this.originalIngressPaths = structuredClone(this.originalServicePorts.flatMap((port) => port.ingressPaths).filter((ingressPath) => ingressPath.Host));
 

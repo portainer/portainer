@@ -5,8 +5,8 @@ import { InputGroup } from '@@/form-components/InputGroup';
 type Props = {
   serviceIndex: number;
   portIndex: number;
-  value?: number;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  value?: number;
 };
 
 export function ContainerPortInput({

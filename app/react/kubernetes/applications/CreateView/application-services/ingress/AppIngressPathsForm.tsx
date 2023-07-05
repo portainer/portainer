@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import { FormikErrors } from 'formik';
 import { useMemo } from 'react';
 
@@ -13,6 +13,7 @@ import { Button } from '@@/buttons';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
 import { Link } from '@@/Link';
+import { Icon } from '@@/Icon';
 
 import { ServicePortIngressPath } from '../types';
 
@@ -75,7 +76,12 @@ export function AppIngressPathsForm({
   }
 
   if (ingressesQuery.isLoading || ingressControllersQuery.isLoading) {
-    return <p>Loading ingresses...</p>;
+    return (
+      <p className="text-muted mt-2 flex items-center gap-x-2 text-sm">
+        <Icon icon={Loader2} className="animate-spin-slow" />
+        Loading ingresses...
+      </p>
+    );
   }
 
   return (
