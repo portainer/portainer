@@ -1,5 +1,5 @@
 import { ChangeEvent, ReactNode } from 'react';
-import { Info, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { Plus, RefreshCw, Trash2 } from 'lucide-react';
 
 import Route from '@/assets/ico/route.svg?c';
 
@@ -387,7 +387,7 @@ export function IngressForm({
                   </div>
                 )}
                 {host.NoHost && (
-                  <TextTip icon={Info} color="blue">
+                  <TextTip color="blue">
                     A fallback rule has no host specified. This rule only
                     applies when an inbound request has a hostname that does not
                     match with any of your other rules.
@@ -401,7 +401,7 @@ export function IngressForm({
                 </div>
 
                 {!host.Paths.length && (
-                  <TextTip icon={Info} className="mt-2" color="blue">
+                  <TextTip className="mt-2" color="blue">
                     You may save the ingress without a path and it will then be
                     an <b>ingress default</b> that a user may select via the
                     hostname dropdown in Create/Edit application.
