@@ -4,6 +4,8 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import _ from 'lodash';
 
+import UpdatesAvailable from '@/assets/ico/icon_updates-available.svg?c';
+import UpToDate from '@/assets/ico/icon_up-to-date.svg?c';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { getDashboardRoute } from '@/react/portainer/environments/utils';
@@ -12,7 +14,7 @@ import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
-import { DeploymentStatus, StatusType } from '../../types';
+import { DeploymentStatus, EdgeStackStatus, StatusType } from '../../types';
 
 import { EnvironmentActions } from './EnvironmentActions';
 import { ActionStatus } from './ActionStatus';
@@ -33,42 +35,56 @@ export const columns = _.compact([
       );
     },
   }),
+  columnHelper.accessor((env) => endpointStatusLabel(env.StackStatus.Status), {
+    id: 'status',
+    header: 'Status',
+    cell({ row: { original: env } }) {
+      return (
+        <ul className="list-none space-y-2">
+          {env.StackStatus.Status.map((s) => (
+            <li key={`status-${s.Type}-${s.Time}`}>
+              <Status value={s.Type} />
+            </li>
+          ))}
+        </ul>
+      );
+    },
+  }),
+  columnHelper.accessor((env) => _.last(env.StackStatus.Status)?.Time, {
+    id: 'statusDate',
+    header: 'Time',
+    cell({ row: { original: env } }) {
+      return (
+        <ul className="list-none space-y-2">
+          {env.StackStatus.Status.map((s) => (
+            <li key={`time-${s.Type}-${s.Time}`}>
+              {isoDateFromTimestamp(s.Time)}
+            </li>
+          ))}
+        </ul>
+      );
+    },
+  }),
+  ...(isBE
+    ? [
+        columnHelper.accessor((env) => endpointTargetVersionLabel(env), {
+          id: 'targetVersion',
+          header: 'Target version',
+          cell: TargetVersionCell,
+        }),
+        columnHelper.accessor(
+          (env) => endpointDeployedVersionLabel(env.StackStatus),
+          {
+            id: 'deployedVersion',
+            header: 'Deployed version',
+            cell: DeployedVersionCell,
+          }
+        ),
+      ]
+    : []),
   columnHelper.accessor(
-    (env) => env.StackStatus.map((s) => StatusType[s.Type]).join(','),
-    {
-      id: 'status',
-      header: 'Status',
-      cell({ row: { original: env } }) {
-        return isBE ? (
-          <ul className="list-none space-y-2">
-            {env.StackStatus.map((s, index) => (
-              <li key={index}>
-                <Status value={s.Type} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          endpointStatusLabel(env.StackStatus)
-        );
-      },
-    }
-  ),
-  isBE &&
-    columnHelper.accessor((env) => _.last(env.StackStatus)?.Time, {
-      id: 'statusDate',
-      header: 'Time',
-      cell({ row: { original: env } }) {
-        return (
-          <ul className="list-none space-y-2">
-            {env.StackStatus.map((s, index) => (
-              <li key={index}>{isoDateFromTimestamp(s.Time)}</li>
-            ))}
-          </ul>
-        );
-      },
-    }),
-  columnHelper.accessor(
-    (env) => env.StackStatus.find((s) => s.Type === StatusType.Error)?.Error,
+    (env) =>
+      env.StackStatus.Status.find((s) => s.Type === StatusType.Error)?.Error,
     {
       id: 'error',
       header: 'Error',
@@ -145,6 +161,93 @@ function endpointStatusLabel(statusArray: Array<DeploymentStatus>) {
   }
 
   return _.uniq(labels).join(', ');
+}
+
+function TargetVersionCell({
+  row,
+  getValue,
+}: CellContext<EdgeStackEnvironment, string>) {
+  const value = getValue();
+  if (!value) {
+    return '';
+  }
+
+  return (
+    <>
+      {row.original.TargetCommitHash ? (
+        <div>
+          <a
+            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {value}
+          </a>
+        </div>
+      ) : (
+        <div>{value}</div>
+      )}
+    </>
+  );
+}
+
+function endpointTargetVersionLabel(env: EdgeStackEnvironment) {
+  if (env.TargetCommitHash) {
+    return env.TargetCommitHash.slice(0, 7).toString();
+  }
+  return env.TargetVersion.toString() || '';
+}
+
+function DeployedVersionCell({
+  row,
+  getValue,
+}: CellContext<EdgeStackEnvironment, string>) {
+  const value = getValue();
+  if (!value || value === '0') {
+    return (
+      <div>
+        <Icon icon={UpdatesAvailable} className="!mr-2" />
+      </div>
+    );
+  }
+
+  let statusIcon = <Icon icon={UpToDate} className="!mr-2" />;
+  if (
+    (row.original.TargetCommitHash &&
+      row.original.TargetCommitHash.slice(0, 7) !== value) ||
+    (!row.original.TargetCommitHash && row.original.TargetVersion !== value)
+  ) {
+    statusIcon = <Icon icon={UpdatesAvailable} className="!mr-2" />;
+  }
+
+  return (
+    <>
+      {row.original.TargetCommitHash ? (
+        <div>
+          {statusIcon}
+          <a
+            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {value}
+          </a>
+        </div>
+      ) : (
+        <div>
+          {statusIcon}
+          {value}
+        </div>
+      )}
+    </>
+  );
+}
+
+function endpointDeployedVersionLabel(status: EdgeStackStatus) {
+  if (status.DeploymentInfo?.ConfigHash) {
+    return status.DeploymentInfo?.ConfigHash.slice(0, 7).toString();
+  }
+  return status.DeploymentInfo?.Version.toString() || '';
 }
 
 function Status({ value }: { value: StatusType }) {

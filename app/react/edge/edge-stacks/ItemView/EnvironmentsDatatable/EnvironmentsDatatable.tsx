@@ -2,17 +2,17 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { HardDrive } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { StatusType } from '@/react/edge/edge-stacks/types';
+import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { useParamState } from '@/react/hooks/useParamState';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import { useEdgeStack } from '../../queries/useEdgeStack';
-import { uniqueStatus } from '../../utils/uniqueStatus';
 
 import { EdgeStackEnvironment } from './types';
 import { columns } from './columns';
@@ -21,7 +21,19 @@ export function EnvironmentsDatatable() {
   const {
     params: { stackId },
   } = useCurrentStateAndParams();
-  const edgeStackQuery = useEdgeStack(stackId);
+  const edgeStackQuery = useEdgeStack(stackId, {
+    refetchInterval(data) {
+      if (!data) {
+        return 0;
+      }
+
+      return Object.values(data.Status).some((status) =>
+        status.Status.every((s) => s.Type === StatusType.Running)
+      )
+        ? 0
+        : 10000;
+    },
+  });
 
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useParamState<StatusType>(
@@ -39,21 +51,31 @@ export function EnvironmentsDatatable() {
     edgeStackStatus: statusFilter,
   });
 
+  const currentVersion = edgeStackQuery.data?.Version.toString() || '';
+  const gitConfigURL = edgeStackQuery.data?.GitConfig?.URL || '';
+  const gitConfigCommitHash = edgeStackQuery.data?.GitConfig?.ConfigHash || '';
   const environments: Array<EdgeStackEnvironment> = useMemo(
     () =>
-      endpointsQuery.environments.map((env) => ({
-        ...env,
-        StackStatus: uniqueStatus(
-          edgeStackQuery.data?.Status[env.Id]?.Status || [
-            {
-              Type: StatusType.Pending,
-              Error: '',
-              Time: new Date().valueOf() / 1000,
-            },
-          ]
-        ),
-      })),
-    [edgeStackQuery.data?.Status, endpointsQuery.environments]
+      endpointsQuery.environments.map(
+        (env) =>
+          ({
+            ...env,
+            TargetVersion: currentVersion,
+            GitConfigURL: gitConfigURL,
+            TargetCommitHash: gitConfigCommitHash,
+            StackStatus: getEnvStackStatus(
+              env.Id,
+              edgeStackQuery.data?.Status[env.Id]
+            ),
+          } satisfies EdgeStackEnvironment)
+      ),
+    [
+      currentVersion,
+      edgeStackQuery.data?.Status,
+      endpointsQuery.environments,
+      gitConfigCommitHash,
+      gitConfigURL,
+    ]
   );
 
   return (
@@ -105,4 +127,29 @@ function parseStatusFilter(status: string | undefined): StatusType | undefined {
     default:
       return undefined;
   }
+}
+
+function getEnvStackStatus(
+  envId: EnvironmentId,
+  envStatus: EdgeStackStatus | undefined
+) {
+  const pendingStatus = {
+    Type: StatusType.Pending,
+    Error: '',
+    Time: new Date().valueOf() / 1000,
+  };
+
+  let status = envStatus;
+  if (!status) {
+    status = {
+      EndpointID: envId,
+      Status: [],
+    };
+  }
+
+  if (status.Status.length === 0) {
+    status.Status.push(pendingStatus);
+  }
+
+  return status;
 }

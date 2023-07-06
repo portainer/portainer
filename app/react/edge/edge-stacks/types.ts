@@ -38,9 +38,15 @@ export interface DeploymentStatus {
   Time: number;
 }
 
+interface EdgeStackDeploymentInfo {
+  Version: number;
+  ConfigHash: string;
+}
+
 export interface EdgeStackStatus {
   Status: Array<DeploymentStatus>;
   EndpointID: EnvironmentId;
+  DeploymentInfo?: EdgeStackDeploymentInfo;
 }
 
 export enum DeploymentType {
