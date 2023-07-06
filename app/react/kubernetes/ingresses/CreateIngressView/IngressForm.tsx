@@ -388,11 +388,9 @@ export function IngressForm({
                 )}
                 {host.NoHost && (
                   <TextTip icon={Info} color="blue">
-                    <span>
-                      A fallback rule has no host specified. This rule only
-                      applies when an inbound request has a hostname that does
-                      not match with any of your other rules.
-                    </span>
+                    A fallback rule has no host specified. This rule only
+                    applies when an inbound request has a hostname that does not
+                    match with any of your other rules.
                   </TextTip>
                 )}
 
@@ -404,11 +402,9 @@ export function IngressForm({
 
                 {!host.Paths.length && (
                   <TextTip icon={Info} className="mt-2" color="blue">
-                    <span>
-                      You may save the ingress without a path and it will then
-                      be an <b>ingress default</b> that a user may select via
-                      the hostname dropdown in Create/Edit application.
-                    </span>
+                    You may save the ingress without a path and it will then be
+                    an <b>ingress default</b> that a user may select via the
+                    hostname dropdown in Create/Edit application.
                   </TextTip>
                 )}
 
