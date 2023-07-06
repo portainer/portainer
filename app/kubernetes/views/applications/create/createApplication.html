@@ -645,9 +645,10 @@
                     </button>
                   </div>
                   <div class="my-2 w-full">
-                    <p class="vertical-center text-warning text-xs" ng-if="ctrl.secrets.length === 0"
-                      ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no secrets available in this namespace.</p
-                    >
+                    <p class="vertical-center text-muted text-xs" ng-if="ctrl.secrets.length === 0">
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                      There are no secrets available in this namespace.
+                    </p>
                   </div>
                   <!-- #endregion -->
 
