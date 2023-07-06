@@ -387,11 +387,7 @@ export function IngressForm({
                   </div>
                 )}
                 {host.NoHost && (
-                  <TextTip
-                    icon={Info}
-                    className="text-muted small"
-                    color="blue"
-                  >
+                  <TextTip icon={Info} color="blue">
                     <span>
                       A fallback rule has no host specified. This rule only
                       applies when an inbound request has a hostname that does
@@ -407,11 +403,7 @@ export function IngressForm({
                 </div>
 
                 {!host.Paths.length && (
-                  <TextTip
-                    icon={Info}
-                    className="text-muted small mt-2"
-                    color="blue"
-                  >
+                  <TextTip icon={Info} className="mt-2" color="blue">
                     <span>
                       You may save the ingress without a path and it will then
                       be an <b>ingress default</b> that a user may select via
