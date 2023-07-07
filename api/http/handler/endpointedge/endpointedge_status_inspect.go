@@ -98,6 +98,13 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
+	handler.DataStore.Endpoint().UpdateHeartbeat(endpoint.ID)
+
+	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(handler.DataStore, endpoint)
+	if err != nil {
+		return httperror.Forbidden("Permission denied to access environment", err)
+	}
+
 	var statusResponse *endpointEdgeStatusInspectResponse
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		statusResponse, err = handler.inspectStatus(handler.DataStore, r, portainer.EndpointID(endpointID))
@@ -124,11 +131,6 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return nil, err
-	}
-
-	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(tx, endpoint)
-	if err != nil {
-		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	if endpoint.EdgeID == "" {

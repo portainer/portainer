@@ -81,7 +81,7 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 	h.Handle("/stacks/{id}/stop",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackStop))).Methods(http.MethodPost)
 	h.Handle("/stacks/webhooks/{webhookID}",
-		httperror.LoggerHandler(h.webhookInvoke)).Methods(http.MethodPost)
+		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInvoke))).Methods(http.MethodPost)
 
 	return h
 }
