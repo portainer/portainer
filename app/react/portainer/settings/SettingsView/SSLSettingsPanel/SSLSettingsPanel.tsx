@@ -3,6 +3,8 @@ import { Key } from 'lucide-react';
 import { useState } from 'react';
 import { SchemaOf, bool, object } from 'yup';
 
+import { withHideOnExtension } from '@/react/hooks/withHideOnExtension';
+
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 import {
@@ -22,7 +24,9 @@ interface FormValues {
   forceHTTPS: boolean;
 }
 
-export function SSLSettingsPanel() {
+export const SSLSettingsPanelWrapper = withHideOnExtension(SSLSettingsPanel);
+
+function SSLSettingsPanel() {
   const [reloadingPage, setReloadingPage] = useState(false);
   const mutation = useUpdateSSLConfigMutation();
   const initialValues: FormValues = {
