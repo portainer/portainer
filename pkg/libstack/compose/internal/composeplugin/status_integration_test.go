@@ -107,14 +107,10 @@ func waitForStatus(deployer libstack.Deployer, ctx context.Context, stackName st
 	defer cancel()
 
 	statusCh := deployer.WaitForStatus(ctx, stackName, requiredStatus)
-	select {
-	case result := <-statusCh:
-		if result == "" {
-			return requiredStatus, "", nil
-		}
-
-		return libstack.StatusError, result, nil
-	case <-ctx.Done():
-		return libstack.StatusError, "", ctx.Err()
+	result := <-statusCh
+	if result == "" {
+		return requiredStatus, "", nil
 	}
+
+	return libstack.StatusError, result, nil
 }

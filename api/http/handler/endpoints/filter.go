@@ -91,7 +91,9 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 	var edgeStackStatus *portainer.EdgeStackStatusType
 	if edgeStackStatusQuery != "" {
 		edgeStackStatusNumber, err := strconv.Atoi(edgeStackStatusQuery)
-		if err != nil || edgeStackStatusNumber < 0 || edgeStackStatusNumber > 6 {
+		if err != nil ||
+			edgeStackStatusNumber < 0 ||
+			edgeStackStatusNumber > int(portainer.EdgeStackStatusRemoving) {
 			return EnvironmentsQuery{}, errors.New("invalid edgeStackStatus parameter")
 		}
 

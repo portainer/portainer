@@ -94,22 +94,17 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *http.Request, stackID portainer.EdgeStackID, payload updateStatusPayload) (*portainer.EdgeStack, error) {
 	stack, err := tx.EdgeStack().EdgeStack(stackID)
 	if err != nil {
-		// skip error because agent tries to report on deleted stack
-		log.Warn().
-			Err(err).
-			Int("stackID", int(stackID)).
-			Int("status", int(*payload.Status)).
-			Msg("Unable to find a stack inside the database, skipping error")
-
-		return nil, nil
-	}
-
-	environmentStatus, ok := stack.Status[payload.EndpointID]
-	if !ok {
-		environmentStatus = portainer.EdgeStackStatus{
-			EndpointID: payload.EndpointID,
-			Status:     []portainer.EdgeStackDeploymentStatus{},
+		if dataservices.IsErrObjectNotFound(err) {
+			// skip error because agent tries to report on deleted stack
+			log.Warn().
+				Err(err).
+				Int("stackID", int(stackID)).
+				Int("status", int(*payload.Status)).
+				Msg("Unable to find a stack inside the database, skipping error")
+			return nil, nil
 		}
+
+		return nil, err
 	}
 
 	endpoint, err := tx.Endpoint().Endpoint(payload.EndpointID)
@@ -129,16 +124,15 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		Int("status", int(status)).
 		Msg("Updating stack status")
 
+	deploymentStatus := portainer.EdgeStackDeploymentStatus{
+		Type:  status,
+		Error: payload.Error,
+		Time:  payload.Time,
+	}
+
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = tx.EdgeStack().UpdateEdgeStackFunc(stackID, func(edgeStack *portainer.EdgeStack) {
-
-			environmentStatus.Status = append(environmentStatus.Status, portainer.EdgeStackDeploymentStatus{
-				Type:  status,
-				Error: payload.Error,
-				Time:  payload.Time,
-			})
-
-			stack.Status[payload.EndpointID] = environmentStatus
+			handler.updateEdgeStackEnvironmentStatus(payload.EndpointID, edgeStack, deploymentStatus)
 
 			stack = edgeStack
 		})
@@ -147,19 +141,22 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		}
 	} else {
 
-		environmentStatus.Status = append(environmentStatus.Status, portainer.EdgeStackDeploymentStatus{
-			Type:  status,
-			Error: payload.Error,
-			Time:  payload.Time,
-		})
-
-		stack.Status[payload.EndpointID] = environmentStatus
-
-		err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
-		if err != nil {
-			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
-		}
+		handler.updateEdgeStackEnvironmentStatus(payload.EndpointID, stack, deploymentStatus)
 	}
 
 	return stack, nil
+}
+
+func (handler *Handler) updateEdgeStackEnvironmentStatus(environmentId portainer.EndpointID, stack *portainer.EdgeStack, deploymentStatus portainer.EdgeStackDeploymentStatus) {
+	environmentStatus, ok := stack.Status[environmentId]
+	if !ok {
+		environmentStatus = portainer.EdgeStackStatus{
+			EndpointID: environmentId,
+			Status:     []portainer.EdgeStackDeploymentStatus{},
+		}
+	}
+
+	environmentStatus.Status = append(environmentStatus.Status, deploymentStatus)
+
+	stack.Status[environmentId] = environmentStatus
 }

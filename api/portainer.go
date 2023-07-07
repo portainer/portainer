@@ -327,7 +327,6 @@ type (
 
 		// Deprecated
 		Prune bool `json:"Prune"`
-		// Deprecated
 	}
 
 	EdgeStackDeploymentType int

@@ -124,10 +124,10 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 		Status:         map[portainer.EndpointID]portainer.EdgeStackStatus{},
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     []portainer.EdgeGroupID{edgeGroup.ID},
-		ProjectPath:    "tmpDir",
+		ProjectPath:    "/project/path",
 		EntryPoint:     "entrypoint",
 		Version:        237,
-		ManifestPath:   "tmpDir",
+		ManifestPath:   "/manifest/path",
 		DeploymentType: portainer.EdgeStackDeploymentKubernetes,
 	}
 
