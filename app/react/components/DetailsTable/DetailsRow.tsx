@@ -25,11 +25,7 @@ export function DetailsRow({
         {children}
       </td>
       {columns?.map((column, index) => (
-        <td
-          key={index}
-          className={colClassName}
-          data-cy={`detailsTable-${label}Value-${index}`}
-        >
+        <td key={index} className={colClassName}>
           {column}
         </td>
       ))}

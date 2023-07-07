@@ -20,9 +20,9 @@ export function HiddenContainersTable({
       className="table-hover"
       emptyMessage="No filter available."
     >
-      {labels.map((label) => (
+      {labels.map((label, index) => (
         <DetailsTable.Row
-          key={label.name}
+          key={index}
           label={label.name}
           columns={[
             <Button
