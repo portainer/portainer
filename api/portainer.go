@@ -301,7 +301,9 @@ type (
 
 	// StackDeploymentInfo records the information of a deployed stack
 	StackDeploymentInfo struct {
-		Version    int    `json:"Version"`
+		// FileVersion is the version of the stack file, used to detect changes
+		FileVersion int `json:"FileVersion"`
+		// ConfigHash is the commit hash of the git repository used for deploying the stack
 		ConfigHash string `json:"ConfigHash"`
 	}
 
