@@ -20,6 +20,7 @@ export function FormActions({
     <div className="form-group">
       <div className="col-sm-12">
         <LoadingButton
+          className="!ml-0"
           loadingText={loadingText}
           isLoading={isLoading}
           disabled={!isValid}

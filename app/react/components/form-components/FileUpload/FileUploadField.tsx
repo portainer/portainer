@@ -30,7 +30,7 @@ export function FileUploadField({
   const fileRef = createRef<HTMLInputElement>();
 
   return (
-    <div className="file-upload-field vertical-center">
+    <div className="file-upload-field flex gap-2">
       <input
         id={inputId}
         ref={fileRef}

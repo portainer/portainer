@@ -10,6 +10,7 @@ import { ApplicationSettingsPanel } from '@/react/portainer/settings/SettingsVie
 import { KubeSettingsPanel } from '@/react/portainer/settings/SettingsView/KubeSettingsPanel';
 import { HelmCertPanel } from '@/react/portainer/settings/SettingsView/HelmCertPanel';
 import { HiddenContainersPanel } from '@/react/portainer/settings/SettingsView/HiddenContainersPanel/HiddenContainersPanel';
+import { SSLSettingsPanel } from '@/react/portainer/settings/SettingsView/SSLSettingsPanel/SSLSettingsPanel';
 
 export const settingsModule = angular
   .module('portainer.app.react.components.settings', [])
@@ -26,6 +27,7 @@ export const settingsModule = angular
     'applicationSettingsPanel',
     r2a(withReactQuery(ApplicationSettingsPanel), ['onSuccess'])
   )
+  .component('sslSettingsPanel', r2a(withReactQuery(SSLSettingsPanel), []))
   .component('helmCertPanel', r2a(withReactQuery(HelmCertPanel), []))
   .component(
     'hiddenContainersPanel',

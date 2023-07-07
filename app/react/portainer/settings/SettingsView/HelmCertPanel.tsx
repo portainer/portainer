@@ -43,6 +43,7 @@ export function HelmCertPanel() {
                 initialValues={initialValues}
                 validationSchema={validation}
                 onSubmit={handleSubmit}
+                validateOnMount
               >
                 <InnerForm isLoading={mutation.isLoading} />
               </Formik>
@@ -116,6 +117,6 @@ function validation(): SchemaOf<FormValues> {
       'crt',
       'cer',
       'cert',
-    ]).required(),
+    ]).required(''),
   });
 }
