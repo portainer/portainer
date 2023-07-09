@@ -8,65 +8,7 @@
 
 <ssl-certificate-settings ng-show="state.showHTTPS"></ssl-certificate-settings>
 
-<div class="row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="box" title-text="Hidden containers"></rd-widget-header>
-      <rd-widget-body>
-        <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
-          <div class="form-group">
-            <span class="col-sm-12 text-muted small"> You can hide containers with specific labels from Portainer UI. You need to specify the label name and value. </span>
-          </div>
-          <div class="form-group">
-            <label for="header_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11 col-md-4">
-              <input type="text" required class="form-control" id="header_name" name="label_name" ng-model="formValues.labelName" placeholder="e.g. com.example.foo" />
-            </div>
-            <label for="header_value" class="col-sm-1 control-label text-left">Value</label>
-            <div class="col-sm-11 col-md-4">
-              <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar" />
-            </div>
-            <div class="col-sm-12 col-md-2">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><pr-icon icon="'plus'" class-name="'mr-1'"></pr-icon>Add filter</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12 table-responsive">
-              <table class="table-hover table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Value</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="label in formValues.BlackListedLabels">
-                    <td>{{ label.name }}</td>
-                    <td>{{ label.value }}</td>
-                    <td>
-                      <button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)">
-                        <pr-icon icon="'trash-2'" class-name="'mr-1'"></pr-icon>
-                        Remove</button
-                      >
-                    </td>
-                  </tr>
-                  <tr ng-if="formValues.BlackListedLabels.length === 0">
-                    <td colspan="3" class="text-muted text-center">No filter available.</td>
-                  </tr>
-                  <tr ng-if="!formValues.BlackListedLabels">
-                    <td colspan="3" class="text-muted text-center">Loading...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <!-- !filtered-labels -->
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+<hidden-containers-panel></hidden-containers-panel>
 
 <!-- backup -->
 <backup-settings-panel></backup-settings-panel>
