@@ -15,7 +15,6 @@ import {
   RegistryId,
   RegistryTypes,
 } from '@/react/portainer/registries/types/registry';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { useRegistry } from '@/react/portainer/registries/queries/useRegistry';
 
 import { Button } from '@@/buttons';
@@ -133,59 +132,26 @@ function RegistrySelector({
   inputId?: string;
 }) {
   const environmentId = useEnvironmentId();
-  const hideDefaultRegistryQuery = usePublicSettings({
-    select: (settings) => settings.DefaultRegistry.Hide,
-  });
 
   const registriesQuery = useEnvironmentRegistries(environmentId, {
     select: (registries) =>
-      registries.sort((a, b) => a.Name.localeCompare(b.Name)),
+      registries
+        .sort((a, b) => a.Name.localeCompare(b.Name))
+        .map((registry) => ({
+          label: registry.Name,
+          value: registry.Id,
+        })),
   });
-
-  const registries = useMemo(
-    () =>
-      transformRegistries(
-        registriesQuery.data || [],
-        !hideDefaultRegistryQuery.data
-      ),
-    [registriesQuery.data, hideDefaultRegistryQuery.data]
-  );
 
   return (
     <PortainerSelect
       inputId={inputId}
-      options={registries}
+      options={registriesQuery.data || []}
       value={value}
       onChange={onChange}
       data-cy="component-registrySelect"
     />
   );
-}
-
-function transformRegistries(
-  registries: Array<Registry>,
-  showDefaultRegistry: boolean
-) {
-  const options = registries.map((registry) => ({
-    label: registry.Name,
-    value: registry.Id,
-  }));
-
-  const hasDockerHubRegistry = registries.some(
-    (registry) => registry.Type === RegistryTypes.DOCKERHUB
-  );
-
-  if (hasDockerHubRegistry || !showDefaultRegistry) {
-    return options;
-  }
-
-  return [
-    {
-      label: 'Docker Hub (anonymous)',
-      value: 0,
-    },
-    ...options,
-  ];
 }
 
 function ImageField({

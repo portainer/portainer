@@ -185,9 +185,8 @@ export interface PublicSettingsResponse {
   IsFDOEnabled: boolean;
   /** Whether AMT is enabled */
   IsAMTEnabled: boolean;
-
   /** Whether to hide default registry (only on BE) */
-  DefaultRegistry: {
+  DefaultRegistry?: {
     Hide: boolean;
   };
   Edge: {

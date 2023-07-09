@@ -36,7 +36,7 @@ export function useGenericRegistriesQuery<T = Registry[]>(
   } = {}
 ) {
   const hideDefaultRegistryQuery = usePublicSettings({
-    select: (settings) => settings.DefaultRegistry.Hide,
+    select: (settings) => settings.DefaultRegistry?.Hide,
     enabled,
   });
 
@@ -49,7 +49,7 @@ export function useGenericRegistriesQuery<T = Registry[]>(
 
       if (
         hideDefault ||
-        registries.find((r) => r.Type === RegistryTypes.DOCKERHUB)
+        registries.some((r) => r.Type === RegistryTypes.DOCKERHUB)
       ) {
         return registries;
       }
