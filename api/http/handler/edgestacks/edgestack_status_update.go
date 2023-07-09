@@ -132,7 +132,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 
 	if featureflags.IsEnabled(portainer.FeatureNoTx) {
 		err = tx.EdgeStack().UpdateEdgeStackFunc(stackID, func(edgeStack *portainer.EdgeStack) {
-			handler.updateEdgeStackEnvironmentStatus(payload.EndpointID, edgeStack, deploymentStatus)
+			updateEnvStatus(payload.EndpointID, edgeStack, deploymentStatus)
 
 			stack = edgeStack
 		})
@@ -140,14 +140,18 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
 		}
 	} else {
+		updateEnvStatus(payload.EndpointID, stack, deploymentStatus)
 
-		handler.updateEdgeStackEnvironmentStatus(payload.EndpointID, stack, deploymentStatus)
+		err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
+		if err != nil {
+			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
+		}
 	}
 
 	return stack, nil
 }
 
-func (handler *Handler) updateEdgeStackEnvironmentStatus(environmentId portainer.EndpointID, stack *portainer.EdgeStack, deploymentStatus portainer.EdgeStackDeploymentStatus) {
+func updateEnvStatus(environmentId portainer.EndpointID, stack *portainer.EdgeStack, deploymentStatus portainer.EdgeStackDeploymentStatus) {
 	environmentStatus, ok := stack.Status[environmentId]
 	if !ok {
 		environmentStatus = portainer.EdgeStackStatus{
