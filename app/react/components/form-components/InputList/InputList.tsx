@@ -17,8 +17,8 @@ type ArrElement<ArrType> = ArrType extends readonly (infer ElementType)[]
   ? ElementType
   : never;
 
-export type ArrayError<T> =
-  | FormikErrors<ArrElement<T>>[]
+export type ArrayError<TArray> =
+  | Array<FormikErrors<ArrElement<TArray> | undefined>>
   | string
   | string[]
   | undefined;
