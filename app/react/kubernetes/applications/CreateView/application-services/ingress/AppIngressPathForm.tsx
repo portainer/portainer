@@ -63,13 +63,29 @@ export function AppIngressPathForm({
     isEditMode,
   ]);
 
-  // when the hostname options change (e.g. after a namespace change), update the selected ingress to the first available one
+  // when the hostname options change (e.g. after a namespace change) and the host and ingress is no longer available, update the selected ingress to the first available one
   useEffect(() => {
     if (ingressHostOptionsWithCurrentValue) {
+      // some rerenders might not be from a namespace or hostname change so keep the current values if they're still valid
+      const ingressHosts = ingressHostOptionsWithCurrentValue.map(
+        (i) => i.value
+      );
+      const newIngressHostValue = ingressHosts.includes(ingressPath?.Host ?? '')
+        ? ingressPath?.Host
+        : ingressHosts[0] ?? '';
+      const ingressNames = ingressHostOptionsWithCurrentValue.map(
+        (i) => i.ingressName
+      );
+      const newIngressNameValue = ingressNames.includes(
+        ingressPath?.IngressName ?? ''
+      )
+        ? ingressPath?.IngressName ?? ''
+        : ingressNames[0] ?? '';
+
       const newIngressPath = {
         ...ingressPath,
-        Host: ingressHostOptionsWithCurrentValue[0]?.value,
-        IngressName: ingressHostOptionsWithCurrentValue[0]?.ingressName,
+        Host: newIngressHostValue,
+        IngressName: newIngressNameValue,
       };
       onChangeIngressPath(newIngressPath);
       setSelectedIngress(ingressHostOptionsWithCurrentValue[0] ?? null);
@@ -78,7 +94,7 @@ export function AppIngressPathForm({
   }, [ingressHostOptionsWithCurrentValue]);
 
   return (
-    <div className="flex w-full flex-wrap gap-x-4">
+    <div className="flex w-full flex-wrap gap-x-4 gap-y-1">
       <div className="flex min-w-[250px] basis-1/3 flex-col">
         <InputGroup size="small">
           <InputGroup.Addon>Hostname</InputGroup.Addon>

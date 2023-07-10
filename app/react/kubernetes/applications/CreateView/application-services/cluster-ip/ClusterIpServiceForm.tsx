@@ -79,7 +79,7 @@ export function ClusterIpServiceForm({
             return (
               <Card key={portIndex} className="flex flex-col gap-y-3">
                 <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-1">
-                  <div className="inline-flex min-w-min flex-grow basis-3/4 flex-wrap gap-2">
+                  <div className="inline-flex min-w-min flex-grow basis-3/4 flex-wrap gap-x-4 gap-y-1">
                     <div className="flex min-w-min basis-1/3 flex-col">
                       <ContainerPortInput
                         serviceIndex={serviceIndex}

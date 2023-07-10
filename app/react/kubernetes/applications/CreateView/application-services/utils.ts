@@ -154,6 +154,8 @@ export function generateNewIngressesFromFormPaths(
   return newIngresses;
 }
 
+/** prependWithSlash puts a '/' in front of a string if there isn't one there already. If the string is empty, it stays empty */
 export function prependWithSlash(path?: string) {
-  return path?.startsWith('/') ? path : `/${path}`;
+  if (!path) return '';
+  return path.startsWith('/') ? path : `/${path}`;
 }
