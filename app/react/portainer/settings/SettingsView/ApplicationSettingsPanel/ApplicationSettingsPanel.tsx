@@ -47,23 +47,19 @@ export function ApplicationSettingsPanel({
   };
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <Widget.Title icon={SettingsIcon} title="Application settings" />
-          <Widget.Body>
-            <Formik
-              initialValues={initialValues}
-              onSubmit={handleSubmit}
-              validationSchema={validation}
-              validateOnMount
-            >
-              <InnerForm isLoading={mutation.isLoading} />
-            </Formik>
-          </Widget.Body>
-        </Widget>
-      </div>
-    </div>
+    <Widget>
+      <Widget.Title icon={SettingsIcon} title="Application settings" />
+      <Widget.Body>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={validation}
+          validateOnMount
+        >
+          <InnerForm isLoading={mutation.isLoading} />
+        </Formik>
+      </Widget.Body>
+    </Widget>
   );
 
   function handleSubmit(values: Values) {

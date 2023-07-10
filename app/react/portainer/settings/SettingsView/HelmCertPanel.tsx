@@ -30,28 +30,24 @@ export function HelmCertPanel() {
   };
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <BEOverlay featureId={FeatureId.CA_FILE}>
-          <Widget>
-            <Widget.Title
-              icon={Key}
-              title="Certificate Authority file for Kubernetes Helm repositories"
-            />
-            <Widget.Body>
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validation}
-                onSubmit={handleSubmit}
-                validateOnMount
-              >
-                <InnerForm isLoading={mutation.isLoading} />
-              </Formik>
-            </Widget.Body>
-          </Widget>
-        </BEOverlay>
-      </div>
-    </div>
+    <BEOverlay featureId={FeatureId.CA_FILE}>
+      <Widget>
+        <Widget.Title
+          icon={Key}
+          title="Certificate Authority file for Kubernetes Helm repositories"
+        />
+        <Widget.Body>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validation}
+            onSubmit={handleSubmit}
+            validateOnMount
+          >
+            <InnerForm isLoading={mutation.isLoading} />
+          </Formik>
+        </Widget.Body>
+      </Widget>
+    </BEOverlay>
   );
 
   function handleSubmit({ clientCertFile }: FormValues) {

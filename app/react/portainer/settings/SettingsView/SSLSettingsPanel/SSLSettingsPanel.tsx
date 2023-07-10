@@ -43,99 +43,95 @@ function SSLSettingsPanel() {
   };
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <Widget.Title icon={Key} title="SSL certificate" />
-          <Widget.Body>
-            <Formik
-              initialValues={initialValues}
-              onSubmit={handleSubmit}
-              validationSchema={validation}
-              validateOnMount
-            >
-              {({ values, setFieldValue, isValid, errors }) => (
-                <Form className="form-horizontal">
-                  <div className="form-group">
-                    <div className="col-sm-12">
-                      <TextTip color="orange">
-                        Forcing HTTPs only will cause Portainer to stop
-                        listening on the HTTP port. Any edge agent environment
-                        that is using HTTP will no longer be available.
-                      </TextTip>
-                    </div>
-                  </div>
+    <Widget>
+      <Widget.Title icon={Key} title="SSL certificate" />
+      <Widget.Body>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={validation}
+          validateOnMount
+        >
+          {({ values, setFieldValue, isValid, errors }) => (
+            <Form className="form-horizontal">
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <TextTip color="orange">
+                    Forcing HTTPs only will cause Portainer to stop listening on
+                    the HTTP port. Any edge agent environment that is using HTTP
+                    will no longer be available.
+                  </TextTip>
+                </div>
+              </div>
 
-                  <div className="form-group">
-                    <div className="col-sm-12">
-                      <SwitchField
-                        checked={values.forceHTTPS}
-                        label="Force HTTPS only"
-                        labelClass="col-sm-3 col-lg-2"
-                        name="forceHTTPS"
-                        onChange={(value) => setFieldValue('forceHTTPS', value)}
-                      />
-                    </div>
-                  </div>
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <SwitchField
+                    checked={values.forceHTTPS}
+                    label="Force HTTPS only"
+                    labelClass="col-sm-3 col-lg-2"
+                    name="forceHTTPS"
+                    onChange={(value) => setFieldValue('forceHTTPS', value)}
+                  />
+                </div>
+              </div>
 
-                  <div className="form-group">
-                    <div className="col-sm-12">
-                      <TextTip color="blue">
-                        Provide a new SSL Certificate to replace the existing
-                        one that is used for HTTPS connections.
-                      </TextTip>
-                    </div>
-                  </div>
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <TextTip color="blue">
+                    Provide a new SSL Certificate to replace the existing one
+                    that is used for HTTPS connections.
+                  </TextTip>
+                </div>
+              </div>
 
-                  <FormControl
-                    label="SSL/TLS certificate"
-                    tooltip="Select an X.509 certificate file, commonly a crt, cer or pem file."
-                    inputId="ca-cert-field"
-                    errors={errors.certFile}
+              <FormControl
+                label="SSL/TLS certificate"
+                tooltip="Select an X.509 certificate file, commonly a crt, cer or pem file."
+                inputId="ca-cert-field"
+                errors={errors.certFile}
+              >
+                <FileUploadField
+                  required={typeof errors.certFile !== 'undefined'}
+                  inputId="ca-cert-field"
+                  name="certFile"
+                  onChange={(file) => setFieldValue('certFile', file)}
+                  value={values.certFile}
+                />
+              </FormControl>
+
+              <FormControl
+                label="SSL/TLS private key"
+                tooltip="Select a private key file, commonly a key, or pem file."
+                inputId="ca-cert-field"
+                errors={errors.keyFile}
+              >
+                <FileUploadField
+                  required={typeof errors.keyFile !== 'undefined'}
+                  inputId="ca-cert-field"
+                  name="keyFile"
+                  onChange={(file) => setFieldValue('keyFile', file)}
+                  value={values.keyFile}
+                />
+              </FormControl>
+
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <LoadingButton
+                    isLoading={mutation.isLoading || reloadingPage}
+                    disabled={!isValid}
+                    loadingText={reloadingPage ? 'Reloading' : 'Saving'}
+                    className="!ml-0"
                   >
-                    <FileUploadField
-                      required={typeof errors.certFile !== 'undefined'}
-                      inputId="ca-cert-field"
-                      name="certFile"
-                      onChange={(file) => setFieldValue('certFile', file)}
-                      value={values.certFile}
-                    />
-                  </FormControl>
-
-                  <FormControl
-                    label="SSL/TLS private key"
-                    tooltip="Select a private key file, commonly a key, or pem file."
-                    inputId="ca-cert-field"
-                    errors={errors.keyFile}
-                  >
-                    <FileUploadField
-                      required={typeof errors.keyFile !== 'undefined'}
-                      inputId="ca-cert-field"
-                      name="keyFile"
-                      onChange={(file) => setFieldValue('keyFile', file)}
-                      value={values.keyFile}
-                    />
-                  </FormControl>
-
-                  <div className="form-group">
-                    <div className="col-sm-12">
-                      <LoadingButton
-                        isLoading={mutation.isLoading || reloadingPage}
-                        disabled={!isValid}
-                        loadingText={reloadingPage ? 'Reloading' : 'Saving'}
-                        className="!ml-0"
-                      >
-                        Save SSL Settings
-                      </LoadingButton>
-                    </div>
-                  </div>
-                </Form>
-              )}
-            </Formik>
-          </Widget.Body>
-        </Widget>
-      </div>
-    </div>
+                    Save SSL Settings
+                  </LoadingButton>
+                </div>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Widget.Body>
+    </Widget>
   );
 
   function handleSubmit({ certFile, forceHTTPS, keyFile }: FormValues) {

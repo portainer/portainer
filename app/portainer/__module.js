@@ -364,8 +364,7 @@ angular
         url: '/settings',
         views: {
           'content@': {
-            templateUrl: './views/settings/settings.html',
-            controller: 'SettingsController',
+            component: 'settingsView',
           },
         },
       };

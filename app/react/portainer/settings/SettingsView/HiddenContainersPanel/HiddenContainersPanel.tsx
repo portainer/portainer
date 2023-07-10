@@ -21,36 +21,30 @@ export function HiddenContainersPanel() {
 
   const labels = settingsQuery.data;
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <Widget.Title icon={Box} title="Hidden containers" />
-          <Widget.Body>
-            <div className="mb-3">
-              <TextTip color="blue">
-                You can hide containers with specific labels from Portainer UI.
-                You need to specify the label name and value.
-              </TextTip>
-            </div>
+    <Widget>
+      <Widget.Title icon={Box} title="Hidden containers" />
+      <Widget.Body>
+        <div className="mb-3">
+          <TextTip color="blue">
+            You can hide containers with specific labels from Portainer UI. You
+            need to specify the label name and value.
+          </TextTip>
+        </div>
 
-            <AddLabelForm
-              isLoading={mutation.isLoading}
-              onSubmit={(name, value) =>
-                handleSubmit([...labels, { name, value }])
-              }
-            />
+        <AddLabelForm
+          isLoading={mutation.isLoading}
+          onSubmit={(name, value) => handleSubmit([...labels, { name, value }])}
+        />
 
-            <HiddenContainersTable
-              labels={labels}
-              isLoading={mutation.isLoading}
-              onDelete={(name) =>
-                handleSubmit(labels.filter((label) => label.name !== name))
-              }
-            />
-          </Widget.Body>
-        </Widget>
-      </div>
-    </div>
+        <HiddenContainersTable
+          labels={labels}
+          isLoading={mutation.isLoading}
+          onDelete={(name) =>
+            handleSubmit(labels.filter((label) => label.name !== name))
+          }
+        />
+      </Widget.Body>
+    </Widget>
   );
 
   function handleSubmit(labels: Pair[]) {
