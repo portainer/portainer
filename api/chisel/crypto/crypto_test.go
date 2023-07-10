@@ -1,4 +1,4 @@
-package chisel
+package crypto
 
 import (
 	"reflect"

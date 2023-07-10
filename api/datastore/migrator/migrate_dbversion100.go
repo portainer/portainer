@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/chisel"
+	"github.com/portainer/portainer/api/chisel/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/rs/zerolog/log"
 )
@@ -43,7 +43,7 @@ func (m *Migrator) convertSeedToPrivateKeyForDB100() error {
 	}
 
 	if serverInfo.PrivateKeySeed != "" {
-		key, err := chisel.GenerateGo119CompatibleKey(serverInfo.PrivateKeySeed)
+		key, err := crypto.GenerateGo119CompatibleKey(serverInfo.PrivateKeySeed)
 		if err != nil {
 			log.Error().
 				Err(err).

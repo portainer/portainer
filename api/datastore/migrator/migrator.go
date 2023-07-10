@@ -3,7 +3,7 @@ package migrator
 import (
 	"errors"
 
-	"github.com/portainer/portainer/api/dataservices/tunnelserver"
+	"github.com/Masterminds/semver"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
@@ -23,10 +23,10 @@ import (
 	"github.com/portainer/portainer/api/dataservices/stack"
 	"github.com/portainer/portainer/api/dataservices/tag"
 	"github.com/portainer/portainer/api/dataservices/teammembership"
+	"github.com/portainer/portainer/api/dataservices/tunnelserver"
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/Masterminds/semver"
 	"github.com/rs/zerolog/log"
 )
 
