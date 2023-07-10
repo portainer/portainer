@@ -240,19 +240,20 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 }
 
 // StoreStackFileFromBytesByVersion creates a version subfolder in the ComposeStorePath and stores a new file from bytes.
-// It returns the path to the folder where the file is stored.
+// It returns the path to the folder where version folders are stored.
 func (service *Service) StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error) {
 	versionStr := ""
 	if version != 0 {
 		versionStr = fmt.Sprintf("v%d", version)
 	}
-	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
-	err := service.createDirectoryInStore(stackStorePath)
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	stackVersionPath := JoinPaths(stackStorePath, versionStr)
+	err := service.createDirectoryInStore(stackVersionPath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := JoinPaths(stackStorePath, fileName)
+	composeFilePath := JoinPaths(stackVersionPath, fileName)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(composeFilePath, r)
@@ -283,14 +284,15 @@ func (service *Service) UpdateStoreStackFileFromBytes(stackIdentifier, fileName 
 }
 
 // UpdateStoreStackFileFromBytesByVersion makes stack file backup and updates a new file from bytes.
-// It returns the path to the version folder where the file is stored.
+// It returns the path to the folder where version folders are stored.
 func (service *Service) UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error) {
 	versionStr := ""
 	if version != 0 {
 		versionStr = fmt.Sprintf("v%d", version)
 	}
-	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
-	composeFilePath := JoinPaths(stackStorePath, fileName)
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	stackVersionPath := JoinPaths(stackStorePath, versionStr)
+	composeFilePath := JoinPaths(stackVersionPath, fileName)
 	err := service.createBackupFileInStore(composeFilePath)
 	if err != nil {
 		return "", err
