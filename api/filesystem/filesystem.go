@@ -6,15 +6,15 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/rs/zerolog/log"
 
-	"io"
-	"os"
+	"github.com/gofrs/uuid"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -327,7 +327,7 @@ func (service *Service) GetEdgeStackProjectPathByVersion(edgeStackIdentifier str
 	}
 
 	if commitHash != "" {
-		versionStr = fmt.Sprintf("%s", commitHash)
+		versionStr = commitHash
 	}
 
 	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier, versionStr)
@@ -367,7 +367,7 @@ func (service *Service) FormProjectPathByVersion(path string, version int, commi
 	}
 
 	if commitHash != "" {
-		versionStr = fmt.Sprintf("%s", commitHash)
+		versionStr = commitHash
 	}
 
 	return JoinPaths(path, versionStr)

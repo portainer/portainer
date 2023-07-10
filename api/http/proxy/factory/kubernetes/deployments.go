@@ -8,8 +8,7 @@ func (transport *baseTransport) proxyDeploymentsRequest(request *http.Request, n
 	switch request.Method {
 	case http.MethodPost, http.MethodPatch:
 		transport.refreshRegistry(request, namespace)
-		return transport.executeKubernetesRequest(request)
-	default:
-		return transport.executeKubernetesRequest(request)
 	}
+
+	return transport.executeKubernetesRequest(request)
 }

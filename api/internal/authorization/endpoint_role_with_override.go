@@ -74,20 +74,11 @@ func (service *Service) getUserEndpointAccessWithPolicies(
 		}
 	}
 
-	if userAccess(tx, userID, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies, memberships) {
-		return true, nil
-	}
-
-	if userAccess(tx, userID, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies, memberships) {
-		return true, nil
-	}
-
-	return false, nil
-
+	return userAccess(userID, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies, memberships) ||
+		userAccess(userID, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies, memberships), nil
 }
 
 func userAccess(
-	tx dataservices.DataStoreTx,
 	userID portainer.UserID,
 	userAccessPolicies portainer.UserAccessPolicies,
 	teamAccessPolicies portainer.TeamAccessPolicies,

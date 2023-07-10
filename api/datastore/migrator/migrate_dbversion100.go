@@ -20,10 +20,6 @@ func (m *Migrator) migrateDockerDesktopExtentionSetting() error {
 	}
 
 	settings.IsDockerDesktopExtension = isDDExtension
-	err = m.settingsService.UpdateSettings(settings)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return m.settingsService.UpdateSettings(settings)
 }

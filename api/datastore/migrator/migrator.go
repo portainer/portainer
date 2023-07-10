@@ -3,15 +3,11 @@ package migrator
 import (
 	"errors"
 
-	"github.com/portainer/portainer/api/dataservices/edgejob"
-	"github.com/portainer/portainer/api/dataservices/edgestack"
-
-	"github.com/Masterminds/semver"
-	"github.com/rs/zerolog/log"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
+	"github.com/portainer/portainer/api/dataservices/edgestack"
 	"github.com/portainer/portainer/api/dataservices/endpoint"
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
@@ -29,6 +25,9 @@ import (
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/internal/authorization"
+
+	"github.com/Masterminds/semver"
+	"github.com/rs/zerolog/log"
 )
 
 type (
