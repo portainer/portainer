@@ -30,7 +30,7 @@ export function findBestMatchRegistry(
     return matchDockerByUserAndUrl;
   }
 
-  const matchByUrl = registries.find((r) => repository.includes(getURL(r)));
+  const matchByUrl = registries.find((r) => repository.startsWith(getURL(r)));
 
   if (matchByUrl) {
     return matchByUrl;
