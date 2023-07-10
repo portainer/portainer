@@ -53,6 +53,10 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Use(h.kubeClient)
 
 	endpointRouter.PathPrefix("/nodes_limits").Handler(httperror.LoggerHandler(h.getKubernetesNodesLimits)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/nodes").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForAllNodes)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/nodes/{name}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForNode)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/pods/namespace/{namespace}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForAllPods)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/pods/namespace/{namespace}/{name}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForPod)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getKubernetesIngressControllers)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllers)).Methods(http.MethodPut)
 	endpointRouter.Handle("/ingresses/delete", httperror.LoggerHandler(h.deleteKubernetesIngresses)).Methods(http.MethodPost)
