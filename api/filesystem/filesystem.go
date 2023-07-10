@@ -313,9 +313,50 @@ func (service *Service) RemoveStackFileBackup(stackIdentifier, fileName string) 
 	return service.removeBackupFileInStore(composeFilePath)
 }
 
+// RemoveStackFileBackupByVersion removes the stack file backup by version in the ComposeStorePath.
+func (service *Service) RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+
+	return service.removeBackupFileInStore(composeFilePath)
+}
+
 // RollbackStackFile rollbacks the stack file backup in the ComposeStorePath.
 func (service *Service) RollbackStackFile(stackIdentifier, fileName string) error {
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	path := service.wrapFileStore(composeFilePath)
+	backupPath := fmt.Sprintf("%s.bak", path)
+
+	exists, err := service.FileExists(backupPath)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		// keep the updated/failed stack file
+		return nil
+	}
+
+	err = service.Copy(backupPath, path, true)
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(backupPath)
+}
+
+// RollbackStackFileByVersion rollbacks the stack file backup by version in the ComposeStorePath.
+func (service *Service) RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	path := service.wrapFileStore(composeFilePath)
 	backupPath := fmt.Sprintf("%s.bak", path)
