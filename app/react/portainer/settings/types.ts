@@ -93,6 +93,10 @@ export interface DefaultRegistry {
   Hide: boolean;
 }
 
+export interface ExperimentalFeatures {
+  OpenAIIntegration: boolean;
+}
+
 export interface Settings {
   LogoURL: string;
   CustomLoginBanner: string;
@@ -123,6 +127,7 @@ export interface Settings {
   DisplayDonationHeader: boolean;
   DisplayExternalContributors: boolean;
   EnableHostManagementFeatures: boolean;
+  ExperimentalFeatures?: ExperimentalFeatures;
   AllowVolumeBrowserForRegularUsers: boolean;
   AllowBindMountsForRegularUsers: boolean;
   AllowPrivilegedModeForRegularUsers: boolean;

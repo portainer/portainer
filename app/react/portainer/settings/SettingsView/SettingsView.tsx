@@ -5,6 +5,7 @@ import { StateManager } from '@/portainer/services/types';
 import { PageHeader } from '@@/PageHeader';
 
 import { Settings } from '../types';
+import { isBE } from '../../feature-flags/feature-flags.service';
 
 import { ApplicationSettingsPanel } from './ApplicationSettingsPanel';
 import { BackupSettingsPanel } from './BackupSettingsView';
@@ -12,7 +13,7 @@ import { HelmCertPanel } from './HelmCertPanel';
 import { HiddenContainersPanel } from './HiddenContainersPanel/HiddenContainersPanel';
 import { KubeSettingsPanel } from './KubeSettingsPanel';
 import { SSLSettingsPanelWrapper } from './SSLSettingsPanel/SSLSettingsPanel';
-// import { ExperimentalFeatures } from './ExperimentalFeatures';
+import { ExperimentalFeatures } from './ExperimentalFeatures';
 
 export function SettingsView() {
   return (
@@ -28,7 +29,7 @@ export function SettingsView() {
 
         <SSLSettingsPanelWrapper />
 
-        {/* <ExperimentalFeatures /> */}
+        {isBE && <ExperimentalFeatures />}
 
         <HiddenContainersPanel />
 
