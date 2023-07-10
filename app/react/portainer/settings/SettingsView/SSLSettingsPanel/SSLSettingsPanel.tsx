@@ -17,6 +17,7 @@ import { FileUploadField } from '@@/form-components/FileUpload';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { useUpdateSSLConfigMutation } from '../useUpdateSSLConfigMutation';
+import { useSSLSettings } from '../../queries/useSSLSettings';
 
 interface FormValues {
   certFile: File | null;
@@ -27,12 +28,18 @@ interface FormValues {
 export const SSLSettingsPanelWrapper = withHideOnExtension(SSLSettingsPanel);
 
 function SSLSettingsPanel() {
+  const settingsQuery = useSSLSettings();
   const [reloadingPage, setReloadingPage] = useState(false);
   const mutation = useUpdateSSLConfigMutation();
+
+  if (!settingsQuery.data) {
+    return null;
+  }
+
   const initialValues: FormValues = {
     certFile: null,
     keyFile: null,
-    forceHTTPS: false,
+    forceHTTPS: !settingsQuery.data.httpEnabled,
   };
 
   return (
