@@ -30,7 +30,7 @@ function Cell({
       as={Link}
       props={{
         to: 'portainer.endpoints.endpoint.access',
-        params: { id: environment.Id },
+        params: { endpointId: environment.Id },
       }}
       color="link"
       icon={Users}

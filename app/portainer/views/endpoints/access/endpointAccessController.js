@@ -21,7 +21,7 @@ class EndpointAccessController {
   async $onInit() {
     this.state = { actionInProgress: false };
     try {
-      this.endpoint = await this.EndpointService.endpoint(this.$transition$.params().id);
+      this.endpoint = await this.EndpointService.endpoint(this.$transition$.params().endpointId);
       this.group = await this.GroupService.group(this.endpoint.GroupId);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
