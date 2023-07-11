@@ -38,10 +38,11 @@
   padding-left: 20px;
 }
 
+/* used for BE teaser. Dark theme specs defined by EE-5621 */
 .box-selector-item.limited.business label,
 .box-selector-item.limited.business input:checked + label {
   @apply border-warning-7 bg-warning-1 text-black;
-  @apply th-dark:bg-warning-8 th-dark:bg-opacity-10 th-dark:text-white;
+  @apply th-dark:border-blue-8 th-dark:bg-[color:var(--bg-BE-only)] th-dark:text-white;
   @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10 th-highcontrast:text-white;
 
   filter: none;

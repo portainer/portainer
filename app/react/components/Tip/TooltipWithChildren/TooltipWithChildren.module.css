@@ -34,9 +34,9 @@
 }
 
 .tooltip-beteaser {
-  color: var(--ui-warning-5);
+  @apply text-warning-5 th-dark:text-blue-8;
 }
 
 .tooltip-beteaser:hover {
-  color: var(--ui-warning-5);
+  @apply text-warning-5 th-dark:text-blue-8;
 }
