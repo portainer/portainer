@@ -38,7 +38,7 @@ export function EnvironmentsDatatable() {
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useParamState<StatusType>(
     'status',
-    parseStatusFilter
+    (value) => (value ? parseInt(value, 10) : undefined)
   );
   const tableState = useTableStateWithoutStorage('name');
   const endpointsQuery = useEnvironmentList({
@@ -110,23 +110,6 @@ export function EnvironmentsDatatable() {
       }
     />
   );
-}
-
-function parseStatusFilter(status: string | undefined): StatusType | undefined {
-  switch (status) {
-    case 'Pending':
-      return StatusType.Pending;
-    case 'Acknowledged':
-      return StatusType.Acknowledged;
-    case 'ImagesPulled':
-      return StatusType.ImagesPulled;
-    case 'Running':
-      return StatusType.Running;
-    case 'Error':
-      return StatusType.Error;
-    default:
-      return undefined;
-  }
 }
 
 function getEnvStackStatus(

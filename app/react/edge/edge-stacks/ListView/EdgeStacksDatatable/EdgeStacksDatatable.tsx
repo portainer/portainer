@@ -22,7 +22,7 @@ export function EdgeStacksDatatable() {
     select: (edgeStacks) =>
       edgeStacks.map((edgeStack) => ({
         ...edgeStack,
-        aggregatedStatus: aggregateStackStatus(edgeStack.StatusArray),
+        aggregatedStatus: aggregateStackStatus(edgeStack.Status),
       })),
     refetchInterval: tableState.autoRefreshRate * 1000,
   });
@@ -49,15 +49,18 @@ export function EdgeStacksDatatable() {
   );
 }
 
-function aggregateStackStatus(stackStatus: EdgeStack['StatusArray']) {
+function aggregateStackStatus(stackStatus: EdgeStack['Status']) {
   const aggregateStatus = { ok: 0, error: 0, acknowledged: 0, imagesPulled: 0 };
-  return Object.values(stackStatus)
-    .flat()
-    .reduce((acc, envStatus) => {
-      acc.ok += Number(envStatus.Type === StatusType.Running);
-      acc.error += Number(envStatus.Type === StatusType.Error);
-      acc.acknowledged += Number(envStatus.Type === StatusType.Acknowledged);
-      acc.imagesPulled += Number(envStatus.Type === StatusType.ImagesPulled);
-      return acc;
-    }, aggregateStatus);
+  return Object.values(stackStatus).reduce(
+    (acc, envStatus) =>
+      envStatus.Status.reduce((acc, status) => {
+        const { Type } = status;
+        acc.ok += Number(Type === StatusType.Running);
+        acc.error += Number(Type === StatusType.Error);
+        acc.acknowledged += Number(Type === StatusType.Acknowledged);
+        acc.imagesPulled += Number(Type === StatusType.ImagesPulled);
+        return acc;
+      }, acc),
+    aggregateStatus
+  );
 }

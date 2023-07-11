@@ -76,6 +76,8 @@ func (m *Migrator) convertSeedToPrivateKeyForDB100() error {
 }
 
 func (m *Migrator) updateEdgeStackStatusForDB100() error {
+	log.Info().Msg("update edge stack status to have deployment steps")
+
 	edgeStacks, err := m.edgeStackService.EdgeStacks()
 	if err != nil {
 		return err
@@ -83,52 +85,54 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 
 	for _, edgeStack := range edgeStacks {
 
-		for _, endpointStatus := range edgeStack.Status {
+		for environmentID, environmentStatus := range edgeStack.Status {
 			statusArray := []portainer.EdgeStackDeploymentStatus{}
-			if endpointStatus.Details.Pending {
+			if environmentStatus.Details.Pending {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
 					Type: portainer.EdgeStackStatusPending,
 					Time: time.Now().Unix(),
 				})
 			}
 
-			if endpointStatus.Details.Acknowledged {
+			if environmentStatus.Details.Acknowledged {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
 					Type: portainer.EdgeStackStatusAcknowledged,
 					Time: time.Now().Unix(),
 				})
 			}
 
-			if endpointStatus.Details.Error {
+			if environmentStatus.Details.Error {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
 					Type:  portainer.EdgeStackStatusError,
-					Error: endpointStatus.Error,
+					Error: environmentStatus.Error,
 					Time:  time.Now().Unix(),
 				})
 			}
 
-			if endpointStatus.Details.Ok {
+			if environmentStatus.Details.Ok {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
 					Type: portainer.EdgeStackStatusRunning,
 					Time: time.Now().Unix(),
 				})
 			}
 
-			if endpointStatus.Details.ImagesPulled {
+			if environmentStatus.Details.ImagesPulled {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
 					Type: portainer.EdgeStackStatusImagesPulled,
 					Time: time.Now().Unix(),
 				})
 			}
 
-			if endpointStatus.Details.Remove {
+			if environmentStatus.Details.Remove {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
 					Type: portainer.EdgeStackStatusRemoving,
 					Time: time.Now().Unix(),
 				})
 			}
 
-			endpointStatus.Status = statusArray
+			environmentStatus.Status = statusArray
+
+			edgeStack.Status[environmentID] = environmentStatus
 		}
 
 		err = m.edgeStackService.UpdateEdgeStack(edgeStack.ID, &edgeStack)
