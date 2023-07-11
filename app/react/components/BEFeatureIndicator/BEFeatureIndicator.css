@@ -9,15 +9,15 @@
 }
 
 .be-indicator .be-indicator-icon {
-  color: #000000;
+  @apply text-black th-highcontrast:text-white th-dark:text-blue-8;
 }
 
 .be-indicator:hover {
-  text-decoration: none;
+  @apply no-underline;
 }
 
 .be-indicator:hover .be-indicator-label {
-  text-decoration: underline;
+  @apply underline;
 }
 
 .be-indicator-container {
