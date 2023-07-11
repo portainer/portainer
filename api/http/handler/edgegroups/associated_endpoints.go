@@ -3,6 +3,7 @@ package edgegroups
 import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type endpointSetType map[portainer.EndpointID]bool
@@ -40,7 +41,7 @@ func GetEndpointsByTags(tx dataservices.DataStoreTx, tagIDs []portainer.TagID, p
 
 	results := []portainer.EndpointID{}
 	for _, endpoint := range endpoints {
-		if _, ok := endpointSet[endpoint.ID]; ok && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
+		if _, ok := endpointSet[endpoint.ID]; ok && endpointutils.IsEdgeEndpoint(&endpoint) && endpoint.UserTrusted {
 			results = append(results, endpoint.ID)
 		}
 	}
