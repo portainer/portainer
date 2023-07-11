@@ -40,9 +40,9 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
 	github.com/portainer/libhttp v0.0.0-20230615144939-a999f666d9a9
-	github.com/portainer/portainer/pkg/featureflags v0.0.0-20230209201943-d73622ed9cd4
-	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230410231754-96474a42eacb
-	github.com/portainer/portainer/pkg/libstack v0.0.0-20230626011105-8c16fbb8aaf9
+	github.com/portainer/portainer/pkg/featureflags v0.0.0-20230711022654-64b227b2e146
+	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230711022654-64b227b2e146
+	github.com/portainer/portainer/pkg/libstack v0.0.0-20230711022654-64b227b2e146
 	github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.29.0
