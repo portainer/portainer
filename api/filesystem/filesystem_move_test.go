@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var content = []byte("content")
+
 func Test_movePath_shouldFailIfSourceDirDoesNotExist(t *testing.T) {
 	sourceDir := "missing"
 	destinationDir := t.TempDir()
@@ -52,8 +54,6 @@ func Test_movePath_successWhenSourceExistsAndDestinationIsMissing(t *testing.T) 
 	assertFileContent(t, path.Join(destinationDir, "dir", "file"))
 }
 
-var content []byte = []byte("content")
-
 func addFile(fileParts ...string) (filepath string) {
 	if len(fileParts) > 2 {
 		dir := path.Join(fileParts[:len(fileParts)-1]...)
@@ -62,6 +62,7 @@ func addFile(fileParts ...string) (filepath string) {
 
 	p := path.Join(fileParts...)
 	os.WriteFile(p, content, 0766)
+
 	return p
 }
 

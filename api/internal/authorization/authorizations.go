@@ -508,18 +508,21 @@ func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.E
 		authorizations := getAuthorizationsFromUserEndpointPolicy(user, &endpoint, roles)
 		if len(authorizations) > 0 {
 			endpointAuthorizations[endpoint.ID] = authorizations
+
 			continue
 		}
 
 		authorizations = getAuthorizationsFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
 		if len(authorizations) > 0 {
 			endpointAuthorizations[endpoint.ID] = authorizations
+
 			continue
 		}
 
 		authorizations = getAuthorizationsFromTeamEndpointPolicies(userMemberships, &endpoint, roles)
 		if len(authorizations) > 0 {
 			endpointAuthorizations[endpoint.ID] = authorizations
+
 			continue
 		}
 
@@ -587,6 +590,7 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 		for _, role := range roles {
 			if role.ID == id {
 				associatedRoles = append(associatedRoles, role)
+
 				break
 			}
 		}
@@ -609,6 +613,7 @@ func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpoin
 	if err != nil {
 		return false, err
 	}
+
 	if user.Role == portainer.AdministratorRole {
 		return true, nil
 	}
@@ -619,5 +624,6 @@ func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpoin
 			return true, nil
 		}
 	}
+
 	return false, nil
 }

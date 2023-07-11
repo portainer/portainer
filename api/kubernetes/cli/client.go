@@ -7,10 +7,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/patrickmn/go-cache"
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/patrickmn/go-cache"
+	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -116,7 +117,7 @@ func (factory *ClientFactory) SetProxyKubeClient(endpointID, token string, cli *
 // CreateKubeClientFromKubeConfig creates a KubeClient from a clusterID, and
 // Kubernetes config.
 func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte) (*KubeClient, error) {
-	config, err := clientcmd.NewClientConfigFromBytes([]byte(kubeConfig))
+	config, err := clientcmd.NewClientConfigFromBytes(kubeConfig)
 	if err != nil {
 		return nil, err
 	}

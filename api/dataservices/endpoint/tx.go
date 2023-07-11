@@ -66,6 +66,7 @@ func (service ServiceTx) DeleteEndpoint(ID portainer.EndpointID) error {
 	for edgeID, endpointID := range service.service.idxEdgeID {
 		if endpointID == ID {
 			delete(service.service.idxEdgeID, edgeID)
+
 			break
 		}
 	}
