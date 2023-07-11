@@ -30,6 +30,6 @@ async function deleteEdgeStack(id: EdgeStack['Id']) {
   try {
     await axios.delete(buildUrl(id));
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to delete environment');
+    throw parseAxiosError(e, 'Unable to delete edge stack');
   }
 }

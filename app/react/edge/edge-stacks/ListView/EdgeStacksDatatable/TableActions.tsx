@@ -7,7 +7,7 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { Link } from '@@/Link';
 
-import { useDeleteEdgeStacksMutation } from './useDeleteEnvironmentsMutation';
+import { useDeleteEdgeStacksMutation } from './useDeleteEdgeStacksMutation';
 import { DecoratedEdgeStack } from './types';
 
 export function TableActions({
