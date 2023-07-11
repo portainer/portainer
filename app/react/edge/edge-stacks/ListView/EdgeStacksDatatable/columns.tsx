@@ -1,7 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
+import _ from 'lodash';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { buildNameColumn } from '@@/datatables/NameCell';
 import { Link } from '@@/Link';
@@ -12,7 +14,7 @@ import { DecoratedEdgeStack } from './types';
 
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
-export const columns = [
+export const columns = _.compact([
   buildNameColumn<DecoratedEdgeStack>('Name', 'Id', 'edge.stacks.edit'),
   columnHelper.accessor('aggregatedStatus.acknowledged', {
     header: 'Acknowledged',
@@ -29,21 +31,22 @@ export const columns = [
       className: '[&>*]:justify-center',
     },
   }),
-  columnHelper.accessor('aggregatedStatus.imagesPulled', {
-    header: 'Images Pre-pulled',
-    cell: ({ getValue, row }) => (
-      <Status
-        count={getValue()}
-        type="ImagesPulled"
-        stackId={row.original.Id}
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      className: '[&>*]:justify-center',
-    },
-  }),
+  isBE &&
+    columnHelper.accessor('aggregatedStatus.imagesPulled', {
+      header: 'Images Pre-pulled',
+      cell: ({ getValue, row }) => (
+        <Status
+          count={getValue()}
+          type="ImagesPulled"
+          stackId={row.original.Id}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        className: '[&>*]:justify-center',
+      },
+    }),
   columnHelper.accessor('aggregatedStatus.ok', {
     header: 'Deployed',
     cell: ({ getValue, row }) => (
@@ -84,35 +87,36 @@ export const columns = [
     cell: ({ getValue }) => isoDateFromTimestamp(getValue()),
     enableHiding: false,
   }),
-  columnHelper.accessor(
-    (item) =>
-      item.GitConfig ? item.GitConfig.ConfigHash : item.StackFileVersion,
-    {
-      header: 'Target Version',
-      enableSorting: false,
-      cell: ({ row: { original: item } }) => {
-        if (item.GitConfig) {
-          return (
-            <div className="text-center">
-              <a
-                target="_blank"
-                href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
-                rel="noreferrer"
-              >
-                {item.GitConfig.ConfigHash.slice(0, 7)}
-              </a>
-            </div>
-          );
-        }
+  isBE &&
+    columnHelper.accessor(
+      (item) =>
+        item.GitConfig ? item.GitConfig.ConfigHash : item.StackFileVersion,
+      {
+        header: 'Target Version',
+        enableSorting: false,
+        cell: ({ row: { original: item } }) => {
+          if (item.GitConfig) {
+            return (
+              <div className="text-center">
+                <a
+                  target="_blank"
+                  href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
+                  rel="noreferrer"
+                >
+                  {item.GitConfig.ConfigHash.slice(0, 7)}
+                </a>
+              </div>
+            );
+          }
 
-        return <div className="text-center">{item.StackFileVersion}</div>;
-      },
-      meta: {
-        className: '[&>*]:justify-center',
-      },
-    }
-  ),
-];
+          return <div className="text-center">{item.StackFileVersion}</div>;
+        },
+        meta: {
+          className: '[&>*]:justify-center',
+        },
+      }
+    ),
+]);
 
 function Status({
   count,
