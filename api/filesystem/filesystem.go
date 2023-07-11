@@ -159,6 +159,16 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier)
 }
 
+// GetStackProjectPathByVersion returns the absolute path on the FS for a stack based
+// on its identifier and version.
+func (service *Service) GetStackProjectPathByVersion(stackIdentifier string, version int) string {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier, versionStr)
+}
+
 // Copy copies the file on fromFilePath to toFilePath
 // if toFilePath exists func will fail unless deleteIfExists is true
 func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error {
