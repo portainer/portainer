@@ -12,7 +12,12 @@ import { DeploymentCounter, DeploymentCounterLink } from './DeploymentCounter';
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
 export const columns = _.compact([
-  buildNameColumn<DecoratedEdgeStack>('Name', 'Id', 'edge.stacks.edit'),
+  buildNameColumn<DecoratedEdgeStack>(
+    'Name',
+    'Id',
+    'edge.stacks.edit',
+    'stackId'
+  ),
   columnHelper.accessor('aggregatedStatus.acknowledged', {
     header: 'Acknowledged',
     enableSorting: false,
