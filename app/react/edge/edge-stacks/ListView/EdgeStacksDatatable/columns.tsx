@@ -1,16 +1,13 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import clsx from 'clsx';
 import _ from 'lodash';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { buildNameColumn } from '@@/datatables/NameCell';
-import { Link } from '@@/Link';
-
-import { EdgeStack, StatusType } from '../../types';
 
 import { DecoratedEdgeStack } from './types';
+import { DeploymentCounter, DeploymentCounterLink } from './DeploymentCounter';
 
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
@@ -21,7 +18,7 @@ export const columns = _.compact([
     enableSorting: false,
     enableHiding: false,
     cell: ({ getValue, row }) => (
-      <Status
+      <DeploymentCounterLink
         count={getValue()}
         type="Acknowledged"
         stackId={row.original.Id}
@@ -35,7 +32,7 @@ export const columns = _.compact([
     columnHelper.accessor('aggregatedStatus.imagesPulled', {
       header: 'Images Pre-pulled',
       cell: ({ getValue, row }) => (
-        <Status
+        <DeploymentCounterLink
           count={getValue()}
           type="ImagesPulled"
           stackId={row.original.Id}
@@ -50,7 +47,11 @@ export const columns = _.compact([
   columnHelper.accessor('aggregatedStatus.ok', {
     header: 'Deployed',
     cell: ({ getValue, row }) => (
-      <Status count={getValue()} type="Ok" stackId={row.original.Id} />
+      <DeploymentCounterLink
+        count={getValue()}
+        type="Ok"
+        stackId={row.original.Id}
+      />
     ),
     enableSorting: false,
     enableHiding: false,
@@ -61,7 +62,11 @@ export const columns = _.compact([
   columnHelper.accessor('aggregatedStatus.error', {
     header: 'Failed',
     cell: ({ getValue, row }) => (
-      <Status count={getValue()} type="Error" stackId={row.original.Id} />
+      <DeploymentCounterLink
+        count={getValue()}
+        type="Error"
+        stackId={row.original.Id}
+      />
     ),
     enableSorting: false,
     enableHiding: false,
@@ -73,7 +78,7 @@ export const columns = _.compact([
     header: 'Deployments',
     cell: ({ getValue }) => (
       <div className="text-center">
-        <span className="edge-stack-status status-total">{getValue()}</span>
+        <DeploymentCounter count={getValue()} />
       </div>
     ),
     enableSorting: false,
@@ -117,34 +122,3 @@ export const columns = _.compact([
       }
     ),
 ]);
-
-function Status({
-  count,
-  type,
-  stackId,
-}: {
-  count: number;
-  type: StatusType;
-  stackId: EdgeStack['Id'];
-}) {
-  return (
-    <div className="text-center">
-      <Link
-        className="hover:no-underline"
-        to="edge.stacks.edit"
-        params={{ stackId, tab: 1, status: type }}
-      >
-        <span
-          className={clsx('edge-stack-status ', {
-            'status-ok': type === 'Ok',
-            'status-error': type === 'Error',
-            'status-acknowledged': type === 'Acknowledged',
-            'status-images-pulled': type === 'ImagesPulled',
-          })}
-        >
-          &bull; {count}
-        </span>
-      </Link>
-    </div>
-  );
-}
