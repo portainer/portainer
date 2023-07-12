@@ -7,10 +7,10 @@ angular.module('portainer.docker').factory('ConfigService', [
     'use strict';
     var service = {};
 
-    service.config = function (configId) {
+    service.config = function (environmentId, configId) {
       var deferred = $q.defer();
 
-      Config.get({ id: configId })
+      Config.get({ id: configId, environmentId })
         .$promise.then(function success(data) {
           var config = new ConfigViewModel(data);
           deferred.resolve(config);
@@ -22,10 +22,10 @@ angular.module('portainer.docker').factory('ConfigService', [
       return deferred.promise;
     };
 
-    service.configs = function () {
+    service.configs = function (environmentId) {
       var deferred = $q.defer();
 
-      Config.query({})
+      Config.query({ environmentId })
         .$promise.then(function success(data) {
           var configs = data.map(function (item) {
             return new ConfigViewModel(item);
@@ -39,10 +39,10 @@ angular.module('portainer.docker').factory('ConfigService', [
       return deferred.promise;
     };
 
-    service.remove = function (configId) {
+    service.remove = function (environmentId, configId) {
       var deferred = $q.defer();
 
-      Config.remove({ id: configId })
+      Config.remove({ environmentId, id: configId })
         .$promise.then(function success(data) {
           if (data.message) {
             deferred.reject({ msg: data.message });
@@ -57,8 +57,8 @@ angular.module('portainer.docker').factory('ConfigService', [
       return deferred.promise;
     };
 
-    service.create = function (config) {
-      return Config.create(config).$promise;
+    service.create = function (environmentId, config) {
+      return Config.create({ environmentId }, config).$promise;
     };
 
     return service;
