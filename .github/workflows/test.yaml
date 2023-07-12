@@ -14,16 +14,12 @@ jobs:
 
       - name: Run tests
         run: yarn jest --maxWorkers=2
-  # test-server:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     GOPRIVATE: "github.com/portainer"
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-go@v3
-  #       with:
-  #         go-version: '1.18'
-  #     - name: Run tests
-  #       run: |
-  #         cd api
-  #         go test ./...
+  test-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.5
+      - name: Run tests
+        run: make test-server
