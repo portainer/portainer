@@ -10,7 +10,7 @@ import {
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { buildImageFullURI } from '@/react/docker/images/utils';
+import { buildImageFullURIFromModel } from '@/react/docker/images/utils';
 
 class KubernetesDaemonSetConverter {
   /**
@@ -51,7 +51,7 @@ class KubernetesDaemonSetConverter {
     payload.spec.template.metadata.labels.app = daemonSet.Name;
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = daemonSet.ApplicationName;
     payload.spec.template.spec.containers[0].name = daemonSet.Name;
-    payload.spec.template.spec.containers[0].image = buildImageFullURI(daemonSet.ImageModel);
+    payload.spec.template.spec.containers[0].image = buildImageFullURIFromModel(daemonSet.ImageModel);
     if (daemonSet.ImageModel.Registry && daemonSet.ImageModel.Registry.Authentication) {
       payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${daemonSet.ImageModel.Registry.Id}` }];
     }
