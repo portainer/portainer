@@ -1384,15 +1384,19 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
+		GetStackProjectPathByVersion(stackIdentifier string, version int, commitHash string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error)
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
+		RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
+		RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string
 		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error)
-		FormProjectPathByVersion(projectIdentifier string, version int, commitHash string) string
+		FormProjectPathByVersion(projectPath string, version int, commitHash string) string
 		SafeMoveDirectory(src, dst string) error
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)

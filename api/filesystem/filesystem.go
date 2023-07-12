@@ -159,6 +159,20 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier)
 }
 
+// GetStackProjectPathByVersion returns the absolute path on the FS for a stack based
+// on its identifier and version.
+func (service *Service) GetStackProjectPathByVersion(stackIdentifier string, version int, commitHash string) string {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+
+	if commitHash != "" {
+		versionStr = fmt.Sprintf("%s", commitHash)
+	}
+	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier, versionStr)
+}
+
 // Copy copies the file on fromFilePath to toFilePath
 // if toFilePath exists func will fail unless deleteIfExists is true
 func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error {
@@ -239,6 +253,31 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 	return service.wrapFileStore(stackStorePath), nil
 }
 
+// StoreStackFileFromBytesByVersion creates a version subfolder in the ComposeStorePath and stores a new file from bytes.
+// It returns the path to the folder where version folders are stored.
+func (service *Service) StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error) {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	stackVersionPath := JoinPaths(stackStorePath, versionStr)
+	err := service.createDirectoryInStore(stackVersionPath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := JoinPaths(stackVersionPath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
 // UpdateStoreStackFileFromBytes makes stack file backup and updates a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
@@ -266,9 +305,50 @@ func (service *Service) RemoveStackFileBackup(stackIdentifier, fileName string) 
 	return service.removeBackupFileInStore(composeFilePath)
 }
 
+// RemoveStackFileBackupByVersion removes the stack file backup by version in the ComposeStorePath.
+func (service *Service) RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+
+	return service.removeBackupFileInStore(composeFilePath)
+}
+
 // RollbackStackFile rollbacks the stack file backup in the ComposeStorePath.
 func (service *Service) RollbackStackFile(stackIdentifier, fileName string) error {
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	path := service.wrapFileStore(composeFilePath)
+	backupPath := fmt.Sprintf("%s.bak", path)
+
+	exists, err := service.FileExists(backupPath)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		// keep the updated/failed stack file
+		return nil
+	}
+
+	err = service.Copy(backupPath, path, true)
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(backupPath)
+}
+
+// RollbackStackFileByVersion rollbacks the stack file backup by version in the ComposeStorePath.
+func (service *Service) RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error {
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	path := service.wrapFileStore(composeFilePath)
 	backupPath := fmt.Sprintf("%s.bak", path)
