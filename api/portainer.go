@@ -1384,6 +1384,7 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
+		GetStackProjectGitRepositoryPath(stackIdentifier, repoName string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
