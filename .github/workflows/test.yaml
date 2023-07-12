@@ -16,8 +16,6 @@ jobs:
         run: yarn jest --maxWorkers=2
   test-server:
     runs-on: ubuntu-latest
-    env:
-      GOPRIVATE: "github.com/portainer"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
