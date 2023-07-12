@@ -66,7 +66,7 @@ function SortWrapper({
       type="button"
       onClick={() => onClick(!isSortedDesc)}
       className={clsx(
-        '!ml-0 h-full w-full border-none !bg-transparent !px-0 focus:border-none',
+        '!ml-0 h-full border-none !bg-transparent !px-0 focus:border-none',
         styles.sortable,
         isSorted && styles.sortingActive
       )}
