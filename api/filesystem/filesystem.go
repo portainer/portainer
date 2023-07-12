@@ -161,10 +161,14 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 
 // GetStackProjectPathByVersion returns the absolute path on the FS for a stack based
 // on its identifier and version.
-func (service *Service) GetStackProjectPathByVersion(stackIdentifier string, version int) string {
+func (service *Service) GetStackProjectPathByVersion(stackIdentifier string, version int, commitHash string) string {
 	versionStr := ""
 	if version != 0 {
 		versionStr = fmt.Sprintf("v%d", version)
+	}
+
+	if commitHash != "" {
+		versionStr = fmt.Sprintf("%s", commitHash)
 	}
 	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier, versionStr)
 }
