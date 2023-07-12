@@ -40,9 +40,17 @@ export function imageContainsURL(image: string) {
   return false;
 }
 
+export function buildImageFullURIFromModel(imageModel: {
+  UseRegistry: boolean;
+  Registry?: Registry;
+  Image: string;
+}) {
+  const registry = imageModel.UseRegistry ? imageModel.Registry : undefined;
+  return buildImageFullURI(imageModel.Image, registry);
+}
+
 /**
  * builds the complete uri for an image based on its registry
- * @param {PorImageRegistryModel} imageModel
  */
 export function buildImageFullURI(image: string, registry?: Registry) {
   if (!registry) {

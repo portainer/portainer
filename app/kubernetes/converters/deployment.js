@@ -11,7 +11,7 @@ import {
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { buildImageFullURI } from '@/react/docker/images/utils';
+import { buildImageFullURIFromModel } from '@/react/docker/images/utils';
 
 class KubernetesDeploymentConverter {
   /**
@@ -56,7 +56,7 @@ class KubernetesDeploymentConverter {
     payload.spec.template.spec.containers[0].name = deployment.Name;
 
     if (deployment.ImageModel) {
-      payload.spec.template.spec.containers[0].image = buildImageFullURI(deployment.ImageModel);
+      payload.spec.template.spec.containers[0].image = buildImageFullURIFromModel(deployment.ImageModel);
 
       if (deployment.ImageModel.Registry && deployment.ImageModel.Registry.Authentication) {
         payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${deployment.ImageModel.Registry.Id}` }];

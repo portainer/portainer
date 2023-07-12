@@ -12,7 +12,7 @@ import {
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { buildImageFullURI } from '@/react/docker/images/utils';
+import { buildImageFullURIFromModel } from '@/react/docker/images/utils';
 import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 
 class KubernetesStatefulSetConverter {
@@ -58,7 +58,7 @@ class KubernetesStatefulSetConverter {
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = statefulSet.ApplicationName;
     payload.spec.template.spec.containers[0].name = statefulSet.Name;
     if (statefulSet.ImageModel.Image) {
-      payload.spec.template.spec.containers[0].image = buildImageFullURI(statefulSet.ImageModel);
+      payload.spec.template.spec.containers[0].image = buildImageFullURIFromModel(statefulSet.ImageModel);
       if (statefulSet.ImageModel.Registry && statefulSet.ImageModel.Registry.Authentication) {
         payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${statefulSet.ImageModel.Registry.Id}` }];
       }
