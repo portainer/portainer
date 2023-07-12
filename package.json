@@ -202,7 +202,7 @@
     "prettier-plugin-tailwindcss": "^0.2.6",
     "react-docgen-typescript-plugin": "^1.0.5",
     "react-test-renderer": "^17.0.2",
-    "source-map-loader": "^3.0.0",
+    "source-map-loader": "^4.0.1",
     "speed-measure-webpack-plugin": "^1.5.0",
     "storybook": "^7.0.18",
     "storybook-css-modules-preset": "^1.1.1",
