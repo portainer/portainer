@@ -5290,15 +5290,15 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-auto-ngtemplate-loader@^2.0.1:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/auto-ngtemplate-loader/-/auto-ngtemplate-loader-2.1.0.tgz#91243d21ebeffe811d48ea75c4ce43f94927f563"
-  integrity sha512-1cjqNs/OKYXhbQpGMhdakURFYt3wOwYFw8MazN8whNirUPH3QOZS94PBj8jJiQbc4nRmNLrowexqyrA6Io8Zyw==
+auto-ngtemplate-loader@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/auto-ngtemplate-loader/-/auto-ngtemplate-loader-3.1.2.tgz#3b61072a0bcb90eac87723e79d1202c459a2651a"
+  integrity sha512-rAoaXKKj7bgZZI4RhpSTimgBv92hea1J9sygmwTFdy7fu8cP1/+xx6vCmW24+z52bmqVluKAJcVIPQ7ancXilA==
   dependencies:
-    html-loader "~0.5.5"
-    loader-utils "~1.4.0"
-    lodash "~4.17.15"
-    ngtemplate-loader "~2.0.1"
+    html-loader "~4.1.0"
+    loader-utils "~3.2.0"
+    lodash "~4.17.20"
+    ngtemplate-loader "~2.1.0"
     var-validator "0.0.3"
 
 autoprefixer@^10.4.14:
@@ -8872,7 +8872,7 @@ html-escaper@^2.0.0, html-escaper@^2.0.2:
   resolved "https://registry.yarnpkg.com/html-escaper/-/html-escaper-2.0.2.tgz#dfd60027da36a36dfcbe236262c00a5822681453"
   integrity sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==
 
-html-loader@^0.5.5, html-loader@~0.5.5:
+html-loader@^0.5.5:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/html-loader/-/html-loader-0.5.5.tgz#6356dbeb0c49756d8ebd5ca327f16ff06ab5faea"
   integrity sha512-7hIW7YinOYUpo//kSYcPB6dCKoceKLmOwjEMmhIobHuWGDVl0Nwe4l68mdG/Ru0wcUxQjVMEoZpkalZ/SE7zog==
@@ -8883,7 +8883,15 @@ html-loader@^0.5.5, html-loader@~0.5.5:
     loader-utils "^1.1.0"
     object-assign "^4.1.1"
 
-html-minifier-terser@^6.0.2:
+html-loader@~4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/html-loader/-/html-loader-4.1.0.tgz#a2f935802675fef0703165491316b200600996be"
+  integrity sha512-QDDNmLgn96NWtTPx/VXRerFXH0hn7cm4bruqsZ333GCb+rqiqGurcxtP/M52wcui1/iLiu0l5ms/McE7/Ik6aQ==
+  dependencies:
+    html-minifier-terser "^6.1.0"
+    parse5 "^7.0.0"
+
+html-minifier-terser@^6.0.2, html-minifier-terser@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/html-minifier-terser/-/html-minifier-terser-6.1.0.tgz#bfc818934cc07918f6b3669f5774ecdfd48f32ab"
   integrity sha512-YXxSlJBZTP7RS3tWnQw74ooKa6L9b9i9QYXY21eUEvhZ3u9XLfv6OnFsQq6RxkhHygsaUMvYsZRV5rU/OVNZxw==
@@ -10488,7 +10496,7 @@ loader-runner@^4.2.0:
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-4.3.0.tgz#c1b4a163b99f614830353b16755e7149ac2314e1"
   integrity sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==
 
-loader-utils@^1.0.2, loader-utils@^1.1.0, loader-utils@~1.4.0:
+loader-utils@^1.0.2, loader-utils@^1.1.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-1.4.0.tgz#c579b5e34cb34b1a74edc6c1fb36bfa371d5a613"
   integrity sha512-qH0WSMBtn/oHuwjy/NucEgbx5dbxxnxup9s4PVXJUDHZBQY+s0NWA9rJf53RBnQZxfch7euUui7hpoAPvALZdA==
@@ -10505,6 +10513,11 @@ loader-utils@^2.0.0, loader-utils@^2.0.4:
     big.js "^5.2.2"
     emojis-list "^3.0.0"
     json5 "^2.1.2"
+
+loader-utils@~3.2.0:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-3.2.1.tgz#4fb104b599daafd82ef3e1a41fb9265f87e1f576"
+  integrity sha512-ZvFw1KWS3GVyYBYb7qkmRM/WwL2TQQBxgCK62rlvm4WpVQ23Nb4tYjApUlfjrEGvOs7KHEsmyUn75OHZrJMWPw==
 
 locate-path@^3.0.0:
   version "3.0.0"
@@ -10570,7 +10583,7 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
-lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0, lodash@~4.17.15:
+lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0, lodash@~4.17.20:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -11068,18 +11081,10 @@ ng-file-upload@~12.2.13:
   resolved "https://registry.yarnpkg.com/ng-file-upload/-/ng-file-upload-12.2.13.tgz#01800f3872e526f95310f8477e99e4f12d0d8d14"
   integrity sha1-AYAPOHLlJvlTEPhHfpnk8S0NjRQ=
 
-ngtemplate-loader@^2.1.0:
+ngtemplate-loader@^2.1.0, ngtemplate-loader@~2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ngtemplate-loader/-/ngtemplate-loader-2.1.0.tgz#fb71c614c509b114b3bb28a828cb608757531e96"
   integrity sha512-8t1a2YOb1vk1A4C74o1ru+T7UeyKDdABWXtGDkjBupmOaV/RPCXjLLF4UZMI45Lfpebkr2p4NlVSROXRshkIhg==
-  dependencies:
-    jsesc "^0.5.0"
-    loader-utils "^1.0.2"
-
-ngtemplate-loader@~2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ngtemplate-loader/-/ngtemplate-loader-2.0.1.tgz#9d7ed2e8a2363523ad7b64d74aac402d8daff3f3"
-  integrity sha1-nX7S6KI2NSOte2TXSqxALY2v8/M=
   dependencies:
     jsesc "^0.5.0"
     loader-utils "^1.0.2"
@@ -11684,6 +11689,13 @@ parse5@6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-6.0.1.tgz#e1a1c085c569b3dc08321184f19a39cc27f7c30b"
   integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
+
+parse5@^7.0.0:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.2.tgz#0736bebbfd77793823240a23b7fc5e010b7f8e32"
+  integrity sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==
+  dependencies:
+    entities "^4.4.0"
 
 parseurl@~1.3.2, parseurl@~1.3.3:
   version "1.3.3"
