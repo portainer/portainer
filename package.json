@@ -50,6 +50,7 @@
     "@reach/dialog": "^0.17.0",
     "@reach/menu-button": "^0.16.1",
     "@tanstack/react-table": "^8.8.5",
+    "@reach/popover": "^0.18.0",
     "@tippyjs/react": "^4.2.6",
     "@uirouter/angularjs": "1.0.11",
     "@uirouter/react": "^1.0.7",

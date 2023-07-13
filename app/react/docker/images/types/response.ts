@@ -1,3 +1,5 @@
+import { PortainerMetadata } from '../../types';
+
 export type DockerImageResponse = {
   Containers: number;
   Created: number;
@@ -9,4 +11,5 @@ export type DockerImageResponse = {
   SharedSize: number;
   Size: number;
   VirtualSize: number;
+  Portainer?: PortainerMetadata;
 };

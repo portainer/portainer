@@ -4,6 +4,8 @@ import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { Column } from '@tanstack/react-table';
 import { Check, Filter } from 'lucide-react';
 
+import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
+
 import { Icon } from '@@/Icon';
 
 interface MultipleSelectionFilterProps {
@@ -102,20 +104,4 @@ export function filterHOC<TData extends Record<string, unknown>>(
       />
     );
   };
-}
-
-function getValueAsArrayOfStrings(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value;
-  }
-
-  if (!value || (typeof value !== 'string' && typeof value !== 'number')) {
-    return [];
-  }
-
-  if (typeof value === 'number') {
-    return [value.toString()];
-  }
-
-  return [value];
 }
