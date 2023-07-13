@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -491,6 +492,7 @@ func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string,
 	var tree struct {
 		TreeEntries []struct {
 			RelativePath string `json:"relativePath"`
+			Mode         string `json:"mode"`
 		} `json:"treeEntries"`
 	}
 
@@ -500,7 +502,11 @@ func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string,
 
 	var allPaths []string
 	for _, treeEntry := range tree.TreeEntries {
-		allPaths = append(allPaths, treeEntry.RelativePath)
+		mode, _ := filemode.New(treeEntry.Mode)
+		isDir := filemode.Dir == mode
+		if opt.dirOnly == isDir {
+			allPaths = append(allPaths, treeEntry.RelativePath)
+		}
 	}
 
 	return allPaths, nil

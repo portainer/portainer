@@ -9,6 +9,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
@@ -165,10 +166,18 @@ func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, e
 	}
 
 	var allPaths []string
-	tree.Files().ForEach(func(f *object.File) error {
-		allPaths = append(allPaths, f.Name)
-		return nil
-	})
+	w := object.NewTreeWalker(tree, true, nil)
+	for {
+		name, entry, err := w.Next()
+		if err != nil {
+			break
+		}
+
+		isDir := entry.Mode == filemode.Dir
+		if opt.dirOnly == isDir {
+			allPaths = append(allPaths, name)
+		}
+	}
 
 	return allPaths, nil
 }

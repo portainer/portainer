@@ -202,7 +202,7 @@ func TestService_ListFiles_GitHub(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, false, tt.extensions, false)
+			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, false, false, tt.extensions, false)
 			if tt.expect.shouldFail {
 				assert.Error(t, err)
 				if tt.expect.err != nil {
@@ -226,8 +226,8 @@ func TestService_ListFiles_Github_Concurrently(t *testing.T) {
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
-	go service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{}, false)
-	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{}, false)
+	go service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, false, []string{}, false)
+	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, false, []string{}, false)
 
 	time.Sleep(2 * time.Second)
 }
@@ -241,7 +241,7 @@ func TestService_purgeCache_Github(t *testing.T) {
 	service := NewService(context.TODO())
 
 	service.ListRefs(repositoryUrl, username, accessToken, false, false)
-	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{}, false)
+	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, false, []string{}, false)
 
 	assert.Equal(t, 1, service.repoRefCache.Len())
 	assert.Equal(t, 1, service.repoFileCache.Len())
@@ -262,7 +262,7 @@ func TestService_purgeCacheByTTL_Github(t *testing.T) {
 	service := newService(context.TODO(), 2, 40*timeout)
 
 	service.ListRefs(repositoryUrl, username, accessToken, false, false)
-	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{}, false)
+	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, false, []string{}, false)
 	assert.Equal(t, 1, service.repoRefCache.Len())
 	assert.Equal(t, 1, service.repoFileCache.Len())
 
@@ -316,12 +316,12 @@ func TestService_HardRefresh_ListRefs_And_RemoveAllCaches_GitHub(t *testing.T) {
 	assert.GreaterOrEqual(t, len(refs), 1)
 	assert.Equal(t, 1, service.repoRefCache.Len())
 
-	files, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{}, false)
+	files, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, false, []string{}, false)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(files), 1)
 	assert.Equal(t, 1, service.repoFileCache.Len())
 
-	files, err = service.ListFiles(repositoryUrl, "refs/heads/test", username, accessToken, false, []string{}, false)
+	files, err = service.ListFiles(repositoryUrl, "refs/heads/test", username, accessToken, false, false, []string{}, false)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(files), 1)
 	assert.Equal(t, 2, service.repoFileCache.Len())
@@ -344,12 +344,12 @@ func TestService_HardRefresh_ListFiles_GitHub(t *testing.T) {
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 	repositoryUrl := privateGitRepoURL
-	files, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{}, false)
+	files, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, false, []string{}, false)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(files), 1)
 	assert.Equal(t, 1, service.repoFileCache.Len())
 
-	_, err = service.ListFiles(repositoryUrl, "refs/heads/main", username, "fake-token", true, []string{}, false)
+	_, err = service.ListFiles(repositoryUrl, "refs/heads/main", username, "fake-token", false, true, []string{}, false)
 	assert.Error(t, err)
 	assert.Equal(t, 0, service.repoFileCache.Len())
 }

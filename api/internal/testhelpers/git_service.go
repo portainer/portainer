@@ -27,6 +27,6 @@ func (g *gitService) ListRefs(repositoryURL, username, password string, hardRefr
 	return nil, nil
 }
 
-func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
+func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, dirOnly, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
 	return nil, nil
 }
