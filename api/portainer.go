@@ -1120,7 +1120,7 @@ type (
 		// Mandatory container/stack fields
 		// Template Identifier
 		ID TemplateID `json:"Id" example:"1"`
-		// Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)
+		// Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack), 4 (Compose edge stack)
 		Type TemplateType `json:"type" example:"1"`
 		// Title of the template
 		Title string `json:"title" example:"Nginx"`

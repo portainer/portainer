@@ -14,19 +14,14 @@
           {{ $ctrl.model.Title }}
         </span>
         <div class="space-left blocklist-item-subtitle inline-flex items-center">
-          <div ng-if="$ctrl.model.Type != 3" class="vertical-center">
-            <pr-icon ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform" icon="'svg-linux'" class="mr-1"></pr-icon>
-            <span ng-if="!$ctrl.model.Platform"> &amp; </span>
-            <pr-icon
-              icon="'svg-microsoft'"
-              ng-if="$ctrl.model.Platform === 2 || $ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"
-              class-name="'[&>*]:flex [&>*]:items-center'"
-              size="'lg'"
-            ></pr-icon>
-          </div>
-          <div ng-if="$ctrl.model.Type === 3" class="vertical-center">
-            <pr-icon icon="'svg-kubernetes'" size="'lg'" class="align-bottom" class-name="'[&>*]:flex [&>*]:items-center'"></pr-icon>
-          </div>
+          <pr-icon ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform" icon="'svg-linux'" class="mr-1"></pr-icon>
+          <span ng-if="!$ctrl.model.Platform"> &amp; </span>
+          <pr-icon
+            icon="'svg-microsoft'"
+            ng-if="$ctrl.model.Platform === 2 || $ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"
+            class-name="'[&>*]:flex [&>*]:items-center'"
+            size="'lg'"
+          ></pr-icon>
           {{ $ctrl.typeLabel }}
         </div>
       </div>
