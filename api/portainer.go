@@ -310,15 +310,16 @@ type (
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
-		ID             EdgeStackID                    `json:"Id" example:"1"`
-		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
-		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
-		ProjectPath    string                         `json:"ProjectPath"`
-		EntryPoint     string                         `json:"EntryPoint"`
-		Version        int                            `json:"Version"`
-		NumDeployments int                            `json:"NumDeployments"`
+		ID     EdgeStackID                    `json:"Id" example:"1"`
+		Name   string                         `json:"Name"`
+		Status map[EndpointID]EdgeStackStatus `json:"Status"`
+		// StatusArray    map[EndpointID][]EdgeStackStatus `json:"StatusArray"`
+		CreationDate   int64         `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID `json:"EdgeGroups"`
+		ProjectPath    string        `json:"ProjectPath"`
+		EntryPoint     string        `json:"EntryPoint"`
+		Version        int           `json:"Version"`
+		NumDeployments int           `json:"NumDeployments"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
 		// Uses the manifest's namespaces instead of the default one
@@ -345,14 +346,24 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Details    EdgeStackStatusDetails `json:"Details"`
-		Error      string                 `json:"Error"`
-		EndpointID EndpointID             `json:"EndpointID"`
+		Status     []EdgeStackDeploymentStatus
+		EndpointID EndpointID
 		// EE only feature
-		DeploymentInfo StackDeploymentInfo `json:"DeploymentInfo"`
+		DeploymentInfo StackDeploymentInfo
 
 		// Deprecated
+		Details EdgeStackStatusDetails
+		// Deprecated
+		Error string
+		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
+	}
+
+	// EdgeStackDeploymentStatus represents an edge stack deployment status
+	EdgeStackDeploymentStatus struct {
+		Time  int64
+		Type  EdgeStackStatusType
+		Error string
 	}
 
 	//EdgeStackStatusType represents an edge stack status type
@@ -1647,18 +1658,24 @@ const (
 const (
 	// EdgeStackStatusPending represents a pending edge stack
 	EdgeStackStatusPending EdgeStackStatusType = iota
-	//EdgeStackStatusOk represents a successfully deployed edge stack
-	EdgeStackStatusOk
-	//EdgeStackStatusError represents an edge environment(endpoint) which failed to deploy its edge stack
+	//EdgeStackStatusDeploymentReceived represents an edge environment which received the edge stack deployment
+	EdgeStackStatusDeploymentReceived
+	//EdgeStackStatusError represents an edge environment which failed to deploy its edge stack
 	EdgeStackStatusError
 	//EdgeStackStatusAcknowledged represents an acknowledged edge stack
 	EdgeStackStatusAcknowledged
-	//EdgeStackStatusRemove represents a removed edge stack (status isn't persisted)
-	EdgeStackStatusRemove
+	//EdgeStackStatusRemoved represents a removed edge stack
+	EdgeStackStatusRemoved
 	// StatusRemoteUpdateSuccess represents a successfully updated edge stack
 	EdgeStackStatusRemoteUpdateSuccess
 	// EdgeStackStatusImagesPulled represents a successfully images-pulling
 	EdgeStackStatusImagesPulled
+	// EdgeStackStatusRunning represents a running Edge stack
+	EdgeStackStatusRunning
+	// EdgeStackStatusDeploying represents an Edge stack which is being deployed
+	EdgeStackStatusDeploying
+	// EdgeStackStatusRemoving represents an Edge stack which is being removed
+	EdgeStackStatusRemoving
 )
 
 const (

@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -41,20 +42,22 @@ func setupHandler(t *testing.T) (*Handler, string) {
 		t.Fatal(err)
 	}
 
-	edgeStacksService := edgestacks.NewService(store)
-
-	handler := NewHandler(
-		security.NewRequestBouncer(store, jwtService, apiKeyService),
-		store,
-		edgeStacksService,
-	)
-
-	tmpDir := t.TempDir()
+	tmpDir, err := os.MkdirTemp(t.TempDir(), "portainer-test")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	handler := NewHandler(
+		security.NewRequestBouncer(store, jwtService, apiKeyService),
+		store,
+		edgestacks.NewService(store),
+	)
+
 	handler.FileService = fs
 
 	settings, err := handler.DataStore.Settings().Settings()
@@ -116,11 +119,9 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 
 	edgeStackID := portainer.EdgeStackID(14)
 	edgeStack := portainer.EdgeStack{
-		ID:   edgeStackID,
-		Name: "test-edge-stack-" + strconv.Itoa(int(edgeStackID)),
-		Status: map[portainer.EndpointID]portainer.EdgeStackStatus{
-			endpointID: {Details: portainer.EdgeStackStatusDetails{Ok: true}, Error: "", EndpointID: endpointID},
-		},
+		ID:             edgeStackID,
+		Name:           "test-edge-stack-" + strconv.Itoa(int(edgeStackID)),
+		Status:         map[portainer.EndpointID]portainer.EdgeStackStatus{},
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     []portainer.EdgeGroupID{edgeGroup.ID},
 		ProjectPath:    "/project/path",

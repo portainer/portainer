@@ -4,7 +4,7 @@ import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { useEdgeStacks } from '../../queries/useEdgeStacks';
-import { EdgeStack } from '../../types';
+import { EdgeStack, StatusType } from '../../types';
 
 import { createStore } from './store';
 import { columns } from './columns';
@@ -51,11 +51,16 @@ export function EdgeStacksDatatable() {
 
 function aggregateStackStatus(stackStatus: EdgeStack['Status']) {
   const aggregateStatus = { ok: 0, error: 0, acknowledged: 0, imagesPulled: 0 };
-  return Object.values(stackStatus).reduce((acc, envStatus) => {
-    acc.ok += Number(envStatus.Details.Ok);
-    acc.error += Number(envStatus.Details.Error);
-    acc.acknowledged += Number(envStatus.Details.Acknowledged);
-    acc.imagesPulled += Number(envStatus.Details.ImagesPulled);
-    return acc;
-  }, aggregateStatus);
+  return Object.values(stackStatus).reduce(
+    (acc, envStatus) =>
+      envStatus.Status.reduce((acc, status) => {
+        const { Type } = status;
+        acc.ok += Number(Type === StatusType.Running);
+        acc.error += Number(Type === StatusType.Error);
+        acc.acknowledged += Number(Type === StatusType.Acknowledged);
+        acc.imagesPulled += Number(Type === StatusType.ImagesPulled);
+        return acc;
+      }, acc),
+    aggregateStatus
+  );
 }

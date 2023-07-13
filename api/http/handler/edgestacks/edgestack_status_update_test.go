@@ -59,23 +59,31 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
 	}
 
-	data := portainer.EdgeStack{}
-	err = json.NewDecoder(rec.Body).Decode(&data)
+	updatedStack := portainer.EdgeStack{}
+	err = json.NewDecoder(rec.Body).Decode(&updatedStack)
 	if err != nil {
 		t.Fatal("error decoding response:", err)
 	}
 
-	if !data.Status[endpoint.ID].Details.Error {
-		t.Fatalf("expected EdgeStackStatusType %d, found %t", payload.Status, data.Status[endpoint.ID].Details.Error)
+	endpointStatus, ok := updatedStack.Status[payload.EndpointID]
+	if !ok {
+		t.Fatal("Missing status")
 	}
 
-	if data.Status[endpoint.ID].Error != payload.Error {
-		t.Fatalf("expected EdgeStackStatusError %s, found %s", payload.Error, data.Status[endpoint.ID].Error)
+	lastStatus := endpointStatus.Status[len(endpointStatus.Status)-1]
+
+	if len(endpointStatus.Status) == len(edgeStack.Status[payload.EndpointID].Status) {
+		t.Fatal("expected status array to be updated")
 	}
 
-	if data.Status[endpoint.ID].EndpointID != payload.EndpointID {
-		t.Fatalf("expected EndpointID %d, found %d", payload.EndpointID, data.Status[endpoint.ID].EndpointID)
+	if lastStatus.Type != *payload.Status {
+		t.Fatalf("expected EdgeStackStatusType %d, found %d", *payload.Status, lastStatus.Type)
 	}
+
+	if endpointStatus.EndpointID != portainer.EndpointID(payload.EndpointID) {
+		t.Fatalf("expected EndpointID %d, found %d", payload.EndpointID, endpointStatus.EndpointID)
+	}
+
 }
 func TestUpdateStatusWithInvalidPayload(t *testing.T) {
 	handler, _ := setupHandler(t)
@@ -85,7 +93,7 @@ func TestUpdateStatusWithInvalidPayload(t *testing.T) {
 
 	// Update edge stack status
 	statusError := portainer.EdgeStackStatusError
-	statusOk := portainer.EdgeStackStatusOk
+	statusOk := portainer.EdgeStackStatusDeploymentReceived
 	cases := []struct {
 		Name                 string
 		Payload              updateStatusPayload

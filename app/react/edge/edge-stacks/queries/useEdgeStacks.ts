@@ -6,6 +6,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EdgeStack } from '../types';
 
 import { buildUrl } from './buildUrl';
+import { queryKeys } from './query-keys';
 
 export function useEdgeStacks<T = Array<EdgeStack>>({
   select,
@@ -19,7 +20,7 @@ export function useEdgeStacks<T = Array<EdgeStack>>({
   select?: (stacks: EdgeStack[]) => T;
   refetchInterval?: number | false | ((data?: T) => false | number);
 } = {}) {
-  return useQuery(['edge_stacks'], () => getEdgeStacks(), {
+  return useQuery(queryKeys.base(), () => getEdgeStacks(), {
     ...withError('Failed loading Edge stack'),
     select,
     refetchInterval,

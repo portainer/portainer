@@ -3,6 +3,7 @@ package composeplugin
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -160,7 +161,11 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 			Err(err).
 			Msg("docker compose command failed")
 
-		return nil, errors.New(errOutput)
+		if errOutput != "" {
+			return nil, errors.New(errOutput)
+		}
+
+		return nil, fmt.Errorf("docker compose command failed: %w", err)
 	}
 
 	return output, nil

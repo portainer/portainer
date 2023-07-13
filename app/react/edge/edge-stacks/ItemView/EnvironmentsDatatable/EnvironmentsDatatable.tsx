@@ -6,6 +6,7 @@ import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { useParamState } from '@/react/hooks/useParamState';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
@@ -20,17 +21,29 @@ export function EnvironmentsDatatable() {
   const {
     params: { stackId },
   } = useCurrentStateAndParams();
-  const edgeStackQuery = useEdgeStack(stackId);
+  const edgeStackQuery = useEdgeStack(stackId, {
+    refetchInterval(data) {
+      if (!data) {
+        return 0;
+      }
+
+      return Object.values(data.Status).some((status) =>
+        status.Status.every((s) => s.Type === StatusType.Running)
+      )
+        ? 0
+        : 10000;
+    },
+  });
 
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useParamState<StatusType>(
     'status',
-    parseStatusFilter
+    (value) => (value ? parseInt(value, 10) : undefined)
   );
   const tableState = useTableStateWithoutStorage('name');
   const endpointsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
-    page,
+    page: page + 1,
     search: tableState.search,
     sort: tableState.sortBy.id as 'Group' | 'Name',
     order: tableState.sortBy.desc ? 'desc' : 'asc',
@@ -38,27 +51,32 @@ export function EnvironmentsDatatable() {
     edgeStackStatus: statusFilter,
   });
 
+  const currentFileVersion =
+    edgeStackQuery.data?.StackFileVersion?.toString() || '';
+  const gitConfigURL = edgeStackQuery.data?.GitConfig?.URL || '';
+  const gitConfigCommitHash = edgeStackQuery.data?.GitConfig?.ConfigHash || '';
   const environments: Array<EdgeStackEnvironment> = useMemo(
     () =>
-      endpointsQuery.environments.map((env) => ({
-        ...env,
-        StackStatus:
-          edgeStackQuery.data?.Status[env.Id] ||
+      endpointsQuery.environments.map(
+        (env) =>
           ({
-            Details: {
-              Pending: true,
-              Acknowledged: false,
-              ImagesPulled: false,
-              Error: false,
-              Ok: false,
-              RemoteUpdateSuccess: false,
-              Remove: false,
-            },
-            EndpointID: env.Id,
-            Error: '',
-          } satisfies EdgeStackStatus),
-      })),
-    [edgeStackQuery.data?.Status, endpointsQuery.environments]
+            ...env,
+            TargetFileVersion: currentFileVersion,
+            GitConfigURL: gitConfigURL,
+            TargetCommitHash: gitConfigCommitHash,
+            StackStatus: getEnvStackStatus(
+              env.Id,
+              edgeStackQuery.data?.Status[env.Id]
+            ),
+          } satisfies EdgeStackEnvironment)
+      ),
+    [
+      currentFileVersion,
+      edgeStackQuery.data?.Status,
+      endpointsQuery.environments,
+      gitConfigCommitHash,
+      gitConfigURL,
+    ]
   );
 
   return (
@@ -81,11 +99,11 @@ export function EnvironmentsDatatable() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e || undefined)}
               options={[
-                { value: 'Pending', label: 'Pending' },
-                { value: 'Acknowledged', label: 'Acknowledged' },
-                { value: 'ImagesPulled', label: 'Images pre-pulled' },
-                { value: 'Ok', label: 'Deployed' },
-                { value: 'Error', label: 'Failed' },
+                { value: StatusType.Pending, label: 'Pending' },
+                { value: StatusType.Acknowledged, label: 'Acknowledged' },
+                { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
+                { value: StatusType.Running, label: 'Deployed' },
+                { value: StatusType.Error, label: 'Failed' },
               ]}
             />
           </div>
@@ -95,19 +113,31 @@ export function EnvironmentsDatatable() {
   );
 }
 
-function parseStatusFilter(status: string | undefined): StatusType | undefined {
-  switch (status) {
-    case 'Pending':
-      return 'Pending';
-    case 'Acknowledged':
-      return 'Acknowledged';
-    case 'ImagesPulled':
-      return 'ImagesPulled';
-    case 'Ok':
-      return 'Ok';
-    case 'Error':
-      return 'Error';
-    default:
-      return undefined;
+function getEnvStackStatus(
+  envId: EnvironmentId,
+  envStatus: EdgeStackStatus | undefined
+) {
+  const pendingStatus = {
+    Type: StatusType.Pending,
+    Error: '',
+    Time: new Date().valueOf() / 1000,
+  };
+
+  let status = envStatus;
+  if (!status) {
+    status = {
+      EndpointID: envId,
+      DeploymentInfo: {
+        ConfigHash: '',
+        FileVersion: 0,
+      },
+      Status: [],
+    };
   }
+
+  if (status.Status.length === 0) {
+    status.Status.push(pendingStatus);
+  }
+
+  return status;
 }

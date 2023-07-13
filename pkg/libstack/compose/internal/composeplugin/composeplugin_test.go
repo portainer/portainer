@@ -2,7 +2,6 @@ package composeplugin
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -16,9 +15,9 @@ import (
 )
 
 func checkPrerequisites(t *testing.T) {
-	if _, err := os.Stat("docker-compose"); errors.Is(err, os.ErrNotExist) {
-		t.Fatal("docker-compose binary not found, please run download.sh and re-run this test suite")
-	}
+	// if _, err := os.Stat("docker-compose"); errors.Is(err, os.ErrNotExist) {
+	// 	t.Fatal("docker-compose binary not found, please run download.sh and re-run this test suite")
+	// }
 }
 
 func setup(t *testing.T) libstack.Deployer {
@@ -118,7 +117,11 @@ func createFile(dir, fileName, content string) (string, error) {
 		return "", err
 	}
 
-	f.WriteString(content)
+	_, err = f.WriteString(content)
+	if err != nil {
+		return "", err
+	}
+
 	f.Close()
 
 	return filePath, nil

@@ -38,10 +38,10 @@ export function DeploymentCounter({
   return (
     <span
       className={clsx(styles.root, {
-        [styles.statusOk]: type === 'Ok',
-        [styles.statusError]: type === 'Error',
-        [styles.statusAcknowledged]: type === 'Acknowledged',
-        [styles.statusImagesPulled]: type === 'ImagesPulled',
+        [styles.statusOk]: type === StatusType.Running,
+        [styles.statusError]: type === StatusType.Error,
+        [styles.statusAcknowledged]: type === StatusType.Acknowledged,
+        [styles.statusImagesPulled]: type === StatusType.ImagesPulled,
         [styles.statusTotal]: type === undefined,
       })}
     >

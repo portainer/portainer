@@ -6,6 +6,9 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { buildNameColumn } from '@@/datatables/NameCell';
 
+import { StatusType } from '../../types';
+import { EdgeStackStatus } from '../EdgeStackStatus';
+
 import { DecoratedEdgeStack } from './types';
 import { DeploymentCounter, DeploymentCounterLink } from './DeploymentCounter';
 
@@ -25,7 +28,7 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type="Acknowledged"
+        type={StatusType.Acknowledged}
         stackId={row.original.Id}
       />
     ),
@@ -39,7 +42,7 @@ export const columns = _.compact([
       cell: ({ getValue, row }) => (
         <DeploymentCounterLink
           count={getValue()}
-          type="ImagesPulled"
+          type={StatusType.ImagesPulled}
           stackId={row.original.Id}
         />
       ),
@@ -54,7 +57,7 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type="Ok"
+        type={StatusType.Running}
         stackId={row.original.Id}
       />
     ),
@@ -69,9 +72,22 @@ export const columns = _.compact([
     cell: ({ getValue, row }) => (
       <DeploymentCounterLink
         count={getValue()}
-        type="Error"
+        type={StatusType.Error}
         stackId={row.original.Id}
       />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    meta: {
+      className: '[&>*]:justify-center',
+    },
+  }),
+  columnHelper.accessor('Status', {
+    header: 'Status',
+    cell: ({ row }) => (
+      <div className="w-full text-center">
+        <EdgeStackStatus edgeStack={row.original} />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
