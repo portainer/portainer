@@ -86,6 +86,11 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 	for _, edgeStack := range edgeStacks {
 
 		for environmentID, environmentStatus := range edgeStack.Status {
+			// skip if status is already updated
+			if len(environmentStatus.Status) > 0 {
+				continue
+			}
+
 			statusArray := []portainer.EdgeStackDeploymentStatus{}
 			if environmentStatus.Details.Pending {
 				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
