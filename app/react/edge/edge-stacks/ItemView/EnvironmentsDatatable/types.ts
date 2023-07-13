@@ -4,7 +4,7 @@ import { EdgeStackStatus } from '../../types';
 
 export type EdgeStackEnvironment = Environment & {
   StackStatus: EdgeStackStatus;
-  TargetVersion: string;
+  TargetFileVersion: string;
   GitConfigURL: string;
   TargetCommitHash: string;
 };

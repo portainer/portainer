@@ -51,7 +51,8 @@ export function EnvironmentsDatatable() {
     edgeStackStatus: statusFilter,
   });
 
-  const currentVersion = edgeStackQuery.data?.Version.toString() || '';
+  const currentFileVersion =
+    edgeStackQuery.data?.StackFileVersion?.toString() || '';
   const gitConfigURL = edgeStackQuery.data?.GitConfig?.URL || '';
   const gitConfigCommitHash = edgeStackQuery.data?.GitConfig?.ConfigHash || '';
   const environments: Array<EdgeStackEnvironment> = useMemo(
@@ -60,7 +61,7 @@ export function EnvironmentsDatatable() {
         (env) =>
           ({
             ...env,
-            TargetVersion: currentVersion,
+            TargetFileVersion: currentFileVersion,
             GitConfigURL: gitConfigURL,
             TargetCommitHash: gitConfigCommitHash,
             StackStatus: getEnvStackStatus(
@@ -70,7 +71,7 @@ export function EnvironmentsDatatable() {
           } satisfies EdgeStackEnvironment)
       ),
     [
-      currentVersion,
+      currentFileVersion,
       edgeStackQuery.data?.Status,
       endpointsQuery.environments,
       gitConfigCommitHash,
@@ -126,6 +127,10 @@ function getEnvStackStatus(
   if (!status) {
     status = {
       EndpointID: envId,
+      DeploymentInfo: {
+        ConfigHash: '',
+        FileVersion: 0,
+      },
       Status: [],
     };
   }

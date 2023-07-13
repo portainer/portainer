@@ -195,7 +195,7 @@ function endpointTargetVersionLabel(env: EdgeStackEnvironment) {
   if (env.TargetCommitHash) {
     return env.TargetCommitHash.slice(0, 7).toString();
   }
-  return env.TargetVersion.toString() || '';
+  return env.TargetFileVersion.toString() || '';
 }
 
 function DeployedVersionCell({
@@ -215,7 +215,7 @@ function DeployedVersionCell({
   if (
     (row.original.TargetCommitHash &&
       row.original.TargetCommitHash.slice(0, 7) !== value) ||
-    (!row.original.TargetCommitHash && row.original.TargetVersion !== value)
+    (!row.original.TargetCommitHash && row.original.TargetFileVersion !== value)
   ) {
     statusIcon = <Icon icon={UpdatesAvailable} className="!mr-2" />;
   }
@@ -247,7 +247,7 @@ function endpointDeployedVersionLabel(status: EdgeStackStatus) {
   if (status.DeploymentInfo?.ConfigHash) {
     return status.DeploymentInfo?.ConfigHash.slice(0, 7).toString();
   }
-  return status.DeploymentInfo?.Version.toString() || '';
+  return status.DeploymentInfo?.FileVersion.toString() || '';
 }
 
 function Status({ value }: { value: StatusType }) {

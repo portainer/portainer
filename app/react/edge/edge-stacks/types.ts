@@ -39,7 +39,7 @@ export interface DeploymentStatus {
 }
 
 interface EdgeStackDeploymentInfo {
-  Version: number;
+  FileVersion: number;
   ConfigHash: string;
 }
 
