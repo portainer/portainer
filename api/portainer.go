@@ -1420,6 +1420,8 @@ type (
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
+		GetDefaultChiselPrivateKeyPath() string
+		StoreChiselPrivateKey(privateKey []byte) error
 	}
 
 	// GitService represents a service for managing Git
