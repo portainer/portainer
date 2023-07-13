@@ -17,8 +17,9 @@ import { GpusInsights } from '@/react/docker/host/SetupView/GpusInsights';
 import { InsightsBox } from '@/react/components/InsightsBox';
 import { BetaAlert } from '@/react/portainer/environments/update-schedules/common/BetaAlert';
 import { ImagesDatatable } from '@/react/docker/images/ListView/ImagesDatatable/ImagesDatatable';
+import { EventsDatatable } from '@/react/docker/events/EventsDatatables';
 
-export const componentsModule = angular
+const ngModule = angular
   .module('portainer.docker.react.components', [])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
@@ -80,4 +81,7 @@ export const componentsModule = angular
       'onRefresh',
       'onRemove',
     ])
-  ).name;
+  )
+  .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']));
+
+export const componentsModule = ngModule.name;
