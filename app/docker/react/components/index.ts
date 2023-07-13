@@ -82,7 +82,8 @@ const ngModule = angular
       'onRefresh',
       'onRemove',
     ])
-  ) .component(
+  )
+  .component(
     'dockerConfigsDatatable',
     r2a(withUIRouter(ConfigsDatatable), [
       'dataset',
