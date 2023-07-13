@@ -40,41 +40,37 @@ export function KubeSettingsPanel() {
   };
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <Widget.Title icon={kubeIcon} title="Kubernetes settings" />
-          <Widget.Body>
-            <Formik
-              initialValues={initialValues}
-              onSubmit={handleSubmit}
-              validationSchema={validation}
-              validateOnMount
-            >
-              {() => (
-                <Form className="form-horizontal">
-                  <HelmSection />
-                  <KubeConfigSection />
-                  <DeploymentOptionsSection />
+    <Widget>
+      <Widget.Title icon={kubeIcon} title="Kubernetes settings" />
+      <Widget.Body>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={validation}
+          validateOnMount
+        >
+          {() => (
+            <Form className="form-horizontal">
+              <HelmSection />
+              <KubeConfigSection />
+              <DeploymentOptionsSection />
 
-                  <div className="form-group">
-                    <div className="col-sm-12">
-                      <LoadingButton
-                        isLoading={mutation.isLoading}
-                        loadingText="Saving"
-                        className="!ml-0"
-                      >
-                        Save Kubernetes Settings
-                      </LoadingButton>
-                    </div>
-                  </div>
-                </Form>
-              )}
-            </Formik>
-          </Widget.Body>
-        </Widget>
-      </div>
-    </div>
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <LoadingButton
+                    isLoading={mutation.isLoading}
+                    loadingText="Saving"
+                    className="!ml-0"
+                  >
+                    Save Kubernetes Settings
+                  </LoadingButton>
+                </div>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Widget.Body>
+    </Widget>
   );
 
   function handleSubmit(values: FormValues) {

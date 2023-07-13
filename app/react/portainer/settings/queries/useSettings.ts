@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 import {
   mutationOptions,
@@ -7,37 +7,22 @@ import {
 } from '@/react-tools/react-query';
 
 import {
-  getSettings,
   updateSettings,
-  getPublicSettings,
+  getSettings,
   updateDefaultRegistry,
-} from './settings.service';
-import { DefaultRegistry, PublicSettingsResponse, Settings } from './types';
+} from '../settings.service';
+import { DefaultRegistry, Settings } from '../types';
 
-export function usePublicSettings<T = PublicSettingsResponse>({
-  enabled,
-  select,
-  onSuccess,
-}: {
-  select?: (settings: PublicSettingsResponse) => T;
-  enabled?: boolean;
-  onSuccess?: (data: T) => void;
-} = {}) {
-  return useQuery(['settings', 'public'], getPublicSettings, {
-    select,
-    ...withError('Unable to retrieve public settings'),
-    enabled,
-    onSuccess,
-  });
-}
+import { queryKeys } from './queryKeys';
 
 export function useSettings<T = Settings>(
   select?: (settings: Settings) => T,
-  enabled?: boolean
+  enabled = true
 ) {
-  return useQuery(['settings'], getSettings, {
+  return useQuery(queryKeys.base(), getSettings, {
     select,
     enabled,
+    staleTime: 50,
     ...withError('Unable to retrieve settings'),
   });
 }
@@ -48,7 +33,7 @@ export function useUpdateSettingsMutation() {
   return useMutation(
     updateSettings,
     mutationOptions(
-      withInvalidate(queryClient, [['settings'], ['cloud']]),
+      withInvalidate(queryClient, [queryKeys.base(), ['cloud']]),
       withError('Unable to update settings')
     )
   );
@@ -60,7 +45,7 @@ export function useUpdateDefaultRegistrySettingsMutation() {
   return useMutation(
     (payload: Partial<DefaultRegistry>) => updateDefaultRegistry(payload),
     mutationOptions(
-      withInvalidate(queryClient, [['settings']]),
+      withInvalidate(queryClient, [queryKeys.base()]),
       withError('Unable to update default registry settings')
     )
   );
