@@ -42,7 +42,7 @@ export function EventsDatatable({ dataset }: { dataset: Array<DockerEvent> }) {
 
   return (
     <Datatable
-      dataset={dataset}
+      dataset={dataset ?? []}
       columns={columns}
       settingsManager={tableState}
       title="Events"
