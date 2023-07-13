@@ -228,7 +228,6 @@
     "http-proxy": "^1.18.1",
     "**/@uirouter/react": "^1.0.7",
     "**/@uirouter/angularjs": "1.0.11",
-    "**/css-loader": "^6.6.0",
     "**/moment": "^2.21.0"
   },
   "browserslist": "last 2 versions"
