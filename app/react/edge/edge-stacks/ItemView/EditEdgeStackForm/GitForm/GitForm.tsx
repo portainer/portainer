@@ -26,6 +26,8 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCreateGitCredentialMutation } from '@/react/portainer/account/git-credentials/git-credentials.service';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/react/portainer/environments/types';
+import { Registry } from '@/react/portainer/registries/types';
+import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
 
 import { LoadingButton } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
@@ -36,6 +38,7 @@ import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { useValidateEnvironmentTypes } from '../useEdgeGroupHasType';
 import { atLeastTwo } from '../atLeastTwo';
+import { PrivateRegistryFieldset } from '../../../components/PrivateRegistryFieldset';
 
 import { useUpdateEdgeStackGitMutation } from './useUpdateEdgeStackGitMutation';
 
@@ -46,6 +49,7 @@ interface FormValues {
   refName: string;
   authentication: GitAuthModel;
   envVars: EnvVar[];
+  privateRegistryId?: Registry['Id'];
 }
 
 export function GitForm({ stack }: { stack: EdgeStack }) {
@@ -173,6 +177,7 @@ function InnerForm({
   onUpdateSettingsClick(): void;
   webhookId: string;
 }) {
+  const registriesQuery = useRegistries();
   const { values, setFieldValue, isValid, handleSubmit, errors, dirty } =
     useFormikContext<FormValues>();
 
@@ -264,6 +269,15 @@ function InnerForm({
           errors={errors.envVars}
         />
       </FormSection>
+
+      <PrivateRegistryFieldset
+        value={values.privateRegistryId}
+        onSelect={(value) => setFieldValue('privateRegistryId', value)}
+        registries={registriesQuery.data ?? []}
+        formInvalid={!isValid}
+        method="repository"
+        errorMessage={errors.privateRegistryId}
+      />
 
       <FormSection title="Actions">
         <LoadingButton
