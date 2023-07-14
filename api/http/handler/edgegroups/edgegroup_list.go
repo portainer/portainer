@@ -14,7 +14,7 @@ import (
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
 	HasEdgeStack  bool `json:"HasEdgeStack"`
-	HasEdgeGroup  bool `json:"HasEdgeGroup"`
+	HasEdgeJob    bool `json:"HasEdgeJob"`
 	EndpointTypes []portainer.EndpointType
 }
 
@@ -99,7 +99,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 
 		edgeGroup.EndpointTypes = endpointTypes
 		edgeGroup.HasEdgeStack = usedEdgeGroups[edgeGroup.ID]
-		edgeGroup.HasEdgeGroup = usedByEdgeJob
+		edgeGroup.HasEdgeJob = usedByEdgeJob
 
 		decoratedEdgeGroups = append(decoratedEdgeGroups, edgeGroup)
 	}
