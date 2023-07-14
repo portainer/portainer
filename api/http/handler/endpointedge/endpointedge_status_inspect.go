@@ -138,6 +138,11 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 		endpoint.EdgeID = edgeIdentifier
 	}
 
+	// Take an initial snapshot
+	if endpoint.LastCheckInDate == 0 {
+		handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
+	}
+
 	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
 	if agentPlatformErr != nil {
 		return nil, httperror.BadRequest("agent platform header is not valid", err)
