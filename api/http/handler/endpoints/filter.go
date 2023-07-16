@@ -87,17 +87,9 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	edgeStackId, _ := request.RetrieveNumericQueryParameter(r, "edgeStackId", true)
 
-	edgeStackStatusQuery, _ := request.RetrieveQueryParameter(r, "edgeStackStatus", true)
-	var edgeStackStatus *portainer.EdgeStackStatusType
-	if edgeStackStatusQuery != "" {
-		edgeStackStatusNumber, err := strconv.Atoi(edgeStackStatusQuery)
-		if err != nil ||
-			edgeStackStatusNumber < 0 ||
-			edgeStackStatusNumber > int(portainer.EdgeStackStatusRemoving) {
-			return EnvironmentsQuery{}, errors.New("invalid edgeStackStatus parameter")
-		}
-
-		edgeStackStatus = ptr(portainer.EdgeStackStatusType(edgeStackStatusNumber))
+	edgeStackStatus, err := getEdgeStackStatusParam(r)
+	if err != nil {
+		return EnvironmentsQuery{}, err
 	}
 
 	return EnvironmentsQuery{
@@ -543,4 +535,34 @@ func contains(strings []string, param string) bool {
 	}
 
 	return false
+}
+
+func getEdgeStackStatusParam(r *http.Request) (*portainer.EdgeStackStatusType, error) {
+	edgeStackStatusQuery, _ := request.RetrieveQueryParameter(r, "edgeStackStatus", true)
+	if edgeStackStatusQuery == "" {
+		return nil, nil
+	}
+
+	edgeStackStatusNumber, err := strconv.Atoi(edgeStackStatusQuery)
+	edgeStackStatus := portainer.EdgeStackStatusType(edgeStackStatusNumber)
+	if err != nil {
+		return nil, fmt.Errorf("failed parsing edgeStackStatus: %w", err)
+	}
+
+	if !slices.Contains([]portainer.EdgeStackStatusType{
+		portainer.EdgeStackStatusPending,
+		portainer.EdgeStackStatusDeploymentReceived,
+		portainer.EdgeStackStatusError,
+		portainer.EdgeStackStatusAcknowledged,
+		portainer.EdgeStackStatusRemoved,
+		portainer.EdgeStackStatusRemoteUpdateSuccess,
+		portainer.EdgeStackStatusImagesPulled,
+		portainer.EdgeStackStatusRunning,
+		portainer.EdgeStackStatusDeploying,
+		portainer.EdgeStackStatusRemoving,
+	}, edgeStackStatus) {
+		return nil, errors.New("invalid edgeStackStatus parameter")
+	}
+
+	return &edgeStackStatus, nil
 }
