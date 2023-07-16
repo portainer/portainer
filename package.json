@@ -22,7 +22,7 @@
     "build": "webpack",
     "format": "prettier --loglevel warn --write \"**/*.{js,css,html,jsx,tsx,ts,json}\"",
     "lint": "eslint --cache --fix './**/*.{js,jsx,ts,tsx}'",
-    "test": "jest --silent",
+    "test": "jest",
     "sb": "yarn storybook",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o ./dist/storybook",

@@ -91,4 +91,8 @@ export const handlers = [
     '/api/status',
     (req, res, ctx) => res(ctx.json({}))
   ),
+  rest.get('/api/teams/:id/memberships', (req, res, ctx) => res(ctx.json([]))),
+  rest.get('/api/endpoints/agent_versions', (req, res, ctx) =>
+    res(ctx.json([]))
+  ),
 ];
