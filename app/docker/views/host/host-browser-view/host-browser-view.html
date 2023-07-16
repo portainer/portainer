@@ -1,7 +1,3 @@
 <page-header title="'Host Browser'" breadcrumbs="['Host', {label:$ctrl.host.Name, link:'docker.host'},  'browse']"> </page-header>
 
-<div class="row">
-  <div class="col-sm-12">
-    <host-browser ng-if="$ctrl.host" endpoint-id="$ctrl.endpoint.Id"></host-browser>
-  </div>
-</div>
+<host-browser ng-if="$ctrl.host" endpoint-id="$ctrl.endpoint.Id"></host-browser>

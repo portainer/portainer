@@ -1,15 +1,13 @@
-<files-datatable
-  title-text="Volume browser"
-  title-icon="file"
+<agent-volume-browser-react
+  ng-if="$ctrl.files"
   dataset="$ctrl.files"
-  table-key="volume_browser"
-  order-by="Dir"
   is-root="$ctrl.state.path === '/'"
-  go-to-parent="$ctrl.up()"
-  browse="$ctrl.browse(name)"
-  rename="$ctrl.rename(name, newName)"
-  download="$ctrl.download(name)"
-  delete="$ctrl.confirmDelete(name)"
+  on-go-to-parent="($ctrl.up)"
+  on-browse="($ctrl.browse)"
+  on-rename="($ctrl.rename)"
+  on-download="($ctrl.download)"
+  on-delete="($ctrl.confirmDelete)"
   is-upload-allowed="$ctrl.isUploadEnabled"
   on-file-selected-for-upload="($ctrl.onFileSelectedForUpload)"
-></files-datatable>
+  relative-path="$ctrl.state.path"
+></agent-volume-browser-react>
