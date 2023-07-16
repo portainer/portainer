@@ -40,7 +40,10 @@ import { useValidateEnvironmentTypes } from '../useEdgeGroupHasType';
 import { atLeastTwo } from '../atLeastTwo';
 import { PrivateRegistryFieldset } from '../../../components/PrivateRegistryFieldset';
 
-import { useUpdateEdgeStackGitMutation } from './useUpdateEdgeStackGitMutation';
+import {
+  UpdateEdgeStackGitPayload,
+  useUpdateEdgeStackGitMutation,
+} from './useUpdateEdgeStackGitMutation';
 
 interface FormValues {
   groupIds: EdgeGroup['Id'][];
@@ -121,10 +124,10 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
   }
 
   function getPayload(
-    { authentication, autoUpdate, ...values }: FormValues,
+    { authentication, autoUpdate, privateRegistryId, ...values }: FormValues,
     credentialId: number | undefined,
     updateVersion: boolean
-  ) {
+  ): UpdateEdgeStackGitPayload {
     return {
       updateVersion,
       id: stack.Id,
@@ -133,6 +136,10 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
         RepositoryGitCredentialID: credentialId,
       }),
       autoUpdate: transformAutoUpdateViewModel(autoUpdate, webhookId),
+      registries:
+        typeof privateRegistryId !== 'undefined'
+          ? [privateRegistryId]
+          : undefined,
       ...values,
     };
   }
