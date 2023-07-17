@@ -7,8 +7,8 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { buildNameColumn } from '@@/datatables/NameCell';
 
 import { StatusType } from '../../types';
-import { EdgeStackStatus } from '../EdgeStackStatus';
 
+import { EdgeStackStatus } from './EdgeStacksStatus';
 import { DecoratedEdgeStack } from './types';
 import { DeploymentCounter, DeploymentCounterLink } from './DeploymentCounter';
 

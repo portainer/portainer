@@ -13,11 +13,9 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
 import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
-import { EdgeStackStatus } from '@/react/edge/edge-stacks/ListView/EdgeStackStatus';
 
 export const componentsModule = angular
   .module('portainer.edge.react.components', [])
-  .component('edgeStacksDatatableStatus', r2a(EdgeStackStatus, ['edgeStack']))
   .component(
     'edgeStackEnvironmentsDatatable',
     r2a(withUIRouter(withReactQuery(EnvironmentsDatatable)), [])
