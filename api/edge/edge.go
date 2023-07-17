@@ -14,6 +14,9 @@ type (
 		// Name of the stack
 		Name string
 
+		// Content of the stack file (for compatibility to agent version less than 2.19.0)
+		StackFileContent string
+
 		// Content of stack folder
 		DirEntries []filesystem.DirEntry
 		// Name of the stack entry file

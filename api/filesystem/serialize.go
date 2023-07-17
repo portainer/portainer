@@ -2,9 +2,12 @@ package filesystem
 
 import (
 	"encoding/base64"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/mod/semver"
 )
 
 type DirEntry struct {
@@ -44,6 +47,22 @@ func FilterDirForEntryFile(dirEntries []DirEntry, entryFile string) []DirEntry {
 	}
 
 	return filteredDirEntries
+}
+
+func FilterDirForCompatibility(dirEntries []DirEntry, entryFilePath, agentVersion string) (string, error) {
+
+	if semver.Compare(fmt.Sprintf("v%s", agentVersion), "v2.19.0") == -1 {
+		for _, dirEntry := range dirEntries {
+			if dirEntry.IsFile {
+				if dirEntry.Name == entryFilePath {
+					return DecodeFileContent(dirEntry.Content)
+				}
+			}
+		}
+		return "", fmt.Errorf("Entry file %s not found in dir entries", entryFilePath)
+	}
+
+	return "", nil
 }
 
 // LoadDir reads all files and folders recursively from the given directory
@@ -127,14 +146,22 @@ func PersistDir(dir string, dirEntries []DirEntry) error {
 	return nil
 }
 
+func DecodeFileContent(encodedFileContent string) (string, error) {
+	decodedBytes, err := base64.StdEncoding.DecodeString(encodedFileContent)
+	if err != nil {
+		return "", err
+	}
+	return string(decodedBytes), nil
+}
+
 func DecodeDirEntries(dirEntries []DirEntry) error {
 	for index, dirEntry := range dirEntries {
 		if dirEntry.IsFile && dirEntry.Content != "" {
-			decodedBytes, err := base64.StdEncoding.DecodeString(dirEntry.Content)
+			decodedFile, err := DecodeFileContent(dirEntry.Content)
 			if err != nil {
 				return err
 			}
-			dirEntries[index].Content = string(decodedBytes)
+			dirEntries[index].Content = decodedFile
 		}
 	}
 
