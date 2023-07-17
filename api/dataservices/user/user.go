@@ -32,6 +32,16 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		BaseDataServiceTx: dataservices.BaseDataServiceTx[portainer.User, portainer.UserID]{
+			Bucket:     BucketName,
+			Connection: service.Connection,
+			Tx:         tx,
+		},
+	}
+}
+
 // UserByUsername returns a user by username.
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
 	var u portainer.User
