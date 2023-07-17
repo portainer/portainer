@@ -15,6 +15,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/agent"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -217,7 +218,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return httperror.NewError(http.StatusConflict, "Name is not unique", nil)
 	}
 
-	endpoint, endpointCreationError := handler.createEndpoint(payload)
+	endpoint, endpointCreationError := handler.createEndpoint(handler.DataStore, payload)
 	if endpointCreationError != nil {
 		return endpointCreationError
 	}
@@ -273,17 +274,17 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 	return response.JSON(w, endpoint)
 }
 
-func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	var err error
 	switch payload.EndpointCreationType {
 	case azureEnvironment:
-		return handler.createAzureEndpoint(payload)
+		return handler.createAzureEndpoint(tx, payload)
 
 	case edgeAgentEnvironment:
-		return handler.createEdgeAgentEndpoint(payload)
+		return handler.createEdgeAgentEndpoint(tx, payload)
 
 	case localKubernetesEnvironment:
-		return handler.createKubernetesEndpoint(payload)
+		return handler.createKubernetesEndpoint(tx, payload)
 	}
 
 	endpointType := portainer.DockerEnvironment
@@ -312,12 +313,13 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 	}
 
 	if payload.TLS {
-		return handler.createTLSSecuredEndpoint(payload, endpointType, agentVersion)
+		return handler.createTLSSecuredEndpoint(tx, payload, endpointType, agentVersion)
 	}
-	return handler.createUnsecuredEndpoint(payload)
+
+	return handler.createUnsecuredEndpoint(tx, payload)
 }
 
-func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createAzureEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	credentials := portainer.AzureCredentials{
 		ApplicationID:     payload.AzureApplicationID,
 		TenantID:          payload.AzureTenantID,
@@ -330,7 +332,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		return nil, httperror.InternalServerError("Unable to authenticate against Azure", err)
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:                 portainer.EndpointID(endpointID),
 		Name:               payload.Name,
@@ -348,7 +350,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
-	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(tx, endpoint)
 	if err != nil {
 		return nil, httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
@@ -356,7 +358,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createEdgeAgentEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
 	portainerHost, err := edge.ParseHostForEdge(payload.URL)
@@ -401,7 +403,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		endpoint.EdgeID = edgeID.String()
 	}
 
-	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(tx, endpoint)
 	if err != nil {
 		return nil, httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
@@ -409,7 +411,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 	return endpoint, nil
 }
 
-func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createUnsecuredEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.DockerEnvironment
 
 	if payload.URL == "" {
@@ -419,7 +421,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		}
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
@@ -439,7 +441,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
-	err := handler.snapshotAndPersistEndpoint(endpoint)
+	err := handler.snapshotAndPersistEndpoint(tx, endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -447,12 +449,12 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 	return endpoint, nil
 }
 
-func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createKubernetesEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if payload.URL == "" {
 		payload.URL = "https://kubernetes.default.svc"
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := tx.Endpoint().GetNextIdentifier()
 
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
@@ -474,7 +476,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
-	err := handler.snapshotAndPersistEndpoint(endpoint)
+	err := handler.snapshotAndPersistEndpoint(tx, endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -482,8 +484,8 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 	return endpoint, nil
 }
 
-func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType, agentVersion string) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+func (handler *Handler) createTLSSecuredEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload, endpointType portainer.EndpointType, agentVersion string) (*portainer.Endpoint, *httperror.HandlerError) {
+	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
@@ -511,7 +513,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 		return nil, err
 	}
 
-	err = handler.snapshotAndPersistEndpoint(endpoint)
+	err = handler.snapshotAndPersistEndpoint(tx, endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -519,7 +521,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 	return endpoint, nil
 }
 
-func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) snapshotAndPersistEndpoint(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	err := handler.SnapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
 		if (endpoint.Type == portainer.AgentOnDockerEnvironment && strings.Contains(err.Error(), "Invalid request signature")) ||
@@ -529,7 +531,7 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 		return httperror.InternalServerError("Unable to initiate communications with environment", err)
 	}
 
-	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(tx, endpoint)
 	if err != nil {
 		return httperror.InternalServerError("An error occurred while trying to create the environment", err)
 	}
@@ -537,7 +539,7 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 	return nil
 }
 
-func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.Endpoint) error {
+func (handler *Handler) saveEndpointAndUpdateAuthorizations(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) error {
 	endpoint.SecuritySettings = portainer.EndpointSecuritySettings{
 		AllowVolumeBrowserForRegularUsers: false,
 		EnableHostManagementFeatures:      false,
@@ -551,13 +553,13 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 		AllowStackManagementForRegularUsers:       true,
 	}
 
-	err := handler.DataStore.Endpoint().Create(endpoint)
+	err := tx.Endpoint().Create(endpoint)
 	if err != nil {
 		return err
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
+		err = tx.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
 			tag.Endpoints[endpoint.ID] = true
 		})
 		if err != nil {

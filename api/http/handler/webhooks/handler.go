@@ -35,5 +35,6 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.webhookDelete))).Methods(http.MethodDelete)
 	h.Handle("/webhooks/{token}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookExecute))).Methods(http.MethodPost)
+
 	return h
 }
