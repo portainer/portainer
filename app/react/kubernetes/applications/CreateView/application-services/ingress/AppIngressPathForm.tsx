@@ -87,8 +87,16 @@ export function AppIngressPathForm({
         Host: newIngressHostValue,
         IngressName: newIngressNameValue,
       };
+      // the selected option should match the new ingress path
+      const newIngressOption = newIngressPath.Host
+        ? {
+            ingressName: newIngressPath.IngressName,
+            value: newIngressPath.Host ?? '',
+            label: `${newIngressPath.Host} (${newIngressPath.IngressName})`,
+          }
+        : null;
       onChangeIngressPath(newIngressPath);
-      setSelectedIngress(ingressHostOptionsWithCurrentValue[0] ?? null);
+      setSelectedIngress(newIngressOption);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ingressHostOptionsWithCurrentValue]);
@@ -129,7 +137,7 @@ export function AppIngressPathForm({
         {ingressHostOptions.length === 0 && !ingressPath?.Host && (
           <FormError>
             No ingress hostnames are available for the namespace &apos;
-            {namespace}&apos;. Please update the namespace or{' '}
+            {namespace}&apos;. Please select another namespace or{' '}
             <Link
               to="kubernetes.ingresses.create"
               target="_blank"
