@@ -5,12 +5,13 @@ import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { buildNameColumn } from '@@/datatables/NameCell';
+import { Link } from '@@/Link';
 
 import { StatusType } from '../../types';
 
 import { EdgeStackStatus } from './EdgeStacksStatus';
 import { DecoratedEdgeStack } from './types';
-import { DeploymentCounter, DeploymentCounterLink } from './DeploymentCounter';
+import { DeploymentCounter } from './DeploymentCounter';
 
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
@@ -21,29 +22,52 @@ export const columns = _.compact([
     'edge.stacks.edit',
     'stackId'
   ),
-  columnHelper.accessor('aggregatedStatus.acknowledged', {
-    header: 'Acknowledged',
-    enableSorting: false,
-    enableHiding: false,
-    cell: ({ getValue, row }) => (
-      <DeploymentCounterLink
-        count={getValue()}
-        type={StatusType.Acknowledged}
-        stackId={row.original.Id}
-      />
-    ),
-    meta: {
-      className: '[&>*]:justify-center',
-    },
-  }),
-  isBE &&
-    columnHelper.accessor('aggregatedStatus.imagesPulled', {
-      header: 'Images Pre-pulled',
+  columnHelper.accessor(
+    (item) => item.aggregatedStatus[StatusType.Acknowledged] || 0,
+    {
+      header: 'Acknowledged',
+      enableSorting: false,
+      enableHiding: false,
       cell: ({ getValue, row }) => (
-        <DeploymentCounterLink
+        <DeploymentCounter
           count={getValue()}
-          type={StatusType.ImagesPulled}
-          stackId={row.original.Id}
+          type={StatusType.Acknowledged}
+          total={row.original.NumDeployments}
+        />
+      ),
+      meta: {
+        className: '[&>*]:justify-center',
+      },
+    }
+  ),
+  isBE &&
+    columnHelper.accessor(
+      (item) => item.aggregatedStatus[StatusType.ImagesPulled] || 0,
+      {
+        header: 'Images pre-pulled',
+        cell: ({ getValue, row }) => (
+          <DeploymentCounter
+            count={getValue()}
+            type={StatusType.ImagesPulled}
+            total={row.original.NumDeployments}
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        meta: {
+          className: '[&>*]:justify-center',
+        },
+      }
+    ),
+  columnHelper.accessor(
+    (item) => item.aggregatedStatus[StatusType.DeploymentReceived] || 0,
+    {
+      header: 'Deployments received',
+      cell: ({ getValue, row }) => (
+        <DeploymentCounter
+          count={getValue()}
+          type={StatusType.Running}
+          total={row.original.NumDeployments}
         />
       ),
       enableSorting: false,
@@ -51,55 +75,50 @@ export const columns = _.compact([
       meta: {
         className: '[&>*]:justify-center',
       },
-    }),
-  columnHelper.accessor('aggregatedStatus.ok', {
-    header: 'Deployed',
-    cell: ({ getValue, row }) => (
-      <DeploymentCounterLink
-        count={getValue()}
-        type={StatusType.Running}
-        stackId={row.original.Id}
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      className: '[&>*]:justify-center',
-    },
-  }),
-  columnHelper.accessor('aggregatedStatus.error', {
-    header: 'Failed',
-    cell: ({ getValue, row }) => (
-      <DeploymentCounterLink
-        count={getValue()}
-        type={StatusType.Error}
-        stackId={row.original.Id}
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      className: '[&>*]:justify-center',
-    },
-  }),
+    }
+  ),
+  columnHelper.accessor(
+    (item) => item.aggregatedStatus[StatusType.Error] || 0,
+    {
+      header: 'Deployments failed',
+      cell: ({ getValue, row }) => {
+        const count = getValue();
+
+        return (
+          <div className="flex items-center gap-2">
+            <DeploymentCounter
+              count={count}
+              type={StatusType.Error}
+              total={row.original.NumDeployments}
+            />
+            {count > 0 && (
+              <Link
+                className="hover:no-underline"
+                to="edge.stacks.edit"
+                params={{
+                  stackId: row.original.Id,
+                  tab: 1,
+                  status: StatusType.Error,
+                }}
+              >
+                ({count}/{row.original.NumDeployments})
+              </Link>
+            )}
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        className: '[&>*]:justify-center',
+      },
+    }
+  ),
   columnHelper.accessor('Status', {
     header: 'Status',
     cell: ({ row }) => (
       <div className="w-full text-center">
         <EdgeStackStatus edgeStack={row.original} />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      className: '[&>*]:justify-center',
-    },
-  }),
-  columnHelper.accessor('NumDeployments', {
-    header: 'Deployments',
-    cell: ({ getValue }) => (
-      <div className="text-center">
-        <DeploymentCounter count={getValue()} />
       </div>
     ),
     enableSorting: false,

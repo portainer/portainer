@@ -50,15 +50,12 @@ export function EdgeStacksDatatable() {
 }
 
 function aggregateStackStatus(stackStatus: EdgeStack['Status']) {
-  const aggregateStatus = { ok: 0, error: 0, acknowledged: 0, imagesPulled: 0 };
+  const aggregateStatus: Partial<Record<StatusType, number>> = {};
   return Object.values(stackStatus).reduce(
     (acc, envStatus) =>
       envStatus.Status.reduce((acc, status) => {
         const { Type } = status;
-        acc.ok += Number(Type === StatusType.Running);
-        acc.error += Number(Type === StatusType.Error);
-        acc.acknowledged += Number(Type === StatusType.Acknowledged);
-        acc.imagesPulled += Number(Type === StatusType.ImagesPulled);
+        acc[Type] = (acc[Type] || 0) + 1;
         return acc;
       }, acc),
     aggregateStatus

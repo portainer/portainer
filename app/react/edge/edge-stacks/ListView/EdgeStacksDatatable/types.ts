@@ -1,12 +1,5 @@
-import { EdgeStack } from '../../types';
-
-interface AggregateStackStatus {
-  ok: number;
-  error: number;
-  acknowledged: number;
-  imagesPulled: number;
-}
+import { EdgeStack, StatusType } from '../../types';
 
 export type DecoratedEdgeStack = EdgeStack & {
-  aggregatedStatus: AggregateStackStatus;
+  aggregatedStatus: Partial<Record<StatusType, number>>;
 };
