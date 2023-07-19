@@ -26,6 +26,8 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCreateGitCredentialMutation } from '@/react/portainer/account/git-credentials/git-credentials.service';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/react/portainer/environments/types';
+import { Registry } from '@/react/portainer/registries/types';
+import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
 
 import { LoadingButton } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
@@ -36,8 +38,12 @@ import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { useValidateEnvironmentTypes } from '../useEdgeGroupHasType';
 import { atLeastTwo } from '../atLeastTwo';
+import { PrivateRegistryFieldset } from '../../../components/PrivateRegistryFieldset';
 
-import { useUpdateEdgeStackGitMutation } from './useUpdateEdgeStackGitMutation';
+import {
+  UpdateEdgeStackGitPayload,
+  useUpdateEdgeStackGitMutation,
+} from './useUpdateEdgeStackGitMutation';
 
 interface FormValues {
   groupIds: EdgeGroup['Id'][];
@@ -46,6 +52,7 @@ interface FormValues {
   refName: string;
   authentication: GitAuthModel;
   envVars: EnvVar[];
+  privateRegistryId?: Registry['Id'];
 }
 
 export function GitForm({ stack }: { stack: EdgeStack }) {
@@ -117,10 +124,10 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
   }
 
   function getPayload(
-    { authentication, autoUpdate, ...values }: FormValues,
+    { authentication, autoUpdate, privateRegistryId, ...values }: FormValues,
     credentialId: number | undefined,
     updateVersion: boolean
-  ) {
+  ): UpdateEdgeStackGitPayload {
     return {
       updateVersion,
       id: stack.Id,
@@ -129,6 +136,10 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
         RepositoryGitCredentialID: credentialId,
       }),
       autoUpdate: transformAutoUpdateViewModel(autoUpdate, webhookId),
+      registries:
+        typeof privateRegistryId !== 'undefined'
+          ? [privateRegistryId]
+          : undefined,
       ...values,
     };
   }
@@ -173,6 +184,7 @@ function InnerForm({
   onUpdateSettingsClick(): void;
   webhookId: string;
 }) {
+  const registriesQuery = useRegistries();
   const { values, setFieldValue, isValid, handleSubmit, errors, dirty } =
     useFormikContext<FormValues>();
 
@@ -264,6 +276,15 @@ function InnerForm({
           errors={errors.envVars}
         />
       </FormSection>
+
+      <PrivateRegistryFieldset
+        value={values.privateRegistryId}
+        onSelect={(value) => setFieldValue('privateRegistryId', value)}
+        registries={registriesQuery.data ?? []}
+        formInvalid={!isValid}
+        method="repository"
+        errorMessage={errors.privateRegistryId}
+      />
 
       <FormSection title="Actions">
         <LoadingButton

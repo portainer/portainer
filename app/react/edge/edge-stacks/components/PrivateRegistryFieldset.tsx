@@ -14,24 +14,24 @@ import { FormSection } from '@@/form-components/FormSection';
 interface Props {
   value?: number;
   registries: Registry[];
-  onChange: () => void;
+  onChange?: () => void;
   formInvalid?: boolean;
   errorMessage?: string;
   onSelect: (value?: number) => void;
   isActive?: boolean;
-  clearRegistries: () => void;
-  method?: string;
+  clearRegistries?: () => void;
+  method?: 'repository' | string;
 }
 
 export function PrivateRegistryFieldset({
   value,
   registries,
-  onChange,
+  onChange = () => {},
   formInvalid,
   errorMessage,
   onSelect,
   isActive,
-  clearRegistries,
+  clearRegistries = () => {},
   method,
 }: Props) {
   const [checked, setChecked] = useState(isActive || false);
