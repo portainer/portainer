@@ -18,10 +18,7 @@ function WaitingRoomView() {
     <>
       <PageHeader
         title="Waiting Room"
-        breadcrumbs={[
-          { label: 'Edge Devices', link: 'edge.devices' },
-          { label: 'Waiting Room' },
-        ]}
+        breadcrumbs={[{ label: 'Waiting Room' }]}
       />
 
       <InformationPanel>
