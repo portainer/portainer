@@ -229,7 +229,11 @@ export function kubeServicesValidation(
                   'path-is-unique',
                   'Ingress path is already in use for this hostname.',
                   (path, context) => {
-                    if (path === undefined || validationData === undefined) {
+                    if (
+                      path === undefined ||
+                      validationData === undefined ||
+                      !context.parent.Host
+                    ) {
                       return true;
                     }
                     const ingressHostAndPath = `${

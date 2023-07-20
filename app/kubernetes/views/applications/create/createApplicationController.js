@@ -1001,9 +1001,11 @@ class KubernetesCreateApplicationController {
       if (updatedService.Ingress && numberOfPortsInOldService && numberOfPortsInOldService <= updatedService.Ports.length) {
         const updatedOldPorts = updatedService.Ports.slice(0, numberOfPortsInOldService);
         const ingressesForService = fullIngresses.filter((ing) => {
-          const ingServiceNames = ing.Paths.map((path) => path.ServiceName);
-          if (ingServiceNames.includes(updatedService.Name)) {
-            return true;
+          if (ing.Paths) {
+            const ingServiceNames = ing.Paths.map((path) => path.ServiceName);
+            if (ingServiceNames.includes(updatedService.Name)) {
+              return true;
+            }
           }
         });
         ingressesForService.forEach((ingressForService) => {
