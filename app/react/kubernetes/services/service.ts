@@ -117,7 +117,10 @@ export async function getMetricsForAllNodes(environmentId: EnvironmentId) {
     );
     return nodes;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for all nodes');
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve metrics for all nodes'
+    );
   }
 }
 
@@ -147,7 +150,10 @@ export async function getMetricsForAllPods(
     );
     return pods;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for all pods');
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve metrics for all pods'
+    );
   }
 }
 
