@@ -7,7 +7,7 @@ import { getMetricsForAllNodes } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesClusterController {
   /* @ngInject */
-    constructor($async, $state, Notifications, LocalStorage, Authentication, KubernetesNodeService, KubernetesApplicationService, KubernetesEndpointService) {
+  constructor($async, $state, Notifications, LocalStorage, Authentication, KubernetesNodeService, KubernetesApplicationService, KubernetesEndpointService) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -98,7 +98,7 @@ class KubernetesClusterController {
 
   async getResourceUsage(endpointId) {
     try {
-            const nodeMetrics = await getMetricsForAllNodes(endpointId);
+      const nodeMetrics = await getMetricsForAllNodes(endpointId);
       const resourceUsageList = nodeMetrics.items.map((i) => i.usage);
       const clusterResourceUsage = resourceUsageList.reduce((total, u) => {
         total.CPU += KubernetesResourceReservationHelper.parseCPU(u.cpu);

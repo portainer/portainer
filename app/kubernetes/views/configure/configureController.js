@@ -17,17 +17,7 @@ class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
   /* @ngInject */
-  constructor(
-    $async,
-    $state,
-    $scope,
-    Notifications,
-    KubernetesStorageService,
-    EndpointService,
-    EndpointProvider,
-    KubernetesResourcePoolService,
-    KubernetesIngressService,
-  ) {
+  constructor($async, $state, $scope, Notifications, KubernetesStorageService, EndpointService, EndpointProvider, KubernetesResourcePoolService, KubernetesIngressService) {
     this.$async = $async;
     this.$state = $state;
     this.$scope = $scope;
@@ -191,7 +181,7 @@ class KubernetesConfigureController {
   }
 
   enableMetricsServer() {
-        return this.$async(async () => {
+    return this.$async(async () => {
       if (this.formValues.UseServerMetrics) {
         this.state.metrics.userClick = true;
         this.state.metrics.pending = true;

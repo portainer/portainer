@@ -6,7 +6,6 @@ import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
-
 import {
   NodeMetrics,
   NodeMetric,

@@ -7,7 +7,7 @@ import { getMetricsForNode } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesNodeStatsController {
   /* @ngInject */
-    constructor($async, $state, $interval, $document, Notifications, KubernetesNodeService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesNodeService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
@@ -79,7 +79,7 @@ class KubernetesNodeStatsController {
   getStats() {
     return this.$async(async () => {
       try {
-                const stats = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
+        const stats = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
         if (stats) {
           const memory = filesizeParser(stats.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
@@ -111,7 +111,7 @@ class KubernetesNodeStatsController {
     };
 
     try {
-            const nodeMetrics = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
+      const nodeMetrics = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
 
       if (nodeMetrics) {
         const node = await this.KubernetesNodeService.get(this.state.transition.nodeName);

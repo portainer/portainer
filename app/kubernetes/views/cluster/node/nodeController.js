@@ -299,7 +299,7 @@ class KubernetesNodeController {
   async getNodeUsageAsync() {
     try {
       const nodeName = this.$transition$.params().name;
-            const node = await getMetricsForNode(this.$state.params.endpointId, nodeName);
+      const node = await getMetricsForNode(this.$state.params.endpointId, nodeName);
       this.resourceUsage = new KubernetesResourceReservation();
       this.resourceUsage.CPU = KubernetesResourceReservationHelper.parseCPU(node.usage.cpu);
       this.resourceUsage.Memory = KubernetesResourceReservationHelper.megaBytesValue(node.usage.memory);

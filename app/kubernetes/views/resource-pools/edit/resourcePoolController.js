@@ -319,7 +319,7 @@ class KubernetesResourcePoolController {
 
   async getResourceUsage(namespace) {
     try {
-            const namespaceMetrics = await getMetricsForAllPods(this.$state.params.endpointId, namespace);
+      const namespaceMetrics = await getMetricsForAllPods(this.$state.params.endpointId, namespace);
       // extract resource usage of all containers within each pod of the namespace
       const containerResourceUsageList = namespaceMetrics.items.flatMap((i) => i.containers.map((c) => c.usage));
       const namespaceResourceUsage = containerResourceUsageList.reduce((total, u) => {

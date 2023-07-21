@@ -8,7 +8,7 @@ import { getMetricsForPod } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesApplicationStatsController {
   /* @ngInject */
-    constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
@@ -126,7 +126,7 @@ class KubernetesApplicationStatsController {
     };
 
     try {
-            await getMetricsForPod(this.$state.params.endpointId, this.state.transition.namespace, this.state.transition.podName);
+      await getMetricsForPod(this.$state.params.endpointId, this.state.transition.namespace, this.state.transition.podName);
     } catch (error) {
       this.state.getMetrics = false;
       this.state.viewReady = true;
