@@ -69,7 +69,7 @@ func (handler *Handler) getKubernetesMetricsForAllNodes(w http.ResponseWriter, r
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
 // @param name path string true "Node identifier"
-// @success 200 {object} models.K8sIngressControllers "Success"
+// @success 200 {object} v1beta1.NodeMetrics "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/nodes/{name} [get]
@@ -188,7 +188,7 @@ func (handler *Handler) getKubernetesMetricsForAllPods(w http.ResponseWriter, r 
 // @param id path int true "Environment (Endpoint) identifier"
 // @param namespace path string true "Namespace"
 // @param name path string true "Pod identifier"
-// @success 200 {object} models.K8sIngressControllers "Success"
+// @success 200 {object} v1beta1.PodMetrics "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/pods/{namespace}/{name} [get]
