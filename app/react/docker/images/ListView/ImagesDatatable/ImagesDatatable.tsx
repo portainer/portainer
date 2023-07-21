@@ -154,7 +154,7 @@ function RemoveButtonMenu({
             <span className="sr-only">Toggle Dropdown</span>
           </MenuButton>
           <MenuPopover position={positionRight}>
-            <div className="mt-3 bg-white">
+            <div className="mt-3 bg-white th-highcontrast:bg-black th-dark:bg-black">
               <MenuItem
                 onSelect={() => {
                   onRemove(selectedItems, true);
