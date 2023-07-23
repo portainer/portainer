@@ -364,6 +364,8 @@ type (
 		Time  int64
 		Type  EdgeStackStatusType
 		Error string
+		// EE only feature
+		RollbackTo *int
 	}
 
 	//EdgeStackStatusType represents an edge stack status type

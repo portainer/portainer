@@ -25,6 +25,8 @@ type (
 		Namespace string
 		// Version of the stack file
 		Version int
+		// RollbackTo specifies the stack file version to rollback to (only support to rollback to the last version currently)
+		RollbackTo *int
 
 		// RegistryCredentials holds the credentials for a Docker registry.
 		// Used only for EE
