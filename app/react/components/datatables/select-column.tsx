@@ -40,6 +40,7 @@ export function createSelectColumn<T>(): ColumnDef<T> {
         }}
       />
     ),
+    enableHiding: false,
     meta: {
       width: 50,
     },
