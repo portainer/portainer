@@ -16,6 +16,7 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { updateIngressControllerClassMap, getIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 import { confirmUpdate } from '@@/modals/confirm';
 import { confirmUpdateNamespace } from '@/react/kubernetes/namespaces/ItemView/ConfirmUpdateNamespace';
+import { getMetricsForAllNodes, getMetricsForAllPods } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -28,8 +29,6 @@ class KubernetesResourcePoolController {
     Notifications,
     LocalStorage,
     EndpointService,
-    KubernetesNodeService,
-    KubernetesMetricsService,
     KubernetesResourceQuotaService,
     KubernetesResourcePoolService,
     KubernetesEventService,
@@ -47,8 +46,6 @@ class KubernetesResourcePoolController {
       Notifications,
       LocalStorage,
       EndpointService,
-      KubernetesNodeService,
-      KubernetesMetricsService,
       KubernetesResourceQuotaService,
       KubernetesResourcePoolService,
       KubernetesEventService,
@@ -322,7 +319,7 @@ class KubernetesResourcePoolController {
 
   async getResourceUsage(namespace) {
     try {
-      const namespaceMetrics = await this.KubernetesMetricsService.getPods(namespace);
+      const namespaceMetrics = await getMetricsForAllPods(this.$state.params.endpointId, namespace);
       // extract resource usage of all containers within each pod of the namespace
       const containerResourceUsageList = namespaceMetrics.items.flatMap((i) => i.containers.map((c) => c.usage));
       const namespaceResourceUsage = containerResourceUsageList.reduce((total, u) => {
@@ -369,7 +366,7 @@ class KubernetesResourcePoolController {
 
         const name = this.$state.params.id;
 
-        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get('', { getQuota: true })]);
+        const [nodes, pools] = await Promise.all([getMetricsForAllNodes, this.KubernetesResourcePoolService.get('', { getQuota: true })]);
 
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {

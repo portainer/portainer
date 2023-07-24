@@ -4,10 +4,11 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesPodConverter from 'Kubernetes/pod/converter';
+import { getMetricsForPod } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesApplicationStatsController {
   /* @ngInject */
-  constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, KubernetesMetricsService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
@@ -15,7 +16,6 @@ class KubernetesApplicationStatsController {
     this.Notifications = Notifications;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesNodeService = KubernetesNodeService;
-    this.KubernetesMetricsService = KubernetesMetricsService;
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
@@ -84,7 +84,7 @@ class KubernetesApplicationStatsController {
   getStats() {
     return this.$async(async () => {
       try {
-        const stats = await this.KubernetesMetricsService.getPod(this.state.transition.namespace, this.state.transition.podName);
+        const stats = await getMetricsForPod(this.$state.params.endpointId, this.state.transition.namespace, this.state.transition.podName);
         const container = _.find(stats.containers, { name: this.state.transition.containerName });
         if (container) {
           const memory = filesizeParser(container.usage.memory);
@@ -126,7 +126,7 @@ class KubernetesApplicationStatsController {
     };
 
     try {
-      await this.KubernetesMetricsService.getPod(this.state.transition.namespace, this.state.transition.podName);
+      await getMetricsForPod(this.$state.params.endpointId, this.state.transition.namespace, this.state.transition.podName);
     } catch (error) {
       this.state.getMetrics = false;
       this.state.viewReady = true;

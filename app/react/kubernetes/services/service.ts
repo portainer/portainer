@@ -6,8 +6,11 @@ import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
-
-import { Service } from './types';
+import {
+  NodeMetrics,
+  NodeMetric,
+  Service,
+} from '@/react/kubernetes/services/types';
 
 export const queryKeys = {
   clusterServices: (environmentId: EnvironmentId) =>
@@ -103,5 +106,69 @@ export async function deleteServices({
     );
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to delete service(s)');
+  }
+}
+
+export async function getMetricsForAllNodes(environmentId: EnvironmentId) {
+  try {
+    const { data: nodes } = await axios.get<NodeMetrics>(
+      `kubernetes/${environmentId}/metrics/nodes`,
+      {}
+    );
+    return nodes;
+  } catch (e) {
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve metrics for all nodes'
+    );
+  }
+}
+
+export async function getMetricsForNode(
+  environmentId: EnvironmentId,
+  nodeName: string
+) {
+  try {
+    const { data: node } = await axios.get<NodeMetric>(
+      `kubernetes/${environmentId}/metrics/nodes/${nodeName}`,
+      {}
+    );
+    return node;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for node');
+  }
+}
+
+export async function getMetricsForAllPods(
+  environmentId: EnvironmentId,
+  namespace: string
+) {
+  try {
+    const { data: pods } = await axios.get(
+      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}`,
+      {}
+    );
+    return pods;
+  } catch (e) {
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve metrics for all pods'
+    );
+  }
+}
+
+export async function getMetricsForPod(
+  environmentId: EnvironmentId,
+  namespace: string,
+  podName: string
+) {
+  try {
+    const { data: pod } = await axios.get(
+      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}/${podName}`,
+      {}
+    );
+    return pod;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for pod');
   }
 }

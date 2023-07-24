@@ -3,17 +3,17 @@ import moment from 'moment';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { PORTAINER_FADEOUT } from '@/constants';
+import { getMetricsForNode } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesNodeStatsController {
   /* @ngInject */
-  constructor($async, $state, $interval, $document, Notifications, KubernetesNodeService, KubernetesMetricsService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesNodeService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
     this.$document = $document;
     this.Notifications = Notifications;
     this.KubernetesNodeService = KubernetesNodeService;
-    this.KubernetesMetricsService = KubernetesMetricsService;
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
@@ -79,7 +79,7 @@ class KubernetesNodeStatsController {
   getStats() {
     return this.$async(async () => {
       try {
-        const stats = await this.KubernetesMetricsService.getNode(this.state.transition.nodeName);
+        const stats = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
         if (stats) {
           const memory = filesizeParser(stats.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
@@ -111,7 +111,7 @@ class KubernetesNodeStatsController {
     };
 
     try {
-      const nodeMetrics = await this.KubernetesMetricsService.getNode(this.state.transition.nodeName);
+      const nodeMetrics = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
 
       if (nodeMetrics) {
         const node = await this.KubernetesNodeService.get(this.state.transition.nodeName);

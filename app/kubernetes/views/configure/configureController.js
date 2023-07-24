@@ -11,23 +11,13 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { confirm } from '@@/modals/confirm';
 import { getIsRBACEnabled } from '@/react/kubernetes/cluster/getIsRBACEnabled';
 import { ModalType } from '@@/modals/Modal/types';
+import { getMetricsForAllNodes } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
   /* @ngInject */
-  constructor(
-    $async,
-    $state,
-    $scope,
-    Notifications,
-    KubernetesStorageService,
-    EndpointService,
-    EndpointProvider,
-    KubernetesResourcePoolService,
-    KubernetesIngressService,
-    KubernetesMetricsService
-  ) {
+  constructor($async, $state, $scope, Notifications, KubernetesStorageService, EndpointService, EndpointProvider, KubernetesResourcePoolService, KubernetesIngressService) {
     this.$async = $async;
     this.$state = $state;
     this.$scope = $scope;
@@ -37,7 +27,6 @@ class KubernetesConfigureController {
     this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
-    this.KubernetesMetricsService = KubernetesMetricsService;
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
 
@@ -192,24 +181,26 @@ class KubernetesConfigureController {
   }
 
   enableMetricsServer() {
-    if (this.formValues.UseServerMetrics) {
-      this.state.metrics.userClick = true;
-      this.state.metrics.pending = true;
-      this.KubernetesMetricsService.capabilities(this.endpoint.Id)
-        .then(() => {
+    return this.$async(async () => {
+      if (this.formValues.UseServerMetrics) {
+        this.state.metrics.userClick = true;
+        this.state.metrics.pending = true;
+        try {
+          await getMetricsForAllNodes(this.endpoint.Id);
           this.state.metrics.isServerRunning = true;
           this.state.metrics.pending = false;
+          this.state.metrics.userClick = false;
           this.formValues.UseServerMetrics = true;
-        })
-        .catch(() => {
+        } catch (_) {
           this.state.metrics.isServerRunning = false;
           this.state.metrics.pending = false;
           this.formValues.UseServerMetrics = false;
-        });
-    } else {
-      this.state.metrics.userClick = false;
-      this.formValues.UseServerMetrics = false;
-    }
+        }
+      } else {
+        this.state.metrics.userClick = false;
+        this.formValues.UseServerMetrics = false;
+      }
+    });
   }
 
   async configureAsync() {

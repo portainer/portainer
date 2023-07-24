@@ -39,3 +39,24 @@ export type Service = {
   CreationTimestamp: string;
   Applications?: Application[];
 };
+
+export type NodeMetrics = {
+  items: NodeMetric[];
+};
+
+export type NodeMetric = {
+  metadata: NodeMetricMetadata;
+  timestamp: Date;
+  usage: Usage;
+  window: string;
+};
+
+export type NodeMetricMetadata = {
+  creationTimestamp: Date;
+  name: string;
+};
+
+export type Usage = {
+  cpu: string;
+  memory: string;
+};

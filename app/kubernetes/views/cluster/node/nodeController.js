@@ -9,6 +9,7 @@ import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubern
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 import { confirmUpdateNode } from '@/react/kubernetes/cluster/NodeView/ConfirmUpdateNode';
+import { getMetricsForNode } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -22,7 +23,6 @@ class KubernetesNodeController {
     KubernetesPodService,
     KubernetesApplicationService,
     KubernetesEndpointService,
-    KubernetesMetricsService,
     Authentication
   ) {
     this.$async = $async;
@@ -34,7 +34,6 @@ class KubernetesNodeController {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEndpointService = KubernetesEndpointService;
-    this.KubernetesMetricsService = KubernetesMetricsService;
     this.Authentication = Authentication;
 
     this.onInit = this.onInit.bind(this);
@@ -300,7 +299,7 @@ class KubernetesNodeController {
   async getNodeUsageAsync() {
     try {
       const nodeName = this.$transition$.params().name;
-      const node = await this.KubernetesMetricsService.getNode(nodeName);
+      const node = await getMetricsForNode(this.$state.params.endpointId, nodeName);
       this.resourceUsage = new KubernetesResourceReservation();
       this.resourceUsage.CPU = KubernetesResourceReservationHelper.parseCPU(node.usage.cpu);
       this.resourceUsage.Memory = KubernetesResourceReservationHelper.megaBytesValue(node.usage.memory);
