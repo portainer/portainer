@@ -189,7 +189,7 @@ class KubernetesConfigureController {
           await getMetricsForAllNodes(this.endpoint.Id);
           this.state.metrics.isServerRunning = true;
           this.state.metrics.pending = false;
-          this.state.metrics.userClick = false;
+          this.state.metrics.userClick = true;
           this.formValues.UseServerMetrics = true;
         } catch (_) {
           this.state.metrics.isServerRunning = false;
