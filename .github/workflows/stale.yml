@@ -9,7 +9,7 @@ jobs:
       issues: write
 
     steps:
-    - uses: actions/stale@v4.0.0
+    - uses: actions/stale@v8
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
