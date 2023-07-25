@@ -90,7 +90,10 @@ func (service *service) upgradeDocker(licenseKey, version, envType string) error
 }
 
 func (service *service) checkImageForDocker(ctx context.Context, image string, skipPullImage bool) error {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := client.NewClientWithOpts(
+		client.FromEnv,
+		client.WithAPIVersionNegotiation(),
+	)
 	if err != nil {
 		return errors.Wrap(err, "failed to create docker client")
 	}
