@@ -17,6 +17,7 @@ class KubernetesNodeStatsController {
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
+    this.initCharts = this.initCharts.bind(this);
   }
 
   changeUpdateRepeater() {
@@ -84,7 +85,7 @@ class KubernetesNodeStatsController {
           const memory = filesizeParser(stats.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
           this.stats = {
-            read: stats.creationTimestamp,
+            read: stats.metadata.creationTimestamp,
             MemoryUsage: memory,
             CPUUsage: (cpu / this.nodeCPU) * 100,
           };
@@ -118,12 +119,6 @@ class KubernetesNodeStatsController {
         this.nodeCPU = node.CPU || 1;
 
         await this.getStats();
-
-        if (this.state.getMetrics) {
-          this.$document.ready(() => {
-            this.initCharts();
-          });
-        }
       } else {
         this.state.getMetrics = false;
       }
@@ -132,6 +127,11 @@ class KubernetesNodeStatsController {
       this.Notifications.error('Failure', err, 'Unable to retrieve node stats');
     } finally {
       this.state.viewReady = true;
+      if (this.state.getMetrics) {
+        this.$document.ready(() => {
+          this.initCharts();
+        });
+      }
     }
   }
 
