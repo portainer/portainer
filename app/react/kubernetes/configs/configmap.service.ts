@@ -9,6 +9,7 @@ import {
   notifySuccess,
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
+import { pluralize } from '@/portainer/helpers/strings';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -104,7 +105,10 @@ export function useMutationDeleteConfigMaps(environmentId: EnvironmentId) {
         // show one summary message for all successful deletes
         if (successfulConfigMaps.length) {
           notifySuccess(
-            'ConfigMaps successfully removed',
+            `${pluralize(
+              successfulConfigMaps.length,
+              'ConfigMap'
+            )} successfully removed`,
             successfulConfigMaps.join(', ')
           );
         }

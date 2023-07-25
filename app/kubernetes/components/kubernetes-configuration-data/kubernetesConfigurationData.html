@@ -14,9 +14,13 @@
       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
       Switch to advanced mode to copy and paste multiple key/values
     </div>
-    <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple">
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple && $ctrl.type === 'configmap'">
       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-      Generate a configuration entry per line, use YAML format
+      Generate a ConfigMap entry per line, use YAML format
+    </div>
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple && $ctrl.type === 'secret'">
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+      Generate a Secret entry per line, use YAML format
     </div>
   </div>
 
