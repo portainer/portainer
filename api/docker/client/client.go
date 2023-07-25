@@ -57,20 +57,20 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeNam
 func createLocalClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 	return client.NewClientWithOpts(
 		client.WithHost(endpoint.URL),
-		client.WithVersion(dockerClientVersion),
+		client.WithAPIVersionNegotiation(),
 	)
 }
 
 func CreateClientFromEnv() (*client.Client, error) {
 	return client.NewClientWithOpts(
 		client.FromEnv,
-		client.WithVersion(dockerClientVersion),
+		client.WithAPIVersionNegotiation(),
 	)
 }
 
 func CreateSimpleClient() (*client.Client, error) {
 	return client.NewClientWithOpts(
-		client.WithVersion(dockerClientVersion),
+		client.WithAPIVersionNegotiation(),
 	)
 }
 
@@ -82,7 +82,7 @@ func createTCPClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*cli
 
 	return client.NewClientWithOpts(
 		client.WithHost(endpoint.URL),
-		client.WithVersion(dockerClientVersion),
+		client.WithAPIVersionNegotiation(),
 		client.WithHTTPClient(httpCli),
 	)
 }
@@ -116,7 +116,7 @@ func createEdgeClient(endpoint *portainer.Endpoint, signatureService portainer.D
 
 	return client.NewClientWithOpts(
 		client.WithHost(endpointURL),
-		client.WithVersion(dockerClientVersion),
+		client.WithAPIVersionNegotiation(),
 		client.WithHTTPClient(httpCli),
 		client.WithHTTPHeaders(headers),
 	)
@@ -144,7 +144,7 @@ func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.
 
 	return client.NewClientWithOpts(
 		client.WithHost(endpoint.URL),
-		client.WithVersion(dockerClientVersion),
+		client.WithAPIVersionNegotiation(),
 		client.WithHTTPClient(httpCli),
 		client.WithHTTPHeaders(headers),
 	)
