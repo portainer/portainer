@@ -22,7 +22,7 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesClusterSetupForm">
-            <div class="col-sm-12 form-section-title"> Networking </div>
+            <div class="col-sm-12 form-section-title"> Networking - Services </div>
 
             <div class="form-group">
               <div class="col-sm-12 text-muted small">
@@ -41,6 +41,8 @@
               </div>
             </div>
 
+            <div class="col-sm-12 form-section-title"> Networking - Ingresses </div>
+
             <ingress-class-datatable
               on-change-controllers="(ctrl.onChangeControllers)"
               allow-none-ingress-class="ctrl.formValues.AllowNoneIngressClass"
@@ -51,47 +53,57 @@
               view="'cluster'"
             ></ingress-class-datatable>
 
-            <label htmlFor="foldingButtonIngControllerSettings" class="col-sm-12 form-section-title flex cursor-pointer items-center">
-              <button
-                id="foldingButtonIngControllerSettings"
-                type="button"
-                class="mx-2 !ml-0 inline-flex w-2 items-center justify-center border-0 bg-transparent"
-                ng-click="ctrl.toggleAdvancedIngSettings($event)"
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.formValues.AllowNoneIngressClass"
+                  name="'allowNoIngressClass'"
+                  label="'Allow ingress class to be set to &quot;none&quot;'"
+                  tooltip="'This allows users setting up ingresses to select &quot;none&quot; as the ingress class.'"
+                  on-change="(ctrl.onToggleAllowNoneIngressClass)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8'"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.formValues.IngressAvailabilityPerNamespace"
+                  name="'ingressAvailabilityPerNamespace'"
+                  label="'Configure ingress controller availability per namespace'"
+                  tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
+                  on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8'"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.formValues.RestrictStandardUserIngressW"
+                  name="'restrictStandardUserIngressW'"
+                  label="'Only allow admins to deploy ingresses'"
+                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
+                  on-change="(ctrl.onToggleRestrictStandardUserIngressW)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
+                  disabled="!ctrl.isRBACEnabled"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+
+            <div class="mb-4 !inline-flex gap-1 !align-top">
+              <div class="icon icon-sm"><pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon></div>
+              <div class="text-muted small"
+                >You may set up ingress defaults (hostnames and annotations) via Create ingress. Users may then select them via the hostname dropdown in Create/Edit
+                application.</div
               >
-                <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" icon="'chevron-right'"></pr-icon>
-                <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" icon="'chevron-down'"></pr-icon>
-              </button>
-              More settings
-            </label>
-            <div ng-if="ctrl.state.isIngToggleSectionExpanded" class="ml-4">
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <por-switch-field
-                    checked="ctrl.formValues.AllowNoneIngressClass"
-                    name="'allowNoIngressClass'"
-                    label="'Allow ingress class to be set to &quot;none&quot;'"
-                    tooltip="'This allows users setting up ingresses to select &quot;none&quot; as the ingress class.'"
-                    on-change="(ctrl.onToggleAllowNoneIngressClass)"
-                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                    switch-class="'col-sm-8'"
-                  >
-                  </por-switch-field>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <por-switch-field
-                    checked="ctrl.formValues.IngressAvailabilityPerNamespace"
-                    name="'ingressAvailabilityPerNamespace'"
-                    label="'Configure ingress controller availability per namespace'"
-                    tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
-                    on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
-                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                    switch-class="'col-sm-8'"
-                  >
-                  </por-switch-field>
-                </div>
-              </div>
             </div>
 
             <!-- auto update window -->
@@ -160,19 +172,6 @@
                   disabled="!ctrl.isRBACEnabled"
                 >
                 </por-switch-field>
-              </div>
-
-              <div class="col-sm-12 mt-5">
-                <por-switch-field
-                  name="'restrictStandardUserIngressW'"
-                  label="'Only allow admins to deploy ingresses'"
-                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
-                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                  switch-class="'col-sm-8 text-muted'"
-                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
-                  feature-id="ctrl.limitedFeatureIngressDeploy"
-                  disabled="!ctrl.isRBACEnabled"
-                ></por-switch-field>
               </div>
             </div>
             <!-- #endregion -->
