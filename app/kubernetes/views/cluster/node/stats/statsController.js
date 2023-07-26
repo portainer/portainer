@@ -17,6 +17,7 @@ class KubernetesNodeStatsController {
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
+    this.initCharts = this.initCharts.bind(this);
   }
 
   changeUpdateRepeater() {
@@ -63,17 +64,20 @@ class KubernetesNodeStatsController {
   }
 
   initCharts() {
-    const cpuChartCtx = $('#cpuChart');
-    const cpuChart = this.ChartService.CreateCPUChart(cpuChartCtx);
-    this.cpuChart = cpuChart;
-
-    const memoryChartCtx = $('#memoryChart');
-    const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
-    this.memoryChart = memoryChart;
-
-    this.updateCPUChart();
-    this.updateMemoryChart();
-    this.setUpdateRepeater();
+    const findCharts = setInterval(() => {
+      let cpuChartCtx = $('#cpuChart');
+      let memoryChartCtx = $('#memoryChart');
+      if (cpuChartCtx.length !== 0 && memoryChartCtx.length !== 0) {
+        const cpuChart = this.ChartService.CreateCPUChart(cpuChartCtx);
+        this.cpuChart = cpuChart;
+        const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
+        this.memoryChart = memoryChart;
+        this.updateCPUChart();
+        this.updateMemoryChart();
+        this.setUpdateRepeater();
+        clearInterval(findCharts);
+      }
+    }, 200);
   }
 
   getStats() {
@@ -84,7 +88,7 @@ class KubernetesNodeStatsController {
           const memory = filesizeParser(stats.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
           this.stats = {
-            read: stats.creationTimestamp,
+            read: stats.metadata.creationTimestamp,
             MemoryUsage: memory,
             CPUUsage: (cpu / this.nodeCPU) * 100,
           };
@@ -118,12 +122,6 @@ class KubernetesNodeStatsController {
         this.nodeCPU = node.CPU || 1;
 
         await this.getStats();
-
-        if (this.state.getMetrics) {
-          this.$document.ready(() => {
-            this.initCharts();
-          });
-        }
       } else {
         this.state.getMetrics = false;
       }
@@ -132,6 +130,11 @@ class KubernetesNodeStatsController {
       this.Notifications.error('Failure', err, 'Unable to retrieve node stats');
     } finally {
       this.state.viewReady = true;
+      if (this.state.getMetrics) {
+        this.$document.ready(() => {
+          this.initCharts();
+        });
+      }
     }
   }
 

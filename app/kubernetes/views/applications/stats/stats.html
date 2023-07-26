@@ -26,95 +26,93 @@
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div ng-if="ctrl.state.viewReady">
-  <information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
-    <span class="small text-warning vertical-center">
-      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-      Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
-      configured.
-    </span>
-  </information-panel>
-  <div class="row" ng-if="ctrl.state.getMetrics">
-    <div class="col-md-12">
-      <rd-widget>
-        <div class="toolBar px-5 pt-5">
-          <div class="toolBarTitle flex">
-            <div class="widget-icon space-right">
-              <pr-icon icon="'info'"></pr-icon>
-            </div>
-            <span class="vertical-center"> About statistics </span>
+<information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
+  <span class="small text-warning vertical-center">
+    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+    Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
+    configured.
+  </span>
+</information-panel>
+<div class="row" ng-if="ctrl.state.getMetrics">
+  <div class="col-md-12">
+    <rd-widget>
+      <div class="toolBar px-5 pt-5">
+        <div class="toolBarTitle flex">
+          <div class="widget-icon space-right">
+            <pr-icon icon="'info'"></pr-icon>
           </div>
+          <span class="vertical-center"> About statistics </span>
         </div>
-        <rd-widget-body>
-          <form class="form-horizontal">
-            <div class="form-group">
-              <div class="col-sm-12">
-                <span class="small text-warning">
-                  This view displays real-time statistics about the container <b>{{ ctrl.state.transition.containerName | trimcontainername }}</b
-                  >.
-                </span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left"> Refresh rate </label>
-              <div class="col-sm-3 col-md-2">
-                <select id="refreshRate" ng-model="ctrl.state.refreshRate" ng-change="ctrl.changeUpdateRepeater()" class="form-control">
-                  <option value="30">30s</option>
-                  <option value="60">60s</option>
-                </select>
-              </div>
-              <span>
-                <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" size="'sm'"></pr-icon>
+      </div>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-warning">
+                This view displays real-time statistics about the container <b>{{ ctrl.state.transition.containerName | trimcontainername }}</b
+                >.
               </span>
             </div>
-            <div class="form-group" ng-if="ctrl.state.networkStatsUnavailable">
-              <div class="col-sm-12">
-                <span class="small text-muted">
-                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                  Network stats are unavailable for this container.
-                </span>
-              </div>
+          </div>
+          <div class="form-group">
+            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left"> Refresh rate </label>
+            <div class="col-sm-3 col-md-2">
+              <select id="refreshRate" ng-model="ctrl.state.refreshRate" ng-change="ctrl.changeUpdateRepeater()" class="form-control">
+                <option value="30">30s</option>
+                <option value="60">60s</option>
+              </select>
             </div>
-          </form>
-        </rd-widget-body>
-      </rd-widget>
-    </div>
+            <span>
+              <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" size="'sm'"></pr-icon>
+            </span>
+          </div>
+          <div class="form-group" ng-if="ctrl.state.networkStatsUnavailable">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                Network stats are unavailable for this container.
+              </span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
   </div>
+</div>
 
-  <div class="row" ng-if="ctrl.state.getMetrics">
-    <div class="col-lg-6 col-md-12 col-sm-12">
-      <rd-widget>
-        <div class="toolBar px-5 pt-5">
-          <div class="toolBarTitle flex">
-            <div class="widget-icon space-right">
-              <pr-icon icon="'svg-memory'"></pr-icon>
-            </div>
-            <span class="vertical-center"> Memory usage </span>
+<div class="row" ng-if="ctrl.state.getMetrics">
+  <div class="col-lg-6 col-md-12 col-sm-12">
+    <rd-widget>
+      <div class="toolBar px-5 pt-5">
+        <div class="toolBarTitle flex">
+          <div class="widget-icon space-right">
+            <pr-icon icon="'svg-memory'"></pr-icon>
           </div>
+          <span class="vertical-center"> Memory usage </span>
         </div>
-        <rd-widget-body>
-          <div class="chart-container" style="position: relative">
-            <canvas id="memoryChart" width="770" height="300"></canvas>
-          </div>
-        </rd-widget-body>
-      </rd-widget>
-    </div>
-    <div class="col-lg-6 col-md-12 col-sm-12" ng-if="!ctrl.state.networkStatsUnavailable">
-      <rd-widget>
-        <div class="toolBar px-5 pt-5">
-          <div class="toolBarTitle flex">
-            <div class="widget-icon space-right">
-              <pr-icon icon="'cpu'"></pr-icon>
-            </div>
-            <span class="vertical-center"> CPU usage </span>
-          </div>
+      </div>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative">
+          <canvas id="memoryChart" width="770" height="300"></canvas>
         </div>
-        <rd-widget-body>
-          <div class="chart-container" style="position: relative">
-            <canvas id="cpuChart" width="770" height="300"></canvas>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-6 col-md-12 col-sm-12" ng-if="!ctrl.state.networkStatsUnavailable">
+    <rd-widget>
+      <div class="toolBar px-5 pt-5">
+        <div class="toolBarTitle flex">
+          <div class="widget-icon space-right">
+            <pr-icon icon="'cpu'"></pr-icon>
           </div>
-        </rd-widget-body>
-      </rd-widget>
-    </div>
+          <span class="vertical-center"> CPU usage </span>
+        </div>
+      </div>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative">
+          <canvas id="cpuChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
   </div>
 </div>

@@ -19,6 +19,7 @@ class KubernetesApplicationStatsController {
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
+    this.initCharts = this.initCharts.bind(this);
   }
 
   changeUpdateRepeater() {
@@ -68,17 +69,26 @@ class KubernetesApplicationStatsController {
   }
 
   initCharts() {
-    const cpuChartCtx = $('#cpuChart');
-    const cpuChart = this.ChartService.CreateCPUChart(cpuChartCtx);
-    this.cpuChart = cpuChart;
-
-    const memoryChartCtx = $('#memoryChart');
-    const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
-    this.memoryChart = memoryChart;
-
-    this.updateCPUChart();
-    this.updateMemoryChart();
-    this.setUpdateRepeater();
+    let i = 0;
+    const findCharts = setInterval(() => {
+      let cpuChartCtx = $('#cpuChart');
+      let memoryChartCtx = $('#memoryChart');
+      if (cpuChartCtx.length !== 0 && memoryChartCtx.length !== 0) {
+        const cpuChart = this.ChartService.CreateCPUChart(cpuChartCtx);
+        this.cpuChart = cpuChart;
+        const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
+        this.memoryChart = memoryChart;
+        this.updateCPUChart();
+        this.updateMemoryChart();
+        this.setUpdateRepeater();
+        clearInterval(findCharts);
+        return;
+      }
+      i++;
+      if (i >= 10) {
+        clearInterval(findCharts);
+      }
+    }, 200);
   }
 
   getStats() {
