@@ -1,54 +1,149 @@
----
-name: Bug report
-about: Create a bug report
-title: ''
-labels: bug/need-confirmation, kind/bug
-assignees: ''
----
+name: Bug Report
+description: Create a report to help us improve.
+labels: kind/bug,bug/need-confirmation
+body:
 
-<!--
+  - type: markdown
+    attributes:
+      value: |
+        # Welcome!
+        
+        The issue tracker is for reporting bugs. If you have an [idea for a new feature](https://github.com/samdulam/dashy/discussions/categories/ideas) or a [general question about Portainer](https://github.com/samdulam/dashy/discussions/categories/help) please post in our [GitHub Discussions](https://github.com/samdulam/dashy/discussions).
+        
+        You can also ask for help in our [community Slack channel](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA).
+        
+        **DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS**.
 
-Thanks for reporting a bug for Portainer !
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before you start please confirm the following.
+      options:
+        - label: Yes, I've searched similar issues on [GitHub](https://github.com/portainer/portainer/issues).
+          required: true
+        - label: Yes, I've checked whether this issue is covered in the Portainer [documentation](https://docs.portainer.io) or [knowledge base](https://portal.portainer.io/knowledge).
+          required: true
 
-You can find more information about Portainer support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+  - type: markdown
+    attributes:
+      value: |
+        # About your issue
 
-Do you need help or have a question? Come chat with us on Slack https://portainer.io/slack/
+        Tell us a bit about the issue you're having.
 
-Before opening a new issue, make sure that we do not have any duplicates
-already open. You can ensure this by searching the issue list for this
-repository. If there is a duplicate, please close your issue and add a comment
-to the existing issue instead.
+        How to write a good bug report:
 
-Also, be sure to check our FAQ and documentation first: https://documentation.portainer.io/
--->
+        - Respect the issue template as much as possible.
+        - Summarize the issue so that we understand what is going wrong.
+        - Describe what you would have expected to have happened, and what actually happened instead.
+        - Provide easy to follow steps to reproduce the issue. 
+        - Remain clear and concise.
+        - Format your messages to help the reader focus on what matters and understand the structure of your message, use [Markdown syntax](https://help.github.com/articles/github-flavored-markdown).
 
-**Bug description**
-A clear and concise description of what the bug is.
+  - type: textarea
+    attributes:
+      label: Problem Description
+      description: A clear and concise description of what the bug is. 
+    validations:
+      required: true
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
 
-**Portainer Logs**
-Provide the logs of your Portainer container or Service.
-You can see how [here](https://documentation.portainer.io/r/portainer-logs)
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: A clear and concise description of what actually happens.
+    validations:
+      required: true
 
-**Steps to reproduce the issue:**
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Please be as detailed as possible when providing steps to reproduce.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error   
+    validations:
+      required: true
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+  - type: textarea
+    attributes:
+      label: Portainer logs or screenshots
+      description: Provide Portainer container logs or any screenshots related to the issue.
+    validations:
+      required: false
 
-**Technical details:**
+  - type: markdown
+    attributes:
+      value: |
+        # About your environment
 
-- Portainer version:
-- Docker version (managed by Portainer):
-- Kubernetes version (managed by Portainer):
-- Platform (windows/linux):
-- Command used to start Portainer (`docker run -p 9443:9443 portainer/portainer`):
-- Browser:
-- Use Case (delete as appropriate): Using Portainer at Home, Using Portainer in a Commercial setup.
-- Have you reviewed our technical documentation and knowledge base? Yes/No
+        Tell us a bit about your Portainer environment.
 
-**Additional context**
-Add any other context about the problem here.
+  - type: input
+    attributes:
+      label: Enter your Portainer version
+      description: |
+        Enter a valid Portainer version. Example: 2.18.4
+        We only provide support for the most recent version of Portainer and the previous 3 versions. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
+    validations:
+      required: false
+
+  - type: dropdown
+    attributes:
+      label: Portainer Edition
+      multiple: false
+      options:
+        - 'Business Edition (BE/EE)'
+        - 'Community Edition (CE)'
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Platform and Version
+      description: |
+        Enter your container management platform (Docker | Swarm | Kubernetes) along with the version. 
+        Example: Docker 24.0.3 | Docker Swarm 24.0.3 | Kubernetes 1.26
+        You can find our supported platforms [in our documentation](https://docs.portainer.io/start/requirements-and-prerequisites).
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: OS and Architecture
+      description: |
+        Enter your Operating System, Version and Architecture. Example: Ubuntu 22.04, AMD64 | Raspbian OS, ARM64
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Browser
+      description: | 
+        Enter your browser and version. Example: Google Chrome 114.0
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: What command did you use to deploy Portainer?
+      description: |
+        Example: `docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest`
+        If you deployed Portainer using a compose file or manifest you can provide this here as well.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Any additional information about your environment, the bug, or anything else you think might be helpful.
+    validations:
+      required: false
