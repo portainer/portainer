@@ -69,6 +69,7 @@ class KubernetesApplicationStatsController {
   }
 
   initCharts() {
+    let i = 0;
     const findCharts = setInterval(() => {
       let cpuChartCtx = $('#cpuChart');
       let memoryChartCtx = $('#memoryChart');
@@ -80,6 +81,11 @@ class KubernetesApplicationStatsController {
         this.updateCPUChart();
         this.updateMemoryChart();
         this.setUpdateRepeater();
+        clearInterval(findCharts);
+        return;
+      }
+      i++;
+      if (i >= 10) {
         clearInterval(findCharts);
       }
     }, 200);
