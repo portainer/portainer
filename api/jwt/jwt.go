@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/gorilla/securecookie"
+	"github.com/portainer/portainer/api/internal/securecookie"
 	"github.com/rs/zerolog/log"
 )
 
