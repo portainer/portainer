@@ -8,7 +8,7 @@ body:
       value: |
         # Welcome!
         
-        The issue tracker is for reporting bugs. If you have an [idea for a new feature](https://github.com/samdulam/dashy/discussions/categories/ideas) or a [general question about Portainer](https://github.com/samdulam/dashy/discussions/categories/help) please post in our [GitHub Discussions](https://github.com/samdulam/dashy/discussions).
+        The issue tracker is for reporting bugs. If you have an [idea for a new feature](https://github.com/orgs/portainer/discussions/categories/ideas) or a [general question about Portainer](https://github.com/orgs/portainer/discussions/categories/help) please post in our [GitHub Discussions](https://github.com/orgs/portainer/discussions).
         
         You can also ask for help in our [community Slack channel](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA).
         
