@@ -87,21 +87,35 @@ body:
 
         Tell us a bit about your Portainer environment.
 
-  - type: input
+    - type: dropdown
     attributes:
-      label: Enter your Portainer version
-      description: |
-        Enter a valid Portainer version. Example: 2.18.4
-        We only provide support for the most recent version of Portainer and the previous 3 versions. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
+      label: Portainer version
+      description: We only provide support for the most recent version of Portainer and the previous 3 versions. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
+      multiple: false
+      options:
+        - '2.18.4'
+        - '2.18.3'
+        - '2.18.2'
+        - '2.18.1'
+        - '2.17.1'
+        - '2.17.0'
+        - '2.16.2'
+        - '2.16.1'
+        - '2.16.0'
+        - '2.15.1'
+        - '2.15.0'
     validations:
-      required: false
+      required: true
 
   - type: dropdown
     attributes:
       label: Portainer Edition
       multiple: false
       options:
-        - 'Business Edition (BE/EE)'
+        - 'Business Edition (BE/EE) with 5NF / 3NF license'
+        - 'Business Edition (BE/EE) with Home & Student license'
+        - 'Business Edition (BE/EE) with Starter license'
+        - 'Business Edition (BE/EE) with Professional or Enterprise license'
         - 'Community Edition (CE)'
     validations:
       required: true
@@ -138,6 +152,7 @@ body:
       description: |
         Example: `docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest`
         If you deployed Portainer using a compose file or manifest you can provide this here as well.
+      render: bash
     validations:
       required: false
 
