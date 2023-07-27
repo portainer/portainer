@@ -11,7 +11,7 @@ export function confirmDeleteAccess() {
           environment. Removing the registry access could lead to a service
           interruption for these applications.
         </p>
-        <p>Do you wish to continue?</p>
+        <p>Are you sure you wish to continue?</p>
       </>
     ),
     confirmButton: buildConfirmButton('Remove', 'danger'),
