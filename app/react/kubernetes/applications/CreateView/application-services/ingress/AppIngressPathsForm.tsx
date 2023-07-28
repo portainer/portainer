@@ -44,13 +44,10 @@ export function AppIngressPathsForm({
     namespace ? [namespace] : undefined
   );
   const { data: ingresses } = ingressesQuery;
-  const ingressControllersQuery = useIngressControllers(
-    environmentId,
-    namespace
-  );
-  const { data: ingressControllers } = ingressControllersQuery;
+  const { data: ingressControllers, ...ingressControllersQuery } =
+    useIngressControllers(environmentId, namespace);
 
-  // if some ingress controllers are restricted by namespace, then filter the ingresses that use allowed ingress controllers
+  // filter for the ingresses that use allowed ingress controllers
   const allowedIngressHostNameOptions = useMemo(() => {
     const allowedIngressClasses =
       ingressControllers

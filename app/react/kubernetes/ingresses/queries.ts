@@ -177,7 +177,8 @@ export function useDeleteIngresses() {
  */
 export function useIngressControllers(
   environmentId: EnvironmentId,
-  namespace?: string
+  namespace?: string,
+  cacheTime?: number
 ) {
   return useQuery(
     [
@@ -192,7 +193,7 @@ export function useIngressControllers(
       namespace ? getIngressControllers(environmentId, namespace) : [],
     {
       enabled: !!namespace,
-      cacheTime: 0,
+      cacheTime,
       ...withError('Unable to get ingress controllers'),
     }
   );
