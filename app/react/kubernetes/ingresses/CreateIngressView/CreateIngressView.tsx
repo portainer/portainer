@@ -68,7 +68,8 @@ export function CreateIngressView() {
   );
   const ingressControllersResults = useIngressControllers(
     environmentId,
-    namespace
+    namespace,
+    0
   );
 
   const createIngressMutation = useCreateIngress();
