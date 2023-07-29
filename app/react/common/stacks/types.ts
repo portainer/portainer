@@ -33,7 +33,7 @@ export enum StackStatus {
 export interface Stack {
   Id: number;
   Name: string;
-  Type: number;
+  Type: StackType;
   EndpointID: number;
   SwarmID: string;
   EntryPoint: string;

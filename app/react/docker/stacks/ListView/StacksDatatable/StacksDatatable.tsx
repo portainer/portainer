@@ -11,7 +11,7 @@ import { isExternalStack, isOrphanedStack } from '../../view-models/utils';
 import { TableActions } from './TableActions';
 import { TableSettingsMenus } from './TableSettingsMenus';
 import { createStore } from './store';
-import { columns } from './columns';
+import { useColumns } from './columns';
 import { DecoratedStack } from './types';
 
 const tableKey = 'docker_stacks';
@@ -20,12 +20,12 @@ const settingsStore = createStore(tableKey);
 export function StacksDatatable({
   onRemove,
   onReload,
-  // isImageNotificationEnabled,
+  isImageNotificationEnabled,
   dataset,
 }: {
   onRemove: (items: Array<DecoratedStack>) => void;
   onReload: () => void;
-  // isImageNotificationEnabled: boolean;
+  isImageNotificationEnabled: boolean;
   dataset: Array<DecoratedStack>;
 }) {
   const tableState = useTableState(settingsStore, tableKey);
@@ -35,6 +35,8 @@ export function StacksDatatable({
     'PortainerStackCreate',
     'PortainerStackDelete',
   ]);
+  const columns = useColumns(isImageNotificationEnabled);
+
   return (
     <Datatable<DecoratedStack>
       settingsManager={tableState}

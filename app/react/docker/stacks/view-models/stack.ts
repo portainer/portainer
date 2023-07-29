@@ -1,4 +1,4 @@
-import { Stack, StackStatus } from '@/react/common/stacks/types';
+import { Stack, StackStatus, StackType } from '@/react/common/stacks/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
@@ -9,7 +9,7 @@ import {
 export class StackViewModel {
   Id: number;
 
-  Type: number;
+  Type: StackType;
 
   Name: string;
 

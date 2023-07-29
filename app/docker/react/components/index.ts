@@ -143,7 +143,7 @@ const ngModule = angular
     'reactDockerStacksDatatable',
     r2a(withUIRouter(withCurrentUser(StacksDatatable)), [
       'dataset',
-      // 'isImageNotificationEnabled',
+      'isImageNotificationEnabled',
       'onReload',
       'onRemove',
     ])
