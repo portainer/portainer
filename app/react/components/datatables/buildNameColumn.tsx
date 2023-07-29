@@ -2,13 +2,16 @@ import { ColumnDef, CellContext } from '@tanstack/react-table';
 
 import { Link } from '@@/Link';
 
-export function buildNameColumn<T extends Record<string, unknown>>(
+import { DefaultType } from './types';
+import { defaultGetRowId } from './defaultGetRowId';
+
+export function buildNameColumn<T extends DefaultType>(
   nameKey: keyof T,
-  idKey: string,
   path: string,
-  idParam = 'id'
+  idParam = 'id',
+  idGetter: (row: T) => string = defaultGetRowId<T>
 ): ColumnDef<T> {
-  const cell = createCell<T>();
+  const cell = createCell();
 
   return {
     header: 'Name',
@@ -19,7 +22,7 @@ export function buildNameColumn<T extends Record<string, unknown>>(
     enableHiding: false,
   };
 
-  function createCell<T extends Record<string, unknown>>() {
+  function createCell() {
     return function NameCell({ renderValue, row }: CellContext<T, unknown>) {
       const name = renderValue() || '';
 
@@ -30,7 +33,7 @@ export function buildNameColumn<T extends Record<string, unknown>>(
       return (
         <Link
           to={path}
-          params={{ [idParam]: row.original[idKey] }}
+          params={{ [idParam]: idGetter(row.original) }}
           title={name}
         >
           {name}

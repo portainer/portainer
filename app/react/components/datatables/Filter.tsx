@@ -8,6 +8,8 @@ import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 
 import { Icon } from '@@/Icon';
 
+import { DefaultType } from './types';
+
 interface MultipleSelectionFilterProps {
   options: string[];
   value: string[];
@@ -70,9 +72,7 @@ export function MultipleSelectionFilter({
   }
 }
 
-export function filterHOC<TData extends Record<string, unknown>>(
-  menuTitle: string
-) {
+export function filterHOC<TData extends DefaultType>(menuTitle: string) {
   return function Filter({
     column: { getFilterValue, setFilterValue, getFacetedRowModel, id },
   }: {

@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
-import { buildNameColumn } from '@@/datatables/NameCell';
+import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { Link } from '@@/Link';
 
 import { StatusType } from '../../types';
@@ -16,12 +16,7 @@ import { DeploymentCounter } from './DeploymentCounter';
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
 export const columns = _.compact([
-  buildNameColumn<DecoratedEdgeStack>(
-    'Name',
-    'Id',
-    'edge.stacks.edit',
-    'stackId'
-  ),
+  buildNameColumn<DecoratedEdgeStack>('Name', 'edge.stacks.edit', 'stackId'),
   columnHelper.accessor(
     (item) => item.aggregatedStatus[StatusType.Acknowledged] || 0,
     {

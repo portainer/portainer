@@ -2,15 +2,16 @@ import { ReactNode } from 'react';
 import { Row } from '@tanstack/react-table';
 
 import { TableRow } from './TableRow';
+import { DefaultType } from './types';
 
-interface Props<D extends Record<string, unknown>> {
+interface Props<D extends DefaultType> {
   row: Row<D>;
   disableSelect?: boolean;
   renderSubRow(row: Row<D>): ReactNode;
   expandOnClick?: boolean;
 }
 
-export function ExpandableDatatableTableRow<D extends Record<string, unknown>>({
+export function ExpandableDatatableTableRow<D extends DefaultType>({
   row,
   disableSelect,
   renderSubRow,

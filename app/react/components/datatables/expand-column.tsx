@@ -3,9 +3,9 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { Button } from '@@/buttons';
 
-export function buildExpandColumn<
-  T extends Record<string, unknown>
->(): ColumnDef<T> {
+import { DefaultType } from './types';
+
+export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
   return {
     id: 'expand',
     header: ({ table }) => {
