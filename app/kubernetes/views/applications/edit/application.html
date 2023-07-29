@@ -40,15 +40,11 @@
                 <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                 The placement component helps you understand whether or not this application can be deployed on a specific node.
               </div>
+
               <kubernetes-application-placements-datatable
-                title-text="Placement constraints/preferences"
-                title-icon="minimize-2"
+                ng-if="ctrl.placements"
                 dataset="ctrl.placements"
-                table-key="kubernetes.application.placements"
-                order-by="Name"
-                reverse-order="false"
-                loading="ctrl.state.dataLoading"
-                refresh-callback="ctrl.getApplication"
+                on-refresh="(ctrl.getApplication)"
               ></kubernetes-application-placements-datatable>
             </uib-tab>
 
