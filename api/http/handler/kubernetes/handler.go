@@ -31,7 +31,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubeClusterAccessService kubernetes.KubeClusterAccessService, kubernetesClientFactory *cli.ClientFactory, kubernetesClient portainer.KubeClient) *Handler {
+func NewHandler(bouncer security.BouncerService, authorizationService *authorization.Service, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubeClusterAccessService kubernetes.KubeClusterAccessService, kubernetesClientFactory *cli.ClientFactory, kubernetesClient portainer.KubeClient) *Handler {
 	h := &Handler{
 		Router:                   mux.NewRouter(),
 		authorizationService:     authorizationService,
@@ -53,6 +53,10 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	endpointRouter.Use(h.kubeClient)
 
 	endpointRouter.PathPrefix("/nodes_limits").Handler(httperror.LoggerHandler(h.getKubernetesNodesLimits)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/nodes").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForAllNodes)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/nodes/{name}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForNode)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/pods/namespace/{namespace}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForAllPods)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/pods/namespace/{namespace}/{name}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForPod)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getKubernetesIngressControllers)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllers)).Methods(http.MethodPut)
 	endpointRouter.Handle("/ingresses/delete", httperror.LoggerHandler(h.deleteKubernetesIngresses)).Methods(http.MethodPost)
@@ -166,22 +170,13 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 		singleEndpointList := []portainer.Endpoint{
 			*endpoint,
 		}
-		config, handlerErr := handler.buildConfig(
+		config := handler.buildConfig(
 			r,
 			tokenData,
 			bearerToken,
 			singleEndpointList,
 			true,
 		)
-		if err != nil {
-			httperror.WriteError(
-				w,
-				http.StatusInternalServerError,
-				"Unable to build endpoint kubeconfig",
-				handlerErr.Err,
-			)
-			return
-		}
 
 		if len(config.Clusters) == 0 {
 			httperror.WriteError(

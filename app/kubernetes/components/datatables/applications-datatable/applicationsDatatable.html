@@ -328,7 +328,19 @@
               </kubernetes-applications-datatable>
             </span>
             <span ng-if="!item.KubernetesApplications">
-              <kubernetes-applications-datatable-url ng-if="$ctrl.getPublishedUrl(item)" published-url="{{ $ctrl.getPublishedUrl(item) }}"></kubernetes-applications-datatable-url>
+              <div class="published-url-container">
+                <div>
+                  <div class="text-muted"> Published URL(s) </div>
+                </div>
+                <div>
+                  <div ng-repeat="url in $ctrl.getPublishedUrls(item)">
+                    <a ng-href="{{ url }}" target="_blank" class="publish-url-link vertical-center">
+                      <pr-icon icon="'external-link'"></pr-icon>
+                      {{ url }}
+                    </a>
+                  </div>
+                </div>
+              </div>
               <kubernetes-applications-datatable-details
                 ng-if="$ctrl.hasConfigurationSecrets(item)"
                 configurations="item.Configurations"

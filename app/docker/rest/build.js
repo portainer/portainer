@@ -1,16 +1,13 @@
+import { API_ENDPOINT_ENDPOINTS } from '@/constants';
 import { jsonObjectsToArrayHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('Build', [
   '$resource',
-  'API_ENDPOINT_ENDPOINTS',
-  'EndpointProvider',
-  function BuildFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function BuildFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/build',
-      {
-        endpointId: EndpointProvider.endpointID,
-      },
+      {},
       {
         buildImage: {
           method: 'POST',

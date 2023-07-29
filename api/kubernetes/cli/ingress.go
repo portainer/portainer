@@ -207,6 +207,16 @@ func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInf
 		})
 	}
 
+	// Add rules for hosts that does not have paths.
+	// e.g. dafault ingress rule without path to support what we had in 2.15
+	for _, host := range info.Hosts {
+		if _, ok := rules[host]; !ok {
+			ingress.Spec.Rules = append(ingress.Spec.Rules, netv1.IngressRule{
+				Host: host,
+			})
+		}
+	}
+
 	_, err := ingressClient.Create(context.Background(), &ingress, metav1.CreateOptions{})
 	return err
 }
@@ -277,6 +287,16 @@ func (kcl *KubeClient) UpdateIngress(namespace string, info models.K8sIngressInf
 				},
 			},
 		})
+	}
+
+	// Add rules for hosts that does not have paths.
+	// e.g. dafault ingress rule without path to support what we had in 2.15
+	for _, host := range info.Hosts {
+		if _, ok := rules[host]; !ok {
+			ingress.Spec.Rules = append(ingress.Spec.Rules, netv1.IngressRule{
+				Host: host,
+			})
+		}
 	}
 
 	_, err := ingressClient.Update(context.Background(), &ingress, metav1.UpdateOptions{})

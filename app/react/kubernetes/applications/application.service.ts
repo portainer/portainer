@@ -27,11 +27,14 @@ import { appRevisionAnnotation } from './constants';
 
 export async function getApplicationsForCluster(
   environmentId: EnvironmentId,
-  namespaces: string[]
+  namespaceNames?: string[]
 ) {
   try {
+    if (!namespaceNames) {
+      return [];
+    }
     const applications = await Promise.all(
-      namespaces.map((namespace) =>
+      namespaceNames.map((namespace) =>
         getApplicationsForNamespace(environmentId, namespace)
       )
     );
@@ -74,7 +77,7 @@ async function getApplicationsForNamespace(
   } catch (e) {
     throw parseAxiosError(
       e as Error,
-      `Unable to retrieve applications in namespace ${namespace}`
+      `Unable to retrieve applications in namespace '${namespace}'`
     );
   }
 }
@@ -145,7 +148,7 @@ export async function getApplication(
   } catch (e) {
     throw parseAxiosError(
       e as Error,
-      `Unable to retrieve application ${name} in namespace ${namespace}`
+      `Unable to retrieve application ${name} in namespace '${namespace}'`
     );
   }
 }
@@ -193,7 +196,7 @@ export async function patchApplication(
   } catch (e) {
     throw parseAxiosError(
       e as Error,
-      `Unable to patch application ${name} in namespace ${namespace}`
+      `Unable to patch application ${name} in namespace '${namespace}'`
     );
   }
 }

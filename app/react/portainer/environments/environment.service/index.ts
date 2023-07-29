@@ -3,6 +3,10 @@ import { type EnvironmentGroupId } from '@/react/portainer/environments/environm
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
+import {
+  EdgeStack,
+  StatusType as EdgeStackStatusType,
+} from '@/react/edge/edge-stacks/types';
 
 import type {
   Environment,
@@ -14,7 +18,16 @@ import type {
 
 import { buildUrl } from './utils';
 
-export interface EnvironmentsQueryParams {
+export type EdgeStackEnvironmentsQueryParams =
+  | {
+      edgeStackId?: EdgeStack['Id'];
+    }
+  | {
+      edgeStackId: EdgeStack['Id'];
+      edgeStackStatus?: EdgeStackStatusType;
+    };
+
+export interface BaseEnvironmentsQueryParams {
   search?: string;
   types?: EnvironmentType[] | readonly EnvironmentType[];
   tagIds?: TagId[];
@@ -32,6 +45,9 @@ export interface EnvironmentsQueryParams {
   edgeCheckInPassedSeconds?: number;
 }
 
+export type EnvironmentsQueryParams = BaseEnvironmentsQueryParams &
+  EdgeStackEnvironmentsQueryParams;
+
 export interface GetEnvironmentsOptions {
   start?: number;
   limit?: number;
@@ -47,7 +63,10 @@ export async function getEnvironments(
     query = {},
   }: GetEnvironmentsOptions = { query: {} }
 ) {
-  if (query.tagIds && query.tagIds.length === 0) {
+  if (
+    (query.tagIds && query.tagIds.length === 0) ||
+    (query.endpointIds && query.endpointIds.length === 0)
+  ) {
     return {
       totalCount: 0,
       value: <Environment[]>[],

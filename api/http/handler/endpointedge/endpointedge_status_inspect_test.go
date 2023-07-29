@@ -108,10 +108,10 @@ func mustSetupHandler(t *testing.T) *Handler {
 		security.NewRequestBouncer(store, jwtService, apiKeyService),
 		store,
 		fs,
-		chisel.NewService(store, shutdownCtx),
+		chisel.NewService(store, shutdownCtx, nil),
 	)
 
-	handler.ReverseTunnelService = chisel.NewService(store, shutdownCtx)
+	handler.ReverseTunnelService = chisel.NewService(store, shutdownCtx, nil)
 
 	return handler
 }
@@ -291,7 +291,7 @@ func TestEdgeStackStatus(t *testing.T) {
 		ID:   edgeStackID,
 		Name: "test-edge-stack-17",
 		Status: map[portainer.EndpointID]portainer.EdgeStackStatus{
-			endpointID: {Details: portainer.EdgeStackStatusDetails{Ok: true}, Error: "", EndpointID: endpoint.ID},
+			endpointID: {},
 		},
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     []portainer.EdgeGroupID{1, 2},

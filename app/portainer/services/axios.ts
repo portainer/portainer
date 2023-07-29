@@ -49,15 +49,22 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 
 axios.interceptors.request.use(agentInterceptor);
 
+/**
+ * Parses an Axios error and returns a PortainerError.
+ * @param err The original error.
+ * @param msg An optional error message to prepend.
+ * @param parseError A function to parse AxiosErrors. Defaults to defaultErrorParser.
+ * @returns A PortainerError with the parsed error message and details.
+ */
 export function parseAxiosError(
-  err: Error,
+  err: unknown,
   msg = '',
   parseError = defaultErrorParser
 ) {
   let resultErr = err;
   let resultMsg = msg;
 
-  if ('isAxiosError' in err) {
+  if (isAxiosError(err)) {
     const { error, details } = parseError(err as AxiosError);
     resultErr = error;
     if (msg && details) {
@@ -70,7 +77,7 @@ export function parseAxiosError(
   return new PortainerError(resultMsg, resultErr);
 }
 
-function defaultErrorParser(axiosError: AxiosError) {
+export function defaultErrorParser(axiosError: AxiosError) {
   const message = axiosError.response?.data.message || '';
   const details = axiosError.response?.data.details || message;
   const error = new Error(message);

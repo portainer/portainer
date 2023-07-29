@@ -39,7 +39,7 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 
 	customTemplate.CreatedByUserID = tokenData.ID
 
-	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
+	customTemplates, err := handler.DataStore.CustomTemplate().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 	}

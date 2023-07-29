@@ -15,6 +15,10 @@ import { TextTip } from '@@/Tip/TextTip';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { LoadingButton } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
+import {
+  EnvironmentVariablesPanel,
+  envVarValidation,
+} from '@@/form-components/EnvironmentVariablesFieldset';
 
 import { PrivateRegistryFieldsetWrapper } from './PrivateRegistryFieldsetWrapper';
 import { FormValues } from './types';
@@ -61,6 +65,7 @@ export function EditEdgeStackForm({
     prePullImage: edgeStack.PrePullImage,
     retryDeploy: edgeStack.RetryDeploy,
     webhookEnabled: !!edgeStack.Webhook,
+    envVars: edgeStack.EnvVars || [],
   };
 
   return (
@@ -181,25 +186,40 @@ function InnerForm({
             onFieldError={(error) => setFieldError('privateRegistryId', error)}
             error={errors.privateRegistryId}
           />
+
+          <EnvironmentVariablesPanel
+            onChange={(value) => setFieldValue('envVars', value)}
+            values={values.envVars}
+            errors={errors.envVars}
+          />
+
           {values.deploymentType === DeploymentType.Compose && (
             <>
-              <SwitchField
-                checked={values.prePullImage}
-                name="prePullImage"
-                label="Pre-pull images"
-                tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"
-                label-Class="col-sm-3 col-lg-2"
-                onChange={(value) => setFieldValue('prePullImage', value)}
-              />
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <SwitchField
+                    checked={values.prePullImage}
+                    name="prePullImage"
+                    label="Pre-pull images"
+                    tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"
+                    labelClass="col-sm-3 col-lg-2"
+                    onChange={(value) => setFieldValue('prePullImage', value)}
+                  />
+                </div>
+              </div>
 
-              <SwitchField
-                checked={values.retryDeploy}
-                name="retryDeploy"
-                label="Retry deployment"
-                tooltip="When enabled, this will allow edge agent keep retrying deployment if failure occur"
-                label-Class="col-sm-3 col-lg-2"
-                onChange={(value) => setFieldValue('retryDeploy', value)}
-              />
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <SwitchField
+                    checked={values.retryDeploy}
+                    name="retryDeploy"
+                    label="Retry deployment"
+                    tooltip="When enabled, this will allow edge agent keep retrying deployment if failure occur"
+                    labelClass="col-sm-3 col-lg-2"
+                    onChange={(value) => setFieldValue('retryDeploy', value)}
+                  />
+                </div>
+              </div>
             </>
           )}
         </>
@@ -263,5 +283,6 @@ function formValidation(): SchemaOf<FormValues> {
       .required()
       .min(1, 'At least one edge group is required'),
     webhookEnabled: boolean().default(false),
+    envVars: envVarValidation(),
   });
 }

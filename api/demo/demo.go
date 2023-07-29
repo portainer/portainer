@@ -73,7 +73,7 @@ func isCleanStore(store dataservices.DataStore) (bool, error) {
 		return false, nil
 	}
 
-	users, err := store.User().Users()
+	users, err := store.User().ReadAll()
 	if err != nil {
 		return false, err
 	}

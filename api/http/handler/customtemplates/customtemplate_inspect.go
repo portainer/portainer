@@ -32,7 +32,7 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid Custom template identifier route variable", err)
 	}
 
-	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
+	customTemplate, err := handler.DataStore.CustomTemplate().Read(portainer.CustomTemplateID(customTemplateID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a custom template with the specified identifier inside the database", err)
 	} else if err != nil {

@@ -29,7 +29,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage settings operations.
-func NewHandler(bouncer *security.RequestBouncer, demoService *demo.Service) *Handler {
+func NewHandler(bouncer security.BouncerService, demoService *demo.Service) *Handler {
 	h := &Handler{
 		Router:      mux.NewRouter(),
 		demoService: demoService,

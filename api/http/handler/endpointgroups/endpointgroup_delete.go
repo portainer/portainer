@@ -56,14 +56,14 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 }
 
 func (handler *Handler) deleteEndpointGroup(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID) error {
-	endpointGroup, err := tx.EndpointGroup().EndpointGroup(endpointGroupID)
+	endpointGroup, err := tx.EndpointGroup().Read(endpointGroupID)
 	if tx.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an environment group with the specified identifier inside the database", err)
 	}
 
-	err = tx.EndpointGroup().DeleteEndpointGroup(endpointGroupID)
+	err = tx.EndpointGroup().Delete(endpointGroupID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the environment group from the database", err)
 	}
@@ -103,14 +103,14 @@ func (handler *Handler) deleteEndpointGroup(tx dataservices.DataStoreTx, endpoin
 			continue
 		}
 
-		tag, err := tx.Tag().Tag(tagID)
+		tag, err := tx.Tag().Read(tagID)
 		if tx.IsErrObjectNotFound(err) {
 			return httperror.InternalServerError("Unable to find a tag inside the database", err)
 		}
 
 		delete(tag.EndpointGroups, endpointGroup.ID)
 
-		err = tx.Tag().UpdateTag(tagID, tag)
+		err = tx.Tag().Update(tagID, tag)
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist tag changes inside the database", err)
 		}

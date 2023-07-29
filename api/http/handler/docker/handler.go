@@ -20,7 +20,7 @@ import (
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).
 type Handler struct {
 	*mux.Router
-	requestBouncer       *security.RequestBouncer
+	requestBouncer       security.BouncerService
 	dataStore            dataservices.DataStore
 	dockerClientFactory  *dockerclient.ClientFactory
 	authorizationService *authorization.Service
@@ -28,7 +28,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to process non-proxied requests to docker APIs directly.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, dockerClientFactory *dockerclient.ClientFactory, containerService *docker.ContainerService) *Handler {
+func NewHandler(bouncer security.BouncerService, authorizationService *authorization.Service, dataStore dataservices.DataStore, dockerClientFactory *dockerclient.ClientFactory, containerService *docker.ContainerService) *Handler {
 	h := &Handler{
 		Router:               mux.NewRouter(),
 		requestBouncer:       bouncer,

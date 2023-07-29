@@ -1,16 +1,12 @@
-<files-datatable
-  title-text="Host browser - {{ $ctrl.getRelativePath() }}"
-  title-icon="file"
+<agent-host-browser-react
+  ng-if="$ctrl.files"
   dataset="$ctrl.files"
-  table-key="host_browser"
-  order-by="Dir"
   is-root="$ctrl.isRoot()"
-  go-to-parent="$ctrl.goToParent()"
-  browse="$ctrl.browse(name)"
-  rename="$ctrl.renameFile(name, newName)"
-  download="$ctrl.downloadFile(name)"
-  delete="$ctrl.confirmDeleteFile(name)"
-  is-upload-allowed="true"
+  on-go-to-parent="($ctrl.goToParent)"
+  relative-path="$ctrl.getRelativePath()"
+  on-browse="($ctrl.browse)"
+  on-rename="($ctrl.renameFile)"
+  on-download="($ctrl.downloadFile)"
+  on-delete="($ctrl.confirmDeleteFile)"
   on-file-selected-for-upload="($ctrl.onFileSelectedForUpload)"
->
-</files-datatable>
+></agent-host-browser-react>

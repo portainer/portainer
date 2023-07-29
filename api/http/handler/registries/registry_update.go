@@ -71,14 +71,14 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid registry identifier route variable", err)
 	}
 
-	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Read(portainer.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a registry with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find a registry with the specified identifier inside the database", err)
 	}
 
-	registries, err := handler.DataStore.Registry().Registries()
+	registries, err := handler.DataStore.Registry().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
@@ -177,7 +177,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		registry.Quay = *payload.Quay
 	}
 
-	err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
+	err = handler.DataStore.Registry().Update(registry.ID, registry)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist registry changes inside the database", err)
 	}

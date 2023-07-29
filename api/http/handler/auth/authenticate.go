@@ -156,7 +156,7 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 		return nil
 	}
 
-	teams, err := handler.DataStore.Team().Teams()
+	teams, err := handler.DataStore.Team().ReadAll()
 	if err != nil {
 		return err
 	}

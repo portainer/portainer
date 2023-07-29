@@ -3,15 +3,12 @@ package migrator
 import (
 	"errors"
 
-	"github.com/portainer/portainer/api/dataservices/edgejob"
-	"github.com/portainer/portainer/api/dataservices/edgestack"
-
 	"github.com/Masterminds/semver"
-	"github.com/rs/zerolog/log"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
+	"github.com/portainer/portainer/api/dataservices/edgestack"
 	"github.com/portainer/portainer/api/dataservices/endpoint"
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
@@ -26,9 +23,11 @@ import (
 	"github.com/portainer/portainer/api/dataservices/stack"
 	"github.com/portainer/portainer/api/dataservices/tag"
 	"github.com/portainer/portainer/api/dataservices/teammembership"
+	"github.com/portainer/portainer/api/dataservices/tunnelserver"
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/rs/zerolog/log"
 )
 
 type (
@@ -58,6 +57,7 @@ type (
 		dockerhubService        *dockerhub.Service
 		edgeStackService        *edgestack.Service
 		edgeJobService          *edgejob.Service
+		TunnelServerService     *tunnelserver.Service
 	}
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
@@ -84,6 +84,7 @@ type (
 		DockerhubService        *dockerhub.Service
 		EdgeStackService        *edgestack.Service
 		EdgeJobService          *edgejob.Service
+		TunnelServerService     *tunnelserver.Service
 	}
 )
 
@@ -112,6 +113,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		dockerhubService:        parameters.DockerhubService,
 		edgeStackService:        parameters.EdgeStackService,
 		edgeJobService:          parameters.EdgeJobService,
+		TunnelServerService:     parameters.TunnelServerService,
 	}
 
 	migrator.initMigrations()
@@ -210,8 +212,11 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.16.1", m.migrateDBVersionToDB71)
 	m.addMigrations("2.17", m.migrateDBVersionToDB80)
 	m.addMigrations("2.18", m.migrateDBVersionToDB90)
-
-	m.addMigrations("2.19", m.migrateDockerDesktopExtentionSetting)
+	m.addMigrations("2.19",
+		m.convertSeedToPrivateKeyForDB100,
+		m.migrateDockerDesktopExtentionSetting,
+		m.updateEdgeStackStatusForDB100,
+	)
 
 	// Add new migrations below...
 	// One function per migration, each versions migration funcs in the same file.

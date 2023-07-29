@@ -14,6 +14,7 @@ interface Props extends IconProps {
   isRefetching?: boolean;
   value?: number;
   to?: string;
+  params?: object;
   children?: ReactNode;
   dataCy?: string;
 }
@@ -26,6 +27,7 @@ export function DashboardItem({
   isRefetching,
   value,
   to,
+  params,
   children,
   dataCy,
 }: Props) {
@@ -41,7 +43,7 @@ export function DashboardItem({
     >
       <div
         className={clsx(
-          'text-muted absolute top-2 right-2 flex items-center transition-opacity',
+          'text-muted absolute top-2 right-2 flex items-center text-xs transition-opacity',
           isRefetching ? 'opacity-100' : 'opacity-0'
         )}
       >
@@ -50,7 +52,7 @@ export function DashboardItem({
       </div>
       <div
         className={clsx(
-          'text-muted absolute top-2 right-2 flex items-center transition-opacity',
+          'text-muted absolute top-2 right-2 flex items-center text-xs transition-opacity',
           isLoading ? 'opacity-100' : 'opacity-0'
         )}
       >
@@ -101,7 +103,7 @@ export function DashboardItem({
 
   if (to) {
     return (
-      <Link to={to} className="!no-underline">
+      <Link to={to} className="!no-underline" params={params}>
         {Item}
       </Link>
     );

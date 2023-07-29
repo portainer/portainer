@@ -16,6 +16,11 @@ export async function getPublicSettings() {
   }
 }
 
+export async function getGlobalDeploymentOptions() {
+  const publicSettings = await getPublicSettings();
+  return publicSettings.GlobalDeploymentOptions;
+}
+
 export async function getSettings() {
   try {
     const { data } = await axios.get<Settings>(buildUrl());
@@ -34,7 +39,8 @@ type OptionalSettings = Omit<Partial<Settings>, 'Edge'> & {
 
 export async function updateSettings(settings: OptionalSettings) {
   try {
-    await axios.put(buildUrl(), settings);
+    const { data } = await axios.put<Settings>(buildUrl(), settings);
+    return data;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update application settings');
   }
@@ -53,7 +59,7 @@ export async function updateDefaultRegistry(
   }
 }
 
-function buildUrl(subResource?: string, action?: string) {
+export function buildUrl(subResource?: string, action?: string) {
   let url = 'settings';
   if (subResource) {
     url += `/${subResource}`;

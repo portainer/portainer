@@ -54,20 +54,6 @@ export class KubernetesIngressService {
   }
 }
 
-const _KubernetesIngressServiceRoute = Object.freeze({
-  Host: '',
-  IngressName: '',
-  Path: '',
-  ServiceName: '',
-  TLSCert: '',
-});
-
-export class KubernetesIngressServiceRoute {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesIngressServiceRoute)));
-  }
-}
-
 /**
  * KubernetesServicePort Model
  */

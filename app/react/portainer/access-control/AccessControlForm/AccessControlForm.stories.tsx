@@ -31,7 +31,7 @@ interface Args {
 
 function Template({ userRole }: Args) {
   const isAdmin = userRole === Role.Admin;
-  const defaults = parseAccessControlFormData(isAdmin);
+  const defaults = parseAccessControlFormData(isAdmin, 0);
 
   const [value, setValue] = useState(defaults);
 

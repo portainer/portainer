@@ -60,7 +60,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
+	stack, err := handler.DataStore.Stack().Read(portainer.StackID(stackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -161,14 +161,14 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	stack.Name = newName
-	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
+	err = handler.DataStore.Stack().Update(stack.ID, stack)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
 
 	if resourceControl != nil {
 		resourceControl.ResourceID = stackutils.ResourceControlID(stack.EndpointID, stack.Name)
-		err := handler.DataStore.ResourceControl().UpdateResourceControl(resourceControl.ID, resourceControl)
+		err := handler.DataStore.ResourceControl().Update(resourceControl.ID, resourceControl)
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist the resource control changes", err)
 		}

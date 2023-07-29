@@ -7,13 +7,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/patrickmn/go-cache"
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/patrickmn/go-cache"
+	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 const (
@@ -116,7 +118,7 @@ func (factory *ClientFactory) SetProxyKubeClient(endpointID, token string, cli *
 // CreateKubeClientFromKubeConfig creates a KubeClient from a clusterID, and
 // Kubernetes config.
 func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte) (*KubeClient, error) {
-	config, err := clientcmd.NewClientConfigFromBytes([]byte(kubeConfig))
+	config, err := clientcmd.NewClientConfigFromBytes(kubeConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -222,6 +224,34 @@ func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernete
 	})
 
 	return kubernetes.NewForConfig(config)
+}
+
+func (factory *ClientFactory) CreateRemoteMetricsClient(endpoint *portainer.Endpoint) (*metricsv.Clientset, error) {
+	endpointURL := fmt.Sprintf("https://%s/kubernetes", endpoint.URL)
+
+	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
+	if err != nil {
+		return nil, err
+	}
+
+	config.Insecure = true
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
+
+	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
+		return &agentHeaderRoundTripper{
+			signatureHeader: signature,
+			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
+			roundTripper:    rt,
+		}
+	})
+
+	return metricsv.NewForConfig(config)
 }
 
 func buildLocalClient() (*kubernetes.Clientset, error) {

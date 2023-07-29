@@ -1,17 +1,12 @@
 package extension
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "extension"
-)
+// BucketName represents the name of the bucket where this service stores data.
+const BucketName = "extension"
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
@@ -51,22 +46,12 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 func (service *Service) Extensions() ([]portainer.Extension, error) {
 	var extensions = make([]portainer.Extension, 0)
 
-	err := service.connection.GetAll(
+	return extensions, service.connection.GetAll(
 		BucketName,
 		&portainer.Extension{},
-		func(obj interface{}) (interface{}, error) {
-			extension, ok := obj.(*portainer.Extension)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Extension object")
-				return nil, fmt.Errorf("Failed to convert to Extension object: %s", obj)
-			}
+		dataservices.AppendFn(&extensions),
+	)
 
-			extensions = append(extensions, *extension)
-
-			return &portainer.Extension{}, nil
-		})
-
-	return extensions, err
 }
 
 // Persist persists a extension inside the database.

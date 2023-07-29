@@ -14,6 +14,7 @@ import {
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import {
   refetchIfAnyOffline,
+  SortType,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
@@ -68,7 +69,9 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     'group',
     []
   );
-  const [sortByFilter, setSortByFilter] = useSearchBarState('sortBy');
+  const [sortByFilter, setSortByFilter] = useHomePageFilter<
+    SortType | undefined
+  >('sortBy', 'Name');
   const [sortByDescending, setSortByDescending] = useHomePageFilter(
     'sortOrder',
     false
@@ -126,7 +129,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
       pageLimit,
       ...queryWithSort,
     },
-    refetchIfAnyOffline
+    { refetchInterval: refetchIfAnyOffline }
   );
 
   useEffect(() => {
@@ -342,7 +345,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     setConnectionTypes([]);
   }
 
-  function sortOnchange(value: string) {
+  function sortOnchange(value?: 'Name' | 'Group' | 'Status') {
     setSortByFilter(value);
     setSortByButton(!!value);
   }

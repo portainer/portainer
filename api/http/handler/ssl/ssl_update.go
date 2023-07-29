@@ -10,6 +10,7 @@ import (
 )
 
 type sslUpdatePayload struct {
+	// SSL Certificates
 	Cert        *string
 	Key         *string
 	HTTPEnabled *bool

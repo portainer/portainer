@@ -14,10 +14,9 @@ angular.module('portainer.app').factory('FileUploadService', [
       return Upload.upload({ url: url, data: { file: file } });
     }
 
-    service.buildImage = function (names, file, path) {
-      var endpointID = EndpointProvider.endpointID();
+    service.buildImage = function (endpointID, names, file, path) {
       return Upload.http({
-        url: 'api/endpoints/' + endpointID + '/docker/build',
+        url: `api/endpoints/${endpointID}/docker/build`,
         headers: {
           'Content-Type': file.type,
         },
@@ -33,10 +32,9 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.buildImageFromFiles = function (names, files) {
-      var endpointID = EndpointProvider.endpointID();
+    service.buildImageFromFiles = function (endpointID, names, files) {
       return Upload.upload({
-        url: 'api/endpoints/' + endpointID + '/docker/build',
+        url: `api/endpoints/${endpointID}/docker/build`,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -113,12 +111,13 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createEdgeStack = function createEdgeStack({ EdgeGroups, ...payload }, file) {
+    service.createEdgeStack = function createEdgeStack({ EdgeGroups, envVars, ...payload }, file) {
       return Upload.upload({
         url: `api/edge_stacks/create/file`,
         data: {
           file,
           EdgeGroups: Upload.json(EdgeGroups),
+          EnvVars: Upload.json(envVars),
           ...payload,
         },
         ignoreLoadingBar: true,

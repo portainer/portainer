@@ -10,8 +10,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/slices"
+	"github.com/portainer/portainer/api/internal/unique"
 )
 
 type EnvironmentsQuery struct {
@@ -29,6 +32,8 @@ type EnvironmentsQuery struct {
 	name                     string
 	agentVersions            []string
 	edgeCheckInPassedSeconds int
+	edgeStackId              portainer.EdgeStackID
+	edgeStackStatus          *portainer.EdgeStackStatusType
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -80,6 +85,13 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	edgeCheckInPassedSeconds, _ := request.RetrieveNumericQueryParameter(r, "edgeCheckInPassedSeconds", true)
 
+	edgeStackId, _ := request.RetrieveNumericQueryParameter(r, "edgeStackId", true)
+
+	edgeStackStatus, err := getEdgeStackStatusParam(r)
+	if err != nil {
+		return EnvironmentsQuery{}, err
+	}
+
 	return EnvironmentsQuery{
 		search:                   search,
 		types:                    endpointTypes,
@@ -94,6 +106,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		name:                     name,
 		agentVersions:            agentVersions,
 		edgeCheckInPassedSeconds: edgeCheckInPassedSeconds,
+		edgeStackId:              portainer.EdgeStackID(edgeStackId),
+		edgeStackStatus:          edgeStackStatus,
 	}, nil
 }
 
@@ -153,7 +167,7 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 	}
 
 	if query.search != "" {
-		tags, err := handler.DataStore.Tag().Tags()
+		tags, err := handler.DataStore.Tag().ReadAll()
 		if err != nil {
 			return nil, 0, errors.WithMessage(err, "Unable to retrieve tags from the database")
 		}
@@ -179,8 +193,68 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 			return !endpointutils.IsAgentEndpoint(&endpoint) || contains(query.agentVersions, endpoint.Agent.Version)
 		})
 	}
+	if query.edgeStackId != 0 {
+		f, err := filterEndpointsByEdgeStack(filteredEndpoints, query.edgeStackId, query.edgeStackStatus, handler.DataStore)
+		if err != nil {
+			return nil, 0, err
+		}
+		filteredEndpoints = f
+	}
 
 	return filteredEndpoints, totalAvailableEndpoints, nil
+}
+
+func endpointStatusInStackMatchesFilter(edgeStackStatus map[portainer.EndpointID]portainer.EdgeStackStatus, envId portainer.EndpointID, statusFilter portainer.EdgeStackStatusType) bool {
+	status, ok := edgeStackStatus[envId]
+
+	// consider that if the env has no status in the stack it is in Pending state
+	// workaround because Stack.Status[EnvId].Details.Pending is never set to True in the codebase
+	if !ok && statusFilter == portainer.EdgeStackStatusPending {
+		return true
+	}
+
+	return slices.ContainsFunc(status.Status, func(s portainer.EdgeStackDeploymentStatus) bool {
+		return s.Type == statusFilter
+	})
+}
+
+func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId portainer.EdgeStackID, statusFilter *portainer.EdgeStackStatusType, datastore dataservices.DataStore) ([]portainer.Endpoint, error) {
+	stack, err := datastore.EdgeStack().EdgeStack(edgeStackId)
+	if err != nil {
+		return nil, errors.WithMessage(err, "Unable to retrieve edge stack from the database")
+	}
+
+	envIds := make([]portainer.EndpointID, 0)
+	for _, edgeGroupdId := range stack.EdgeGroups {
+		edgeGroup, err := datastore.EdgeGroup().Read(edgeGroupdId)
+		if err != nil {
+			return nil, errors.WithMessage(err, "Unable to retrieve edge group from the database")
+		}
+		if edgeGroup.Dynamic {
+			endpointIDs, err := edgegroups.GetEndpointsByTags(datastore, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+			if err != nil {
+				return nil, errors.WithMessage(err, "Unable to retrieve environments and environment groups for Edge group")
+			}
+			edgeGroup.Endpoints = endpointIDs
+		}
+		envIds = append(envIds, edgeGroup.Endpoints...)
+	}
+
+	if statusFilter != nil {
+		n := 0
+		for _, envId := range envIds {
+			if endpointStatusInStackMatchesFilter(stack.Status, envId, *statusFilter) {
+				envIds[n] = envId
+				n++
+			}
+		}
+		envIds = envIds[:n]
+	}
+
+	uniqueIds := unique.Unique(envIds)
+	filteredEndpoints := filteredEndpointsByIds(endpoints, uniqueIds)
+
+	return filteredEndpoints, nil
 }
 
 func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs []portainer.EndpointGroupID) []portainer.Endpoint {
@@ -394,7 +468,6 @@ func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.Endp
 	}
 
 	return endpoints[:n]
-
 }
 
 func filterEndpointsByName(endpoints []portainer.Endpoint, name string) []portainer.Endpoint {
@@ -462,4 +535,34 @@ func contains(strings []string, param string) bool {
 	}
 
 	return false
+}
+
+func getEdgeStackStatusParam(r *http.Request) (*portainer.EdgeStackStatusType, error) {
+	edgeStackStatusQuery, _ := request.RetrieveQueryParameter(r, "edgeStackStatus", true)
+	if edgeStackStatusQuery == "" {
+		return nil, nil
+	}
+
+	edgeStackStatusNumber, err := strconv.Atoi(edgeStackStatusQuery)
+	edgeStackStatus := portainer.EdgeStackStatusType(edgeStackStatusNumber)
+	if err != nil {
+		return nil, fmt.Errorf("failed parsing edgeStackStatus: %w", err)
+	}
+
+	if !slices.Contains([]portainer.EdgeStackStatusType{
+		portainer.EdgeStackStatusPending,
+		portainer.EdgeStackStatusDeploymentReceived,
+		portainer.EdgeStackStatusError,
+		portainer.EdgeStackStatusAcknowledged,
+		portainer.EdgeStackStatusRemoved,
+		portainer.EdgeStackStatusRemoteUpdateSuccess,
+		portainer.EdgeStackStatusImagesPulled,
+		portainer.EdgeStackStatusRunning,
+		portainer.EdgeStackStatusDeploying,
+		portainer.EdgeStackStatusRemoving,
+	}, edgeStackStatus) {
+		return nil, errors.New("invalid edgeStackStatus parameter")
+	}
+
+	return &edgeStackStatus, nil
 }

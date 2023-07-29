@@ -20,14 +20,14 @@ func updateEnvironmentTags(tx dataservices.DataStoreTx, newTags []portainer.TagI
 
 	updateSet := func(tagIDs set.Set[portainer.TagID], updateItem func(*portainer.Tag)) error {
 		for tagID := range tagIDs {
-			tag, err := tx.Tag().Tag(tagID)
+			tag, err := tx.Tag().Read(tagID)
 			if err != nil {
 				return errors.WithMessage(err, "Unable to find a tag inside the database")
 			}
 
 			updateItem(tag)
 
-			err = tx.Tag().UpdateTag(tagID, tag)
+			err = tx.Tag().Update(tagID, tag)
 			if err != nil {
 				return errors.WithMessage(err, "Unable to persist tag changes inside the database")
 			}

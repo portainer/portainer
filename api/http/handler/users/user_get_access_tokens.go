@@ -42,7 +42,7 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 		return httperror.Forbidden("Permission denied to get user access tokens", httperrors.ErrUnauthorized)
 	}
 
-	_, err = handler.DataStore.User().User(portainer.UserID(userID))
+	_, err = handler.DataStore.User().Read(portainer.UserID(userID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)

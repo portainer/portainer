@@ -8,6 +8,7 @@ import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
+import { TLSFieldset } from '@/react/components/TLSFieldset/TLSFieldset';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -19,7 +20,6 @@ import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { useValidation } from './APIForm.validation';
 import { FormValues } from './types';
-import { TLSFieldset } from './TLSFieldset';
 
 interface Props {
   onCreate(environment: Environment): void;
@@ -31,7 +31,10 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
   const initialValues: FormValues = {
     url: '',
     name: '',
-    tls: false,
+    tlsConfig: {
+      tls: false,
+      skipVerify: false,
+    },
     meta: {
       groupId: 1,
       tagIds: [],
@@ -52,7 +55,7 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
       validateOnMount
       key={formKey}
     >
-      {({ isValid, dirty }) => (
+      {({ values, errors, setFieldValue, isValid, dirty }) => (
         <Form>
           <NameField />
 
@@ -70,7 +73,15 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
             />
           </FormControl>
 
-          <TLSFieldset />
+          <TLSFieldset
+            values={values.tlsConfig}
+            onChange={(value) =>
+              Object.entries(value).forEach(([key, value]) =>
+                setFieldValue(`tlsConfig.${key}`, value)
+              )
+            }
+            errors={errors.tlsConfig}
+          />
 
           <MoreSettingsSection>
             {isDockerStandalone && (
@@ -141,24 +152,24 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
       }
     );
     function getTlsValues() {
-      if (!values.tls) {
+      if (!values.tlsConfig.tls) {
         return undefined;
       }
 
       return {
-        skipVerify: values.skipVerify,
+        skipVerify: values.tlsConfig.skipVerify,
         ...getCertFiles(),
       };
 
       function getCertFiles() {
-        if (values.skipVerify) {
+        if (values.tlsConfig.skipVerify) {
           return {};
         }
 
         return {
-          caCertFile: values.caCertFile,
-          certFile: values.certFile,
-          keyFile: values.keyFile,
+          caCertFile: values.tlsConfig.caCertFile,
+          certFile: values.tlsConfig.certFile,
+          keyFile: values.tlsConfig.keyFile,
         };
       }
     }

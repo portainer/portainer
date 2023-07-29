@@ -6,9 +6,10 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { IngressesDatatableView } from '@/react/kubernetes/ingresses/IngressDatatable';
 import { CreateIngressView } from '@/react/kubernetes/ingresses/CreateIngressView';
-import { DashboardView } from '@/react/kubernetes/DashboardView';
-import { ServicesView } from '@/react/kubernetes/ServicesView';
+import { DashboardView } from '@/react/kubernetes/dashboard/DashboardView';
+import { ServicesView } from '@/react/kubernetes/services/ServicesView';
 import { ConsoleView } from '@/react/kubernetes/applications/ConsoleView';
+import { ConfigmapsAndSecretsView } from '@/react/kubernetes/configs/ListView/ConfigmapsAndSecretsView';
 
 export const viewsModule = angular
   .module('portainer.kubernetes.react.views', [])
@@ -26,6 +27,13 @@ export const viewsModule = angular
   .component(
     'kubernetesIngressesCreateView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(CreateIngressView))), [])
+  )
+  .component(
+    'kubernetesConfigMapsAndSecretsView',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(ConfigmapsAndSecretsView))),
+      []
+    )
   )
   .component(
     'kubernetesDashboardView',

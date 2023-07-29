@@ -4,6 +4,7 @@ import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
 import { EnvironmentType } from '@/react/portainer/environments/types';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -19,16 +20,17 @@ export default class CreateEdgeStackViewController {
       RepositoryAuthentication: false,
       RepositoryUsername: '',
       RepositoryPassword: '',
-      Env: [],
       ComposeFilePathInRepository: '',
       Groups: [],
       DeploymentType: 0,
       UseManifestNamespaces: false,
       TLSSkipVerify: false,
+      envVars: [],
     };
 
     this.EditorType = EditorType;
     this.EnvironmentType = EnvironmentType;
+    this.isBE = isBE;
 
     this.state = {
       Method: 'editor',
@@ -54,6 +56,13 @@ export default class CreateEdgeStackViewController {
     this.onChangeGroups = this.onChangeGroups.bind(this);
     this.hasType = this.hasType.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
+    this.onEnvVarChange = this.onEnvVarChange.bind(this);
+  }
+
+  onEnvVarChange(envVars) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.envVars = envVars;
+    });
   }
 
   buildAnalyticsProperties() {
@@ -183,7 +192,7 @@ export default class CreateEdgeStackViewController {
   }
 
   createStackFromFileContent(name) {
-    const { StackFileContent, Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+    const { StackFileContent, Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
 
     return this.EdgeStackService.createStackFromFileContent({
       name,
@@ -191,24 +200,26 @@ export default class CreateEdgeStackViewController {
       EdgeGroups: Groups,
       DeploymentType,
       UseManifestNamespaces,
+      envVars,
     });
   }
 
   createStackFromFileUpload(name) {
-    const { StackFile, Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+    const { StackFile, Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
     return this.EdgeStackService.createStackFromFileUpload(
       {
         Name: name,
         EdgeGroups: Groups,
         DeploymentType,
         UseManifestNamespaces,
+        envVars,
       },
       StackFile
     );
   }
 
   createStackFromGitRepository(name) {
-    const { Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+    const { Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
     const repositoryOptions = {
       RepositoryURL: this.formValues.RepositoryURL,
       RepositoryReferenceName: this.formValues.RepositoryReferenceName,
@@ -224,6 +235,7 @@ export default class CreateEdgeStackViewController {
         EdgeGroups: Groups,
         DeploymentType,
         UseManifestNamespaces,
+        envVars,
       },
       repositoryOptions
     );

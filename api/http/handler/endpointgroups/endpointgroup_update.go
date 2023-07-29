@@ -80,7 +80,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 }
 
 func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID, payload endpointGroupUpdatePayload) (*portainer.EndpointGroup, error) {
-	endpointGroup, err := tx.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
+	endpointGroup, err := tx.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
 	if tx.IsErrObjectNotFound(err) {
 		return nil, httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -121,14 +121,14 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 					continue
 				}
 
-				tag, err := tx.Tag().Tag(tagID)
+				tag, err := tx.Tag().Read(tagID)
 				if err != nil {
 					return nil, httperror.InternalServerError("Unable to find a tag inside the database", err)
 				}
 
 				delete(tag.EndpointGroups, endpointGroup.ID)
 
-				err = tx.Tag().UpdateTag(tagID, tag)
+				err = tx.Tag().Update(tagID, tag)
 				if err != nil {
 					return nil, httperror.InternalServerError("Unable to persist tag changes inside the database", err)
 				}
@@ -150,14 +150,14 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 					continue
 				}
 
-				tag, err := tx.Tag().Tag(tagID)
+				tag, err := tx.Tag().Read(tagID)
 				if err != nil {
 					return nil, httperror.InternalServerError("Unable to find a tag inside the database", err)
 				}
 
 				tag.EndpointGroups[endpointGroup.ID] = true
 
-				err = tx.Tag().UpdateTag(tagID, tag)
+				err = tx.Tag().Update(tagID, tag)
 				if err != nil {
 					return nil, httperror.InternalServerError("Unable to persist tag changes inside the database", err)
 				}
@@ -194,7 +194,7 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 		}
 	}
 
-	err = tx.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+	err = tx.EndpointGroup().Update(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to persist environment group changes inside the database", err)
 	}

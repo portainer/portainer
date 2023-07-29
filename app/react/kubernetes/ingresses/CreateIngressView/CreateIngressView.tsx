@@ -624,18 +624,11 @@ export function CreateIngressView() {
     const newKey = `${namespace}-ingress-${
       (ruleCounterByNamespace[namespace] || 0) + 1
     }`;
-    const path: Path = {
-      Key: uuidv4(),
-      ServiceName: '',
-      ServicePort: 0,
-      Route: '',
-      PathType: 'Prefix',
-    };
 
     const host: Host = {
       Host: '',
       Secret: '',
-      Paths: [path],
+      Paths: [],
       Key: uuidv4(),
     };
 
@@ -654,17 +647,17 @@ export function CreateIngressView() {
     const rule = { ...ingressRule };
 
     const path: Path = {
+      Key: uuidv4(),
       ServiceName: '',
       ServicePort: 0,
       Route: '',
       PathType: 'Prefix',
-      Key: uuidv4(),
     };
 
     const host: Host = {
       Host: '',
       Secret: '',
-      Paths: [path],
+      Paths: noHost ? [path] : [],
       NoHost: noHost,
       Key: uuidv4(),
     };

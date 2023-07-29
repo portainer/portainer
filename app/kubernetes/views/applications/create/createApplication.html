@@ -349,28 +349,28 @@
                   </div>
                   <!-- #endregion -->
 
-                  <!-- #region CONFIGURATIONS -->
+                  <!-- #region CONFIGMAPS -->
                   <div class="form-group">
                     <div class="col-sm-12 vertical-center">
-                      <label class="control-label !pt-0 text-left">ConfigMap or Secret</label>
+                      <label class="control-label !pt-0 text-left">ConfigMap</label>
                     </div>
-                    <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
+                    <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.ConfigMaps.length">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      Portainer will automatically expose all the keys of a ConfigMap or Secret as environment variables. This behavior can be overridden to filesystem mounts for
-                      each key via the override option.
+                      Portainer will automatically expose all the keys of a ConfigMap as environment variables. This behavior can be overridden to filesystem mounts for each key
+                      via the override option.
                     </div>
                   </div>
 
                   <!-- config-element -->
-                  <div class="form-inline clearfix" ng-repeat="(index, config) in ctrl.formValues.Configurations">
+                  <div class="form-inline clearfix" ng-repeat="(index, config) in ctrl.formValues.ConfigMaps">
                     <div class="col-sm-12 !p-0">
                       <div class="input-group input-group-sm !mr-1">
                         <span class="input-group-addon">name</span>
                         <select
                           class="form-control col-sm-6"
                           ng-model="config.SelectedConfiguration"
-                          ng-options="c as c.Name for c in ctrl.configurations track by c.Name"
-                          ng-change="ctrl.resetConfiguration(index)"
+                          ng-options="c as c.Name for c in ctrl.configMaps track by c.Name"
+                          ng-change="ctrl.resetConfigMap(index)"
                           ng-disabled="ctrl.formValues.Containers.length > 1"
                           data-cy="k8sAppCreate-addConfigSelect_{{ $index }}"
                         ></select>
@@ -380,7 +380,7 @@
                         <label
                           class="btn btn-md btn-light vertical-center !ml-0"
                           type="button"
-                          ng-click="ctrl.resetConfiguration(index)"
+                          ng-click="ctrl.resetConfigMap(index)"
                           ng-disabled="ctrl.formValues.Containers.length > 1"
                           data-cy="k8sAppCreate-configAutoButton_{{ $index }}"
                           uib-btn-radio="false"
@@ -390,7 +390,7 @@
                         </label>
                         <label
                           class="btn btn-md btn-light vertical-center !ml-0"
-                          ng-click="ctrl.overrideConfiguration(index)"
+                          ng-click="ctrl.overrideConfigMap(index)"
                           ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
                           data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
                           uib-btn-radio="true"
@@ -403,7 +403,7 @@
                       <button
                         class="btn btn-md btn-dangerlight btn-only-icon vertical-center"
                         type="button"
-                        ng-click="ctrl.removeConfiguration(index)"
+                        ng-click="ctrl.removeConfigMap(index)"
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         data-cy="k8sAppCreate-configRemoveButton"
                       >
@@ -414,8 +414,7 @@
                     <div class="row clearfix" ng-if="config.SelectedConfiguration && !config.Overriden">
                       <div class="col-sm-9 small text-muted !mt-2 !p-0">
                         The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code>
-                        <span ng-if="config.SelectedConfiguration.Kind === 1">ConfigMap</span><span ng-if="config.SelectedConfiguration.Kind === 2">Secret</span> as environment
-                        variables:
+                        ConfigMap as environment variables:
                         <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
                           <code>{{ key }}</code
                           >{{ $last ? '' : ', ' }}
@@ -448,31 +447,31 @@
                             class="form-control"
                             ng-model="overridenKey.Path"
                             placeholder="/etc/myapp/conf.d"
-                            name="overriden_key_path_{{ index }}_{{ keyIndex }}"
+                            name="overriden_key_configmap_path_{{ index }}_{{ keyIndex }}"
                             ng-disabled="ctrl.formValues.Containers.length > 1"
                             required
-                            ng-change="ctrl.onChangeConfigurationPath()"
+                            ng-change="ctrl.onChangeConfigMapPath()"
                             data-cy="k8sAppCreate-pathOnDiskInput"
                           />
                         </div>
                         <div
                           class="small"
                           ng-show="
-                            kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                            ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                            kubernetesApplicationCreationForm['overriden_key_configmap_path_' + index + '_' + keyIndex].$invalid ||
+                            ctrl.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] !== undefined
                           "
                         >
                           <div class="text-warning" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                             <div
                               ng-show="
-                                kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                                ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                                kubernetesApplicationCreationForm['overriden_key_configmap_path_' + index + '_' + keyIndex].$invalid ||
+                                ctrl.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] !== undefined
                               "
                             >
-                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
+                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_configmap_path_' + index + '_' + keyIndex].$error">
                                 <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
                               </ng-messages>
-                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined">
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] !== undefined">
                                 <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.
                               </p>
                             </div>
@@ -484,239 +483,398 @@
                   </div>
                   <!-- !config-element -->
                   <div class="col-sm-12 !p-0">
-                    <span
+                    <button
+                      type="button"
                       class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
-                      ng-click="ctrl.addConfiguration()"
+                      ng-disabled="ctrl.configMaps.length === 0"
+                      ng-click="ctrl.addConfigMap()"
                       ng-if="ctrl.formValues.Containers.length <= 1"
                       data-cy="k8sAppCreate-addConfigButton"
                     >
-                      <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add ConfigMap and Secret
-                    </span>
+                      <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add ConfigMap
+                    </button>
+                  </div>
+                  <div class="my-2 w-full">
+                    <p class="vertical-center text-warning text-xs" ng-if="ctrl.configMaps.length === 0"
+                      ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> There are no ConfigMaps available in this namespace.</p
+                    >
+                  </div>
+
+                  <!-- #region SECRETS -->
+                  <div class="form-group">
+                    <div class="col-sm-12 vertical-center pt-2.5">
+                      <label class="control-label !pt-0 text-left">Secret</label>
+                    </div>
+                    <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.Secrets.length">
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                      Portainer will automatically expose all the keys of a Secret as environment variables. This behavior can be overridden to filesystem mounts for each key via
+                      the override option.
+                    </div>
+                  </div>
+
+                  <!-- config-element -->
+                  <div class="form-inline clearfix" ng-repeat="(index, config) in ctrl.formValues.Secrets">
+                    <div class="col-sm-12 !p-0">
+                      <div class="input-group input-group-sm !mr-1">
+                        <span class="input-group-addon">name</span>
+                        <select
+                          class="form-control col-sm-6"
+                          ng-model="config.SelectedConfiguration"
+                          ng-options="c as c.Name for c in ctrl.secrets track by c.Name"
+                          ng-change="ctrl.resetSecret(index)"
+                          ng-disabled="ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-addSecretSelect_{{ $index }}"
+                        ></select>
+                      </div>
+
+                      <div class="input-group btn-group btn-group-sm">
+                        <label
+                          class="btn btn-md btn-light vertical-center !ml-0"
+                          type="button"
+                          ng-click="ctrl.resetSecret(index)"
+                          ng-disabled="ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-secretAutoButton_{{ $index }}"
+                          uib-btn-radio="false"
+                          ng-model="config.Overriden"
+                        >
+                          <pr-icon icon="'rotate-cw'" size="'md'"></pr-icon> Auto
+                        </label>
+                        <label
+                          class="btn btn-md btn-light vertical-center !ml-0"
+                          ng-click="ctrl.overrideSecret(index)"
+                          ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-secretOverrideButton_{{ $index }}"
+                          uib-btn-radio="true"
+                          ng-model="config.Overriden"
+                        >
+                          <pr-icon icon="'list'" size="'md'"></pr-icon> Override
+                        </label>
+                      </div>
+
+                      <button
+                        class="btn btn-md btn-dangerlight btn-only-icon vertical-center"
+                        type="button"
+                        ng-click="ctrl.removeSecret(index)"
+                        ng-if="ctrl.formValues.Containers.length <= 1"
+                        data-cy="k8sAppCreate-secretRemoveButton"
+                      >
+                        <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+                      </button>
+                    </div>
+                    <!-- no-override -->
+                    <div class="row clearfix" ng-if="config.SelectedConfiguration && !config.Overriden">
+                      <div class="col-sm-9 small text-muted !mt-2 !p-0">
+                        The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> Secret as environment variables:
+                        <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
+                          <code>{{ key }}</code
+                          >{{ $last ? '' : ', ' }}
+                        </span>
+                      </div>
+                    </div>
+                    <!-- !no-override -->
+
+                    <!-- has-override -->
+                    <div class="col-sm-12 !mt-2 !mb-4 !p-0" ng-if="config.Overriden" ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
+                      <div class="input-group input-group-sm !mr-1">
+                        <span class="input-group-addon">key</span>
+                        <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
+                      </div>
+
+                      <div class="input-group btn-group btn-group-sm !mr-1">
+                        <label class="btn btn-light" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
+                          <pr-icon icon="'list'"></pr-icon> Environment
+                        </label>
+                        <label class="btn btn-light" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                          <pr-icon icon="'file-text'"></pr-icon> Filesystem
+                        </label>
+                      </div>
+
+                      <div class="form-group !ml-0 !mr-0 !align-top" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon required">path on disk</span>
+                          <input
+                            type="text"
+                            class="form-control"
+                            ng-model="overridenKey.Path"
+                            placeholder="/etc/myapp/conf.d"
+                            name="overriden_key_secret_path_{{ index }}_{{ keyIndex }}"
+                            ng-disabled="ctrl.formValues.Containers.length > 1"
+                            required
+                            ng-change="ctrl.onChangeSecretPath()"
+                            data-cy="k8sAppCreate-secretPathOnDiskInput"
+                          />
+                        </div>
+                        <div
+                          class="small"
+                          ng-show="
+                            kubernetesApplicationCreationForm['overriden_key_secret_path_' + index + '_' + keyIndex].$invalid ||
+                            ctrl.state.duplicates.secretPaths.refs[index + '_' + keyIndex] !== undefined
+                          "
+                        >
+                          <div class="text-warning" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                            <div
+                              ng-show="
+                                kubernetesApplicationCreationForm['overriden_key_secret_path_' + index + '_' + keyIndex].$invalid ||
+                                ctrl.state.duplicates.secretPaths.refs[index + '_' + keyIndex] !== undefined
+                              "
+                            >
+                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_secret_path_' + index + '_' + keyIndex].$error">
+                                <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
+                              </ng-messages>
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.secretPaths.refs[index + '_' + keyIndex] !== undefined"
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already used.</p
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- !has-override -->
+                  </div>
+
+                  <div class="my-2 w-full">
+                    <p class="vertical-center text-muted text-xs" ng-if="ctrl.secrets.length === 0">
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                      There are no secrets available in this namespace.
+                    </p>
+                  </div>
+                  <!-- !config-element -->
+                  <div class="col-sm-12 !p-0">
+                    <button
+                      type="button"
+                      ng-disabled="ctrl.secrets.length === 0"
+                      class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                      ng-click="ctrl.addSecret()"
+                      ng-if="ctrl.formValues.Containers.length <= 1"
+                      data-cy="k8sAppCreate-addSecretButton"
+                    >
+                      <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add Secret
+                    </button>
                   </div>
                   <!-- #endregion -->
 
                   <!-- #region PERSISTED FOLDERS -->
-                  <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      No storage option is available to persist data, contact your administrator to enable a storage option.
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="ctrl.storageClassAvailable()">
-                    <div class="col-sm-12 vertical-center mb-2 pt-2.5" style="margin-top: 5px" ng-if="!ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
+                  <div class="form-group">
+                    <div class="col-sm-12 vertical-center mb-2 pt-2.5" style="margin-top: 5px">
                       <label class="control-label !pt-0 text-left">Persisted folders</label>
                     </div>
 
-                    <div class="col-sm-12" style="margin-top: 5px" ng-if="ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
-                      <span class="small text-muted vertical-center">
-                        <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                        This namespace has exhausted its storage capacity. Contact your administrator to expand the capacity of the namespace.
-                      </span>
+                    <div class="col-sm-12 small text-muted vertical-center mt-1" ng-if="!ctrl.storageClassAvailable()">
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                      No storage option is available to persist data, contact your administrator to enable a storage option.
                     </div>
 
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
-                      <div style="margin-top: 2px">
-                        <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
-                          <span class="input-group-addon required">path in container</span>
-                          <input
-                            type="text"
-                            class="form-control"
-                            name="persisted_folder_path_{{ $index }}"
-                            ng-model="persistedFolder.ContainerPath"
-                            ng-change="ctrl.onChangePersistedFolderPath()"
-                            ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
-                            placeholder="/data"
-                            required
-                            data-cy="k8sAppCreate-containerPathInput_{{ $index }}"
-                          />
+                    <div class="row" ng-if="ctrl.storageClassAvailable()">
+                      <div class="col-sm-12" style="margin-top: 5px" ng-if="ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
+                        <span class="small text-muted vertical-center">
+                          <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                          This namespace has exhausted its storage capacity. Contact your administrator to expand the capacity of the namespace.
+                        </span>
+                      </div>
+
+                      <div class="col-sm-12 form-inline" style="margin-top: 10px" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
+                        <div style="margin-top: 2px">
+                          <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                            <span class="input-group-addon required">path in container</span>
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="persisted_folder_path_{{ $index }}"
+                              ng-model="persistedFolder.ContainerPath"
+                              ng-change="ctrl.onChangePersistedFolderPath()"
+                              ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                              placeholder="/data"
+                              required
+                              data-cy="k8sAppCreate-containerPathInput_{{ $index }}"
+                            />
+                          </div>
+
+                          <div
+                            class="input-group col-sm-2 input-group-sm"
+                            ng-if="
+                              !ctrl.isEditAndExistingPersistedFolder($index) &&
+                              ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET &&
+                              ctrl.formValues.Containers.length <= 1
+                            "
+                          >
+                            <span class="btn-group btn-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                              <label
+                                class="btn btn-light"
+                                ng-model="persistedFolder.UseNewVolume"
+                                uib-btn-radio="true"
+                                ng-change="ctrl.useNewVolume($index)"
+                                ng-disabled="ctrl.isNewVolumeButtonDisabled($index)"
+                                >New volume</label
+                              >
+                              <label
+                                class="btn btn-light"
+                                ng-model="persistedFolder.UseNewVolume"
+                                uib-btn-radio="false"
+                                ng-change="ctrl.useExistingVolume($index)"
+                                ng-disabled="ctrl.isExistingVolumeButtonDisabled()"
+                                >Existing volume</label
+                              >
+                            </span>
+                          </div>
+
+                          <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
+                            <span class="input-group-addon required">requested size</span>
+                            <input
+                              type="number"
+                              class="form-control !rounded-none"
+                              name="persisted_folder_size_{{ $index }}"
+                              ng-model="persistedFolder.Size"
+                              placeholder="20"
+                              min="0"
+                              required
+                              ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                              ng-change="ctrl.onChangeVolumeRequestedSize()"
+                            />
+                            <span class="input-group-addon !rounded-r-[5px] !p-0">
+                              <select
+                                class="form-control !h-[28px] w-12 !rounded-r-[5px] !border-none text-xs"
+                                ng-model="persistedFolder.SizeUnit"
+                                ng-style="{ height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
+                                ng-options="unit for unit in ctrl.state.availableSizeUnits"
+                                ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                                ng-change="ctrl.onChangeVolumeRequestedSize()"
+                              ></select>
+                            </span>
+                          </div>
+
+                          <div class="input-group col-sm-2 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
+                            <span class="input-group-addon">storage</span>
+                            <select
+                              ng-if="ctrl.hasMultipleStorageClassesAvailable()"
+                              class="form-control"
+                              ng-model="persistedFolder.StorageClass"
+                              ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
+                              ng-disabled="ctrl.state.isEdit || ctrl.formValues.Containers.length > 1"
+                              data-cy="k8sAppCreate-storageSelect_{{ $index }}"
+                            ></select>
+                            <input
+                              ng-if="!ctrl.hasMultipleStorageClassesAvailable()"
+                              type="text"
+                              class="form-control"
+                              disabled
+                              ng-model="persistedFolder.StorageClass.Name"
+                              data-cy="k8sAppCreate-storageClassNameInput_{{ $index }}"
+                            />
+                          </div>
+
+                          <div class="input-group col-sm-5 input-group-sm" ng-if="!persistedFolder.UseNewVolume" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                            <span class="input-group-addon">volume</span>
+                            <select
+                              class="form-control"
+                              name="existing_volumes_{{ $index }}"
+                              ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
+                              ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
+                              ng-change="ctrl.onChangeExistingVolumeSelection()"
+                              ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                              required
+                            >
+                              <option selected disabled hidden value="">Select a volume</option>
+                            </select>
+                          </div>
+
+                          <div class="input-group col-sm-1 input-group-sm">
+                            <div ng-if="!ctrl.isEditAndStatefulSet() && !ctrl.state.useExistingVolume[$index] && ctrl.formValues.Containers.length <= 1">
+                              <button
+                                ng-if="!persistedFolder.NeedsDeletion"
+                                class="btn btn-sm btn-dangerlight !ml-0 h-[30px]"
+                                type="button"
+                                ng-click="ctrl.removePersistedFolder($index)"
+                                data-cy="k8sAppCreate-rmPersistentFolderButton"
+                              >
+                                <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+                              </button>
+                              <button
+                                ng-if="persistedFolder.NeedsDeletion"
+                                class="btn btn-sm btn-primary"
+                                type="button"
+                                ng-click="ctrl.restorePersistedFolder($index)"
+                                data-cy="k8sAppCreate-restorePersistentButton"
+                              >
+                                <pr-icon icon="'rotate-cw'"></pr-icon>
+                              </button>
+                            </div>
+                          </div>
                         </div>
 
                         <div
-                          class="input-group col-sm-2 input-group-sm"
-                          ng-if="
-                            !ctrl.isEditAndExistingPersistedFolder($index) &&
-                            ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET &&
-                            ctrl.formValues.Containers.length <= 1
+                          class="flex flex-row gap-x-1"
+                          ng-show="
+                            kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
+                            ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined ||
+                            kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
+                            ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined ||
+                            kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid ||
+                            ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined
                           "
                         >
-                          <span class="btn-group btn-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
-                            <label
-                              class="btn btn-light"
-                              ng-model="persistedFolder.UseNewVolume"
-                              uib-btn-radio="true"
-                              ng-change="ctrl.useNewVolume($index)"
-                              ng-disabled="ctrl.isNewVolumeButtonDisabled($index)"
-                              >New volume</label
+                          <div class="input-group col-sm-3 input-group-sm">
+                            <div
+                              class="small text-warning"
+                              style="margin-top: 5px"
+                              ng-show="
+                                kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined
+                              "
                             >
-                            <label
-                              class="btn btn-light"
-                              ng-model="persistedFolder.UseNewVolume"
-                              uib-btn-radio="false"
-                              ng-change="ctrl.useExistingVolume($index)"
-                              ng-disabled="ctrl.isExistingVolumeButtonDisabled()"
-                              >Existing volume</label
-                            >
-                          </span>
-                        </div>
-
-                        <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
-                          <span class="input-group-addon required">requested size</span>
-                          <input
-                            type="number"
-                            class="form-control !rounded-none"
-                            name="persisted_folder_size_{{ $index }}"
-                            ng-model="persistedFolder.Size"
-                            placeholder="20"
-                            min="0"
-                            required
-                            ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
-                            ng-change="ctrl.onChangeVolumeRequestedSize()"
-                          />
-                          <span class="input-group-addon !rounded-r-[5px] !p-0">
-                            <select
-                              class="form-control !h-[28px] w-12 !rounded-r-[5px] !border-none text-xs"
-                              ng-model="persistedFolder.SizeUnit"
-                              ng-style="{ height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
-                              ng-options="unit for unit in ctrl.state.availableSizeUnits"
-                              ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
-                              ng-change="ctrl.onChangeVolumeRequestedSize()"
-                            ></select>
-                          </span>
-                        </div>
-
-                        <div class="input-group col-sm-2 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
-                          <span class="input-group-addon">storage</span>
-                          <select
-                            ng-if="ctrl.hasMultipleStorageClassesAvailable()"
-                            class="form-control"
-                            ng-model="persistedFolder.StorageClass"
-                            ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
-                            ng-disabled="ctrl.state.isEdit || ctrl.formValues.Containers.length > 1"
-                            data-cy="k8sAppCreate-storageSelect_{{ $index }}"
-                          ></select>
-                          <input
-                            ng-if="!ctrl.hasMultipleStorageClassesAvailable()"
-                            type="text"
-                            class="form-control"
-                            disabled
-                            ng-model="persistedFolder.StorageClass.Name"
-                            data-cy="k8sAppCreate-storageClassNameInput_{{ $index }}"
-                          />
-                        </div>
-
-                        <div class="input-group col-sm-5 input-group-sm" ng-if="!persistedFolder.UseNewVolume" ng-class="{ striked: persistedFolder.NeedsDeletion }">
-                          <span class="input-group-addon">volume</span>
-                          <select
-                            class="form-control"
-                            name="existing_volumes_{{ $index }}"
-                            ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
-                            ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
-                            ng-change="ctrl.onChangeExistingVolumeSelection()"
-                            ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
-                            required
-                          >
-                            <option selected disabled hidden value="">Select a volume</option>
-                          </select>
-                        </div>
-
-                        <div class="input-group col-sm-1 input-group-sm">
-                          <div ng-if="!ctrl.isEditAndStatefulSet() && !ctrl.state.useExistingVolume[$index] && ctrl.formValues.Containers.length <= 1">
-                            <button
-                              ng-if="!persistedFolder.NeedsDeletion"
-                              class="btn btn-sm btn-dangerlight !ml-0 h-[30px]"
-                              type="button"
-                              ng-click="ctrl.removePersistedFolder($index)"
-                              data-cy="k8sAppCreate-rmPersistentFolderButton"
-                            >
-                              <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
-                            </button>
-                            <button
-                              ng-if="persistedFolder.NeedsDeletion"
-                              class="btn btn-sm btn-primary"
-                              type="button"
-                              ng-click="ctrl.restorePersistedFolder($index)"
-                              data-cy="k8sAppCreate-restorePersistentButton"
-                            >
-                              <pr-icon icon="'rotate-cw'"></pr-icon>
-                            </button>
+                              <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
+                                <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
+                              </ng-messages>
+                              <p class="vertical-center" ng-if="ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined"
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already defined.</p
+                              >
+                            </div>
                           </div>
+
+                          <div class="input-group col-sm-offset-3 col-sm-3 input-group-sm">
+                            <div
+                              class="small text-warning"
+                              style="margin-top: 5px"
+                              ng-show="
+                                kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid || ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined
+                              "
+                            >
+                              <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
+                                <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Size is required.</p>
+                                <p class="vertical-center" ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This value must be greater than zero.</p>
+                              </ng-messages>
+                              <p class="vertical-center" ng-if="ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined">
+                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                                You can only request up to
+                                {{ ctrl.state.storages.availabilities[persistedFolder.StorageClass.Name] | kubernetesAppStorageRequestSizeHumanReadable }} for
+                                {{ persistedFolder.StorageClass.Name }}
+                              </p>
+                            </div>
+                            <div
+                              class="small text-warning"
+                              ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
+                            >
+                              <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
+                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Volume is required.</p>
+                              </ng-messages>
+                              <p ng-if="ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This volume is already used.</p
+                              >
+                            </div>
+                          </div>
+
+                          <div class="input-group col-sm-1 input-group-sm"> </div>
                         </div>
                       </div>
 
-                      <div
-                        class="flex flex-row gap-x-1"
-                        ng-show="
-                          kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
-                          ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined ||
-                          kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
-                          ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined ||
-                          kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid ||
-                          ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined
-                        "
-                      >
-                        <div class="input-group col-sm-3 input-group-sm">
-                          <div
-                            class="small text-warning"
-                            style="margin-top: 5px"
-                            ng-show="
-                              kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined
-                            "
-                          >
-                            <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
-                              <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Path is required.</p>
-                            </ng-messages>
-                            <p class="vertical-center" ng-if="ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined"
-                              ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This path is already defined.</p
-                            >
-                          </div>
-                        </div>
-
-                        <div class="input-group col-sm-offset-3 col-sm-3 input-group-sm">
-                          <div
-                            class="small text-warning"
-                            style="margin-top: 5px"
-                            ng-show="
-                              kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid || ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined
-                            "
-                          >
-                            <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
-                              <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Size is required.</p>
-                              <p class="vertical-center" ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This value must be greater than zero.</p>
-                            </ng-messages>
-                            <p class="vertical-center" ng-if="ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined">
-                              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                              You can only request up to
-                              {{ ctrl.state.storages.availabilities[persistedFolder.StorageClass.Name] | kubernetesAppStorageRequestSizeHumanReadable }} for
-                              {{ persistedFolder.StorageClass.Name }}
-                            </p>
-                          </div>
-                          <div
-                            class="small text-warning"
-                            ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
-                          >
-                            <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
-                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Volume is required.</p>
-                            </ng-messages>
-                            <p ng-if="ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
-                              ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This volume is already used.</p
-                            >
-                          </div>
-                        </div>
-
-                        <div class="input-group col-sm-1 input-group-sm"> </div>
+                      <div class="col-sm-12 mt-2">
+                        <span
+                          class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                          ng-click="ctrl.addPersistedFolder()"
+                          ng-if="ctrl.isAddPersistentFolderButtonShowed()"
+                          data-cy="k8sAppCreate-addPersistentFolderButton"
+                        >
+                          <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add persisted folder
+                        </span>
                       </div>
-                    </div>
-
-                    <div class="col-sm-12 mt-2">
-                      <span
-                        class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
-                        ng-click="ctrl.addPersistedFolder()"
-                        ng-if="ctrl.isAddPersistentFolderButtonShowed()"
-                        data-cy="k8sAppCreate-addPersistentFolderButton"
-                      >
-                        <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add persisted folder
-                      </span>
                     </div>
                   </div>
                   <!-- #endregion -->
@@ -1150,8 +1308,9 @@
                   load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
                   app-name="ctrl.formValues.Name"
                   selector="ctrl.formValues.Selector"
-                  validation-context="{nodePortServices: ctrl.state.nodePortServices}"
+                  validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
                   is-edit-mode="ctrl.state.isEdit"
+                  namespace="ctrl.formValues.ResourcePool.Namespace.Name"
                 ></kube-services-form>
                 <!-- kubernetes services options -->
 
@@ -1197,11 +1356,11 @@
               <kube-services-form
                 on-change="(ctrl.onServicesChange)"
                 values="ctrl.formValues.Services"
-                load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
                 app-name="ctrl.formValues.Name"
                 selector="ctrl.formValues.Selector"
-                validation-context="{nodePortServices: ctrl.state.nodePortServices}"
+                validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
                 is-edit-mode="ctrl.state.isEdit"
+                namespace="ctrl.formValues.ResourcePool.Namespace.Name"
               ></kube-services-form>
               <!-- kubernetes services options -->
             </div>

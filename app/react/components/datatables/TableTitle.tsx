@@ -18,20 +18,22 @@ export function TableTitle({
   className,
 }: PropsWithChildren<Props>) {
   return (
-    <div className={clsx('toolBar flex-col', className)}>
-      <div className="flex w-full items-center gap-1 p-0">
-        <div className="toolBarTitle">
-          {icon && (
-            <div className="widget-icon">
-              <Icon icon={icon} className="space-right" />
-            </div>
-          )}
+    <>
+      <div className={clsx('toolBar flex-col', className)}>
+        <div className="flex w-full items-center gap-1 p-0">
+          <div className="toolBarTitle">
+            {icon && (
+              <div className="widget-icon">
+                <Icon icon={icon} className="space-right" />
+              </div>
+            )}
 
-          {label}
+            {label}
+          </div>
+          {children}
         </div>
-        {children}
       </div>
-      {description}
-    </div>
+      {!!description && <div className="toolBar !pt-0">{description}</div>}
+    </>
   );
 }

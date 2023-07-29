@@ -1,15 +1,3 @@
 <page-header title="'Configs list'" breadcrumbs="['Configs']" reload="true"> </page-header>
 
-<div class="row">
-  <div class="col-sm-12">
-    <configs-datatable
-      title-text="Configs"
-      title-icon="clipboard"
-      dataset="ctrl.configs"
-      table-key="configs"
-      order-by="Name"
-      remove-action="ctrl.removeAction"
-      refresh-callback="ctrl.getConfigs"
-    ></configs-datatable>
-  </div>
-</div>
+<docker-configs-datatable dataset="ctrl.configs" on-remove-click="(ctrl.removeAction)" on-refresh="(ctrl.getConfigs)"></docker-configs-datatable>

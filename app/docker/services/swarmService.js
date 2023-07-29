@@ -7,10 +7,10 @@ angular.module('portainer.docker').factory('SwarmService', [
     'use strict';
     var service = {};
 
-    service.swarm = function () {
+    service.swarm = function (endpointId) {
       var deferred = $q.defer();
 
-      Swarm.get()
+      Swarm.get(endpointId ? { endpointId } : undefined)
         .$promise.then(function success(data) {
           var swarm = new SwarmViewModel(data);
           deferred.resolve(swarm);

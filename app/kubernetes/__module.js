@@ -223,30 +223,64 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const configurations = {
       name: 'kubernetes.configurations',
-      url: '/configurations',
+      url: '/configurations?tab',
       views: {
         'content@': {
-          component: 'kubernetesConfigurationsView',
+          component: 'kubernetesConfigMapsAndSecretsView',
         },
       },
+      params: {
+        tab: null,
+      },
+    };
+    const configmaps = {
+      name: 'kubernetes.configmaps',
+      url: '/configmaps',
+      abstract: true,
     };
 
-    const configurationCreation = {
-      name: 'kubernetes.configurations.new',
+    const configMapCreation = {
+      name: 'kubernetes.configmaps.new',
       url: '/new',
       views: {
         'content@': {
-          component: 'kubernetesCreateConfigurationView',
+          component: 'kubernetesCreateConfigMapView',
         },
       },
     };
 
-    const configuration = {
-      name: 'kubernetes.configurations.configuration',
+    const configMap = {
+      name: 'kubernetes.configmaps.configmap',
       url: '/:namespace/:name',
       views: {
         'content@': {
-          component: 'kubernetesConfigurationView',
+          component: 'kubernetesConfigMapView',
+        },
+      },
+    };
+
+    const secrets = {
+      name: 'kubernetes.secrets',
+      url: '/secrets',
+      abstract: true,
+    };
+
+    const secretCreation = {
+      name: 'kubernetes.secrets.new',
+      url: '/new',
+      views: {
+        'content@': {
+          component: 'kubernetesCreateSecretView',
+        },
+      },
+    };
+
+    const secret = {
+      name: 'kubernetes.secrets.secret',
+      url: '/:namespace/:name',
+      views: {
+        'content@': {
+          component: 'kubernetesSecretView',
         },
       },
     };
@@ -293,7 +327,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const deploy = {
       name: 'kubernetes.deploy',
-      url: '/deploy?templateId&referrer',
+      url: '/deploy?templateId&referrer&tab',
       views: {
         'content@': {
           component: 'kubernetesDeployView',
@@ -418,8 +452,12 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(stack);
     $stateRegistryProvider.register(stackLogs);
     $stateRegistryProvider.register(configurations);
-    $stateRegistryProvider.register(configurationCreation);
-    $stateRegistryProvider.register(configuration);
+    $stateRegistryProvider.register(configmaps);
+    $stateRegistryProvider.register(configMapCreation);
+    $stateRegistryProvider.register(secrets);
+    $stateRegistryProvider.register(secretCreation);
+    $stateRegistryProvider.register(configMap);
+    $stateRegistryProvider.register(secret);
     $stateRegistryProvider.register(cluster);
     $stateRegistryProvider.register(dashboard);
     $stateRegistryProvider.register(deploy);

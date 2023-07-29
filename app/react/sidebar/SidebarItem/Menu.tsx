@@ -53,7 +53,7 @@ export function Menu({
         )}
       </div>
 
-      {isOpen && <ul className="!pl-8">{children}</ul>}
+      {isOpen && <ul className="!pl-11">{children}</ul>}
     </div>
   );
 

@@ -48,12 +48,12 @@ func FetchEndpointRelationsConfig(tx dataservices.DataStoreTx) (*EndpointRelatio
 		return nil, fmt.Errorf("unable to retrieve environments from database: %w", err)
 	}
 
-	endpointGroups, err := tx.EndpointGroup().EndpointGroups()
+	endpointGroups, err := tx.EndpointGroup().ReadAll()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve environment groups from database: %w", err)
 	}
 
-	edgeGroups, err := tx.EdgeGroup().EdgeGroups()
+	edgeGroups, err := tx.EdgeGroup().ReadAll()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve edge groups from database: %w", err)
 	}

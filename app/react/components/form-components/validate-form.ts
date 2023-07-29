@@ -3,8 +3,7 @@ import { SchemaOf } from 'yup';
 
 export async function validateForm<T>(
   schemaBuilder: () => SchemaOf<T>,
-  formValues: T,
-  validationContext?: object
+  formValues: T
 ) {
   const validationSchema = schemaBuilder();
 
@@ -12,8 +11,6 @@ export async function validateForm<T>(
     await validationSchema.validate(formValues, {
       strict: true,
       abortEarly: false,
-      // workaround to access all parents for nested fields. See clusterIpFormValidation for a use case.
-      context: { formValues, validationContext },
     });
     return undefined;
   } catch (error) {

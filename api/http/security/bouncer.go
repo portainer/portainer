@@ -5,15 +5,30 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+
+	"github.com/pkg/errors"
 )
 
 type (
+	BouncerService interface {
+		PublicAccess(http.Handler) http.Handler
+		AdminAccess(http.Handler) http.Handler
+		RestrictedAccess(http.Handler) http.Handler
+		TeamLeaderAccess(http.Handler) http.Handler
+		AuthenticatedAccess(http.Handler) http.Handler
+		EdgeComputeOperation(http.Handler) http.Handler
+
+		AuthorizedEndpointOperation(*http.Request, *portainer.Endpoint) error
+		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
+		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
+		JWTAuthLookup(*http.Request) *portainer.TokenData
+	}
+
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
 		dataStore     dataservices.DataStore
@@ -119,7 +134,7 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return err
 	}
 
-	group, err := bouncer.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	group, err := bouncer.dataStore.EndpointGroup().Read(endpoint.GroupID)
 	if err != nil {
 		return err
 	}
@@ -202,7 +217,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 			return
 		}
 
-		_, err = bouncer.dataStore.User().User(tokenData.ID)
+		_, err = bouncer.dataStore.User().Read(tokenData.ID)
 		if bouncer.dataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
@@ -273,7 +288,7 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			return
 		}
 
-		_, err := bouncer.dataStore.User().User(token.ID)
+		_, err := bouncer.dataStore.User().Read(token.ID)
 		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
@@ -332,9 +347,11 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 		return nil
 	}
 
-	// update the last used time of the key
-	apiKey.LastUsed = time.Now().UTC().Unix()
-	bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
+		// update the last used time of the key
+		apiKey.LastUsed = now
+		bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+	}
 
 	return tokenData
 }

@@ -78,13 +78,13 @@ func (m *Migrator) updateEdgeStackStatusForDB80() error {
 			switch status.Type {
 			case portainer.EdgeStackStatusPending:
 				status.Details.Pending = true
-			case portainer.EdgeStackStatusOk:
+			case portainer.EdgeStackStatusDeploymentReceived:
 				status.Details.Ok = true
 			case portainer.EdgeStackStatusError:
 				status.Details.Error = true
 			case portainer.EdgeStackStatusAcknowledged:
 				status.Details.Acknowledged = true
-			case portainer.EdgeStackStatusRemove:
+			case portainer.EdgeStackStatusRemoved:
 				status.Details.Remove = true
 			case portainer.EdgeStackStatusRemoteUpdateSuccess:
 				status.Details.RemoteUpdateSuccess = true

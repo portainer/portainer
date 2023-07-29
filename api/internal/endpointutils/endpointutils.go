@@ -200,6 +200,7 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 
 func UpdateEdgeEndpointHeartbeat(endpoint *portainer.Endpoint, settings *portainer.Settings) {
 	if IsEdgeEndpoint(endpoint) {
+		endpoint.QueryDate = time.Now().Unix()
 		checkInInterval := getEndpointCheckinInterval(endpoint, settings)
 		endpoint.Heartbeat = endpoint.QueryDate-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
 	}

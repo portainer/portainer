@@ -5,22 +5,48 @@ import {
 } from '@/react/portainer/gitops/types';
 import { RegistryId } from '@/react/portainer/registries/types';
 
+import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
+
 import { EdgeGroup } from '../edge-groups/types';
 
-interface EdgeStackStatusDetails {
-  Pending: boolean;
-  Ok: boolean;
-  Error: boolean;
-  Acknowledged: boolean;
-  Remove: boolean;
-  RemoteUpdateSuccess: boolean;
-  ImagesPulled: boolean;
+export enum StatusType {
+  /** Pending represents a pending edge stack */
+  Pending,
+  /** DeploymentReceived represents an edge environment which received the edge stack deployment */
+  DeploymentReceived,
+  /** Error represents an edge environment which failed to deploy its edge stack */
+  Error,
+  /** Acknowledged represents an acknowledged edge stack */
+  Acknowledged,
+  /** Removed represents a removed edge stack */
+  Removed,
+  /** StatusRemoteUpdateSuccess represents a successfully updated edge stack */
+  RemoteUpdateSuccess,
+  /** ImagesPulled represents a successfully images-pulling */
+  ImagesPulled,
+  /** Running represents a running Edge stack */
+  Running,
+  /** Deploying represents an Edge stack which is being deployed */
+  Deploying,
+  /** Removing represents an Edge stack which is being removed */
+  Removing,
 }
 
-interface EdgeStackStatus {
-  Details: EdgeStackStatusDetails;
+export interface DeploymentStatus {
+  Type: StatusType;
   Error: string;
+  Time: number;
+}
+
+interface EdgeStackDeploymentInfo {
+  FileVersion: number;
+  ConfigHash: string;
+}
+
+export interface EdgeStackStatus {
+  Status: Array<DeploymentStatus>;
   EndpointID: EnvironmentId;
+  DeploymentInfo?: EdgeStackDeploymentInfo;
 }
 
 export enum DeploymentType {
@@ -55,6 +81,8 @@ export type EdgeStack = {
   Prune: boolean;
   RetryDeploy: boolean;
   Webhook?: string;
+  StackFileVersion?: number;
+  EnvVars?: EnvVar[];
 };
 
 export enum EditorType {

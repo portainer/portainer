@@ -42,7 +42,7 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 }
 
 func getEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error) {
-	edgeGroup, err := tx.EdgeGroup().EdgeGroup(ID)
+	edgeGroup, err := tx.EdgeGroup().Read(ID)
 	if tx.IsErrObjectNotFound(err) {
 		return nil, httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -50,7 +50,7 @@ func getEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) (*porta
 	}
 
 	if edgeGroup.Dynamic {
-		endpoints, err := getEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+		endpoints, err := GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
 		}

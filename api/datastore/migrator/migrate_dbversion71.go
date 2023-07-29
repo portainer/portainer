@@ -9,7 +9,7 @@ import (
 func (m *Migrator) migrateDBVersionToDB71() error {
 	log.Info().Msg("removing orphaned snapshots")
 
-	snapshots, err := m.snapshotService.Snapshots()
+	snapshots, err := m.snapshotService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (m *Migrator) migrateDBVersionToDB71() error {
 
 		log.Debug().Int("endpoint_id", int(s.EndpointID)).Msg("removing snapshot")
 
-		err = m.snapshotService.DeleteSnapshot(s.EndpointID)
+		err = m.snapshotService.Delete(s.EndpointID)
 		if err != nil {
 			return err
 		}

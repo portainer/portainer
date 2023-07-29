@@ -14,7 +14,7 @@ import (
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
 	HasEdgeStack  bool `json:"HasEdgeStack"`
-	HasEdgeGroup  bool `json:"HasEdgeGroup"`
+	HasEdgeJob    bool `json:"HasEdgeJob"`
 	EndpointTypes []portainer.EndpointType
 }
 
@@ -46,7 +46,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 }
 
 func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error) {
-	edgeGroups, err := tx.EdgeGroup().EdgeGroups()
+	edgeGroups, err := tx.EdgeGroup().ReadAll()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
 	}
@@ -64,7 +64,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 		}
 	}
 
-	edgeJobs, err := tx.EdgeJob().EdgeJobs()
+	edgeJobs, err := tx.EdgeJob().ReadAll()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
 	}
@@ -84,7 +84,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 			EndpointTypes: []portainer.EndpointType{},
 		}
 		if edgeGroup.Dynamic {
-			endpointIDs, err := getEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+			endpointIDs, err := GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
 				return nil, httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
 			}
@@ -99,7 +99,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 
 		edgeGroup.EndpointTypes = endpointTypes
 		edgeGroup.HasEdgeStack = usedEdgeGroups[edgeGroup.ID]
-		edgeGroup.HasEdgeGroup = usedByEdgeJob
+		edgeGroup.HasEdgeJob = usedByEdgeJob
 
 		decoratedEdgeGroups = append(decoratedEdgeGroups, edgeGroup)
 	}

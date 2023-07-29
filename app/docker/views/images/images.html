@@ -44,20 +44,17 @@
     </rd-widget>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-12">
-    <images-datatable
-      title-text="Images"
-      title-icon="list"
-      dataset="images"
-      table-key="images"
-      order-by="RepoTags"
-      show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
-      download-action="downloadAction"
-      remove-action="confirmRemove"
-      force-remove-action="confirmForceRemove"
-      export-in-progress="state.exportInProgress"
-      refresh-callback="getImages"
-    ></images-datatable>
-  </div>
-</div>
+
+<docker-images-datatable
+  ng-if="images"
+  dataset="images"
+  is-host-column-visible="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
+  on-download="(downloadAction)"
+  on-remove="(confirmRemovalAction)"
+  on-refresh="(getImages)"
+  is-export-in-progress="state.exportInProgress"
+  storage-key="images"
+  environment="endpoint"
+  settings-store="settingsStore"
+  containers="containers"
+></docker-images-datatable>

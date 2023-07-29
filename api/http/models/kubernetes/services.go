@@ -48,12 +48,15 @@ func (s *K8sServiceInfo) Validate(request *http.Request) error {
 	if s.Name == "" {
 		return errors.New("missing service name from the request payload")
 	}
+
 	if s.Namespace == "" {
 		return errors.New("missing service namespace from the request payload")
 	}
+
 	if s.Ports == nil {
 		return errors.New("missing service ports from the request payload")
 	}
+
 	return nil
 }
 
@@ -61,10 +64,12 @@ func (r K8sServiceDeleteRequests) Validate(request *http.Request) error {
 	if len(r) == 0 {
 		return errors.New("missing deletion request list in payload")
 	}
+
 	for ns := range r {
 		if len(ns) == 0 {
 			return errors.New("deletion given with empty namespace")
 		}
 	}
+
 	return nil
 }

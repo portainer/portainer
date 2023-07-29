@@ -1,0 +1,38 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Welcome!
+        
+        Thanks for suggesting an idea for Portainer!
+
+        Before opening a new idea or feature request, make sure that we do not have any duplicates already open. You can ensure this by [searching this discussion cagetory](https://github.com/orgs/portainer/discussions/categories/ideas). If there is a duplicate, please add a comment to the existing idea instead.
+
+        Also, be sure to check our [knowledge base](https://portal.portainer.io/knowledge) and [documentation](https://docs.portainer.io) as they may point you toward a solution.
+        
+        **DO NOT FILE DUPLICATE REQUESTS.**
+
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem? Please describe
+      description: Short list of what the feature request aims to address.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false

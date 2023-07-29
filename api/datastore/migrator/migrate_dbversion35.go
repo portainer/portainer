@@ -16,7 +16,7 @@ func (m *Migrator) migrateDBVersionToDB36() error {
 func (m *Migrator) migrateUsersToDB36() error {
 	log.Info().Msg("updating user authorizations")
 
-	users, err := m.userService.Users()
+	users, err := m.userService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func (m *Migrator) migrateUsersToDB36() error {
 		currentAuthorizations[portainer.OperationPortainerUserCreateToken] = true
 		currentAuthorizations[portainer.OperationPortainerUserRevokeToken] = true
 		user.PortainerAuthorizations = currentAuthorizations
-		err = m.userService.UpdateUser(user.ID, &user)
+		err = m.userService.Update(user.ID, &user)
 		if err != nil {
 			return err
 		}

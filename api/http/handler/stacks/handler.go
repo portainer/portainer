@@ -27,7 +27,7 @@ import (
 type Handler struct {
 	stackCreationMutex *sync.Mutex
 	stackDeletionMutex *sync.Mutex
-	requestBouncer     *security.RequestBouncer
+	requestBouncer     security.BouncerService
 	*mux.Router
 	DataStore               dataservices.DataStore
 	DockerClientFactory     *dockerclient.ClientFactory
@@ -48,7 +48,7 @@ func stackExistsError(name string) *httperror.HandlerError {
 }
 
 // NewHandler creates a handler to manage stack operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		stackCreationMutex: &sync.Mutex{},
@@ -81,13 +81,13 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/stacks/{id}/stop",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackStop))).Methods(http.MethodPost)
 	h.Handle("/stacks/webhooks/{webhookID}",
-		httperror.LoggerHandler(h.webhookInvoke)).Methods(http.MethodPost)
+		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInvoke))).Methods(http.MethodPost)
 
 	return h
 }
 
 func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID, resourceControl *portainer.ResourceControl) (bool, error) {
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return false, err
 	}
@@ -105,7 +105,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 }
 
 func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return false, err
 	}
@@ -116,7 +116,7 @@ func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
 }
 
 func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return false, err
 	}
@@ -145,7 +145,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 }
 
 func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID) (bool, error) {
-	stacks, err := handler.DataStore.Stack().Stacks()
+	stacks, err := handler.DataStore.Stack().ReadAll()
 	if err != nil {
 		return false, err
 	}

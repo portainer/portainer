@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -34,7 +35,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		return httperror.BadRequest("Invalid Custom template identifier route variable", err)
 	}
 
-	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
+	customTemplate, err := handler.DataStore.CustomTemplate().Read(portainer.CustomTemplateID(customTemplateID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a custom template with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -68,17 +69,19 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 	})
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to download git repository")
-		rbErr := rollbackCustomTemplate(backupPath, customTemplate.ProjectPath)
+
 		if err != nil {
+			rbErr := rollbackCustomTemplate(backupPath, customTemplate.ProjectPath)
 			return httperror.InternalServerError("Failed to rollback the custom template folder", rbErr)
 		}
+
 		return httperror.InternalServerError("Failed to download git repository", err)
 	}
 
 	if customTemplate.GitConfig.ConfigHash != commitHash {
 		customTemplate.GitConfig.ConfigHash = commitHash
 
-		err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
+		err = handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate)
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
 		}
@@ -104,11 +107,7 @@ func backupCustomTemplate(projectPath string) (string, error) {
 		return "", err
 	}
 
-	err = os.Mkdir(projectPath, stat.Mode())
-	if err != nil {
-		return backupPath, err
-	}
-	return backupPath, nil
+	return backupPath, os.Mkdir(projectPath, stat.Mode())
 }
 
 func rollbackCustomTemplate(backupPath, projectPath string) error {
@@ -116,6 +115,7 @@ func rollbackCustomTemplate(backupPath, projectPath string) error {
 	if err != nil {
 		return err
 	}
+
 	return os.Rename(backupPath, projectPath)
 }
 

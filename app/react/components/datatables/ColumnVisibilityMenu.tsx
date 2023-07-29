@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { Columns } from 'lucide-react';
@@ -44,7 +45,7 @@ export function ColumnVisibilityMenu<D extends object>({
                       label={
                         typeof column.columnDef.header === 'string'
                           ? column.columnDef.header
-                          : ''
+                          : _.capitalize(column.columnDef.id)
                       }
                       id={`visibility_${column.id}`}
                       onChange={(e) =>

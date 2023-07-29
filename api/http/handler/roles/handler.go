@@ -16,7 +16,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage role operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}

@@ -1,4 +1,4 @@
-import { User, Clock, Edit, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, Clock, Edit, ChevronRight, ChevronUp } from 'lucide-react';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Pod } from 'kubernetes-types/core/v1';
@@ -197,16 +197,16 @@ export function ApplicationSummaryWidget() {
             <form className="form-horizontal">
               <div className="form-group">
                 <div className="col-sm-12 vertical-center">
-                  <Edit /> Note
                   <Button
-                    size="xsmall"
+                    size="small"
                     type="button"
-                    color="light"
+                    color="none"
                     data-cy="k8sAppDetail-expandNoteButton"
                     onClick={() => setIsNoteOpen(!isNoteOpen)}
+                    className="!m-0 !p-0"
                   >
-                    {isNoteOpen ? 'Collapse' : 'Expand'}
-                    {isNoteOpen ? <ChevronUp /> : <ChevronDown />}
+                    {isNoteOpen ? <ChevronUp /> : <ChevronRight />} <Edit />{' '}
+                    Note
                   </Button>
                 </div>
               </div>
@@ -267,7 +267,7 @@ export function ApplicationSummaryWidget() {
       {
         op: 'replace',
         path: `/metadata/annotations/${appNoteAnnotation}`,
-        value: 'applicationNoteFormValues',
+        value: applicationNoteFormValues,
       },
     ];
     if (application?.kind) {

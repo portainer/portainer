@@ -40,7 +40,7 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid registry identifier route variable", err)
 	}
 
-	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Read(portainer.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a registry with the specified identifier inside the database", err)
 	} else if err != nil {

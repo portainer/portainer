@@ -50,7 +50,7 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 }
 
 func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) error {
-	_, err := tx.EdgeGroup().EdgeGroup(ID)
+	_, err := tx.EdgeGroup().Read(ID)
 	if tx.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -70,7 +70,7 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 		}
 	}
 
-	edgeJobs, err := tx.EdgeJob().EdgeJobs()
+	edgeJobs, err := tx.EdgeJob().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
 	}
@@ -83,7 +83,7 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 		}
 	}
 
-	err = tx.EdgeGroup().DeleteEdgeGroup(ID)
+	err = tx.EdgeGroup().Delete(ID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the Edge group from the database", err)
 	}

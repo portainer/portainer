@@ -5,7 +5,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { getPVCsForCluster } from './service';
 
-// useQuery to get a list of all applications from an array of namespaces
+// useQuery to get a list of all persistent volume claims from an array of namespaces
 export function usePVCsForCluster(
   environemtId: EnvironmentId,
   namespaces?: string[]
@@ -14,7 +14,7 @@ export function usePVCsForCluster(
     ['environments', environemtId, 'kubernetes', 'pvcs'],
     () => namespaces && getPVCsForCluster(environemtId, namespaces),
     {
-      ...withError('Unable to retrieve applications'),
+      ...withError('Unable to retrieve perrsistent volume claims'),
       enabled: !!namespaces,
     }
   );

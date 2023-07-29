@@ -4,5 +4,6 @@ use (
 	./api
 	./pkg/featureflags
 	./pkg/libhelm
+	./pkg/libstack
 	./third_party/digest
 )

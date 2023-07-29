@@ -57,7 +57,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(id))
+	stack, err := handler.DataStore.Stack().Read(portainer.StackID(id))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -123,13 +123,13 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	err = handler.DataStore.Stack().DeleteStack(portainer.StackID(id))
+	err = handler.DataStore.Stack().Delete(portainer.StackID(id))
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the stack from the database", err)
 	}
 
 	if resourceControl != nil {
-		err = handler.DataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+		err = handler.DataStore.ResourceControl().Delete(resourceControl.ID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to remove the associated resource control from the database", err)
 		}

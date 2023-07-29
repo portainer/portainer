@@ -20,14 +20,22 @@ type RegularProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
-> = { isCreatable?: false } & ReactSelectProps<Option, IsMulti, Group> &
+> = { isCreatable?: false; size?: 'sm' | 'md' } & ReactSelectProps<
+  Option,
+  IsMulti,
+  Group
+> &
   RefAttributes<ReactSelectType<Option, IsMulti, Group>>;
 
 type CreatableProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
-> = { isCreatable: true } & ReactSelectCreatableProps<Option, IsMulti, Group>;
+> = { isCreatable: true; size?: 'sm' | 'md' } & ReactSelectCreatableProps<
+  Option,
+  IsMulti,
+  Group
+>;
 
 type Props<
   Option = DefaultOption,
@@ -41,12 +49,17 @@ export function Select<
   Option = DefaultOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->({ className, isCreatable = false, ...props }: Props<Option, IsMulti, Group>) {
+>({
+  className,
+  isCreatable = false,
+  size = 'md',
+  ...props
+}: Props<Option, IsMulti, Group>) {
   const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
 
   return (
     <Component
-      className={clsx(className, 'portainer-selector-root')}
+      className={clsx(className, 'portainer-selector-root', size)}
       classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}

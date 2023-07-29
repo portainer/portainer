@@ -18,7 +18,7 @@ type Handler struct {
 	fileService portainer.FileService
 }
 
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService) *Handler {
 	h := &Handler{
 		Router:      mux.NewRouter(),
 		dataStore:   dataStore,

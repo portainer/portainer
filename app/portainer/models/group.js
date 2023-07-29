@@ -2,6 +2,7 @@ export function EndpointGroupDefaultModel() {
   this.Name = '';
   this.Description = '';
   this.TagIds = [];
+  this.AssociatedEndpoints = [];
 }
 
 export function EndpointGroupModel(data) {

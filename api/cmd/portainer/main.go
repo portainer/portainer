@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	libstack "github.com/portainer/docker-compose-wrapper"
-	"github.com/portainer/docker-compose-wrapper/compose"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/build"
@@ -48,6 +46,8 @@ import (
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/libhelm"
+	"github.com/portainer/portainer/pkg/libstack"
+	"github.com/portainer/portainer/pkg/libstack/compose"
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
@@ -152,7 +152,7 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	return store
 }
 
-func initComposeStackManager(composeDeployer libstack.Deployer, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
+func initComposeStackManager(composeDeployer libstack.Deployer, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper, err := exec.NewComposeStackManager(composeDeployer, proxyManager)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed creating compose manager")
@@ -429,7 +429,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed initializing key pair")
 	}
 
-	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
+	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx, fileService)
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
 	kubernetesClientFactory, err := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, dataStore, instanceID, *flags.AddrHTTPS, settings.UserSessionTimeout)
@@ -458,7 +458,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed initializing compose deployer")
 	}
 
-	composeStackManager := initComposeStackManager(composeDeployer, reverseTunnelService, proxyManager)
+	composeStackManager := initComposeStackManager(composeDeployer, proxyManager)
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService, dataStore)
 	if err != nil {

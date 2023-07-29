@@ -9,8 +9,9 @@ import {
 import { buildUrl } from '@/react/edge/edge-stacks/queries/buildUrl';
 import { DeploymentType, EdgeStack } from '@/react/edge/edge-stacks/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
+import { Registry } from '@/react/portainer/registries/types';
 
-interface UpdateEdgeStackGitPayload {
+export interface UpdateEdgeStackGitPayload {
   id: EdgeStack['Id'];
   autoUpdate: AutoUpdateResponse | null;
   refName: string;
@@ -18,6 +19,7 @@ interface UpdateEdgeStackGitPayload {
   groupIds: EdgeGroup['Id'][];
   deploymentType: DeploymentType;
   updateVersion: boolean;
+  registries?: Array<Registry['Id']>;
 }
 
 export function useUpdateEdgeStackGitMutation() {

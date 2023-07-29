@@ -299,18 +299,27 @@ type (
 		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
+	// StackDeploymentInfo records the information of a deployed stack
+	StackDeploymentInfo struct {
+		// FileVersion is the version of the stack file, used to detect changes
+		FileVersion int `json:"FileVersion"`
+		// ConfigHash is the commit hash of the git repository used for deploying the stack
+		ConfigHash string `json:"ConfigHash"`
+	}
+
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
-		ID             EdgeStackID                    `json:"Id" example:"1"`
-		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
-		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
-		ProjectPath    string                         `json:"ProjectPath"`
-		EntryPoint     string                         `json:"EntryPoint"`
-		Version        int                            `json:"Version"`
-		NumDeployments int                            `json:"NumDeployments"`
+		ID     EdgeStackID                    `json:"Id" example:"1"`
+		Name   string                         `json:"Name"`
+		Status map[EndpointID]EdgeStackStatus `json:"Status"`
+		// StatusArray    map[EndpointID][]EdgeStackStatus `json:"StatusArray"`
+		CreationDate   int64         `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID `json:"EdgeGroups"`
+		ProjectPath    string        `json:"ProjectPath"`
+		EntryPoint     string        `json:"EntryPoint"`
+		Version        int           `json:"Version"`
+		NumDeployments int           `json:"NumDeployments"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
 		// Uses the manifest's namespaces instead of the default one
@@ -337,12 +346,26 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Details    EdgeStackStatusDetails `json:"Details"`
-		Error      string                 `json:"Error"`
-		EndpointID EndpointID             `json:"EndpointID"`
+		Status     []EdgeStackDeploymentStatus
+		EndpointID EndpointID
+		// EE only feature
+		DeploymentInfo StackDeploymentInfo
 
 		// Deprecated
+		Details EdgeStackStatusDetails
+		// Deprecated
+		Error string
+		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
+	}
+
+	// EdgeStackDeploymentStatus represents an edge stack deployment status
+	EdgeStackDeploymentStatus struct {
+		Time  int64
+		Type  EdgeStackStatusType
+		Error string
+		// EE only feature
+		RollbackTo *int
 	}
 
 	//EdgeStackStatusType represents an edge stack status type
@@ -1017,7 +1040,7 @@ type (
 		UpdatedBy string `example:"bob"`
 		// Only applies when deploying stack with multiple files
 		AdditionalFiles []string `json:"AdditionalFiles"`
-		// The auto update settings of a git stack
+		// The GitOps update settings of a git stack
 		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`
@@ -1110,7 +1133,7 @@ type (
 		// Mandatory container/stack fields
 		// Template Identifier
 		ID TemplateID `json:"Id" example:"1"`
-		// Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)
+		// Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack), 4 (Compose edge stack)
 		Type TemplateType `json:"type" example:"1"`
 		// Title of the template
 		Title string `json:"title" example:"Nginx"`
@@ -1374,12 +1397,20 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
+		GetStackProjectPathByVersion(stackIdentifier string, version int, commitHash string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error)
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
+		RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
+		RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
+		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string
+		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error)
+		FormProjectPathByVersion(projectPath string, version int, commitHash string) string
+		SafeMoveDirectory(src, dst string) error
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
@@ -1402,6 +1433,8 @@ type (
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
+		GetDefaultChiselPrivateKeyPath() string
+		StoreChiselPrivateKey(privateKey []byte) error
 	}
 
 	// GitService represents a service for managing Git
@@ -1409,7 +1442,7 @@ type (
 		CloneRepository(destination string, repositoryURL, referenceName, username, password string, tlsSkipVerify bool) error
 		LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error)
 		ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error)
-		ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includeExts []string, tlsSkipVerify bool) ([]string, error)
+		ListFiles(repositoryURL, referenceName, username, password string, dirOnly, hardRefresh bool, includeExts []string, tlsSkipVerify bool) ([]string, error)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT
@@ -1627,18 +1660,24 @@ const (
 const (
 	// EdgeStackStatusPending represents a pending edge stack
 	EdgeStackStatusPending EdgeStackStatusType = iota
-	//EdgeStackStatusOk represents a successfully deployed edge stack
-	EdgeStackStatusOk
-	//EdgeStackStatusError represents an edge environment(endpoint) which failed to deploy its edge stack
+	//EdgeStackStatusDeploymentReceived represents an edge environment which received the edge stack deployment
+	EdgeStackStatusDeploymentReceived
+	//EdgeStackStatusError represents an edge environment which failed to deploy its edge stack
 	EdgeStackStatusError
 	//EdgeStackStatusAcknowledged represents an acknowledged edge stack
 	EdgeStackStatusAcknowledged
-	//EdgeStackStatusRemove represents a removed edge stack (status isn't persisted)
-	EdgeStackStatusRemove
+	//EdgeStackStatusRemoved represents a removed edge stack
+	EdgeStackStatusRemoved
 	// StatusRemoteUpdateSuccess represents a successfully updated edge stack
 	EdgeStackStatusRemoteUpdateSuccess
 	// EdgeStackStatusImagesPulled represents a successfully images-pulling
 	EdgeStackStatusImagesPulled
+	// EdgeStackStatusRunning represents a running Edge stack
+	EdgeStackStatusRunning
+	// EdgeStackStatusDeploying represents an Edge stack which is being deployed
+	EdgeStackStatusDeploying
+	// EdgeStackStatusRemoving represents an Edge stack which is being removed
+	EdgeStackStatusRemoving
 )
 
 const (
@@ -2019,4 +2058,11 @@ const (
 const (
 	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
 	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
+)
+
+type PerDevConfigsFilterType string
+
+const (
+	PerDevConfigsTypeFile PerDevConfigsFilterType = "file"
+	PerDevConfigsTypeDir  PerDevConfigsFilterType = "dir"
 )

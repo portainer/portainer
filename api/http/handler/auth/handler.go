@@ -27,7 +27,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage authentication operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, passwordStrengthChecker security.PasswordStrengthChecker) *Handler {
+func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimiter, passwordStrengthChecker security.PasswordStrengthChecker) *Handler {
 	h := &Handler{
 		Router:                  mux.NewRouter(),
 		passwordStrengthChecker: passwordStrengthChecker,

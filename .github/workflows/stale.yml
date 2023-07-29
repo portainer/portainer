@@ -1,7 +1,8 @@
 name: Close Stale Issues
 on:
   schedule:
-  - cron: '0 12 * * *'
+    - cron: '0 12 * * *'
+  workflow_dispatch:
 jobs:
   stale:
     runs-on: ubuntu-latest
@@ -9,7 +10,7 @@ jobs:
       issues: write
 
     steps:
-    - uses: actions/stale@v4.0.0
+    - uses: actions/stale@v8
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 

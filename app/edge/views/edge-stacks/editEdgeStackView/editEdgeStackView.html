@@ -12,7 +12,7 @@
 
             <div style="padding: 20px">
               <edit-edge-stack-form
-                ng-if="$ctrl.edgeGroups && $ctrl.stack && $ctrl.formValues.content"
+                ng-if="$ctrl.edgeGroups && $ctrl.stack && $ctrl.formValues.content !== null"
                 edge-groups="$ctrl.edgeGroups"
                 edge-stack="$ctrl.stack"
                 is-submitting="$ctrl.state.actionInProgress"
@@ -29,17 +29,7 @@
             </uib-tab-heading>
 
             <div style="margin-top: 25px">
-              <edge-stack-endpoints-datatable
-                title-text="Environments Status"
-                dataset="$ctrl.endpoints"
-                title-icon="hard-drive"
-                table-key="edgeStackEndpoints"
-                order-by="Name"
-                retrieve-page="$ctrl.getPaginatedEndpoints"
-                edge-stack-id="$ctrl.stack.Id"
-                endpoints-status="$ctrl.stack.Status"
-              >
-              </edge-stack-endpoints-datatable>
+              <edge-stack-environments-datatable></edge-stack-environments-datatable>
             </div>
           </uib-tab>
         </uib-tabset>

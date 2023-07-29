@@ -2,12 +2,31 @@ package slices
 
 // Contains is a generic function that returns true if the element is contained within the slice
 func Contains[T comparable](elems []T, v T) bool {
+	return ContainsFunc(elems, func(s T) bool {
+		return s == v
+	})
+}
+
+// Contains is a generic function that returns true if the element is contained within the slice
+func ContainsFunc[T any](elems []T, f func(T) bool) bool {
 	for _, s := range elems {
-		if v == s {
+		if f(s) {
 			return true
 		}
 	}
 	return false
+}
+
+func Find[T any](elems []T, f func(T) bool) (T, bool) {
+	for _, s := range elems {
+		if f(s) {
+			return s, true
+		}
+	}
+
+	// return default value
+	var result T
+	return result, false
 }
 
 // IndexFunc returns the first index i satisfying f(s[i]),

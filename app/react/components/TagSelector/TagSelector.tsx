@@ -81,6 +81,7 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
           noOptionsMessage={() => 'No tags available'}
           formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
           onCreateOption={handleCreateOption}
+          aria-label="Tags"
         />
       </FormControl>
     </>

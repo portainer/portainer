@@ -9,7 +9,7 @@ Portainer consists of a single container that can run on any cluster. It can be 
 **Portainer Business Edition** builds on the open-source base and includes a range of advanced features and functions (like RBAC and Support) that are specific to the needs of business users.
 
 - [Compare Portainer CE and Compare Portainer BE](https://portainer.io/products)
-- [Take5 – get 5 free nodes of Portainer Business for as long as you want them](https://portainer.io/pricing/take5)
+- [Take3 – get 3 free nodes of Portainer Business for as long as you want them](https://www.portainer.io/take-3)
 - [Portainer BE install guide](https://install.portainer.io)
 
 ## Latest Version
@@ -21,8 +21,8 @@ Portainer CE is updated regularly. We aim to do an update release every couple o
 ## Getting started
 
 - [Deploy Portainer](https://docs.portainer.io/start/install)
-- [Documentation](https://documentation.portainer.io)
-- [Contribute to the project](https://documentation.portainer.io/contributing/instructions/)
+- [Documentation](https://docs.portainer.io)
+- [Contribute to the project](https://docs.portainer.io/contribute/contribute)
 
 ## Features & Functions
 
@@ -30,23 +30,22 @@ View [this](https://www.portainer.io/products) table to see all of the Portainer
 
 - [Portainer CE for Docker / Docker Swarm](https://www.portainer.io/solutions/docker)
 - [Portainer CE for Kubernetes](https://www.portainer.io/solutions/kubernetes-ui)
-- [Portainer CE for Azure ACI](https://www.portainer.io/solutions/serverless-containers)
 
 ## Getting help
 
 Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
 
-Learn more about Portainer's community support channels [here.](https://www.portainer.io/community_help)
+Learn more about Portainer's community support channels [here.](https://www.portainer.io/get-support-for-portainer)
 
 - Issues: https://github.com/portainer/portainer/issues
 - Slack (chat): [https://portainer.io/slack](https://portainer.io/slack)
 
-You can join the Portainer Community by visiting community.portainer.io. This will give you advance notice of events, content and other related Portainer content.
+You can join the Portainer Community by visiting [https://www.portainer.io/join-our-community](https://www.portainer.io/join-our-community). This will give you advance notice of events, content and other related Portainer content.
 
 ## Reporting bugs and contributing
 
 - Want to report a bug or request a feature? Please open [an issue](https://github.com/portainer/portainer/issues/new).
-- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://documentation.portainer.io/contributing/instructions/) to build it locally and make a pull request.
+- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://docs.portainer.io/contribute/contribute) to build it locally and make a pull request.
 
 ## Security
 
@@ -60,7 +59,7 @@ If you are a developer, and our code in this repo makes sense to you, we would l
 
 **To make sure we focus our development effort in the right places we need to know which features get used most often. To give us this information we use [Matomo Analytics](https://matomo.org/), which is hosted in Germany and is fully GDPR compliant.**
 
-When Portainer first starts, you are given the option to DISABLE analytics. If you **don't** choose to disable it, we collect anonymous usage as per [our privacy policy](https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/). **Please note**, there is no personally identifiable information sent or stored at any time and we only use the data to help us improve Portainer.
+When Portainer first starts, you are given the option to DISABLE analytics. If you **don't** choose to disable it, we collect anonymous usage as per [our privacy policy](https://www.portainer.io/privacy-policy). **Please note**, there is no personally identifiable information sent or stored at any time and we only use the data to help us improve Portainer.
 
 ## Limitations
 

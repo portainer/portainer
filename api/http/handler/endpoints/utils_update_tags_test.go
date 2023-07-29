@@ -33,7 +33,7 @@ func Test_updateTags(t *testing.T) {
 
 	checkTags := func(store *datastore.Store, is *assert.Assertions, tagIDs []portainer.TagID, endpointID portainer.EndpointID) {
 		for _, tagID := range tagIDs {
-			tag, err := store.Tag().Tag(tagID)
+			tag, err := store.Tag().Read(tagID)
 			is.NoError(err)
 
 			_, ok := tag.Endpoints[endpointID]
@@ -87,7 +87,7 @@ func Test_updateTags(t *testing.T) {
 		for _, tag := range endpointTags {
 			tag.Endpoints[testCase.endpoint.ID] = true
 
-			err = store.Tag().UpdateTag(tag.ID, &tag)
+			err = store.Tag().Update(tag.ID, &tag)
 			is.NoError(err)
 		}
 

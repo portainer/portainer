@@ -61,13 +61,13 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
-	err = handler.DataStore.Stack().DeleteStack(stack.ID)
+	err = handler.DataStore.Stack().Delete(stack.ID)
 	if err != nil {
 		return err
 	}
 
 	if resourceControl != nil {
-		err = handler.DataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+		err = handler.DataStore.ResourceControl().Delete(resourceControl.ID)
 		if err != nil {
 			log.Error().
 				Str("stack", fmt.Sprintf("%+v", stack)).
@@ -171,7 +171,7 @@ type composeStackFromGitRepositoryPayload struct {
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Applicable when deploying with multiple stack files
 	AdditionalFiles []string `example:"[nz.compose.yml, uat.compose.yml]"`
-	// Optional auto update configuration
+	// Optional GitOps update configuration
 	AutoUpdate *portainer.AutoUpdateSettings
 	// A list of environment variables used during stack deployment
 	Env []portainer.Pair

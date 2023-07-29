@@ -61,6 +61,7 @@ export function EdgeCheckinIntervalField({
         }}
         options={options}
         disabled={readonly}
+        id="edge_checkin"
       />
     </FormControl>
   );

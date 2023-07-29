@@ -68,26 +68,17 @@ func (service *Service) getUserEndpointAccessWithPolicies(
 	}
 
 	if endpointGroup == nil {
-		endpointGroup, err = tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		endpointGroup, err = tx.EndpointGroup().Read(endpoint.GroupID)
 		if err != nil {
 			return false, err
 		}
 	}
 
-	if userAccess(tx, userID, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies, memberships) {
-		return true, nil
-	}
-
-	if userAccess(tx, userID, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies, memberships) {
-		return true, nil
-	}
-
-	return false, nil
-
+	return userAccess(userID, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies, memberships) ||
+		userAccess(userID, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies, memberships), nil
 }
 
 func userAccess(
-	tx dataservices.DataStoreTx,
 	userID portainer.UserID,
 	userAccessPolicies portainer.UserAccessPolicies,
 	teamAccessPolicies portainer.TeamAccessPolicies,
@@ -114,7 +105,7 @@ func (service *Service) getTeamEndpointAccessWithPolicies(
 ) (bool, error) {
 	if endpointGroup == nil {
 		var err error
-		endpointGroup, err = tx.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		endpointGroup, err = tx.EndpointGroup().Read(endpoint.GroupID)
 		if err != nil {
 			return false, err
 		}

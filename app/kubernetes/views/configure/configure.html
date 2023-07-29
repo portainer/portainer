@@ -22,24 +22,26 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesClusterSetupForm">
-            <div class="col-sm-12 form-section-title"> Networking </div>
+            <div class="col-sm-12 form-section-title"> Networking - Services </div>
 
             <div class="form-group">
               <div class="col-sm-12 text-muted small">
                 <p> Enabling the load balancer feature will allow users to expose application they deploy over an external IP address assigned by cloud provider. </p>
-                <p class="vertical-center mt-1">
-                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                  Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
-                </p>
+                <div class="!inline-flex gap-1 !align-top">
+                  <div class="icon icon-sm"><pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon></div>
+                  <div>Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.</div>
+                </div>
               </div>
 
-              <div class="col-sm-12">
+              <div class="col-sm-12 mt-4">
                 <label class="control-label col-sm-5 col-lg-4 px-0 text-left"> Allow users to use external load balancer </label>
                 <label class="switch col-sm-8 mb-0">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
               </div>
             </div>
+
+            <div class="col-sm-12 form-section-title"> Networking - Ingresses </div>
 
             <ingress-class-datatable
               on-change-controllers="(ctrl.onChangeControllers)"
@@ -51,47 +53,57 @@
               view="'cluster'"
             ></ingress-class-datatable>
 
-            <label htmlFor="foldingButtonIngControllerSettings" class="col-sm-12 form-section-title flex cursor-pointer items-center">
-              <button
-                id="foldingButtonIngControllerSettings"
-                type="button"
-                class="mx-2 !ml-0 inline-flex w-2 items-center justify-center border-0 bg-transparent"
-                ng-click="ctrl.toggleAdvancedIngSettings()"
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.formValues.AllowNoneIngressClass"
+                  name="'allowNoIngressClass'"
+                  label="'Allow ingress class to be set to &quot;none&quot;'"
+                  tooltip="'This allows users setting up ingresses to select &quot;none&quot; as the ingress class.'"
+                  on-change="(ctrl.onToggleAllowNoneIngressClass)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8'"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.formValues.IngressAvailabilityPerNamespace"
+                  name="'ingressAvailabilityPerNamespace'"
+                  label="'Configure ingress controller availability per namespace'"
+                  tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
+                  on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8'"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.formValues.RestrictStandardUserIngressW"
+                  name="'restrictStandardUserIngressW'"
+                  label="'Only allow admins to deploy ingresses'"
+                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
+                  on-change="(ctrl.onToggleRestrictStandardUserIngressW)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8 text-muted'"
+                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
+                  disabled="!ctrl.isRBACEnabled"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+
+            <div class="mb-4 !inline-flex gap-1 !align-top">
+              <div class="icon icon-sm"><pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon></div>
+              <div class="text-muted small"
+                >You may set up ingress defaults (hostnames and annotations) via Create/Edit ingress. Users may then select them via the hostname dropdown in Create/Edit
+                application.</div
               >
-                <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" icon="'chevron-right'"></pr-icon>
-                <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" icon="'chevron-down'"></pr-icon>
-              </button>
-              More settings
-            </label>
-            <div ng-if="ctrl.state.isIngToggleSectionExpanded" class="ml-4">
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <por-switch-field
-                    checked="ctrl.formValues.AllowNoneIngressClass"
-                    name="'allowNoIngressClass'"
-                    label="'Allow ingress class to be set to &quot;none&quot;'"
-                    tooltip="'This allows users setting up ingresses to select &quot;none&quot; as the ingress class.'"
-                    on-change="(ctrl.onToggleAllowNoneIngressClass)"
-                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                    switch-class="'col-sm-8'"
-                  >
-                  </por-switch-field>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <por-switch-field
-                    checked="ctrl.formValues.IngressAvailabilityPerNamespace"
-                    name="'ingressAvailabilityPerNamespace'"
-                    label="'Configure ingress controller availability per namespace'"
-                    tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
-                    on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
-                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                    switch-class="'col-sm-8'"
-                  >
-                  </por-switch-field>
-                </div>
-              </div>
             </div>
 
             <!-- auto update window -->
@@ -104,7 +116,7 @@
                   name="'disableSysctlSettingForRegularUsers'"
                   label="'Enable Change Window'"
                   feature-id="ctrl.limitedFeatureAutoWindow"
-                  tooltip="'Automatic updates to stacks or applications outside the defined change window will not occur.'"
+                  tooltip="'GitOps updates to stacks or applications outside the defined change window will not occur.'"
                   on-change="(ctrl.onToggleAutoUpdate)"
                   label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
                   switch-class="'col-sm-8 text-muted'"
@@ -161,19 +173,6 @@
                 >
                 </por-switch-field>
               </div>
-
-              <div class="col-sm-12 mt-5">
-                <por-switch-field
-                  name="'restrictStandardUserIngressW'"
-                  label="'Only allow admins to deploy ingresses'"
-                  tooltip="'Enforces only allowing admins to deploy ingresses (and disallows standard users from doing so).'"
-                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                  switch-class="'col-sm-8 text-muted'"
-                  data-cy="kubeSetup-restrictStandardUserIngressWToggle"
-                  feature-id="ctrl.limitedFeatureIngressDeploy"
-                  disabled="!ctrl.isRBACEnabled"
-                ></por-switch-field>
-              </div>
             </div>
             <!-- #endregion -->
 
@@ -185,14 +184,16 @@
                   By ENABLING resource over-commit, you are able to assign more resources to namespaces than is physically available in the cluster. This may lead to unexpected
                   deployment failures if there is insufficient resource to service demand.
                 </p>
-                <p class="vertical-center mt-1">
-                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                  By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
-                  minus any system resource reservation.
-                </p>
+                <div class="mt-1 inline-flex gap-1 !align-top">
+                  <div class="icon icon-sm"><pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon></div>
+                  <div
+                    >By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
+                    minus any system resource reservation.</div
+                  >
+                </div>
               </div>
 
-              <div class="col-sm-12">
+              <div class="col-sm-12 mt-2">
                 <por-switch-field
                   data-cy="'kubeSetup-resourceOverCommitToggle'"
                   label="'Allow resource over-commit'"
@@ -209,11 +210,14 @@
             <div class="form-group">
               <div class="col-sm-12 text-muted small">
                 <p> Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage. </p>
-                <p class="vertical-center mt-1">
-                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
-                  <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
-                </p>
+                <div class="mt-1 !inline-flex gap-1 !align-top">
+                  <div class="icon icon-small"><pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon></div>
+                  <div
+                    >Ensure that
+                    <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
+                    <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.</div
+                  >
+                </div>
               </div>
             </div>
             <div class="form-group">

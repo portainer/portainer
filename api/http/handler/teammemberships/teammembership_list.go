@@ -21,7 +21,7 @@ import (
 // @failure 500 "Server error"
 // @router /team_memberships [get]
 func (handler *Handler) teamMembershipList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	memberships, err := handler.DataStore.TeamMembership().TeamMemberships()
+	memberships, err := handler.DataStore.TeamMembership().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve team memberships from the database", err)
 	}

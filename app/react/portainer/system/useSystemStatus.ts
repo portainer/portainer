@@ -2,6 +2,10 @@ import { useQuery } from 'react-query';
 import { RetryValue } from 'react-query/types/core/retryer';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { UserId } from '@/portainer/users/types';
+
+import { isBE } from '../feature-flags/feature-flags.service';
+import { EnvironmentId } from '../environments/types';
 
 import { buildUrl } from './build-url';
 import { queryKeys } from './query-keys';
@@ -12,13 +16,18 @@ export interface StatusResponse {
   Edition: string;
   Version: string;
   InstanceID: string;
+  DemoEnvironment: {
+    Enabled: boolean;
+    Users: Array<UserId>;
+    Environments: Array<EnvironmentId>;
+  };
 }
 
 export async function getSystemStatus() {
   try {
     const { data } = await axios.get<StatusResponse>(buildUrl('status'));
 
-    data.Edition = 'Community Edition';
+    data.Edition = isBE ? 'Business Edition' : 'Community Edition';
 
     return data;
   } catch (error) {
@@ -43,5 +52,11 @@ export function useSystemStatus<T = StatusResponse>({
     retry,
     retryDelay: 1000,
     onSuccess,
+  });
+}
+
+export function useIsDemo() {
+  return useSystemStatus({
+    select: (status) => status.DemoEnvironment.Enabled,
   });
 }

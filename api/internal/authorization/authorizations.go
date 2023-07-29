@@ -432,13 +432,17 @@ func DefaultPortainerAuthorizations() portainer.Authorizations {
 
 // UpdateUsersAuthorizations will trigger an update of the authorizations for all the users.
 func (service *Service) UpdateUsersAuthorizations() error {
-	users, err := service.dataStore.User().Users()
+	return service.UpdateUsersAuthorizationsTx(service.dataStore)
+}
+
+func (service *Service) UpdateUsersAuthorizationsTx(tx dataservices.DataStoreTx) error {
+	users, err := tx.User().ReadAll()
 	if err != nil {
 		return err
 	}
 
 	for _, user := range users {
-		err := service.updateUserAuthorizations(user.ID)
+		err := service.updateUserAuthorizations(tx, user.ID)
 		if err != nil {
 			return err
 		}
@@ -447,44 +451,44 @@ func (service *Service) UpdateUsersAuthorizations() error {
 	return nil
 }
 
-func (service *Service) updateUserAuthorizations(userID portainer.UserID) error {
-	user, err := service.dataStore.User().User(userID)
+func (service *Service) updateUserAuthorizations(tx dataservices.DataStoreTx, userID portainer.UserID) error {
+	user, err := tx.User().Read(userID)
 	if err != nil {
 		return err
 	}
 
-	endpointAuthorizations, err := service.getAuthorizations(user)
+	endpointAuthorizations, err := service.getAuthorizations(tx, user)
 	if err != nil {
 		return err
 	}
 
 	user.EndpointAuthorizations = endpointAuthorizations
 
-	return service.dataStore.User().UpdateUser(userID, user)
+	return tx.User().Update(userID, user)
 }
 
-func (service *Service) getAuthorizations(user *portainer.User) (portainer.EndpointAuthorizations, error) {
+func (service *Service) getAuthorizations(tx dataservices.DataStoreTx, user *portainer.User) (portainer.EndpointAuthorizations, error) {
 	endpointAuthorizations := portainer.EndpointAuthorizations{}
 	if user.Role == portainer.AdministratorRole {
 		return endpointAuthorizations, nil
 	}
 
-	userMemberships, err := service.dataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+	userMemberships, err := tx.TeamMembership().TeamMembershipsByUserID(user.ID)
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	endpoints, err := service.dataStore.Endpoint().Endpoints()
+	endpoints, err := tx.Endpoint().Endpoints()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := tx.EndpointGroup().ReadAll()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	roles, err := service.dataStore.Role().Roles()
+	roles, err := tx.Role().ReadAll()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
@@ -508,18 +512,21 @@ func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.E
 		authorizations := getAuthorizationsFromUserEndpointPolicy(user, &endpoint, roles)
 		if len(authorizations) > 0 {
 			endpointAuthorizations[endpoint.ID] = authorizations
+
 			continue
 		}
 
 		authorizations = getAuthorizationsFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
 		if len(authorizations) > 0 {
 			endpointAuthorizations[endpoint.ID] = authorizations
+
 			continue
 		}
 
 		authorizations = getAuthorizationsFromTeamEndpointPolicies(userMemberships, &endpoint, roles)
 		if len(authorizations) > 0 {
 			endpointAuthorizations[endpoint.ID] = authorizations
+
 			continue
 		}
 
@@ -587,6 +594,7 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 		for _, role := range roles {
 			if role.ID == id {
 				associatedRoles = append(associatedRoles, role)
+
 				break
 			}
 		}
@@ -604,11 +612,12 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 	return authorizations
 }
 
-func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
-	user, err := service.dataStore.User().User(userID)
+func (service *Service) UserIsAdminOrAuthorized(tx dataservices.DataStoreTx, userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
+	user, err := tx.User().Read(userID)
 	if err != nil {
 		return false, err
 	}
+
 	if user.Role == portainer.AdministratorRole {
 		return true, nil
 	}
@@ -619,5 +628,6 @@ func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpoin
 			return true, nil
 		}
 	}
+
 	return false, nil
 }

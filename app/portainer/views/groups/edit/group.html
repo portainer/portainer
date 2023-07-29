@@ -6,15 +6,12 @@
       <rd-widget-body>
         <group-form
           loaded="loaded"
-          page-type="edit"
           model="group"
-          available-endpoints="availableEndpoints"
           associated-endpoints="associatedEndpoints"
-          add-label-action="addLabel"
-          remove-label-action="removeLabel"
           form-action="update"
           form-action-label="Update the group"
           action-in-progress="state.actionInProgress"
+          on-change-environments="(onChangeEnvironments)"
         ></group-form>
       </rd-widget-body>
     </rd-widget>

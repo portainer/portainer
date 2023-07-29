@@ -52,12 +52,14 @@ import (
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
+	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
@@ -327,13 +329,19 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
+	errorLogger := NewHTTPLogger()
+
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
+
+	handler = middlewares.WithSlowRequestsLogger(handler)
+
 	if server.HTTPEnabled {
 		go func() {
 			log.Info().Str("bind_address", server.BindAddress).Msg("starting HTTP server")
 			httpServer := &http.Server{
-				Addr:    server.BindAddress,
-				Handler: handler,
+				Addr:     server.BindAddress,
+				Handler:  handler,
+				ErrorLog: errorLogger,
 			}
 
 			go shutdown(server.ShutdownCtx, httpServer)
@@ -349,6 +357,7 @@ func (server *Server) Start() error {
 	httpsServer := &http.Server{
 		Addr:         server.BindAddressHTTPS,
 		Handler:      handler,
+		ErrorLog:     errorLogger,
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)), // Disable HTTP/2
 	}
 
@@ -358,6 +367,8 @@ func (server *Server) Start() error {
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
+
+	go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
 
 	return httpsServer.ListenAndServeTLS("", "")
 }

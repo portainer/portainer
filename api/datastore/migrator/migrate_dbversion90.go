@@ -22,7 +22,7 @@ func (m *Migrator) migrateDBVersionToDB90() error {
 func (m *Migrator) updateEdgeStackStatusForDB90() error {
 	log.Info().Msg("clean up deleted endpoints from edge jobs")
 
-	edgeJobs, err := m.edgeJobService.EdgeJobs()
+	edgeJobs, err := m.edgeJobService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (m *Migrator) updateEdgeStackStatusForDB90() error {
 			if dataservices.IsErrObjectNotFound(err) {
 				delete(edgeJob.Endpoints, endpointId)
 
-				err = m.edgeJobService.UpdateEdgeJob(edgeJob.ID, &edgeJob)
+				err = m.edgeJobService.Update(edgeJob.ID, &edgeJob)
 				if err != nil {
 					return err
 				}
@@ -47,7 +47,7 @@ func (m *Migrator) updateEdgeStackStatusForDB90() error {
 func (m *Migrator) updateUserThemeForDB90() error {
 	log.Info().Msg("updating existing user theme settings")
 
-	users, err := m.userService.Users()
+	users, err := m.userService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (m *Migrator) updateUserThemeForDB90() error {
 			user.ThemeSettings.Color = user.UserTheme
 		}
 
-		if err := m.userService.UpdateUser(user.ID, user); err != nil {
+		if err := m.userService.Update(user.ID, user); err != nil {
 			return err
 		}
 	}

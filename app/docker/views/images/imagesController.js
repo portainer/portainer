@@ -15,7 +15,7 @@ angular.module('portainer.docker').controller('ImagesController', [
   'Blob',
   'endpoint',
   '$async',
-  function ($scope, $state, Authentication, ImageService, Notifications, HttpRequestHelper, FileSaver, Blob, endpoint, $async) {
+  function ($scope, $state, Authentication, ImageService, Notifications, HttpRequestHelper, FileSaver, Blob, endpoint) {
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
 
@@ -54,39 +54,31 @@ angular.module('portainer.docker').controller('ImagesController', [
         });
     };
 
-    $scope.confirmForceRemove = confirmForceRemove;
-    function confirmForceRemove(selectedItems, force) {
-      return $async(async () => {
-        const confirmed = await confirmDestructive({
-          title: 'Are you sure?',
-          message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
-          confirmButton: buildConfirmButton('Remove the image', 'danger'),
-        });
-
-        if (!confirmed) {
-          return;
-        }
-
-        $scope.removeAction(selectedItems, force);
+    function confirmImageForceRemoval() {
+      return confirmDestructive({
+        title: 'Are you sure?',
+        message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
+        confirmButton: buildConfirmButton('Remove the image', 'danger'),
       });
     }
 
-    $scope.confirmRemove = confirmRemove;
-    function confirmRemove(selectedItems) {
-      return $async(async () => {
-        const confirmed = await confirmDestructive({
-          title: 'Are you sure?',
-          message: 'Removing the image will remove all tags associated to that image. Are you sure you want to remove the image?',
-          confirmButton: buildConfirmButton('Remove the image', 'danger'),
-        });
-
-        if (!confirmed) {
-          return;
-        }
-
-        $scope.removeAction(selectedItems, false);
+    function confirmRegularRemove() {
+      return confirmDestructive({
+        title: 'Are you sure?',
+        message: 'Removing the image will remove all tags associated to that image. Are you sure you want to remove the image?',
+        confirmButton: buildConfirmButton('Remove the image', 'danger'),
       });
     }
+
+    $scope.confirmRemovalAction = async function (selectedItems, force) {
+      const confirmed = await (force ? confirmImageForceRemoval() : confirmRegularRemove());
+
+      if (!confirmed) {
+        return;
+      }
+
+      $scope.removeAction(selectedItems, force);
+    };
 
     function isAuthorizedToDownload(selectedItems) {
       for (var i = 0; i < selectedItems.length; i++) {

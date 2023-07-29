@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
 
 import { Registry } from '@/react/portainer/registries/types';
 
@@ -13,24 +14,24 @@ import { FormSection } from '@@/form-components/FormSection';
 interface Props {
   value?: number;
   registries: Registry[];
-  onChange: () => void;
+  onChange?: () => void;
   formInvalid?: boolean;
   errorMessage?: string;
   onSelect: (value?: number) => void;
   isActive?: boolean;
-  clearRegistries: () => void;
-  method?: string;
+  clearRegistries?: () => void;
+  method?: 'repository' | string;
 }
 
 export function PrivateRegistryFieldset({
   value,
   registries,
-  onChange,
+  onChange = () => {},
   formInvalid,
   errorMessage,
   onSelect,
   isActive,
-  clearRegistries,
+  clearRegistries = () => {},
   method,
 }: Props) {
   const [checked, setChecked] = useState(isActive || false);
@@ -75,26 +76,34 @@ export function PrivateRegistryFieldset({
       {checked && (
         <>
           {method !== 'repository' && (
-            <>
-              <TextTip color="blue">
-                If you make any changes to the image urls in your yaml, please
-                reload or select registry manually
-              </TextTip>
-
-              <Button onClick={reload}>Reload</Button>
-            </>
+            <TextTip color="blue">
+              If you make any changes to the image urls in your yaml, please
+              reload or select registry manually
+            </TextTip>
           )}
+
           {!errorMessage ? (
             <FormControl label="Registry" inputId="users-selector">
-              <Select
-                value={registries.filter(
-                  (registry) => registry.Id === selected
+              <div className="flex">
+                <Select
+                  value={registries.filter(
+                    (registry) => registry.Id === selected
+                  )}
+                  options={registries}
+                  getOptionLabel={(registry) => registry.Name}
+                  getOptionValue={(registry) => registry.Id.toString()}
+                  onChange={(value) => onSelect(value?.Id)}
+                  className="w-full"
+                />
+                {method !== 'repository' && (
+                  <Button
+                    onClick={reload}
+                    title="Reload"
+                    icon={RefreshCw}
+                    color="light"
+                  />
                 )}
-                options={registries}
-                getOptionLabel={(registry) => registry.Name}
-                getOptionValue={(registry) => registry.Id.toString()}
-                onChange={(value) => onSelect(value?.Id)}
-              />
+              </div>
             </FormControl>
           ) : (
             <FormError>{errorMessage}</FormError>

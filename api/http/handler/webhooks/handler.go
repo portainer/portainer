@@ -3,10 +3,9 @@ package webhooks
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
-
-	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/http/security"
 
 	"github.com/gorilla/mux"
@@ -15,13 +14,13 @@ import (
 // Handler is the HTTP handler used to handle webhook operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer      *security.RequestBouncer
+	requestBouncer      security.BouncerService
 	DataStore           dataservices.DataStore
 	DockerClientFactory *dockerclient.ClientFactory
 }
 
 // NewHandler creates a handler to manage webhooks operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
@@ -36,5 +35,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.webhookDelete))).Methods(http.MethodDelete)
 	h.Handle("/webhooks/{token}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookExecute))).Methods(http.MethodPost)
+
 	return h
 }

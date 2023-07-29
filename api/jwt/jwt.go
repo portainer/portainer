@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/gorilla/securecookie"
+	"github.com/portainer/portainer/api/internal/securecookie"
 	"github.com/rs/zerolog/log"
 )
 
@@ -125,7 +125,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
 
-			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
+			user, err := service.dataStore.User().Read(portainer.UserID(cl.UserID))
 			if err != nil {
 				return nil, errInvalidJWTToken
 			}

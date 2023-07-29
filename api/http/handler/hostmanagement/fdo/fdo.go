@@ -99,7 +99,7 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 		return httperror.BadRequest("Error saving FDO settings", err)
 	}
 
-	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	profiles, err := handler.DataStore.FDOProfile().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Error saving FDO settings", err)
 	}

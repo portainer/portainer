@@ -5,7 +5,8 @@ import { Link } from '@@/Link';
 export function buildNameColumn<T extends Record<string, unknown>>(
   nameKey: keyof T,
   idKey: string,
-  path: string
+  path: string,
+  idParam = 'id'
 ): ColumnDef<T> {
   const cell = createCell<T>();
 
@@ -15,6 +16,7 @@ export function buildNameColumn<T extends Record<string, unknown>>(
     id: 'name',
     cell,
     enableSorting: true,
+    enableHiding: false,
     sortingFn: 'text',
   };
 
@@ -27,7 +29,11 @@ export function buildNameColumn<T extends Record<string, unknown>>(
       }
 
       return (
-        <Link to={path} params={{ id: row.original[idKey] }} title={name}>
+        <Link
+          to={path}
+          params={{ [idParam]: row.original[idKey] }}
+          title={name}
+        >
           {name}
         </Link>
       );

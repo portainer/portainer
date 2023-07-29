@@ -22,7 +22,7 @@ import (
 // @failure 500 "Server error"
 // @router /endpoint_groups [get]
 func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

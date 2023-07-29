@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testFileContent string = "abcdefg"
+var testFileContent = "abcdefg"
 
 type TestGitService struct {
 	portainer.GitService
@@ -32,6 +32,7 @@ type TestGitService struct {
 
 func (g *TestGitService) CloneRepository(destination string, repositoryURL, referenceName string, username, password string, tlsSkipVerify bool) error {
 	time.Sleep(100 * time.Millisecond)
+
 	return createTestFile(g.targetFilePath)
 }
 
@@ -53,7 +54,9 @@ func createTestFile(targetPath string) error {
 		return err
 	}
 	defer f.Close()
+
 	_, err = f.WriteString(testFileContent)
+
 	return err
 }
 
@@ -152,7 +155,7 @@ func Test_customTemplateGitFetch(t *testing.T) {
 		wg.Add(10)
 		for i := 0; i < 10; i++ {
 			go func(j int) {
-				if j%1 == 0 {
+				if j%2 == 0 {
 					singleAPIRequest(h, jwt1, is, "abcdefg")
 				} else {
 					singleAPIRequest(h, jwt2, is, "abcdefg")

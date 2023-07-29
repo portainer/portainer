@@ -22,7 +22,7 @@ export function Badge({ type, className, children }: PropsWithChildren<Props>) {
   );
 }
 
-// classes in full to prevent a dev server bug, where tailwind doesn't render the interpolated classes
+// the classes are typed in full to prevent a dev server bug, where tailwind doesn't render the interpolated classes
 function getClasses(type: BadgeType | undefined) {
   switch (type) {
     case 'success':

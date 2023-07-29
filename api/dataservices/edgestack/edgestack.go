@@ -1,12 +1,10 @@
 package edgestack
 
 import (
-	"fmt"
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -64,22 +62,11 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 	var stacks = make([]portainer.EdgeStack, 0)
 
-	err := service.connection.GetAll(
+	return stacks, service.connection.GetAll(
 		BucketName,
 		&portainer.EdgeStack{},
-		func(obj interface{}) (interface{}, error) {
-			stack, ok := obj.(*portainer.EdgeStack)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")
-				return nil, fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
-			}
-
-			stacks = append(stacks, *stack)
-
-			return &portainer.EdgeStack{}, nil
-		})
-
-	return stacks, err
+		dataservices.AppendFn(&stacks),
+	)
 }
 
 // EdgeStack returns an Edge stack by ID.

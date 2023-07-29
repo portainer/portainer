@@ -16,6 +16,12 @@ export function isFulfilled<T>(
   return result.status === 'fulfilled';
 }
 
+export function isRejected<T>(
+  result: PromiseSettledResult<T>
+): result is PromiseRejectedResult {
+  return result.status === 'rejected';
+}
+
 export function getFulfilledResults<T>(
   results: Array<PromiseSettledResult<T>>
 ) {
