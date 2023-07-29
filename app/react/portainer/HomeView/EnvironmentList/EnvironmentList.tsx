@@ -71,7 +71,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
   );
   const [sortByFilter, setSortByFilter] = useHomePageFilter<
     SortType | undefined
-  >('sortBy', 'Name');
+  >('sortBy', undefined);
   const [sortByDescending, setSortByDescending] = useHomePageFilter(
     'sortOrder',
     false
