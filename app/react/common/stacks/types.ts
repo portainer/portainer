@@ -42,7 +42,7 @@ export interface Stack {
     value: string;
   }[];
   ResourceControl?: ResourceControlResponse;
-  Status: number;
+  Status: StackStatus;
   ProjectPath: string;
   CreationDate: number;
   CreatedBy: string;

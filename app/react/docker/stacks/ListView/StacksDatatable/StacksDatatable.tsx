@@ -1,13 +1,12 @@
 import { Layers } from 'lucide-react';
 
-import { isEnvironmentAdmin, useCurrentUser } from '@/react/hooks/useUser';
-import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useAuthorizations, useCurrentUser } from '@/react/hooks/useUser';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { useRepeater } from '@@/datatables/useRepeater';
 
-import { isExternalStack } from '../../view-models/utils';
+import { isExternalStack, isOrphanedStack } from '../../view-models/utils';
 
 import { TableActions } from './TableActions';
 import { TableSettingsMenus } from './TableSettingsMenus';
@@ -31,10 +30,11 @@ export function StacksDatatable({
 }) {
   const tableState = useTableState(settingsStore, tableKey);
   useRepeater(tableState.autoRefreshRate, onReload);
-  const { user } = useCurrentUser();
-  const environmentId = useEnvironmentId();
-  const isAdmin = isEnvironmentAdmin(user, environmentId);
-
+  const { isAdmin } = useCurrentUser();
+  const canManageStacks = useAuthorizations([
+    'PortainerStackCreate',
+    'PortainerStackDelete',
+  ]);
   return (
     <Datatable<DecoratedStack>
       settingsManager={tableState}
@@ -52,9 +52,25 @@ export function StacksDatatable({
       columns={columns}
       dataset={dataset}
       isRowSelectable={({ original: item }) =>
-        !isExternalStack(item) && (isAdmin || !item.Orphaned)
+        allowSelection(item, isAdmin, canManageStacks)
       }
       getRowId={(item) => item.Id.toString()}
     />
   );
+}
+
+function allowSelection(
+  item: DecoratedStack,
+  isAdmin: boolean,
+  canManageStacks: boolean
+) {
+  if (isExternalStack(item)) {
+    return false;
+  }
+
+  if (isOrphanedStack(item) && !isAdmin) {
+    return false;
+  }
+
+  return isAdmin || canManageStacks;
 }
