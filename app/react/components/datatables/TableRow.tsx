@@ -1,15 +1,19 @@
 import { Cell, flexRender } from '@tanstack/react-table';
 import clsx from 'clsx';
 
-interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
+import { DefaultType } from './types';
+
+interface Props<D extends DefaultType = DefaultType> {
   cells: Cell<D, unknown>[];
   className?: string;
   onClick?: () => void;
 }
 
-export function TableRow<
-  D extends Record<string, unknown> = Record<string, unknown>
->({ cells, className, onClick }: Props<D>) {
+export function TableRow<D extends DefaultType = DefaultType>({
+  cells,
+  className,
+  onClick,
+}: Props<D>) {
   return (
     <tr
       className={clsx(className, { 'cursor-pointer': !!onClick })}

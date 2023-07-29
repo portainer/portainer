@@ -2,15 +2,17 @@ import { Header, flexRender } from '@tanstack/react-table';
 
 import { filterHOC } from './Filter';
 import { TableHeaderCell } from './TableHeaderCell';
+import { DefaultType } from './types';
 
-interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
+interface Props<D extends DefaultType = DefaultType> {
   headers: Header<D, unknown>[];
   onSortChange?(colId: string, desc: boolean): void;
 }
 
-export function TableHeaderRow<
-  D extends Record<string, unknown> = Record<string, unknown>
->({ headers, onSortChange }: Props<D>) {
+export function TableHeaderRow<D extends DefaultType = DefaultType>({
+  headers,
+  onSortChange,
+}: Props<D>) {
   return (
     <tr>
       {headers.map((header) => {

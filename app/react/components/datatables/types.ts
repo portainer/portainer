@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 
 import { keyBuilder } from '@/react/hooks/useLocalStorage';
 
+export type DefaultType = object;
+
 export interface PaginationTableSettings {
   pageSize: number;
   setPageSize: (pageSize: number) => void;
