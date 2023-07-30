@@ -14,3 +14,11 @@
     ></stacks-datatable>
   </div>
 </div>
+
+<react-docker-stacks-datatable
+  ng-if="stacks"
+  dataset="stacks"
+  is-image-notification-enabled="enableImageNotification"
+  on-remove="(removeAction)"
+  on-refresh="(getStacks)"
+></react-docker-stacks-datatable>

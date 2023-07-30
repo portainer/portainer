@@ -1,6 +1,6 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-body classes="no-padding" ng-if="$ctrl.createEnabled">
+    <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center flex-wrap !gap-x-5 !gap-y-1">
         <div class="toolBarTitle vertical-center">
           <div class="widget-icon space-right">
@@ -26,14 +26,13 @@
             type="button"
             class="btn btn-sm btn-dangerlight vertical-center !ml-0 h-fit"
             authorization="PortainerStackDelete"
-            ng-disabled="!$ctrl.createEnabled || $ctrl.state.selectedItemCount === 0"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="stack-removeStackButton"
           >
             <pr-icon icon="'trash-2'"></pr-icon>Remove
           </button>
           <button
-            ng-disabled="!$ctrl.createEnabled"
             type="button"
             class="btn btn-sm btn-primary vertical-center !ml-0 h-fit"
             ui-sref="docker.stacks.newstack"
