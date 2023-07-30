@@ -57,6 +57,10 @@ export function StacksDatatable({
         allowSelection(item, isAdmin, canManageStacks)
       }
       getRowId={(item) => item.Id.toString()}
+      meta={{
+        table: 'stacks',
+        tableState,
+      }}
     />
   );
 }
