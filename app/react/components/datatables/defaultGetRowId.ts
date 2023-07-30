@@ -1,25 +1,17 @@
 import { DefaultType } from './types';
 
+/**
+ * gets row id by looking for one of id, Id, or ID keys on the object
+ */
 export function defaultGetRowId<D extends DefaultType>(row: D): string {
-  if (
-    'id' in row &&
-    (typeof row.id === 'string' || typeof row.id === 'number')
-  ) {
-    return row.id.toString();
-  }
+  const key = ['id', 'Id', 'ID'].find((key) =>
+    Object.hasOwn(row, key)
+  ) as keyof D;
 
-  if (
-    'Id' in row &&
-    (typeof row.Id === 'string' || typeof row.Id === 'number')
-  ) {
-    return row.Id.toString();
-  }
+  const value = row[key];
 
-  if (
-    'ID' in row &&
-    (typeof row.ID === 'string' || typeof row.ID === 'number')
-  ) {
-    return row.ID.toString();
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value.toString();
   }
 
   return '';
