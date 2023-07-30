@@ -1,12 +1,12 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { ImageUpToDateTooltip } from '@/react/docker/components/datatables/TableColumnHeaderImageUpToDate';
+import { ImageUpToDateTooltip } from '@/react/docker/components/datatable/TableColumnHeaderImageUpToDate';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { isRegularStack } from '../../../view-models/utils';
-import { StackImageStatus } from '../../StackImageStatus';
 import { DecoratedStack } from '../types';
 
+import { StackImageStatus } from './StackImageStatus';
 import { columnHelper } from './helper';
 
 export const imageNotificationColumn = columnHelper.display({
