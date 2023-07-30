@@ -5,6 +5,7 @@ import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { StackStatus } from '@/react/common/stacks/types';
 import {
   isExternalStack,
+  isOrphanedStack,
   isRegularStack,
 } from '@/react/docker/stacks/view-models/utils';
 
@@ -70,21 +71,14 @@ function NameLink({ item }: { item: DecoratedStack }) {
 
   const name = item.Name;
 
-  if (!isExternalStack(item)) {
-    if (!isAdmin && item.Orphaned) {
-      return <>{name}</>;
-    }
-
+  if (isExternalStack(item)) {
     return (
       <Link
         to="docker.stacks.stack"
         params={{
           name: item.Name,
-          id: item.Id,
           type: item.Type,
-          regular: item.Regular,
-          orphaned: item.Orphaned,
-          orphanedRunning: item.OrphanedRunning,
+          external: true,
         }}
         title={name}
       >
@@ -93,13 +87,20 @@ function NameLink({ item }: { item: DecoratedStack }) {
     );
   }
 
+  if (!isAdmin && isOrphanedStack(item)) {
+    return <>{name}</>;
+  }
+
   return (
     <Link
       to="docker.stacks.stack"
       params={{
         name: item.Name,
+        id: item.Id,
         type: item.Type,
-        external: true,
+        regular: item.Regular,
+        orphaned: item.Orphaned,
+        orphanedRunning: item.OrphanedRunning,
       }}
       title={name}
     >
