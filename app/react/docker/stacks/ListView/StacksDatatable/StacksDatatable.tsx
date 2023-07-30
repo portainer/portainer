@@ -68,6 +68,9 @@ export function StacksDatatable({
         globalFilter: {
           showOrphanedStacks: tableState.showOrphanedStacks,
         },
+        columnVisibility: Object.fromEntries(
+          tableState.hiddenColumns.map((col) => [col, false])
+        ),
       }}
     />
   );

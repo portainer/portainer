@@ -12,6 +12,7 @@ export const deployedVersion = columnHelper.accessor(
   },
   {
     header: 'Deployed Version',
+    id: 'deployed-version',
     cell: ({ row: { original: item } }) => {
       if (isExternalStack(item)) {
         return <div className="text-center">-</div>;
