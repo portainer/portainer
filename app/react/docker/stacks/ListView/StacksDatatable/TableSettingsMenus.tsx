@@ -39,7 +39,13 @@ export function TableSettingsMenus({
             id="setting_all_orphaned_stacks"
             label="Show all orphaned stacks"
             checked={tableState.showOrphanedStacks}
-            onChange={(e) => tableState.setShowOrphanedStacks(e.target.checked)}
+            onChange={(e) => {
+              tableState.setShowOrphanedStacks(e.target.checked);
+              tableInstance.setGlobalFilter((filter: object) => ({
+                ...filter,
+                showOrphanedStacks: e.target.checked,
+              }));
+            }}
           />
         </Authorized>
 

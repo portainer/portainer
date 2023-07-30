@@ -1,10 +1,12 @@
 import { Layers } from 'lucide-react';
+import { Row, TableMeta } from '@tanstack/react-table';
 
 import { useAuthorizations, useCurrentUser } from '@/react/hooks/useUser';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { useRepeater } from '@@/datatables/useRepeater';
+import { defaultGlobalFilterFn } from '@@/datatables/Datatable';
 
 import { isExternalStack, isOrphanedStack } from '../../view-models/utils';
 
@@ -38,7 +40,11 @@ export function StacksDatatable({
   const columns = useColumns(isImageNotificationEnabled);
 
   return (
-    <Datatable<DecoratedStack>
+    <Datatable<
+      DecoratedStack,
+      TableMeta<DecoratedStack>,
+      { search: string; showOrphanedStacks: boolean }
+    >
       settingsManager={tableState}
       title="Stacks"
       titleIcon={Layers}
@@ -57,6 +63,12 @@ export function StacksDatatable({
         allowSelection(item, isAdmin, canManageStacks)
       }
       getRowId={(item) => item.Id.toString()}
+      globalFilterFn={globalFilterFn}
+      initialTableState={{
+        globalFilter: {
+          showOrphanedStacks: tableState.showOrphanedStacks,
+        },
+      }}
     />
   );
 }
@@ -75,4 +87,26 @@ function allowSelection(
   }
 
   return isAdmin || canManageStacks;
+}
+
+function globalFilterFn(
+  row: Row<DecoratedStack>,
+  columnId: string,
+  filterValue: null | { showOrphanedStacks: boolean; search: string }
+) {
+  return (
+    orphanedFilter(row, filterValue) &&
+    defaultGlobalFilterFn(row, columnId, filterValue)
+  );
+}
+
+function orphanedFilter(
+  row: Row<DecoratedStack>,
+  filterValue: null | { showOrphanedStacks: boolean; search: string }
+) {
+  if (filterValue?.showOrphanedStacks) {
+    return true;
+  }
+
+  return !isOrphanedStack(row.original);
 }
