@@ -12,15 +12,21 @@ export function EnvironmentVariablesPanel({
   values,
   showHelpMessage,
   errors,
+  isFoldable = false,
 }: {
   explanation?: string;
   values: Value;
   onChange(value: Value): void;
   showHelpMessage?: boolean;
   errors?: ArrayError<Value>;
+  isFoldable?: boolean;
 }) {
   return (
-    <FormSection title="Environment variables">
+    <FormSection
+      title="Environment variables"
+      isFoldable={isFoldable}
+      defaultFolded={isFoldable}
+    >
       <div className="form-group">
         {!!explanation && (
           <div className="col-sm-12 environment-variables-panel--explanation">

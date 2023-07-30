@@ -164,6 +164,19 @@
                 </div>
               </div>
 
+              <!-- environment-variables -->
+              <div ng-if="stack">
+                <environment-variables-panel
+                  values="formValues.Env"
+                  explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
+                  on-change="(handleEnvVarChange)"
+                  show-help-message="true"
+                  is-foldable="true"
+                ></environment-variables-panel>
+              </div>
+              <!-- !environment-variables -->
+
+              <!-- webhook -->
               <div ng-if="isAdmin && applicationState.endpoint.type !== 4">
                 <div class="col-sm-12 form-section-title">
                   Webhooks
@@ -177,17 +190,8 @@
                   ></por-switch-field>
                 </div>
               </div>
+              <!-- !webhook -->
 
-              <!-- environment-variables -->
-              <div ng-if="stack">
-                <environment-variables-panel
-                  values="formValues.Env"
-                  explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
-                  on-change="(handleEnvVarChange)"
-                  show-help-message="true"
-                ></environment-variables-panel>
-              </div>
-              <!-- !environment-variables -->
               <!-- options -->
               <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27" authorization="PortainerStackUpdate">
                 <div class="col-sm-12 form-section-title"> Options </div>

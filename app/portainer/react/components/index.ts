@@ -239,6 +239,6 @@ withFormValidation(
   ngModule,
   EnvironmentVariablesPanel,
   'environmentVariablesPanel',
-  ['explanation', 'showHelpMessage'],
+  ['explanation', 'showHelpMessage', 'isFoldable'],
   envVarValidation
 );
