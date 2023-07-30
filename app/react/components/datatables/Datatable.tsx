@@ -48,9 +48,12 @@ export type PaginationProps =
       onPageChange(page: number): void;
     };
 
+type DefaultGlobalFilter = { search: string };
+
 export interface Props<
   D extends DefaultType,
-  TMeta extends TableMeta<D> = TableMeta<D>
+  TMeta extends TableMeta<D> = TableMeta<D>,
+  TFilter extends DefaultGlobalFilter = DefaultGlobalFilter
 > extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
@@ -71,11 +74,13 @@ export interface Props<
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
   meta?: TMeta;
+  globalFilterFn?: typeof defaultGlobalFilterFn<D, TFilter>;
 }
 
 export function Datatable<
   D extends DefaultType,
-  TMeta extends TableMeta<D> = TableMeta<D>
+  TMeta extends TableMeta<D> = TableMeta<D>,
+  TFilter extends DefaultGlobalFilter = DefaultGlobalFilter
 >({
   columns,
   dataset,
@@ -101,7 +106,8 @@ export function Datatable<
   page,
   totalCount = dataset.length,
   isServerSidePagination = false,
-}: Props<D, TMeta> & PaginationProps) {
+  globalFilterFn = defaultGlobalFilterFn,
+}: Props<D, TMeta, TFilter> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
     [settings.pageSize, totalCount]
@@ -126,7 +132,10 @@ export function Datatable<
         pageIndex: page || 0,
       },
       sorting: settings.sortBy ? [settings.sortBy] : [],
-      globalFilter: settings.search,
+      globalFilter: {
+        search: settings.search,
+        ...initialTableState.globalFilter,
+      },
 
       ...initialTableState,
     },
@@ -201,9 +210,9 @@ export function Datatable<
     </Table.Container>
   );
 
-  function handleSearchBarChange(value: string) {
-    tableInstance.setGlobalFilter(value);
-    settings.setSearch(value);
+  function handleSearchBarChange(search: string) {
+    tableInstance.setGlobalFilter({ search });
+    settings.setSearch(search);
   }
 
   function handlePageChange(page: number) {
@@ -250,14 +259,14 @@ function getIsSelectionEnabled<D extends DefaultType>(
   return true;
 }
 
-function globalFilterFn<D>(
+export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
   row: Row<D>,
   columnId: string,
-  filterValue: null | string
+  filterValue: null | TFilter
 ): boolean {
   const value = row.getValue(columnId);
 
-  if (filterValue === null || filterValue === '') {
+  if (filterValue === null || !filterValue.search) {
     return true;
   }
 
@@ -265,7 +274,7 @@ function globalFilterFn<D>(
     return false;
   }
 
-  const filterValueLower = filterValue.toLowerCase();
+  const filterValueLower = filterValue.search.toLowerCase();
 
   if (
     typeof value === 'string' ||
