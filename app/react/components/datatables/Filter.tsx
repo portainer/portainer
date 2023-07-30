@@ -11,7 +11,7 @@ import { Icon } from '@@/Icon';
 import { DefaultType } from './types';
 
 interface MultipleSelectionFilterProps {
-  options: string[];
+  options: Array<string> | ReadonlyArray<string>;
   value: string[];
   filterKey: string;
   onChange: (value: string[]) => void;
@@ -30,12 +30,12 @@ export function MultipleSelectionFilter({
     <div>
       <Menu>
         <MenuButton
-          className={clsx('table-filter', { 'filter-active': enabled })}
+          className={clsx('table-filter flex items-center gap-1', {
+            'filter-active': enabled,
+          })}
         >
-          <div className="flex items-center gap-1">
-            Filter
-            <Icon icon={enabled ? Check : Filter} />
-          </div>
+          Filter
+          <Icon icon={enabled ? Check : Filter} />
         </MenuButton>
         <MenuPopover className="dropdown-menu">
           <div className="tableMenu">
