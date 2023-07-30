@@ -2,6 +2,7 @@ import { Layers } from 'lucide-react';
 import { Row, TableMeta } from '@tanstack/react-table';
 
 import { useAuthorizations, useCurrentUser } from '@/react/hooks/useUser';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
@@ -85,7 +86,7 @@ function allowSelection(
     return false;
   }
 
-  if (isOrphanedStack(item) && !isAdmin) {
+  if (isBE && isOrphanedStack(item) && !isAdmin) {
     return false;
   }
 
