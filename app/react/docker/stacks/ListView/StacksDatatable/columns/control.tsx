@@ -2,15 +2,16 @@ import { CellContext } from '@tanstack/react-table';
 import { AlertCircle } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 
-import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
-import { Icon } from '@@/Icon';
-
-import { DecoratedStack } from '../types';
 import {
   isExternalStack,
   isOrphanedStack,
   isRegularStack,
-} from '../../../view-models/utils';
+} from '@/react/docker/stacks/view-models/utils';
+
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
+import { Icon } from '@@/Icon';
+
+import { DecoratedStack } from '../types';
 
 import { columnHelper } from './helper';
 
@@ -18,6 +19,7 @@ export const control = columnHelper.display({
   header: 'Control',
   id: 'control',
   cell: ControlCell,
+  enableHiding: false,
 });
 
 function ControlCell({

@@ -6,7 +6,9 @@ import {
   RepoConfigResponse,
 } from '@/react/portainer/gitops/types';
 
-export class StackViewModel {
+import { IResource } from '../../components/datatable/createOwnershipColumn';
+
+export class StackViewModel implements IResource {
   Id: number;
 
   Type: StackType;

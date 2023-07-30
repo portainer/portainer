@@ -3,11 +3,14 @@ import { CellContext, Column } from '@tanstack/react-table';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { StackStatus } from '@/react/common/stacks/types';
+import {
+  isExternalStack,
+  isRegularStack,
+} from '@/react/docker/stacks/view-models/utils';
 
 import { Link } from '@@/Link';
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
 
-import { isExternalStack, isRegularStack } from '../../../view-models/utils';
 import { DecoratedStack } from '../types';
 
 import { columnHelper } from './helper';
@@ -20,6 +23,7 @@ export const name = columnHelper.accessor('Name', {
   header: 'Name',
   id: 'name',
   cell: NameCell,
+  enableHiding: false,
   enableColumnFilter: true,
   filterFn: (
     { original: stack },
