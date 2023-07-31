@@ -3,7 +3,7 @@ import { FormikErrors } from 'formik';
 import { AutoUpdateModel } from '@/react/portainer/gitops/types';
 
 import { SwitchField } from '@@/form-components/SwitchField';
-import { TextTip } from '@@/Tip/TextTip';
+import { InsightsBox } from '@@/InsightsBox';
 
 import { AutoUpdateSettings } from './AutoUpdateSettings';
 
@@ -30,15 +30,13 @@ export function AutoUpdateFieldset({
     <>
       <div className="form-group">
         <div className="col-sm-12">
-          <TextTip color="blue" className="mb-2">
-            When enabled, at each polling interval or webhook invocation, if the
-            git repo differs from what was stored locally on the last git pull,
-            the changes are deployed.
-          </TextTip>
           <SwitchField
             name="autoUpdate"
-            checked={!!value.RepositoryAutomaticUpdates}
+            checked={value.RepositoryAutomaticUpdates}
             label="GitOps updates"
+            tooltip="When enabled, at each polling interval or webhook invocation, if the
+              git repo differs from what was stored locally on the last git pull,
+              the changes are deployed."
             labelClass="col-sm-3 col-lg-2"
             onChange={(value) =>
               handleChange({ RepositoryAutomaticUpdates: value })
@@ -46,6 +44,23 @@ export function AutoUpdateFieldset({
           />
         </div>
       </div>
+
+      <InsightsBox
+        content={
+          <p>
+            We&#39;ve renamed &quot;Automatic updates&quot; to better align with
+            industry terminology and clarify its purpose for all users.
+            Originally chosen during the early emergence of GitOps, the name has
+            changed, but the functionality remains the same. GitOps has rapidly
+            emerged as a revolutionary approach to manage infrastructure and
+            application changes, and we want to ensure our platform reflects the
+            latest advancements in the industry.
+          </p>
+        }
+        header="Meet ‘GitOps updates’ : Formerly known as Automatic updates"
+        insightCloseId="rename-gitops-updates"
+        className="mb-3"
+      />
 
       {value.RepositoryAutomaticUpdates && (
         <AutoUpdateSettings
