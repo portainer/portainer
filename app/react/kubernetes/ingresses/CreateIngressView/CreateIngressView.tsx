@@ -178,13 +178,17 @@ export function CreateIngressView() {
       ),
     [ingressControllersQuery.data, ingressRule.IngressClassName]
   );
-  const ingressClassOptions: Option<string>[] =
-    ingressControllersQuery.data
-      ?.filter((cls) => cls.Availability)
-      .map((cls) => ({
-        label: cls.ClassName,
-        value: cls.ClassName,
-      })) || [];
+
+  const ingressClassOptions: Option<string>[] = useMemo(
+    () =>
+      ingressControllersQuery.data
+        ?.filter((cls) => cls.Availability)
+        .map((cls) => ({
+          label: cls.ClassName,
+          value: cls.ClassName,
+        })) || [],
+    [ingressControllersQuery.data]
+  );
 
   if (
     (!existingIngressClass ||
@@ -462,7 +466,7 @@ export function CreateIngressView() {
     },
     [
       isEdit,
-      ingressClassOptions.length,
+      ingressClassOptions,
       ingressControllersQuery.isSuccess,
       environmentId,
       ingresses,

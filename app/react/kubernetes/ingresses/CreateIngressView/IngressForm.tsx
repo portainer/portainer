@@ -111,7 +111,7 @@ export function IngressForm({
     PlaceholderAnnotations.other;
   const pathTypes = PathTypes[rule.IngressType || 'other'] || PathTypes.other;
 
-  // when the namespace options update update the value to an available one
+  // when the namespace options update the value to an available one
   useEffect(() => {
     const namespaces = namespacesOptions.map((option) => option.value);
     if (!namespaces.includes(namespace) && namespaces.length > 0) {
