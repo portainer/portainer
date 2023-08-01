@@ -18,7 +18,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // User returns a user by ID
 func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
-	obj := portainer.User{}
+	var obj portainer.User
 
 	err := service.connection.GetByID(int(ID), &obj)
 	if err != nil {

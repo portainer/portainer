@@ -18,14 +18,13 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // Settings retrieve the ssl settings object.
 func (service *Service) Settings() (*portainer.SSLSettings, error) {
-	var settings portainer.SSLSettings
-	db := service.connection.GetDB()
-	tx := db.Take(&settings)
-	if tx.Error != nil {
-		return nil, tx.Error
+	var obj portainer.SSLSettings
+	err := service.connection.GetByID(1, &obj)
+	if err != nil {
+		return nil, err
 	}
 
-	return &settings, nil
+	return &obj, nil
 }
 
 // UpdateSettings persists a SSLSettings object.
