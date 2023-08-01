@@ -17,7 +17,7 @@ interface WidgetProps {
 }
 
 const meta: Meta<WidgetProps> = {
-  title: 'Widget',
+  title: 'Components/Widget',
   component: Widget,
   args: {
     loading: false,

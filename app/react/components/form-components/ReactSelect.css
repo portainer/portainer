@@ -31,6 +31,22 @@
   display: none;
 }
 
+.portainer-selector-root .portainer-selector__group-heading {
+  text-transform: none !important;
+  font-size: 85% !important;
+}
+
+.input-group .portainer-selector-root:last-child .portainer-selector__control {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.input-group .portainer-selector-root:not(:first-child):not(:last-child) .portainer-selector__control {
+  border-radius: 0;
+}
+
 /* input style */
 .portainer-selector-root .portainer-selector__control {
   border-color: var(--border-form-control-color);
