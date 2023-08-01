@@ -111,10 +111,6 @@ export function AppIngressPathForm({
             value={selectedIngress}
             defaultValue={ingressHostOptions[0]}
             placeholder="Select a hostname..."
-            theme={(theme) => ({
-              ...theme,
-              borderRadius: 0,
-            })}
             size="sm"
             onChange={(ingressOption) => {
               setSelectedIngress(ingressOption);
