@@ -14,14 +14,19 @@
           {{ $ctrl.model.Title }}
         </span>
         <div class="space-left blocklist-item-subtitle inline-flex items-center">
-          <pr-icon ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform" icon="'svg-linux'" class="mr-1"></pr-icon>
-          <span ng-if="!$ctrl.model.Platform"> &amp; </span>
-          <pr-icon
-            icon="'svg-microsoft'"
-            ng-if="$ctrl.model.Platform === 2 || $ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"
-            class-name="'[&>*]:flex [&>*]:items-center'"
-            size="'lg'"
-          ></pr-icon>
+          <div ng-if="$ctrl.typeLabel !== 'manifest'" class="vertical-center gap-1">
+            <pr-icon ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform" icon="'svg-linux'" class="mr-1"></pr-icon>
+            <pr-icon
+              icon="'svg-microsoft'"
+              ng-if="$ctrl.model.Platform === 2 || $ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"
+              class-name="'[&>*]:flex [&>*]:items-center'"
+              size="'lg'"
+            ></pr-icon>
+          </div>
+          <!-- currently only kubernetes uses the typeLabel of 'manifest' -->
+          <div ng-if="$ctrl.typeLabel === 'manifest'" class="vertical-center">
+            <pr-icon icon="'svg-kubernetes'" size="'lg'" class="align-bottom" class-name="'[&>*]:flex [&>*]:items-center'"></pr-icon>
+          </div>
           {{ $ctrl.typeLabel }}
         </div>
       </div>
