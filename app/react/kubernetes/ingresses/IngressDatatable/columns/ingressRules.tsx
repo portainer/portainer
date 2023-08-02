@@ -32,7 +32,7 @@ function Cell({ row }: CellContext<Ingress, string>) {
   }
 
   return (
-    <div className="flex flex-col gap-y-0.5">
+    <div className="flex flex-col gap-y-0.5 whitespace-nowrap">
       {paths.map((path) => (
         <div key={`${path.Host}${path.Path}${path.ServiceName}:${path.Port}`}>
           <span className="flex flex-nowrap items-center gap-1 px-2">
