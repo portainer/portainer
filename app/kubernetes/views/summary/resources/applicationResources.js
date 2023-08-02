@@ -20,7 +20,7 @@ const { CREATE, UPDATE, DELETE } = KubernetesResourceActions;
  * Get summary of Kubernetes resources to be created, updated or deleted
  * @param {KubernetesApplicationFormValues} formValues
  */
-export default function (formValues, oldFormValues = {}) {
+export function getApplicationResources(formValues, oldFormValues = {}) {
   if (oldFormValues instanceof KubernetesApplicationFormValues) {
     const resourceSummary = getUpdatedApplicationResources(oldFormValues, formValues);
     return resourceSummary;
@@ -139,9 +139,9 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
     }
 
     // Ingress
-    const oldIngresses = KubernetesIngressConverter.applicationFormValuesToIngresses(oldFormValues, oldService.Name);
-    const newServicePorts = newFormValues.Services.flatMap((service) => service.Ports);
     const oldServicePorts = oldFormValues.Services.flatMap((service) => service.Ports);
+    const oldIngresses = generateNewIngressesFromFormPaths(oldFormValues.OriginalIngresses, oldServicePorts, oldServicePorts);
+    const newServicePorts = newFormValues.Services.flatMap((service) => service.Ports);
     const newIngresses = generateNewIngressesFromFormPaths(newFormValues.OriginalIngresses, newServicePorts, oldServicePorts);
     resources.push(...getIngressUpdateSummary(oldIngresses, newIngresses));
   } else if (!oldService && newService) {
@@ -190,7 +190,7 @@ function getApplicationResourceType(app) {
 function getIngressUpdateSummary(oldIngresses, newIngresses) {
   const ingressesSummaries = newIngresses
     .map((newIng) => {
-      const oldIng = _.find(oldIngresses, { Name: newIng.Name });
+      const oldIng = oldIngresses.find((oldIng) => oldIng.Name === newIng.Name);
       return getIngressUpdateResourceSummary(oldIng, newIng);
     })
     .filter((s) => s); // remove nulls
