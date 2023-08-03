@@ -7,6 +7,6 @@ export const size = columnHelper.accessor('VirtualSize', {
   header: 'Size',
   cell: ({ getValue }) => {
     const value = getValue();
-    return humanize(value);
+    return humanize(value) || '-';
   },
 });
