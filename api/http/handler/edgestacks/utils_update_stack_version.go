@@ -50,7 +50,7 @@ func (handler *Handler) storeStackFile(stack *portainer.EdgeStack, deploymentTyp
 		entryPoint = stack.ManifestPath
 	}
 
-	_, err := handler.FileService.StoreEdgeStackFileFromBytesByVersion(stackFolder, entryPoint, stack.Version, config)
+	_, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, entryPoint, config)
 	if err != nil {
 		return fmt.Errorf("unable to persist updated Compose file with version on disk: %w", err)
 	}
