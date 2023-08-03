@@ -66,10 +66,8 @@ export function CreateIngressView() {
     environmentId,
     namespaces ? Object.keys(namespaces || {}) : []
   );
-  const ingressControllersQuery = useIngressControllers(
-    environmentId,
-    namespace
-  );
+  const { data: ingressControllers, ...ingressControllersQuery } =
+    useIngressControllers(environmentId, namespace);
 
   const createIngressMutation = useCreateIngress();
   const updateIngressMutation = useUpdateIngress();
@@ -171,39 +169,84 @@ export function CreateIngressView() {
 
   const existingIngressClass = useMemo(
     () =>
-      ingressControllersQuery.data?.find(
-        (i) =>
-          i.ClassName === ingressRule.IngressClassName ||
-          (i.Type === 'custom' && ingressRule.IngressClassName === '')
+      ingressControllers?.find(
+        (controller) =>
+          controller.ClassName === ingressRule.IngressClassName ||
+          (controller.Type === 'custom' && ingressRule.IngressClassName === '')
       ),
-    [ingressControllersQuery.data, ingressRule.IngressClassName]
+    [ingressControllers, ingressRule.IngressClassName]
   );
 
-  const ingressClassOptions: Option<string>[] = useMemo(
-    () =>
-      ingressControllersQuery.data
-        ?.filter((cls) => cls.Availability)
+  const ingressClassOptions: Option<string>[] = useMemo(() => {
+    const allowedIngressClassOptions =
+      ingressControllers
+        ?.filter((controller) => !!controller.Availability)
         .map((cls) => ({
           label: cls.ClassName,
           value: cls.ClassName,
-        })) || [],
-    [ingressControllersQuery.data]
+        })) || [];
+
+    // if the ingress class is not set, return only the allowed ingress classes
+    if (ingressRule.IngressClassName === '' || !isEdit) {
+      return allowedIngressClassOptions;
+    }
+
+    // if the ingress class is set and it exists (even if disallowed), return the allowed ingress classes + the disallowed option
+    const disallowedIngressClasses =
+      ingressControllers
+        ?.filter(
+          (controller) =>
+            !controller.Availability &&
+            existingIngressClass?.ClassName === controller.ClassName
+        )
+        .map((controller) => ({
+          label: `${controller.ClassName} - DISALLOWED`,
+          value: controller.ClassName,
+        })) || [];
+
+    const existingIngressClassFound = ingressControllers?.find(
+      (controller) => existingIngressClass?.ClassName === controller.ClassName
+    );
+    if (existingIngressClassFound) {
+      return [...allowedIngressClassOptions, ...disallowedIngressClasses];
+    }
+
+    // if the ingress class is set and it doesn't exist, return the allowed ingress classes + the not found option
+    const notFoundIngressClassOption = {
+      label: `${ingressRule.IngressClassName} - NOT FOUND`,
+      value: ingressRule.IngressClassName || '',
+    };
+    return [...allowedIngressClassOptions, notFoundIngressClassOption];
+  }, [
+    existingIngressClass?.ClassName,
+    ingressControllers,
+    ingressRule.IngressClassName,
+    isEdit,
+  ]);
+
+  const handleIngressChange = useCallback(
+    (key: string, val: string) => {
+      setIngressRule((prevRules) => {
+        const rule = { ...prevRules, [key]: val };
+        if (key === 'IngressClassName') {
+          rule.IngressType = ingressControllers?.find(
+            (c) => c.ClassName === val
+          )?.Type;
+        }
+        return rule;
+      });
+    },
+    [ingressControllers]
   );
 
-  if (
-    (!existingIngressClass ||
-      (existingIngressClass && !existingIngressClass.Availability)) &&
-    ingressRule.IngressClassName &&
-    !ingressControllersQuery.isLoading
-  ) {
-    const optionLabel = !ingressRule.IngressType
-      ? `${ingressRule.IngressClassName} - NOT FOUND`
-      : `${ingressRule.IngressClassName} - DISALLOWED`;
-    ingressClassOptions.push({
-      label: optionLabel,
-      value: ingressRule.IngressClassName,
-    });
-  }
+  // when the ingress class options update the value to an available one
+  useEffect(() => {
+    const ingressClasses = ingressClassOptions.map((option) => option.value);
+    if (!ingressClasses.includes(ingressRule.IngressClassName)) {
+      // setting to the first available option (or undefined when there are no options)
+      handleIngressChange('IngressClassName', ingressClasses[0]);
+    }
+  }, [handleIngressChange, ingressClassOptions, ingressRule.IngressClassName]);
 
   const matchedConfigs = configResults?.data?.filter(
     (config) =>
@@ -234,7 +277,7 @@ export function CreateIngressView() {
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
-        const type = ingressControllersQuery.data?.find(
+        const type = ingressControllers?.find(
           (c) =>
             c.ClassName === ing.ClassName ||
             (c.Type === 'custom' && !ing.ClassName)
@@ -248,7 +291,7 @@ export function CreateIngressView() {
   }, [
     params.name,
     ingressesResults.data,
-    ingressControllersQuery.data,
+    ingressControllers,
     ingressRule.IngressName,
     params.namespace,
   ]);
@@ -557,18 +600,6 @@ export function CreateIngressView() {
     if (!isEdit) {
       addNewIngress(ns);
     }
-  }
-
-  function handleIngressChange(key: string, val: string) {
-    setIngressRule((prevRules) => {
-      const rule = { ...prevRules, [key]: val };
-      if (key === 'IngressClassName') {
-        rule.IngressType = ingressControllersQuery.data?.find(
-          (c) => c.ClassName === val
-        )?.Type;
-      }
-      return rule;
-    });
   }
 
   function handleTLSChange(hostIndex: number, tls: string) {
