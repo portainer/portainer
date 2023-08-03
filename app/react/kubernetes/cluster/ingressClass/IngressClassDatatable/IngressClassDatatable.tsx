@@ -199,7 +199,7 @@ export function IngressClassDatatable({
               </p>
               <ul className="ml-6">
                 {usedControllersToDisallow.map((controller) => (
-                  <li key={controller.ClassName}>${controller.ClassName}</li>
+                  <li key={controller.ClassName}>{controller.ClassName}</li>
                 ))}
               </ul>
               <p>

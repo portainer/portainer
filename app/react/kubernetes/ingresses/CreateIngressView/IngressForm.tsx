@@ -119,17 +119,6 @@ export function IngressForm({
     }
   }, [namespacesOptions, namespace, handleNamespaceChange]);
 
-  // when the ingress class options update update the value to an available one
-  useEffect(() => {
-    const ingressClasses = ingressClassOptions.map((option) => option.value);
-    if (
-      !ingressClasses.includes(rule.IngressClassName) &&
-      ingressClasses.length > 0
-    ) {
-      handleIngressChange('IngressClassName', ingressClasses[0]);
-    }
-  }, [ingressClassOptions, rule.IngressClassName, handleIngressChange]);
-
   return (
     <Widget>
       <WidgetTitle icon={Route} title="Ingress" />
@@ -157,12 +146,22 @@ export function IngressForm({
                   ) : (
                     <Select
                       name="namespaces"
-                      options={namespacesOptions || []}
-                      value={{ value: namespace, label: namespace }}
+                      options={namespacesOptions}
+                      value={
+                        namespace
+                          ? { value: namespace, label: namespace }
+                          : null
+                      }
                       isDisabled={isEdit}
                       onChange={(val) =>
                         handleNamespaceChange(val?.value || '')
                       }
+                      placeholder={
+                        namespacesOptions.length
+                          ? 'Select a namespace'
+                          : 'No namespaces available'
+                      }
+                      noOptionsMessage={() => 'No namespaces available'}
                     />
                   )}
                 </div>
@@ -222,18 +221,27 @@ export function IngressForm({
                     <>
                       <Select
                         name="ingress_class"
-                        placeholder="Ingress name"
+                        placeholder={
+                          ingressClassOptions.length
+                            ? 'Select an ingress class'
+                            : 'No ingress classes available'
+                        }
                         options={ingressClassOptions}
-                        value={{
-                          label: rule.IngressClassName,
-                          value: rule.IngressClassName,
-                        }}
+                        value={
+                          rule.IngressClassName
+                            ? {
+                                label: rule.IngressClassName,
+                                value: rule.IngressClassName,
+                              }
+                            : null
+                        }
                         onChange={(ingressClassOption) =>
                           handleIngressChange(
                             'IngressClassName',
                             ingressClassOption?.value || ''
                           )
                         }
+                        noOptionsMessage={() => 'No ingress classes available'}
                       />
                       {errors.className && (
                         <FormError className="error-inline mt-1">
@@ -241,11 +249,6 @@ export function IngressForm({
                         </FormError>
                       )}
                     </>
-                  )}
-                  {errors.className && (
-                    <FormError className="error-inline mt-1">
-                      {errors.className}
-                    </FormError>
                   )}
                 </div>
               </div>
@@ -401,13 +404,23 @@ export function IngressForm({
                         <Select
                           key={tlsOptions.toString() + host.Secret}
                           name={`ingress_tls_${hostIndex}`}
-                          value={{
-                            value: rule.Hosts[hostIndex].Secret,
-                            label: rule.Hosts[hostIndex].Secret || 'No TLS',
-                          }}
+                          value={
+                            host.Secret !== undefined
+                              ? {
+                                  value: host.Secret,
+                                  label: host.Secret || 'No TLS',
+                                }
+                              : null
+                          }
                           onChange={(TLSOption) =>
                             handleTLSChange(hostIndex, TLSOption?.value || '')
                           }
+                          placeholder={
+                            tlsOptions.length
+                              ? 'Select a TLS secret'
+                              : 'No TLS secrets available'
+                          }
+                          noOptionsMessage={() => 'No TLS secrets available'}
                           size="sm"
                         />
                         {!host.NoHost && (
@@ -472,10 +485,14 @@ export function IngressForm({
                           key={serviceOptions.toString() + path.ServiceName}
                           name={`ingress_service_${hostIndex}_${pathIndex}`}
                           options={serviceOptions}
-                          value={{
-                            value: path.ServiceName,
-                            label: path.ServiceName || 'Select a service',
-                          }}
+                          value={
+                            path.ServiceName
+                              ? {
+                                  value: path.ServiceName,
+                                  label: path.ServiceName,
+                                }
+                              : null
+                          }
                           onChange={(serviceOption) =>
                             handlePathChange(
                               hostIndex,
@@ -484,6 +501,12 @@ export function IngressForm({
                               serviceOption?.value || ''
                             )
                           }
+                          placeholder={
+                            serviceOptions.length
+                              ? 'Select a service'
+                              : 'No services available'
+                          }
+                          noOptionsMessage={() => 'No services available'}
                           size="sm"
                         />
                       </InputGroup>
@@ -526,15 +549,20 @@ export function IngressForm({
                                   option?.value || ''
                                 )
                               }
-                              value={{
-                                label: (
-                                  path.ServicePort || 'Select a port'
-                                ).toString(),
-                                value:
-                                  rule.Hosts[hostIndex].Paths[
-                                    pathIndex
-                                  ].ServicePort.toString(),
-                              }}
+                              value={
+                                path.ServicePort
+                                  ? {
+                                      label: path.ServicePort.toString(),
+                                      value: path.ServicePort.toString(),
+                                    }
+                                  : null
+                              }
+                              placeholder={
+                                servicePorts[path.ServiceName]?.length
+                                  ? 'Select a port'
+                                  : 'No ports available'
+                              }
+                              noOptionsMessage={() => 'No ports available'}
                               size="sm"
                             />
                           </InputGroup>
@@ -573,10 +601,20 @@ export function IngressForm({
                               option?.value || ''
                             )
                           }
-                          value={{
-                            label: path.PathType || 'Select a path type',
-                            value: path.PathType || '',
-                          }}
+                          value={
+                            path.PathType
+                              ? {
+                                  label: path.PathType,
+                                  value: path.PathType,
+                                }
+                              : null
+                          }
+                          placeholder={
+                            pathTypes?.length
+                              ? 'Select a path type'
+                              : 'No path types available'
+                          }
+                          noOptionsMessage={() => 'No path types available'}
                           size="sm"
                         />
                       </InputGroup>
