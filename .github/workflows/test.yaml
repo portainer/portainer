@@ -1,11 +1,18 @@
 name: Test
 
-on: push
-
 env:
   GO_VERSION: 1.21.3
   NODE_VERSION: 18.x
 
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  push:
+    
 jobs:
   test-client:
     runs-on: ubuntu-latest

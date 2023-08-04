@@ -11,6 +11,7 @@ on:
       - master
       - develop
       - release/*
+    types: [ready_for_review]
 
 env:
   GO_VERSION: 1.21.3
