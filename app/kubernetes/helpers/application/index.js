@@ -76,12 +76,6 @@ class KubernetesApplicationHelper {
     return containers;
   }
 
-  static associateAllContainersAndApplication(app) {
-    const containers = _.flatMap(_.map(app.Pods, 'Containers'));
-    KubernetesApplicationHelper.associateContainerPersistedFoldersAndConfigurations(app, containers);
-    return containers;
-  }
-
   static portMappingsFromApplications(applications) {
     const res = _.reduce(
       applications,

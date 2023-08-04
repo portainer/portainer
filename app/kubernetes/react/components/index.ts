@@ -16,6 +16,7 @@ import {
   ApplicationSummaryWidget,
   ApplicationDetailsWidget,
 } from '@/react/kubernetes/applications/DetailsView';
+import { ApplicationContainersDatatable } from '@/react/kubernetes/applications/DetailsView/ApplicationContainersDatatable';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
@@ -99,6 +100,15 @@ export const ngModule = angular
     'applicationSummaryWidget',
     r2a(
       withUIRouter(withReactQuery(withCurrentUser(ApplicationSummaryWidget))),
+      []
+    )
+  )
+  .component(
+    'applicationContainersDatatable',
+    r2a(
+      withUIRouter(
+        withReactQuery(withCurrentUser(ApplicationContainersDatatable))
+      ),
       []
     )
   )
