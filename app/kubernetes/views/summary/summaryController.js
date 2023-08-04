@@ -3,7 +3,7 @@ import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configurati
 import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesApplicationFormValues } from 'Kubernetes/models/application/formValues';
 import { KubernetesResourceActions, KubernetesResourceTypes } from 'Kubernetes/models/resource-types/models';
-import getApplicationResources from './resources/applicationResources';
+import { getApplicationResources } from './resources/applicationResources';
 import getNamespaceResources from './resources/namespaceResources';
 import getConfigurationResources from './resources/configurationResources';
 
