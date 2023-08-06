@@ -3,6 +3,7 @@ import {
   TableState,
   useReactTable,
   Row,
+  Column,
   getCoreRowModel,
   getPaginationRowModel,
   getFilteredRowModel,
@@ -130,6 +131,7 @@ export function Datatable<
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand,
+    getColumnCanGlobalFilter,
     ...(isServerSidePagination ? { manualPagination: true, pageCount } : {}),
     meta,
   });
@@ -257,4 +259,11 @@ function globalFilterFn<D>(
   }
 
   return false;
+}
+
+function getColumnCanGlobalFilter<D>(column: Column<D, unknown>): boolean {
+  if (column.id === 'select') {
+    return false;
+  }
+  return true;
 }
