@@ -33,7 +33,7 @@ function validateYAML(yaml, containerNames, originalContainersNames = []) {
   let yamlObject;
 
   try {
-    yamlObject = YAML.parse(yaml);
+    yamlObject = YAML.parse(yaml, { maxAliasCount: -1 });
   } catch (err) {
     return 'There is an error in the yaml syntax: ' + err;
   }
@@ -58,7 +58,7 @@ export function extractContainerNames(yaml = '') {
   let yamlObject;
 
   try {
-    yamlObject = YAML.parse(yaml);
+    yamlObject = YAML.parse(yaml, { maxAliasCount: -1 });
   } catch (err) {
     return [];
   }
