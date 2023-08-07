@@ -7,7 +7,11 @@ import {
   XCircle,
 } from 'lucide-react';
 
+import { useEnvironmentList } from '@/react/portainer/environments/queries';
+import { semverCompare } from '@/react/portainer/environments/update-schedules/common/utils';
+
 import { Icon, IconMode } from '@@/Icon';
+import { Tooltip } from '@@/Tip/Tooltip';
 
 import { DeploymentStatus, EdgeStack, StatusType } from '../../types';
 
@@ -15,27 +19,41 @@ export function EdgeStackStatus({ edgeStack }: { edgeStack: EdgeStack }) {
   const status = Object.values(edgeStack.Status);
   const lastStatus = _.compact(status.map((s) => _.last(s.Status)));
 
-  const { icon, label, mode, spin } = getStatus(
+  const environmentsQuery = useEnvironmentList({ edgeStackId: edgeStack.Id });
+
+  if (environmentsQuery.isLoading) {
+    return null;
+  }
+
+  const hasOldVersion = environmentsQuery.environments.some((env) =>
+    semverCompare(env.Agent.Version, '2.19.0')
+  );
+
+  const { icon, label, mode, spin, tooltip } = getStatus(
     edgeStack.NumDeployments,
-    lastStatus
+    lastStatus,
+    hasOldVersion
   );
 
   return (
     <div className="mx-auto inline-flex items-center gap-2">
       {icon && <Icon icon={icon} spin={spin} mode={mode} />}
       {label}
+      {tooltip && <Tooltip message={tooltip} />}
     </div>
   );
 }
 
 function getStatus(
   numDeployments: number,
-  envStatus: Array<DeploymentStatus>
+  envStatus: Array<DeploymentStatus>,
+  hasOldVersion: boolean
 ): {
   label: string;
   icon?: IconType;
   spin?: boolean;
   mode?: IconMode;
+  tooltip?: string;
 } {
   if (envStatus.length < numDeployments) {
     return {
@@ -56,13 +74,20 @@ function getStatus(
     };
   }
 
-  const allRunning = envStatus.every((s) => s.Type === StatusType.Running);
+  const allRunning = envStatus.every(
+    (s) =>
+      s.Type === StatusType.Running ||
+      (s.Type === StatusType.DeploymentReceived && hasOldVersion)
+  );
 
   if (allRunning) {
     return {
       label: 'Running',
       icon: CheckCircle,
       mode: 'success',
+      tooltip: hasOldVersion
+        ? 'Please note that the new status feature for the Edge stack is only available for Edge Agent versions 2.19.0 and above. To access the status of your edge stack, it is essential to upgrade your Edge Agent to a corresponding version that is compatible with your Portainer server.'
+        : undefined,
     };
   }
 
