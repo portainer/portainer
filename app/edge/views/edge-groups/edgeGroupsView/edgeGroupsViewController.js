@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { confirmDelete } from '@@/modals/confirm';
 
 export class EdgeGroupsController {
   /* @ngInject */
@@ -26,6 +27,10 @@ export class EdgeGroupsController {
   }
 
   async removeActionAsync(selectedItems) {
+    if (!(await confirmDelete('Do you want to remove the selected Edge Group(s)?'))) {
+      return;
+    }
+
     for (let item of selectedItems) {
       try {
         await this.EdgeGroupService.remove(item.Id);
