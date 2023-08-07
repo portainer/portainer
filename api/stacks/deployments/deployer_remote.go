@@ -216,7 +216,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 				Error string
 			}{}
 
-			if err := dec.Decode(&errorStruct); err == io.EOF {
+			if err := dec.Decode(&errorStruct); errors.Is(err, io.EOF) {
 				break
 			} else if err != nil {
 				log.Warn().Err(err).Msg("unable to parse logs from unpacker container")
