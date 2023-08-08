@@ -50,7 +50,6 @@ export interface Props<
   titleIcon?: IconProps['icon'];
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
-  totalCount?: number;
   description?: ReactNode;
   pageCount?: number;
   highlightedItemId?: string;
@@ -80,7 +79,6 @@ export function Datatable<
   emptyContentLabel,
   initialTableState = {},
   isLoading,
-  totalCount = dataset.length,
   description,
   pageCount,
   page,
@@ -177,7 +175,7 @@ export function Datatable<
         onPageSizeChange={handlePageSizeChange}
         page={typeof page === 'number' ? page : tableState.pagination.pageIndex}
         pageSize={tableState.pagination.pageSize}
-        totalCount={totalCount}
+        pageCount={tableInstance.getPageCount()}
         totalSelected={selectedItems.length}
       />
     </Table.Container>

@@ -98,7 +98,6 @@ export function EdgeGroupAssociationTable({
       emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
       disableSelect
-      totalCount={totalCount}
     />
   );
 }
