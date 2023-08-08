@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
@@ -122,6 +123,28 @@ func Test_Filter_edgeFilter(t *testing.T) {
 	}
 
 	runTests(tests, t, handler, endpoints)
+}
+
+func Test_Filter_excludeIDs(t *testing.T) {
+	ids := []portainer.EndpointID{1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	environments := slices.Map(ids, func(id portainer.EndpointID) portainer.Endpoint {
+		return portainer.Endpoint{ID: id, GroupID: 1, Type: portainer.DockerEnvironment}
+	})
+
+	handler := setupFilterTest(t, environments)
+
+	tests := []filterTest{
+		{
+			title:    "should exclude IDs 2,5,8",
+			expected: []portainer.EndpointID{1, 3, 4, 6, 7, 9},
+			query: EnvironmentsQuery{
+				excludeIds: []portainer.EndpointID{2, 5, 8},
+			},
+		},
+	}
+
+	runTests(tests, t, handler, environments)
 }
 
 func runTests(tests []filterTest, t *testing.T, handler *Handler, endpoints []portainer.Endpoint) {
