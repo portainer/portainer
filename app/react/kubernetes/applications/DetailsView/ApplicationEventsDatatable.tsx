@@ -1,28 +1,22 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
-import { Event } from 'kubernetes-types/core/v1';
-import { History } from 'lucide-react';
 
-import { IndexOptional } from '@/react/kubernetes/configs/types';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
-import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
-import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 
-import { useNamespaceEventsQuery } from '../../event.service';
+import { useNamespaceEventsQuery } from '../event.service';
 import {
   useApplication,
   useApplicationPods,
   useApplicationServices,
-} from '../../application.queries';
-
-import { columns } from './columns';
+} from '../application.queries';
+import { EventsDatatable } from '../../components/KubernetesEventsDatatable';
 
 const storageKey = 'k8sAppEventsDatatable';
 const settingsStore = createStore(storageKey, { id: 'Date', desc: true });
 
-export function EventsDatatable() {
+export function ApplicationEventsDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const {
     params: {
@@ -74,29 +68,15 @@ export function EventsDatatable() {
   }, [application?.metadata?.uid, events, pods, services]);
 
   return (
-    <Datatable<IndexOptional<Event>>
+    <EventsDatatable
       dataset={relatedEvents}
-      columns={columns}
-      settingsManager={tableState}
+      tableState={tableState}
       isLoading={
         applicationQuery.isLoading ||
         eventsQuery.isLoading ||
         servicesQuery.isLoading ||
         podsQuery.isLoading
       }
-      emptyContentLabel="No event available."
-      title="Events"
-      titleIcon={History}
-      getRowId={(row) => row.metadata?.uid || ''}
-      disableSelect
-      renderTableSettings={() => (
-        <TableSettingsMenu>
-          <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
-            onChange={(value) => tableState.setAutoRefreshRate(value)}
-          />
-        </TableSettingsMenu>
-      )}
       data-cy="k8sAppDetail-eventsTable"
       noWidget
     />
