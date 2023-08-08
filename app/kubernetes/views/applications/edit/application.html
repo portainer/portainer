@@ -66,6 +66,7 @@
                 loading="ctrl.state.eventsLoading"
                 refresh-callback="ctrl.getEvents"
               ></kubernetes-events-datatable>
+              <application-events-datatable />
             </uib-tab>
 
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">

@@ -15,6 +15,7 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import {
   ApplicationSummaryWidget,
   ApplicationDetailsWidget,
+  EventsDatatable,
 } from '@/react/kubernetes/applications/DetailsView';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withFormValidation } from '@/react-tools/withFormValidation';
@@ -108,6 +109,10 @@ export const ngModule = angular
       withUIRouter(withReactQuery(withUserProvider(ApplicationDetailsWidget))),
       []
     )
+  )
+  .component(
+    'applicationEventsDatatable',
+    r2a(withUIRouter(withReactQuery(withUserProvider(EventsDatatable))), [])
   )
   .component(
     'kubernetesApplicationPlacementsDatatable',
