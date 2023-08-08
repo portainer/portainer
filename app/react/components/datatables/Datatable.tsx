@@ -51,11 +51,11 @@ export interface Props<
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
   description?: ReactNode;
+  /** The total pages, use only when using server side pagination */
   pageCount?: number;
   highlightedItemId?: string;
   page?: number;
   onPageChange?(page: number): void;
-
   settingsManager: GlobalTableState<BasicTableSettings>;
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
