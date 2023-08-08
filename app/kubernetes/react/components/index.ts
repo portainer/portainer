@@ -121,7 +121,10 @@ export const ngModule = angular
   )
   .component(
     'kubernetesApplicationPlacementsDatatable',
-    r2a(withCurrentUser(PlacementsDatatable), ['dataset', 'onRefresh'])
+    r2a(withUIRouter(withCurrentUser(PlacementsDatatable)), [
+      'dataset',
+      'onRefresh',
+    ])
   );
 
 export const componentsModule = ngModule.name;

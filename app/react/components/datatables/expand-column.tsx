@@ -9,7 +9,7 @@ export function buildExpandColumn<
   return {
     id: 'expand',
     header: ({ table }) => {
-      const hasExpandableItems = table.getExpandedRowModel().rows.length > 0;
+      const hasExpandableItems = table.getCanSomeRowsExpand();
 
       return (
         hasExpandableItems && (
