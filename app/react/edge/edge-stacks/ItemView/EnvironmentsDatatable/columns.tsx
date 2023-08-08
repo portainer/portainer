@@ -121,6 +121,7 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
 
   return (
     <Button
+      color="none"
       className="flex cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
