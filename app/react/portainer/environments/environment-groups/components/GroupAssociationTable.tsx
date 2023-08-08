@@ -62,7 +62,6 @@ export function GroupAssociationTable({
       emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
       disableSelect
-      totalCount={environmentsQuery.totalCount}
     />
   );
 }

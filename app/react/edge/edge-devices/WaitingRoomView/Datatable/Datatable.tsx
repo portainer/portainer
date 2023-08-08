@@ -37,7 +37,6 @@ export function Datatable() {
         <TableActions selectedRows={selectedRows} />
       )}
       isLoading={isLoading}
-      totalCount={totalCount}
       pageCount={pageCount}
       page={page}
       onPageChange={setPage}

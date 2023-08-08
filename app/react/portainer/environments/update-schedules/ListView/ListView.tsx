@@ -53,7 +53,6 @@ export function ListView() {
         titleIcon={Clock}
         emptyContentLabel="No schedules found"
         isLoading={listQuery.isLoading}
-        totalCount={listQuery.data.length}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}

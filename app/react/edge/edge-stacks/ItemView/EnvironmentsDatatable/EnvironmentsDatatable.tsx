@@ -87,7 +87,7 @@ export function EnvironmentsDatatable() {
       title="Environments Status"
       titleIcon={HardDrive}
       onPageChange={setPage}
-      totalCount={endpointsQuery.totalCount}
+      pageCount={Math.ceil(endpointsQuery.totalCount / tableState.pageSize)}
       emptyContentLabel="No environment available."
       disableSelect
       description={

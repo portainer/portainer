@@ -28,7 +28,6 @@ export function EventsDatatable({ data, isLoading }: EventsDatatableProps) {
       dataset={data}
       titleIcon={History}
       title="Events"
-      totalCount={data.length}
       getRowId={(row) => `${row.Date}-${row.Message}-${row.Type}`}
       disableSelect
     />
