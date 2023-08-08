@@ -10,7 +10,15 @@ import { WaitingRoomEnvironment } from '../types';
 
 import { useFilterStore } from './filter-store';
 
-export function useEnvironments() {
+export function useEnvironments({
+  page = 1,
+  pageLimit = 10,
+  search,
+}: {
+  page: number;
+  pageLimit: number;
+  search: string;
+}) {
   const filterStore = useFilterStore();
   const edgeGroupsQuery = useEdgeGroups();
 
@@ -24,6 +32,8 @@ export function useEnvironments() {
     : undefined;
 
   const environmentsQuery = useEnvironmentList({
+    page,
+    pageLimit,
     edgeDeviceUntrusted: true,
     excludeSnapshots: true,
     types: EdgeTypes,
@@ -31,6 +41,7 @@ export function useEnvironments() {
     groupIds: filterStore.groups.length ? filterStore.groups : undefined,
     endpointIds: filterByEnvironmentsIds,
     edgeCheckInPassedSeconds: filterStore.checkIn,
+    search,
   });
 
   const groupsQuery = useGroups({
