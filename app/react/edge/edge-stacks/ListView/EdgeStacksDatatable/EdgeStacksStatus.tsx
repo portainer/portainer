@@ -5,6 +5,7 @@ import {
   type Icon as IconType,
   Loader2,
   XCircle,
+  MinusCircle,
 } from 'lucide-react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
@@ -55,6 +56,15 @@ function getStatus(
   mode?: IconMode;
   tooltip?: string;
 } {
+  if (!numDeployments || hasOldVersion) {
+    return {
+      label: 'Unavailable',
+      icon: MinusCircle,
+      mode: 'secondary',
+      tooltip: getUnavailableTooltip(),
+    };
+  }
+
   if (envStatus.length < numDeployments) {
     return {
       label: 'Deploying',
@@ -85,9 +95,6 @@ function getStatus(
       label: 'Running',
       icon: CheckCircle,
       mode: 'success',
-      tooltip: hasOldVersion
-        ? 'Please note that the new status feature for the Edge stack is only available for Edge Agent versions 2.19.0 and above. To access the status of your edge stack, it is essential to upgrade your Edge Agent to a corresponding version that is compatible with your Portainer server.'
-        : undefined,
     };
   }
 
@@ -109,4 +116,16 @@ function getStatus(
     spin: true,
     mode: 'primary',
   };
+
+  function getUnavailableTooltip() {
+    if (!numDeployments) {
+      return 'Your edge stack is currently unavailable due to the absence of an available environment in your edge group';
+    }
+
+    if (hasOldVersion) {
+      return 'Please note that the new status feature for the Edge stack is only available for Edge Agent versions 2.19.0 and above. To access the status of your edge stack, it is essential to upgrade your Edge Agent to a corresponding version that is compatible with your Portainer server.';
+    }
+
+    return '';
+  }
 }
