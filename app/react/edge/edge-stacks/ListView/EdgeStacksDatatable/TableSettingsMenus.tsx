@@ -20,16 +20,18 @@ export function TableSettingsMenus({
 
   return (
     <>
-      <ColumnVisibilityMenu<DecoratedEdgeStack>
-        columns={columnsToHide}
-        onChange={(hiddenColumns) => {
-          tableState.setHiddenColumns(hiddenColumns);
-          tableInstance.setColumnVisibility(
-            Object.fromEntries(hiddenColumns.map((col) => [col, false]))
-          );
-        }}
-        value={tableState.hiddenColumns}
-      />
+      {columnsToHide && columnsToHide.length > 0 && (
+        <ColumnVisibilityMenu<DecoratedEdgeStack>
+          columns={columnsToHide}
+          onChange={(hiddenColumns) => {
+            tableState.setHiddenColumns(hiddenColumns);
+            tableInstance.setColumnVisibility(
+              Object.fromEntries(hiddenColumns.map((col) => [col, false]))
+            );
+          }}
+          value={tableState.hiddenColumns}
+        />
+      )}
       <TableSettingsMenu>
         <TableSettingsMenuAutoRefresh
           value={tableState.autoRefreshRate}
