@@ -214,7 +214,7 @@ function InnerForm({
                     checked={values.retryDeploy}
                     name="retryDeploy"
                     label="Retry deployment"
-                    tooltip="When enabled, this will allow edge agent keep retrying deployment if failure occur"
+                    tooltip="When enabled, this will allow the edge agent to retry deployment if failed to deploy initially"
                     labelClass="col-sm-3 col-lg-2"
                     onChange={(value) => setFieldValue('retryDeploy', value)}
                   />
