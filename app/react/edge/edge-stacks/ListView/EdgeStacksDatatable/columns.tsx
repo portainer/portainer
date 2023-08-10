@@ -47,7 +47,7 @@ export const columns = _.compact([
         header: 'Images pre-pulled',
         cell: ({ getValue, row: { original: item } }) => {
           if (!item.PrePullImage) {
-            return '-';
+            return <div className="text-center">-</div>;
           }
 
           return (
