@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
-import { semverCompare } from '@/react/portainer/environments/update-schedules/common/utils';
+import { semverCompare } from '@/react/common/semver-utils';
 
 import { Icon, IconMode } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
