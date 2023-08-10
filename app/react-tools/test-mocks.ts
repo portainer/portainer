@@ -117,8 +117,8 @@ export function createMockEnvironment(): Environment {
       StartTime: '',
     },
     StatusMessage: {
-      Detail: '',
-      Summary: '',
+      detail: '',
+      summary: '',
     },
   };
 }

@@ -30,6 +30,7 @@ export function confirmUpdateNamespace(
           a service interruption for these applications.
         </p>
       )}
+      <p>Are you sure you want to continue?</p>
     </>
   );
 
