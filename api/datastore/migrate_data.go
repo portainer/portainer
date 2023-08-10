@@ -50,7 +50,7 @@ func (store *Store) MigrateData() error {
 	if err != nil {
 		err = errors.Wrap(err, "failed to migrate database")
 
-		log.Warn().Msg("migration failed, restoring database to previous version")
+		log.Warn().Err(err).Msg("migration failed, restoring database to previous version")
 		err = store.restoreWithOptions(&BackupOptions{BackupPath: backupPath})
 		if err != nil {
 			return errors.Wrap(err, "failed to restore database")
