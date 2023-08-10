@@ -1,4 +1,4 @@
-import { semverCompare } from './utils';
+import { semverCompare } from './semver-utils';
 
 describe('semverCompare', () => {
   test('sort array', () => {
