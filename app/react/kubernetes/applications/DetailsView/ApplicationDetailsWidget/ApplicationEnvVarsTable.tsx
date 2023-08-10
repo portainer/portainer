@@ -20,12 +20,12 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
     <>
       <div className="text-muted mb-4 mt-6 flex items-center">
         <Icon icon={File} className="!mr-2" />
-        Configuration
+        Environment variables, ConfigMaps or Secrets
       </div>
       {appEnvVars.length === 0 && (
         <TextTip color="blue">
-          This application is not using any environment variable or
-          configuration.
+          This application is not using any environment variable, ConfigMap or
+          Secret.
         </TextTip>
       )}
       {appEnvVars.length > 0 && (
