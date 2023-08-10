@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
-import { semverCompare } from '@/react/common/semver-utils';
+import { isVersionSmaller } from '@/react/common/semver-utils';
 
 import { Icon, IconMode } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -27,7 +27,7 @@ export function EdgeStackStatus({ edgeStack }: { edgeStack: EdgeStack }) {
   }
 
   const hasOldVersion = environmentsQuery.environments.some((env) =>
-    semverCompare(env.Agent.Version, '2.19.0')
+    isVersionSmaller(env.Agent.Version, '2.19.0')
   );
 
   const { icon, label, mode, spin, tooltip } = getStatus(
