@@ -16,7 +16,6 @@ import {
   ApplicationSummaryWidget,
   ApplicationDetailsWidget,
 } from '@/react/kubernetes/applications/DetailsView';
-import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 
@@ -104,7 +103,7 @@ export const ngModule = angular
   .component(
     'applicationDetailsWidget',
     r2a(
-      withUIRouter(withReactQuery(withUserProvider(ApplicationDetailsWidget))),
+      withUIRouter(withReactQuery(withCurrentUser(ApplicationDetailsWidget))),
       []
     )
   );
