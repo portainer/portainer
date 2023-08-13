@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useTags } from '@/portainer/tags/queries';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
@@ -12,37 +12,58 @@ import { WaitingRoomEnvironment } from '../types';
 import { useFilterStore } from './filter-store';
 
 export function useEnvironments({
-  page = 1,
   pageLimit = 10,
   search,
 }: {
-  page: number;
   pageLimit: number;
   search: string;
 }) {
+  const [page, setPage] = useState(0);
   const filterStore = useFilterStore();
   const edgeGroupsQuery = useEdgeGroups();
 
-  const filterByEnvironmentsIds = filterStore.edgeGroups.length
-    ? _.compact(
-        filterStore.edgeGroups.flatMap(
-          (groupId) =>
-            edgeGroupsQuery.data?.find((g) => g.Id === groupId)?.Endpoints
-        )
-      )
-    : undefined;
+  const filterByEnvironmentsIds = useMemo(
+    () =>
+      filterStore.edgeGroups.length
+        ? _.compact(
+            filterStore.edgeGroups.flatMap(
+              (groupId) =>
+                edgeGroupsQuery.data?.find((g) => g.Id === groupId)?.Endpoints
+            )
+          )
+        : undefined,
+    [edgeGroupsQuery.data, filterStore.edgeGroups]
+  );
+
+  const query = useMemo(
+    () => ({
+      pageLimit,
+      edgeDeviceUntrusted: true,
+      excludeSnapshots: true,
+      types: EdgeTypes,
+      tagIds: filterStore.tags.length ? filterStore.tags : undefined,
+      groupIds: filterStore.groups.length ? filterStore.groups : undefined,
+      endpointIds: filterByEnvironmentsIds,
+      edgeCheckInPassedSeconds: filterStore.checkIn,
+      search,
+    }),
+    [
+      filterByEnvironmentsIds,
+      filterStore.checkIn,
+      filterStore.groups,
+      filterStore.tags,
+      pageLimit,
+      search,
+    ]
+  );
+
+  useEffect(() => {
+    setPage(0);
+  }, [query]);
 
   const environmentsQuery = useEnvironmentList({
-    page,
-    pageLimit,
-    edgeDeviceUntrusted: true,
-    excludeSnapshots: true,
-    types: EdgeTypes,
-    tagIds: filterStore.tags.length ? filterStore.tags : undefined,
-    groupIds: filterStore.groups.length ? filterStore.groups : undefined,
-    endpointIds: filterByEnvironmentsIds,
-    edgeCheckInPassedSeconds: filterStore.checkIn,
-    search,
+    page: page + 1,
+    ...query,
   });
 
   const groupsQuery = useGroups({
@@ -92,6 +113,8 @@ export function useEnvironments({
         environmentEdgeGroupsQuery.isLoading ||
         tagsQuery.isLoading,
       totalCount: environmentsQuery.totalCount,
+      page,
+      setPage,
     }),
     [
       environmentEdgeGroupsQuery.isLoading,
@@ -99,6 +122,7 @@ export function useEnvironments({
       environmentsQuery.totalCount,
       envs,
       groupsQuery.isLoading,
+      page,
       tagsQuery.isLoading,
     ]
   );
