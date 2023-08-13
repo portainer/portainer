@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
@@ -25,6 +25,10 @@ export function Datatable() {
     pageLimit: tableState.pageSize,
     search: tableState.search,
   });
+
+  useEffect(() => {
+    setPage(0);
+  }, [environments]);
 
   const pageCount = Math.ceil(totalCount / tableState.pageSize);
 
