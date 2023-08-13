@@ -7,6 +7,5 @@ export const date = columnHelper.accessor(
   {
     header: 'Date',
     id: 'Date',
-    cell: ({ getValue }) => formatDate(getValue()),
   }
 );

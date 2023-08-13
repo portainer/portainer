@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
-type BadgeType = 'success' | 'danger' | 'warn' | 'info';
+export type BadgeType = 'success' | 'danger' | 'warn' | 'info';
 
 export interface Props {
   type?: BadgeType;
