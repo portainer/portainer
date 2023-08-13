@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { useMemo } from 'react';
 
 import { useTags } from '@/portainer/tags/queries';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
@@ -63,24 +64,42 @@ export function useEnvironments({
       Object.fromEntries(tags.map((tag) => [tag.ID, tag.Name] as const)),
   });
 
-  const envs: Array<WaitingRoomEnvironment> =
-    environmentsQuery.environments.map((env) => ({
-      ...env,
-      Group: (env.GroupId !== 1 && groupsQuery.data?.[env.GroupId]) || '',
-      EdgeGroups:
-        environmentEdgeGroupsQuery.data?.[env.Id]?.map((env) => env.group) ||
-        [],
-      Tags:
-        _.compact(env.TagIds?.map((tagId) => tagsQuery.data?.[tagId])) || [],
-    }));
+  const envs: Array<WaitingRoomEnvironment> = useMemo(
+    () =>
+      environmentsQuery.environments.map((env) => ({
+        ...env,
+        Group: (env.GroupId !== 1 && groupsQuery.data?.[env.GroupId]) || '',
+        EdgeGroups:
+          environmentEdgeGroupsQuery.data?.[env.Id]?.map((env) => env.group) ||
+          [],
+        Tags:
+          _.compact(env.TagIds?.map((tagId) => tagsQuery.data?.[tagId])) || [],
+      })),
+    [
+      environmentEdgeGroupsQuery.data,
+      environmentsQuery.environments,
+      groupsQuery.data,
+      tagsQuery.data,
+    ]
+  );
 
-  return {
-    data: envs,
-    isLoading:
-      environmentsQuery.isLoading ||
-      groupsQuery.isLoading ||
-      environmentEdgeGroupsQuery.isLoading ||
+  return useMemo(
+    () => ({
+      data: envs,
+      isLoading:
+        environmentsQuery.isLoading ||
+        groupsQuery.isLoading ||
+        environmentEdgeGroupsQuery.isLoading ||
+        tagsQuery.isLoading,
+      totalCount: environmentsQuery.totalCount,
+    }),
+    [
+      environmentEdgeGroupsQuery.isLoading,
+      environmentsQuery.isLoading,
+      environmentsQuery.totalCount,
+      envs,
+      groupsQuery.isLoading,
       tagsQuery.isLoading,
-    totalCount: environmentsQuery.totalCount,
-  };
+    ]
+  );
 }
