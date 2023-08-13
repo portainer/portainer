@@ -11,12 +11,8 @@ export const status = columnHelper.accessor('status', {
   cell: StatusCell,
 });
 
-function StatusCell({
-  row: {
-    original: { status },
-  },
-}: CellContext<ContainerRowData, string>) {
-  return <Badge type={getContainerStatusType(status)}>{status}</Badge>;
+function StatusCell({ getValue }: CellContext<ContainerRowData, string>) {
+  return <Badge type={getContainerStatusType(getValue())}>{getValue()}</Badge>;
 }
 
 function getContainerStatusType(status: string): BadgeType {

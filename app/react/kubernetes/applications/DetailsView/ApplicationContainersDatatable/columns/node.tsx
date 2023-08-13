@@ -6,20 +6,19 @@ import { columnHelper } from './helper';
 
 export const node = columnHelper.accessor('nodeName', {
   header: 'Node',
-  cell: ({
-    row: {
-      original: { nodeName },
-    },
-  }) => (
-    <Authorized
-      authorizations="K8sClusterNodeR"
-      childrenUnauthorized={nodeName}
-    >
-      <Link to="kubernetes.cluster.node" params={{ nodeName }}>
-        <div className="max-w-xs truncate" title={nodeName}>
-          {nodeName}
-        </div>
-      </Link>
-    </Authorized>
-  ),
+  cell: ({ getValue }) => {
+    const nodeName = getValue();
+    return (
+      <Authorized
+        authorizations="K8sClusterNodeR"
+        childrenUnauthorized={nodeName}
+      >
+        <Link to="kubernetes.cluster.node" params={{ nodeName }}>
+          <div className="max-w-xs truncate" title={nodeName}>
+            {nodeName}
+          </div>
+        </Link>
+      </Authorized>
+    );
+  },
 });

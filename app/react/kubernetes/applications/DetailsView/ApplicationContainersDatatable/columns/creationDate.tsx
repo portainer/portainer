@@ -6,10 +6,6 @@ export const creationDate = columnHelper.accessor(
   (row) => formatDate(row.creationDate),
   {
     header: 'Creation Date',
-    cell: ({
-      row: {
-        original: { creationDate },
-      },
-    }) => formatDate(creationDate),
+    cell: ({ getValue }) => getValue(),
   }
 );
