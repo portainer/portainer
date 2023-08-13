@@ -2,10 +2,10 @@ import { Badge, BadgeType } from '@@/Badge';
 
 import { columnHelper } from './helper';
 
-export const type = columnHelper.accessor('type', {
+export const eventType = columnHelper.accessor('type', {
   header: 'Type',
-  cell: ({ row: { original: event } }) => (
-    <Badge type={getBadgeColor(event.type)}>{event.type}</Badge>
+  cell: ({ getValue }) => (
+    <Badge type={getBadgeColor(getValue())}>{getValue()}</Badge>
   ),
 });
 

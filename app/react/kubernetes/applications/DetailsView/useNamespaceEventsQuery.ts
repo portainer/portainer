@@ -32,7 +32,14 @@ export function useNamespaceEventsQuery(
   labelSelector?: string
 ) {
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'events', namespace],
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'events',
+      namespace,
+      labelSelector,
+    ],
     () => getNamespaceEvents(environmentId, namespace, labelSelector),
     {
       ...withError('Unable to retrieve events'),

@@ -5,13 +5,14 @@ import { createStore } from '@/react/kubernetes/datatables/default-kube-datatabl
 
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useNamespaceEventsQuery } from '../event.service';
 import {
   useApplication,
   useApplicationPods,
   useApplicationServices,
 } from '../application.queries';
 import { EventsDatatable } from '../../components/KubernetesEventsDatatable';
+
+import { useNamespaceEventsQuery } from './useNamespaceEventsQuery';
 
 const storageKey = 'k8sAppEventsDatatable';
 const settingsStore = createStore(storageKey, { id: 'Date', desc: true });

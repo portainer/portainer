@@ -1,6 +1,6 @@
 import { date } from './date';
 import { kind } from './kind';
-import { type } from './type';
+import { eventType } from './eventType';
 import { message } from './message';
 
-export const columns = [date, kind, type, message];
+export const columns = [date, kind, eventType, message];

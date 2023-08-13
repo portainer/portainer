@@ -7,7 +7,6 @@ export const date = columnHelper.accessor(
   {
     header: 'Date',
     id: 'Date',
-    cell: ({ row: { original: event } }) =>
-      formatDate(event.lastTimestamp || event.eventTime),
+    cell: ({ getValue }) => formatDate(getValue()),
   }
 );
