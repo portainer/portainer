@@ -5,7 +5,9 @@ import { Icon } from '@@/Icon';
 import { columnHelper } from './helper';
 
 export const status = columnHelper.accessor('AcceptsApplication', {
+  header: '',
   id: 'status',
+  enableSorting: false,
   cell: ({ getValue }) => {
     const acceptsApplication = getValue();
     return (

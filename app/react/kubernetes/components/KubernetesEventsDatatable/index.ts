@@ -1,0 +1,1 @@
+export { EventsDatatable } from './EventsDatatable';

@@ -24,7 +24,7 @@ export function ExpandableDatatableTableRow<D extends Record<string, unknown>>({
         cells={cells}
         onClick={expandOnClick ? () => row.toggleExpanded() : undefined}
       />
-      {row.getIsExpanded() && (
+      {row.getIsExpanded() && row.getCanExpand() && (
         <tr>
           {!disableSelect && <td />}
           <td colSpan={disableSelect ? cells.length : cells.length - 1}>
