@@ -133,7 +133,11 @@ export function CreateIngressView() {
                 ...group,
                 options: [
                   ...group.options,
-                  { label: service.Name, value: service.Name },
+                  {
+                    label: service.Name,
+                    selectedLabel: `${service.Name} (${service.Type})`,
+                    value: service.Name,
+                  },
                 ],
               };
             }
@@ -540,14 +544,14 @@ export function CreateIngressView() {
   return (
     <>
       <PageHeader
-        title={isEdit ? 'Edit ingress' : 'Add ingress'}
+        title={isEdit ? 'Edit ingress' : 'Create ingress'}
         breadcrumbs={[
           {
             link: 'kubernetes.ingresses',
             label: 'Ingresses',
           },
           {
-            label: isEdit ? 'Edit ingress' : 'Add ingress',
+            label: isEdit ? 'Edit ingress' : 'Create ingress',
           },
         ]}
       />
