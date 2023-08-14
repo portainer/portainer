@@ -117,7 +117,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		stack.AutoUpdate.JobID = jobID
 	}
 
-	err = handler.startStack(stack, endpoint)
+	err = handler.startStack(stack, endpoint, securityContext)
 	if err != nil {
 		return httperror.InternalServerError("Unable to start stack", err)
 	}
@@ -136,7 +136,11 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	return response.JSON(w, stack)
 }
 
-func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (handler *Handler) startStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	securityContext *security.RestrictedRequestContext,
+) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
@@ -153,7 +157,19 @@ func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.E
 			return handler.StackDeployer.StartRemoteSwarmStack(stack, endpoint)
 		}
 
-		return handler.SwarmStackManager.Deploy(stack, true, true, endpoint)
+		user, err := handler.DataStore.User().Read(securityContext.UserID)
+		if err != nil {
+			return fmt.Errorf("unable to load user information from the database: %w", err)
+		}
+
+		registries, err := handler.DataStore.Registry().ReadAll()
+		if err != nil {
+			return fmt.Errorf("unable to retrieve registries from the database: %w", err)
+		}
+
+		filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
+
+		return handler.StackDeployer.DeploySwarmStack(stack, endpoint, filteredRegistries, true, true)
 	}
 
 	return nil
