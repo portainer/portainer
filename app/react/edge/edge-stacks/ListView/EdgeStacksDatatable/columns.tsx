@@ -45,13 +45,19 @@ export const columns = _.compact([
       (item) => item.aggregatedStatus[StatusType.ImagesPulled] || 0,
       {
         header: 'Images pre-pulled',
-        cell: ({ getValue, row }) => (
-          <DeploymentCounter
-            count={getValue()}
-            type={StatusType.ImagesPulled}
-            total={row.original.NumDeployments}
-          />
-        ),
+        cell: ({ getValue, row: { original: item } }) => {
+          if (!item.PrePullImage) {
+            return <div className="text-center">-</div>;
+          }
+
+          return (
+            <DeploymentCounter
+              count={getValue()}
+              type={StatusType.ImagesPulled}
+              total={item.NumDeployments}
+            />
+          );
+        },
         enableSorting: false,
         enableHiding: false,
         meta: {

@@ -1,12 +1,12 @@
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
+import { semverCompare } from '@/react/common/semver-utils';
 
 import { TextTip } from '@@/Tip/TextTip';
 
 import { VersionSelect } from './VersionSelect';
 import { ScheduledTimeField } from './ScheduledTimeField';
-import { semverCompare } from './utils';
 
 interface Props {
   environments: Environment[];
