@@ -98,7 +98,7 @@ export function EnvironmentsDatatable() {
               isClearable
               bindToBody
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e || undefined)}
+              onChange={(e) => setStatusFilter(e ?? undefined)}
               options={[
                 { value: StatusType.Pending, label: 'Pending' },
                 { value: StatusType.Acknowledged, label: 'Acknowledged' },
