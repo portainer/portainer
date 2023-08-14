@@ -133,8 +133,8 @@ interface EndpointChangeWindow {
   EndTime: string;
 }
 export interface EnvironmentStatusMessage {
-  Summary: string;
-  Detail: string;
+  summary: string;
+  detail: string;
 }
 
 export type Environment = {
