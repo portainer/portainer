@@ -41,7 +41,7 @@ export default class LdapSettingsBaseDnBuilderController {
   }
 
   getOUValues(dn, domainSuffix = '') {
-    const regex = /(\w+)=(\w*),?/;
+    const regex = /(\w+)=([a-zA-Z0-9_ ]*),?/;
     let ouValues = [];
     let left = dn;
     let match = left.match(regex);
