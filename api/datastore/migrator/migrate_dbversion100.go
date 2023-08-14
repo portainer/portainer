@@ -115,10 +115,16 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 			}
 
 			if environmentStatus.Details.Ok {
-				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
-					Type: portainer.EdgeStackStatusRunning,
-					Time: time.Now().Unix(),
-				})
+				statusArray = append(statusArray,
+					portainer.EdgeStackDeploymentStatus{
+						Type: portainer.EdgeStackStatusDeploymentReceived,
+						Time: time.Now().Unix(),
+					},
+					portainer.EdgeStackDeploymentStatus{
+						Type: portainer.EdgeStackStatusRunning,
+						Time: time.Now().Unix(),
+					},
+				)
 			}
 
 			if environmentStatus.Details.ImagesPulled {
