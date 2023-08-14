@@ -1,7 +1,9 @@
 package deployments
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
@@ -12,6 +14,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
@@ -184,16 +187,18 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	case <-statusCh:
 	}
 
+	stdErr := &bytes.Buffer{}
+
 	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		log.Error().Err(err).Msg("unable to get logs from unpacker container")
 	} else {
-		outputBytes, err := io.ReadAll(out)
+		_, err = stdcopy.StdCopy(io.Discard, stdErr, out)
 		if err != nil {
-			log.Error().Err(err).Msg("unable to parse logs from unpacker container")
+			log.Warn().Err(err).Msg("unable to parse logs from unpacker container")
 		} else {
 			log.Info().
-				Str("output", string(outputBytes)).
+				Str("output", stdErr.String()).
 				Msg("Stack deployment output")
 		}
 	}
@@ -204,6 +209,26 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	}
 
 	if status.State.ExitCode != 0 {
+		dec := json.NewDecoder(stdErr)
+		for {
+			errorStruct := struct {
+				Level string
+				Error string
+			}{}
+
+			if err := dec.Decode(&errorStruct); errors.Is(err, io.EOF) {
+				break
+			} else if err != nil {
+				log.Warn().Err(err).Msg("unable to parse logs from unpacker container")
+
+				continue
+			}
+
+			if errorStruct.Level == "error" {
+				return fmt.Errorf("an error occurred while running unpacker container with exit code %d: %s", status.State.ExitCode, errorStruct.Error)
+			}
+		}
+
 		return fmt.Errorf("an error occurred while running unpacker container with exit code %d", status.State.ExitCode)
 	}
 

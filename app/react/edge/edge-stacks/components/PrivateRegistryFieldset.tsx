@@ -38,7 +38,7 @@ export function PrivateRegistryFieldset({
   const [selected, setSelected] = useState(value);
 
   const tooltipMessage =
-    'Use this when using a private registry that requires credentials';
+    'This allows you to provide credentials when using a private registry that requires authentication';
 
   useEffect(() => {
     if (checked) {

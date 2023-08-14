@@ -268,6 +268,11 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 
 	stack.Env = payload.Env
 
+	if stack.GitConfig != nil {
+		// detach from git
+		stack.GitConfig = nil
+	}
+
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {

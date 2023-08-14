@@ -56,16 +56,7 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                title-icon="history"
-                dataset="ctrl.events"
-                table-key="kubernetes.application.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
-              ></kubernetes-events-datatable>
+              <application-events-datatable />
             </uib-tab>
 
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">

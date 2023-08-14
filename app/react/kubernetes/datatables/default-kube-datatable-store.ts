@@ -5,9 +5,16 @@ import {
   TableSettings,
 } from './DefaultDatatableSettings';
 
-export function createStore(storageKey: string) {
-  return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
-    ...refreshableSettings(set),
-    ...systemResourcesSettings(set),
-  }));
+export function createStore(
+  storageKey: string,
+  initialSortBy: string | { id: string; desc: boolean } = 'name'
+) {
+  return createPersistedStore<TableSettings>(
+    storageKey,
+    initialSortBy,
+    (set) => ({
+      ...refreshableSettings(set),
+      ...systemResourcesSettings(set),
+    })
+  );
 }
