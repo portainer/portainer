@@ -112,9 +112,7 @@ export const ngModule = angular
   .component(
     'applicationEventsDatatable',
     r2a(
-      withUIRouter(
-        withReactQuery(withUserProvider(ApplicationEventsDatatable))
-      ),
+      withUIRouter(withReactQuery(withCurrentUser(ApplicationEventsDatatable))),
       []
     )
   )
