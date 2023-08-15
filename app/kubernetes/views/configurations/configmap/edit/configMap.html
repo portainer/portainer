@@ -75,7 +75,7 @@
                 YAML
               </uib-tab-heading>
               <div class="px-5 !pt-5" ng-if="ctrl.state.showEditorTab">
-                <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml"></kubernetes-yaml-inspector>
+                <kube-yaml-inspector identifier="'configuration-yaml'" data="ctrl.configuration.Yaml" />
               </div>
             </uib-tab>
           </uib-tabset>

@@ -82,12 +82,12 @@ export function ApplicationServicesTable({
                   )}
                   <td data-cy="k8sAppDetail-containerPort">
                     {service.spec?.ports?.map((port) => (
-                      <div key={port.port}>{port.targetPort}</div>
+                      <div key={port.name}>{port.targetPort}</div>
                     ))}
                   </td>
                   <td>
                     {service.spec?.ports?.map((port) => (
-                      <div key={port.port}>
+                      <div key={port.name}>
                         {environment?.PublicURL && port.nodePort && (
                           <a
                             className="vertical-center hyperlink"

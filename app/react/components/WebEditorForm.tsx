@@ -56,6 +56,7 @@ interface Props {
   readonly?: boolean;
   hideTitle?: boolean;
   error?: string;
+  height?: string;
 }
 
 export function WebEditorForm({
@@ -68,6 +69,7 @@ export function WebEditorForm({
   yaml,
   children,
   error,
+  height,
 }: PropsWithChildren<Props>) {
   return (
     <div>
@@ -98,6 +100,7 @@ export function WebEditorForm({
               yaml={yaml}
               value={value}
               onChange={onChange}
+              height={height}
             />
           </div>
         </div>
