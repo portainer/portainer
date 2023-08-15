@@ -248,6 +248,12 @@ const docURLs = [
     examples: ['#!/edge/jobs', '#!/edge/jobs/new'],
   },
   {
+    desc: 'Edge Compute / Edge Configurations',
+    docURL: 'https://docs.portainer.io/user/edge/configurations',
+    locationRegex: /#!\/edge\/configurations/,
+    examples: ['#!/edge/configurations', '#!/edge/configurations/new'],
+  },
+  {
     desc: 'Nomad / Dashboard',
     docURL: 'https://docs.portainer.io/user/nomad/dashboard',
     locationRegex: /#!\/\d+\/nomad\/dashboard/,
