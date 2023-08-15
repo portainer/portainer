@@ -16,7 +16,7 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { updateIngressControllerClassMap, getIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 import { confirmUpdate } from '@@/modals/confirm';
 import { confirmUpdateNamespace } from '@/react/kubernetes/namespaces/ItemView/ConfirmUpdateNamespace';
-import { getMetricsForAllNodes, getMetricsForAllPods } from '@/react/kubernetes/services/service.ts';
+import { getMetricsForAllPods } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -36,7 +36,8 @@ class KubernetesResourcePoolController {
     KubernetesApplicationService,
     KubernetesIngressService,
     KubernetesVolumeService,
-    KubernetesNamespaceService
+    KubernetesNamespaceService,
+    KubernetesNodeService
   ) {
     Object.assign(this, {
       $async,
@@ -54,6 +55,7 @@ class KubernetesResourcePoolController {
       KubernetesIngressService,
       KubernetesVolumeService,
       KubernetesNamespaceService,
+      KubernetesNodeService,
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
@@ -366,7 +368,7 @@ class KubernetesResourcePoolController {
 
         const name = this.$state.params.id;
 
-        const [nodes, pools] = await Promise.all([getMetricsForAllNodes, this.KubernetesResourcePoolService.get('', { getQuota: true })]);
+        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get('', { getQuota: true })]);
 
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
