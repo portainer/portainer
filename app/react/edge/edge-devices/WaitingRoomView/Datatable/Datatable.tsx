@@ -9,11 +9,22 @@ import { useEnvironments } from './useEnvironments';
 
 const storageKey = 'edge-devices-waiting-room';
 
-const settingsStore = createPersistedStore(storageKey, 'Name');
+const settingsStore = createPersistedStore(storageKey);
 
 export function Datatable() {
   const tableState = useTableState(settingsStore, storageKey);
-  const { data: environments, totalCount, isLoading } = useEnvironments();
+  const {
+    data: environments,
+    totalCount,
+    isLoading,
+    page,
+    setPage,
+  } = useEnvironments({
+    pageLimit: tableState.pageSize,
+    search: tableState.search,
+  });
+
+  const pageCount = Math.ceil(totalCount / tableState.pageSize);
 
   return (
     <GenericDatatable
@@ -27,6 +38,9 @@ export function Datatable() {
       )}
       isLoading={isLoading}
       totalCount={totalCount}
+      pageCount={pageCount}
+      page={page}
+      onPageChange={setPage}
       description={<Filter />}
     />
   );
