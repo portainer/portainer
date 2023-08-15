@@ -72,6 +72,11 @@ angular
           component: 'editEdgeStackView',
         },
       },
+      params: {
+        status: {
+          dynamic: true,
+        },
+      },
     };
 
     const edgeJobs = {
