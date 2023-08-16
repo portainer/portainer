@@ -53,6 +53,8 @@ export function CreateIngressView() {
 
   const [namespace, setNamespace] = useState<string>(params.namespace || '');
   const [ingressRule, setIngressRule] = useState<Rule>({} as Rule);
+  // isEditClassNameSet is used to prevent premature validation of the classname in the edit view
+  const [isEditClassNameSet, setIsEditClassNameSet] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<Record<string, ReactNode>>(
     {} as Record<string, string>
@@ -243,14 +245,21 @@ export function CreateIngressView() {
     [ingressControllers]
   );
 
-  // when the ingress class options update the value to an available one
+  // when them selected ingress class option update is no longer available set to an empty value
   useEffect(() => {
     const ingressClasses = ingressClassOptions.map((option) => option.value);
-    if (!ingressClasses.includes(ingressRule.IngressClassName)) {
-      // setting to the first available option (or undefined when there are no options)
-      handleIngressChange('IngressClassName', ingressClasses[0]);
+    if (
+      !ingressClasses.includes(ingressRule.IngressClassName) &&
+      ingressControllersQuery.isSuccess
+    ) {
+      handleIngressChange('IngressClassName', '');
     }
-  }, [handleIngressChange, ingressClassOptions, ingressRule.IngressClassName]);
+  }, [
+    handleIngressChange,
+    ingressClassOptions,
+    ingressControllersQuery.isSuccess,
+    ingressRule.IngressClassName,
+  ]);
 
   const matchedConfigs = configResults?.data?.filter(
     (config) =>
@@ -289,6 +298,7 @@ export function CreateIngressView() {
         const r = prepareRuleFromIngress(ing, type);
         r.IngressType = type || r.IngressType;
         setIngressRule(r);
+        setIsEditClassNameSet(true);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -365,12 +375,15 @@ export function CreateIngressView() {
           errors.ingressName = 'Ingress name already exists';
         }
 
-        if (!ingressClassOptions.length && ingressControllersQuery.isSuccess) {
+        if (
+          (!ingressClassOptions.length || !rule.IngressClassName) &&
+          ingressControllersQuery.isSuccess
+        ) {
           errors.className = 'Ingress class is required';
         }
       }
 
-      if (isEdit && !ingressRule.IngressClassName) {
+      if (isEdit && !ingressRule.IngressClassName && isEditClassNameSet) {
         errors.className =
           'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
       }
@@ -513,7 +526,8 @@ export function CreateIngressView() {
     },
     [
       isEdit,
-      ingressClassOptions,
+      isEditClassNameSet,
+      ingressClassOptions.length,
       ingressControllersQuery.isSuccess,
       environmentId,
       ingresses,
@@ -583,6 +597,8 @@ export function CreateIngressView() {
             handleNamespaceChange={handleNamespaceChange}
             namespacesOptions={namespaceOptions}
             isNamespaceOptionsLoading={namespacesQuery.isLoading}
+            // wait for ingress results too to set a name that's not taken with handleNamespaceChange()
+            isIngressNamesLoading={ingressesResults.isLoading}
           />
         </div>
         {namespace && (
@@ -688,6 +704,7 @@ export function CreateIngressView() {
       Namespace: namespace,
       IngressName: newKey,
       IngressClassName: ingressRule.IngressClassName || '',
+      IngressType: ingressRule.IngressType || '',
       Hosts: [host],
     };
 
