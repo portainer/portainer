@@ -34,6 +34,20 @@ import { createSelectColumn } from './select-column';
 import { TableRow } from './TableRow';
 import { type TableState as GlobalTableState } from './useTableState';
 
+export type PaginationProps =
+  | {
+      isServerSidePagination?: false;
+      totalCount?: never;
+      page?: never;
+      onPageChange?: never;
+    }
+  | {
+      isServerSidePagination: true;
+      totalCount: number;
+      page: number;
+      onPageChange(page: number): void;
+    };
+
 export interface Props<
   D extends Record<string, unknown>,
   TMeta extends TableMeta<D> = TableMeta<D>
@@ -51,11 +65,7 @@ export interface Props<
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
   description?: ReactNode;
-  /** The total pages, use only when using server side pagination */
-  pageCount?: number;
   highlightedItemId?: string;
-  page?: number;
-  onPageChange?(page: number): void;
   settingsManager: GlobalTableState<BasicTableSettings>;
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
@@ -80,9 +90,6 @@ export function Datatable<
   initialTableState = {},
   isLoading,
   description,
-  pageCount,
-  page,
-  onPageChange = () => null,
   settingsManager: settings,
   renderRow = defaultRenderRow,
   highlightedItemId,
@@ -90,8 +97,16 @@ export function Datatable<
   getRowCanExpand,
   'data-cy': dataCy,
   meta,
-}: Props<D, TMeta>) {
-  const isServerSidePagination = typeof pageCount !== 'undefined';
+  onPageChange = () => {},
+  page,
+  totalCount = dataset.length,
+  isServerSidePagination = false,
+}: Props<D, TMeta> & PaginationProps) {
+  const pageCount = useMemo(
+    () => Math.ceil(totalCount / settings.pageSize),
+    [settings.pageSize, totalCount]
+  );
+
   const enableRowSelection = getIsSelectionEnabled(
     disableSelect,
     isRowSelectable

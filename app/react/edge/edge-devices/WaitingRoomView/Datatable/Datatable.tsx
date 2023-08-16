@@ -24,8 +24,6 @@ export function Datatable() {
     search: tableState.search,
   });
 
-  const pageCount = Math.ceil(totalCount / tableState.pageSize);
-
   return (
     <GenericDatatable
       settingsManager={tableState}
@@ -37,9 +35,10 @@ export function Datatable() {
         <TableActions selectedRows={selectedRows} />
       )}
       isLoading={isLoading}
-      pageCount={pageCount}
+      isServerSidePagination
       page={page}
       onPageChange={setPage}
+      totalCount={totalCount}
       description={<Filter />}
     />
   );
