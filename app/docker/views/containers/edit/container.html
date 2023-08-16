@@ -348,21 +348,15 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-sm-12">
-    <container-networks-datatable
-      ng-if="container.NetworkSettings.Networks"
-      title-text="Connected networks"
-      title-icon="share-2"
-      dataset="container.NetworkSettings.Networks"
-      table-key="container-networks"
-      container="container"
-      available-networks="availableNetworks"
-      join-network-action="containerJoinNetwork"
-      join-network-action-in-progress="state.joinNetworkInProgress"
-      leave-network-action="containerLeaveNetwork"
-      leave-network-action-in-progress="state.leaveNetworkInProgress"
-      node-name="nodeName"
-    ></container-networks-datatable>
-  </div>
-</div>
+<docker-container-networks-datatable
+  ng-if="container.NetworkSettings.Networks"
+  dataset="container.NetworkSettings.Networks"
+  container="container"
+  available-networks="availableNetworks"
+  on-join="(containerJoinNetwork)"
+  join-in-progress="state.joinNetworkInProgress"
+  on-leave="(containerLeaveNetwork)"
+  leave-in-progress="state.leaveNetworkInProgress"
+  node-name="nodeName"
+>
+</docker-container-networks-datatable>

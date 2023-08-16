@@ -41,3 +41,14 @@ export function useIsSwarm(environmentId: EnvironmentId) {
 
   return !!query.data;
 }
+
+export function useSystemLimits(environmentId: EnvironmentId) {
+  const infoQuery = useInfo(environmentId);
+
+  const maxCpu = infoQuery.data?.NCPU || 32;
+  const maxMemory = infoQuery.data?.MemTotal
+    ? Math.floor(infoQuery.data.MemTotal / 1000 / 1000)
+    : 32768;
+
+  return { maxCpu, maxMemory };
+}

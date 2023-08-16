@@ -1,17 +1,14 @@
 import { useQuery } from 'react-query';
+import { SystemVersion } from 'docker-types/generated/1.41';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { buildUrl } from './build-url';
 
-export interface VersionResponse {
-  ApiVersion: string;
-}
-
 export async function getVersion(environmentId: EnvironmentId) {
   try {
-    const { data } = await axios.get<VersionResponse>(
+    const { data } = await axios.get<SystemVersion>(
       buildUrl(environmentId, 'version')
     );
     return data;
@@ -20,9 +17,9 @@ export async function getVersion(environmentId: EnvironmentId) {
   }
 }
 
-export function useVersion<TSelect = VersionResponse>(
+export function useVersion<TSelect = SystemVersion>(
   environmentId: EnvironmentId,
-  select?: (info: VersionResponse) => TSelect
+  select?: (info: SystemVersion) => TSelect
 ) {
   return useQuery(
     ['environment', environmentId, 'docker', 'version'],
@@ -31,4 +28,9 @@ export function useVersion<TSelect = VersionResponse>(
       select,
     }
   );
+}
+
+export function useApiVersion(environmentId: EnvironmentId) {
+  const query = useVersion(environmentId, (info) => info.ApiVersion);
+  return query.data ? parseFloat(query.data) : 0;
 }
