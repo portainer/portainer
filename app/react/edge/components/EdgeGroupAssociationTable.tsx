@@ -3,10 +3,7 @@ import { truncate } from 'lodash';
 import { useMemo, useState } from 'react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
-import {
-  Environment,
-  EnvironmentId,
-} from '@/react/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
@@ -47,13 +44,11 @@ export function EdgeGroupAssociationTable({
   emptyContentLabel,
   onClickRow,
   'data-cy': dataCy,
-  hideEnvironmentIds = [],
 }: {
   title: string;
   query: EnvironmentsQueryParams;
   emptyContentLabel: string;
   onClickRow: (env: Environment) => void;
-  hideEnvironmentIds?: EnvironmentId[];
 } & AutomationTestingProps) {
   const tableState = useTableStateWithoutStorage('Name');
   const [page, setPage] = useState(1);
@@ -74,25 +69,17 @@ export function EdgeGroupAssociationTable({
 
   const environments: Array<DecoratedEnvironment> = useMemo(
     () =>
-      environmentsQuery.environments
-        .filter((e) => !hideEnvironmentIds.includes(e.Id))
-        .map((env) => ({
-          ...env,
-          Group:
-            groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name || '',
-          Tags: env.TagIds.map(
-            (tagId) => tagsQuery.data?.find((t) => t.ID === tagId)?.Name || ''
-          ),
-        })),
-    [
-      environmentsQuery.environments,
-      groupsQuery.data,
-      hideEnvironmentIds,
-      tagsQuery.data,
-    ]
+      environmentsQuery.environments.map((env) => ({
+        ...env,
+        Group: groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name || '',
+        Tags: env.TagIds.map(
+          (tagId) => tagsQuery.data?.find((t) => t.ID === tagId)?.Name || ''
+        ),
+      })),
+    [environmentsQuery.environments, groupsQuery.data, tagsQuery.data]
   );
 
-  const totalCount = environmentsQuery.totalCount - hideEnvironmentIds.length;
+  const { totalCount } = environmentsQuery;
 
   return (
     <Datatable<DecoratedEnvironment>
