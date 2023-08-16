@@ -28,6 +28,7 @@ export function AssociatedEdgeEnvironmentsSelector({
               emptyContentLabel="No environment available"
               query={{
                 types: EdgeTypes,
+                excludeIds: value,
               }}
               onClickRow={(env) => {
                 if (!value.includes(env.Id)) {
@@ -35,7 +36,6 @@ export function AssociatedEdgeEnvironmentsSelector({
                 }
               }}
               data-cy="edgeGroupCreate-availableEndpoints"
-              hideEnvironmentIds={value}
             />
           </div>
           <div className="w-1/2">

@@ -92,7 +92,6 @@ export const componentsModule = angular
       'query',
       'title',
       'data-cy',
-      'hideEnvironmentIds',
     ])
   )
   .component(
