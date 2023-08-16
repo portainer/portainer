@@ -11,7 +11,7 @@ import { Link } from '@@/Link';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { isBE } from '../../feature-flags/feature-flags.service';
-import { isSortType, refetchIfAnyOffline } from '../queries/useEnvironmentList';
+import { isSortType } from '../queries/useEnvironmentList';
 
 import { columns } from './columns';
 import { EnvironmentListItem } from './types';
@@ -39,7 +39,7 @@ export function EnvironmentsDatatable({
       sort: isSortType(tableState.sortBy.id) ? tableState.sortBy.id : undefined,
       order: tableState.sortBy.desc ? 'desc' : 'asc',
     },
-    { enabled: groupsQuery.isSuccess, refetchInterval: refetchIfAnyOffline }
+    { enabled: groupsQuery.isSuccess, refetchInterval: 30 * 1000 }
   );
 
   const environmentsWithGroups = environments.map<EnvironmentListItem>(
@@ -88,15 +88,17 @@ export function EnvironmentsDatatable({
               Auto onboarding
             </Button>
           )}
-
-          <Button
-            as={Link}
-            props={{ to: 'portainer.wizard.endpoints' }}
-            icon={Plus}
-            className="!m-0"
-          >
-            Add environment
-          </Button>
+          <Link to="portainer.wizard.endpoints">
+            <Button
+              onClick={() =>
+                localStorage.setItem('wizardReferrer', 'environments')
+              }
+              icon={Plus}
+              className="!m-0"
+            >
+              Add environment
+            </Button>
+          </Link>
         </div>
       )}
     />
