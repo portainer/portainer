@@ -1412,7 +1412,7 @@ type (
 		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string
 		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error)
 		FormProjectPathByVersion(projectPath string, version int, commitHash string) string
-		SafeMoveDirectory(src, dst string) error
+		SafeCopyDirectory(src, dst string) error
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error

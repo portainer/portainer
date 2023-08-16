@@ -899,18 +899,22 @@ func FileExists(filePath string) (bool, error) {
 }
 
 // SafeCopyDirectory copies a directory from src to dst in a safe way.
-func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
+func (service *Service) SafeCopyDirectory(originalPath, newPath string) error {
 	// 1. Backup the source directory to a different folder
 	backupDir := fmt.Sprintf("%s-%s", filepath.Dir(originalPath), "backup")
-	err := MoveDirectory(originalPath, backupDir)
+	err := CopyDir(originalPath, backupDir, false)
 	if err != nil {
 		return fmt.Errorf("failed to backup source directory: %w", err)
 	}
 
 	defer func() {
 		if err != nil {
+			restoreErr := os.RemoveAll(originalPath)
+			if err != nil {
+				log.Warn().Err(restoreErr).Msg("failed to cleanup original directory")
+			}
 			// If an error occurred, rollback the backup directory
-			restoreErr := restoreBackup(originalPath, backupDir)
+			restoreErr = restoreBackup(originalPath, backupDir)
 			if restoreErr != nil {
 				log.Warn().Err(restoreErr).Msg("failed to restore backup during creating versioning folder")
 			}
