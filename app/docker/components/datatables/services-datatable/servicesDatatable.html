@@ -180,7 +180,7 @@
               <td ng-show="$ctrl.columnVisibility.columns.image.display">{{ item.Image | hideshasum }}</td>
               <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
-                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount : item) }}</code>
+                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
                 <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
                   <a class="interactive vertical-center" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
                     <pr-icon icon="'minimize-2'"></pr-icon>

@@ -79,7 +79,7 @@ export function CreateIngressView() {
       string[],
       Ingress[],
       Record<string, number>,
-      Record<string, string>
+      Record<string, string>,
     ] => {
       const ruleCounterByNamespace: Record<string, number> = {};
       const hostWithTLS: Record<string, string> = {};

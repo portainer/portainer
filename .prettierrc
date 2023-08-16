@@ -2,15 +2,21 @@
   "printWidth": 180,
   "singleQuote": true,
   "htmlWhitespaceSensitivity": "strict",
+  "trailingComma": "es5",
   "overrides": [
     {
-      "files": ["*.html"],
+      "files": [
+        "*.html"
+      ],
       "options": {
         "parser": "angular"
       }
     },
     {
-      "files": ["*.{j,t}sx", "*.ts"],
+      "files": [
+        "*.{j,t}sx",
+        "*.ts"
+      ],
       "options": {
         "printWidth": 80
       }

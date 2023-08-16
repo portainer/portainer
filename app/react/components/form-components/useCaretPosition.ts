@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 
 export function useCaretPosition<
-  T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement
+  T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement,
 >() {
   const node = useRef<T>(null);
   const [start, setStart] = useState(0);

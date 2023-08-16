@@ -12,9 +12,12 @@ angular.module('portainer.app').directive('focusIf', function ($timeout) {
       }
       function focus(condition) {
         if (condition) {
-          $timeout(function () {
-            dom.focus();
-          }, $scope.$eval($attrs.focusDelay) || 0);
+          $timeout(
+            function () {
+              dom.focus();
+            },
+            $scope.$eval($attrs.focusDelay) || 0
+          );
         }
       }
     },

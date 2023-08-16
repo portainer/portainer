@@ -233,23 +233,31 @@ export function getRollbackPatchPayload(
       // keep the annotations to skip from the deployment, in the patch
       const applicationAnnotations = application.metadata?.annotations || {};
       const applicationAnnotationsInPatch =
-        unchangedAnnotationKeysForRollbackPatch.reduce((acc, annotationKey) => {
-          if (applicationAnnotations[annotationKey]) {
-            acc[annotationKey] = applicationAnnotations[annotationKey];
-          }
-          return acc;
-        }, {} as Record<string, string>);
+        unchangedAnnotationKeysForRollbackPatch.reduce(
+          (acc, annotationKey) => {
+            if (applicationAnnotations[annotationKey]) {
+              acc[annotationKey] = applicationAnnotations[annotationKey];
+            }
+            return acc;
+          },
+          {} as Record<string, string>
+        );
 
       // add any annotations from the target revision that shouldn't be skipped
       const revisionAnnotations = previousRevision.metadata?.annotations || {};
       const revisionAnnotationsInPatch = Object.entries(
         revisionAnnotations
-      ).reduce((acc, [annotationKey, annotationValue]) => {
-        if (!unchangedAnnotationKeysForRollbackPatch.includes(annotationKey)) {
-          acc[annotationKey] = annotationValue;
-        }
-        return acc;
-      }, {} as Record<string, string>);
+      ).reduce(
+        (acc, [annotationKey, annotationValue]) => {
+          if (
+            !unchangedAnnotationKeysForRollbackPatch.includes(annotationKey)
+          ) {
+            acc[annotationKey] = annotationValue;
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
       const patchAnnotations = {
         ...applicationAnnotationsInPatch,

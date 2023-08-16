@@ -10,7 +10,7 @@ export type TableState<TSettings extends BasicTableSettings> = TSettings & {
 };
 
 export function useTableState<
-  TSettings extends BasicTableSettings = BasicTableSettings
+  TSettings extends BasicTableSettings = BasicTableSettings,
 >(
   store: ReturnType<typeof createPersistedStore<TSettings>>,
   storageKey: string

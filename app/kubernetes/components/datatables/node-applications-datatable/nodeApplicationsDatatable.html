@@ -131,7 +131,7 @@
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })">{{ item.ResourcePool }}</a>
               </td>
               <td title="{{ item.Image }}"
-                >{{ item.Image | truncate : 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+                >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
               >
               <td>{{ item.CPU | kubernetesApplicationCPUValue }}</td>
               <td>{{ item.Memory | humansize }}</td>

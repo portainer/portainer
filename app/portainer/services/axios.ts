@@ -85,7 +85,7 @@ export function defaultErrorParser(axiosError: AxiosError) {
 }
 
 export function isAxiosError<
-  ResponseType = { message: string; details: string }
+  ResponseType = { message: string; details: string },
 >(error: unknown): error is AxiosError<ResponseType> {
   return axiosOrigin.isAxiosError(error);
 }

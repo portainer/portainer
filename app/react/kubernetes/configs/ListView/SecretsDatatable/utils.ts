@@ -11,11 +11,12 @@ export function getIsSecretInUse(secret: Secret, applications: Application[]) {
       ? app?.spec
       : app?.spec?.template?.spec;
 
-    const hasEnvVarReference = appSpec?.containers.some((container) =>
-      container.env?.some(
-        (envVar) =>
-          envVar.valueFrom?.secretKeyRef?.name === secret.metadata?.name
-      )
+    const hasEnvVarReference = appSpec?.containers.some(
+      (container) =>
+        container.env?.some(
+          (envVar) =>
+            envVar.valueFrom?.secretKeyRef?.name === secret.metadata?.name
+        )
     );
     const hasVolumeReference = appSpec?.volumes?.some(
       (volume) => volume.secret?.secretName === secret.metadata?.name
