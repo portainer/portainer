@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 
 import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { useParamState } from '@/react/hooks/useParamState';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -92,23 +91,21 @@ export function EnvironmentsDatatable() {
       emptyContentLabel="No environment available."
       disableSelect
       description={
-        isBE && (
-          <div className="w-1/4">
-            <PortainerSelect<StatusType | undefined>
-              isClearable
-              bindToBody
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e || undefined)}
-              options={[
-                { value: StatusType.Pending, label: 'Pending' },
-                { value: StatusType.Acknowledged, label: 'Acknowledged' },
-                { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
-                { value: StatusType.Running, label: 'Deployed' },
-                { value: StatusType.Error, label: 'Failed' },
-              ]}
-            />
-          </div>
-        )
+        <div className="w-1/4">
+          <PortainerSelect<StatusType | undefined>
+            isClearable
+            bindToBody
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e ?? undefined)}
+            options={[
+              { value: StatusType.Pending, label: 'Pending' },
+              { value: StatusType.Acknowledged, label: 'Acknowledged' },
+              { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
+              { value: StatusType.Running, label: 'Deployed' },
+              { value: StatusType.Error, label: 'Failed' },
+            ]}
+          />
+        </div>
       }
     />
   );
