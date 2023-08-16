@@ -110,7 +110,7 @@ export function Datatable<
     initialState: {
       pagination: {
         pageSize: settings.pageSize,
-        pageIndex: page,
+        pageIndex: page || 0,
       },
       sorting: settings.sortBy ? [settings.sortBy] : [],
       globalFilter: settings.search,
@@ -163,6 +163,7 @@ export function Datatable<
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
       />
+
       <DatatableContent<D>
         tableInstance={tableInstance}
         renderRow={(row) => renderRow(row, highlightedItemId)}
