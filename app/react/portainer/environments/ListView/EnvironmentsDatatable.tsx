@@ -61,8 +61,10 @@ export function EnvironmentsDatatable({
       dataset={environmentsWithGroups}
       columns={columns}
       settingsManager={tableState}
-      pageCount={Math.ceil(totalCount / tableState.pageSize)}
+      isServerSidePagination
+      page={page}
       onPageChange={setPage}
+      totalCount={totalCount}
       isLoading={isLoading}
       isRowSelectable={(row) =>
         row.original.Status !== EnvironmentStatus.Provisioning
