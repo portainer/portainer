@@ -339,7 +339,7 @@
                     <div class="col-sm-12 mt-2">
                       <span
                         ng-if="ctrl.formValues.Containers.length <= 1"
-                        class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                        class="btn btn-primary btn-sm btn btn-sm btn-light !ml-0 mb-2"
                         ng-click="ctrl.addEnvironmentVariable()"
                         data-cy="k8sAppCreate-addEnvVarButton"
                       >
@@ -424,7 +424,7 @@
                     <!-- !no-override -->
 
                     <!-- has-override -->
-                    <div class="col-sm-12 !mt-2 !mb-4 !p-0" ng-if="config.Overriden" ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
+                    <div class="col-sm-12 !mb-4 !mt-2 !p-0" ng-if="config.Overriden" ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
                       <div class="input-group input-group-sm !mr-1">
                         <span class="input-group-addon">key</span>
                         <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
@@ -485,7 +485,7 @@
                   <div class="col-sm-12 !p-0">
                     <button
                       type="button"
-                      class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                      class="btn btn-primary btn-sm btn btn-sm btn-light !ml-0 mb-2"
                       ng-disabled="ctrl.configMaps.length === 0"
                       ng-click="ctrl.addConfigMap()"
                       ng-if="ctrl.formValues.Containers.length <= 1"
@@ -574,7 +574,7 @@
                     <!-- !no-override -->
 
                     <!-- has-override -->
-                    <div class="col-sm-12 !mt-2 !mb-4 !p-0" ng-if="config.Overriden" ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
+                    <div class="col-sm-12 !mb-4 !mt-2 !p-0" ng-if="config.Overriden" ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
                       <div class="input-group input-group-sm !mr-1">
                         <span class="input-group-addon">key</span>
                         <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
@@ -643,7 +643,7 @@
                     <button
                       type="button"
                       ng-disabled="ctrl.secrets.length === 0"
-                      class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                      class="btn btn-primary btn-sm btn btn-sm btn-light !ml-0 mb-2"
                       ng-click="ctrl.addSecret()"
                       ng-if="ctrl.formValues.Containers.length <= 1"
                       data-cy="k8sAppCreate-addSecretButton"
@@ -867,7 +867,7 @@
 
                       <div class="col-sm-12 mt-2">
                         <span
-                          class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
+                          class="btn btn-primary btn-sm btn btn-sm btn-light !ml-0 mb-2"
                           ng-click="ctrl.addPersistedFolder()"
                           ng-if="ctrl.isAddPersistentFolderButtonShowed()"
                           data-cy="k8sAppCreate-addPersistentFolderButton"
@@ -1206,7 +1206,7 @@
                   </div>
                   <!-- #endregion -->
 
-                  <div class="mt-4 mb-2" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+                  <div class="mb-2 mt-4" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
                     <div class="col-sm-12 control-label !mb-2 !p-0 text-left"> Placement preferences and constraints </div>
 
                     <!-- #region PLACEMENTS -->
@@ -1273,7 +1273,7 @@
                     </div>
 
                     <div class="col-sm-12">
-                      <span class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0 mt-2" ng-click="ctrl.addPlacement()">
+                      <span class="btn btn-primary btn-sm btn btn-sm btn-light !ml-0 mb-2 mt-2" ng-click="ctrl.addPlacement()">
                         <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add rule
                       </span>
                     </div>

@@ -43,7 +43,7 @@ export function DashboardItem({
     >
       <div
         className={clsx(
-          'text-muted absolute top-2 right-2 flex items-center text-xs transition-opacity',
+          'text-muted absolute right-2 top-2 flex items-center text-xs transition-opacity',
           isRefetching ? 'opacity-100' : 'opacity-0'
         )}
       >
@@ -52,7 +52,7 @@ export function DashboardItem({
       </div>
       <div
         className={clsx(
-          'text-muted absolute top-2 right-2 flex items-center text-xs transition-opacity',
+          'text-muted absolute right-2 top-2 flex items-center text-xs transition-opacity',
           isLoading ? 'opacity-100' : 'opacity-0'
         )}
       >

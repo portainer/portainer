@@ -21,7 +21,7 @@ export function EnvironmentStatusBadgeItem({
       className={clsx(
         'flex items-center gap-1',
         'rounded border-2 border-solid',
-        'w-fit py-px px-1',
+        'w-fit px-1 py-px',
         'text-xs font-semibold text-gray-7',
         {
           'border-green-3 bg-green-2': color === 'success',

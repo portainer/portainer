@@ -209,7 +209,7 @@
     "storybook-css-modules-preset": "^1.1.1",
     "style-loader": "^3.3.3",
     "swagger2openapi": "^7.0.8",
-    "tailwindcss": "3.1.4",
+    "tailwindcss": "3.3.3",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5.0.4",
     "webpack": "^5.88.1",

@@ -125,7 +125,7 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
       className="flex cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
-      <div className="pt-0.5 pr-1">
+      <div className="pr-1 pt-0.5">
         <Icon icon={isExpanded ? ChevronDown : ChevronRight} />
       </div>
       <div

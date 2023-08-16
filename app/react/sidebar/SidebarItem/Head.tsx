@@ -66,7 +66,7 @@ export function Head({
 
   return (
     <Tippy
-      className="!rounded-md bg-blue-9 !py-2 !px-3 !opacity-100 be:bg-gray-9 th-dark:bg-gray-true-9"
+      className="!rounded-md bg-blue-9 !px-3 !py-2 !opacity-100 be:bg-gray-9 th-dark:bg-gray-true-9"
       content={label}
       delay={[0, 0]}
       duration={[0, 0]}
