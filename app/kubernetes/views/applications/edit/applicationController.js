@@ -10,7 +10,6 @@ import {
   KubernetesDeploymentTypes,
 } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
@@ -199,7 +198,6 @@ class KubernetesApplicationController {
         this.KubernetesNodeService.get(),
       ]);
       this.application = application;
-      this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
 
       this.placements = computePlacements(nodes, this.application);
       this.state.placementWarning = _.find(this.placements, { AcceptsApplication: true }) ? false : true;
@@ -238,7 +236,6 @@ class KubernetesApplicationController {
       eventWarningCount: 0,
       placementWarning: false,
       expandedNote: false,
-      useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
       publicUrl: this.endpoint.PublicURL,
     };
 

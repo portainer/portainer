@@ -25,7 +25,7 @@ export function DatatableContent<D extends Record<string, unknown>>({
   const pageRowModel = tableInstance.getPaginationRowModel();
 
   return (
-    <Table data-cy={dataCy}>
+    <Table data-cy={dataCy} className="nowrap-cells">
       <thead>
         {headerGroups.map((headerGroup) => (
           <Table.HeaderRow<D>
