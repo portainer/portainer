@@ -4,9 +4,11 @@ class KubernetesFormValidationHelper {
   static getInvalidKeys(names) {
     const res = {};
     _.forEach(names, (name, index) => {
-      const valid = /^[-._a-zA-Z0-9]+$/.test(name);
-      if (!valid) {
-        res[index] = true;
+      if (name) {
+        const valid = /^[-._a-zA-Z0-9]+$/.test(name);
+        if (!valid) {
+          res[index] = true;
+        }
       }
     });
     return res;
