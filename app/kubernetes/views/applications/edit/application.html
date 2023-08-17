@@ -62,7 +62,7 @@
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
-                <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
+                <kube-yaml-inspector identifier="'application-yaml'" data="ctrl.application.Yaml" />
               </div>
             </uib-tab>
           </uib-tabset>

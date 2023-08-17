@@ -84,23 +84,19 @@ export function CodeEditor({
 
   return (
     <>
-      <div className="mb-2 flex flex-col">
-        <div className="flex">
-          <div className="flex-1">
-            {!!placeholder && <TextTip color="blue">{placeholder}</TextTip>}
-          </div>
-
-          <div className="ml-auto">
-            <CopyButton
-              copyText={value}
-              color="none"
-              className="!text-sm !font-medium text-blue-9 hover:!text-blue-11 th-highcontrast:text-blue-7 hover:th-highcontrast:!text-blue-6 th-dark:text-blue-7 hover:th-dark:!text-blue-6"
-              indicatorPosition="left"
-            >
-              Copy to clipboard
-            </CopyButton>
-          </div>
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex flex-1 items-center">
+          {!!placeholder && <TextTip color="blue">{placeholder}</TextTip>}
         </div>
+
+        <CopyButton
+          copyText={value}
+          color="link"
+          className="!pr-0 !text-sm !font-medium hover:no-underline focus:no-underline"
+          indicatorPosition="left"
+        >
+          Copy to clipboard
+        </CopyButton>
       </div>
       <CodeMirror
         className={styles.root}
