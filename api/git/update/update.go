@@ -48,10 +48,6 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 	}
 
 	toDir := projectPath
-	if enableVersionFolder {
-		toDir = filesystem.JoinPaths(projectPath, newHash)
-	}
-
 	cloneParams := &cloneRepositoryParameters{
 		url:           gitConfig.URL,
 		ref:           gitConfig.ReferenceName,
@@ -65,8 +61,18 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 		}
 	}
 
+	// For backward compatibility, we need to clone the repository in the old project path
 	if err := cloneGitRepository(gitService, cloneParams); err != nil {
 		return false, "", errors.WithMessagef(err, "failed to do a fresh clone of %v", objId)
+	}
+
+	if enableVersionFolder {
+		toDir = filesystem.JoinPaths(projectPath, newHash)
+		cloneParams.toDir = toDir
+
+		if err := cloneGitRepository(gitService, cloneParams); err != nil {
+			return false, "", errors.WithMessagef(err, "failed to do a fresh clone of %v", objId)
+		}
 	}
 
 	log.Debug().
