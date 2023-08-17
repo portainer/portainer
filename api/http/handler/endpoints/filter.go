@@ -118,7 +118,13 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 	}, nil
 }
 
-func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.Endpoint, query EnvironmentsQuery, groups []portainer.EndpointGroup, settings *portainer.Settings) ([]portainer.Endpoint, int, error) {
+func (handler *Handler) filterEndpointsByQuery(
+	filteredEndpoints []portainer.Endpoint,
+	query EnvironmentsQuery,
+	groups []portainer.EndpointGroup,
+	edgeGroups []portainer.EdgeGroup,
+	settings *portainer.Settings,
+) ([]portainer.Endpoint, int, error) {
 	totalAvailableEndpoints := len(filteredEndpoints)
 
 	if len(query.endpointIds) > 0 {
@@ -190,7 +196,7 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 			tagsMap[tag.ID] = tag.Name
 		}
 
-		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, groups, tagsMap, query.search)
+		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, groups, edgeGroups, tagsMap, query.search)
 	}
 
 	if len(query.types) > 0 {
@@ -285,7 +291,13 @@ func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs 
 	return endpoints[:n]
 }
 
-func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, tagsMap map[portainer.TagID]string, searchCriteria string) []portainer.Endpoint {
+func filterEndpointsBySearchCriteria(
+	endpoints []portainer.Endpoint,
+	endpointGroups []portainer.EndpointGroup,
+	edgeGroups []portainer.EdgeGroup,
+	tagsMap map[portainer.TagID]string,
+	searchCriteria string,
+) []portainer.Endpoint {
 	n := 0
 	for _, endpoint := range endpoints {
 		endpointTags := convertTagIDsToTags(tagsMap, endpoint.TagIDs)
@@ -297,6 +309,11 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 		}
 
 		if endpointGroupMatchSearchCriteria(&endpoint, endpointGroups, tagsMap, searchCriteria) {
+			endpoints[n] = endpoint
+			n++
+		}
+
+		if edgeGroupMatchSearchCriteria(&endpoint, edgeGroups, searchCriteria) {
 			endpoints[n] = endpoint
 			n++
 		}
@@ -369,6 +386,24 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 			tags := convertTagIDsToTags(tagsMap, group.TagIDs)
 			for _, tag := range tags {
 				if strings.Contains(strings.ToLower(tag), searchCriteria) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func edgeGroupMatchSearchCriteria(
+	endpoint *portainer.Endpoint,
+	edgeGroups []portainer.EdgeGroup,
+	searchCriteria string,
+) bool {
+	for _, edgeGroup := range edgeGroups {
+		for _, endpointID := range edgeGroup.Endpoints {
+			if endpointID == endpoint.ID {
+				if strings.Contains(strings.ToLower(edgeGroup.Name), searchCriteria) {
 					return true
 				}
 			}
