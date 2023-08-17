@@ -70,6 +70,7 @@ export function useEnvironments({
     select: (groups) =>
       Object.fromEntries(groups.map((g) => [g.Id, g.Name] as const)),
   });
+
   const environmentEdgeGroupsQuery = useEdgeGroups({
     select: (groups) =>
       _.groupBy(
@@ -80,6 +81,7 @@ export function useEnvironments({
         (env) => env.id
       ),
   });
+
   const tagsQuery = useTags({
     select: (tags) =>
       Object.fromEntries(tags.map((tag) => [tag.ID, tag.Name] as const)),
