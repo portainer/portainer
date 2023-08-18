@@ -20,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
@@ -119,11 +120,15 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 			log.Fatal().Err(err).Msg("failed generating instance id")
 		}
 
+		migratorInstance := migrator.NewMigrator(&migrator.MigratorParameters{})
+		migratorCount := migratorInstance.GetMigratorCountOfCurrentAPIVersion()
+
 		// from MigrateData
 		v := models.Version{
 			SchemaVersion: portainer.APIVersion,
 			Edition:       int(portainer.PortainerCE),
 			InstanceID:    instanceId.String(),
+			MigratorCount: migratorCount,
 		}
 		store.VersionService.UpdateVersion(&v)
 
