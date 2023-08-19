@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 
 import { useSearchBarState } from './SearchBar';
-import { BasicTableSettings, CreatePersistedStoreReturn } from './types';
+import { BasicTableSettings, createPersistedStore } from './types';
 
 export type TableState<TSettings extends BasicTableSettings> = TSettings & {
   setSearch: (search: string) => void;
@@ -11,7 +11,10 @@ export type TableState<TSettings extends BasicTableSettings> = TSettings & {
 
 export function useTableState<
   TSettings extends BasicTableSettings = BasicTableSettings
->(store: CreatePersistedStoreReturn<TSettings>, storageKey: string) {
+>(
+  store: ReturnType<typeof createPersistedStore<TSettings>>,
+  storageKey: string
+) {
   const settings = useStore(store);
 
   const [search, setSearch] = useSearchBarState(storageKey);
