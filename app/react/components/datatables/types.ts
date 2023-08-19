@@ -100,18 +100,3 @@ export function createPersistedStore<T extends BasicTableSettings>(
     )
   );
 }
-
-/** this class is just a dummy class to get return type of createPersistedStore
- * can be fixed after upgrade to ts 4.7+
- * https://stackoverflow.com/a/64919133
- */
-class Wrapper<T extends BasicTableSettings> {
-  // eslint-disable-next-line class-methods-use-this
-  wrapped() {
-    return createPersistedStore<T>('', '');
-  }
-}
-
-export type CreatePersistedStoreReturn<
-  T extends BasicTableSettings = BasicTableSettings
-> = ReturnType<Wrapper<T>['wrapped']>;
