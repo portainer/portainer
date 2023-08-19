@@ -23,21 +23,24 @@ export function useTableState<
 }
 
 export function useTableStateWithoutStorage(
-  defaultSortKey: string
+  defaultSortKey?: string
 ): BasicTableSettings & {
   setSearch: (search: string) => void;
   search: string;
 } {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(10);
-  const [sortBy, setSortBy] = useState({ id: defaultSortKey, desc: false });
+  const [sortBy, setSortBy] = useState(
+    defaultSortKey ? { id: defaultSortKey, desc: false } : undefined
+  );
 
   return {
     search,
     setSearch,
     pageSize,
     setPageSize,
-    setSortBy: (id: string, desc: boolean) => setSortBy({ id, desc }),
+    setSortBy: (id: string | undefined, desc: boolean) =>
+      setSortBy(id ? { id, desc } : undefined),
     sortBy,
   };
 }

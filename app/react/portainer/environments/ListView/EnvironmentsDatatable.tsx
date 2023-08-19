@@ -37,8 +37,10 @@ export function EnvironmentsDatatable({
       excludeSnapshots: true,
       page: page + 1,
       pageLimit: tableState.pageSize,
-      sort: isSortType(tableState.sortBy.id) ? tableState.sortBy.id : undefined,
-      order: tableState.sortBy.desc ? 'desc' : 'asc',
+      sort: isSortType(tableState.sortBy?.id)
+        ? tableState.sortBy?.id
+        : undefined,
+      order: tableState.sortBy?.desc ? 'desc' : 'asc',
     },
     { enabled: groupsQuery.isSuccess, refetchInterval: 30 * 1000 }
   );

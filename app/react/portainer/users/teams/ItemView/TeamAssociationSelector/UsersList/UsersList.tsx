@@ -25,7 +25,9 @@ export function UsersList({ users, disabled, teamId }: Props) {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const addMemberMutation = useAddMemberMutation(teamId);
-  const [sortBy, setSortBy] = useState({ id: 'name', desc: false });
+  const [sortBy, setSortBy] = useState<
+    { id: string; desc: boolean } | undefined
+  >({ id: 'name', desc: false });
 
   const { isAdmin } = useUser();
 
@@ -62,8 +64,8 @@ export function UsersList({ users, disabled, teamId }: Props) {
     </RowProvider>
   );
 
-  function handleSetSort(colId: string, desc: boolean) {
-    setSortBy({ id: colId, desc });
+  function handleSetSort(colId: string | undefined, desc: boolean) {
+    setSortBy(colId ? { id: colId, desc } : undefined);
   }
 
   function handleAddAllMembers(userIds: UserId[]) {
