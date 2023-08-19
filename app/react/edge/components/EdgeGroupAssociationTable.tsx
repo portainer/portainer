@@ -56,8 +56,8 @@ export function EdgeGroupAssociationTable({
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
-    sort: tableState.sortBy.id as 'Group' | 'Name',
-    order: tableState.sortBy.desc ? 'desc' : 'asc',
+    sort: tableState.sortBy?.id as 'Group' | 'Name',
+    order: tableState.sortBy?.desc ? 'desc' : 'asc',
     ...query,
   });
   const groupsQuery = useGroups({

@@ -25,7 +25,7 @@ interface Props {
   isAdmin: boolean;
 }
 
-const settingsStore = createPersistedStore(storageKey);
+const settingsStore = createPersistedStore(storageKey, 'name');
 
 export function TeamsDatatable({ teams, isAdmin }: Props) {
   const { handleRemove } = useRemoveMutation();

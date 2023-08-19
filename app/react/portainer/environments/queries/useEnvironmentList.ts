@@ -14,7 +14,7 @@ export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
 export const SortOptions = ['Name', 'Group', 'Status'] as const;
 export type SortType = (typeof SortOptions)[number];
-export function isSortType(value: string): value is SortType {
+export function isSortType(value?: string): value is SortType {
   return SortOptions.includes(value as SortType);
 }
 
