@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { confirmImageExport } from '@/react/docker/images/common/ConfirmExportModal';
+import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.docker').controller('ImageController', [
   '$async',
@@ -120,30 +121,42 @@ angular.module('portainer.docker').controller('ImageController', [
     }
 
     $scope.removeTag = function (repository) {
-      ImageService.deleteImage(repository, false)
-        .then(function success() {
-          if ($scope.image.RepoTags.length === 1) {
-            Notifications.success('Image successfully deleted', repository);
-            $state.go('docker.images', {}, { reload: true });
-          } else {
-            Notifications.success('Tag successfully deleted', repository);
-            $state.go('docker.images.image', { id: $transition$.params().id }, { reload: true });
-          }
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove image');
-        });
+      return $async(async () => {
+        if (!(await confirmDelete('Are you sure you want to delete this tag?'))) {
+          return;
+        }
+
+        ImageService.deleteImage(repository, false)
+          .then(function success() {
+            if ($scope.image.RepoTags.length === 1) {
+              Notifications.success('Image successfully deleted', repository);
+              $state.go('docker.images', {}, { reload: true });
+            } else {
+              Notifications.success('Tag successfully deleted', repository);
+              $state.go('docker.images.image', { id: $transition$.params().id }, { reload: true });
+            }
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove image');
+          });
+      });
     };
 
     $scope.removeImage = function (id) {
-      ImageService.deleteImage(id, false)
-        .then(function success() {
-          Notifications.success('Image successfully deleted', id);
-          $state.go('docker.images', {}, { reload: true });
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove image');
-        });
+      return $async(async () => {
+        if (!(await confirmDelete('Deleting this image will also delete all associated tags. Are you sure you want to delete this image?'))) {
+          return;
+        }
+
+        ImageService.deleteImage(id, false)
+          .then(function success() {
+            Notifications.success('Image successfully deleted', id);
+            $state.go('docker.images', {}, { reload: true });
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove image');
+          });
+      });
     };
 
     function exportImage(image) {

@@ -57,7 +57,8 @@ angular.module('portainer.docker').controller('ImagesController', [
     function confirmImageForceRemoval() {
       return confirmDestructive({
         title: 'Are you sure?',
-        message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
+        message:
+          "Forcing removal of an image will remove it even if it's used by stopped containers, and delete all associated tags. Are you sure you want to remove the selected image(s)?",
         confirmButton: buildConfirmButton('Remove the image', 'danger'),
       });
     }
@@ -65,7 +66,7 @@ angular.module('portainer.docker').controller('ImagesController', [
     function confirmRegularRemove() {
       return confirmDestructive({
         title: 'Are you sure?',
-        message: 'Removing the image will remove all tags associated to that image. Are you sure you want to remove the image?',
+        message: 'Removing an image will also delete all associated tags. Are you sure you want to remove the selected image(s)?',
         confirmButton: buildConfirmButton('Remove the image', 'danger'),
       });
     }

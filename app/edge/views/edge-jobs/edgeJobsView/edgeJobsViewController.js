@@ -15,7 +15,7 @@ export class EdgeJobsViewController {
   }
 
   removeAction(selectedItems) {
-    confirmDelete('Do you want to remove the selected edge job(s)?').then((confirmed) => {
+    confirmDelete('Do you want to remove the selected Edge job(s)?').then((confirmed) => {
       if (!confirmed) {
         return;
       }
