@@ -3,7 +3,6 @@ angular.module('portainer.docker').factory('ConfigHelper', [
     'use strict';
     return {
       flattenConfig: function (config) {
-        console.log('flattenConfig', config);
         if (config) {
           return {
             Id: config.ConfigID,
