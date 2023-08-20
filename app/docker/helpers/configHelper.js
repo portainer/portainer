@@ -3,14 +3,12 @@ angular.module('portainer.docker').factory('ConfigHelper', [
     'use strict';
     return {
       flattenConfig: function (config) {
+        console.log('flattenConfig', config);
         if (config) {
           return {
             Id: config.ConfigID,
             Name: config.ConfigName,
-            FileName: config.File.Name,
-            Uid: config.File.UID,
-            Gid: config.File.GID,
-            Mode: config.File.Mode,
+            ...(config.File ? { FileName: config.File.Name, Uid: config.File.UID, Gid: config.File.GID, Mode: config.File.Mode } : {}),
           };
         }
         return {};

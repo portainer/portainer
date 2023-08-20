@@ -91,6 +91,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     endpoint
   ) {
     $scope.resourceType = ResourceControlType.Service;
+    $scope.WebhookExists = false;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
@@ -735,7 +736,6 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
           $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');
-          $scope.WebhookExists = false;
 
           const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks || []), 'Target');
           const networks = _.filter(
