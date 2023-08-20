@@ -2,6 +2,7 @@ import { FormikErrors } from 'formik';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+import { ControlledInput } from '@@/form-components/Input/Input';
 
 import { ConsoleSettings } from './ConsoleSettings';
 import { LoggerConfig } from './LoggerConfig';
@@ -57,7 +58,7 @@ export function CommandsTab({
           className="w-1/2"
           errors={errors?.workingDir}
         >
-          <Input
+          <ControlledInput
             value={values.workingDir}
             onChange={(e) => handleChange({ workingDir: e.target.value })}
             placeholder="e.g. /myapp"

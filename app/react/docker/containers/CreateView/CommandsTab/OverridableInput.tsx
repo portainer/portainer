@@ -42,6 +42,7 @@ export function OverridableInput({
         onChange={(e) => onChange(e.target.value)}
         id={id}
         placeholder={placeholder}
+        controlled
       />
     </InputGroup>
   );
