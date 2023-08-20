@@ -6,7 +6,7 @@ import { Values } from './types';
 import { LogConfig } from './LoggerConfig';
 import { ConsoleConfig, ConsoleSetting } from './ConsoleSettings';
 
-export function parseRequest(
+export function toRequest(
   oldConfig: CreateContainerRequest,
   values: Values
 ): CreateContainerRequest {

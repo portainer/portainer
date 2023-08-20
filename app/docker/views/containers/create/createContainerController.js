@@ -7,7 +7,7 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { buildConfirmButton } from '@@/modals/utils';
 
-import { parseCommandsTabRequest, parseCommandsTabViewModel } from '@/react/docker/containers/CreateView/CommandsTab';
+import { commandsTabUtils } from '@/react/docker/containers/CreateView/CommandsTab';
 import { ContainerCapabilities, ContainerCapability } from '@/docker/models/containerCapabilities';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '@/docker/models/container';
@@ -96,7 +96,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       capabilities: [],
       Sysctls: [],
       RegistryModel: new PorImageRegistryModel(),
-      commands: parseCommandsTabViewModel(),
+      commands: commandsTabUtils.getDefaultViewModel(),
     };
 
     $scope.extraNetworks = {};
@@ -462,7 +462,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareConfiguration() {
       var config = angular.copy($scope.config);
-      config = parseCommandsTabRequest(config, $scope.formValues.commands);
+      config = commandsTabUtils.toRequest(config, $scope.formValues.commands);
 
       prepareNetworkConfig(config);
       prepareImageConfig(config);
@@ -687,7 +687,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.state.mode = 'duplicate';
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
 
-          $scope.formValues.commands = parseCommandsTabViewModel(d);
+          $scope.formValues.commands = commandsTabUtils.toViewModel(d);
 
           loadFromContainerPortBindings(d);
           loadFromContainerVolumes(d);
