@@ -207,7 +207,7 @@
             <!-- tab-command -->
             <div class="tab-pane active" id="command">
               <docker-create-container-commands-tab
-                ng-if="config"
+                ng-if="state.containerIsLoaded"
                 values="formValues.commands"
                 api-version="applicationState.endpoint.apiVersion"
                 on-change="(handleCommandsChange)"

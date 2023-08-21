@@ -24,7 +24,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   '$analytics',
   'Container',
   'ContainerHelper',
-  'Image',
   'ImageHelper',
   'Volume',
   'NetworkService',
@@ -49,7 +48,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $analytics,
     Container,
     ContainerHelper,
-    Image,
     ImageHelper,
     Volume,
     NetworkService,
@@ -107,6 +105,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       mode: '',
       pullImageValidity: true,
       settingUnlimitedResources: false,
+      containerIsLoaded: false,
     };
 
     $scope.onAlwaysPullChange = onAlwaysPullChange;
@@ -701,6 +700,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           loadFromContainerCapabilities(d);
           loadFromContainerSysctls(d);
         })
+        .then(() => {
+          $scope.state.containerIsLoaded = true;
+        })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container');
         });
@@ -754,6 +756,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
+            $scope.state.containerIsLoaded = true;
             $scope.fromContainer = {};
             $scope.formValues.capabilities = $scope.areContainerCapabilitiesEnabled ? new ContainerCapabilities() : [];
           }

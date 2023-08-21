@@ -5,9 +5,8 @@ import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
 
 import { reactModule } from './react';
-import { containersModule } from './views/containers';
 
-angular.module('portainer.docker', ['portainer.app', reactModule, containersModule]).config([
+angular.module('portainer.docker', ['portainer.app', reactModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
