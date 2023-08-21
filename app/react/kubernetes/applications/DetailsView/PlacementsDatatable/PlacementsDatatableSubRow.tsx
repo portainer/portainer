@@ -1,13 +1,14 @@
 import clsx from 'clsx';
 import { Fragment } from 'react';
+import { Taint } from 'kubernetes-types/core/v1';
 
 import { nodeAffinityValues } from '@/kubernetes/filters/application';
 import { useAuthorizations } from '@/react/hooks/useUser';
 
-import { Affinity, Label, Node, Taint } from '../types';
+import { Affinity, Label, NodePlacementRowData } from '../types';
 
 interface SubRowProps {
-  node: Node;
+  node: NodePlacementRowData;
   cellCount: number;
 }
 
@@ -20,11 +21,11 @@ export function SubRow({ node, cellCount }: SubRowProps) {
 
   if (!authorized) {
     <>
-      {isDefined(node.UnmetTaints) && (
+      {isDefined(node.unmetTaints) && (
         <tr
           className={clsx({
-            'datatable-highlighted': node.Highlighted,
-            'datatable-unhighlighted': !node.Highlighted,
+            'datatable-highlighted': node.highlighted,
+            'datatable-unhighlighted': !node.highlighted,
           })}
         >
           <td colSpan={cellCount}>
@@ -33,12 +34,12 @@ export function SubRow({ node, cellCount }: SubRowProps) {
         </tr>
       )}
 
-      {(isDefined(node.UnmatchedNodeSelectorLabels) ||
-        isDefined(node.UnmatchedNodeAffinities)) && (
+      {(isDefined(node.unmatchedNodeSelectorLabels) ||
+        isDefined(node.unmatchedNodeAffinities)) && (
         <tr
           className={clsx({
-            'datatable-highlighted': node.Highlighted,
-            'datatable-unhighlighted': !node.Highlighted,
+            'datatable-highlighted': node.highlighted,
+            'datatable-unhighlighted': !node.highlighted,
           })}
         >
           <td colSpan={cellCount}>
@@ -51,25 +52,25 @@ export function SubRow({ node, cellCount }: SubRowProps) {
 
   return (
     <>
-      {isDefined(node.UnmetTaints) && (
+      {isDefined(node.unmetTaints) && (
         <UnmetTaintsInfo
-          taints={node.UnmetTaints}
+          taints={node.unmetTaints}
           cellCount={cellCount}
-          isHighlighted={node.Highlighted}
+          isHighlighted={node.highlighted}
         />
       )}
-      {isDefined(node.UnmatchedNodeSelectorLabels) && (
+      {isDefined(node.unmatchedNodeSelectorLabels) && (
         <UnmatchedLabelsInfo
-          labels={node.UnmatchedNodeSelectorLabels}
+          labels={node.unmatchedNodeSelectorLabels}
           cellCount={cellCount}
-          isHighlighted={node.Highlighted}
+          isHighlighted={node.highlighted}
         />
       )}
-      {isDefined(node.UnmatchedNodeAffinities) && (
+      {isDefined(node.unmatchedNodeAffinities) && (
         <UnmatchedAffinitiesInfo
-          affinities={node.UnmatchedNodeAffinities}
+          affinities={node.unmatchedNodeAffinities}
           cellCount={cellCount}
-          isHighlighted={node.Highlighted}
+          isHighlighted={node.highlighted}
         />
       )}
     </>
@@ -97,13 +98,13 @@ function UnmetTaintsInfo({
             'datatable-highlighted': isHighlighted,
             'datatable-unhighlighted': !isHighlighted,
           })}
-          key={taint.Key}
+          key={taint.key}
         >
           <td colSpan={cellCount}>
             This application is missing a toleration for the taint
             <code className="space-left">
-              {taint.Key}
-              {taint.Value ? `=${taint.Value}` : ''}:{taint.Effect}
+              {taint.key}
+              {taint.value ? `=${taint.value}` : ''}:{taint.effect}
             </code>
           </td>
         </tr>

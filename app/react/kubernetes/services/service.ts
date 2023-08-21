@@ -7,10 +7,12 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
 import {
+  Service,
   NodeMetrics,
   NodeMetric,
-  Service,
 } from '@/react/kubernetes/services/types';
+
+import { parseKubernetesAxiosError } from '../axiosError';
 
 export const queryKeys = {
   clusterServices: (environmentId: EnvironmentId) =>
@@ -47,6 +49,31 @@ export function useServicesForCluster(
   );
 }
 
+// get a list of services, based on an array of service names, for a specific namespace
+export function useServicesQuery<T extends Service | string = Service>(
+  environmentId: EnvironmentId,
+  namespace: string,
+  serviceNames: string[],
+  options?: { yaml?: boolean }
+) {
+  return useQuery(
+    ['environments', environmentId, 'kubernetes', 'services', serviceNames],
+    async () => {
+      // promise.all is best in this case because I want to return an error if even one service request has an error
+      const services = await Promise.all(
+        serviceNames.map((serviceName) =>
+          getService<T>(environmentId, namespace, serviceName, options?.yaml)
+        )
+      );
+      return services;
+    },
+    {
+      ...withError('Unable to retrieve services.'),
+      enabled: !!serviceNames?.length,
+    }
+  );
+}
+
 export function useMutationDeleteServices(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
   return useMutation(deleteServices, {
@@ -57,7 +84,7 @@ export function useMutationDeleteServices(environmentId: EnvironmentId) {
 }
 
 // get a list of services for a specific namespace from the Portainer API
-async function getServices(
+export async function getServices(
   environmentId: EnvironmentId,
   namespace: string,
   lookupApps: boolean
@@ -77,19 +104,45 @@ async function getServices(
   }
 }
 
-// getNamespaceServices is used to get a list of services for a specific namespace directly from the Kubernetes API
+// getNamespaceServices is used to get a list of services for a specific namespace
+// it calls the kubernetes api directly and not the portainer api
 export async function getNamespaceServices(
   environmentId: EnvironmentId,
   namespace: string,
   queryParams?: Record<string, string>
 ) {
-  const { data: services } = await axios.get<ServiceList>(
-    `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/services`,
-    {
-      params: queryParams,
-    }
-  );
-  return services.items;
+  try {
+    const { data: services } = await axios.get<ServiceList>(
+      `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/services`,
+      {
+        params: queryParams,
+      }
+    );
+    return services.items;
+  } catch (e) {
+    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve services');
+  }
+}
+
+async function getService<T extends Service | string = Service>(
+  environmentId: EnvironmentId,
+  namespace: string,
+  serviceName: string,
+  yaml?: boolean
+) {
+  try {
+    const { data: service } = await axios.get<T>(
+      `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/services/${serviceName}`,
+      {
+        headers: {
+          Accept: yaml ? 'application/yaml' : 'application/json',
+        },
+      }
+    );
+    return service;
+  } catch (e) {
+    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve service');
+  }
 }
 
 export async function deleteServices({

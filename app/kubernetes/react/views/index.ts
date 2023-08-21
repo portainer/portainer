@@ -10,6 +10,7 @@ import { DashboardView } from '@/react/kubernetes/dashboard/DashboardView';
 import { ServicesView } from '@/react/kubernetes/services/ServicesView';
 import { ConsoleView } from '@/react/kubernetes/applications/ConsoleView';
 import { ConfigmapsAndSecretsView } from '@/react/kubernetes/configs/ListView/ConfigmapsAndSecretsView';
+import { ApplicationDetailsView } from '@/react/kubernetes/applications/DetailsView/ApplicationDetailsView';
 
 export const viewsModule = angular
   .module('portainer.kubernetes.react.views', [])
@@ -32,6 +33,13 @@ export const viewsModule = angular
     'kubernetesConfigMapsAndSecretsView',
     r2a(
       withUIRouter(withReactQuery(withCurrentUser(ConfigmapsAndSecretsView))),
+      []
+    )
+  )
+  .component(
+    'applicationDetailsView',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(ApplicationDetailsView))),
       []
     )
   )

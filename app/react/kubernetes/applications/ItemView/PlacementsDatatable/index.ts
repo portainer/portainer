@@ -1,1 +1,0 @@
-export { PlacementsDatatable } from './PlacementsDatatable';

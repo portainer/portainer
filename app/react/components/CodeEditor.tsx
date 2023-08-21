@@ -90,6 +90,7 @@ export function CodeEditor({
         </div>
 
         <CopyButton
+          fadeDelay={2500}
           copyText={value}
           color="link"
           className="!pr-0 !text-sm !font-medium hover:no-underline focus:no-underline"

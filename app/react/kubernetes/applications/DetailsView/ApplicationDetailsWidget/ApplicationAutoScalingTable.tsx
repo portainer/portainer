@@ -7,7 +7,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Tooltip } from '@@/Tip/Tooltip';
 
 import { Application } from '../../types';
-import { useApplicationHorizontalPodAutoscalers } from '../../application.queries';
+import { useApplicationHorizontalPodAutoscaler } from '../../application.queries';
 
 type Props = {
   environmentId: EnvironmentId;
@@ -22,7 +22,7 @@ export function ApplicationAutoScalingTable({
   appName,
   app,
 }: Props) {
-  const { data: appAutoScalar } = useApplicationHorizontalPodAutoscalers(
+  const { data: appAutoScalar } = useApplicationHorizontalPodAutoscaler(
     environmentId,
     namespace,
     appName,

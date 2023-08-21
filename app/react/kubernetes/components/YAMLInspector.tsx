@@ -11,9 +11,10 @@ import { BETeaserButton } from '@@/BETeaserButton';
 type Props = {
   identifier: string;
   data: string;
+  hideMessage?: boolean;
 };
 
-export function YAMLInspector({ identifier, data }: Props) {
+export function YAMLInspector({ identifier, data, hideMessage }: Props) {
   const [expanded, setExpanded] = useState(false);
   const yaml = useMemo(() => cleanYamlUnwantedFields(data), [data]);
 
@@ -21,7 +22,11 @@ export function YAMLInspector({ identifier, data }: Props) {
     <div>
       <WebEditorForm
         value={yaml}
-        placeholder="Define or paste the content of your manifest here"
+        placeholder={
+          hideMessage
+            ? undefined
+            : 'Define or paste the content of your manifest here'
+        }
         readonly
         hideTitle
         id={identifier}

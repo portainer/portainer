@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
-import { useServices } from '@/react/kubernetes/networks/services/queries';
+import { useNamespaceServices } from '@/react/kubernetes/networks/services/queries';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
 
@@ -62,7 +62,7 @@ export function CreateIngressView() {
 
   const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
 
-  const { data: allServices } = useServices(environmentId, namespace);
+  const { data: allServices } = useNamespaceServices(environmentId, namespace);
   const configResults = useConfigurations(environmentId, namespace);
   const ingressesResults = useIngresses(
     environmentId,
