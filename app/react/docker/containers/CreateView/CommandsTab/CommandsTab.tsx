@@ -1,8 +1,8 @@
 import { FormikErrors } from 'formik';
+import { useState } from 'react';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
-import { ControlledInput } from '@@/form-components/Input/Input';
 
 import { ConsoleSettings } from './ConsoleSettings';
 import { LoggerConfig } from './LoggerConfig';
@@ -20,6 +20,8 @@ export function CommandsTab({
   onChange: (values: Values) => void;
   errors?: FormikErrors<Values>;
 }) {
+  const [controlledValues, setControlledValues] = useState(values);
+
   return (
     <div className="mt-3">
       <FormControl
@@ -29,7 +31,7 @@ export function CommandsTab({
         errors={errors?.cmd}
       >
         <OverridableInput
-          value={values.cmd}
+          value={controlledValues.cmd}
           onChange={(cmd) => handleChange({ cmd })}
           id="command-input"
           placeholder="e.g. '-logtostderr' '--housekeeping_interval=5s' or /usr/bin/nginx -t -c /mynginx.conf"
@@ -44,7 +46,7 @@ export function CommandsTab({
         errors={errors?.entrypoint}
       >
         <OverridableInput
-          value={values.entrypoint}
+          value={controlledValues.entrypoint}
           onChange={(entrypoint) => handleChange({ entrypoint })}
           id="entrypoint-input"
           placeholder="e.g. /bin/sh -c"
@@ -58,8 +60,8 @@ export function CommandsTab({
           className="w-1/2"
           errors={errors?.workingDir}
         >
-          <ControlledInput
-            value={values.workingDir}
+          <Input
+            value={controlledValues.workingDir}
             onChange={(e) => handleChange({ workingDir: e.target.value })}
             placeholder="e.g. /myapp"
           />
@@ -71,7 +73,7 @@ export function CommandsTab({
           errors={errors?.user}
         >
           <Input
-            value={values.user}
+            value={controlledValues.user}
             onChange={(e) => handleChange({ user: e.target.value })}
             placeholder="e.g. nginx"
           />
@@ -79,13 +81,13 @@ export function CommandsTab({
       </div>
 
       <ConsoleSettings
-        value={values.console}
+        value={controlledValues.console}
         onChange={(console) => handleChange({ console })}
       />
 
       <LoggerConfig
         apiVersion={apiVersion}
-        value={values.logConfig}
+        value={controlledValues.logConfig}
         onChange={(logConfig) =>
           handleChange({
             logConfig,
@@ -98,5 +100,6 @@ export function CommandsTab({
 
   function handleChange(newValues: Partial<Values>) {
     onChange({ ...values, ...newValues });
+    setControlledValues((values) => ({ ...values, ...newValues }));
   }
 }
