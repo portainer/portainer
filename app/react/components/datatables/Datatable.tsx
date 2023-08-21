@@ -133,6 +133,7 @@ export function Datatable<
     defaultColumn: {
       enableColumnFilter: false,
       enableHiding: true,
+      sortingFn: 'alphanumeric',
     },
     enableRowSelection,
     autoResetExpanded: false,
@@ -140,7 +141,6 @@ export function Datatable<
     getRowId,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -148,7 +148,11 @@ export function Datatable<
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand,
     getColumnCanGlobalFilter,
-    ...(isServerSidePagination ? { manualPagination: true, pageCount } : {}),
+    ...(isServerSidePagination
+      ? { manualPagination: true, pageCount }
+      : {
+          getSortedRowModel: getSortedRowModel(),
+        }),
     meta,
   });
 
