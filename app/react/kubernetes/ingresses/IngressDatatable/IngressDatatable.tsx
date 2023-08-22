@@ -4,11 +4,7 @@ import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
-import {
-  useAuthorizations,
-  Authorized,
-  useCurrentUser,
-} from '@/react/hooks/useUser';
+import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import Route from '@/assets/ico/route.svg?c';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
@@ -40,7 +36,9 @@ export function IngressDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
 
-  const { isAdmin } = useCurrentUser();
+  const canAccessSystemResources = useAuthorizations(
+    'K8sAccessSystemNamespaces'
+  );
   const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(
     environmentId,
@@ -54,10 +52,10 @@ export function IngressDatatable() {
     () =>
       ingresses?.filter(
         (ingress) =>
-          (isAdmin && tableState.showSystemResources) ||
+          (canAccessSystemResources && tableState.showSystemResources) ||
           !isSystemNamespace(ingress.Namespace ?? '')
       ) || [],
-    [ingresses, tableState, isAdmin]
+    [ingresses, tableState, canAccessSystemResources]
   );
 
   const deleteIngressesMutation = useDeleteIngresses();
@@ -79,13 +77,15 @@ export function IngressDatatable() {
         <TableSettingsMenu>
           <DefaultDatatableSettings
             settings={tableState}
-            hideShowSystemResources={!isAdmin}
+            hideShowSystemResources={!canAccessSystemResources}
           />
         </TableSettingsMenu>
       )}
       description={
         <SystemResourceDescription
-          showSystemResources={tableState.showSystemResources || !isAdmin}
+          showSystemResources={
+            tableState.showSystemResources || !canAccessSystemResources
+          }
         />
       }
       disableSelect={useCheckboxes()}
