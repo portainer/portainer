@@ -17,7 +17,6 @@ export function buildNameColumn<T extends Record<string, unknown>>(
     cell,
     enableSorting: true,
     enableHiding: false,
-    sortingFn: 'text',
   };
 
   function createCell<T extends Record<string, unknown>>() {

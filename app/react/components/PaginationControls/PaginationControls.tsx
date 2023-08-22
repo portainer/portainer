@@ -9,7 +9,7 @@ interface Props {
   page: number;
   pageLimit: number;
   showAll?: boolean;
-  totalCount: number;
+  pageCount: number;
   isPageInputVisible?: boolean;
   className?: string;
 }
@@ -20,7 +20,7 @@ export function PaginationControls({
   onPageLimitChange,
   showAll,
   onPageChange,
-  totalCount,
+  pageCount,
   isPageInputVisible,
   className,
 }: Props) {
@@ -38,8 +38,7 @@ export function PaginationControls({
             maxSize={5}
             onPageChange={onPageChange}
             currentPage={page}
-            itemsPerPage={pageLimit}
-            totalCount={totalCount}
+            pageCount={pageCount}
             isInputVisible={isPageInputVisible}
           />
         )}
