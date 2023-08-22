@@ -83,7 +83,7 @@ export function AssociateAMTDialog({
               onPageChange={setPage}
               pageLimit={pageLimit}
               onPageLimitChange={setPageLimit}
-              totalCount={totalCount}
+              pageCount={Math.ceil(totalCount / pageLimit)}
             />
           </div>
         </div>

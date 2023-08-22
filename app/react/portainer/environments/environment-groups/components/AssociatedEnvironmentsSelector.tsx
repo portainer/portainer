@@ -28,6 +28,7 @@ export function AssociatedEnvironmentsSelector({
               emptyContentLabel="No environment available"
               query={{
                 groupIds: [1],
+                excludeIds: value,
               }}
               onClickRow={(env) => {
                 if (!value.includes(env.Id)) {

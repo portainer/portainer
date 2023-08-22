@@ -51,10 +51,10 @@ export function EdgeGroupAssociationTable({
   onClickRow: (env: Environment) => void;
 } & AutomationTestingProps) {
   const tableState = useTableStateWithoutStorage('Name');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const environmentsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
-    page,
+    page: page + 1,
     search: tableState.search,
     sort: tableState.sortBy.id as 'Group' | 'Name',
     order: tableState.sortBy.desc ? 'desc' : 'asc',
@@ -87,8 +87,10 @@ export function EdgeGroupAssociationTable({
       columns={columns}
       settingsManager={tableState}
       dataset={environments}
+      isServerSidePagination
+      page={page}
       onPageChange={setPage}
-      pageCount={Math.ceil(totalCount / tableState.pageSize)}
+      totalCount={totalCount}
       renderRow={(row) => (
         <TableRow<DecoratedEnvironment>
           cells={row.getVisibleCells()}
@@ -98,7 +100,6 @@ export function EdgeGroupAssociationTable({
       emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
       disableSelect
-      totalCount={totalCount}
     />
   );
 }

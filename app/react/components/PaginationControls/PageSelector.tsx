@@ -8,29 +8,22 @@ interface Props {
   boundaryLinks?: boolean;
   currentPage: number;
   directionLinks?: boolean;
-  itemsPerPage: number;
   onPageChange(page: number): void;
-  totalCount: number;
+  pageCount: number;
   maxSize: number;
   isInputVisible?: boolean;
 }
 
 export function PageSelector({
   currentPage,
-  totalCount,
-  itemsPerPage,
+  pageCount,
   onPageChange,
   maxSize = 5,
   directionLinks = true,
   boundaryLinks = false,
   isInputVisible = false,
 }: Props) {
-  const pages = generatePagesArray(
-    currentPage,
-    totalCount,
-    itemsPerPage,
-    maxSize
-  );
+  const pages = generatePagesArray(currentPage, pageCount, maxSize);
   const last = pages[pages.length - 1];
 
   if (pages.length <= 1) {
@@ -42,7 +35,7 @@ export function PageSelector({
       {isInputVisible && (
         <PageInput
           onChange={(page) => onPageChange(page)}
-          totalPages={Math.ceil(totalCount / itemsPerPage)}
+          totalPages={pageCount}
         />
       )}
       <ul className="pagination">

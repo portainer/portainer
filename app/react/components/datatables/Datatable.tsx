@@ -34,6 +34,20 @@ import { createSelectColumn } from './select-column';
 import { TableRow } from './TableRow';
 import { type TableState as GlobalTableState } from './useTableState';
 
+export type PaginationProps =
+  | {
+      isServerSidePagination?: false;
+      totalCount?: never;
+      page?: never;
+      onPageChange?: never;
+    }
+  | {
+      isServerSidePagination: true;
+      totalCount: number;
+      page: number;
+      onPageChange(page: number): void;
+    };
+
 export interface Props<
   D extends Record<string, unknown>,
   TMeta extends TableMeta<D> = TableMeta<D>
@@ -50,13 +64,8 @@ export interface Props<
   titleIcon?: IconProps['icon'];
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
-  totalCount?: number;
   description?: ReactNode;
-  pageCount?: number;
   highlightedItemId?: string;
-  page?: number;
-  onPageChange?(page: number): void;
-
   settingsManager: GlobalTableState<BasicTableSettings>;
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
@@ -80,11 +89,7 @@ export function Datatable<
   emptyContentLabel,
   initialTableState = {},
   isLoading,
-  totalCount = dataset.length,
   description,
-  pageCount,
-  page,
-  onPageChange = () => null,
   settingsManager: settings,
   renderRow = defaultRenderRow,
   highlightedItemId,
@@ -92,8 +97,16 @@ export function Datatable<
   getRowCanExpand,
   'data-cy': dataCy,
   meta,
-}: Props<D, TMeta>) {
-  const isServerSidePagination = typeof pageCount !== 'undefined';
+  onPageChange = () => {},
+  page,
+  totalCount = dataset.length,
+  isServerSidePagination = false,
+}: Props<D, TMeta> & PaginationProps) {
+  const pageCount = useMemo(
+    () => Math.ceil(totalCount / settings.pageSize),
+    [settings.pageSize, totalCount]
+  );
+
   const enableRowSelection = getIsSelectionEnabled(
     disableSelect,
     isRowSelectable
@@ -120,6 +133,7 @@ export function Datatable<
     defaultColumn: {
       enableColumnFilter: false,
       enableHiding: true,
+      sortingFn: 'alphanumeric',
     },
     enableRowSelection,
     autoResetExpanded: false,
@@ -127,7 +141,6 @@ export function Datatable<
     getRowId,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -135,7 +148,11 @@ export function Datatable<
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand,
     getColumnCanGlobalFilter,
-    ...(isServerSidePagination ? { manualPagination: true, pageCount } : {}),
+    ...(isServerSidePagination
+      ? { manualPagination: true, pageCount }
+      : {
+          getSortedRowModel: getSortedRowModel(),
+        }),
     meta,
   });
 
@@ -178,7 +195,7 @@ export function Datatable<
         onPageSizeChange={handlePageSizeChange}
         page={typeof page === 'number' ? page : tableState.pagination.pageIndex}
         pageSize={tableState.pagination.pageSize}
-        totalCount={totalCount}
+        pageCount={tableInstance.getPageCount()}
         totalSelected={selectedItems.length}
       />
     </Table.Container>

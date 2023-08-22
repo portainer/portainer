@@ -40,7 +40,7 @@ export function EnvironmentsDatatable() {
     (value) => (value ? parseInt(value, 10) : undefined)
   );
   const tableState = useTableStateWithoutStorage('name');
-  const endpointsQuery = useEnvironmentList({
+  const environmentsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
@@ -56,7 +56,7 @@ export function EnvironmentsDatatable() {
   const gitConfigCommitHash = edgeStackQuery.data?.GitConfig?.ConfigHash || '';
   const environments: Array<EdgeStackEnvironment> = useMemo(
     () =>
-      endpointsQuery.environments.map(
+      environmentsQuery.environments.map(
         (env) =>
           ({
             ...env,
@@ -72,7 +72,7 @@ export function EnvironmentsDatatable() {
     [
       currentFileVersion,
       edgeStackQuery.data?.Status,
-      endpointsQuery.environments,
+      environmentsQuery.environments,
       gitConfigCommitHash,
       gitConfigURL,
     ]
@@ -81,13 +81,15 @@ export function EnvironmentsDatatable() {
   return (
     <Datatable
       columns={columns}
-      isLoading={endpointsQuery.isLoading}
+      isLoading={environmentsQuery.isLoading}
       dataset={environments}
       settingsManager={tableState}
       title="Environments Status"
       titleIcon={HardDrive}
+      isServerSidePagination
+      page={page}
       onPageChange={setPage}
-      totalCount={endpointsQuery.totalCount}
+      totalCount={environmentsQuery.totalCount}
       emptyContentLabel="No environment available."
       disableSelect
       description={
