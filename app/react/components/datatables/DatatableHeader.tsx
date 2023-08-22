@@ -34,9 +34,9 @@ export function DatatableHeader({
       {renderTableActions && (
         <Table.Actions>{renderTableActions()}</Table.Actions>
       )}
-      <Table.TitleActions>
-        {!!renderTableSettings && renderTableSettings()}
-      </Table.TitleActions>
+      {!!renderTableSettings && (
+        <Table.TitleActions>{renderTableSettings()}</Table.TitleActions>
+      )}
     </Table.Title>
   );
 }
