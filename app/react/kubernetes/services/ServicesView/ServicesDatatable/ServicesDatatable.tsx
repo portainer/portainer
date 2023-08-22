@@ -4,11 +4,7 @@ import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import {
-  Authorized,
-  useAuthorizations,
-  useCurrentUser,
-} from '@/react/hooks/useUser';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
 
@@ -48,11 +44,13 @@ export function ServicesDatatable() {
   );
 
   const readOnly = !useAuthorizations(['K8sServiceW']);
-  const { isAdmin } = useCurrentUser();
+  const canAccessSystemResources = useAuthorizations(
+    'K8sAccessSystemNamespaces'
+  );
 
   const filteredServices = services?.filter(
     (service) =>
-      (isAdmin && tableState.showSystemResources) ||
+      (canAccessSystemResources && tableState.showSystemResources) ||
       !isSystemNamespace(service.Namespace)
   );
 
@@ -75,13 +73,15 @@ export function ServicesDatatable() {
         <TableSettingsMenu>
           <DefaultDatatableSettings
             settings={tableState}
-            hideShowSystemResources={!isAdmin}
+            hideShowSystemResources={!canAccessSystemResources}
           />
         </TableSettingsMenu>
       )}
       description={
         <SystemResourceDescription
-          showSystemResources={tableState.showSystemResources || !isAdmin}
+          showSystemResources={
+            tableState.showSystemResources || !canAccessSystemResources
+          }
         />
       }
       renderRow={servicesRenderRow}
