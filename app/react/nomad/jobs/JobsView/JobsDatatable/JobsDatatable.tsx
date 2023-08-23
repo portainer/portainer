@@ -38,7 +38,13 @@ export function JobsDatatable({
       titleIcon={Clock}
       disableSelect
       emptyContentLabel="No jobs found"
-      renderSubRow={(row) => <TasksDatatable data={row.original.Tasks} />}
+      renderSubRow={(row) => (
+        <tr>
+          <td colSpan={6}>
+            <TasksDatatable data={row.original.Tasks} />
+          </td>
+        </tr>
+      )}
       isLoading={isLoading}
       renderTableSettings={() => (
         <TableSettingsMenu>
