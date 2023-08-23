@@ -33,22 +33,29 @@ type RemoteStackDeployer interface {
 	// compose
 	DeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error
 	UndeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
-	StartRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
+	StartRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error
 	StopRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
 	// swarm
 	DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error
 	UndeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
-	StartRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
+	StartRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error
 	StopRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
 }
 
 // Deploy a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error {
+func (d *stackDeployer) DeployRemoteComposeStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+	forcePullImage bool,
+	forceRecreate bool,
+) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
 	d.swarmStackManager.Login(registries, endpoint)
 	defer d.swarmStackManager.Logout(endpoint)
+
 	// --force-recreate doesn't pull updated images
 	if forcePullImage {
 		err := d.composeStackManager.Pull(context.TODO(), stack, endpoint)
@@ -57,9 +64,14 @@ func (d *stackDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoin
 		}
 	}
 
-	return d.remoteStack(stack, endpoint, OperationDeploy, unpackerCmdBuilderOptions{
-		registries: registries,
-	})
+	return d.remoteStack(
+		stack,
+		endpoint,
+		OperationDeploy,
+		unpackerCmdBuilderOptions{
+			registries: registries,
+		},
+	)
 }
 
 // Undeploy a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
@@ -71,8 +83,19 @@ func (d *stackDeployer) UndeployRemoteComposeStack(stack *portainer.Stack, endpo
 }
 
 // Start a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) StartRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	return d.remoteStack(stack, endpoint, OperationComposeStart, unpackerCmdBuilderOptions{})
+func (d *stackDeployer) StartRemoteComposeStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+) error {
+	return d.remoteStack(
+		stack,
+		endpoint,
+		OperationComposeStart,
+		unpackerCmdBuilderOptions{
+			registries: registries,
+		},
+	)
 }
 
 // Stop a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
@@ -81,7 +104,13 @@ func (d *stackDeployer) StopRemoteComposeStack(stack *portainer.Stack, endpoint 
 }
 
 // Deploy a swarm stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error {
+func (d *stackDeployer) DeployRemoteSwarmStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+	prune bool,
+	pullImage bool,
+) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -105,8 +134,19 @@ func (d *stackDeployer) UndeployRemoteSwarmStack(stack *portainer.Stack, endpoin
 }
 
 // Start a swarm stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) StartRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	return d.remoteStack(stack, endpoint, OperationSwarmStart, unpackerCmdBuilderOptions{})
+func (d *stackDeployer) StartRemoteSwarmStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+) error {
+	return d.remoteStack(
+		stack,
+		endpoint,
+		OperationSwarmStart,
+		unpackerCmdBuilderOptions{
+			registries: registries,
+		},
+	)
 }
 
 // Stop a swarm stack on remote environment using a https://github.com/portainer/compose-unpacker container
