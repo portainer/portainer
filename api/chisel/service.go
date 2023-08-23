@@ -126,8 +126,8 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotService por
 	}
 
 	config := &chserver.Config{
-		Reverse:        true,
-		PrivateKeyFile: privateKeyFile,
+		Reverse: true,
+		KeyFile: privateKeyFile,
 	}
 
 	chiselServer, err := chserver.NewServer(config)
