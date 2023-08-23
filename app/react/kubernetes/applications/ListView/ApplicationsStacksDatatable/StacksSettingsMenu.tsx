@@ -1,7 +1,7 @@
+import { SystemResourcesSettings } from '@/react/kubernetes/datatables/SystemResourcesSettings';
+
 import { TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-
-import { SystemResourcesSettings } from '../../datatables/SystemResourcesSettings';
 
 import { type TableSettings } from './types';
 

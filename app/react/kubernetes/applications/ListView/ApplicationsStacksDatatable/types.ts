@@ -1,9 +1,9 @@
+import { SystemResourcesTableSettings } from '@/react/kubernetes/datatables/SystemResourcesSettings';
+
 import {
   BasicTableSettings,
   RefreshableTableSettings,
 } from '@@/datatables/types';
-
-import { SystemResourcesTableSettings } from '../../datatables/SystemResourcesSettings';
 
 export interface TableSettings
   extends BasicTableSettings,

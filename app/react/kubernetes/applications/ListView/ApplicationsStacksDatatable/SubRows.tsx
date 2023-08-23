@@ -5,7 +5,7 @@ import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 
 import { Link } from '@@/Link';
 
-import { KubernetesStack } from '../types';
+import { KubernetesStack } from '../../types';
 
 export function SubRows({
   stack,

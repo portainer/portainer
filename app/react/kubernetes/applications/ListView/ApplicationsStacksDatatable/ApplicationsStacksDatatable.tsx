@@ -8,13 +8,14 @@ import { createPersistedStore, refreshableSettings } from '@@/datatables/types';
 import { Button } from '@@/buttons';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
-import { PortainerSelect } from '@@/form-components/PortainerSelect';
 import { InputGroup } from '@@/form-components/InputGroup';
 import { Icon } from '@@/Icon';
+import { InsightsBox } from '@@/InsightsBox';
+import { Select } from '@@/form-components/Input';
 
-import { SystemResourcesAlert } from '../../datatables/SystemResourcesAlert';
-import { KubernetesStack } from '../types';
-import { systemResourcesSettings } from '../../datatables/SystemResourcesSettings';
+import { SystemResourceDescription } from '../../../datatables/SystemResourceDescription';
+import { KubernetesStack } from '../../types';
+import { systemResourcesSettings } from '../../../datatables/SystemResourcesSettings';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
@@ -44,8 +45,9 @@ interface Props {
   onRemove(selectedItems: Array<KubernetesStack>): void;
   onRefresh(): Promise<void>;
   namespace?: string;
-  namespaces: Namespace[];
+  namespaces: Array<Namespace>;
   onNamespaceChange(namespace: string): void;
+  isLoading?: boolean;
 }
 
 export function ApplicationsStacksDatatable({
@@ -55,6 +57,7 @@ export function ApplicationsStacksDatatable({
   namespace = '',
   namespaces,
   onNamespaceChange,
+  isLoading,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
 
@@ -67,6 +70,7 @@ export function ApplicationsStacksDatatable({
       title="Stacks"
       titleIcon={List}
       dataset={dataset}
+      isLoading={isLoading}
       columns={columns}
       settingsManager={tableState}
       disableSelect={!authorized}
@@ -76,51 +80,49 @@ export function ApplicationsStacksDatatable({
       noWidget
       emptyContentLabel="No stack available."
       description={
-        <div className="w-full">
-          <SystemResourcesAlert
+        <div className="w-full space-y-2">
+          <SystemResourceDescription
             showSystemResources={tableState.showSystemResources}
           />
 
-          <NamespaceFilter
-            namespaces={namespaces}
-            value={namespace}
-            onChange={onNamespaceChange}
-            showSystem={tableState.showSystemResources}
-          />
+          <div className="w-fit">
+            <InsightsBox
+              type="slim"
+              header="From 2.18 on, you can filter this view by namespace."
+              insightCloseId="k8s-namespace-filtering"
+            />
+          </div>
         </div>
       }
       renderTableActions={(selectedRows) => (
-        <>
-          <Authorized authorizations="K8sApplicationsW">
-            <Button
-              disabled={selectedRows.length === 0}
-              color="dangerlight"
-              onClick={() => onRemove(selectedRows)}
-              icon={Trash2}
-              data-cy="k8sApp-removeStackButton"
-            >
-              Remove
-            </Button>
-          </Authorized>
-          {/* <div class="form-group namespaces !mb-0 !mr-0 !h-[30px] w-fit min-w-[140px]">
-          <div class="input-group">
-            <span class="input-group-addon">
-              <pr-icon icon="'filter'" size="'sm'"></pr-icon>
-              Namespace
-            </span>
-            <select
-              class="form-control !h-[30px] !py-1"
-              ng-model="$ctrl.state.namespace"
-              ng-change="$ctrl.onChangeNamespace()"
-              data-cy="component-namespaceSelect"
-              ng-options="o.Value as (o.Name + (o.IsSystem ? ' - system' : '')) for o in $ctrl.state.namespaces"
-            >
-            </select>
-          </div>
-        </div> */}
-        </>
+        <Authorized authorizations="K8sApplicationsW">
+          <Button
+            disabled={selectedRows.length === 0}
+            color="dangerlight"
+            onClick={() => onRemove(selectedRows)}
+            icon={Trash2}
+            data-cy="k8sApp-removeStackButton"
+          >
+            Remove
+          </Button>
+        </Authorized>
       )}
       renderTableSettings={() => <StacksSettingsMenu settings={tableState} />}
+      renderHeaderRightSide={(searchBar, tableActions, tableTitleSettings) => (
+        <>
+          <div className="mr-2">
+            <NamespaceFilter
+              namespaces={namespaces}
+              value={namespace}
+              onChange={onNamespaceChange}
+              showSystem={tableState.showSystemResources}
+            />
+          </div>
+          {searchBar}
+          {tableActions}
+          {tableTitleSettings}
+        </>
+      )}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
     />
   );
@@ -166,15 +168,14 @@ function NamespaceFilter({
           Namespace
         </div>
       </InputGroup.Addon>
-      <PortainerSelect
+      <Select
+        className="!h-[30px] py-1"
         value={value || ''}
-        onChange={onChange}
+        onChange={(e) => onChange(e.target.value)}
         options={[
           { label: 'All namespaces', value: '' },
           ...transformedNamespaces,
         ]}
-        bindToBody
-        data-cy="component-namespaceSelect"
       />
     </InputGroup>
   );

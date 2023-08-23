@@ -7,16 +7,13 @@ interface Props {
 }
 
 export function SystemResourceDescription({ showSystemResources }: Props) {
-  return (
+  return !showSystemResources ? (
     <Authorized authorizations="K8sAccessSystemNamespaces" adminOnlyCE>
       <div className="w-full">
-        {!showSystemResources && (
-          <TextTip color="blue" className="!mb-0">
-            System resources are hidden, this can be changed in the table
-            settings
-          </TextTip>
-        )}
+        <TextTip color="blue" className="!mb-0">
+          System resources are hidden, this can be changed in the table settings
+        </TextTip>
       </div>
     </Authorized>
-  );
+  ) : null;
 }

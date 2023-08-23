@@ -7,7 +7,7 @@ import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
 
-import { KubernetesStack } from '../types';
+import { KubernetesStack } from '../../types';
 
 export const columnHelper = createColumnHelper<KubernetesStack>();
 
