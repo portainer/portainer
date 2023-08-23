@@ -2,6 +2,8 @@ import { Filter, List, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
+import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
+import { systemResourcesSettings } from '@/react/kubernetes/datatables/SystemResourcesSettings';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { createPersistedStore, refreshableSettings } from '@@/datatables/types';
@@ -13,9 +15,7 @@ import { Icon } from '@@/Icon';
 import { InsightsBox } from '@@/InsightsBox';
 import { Select } from '@@/form-components/Input';
 
-import { SystemResourceDescription } from '../../../datatables/SystemResourceDescription';
 import { KubernetesStack } from '../../types';
-import { systemResourcesSettings } from '../../../datatables/SystemResourcesSettings';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
