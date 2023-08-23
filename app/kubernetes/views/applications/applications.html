@@ -33,21 +33,6 @@
 
               <kubernetes-applications-stacks-datatable
                 dataset="ctrl.state.stacks"
-                table-key="kubernetes.applications.stacks"
-                order-by="Name"
-                refresh-callback="ctrl.getApplications"
-                remove-action="ctrl.removeStacksAction"
-                namespaces="ctrl.state.namespaces"
-                namespace="ctrl.state.namespaceName"
-                on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
-                is-apps-loading="ctrl.state.isAppsLoading"
-                is-system-resources="ctrl.state.isSystemResources"
-                set-system-resources="(ctrl.setSystemResources)"
-              >
-              </kubernetes-applications-stacks-datatable>
-
-              <react-kubernetes-applications-stacks-datatable
-                dataset="ctrl.state.stacks"
                 on-refresh="(ctrl.getApplications)"
                 on-remove="(ctrl.removeStacksAction)"
                 namespaces="ctrl.state.namespaces"
@@ -55,7 +40,7 @@
                 is-loading="ctrl.state.isAppsLoading"
                 on-namespace-change="(ctrl.onChangeNamespaceDropdown)"
               >
-              </react-kubernetes-applications-stacks-datatable>
+              </kubernetes-applications-stacks-datatable>
             </uib-tab>
           </uib-tabset>
         </rd-widget-body>
