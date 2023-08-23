@@ -13,7 +13,6 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DockerfileDetails } from '@/react/docker/images/ItemView/DockerfileDetails';
 import { HealthStatus } from '@/react/docker/containers/ItemView/HealthStatus';
 import { GpusList } from '@/react/docker/host/SetupView/GpusList';
-import { GpusInsights } from '@/react/docker/host/SetupView/GpusInsights';
 import { InsightsBox } from '@/react/components/InsightsBox';
 import { BetaAlert } from '@/react/portainer/environments/update-schedules/common/BetaAlert';
 import { ImagesDatatable } from '@/react/docker/images/ListView/ImagesDatatable/ImagesDatatable';
@@ -71,7 +70,6 @@ const ngModule = angular
     ])
   )
   .component('betaAlert', r2a(BetaAlert, ['className', 'message', 'isHtml']))
-  .component('gpusInsights', r2a(GpusInsights, []))
   .component(
     'dockerImagesDatatable',
     r2a(withUIRouter(withCurrentUser(ImagesDatatable)), [
