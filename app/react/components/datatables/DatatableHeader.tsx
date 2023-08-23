@@ -12,6 +12,11 @@ type Props = {
   onSearchChange(value: string): void;
   renderTableSettings?(): ReactNode;
   renderTableActions?(): ReactNode;
+  renderRightSide?(
+    searchBar: ReactNode,
+    tableActions: ReactNode,
+    tableTitleSettings: ReactNode
+  ): ReactNode;
   description?: ReactNode;
 };
 
@@ -19,6 +24,13 @@ export function DatatableHeader({
   onSearchChange,
   renderTableActions,
   renderTableSettings,
+  renderRightSide = (searchBar, tableActions, tableTitleSettings) => (
+    <>
+      {searchBar}
+      {tableActions}
+      {tableTitleSettings}
+    </>
+  ),
   searchValue,
   title,
   titleIcon,
@@ -28,15 +40,17 @@ export function DatatableHeader({
     return null;
   }
 
+  const searchBar = <SearchBar value={searchValue} onChange={onSearchChange} />;
+  const tableActions = !!renderTableActions && (
+    <Table.Actions>{renderTableActions()}</Table.Actions>
+  );
+  const tableTitleSettings = !!renderTableSettings && (
+    <Table.TitleActions>{renderTableSettings()}</Table.TitleActions>
+  );
+
   return (
     <Table.Title label={title} icon={titleIcon} description={description}>
-      <SearchBar value={searchValue} onChange={onSearchChange} />
-      {renderTableActions && (
-        <Table.Actions>{renderTableActions()}</Table.Actions>
-      )}
-      {!!renderTableSettings && (
-        <Table.TitleActions>{renderTableSettings()}</Table.TitleActions>
-      )}
+      {renderRightSide(searchBar, tableActions, tableTitleSettings)}
     </Table.Title>
   );
 }

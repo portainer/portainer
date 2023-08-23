@@ -67,6 +67,11 @@ export interface Props<D extends DefaultType> extends AutomationTestingProps {
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
   extendTableOptions?: (options: TableOptions<D>) => TableOptions<D>;
+  renderHeaderRightSide?(
+    searchBar: ReactNode,
+    tableActions: ReactNode,
+    tableTitleSettings: ReactNode
+  ): ReactNode;
 }
 
 export function Datatable<D extends DefaultType>({
@@ -94,6 +99,7 @@ export function Datatable<D extends DefaultType>({
   totalCount = dataset.length,
   isServerSidePagination = false,
   extendTableOptions = (value) => value,
+  renderHeaderRightSide,
 }: Props<D> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
@@ -176,6 +182,7 @@ export function Datatable<D extends DefaultType>({
         description={description}
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
+        renderRightSide={renderHeaderRightSide}
       />
 
       <DatatableContent<D>
