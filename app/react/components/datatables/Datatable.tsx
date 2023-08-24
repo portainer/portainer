@@ -14,6 +14,8 @@ import {
   getExpandedRowModel,
   TableOptions,
   TableMeta,
+  Updater,
+  RowSelectionState,
 } from '@tanstack/react-table';
 import { ReactNode, useMemo } from 'react';
 import clsx from 'clsx';
@@ -75,6 +77,12 @@ export interface Props<
   noWidget?: boolean;
   meta?: TMeta;
   globalFilterFn?: typeof defaultGlobalFilterFn<D, TFilter>;
+  /**
+   * pass selectedItemIds and onChangeSelectedItems to control selected values from the parent
+   * usually useful when the table is used in a form
+   */
+  selectedItemIds?: Array<string>;
+  onChangeSelectedItems?(value: Array<string>): void;
 }
 
 export function Datatable<
@@ -107,6 +115,8 @@ export function Datatable<
   totalCount = dataset.length,
   isServerSidePagination = false,
   globalFilterFn = defaultGlobalFilterFn,
+  selectedItemIds,
+  onChangeSelectedItems,
 }: Props<D, TMeta, TFilter> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
@@ -144,6 +154,7 @@ export function Datatable<
       enableHiding: true,
       sortingFn: 'alphanumeric',
     },
+    ...getControlledSelectionState(onChangeSelectedItems, selectedItemIds),
     enableRowSelection,
     autoResetExpanded: false,
     globalFilterFn,
@@ -228,6 +239,32 @@ export function Datatable<
     tableInstance.setPageSize(pageSize);
     settings.setPageSize(pageSize);
   }
+}
+
+function getControlledSelectionState(
+  onChange?: (value: string[]) => void,
+  value?: string[]
+) {
+  if (!onChange || !value) {
+    return {};
+  }
+
+  return {
+    state: {
+      rowSelection: Object.fromEntries(value.map((i) => [i, true])),
+    },
+    onRowSelectionChange(updater: Updater<RowSelectionState>) {
+      const newValue =
+        typeof updater !== 'function'
+          ? updater
+          : updater(Object.fromEntries(value.map((i) => [i, true])));
+      onChange(
+        Object.entries(newValue)
+          .filter(([, selected]) => selected)
+          .map(([id]) => id)
+      );
+    },
+  };
 }
 
 function defaultRenderRow<D extends DefaultType>(
