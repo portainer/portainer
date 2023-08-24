@@ -22,6 +22,7 @@ import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowse
 import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
 import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
 import { ScaleServiceButton } from '@/react/docker/services/ListView/ServicesDatatable/columns/schedulingMode/ScaleServiceButton';
+import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatable';
 
 import { containersModule } from './containers';
 
@@ -132,6 +133,10 @@ const ngModule = angular
     'dockerServicesDatatableScaleServiceButton',
     r2a(withUIRouter(withCurrentUser(ScaleServiceButton)), ['service'])
   )
-  .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']));
+  .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
+  .component(
+    'dockerSecretsDatatable',
+    r2a(withUIRouter(SecretsDatatable), ['dataset', 'onRefresh', 'onRemove'])
+  );
 
 export const componentsModule = ngModule.name;
