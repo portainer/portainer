@@ -1,5 +1,5 @@
+import { NodeStatus, TaskState } from 'docker-types/generated/1.41';
 import _ from 'lodash';
-import { TaskState } from 'docker-types/generated/1.41';
 
 export function trimSHA(imageName: string) {
   if (!imageName) {
@@ -52,4 +52,12 @@ export function taskStatusBadge(text?: TaskState) {
     return 'success';
   }
   return 'default';
+}
+
+export function nodeStatusBadge(text: NodeStatus['State']) {
+  if (text === 'down' || text === 'unknown' || text === 'disconnected') {
+    return 'danger';
+  }
+
+  return 'success';
 }

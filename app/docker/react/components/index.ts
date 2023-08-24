@@ -26,11 +26,13 @@ import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatab
 
 import { containersModule } from './containers';
 import { servicesModule } from './services';
+import { networksModule } from './networks';
 
 const ngModule = angular
   .module('portainer.docker.react.components', [
     containersModule,
     servicesModule,
+    networksModule,
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))

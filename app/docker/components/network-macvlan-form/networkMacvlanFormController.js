@@ -12,11 +12,18 @@ angular.module('portainer.docker').controller('NetworkMacvlanFormController', [
 
     this.options = [];
 
+    ctrl.onChangeSelectedNodes = onChangeSelectedNodes.bind(ctrl);
+    function onChangeSelectedNodes(nodes) {
+      return $scope.$evalAsync(() => {
+        ctrl.data.DatatableState.selectedItems = nodes;
+      });
+    }
+
     ctrl.requiredNodeSelection = function () {
       if (ctrl.data.Scope !== 'local' || ctrl.data.DatatableState === undefined) {
         return false;
       }
-      return ctrl.data.DatatableState.selectedItemCount === 0;
+      return ctrl.data.DatatableState.selectedItems.length;
     };
 
     ctrl.requiredConfigSelection = function () {
