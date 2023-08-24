@@ -7,11 +7,13 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/tag"
 	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 type endpointGroupUpdatePayload struct {
@@ -187,7 +189,10 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 				if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(tx, &endpoint, endpointGroup)
 					if err != nil {
-						return nil, httperror.InternalServerError("Unable to update user authorizations", err)
+						// Update flag with endpoint and continue
+						endpoint.PendingActions = utils.GetUpdatedEndpointPendingActions(&endpoint, "CleanNAPWithOverridePolicies", endpointGroup.ID)
+						err = tx.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
+						log.Warn().Err(err).Msgf("Unable to update user authorizations for endpoint (%d) and endpopint group (%d)", endpoint.ID, endpointGroup.ID)
 					}
 				}
 			}

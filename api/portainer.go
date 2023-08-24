@@ -373,6 +373,12 @@ type (
 	//EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
+	EndpointPendingActions struct {
+		CleanNAPWithOverridePolicies struct {
+			EndpointGroups []EndpointGroupID `json:"EndpointGroups"`
+		} `json:"CleanNAPWithOverridePolicies"`
+	}
+
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
 	Endpoint struct {
@@ -427,6 +433,9 @@ type (
 
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
+
+		// Whether we need to run any action when an endpoint is back online.
+		PendingActions *EndpointPendingActions `json:"PendingActions"`
 
 		Edge EnvironmentEdgeSettings
 
