@@ -39,9 +39,9 @@ func setLoggingMode(mode string) {
 	case "PRETTY":
 		log.Logger = log.Output(zerolog.ConsoleWriter{
 			Out:           os.Stderr,
-			NoColor:       true,
 			TimeFormat:    "2006/01/02 03:04PM",
-			FormatMessage: formatMessage})
+			FormatMessage: formatMessage,
+		})
 	case "JSON":
 		log.Logger = log.Output(os.Stderr)
 	}
@@ -51,5 +51,6 @@ func formatMessage(i interface{}) string {
 	if i == nil {
 		return ""
 	}
+
 	return fmt.Sprintf("%s |", i)
 }
