@@ -130,6 +130,11 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	// to retain the same network settings we have to connect on creation to one of the old
 	// container's networks, and connect to the other networks after creation.
 	// see: https://portainer.atlassian.net/browse/EE-5448
+
+	// Don't copy the hostname from the old container to the new one.
+	// https://github.com/portainer/portainer/issues/9047
+	config := container.Config
+	config.Hostname = ""
 	create, err := cli.ContainerCreate(ctx, container.Config, container.HostConfig, &networkWithCreation, nil, container.Name)
 
 	c.sr.push(func() {
