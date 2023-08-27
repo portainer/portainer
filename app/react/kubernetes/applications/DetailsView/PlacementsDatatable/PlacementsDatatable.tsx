@@ -2,53 +2,60 @@ import { Minimize2 } from 'lucide-react';
 
 import {
   BasicTableSettings,
-  createPersistedStore,
-  refreshableSettings,
   RefreshableTableSettings,
 } from '@@/datatables/types';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
-import { useRepeater } from '@@/datatables/useRepeater';
 import { TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useTableState } from '@@/datatables/useTableState';
+import { TextTip } from '@@/Tip/TextTip';
 
-import { Node } from '../types';
+import { NodePlacementRowData } from '../types';
 
 import { SubRow } from './PlacementsDatatableSubRow';
 import { columns } from './columns';
 
 interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
 
-function createStore(storageKey: string) {
-  return createPersistedStore<TableSettings>(storageKey, 'node', (set) => ({
-    ...refreshableSettings(set),
-  }));
-}
-
-const storageKey = 'kubernetes.application.placements';
-const settingsStore = createStore(storageKey);
+type Props = {
+  isLoading: boolean;
+  dataset: NodePlacementRowData[];
+  hasPlacementWarning: boolean;
+  tableState: TableSettings & {
+    setSearch: (value: string) => void;
+    search: string;
+  };
+};
 
 export function PlacementsDatatable({
+  isLoading,
   dataset,
-  onRefresh,
-}: {
-  dataset: Node[];
-  onRefresh: () => Promise<void>;
-}) {
-  const tableState = useTableState(settingsStore, storageKey);
-
-  useRepeater(tableState.autoRefreshRate, onRefresh);
-
+  hasPlacementWarning,
+  tableState,
+}: Props) {
   return (
     <ExpandableDatatable
-      getRowCanExpand={(row) => !row.original.AcceptsApplication}
+      isLoading={isLoading}
+      getRowCanExpand={(row) => !row.original.acceptsApplication}
       title="Placement constraints/preferences"
       titleIcon={Minimize2}
       dataset={dataset}
       settingsManager={tableState}
+      getRowId={(row) => row.name}
       columns={columns}
       disableSelect
-      noWidget
+      description={
+        hasPlacementWarning ? (
+          <TextTip>
+            Based on the placement rules, the application pod can&apos;t be
+            scheduled on any nodes.
+          </TextTip>
+        ) : (
+          <TextTip color="blue">
+            The placement table helps you understand whether or not this
+            application can be deployed on a specific node.
+          </TextTip>
+        )
+      }
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh

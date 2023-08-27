@@ -4,7 +4,7 @@ import { Icon } from '@@/Icon';
 
 import { columnHelper } from './helper';
 
-export const status = columnHelper.accessor('AcceptsApplication', {
+export const status = columnHelper.accessor('acceptsApplication', {
   header: '',
   id: 'status',
   enableSorting: false,

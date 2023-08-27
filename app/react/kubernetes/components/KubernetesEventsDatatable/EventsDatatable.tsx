@@ -15,7 +15,7 @@ type Props = {
   tableState: TableState<TableSettings>;
   isLoading: boolean;
   'data-cy': string;
-  noWidget: boolean;
+  noWidget?: boolean;
 };
 
 export function EventsDatatable({

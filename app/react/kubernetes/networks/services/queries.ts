@@ -6,7 +6,10 @@ import { error as notifyError } from '@/portainer/services/notifications';
 import { getServices } from './service';
 import { Service } from './types';
 
-export function useServices(environmentId: EnvironmentId, namespace: string) {
+export function useNamespaceServices(
+  environmentId: EnvironmentId,
+  namespace: string
+) {
   return useQuery(
     [
       'environments',

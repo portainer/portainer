@@ -25,14 +25,18 @@ export async function getNamespacePods(
   }
 }
 
-export async function getPod(
+export async function getPod<T extends Pod | string = Pod>(
   environmentId: EnvironmentId,
   namespace: string,
-  name: string
+  name: string,
+  yaml?: boolean
 ) {
   try {
-    const { data } = await axios.get<Pod>(
-      buildUrl(environmentId, namespace, name)
+    const { data } = await axios.get<T>(
+      buildUrl(environmentId, namespace, name),
+      {
+        headers: { Accept: yaml ? 'application/yaml' : 'application/json' },
+      }
     );
     return data;
   } catch (e) {

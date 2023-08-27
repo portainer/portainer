@@ -151,10 +151,10 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const application = {
       name: 'kubernetes.applications.application',
-      url: '/:namespace/:name?resource-type',
+      url: '/:namespace/:name?resource-type&tab',
       views: {
         'content@': {
-          component: 'kubernetesApplicationView',
+          component: 'applicationDetailsView',
         },
       },
     };

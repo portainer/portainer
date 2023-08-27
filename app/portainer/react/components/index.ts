@@ -121,7 +121,10 @@ export const ngModule = angular
     r2a(FallbackImage, ['src', 'fallbackIcon', 'alt', 'size', 'className'])
   )
   .component('prIcon', r2a(Icon, ['className', 'icon', 'mode', 'size', 'spin']))
-  .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
+  .component(
+    'reactQueryDevTools',
+    r2a(withReactQuery(ReactQueryDevtoolsWrapper), [])
+  )
   .component(
     'dashboardItem',
     r2a(DashboardItem, [

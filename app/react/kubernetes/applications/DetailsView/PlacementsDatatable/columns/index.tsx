@@ -1,14 +1,14 @@
 import { buildExpandColumn } from '@@/datatables/expand-column';
 
-import { Node } from '../../types';
+import { NodePlacementRowData } from '../../types';
 
 import { columnHelper } from './helper';
 import { status } from './status';
 
 export const columns = [
-  buildExpandColumn<Node>(),
+  buildExpandColumn<NodePlacementRowData>(),
   status,
-  columnHelper.accessor('Name', {
+  columnHelper.accessor('name', {
     header: 'Node',
     id: 'node',
   }),
