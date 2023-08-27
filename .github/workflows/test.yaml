@@ -13,7 +13,7 @@ jobs:
       - run: yarn --frozen-lockfile
 
       - name: Run tests
-        run: yarn jest --maxWorkers=2
+        run: make test-client ARGS="--maxWorkers=2"
   test-server:
     runs-on: ubuntu-latest
     steps:

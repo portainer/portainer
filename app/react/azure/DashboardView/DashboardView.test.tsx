@@ -71,6 +71,8 @@ test('should correctly show total number of resource groups across multiple subs
 });
 
 test("when only subscriptions fail to load, don't show the dashboard", async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+
   const { queryByLabelText } = await renderComponent(
     1,
     { 'subscription-1': 1 },
@@ -82,6 +84,8 @@ test("when only subscriptions fail to load, don't show the dashboard", async () 
 });
 
 test('when only resource groups fail to load, still show the subscriptions', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+
   const { queryByLabelText, findByLabelText } = await renderComponent(
     1,
     { 'subscription-1': 1 },

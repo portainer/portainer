@@ -65,7 +65,7 @@ clean: ## Remove all build and download artifacts
 test: test-server test-client ## Run all tests
 
 test-client: ## Run client tests
-	yarn test
+	yarn test $(ARGS)
 
 test-server:	## Run server tests
 	cd api && $(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover  ./...

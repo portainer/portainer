@@ -1,6 +1,5 @@
 // general icons
-import heartbeatup from '@/assets/ico/heartbeat-up.svg?c';
-import heartbeatdown from '@/assets/ico/heartbeat-down.svg?c';
+
 import dataflow from '@/assets/ico/dataflow-1.svg?c';
 import git from '@/assets/ico/git.svg?c';
 import kube from '@/assets/ico/kube.svg?c';
@@ -40,8 +39,6 @@ import quay from '@/assets/ico/vendor/quay.svg?c';
 const placeholder = Placeholder;
 
 export const SvgIcons = {
-  heartbeatup,
-  heartbeatdown,
   dataflow,
   dockericon,
   git,
