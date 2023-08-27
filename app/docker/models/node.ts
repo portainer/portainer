@@ -8,7 +8,7 @@ import {
   ObjectVersion,
   Platform,
   ResourceObject,
-} from 'docker-types/generated/1.42';
+} from 'docker-types/generated/1.41';
 
 type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
   [Property in Key]-?: Type[Property];
