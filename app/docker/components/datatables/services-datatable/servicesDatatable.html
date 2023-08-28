@@ -210,16 +210,7 @@
             <tr dir-paginate-end ng-show="item.Expanded">
               <td></td>
               <td colspan="8">
-                <service-tasks-datatable
-                  dataset="item.Tasks"
-                  service-id="item.Id"
-                  table-key="service-tasks"
-                  order-by="Status.State"
-                  nodes="$ctrl.nodes"
-                  agent-proxy="$ctrl.agentProxy"
-                  show-task-logs-button="$ctrl.showTaskLogsButton"
-                  text-filter="$ctrl.state.textFilter"
-                ></service-tasks-datatable>
+                <docker-service-tasks-datatable dataset="item.Tasks" search="$ctrl.state.textFilter"></docker-service-tasks-datatable>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
