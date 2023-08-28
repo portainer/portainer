@@ -89,13 +89,7 @@
                 >
               </td>
               <td>
-                <container-quick-actions
-                  ng-if="!$ctrl.agentProxy || !item.Container"
-                  container-id="item.ContainerId"
-                  task-id="item.Id"
-                  status="item.Status.State"
-                  state="$ctrl.state"
-                ></container-quick-actions>
+                <task-table-quick-actions ng-if="!$ctrl.agentProxy || !item.Container" task-id="item.Id" state="$ctrl.state"></task-table-quick-actions>
                 <container-quick-actions
                   ng-if="$ctrl.agentProxy && item.Container"
                   container-id="item.Container.Id"

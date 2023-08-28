@@ -23,6 +23,11 @@ interface Props<D extends DefaultType> {
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
   initialSortBy?: BasicTableSettings['sortBy'];
+
+  /**
+   * keyword to filter by
+   */
+  search?: string;
 }
 
 export function NestedDatatable<D extends DefaultType>({
@@ -33,6 +38,7 @@ export function NestedDatatable<D extends DefaultType>({
   initialTableState = {},
   isLoading,
   initialSortBy,
+  search,
 }: Props<D>) {
   const tableInstance = useReactTable<D>({
     columns,
@@ -45,6 +51,9 @@ export function NestedDatatable<D extends DefaultType>({
       enableColumnFilter: false,
       enableHiding: false,
     },
+    state: {
+      globalFilter: search,
+    },
     getRowId,
     autoResetExpanded: false,
     getCoreRowModel: getCoreRowModel(),
@@ -55,7 +64,7 @@ export function NestedDatatable<D extends DefaultType>({
 
   return (
     <NestedTable>
-      <Table.Container>
+      <Table.Container noWidget>
         <DatatableContent<D>
           tableInstance={tableInstance}
           isLoading={isLoading}
