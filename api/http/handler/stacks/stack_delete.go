@@ -190,7 +190,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 	if stack.Type == portainer.DockerSwarmStack {
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
-		if stackutils.IsGitStack(stack) {
+		if stackutils.IsRelativePathStack(stack) {
 			return handler.StackDeployer.UndeployRemoteSwarmStack(stack, endpoint)
 		}
 
@@ -200,7 +200,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 	if stack.Type == portainer.DockerComposeStack {
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
-		if stackutils.IsGitStack(stack) {
+		if stackutils.IsRelativePathStack(stack) {
 			return handler.StackDeployer.UndeployRemoteComposeStack(stack, endpoint)
 		}
 
