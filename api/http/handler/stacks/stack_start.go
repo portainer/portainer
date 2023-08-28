@@ -145,7 +145,7 @@ func (handler *Handler) startStack(
 	case portainer.DockerComposeStack:
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
-		if stackutils.IsGitStack(stack) {
+		if stackutils.IsRelativePathStack(stack) {
 			return handler.StackDeployer.StartRemoteComposeStack(stack, endpoint)
 		}
 
@@ -153,7 +153,7 @@ func (handler *Handler) startStack(
 	case portainer.DockerSwarmStack:
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
-		if stackutils.IsGitStack(stack) {
+		if stackutils.IsRelativePathStack(stack) {
 			return handler.StackDeployer.StartRemoteSwarmStack(stack, endpoint)
 		}
 

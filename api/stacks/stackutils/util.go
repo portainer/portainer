@@ -47,3 +47,10 @@ func SanitizeLabel(value string) string {
 func IsGitStack(stack *portainer.Stack) bool {
 	return stack.GitConfig != nil && len(stack.GitConfig.URL) != 0
 }
+
+// IsRelativePathStack checks if the stack is a git stack or not
+func IsRelativePathStack(stack *portainer.Stack) bool {
+	// Always return false in CE
+	// This function is only for code consistency with EE
+	return false
+}
