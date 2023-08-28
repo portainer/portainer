@@ -84,7 +84,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.19.5'
+          go-version: '1.20.5'
 
       - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
@@ -143,10 +143,10 @@ jobs:
       - name: checkout code
         uses: actions/checkout@master
 
-      - name: install Go 1.19.5
+      - name: install Go 1.20.5
         uses: actions/setup-go@v3
         with:
-          go-version: '1.19.5'
+          go-version: '1.20.5'
 
       - name: install Node.js 18.x
         uses: actions/setup-node@v3
