@@ -117,9 +117,10 @@ export function IngressForm({
   useEffect(() => {
     const namespaces = namespacesOptions.map((option) => option.value);
     if (
+      !isEdit &&
       !namespaces.includes(namespace) &&
       namespaces.length > 0 &&
-      (!isIngressNamesLoading || isEdit)
+      !isIngressNamesLoading
     ) {
       handleNamespaceChange(namespaces[0]);
     }
