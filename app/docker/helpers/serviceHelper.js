@@ -21,18 +21,6 @@ angular.module('portainer.docker').factory('ServiceHelper', [
       tasks = otherServicesTasks;
     };
 
-    helper.serviceToConfig = function (service) {
-      return {
-        Name: service.Spec.Name,
-        Labels: service.Spec.Labels,
-        TaskTemplate: service.Spec.TaskTemplate,
-        Mode: service.Spec.Mode,
-        UpdateConfig: service.Spec.UpdateConfig,
-        Networks: service.Spec.Networks,
-        EndpointSpec: service.Spec.EndpointSpec,
-      };
-    };
-
     helper.translateKeyValueToPlacementPreferences = function (keyValuePreferences) {
       if (keyValuePreferences) {
         var preferences = [];

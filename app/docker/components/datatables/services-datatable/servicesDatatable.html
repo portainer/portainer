@@ -178,32 +178,11 @@
               </td>
               <td ng-if="$ctrl.showStackColumn">{{ item.StackName ? item.StackName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.image.display">{{ item.Image | hideshasum }}</td>
-              <td ng-controller="ServicesDatatableActionsController as actionCtrl">
+              <td>
                 {{ item.Mode }}
                 <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
-                <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
-                  <a class="interactive vertical-center" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
-                    <pr-icon icon="'minimize-2'"></pr-icon>
-                    Scale
-                  </a>
-                </span>
-                <span ng-if="item.Mode === 'replicated' && item.Scale">
-                  <input
-                    class="input-sm"
-                    type="number"
-                    min="0"
-                    step="1"
-                    ng-model="item.Replicas"
-                    on-enter-key="actionCtrl.scaleAction(item)"
-                    auto-focus
-                    ng-click="$event.stopPropagation();"
-                  />
-                  <a class="interactive vertical-center" ng-click="item.Scale = false; $event.stopPropagation();">
-                    <pr-icon icon="'x'"></pr-icon>
-                  </a>
-                  <a class="interactive vertical-center" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();">
-                    <pr-icon icon="'check-square'"></pr-icon>
-                  </a>
+                <span ng-if="item.Mode === 'replicated'">
+                  <docker-services-datatable-scale-service-button service="item"></docker-services-datatable-scale-service-button>
                 </span>
               </td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">

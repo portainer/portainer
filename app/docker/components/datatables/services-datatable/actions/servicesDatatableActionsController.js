@@ -1,31 +1,16 @@
 import { confirmDelete } from '@@/modals/confirm';
 import { confirmServiceForceUpdate } from '@/react/docker/services/common/update-service-modal';
+import { convertServiceToConfig } from '@/react/docker/services/common/convertServiceToConfig';
 
 angular.module('portainer.docker').controller('ServicesDatatableActionsController', [
   '$q',
   '$state',
   'ServiceService',
-  'ServiceHelper',
   'Notifications',
   'ImageHelper',
   'WebhookService',
-  function ($q, $state, ServiceService, ServiceHelper, Notifications, ImageHelper, WebhookService) {
+  function ($q, $state, ServiceService, Notifications, ImageHelper, WebhookService) {
     const ctrl = this;
-
-    this.scaleAction = function scaleService(service) {
-      var config = ServiceHelper.serviceToConfig(service.Model);
-      config.Mode.Replicated.Replicas = service.Replicas;
-      ServiceService.update(service, config)
-        .then(function success() {
-          Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to scale service');
-          service.Scale = false;
-          service.Replicas = service.ReplicaCount;
-        });
-    };
 
     this.removeAction = function (selectedItems) {
       confirmDelete('Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.').then((confirmed) => {
@@ -51,7 +36,7 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
     function forceUpdateServices(services, pullImage) {
       var actionCount = services.length;
       angular.forEach(services, function (service) {
-        var config = ServiceHelper.serviceToConfig(service.Model);
+        var config = convertServiceToConfig(service.Model);
         if (pullImage) {
           config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
         }

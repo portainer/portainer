@@ -29,7 +29,7 @@ type OptionalReadonly<T> = T | Readonly<T>;
 
 export function withInvalidate(
   queryClient: QueryClient,
-  queryKeysToInvalidate: OptionalReadonly<string[]>[]
+  queryKeysToInvalidate: Array<OptionalReadonly<Array<string | number>>>
 ) {
   return {
     onSuccess() {
