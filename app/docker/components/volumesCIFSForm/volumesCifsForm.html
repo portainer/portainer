@@ -17,6 +17,21 @@
       </div>
     </div>
     <!-- !address-input -->
+    <!-- port-input -->
+    <div class="form-group col-md-12">
+      <label for="cifs_port" class="col-sm-2 col-md-1 control-label required text-left">Port</label>
+      <div class="col-sm-10 col-md-11">
+        <input type="number" class="form-control" ng-model="$ctrl.data.serverPort" name="cifs_port" placeholder="445" required />
+      </div>
+    </div>
+    <div class="form-group col-md-12" ng-show="cifsInformationForm.cifs_port.$invalid">
+      <div class="small text-warning">
+        <div ng-messages="cifsInformationForm.cifs_port.$error">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !port-input -->
     <!-- mount-point-input -->
     <div class="form-group col-md-12">
       <label for="cifs_share" class="col-sm-2 col-md-1 control-label required text-left">Share</label>
