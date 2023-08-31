@@ -1,16 +1,12 @@
 import { Formik, Form, FormikProps, FormikHelpers } from 'formik';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import _ from 'lodash';
 import { useTransitionHook } from '@uirouter/react';
-import moment from 'moment';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { IngressClassDatatable } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
-import { TimeWindowPicker } from '@/react/portainer/environments/common/TimeWindowPicker';
-import { timeZoneToUtc } from '@/react/portainer/environments/common/TimeWindowPicker/utils';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { FormSection } from '@@/form-components/FormSection';
@@ -68,8 +64,8 @@ export function ConfigureForm() {
         !!environment.Kubernetes.Configuration.IngressAvailabilityPerNamespace,
       allowNoneIngressClass:
         !!environment.Kubernetes.Configuration.AllowNoneIngressClass,
-      deploymentOptions: environment.DeploymentOptions,
-      changeWindow: environment.ChangeWindow,
+      // deploymentOptions: environment.DeploymentOptions,
+      // changeWindow: environment.ChangeWindow,
       ingressClasses: ingressClasses || [],
     };
   }, [environment, ingressClasses, storageClassFormValues]);
@@ -123,9 +119,6 @@ function InnerForm({
   isIngressClassesLoading: boolean;
   environmentId: EnvironmentId;
 }) {
-  const [isTimeWindowEditMode, setIsTimeWindowEditMode] = useState(false);
-  const { data: settings } = usePublicSettings();
-  const perEnvOverride = settings?.GlobalDeploymentOptions?.perEnvOverride;
   const { data: isRBACEnabled, ...isRBACEnabledQuery } =
     useIsRBACEnabledQuery(environmentId);
 
@@ -274,175 +267,13 @@ function InnerForm({
                 label="Enable Change Window"
                 tooltip="GitOps updates to stacks or applications outside the defined change window will not occur.'"
                 labelClass="col-sm-5 col-lg-4"
-                checked={values.changeWindow?.Enabled}
+                checked={false}
                 featureId={FeatureId.HIDE_AUTO_UPDATE_WINDOW}
-                onChange={(checked) => {
-                  setFieldValue('changeWindow.Enabled', checked);
-                  // when enabled
-                  if (checked) {
-                    // enable time window edit mode when the change window is enabled
-                    setIsTimeWindowEditMode(true);
-                    // set a default time window when the change window is enabled
-                    const midnightLocalTime = timeZoneToUtc(
-                      '00:00',
-                      values.timeZone || moment.tz.guess()
-                    );
-                    if (!values.changeWindow.StartTime) {
-                      setFieldValue(
-                        'changeWindow.StartTime',
-                        midnightLocalTime
-                      );
-                    }
-                    if (!values.changeWindow.EndTime) {
-                      setFieldValue('changeWindow.EndTime', midnightLocalTime);
-                    }
-                  }
-                }}
+                onChange={() => {}}
               />
             </div>
           </div>
-          {values.changeWindow?.Enabled && (
-            <TimeWindowPicker
-              values={values.changeWindow}
-              initialValues={initialValues.changeWindow}
-              onChange={({ changeWindow, timeZone }) => {
-                setFieldValue('changeWindow', changeWindow);
-                setFieldValue('timeZone', timeZone);
-              }}
-              timeZone={values.timeZone}
-              initialTimeZone={initialValues.timeZone}
-              isEditMode={isTimeWindowEditMode}
-              setIsEditMode={setIsTimeWindowEditMode}
-            />
-          )}
         </FormSection>
-        {perEnvOverride && (
-          <FormSection title="Deployment Options">
-            <div className="form-group">
-              <div className="col-sm-12">
-                <SwitchField
-                  name="deploymentOptions.overrideGlobalOptions"
-                  data-cy="kubeSetup-overrideGlobalDeploymentOptions"
-                  label="Override global deployment options"
-                  tooltip="Set deployment options for this environment, overriding those from Portainer's global settings screen."
-                  labelClass="col-sm-5 col-lg-4"
-                  checked={!!values.deploymentOptions?.overrideGlobalOptions}
-                  onChange={(checked) =>
-                    setFieldValue(
-                      'deploymentOptions.overrideGlobalOptions',
-                      checked
-                    )
-                  }
-                />
-              </div>
-            </div>
-            {values.deploymentOptions?.overrideGlobalOptions && (
-              <>
-                <div className="form-group">
-                  <div className="col-sm-12">
-                    <SwitchField
-                      name="deploymentOptions.hideAddWithForm"
-                      data-cy="kubesetup-hideAddWithForm"
-                      label="Enforce code-based deployment"
-                      tooltip="Hides the 'Add with form' buttons and prevents adding/editing of resources via forms."
-                      labelClass="col-sm-5 col-lg-4 pr-0 !pl-4"
-                      checked={!!values.deploymentOptions?.hideAddWithForm}
-                      valueExplanation={
-                        <em className="control-label h-full w-max pl-10 !pt-0 align-middle text-[0.9em]">
-                          {`${
-                            values.deploymentOptions.hideAddWithForm ===
-                            settings?.GlobalDeploymentOptions.hideAddWithForm
-                              ? 'same as global setting:'
-                              : 'overriding global setting:'
-                          } ${
-                            settings?.GlobalDeploymentOptions.hideAddWithForm
-                              ? 'ON'
-                              : 'OFF'
-                          }`}
-                        </em>
-                      }
-                      onChange={(checked) =>
-                        setFieldValue(
-                          'deploymentOptions.hideAddWithForm',
-                          checked
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-                {values.deploymentOptions.hideAddWithForm && (
-                  <>
-                    <div className="form-group">
-                      <div className="col-sm-12">
-                        <SwitchField
-                          name="deploymentOptions.hideWebEditor"
-                          data-cy="kubesetup-hideWebEditor"
-                          label="Allow web editor and custom template use"
-                          labelClass="col-sm-5 col-lg-4 pr-0 !pl-4"
-                          checked={!values.deploymentOptions?.hideWebEditor}
-                          valueExplanation={
-                            <em className="control-label h-full w-max pl-10 !pt-0 align-middle text-[0.9em]">
-                              {`${
-                                !!values.deploymentOptions.hideWebEditor ===
-                                !!settings?.GlobalDeploymentOptions
-                                  .hideWebEditor
-                                  ? 'same as global setting:'
-                                  : 'overriding global setting:'
-                              } ${
-                                !settings?.GlobalDeploymentOptions
-                                  .hideWebEditor ||
-                                !settings?.GlobalDeploymentOptions.hideWebEditor
-                                  ? 'ON'
-                                  : 'OFF'
-                              }`}
-                            </em>
-                          }
-                          onChange={(checked) =>
-                            setFieldValue(
-                              'deploymentOptions.hideWebEditor',
-                              !checked
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <div className="col-sm-12">
-                        <SwitchField
-                          name="deploymentOptions.hideFileUpload"
-                          data-cy="kubesetup-allowFileUpload"
-                          label="Allow specifying of a manifest via a URL"
-                          labelClass="col-sm-5 col-lg-4 pr-0 !pl-4"
-                          checked={!values.deploymentOptions?.hideFileUpload}
-                          valueExplanation={
-                            <em className="control-label h-full w-max pl-10 !pt-0 align-middle text-[0.9em]">{`${
-                              !!values.deploymentOptions.hideFileUpload ===
-                              !!settings?.GlobalDeploymentOptions.hideFileUpload
-                                ? 'same as global setting:'
-                                : 'overriding global setting:'
-                            } ${
-                              !settings?.GlobalDeploymentOptions
-                                .hideFileUpload ||
-                              !settings?.GlobalDeploymentOptions.hideFileUpload
-                                ? 'ON'
-                                : 'OFF'
-                            }`}</em>
-                          }
-                          onChange={(checked) =>
-                            setFieldValue(
-                              'deploymentOptions.hideFileUpload',
-                              !checked
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </FormSection>
-        )}
         <FormSection title="Security">
           {!isRBACEnabled && isRBACEnabledQuery.isSuccess && <RBACAlert />}
           <TextTip color="blue">

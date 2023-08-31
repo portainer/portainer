@@ -1,8 +1,3 @@
-import {
-  DeploymentOptions,
-  EndpointChangeWindow,
-} from '@/react/portainer/environments/types';
-
 import { IngressControllerClassMap } from '../../ingressClass/types';
 
 export type AccessMode = {
@@ -29,8 +24,6 @@ export type ConfigureFormValues = {
   ingressAvailabilityPerNamespace: boolean;
   allowNoneIngressClass: boolean;
   storageClasses: StorageClassFormValues[];
-  deploymentOptions: DeploymentOptions | null;
-  changeWindow: EndpointChangeWindow;
   timeZone?: string;
   ingressClasses: IngressControllerClassMap[];
 };

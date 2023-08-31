@@ -4,14 +4,6 @@ import { IngressControllerClassMap } from '../../ingressClass/types';
 
 import { ConfigureFormValues } from './types';
 
-// Define Yup schema for DeploymentOptions
-const deploymentOptionsSchema = object().shape({
-  overrideGlobalOptions: boolean().required(),
-  hideAddWithForm: boolean().required(),
-  hideWebEditor: boolean().required(),
-  hideFileUpload: boolean().required(),
-});
-
 // Define Yup schema for AccessMode
 const accessModeSchema = object().shape({
   Description: string().required(),
@@ -44,13 +36,6 @@ const storageClassFormValuesSchema = array()
     }
   );
 
-// Define Yup schema for EndpointChangeWindow
-const endpointChangeWindowSchema = object().shape({
-  Enabled: boolean().required(),
-  StartTime: string(),
-  EndTime: string(),
-});
-
 // Define Yup schema for IngressControllerClassMap
 const ingressControllerClassMapSchema: SchemaOf<IngressControllerClassMap> =
   object().shape({
@@ -73,8 +58,8 @@ export const configureValidationSchema: SchemaOf<ConfigureFormValues> = object({
   ingressAvailabilityPerNamespace: boolean().required(),
   allowNoneIngressClass: boolean().required(),
   storageClasses: storageClassFormValuesSchema.required(),
-  deploymentOptions: deploymentOptionsSchema.nullable(),
-  changeWindow: endpointChangeWindowSchema.required(),
+  // deploymentOptions: deploymentOptionsSchema.nullable(),
+  // changeWindow: endpointChangeWindowSchema.required(),
   ingressClasses: array().of(ingressControllerClassMapSchema).required(),
   timeZone: string(),
 });

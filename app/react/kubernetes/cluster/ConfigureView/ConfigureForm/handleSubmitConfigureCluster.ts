@@ -44,16 +44,6 @@ export async function handleSubmitConfigureCluster(
       },
     });
   }
-  if (values.changeWindow.Enabled && !initialValues?.changeWindow.Enabled) {
-    trackEvent('time-window-create', {
-      category: 'kubernetes',
-      metadata: {
-        'Start-time': values.changeWindow.StartTime,
-        'End-time': values.changeWindow.EndTime,
-        'Time-zone': values.timeZone,
-      },
-    });
-  }
 
   // transform the form values into the environment object
   const selectedStorageClasses = values.storageClasses.filter(
@@ -150,8 +140,6 @@ function assignFormValuesToEnvironment(
         })),
       },
     },
-    DeploymentOptions: values.deploymentOptions,
-    ChangeWindow: values.changeWindow,
   };
   return updatedEnvironment;
 }
