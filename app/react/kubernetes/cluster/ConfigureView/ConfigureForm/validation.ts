@@ -58,8 +58,5 @@ export const configureValidationSchema: SchemaOf<ConfigureFormValues> = object({
   ingressAvailabilityPerNamespace: boolean().required(),
   allowNoneIngressClass: boolean().required(),
   storageClasses: storageClassFormValuesSchema.required(),
-  // deploymentOptions: deploymentOptionsSchema.nullable(),
-  // changeWindow: endpointChangeWindowSchema.required(),
   ingressClasses: array().of(ingressControllerClassMapSchema).required(),
-  timeZone: string(),
 });

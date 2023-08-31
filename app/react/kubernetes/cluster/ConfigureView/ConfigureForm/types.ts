@@ -24,6 +24,5 @@ export type ConfigureFormValues = {
   ingressAvailabilityPerNamespace: boolean;
   allowNoneIngressClass: boolean;
   storageClasses: StorageClassFormValues[];
-  timeZone?: string;
   ingressClasses: IngressControllerClassMap[];
 };
