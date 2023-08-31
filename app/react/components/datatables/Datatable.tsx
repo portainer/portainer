@@ -83,6 +83,7 @@ export interface Props<
    */
   selectedItemIds?: Array<string>;
   onChangeSelectedItems?(value: Array<string>): void;
+  extendTableOptions?: (options: TableOptions<D>) => TableOptions<D>;
 }
 
 export function Datatable<
@@ -117,6 +118,7 @@ export function Datatable<
   globalFilterFn = defaultGlobalFilterFn,
   selectedItemIds,
   onChangeSelectedItems,
+  extendTableOptions = (value) => value,
 }: Props<D, TMeta, TFilter> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
@@ -133,48 +135,50 @@ export function Datatable<
     [disableSelect, columns]
   );
 
-  const tableInstance = useReactTable<D>({
-    columns: allColumns,
-    data: dataset,
-    initialState: {
-      pagination: {
-        pageSize: settings.pageSize,
-        pageIndex: page || 0,
-      },
-      sorting: settings.sortBy ? [settings.sortBy] : [],
-      globalFilter: {
-        search: settings.search,
-        ...initialTableState.globalFilter,
-      },
+  const tableInstance = useReactTable<D>(
+    extendTableOptions({
+      columns: allColumns,
+      data: dataset,
+      initialState: {
+        pagination: {
+          pageSize: settings.pageSize,
+          pageIndex: page || 0,
+        },
+        sorting: settings.sortBy ? [settings.sortBy] : [],
+        globalFilter: {
+          search: settings.search,
+          ...initialTableState.globalFilter,
+        },
 
-      ...initialTableState,
-    },
-    defaultColumn: {
-      enableColumnFilter: false,
-      enableHiding: true,
-      sortingFn: 'alphanumeric',
-    },
-    ...getControlledSelectionState(onChangeSelectedItems, selectedItemIds),
-    enableRowSelection,
-    autoResetExpanded: false,
-    globalFilterFn,
-    getRowId,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand,
-    getColumnCanGlobalFilter,
-    ...(isServerSidePagination
-      ? { manualPagination: true, pageCount }
-      : {
-          getSortedRowModel: getSortedRowModel(),
-        }),
-    meta,
-  });
+        ...initialTableState,
+      },
+      defaultColumn: {
+        enableColumnFilter: false,
+        enableHiding: true,
+        sortingFn: 'alphanumeric',
+      },
+      ...getControlledSelectionState(onChangeSelectedItems, selectedItemIds),
+      enableRowSelection,
+      autoResetExpanded: false,
+      globalFilterFn,
+      getRowId,
+      getCoreRowModel: getCoreRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getFacetedRowModel: getFacetedRowModel(),
+      getFacetedUniqueValues: getFacetedUniqueValues(),
+      getFacetedMinMaxValues: getFacetedMinMaxValues(),
+      getExpandedRowModel: getExpandedRowModel(),
+      getRowCanExpand,
+      getColumnCanGlobalFilter,
+      ...(isServerSidePagination
+        ? { manualPagination: true, pageCount }
+        : {
+            getSortedRowModel: getSortedRowModel(),
+          }),
+      meta,
+    })
+  );
 
   const tableState = tableInstance.getState();
 
