@@ -2057,6 +2057,20 @@ const (
 	OperationIntegrationStoridgeAdmin         Authorization = "IntegrationStoridgeAdmin"
 )
 
+// GetEditionLabel returns the portainer edition label
+func (e SoftwareEdition) GetEditionLabel() string {
+	switch e {
+	case PortainerCE:
+		return "CE"
+	case PortainerBE:
+		return "BE"
+	case PortainerEE:
+		return "EE"
+	}
+
+	return "CE"
+}
+
 const (
 	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
 	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
