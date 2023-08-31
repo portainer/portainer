@@ -436,6 +436,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No TLS secrets available'}
                           size="sm"
+                          options={tlsOptions}
                         />
                         {!host.NoHost && (
                           <div className="input-group-btn">
