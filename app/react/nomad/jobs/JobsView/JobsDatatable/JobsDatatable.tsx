@@ -40,7 +40,7 @@ export function JobsDatatable({
       emptyContentLabel="No jobs found"
       renderSubRow={(row) => (
         <tr>
-          <td colSpan={6}>
+          <td colSpan={Number.MAX_SAFE_INTEGER}>
             <TasksDatatable data={row.original.Tasks} />
           </td>
         </tr>
