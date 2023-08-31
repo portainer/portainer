@@ -47,12 +47,7 @@ export type PaginationProps =
       onPageChange(page: number): void;
     };
 
-type DefaultGlobalFilter = { search: string };
-
-export interface Props<
-  D extends DefaultType,
-  TFilter extends DefaultGlobalFilter = DefaultGlobalFilter
-> extends AutomationTestingProps {
+export interface Props<D extends DefaultType> extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
@@ -71,14 +66,10 @@ export interface Props<
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
-  globalFilterFn?: typeof defaultGlobalFilterFn<D, TFilter>;
   extendTableOptions?: (options: TableOptions<D>) => TableOptions<D>;
 }
 
-export function Datatable<
-  D extends DefaultType,
-  TFilter extends DefaultGlobalFilter = DefaultGlobalFilter
->({
+export function Datatable<D extends DefaultType>({
   columns,
   dataset,
   renderTableSettings = () => null,
@@ -102,9 +93,8 @@ export function Datatable<
   page,
   totalCount = dataset.length,
   isServerSidePagination = false,
-  globalFilterFn = defaultGlobalFilterFn,
   extendTableOptions = (value) => value,
-}: Props<D, TFilter> & PaginationProps) {
+}: Props<D> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
     [settings.pageSize, totalCount]
@@ -144,7 +134,7 @@ export function Datatable<
       },
       enableRowSelection,
       autoResetExpanded: false,
-      globalFilterFn,
+      globalFilterFn: defaultGlobalFilterFn,
       getRowId,
       getCoreRowModel: getCoreRowModel(),
       getFilteredRowModel: getFilteredRowModel(),
