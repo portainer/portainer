@@ -13,7 +13,6 @@ import {
   getFacetedMinMaxValues,
   getExpandedRowModel,
   TableOptions,
-  TableMeta,
 } from '@tanstack/react-table';
 import { ReactNode, useMemo } from 'react';
 import clsx from 'clsx';
@@ -52,7 +51,6 @@ type DefaultGlobalFilter = { search: string };
 
 export interface Props<
   D extends DefaultType,
-  TMeta extends TableMeta<D> = TableMeta<D>,
   TFilter extends DefaultGlobalFilter = DefaultGlobalFilter
 > extends AutomationTestingProps {
   dataset: D[];
@@ -73,14 +71,12 @@ export interface Props<
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
-  meta?: TMeta;
   globalFilterFn?: typeof defaultGlobalFilterFn<D, TFilter>;
   extendTableOptions?: (options: TableOptions<D>) => TableOptions<D>;
 }
 
 export function Datatable<
   D extends DefaultType,
-  TMeta extends TableMeta<D> = TableMeta<D>,
   TFilter extends DefaultGlobalFilter = DefaultGlobalFilter
 >({
   columns,
@@ -102,14 +98,13 @@ export function Datatable<
   noWidget,
   getRowCanExpand,
   'data-cy': dataCy,
-  meta,
   onPageChange = () => {},
   page,
   totalCount = dataset.length,
   isServerSidePagination = false,
   globalFilterFn = defaultGlobalFilterFn,
   extendTableOptions = (value) => value,
-}: Props<D, TMeta, TFilter> & PaginationProps) {
+}: Props<D, TFilter> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
     [settings.pageSize, totalCount]
@@ -165,7 +160,6 @@ export function Datatable<
         : {
             getSortedRowModel: getSortedRowModel(),
           }),
-      meta,
     })
   );
 
