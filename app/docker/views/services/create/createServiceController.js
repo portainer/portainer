@@ -608,7 +608,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         volumes: VolumeService.volumes(),
         networks: NetworkService.networks(true, true, false),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-        configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
+        configs: apiVersion >= 1.3 ? ConfigService.configs(endpoint.Id) : [],
         nodes: NodeService.nodes(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
         allowBindMounts: checkIfAllowedBindMounts(),

@@ -3,11 +3,12 @@ import { confirmDelete } from '@@/modals/confirm';
 
 class ConfigsController {
   /* @ngInject */
-  constructor($state, ConfigService, Notifications, $async) {
+  constructor($state, ConfigService, Notifications, $async, endpoint) {
     this.$state = $state;
     this.ConfigService = ConfigService;
     this.Notifications = Notifications;
     this.$async = $async;
+    this.endpoint = endpoint;
 
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
@@ -21,7 +22,7 @@ class ConfigsController {
 
   async getConfigsAsync() {
     try {
-      this.configs = await this.ConfigService.configs();
+      this.configs = await this.ConfigService.configs(this.endpoint.Id);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve configs');
     }
@@ -44,7 +45,7 @@ class ConfigsController {
     let actionCount = selectedItems.length;
     for (const config of selectedItems) {
       try {
-        await this.ConfigService.remove(config.Id);
+        await this.ConfigService.remove(this.endpoint.Id, config.Id);
         this.Notifications.success('Config successfully removed', config.Name);
         const index = this.configs.indexOf(config);
         this.configs.splice(index, 1);

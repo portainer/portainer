@@ -717,7 +717,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             containers: agentProxy ? ContainerService.containers() : [],
             nodes: NodeService.nodes(),
             secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-            configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
+            configs: apiVersion >= 1.3 ? ConfigService.configs(endpoint.Id) : [],
             availableImages: ImageService.images(),
             availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
             availableNetworks: NetworkService.networks(true, true, apiVersion >= 1.25),
