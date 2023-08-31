@@ -8,7 +8,7 @@ import {
   getEnvironments,
 } from '../environment.service';
 
-import { queryKeys } from './query-keys';
+import { environmentQueryKeys } from './query-keys';
 
 export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
@@ -60,7 +60,7 @@ export function useEnvironmentList(
 ) {
   const { isLoading, data } = useQuery(
     [
-      ...queryKeys.base(),
+      ...environmentQueryKeys.base(),
       {
         page,
         pageLimit,

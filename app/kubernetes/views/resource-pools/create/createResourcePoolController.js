@@ -7,7 +7,7 @@ import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
+import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/useIngressControllerClassMap';
 
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -201,6 +201,7 @@ class KubernetesCreateResourcePoolController {
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
           this.ingressControllers = await getIngressControllerClassMap({ environmentId: this.endpoint.Id, allowedOnly: true });
+          this.initialIngressControllers = structuredClone(this.ingressControllers);
         }
 
         _.forEach(nodes, (item) => {

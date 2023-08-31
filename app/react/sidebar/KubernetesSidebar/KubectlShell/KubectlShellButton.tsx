@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { Terminal } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { ComponentProps } from 'react';
 import uuid from 'uuid';
+import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -24,6 +24,7 @@ export interface Props {
   dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
+  valueExplanation?: ReactNode;
 }
 
 export function SwitchField({
@@ -40,7 +41,8 @@ export function SwitchField({
   featureId,
   switchClass,
   setTooltipHtmlMessage,
-}: Props) {
+  valueExplanation,
+}: PropsWithChildren<Props>) {
   const toggleName = name ? `toggle_${name}` : '';
 
   return (
@@ -65,6 +67,7 @@ export function SwitchField({
         featureId={featureId}
         dataCy={dataCy}
       />
+      {valueExplanation && <span>{valueExplanation}</span>}
     </div>
   );
 }

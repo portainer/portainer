@@ -2,10 +2,10 @@ import { useQuery } from 'react-query';
 
 import { getAgentVersions } from '../environment.service';
 
-import { queryKeys } from './query-keys';
+import { environmentQueryKeys } from './query-keys';
 
 export function useAgentVersionsList() {
-  return useQuery([...queryKeys.base(), 'agentVersions'], () =>
+  return useQuery([...environmentQueryKeys.base(), 'agentVersions'], () =>
     getAgentVersions()
   );
 }

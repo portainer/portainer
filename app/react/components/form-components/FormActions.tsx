@@ -7,6 +7,7 @@ interface Props {
   loadingText: string;
   isLoading: boolean;
   isValid: boolean;
+  'data-cy'?: string;
 }
 
 export function FormActions({
@@ -15,6 +16,7 @@ export function FormActions({
   isLoading,
   children,
   isValid,
+  'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
     <div className="form-group">
@@ -24,6 +26,7 @@ export function FormActions({
           loadingText={loadingText}
           isLoading={isLoading}
           disabled={!isValid}
+          data-cy={dataCy}
         >
           {submitLabel}
         </LoadingButton>

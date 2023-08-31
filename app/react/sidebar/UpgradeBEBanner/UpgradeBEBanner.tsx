@@ -2,7 +2,7 @@ import { ArrowUpCircle } from 'lucide-react';
 import { useState } from 'react';
 import clsx from 'clsx';
 
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
 import {
   ContainerPlatform,
