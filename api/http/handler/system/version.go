@@ -20,6 +20,7 @@ type versionResponse struct {
 	LatestVersion string `json:"LatestVersion" example:"2.0.0"`
 
 	ServerVersion   string
+	ServerEdition   string `json:"ServerEdition" example:"CE/EE"`
 	DatabaseVersion string
 	Build           BuildInfo
 }
@@ -48,6 +49,7 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 	result := &versionResponse{
 		ServerVersion:   portainer.APIVersion,
 		DatabaseVersion: portainer.APIVersion,
+		ServerEdition:   portainer.Edition.GetEditionLabel(),
 		Build: BuildInfo{
 			BuildNumber:    build.BuildNumber,
 			ImageTag:       build.ImageTag,
