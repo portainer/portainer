@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge/cache"
+	"github.com/portainer/portainer/pkg/libcrypto"
 
 	"github.com/dchest/uniuri"
 )

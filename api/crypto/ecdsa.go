@@ -8,7 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 
-	"github.com/portainer/libcrypto"
+	"github.com/portainer/portainer/pkg/libcrypto"
 )
 
 const (
