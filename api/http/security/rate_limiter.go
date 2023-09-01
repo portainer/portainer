@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/g07cha/defender"
-	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/http/errors"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/g07cha/defender"
 )
 
 // RateLimiter represents an entity that manages request rate limiting

@@ -5,11 +5,11 @@ import (
 
 	"github.com/gorilla/mux"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 // Handler is the HTTP handler used to handle OpenAMT operations.

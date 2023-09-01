@@ -15,6 +15,8 @@ linters-settings:
     packages:
       - github.com/sirupsen/logrus
       - golang.org/x/exp
+      - github.com/portainer/libcrypto
+      - github.com/portainer/libhttp
     packages-with-error-message:
       - github.com/sirupsen/logrus: 'logging is allowed only by github.com/rs/zerolog'
     ignore-file-rules:
