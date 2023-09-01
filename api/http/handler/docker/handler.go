@@ -4,17 +4,17 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
-	"github.com/portainer/portainer/api/internal/endpointutils"
-
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/handler/docker/containers"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).

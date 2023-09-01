@@ -3,14 +3,15 @@ package registries
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/gorilla/mux"
 )
 
 func hideFields(registry *portainer.Registry, hideAccesses bool) {

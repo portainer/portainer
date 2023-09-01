@@ -1,11 +1,11 @@
 package upload
 
 import (
-	httperror "github.com/portainer/libhttp/error"
+	"net/http"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
-
-	"net/http"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
 )

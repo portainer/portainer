@@ -3,7 +3,7 @@ package registries
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 // request on /api/registries/proxies/gitlab

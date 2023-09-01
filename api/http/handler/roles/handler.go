@@ -3,10 +3,11 @@ package roles
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle role operations.

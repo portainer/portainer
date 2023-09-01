@@ -3,7 +3,7 @@ package errors
 import (
 	"errors"
 
-	httperror "github.com/portainer/libhttp/error"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 func TxResponse(err error, validResponse func() *httperror.HandlerError) *httperror.HandlerError {

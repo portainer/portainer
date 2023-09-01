@@ -1,7 +1,8 @@
 package endpoints
 
 import (
-	httperror "github.com/portainer/libhttp/error"
+	"net/http"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/demo"
@@ -9,8 +10,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
-
-	"net/http"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
 )

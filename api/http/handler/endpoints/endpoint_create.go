@@ -8,10 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gofrs/uuid"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/agent"
 	"github.com/portainer/portainer/api/crypto"
@@ -19,6 +15,11 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/gofrs/uuid"
 )
 
 type endpointCreatePayload struct {

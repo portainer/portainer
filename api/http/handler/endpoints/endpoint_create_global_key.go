@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type endpointCreateGlobalKeyResponse struct {

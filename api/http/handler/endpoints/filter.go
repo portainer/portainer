@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -16,6 +14,9 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/unique"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/pkg/errors"
 )
 
 type EnvironmentsQuery struct {

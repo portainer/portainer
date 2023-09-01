@@ -7,17 +7,17 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/kubernetes"
-
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).

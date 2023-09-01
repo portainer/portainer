@@ -2,17 +2,17 @@ package endpointedge
 
 import (
 	"errors"
+	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edge"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes"
-	"net/http"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @summary Inspect an Edge Stack for an Environment(Endpoint)

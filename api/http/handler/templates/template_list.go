@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 // introduced for swagger
