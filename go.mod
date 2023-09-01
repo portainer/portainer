@@ -1,4 +1,4 @@
-module github.com/portainer/portainer/api
+module github.com/portainer/portainer
 
 go 1.20
 
@@ -39,10 +39,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
 	github.com/portainer/libhttp v0.0.0-20230615144939-a999f666d9a9
-	github.com/portainer/portainer/pkg/featureflags v0.0.0-20230711022654-64b227b2e146
-	github.com/portainer/portainer/pkg/libhelm v0.0.0-20230711022654-64b227b2e146
-	github.com/portainer/portainer/pkg/libstack v0.0.0-20230711022654-64b227b2e146
-	github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.2
@@ -63,11 +59,11 @@ require (
 )
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
-	github.com/alecthomas/units v0.0.0-20210208195552-ff826a37aa15 // indirect
+	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.25 // indirect

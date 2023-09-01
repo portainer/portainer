@@ -1,6 +1,6 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 h1:UQHMgLO+TxOElx5B5HZ4hJQsoJ/PvUvKRhJHDQXO8P8=
-github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
+github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 h1:L/gRVlceqvL25UVaW/CKtUDjefjrs0SPonmDGUVOYP0=
+github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c h1:/IBSNwUN8+eKzUzbJPqhK839ygXJ82sde8x3ogr6R28=
 github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c/go.mod h1:chxPXzSsl7ZWRAuOIE23GDNzjWuZquvFlgA8xmpunjU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
@@ -18,8 +18,8 @@ github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7 h1:uSoVVbwJiQipAclBb
 github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7/go.mod h1:6zEj6s6u/ghQa61ZWa/C2Aw3RkjiTBOix7dkqa1VLIs=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 h1:JYp7IbQjafoB+tBA3gMyHYHrpOtNuDiK/uB5uXxq5wM=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
-github.com/alecthomas/units v0.0.0-20210208195552-ff826a37aa15 h1:AUNCr9CiJuwrRYS3XieqF+Z9B9gNxo/eANAJCF2eiN4=
-github.com/alecthomas/units v0.0.0-20210208195552-ff826a37aa15/go.mod h1:OMCwj8VM1Kc9e19TLln2VL61YJF0x1XFtfdL4JdbSyE=
+github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 h1:s6gZFSlWYmbqAuRjVTiNNhvNRfY2Wxp9nhfyel4rklc=
+github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137/go.mod h1:OMCwj8VM1Kc9e19TLln2VL61YJF0x1XFtfdL4JdbSyE=
 github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156 h1:eMwmnE/GDgah4HI848JfFxHt+iPb26b4zyfspmqY0/8=
 github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
 github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2 h1:axBiC50cNZOs7ygH5BgQp4N+aYrZ2DNpWZ1KG3VOSOM=
@@ -315,14 +315,6 @@ github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a h1:B0z3skIMT+O
 github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a/go.mod h1:n54EEIq+MM0NNtqLeCby8ljL+l275VpolXO0ibHegLE=
 github.com/portainer/libhttp v0.0.0-20230615144939-a999f666d9a9 h1:Jq8g/pDcFL1Z/DnZgn6DyaWu29y9+RiB5aOJ/Xw4960=
 github.com/portainer/libhttp v0.0.0-20230615144939-a999f666d9a9/go.mod h1:H49JLiywwLt2rrJVroafEWy8fIs0i7mThAThK40sbb8=
-github.com/portainer/portainer/pkg/featureflags v0.0.0-20230711022654-64b227b2e146 h1:8JVXjyFhGgSogKGOddnOROZxBEeWNvvo3EPT9uIJ2Xo=
-github.com/portainer/portainer/pkg/featureflags v0.0.0-20230711022654-64b227b2e146/go.mod h1:x4Lpq/BjFhZmuNB8e8FO0ObRPQ/Z/V9rTe54bMedf1A=
-github.com/portainer/portainer/pkg/libhelm v0.0.0-20230711022654-64b227b2e146 h1:1qW7quKyFG4tOnMcnnqyYsDVfL09etO1h/Cu/3ak7KU=
-github.com/portainer/portainer/pkg/libhelm v0.0.0-20230711022654-64b227b2e146/go.mod h1:cFRD6PvOwpd2pf/O1r/IMKl+ZB12pWfo/Evleh3aCfM=
-github.com/portainer/portainer/pkg/libstack v0.0.0-20230711022654-64b227b2e146 h1:ZGj+j5HoajaO+mXgCm6NzOU+zUdIlJK2amagB+QIDvc=
-github.com/portainer/portainer/pkg/libstack v0.0.0-20230711022654-64b227b2e146/go.mod h1:+zCK2UbsH6A3yEGi0yZ45ec5VFRP7svob5Q2lW6LFgk=
-github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73 h1:7bPOnwucE0nor0so1BQJxQKCL5t+vCWO4nAz/S0lci0=
-github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73/go.mod h1:E2w/A6qsKuG2VyiUubPdXpDyPykWfQqxuCs0YNS0MhM=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
 github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
 github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
