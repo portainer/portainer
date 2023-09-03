@@ -7,16 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Docker or Swarm / Volumes',
-    docURL: '/user/docker/volumes',
-    locationRegex: /#!\/\d+\/docker\/volumes/,
-    examples: [
-      '#!/10/docker/volumes',
-      '#!/10/docker/volumes/new',
-      '#!/10/docker/volumes/153b46162f5bab9a7c9d2c8e1675115fcedd4c0ccdf5834159400750fa6b794c',
-    ],
-  },
-  {
     desc: 'Swarm / Configs',
     docURL: '/user/docker/configs',
     locationRegex: /#!\/\d+\/docker\/configs/,

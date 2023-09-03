@@ -496,6 +496,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'VolumesController',
         },
       },
+      data: {
+        docs: '/user/docker/volumes',
+      },
     };
 
     var volume = {
