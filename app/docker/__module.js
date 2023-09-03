@@ -308,6 +308,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'SecretsController',
         },
       },
+      data: {
+        docs: '/user/docker/secrets',
+      },
     };
 
     var secret = {

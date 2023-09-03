@@ -7,16 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Swarm / Secrets',
-    docURL: '/user/docker/secrets',
-    locationRegex: /#!\/\d+\/docker\/secrets/,
-    examples: [
-      '#!/10/docker/secrets',
-      '#!/10/docker/secrets/new',
-      '#!/10/docker/secrets/tsoeeh7ln7g54g5qkk67eg4xe',
-    ],
-  },
-  {
     desc: 'Docker or Swarm / Swarm / Cluster visualizer',
     docURL: '/user/docker/swarm/cluster-visualizer',
     locationRegex: /#!\/\d+\/docker\/swarm\/visualizer/,
