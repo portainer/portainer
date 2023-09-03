@@ -244,6 +244,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'NetworksController',
         },
       },
+      data: {
+        docs: '/user/docker/networks',
+      },
     };
 
     var network = {
