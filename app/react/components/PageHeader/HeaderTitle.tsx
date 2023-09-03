@@ -1,4 +1,4 @@
-import { ComponentProps, PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { ContextHelp } from '@@/PageHeader/ContextHelp';
 
@@ -8,14 +8,9 @@ import { UserMenu } from './UserMenu';
 
 interface Props {
   title: string;
-  docsUrl?: ComponentProps<typeof ContextHelp>['url'];
 }
 
-export function HeaderTitle({
-  title,
-  docsUrl,
-  children,
-}: PropsWithChildren<Props>) {
+export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
   useHeaderContext();
 
   return (
@@ -28,7 +23,7 @@ export function HeaderTitle({
       </div>
       <div className="flex items-end">
         <NotificationsMenu />
-        <ContextHelp url={docsUrl} />
+        <ContextHelp />
         {!window.ddExtension && <UserMenu />}
       </div>
     </div>

@@ -5,16 +5,9 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import headerStyles from '../HeaderTitle.module.css';
 import './ContextHelp.css';
 
-export function ContextHelp({
-  url = '',
-}: {
-  /** relative url to https://docs.portainer.io/ */
-  url?: string;
-}) {
-  const {
-    state: { data },
-  } = useCurrentStateAndParams();
-  const docsUrl = url || getDocsUrl(data);
+export function ContextHelp() {
+  const docsUrl = useDocsUrl();
+
   return (
     <div className={headerStyles.menuButton}>
       <a
@@ -37,7 +30,14 @@ export function ContextHelp({
   );
 }
 
-function getDocsUrl(data: unknown) {
+function useDocsUrl(): string {
+  const { state } = useCurrentStateAndParams();
+
+  if (!state) {
+    return '';
+  }
+
+  const { data } = state;
   if (
     data &&
     typeof data === 'object' &&
@@ -47,5 +47,5 @@ function getDocsUrl(data: unknown) {
     return data.docs;
   }
 
-  return undefined;
+  return '';
 }

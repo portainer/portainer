@@ -1,6 +1,6 @@
 import { useRouter } from '@uirouter/react';
 import { RefreshCw } from 'lucide-react';
-import { ComponentProps, PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { Button } from '../buttons';
 
@@ -16,7 +16,6 @@ interface Props {
   onReload?(): Promise<void> | void;
   breadcrumbs?: (Crumb | string)[] | string;
   title: string;
-  docsUrl?: ComponentProps<typeof HeaderTitle>['docsUrl'];
 }
 
 export function PageHeader({
@@ -26,7 +25,6 @@ export function PageHeader({
   reload,
   loading,
   onReload,
-  docsUrl,
   children,
 }: PropsWithChildren<Props>) {
   const router = useRouter();
@@ -35,7 +33,7 @@ export function PageHeader({
     <HeaderContainer id={id}>
       <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-      <HeaderTitle title={title} docsUrl={docsUrl}>
+      <HeaderTitle title={title}>
         {reload && (
           <Button
             color="none"
