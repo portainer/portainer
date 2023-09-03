@@ -306,6 +306,9 @@ angular
             component: 'homeView',
           },
         },
+        data: {
+          docs: '/user/home',
+        },
       };
 
       var init = {
