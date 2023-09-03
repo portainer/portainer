@@ -112,6 +112,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           component: 'customTemplatesView',
         },
       },
+      data: {
+        docs: '/user/docker/templates/custom',
+      },
     };
 
     const customTemplatesNew = {
