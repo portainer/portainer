@@ -332,6 +332,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'ServicesController',
         },
       },
+      data: {
+        docs: '/user/docker/services',
+      },
     };
 
     var service = {

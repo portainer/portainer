@@ -7,18 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Swarm / Services',
-    docURL: '/user/docker/services',
-    locationRegex: /#!\/\d+\/docker\/(services|tasks)/,
-    examples: [
-      '#!/10/docker/services',
-      '#!/10/docker/services/zqp46vzoz5nnf39m6c518nlt8',
-      '#!/10/docker/services/zqp46vzoz5nnf39m6c518nlt8/logs',
-      '#!/10/docker/tasks/yyll0peo7ack4uaw2wom3nxso',
-      '#!/10/docker/tasks/yyll0peo7ack4uaw2wom3nxso/logs',
-    ],
-  },
-  {
     desc: 'Docker or Swarm / Containers',
     docURL: '/user/docker/containers',
     locationRegex: /#!\/\d+\/docker\/containers/,
