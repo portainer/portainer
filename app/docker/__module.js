@@ -376,6 +376,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'StacksController',
         },
       },
+      data: {
+        docs: '/user/docker/stacks',
+      },
     };
 
     var stack = {
@@ -469,6 +472,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: '~Portainer/views/templates/templates.html',
           controller: 'TemplatesController',
         },
+      },
+      data: {
+        docs: '/user/docker/templates',
       },
     };
 
