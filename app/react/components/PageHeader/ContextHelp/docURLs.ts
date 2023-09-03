@@ -7,16 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Docker or Swarm / Images',
-    docURL: '/user/docker/images',
-    locationRegex: /#!\/\d+\/docker\/images/,
-    examples: [
-      '#!/10/docker/images',
-      '#!/10/docker/images/build',
-      '#!/10/docker/images/sha256:feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412',
-    ],
-  },
-  {
     desc: 'Docker or Swarm / Networks',
     docURL: '/user/docker/networks',
     locationRegex: /#!\/\d+\/docker\/networks/,

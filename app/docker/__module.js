@@ -197,6 +197,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'ImagesController',
         },
       },
+      data: {
+        docs: '/user/docker/images',
+      },
     };
 
     var image = {
