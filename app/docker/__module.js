@@ -149,6 +149,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'DashboardController',
         },
       },
+      data: {
+        docs: '/user/docker/dashboard',
+      },
     };
 
     var host = {

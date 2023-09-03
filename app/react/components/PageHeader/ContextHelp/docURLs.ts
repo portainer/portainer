@@ -7,12 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Docker or Swarm / Dashboard',
-    docURL: '/user/docker/dashboard',
-    locationRegex: /#!\/\d+\/docker\/dashboard/,
-    examples: ['#!/10/docker/dashboard'],
-  },
-  {
     desc: 'Docker or Swarm / Custom Templates',
     docURL: '/user/docker/templates/custom',
     locationRegex: /#!\/\d+\/docker\/templates\/custom/,
