@@ -78,6 +78,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controllerAs: 'ctrl',
         },
       },
+      data: {
+        docs: '/user/docker/configs',
+      },
     };
 
     var config = {
