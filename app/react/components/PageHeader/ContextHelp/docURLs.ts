@@ -7,20 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Docker or Swarm / Containers',
-    docURL: '/user/docker/containers',
-    locationRegex: /#!\/\d+\/docker\/containers/,
-    examples: [
-      '#!/10/docker/containers',
-      '#!/10/docker/containers/new',
-      '#!/10/docker/containers/new?from=49ff4ae03d10c57fe375f6968c48a6169a9852a6bfbb5137cd30c615d58188c1',
-      '#!/10/docker/containers/49ff4ae03d10c57fe375f6968c48a6169a9852a6bfbb5137cd30c615d58188c1',
-      '#!/10/docker/containers/49ff4ae03d10c57fe375f6968c48a6169a9852a6bfbb5137cd30c615d58188c1/logs',
-      '#!/10/docker/containers/49ff4ae03d10c57fe375f6968c48a6169a9852a6bfbb5137cd30c615d58188c1/inspect',
-      '#!/10/docker/containers/49ff4ae03d10c57fe375f6968c48a6169a9852a6bfbb5137cd30c615d58188c1/stats',
-    ],
-  },
-  {
     desc: 'Docker or Swarm / Images',
     docURL: '/user/docker/images',
     locationRegex: /#!\/\d+\/docker\/images/,
