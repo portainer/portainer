@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -77,6 +78,9 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 			)
 		}
 	}
+
+	// Run the pending actions
+	utils.RunPendingActions(endpoint, handler.DataStore, handler.AuthorizationService)
 
 	return response.JSON(w, endpoint)
 }
