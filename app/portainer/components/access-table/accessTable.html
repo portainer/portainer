@@ -52,7 +52,7 @@
       <tr
         ng-if="
           $ctrl.dataset.length === 0 ||
-          ($ctrl.dataset | filter : $ctrl.state.textFilter | orderBy : $ctrl.state.orderBy : $ctrl.state.reverseOrder | itemsPerPage : $ctrl.state.paginatedItemLimit).length === 0
+          ($ctrl.dataset | filter: $ctrl.state.textFilter | orderBy: $ctrl.state.orderBy : $ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit).length === 0
         "
       >
         <td colspan="2" class="text-muted text-center">{{ $ctrl.emptyDatasetMessage }}</td>

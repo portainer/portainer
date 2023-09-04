@@ -57,7 +57,7 @@ function CreateView() {
       />
 
       <BetaAlert
-        className="ml-[15px] mb-2"
+        className="mb-2 ml-[15px]"
         message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
       />
 

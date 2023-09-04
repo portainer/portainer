@@ -133,7 +133,7 @@
 
             <div
               ng-if="!ctrl.isRBACEnabled"
-              class="small mt-1 mb-6 flex w-full gap-1 rounded-lg border border-solid border-warning-5 bg-warning-2 p-4 text-warning-8 th-highcontrast:bg-yellow-11 th-highcontrast:text-white th-dark:bg-yellow-11 th-dark:text-white"
+              class="small mb-6 mt-1 flex w-full gap-1 rounded-lg border border-solid border-warning-5 bg-warning-2 p-4 text-warning-8 th-highcontrast:bg-yellow-11 th-highcontrast:text-white th-dark:bg-yellow-11 th-dark:text-white"
             >
               <div class="mt-0.5">
                 <pr-icon icon="'alert-triangle'" feather="true" class-name="'text-warning-7 th-dark:text-white th-highcontrast:text-white'"></pr-icon>
@@ -281,7 +281,7 @@
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
                         <div class="flex h-full flex-row items-center">
-                          <label class="switch mr-2 mb-0">
+                          <label class="switch mb-0 mr-2">
                             <input type="checkbox" ng-model="class.selected" /><span class="slider round" data-cy="kubeSetup-storageToggle{{ class.Name }}"></span>
                           </label>
                           <span>{{ class.Name }}</span>
@@ -297,7 +297,7 @@
                       </td>
                       <td>
                         <div class="flex h-full flex-row items-center">
-                          <label class="switch mr-2 mb-0"
+                          <label class="switch mb-0 mr-2"
                             ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><span
                               class="slider round"
                               data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}"

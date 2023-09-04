@@ -78,7 +78,7 @@ export function withControlledInput<T>(
   // extract keys of values that will be updated outside of React lifecycle and their handler functions
   const keysToControl = Object.entries(controlledValueOnChangePairs) as [
     keyof T,
-    keyof T
+    keyof T,
   ][];
 
   function WrapperComponent(props: T) {
@@ -99,7 +99,7 @@ export function withControlledInput<T>(
             (value: T[keyof T]) => {
               // update the state with the value coming from WrappedComponent
               setControlledValues(
-                (c) => ({ ...c, [valueKey]: value } as KeyRecord<T>)
+                (c) => ({ ...c, [valueKey]: value }) as KeyRecord<T>
               );
 
               // call the bound handler func to update the value outside of React

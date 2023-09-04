@@ -5,8 +5,11 @@
 @font-face {
   font-family: 'nomad-icon';
   src: url('nomad-icon/nomad-icon.eot?6tre2n');
-  src: url('nomad-icon/nomad-icon.eot?6tre2n#iefix') format('embedded-opentype'), url('nomad-icon/nomad-icon.ttf?6tre2n') format('truetype'),
-    url('nomad-icon/nomad-icon.woff?6tre2n') format('woff'), url('nomad-icon/nomad-icon.svg?6tre2n#nomad-icon') format('svg');
+  src:
+    url('nomad-icon/nomad-icon.eot?6tre2n#iefix') format('embedded-opentype'),
+    url('nomad-icon/nomad-icon.ttf?6tre2n') format('truetype'),
+    url('nomad-icon/nomad-icon.woff?6tre2n') format('woff'),
+    url('nomad-icon/nomad-icon.svg?6tre2n#nomad-icon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;

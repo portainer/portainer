@@ -30,7 +30,7 @@ export function PublishingExplaination() {
             ingresses
           </a>
           :
-          <ul className="mt-3 ml-5 [&>li]:mb-3 [&>li>ul>li]:ml-5">
+          <ul className="ml-5 mt-3 [&>li>ul>li]:ml-5 [&>li]:mb-3">
             <li>
               <b>Inside</b> the cluster{' '}
               <b>

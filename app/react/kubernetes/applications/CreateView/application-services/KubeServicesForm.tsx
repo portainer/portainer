@@ -196,14 +196,17 @@ function getUniqNames(appName: string, services: ServiceFormValues[]) {
 function getServiceTypeCounts(
   services: ServiceFormValues[]
 ): Record<ServiceTypeValue, number> {
-  return services.reduce((acc, service) => {
-    const type = serviceTypeEnumsToValues[service.Type];
-    const count = acc[type];
-    return {
-      ...acc,
-      [type]: count ? count + 1 : 1,
-    };
-  }, {} as Record<ServiceTypeValue, number>);
+  return services.reduce(
+    (acc, service) => {
+      const type = serviceTypeEnumsToValues[service.Type];
+      const count = acc[type];
+      return {
+        ...acc,
+        [type]: count ? count + 1 : 1,
+      };
+    },
+    {} as Record<ServiceTypeValue, number>
+  );
 }
 
 /**
@@ -213,15 +216,18 @@ function getServiceTypeHasErrors(
   services: ServiceFormValues[],
   errors: FormikErrors<ServiceFormValues[] | undefined>
 ): Record<ServiceTypeValue, boolean> {
-  return services.reduce((acc, service, index) => {
-    const type = serviceTypeEnumsToValues[service.Type];
-    const serviceHasErrors = !!errors?.[index];
-    // if the service type already has an error, don't overwrite it
-    if (acc[type] === true) return acc;
-    // otherwise, set the error to the value of serviceHasErrors
-    return {
-      ...acc,
-      [type]: serviceHasErrors,
-    };
-  }, {} as Record<ServiceTypeValue, boolean>);
+  return services.reduce(
+    (acc, service, index) => {
+      const type = serviceTypeEnumsToValues[service.Type];
+      const serviceHasErrors = !!errors?.[index];
+      // if the service type already has an error, don't overwrite it
+      if (acc[type] === true) return acc;
+      // otherwise, set the error to the value of serviceHasErrors
+      return {
+        ...acc,
+        [type]: serviceHasErrors,
+      };
+    },
+    {} as Record<ServiceTypeValue, boolean>
+  );
 }

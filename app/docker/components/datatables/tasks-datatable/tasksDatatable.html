@@ -105,7 +105,7 @@
                 ></container-quick-actions>
               </td>
               <td ng-if="$ctrl.showSlotColumn">{{ item.Slot ? item.Slot : '-' }}</td>
-              <td>{{ item.NodeId | tasknodename : $ctrl.nodes }}</td>
+              <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
               <td>{{ item.Updated | getisodate }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

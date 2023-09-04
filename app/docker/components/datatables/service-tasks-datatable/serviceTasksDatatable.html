@@ -98,7 +98,7 @@
           ></container-quick-actions>
         </td>
         <td>{{ item.Slot ? item.Slot : '-' }}</td>
-        <td>{{ item.NodeId | tasknodename : $ctrl.nodes }}</td>
+        <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
         <td>{{ item.Updated | getisodate }}</td>
       </tr>
       <tr ng-if="$ctrl.state.filteredDataSet.length === 0">

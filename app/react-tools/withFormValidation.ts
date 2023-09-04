@@ -70,9 +70,9 @@ export function createFormValidationComponent<TFormModel, TData = never>(
   return {
     template: `<ng-form name="$ctrl.form">
       <${kebabName} ${propsWithErrors
-      .filter((p) => p !== 'onChange')
-      .map((p) => `${_.kebabCase(p)}="$ctrl.${p}"`)
-      .join(' ')}
+        .filter((p) => p !== 'onChange')
+        .map((p) => `${_.kebabCase(p)}="$ctrl.${p}"`)
+        .join(' ')}
         on-change="($ctrl.handleChange)"
       ></${kebabName}>
     </ng-form>`,

@@ -19,7 +19,7 @@ interface DefaultOption {
 type RegularProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > = { isCreatable?: false; size?: 'sm' | 'md' } & ReactSelectProps<
   Option,
   IsMulti,
@@ -30,7 +30,7 @@ type RegularProps<
 type CreatableProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > = { isCreatable: true; size?: 'sm' | 'md' } & ReactSelectCreatableProps<
   Option,
   IsMulti,
@@ -40,7 +40,7 @@ type CreatableProps<
 type Props<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > =
   | CreatableProps<Option, IsMulti, Group>
   | RegularProps<Option, IsMulti, Group>;
@@ -48,7 +48,7 @@ type Props<
 export function Select<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({
   className,
   isCreatable = false,
@@ -70,7 +70,7 @@ export function Select<
 export function Creatable<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({ className, ...props }: ReactSelectCreatableProps<Option, IsMulti, Group>) {
   return (
     <ReactSelectCreatable

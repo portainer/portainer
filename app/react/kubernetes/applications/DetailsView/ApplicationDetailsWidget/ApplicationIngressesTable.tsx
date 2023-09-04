@@ -97,15 +97,16 @@ function getIngressPathsForAppServices(
     if (!ingress.Paths) {
       return [];
     }
-    const matchingIngressPaths = ingress.Paths?.filter((path) =>
-      services?.some((service) => {
-        const servicePorts = service.spec?.ports?.map((port) => port.port);
-        // include the ingress if the ingress path has a matching service name and port
-        return (
-          path.ServiceName === service.metadata?.name &&
-          servicePorts?.includes(path.Port)
-        );
-      })
+    const matchingIngressPaths = ingress.Paths?.filter(
+      (path) =>
+        services?.some((service) => {
+          const servicePorts = service.spec?.ports?.map((port) => port.port);
+          // include the ingress if the ingress path has a matching service name and port
+          return (
+            path.ServiceName === service.metadata?.name &&
+            servicePorts?.includes(path.Port)
+          );
+        })
     ).map((path) => {
       const secure =
         (ingress.TLS &&

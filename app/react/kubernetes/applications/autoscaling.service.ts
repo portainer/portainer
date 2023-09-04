@@ -12,7 +12,7 @@ import { parseKubernetesAxiosError } from '../axiosError';
 
 // when yaml is set to true, the expected return type is a string
 export function useHorizontalAutoScalarQuery<
-  T extends HorizontalPodAutoscaler | string = HorizontalPodAutoscaler
+  T extends HorizontalPodAutoscaler | string = HorizontalPodAutoscaler,
 >(
   environmentId: EnvironmentId,
   namespace: string,
@@ -62,7 +62,7 @@ export async function getNamespaceHorizontalPodAutoscalers(
 }
 
 export async function getNamespaceHorizontalPodAutoscaler<
-  T extends HorizontalPodAutoscaler | string = HorizontalPodAutoscaler
+  T extends HorizontalPodAutoscaler | string = HorizontalPodAutoscaler,
 >(
   environmentId: EnvironmentId,
   namespace: string,

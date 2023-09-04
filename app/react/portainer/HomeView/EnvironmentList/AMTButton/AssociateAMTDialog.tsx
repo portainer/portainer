@@ -63,7 +63,7 @@ export function AssociateAMTDialog({
             {environments.map((env) => (
               <div
                 key={env.Id}
-                className={clsx('flex h-8 items-center pt-1 pl-2')}
+                className={clsx('flex h-8 items-center pl-2 pt-1')}
               >
                 <Checkbox
                   id={`${env.Id}`}

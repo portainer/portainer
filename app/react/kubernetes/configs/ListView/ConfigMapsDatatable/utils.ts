@@ -14,11 +14,12 @@ export function getIsConfigMapInUse(
       ? app?.spec
       : app?.spec?.template?.spec;
 
-    const hasEnvVarReference = appSpec?.containers.some((container) =>
-      container.env?.some(
-        (envVar) =>
-          envVar.valueFrom?.configMapKeyRef?.name === configMap.metadata?.name
-      )
+    const hasEnvVarReference = appSpec?.containers.some(
+      (container) =>
+        container.env?.some(
+          (envVar) =>
+            envVar.valueFrom?.configMapKeyRef?.name === configMap.metadata?.name
+        )
     );
     const hasVolumeReference = appSpec?.volumes?.some(
       (volume) => volume.configMap?.name === configMap.metadata?.name

@@ -92,7 +92,7 @@
             <div class="col-sm-12">
               <button
                 ng-if="!$ctrl.state.showCustomValues && !$ctrl.state.loadingValues"
-                class="btn btn-xs btn-default vertical-center mr-2 !ml-0"
+                class="btn btn-xs btn-default vertical-center !ml-0 mr-2"
                 ng-click="$ctrl.state.showCustomValues = true;"
               >
                 <pr-icon icon="'plus'" class="vertical-center"></pr-icon>
@@ -102,7 +102,7 @@
                 <pr-icon icon="'refresh-cw'" class="mr-1"></pr-icon>
                 Loading values.yaml...
               </span>
-              <button ng-if="$ctrl.state.showCustomValues" class="btn btn-xs btn-default vertical-center mr-2 !ml-0" ng-click="$ctrl.state.showCustomValues = false;">
+              <button ng-if="$ctrl.state.showCustomValues" class="btn btn-xs btn-default vertical-center !ml-0 mr-2" ng-click="$ctrl.state.showCustomValues = false;">
                 <pr-icon icon="'minus'" class="vertical-center"></pr-icon>
                 Hide custom values
               </button>

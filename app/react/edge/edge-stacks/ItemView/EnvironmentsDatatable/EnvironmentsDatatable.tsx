@@ -67,7 +67,7 @@ export function EnvironmentsDatatable() {
               env.Id,
               edgeStackQuery.data?.Status[env.Id]
             ),
-          } satisfies EdgeStackEnvironment)
+          }) satisfies EdgeStackEnvironment
       ),
     [
       currentFileVersion,
