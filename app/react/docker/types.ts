@@ -8,3 +8,7 @@ export interface PortainerMetadata {
   ResourceControl?: ResourceControlResponse;
   Agent?: AgentMetadata;
 }
+
+export type PortainerResponse<T> = T & {
+  Portainer?: PortainerMetadata;
+};

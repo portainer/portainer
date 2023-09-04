@@ -8,7 +8,7 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 
 export const containersModule = angular
-  .module('portainer.docker.containers', [])
+  .module('portainer.docker.react.views.containers', [])
   .component(
     'containersView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ListView))), ['endpoint'])

@@ -7,9 +7,10 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { buildConfirmButton } from '@@/modals/utils';
 
-import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
-import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
-import { ContainerDetailsViewModel } from '../../../models/container';
+import { commandsTabUtils } from '@/react/docker/containers/CreateView/CommandsTab';
+import { ContainerCapabilities, ContainerCapability } from '@/docker/models/containerCapabilities';
+import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
+import { ContainerDetailsViewModel } from '@/docker/models/container';
 
 import './createcontainer.css';
 
@@ -20,11 +21,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   '$state',
   '$timeout',
   '$transition$',
-  '$filter',
   '$analytics',
   'Container',
   'ContainerHelper',
-  'Image',
   'ImageHelper',
   'Volume',
   'NetworkService',
@@ -37,7 +36,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'RegistryService',
   'SystemService',
   'SettingsService',
-  'PluginService',
   'HttpRequestHelper',
   'endpoint',
   function (
@@ -47,11 +45,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $state,
     $timeout,
     $transition$,
-    $filter,
     $analytics,
     Container,
     ContainerHelper,
-    Image,
     ImageHelper,
     Volume,
     NetworkService,
@@ -64,7 +60,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     RegistryService,
     SystemService,
     SettingsService,
-    PluginService,
     HttpRequestHelper,
     endpoint
   ) {
@@ -80,7 +75,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         selectedGPUs: ['all'],
         capabilities: ['compute', 'utility'],
       },
-      Console: 'none',
       Volumes: [],
       NetworkContainer: null,
       Labels: [],
@@ -95,15 +89,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       MemoryLimit: 0,
       MemoryReservation: 0,
       ShmSize: 64,
-      CmdMode: 'default',
-      EntrypointMode: 'default',
       Env: [],
       NodeName: null,
       capabilities: [],
       Sysctls: [],
-      LogDriverName: '',
-      LogDriverOpts: [],
       RegistryModel: new PorImageRegistryModel(),
+      commands: commandsTabUtils.getDefaultViewModel(),
     };
 
     $scope.extraNetworks = {};
@@ -114,6 +105,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       mode: '',
       pullImageValidity: true,
       settingUnlimitedResources: false,
+      containerIsLoaded: false,
     };
 
     $scope.onAlwaysPullChange = onAlwaysPullChange;
@@ -121,6 +113,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.handleAutoRemoveChange = handleAutoRemoveChange;
     $scope.handlePrivilegedChange = handlePrivilegedChange;
     $scope.handleInitChange = handleInitChange;
+    $scope.handleCommandsChange = handleCommandsChange;
+
+    function handleCommandsChange(commands) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.commands = commands;
+      });
+    }
 
     function onAlwaysPullChange(checked) {
       return $scope.$evalAsync(() => {
@@ -179,10 +178,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.config = {
       Image: '',
       Env: [],
-      Cmd: '',
+      Cmd: null,
       MacAddress: '',
       ExposedPorts: {},
-      Entrypoint: '',
+      Entrypoint: null,
+      WorkingDir: '',
+      User: '',
       HostConfig: {
         RestartPolicy: {
           Name: 'no',
@@ -201,6 +202,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         CapAdd: [],
         CapDrop: [],
         Sysctls: {},
+        LogConfig: {
+          Type: '',
+          Config: {},
+        },
       },
       NetworkingConfig: {
         EndpointsConfig: {},
@@ -262,14 +267,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $scope.formValues.Sysctls.splice(index, 1);
     };
 
-    $scope.addLogDriverOpt = function () {
-      $scope.formValues.LogDriverOpts.push({ name: '', value: '' });
-    };
-
-    $scope.removeLogDriverOpt = function (index) {
-      $scope.formValues.LogDriverOpts.splice(index, 1);
-    };
-
     $scope.fromContainerMultipleNetworks = false;
 
     function prepareImageConfig(config) {
@@ -282,36 +279,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       config.ExposedPorts = {};
       _.forEach(bindings, (_, key) => (config.ExposedPorts[key] = {}));
       config.HostConfig.PortBindings = bindings;
-    }
-
-    function prepareConsole(config) {
-      var value = $scope.formValues.Console;
-      var openStdin = true;
-      var tty = true;
-      if (value === 'tty') {
-        openStdin = false;
-      } else if (value === 'interactive') {
-        tty = false;
-      } else if (value === 'none') {
-        openStdin = false;
-        tty = false;
-      }
-      config.OpenStdin = openStdin;
-      config.Tty = tty;
-    }
-
-    function prepareCmd(config) {
-      if (_.isEmpty(config.Cmd) || $scope.formValues.CmdMode == 'default') {
-        delete config.Cmd;
-      } else {
-        config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
-      }
-    }
-
-    function prepareEntrypoint(config) {
-      if ($scope.formValues.EntrypointMode == 'default' || (_.isEmpty(config.Cmd) && _.isEmpty(config.Entrypoint))) {
-        config.Entrypoint = null;
-      }
     }
 
     function prepareEnvironmentVariables(config) {
@@ -447,23 +414,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
     }
 
-    function prepareLogDriver(config) {
-      var logOpts = {};
-      if ($scope.formValues.LogDriverName) {
-        config.HostConfig.LogConfig = { Type: $scope.formValues.LogDriverName };
-        if ($scope.formValues.LogDriverName !== 'none') {
-          $scope.formValues.LogDriverOpts.forEach(function (opt) {
-            if (opt.name) {
-              logOpts[opt.name] = opt.value;
-            }
-          });
-          if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
-            config.HostConfig.LogConfig.Config = logOpts;
-          }
-        }
-      }
-    }
-
     function prepareCapabilities(config) {
       var allowed = $scope.formValues.capabilities.filter(function (item) {
         return item.allowed === true;
@@ -511,38 +461,20 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareConfiguration() {
       var config = angular.copy($scope.config);
-      prepareCmd(config);
-      prepareEntrypoint(config);
+      config = commandsTabUtils.toRequest(config, $scope.formValues.commands);
+
       prepareNetworkConfig(config);
       prepareImageConfig(config);
       preparePortBindings(config);
-      prepareConsole(config);
       prepareEnvironmentVariables(config);
       prepareVolumes(config);
       prepareLabels(config);
       prepareDevices(config);
       prepareResources(config);
-      prepareLogDriver(config);
       prepareCapabilities(config);
       prepareSysctls(config);
       prepareGPUOptions(config);
       return config;
-    }
-
-    function loadFromContainerCmd() {
-      if ($scope.config.Cmd) {
-        $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
-        $scope.formValues.CmdMode = 'override';
-      }
-    }
-
-    function loadFromContainerEntrypoint() {
-      if (_.has($scope.config, 'Entrypoint')) {
-        if ($scope.config.Entrypoint == null) {
-          $scope.config.Entrypoint = '';
-        }
-        $scope.formValues.EntrypointMode = 'override';
-      }
     }
 
     function loadFromContainerPortBindings() {
@@ -638,18 +570,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         if ({}.hasOwnProperty.call($scope.config.Labels, l)) {
           $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l] });
         }
-      }
-    }
-
-    function loadFromContainerConsole() {
-      if ($scope.config.OpenStdin && $scope.config.Tty) {
-        $scope.formValues.Console = 'both';
-      } else if (!$scope.config.OpenStdin && $scope.config.Tty) {
-        $scope.formValues.Console = 'tty';
-      } else if ($scope.config.OpenStdin && !$scope.config.Tty) {
-        $scope.formValues.Console = 'interactive';
-      } else if (!$scope.config.OpenStdin && !$scope.config.Tty) {
-        $scope.formValues.Console = 'none';
       }
     }
 
@@ -765,15 +685,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.fromContainer = fromContainer;
           $scope.state.mode = 'duplicate';
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
-          loadFromContainerCmd(d);
-          loadFromContainerEntrypoint(d);
-          loadFromContainerLogging(d);
+
+          $scope.formValues.commands = commandsTabUtils.toViewModel(d);
+
           loadFromContainerPortBindings(d);
           loadFromContainerVolumes(d);
           loadFromContainerNetworkConfig(d);
           loadFromContainerEnvironmentVariables(d);
           loadFromContainerLabels(d);
-          loadFromContainerConsole(d);
           loadFromContainerDevices(d);
           loadFromContainerDeviceRequests(d);
           loadFromContainerImageConfig(d);
@@ -781,20 +700,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           loadFromContainerCapabilities(d);
           loadFromContainerSysctls(d);
         })
+        .then(() => {
+          $scope.state.containerIsLoaded = true;
+        })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container');
         });
-    }
-
-    function loadFromContainerLogging(config) {
-      var logConfig = config.HostConfig.LogConfig;
-      $scope.formValues.LogDriverName = logConfig.Type;
-      $scope.formValues.LogDriverOpts = _.map(logConfig.Config, function (value, name) {
-        return {
-          name: name,
-          value: value,
-        };
-      });
     }
 
     async function initView() {
@@ -845,6 +756,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
+            $scope.state.containerIsLoaded = true;
             $scope.fromContainer = {};
             $scope.formValues.capabilities = $scope.areContainerCapabilitiesEnabled ? new ContainerCapabilities() : [];
           }
@@ -872,10 +784,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       $scope.allowBindMounts = $scope.isAdminOrEndpointAdmin || endpoint.SecuritySettings.allowBindMountsForRegularUsers;
       $scope.allowPrivilegedMode = endpoint.SecuritySettings.allowPrivilegedModeForRegularUsers;
-
-      PluginService.loggingPlugins(apiVersion < 1.25).then(function success(loggingDrivers) {
-        $scope.availableLoggingDrivers = loggingDrivers;
-      });
     }
 
     function validateForm(accessControlData, isAdmin) {

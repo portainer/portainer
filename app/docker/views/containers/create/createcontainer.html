@@ -202,645 +202,501 @@
           <li ng-if="areContainerCapabilitiesEnabled" class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
-        <div class="tab-content">
-          <!-- tab-command -->
-          <div class="tab-pane active" id="command">
-            <form class="form-horizontal" style="margin-top: 15px">
-              <!-- command-input -->
-              <div class="form-group">
-                <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
-                <div class="col-sm-9">
-                  <div class="input-group">
-                    <div class="input-group-btn">
-                      <label class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</label>
-                      <label class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</label>
-                    </div>
-                    <input
-                      type="text"
-                      class="form-control"
-                      ng-model="config.Cmd"
-                      ng-disabled="formValues.CmdMode === 'default'"
-                      id="container_command"
-                      placeholder="e.g. '-logtostderr' '--housekeeping_interval=5s' or /usr/bin/nginx -t -c /mynginx.conf"
-                    />
-                  </div>
-                </div>
-              </div>
-              <!-- !command-input -->
-              <!-- entrypoint-input -->
-              <div class="form-group">
-                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">
-                  Entrypoint
-                  <portainer-tooltip
-                    message="'When container entrypoint is entered as part of the Command field, set Entrypoint to Override mode and leave blank, else it will revert to default.'"
-                  ></portainer-tooltip>
-                </label>
-                <div class="col-sm-9">
-                  <div class="input-group">
-                    <div class="input-group-btn">
-                      <label class="btn btn-light" ng-model="formValues.EntrypointMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</label>
-                      <label class="btn btn-light" ng-model="formValues.EntrypointMode" uib-btn-radio="'override'">Override</label>
-                    </div>
-                    <input
-                      type="text"
-                      class="form-control"
-                      ng-model="config.Entrypoint"
-                      ng-disabled="formValues.EntrypointMode === 'default'"
-                      id="container_entrypoint"
-                      placeholder="e.g. /bin/sh -c"
-                    />
-                  </div>
-                </div>
-              </div>
-              <!-- !entrypoint-input -->
-              <!-- workdir-user-input -->
-              <div class="form-group">
-                <label for="container_workingdir" class="col-sm-2 col-lg-1 control-label text-left">Working Dir</label>
-                <div class="col-sm-4">
-                  <input type="text" class="form-control" ng-model="config.WorkingDir" id="container_workingdir" placeholder="e.g. /myapp" />
-                </div>
-                <label for="container_user" class="col-sm-1 control-label text-left">User</label>
-                <div class="col-sm-4">
-                  <input type="text" class="form-control" ng-model="config.User" id="container_user" placeholder="e.g. nginx" />
-                </div>
-              </div>
-              <!-- !workdir-user-input -->
-              <!-- console -->
-              <div class="form-group">
-                <label for="container_console" class="col-sm-2 col-lg-1 control-label text-left">Console</label>
-                <div class="col-sm-10 col-lg-11">
-                  <div class="col-sm-4">
-                    <label class="radio-inline">
-                      <input type="radio" name="container_console" ng-model="formValues.Console" value="both" />
-                      Interactive & TTY <span class="small text-muted">(-i -t)</span>
-                    </label>
-                  </div>
-                  <div class="col-sm-4">
-                    <label class="radio-inline">
-                      <input type="radio" name="container_console" ng-model="formValues.Console" value="interactive" />
-                      Interactive <span class="small text-muted">(-i)</span>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-sm-offset-2 col-sm-10 col-lg-offset-1 col-lg-11">
-                  <div class="col-sm-4">
-                    <label class="radio-inline">
-                      <input type="radio" name="container_console" ng-model="formValues.Console" value="tty" />
-                      TTY <span class="small text-muted">(-t)</span>
-                    </label>
-                  </div>
-                  <div class="col-sm-4">
-                    <label class="radio-inline">
-                      <input type="radio" name="container_console" ng-model="formValues.Console" value="none" />
-                      None
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <!-- !console -->
-
-              <div class="col-sm-12 form-section-title"> Logging </div>
-              <!-- logging-driver -->
-              <div class="form-group">
-                <label for="log-driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
-                <div class="col-sm-4">
-                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver">
-                    <option selected value="">Default logging driver</option>
-                    <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
-                    <option value="none">none</option>
-                  </select>
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Logging driver that will override the default docker daemon driver. Select Default logging driver if you don't want to override it. Supported logging drivers
-                    can be found <a href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers" target="_blank">in the Docker documentation</a>.
-                  </p>
-                </div>
-              </div>
-              <!-- !logging-driver -->
-              <!-- logging-opts -->
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px">
-                  <label class="control-label text-left">
-                    Options
-                    <portainer-tooltip
-                      position="'top'"
-                      message="'Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation.'"
-                    ></portainer-tooltip>
-                  </label>
-                  <span
-                    class="label label-default interactive"
-                    style="margin-left: 10px"
-                    ng-click="!formValues.LogDriverName || formValues.LogDriverName === 'none' || addLogDriverOpt(formValues.LogDriverName)"
-                  >
-                    <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add logging driver option
-                  </span>
-                </div>
-                <!-- logging-opts-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                  <div ng-repeat="opt in formValues.LogDriverOpts" style="margin-top: 2px">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">option</span>
-                      <input type="text" class="form-control" ng-model="opt.name" placeholder="e.g. FOO" />
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="opt.value" placeholder="e.g. bar" />
-                    </div>
-                    <button class="btn btn-light" type="button" ng-click="removeLogDriverOpt($index)">
-                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-                <!-- logging-opts-input-list -->
-              </div>
-              <!-- !logging-opts -->
-            </form>
-          </div>
-          <!-- !tab-command -->
-          <!-- tab-volume -->
-          <div class="tab-pane" id="volumes">
-            <form class="form-horizontal" style="margin-top: 15px">
-              <!-- volumes -->
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px">
-                  <label class="control-label text-left">Volume mapping</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addVolume()">
-                    <pr-icon icon="'plus'" mode="'alt'"></pr-icon> map additional volume
-                  </span>
-                </div>
-                <!-- volumes-input-list -->
-                <div class="form-inline" style="margin-top: 10px">
-                  <div ng-repeat="volume in formValues.Volumes">
-                    <!-- volume-line1 -->
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                      <!-- container-path -->
-                      <div class="input-group input-group-sm col-sm-6">
-                        <span class="input-group-addon">container</span>
-                        <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container" />
-                      </div>
-                      <!-- !container-path -->
-                      <!-- volume-type -->
-                      <div class="input-group col-sm-5" style="margin-left: 5px">
-                        <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
-                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
-                        </div>
-                        <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                          <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                        </button>
-                      </div>
-                      <!-- !volume-type -->
-                    </div>
-                    <!-- !volume-line1 -->
-                    <!-- volume-line2 -->
-                    <div class="col-sm-12 form-inline" style="margin-top: 5px">
-                      <pr-icon icon="'arrow-right'"></pr-icon>
-                      <!-- volume -->
-                      <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
-                        <span class="input-group-addon">volume</span>
-                        <select class="form-control" ng-model="volume.name">
-                          <option selected disabled hidden value="">Select a volume</option>
-                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
-                        </select>
-                      </div>
-                      <!-- !volume -->
-                      <!-- bind -->
-                      <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
-                        <span class="input-group-addon">host</span>
-                        <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host" />
-                      </div>
-                      <!-- !bind -->
-                      <!-- read-only -->
-                      <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px">
-                        <div class="btn-group btn-group-sm">
-                          <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                          <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
-                        </div>
-                      </div>
-                      <!-- !read-only -->
-                    </div>
-                    <!-- !volume-line2 -->
-                  </div>
-                </div>
-                <!-- !volumes-input-list -->
-              </div>
-            </form>
-            <!-- !volumes -->
-          </div>
-          <!-- !tab-volume -->
-          <!-- tab-network -->
-          <div class="tab-pane" id="network">
-            <form class="form-horizontal" style="margin-top: 15px">
-              <div class="form-group" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE'">
-                <div class="col-sm-12">
-                  <span class="small text-muted">You don't have any shared networks. Head over to the <a ui-sref="docker.networks">networks view</a> to create one.</span>
-                </div>
-              </div>
-              <!-- network-input -->
-              <div class="form-group">
-                <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
-                <div class="col-sm-9">
-                  <select
-                    class="form-control"
-                    ng-options="net.Name as net.Name for net in availableNetworks"
-                    ng-model="config.HostConfig.NetworkMode"
-                    id="container_network"
-                    ng-change="resetNetworkConfig()"
-                  >
-                    <option selected disabled hidden value="">Select a network</option>
-                  </select>
-                </div>
-              </div>
-              <!-- !network-input -->
-              <!-- container-name-input -->
-              <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
-                <label for="container_network_container" class="col-sm-2 col-lg-1 control-label text-left">Container</label>
-                <div class="col-sm-9">
-                  <select ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
-                    <option selected disabled hidden value="">Select a container</option>
-                  </select>
-                </div>
-              </div>
-              <!-- !container-name-input -->
-              <!-- hostname-input -->
-              <div class="form-group">
-                <label for="container_hostname" class="col-sm-2 col-lg-1 control-label text-left">Hostname</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Hostname" id="container_hostname" placeholder="e.g. web01" />
-                </div>
-              </div>
-              <!-- !hostname-input -->
-              <!-- domainname-input -->
-              <div class="form-group">
-                <label for="container_domainname" class="col-sm-2 col-lg-1 control-label text-left">Domain Name</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Domainname" id="container_domainname" placeholder="e.g. example.com" />
-                </div>
-              </div>
-              <!-- !domainname -->
-              <!-- mac-address-input -->
-              <div class="form-group">
-                <label for="container_macaddress" class="col-sm-2 col-lg-1 control-label text-left">Mac Address</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.MacAddress" id="container_macaddress" placeholder="e.g. 12-34-56-78-9a-bc" />
-                </div>
-              </div>
-              <!-- !mac-address-input -->
-              <!-- ipv4-input -->
-              <div class="form-group">
-                <label for="container_ipv4" class="col-sm-2 col-lg-1 control-label text-left">IPv4 Address</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.IPv4" id="container_ipv4" placeholder="e.g. 172.20.0.7" />
-                </div>
-              </div>
-              <!-- !ipv4-input -->
-              <!-- ipv6-input -->
-              <div class="form-group">
-                <label for="container_ipv6" class="col-sm-2 col-lg-1 control-label text-left">IPv6 Address</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.IPv6" id="container_ipv6" placeholder="e.g. a:b:c:d::1234" />
-                </div>
-              </div>
-              <!-- !ipv6-input -->
-              <!-- dns-primary-input -->
-              <div class="form-group">
-                <label for="container_dns_primary" class="col-sm-2 col-lg-1 control-label text-left">Primary DNS Server</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.DnsPrimary" id="container_dns_primary" placeholder="e.g. 1.1.1.1, 2606:4700:4700::1111" />
-                </div>
-              </div>
-              <!-- !dns-primary-input -->
-              <!-- dns-secondary-input -->
-              <div class="form-group">
-                <label for="container_dns_secondary" class="col-sm-2 col-lg-1 control-label text-left">Secondary DNS Server</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.DnsSecondary" id="container_dns_secondary" placeholder="e.g. 1.0.0.1, 2606:4700:4700::1001" />
-                </div>
-              </div>
-              <!-- !dns-secondary-input -->
-              <!-- extra-hosts-variables -->
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px">
-                  <label class="control-label text-left">Hosts file entries</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addExtraHost()">
-                    <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add additional entry
-                  </span>
-                </div>
-                <!-- extra-hosts-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                  <div ng-repeat="variable in formValues.ExtraHosts" style="margin-top: 2px">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
-                    </div>
-                    <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-                <!-- !extra-hosts-input-list -->
-              </div>
-              <!-- !extra-hosts-variables -->
-            </form>
-          </div>
-          <!-- !tab-network -->
-          <!-- tab-labels -->
-          <div class="tab-pane" id="labels">
-            <form class="form-horizontal" style="margin-top: 15px">
-              <!-- labels -->
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px">
-                  <label class="control-label text-left">Labels</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()"> <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add label </span>
-                </div>
-                <!-- labels-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                  <div ng-repeat="label in formValues.Labels" style="margin-top: 2px">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
-                    </div>
-                    <button class="btn btn-sm btn-light" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-                <!-- !labels-input-list -->
-              </div>
-              <!-- !labels-->
-            </form>
-          </div>
-          <!-- !tab-labels -->
-          <!-- tab-env -->
-          <div class="tab-pane" id="env">
-            <div class="form-horizontal">
-              <environment-variables-panel
-                values="formValues.Env"
-                explanation="'These values will be applied to the container when deployed'"
-                on-change="(handleEnvVarChange)"
-              ></environment-variables-panel>
+        <div class="form-horizontal">
+          <div class="tab-content">
+            <!-- tab-command -->
+            <div class="tab-pane active" id="command">
+              <docker-create-container-commands-tab
+                ng-if="state.containerIsLoaded"
+                values="formValues.commands"
+                api-version="applicationState.endpoint.apiVersion"
+                on-change="(handleCommandsChange)"
+              ></docker-create-container-commands-tab>
             </div>
-          </div>
-          <!-- !tab-env -->
-          <!-- tab-restart-policy -->
-          <div class="tab-pane" id="restart-policy">
-            <form class="form-horizontal" style="margin-top: 15px">
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <label class="control-label text-left"> Restart policy </label>
-                  <div class="btn-group btn-group-sm" style="margin-left: 20px">
-                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'"> Never </label>
-                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'"> Always </label>
-                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'"> On failure </label>
-                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'"> Unless stopped </label>
+            <!-- !tab-command -->
+            <!-- tab-volume -->
+            <div class="tab-pane" id="volumes">
+              <form class="form-horizontal" style="margin-top: 15px">
+                <!-- volumes -->
+                <div class="form-group">
+                  <div class="col-sm-12" style="margin-top: 5px">
+                    <label class="control-label text-left">Volume mapping</label>
+                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addVolume()">
+                      <pr-icon icon="'plus'" mode="'alt'"></pr-icon> map additional volume
+                    </span>
                   </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <!-- !tab-restart-policy -->
-          <!-- tab-runtime-resources -->
-          <div class="tab-pane" id="runtime-resources">
-            <form class="form-horizontal" style="margin-top: 15px">
-              <div class="col-sm-12 form-section-title"> Runtime </div>
-              <!-- privileged-mode -->
-              <div class="form-group" ng-if="isAdmin || allowPrivilegedMode">
-                <div class="col-sm-12">
-                  <por-switch-field
-                    label-class="'col-sm-2'"
-                    checked="config.HostConfig.Privileged"
-                    label="'Privileged mode'"
-                    on-change="(handlePrivilegedChange)"
-                  ></por-switch-field>
-                </div>
-              </div>
-              <!-- !privileged-mode -->
-              <!-- init -->
-              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.37">
-                <div class="col-sm-12">
-                  <por-switch-field label-class="'col-sm-2'" checked="config.HostConfig.Init" label="'Init'" on-change="(handleInitChange)"></por-switch-field>
-                </div>
-              </div>
-              <!-- !init -->
-              <!-- runtimes -->
-              <div class="form-group">
-                <label for="container_runtime" class="col-sm-1 control-label text-left">Runtime</label>
-                <div class="col-sm-11">
-                  <select class="form-control" ng-model="config.HostConfig.Runtime" id="container_runtime" ng-options="runtime for runtime in availableRuntimes">
-                    <option selected value="">Default</option>
-                  </select>
-                </div>
-              </div>
-              <!-- !runtimes -->
-            </form>
-            <form class="form-horizontal" style="margin-top: 15px" name="resourceForm">
-              <!-- devices -->
-              <div ng-if="showDeviceMapping" class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px">
-                  <label class="control-label text-left">Devices</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDevice()"> <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add device </span>
-                </div>
-                <!-- devices-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                  <div ng-repeat="device in config.HostConfig.Devices" style="margin-top: 2px">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">host</span>
-                      <input type="text" class="form-control" ng-model="device.pathOnHost" placeholder="e.g. /dev/tty0" />
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">container</span>
-                      <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0" />
-                    </div>
-                    <button class="btn btn-sm btn-light" type="button" ng-click="removeDevice($index)">
-                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-                <!-- !devices-input-list -->
-              </div>
-              <!-- !devices-->
-              <!-- sysctls -->
-              <div ng-if="showSysctls" class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px">
-                  <label class="control-label text-left">Sysctls</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addSysctl()"> <pr-icon icon="'plus'"></pr-icon> add sysctl </span>
-                </div>
-                <!-- sysctls-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                  <div ng-repeat="sysctl in formValues.Sysctls" style="margin-top: 2px">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="sysctl.name" placeholder="e.g. FOO" />
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
-                    </div>
-                    <button class="btn btn-sm btn-light" type="button" ng-click="removeSysctl($index)">
-                      <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-                <!-- !sysctls-input-list -->
-              </div>
-              <!-- !sysctls -->
-              <!-- shm-size-input -->
-              <div class="form-group">
-                <label for="shm-size" class="col-sm-2 control-label text-left"> Shared memory size </label>
-                <div class="col-sm-2">
-                  <input type="number" min="1" class="form-control" ng-model="formValues.ShmSize" id="shm-size" />
-                </div>
-                <div class="col-sm-2">
-                  <p class="small text-muted mt-2"> Size of /dev/shm (<b>MB</b>) </p>
-                </div>
-              </div>
-              <!-- !shm-size-input -->
-              <!-- #region GPU -->
-              <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
-                <div class="col-sm-12 form-section-title"> GPU </div>
-
-                <gpu
-                  ng-if="applicationState.endpoint.apiVersion >= 1.4"
-                  values="formValues.GPU"
-                  on-change="(onGpuChange)"
-                  gpus="endpoint.Gpus"
-                  used-gpus="gpuUseList"
-                  used-all-gpus="gpuUseAll"
-                  enable-gpu-management="endpoint.EnableGPUManagement"
-                >
-                </gpu>
-              </div>
-
-              <!-- #endregion GPU -->
-              <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
-                <div class="col-sm-12 form-section-title"> Resources </div>
-                <!-- memory-reservation-input -->
-                <div class="form-group flex">
-                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory reservation (MB) </label>
-                  <div class="col-sm-6">
-                    <slider
-                      on-change="(handleResourceChange)"
-                      model="formValues.MemoryReservation"
-                      floor="0"
-                      ceil="state.sliderMaxMemory"
-                      step="256"
-                      ng-if="state.sliderMaxMemory"
-                    ></slider>
-                  </div>
-                  <div class="col-sm-2 vertical-center">
-                    <input
-                      name="memory_reservation"
-                      type="number"
-                      min="0"
-                      max="{{ state.sliderMaxMemory }}"
-                      class="form-control"
-                      ng-model="formValues.MemoryReservation"
-                      id="memory-reservation"
-                      required
-                    />
-                  </div>
-                </div>
-                <div class="form-group" ng-show="resourceForm.memory_reservation.$invalid">
-                  <div class="col-sm-3 col-lg-2"></div>
-                  <div class="col-sm-8 small text-muted">
-                    <div ng-messages="resourceForm.memory-reservation.$error">
-                      <p class="vertical-center text-warning">
-                        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
-                      </p>
+                  <!-- volumes-input-list -->
+                  <div class="form-inline" style="margin-top: 10px">
+                    <div ng-repeat="volume in formValues.Volumes">
+                      <!-- volume-line1 -->
+                      <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                        <!-- container-path -->
+                        <div class="input-group input-group-sm col-sm-6">
+                          <span class="input-group-addon">container</span>
+                          <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container" />
+                        </div>
+                        <!-- !container-path -->
+                        <!-- volume-type -->
+                        <div class="input-group col-sm-5" style="margin-left: 5px">
+                          <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
+                            <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
+                            <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                          </div>
+                          <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
+                            <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
+                          </button>
+                        </div>
+                        <!-- !volume-type -->
+                      </div>
+                      <!-- !volume-line1 -->
+                      <!-- volume-line2 -->
+                      <div class="col-sm-12 form-inline" style="margin-top: 5px">
+                        <pr-icon icon="'arrow-right'"></pr-icon>
+                        <!-- volume -->
+                        <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
+                          <span class="input-group-addon">volume</span>
+                          <select class="form-control" ng-model="volume.name">
+                            <option selected disabled hidden value="">Select a volume</option>
+                            <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
+                          </select>
+                        </div>
+                        <!-- !volume -->
+                        <!-- bind -->
+                        <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
+                          <span class="input-group-addon">host</span>
+                          <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host" />
+                        </div>
+                        <!-- !bind -->
+                        <!-- read-only -->
+                        <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px">
+                          <div class="btn-group btn-group-sm">
+                            <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                            <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                          </div>
+                        </div>
+                        <!-- !read-only -->
+                      </div>
+                      <!-- !volume-line2 -->
                     </div>
                   </div>
+                  <!-- !volumes-input-list -->
                 </div>
-                <!-- !memory-reservation-input -->
-                <!-- memory-limit-input -->
-                <div class="form-group flex">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory limit (MB) </label>
-                  <div class="col-sm-6">
-                    <slider
-                      on-change="(handleResourceChange)"
-                      model="formValues.MemoryLimit"
-                      floor="0"
-                      ceil="state.sliderMaxMemory"
-                      step="256"
-                      ng-if="state.sliderMaxMemory"
-                    ></slider>
-                  </div>
-                  <div class="col-sm-2 vertical-center">
-                    <input
-                      name="memory_Limit"
-                      type="number"
-                      min="0"
-                      max="{{ state.sliderMaxMemory }}"
-                      class="form-control"
-                      ng-model="formValues.MemoryLimit"
-                      id="memory-limit"
-                      required
-                    />
-                  </div>
-                </div>
-                <div class="form-group" ng-show="resourceForm.memory_Limit.$invalid">
-                  <div class="col-sm-3 col-lg-2"></div>
-                  <div class="col-sm-8 small text-muted">
-                    <div ng-messages="resourceForm.memory-limit.$error">
-                      <p class="vertical-center text-warning">
-                        <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <!-- !memory-limit-input -->
-                <!-- cpu-limit-input -->
-                <div class="form-group flex">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Maximum CPU usage </label>
-                  <div class="col-sm-8">
-                    <slider
-                      on-change="(handleResourceChange)"
-                      model="formValues.CpuLimit"
-                      floor="0"
-                      ceil="state.sliderMaxCpu"
-                      step="0.1"
-                      precision="2"
-                      ng-if="state.sliderMaxCpu"
-                    ></slider>
-                  </div>
-                </div>
-                <!-- !cpu-limit-input -->
-
-                <!-- update-limit-btn -->
-                <div class="form-group" ng-if="state.mode == 'duplicate'">
+              </form>
+              <!-- !volumes -->
+            </div>
+            <!-- !tab-volume -->
+            <!-- tab-network -->
+            <div class="tab-pane" id="network">
+              <form class="form-horizontal" style="margin-top: 15px">
+                <div class="form-group" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE'">
                   <div class="col-sm-12">
-                    <button
-                      type="button"
-                      class="btn btn-primary btn-sm"
-                      ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)"
-                      ng-click="update()"
-                      button-spinner="state.actionInProgress"
-                    >
-                      <span ng-hide="state.actionInProgress">Update Limits</span>
-                      <span ng-show="state.actionInProgress">Update in progress...</span>
-                    </button>
-                  </div>
-                  <div class="col-sm-12" ng-if="state.settingUnlimitedResources">
-                    <p class="text-muted mr-4">
-                      <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mt-10'"></pr-icon>
-                      Updating any resource value to ‘unlimited' will redeploy this container.
-                    </p>
+                    <span class="small text-muted">You don't have any shared networks. Head over to the <a ui-sref="docker.networks">networks view</a> to create one.</span>
                   </div>
                 </div>
-                <!-- !update-limit-btn -->
+                <!-- network-input -->
+                <div class="form-group">
+                  <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
+                  <div class="col-sm-9">
+                    <select
+                      class="form-control"
+                      ng-options="net.Name as net.Name for net in availableNetworks"
+                      ng-model="config.HostConfig.NetworkMode"
+                      id="container_network"
+                      ng-change="resetNetworkConfig()"
+                    >
+                      <option selected disabled hidden value="">Select a network</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- !network-input -->
+                <!-- container-name-input -->
+                <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
+                  <label for="container_network_container" class="col-sm-2 col-lg-1 control-label text-left">Container</label>
+                  <div class="col-sm-9">
+                    <select ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
+                      <option selected disabled hidden value="">Select a container</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- !container-name-input -->
+                <!-- hostname-input -->
+                <div class="form-group">
+                  <label for="container_hostname" class="col-sm-2 col-lg-1 control-label text-left">Hostname</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="config.Hostname" id="container_hostname" placeholder="e.g. web01" />
+                  </div>
+                </div>
+                <!-- !hostname-input -->
+                <!-- domainname-input -->
+                <div class="form-group">
+                  <label for="container_domainname" class="col-sm-2 col-lg-1 control-label text-left">Domain Name</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="config.Domainname" id="container_domainname" placeholder="e.g. example.com" />
+                  </div>
+                </div>
+                <!-- !domainname -->
+                <!-- mac-address-input -->
+                <div class="form-group">
+                  <label for="container_macaddress" class="col-sm-2 col-lg-1 control-label text-left">Mac Address</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="formValues.MacAddress" id="container_macaddress" placeholder="e.g. 12-34-56-78-9a-bc" />
+                  </div>
+                </div>
+                <!-- !mac-address-input -->
+                <!-- ipv4-input -->
+                <div class="form-group">
+                  <label for="container_ipv4" class="col-sm-2 col-lg-1 control-label text-left">IPv4 Address</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="formValues.IPv4" id="container_ipv4" placeholder="e.g. 172.20.0.7" />
+                  </div>
+                </div>
+                <!-- !ipv4-input -->
+                <!-- ipv6-input -->
+                <div class="form-group">
+                  <label for="container_ipv6" class="col-sm-2 col-lg-1 control-label text-left">IPv6 Address</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="formValues.IPv6" id="container_ipv6" placeholder="e.g. a:b:c:d::1234" />
+                  </div>
+                </div>
+                <!-- !ipv6-input -->
+                <!-- dns-primary-input -->
+                <div class="form-group">
+                  <label for="container_dns_primary" class="col-sm-2 col-lg-1 control-label text-left">Primary DNS Server</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="formValues.DnsPrimary" id="container_dns_primary" placeholder="e.g. 1.1.1.1, 2606:4700:4700::1111" />
+                  </div>
+                </div>
+                <!-- !dns-primary-input -->
+                <!-- dns-secondary-input -->
+                <div class="form-group">
+                  <label for="container_dns_secondary" class="col-sm-2 col-lg-1 control-label text-left">Secondary DNS Server</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="formValues.DnsSecondary" id="container_dns_secondary" placeholder="e.g. 1.0.0.1, 2606:4700:4700::1001" />
+                  </div>
+                </div>
+                <!-- !dns-secondary-input -->
+                <!-- extra-hosts-variables -->
+                <div class="form-group">
+                  <div class="col-sm-12" style="margin-top: 5px">
+                    <label class="control-label text-left">Hosts file entries</label>
+                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addExtraHost()">
+                      <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add additional entry
+                    </span>
+                  </div>
+                  <!-- extra-hosts-input-list -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                    <div ng-repeat="variable in formValues.ExtraHosts" style="margin-top: 2px">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
+                      </div>
+                      <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
+                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- !extra-hosts-input-list -->
+                </div>
+                <!-- !extra-hosts-variables -->
+              </form>
+            </div>
+            <!-- !tab-network -->
+            <!-- tab-labels -->
+            <div class="tab-pane" id="labels">
+              <form class="form-horizontal" style="margin-top: 15px">
+                <!-- labels -->
+                <div class="form-group">
+                  <div class="col-sm-12" style="margin-top: 5px">
+                    <label class="control-label text-left">Labels</label>
+                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()"> <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add label </span>
+                  </div>
+                  <!-- labels-input-list -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                    <div ng-repeat="label in formValues.Labels" style="margin-top: 2px">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">name</span>
+                        <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                      </div>
+                      <button class="btn btn-sm btn-light" type="button" ng-click="removeLabel($index)">
+                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- !labels-input-list -->
+                </div>
+                <!-- !labels-->
+              </form>
+            </div>
+            <!-- !tab-labels -->
+            <!-- tab-env -->
+            <div class="tab-pane" id="env">
+              <div class="form-horizontal">
+                <environment-variables-panel
+                  values="formValues.Env"
+                  explanation="'These values will be applied to the container when deployed'"
+                  on-change="(handleEnvVarChange)"
+                ></environment-variables-panel>
               </div>
-            </form>
+            </div>
+            <!-- !tab-env -->
+            <!-- tab-restart-policy -->
+            <div class="tab-pane" id="restart-policy">
+              <form class="form-horizontal" style="margin-top: 15px">
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <label class="control-label text-left"> Restart policy </label>
+                    <div class="btn-group btn-group-sm" style="margin-left: 20px">
+                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'"> Never </label>
+                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'"> Always </label>
+                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'"> On failure </label>
+                      <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'"> Unless stopped </label>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- !tab-restart-policy -->
+            <!-- tab-runtime-resources -->
+            <div class="tab-pane" id="runtime-resources">
+              <form class="form-horizontal" style="margin-top: 15px">
+                <div class="col-sm-12 form-section-title"> Runtime </div>
+                <!-- privileged-mode -->
+                <div class="form-group" ng-if="isAdmin || allowPrivilegedMode">
+                  <div class="col-sm-12">
+                    <por-switch-field
+                      label-class="'col-sm-2'"
+                      checked="config.HostConfig.Privileged"
+                      label="'Privileged mode'"
+                      on-change="(handlePrivilegedChange)"
+                    ></por-switch-field>
+                  </div>
+                </div>
+                <!-- !privileged-mode -->
+                <!-- init -->
+                <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.37">
+                  <div class="col-sm-12">
+                    <por-switch-field label-class="'col-sm-2'" checked="config.HostConfig.Init" label="'Init'" on-change="(handleInitChange)"></por-switch-field>
+                  </div>
+                </div>
+                <!-- !init -->
+                <!-- runtimes -->
+                <div class="form-group">
+                  <label for="container_runtime" class="col-sm-1 control-label text-left">Runtime</label>
+                  <div class="col-sm-11">
+                    <select class="form-control" ng-model="config.HostConfig.Runtime" id="container_runtime" ng-options="runtime for runtime in availableRuntimes">
+                      <option selected value="">Default</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- !runtimes -->
+              </form>
+              <form class="form-horizontal" style="margin-top: 15px" name="resourceForm">
+                <!-- devices -->
+                <div ng-if="showDeviceMapping" class="form-group">
+                  <div class="col-sm-12" style="margin-top: 5px">
+                    <label class="control-label text-left">Devices</label>
+                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDevice()">
+                      <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add device
+                    </span>
+                  </div>
+                  <!-- devices-input-list -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                    <div ng-repeat="device in config.HostConfig.Devices" style="margin-top: 2px">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">host</span>
+                        <input type="text" class="form-control" ng-model="device.pathOnHost" placeholder="e.g. /dev/tty0" />
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">container</span>
+                        <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0" />
+                      </div>
+                      <button class="btn btn-sm btn-light" type="button" ng-click="removeDevice($index)">
+                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- !devices-input-list -->
+                </div>
+                <!-- !devices-->
+                <!-- sysctls -->
+                <div ng-if="showSysctls" class="form-group">
+                  <div class="col-sm-12" style="margin-top: 5px">
+                    <label class="control-label text-left">Sysctls</label>
+                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addSysctl()"> <pr-icon icon="'plus'"></pr-icon> add sysctl </span>
+                  </div>
+                  <!-- sysctls-input-list -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                    <div ng-repeat="sysctl in formValues.Sysctls" style="margin-top: 2px">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">name</span>
+                        <input type="text" class="form-control" ng-model="sysctl.name" placeholder="e.g. FOO" />
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
+                      </div>
+                      <button class="btn btn-sm btn-light" type="button" ng-click="removeSysctl($index)">
+                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- !sysctls-input-list -->
+                </div>
+                <!-- !sysctls -->
+                <!-- shm-size-input -->
+                <div class="form-group">
+                  <label for="shm-size" class="col-sm-2 control-label text-left"> Shared memory size </label>
+                  <div class="col-sm-2">
+                    <input type="number" min="1" class="form-control" ng-model="formValues.ShmSize" id="shm-size" />
+                  </div>
+                  <div class="col-sm-2">
+                    <p class="small text-muted mt-2"> Size of /dev/shm (<b>MB</b>) </p>
+                  </div>
+                </div>
+                <!-- !shm-size-input -->
+                <!-- #region GPU -->
+                <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
+                  <div class="col-sm-12 form-section-title"> GPU </div>
+                  <gpu
+                    ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                    values="formValues.GPU"
+                    on-change="(onGpuChange)"
+                    gpus="endpoint.Gpus"
+                    used-gpus="gpuUseList"
+                    used-all-gpus="gpuUseAll"
+                    enable-gpu-management="endpoint.EnableGPUManagement"
+                  >
+                  </gpu>
+                </div>
+                <!-- #endregion GPU -->
+                <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
+                  <div class="col-sm-12 form-section-title"> Resources </div>
+                  <!-- memory-reservation-input -->
+                  <div class="form-group flex">
+                    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory reservation (MB) </label>
+                    <div class="col-sm-6">
+                      <slider
+                        on-change="(handleResourceChange)"
+                        model="formValues.MemoryReservation"
+                        floor="0"
+                        ceil="state.sliderMaxMemory"
+                        step="256"
+                        ng-if="state.sliderMaxMemory"
+                      ></slider>
+                    </div>
+                    <div class="col-sm-2 vertical-center">
+                      <input
+                        name="memory_reservation"
+                        type="number"
+                        min="0"
+                        max="{{ state.sliderMaxMemory }}"
+                        class="form-control"
+                        ng-model="formValues.MemoryReservation"
+                        id="memory-reservation"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group" ng-show="resourceForm.memory_reservation.$invalid">
+                    <div class="col-sm-3 col-lg-2"></div>
+                    <div class="col-sm-8 small text-muted">
+                      <div ng-messages="resourceForm.memory-reservation.$error">
+                        <p class="vertical-center text-warning">
+                          <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !memory-reservation-input -->
+                  <!-- memory-limit-input -->
+                  <div class="form-group flex">
+                    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Memory limit (MB) </label>
+                    <div class="col-sm-6">
+                      <slider
+                        on-change="(handleResourceChange)"
+                        model="formValues.MemoryLimit"
+                        floor="0"
+                        ceil="state.sliderMaxMemory"
+                        step="256"
+                        ng-if="state.sliderMaxMemory"
+                      ></slider>
+                    </div>
+                    <div class="col-sm-2 vertical-center">
+                      <input
+                        name="memory_Limit"
+                        type="number"
+                        min="0"
+                        max="{{ state.sliderMaxMemory }}"
+                        class="form-control"
+                        ng-model="formValues.MemoryLimit"
+                        id="memory-limit"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group" ng-show="resourceForm.memory_Limit.$invalid">
+                    <div class="col-sm-3 col-lg-2"></div>
+                    <div class="col-sm-8 small text-muted">
+                      <div ng-messages="resourceForm.memory-limit.$error">
+                        <p class="vertical-center text-warning">
+                          <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !memory-limit-input -->
+                  <!-- cpu-limit-input -->
+                  <div class="form-group flex">
+                    <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label vertical-center text-left"> Maximum CPU usage </label>
+                    <div class="col-sm-8">
+                      <slider
+                        on-change="(handleResourceChange)"
+                        model="formValues.CpuLimit"
+                        floor="0"
+                        ceil="state.sliderMaxCpu"
+                        step="0.1"
+                        precision="2"
+                        ng-if="state.sliderMaxCpu"
+                      ></slider>
+                    </div>
+                  </div>
+                  <!-- !cpu-limit-input -->
+                  <!-- update-limit-btn -->
+                  <div class="form-group" ng-if="state.mode == 'duplicate'">
+                    <div class="col-sm-12">
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm"
+                        ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)"
+                        ng-click="update()"
+                        button-spinner="state.actionInProgress"
+                      >
+                        <span ng-hide="state.actionInProgress">Update Limits</span>
+                        <span ng-show="state.actionInProgress">Update in progress...</span>
+                      </button>
+                    </div>
+                    <div class="col-sm-12" ng-if="state.settingUnlimitedResources">
+                      <p class="text-muted mr-4">
+                        <pr-icon icon="'alert-triangle'" mode="'warning'" class-name="'mt-10'"></pr-icon>
+                        Updating any resource value to ‘unlimited' will redeploy this container.
+                      </p>
+                    </div>
+                  </div>
+                  <!-- !update-limit-btn -->
+                </div>
+              </form>
+            </div>
+            <!-- !tab-runtime-resources -->
+            <!-- tab-container-capabilities -->
+            <div class="tab-pane" id="container-capabilities">
+              <container-capabilities capabilities="formValues.capabilities"></container-capabilities>
+            </div>
+            <!-- !tab-container-capabilities -->
           </div>
-          <!-- !tab-runtime-resources -->
-          <!-- tab-container-capabilities -->
-          <div class="tab-pane" id="container-capabilities">
-            <container-capabilities capabilities="formValues.capabilities"></container-capabilities>
-          </div>
-          <!-- !tab-container-capabilities -->
         </div>
       </rd-widget-body>
     </rd-widget>

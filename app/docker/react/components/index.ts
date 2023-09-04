@@ -22,8 +22,10 @@ import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowse
 import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
 import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
 
+import { containersModule } from './containers';
+
 const ngModule = angular
-  .module('portainer.docker.react.components', [])
+  .module('portainer.docker.react.components', [containersModule])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
   .component(
