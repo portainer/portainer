@@ -277,6 +277,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       name: 'docker.nodes',
       url: '/nodes',
       abstract: true,
+      data: {
+        docs: '/user/docker/swarm',
+      },
     };
 
     var node = {
@@ -438,6 +441,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'SwarmController',
         },
       },
+      data: {
+        docs: '/user/docker/swarm',
+      },
     };
 
     var swarmVisualizer = {
@@ -448,6 +454,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: './views/swarm/visualizer/swarmvisualizer.html',
           controller: 'SwarmVisualizerController',
         },
+      },
+      data: {
+        docs: '/user/docker/swarm/cluster-visualizer',
       },
     };
 
@@ -548,6 +557,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           component: 'dockerFeaturesConfigurationView',
         },
       },
+      data: {
+        docs: '/user/docker/swarm/setup',
+      },
     };
 
     const swarmFeaturesConfiguration = {
@@ -577,6 +589,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         'content@': {
           component: 'endpointRegistriesView',
         },
+      },
+      data: {
+        docs: '/user/docker/swarm/registries',
       },
     };
 

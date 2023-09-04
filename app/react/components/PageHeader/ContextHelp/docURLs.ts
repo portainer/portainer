@@ -7,33 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Docker or Swarm / Swarm / Cluster visualizer',
-    docURL: '/user/docker/swarm/cluster-visualizer',
-    locationRegex: /#!\/\d+\/docker\/swarm\/visualizer/,
-    examples: ['#!/10/docker/swarm/visualizer'],
-  },
-  {
-    desc: 'Docker or Swarm / Swarm / Set up',
-    docURL: '/user/docker/swarm/setup',
-    locationRegex: /#!\/\d+\/docker\/swarm\/feat-config/,
-    examples: ['#!/10/docker/feat-config'],
-  },
-  {
-    desc: 'Swarm / Swarm / Registries',
-    docURL: '/user/docker/swarm/registries',
-    locationRegex: /#!\/\d+\/docker\/swarm\/registries/,
-    examples: ['#!/10/docker/registries'],
-  },
-  {
-    desc: 'Swarm / Swarm',
-    docURL: '/user/docker/swarm',
-    locationRegex: /#!\/\d+\/docker\/(swarm|nodes)/,
-    examples: [
-      '#!/10/docker/swarm',
-      '#!/10/docker/nodes/nd694yepzgms1j8y7kv3lpcc3',
-    ],
-  },
-  {
     desc: 'Docker / Events',
     docURL: '/user/docker/events',
     locationRegex: /#!\/\d+\/docker\/events/,
