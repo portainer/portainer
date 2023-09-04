@@ -91,5 +91,5 @@ func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portai
 		return len(intersection) != 0
 	}
 
-	return tag.Contains(edgeGroupTags, endpointTags)
+	return tag.FullMatch(edgeGroupTags, endpointTags)
 }

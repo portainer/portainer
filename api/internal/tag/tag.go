@@ -48,6 +48,21 @@ func Union(sets ...tagSet) tagSet {
 	return union
 }
 
+// FullMatch return true if values in setB matches all values in setA
+func FullMatch(setA tagSet, setB tagSet) bool {
+	if len(setA) == 0 || len(setB) == 0 {
+		return false
+	}
+
+	containedTags := 0
+	for tag := range setB {
+		if setA[tag] {
+			containedTags++
+		}
+	}
+	return containedTags == len(setA)
+}
+
 // Contains return true if setA contains setB
 func Contains(setA tagSet, setB tagSet) bool {
 	if len(setA) == 0 || len(setB) == 0 {

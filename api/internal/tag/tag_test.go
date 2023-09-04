@@ -21,9 +21,15 @@ func TestIntersection(t *testing.T) {
 			expected: Set([]portainer.TagID{4, 5}),
 		},
 		{
-			name:     "empty set intersection",
+			name:     "empty setA intersection",
 			setA:     Set([]portainer.TagID{1, 2, 3}),
 			setB:     Set([]portainer.TagID{}),
+			expected: Set([]portainer.TagID{}),
+		},
+		{
+			name:     "empty setB intersection",
+			setA:     Set([]portainer.TagID{}),
+			setB:     Set([]portainer.TagID{1, 2, 3}),
 			expected: Set([]portainer.TagID{}),
 		},
 		{
@@ -64,9 +70,15 @@ func TestUnion(t *testing.T) {
 			expected: Set([]portainer.TagID{1, 2, 3, 4, 5, 6}),
 		},
 		{
-			name:     "empty set union",
+			name:     "empty setA union",
 			setA:     Set([]portainer.TagID{1, 2, 3}),
 			setB:     Set([]portainer.TagID{}),
+			expected: Set([]portainer.TagID{1, 2, 3}),
+		},
+		{
+			name:     "empty setB union",
+			setA:     Set([]portainer.TagID{}),
+			setB:     Set([]portainer.TagID{1, 2, 3}),
 			expected: Set([]portainer.TagID{1, 2, 3}),
 		},
 		{
@@ -147,6 +159,67 @@ func TestContains(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := Contains(tc.setA, tc.setB)
+			if result != tc.expected {
+				t.Errorf("Expected %v, got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestFullMatch(t *testing.T) {
+	cases := []struct {
+		name     string
+		setA     tagSet
+		setB     tagSet
+		expected bool
+	}{
+		{
+			name:     "setB partially matches setB",
+			setA:     Set([]portainer.TagID{1, 2, 3}),
+			setB:     Set([]portainer.TagID{1, 2}),
+			expected: false,
+		},
+		{
+			name:     "setA equals to setB",
+			setA:     Set([]portainer.TagID{1, 2}),
+			setB:     Set([]portainer.TagID{1, 2}),
+			expected: true,
+		},
+		{
+			name:     "setB fully matches setA",
+			setA:     Set([]portainer.TagID{1, 2}),
+			setB:     Set([]portainer.TagID{1, 2, 3}),
+			expected: true,
+		},
+		{
+			name:     "setB does not matches setA",
+			setA:     Set([]portainer.TagID{1, 2}),
+			setB:     Set([]portainer.TagID{3, 4}),
+			expected: false,
+		},
+		{
+			name:     "setA is empty and setB is not empty",
+			setA:     Set([]portainer.TagID{}),
+			setB:     Set([]portainer.TagID{1, 2}),
+			expected: false,
+		},
+		{
+			name:     "setA is not empty and setB is empty",
+			setA:     Set([]portainer.TagID{1, 2}),
+			setB:     Set([]portainer.TagID{}),
+			expected: false,
+		},
+		{
+			name:     "setA is empty and setB is empty",
+			setA:     Set([]portainer.TagID{}),
+			setB:     Set([]portainer.TagID{}),
+			expected: false,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := FullMatch(tc.setA, tc.setB)
 			if result != tc.expected {
 				t.Errorf("Expected %v, got %v", tc.expected, result)
 			}
