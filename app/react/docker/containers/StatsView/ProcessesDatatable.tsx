@@ -35,9 +35,9 @@ export function ProcessesDatatable({
       headers
         ? headers.map(
             (header) =>
-              ({ header, accessorKey: header } satisfies ColumnDef<{
+              ({ header, accessorKey: header }) satisfies ColumnDef<{
                 [k: string]: string;
-              }>)
+              }>
           )
         : [],
     [headers]

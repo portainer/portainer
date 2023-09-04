@@ -26,6 +26,7 @@ import { confirmServiceForceUpdate } from '@/react/docker/services/common/update
 import { confirm, confirmDelete } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
+import { convertServiceToConfig } from '@/react/docker/services/common/convertServiceToConfig';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -438,7 +439,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     function buildChanges(service) {
-      var config = ServiceHelper.serviceToConfig(service.Model);
+      var config = convertServiceToConfig(service.Model);
       config.Name = service.Name;
       config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
       config.TaskTemplate.ContainerSpec.Env = envVarsUtils.convertToArrayOfStrings(service.EnvironmentVariables);
