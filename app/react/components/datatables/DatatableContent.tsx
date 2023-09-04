@@ -3,9 +3,9 @@ import { Row, Table as TableInstance } from '@tanstack/react-table';
 import { AutomationTestingProps } from '@/types';
 
 import { Table } from './Table';
+import { DefaultType } from './types';
 
-interface Props<D extends Record<string, unknown>>
-  extends AutomationTestingProps {
+interface Props<D extends DefaultType> extends AutomationTestingProps {
   tableInstance: TableInstance<D>;
   renderRow(row: Row<D>): React.ReactNode;
   onSortChange?(colId: string, desc: boolean): void;
@@ -13,7 +13,7 @@ interface Props<D extends Record<string, unknown>>
   emptyContentLabel?: string;
 }
 
-export function DatatableContent<D extends Record<string, unknown>>({
+export function DatatableContent<D extends DefaultType>({
   tableInstance,
   renderRow,
   onSortChange,

@@ -10,14 +10,14 @@ import { deleteTeam } from '@/react/portainer/users/teams/teams.service';
 import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
-import { buildNameColumn } from '@@/datatables/NameCell';
+import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 
 const storageKey = 'teams';
 
 const columns: ColumnDef<Team>[] = [
-  buildNameColumn<Team>('Name', 'Id', 'portainer.teams.team'),
+  buildNameColumn<Team>('Name', 'portainer.teams.team'),
 ];
 
 interface Props {
@@ -25,7 +25,7 @@ interface Props {
   isAdmin: boolean;
 }
 
-const settingsStore = createPersistedStore(storageKey);
+const settingsStore = createPersistedStore(storageKey, 'name');
 
 export function TeamsDatatable({ teams, isAdmin }: Props) {
   const { handleRemove } = useRemoveMutation();

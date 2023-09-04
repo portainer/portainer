@@ -1,4 +1,4 @@
-import { buildNameColumn } from '@@/datatables/NameCell';
+import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
 import { EdgeUpdateListItemResponse } from '../../queries/list';
 
@@ -9,7 +9,7 @@ import { scheduledTime } from './scheduled-time';
 import { scheduleType } from './type';
 
 export const columns = [
-  buildNameColumn<EdgeUpdateListItemResponse>('name', 'id', '.item'),
+  buildNameColumn<EdgeUpdateListItemResponse>('name', '.item'),
   scheduledTime,
   groups,
   scheduleType,

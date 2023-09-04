@@ -44,8 +44,8 @@ export function EnvironmentsDatatable() {
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
-    sort: tableState.sortBy.id as 'Group' | 'Name',
-    order: tableState.sortBy.desc ? 'desc' : 'asc',
+    sort: tableState.sortBy?.id as 'Group' | 'Name',
+    order: tableState.sortBy?.desc ? 'desc' : 'asc',
     edgeStackId: stackId,
     edgeStackStatus: statusFilter,
   });

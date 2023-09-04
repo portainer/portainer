@@ -1,8 +1,12 @@
 import { Row } from '@tanstack/react-table';
 
-export function multiple<
-  D extends Record<string, unknown> = Record<string, unknown>
->({ getValue }: Row<D>, columnId: string, filterValue: string[]): boolean {
+import { DefaultType } from './types';
+
+export function multiple<D extends DefaultType = DefaultType>(
+  { getValue }: Row<D>,
+  columnId: string,
+  filterValue: string[]
+): boolean {
   if (filterValue.length === 0) {
     return true;
   }

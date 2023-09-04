@@ -13,7 +13,6 @@ import {
   getFacetedMinMaxValues,
   getExpandedRowModel,
   TableOptions,
-  TableMeta,
 } from '@tanstack/react-table';
 import { ReactNode, useMemo } from 'react';
 import clsx from 'clsx';
@@ -28,7 +27,7 @@ import { DatatableFooter } from './DatatableFooter';
 import { defaultGetRowId } from './defaultGetRowId';
 import { Table } from './Table';
 import { useGoToHighlightedRow } from './useGoToHighlightedRow';
-import { BasicTableSettings } from './types';
+import { BasicTableSettings, DefaultType } from './types';
 import { DatatableContent } from './DatatableContent';
 import { createSelectColumn } from './select-column';
 import { TableRow } from './TableRow';
@@ -48,10 +47,7 @@ export type PaginationProps =
       onPageChange(page: number): void;
     };
 
-export interface Props<
-  D extends Record<string, unknown>,
-  TMeta extends TableMeta<D> = TableMeta<D>
-> extends AutomationTestingProps {
+export interface Props<D extends DefaultType> extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
@@ -70,13 +66,10 @@ export interface Props<
   renderRow?(row: Row<D>, highlightedItemId?: string): ReactNode;
   getRowCanExpand?(row: Row<D>): boolean;
   noWidget?: boolean;
-  meta?: TMeta;
+  extendTableOptions?: (options: TableOptions<D>) => TableOptions<D>;
 }
 
-export function Datatable<
-  D extends Record<string, unknown>,
-  TMeta extends TableMeta<D> = TableMeta<D>
->({
+export function Datatable<D extends DefaultType>({
   columns,
   dataset,
   renderTableSettings = () => null,
@@ -96,12 +89,12 @@ export function Datatable<
   noWidget,
   getRowCanExpand,
   'data-cy': dataCy,
-  meta,
   onPageChange = () => {},
   page,
   totalCount = dataset.length,
   isServerSidePagination = false,
-}: Props<D, TMeta> & PaginationProps) {
+  extendTableOptions = (value) => value,
+}: Props<D> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
     [settings.pageSize, totalCount]
@@ -117,44 +110,48 @@ export function Datatable<
     [disableSelect, columns]
   );
 
-  const tableInstance = useReactTable<D>({
-    columns: allColumns,
-    data: dataset,
-    initialState: {
-      pagination: {
-        pageSize: settings.pageSize,
-        pageIndex: page || 0,
-      },
-      sorting: settings.sortBy ? [settings.sortBy] : [],
-      globalFilter: settings.search,
+  const tableInstance = useReactTable<D>(
+    extendTableOptions({
+      columns: allColumns,
+      data: dataset,
+      initialState: {
+        pagination: {
+          pageSize: settings.pageSize,
+          pageIndex: page || 0,
+        },
+        sorting: settings.sortBy ? [settings.sortBy] : [],
+        globalFilter: {
+          search: settings.search,
+          ...initialTableState.globalFilter,
+        },
 
-      ...initialTableState,
-    },
-    defaultColumn: {
-      enableColumnFilter: false,
-      enableHiding: true,
-      sortingFn: 'alphanumeric',
-    },
-    enableRowSelection,
-    autoResetExpanded: false,
-    globalFilterFn,
-    getRowId,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand,
-    getColumnCanGlobalFilter,
-    ...(isServerSidePagination
-      ? { manualPagination: true, pageCount }
-      : {
-          getSortedRowModel: getSortedRowModel(),
-        }),
-    meta,
-  });
+        ...initialTableState,
+      },
+      defaultColumn: {
+        enableColumnFilter: false,
+        enableHiding: true,
+        sortingFn: 'alphanumeric',
+      },
+      enableRowSelection,
+      autoResetExpanded: false,
+      globalFilterFn: defaultGlobalFilterFn,
+      getRowId,
+      getCoreRowModel: getCoreRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getFacetedRowModel: getFacetedRowModel(),
+      getFacetedUniqueValues: getFacetedUniqueValues(),
+      getFacetedMinMaxValues: getFacetedMinMaxValues(),
+      getExpandedRowModel: getExpandedRowModel(),
+      getRowCanExpand,
+      getColumnCanGlobalFilter,
+      ...(isServerSidePagination
+        ? { manualPagination: true, pageCount }
+        : {
+            getSortedRowModel: getSortedRowModel(),
+          }),
+    })
+  );
 
   const tableState = tableInstance.getState();
 
@@ -201,9 +198,9 @@ export function Datatable<
     </Table.Container>
   );
 
-  function handleSearchBarChange(value: string) {
-    tableInstance.setGlobalFilter(value);
-    settings.setSearch(value);
+  function handleSearchBarChange(search: string) {
+    tableInstance.setGlobalFilter({ search });
+    settings.setSearch(search);
   }
 
   function handlePageChange(page: number) {
@@ -221,7 +218,7 @@ export function Datatable<
   }
 }
 
-function defaultRenderRow<D extends Record<string, unknown>>(
+function defaultRenderRow<D extends DefaultType>(
   row: Row<D>,
   highlightedItemId?: string
 ) {
@@ -235,7 +232,7 @@ function defaultRenderRow<D extends Record<string, unknown>>(
   );
 }
 
-function getIsSelectionEnabled<D extends Record<string, unknown>>(
+function getIsSelectionEnabled<D extends DefaultType>(
   disabledSelect?: boolean,
   isRowSelectable?: Props<D>['isRowSelectable']
 ) {
@@ -250,14 +247,14 @@ function getIsSelectionEnabled<D extends Record<string, unknown>>(
   return true;
 }
 
-function globalFilterFn<D>(
+export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
   row: Row<D>,
   columnId: string,
-  filterValue: null | string
+  filterValue: null | TFilter
 ): boolean {
   const value = row.getValue(columnId);
 
-  if (filterValue === null || filterValue === '') {
+  if (filterValue === null || !filterValue.search) {
     return true;
   }
 
@@ -265,7 +262,7 @@ function globalFilterFn<D>(
     return false;
   }
 
-  const filterValueLower = filterValue.toLowerCase();
+  const filterValueLower = filterValue.search.toLowerCase();
 
   if (
     typeof value === 'string' ||

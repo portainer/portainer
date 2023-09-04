@@ -15,7 +15,7 @@ import { IngressControllerClassMap } from '../types';
 import { columns } from './columns';
 
 const storageKey = 'ingressClasses';
-const settingsStore = createPersistedStore(storageKey);
+const settingsStore = createPersistedStore(storageKey, 'name');
 
 interface Props {
   onChangeControllers: (
