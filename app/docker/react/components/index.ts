@@ -127,7 +127,7 @@ const ngModule = angular
   .component(
     'dockerContainerProcessesDatatable',
     r2a(ProcessesDatatable, ['dataset', 'headers'])
-  );
+  )
   .component(
     'dockerServicesDatatableScaleServiceButton',
     r2a(withUIRouter(withCurrentUser(ScaleServiceButton)), ['service'])
