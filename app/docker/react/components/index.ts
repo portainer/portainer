@@ -20,6 +20,7 @@ import { EventsDatatable } from '@/react/docker/events/EventsDatatables';
 import { ConfigsDatatable } from '@/react/docker/configs/ListView/ConfigsDatatable';
 import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowser';
 import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
+import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
 
 const ngModule = angular
   .module('portainer.docker.react.components', [])
@@ -120,6 +121,10 @@ const ngModule = angular
       'relativePath',
     ])
   )
-  .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']));
+  .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
+  .component(
+    'dockerContainerProcessesDatatable',
+    r2a(ProcessesDatatable, ['dataset', 'headers'])
+  );
 
 export const componentsModule = ngModule.name;
