@@ -1,5 +1,5 @@
 import { Layers } from 'lucide-react';
-import { Row, TableMeta } from '@tanstack/react-table';
+import { Row } from '@tanstack/react-table';
 
 import { useAuthorizations, useCurrentUser } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -8,6 +8,7 @@ import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { defaultGlobalFilterFn } from '@@/datatables/Datatable';
+import { withGlobalFilter } from '@@/datatables/extend-options/withGlobalFilter';
 
 import { isExternalStack, isOrphanedStack } from '../../view-models/utils';
 
@@ -41,11 +42,7 @@ export function StacksDatatable({
   const columns = useColumns(isImageNotificationEnabled);
 
   return (
-    <Datatable<
-      DecoratedStack,
-      TableMeta<DecoratedStack>,
-      { search: string; showOrphanedStacks: boolean }
-    >
+    <Datatable<DecoratedStack>
       settingsManager={tableState}
       title="Stacks"
       titleIcon={Layers}
@@ -64,7 +61,6 @@ export function StacksDatatable({
         allowSelection(item, isAdmin, canManageStacks)
       }
       getRowId={(item) => item.Id.toString()}
-      globalFilterFn={globalFilterFn}
       initialTableState={{
         globalFilter: {
           showOrphanedStacks: tableState.showOrphanedStacks,
@@ -73,6 +69,7 @@ export function StacksDatatable({
           tableState.hiddenColumns.map((col) => [col, false])
         ),
       }}
+      extendTableOptions={withGlobalFilter(globalFilterFn)}
     />
   );
 }
