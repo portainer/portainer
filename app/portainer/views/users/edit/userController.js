@@ -72,7 +72,7 @@ angular.module('portainer.app').controller('UserController', [
       if (!confirmed) {
         return;
       }
-      UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
+      UserService.updateUser($scope.user.Id, { newPassword: $scope.formValues.newPassword })
         .then(function success() {
           Notifications.success('Success', 'Password successfully updated');
 
