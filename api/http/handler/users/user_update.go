@@ -45,6 +45,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 // @id UserUpdate
 // @summary Update a user
 // @description Update user details. A regular user account can only update his details.
+// @description A regular user account cannot change their username or role.
 // @description **Access policy**: authenticated
 // @tags users
 // @security ApiKeyAuth
@@ -97,6 +98,10 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if payload.Username != "" && payload.Username != user.Username {
+		if tokenData.Role != portainer.AdministratorRole {
+			return httperror.Forbidden("Permission denied. Unable to update username", httperrors.ErrResourceAccessDenied)
+		}
+
 		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
 		if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 			return httperror.InternalServerError("Unable to retrieve users from the database", err)
