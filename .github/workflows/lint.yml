@@ -25,7 +25,7 @@ jobs:
           cache: 'yarn'
       - uses: actions/setup-go@v4
         with:
-          go-version: 1.19.5
+          go-version: 1.21.0
       - run: yarn --frozen-lockfile
       - name: Run linters
         uses: wearerequired/lint-action@v1

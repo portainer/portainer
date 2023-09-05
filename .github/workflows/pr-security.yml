@@ -7,7 +7,7 @@ on:
       - edited
     paths:
       - 'package.json'
-      - 'api/go.mod'
+      - 'go.mod'
       - 'gruntfile.js'
       - 'build/linux/Dockerfile'
       - 'build/linux/alpine.Dockerfile'
@@ -84,7 +84,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.19.5'
+          go-version: '1.21.0'
 
       - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
@@ -95,7 +95,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           yarn global add snyk
-          snyk test --file=./api/go.mod --json-file-output=snyk.json 2>/dev/null || :
+          snyk test --file=./go.mod --json-file-output=snyk.json 2>/dev/null || :
 
       - name: upload scan result as pull-request artifact
         uses: actions/upload-artifact@v3
@@ -143,10 +143,10 @@ jobs:
       - name: checkout code
         uses: actions/checkout@master
 
-      - name: install Go 1.19.5
+      - name: install Go 1.21.0
         uses: actions/setup-go@v3
         with:
-          go-version: '1.19.5'
+          go-version: '1.21.0'
 
       - name: install Node.js 18.x
         uses: actions/setup-node@v3
