@@ -3,6 +3,8 @@ package websocket
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -80,6 +82,14 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 }
 
 func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		log.Warn().
+			Err(err).
+			Msg("unable to retrieve user details from authentication token")
+		return err
+	}
+
 	r.Header.Del("Origin")
 
 	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
@@ -94,10 +104,15 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 	}
 	defer websocketConn.Close()
 
-	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID)
+	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID, tokenData.Token)
 }
 
-func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, execID string) error {
+func hijackExecStartOperation(
+	websocketConn *websocket.Conn,
+	endpoint *portainer.Endpoint,
+	execID string,
+	token string,
+) error {
 	dial, err := initDial(endpoint)
 	if err != nil {
 		return err
@@ -121,7 +136,7 @@ func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer
 		return err
 	}
 
-	return hijackRequest(websocketConn, httpConn, execStartRequest)
+	return hijackRequest(websocketConn, httpConn, execStartRequest, token)
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {
