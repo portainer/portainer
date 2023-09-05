@@ -1,11 +1,12 @@
 package endpoints
 
 import (
+	"slices"
+
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/set"
-	"github.com/portainer/portainer/api/internal/slices"
 )
 
 func updateEnvironmentEdgeGroups(tx dataservices.DataStoreTx, newEdgeGroups []portainer.EdgeGroupID, environmentID portainer.EndpointID) (bool, error) {
@@ -52,7 +53,7 @@ func updateEnvironmentEdgeGroups(tx dataservices.DataStoreTx, newEdgeGroups []po
 
 	removeEdgeGroups := environmentEdgeGroupsSet.Difference(newEdgeGroupsSet)
 	err = updateSet(removeEdgeGroups, func(edgeGroup *portainer.EdgeGroup) {
-		edgeGroup.Endpoints = slices.RemoveItem(edgeGroup.Endpoints, func(eID portainer.EndpointID) bool {
+		edgeGroup.Endpoints = slices.DeleteFunc(edgeGroup.Endpoints, func(eID portainer.EndpointID) bool {
 			return eID == environmentID
 		})
 	})

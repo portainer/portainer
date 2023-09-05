@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 )
 
