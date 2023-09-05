@@ -3,6 +3,7 @@ package endpoints
 import (
 	"errors"
 	"net/http"
+	"slices"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -131,10 +132,14 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	for _, edgeGroup := range edgeGroups {
 		if featureflags.IsEnabled(portainer.FeatureNoTx) {
 			err = handler.DataStore.EdgeGroup().UpdateEdgeGroupFunc(edgeGroup.ID, func(g *portainer.EdgeGroup) {
-				g.Endpoints = removeElement(g.Endpoints, endpoint.ID)
+				g.Endpoints = slices.DeleteFunc(g.Endpoints, func(e portainer.EndpointID) bool {
+					return e == endpoint.ID
+				})
 			})
 		} else {
-			edgeGroup.Endpoints = removeElement(edgeGroup.Endpoints, endpoint.ID)
+			edgeGroup.Endpoints = slices.DeleteFunc(edgeGroup.Endpoints, func(e portainer.EndpointID) bool {
+				return e == endpoint.ID
+			})
 			tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
 		}
 
@@ -206,16 +211,4 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	}
 
 	return nil
-}
-
-func removeElement(slice []portainer.EndpointID, elem portainer.EndpointID) []portainer.EndpointID {
-	for i, id := range slice {
-		if id == elem {
-			slice[i] = slice[len(slice)-1]
-
-			return slice[:len(slice)-1]
-		}
-	}
-
-	return slice
 }
