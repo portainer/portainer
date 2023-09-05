@@ -8,7 +8,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -34,14 +33,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.BadRequest("Invalid tag identifier route variable", err)
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = deleteTag(handler.DataStore, portainer.TagID(id))
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return deleteTag(tx, portainer.TagID(id))
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return deleteTag(tx, portainer.TagID(id))
+	})
 	if err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {
@@ -118,27 +112,14 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 		}
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		for _, edgeGroup := range edgeGroups {
-			err = tx.EdgeGroup().UpdateEdgeGroupFunc(edgeGroup.ID, func(g *portainer.EdgeGroup) {
-				g.TagIDs = slices.DeleteFunc(g.TagIDs, func(t portainer.TagID) bool {
-					return t == tagID
-				})
-			})
-			if err != nil {
-				return httperror.InternalServerError("Unable to update edge group", err)
-			}
-		}
-	} else {
-		for _, edgeGroup := range edgeGroups {
-			edgeGroup.TagIDs = slices.DeleteFunc(edgeGroup.TagIDs, func(t portainer.TagID) bool {
-				return t == tagID
-			})
+	for _, edgeGroup := range edgeGroups {
+		edgeGroup.TagIDs = slices.DeleteFunc(edgeGroup.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
 
-			err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
-			if err != nil {
-				return httperror.InternalServerError("Unable to update edge group", err)
-			}
+		err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
+		if err != nil {
+			return httperror.InternalServerError("Unable to update edge group", err)
 		}
 	}
 

@@ -7,7 +7,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -70,15 +69,10 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	var stack *portainer.EdgeStack
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		stack, err = handler.updateEdgeStackStatus(handler.DataStore, r, portainer.EdgeStackID(stackID), payload)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			stack, err = handler.updateEdgeStackStatus(tx, r, portainer.EdgeStackID(stackID), payload)
-			return err
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stack, err = handler.updateEdgeStackStatus(tx, r, portainer.EdgeStackID(stackID), payload)
+		return err
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
@@ -130,22 +124,11 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		Time:  payload.Time,
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = tx.EdgeStack().UpdateEdgeStackFunc(stackID, func(edgeStack *portainer.EdgeStack) {
-			updateEnvStatus(payload.EndpointID, edgeStack, deploymentStatus)
+	updateEnvStatus(payload.EndpointID, stack, deploymentStatus)
 
-			stack = edgeStack
-		})
-		if err != nil {
-			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
-		}
-	} else {
-		updateEnvStatus(payload.EndpointID, stack, deploymentStatus)
-
-		err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
-		if err != nil {
-			return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
-		}
+	err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
+	if err != nil {
+		return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
 	}
 
 	return stack, nil

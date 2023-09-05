@@ -6,7 +6,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -35,14 +34,9 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 		return httperror.Forbidden("Unable to remove the default 'Unassigned' group", errors.New("Cannot remove the default environment group"))
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = handler.deleteEndpointGroup(handler.DataStore, portainer.EndpointGroupID(endpointGroupID))
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.deleteEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID))
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return handler.deleteEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID))
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
@@ -89,20 +83,6 @@ func (handler *Handler) deleteEndpointGroup(tx dataservices.DataStoreTx, endpoin
 	}
 
 	for _, tagID := range endpointGroup.TagIDs {
-		if featureflags.IsEnabled(portainer.FeatureNoTx) {
-			err = tx.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
-				delete(tag.EndpointGroups, endpointGroup.ID)
-			})
-
-			if tx.IsErrObjectNotFound(err) {
-				return httperror.InternalServerError("Unable to find a tag inside the database", err)
-			} else if err != nil {
-				return httperror.InternalServerError("Unable to persist tag changes inside the database", err)
-			}
-
-			continue
-		}
-
 		tag, err := tx.Tag().Read(tagID)
 		if tx.IsErrObjectNotFound(err) {
 			return httperror.InternalServerError("Unable to find a tag inside the database", err)
