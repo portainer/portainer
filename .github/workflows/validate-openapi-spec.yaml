@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.18'
+          go-version: '1.21.0'
 
       - name: Download golang modules
         run: cd ./api && go get -t -v -d ./...

@@ -224,7 +224,7 @@
     "decompress": "^4.2.1",
     "**/lodash": "^4.17.21",
     "js-yaml": "^3.14.0",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "http-proxy": "^1.18.1",
     "**/@uirouter/react": "^1.0.7",
     "**/@uirouter/angularjs": "1.0.11",
