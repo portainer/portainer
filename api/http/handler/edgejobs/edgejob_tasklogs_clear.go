@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/slices"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -54,27 +53,15 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		updateEdgeJobFn := func(edgeJob *portainer.EdgeJob, endpointID portainer.EndpointID, endpointsFromGroups []portainer.EndpointID) error {
-			return handler.DataStore.EdgeJob().UpdateEdgeJobFunc(edgeJob.ID, func(j *portainer.EdgeJob) {
-				mutationFn(j, endpointID, endpointsFromGroups)
-			})
+			mutationFn(edgeJob, endpointID, endpointsFromGroups)
+
+			return tx.EdgeJob().Update(edgeJob.ID, edgeJob)
 		}
 
-		err = handler.clearEdgeJobTaskLogs(handler.DataStore, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			updateEdgeJobFn := func(edgeJob *portainer.EdgeJob, endpointID portainer.EndpointID, endpointsFromGroups []portainer.EndpointID) error {
-				mutationFn(edgeJob, endpointID, endpointsFromGroups)
-
-				return tx.EdgeJob().Update(edgeJob.ID, edgeJob)
-			}
-
-			return handler.clearEdgeJobTaskLogs(tx, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
-		})
-	}
-
+		return handler.clearEdgeJobTaskLogs(tx, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
+	})
 	if err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {

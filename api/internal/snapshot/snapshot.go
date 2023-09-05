@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/pkg/featureflags"
 
 	"github.com/rs/zerolog/log"
 )
@@ -263,14 +262,10 @@ func (service *Service) snapshotEndpoints() error {
 
 		snapshotError := service.SnapshotEndpoint(&endpoint)
 
-		if featureflags.IsEnabled(portainer.FeatureNoTx) {
-			updateEndpointStatus(service.dataStore, &endpoint, snapshotError)
-		} else {
-			service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-				updateEndpointStatus(tx, &endpoint, snapshotError)
-				return nil
-			})
-		}
+		service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			updateEndpointStatus(tx, &endpoint, snapshotError)
+			return nil
+		})
 	}
 
 	return nil
