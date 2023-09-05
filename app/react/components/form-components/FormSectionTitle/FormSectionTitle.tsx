@@ -33,7 +33,7 @@ export function FormSectionTitle({
   return (
     <div
       className={clsx(
-        'col-sm-12 mb-2 mt-1 pl-0 font-medium',
+        'col-sm-12 mb-2 mt-4 pl-0 font-medium',
         tailwindTitleSize[titleSize]
       )}
     >
