@@ -5,7 +5,10 @@ import { useTransitionHook } from '@uirouter/react';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { IngressClassDatatable } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable';
-import { EnvironmentId } from '@/react/portainer/environments/types';
+import {
+  Environment,
+  EnvironmentId,
+} from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -25,7 +28,7 @@ import {
 import { useIsRBACEnabledQuery } from '../../getIsRBACEnabled';
 
 import { useStorageClassesFormValues } from './useStorageClassesFormValues';
-import { ConfigureFormValues } from './types';
+import { ConfigureFormValues, StorageClassFormValues } from './types';
 import { configureValidationSchema } from './validation';
 import { RBACAlert } from './RBACAlert';
 import { EnableMetricsInput } from './EnableMetricsInput';
@@ -44,31 +47,11 @@ export function ConfigureForm() {
     useIngressControllerClassMapQuery({
       environmentId: environment?.Id,
     });
-  const initialValues: ConfigureFormValues | undefined = useMemo(() => {
-    if (!environment) {
-      return undefined;
-    }
-    return {
-      storageClasses: storageClassFormValues || [],
-      useLoadBalancer: !!environment.Kubernetes.Configuration.UseLoadBalancer,
-      useServerMetrics: !!environment.Kubernetes.Configuration.UseServerMetrics,
-      enableResourceOverCommit:
-        !!environment.Kubernetes.Configuration.EnableResourceOverCommit,
-      resourceOverCommitPercentage:
-        environment.Kubernetes.Configuration.ResourceOverCommitPercentage || 20,
-      restrictDefaultNamespace:
-        !!environment.Kubernetes.Configuration.RestrictDefaultNamespace,
-      restrictStandardUserIngressW:
-        !!environment.Kubernetes.Configuration.RestrictStandardUserIngressW,
-      ingressAvailabilityPerNamespace:
-        !!environment.Kubernetes.Configuration.IngressAvailabilityPerNamespace,
-      allowNoneIngressClass:
-        !!environment.Kubernetes.Configuration.AllowNoneIngressClass,
-      // deploymentOptions: environment.DeploymentOptions,
-      // changeWindow: environment.ChangeWindow,
-      ingressClasses: ingressClasses || [],
-    };
-  }, [environment, ingressClasses, storageClassFormValues]);
+  const initialValues = useInitialValues(
+    environment,
+    storageClassFormValues,
+    ingressClasses
+  );
 
   if (!initialValues || !environment) {
     return null;
@@ -388,6 +371,36 @@ function InnerForm({
       </div>
     </Form>
   );
+}
+
+function useInitialValues(
+  environment?: Environment | null,
+  storageClassFormValues?: StorageClassFormValues[],
+  ingressClasses?: IngressControllerClassMapRowData[]
+): ConfigureFormValues | undefined {
+  return useMemo(() => {
+    if (!environment) {
+      return undefined;
+    }
+    return {
+      storageClasses: storageClassFormValues || [],
+      useLoadBalancer: !!environment.Kubernetes.Configuration.UseLoadBalancer,
+      useServerMetrics: !!environment.Kubernetes.Configuration.UseServerMetrics,
+      enableResourceOverCommit:
+        !!environment.Kubernetes.Configuration.EnableResourceOverCommit,
+      resourceOverCommitPercentage:
+        environment.Kubernetes.Configuration.ResourceOverCommitPercentage || 20,
+      restrictDefaultNamespace:
+        !!environment.Kubernetes.Configuration.RestrictDefaultNamespace,
+      restrictStandardUserIngressW:
+        !!environment.Kubernetes.Configuration.RestrictStandardUserIngressW,
+      ingressAvailabilityPerNamespace:
+        !!environment.Kubernetes.Configuration.IngressAvailabilityPerNamespace,
+      allowNoneIngressClass:
+        !!environment.Kubernetes.Configuration.AllowNoneIngressClass,
+      ingressClasses: ingressClasses || [],
+    };
+  }, [environment, ingressClasses, storageClassFormValues]);
 }
 
 function isFormChanged(
