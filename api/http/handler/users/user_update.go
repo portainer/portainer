@@ -21,9 +21,10 @@ type themePayload struct {
 }
 
 type userUpdatePayload struct {
-	Username string `validate:"required" example:"bob"`
-	Password string `validate:"required" example:"cg9Wgky3"`
-	Theme    *themePayload
+	Username    string `validate:"required" example:"bob"`
+	Password    string `validate:"required" example:"cg9Wgky3"`
+	NewPassword string `validate:"required" example:"asfj2emv"`
+	Theme       *themePayload
 
 	// User role (1 for administrator account and 2 for regular account)
 	Role int `validate:"required" enums:"1,2" example:"2"`
@@ -37,6 +38,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
 		return errors.New("invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
+
 	return nil
 }
 
@@ -106,8 +108,20 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Username = payload.Username
 	}
 
-	if payload.Password != "" {
-		user.Password, err = handler.CryptoService.Hash(payload.Password)
+	if payload.NewPassword != "" {
+		// Non-admins need to supply the previous password
+		if tokenData.Role != portainer.AdministratorRole {
+			err := handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
+			if err != nil {
+				return httperror.Forbidden("Current password doesn't match. Password left unchanged", errors.New("Current password does not match the password provided. Please try again"))
+			}
+		}
+
+		if !handler.passwordStrengthChecker.Check(payload.NewPassword) {
+			return httperror.BadRequest("Password does not meet the minimum strength requirements", nil)
+		}
+
+		user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
 		if err != nil {
 			return httperror.InternalServerError("Unable to hash user password", errCryptoHashFailure)
 		}

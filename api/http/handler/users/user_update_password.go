@@ -87,7 +87,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 	}
 
 	if !handler.passwordStrengthChecker.Check(payload.NewPassword) {
-		return httperror.BadRequest("Password does not meet the requirements", nil)
+		return httperror.BadRequest("Password does not meet the minimum strength requirements", nil)
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)

@@ -54,8 +54,8 @@ export function UserService($q, Users, TeamService, TeamMembershipService) {
     return Users.remove({ id: id }).$promise;
   };
 
-  service.updateUser = function (id, { password, role, username }) {
-    return Users.update({ id }, { password, role, username }).$promise;
+  service.updateUser = function (id, { newPassword, role, username }) {
+    return Users.update({ id }, { newPassword, role, username }).$promise;
   };
 
   service.updateUserPassword = function (id, currentPassword, newPassword) {
