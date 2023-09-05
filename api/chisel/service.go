@@ -75,10 +75,11 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 		log.Debug().
 			Int("endpoint_id", int(endpointID)).
 			Float64("max_alive_minutes", maxAlive.Minutes()).
-			Msg("start")
+			Msg("KeepTunnelAlive: start")
 
 		maxAliveTicker := time.NewTicker(maxAlive)
 		defer maxAliveTicker.Stop()
+
 		pingTicker := time.NewTicker(tunnelCleanupInterval)
 		defer pingTicker.Stop()
 
@@ -91,13 +92,13 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 					log.Debug().
 						Int("endpoint_id", int(endpointID)).
 						Err(err).
-						Msg("ping agent")
+						Msg("KeepTunnelAlive: ping agent")
 				}
 			case <-maxAliveTicker.C:
 				log.Debug().
 					Int("endpoint_id", int(endpointID)).
 					Float64("timeout_minutes", maxAlive.Minutes()).
-					Msg("tunnel keep alive timeout")
+					Msg("KeepTunnelAlive: tunnel keep alive timeout")
 
 				return
 			case <-ctx.Done():
@@ -105,7 +106,7 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 				log.Debug().
 					Int("endpoint_id", int(endpointID)).
 					Err(err).
-					Msg("tunnel stop")
+					Msg("KeepTunnelAlive: tunnel stop")
 
 				return
 			}
