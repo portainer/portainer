@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -26,14 +25,10 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var edgeStack *portainer.EdgeStack
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		edgeStack, err = handler.createSwarmStack(handler.DataStore, method, dryrun, tokenData.ID, r)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			edgeStack, err = handler.createSwarmStack(tx, method, dryrun, tokenData.ID, r)
-			return err
-		})
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		edgeStack, err = handler.createSwarmStack(tx, method, dryrun, tokenData.ID, r)
+		return err
+	})
 	if err != nil {
 		switch {
 		case httperrors.IsInvalidPayloadError(err):

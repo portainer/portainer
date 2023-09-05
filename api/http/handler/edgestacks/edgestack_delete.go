@@ -6,7 +6,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -30,14 +29,9 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid edge stack identifier route variable", err)
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = handler.deleteEdgeStack(handler.DataStore, portainer.EdgeStackID(edgeStackID))
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.deleteEdgeStack(tx, portainer.EdgeStackID(edgeStackID))
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return handler.deleteEdgeStack(tx, portainer.EdgeStackID(edgeStackID))
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {

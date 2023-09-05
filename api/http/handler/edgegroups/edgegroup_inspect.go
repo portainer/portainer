@@ -5,7 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 )
@@ -29,14 +28,10 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 	}
 
 	var edgeGroup *portainer.EdgeGroup
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		edgeGroup, err = getEdgeGroup(handler.DataStore, portainer.EdgeGroupID(edgeGroupID))
-	} else {
-		err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-			edgeGroup, err = getEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
-			return err
-		})
-	}
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		edgeGroup, err = getEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
+		return err
+	})
 
 	return txResponse(w, edgeGroup, err)
 }
