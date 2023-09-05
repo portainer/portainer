@@ -43,23 +43,33 @@ const alertSettings: Record<
 export function Alert({
   color,
   title,
+  className,
   children,
-}: PropsWithChildren<{ color: AlertType; title?: string }>) {
+}: PropsWithChildren<{
+  color: AlertType;
+  title?: string;
+  className?: string;
+}>) {
   const { container, header, body, icon } = alertSettings[color];
 
   return (
-    <AlertContainer className={container}>
+    <AlertContainer className={clsx(container, className)}>
       {title ? (
         <>
           <AlertHeader className={header}>
             <Icon icon={icon} />
             {title}
           </AlertHeader>
-          <AlertBody className={body}>{children}</AlertBody>
+          <AlertBody className={body} hasTitle={!!title}>
+            {children}
+          </AlertBody>
         </>
       ) : (
-        <AlertBody className={clsx(body, 'flex items-center gap-2')}>
-          <Icon icon={icon} /> {children}
+        <AlertBody
+          className={clsx(body, 'flex items-start gap-2')}
+          hasTitle={!!title}
+        >
+          <Icon icon={icon} className="!mt-0.5 flex-none" /> {children}
         </AlertBody>
       )}
     </AlertContainer>
@@ -96,7 +106,12 @@ function AlertHeader({
 
 function AlertBody({
   className,
+  hasTitle,
   children,
-}: PropsWithChildren<{ className?: string }>) {
-  return <div className={clsx('ml-6 text-sm', className)}>{children}</div>;
+}: PropsWithChildren<{ className?: string; hasTitle: boolean }>) {
+  return (
+    <div className={clsx('text-sm', className, { 'ml-6': hasTitle })}>
+      {children}
+    </div>
+  );
 }

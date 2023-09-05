@@ -9,7 +9,7 @@ interface Option {
 
 interface Props {
   value: Option[];
-  onChange(storageClassName: string, value: readonly Option[]): void;
+  onChange(value: readonly Option[]): void;
   options: Option[];
   inputId?: string;
   storageClassName: string;
@@ -31,7 +31,7 @@ export function StorageAccessModeSelector({
       options={options}
       value={value}
       closeMenuOnSelect={false}
-      onChange={(value) => onChange(storageClassName, value)}
+      onChange={(value) => onChange(value)}
       inputId={inputId}
       placeholder="Not configured"
       data-cy={`kubeSetup-storageAccessSelect${storageClassName}`}

@@ -127,7 +127,7 @@ export type DeploymentOptions = {
 /**
  *  EndpointChangeWindow determine when GitOps stack/app updates may occur
  */
-interface EndpointChangeWindow {
+export interface EndpointChangeWindow {
   Enabled: boolean;
   StartTime: string;
   EndTime: string;
