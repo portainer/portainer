@@ -3,6 +3,7 @@ package tags
 import (
 	"errors"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -61,7 +62,10 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 		}
 
-		endpoint.TagIDs = removeElement(endpoint.TagIDs, tagID)
+		endpoint.TagIDs = slices.DeleteFunc(endpoint.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
+
 		err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
 			return httperror.InternalServerError("Unable to update environment", err)
@@ -74,7 +78,10 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 			return httperror.InternalServerError("Unable to retrieve environment group from the database", err)
 		}
 
-		endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagID)
+		endpointGroup.TagIDs = slices.DeleteFunc(endpointGroup.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
+
 		err = tx.EndpointGroup().Update(endpointGroup.ID, endpointGroup)
 		if err != nil {
 			return httperror.InternalServerError("Unable to update environment group", err)
@@ -106,7 +113,9 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 	}
 
 	for _, edgeGroup := range edgeGroups {
-		edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagID)
+		edgeGroup.TagIDs = slices.DeleteFunc(edgeGroup.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
 
 		err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
 		if err != nil {
@@ -141,16 +150,4 @@ func updateEndpointRelations(tx dataservices.DataStoreTx, endpoint portainer.End
 	endpointRelation.EdgeStacks = stacksSet
 
 	return tx.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
-}
-
-func removeElement(slice []portainer.TagID, elem portainer.TagID) []portainer.TagID {
-	for i, id := range slice {
-		if id == elem {
-			slice[i] = slice[len(slice)-1]
-
-			return slice[:len(slice)-1]
-		}
-	}
-
-	return slice
 }

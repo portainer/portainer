@@ -3,6 +3,7 @@ package endpoints
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/unique"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 

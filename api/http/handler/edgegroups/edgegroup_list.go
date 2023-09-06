@@ -3,10 +3,10 @@ package edgegroups
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/internal/slices"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 

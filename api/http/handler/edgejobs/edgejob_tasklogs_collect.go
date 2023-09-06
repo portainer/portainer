@@ -3,11 +3,11 @@ package edgejobs
 import (
 	"errors"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/api/internal/slices"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
