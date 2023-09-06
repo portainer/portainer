@@ -306,7 +306,7 @@
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center"><pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'namespace-yaml'" data="ctrl.pool.Yaml" />
+                <kube-yaml-inspector identifier="'namespace-yaml'" data="ctrl.pool.Yaml" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>
