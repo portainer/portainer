@@ -37,7 +37,7 @@ import (
 // @param SwarmID formData string false "Swarm cluster identifier. Required when method equals file and type equals 1. required when method is file"
 // @param Env formData string false "Environment(Endpoint) variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
 // @param file formData file false "Stack file. required when method is file"
-// @success 200 {object} portaineree.Stack
+// @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @deprecated

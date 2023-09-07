@@ -36,7 +36,7 @@ type edgeJobBasePayload struct {
 // @param method query string true "Creation Method" Enums(file, string)
 // @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
 // @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
-// @success 200 {object} portaineree.EdgeGroup
+// @success 200 {object} portainer.EdgeGroup
 // @failure 503 "Edge compute features are disabled"
 // @failure 500
 // @deprecated

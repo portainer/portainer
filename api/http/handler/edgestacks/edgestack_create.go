@@ -23,7 +23,7 @@ import (
 // @param body_string body edgeStackFromFileUploadPayload true "Required when using method=string"
 // @param body_file body edgeStackFromFileUploadPayload true "Required when using method=file"
 // @param body_repository body edgeStackFromGitRepositoryPayload true "Required when using method=repository"
-// @success 200 {object} portaineree.EdgeStack
+// @success 200 {object} portainer.EdgeStack
 // @failure 500
 // @failure 503 "Edge compute features are disabled"
 // @deprecated
