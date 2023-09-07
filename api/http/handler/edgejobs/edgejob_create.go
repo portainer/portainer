@@ -27,10 +27,28 @@ type edgeJobBasePayload struct {
 	EdgeGroups     []portainer.EdgeGroupID
 }
 
+// @id EdgeJobCreate
+// @summary Create an EdgeJob
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file, string)
+// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
+// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
+// @success 200 {object} portaineree.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @deprecated
+// @router /edge_jobs [post]
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+		method, err = request.RetrieveQueryParameter(r, "method", true)
+		if err != nil {
+			return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+		}
 	}
 
 	switch method {

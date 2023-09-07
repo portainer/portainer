@@ -13,11 +13,31 @@ import (
 	"github.com/portainer/portainer/pkg/featureflags"
 )
 
+// @id EdgeStackCreate
+// @summary Create an EdgeStack
+// @description **Access policy**: administrator
+// @tags edge_stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file,string,repository)
+// @param body_string body edgeStackFromFileUploadPayload true "Required when using method=string"
+// @param body_file body edgeStackFromFileUploadPayload true "Required when using method=file"
+// @param body_repository body edgeStackFromGitRepositoryPayload true "Required when using method=repository"
+// @success 200 {object} portaineree.EdgeStack
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @deprecated
+// @router /edge_stacks [post]
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method", err)
+		method, err = request.RetrieveQueryParameter(r, "method", true)
+		if err != nil {
+			return httperror.BadRequest("Invalid query parameter: method", err)
+		}
 	}
+
 	dryrun, _ := request.RetrieveBooleanQueryParameter(r, "dryrun", true)
 
 	tokenData, err := security.RetrieveTokenData(r)

@@ -13,15 +13,49 @@ import (
 	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
+// @id StackCreate
+// @summary Deploy a new stack
+// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json,multipart/form-data
+// @produce json
+// @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack), 2 (Compose stack) or 3 (Kubernetes stack)." Enums(1,2,3)
+// @param method query string true "Stack deployment method. Possible values: file, string, repository or url." Enums(string, file, repository, url)
+// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @param body_swarm_string body swarmStackFromFileContentPayload false "Required when using method=string and type=1"
+// @param body_swarm_repository body swarmStackFromGitRepositoryPayload false "Required when using method=repository and type=1"
+// @param body_compose_string body composeStackFromFileContentPayload false "Required when using method=string and type=2"
+// @param body_compose_repository body composeStackFromGitRepositoryPayload false "Required when using method=repository and type=2"
+// @param body_kubernetes_string body kubernetesStringDeploymentPayload false "Required when using method=string and type=3"
+// @param body_kubernetes_repository body kubernetesGitDeploymentPayload false "Required when using method=repository and type=3"
+// @param body_kubernetes_url body kubernetesManifestURLDeploymentPayload false "Required when using method=url and type=3"
+// @param Name formData string false "Name of the stack. required when method is file"
+// @param SwarmID formData string false "Swarm cluster identifier. Required when method equals file and type equals 1. required when method is file"
+// @param Env formData string false "Environment(Endpoint) variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
+// @param file formData file false "Stack file. required when method is file"
+// @success 200 {object} portaineree.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @deprecated
+// @router /stacks [post]
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackType, err := request.RetrieveRouteVariableValue(r, "type")
 	if err != nil {
-		return httperror.BadRequest("Invalid path parameter: type", err)
+		stackType, err = request.RetrieveQueryParameter(r, "type", true)
+		if err != nil {
+			return httperror.BadRequest("Invalid path parameter: type", err)
+		}
 	}
 
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		return httperror.BadRequest("Invalid path parameter: method", err)
+		method, err = request.RetrieveQueryParameter(r, "method", true)
+		if err != nil {
+			return httperror.BadRequest("Invalid path parameter: method", err)
+		}
 	}
 
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
