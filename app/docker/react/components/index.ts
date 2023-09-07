@@ -25,9 +25,13 @@ import { ScaleServiceButton } from '@/react/docker/services/ListView/ServicesDat
 import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatable';
 
 import { containersModule } from './containers';
+import { servicesModule } from './services';
 
 const ngModule = angular
-  .module('portainer.docker.react.components', [containersModule])
+  .module('portainer.docker.react.components', [
+    containersModule,
+    servicesModule,
+  ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
   .component(
@@ -37,7 +41,6 @@ const ngModule = angular
       'nodeName',
       'state',
       'status',
-      'taskId',
     ])
   )
   .component('templateListDropdown', TemplateListDropdownAngular)
