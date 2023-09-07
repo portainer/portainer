@@ -29,6 +29,8 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 
 	h.Handle("/edge_jobs",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobList)))).Methods(http.MethodGet)
+	h.Handle("/edge_jobs",
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/create/{method}",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/{id}",

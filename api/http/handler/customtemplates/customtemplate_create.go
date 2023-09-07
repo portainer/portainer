@@ -22,10 +22,36 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// @id CustomTemplateCreate
+// @summary Create a custom template
+// @description Create a custom template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @accept json,multipart/form-data
+// @produce json
+// @param method query string true "method for creating template" Enums(string, file, repository)
+// @param body_string body customTemplateFromFileContentPayload false "Required when using method=string"
+// @param body_repository body customTemplateFromGitRepositoryPayload false "Required when using method=repository"
+// @param Title formData string false "Title of the template. required when method is file"
+// @param Description formData string false "Description of the template. required when method is file"
+// @param Note formData string false "A note that will be displayed in the UI. Supports HTML content"
+// @param Platform formData int false "Platform associated to the template (1 - 'linux', 2 - 'windows'). required when method is file" Enums(1,2)
+// @param Type formData int false "Type of created stack (1 - swarm, 2 - compose), required when method is file" Enums(1,2)
+// @param file formData file false "required when method is file"
+// @success 200 {object} portaineree.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @deprecated
+// @router /custom_templates [post]
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method", err)
+		method, err = request.RetrieveQueryParameter(r, "method", true)
+		if err != nil {
+			return httperror.BadRequest("Invalid query parameter: method", err)
+		}
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
