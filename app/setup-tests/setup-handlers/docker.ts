@@ -1,7 +1,5 @@
 import { DefaultBodyType, PathParams, rest } from 'msw';
-import { SystemInfo } from 'docker-types/generated/1.41';
-
-import { VersionResponse } from '@/react/docker/proxy/queries/useVersion';
+import { SystemInfo, SystemVersion } from 'docker-types/generated/1.41';
 
 export const dockerHandlers = [
   rest.get<DefaultBodyType, PathParams, SystemInfo>(
@@ -16,7 +14,7 @@ export const dockerHandlers = [
         })
       )
   ),
-  rest.get<DefaultBodyType, PathParams, VersionResponse>(
+  rest.get<DefaultBodyType, PathParams, SystemVersion>(
     '/api/endpoints/:endpointId/docker/version',
     (req, res, ctx) => res(ctx.json({ ApiVersion: '1.24' }))
   ),
