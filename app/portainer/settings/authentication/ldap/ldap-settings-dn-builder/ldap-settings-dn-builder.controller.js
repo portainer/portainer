@@ -49,7 +49,7 @@ export default class LdapSettingsBaseDnBuilderController {
       const [, type, value] = match;
       ouValues.push({ type, value });
       left = left.replace(regex, '');
-      match = left.match(/(\w+)=(\w+),?/);
+      match = left.match(regex);
     }
     return ouValues;
   }
