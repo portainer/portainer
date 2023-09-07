@@ -1,3 +1,9 @@
+import { ResourceControlResponse } from '@/react/portainer/access-control/types';
+import {
+  AutoUpdateResponse,
+  RepoConfigResponse,
+} from '@/react/portainer/gitops/types';
+
 export type StackId = number;
 
 export enum StackType {
@@ -22,6 +28,41 @@ export enum StackType {
 export enum StackStatus {
   Active = 1,
   Inactive,
+}
+
+export interface Stack {
+  Id: number;
+  Name: string;
+  Type: StackType;
+  EndpointID: number;
+  SwarmID: string;
+  EntryPoint: string;
+  Env: {
+    name: string;
+    value: string;
+  }[];
+  ResourceControl?: ResourceControlResponse;
+  Status: StackStatus;
+  ProjectPath: string;
+  CreationDate: number;
+  CreatedBy: string;
+  UpdateDate: number;
+  UpdatedBy: string;
+  AdditionalFiles?: string[];
+  AutoUpdate?: AutoUpdateResponse;
+  Option?: {
+    Prune: boolean;
+    Force: boolean;
+  };
+  GitConfig?: RepoConfigResponse;
+  FromAppTemplate: boolean;
+  Namespace?: string;
+  IsComposeFormat: boolean;
+  Webhook?: string;
+  SupportRelativePath: boolean;
+  FilesystemPath: string;
+  StackFileVersion: string;
+  PreviousDeploymentInfo: unknown;
 }
 
 export type StackFile = {

@@ -11,16 +11,16 @@ export interface IResource {
   };
 }
 
-export function createOwnershipColumn<D extends IResource>(): ColumnDef<
-  D,
-  ResourceControlOwnership
-> {
+export function createOwnershipColumn<D extends IResource>(
+  enableHiding = true
+): ColumnDef<D, ResourceControlOwnership> {
   return {
     accessorFn: (row) =>
       row.ResourceControl?.Ownership || ResourceControlOwnership.ADMINISTRATORS,
     header: 'Ownership',
     id: 'ownership',
     cell: OwnershipCell,
+    enableHiding,
   };
 
   function OwnershipCell({

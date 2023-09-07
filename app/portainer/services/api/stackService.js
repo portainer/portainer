@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
+import { StackViewModel } from '@/react/docker/stacks/view-models/stack';
 
 angular.module('portainer.app').factory('StackService', [
   '$q',
@@ -164,11 +164,7 @@ angular.module('portainer.app').factory('StackService', [
       })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            if (item.EndpointId == endpointId) {
-              return new StackViewModel(item);
-            } else {
-              return new OrphanedStackViewModel(item);
-            }
+            return new StackViewModel(item, item.EndpointId == endpointId);
           });
 
           var externalStacks = data.externalStacks;
@@ -197,11 +193,7 @@ angular.module('portainer.app').factory('StackService', [
         })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            if (item.EndpointId == endpointId) {
-              return new StackViewModel(item);
-            } else {
-              return new OrphanedStackViewModel(item);
-            }
+            return new StackViewModel(item, item.EndpointId == endpointId);
           });
 
           var externalStacks = data.externalStacks;

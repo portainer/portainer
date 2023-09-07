@@ -1,7 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { isoDate } from '@/portainer/filters/filters';
-import { createOwnershipColumn } from '@/react/docker/components/datatable-helpers/createOwnershipColumn';
+import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
 
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
