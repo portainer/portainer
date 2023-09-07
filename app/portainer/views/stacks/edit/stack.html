@@ -164,20 +164,6 @@
                 </div>
               </div>
 
-              <div ng-if="isAdmin && applicationState.endpoint.type !== 4">
-                <div class="col-sm-12 form-section-title">
-                  Webhooks
-                  <por-switch-field
-                    name="EnableWebhook"
-                    checked="formValues.EnableWebhook"
-                    label-class="'col-sm-2'"
-                    tooltip="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
-                    label="'Create a Stack webhook'"
-                    feature-id="'stack-webhook'"
-                  ></por-switch-field>
-                </div>
-              </div>
-
               <!-- environment-variables -->
               <div ng-if="stack">
                 <environment-variables-panel
@@ -185,9 +171,25 @@
                   explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
                   on-change="(handleEnvVarChange)"
                   show-help-message="true"
+                  is-foldable="true"
                 ></environment-variables-panel>
               </div>
               <!-- !environment-variables -->
+
+              <!-- webhook -->
+              <div ng-if="isAdmin && applicationState.endpoint.type !== 4">
+                <div class="form-section-title"> Webhooks</div>
+                <por-switch-field
+                  name="EnableWebhook"
+                  checked="formValues.EnableWebhook"
+                  label-class="'col-sm-2'"
+                  tooltip="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
+                  label="'Create a Stack webhook'"
+                  feature-id="'stack-webhook'"
+                ></por-switch-field>
+              </div>
+              <!-- !webhook -->
+
               <!-- options -->
               <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27" authorization="PortainerStackUpdate">
                 <div class="col-sm-12 form-section-title"> Options </div>

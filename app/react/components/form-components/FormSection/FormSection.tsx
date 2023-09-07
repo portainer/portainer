@@ -9,6 +9,7 @@ interface Props {
   title: ReactNode;
   titleSize?: 'sm' | 'md' | 'lg';
   isFoldable?: boolean;
+  defaultFolded?: boolean;
 }
 
 export function FormSection({
@@ -16,8 +17,9 @@ export function FormSection({
   titleSize = 'md',
   children,
   isFoldable = false,
+  defaultFolded = isFoldable,
 }: PropsWithChildren<Props>) {
-  const [isExpanded, setIsExpanded] = useState(!isFoldable);
+  const [isExpanded, setIsExpanded] = useState(!defaultFolded);
 
   return (
     <>
