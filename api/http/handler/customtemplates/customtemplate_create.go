@@ -39,7 +39,7 @@ import (
 // @param Platform formData int false "Platform associated to the template (1 - 'linux', 2 - 'windows'). required when method is file" Enums(1,2)
 // @param Type formData int false "Type of created stack (1 - swarm, 2 - compose), required when method is file" Enums(1,2)
 // @param file formData file false "required when method is file"
-// @success 200 {object} portaineree.CustomTemplate
+// @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @deprecated
