@@ -45,7 +45,7 @@ import (
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackType, err := request.RetrieveRouteVariableValue(r, "type")
 	if err != nil {
-		stackType, err = request.RetrieveQueryParameter(r, "type", true)
+		stackType, err = getStackTypeFromQueryParameter(r)
 		if err != nil {
 			return httperror.BadRequest("Invalid path parameter: type", err)
 		}
@@ -173,4 +173,22 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	}
 
 	return response.JSON(w, stack)
+}
+
+func getStackTypeFromQueryParameter(r *http.Request) (string, error) {
+	stackType, err := request.RetrieveNumericQueryParameter(r, "type", true)
+	if err != nil {
+		return "", err
+	}
+
+	switch stackType {
+	case 1:
+		return "swarm", nil
+	case 2:
+		return "standalone", nil
+	case 3:
+		return "kubernetes", nil
+	}
+
+	return "", errors.New(request.ErrInvalidQueryParameter)
 }
