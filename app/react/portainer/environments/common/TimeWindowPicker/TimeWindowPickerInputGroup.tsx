@@ -57,6 +57,12 @@ export function TimeWindowPickerInputGroup({
     });
   }
 
+  // find the option index for react-select to scroll to the current option
+  const timeZoneOptionIndex = useMemo(
+    () => timeZoneOptions.findIndex((option) => option.value === timeZone),
+    [timeZone, timeZoneOptions]
+  );
+
   return (
     <div className="flex flex-wrap items-center gap-x-5">
       <div className="flex items-center gap-x-5">
@@ -90,7 +96,7 @@ export function TimeWindowPickerInputGroup({
       </div>
       <Select<Option<string>>
         options={timeZoneOptions}
-        value={{ value: timeZone, label: timeZone }}
+        value={timeZoneOptions[timeZoneOptionIndex]}
         className="w-72 min-w-fit"
         onChange={(newTimeZone) => {
           if (!newTimeZone) return;
