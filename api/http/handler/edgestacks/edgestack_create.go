@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -10,24 +11,9 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
-// @id EdgeStackCreate
-// @summary Create an EdgeStack
-// @description **Access policy**: administrator
-// @tags edge_stacks
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param method query string true "Creation Method" Enums(file,string,repository)
-// @param body_string body edgeStackFromFileUploadPayload true "Required when using method=string"
-// @param body_file body edgeStackFromFileUploadPayload true "Required when using method=file"
-// @param body_repository body edgeStackFromGitRepositoryPayload true "Required when using method=repository"
-// @success 200 {object} portainer.EdgeStack
-// @failure 500
-// @failure 503 "Edge compute features are disabled"
-// @deprecated
-// @router /edge_stacks [post]
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
@@ -74,4 +60,33 @@ func (handler *Handler) createSwarmStack(tx dataservices.DataStoreTx, method str
 	}
 
 	return nil, httperrors.NewInvalidPayloadError("Invalid value for query parameter: method. Value must be one of: string, repository or file")
+}
+
+// @id EdgeStackCreate
+// @summary Create an EdgeStack
+// @description **Access policy**: administrator
+// @tags edge_stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file,string,repository)
+// @param body_string body edgeStackFromFileUploadPayload true "Required when using method=string"
+// @param body_file body edgeStackFromFileUploadPayload true "Required when using method=file"
+// @param body_repository body edgeStackFromGitRepositoryPayload true "Required when using method=repository"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @deprecated
+// @router /edge_stacks [post]
+func (handler *Handler) edgeStackCreateDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	method, err := request.RetrieveQueryParameter(r, "method", true)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+	}
+
+	url := fmt.Sprintf("/api/edge_stacks/create/%s", method)
+	log.Warn().Msgf("This api is deprecated. Use %s instead", url)
+
+	http.Redirect(w, r, url, http.StatusPermanentRedirect)
+	return nil
 }
