@@ -64,6 +64,8 @@ export async function handleSubmitConfigureCluster(
     {
       id: environment.Id,
       updateEnvironmentPayload: updatedEnvironment,
+      initialIngressControllers:
+        initialValues?.ingressClasses as IngressControllerClassMapRowData[],
       ingressControllers:
         values.ingressClasses as IngressControllerClassMapRowData[],
       storageClassPatches,
