@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from 'react-query';
 import { Operation } from 'fast-json-patch';
+import _ from 'lodash';
 
-import { withError, withInvalidate } from '@/react-tools/react-query';
+import { withError } from '@/react-tools/react-query';
 import { environmentQueryKeys } from '@/react/portainer/environments/queries/query-keys';
 import {
   UpdateEnvironmentPayload,
@@ -16,6 +17,7 @@ import { IngressControllerClassMapRowData } from '../../ingressClass/types';
 export type ConfigureClusterPayloads = {
   id: number;
   updateEnvironmentPayload: Partial<UpdateEnvironmentPayload>;
+  initialIngressControllers: IngressControllerClassMapRowData[];
   ingressControllers: IngressControllerClassMapRowData[];
   storageClassPatches: {
     name: string;
@@ -30,6 +32,7 @@ export function useConfigureClusterMutation() {
     async ({
       id,
       updateEnvironmentPayload,
+      initialIngressControllers,
       ingressControllers,
       storageClassPatches,
     }: ConfigureClusterPayloads) => {
@@ -39,10 +42,16 @@ export function useConfigureClusterMutation() {
           patchStorageClass(id, name, patch)
         )
       );
-      await updateIngressControllerClassMap(id, ingressControllers);
+      // only update the ingress classes if they have changed
+      if (!_.isEqual(initialIngressControllers, ingressControllers)) {
+        await updateIngressControllerClassMap(id, ingressControllers);
+      }
     },
     {
-      ...withInvalidate(queryClient, [environmentQueryKeys.base()]),
+      onSuccess: () => {
+        // not returning the promise here because we don't want to wait for the invalidateQueries to complete (longer than the mutation itself)
+        queryClient.invalidateQueries(environmentQueryKeys.base());
+      },
       ...withError('Unable to apply configuration', 'Failure'),
     }
   );
