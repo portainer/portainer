@@ -498,15 +498,12 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 // @failure 500 "Server error"
 // @deprecated
 // @router /custom_templates [post]
-func (handler *Handler) customTemplateCreateDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) deprecatedCustomTemplateCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
 	method, err := request.RetrieveQueryParameter(r, "method", true)
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method", err)
+		return "", httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
 	url := fmt.Sprintf("/api/custom_templates/create/%s", method)
-	log.Warn().Msgf("This api is deprecated. Use %s instead", url)
-
-	http.Redirect(w, r, url, http.StatusPermanentRedirect)
-	return nil
+	return url, nil
 }
