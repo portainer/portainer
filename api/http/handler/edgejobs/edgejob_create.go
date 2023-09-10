@@ -16,7 +16,6 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/maps"
 	"github.com/portainer/portainer/pkg/featureflags"
-	"github.com/rs/zerolog/log"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -305,15 +304,11 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 // @failure 500
 // @deprecated
 // @router /edge_jobs [post]
-func (handler *Handler) edgeJobCreateDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) deprecatedEdgeJobCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
 	method, err := request.RetrieveQueryParameter(r, "method", true)
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
-	url := fmt.Sprintf("/api/edge_jobs/create/%s", method)
-	log.Warn().Msgf("This api is deprecated. Use %s instead", url)
-
-	http.Redirect(w, r, url, http.StatusPermanentRedirect)
-	return nil
+	return fmt.Sprintf("/api/edge_jobs/create/%s", method), nil
 }

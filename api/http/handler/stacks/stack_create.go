@@ -12,8 +12,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/stacks/stackutils"
-
-	"github.com/rs/zerolog/log"
 )
 
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -192,20 +190,16 @@ func getStackTypeFromQueryParameter(r *http.Request) (string, error) {
 // @failure 500 "Server error"
 // @deprecated
 // @router /stacks [post]
-func (handler *Handler) stackCreateDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) deprecatedStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
 	method, err := request.RetrieveQueryParameter(r, "method", true)
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
 	stackType, err := getStackTypeFromQueryParameter(r)
 	if err != nil {
-		return httperror.BadRequest("Invalid path parameter: type", err)
+		return "", httperror.BadRequest("Invalid path parameter: type", err)
 	}
 
-	url := fmt.Sprintf("/api/stacks/create/%s/%s", stackType, method)
-	log.Warn().Msgf("This api is deprecated. Use %s instead", url)
-
-	http.Redirect(w, r, url, http.StatusPermanentRedirect)
-	return nil
+	return fmt.Sprintf("/api/stacks/create/%s/%s", stackType, method), nil
 }

@@ -12,7 +12,6 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/pkg/featureflags"
-	"github.com/rs/zerolog/log"
 )
 
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -83,15 +82,11 @@ func (handler *Handler) createSwarmStack(tx dataservices.DataStoreTx, method str
 // @failure 503 "Edge compute features are disabled"
 // @deprecated
 // @router /edge_stacks [post]
-func (handler *Handler) edgeStackCreateDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) deprecatedEdgeStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
 	method, err := request.RetrieveQueryParameter(r, "method", true)
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
-	url := fmt.Sprintf("/api/edge_stacks/create/%s", method)
-	log.Warn().Msgf("This api is deprecated. Use %s instead", url)
-
-	http.Redirect(w, r, url, http.StatusPermanentRedirect)
-	return nil
+	return fmt.Sprintf("/api/edge_stacks/create/%s", method), nil
 }
