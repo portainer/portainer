@@ -2,6 +2,7 @@ package edgejobs
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/maps"
 	"github.com/portainer/portainer/pkg/featureflags"
+	"github.com/rs/zerolog/log"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -27,28 +29,10 @@ type edgeJobBasePayload struct {
 	EdgeGroups     []portainer.EdgeGroupID
 }
 
-// @id EdgeJobCreate
-// @summary Create an EdgeJob
-// @description **Access policy**: administrator
-// @tags edge_jobs
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param method query string true "Creation Method" Enums(file, string)
-// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
-// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
-// @success 200 {object} portainer.EdgeGroup
-// @failure 503 "Edge compute features are disabled"
-// @failure 500
-// @deprecated
-// @router /edge_jobs [post]
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		method, err = request.RetrieveQueryParameter(r, "method", true)
-		if err != nil {
-			return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
-		}
+		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
 	switch method {
@@ -304,4 +288,32 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 	}
 
 	return tx.EdgeJob().CreateWithID(edgeJob.ID, edgeJob)
+}
+
+// @id EdgeJobCreate
+// @summary Create an EdgeJob
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file, string)
+// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
+// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @deprecated
+// @router /edge_jobs [post]
+func (handler *Handler) edgeJobCreateDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	method, err := request.RetrieveQueryParameter(r, "method", true)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+	}
+
+	url := fmt.Sprintf("/api/edge_jobs/create/%s", method)
+	log.Warn().Msgf("This api is deprecated. Use %s instead", url)
+
+	http.Redirect(w, r, url, http.StatusPermanentRedirect)
+	return nil
 }
