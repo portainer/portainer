@@ -73,3 +73,7 @@ export function dockerNodeAvailabilityBadge(text: NodeSpec['Availability']) {
 
   return 'success';
 }
+
+export function hideShaSum(imageName = '') {
+  return imageName.split('@sha')[0];
+}

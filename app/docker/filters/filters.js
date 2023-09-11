@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
-import { joinCommand, taskStatusBadge, nodeStatusBadge, trimSHA, dockerNodeAvailabilityBadge } from './utils';
+import { matchesServiceConstraints } from '@/react/docker/services/ListView/ServicesDatatable/columns/schedulingMode/constraint-helper';
+import { dockerNodeAvailabilityBadge, hideShaSum, joinCommand, nodeStatusBadge, taskStatusBadge, trimSHA } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -159,31 +160,22 @@ angular
   .filter('command', function () {
     return joinCommand;
   })
-  .filter('hideshasum', function () {
+  .filter('hideshasum', () => hideShaSum)
+  // remove after removing old services table
+  .filter('availablenodecount', function () {
     'use strict';
-    return function (imageName) {
-      if (imageName) {
-        return imageName.split('@sha')[0];
+    return function (nodes, service) {
+      var availableNodes = 0;
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        if (node.Availability === 'active' && node.Status === 'ready' && matchesServiceConstraints(service, node)) {
+          availableNodes++;
+        }
       }
-      return '';
+      return availableNodes;
     };
   })
-  .filter('availablenodecount', [
-    'ConstraintsHelper',
-    function (ConstraintsHelper) {
-      'use strict';
-      return function (nodes, service) {
-        var availableNodes = 0;
-        for (var i = 0; i < nodes.length; i++) {
-          var node = nodes[i];
-          if (node.Availability === 'active' && node.Status === 'ready' && ConstraintsHelper.matchesServiceConstraints(service, node)) {
-            availableNodes++;
-          }
-        }
-        return availableNodes;
-      };
-    },
-  ])
+  // remove after removing old services table
   .filter('runningtaskscount', function () {
     'use strict';
     return function (tasks) {
