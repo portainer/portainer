@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { joinCommand, taskStatusBadge, trimSHA } from './utils';
+import { joinCommand, taskStatusBadge, nodeStatusBadge, trimSHA } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -75,15 +75,7 @@ angular
       return 'success';
     };
   })
-  .filter('nodestatusbadge', function () {
-    'use strict';
-    return function (text) {
-      if (text === 'down' || text === 'Unhealthy') {
-        return 'danger';
-      }
-      return 'success';
-    };
-  })
+  .filter('nodestatusbadge', () => nodeStatusBadge)
   .filter('dockerNodeAvailabilityBadge', function () {
     'use strict';
     return function (text) {
