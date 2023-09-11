@@ -852,6 +852,11 @@ angular.module('portainer.docker').controller('ServiceController', [
       return networks.filter((network) => !network.Ingress && (network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id)));
     }
 
+    $scope.filterConfigs = filterConfigs;
+    function filterConfigs(configs) {
+      return configs.filter((config) => $scope.service.ServiceConfigs.every((serviceConfig) => config.Id !== serviceConfig.Id));
+    }
+
     function updateServiceArray(service, name) {
       previousServiceValues.push(name);
       service.hasChanges = true;
