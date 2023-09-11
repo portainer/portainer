@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -154,17 +155,29 @@ func (factory *ClientFactory) createCachedAdminKubeClient(endpoint *portainer.En
 	}, nil
 }
 
-// CreateClient returns a pointer to a new Clientset instance
+// CreateClient returns a pointer to a new Clientset instance.
 func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
 	switch endpoint.Type {
-	case portainer.KubernetesLocalEnvironment:
-		return buildLocalClient()
-	case portainer.AgentOnKubernetesEnvironment:
-		return factory.buildAgentClient(endpoint)
-	case portainer.EdgeAgentOnKubernetesEnvironment:
-		return factory.buildEdgeClient(endpoint)
+	case portainer.KubernetesLocalEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.EdgeAgentOnKubernetesEnvironment:
+		c, err := factory.CreateConfig(endpoint)
+		if err != nil {
+			return nil, err
+		}
+		return kubernetes.NewForConfig(c)
 	}
+	return nil, errors.New("unsupported environment type")
+}
 
+// CreateConfig returns a pointer to a new kubeconfig ready to create a client.
+func (factory *ClientFactory) CreateConfig(endpoint *portainer.Endpoint) (*rest.Config, error) {
+	switch endpoint.Type {
+	case portainer.KubernetesLocalEnvironment:
+		return buildLocalConfig()
+	case portainer.AgentOnKubernetesEnvironment:
+		return factory.buildAgentConfig(endpoint)
+	case portainer.EdgeAgentOnKubernetesEnvironment:
+		return factory.buildEdgeConfig(endpoint)
+	}
 	return nil, errors.New("unsupported environment type")
 }
 
@@ -184,20 +197,64 @@ func (rt *agentHeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
 	return rt.roundTripper.RoundTrip(req)
 }
 
-func (factory *ClientFactory) buildAgentClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
-	endpointURL := fmt.Sprintf("https://%s/kubernetes", endpoint.URL)
+func (factory *ClientFactory) buildAgentConfig(endpoint *portainer.Endpoint) (*rest.Config, error) {
+	var clientURL strings.Builder
+	if !strings.HasPrefix(endpoint.URL, "http") {
+		clientURL.WriteString("https://")
+	}
+	clientURL.WriteString(endpoint.URL)
+	clientURL.WriteString("/kubernetes")
 
-	return factory.createRemoteClient(endpointURL)
+	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := clientcmd.BuildConfigFromFlags(clientURL.String(), "")
+	if err != nil {
+		return nil, err
+	}
+
+	config.Insecure = true
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
+
+	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
+		return &agentHeaderRoundTripper{
+			signatureHeader: signature,
+			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
+			roundTripper:    rt,
+		}
+	})
+	return config, nil
 }
 
-func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
+func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*rest.Config, error) {
 	tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed activating tunnel")
 	}
 	endpointURL := fmt.Sprintf("http://127.0.0.1:%d/kubernetes", tunnel.Port)
 
-	return factory.createRemoteClient(endpointURL)
+	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
+	if err != nil {
+		return nil, err
+	}
+
+	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	config.Insecure = true
+	config.QPS = DefaultKubeClientQPS
+	config.Burst = DefaultKubeClientBurst
+
+	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
+		return &agentHeaderRoundTripper{
+			signatureHeader: signature,
+			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
+			roundTripper:    rt,
+		}
+	})
+
+	return config, nil
 }
 
 func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernetes.Clientset, error) {
@@ -227,34 +284,14 @@ func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernete
 }
 
 func (factory *ClientFactory) CreateRemoteMetricsClient(endpoint *portainer.Endpoint) (*metricsv.Clientset, error) {
-	endpointURL := fmt.Sprintf("https://%s/kubernetes", endpoint.URL)
-
-	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	config, err := factory.CreateConfig(endpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create metrics KubeConfig")
 	}
-
-	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
-	if err != nil {
-		return nil, err
-	}
-
-	config.Insecure = true
-	config.QPS = DefaultKubeClientQPS
-	config.Burst = DefaultKubeClientBurst
-
-	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
-		return &agentHeaderRoundTripper{
-			signatureHeader: signature,
-			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
-			roundTripper:    rt,
-		}
-	})
-
 	return metricsv.NewForConfig(config)
 }
 
-func buildLocalClient() (*kubernetes.Clientset, error) {
+func buildLocalConfig() (*rest.Config, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
@@ -263,7 +300,7 @@ func buildLocalClient() (*kubernetes.Clientset, error) {
 	config.QPS = DefaultKubeClientQPS
 	config.Burst = DefaultKubeClientBurst
 
-	return kubernetes.NewForConfig(config)
+	return config, nil
 }
 
 func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint) error {
