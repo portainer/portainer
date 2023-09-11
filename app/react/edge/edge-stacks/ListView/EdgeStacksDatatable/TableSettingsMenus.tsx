@@ -14,24 +14,17 @@ export function TableSettingsMenus({
   tableInstance: Table<DecoratedEdgeStack>;
   tableState: TableSettings;
 }) {
-  const columnsToHide = tableInstance
-    .getAllColumns()
-    .filter((col) => col.getCanHide());
-
   return (
     <>
-      {columnsToHide && columnsToHide.length > 0 && (
-        <ColumnVisibilityMenu<DecoratedEdgeStack>
-          columns={columnsToHide}
-          onChange={(hiddenColumns) => {
-            tableState.setHiddenColumns(hiddenColumns);
-            tableInstance.setColumnVisibility(
-              Object.fromEntries(hiddenColumns.map((col) => [col, false]))
-            );
-          }}
-          value={tableState.hiddenColumns}
-        />
-      )}
+      (
+      <ColumnVisibilityMenu<DecoratedEdgeStack>
+        table={tableInstance}
+        onChange={(hiddenColumns) => {
+          tableState.setHiddenColumns(hiddenColumns);
+        }}
+        value={tableState.hiddenColumns}
+      />
+      )
       <TableSettingsMenu>
         <TableSettingsMenuAutoRefresh
           value={tableState.autoRefreshRate}

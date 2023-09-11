@@ -2,6 +2,7 @@ import { Layers } from 'lucide-react';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
+import { getColumnVisibilityState } from '@@/datatables/ColumnVisibilityMenu';
 
 import { useEdgeStacks } from '../../queries/useEdgeStacks';
 import { EdgeStack, StatusType } from '../../types';
@@ -33,6 +34,7 @@ export function EdgeStacksDatatable() {
       titleIcon={Layers}
       columns={columns}
       dataset={edgeStacksQuery.data || []}
+      initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
       settingsManager={tableState}
       emptyContentLabel="No stack available."
       isLoading={edgeStacksQuery.isLoading}
