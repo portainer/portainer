@@ -499,11 +499,11 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 // @deprecated
 // @router /custom_templates [post]
 func (handler *Handler) deprecatedCustomTemplateCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
-	method, err := request.RetrieveQueryParameter(r, "method", true)
+	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return "", httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
-	url := fmt.Sprintf("/api/custom_templates/create/%s", method)
+	url := fmt.Sprintf("/custom_templates/create/%s", method)
 	return url, nil
 }

@@ -296,10 +296,10 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 // @deprecated
 // @router /edge_jobs [post]
 func (handler *Handler) deprecatedEdgeJobCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
-	method, err := request.RetrieveQueryParameter(r, "method", true)
+	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
-	return fmt.Sprintf("/api/edge_jobs/create/%s", method), nil
+	return fmt.Sprintf("/edge_jobs/create/%s", method), nil
 }
