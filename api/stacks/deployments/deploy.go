@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/pkg/errors"
@@ -29,7 +30,9 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	log.Debug().Int("stack_id", int(stackID)).Msg("redeploying stack")
 
 	stack, err := datastore.Stack().Read(stackID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return scheduler.NewPermanentError(errors.WithMessagef(err, "failed to get the stack %v", stackID))
+	} else if err != nil {
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
 	}
 
@@ -38,7 +41,15 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	}
 
 	endpoint, err := datastore.Endpoint().Endpoint(stack.EndpointID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return scheduler.NewPermanentError(
+			errors.WithMessagef(err,
+				"failed to find the environment %v associated to the stack %v",
+				stack.EndpointID,
+				stack.ID,
+			),
+		)
+	} else if err != nil {
 		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
 	}
 
@@ -78,7 +89,9 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	}
 
 	registries, err := getUserRegistries(datastore, user, endpoint.ID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return scheduler.NewPermanentError(err)
+	} else if err != nil {
 		return err
 	}
 
