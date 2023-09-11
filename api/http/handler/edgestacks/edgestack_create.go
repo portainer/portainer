@@ -83,10 +83,10 @@ func (handler *Handler) createSwarmStack(tx dataservices.DataStoreTx, method str
 // @deprecated
 // @router /edge_stacks [post]
 func (handler *Handler) deprecatedEdgeStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
-	method, err := request.RetrieveQueryParameter(r, "method", true)
+	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
-	return fmt.Sprintf("/api/edge_stacks/create/%s", method), nil
+	return fmt.Sprintf("/edge_stacks/create/%s", method), nil
 }

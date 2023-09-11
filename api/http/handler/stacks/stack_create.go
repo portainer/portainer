@@ -22,10 +22,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		method, err = request.RetrieveQueryParameter(r, "method", true)
-		if err != nil {
-			return httperror.BadRequest("Invalid path parameter: method", err)
-		}
+		return httperror.BadRequest("Invalid path parameter: method", err)
 	}
 
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
@@ -145,7 +142,7 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 }
 
 func getStackTypeFromQueryParameter(r *http.Request) (string, error) {
-	stackType, err := request.RetrieveNumericQueryParameter(r, "type", true)
+	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {
 		return "", err
 	}
@@ -191,15 +188,15 @@ func getStackTypeFromQueryParameter(r *http.Request) (string, error) {
 // @deprecated
 // @router /stacks [post]
 func (handler *Handler) deprecatedStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
-	method, err := request.RetrieveQueryParameter(r, "method", true)
+	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
 	stackType, err := getStackTypeFromQueryParameter(r)
 	if err != nil {
-		return "", httperror.BadRequest("Invalid path parameter: type", err)
+		return "", httperror.BadRequest("Invalid query parameter: type", err)
 	}
 
-	return fmt.Sprintf("/api/stacks/create/%s/%s", stackType, method), nil
+	return fmt.Sprintf("/stacks/create/%s/%s", stackType, method), nil
 }

@@ -8,16 +8,18 @@ import (
 )
 
 // deprecate api route
-func Deprecated(urlBuilder func(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError)) http.Handler {
+func Deprecated(urlBuilder func(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError), router http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		url, err := urlBuilder(w, r)
+		newUrl, err := urlBuilder(w, r)
 		if err != nil {
 			httperror.WriteError(w, err.StatusCode, err.Error(), err)
 			return
 		}
 
-		log.Warn().Msgf("This api is deprecated. Use %s instead", url)
+		log.Warn().Msgf("This api is deprecated. Use %s instead", newUrl)
 
-		http.Redirect(w, r, url, http.StatusMovedPermanently)
+		redirectedRequest := r.Clone(r.Context())
+		redirectedRequest.URL.Path = newUrl
+		router.ServeHTTP(w, redirectedRequest)
 	})
 }

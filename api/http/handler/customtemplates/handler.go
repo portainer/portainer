@@ -33,7 +33,7 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 
 	h.Handle("/custom_templates/create/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateCreate))).Methods(http.MethodPost)
-	h.Handle("/custom_templates", middlewares.Deprecated(h.deprecatedCustomTemplateCreateUrlParser)).Methods(http.MethodPost) // Deprecated
+	h.Handle("/custom_templates", middlewares.Deprecated(h.deprecatedCustomTemplateCreateUrlParser, h)).Methods(http.MethodPost) // Deprecated
 	h.Handle("/custom_templates",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateCreate))).Methods(http.MethodPost)
 	h.Handle("/custom_templates",
