@@ -102,7 +102,6 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
       </FormControl>
 
       <EdgeCheckinIntervalField
-        size="xsmall"
         value={values.edgeAgentCheckinInterval}
         label="Edge agent default poll frequency"
         isDefaultHidden
