@@ -3,6 +3,7 @@ import { Loader } from 'lucide-react';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 import { statusIcon } from '@/react/docker/components/ImageStatus/helpers';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Icon } from '@@/Icon';
 
@@ -36,6 +37,10 @@ export function ImageStatus({
   );
 
   if (!enableImageNotificationQuery.data || isError) {
+    return null;
+  }
+
+  if (!isBE) {
     return null;
   }
 
