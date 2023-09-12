@@ -157,6 +157,16 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	return store
 }
 
+// checkDBSchemaServerVersionMatch checks if the server version matches the db scehma version
+func checkDBSchemaServerVersionMatch(dbStore dataservices.DataStore, serverVersion string) bool {
+	v, err := dbStore.Version().Version()
+	if err != nil {
+		return false
+	}
+
+	return v.SchemaVersion == serverVersion && v.Edition == int(portainer.Edition)
+}
+
 func initComposeStackManager(composeDeployer libstack.Deployer, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper, err := exec.NewComposeStackManager(composeDeployer, proxyManager)
 	if err != nil {
@@ -386,6 +396,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal().Err(err).Msg("")
+	}
+
+	// check if the db schema version matches with server version
+	if !checkDBSchemaServerVersionMatch(dataStore, portainer.APIVersion) {
+		log.Fatal().Msg("The database schema version does not align with the server version. Please consider reverting to the previous server version or addressing the database migration issue.")
 	}
 
 	instanceID, err := dataStore.Version().InstanceID()
