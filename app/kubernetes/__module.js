@@ -53,7 +53,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             try {
               await getSelfSubjectAccessReview(endpoint.Id, 'default');
             } catch (e) {
-              throw new Error('Environment is unreachable.');
+              throw new Error(`The environment named ${endpoint.Name} is unreachable.`);
             }
           } catch (e) {
             let params = {};
