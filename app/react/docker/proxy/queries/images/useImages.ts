@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { buildUrl } from '../../proxy/queries/build-url';
+import { buildUrl } from '../build-url';
 
 import { queryKeys } from './queryKeys';
 
