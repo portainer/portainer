@@ -77,7 +77,7 @@ func (handler *Handler) createSwarmStack(tx dataservices.DataStoreTx, method str
 // @failure 503 "Edge compute features are disabled"
 // @deprecated
 // @router /edge_stacks [post]
-func (handler *Handler) deprecatedEdgeStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
+func deprecatedEdgeStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)

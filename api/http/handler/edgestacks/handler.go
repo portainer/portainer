@@ -40,7 +40,7 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	h.Handle("/edge_stacks/create/{method}",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_stacks",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(middlewares.Deprecated(h.deprecatedEdgeStackCreateUrlParser, h)))).Methods(http.MethodPost) // Deprecated
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(middlewares.Deprecated(h, deprecatedEdgeStackCreateUrlParser)))).Methods(http.MethodPost) // Deprecated
 	h.Handle("/edge_stacks",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackList)))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}",
