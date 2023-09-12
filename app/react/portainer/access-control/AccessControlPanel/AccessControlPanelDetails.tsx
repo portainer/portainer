@@ -9,6 +9,7 @@ import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
 import { useCurrentUser } from '@/react/hooks/useUser';
+import { pluralize } from '@/portainer/helpers/strings';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -55,10 +56,18 @@ export function AccessControlPanelDetails({
   let teamsMessage = teams.data && teams.data.join(', ');
   if (unauthoisedTeams > 0 && teams.isFetched) {
     teamsMessage += teamsLength > 0 ? ' and' : '';
-    teamsMessage += ` ${unauthoisedTeams} team${
-      unauthoisedTeams > 1 ? 's' : ''
-    } you are not part of`;
+    teamsMessage += ` ${unauthoisedTeams} ${pluralize(
+      unauthoisedTeams,
+      'team'
+    )} you are not part of`;
   }
+
+  const userMessage = isAdmin
+    ? (users.data && users.data.join(', ')) || ''
+    : `${restrictedToUsers.length} ${pluralize(
+        restrictedToUsers.length,
+        'user'
+      )}`;
 
   return (
     <table className="table">
@@ -79,13 +88,7 @@ export function AccessControlPanelDetails({
         {restrictedToUsers.length > 0 && (
           <tr data-cy="access-authorisedUsers">
             <td>Authorized users</td>
-            <td aria-label="authorized-users">
-              {isAdmin
-                ? users.data && users.data.join(', ')
-                : `${restrictedToUsers.length} ${
-                    restrictedToUsers.length > 1 ? 'users' : 'user'
-                  }`}
-            </td>
+            <td aria-label="authorized-users">{userMessage}</td>
           </tr>
         )}
         {restrictedToTeams.length > 0 && (
