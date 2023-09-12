@@ -176,7 +176,7 @@ angular.module('portainer.app').controller('StackController', [
       // The EndpointID property is not available for these stacks, we can pass
       // the current endpoint identifier as a part of the migrate request. It will be used if
       // the EndpointID property is not defined on the stack.
-      if (stack.EndpointId === 0) {
+      if (!stack.EndpointId) {
         stack.EndpointId = endpoint.Id;
       }
 
