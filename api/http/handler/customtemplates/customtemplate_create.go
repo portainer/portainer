@@ -497,7 +497,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 // @failure 500 "Server error"
 // @deprecated
 // @router /custom_templates [post]
-func (handler *Handler) deprecatedCustomTemplateCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
+func deprecatedCustomTemplateCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return "", httperror.BadRequest("Invalid query parameter: method", err)

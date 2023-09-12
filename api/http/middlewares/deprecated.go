@@ -8,7 +8,7 @@ import (
 )
 
 // deprecate api route
-func Deprecated(urlBuilder func(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError), router http.Handler) http.Handler {
+func Deprecated(router http.Handler, urlBuilder func(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		newUrl, err := urlBuilder(w, r)
 		if err != nil {
