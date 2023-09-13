@@ -28,12 +28,14 @@ import { StacksDatatable } from '@/react/docker/stacks/ListView/StacksDatatable'
 import { containersModule } from './containers';
 import { servicesModule } from './services';
 import { networksModule } from './networks';
+import { swarmModule } from './swarm';
 
 const ngModule = angular
   .module('portainer.docker.react.components', [
     containersModule,
     servicesModule,
     networksModule,
+    swarmModule,
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
