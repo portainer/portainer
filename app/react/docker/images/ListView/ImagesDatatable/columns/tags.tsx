@@ -1,16 +1,16 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { DockerImage } from '@/react/docker/images/types';
+import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
 
 import { columnHelper } from './helper';
 
-export const tags = columnHelper.accessor('RepoTags', {
+export const tags = columnHelper.accessor('tags', {
   id: 'tags',
   header: 'Tags',
   cell: Cell,
 });
 
-function Cell({ getValue }: CellContext<DockerImage, string[]>) {
+function Cell({ getValue }: CellContext<ImagesListResponse, string[]>) {
   const repoTags = getValue();
 
   return (

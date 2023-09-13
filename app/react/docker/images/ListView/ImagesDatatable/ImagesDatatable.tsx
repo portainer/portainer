@@ -27,7 +27,7 @@ import { ButtonWithRef } from '@@/buttons/Button';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 
-import { DockerImage } from '../../types';
+import { ImagesListResponse, useImages } from '../../queries/useImages';
 
 import { columns as defColumns } from './columns';
 import { host as hostColumn } from './columns/host';
@@ -48,8 +48,6 @@ const settingsStore = createPersistedStore<TableSettings>(
 );
 
 export function ImagesDatatable({
-  dataset,
-
   environment,
   isHostColumnVisible,
   isExportInProgress,
@@ -57,15 +55,15 @@ export function ImagesDatatable({
   onRefresh,
   onRemove,
 }: {
-  dataset: Array<DockerImage>;
   environment: Environment;
   isHostColumnVisible: boolean;
 
-  onDownload: (images: Array<DockerImage>) => void;
-  onRemove: (images: Array<DockerImage>, force: true) => void;
-  onRefresh: () => Promise<void>;
+  onDownload: (images: Array<ImagesListResponse>) => void;
+  onRemove: (images: Array<ImagesListResponse>, force: true) => void;
+  onRefresh: () => void;
   isExportInProgress: boolean;
 }) {
+  const imagesQuery = useImages(environment.Id, true);
   const tableState = useTableState(settingsStore, tableKey);
   const columns = useMemo(
     () => (isHostColumnVisible ? [...defColumns, hostColumn] : defColumns),
@@ -104,7 +102,8 @@ export function ImagesDatatable({
             </Authorized>
           </div>
         )}
-        dataset={dataset}
+        dataset={imagesQuery.data || []}
+        isLoading={imagesQuery.isLoading}
         settingsManager={tableState}
         columns={columns}
         emptyContentLabel="No images found"
@@ -125,8 +124,8 @@ function RemoveButtonMenu({
   onRemove,
   selectedItems,
 }: {
-  selectedItems: Array<DockerImage>;
-  onRemove(selectedItems: Array<DockerImage>, force: boolean): void;
+  selectedItems: Array<ImagesListResponse>;
+  onRemove(selectedItems: Array<ImagesListResponse>, force: boolean): void;
 }) {
   return (
     <Authorized authorizations="DockerImageDelete">
@@ -176,8 +175,8 @@ function ImportExportButtons({
   onExportClick,
 }: {
   isExportInProgress: boolean;
-  selectedItems: Array<DockerImage>;
-  onExportClick(selectedItems: Array<DockerImage>): void;
+  selectedItems: Array<ImagesListResponse>;
+  onExportClick(selectedItems: Array<ImagesListResponse>): void;
 }) {
   return (
     <ButtonGroup>
