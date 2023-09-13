@@ -5,7 +5,7 @@ function EdgeJobsFactory($resource, API_ENDPOINT_EDGE_JOBS) {
     API_ENDPOINT_EDGE_JOBS + '/:id/:action',
     {},
     {
-      create: { method: 'POST' },
+      create: { method: 'POST', params: { id: 'create', action: '@method' } },
       query: { method: 'GET', isArray: true },
       get: { method: 'GET', params: { id: '@id' } },
       update: { method: 'PUT', params: { id: '@id' } },

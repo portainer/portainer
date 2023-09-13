@@ -4,10 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pkg/errors"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/git"
 	httperrors "github.com/portainer/portainer/api/http/errors"
@@ -15,6 +11,11 @@ import (
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 )
 
 type stackGitRedployPayload struct {
@@ -56,7 +57,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
+	stack, err := handler.DataStore.Stack().Read(portainer.StackID(stackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -139,13 +140,25 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	repositoryPassword := ""
 	if payload.RepositoryAuthentication {
 		repositoryPassword = payload.RepositoryPassword
+
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
 		if repositoryPassword == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 			repositoryPassword = stack.GitConfig.Authentication.Password
 		}
 		repositoryUsername = payload.RepositoryUsername
 	}
 
-	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, git.CloneOptions{ProjectPath: stack.ProjectPath, URL: stack.GitConfig.URL, ReferenceName: stack.GitConfig.ReferenceName, Username: repositoryUsername, Password: repositoryPassword})
+	cloneOptions := git.CloneOptions{
+		ProjectPath:   stack.ProjectPath,
+		URL:           stack.GitConfig.URL,
+		ReferenceName: stack.GitConfig.ReferenceName,
+		Username:      repositoryUsername,
+		Password:      repositoryPassword,
+		TLSSkipVerify: stack.GitConfig.TLSSkipVerify,
+	}
+
+	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, cloneOptions)
 	if err != nil {
 		return httperror.InternalServerError("Unable to clone git repository directory", err)
 	}
@@ -157,13 +170,13 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httpErr
 	}
 
-	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword, stack.GitConfig.TLSSkipVerify)
 	if err != nil {
 		return httperror.InternalServerError("Unable get latest commit id", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID))
 	}
 	stack.GitConfig.ConfigHash = newHash
 
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return httperror.BadRequest("Cannot find context user", errors.Wrap(err, "failed to fetch the user"))
 	}
@@ -171,7 +184,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	stack.UpdateDate = time.Now().Unix()
 	stack.Status = portainer.StackStatusActive
 
-	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
+	err = handler.DataStore.Stack().Update(stack.ID, stack)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", errors.Wrap(err, "failed to update the stack"))
 	}

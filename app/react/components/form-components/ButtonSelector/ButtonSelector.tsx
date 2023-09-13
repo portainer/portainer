@@ -18,6 +18,7 @@ interface Props<T> {
   size?: Size;
   disabled?: boolean;
   readOnly?: boolean;
+  className?: string;
 }
 
 export function ButtonSelector<T extends string | number>({
@@ -27,9 +28,10 @@ export function ButtonSelector<T extends string | number>({
   options,
   disabled,
   readOnly,
+  className,
 }: Props<T>) {
   return (
-    <ButtonGroup size={size} className={styles.group}>
+    <ButtonGroup size={size} className={clsx(styles.group, className)}>
       {options.map((option) => (
         <OptionItem
           key={option.value}
@@ -64,9 +66,12 @@ function OptionItem({
       color="light"
       as="label"
       disabled={disabled || readOnly}
-      className={clsx({
-        active: selected,
-      })}
+      className={clsx(
+        {
+          active: selected,
+        },
+        '!static !z-auto'
+      )}
     >
       {children}
       <input

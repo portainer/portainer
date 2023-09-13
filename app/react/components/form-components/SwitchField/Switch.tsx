@@ -13,8 +13,9 @@ export interface Props {
   checked: boolean;
   id: string;
   name: string;
-  onChange(checked: boolean): void;
+  onChange(checked: boolean, index?: number): void;
 
+  index?: number;
   className?: string;
   dataCy?: string;
   disabled?: boolean;
@@ -28,6 +29,7 @@ export function Switch({
   disabled,
   dataCy,
   onChange,
+  index,
   featureId,
   className,
 }: Props) {
@@ -47,7 +49,7 @@ export function Switch({
           id={id}
           checked={checked}
           disabled={disabled || limitedToBE}
-          onChange={({ target: { checked } }) => onChange(checked)}
+          onChange={({ target: { checked } }) => onChange(checked, index)}
         />
         <span className="slider round before:content-['']" data-cy={dataCy} />
       </label>

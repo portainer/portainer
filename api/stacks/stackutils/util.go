@@ -15,6 +15,10 @@ func UserIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.Endpo
 }
 
 // GetStackFilePaths returns a list of file paths based on stack project path
+// If absolute is false, the path sanitization step will be skipped, which makes the returning
+// paths vulnerable to path traversal attacks. Thus, the followed function using the returning
+// paths are responsible to sanitize the raw paths
+// If absolute is true, the raw paths will be sanitized
 func GetStackFilePaths(stack *portainer.Stack, absolute bool) []string {
 	if !absolute {
 		return append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
@@ -37,4 +41,16 @@ func ResourceControlID(endpointID portainer.EndpointID, name string) string {
 func SanitizeLabel(value string) string {
 	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
 	return re.ReplaceAllString(value, ".")
+}
+
+// IsGitStack checks if the stack is a git stack or not
+func IsGitStack(stack *portainer.Stack) bool {
+	return stack.GitConfig != nil && len(stack.GitConfig.URL) != 0
+}
+
+// IsRelativePathStack checks if the stack is a git stack or not
+func IsRelativePathStack(stack *portainer.Stack) bool {
+	// Always return false in CE
+	// This function is only for code consistency with EE
+	return false
 }

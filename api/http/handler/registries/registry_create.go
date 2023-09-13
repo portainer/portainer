@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type registryCreatePayload struct {
@@ -119,7 +120,9 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Ecr:              payload.Ecr,
 	}
 
-	registries, err := handler.DataStore.Registry().Registries()
+	registry.ManagementConfiguration = syncConfig(registry)
+
+	registries, err := handler.DataStore.Registry().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}

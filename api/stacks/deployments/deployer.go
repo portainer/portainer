@@ -7,13 +7,20 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	k "github.com/portainer/portainer/api/kubernetes"
 )
 
-type StackDeployer interface {
+type BaseStackDeployer interface {
 	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error
-	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRereate bool) error
+	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error
 	DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error
+}
+
+type StackDeployer interface {
+	BaseStackDeployer
+	RemoteStackDeployer
 }
 
 type stackDeployer struct {
@@ -21,18 +28,22 @@ type stackDeployer struct {
 	swarmStackManager   portainer.SwarmStackManager
 	composeStackManager portainer.ComposeStackManager
 	kubernetesDeployer  portainer.KubernetesDeployer
+	ClientFactory       *dockerclient.ClientFactory
+	dataStore           dataservices.DataStore
 }
 
 // NewStackDeployer inits a stackDeployer struct with a SwarmStackManager, a ComposeStackManager and a KubernetesDeployer
-func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStackManager portainer.ComposeStackManager, kubernetesDeployer portainer.KubernetesDeployer) *stackDeployer {
+func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStackManager portainer.ComposeStackManager,
+	kubernetesDeployer portainer.KubernetesDeployer, clientFactory *dockerclient.ClientFactory, dataStore dataservices.DataStore) *stackDeployer {
 	return &stackDeployer{
 		lock:                &sync.Mutex{},
 		swarmStackManager:   swarmStackManager,
 		composeStackManager: composeStackManager,
 		kubernetesDeployer:  kubernetesDeployer,
+		ClientFactory:       clientFactory,
+		dataStore:           dataStore,
 	}
 }
-
 func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
@@ -43,7 +54,7 @@ func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *porta
 	return d.swarmStackManager.Deploy(stack, prune, pullImage, endpoint)
 }
 
-func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRereate bool) error {
+func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -58,7 +69,7 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 		}
 	}
 
-	err := d.composeStackManager.Up(context.TODO(), stack, endpoint, forceRereate)
+	err := d.composeStackManager.Up(context.TODO(), stack, endpoint, forceRecreate)
 	if err != nil {
 		d.composeStackManager.Down(context.TODO(), stack, endpoint)
 	}

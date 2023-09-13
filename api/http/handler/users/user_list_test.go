@@ -23,8 +23,7 @@ import (
 func Test_userList(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	// create admin and standard user(s)
 	adminUser := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
@@ -112,28 +111,14 @@ func Test_userList(t *testing.T) {
 		}
 	})
 
-	t.Run("standard user cannot list amdin users", func(t *testing.T) {
+	t.Run("standard user cannot list users", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/users", nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)
 
-		is.Equal(http.StatusOK, rr.Code)
-
-		body, err := io.ReadAll(rr.Body)
-		is.NoError(err, "ReadAll should not return error")
-
-		var resp []portainer.User
-		err = json.Unmarshal(body, &resp)
-		is.NoError(err, "response should be list json")
-
-		is.Len(resp, 2)
-		if len(resp) > 0 {
-			for _, user := range resp {
-				is.NotEqual(portainer.AdministratorRole, user.Role)
-			}
-		}
+		is.Equal(http.StatusForbidden, rr.Code)
 	})
 
 	// Case 2: the user is under an environment group and the environment group has endpoint access.

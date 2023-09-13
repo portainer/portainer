@@ -2,6 +2,7 @@ package boltdb
 
 import (
 	"bytes"
+	"fmt"
 
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
@@ -24,13 +25,10 @@ func (tx *DbTransaction) GetObject(bucketName string, key []byte, object interfa
 
 	value := bucket.Get(key)
 	if value == nil {
-		return dserrors.ErrObjectNotFound
+		return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 	}
 
-	data := make([]byte, len(value))
-	copy(data, value)
-
-	return tx.conn.UnmarshalObjectWithJsoniter(data, object)
+	return tx.conn.UnmarshalObjectWithJsoniter(value, object)
 }
 
 func (tx *DbTransaction) UpdateObject(bucketName string, key []byte, object interface{}) error {
@@ -48,7 +46,9 @@ func (tx *DbTransaction) DeleteObject(bucketName string, key []byte) error {
 	return bucket.Delete(key)
 }
 
-func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error {
+func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, matchingFn func(o interface{}) (id int, ok bool)) error {
+	var ids []int
+
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
 	cursor := bucket.Cursor()
@@ -58,11 +58,14 @@ func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, ma
 			return err
 		}
 
-		if id, ok := matching(obj); ok {
-			err := bucket.Delete(tx.conn.ConvertToKey(id))
-			if err != nil {
-				return err
-			}
+		if id, ok := matchingFn(obj); ok {
+			ids = append(ids, id)
+		}
+	}
+
+	for _, id := range ids {
+		if err := bucket.Delete(tx.conn.ConvertToKey(id)); err != nil {
+			return err
 		}
 	}
 
@@ -74,7 +77,6 @@ func (tx *DbTransaction) GetNextIdentifier(bucketName string) int {
 	id, err := bucket.NextSequence()
 	if err != nil {
 		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifer")
-
 		return 0
 	}
 
@@ -115,45 +117,33 @@ func (tx *DbTransaction) CreateObjectWithStringId(bucketName string, id []byte, 
 	return bucket.Put(id, data)
 }
 
-func (tx *DbTransaction) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (tx *DbTransaction) GetAll(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
-	cursor := bucket.Cursor()
-	for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+	return bucket.ForEach(func(k []byte, v []byte) error {
 		err := tx.conn.UnmarshalObject(v, obj)
-		if err != nil {
-			return err
+		if err == nil {
+			obj, err = appendFn(obj)
 		}
 
-		obj, err = append(obj)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+		return err
+	})
 }
 
-func (tx *DbTransaction) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (tx *DbTransaction) GetAllWithJsoniter(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
-	cursor := bucket.Cursor()
-	for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+	return bucket.ForEach(func(k []byte, v []byte) error {
 		err := tx.conn.UnmarshalObjectWithJsoniter(v, obj)
-		if err != nil {
-			return err
+		if err == nil {
+			obj, err = appendFn(obj)
 		}
 
-		obj, err = append(obj)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+		return err
+	})
 }
 
-func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	cursor := tx.tx.Bucket([]byte(bucketName)).Cursor()
 
 	for k, v := cursor.Seek(keyPrefix); k != nil && bytes.HasPrefix(k, keyPrefix); k, v = cursor.Next() {
@@ -162,7 +152,7 @@ func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte
 			return err
 		}
 
-		obj, err = append(obj)
+		obj, err = appendFn(obj)
 		if err != nil {
 			return err
 		}

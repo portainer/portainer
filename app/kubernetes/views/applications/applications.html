@@ -20,8 +20,9 @@
                 on-publishing-mode-click="(ctrl.onPublishingModeClick)"
                 is-primary="true"
                 namespaces="ctrl.state.namespaces"
-                namespace="ctrl.state.namespace"
+                namespace="ctrl.state.namespaceName"
                 on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
+                is-apps-loading="ctrl.state.isAppsLoading"
                 is-system-resources="ctrl.state.isSystemResources"
                 set-system-resources="(ctrl.setSystemResources)"
               >
@@ -36,8 +37,9 @@
                 refresh-callback="ctrl.getApplications"
                 remove-action="ctrl.removeStacksAction"
                 namespaces="ctrl.state.namespaces"
-                namespace="ctrl.state.namespace"
+                namespace="ctrl.state.namespaceName"
                 on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
+                is-apps-loading="ctrl.state.isAppsLoading"
                 is-system-resources="ctrl.state.isSystemResources"
                 set-system-resources="(ctrl.setSystemResources)"
               >

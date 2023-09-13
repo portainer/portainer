@@ -29,8 +29,7 @@ func TestService_StackByWebhookID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	b := stackBuilder{t: t, store: store}
 	b.createNewStack(newGuidString(t))
@@ -59,7 +58,7 @@ func (b *stackBuilder) createNewStack(webhookID string) portainer.Stack {
 		Type:         portainer.DockerComposeStack,
 		EndpointID:   2,
 		EntryPoint:   filesystem.ComposeFileDefaultName,
-		Env:          []portainer.Pair{{"Name1", "Value1"}},
+		Env:          []portainer.Pair{{Name: "Name1", Value: "Value1"}},
 		Status:       portainer.StackStatusActive,
 		CreationDate: time.Now().Unix(),
 		ProjectPath:  "/tmp/project",
@@ -87,8 +86,7 @@ func Test_RefreshableStacks(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	staticStack := portainer.Stack{ID: 1}
 	stackWithWebhook := portainer.Stack{ID: 2, AutoUpdate: &portainer.AutoUpdateSettings{Webhook: "webhook"}}

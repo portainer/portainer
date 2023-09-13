@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"io"
 
@@ -50,13 +51,14 @@ func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namesp
 		return
 	}
 
-	err = exec.Stream(remotecommand.StreamOptions{
+	err = exec.StreamWithContext(context.TODO(), remotecommand.StreamOptions{
 		Stdin:  stdin,
 		Stdout: stdout,
 		Tty:    true,
 	})
 	if err != nil {
-		if _, ok := err.(utilexec.ExitError); !ok {
+		var exitError utilexec.ExitError
+		if !errors.As(err, &exitError) {
 			errChan <- errors.New("unable to start exec process")
 		}
 	}

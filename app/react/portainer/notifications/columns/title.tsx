@@ -1,11 +1,6 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { ToastNotification } from '../types';
-
-export const title: Column<ToastNotification> = {
-  Header: 'Title',
-  accessor: 'title',
+export const title = columnHelper.accessor('title', {
+  header: 'Title',
   id: 'title',
-  disableFilters: true,
-  canHide: true,
-};
+});

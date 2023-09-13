@@ -49,6 +49,7 @@
       "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
+      "Heartbeat": false,
       "Id": 1,
       "IsEdgeDevice": false,
       "Kubernetes": {
@@ -72,6 +73,7 @@
       },
       "LastCheckInDate": 0,
       "Name": "local",
+      "PendingActions": null,
       "PostInitMigrations": {
         "MigrateGPUs": true,
         "MigrateIngresses": true
@@ -605,6 +607,7 @@
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
     },
+    "IsDockerDesktopExtension": false,
     "KubeconfigExpiry": "0",
     "KubectlShellImage": "portainer/kubectl-shell",
     "LDAPSettings": {
@@ -712,8 +715,6 @@
               "ID": ""
             },
             "Isolation": "",
-            "KernelMemory": false,
-            "KernelMemoryTCP": false,
             "KernelVersion": "",
             "Labels": null,
             "LiveRestoreEnabled": false,
@@ -879,7 +880,7 @@
     }
   ],
   "tunnel_server": {
-    "PrivateKeySeed": "IvX6ZPRuWtLS5zyg"
+    "PrivateKeySeed": ""
   },
   "users": [
     {
@@ -944,6 +945,6 @@
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.19.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.20.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

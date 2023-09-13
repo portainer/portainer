@@ -76,12 +76,6 @@ class KubernetesApplicationHelper {
     return containers;
   }
 
-  static associateAllContainersAndApplication(app) {
-    const containers = _.flatMap(_.map(app.Pods, 'Containers'));
-    KubernetesApplicationHelper.associateContainerPersistedFoldersAndConfigurations(app, containers);
-    return containers;
-  }
-
   static portMappingsFromApplications(applications) {
     const res = _.reduce(
       applications,
@@ -145,12 +139,11 @@ class KubernetesApplicationHelper {
   /* #endregion */
 
   /* #region  CONFIGURATIONS FV <> ENV & VOLUMES */
-  static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations) {
+  static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations, configurationKind) {
+    const filterCondition = configurationKind === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
     const finalRes = _.flatMap(configurations, (cfg) => {
-      const filterCondition = cfg.Kind === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
-
       const cfgEnv = _.filter(env, [filterCondition, cfg.Name]);
-      const cfgVol = _.filter(volumes, { configurationName: cfg.Name });
+      const cfgVol = volumes.filter((volume) => volume.configurationName === cfg.Name && volume.configurationType === configurationKind);
       if (!cfgEnv.length && !cfgVol.length) {
         return;
       }
@@ -201,7 +194,8 @@ class KubernetesApplicationHelper {
     return _.without(finalRes, undefined);
   }
 
-  static generateEnvOrVolumesFromConfigurations(app, configurations) {
+  static generateEnvOrVolumesFromConfigurations(app, configMaps, secrets) {
+    const configurations = [...configMaps, ...secrets];
     let finalEnv = [];
     let finalVolumes = [];
     let finalMounts = [];
@@ -303,24 +297,22 @@ class KubernetesApplicationHelper {
             const svcport = new KubernetesServicePort();
             svcport.name = port.name;
             svcport.port = port.port;
-            svcport.nodePort = port.nodePort;
+            svcport.nodePort = port.nodePort || 0;
             svcport.protocol = port.protocol;
             svcport.targetPort = port.targetPort;
+            svcport.serviceName = service.metadata.name;
+            svcport.ingressPaths = [];
 
             app.Ingresses.value.forEach((ingress) => {
-              const ingressNameMatched = ingress.Paths.find((ingPath) => ingPath.ServiceName === service.metadata.name);
-              const ingressPortMatched = ingress.Paths.find((ingPath) => ingPath.Port === port.port);
-              // only add ingress info to the port if the ingress serviceport matches the port in the service
-              if (ingressPortMatched) {
-                svcport.ingress = {
-                  IngressName: ingressPortMatched.IngressName,
-                  Host: ingressPortMatched.Host,
-                  Path: ingressPortMatched.Path,
-                };
-              }
-              if (ingressNameMatched) {
-                svc.Ingress = true;
-              }
+              const matchingIngressPaths = ingress.Paths.filter((ingPath) => ingPath.ServiceName === service.metadata.name && ingPath.Port === port.port);
+              // only add ingress info to the port if the ingress serviceport and name matches
+              const newPaths = matchingIngressPaths.map((ingPath) => ({
+                IngressName: ingPath.IngressName,
+                Host: ingPath.Host,
+                Path: ingPath.Path,
+              }));
+              svcport.ingressPaths = [...svcport.ingressPaths, ...newPaths];
+              svc.Ingress = matchingIngressPaths.length > 0;
             });
 
             ports.push(svcport);

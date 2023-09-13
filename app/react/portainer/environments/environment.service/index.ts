@@ -3,6 +3,10 @@ import { type EnvironmentGroupId } from '@/react/portainer/environments/environm
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
+import {
+  EdgeStack,
+  StatusType as EdgeStackStatusType,
+} from '@/react/edge/edge-stacks/types';
 
 import type {
   Environment,
@@ -14,11 +18,21 @@ import type {
 
 import { buildUrl } from './utils';
 
-export interface EnvironmentsQueryParams {
+export type EdgeStackEnvironmentsQueryParams =
+  | {
+      edgeStackId?: EdgeStack['Id'];
+    }
+  | {
+      edgeStackId: EdgeStack['Id'];
+      edgeStackStatus?: EdgeStackStatusType;
+    };
+
+export interface BaseEnvironmentsQueryParams {
   search?: string;
   types?: EnvironmentType[] | readonly EnvironmentType[];
   tagIds?: TagId[];
   endpointIds?: EnvironmentId[];
+  excludeIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
   groupIds?: EnvironmentGroupId[];
   status?: EnvironmentStatus[];
@@ -29,7 +43,11 @@ export interface EnvironmentsQueryParams {
   name?: string;
   agentVersions?: string[];
   updateInformation?: boolean;
+  edgeCheckInPassedSeconds?: number;
 }
+
+export type EnvironmentsQueryParams = BaseEnvironmentsQueryParams &
+  EdgeStackEnvironmentsQueryParams;
 
 export interface GetEnvironmentsOptions {
   start?: number;
@@ -46,7 +64,10 @@ export async function getEnvironments(
     query = {},
   }: GetEnvironmentsOptions = { query: {} }
 ) {
-  if (query.tagIds && query.tagIds.length === 0) {
+  if (
+    (query.tagIds && query.tagIds.length === 0) ||
+    (query.endpointIds && query.endpointIds.length === 0)
+  ) {
     return {
       totalCount: 0,
       value: <Environment[]>[],
@@ -136,75 +157,6 @@ export async function disassociateEndpoint(id: EnvironmentId) {
     await axios.delete(buildUrl(id, 'association'));
   } catch (e) {
     throw parseAxiosError(e as Error);
-  }
-}
-
-interface UpdatePayload {
-  TLSCACert?: File;
-  TLSCert?: File;
-  TLSKey?: File;
-
-  Name: string;
-  PublicURL: string;
-  GroupID: EnvironmentGroupId;
-  TagIds: TagId[];
-
-  EdgeCheckinInterval: number;
-
-  TLS: boolean;
-  TLSSkipVerify: boolean;
-  TLSSkipClientVerify: boolean;
-  AzureApplicationID: string;
-  AzureTenantID: string;
-  AzureAuthenticationKey: string;
-}
-
-async function uploadTLSFilesForEndpoint(
-  id: EnvironmentId,
-  tlscaCert?: File,
-  tlsCert?: File,
-  tlsKey?: File
-) {
-  await Promise.all([
-    uploadCert('ca', tlscaCert),
-    uploadCert('cert', tlsCert),
-    uploadCert('key', tlsKey),
-  ]);
-
-  function uploadCert(type: 'ca' | 'cert' | 'key', cert?: File) {
-    if (!cert) {
-      return null;
-    }
-    try {
-      return axios.post<void>(`upload/tls/${type}`, cert, {
-        params: { folder: id },
-      });
-    } catch (e) {
-      throw parseAxiosError(e as Error);
-    }
-  }
-}
-
-export async function updateEndpoint(
-  id: EnvironmentId,
-  payload: UpdatePayload
-) {
-  try {
-    await uploadTLSFilesForEndpoint(
-      id,
-      payload.TLSCACert,
-      payload.TLSCert,
-      payload.TLSKey
-    );
-
-    const { data: endpoint } = await axios.put<Environment>(
-      buildUrl(id),
-      payload
-    );
-
-    return endpoint;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to update environment');
   }
 }
 

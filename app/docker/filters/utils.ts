@@ -1,3 +1,4 @@
+import { NodeStatus, TaskState, NodeSpec } from 'docker-types/generated/1.41';
 import _ from 'lodash';
 
 export function trimSHA(imageName: string) {
@@ -16,4 +17,59 @@ export function joinCommand(command: null | Array<string> = []) {
   }
 
   return command.join(' ');
+}
+
+export function taskStatusBadge(text?: TaskState) {
+  const status = _.toLower(text);
+  if (
+    [
+      'new',
+      'allocated',
+      'assigned',
+      'accepted',
+      'preparing',
+      'ready',
+      'starting',
+      'remove',
+    ].includes(status)
+  ) {
+    return 'info';
+  }
+
+  if (['pending'].includes(status)) {
+    return 'warning';
+  }
+
+  if (['shutdown', 'failed', 'rejected', 'orphaned'].includes(status)) {
+    return 'danger';
+  }
+
+  if (['complete'].includes(status)) {
+    return 'primary';
+  }
+
+  if (['running'].includes(status)) {
+    return 'success';
+  }
+  return 'default';
+}
+
+export function nodeStatusBadge(text: NodeStatus['State']) {
+  if (text === 'down' || text === 'unknown' || text === 'disconnected') {
+    return 'danger';
+  }
+
+  return 'success';
+}
+
+export function dockerNodeAvailabilityBadge(text: NodeSpec['Availability']) {
+  if (text === 'pause') {
+    return 'warning';
+  }
+
+  if (text === 'drain') {
+    return 'danger';
+  }
+
+  return 'success';
 }

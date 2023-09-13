@@ -1,28 +1,15 @@
 package docker
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
-
-type noopGitService struct{}
-
-func (s *noopGitService) CloneRepository(destination string, repositoryURL, referenceName, username, password string) error {
-	return nil
-}
-func (s *noopGitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
-	return "my-latest-commit-id", nil
-}
-func (g *noopGitService) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
-	return nil, nil
-}
-func (g *noopGitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
-	return nil, nil
-}
 
 func TestTransport_updateDefaultGitBranch(t *testing.T) {
 	type fields struct {
@@ -33,8 +20,10 @@ func TestTransport_updateDefaultGitBranch(t *testing.T) {
 		request *http.Request
 	}
 
+	commitId := "my-latest-commit-id"
+
 	defaultFields := fields{
-		gitService: &noopGitService{},
+		gitService: testhelpers.NewGitService(nil, commitId),
 	}
 
 	tests := []struct {
@@ -51,7 +40,7 @@ func TestTransport_updateDefaultGitBranch(t *testing.T) {
 				request: httptest.NewRequest(http.MethodPost, "http://unixsocket/build?dockerfile=Dockerfile&remote=https://my-host.com/my-user/my-repo.git&t=my-image", nil),
 			},
 			wantErr:       false,
-			expectedQuery: "dockerfile=Dockerfile&remote=https%3A%2F%2Fmy-host.com%2Fmy-user%2Fmy-repo.git%23my-latest-commit-id&t=my-image",
+			expectedQuery: fmt.Sprintf("dockerfile=Dockerfile&remote=https%%3A%%2F%%2Fmy-host.com%%2Fmy-user%%2Fmy-repo.git%%23%s&t=my-image", commitId),
 		},
 		{
 			name:   "not append commit ID",

@@ -79,25 +79,33 @@ The feature request process is similar to the bug report process but has an extr
 
 Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versions.
 
-Install dependencies with yarn:
+Install dependencies:
 
 ```sh
-$ yarn
+$ make deps
 ```
 
 Then build and run the project in a Docker container:
 
 ```sh
-$ yarn start
+$ make dev
 ```
 
-Portainer can now be accessed at <https://localhost:9443>.
+Portainer server can now be accessed at <https://localhost:9443>. and UI dev server runs on <http://localhost:8999>.
+
+if you want to build the project you can run:
+
+```sh
+make build-all
+```
+
+For additional make commands, run `make help`.
 
 Find more detailed steps at <https://docs.portainer.io/contribute/build>.
 
-### Build customisation
+### Build customization
 
-You can customise the following settings:
+You can customize the following settings:
 
 - `PORTAINER_DATA`: The host dir or volume name used by portainer (default is `/tmp/portainer`, which won't persist over reboots).
 - `PORTAINER_PROJECT`: The root dir of the repository - `${portainerRoot}/dist/` is imported into the container to get the build artifacts and external tools (defaults to `your current dir`).

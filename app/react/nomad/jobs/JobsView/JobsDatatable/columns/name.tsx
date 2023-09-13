@@ -1,24 +1,6 @@
-import { CellProps, Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Job } from '@/react/nomad/types';
-
-import { ExpandingCell } from '@@/datatables/ExpandingCell';
-
-export const name: Column<Job> = {
-  Header: 'Name',
-  accessor: (row) => row.ID,
+export const name = columnHelper.accessor('ID', {
+  header: 'Name',
   id: 'name',
-  Cell: NameCell,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  sortType: 'string',
-};
-
-export function NameCell({ value: name, row }: CellProps<Job>) {
-  return (
-    <ExpandingCell row={row} showExpandArrow>
-      {name}
-    </ExpandingCell>
-  );
-}
+});

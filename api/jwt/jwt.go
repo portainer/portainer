@@ -3,14 +3,13 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/gorilla/securecookie"
+	"github.com/portainer/portainer/api/internal/securecookie"
 	"github.com/rs/zerolog/log"
 )
 
@@ -126,7 +125,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
 
-			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
+			user, err := service.dataStore.User().Read(portainer.UserID(cl.UserID))
 			if err != nil {
 				return nil, errInvalidJWTToken
 			}
@@ -169,7 +168,12 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		return "", fmt.Errorf("invalid scope: %v", scope)
 	}
 
-	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
+	settings, err := service.dataStore.Settings().Settings()
+	if err != nil {
+		return "", fmt.Errorf("failed fetching settings from db: %w", err)
+	}
+
+	if settings.IsDockerDesktopExtension {
 		// Set expiration to 99 years for docker desktop extension.
 		log.Info().Msg("detected docker desktop extension mode")
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()

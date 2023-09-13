@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/hostmanagement/fdo"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/rs/zerolog/log"
 )
@@ -99,7 +99,7 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 		return httperror.BadRequest("Error saving FDO settings", err)
 	}
 
-	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	profiles, err := handler.DataStore.FDOProfile().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Error saving FDO settings", err)
 	}

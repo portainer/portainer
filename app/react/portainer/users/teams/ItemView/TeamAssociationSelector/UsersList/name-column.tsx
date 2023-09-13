@@ -1,5 +1,5 @@
-import { CellProps, Column } from 'react-table';
 import { PlusCircle } from 'lucide-react';
+import { CellContext, ColumnDef } from '@tanstack/react-table';
 
 import { User } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -9,21 +9,18 @@ import { Button } from '@@/buttons';
 
 import { useRowContext } from './RowContext';
 
-export const name: Column<User> = {
-  Header: 'Name',
-  accessor: (row) => row.Username,
+export const name: ColumnDef<User, string> = {
+  header: 'Name',
+  accessorFn: (row) => row.Username,
   id: 'name',
-  Cell: NameCell,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: false,
-  sortType: 'string',
+  cell: NameCell,
 };
 
 export function NameCell({
-  value: name,
+  getValue,
   row: { original: user },
-}: CellProps<User, string>) {
+}: CellContext<User, string>) {
+  const name = getValue();
   const { disabled, teamId } = useRowContext();
 
   const addMemberMutation = useAddMemberMutation(teamId);

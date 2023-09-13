@@ -3,12 +3,12 @@ package fdo
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
-
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 type Handler struct {
@@ -17,7 +17,7 @@ type Handler struct {
 	FileService portainer.FileService
 }
 
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, fileService portainer.FileService) *Handler {
 	h := &Handler{
 		Router:      mux.NewRouter(),
 		DataStore:   dataStore,

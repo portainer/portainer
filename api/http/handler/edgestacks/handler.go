@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer     *security.RequestBouncer
+	requestBouncer     security.BouncerService
 	DataStore          dataservices.DataStore
 	FileService        portainer.FileService
 	GitService         portainer.GitService
@@ -25,8 +26,10 @@ type Handler struct {
 	KubernetesDeployer portainer.KubernetesDeployer
 }
 
+const contextKey = "edgeStack_item"
+
 // NewHandler creates a handler to manage environment(endpoint) group operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
 	h := &Handler{
 		Router:            mux.NewRouter(),
 		requestBouncer:    bouncer,
@@ -34,7 +37,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		edgeStacksService: edgeStacksService,
 	}
 
-	h.Handle("/edge_stacks",
+	h.Handle("/edge_stacks/create/{method}",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_stacks",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackList)))).Methods(http.MethodGet)

@@ -13,7 +13,7 @@ import (
 
 const invalidChartRepo = "%q is not a valid chart repository or cannot be reached"
 
-func ValidateHelmRepositoryURL(repoUrl string) error {
+func ValidateHelmRepositoryURL(repoUrl string, client *http.Client) error {
 	if repoUrl == "" {
 		return errors.New("URL is required")
 	}
@@ -29,9 +29,12 @@ func ValidateHelmRepositoryURL(repoUrl string) error {
 
 	url.Path = path.Join(url.Path, "index.yaml")
 
-	var client = &http.Client{
-		Timeout: time.Second * 10,
+	if client == nil {
+		client = &http.Client{
+			Timeout: time.Second * 10,
+		}
 	}
+
 	response, err := client.Head(url.String())
 	if err != nil {
 		return errors.Wrapf(err, invalidChartRepo, repoUrl)

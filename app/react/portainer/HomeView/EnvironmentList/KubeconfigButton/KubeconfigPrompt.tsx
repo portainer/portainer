@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { downloadKubeconfigFile } from '@/react/kubernetes/services/kubeconfig.service';
+import { downloadKubeconfigFile } from '@/react/portainer/HomeView/EnvironmentList/KubeconfigButton/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
 import {
   Environment,
@@ -111,7 +111,7 @@ export function KubeconfigPrompt({
               onPageChange={setPage}
               pageLimit={pageLimit}
               onPageLimitChange={setPageLimit}
-              totalCount={totalCount}
+              pageCount={Math.ceil(totalCount / pageLimit)}
             />
           </div>
         </div>

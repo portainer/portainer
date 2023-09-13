@@ -78,7 +78,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
-                <TextTip color="blue">
+                <TextTip color="blue" className="mb-2">
                   Enable this setting to use Portainer Edge Compute
                   capabilities.
                 </TextTip>

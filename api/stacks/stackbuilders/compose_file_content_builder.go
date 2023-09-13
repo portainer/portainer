@@ -3,12 +3,12 @@ package stackbuilders
 import (
 	"strconv"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 type ComposeStackFileContentBuilder struct {

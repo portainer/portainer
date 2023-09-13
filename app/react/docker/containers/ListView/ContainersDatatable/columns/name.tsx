@@ -1,4 +1,4 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
@@ -8,21 +8,20 @@ import { useTableSettings } from '@@/datatables/useTableSettings';
 
 import { TableSettings } from '../types';
 
-export const name: Column<DockerContainer> = {
-  Header: 'Name',
-  accessor: (row) => row.Names[0],
+import { columnHelper } from './helper';
+
+export const name = columnHelper.accessor((row) => row.Names[0], {
+  header: 'Name',
   id: 'name',
-  Cell: NameCell,
-  disableFilters: true,
-  Filter: () => null,
-  canHide: true,
-  sortType: 'string',
-};
+  cell: NameCell,
+});
 
 export function NameCell({
-  value: name,
+  getValue,
   row: { original: container },
-}: CellProps<DockerContainer>) {
+}: CellContext<DockerContainer, string>) {
+  const name = getValue();
+
   const linkProps = useSref('.container', {
     id: container.Id,
     nodeName: container.NodeName,

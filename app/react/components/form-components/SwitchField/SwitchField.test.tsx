@@ -7,6 +7,7 @@ function renderDefault({
   checked = false,
   label = 'label',
   onChange = jest.fn(),
+  index,
 }: Partial<Props> = {}) {
   return render(
     <SwitchField
@@ -14,6 +15,7 @@ function renderDefault({
       name={name}
       checked={checked}
       onChange={onChange}
+      index={index}
     />
   );
 }
@@ -33,5 +35,17 @@ test('clicking should emit on-change with the opposite value', async () => {
   const switchElem = await findByRole('checkbox');
   fireEvent.click(switchElem);
 
-  expect(onChange).toHaveBeenCalledWith(!checked);
+  expect(onChange).toHaveBeenCalledWith(!checked, undefined);
+});
+
+test('clicking should emit on-change with the opposite value and index', async () => {
+  const onChange = jest.fn();
+  const checked = true;
+  const index = 3;
+  const { findByRole } = renderDefault({ onChange, checked, index });
+
+  const switchElem = await findByRole('checkbox');
+  fireEvent.click(switchElem);
+
+  expect(onChange).toHaveBeenCalledWith(!checked, index);
 });

@@ -29,7 +29,7 @@ type OptionalReadonly<T> = T | Readonly<T>;
 
 export function withInvalidate(
   queryClient: QueryClient,
-  queryKeysToInvalidate: OptionalReadonly<string[]>[]
+  queryKeysToInvalidate: Array<OptionalReadonly<Array<string | number>>>
 ) {
   return {
     onSuccess() {
@@ -44,7 +44,7 @@ export function mutationOptions<
   TData = unknown,
   TError = unknown,
   TVariables = void,
-  TContext = unknown
+  TContext = unknown,
 >(...options: MutationOptions<TData, TError, TVariables, TContext>[]) {
   return mergeOptions(options);
 }
@@ -53,7 +53,7 @@ export function queryOptions<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
+  TQueryKey extends QueryKey = QueryKey,
 >(...options: QueryOptions<TQueryFnData, TError, TData, TQueryKey>[]) {
   return mergeOptions(options);
 }
@@ -64,7 +64,7 @@ function mergeOptions<T>(options: T[]) {
       ...acc,
       ...option,
     }),
-    {}
+    {} as T
   );
 }
 

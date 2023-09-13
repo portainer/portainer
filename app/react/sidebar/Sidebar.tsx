@@ -41,7 +41,7 @@ export function Sidebar() {
         >
           <Header logo={LogoURL} />
           {/* negative margin + padding -> scrollbar won't hide the content */}
-          <div className="mt-6 -mr-4 flex-1 overflow-y-auto pr-4">
+          <div className="-mr-4 mt-6 flex-1 overflow-y-auto pr-4">
             <ul className="space-y-9">
               <SidebarItem
                 to="portainer.home"

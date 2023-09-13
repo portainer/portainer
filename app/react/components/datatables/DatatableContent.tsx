@@ -1,58 +1,44 @@
-import { Row, TableInstance, TableRowProps } from 'react-table';
+import { Row, Table as TableInstance } from '@tanstack/react-table';
+
+import { AutomationTestingProps } from '@/types';
 
 import { Table } from './Table';
+import { DefaultType } from './types';
 
-interface Props<D extends Record<string, unknown>> {
+interface Props<D extends DefaultType> extends AutomationTestingProps {
   tableInstance: TableInstance<D>;
-  renderRow(row: Row<D>, rowProps: TableRowProps): React.ReactNode;
+  renderRow(row: Row<D>): React.ReactNode;
   onSortChange?(colId: string, desc: boolean): void;
   isLoading?: boolean;
   emptyContentLabel?: string;
 }
 
-export function DatatableContent<D extends Record<string, unknown>>({
+export function DatatableContent<D extends DefaultType>({
   tableInstance,
   renderRow,
   onSortChange,
   isLoading,
   emptyContentLabel,
+  'data-cy': dataCy,
 }: Props<D>) {
-  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
-    tableInstance;
+  const headerGroups = tableInstance.getHeaderGroups();
+  const pageRowModel = tableInstance.getPaginationRowModel();
 
-  const tableProps = getTableProps();
-  const tbodyProps = getTableBodyProps();
   return (
-    <Table
-      className={tableProps.className}
-      role={tableProps.role}
-      style={tableProps.style}
-    >
+    <Table data-cy={dataCy} className="nowrap-cells">
       <thead>
-        {headerGroups.map((headerGroup) => {
-          const { key, className, role, style } =
-            headerGroup.getHeaderGroupProps();
-          return (
-            <Table.HeaderRow<D>
-              key={key}
-              className={className}
-              role={role}
-              style={style}
-              headers={headerGroup.headers}
-              onSortChange={onSortChange}
-            />
-          );
-        })}
+        {headerGroups.map((headerGroup) => (
+          <Table.HeaderRow<D>
+            key={headerGroup.id}
+            headers={headerGroup.headers}
+            onSortChange={onSortChange}
+          />
+        ))}
       </thead>
-      <tbody
-        className={tbodyProps.className}
-        role={tbodyProps.role}
-        style={tbodyProps.style}
-      >
+      <tbody>
         <Table.Content<D>
-          rows={page}
+          rows={pageRowModel.rows}
           isLoading={isLoading}
-          prepareRow={prepareRow}
           emptyContent={emptyContentLabel}
           renderRow={renderRow}
         />

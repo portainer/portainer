@@ -5,14 +5,14 @@ import (
 	"strconv"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -63,7 +63,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
+// @param endpointId query int true "Environment identifier"
 // @param body body updateSwarmStackPayload true "Stack details"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -77,7 +77,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
+	stack, err := handler.DataStore.Stack().Read(portainer.StackID(stackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -85,9 +85,9 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API environment(endpoint)
+	// The EndpointID property is not available for these stacks, this API endpoint
 	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
-	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: endpointId", err)
 	}
@@ -143,7 +143,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return updateError
 	}
 
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return httperror.BadRequest("Cannot find context user", errors.Wrap(err, "failed to fetch the user"))
 	}
@@ -151,7 +151,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	stack.UpdateDate = time.Now().Unix()
 	stack.Status = portainer.StackStatusActive
 
-	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
+	err = handler.DataStore.Stack().Update(stack.ID, stack)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
@@ -166,8 +166,12 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 
 func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	if stack.Type == portainer.DockerSwarmStack {
+		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
+
 		return handler.updateSwarmStack(r, stack, endpoint)
 	} else if stack.Type == portainer.DockerComposeStack {
+		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
+
 		return handler.updateComposeStack(r, stack, endpoint)
 	} else if stack.Type == portainer.KubernetesStack {
 		return handler.updateKubernetesStack(r, stack, endpoint)
@@ -193,6 +197,11 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	}
 
 	stack.Env = payload.Env
+
+	if stack.GitConfig != nil {
+		// detach from git
+		stack.GitConfig = nil
+	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
@@ -258,6 +267,11 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	}
 
 	stack.Env = payload.Env
+
+	if stack.GitConfig != nil {
+		// detach from git
+		stack.GitConfig = nil
+	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))

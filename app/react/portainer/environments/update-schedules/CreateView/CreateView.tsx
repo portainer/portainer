@@ -5,6 +5,7 @@ import { useRouter } from '@uirouter/react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
+import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -36,7 +37,7 @@ function CreateView() {
     }),
     []
   );
-
+  const edgeGroupsQuery = useEdgeGroups();
   const schedulesQuery = useList();
 
   const createMutation = useCreateMutation();
@@ -55,14 +56,17 @@ function CreateView() {
         breadcrumbs="Edge agent update and rollback"
       />
 
-      <BetaAlert />
+      <BetaAlert
+        className="mb-2 ml-[15px]"
+        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+      />
 
       <div className="row">
         <div className="col-sm-12">
           <Widget>
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
-              <TextTip color="blue">
+              <TextTip color="blue" className="mb-2">
                 Devices need to be allocated to an Edge group, visit the{' '}
                 <Link to="edge.groups">Edge Groups</Link> page to assign
                 environments and create groups.
@@ -72,7 +76,9 @@ function CreateView() {
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
                 validateOnMount
-                validationSchema={() => validation(schedules)}
+                validationSchema={() =>
+                  validation(schedules, edgeGroupsQuery.data)
+                }
               >
                 {({ isValid, setFieldValue, values, handleBlur, errors }) => (
                   <FormikForm className="form-horizontal">
@@ -91,7 +97,9 @@ function CreateView() {
                       for 2.15.0+ only.
                     </TextTip>
 
-                    <ScheduleTypeSelector />
+                    <div className="mt-2">
+                      <ScheduleTypeSelector />
+                    </div>
 
                     <div className="form-group">
                       <div className="col-sm-12">

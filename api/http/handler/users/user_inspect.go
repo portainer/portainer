@@ -3,12 +3,12 @@ package users
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id UserInspect
@@ -42,7 +42,7 @@ func (handler *Handler) userInspect(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.Forbidden("Permission denied inspect user", errors.ErrResourceAccessDenied)
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)
 	} else if err != nil {

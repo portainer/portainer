@@ -9,7 +9,7 @@ import {
   Environment,
   EnvironmentId,
 } from '@/react/portainer/environments/types';
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { Stepper } from '@@/Stepper';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -154,7 +154,7 @@ function useParamEnvironmentTypes(): EnvironmentOptionValue[] {
 }
 
 function useStepper(
-  steps: typeof environmentTypes[number][],
+  steps: (typeof environmentTypes)[number][],
   onFinish: () => void
 ) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);

@@ -72,7 +72,7 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="$ctrl.endpointForm">
           <div class="col-sm-12 form-section-title"> Configuration </div>
           <!-- name-input -->
           <div class="form-group">
@@ -124,6 +124,14 @@
           </div>
 
           <!-- !endpoint-public-url-input -->
+
+          <tls-fieldset
+            ng-if="!state.edgeEndpoint && endpoint.Status !== 4 && state.showTLSConfig"
+            values="formValues.tlsConfig"
+            on-change="(onChangeTLSConfigFormValues)"
+            validation-data="{optionalCert: true}"
+          ></tls-fieldset>
+
           <azure-endpoint-config
             ng-if="state.azureEndpoint"
             application-id="endpoint.AzureCredentials.ApplicationID"
@@ -142,12 +150,6 @@
 
           <tag-selector ng-if="endpoint" value="endpoint.TagIds" allow-create="state.allowCreate" on-change="(onChangeTags)"></tag-selector>
 
-          <!-- endpoint-security -->
-          <div ng-if="endpointType === 'remote' && !state.azureEndpoint && !state.kubernetesEndpoint && !state.edgeEndpoint && endpoint.Type !== 6">
-            <div class="col-sm-12 form-section-title"> Security </div>
-            <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
-          </div>
-          <!-- !endpoint-security -->
           <!-- open-amt info -->
           <div ng-if="state.showAMTInfo">
             <div class="col-sm-12 form-section-title"> Open Active Management Technology </div>
@@ -209,17 +211,12 @@
             </div>
           </div>
           <!-- !open-amt info -->
-          <!-- gpus info -->
-          <div class="mb-4">
-            <gpus-insights></gpus-insights>
-          </div>
-          <!-- gpus info -->
           <div class="form-group">
             <div class="col-sm-12">
               <button
                 type="button"
                 class="btn btn-primary btn-sm !ml-0"
-                ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))"
+                ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || !$ctrl.endpointForm.$valid"
                 ng-click="updateEndpoint()"
                 button-spinner="state.actionInProgress"
               >

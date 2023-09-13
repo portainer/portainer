@@ -1,0 +1,1 @@
+export { FilesTable } from './FilesTable';

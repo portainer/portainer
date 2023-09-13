@@ -1,28 +1,30 @@
-import { CellProps, Column } from 'react-table';
+import { CellContext } from '@tanstack/react-table';
 import { Check, X } from 'lucide-react';
 
 import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';
 
-import type { IngressControllerClassMap } from '../../types';
+import type { IngressControllerClassMapRowData } from '../../types';
 
-export const availability: Column<IngressControllerClassMap> = {
-  Header: 'Availability',
-  accessor: 'Availability',
-  Cell: AvailailityCell,
+import { columnHelper } from './helper';
+
+export const availability = columnHelper.accessor('Availability', {
+  header: 'Availability',
+  cell: Cell,
   id: 'availability',
-  disableFilters: true,
-  canHide: true,
-  sortInverted: true,
-  sortType: 'basic',
-  Filter: () => null,
-};
+  invertSorting: true,
+  sortingFn: 'basic',
+});
 
-function AvailailityCell({ value }: CellProps<IngressControllerClassMap>) {
+function Cell({
+  getValue,
+}: CellContext<IngressControllerClassMapRowData, boolean>) {
+  const availability = getValue();
+
   return (
-    <Badge type={value ? 'success' : 'danger'}>
-      <Icon icon={value ? Check : X} className="!mr-1" />
-      {value ? 'Allowed' : 'Disallowed'}
+    <Badge type={availability ? 'success' : 'danger'}>
+      <Icon icon={availability ? Check : X} className="!mr-1" />
+      {availability ? 'Allowed' : 'Disallowed'}
     </Badge>
   );
 }

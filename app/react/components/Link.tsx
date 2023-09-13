@@ -4,6 +4,7 @@ import { UISref, UISrefProps } from '@uirouter/react';
 interface Props {
   title?: string;
   target?: AnchorHTMLAttributes<HTMLAnchorElement>['target'];
+  rel?: AnchorHTMLAttributes<HTMLAnchorElement>['rel'];
 }
 
 export function Link({
@@ -16,7 +17,7 @@ export function Link({
     // eslint-disable-next-line react/jsx-props-no-spreading
     <UISref className={className} {...props}>
       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a title={title} target={props.target}>
+      <a title={title} target={props.target} rel={props.rel}>
         {children}
       </a>
     </UISref>

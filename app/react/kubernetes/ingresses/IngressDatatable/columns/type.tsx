@@ -1,11 +1,7 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Ingress } from '../../types';
-
-export const type: Column<Ingress> = {
-  Header: 'Type',
-  accessor: 'Type',
+export const type = columnHelper.accessor('Type', {
+  header: 'Type',
   id: 'type',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ row }) => row.original.Type || '-',
+});

@@ -93,8 +93,13 @@ export interface DefaultRegistry {
   Hide: boolean;
 }
 
+export interface ExperimentalFeatures {
+  OpenAIIntegration: boolean;
+}
+
 export interface Settings {
   LogoURL: string;
+  CustomLoginBanner: string;
   BlackListedLabels: Pair[];
   AuthenticationMethod: AuthenticationMethod;
   InternalAuthSettings: { RequiredPasswordLength: number };
@@ -122,6 +127,7 @@ export interface Settings {
   DisplayDonationHeader: boolean;
   DisplayExternalContributors: boolean;
   EnableHostManagementFeatures: boolean;
+  ExperimentalFeatures?: ExperimentalFeatures;
   AllowVolumeBrowserForRegularUsers: boolean;
   AllowBindMountsForRegularUsers: boolean;
   AllowPrivilegedModeForRegularUsers: boolean;
@@ -129,6 +135,7 @@ export interface Settings {
   AllowStackManagementForRegularUsers: boolean;
   AllowDeviceMappingForRegularUsers: boolean;
   AllowContainerCapabilitiesForRegularUsers: boolean;
+  GlobalDeploymentOptions?: GlobalDeploymentOptions;
   Edge: {
     PingInterval: number;
     SnapshotInterval: number;
@@ -147,6 +154,9 @@ interface GlobalDeploymentOptions {
   hideWebEditor: boolean;
   /** Hide the file upload option in the remaining visible forms */
   hideFileUpload: boolean;
+  /** Make note on application add/edit screen required */
+  requireNoteOnApplications: boolean;
+  minApplicationNoteLength: number;
 }
 
 export interface PublicSettingsResponse {
@@ -180,9 +190,8 @@ export interface PublicSettingsResponse {
   IsFDOEnabled: boolean;
   /** Whether AMT is enabled */
   IsAMTEnabled: boolean;
-
   /** Whether to hide default registry (only on BE) */
-  DefaultRegistry: {
+  DefaultRegistry?: {
     Hide: boolean;
   };
   Edge: {

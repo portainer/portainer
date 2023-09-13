@@ -84,17 +84,22 @@ body,
 
 .form-section-title {
   @apply text-gray-9;
-  @apply th-dark:text-gray-5;
+  @apply th-dark:text-white;
   @apply th-highcontrast:text-white;
 
-  margin-top: 5px;
+  margin-top: 20px;
   margin-bottom: 10px;
   padding-left: 0;
   font-weight: 500;
   font-size: 16px;
 }
 
-.form-horizontal .control-label.text-left {
+.form-section-title:first-child {
+  margin-top: 5px;
+}
+
+.form-horizontal .control-label.text-left,
+.form-row .control-label.text-left {
   text-align: left;
   font-size: 0.9em;
 }
@@ -214,6 +219,14 @@ input[type='checkbox'] {
   background-color: var(--bg-blocklist-item-selected-color);
   border: 2px solid var(--border-blocklist-item-selected-color);
   color: var(--text-blocklist-item-selected-color);
+}
+
+.blocklist-item:not(.blocklist-item-not-interactive):hover {
+  @apply border border-blue-7;
+  cursor: pointer;
+
+  background-color: var(--bg-blocklist-hover-color);
+  color: var(--text-blocklist-hover-color);
 }
 
 .blocklist-item-box {

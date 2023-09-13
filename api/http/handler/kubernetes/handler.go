@@ -7,18 +7,17 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
-	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/portainer/portainer/api/kubernetes"
-
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).
@@ -32,7 +31,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubeClusterAccessService kubernetes.KubeClusterAccessService, kubernetesClientFactory *cli.ClientFactory, kubernetesClient portainer.KubeClient) *Handler {
+func NewHandler(bouncer security.BouncerService, authorizationService *authorization.Service, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubeClusterAccessService kubernetes.KubeClusterAccessService, kubernetesClientFactory *cli.ClientFactory, kubernetesClient portainer.KubeClient) *Handler {
 	h := &Handler{
 		Router:                   mux.NewRouter(),
 		authorizationService:     authorizationService,
@@ -54,6 +53,10 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	endpointRouter.Use(h.kubeClient)
 
 	endpointRouter.PathPrefix("/nodes_limits").Handler(httperror.LoggerHandler(h.getKubernetesNodesLimits)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/nodes").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForAllNodes)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/nodes/{name}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForNode)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/pods/namespace/{namespace}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForAllPods)).Methods(http.MethodGet)
+	endpointRouter.Path("/metrics/pods/namespace/{namespace}/{name}").Handler(httperror.LoggerHandler(h.getKubernetesMetricsForPod)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getKubernetesIngressControllers)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllers)).Methods(http.MethodPut)
 	endpointRouter.Handle("/ingresses/delete", httperror.LoggerHandler(h.deleteKubernetesIngresses)).Methods(http.MethodPost)
@@ -62,7 +65,7 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	endpointRouter.Path("/namespaces").Handler(httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
 	endpointRouter.Path("/namespaces").Handler(httperror.LoggerHandler(h.updateKubernetesNamespace)).Methods(http.MethodPut)
 	endpointRouter.Path("/namespaces").Handler(httperror.LoggerHandler(h.getKubernetesNamespaces)).Methods(http.MethodGet)
-	endpointRouter.Path("/namespace/{namespace}").Handler(httperror.LoggerHandler(h.deleteKubernetesNamespaces)).Methods(http.MethodDelete)
+	endpointRouter.Path("/namespace/{namespace}").Handler(httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Path("/namespaces/{namespace}").Handler(httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
 
 	// namespaces
@@ -72,7 +75,7 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	namespaceRouter.Handle("/system", bouncer.RestrictedAccess(httperror.LoggerHandler(h.namespacesToggleSystem))).Methods(http.MethodPut)
 	namespaceRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getKubernetesIngressControllersByNamespace)).Methods(http.MethodGet)
 	namespaceRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllersByNamespace)).Methods(http.MethodPut)
-	namespaceRouter.Handle("/configmaps", httperror.LoggerHandler(h.getKubernetesConfigMaps)).Methods(http.MethodGet)
+	namespaceRouter.Handle("/configuration", httperror.LoggerHandler(h.getKubernetesConfigMapsAndSecrets)).Methods(http.MethodGet)
 	namespaceRouter.Handle("/ingresses", httperror.LoggerHandler(h.createKubernetesIngress)).Methods(http.MethodPost)
 	namespaceRouter.Handle("/ingresses", httperror.LoggerHandler(h.updateKubernetesIngress)).Methods(http.MethodPut)
 	namespaceRouter.Handle("/ingresses", httperror.LoggerHandler(h.getKubernetesIngresses)).Methods(http.MethodGet)
@@ -121,7 +124,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 		}
 
 		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-		if err == portainerDsErrors.ErrObjectNotFound {
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(
 				w,
 				http.StatusNotFound,
@@ -167,21 +170,13 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 		singleEndpointList := []portainer.Endpoint{
 			*endpoint,
 		}
-		config, handlerErr := handler.buildConfig(
+		config := handler.buildConfig(
 			r,
 			tokenData,
 			bearerToken,
 			singleEndpointList,
+			true,
 		)
-		if err != nil {
-			httperror.WriteError(
-				w,
-				http.StatusInternalServerError,
-				"Unable to build endpoint kubeconfig",
-				handlerErr.Err,
-			)
-			return
-		}
 
 		if len(config.Clusters) == 0 {
 			httperror.WriteError(

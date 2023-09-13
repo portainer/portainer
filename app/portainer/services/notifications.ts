@@ -47,8 +47,10 @@ export function notifyError(title: string, e?: Error, fallbackText = '') {
   const msg = pickErrorMsg(e) || fallbackText;
   saveNotification(title, msg, 'error');
 
-  // eslint-disable-next-line no-console
-  console.error(e);
+  if (!_.get(e, 'resource.password')) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
 
   if (msg !== 'Invalid JWT token') {
     toastr.error(sanitize(_.escape(msg)), sanitize(title), { timeOut: 6000 });

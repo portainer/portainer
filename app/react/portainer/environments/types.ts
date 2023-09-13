@@ -64,6 +64,7 @@ export interface KubernetesConfiguration {
   EnableResourceOverCommit?: boolean;
   ResourceOverCommitPercentage?: number;
   RestrictDefaultNamespace?: boolean;
+  RestrictStandardUserIngressW?: boolean;
   IngressClasses: IngressClass[];
   IngressAvailabilityPerNamespace: boolean;
   AllowNoneIngressClass: boolean;
@@ -124,12 +125,16 @@ export type DeploymentOptions = {
 };
 
 /**
- *  EndpointChangeWindow determine when automatic stack/app updates may occur
+ *  EndpointChangeWindow determine when GitOps stack/app updates may occur
  */
-interface EndpointChangeWindow {
+export interface EndpointChangeWindow {
   Enabled: boolean;
   StartTime: string;
   EndTime: string;
+}
+export interface EnvironmentStatusMessage {
+  summary: string;
+  detail: string;
 }
 
 export type Environment = {
@@ -144,6 +149,7 @@ export type Environment = {
   EdgeKey: string;
   EdgeCheckinInterval?: number;
   QueryDate?: number;
+  Heartbeat?: boolean;
   LastCheckInDate?: number;
   Name: string;
   Status: EnvironmentStatus;
@@ -160,8 +166,12 @@ export type Environment = {
   EnableImageNotification: boolean;
   LocalTimeZone?: string;
 
-  /** Automatic update change window restriction for stacks and apps */
+  /** GitOps update change window restriction for stacks and apps */
   ChangeWindow: EndpointChangeWindow;
+  /**
+   *  A message that describes the status. Should be included for Status Provisioning or Error.
+   */
+  StatusMessage?: EnvironmentStatusMessage;
 };
 
 /**

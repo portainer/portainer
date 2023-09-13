@@ -3,8 +3,8 @@ package teammemberships
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id TeamMembershipList
@@ -21,7 +21,7 @@ import (
 // @failure 500 "Server error"
 // @router /team_memberships [get]
 func (handler *Handler) teamMembershipList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	memberships, err := handler.DataStore.TeamMembership().TeamMemberships()
+	memberships, err := handler.DataStore.TeamMembership().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve team memberships from the database", err)
 	}

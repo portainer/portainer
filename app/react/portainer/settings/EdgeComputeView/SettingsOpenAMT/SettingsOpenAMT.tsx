@@ -130,7 +130,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
-                <TextTip color="blue">
+                <TextTip color="blue" className="mb-2">
                   When enabled, this will allow Portainer to interact with an
                   OpenAMT MPS API.
                 </TextTip>

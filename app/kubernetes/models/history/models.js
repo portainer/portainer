@@ -1,7 +1,6 @@
 export const KubernetesSystem_DefaultDeploymentUniqueLabelKey = 'pod-template-hash';
 export const KubernetesSystem_RevisionAnnotation = 'deployment.kubernetes.io/revision';
 export const KubernetesSystem_RevisionHistoryAnnotation = 'deployment.kubernetes.io/revision-history';
-export const KubernetesSystem_ChangeCauseAnnotation = 'kubernetes.io/change-cause';
 export const KubernetesSystem_DesiredReplicasAnnotation = 'deployment.kubernetes.io/desired-replicas';
 export const KubernetesSystem_MaxReplicasAnnotation = 'deployment.kubernetes.io/max-replicas';
 

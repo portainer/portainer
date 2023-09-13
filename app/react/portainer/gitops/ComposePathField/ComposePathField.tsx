@@ -31,7 +31,7 @@ export function ComposePathField({
   return (
     <div className="form-group">
       <span className="col-sm-12">
-        <TextTip color="blue">
+        <TextTip color="blue" className="mb-2">
           <span>
             Indicate the path to the {isCompose ? 'Compose' : 'Manifest'} file
             from the root of your repository (requires a yaml, yml, json, or hcl

@@ -30,6 +30,7 @@ var filesToBackup = []string{
 	"portainer.key",
 	"portainer.pub",
 	"tls",
+	"chisel",
 }
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.

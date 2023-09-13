@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id updateProfile
@@ -19,6 +19,7 @@ import (
 // @tags intel
 // @security jwt
 // @produce json
+// @param id path int true "FDO Profile identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 409 "Profile name already exists"
@@ -36,7 +37,7 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
+	profile, err := handler.DataStore.FDOProfile().Read(portainer.FDOProfileID(id))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	} else if err != nil {

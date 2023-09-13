@@ -1,7 +1,7 @@
 import { Wand2, Plug2 } from 'lucide-react';
 
 import { EnvironmentType } from '@/react/portainer/environments/types';
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
 import Kube from '@/assets/ico/kube.svg?c';
 

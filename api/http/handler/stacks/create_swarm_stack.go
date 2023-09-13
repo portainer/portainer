@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type swarmStackFromFileContentPayload struct {
@@ -23,7 +23,7 @@ type swarmStackFromFileContentPayload struct {
 	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
-	// A list of environment(endpoint) variables used during stack deployment
+	// A list of environment variables used during stack deployment
 	Env []portainer.Pair
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
@@ -52,6 +52,21 @@ func createStackPayloadFromSwarmFileContentPayload(name string, swarmID string, 
 	}
 }
 
+// @id StackCreateDockerSwarmString
+// @summary Deploy a new swarm stack from a text
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body swarmStackFromFileContentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/string [post]
 func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -96,7 +111,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	Name string `example:"myStack" validate:"required"`
 	// Swarm cluster identifier
 	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
-	// A list of environment(endpoint) variables used during stack deployment
+	// A list of environment variables used during stack deployment
 	Env []portainer.Pair
 
 	// URL of a Git repository hosting the Stack file
@@ -115,8 +130,10 @@ type swarmStackFromGitRepositoryPayload struct {
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Applicable when deploying with multiple stack files
 	AdditionalFiles []string `example:"[nz.compose.yml, uat.compose.yml]"`
-	// Optional auto update configuration
+	// Optional GitOps update configuration
 	AutoUpdate *portainer.AutoUpdateSettings
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -138,7 +155,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool) stackbuilders.StackPayload {
+func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool, repoSkipSSLVerify bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name:    name,
 		SwarmID: swarmID,
@@ -148,6 +165,7 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 			Authentication: repoAuthentication,
 			Username:       repoUsername,
 			Password:       repoPassword,
+			TLSSkipVerify:  repoSkipSSLVerify,
 		},
 		ComposeFile:     composeFile,
 		AdditionalFiles: additionalFiles,
@@ -157,6 +175,21 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 	}
 }
 
+// @id StackCreateDockerSwarmRepository
+// @summary Deploy a new swarm stack from a git repository
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @accept json
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @param body body swarmStackFromGitRepositoryPayload true "stack config"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/repository [post]
 func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -201,7 +234,9 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		payload.AdditionalFiles,
 		payload.AutoUpdate,
 		payload.Env,
-		payload.FromAppTemplate)
+		payload.FromAppTemplate,
+		payload.TLSSkipVerify,
+	)
 
 	swarmStackBuilder := stackbuilders.CreateSwarmStackGitBuilder(securityContext,
 		handler.DataStore,
@@ -263,8 +298,26 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	return nil
 }
 
+// @id StackCreateDockerSwarmFile
+// @summary Deploy a new swarm stack from a file
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept multipart/form-data
+// @produce json
+// @param Name formData string false "Name of the stack"
+// @param SwarmID formData string false "Swarm cluster identifier."
+// @param Env formData string false "Environment variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional"
+// @param file formData file false "Stack file"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/file [post]
 func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
-	payload := &swarmStackFromFileUploadPayload{}
+	var payload swarmStackFromFileUploadPayload
 	err := payload.Validate(r)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)

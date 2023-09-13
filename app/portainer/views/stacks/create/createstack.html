@@ -91,19 +91,31 @@
           ></git-form>
 
           <div ng-show="state.Method === 'template'">
-            <custom-template-selector
-              new-template-path="docker.templates.custom.new"
-              stack-type="state.StackType"
-              on-change="(onChangeTemplateId)"
-              value="state.selectedTemplateId"
-            ></custom-template-selector>
+            <div class="col-sm-12">
+              <custom-template-selector
+                new-template-path="docker.templates.custom.new"
+                stack-type="state.StackType"
+                on-change="(onChangeTemplateId)"
+                value="state.selectedTemplateId"
+              ></custom-template-selector>
 
-            <custom-templates-variables-field
-              ng-if="isTemplateVariablesEnabled && state.selectedTemplate"
-              definitions="state.selectedTemplate.Variables"
-              value="formValues.Variables"
-              on-change="(onChangeTemplateVariables)"
-            ></custom-templates-variables-field>
+              <custom-templates-variables-field
+                ng-if="isTemplateVariablesEnabled && state.selectedTemplate"
+                definitions="state.selectedTemplate.Variables"
+                value="formValues.Variables"
+                on-change="(onChangeTemplateVariables)"
+              ></custom-templates-variables-field>
+
+              <span ng-if="state.Method === 'template' && state.selectedTemplateId && state.templateLoadFailed">
+                <p class="small vertical-center text-danger mb-5" ng-if="currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId">
+                  <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
+                  <a ui-sref="docker.templates.custom.edit({id: state.selectedTemplateId})">click here</a> for configuration.</p
+                >
+                <p class="small vertical-center text-danger mb-5" ng-if="!(currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId)">
+                  <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
+                >
+              </span>
+            </div>
           </div>
 
           <web-editor-form
@@ -113,15 +125,14 @@
             on-change="(onChangeFileContent)"
             ng-required="true"
             yml="true"
-            placeholder="# Define or paste the content of your docker compose file here"
+            placeholder="Define or paste the content of your docker compose file here"
+            read-only="state.isEditorReadOnly"
           >
             <editor-description>
-              <span class="col-sm-12 text-muted small">
+              <p>
                 You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-              </span>
-              <div class="col-sm-12" ng-if="state.editorYamlValidationError">
-                <span class="text-danger small">{{ state.editorYamlValidationError }}</span>
-              </div>
+              </p>
+              <p ng-if="state.editorYamlValidationError" class="text-danger">{{ state.editorYamlValidationError }}</p>
             </editor-description>
           </web-editor-form>
 
@@ -141,7 +152,11 @@
           </div>
 
           <!-- environment-variables -->
-          <environment-variables-panel ng-model="formValues.Env" explanation="These values will be used as substitutions in the stack file" on-change="(handleEnvVarChange)">
+          <environment-variables-panel
+            values="formValues.Env"
+            explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’'"
+            on-change="(handleEnvVarChange)"
+          >
           </environment-variables-panel>
           <!-- !environment-variables -->
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>

@@ -1,7 +1,6 @@
 package edgestack
 
 import (
-	"errors"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
@@ -29,7 +28,7 @@ func (service ServiceTx) EdgeStacks() ([]portainer.EdgeStack, error) {
 			stack, ok := obj.(*portainer.EdgeStack)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")
-				return nil, fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
+				return nil, fmt.Errorf("failed to convert to EdgeStack object: %s", obj)
 			}
 
 			stacks = append(stacks, *stack)
@@ -101,9 +100,16 @@ func (service ServiceTx) UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *po
 	return nil
 }
 
-// UpdateEdgeStackFunc is a no-op inside a transaction.
+// Deprecated: use UpdateEdgeStack inside a transaction instead.
 func (service ServiceTx) UpdateEdgeStackFunc(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error {
-	return errors.New("cannot be called inside a transaction")
+	edgeStack, err := service.EdgeStack(ID)
+	if err != nil {
+		return err
+	}
+
+	updateFunc(edgeStack)
+
+	return service.UpdateEdgeStack(ID, edgeStack)
 }
 
 // DeleteEdgeStack deletes an Edge stack.

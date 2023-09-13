@@ -1,21 +1,19 @@
-import { PropsWithChildren } from 'react';
-import { Row, TableRowProps } from 'react-table';
+import { Fragment, PropsWithChildren } from 'react';
+import { Row } from '@tanstack/react-table';
 
-interface Props<T extends Record<string, unknown> = Record<string, unknown>> {
+import { DefaultType } from './types';
+
+interface Props<T extends DefaultType = DefaultType> {
   isLoading?: boolean;
   rows: Row<T>[];
   emptyContent?: string;
-  prepareRow(row: Row<T>): void;
-  renderRow(row: Row<T>, rowProps: TableRowProps): React.ReactNode;
+  renderRow(row: Row<T>): React.ReactNode;
 }
 
-export function TableContent<
-  T extends Record<string, unknown> = Record<string, unknown>
->({
+export function TableContent<T extends DefaultType = DefaultType>({
   isLoading = false,
   rows,
   emptyContent = 'No items available',
-  prepareRow,
   renderRow,
 }: Props<T>) {
   if (isLoading) {
@@ -28,11 +26,9 @@ export function TableContent<
 
   return (
     <>
-      {rows.map((row) => {
-        prepareRow(row);
-        const { key, className, role, style } = row.getRowProps();
-        return renderRow(row, { key, className, role, style });
-      })}
+      {rows.map((row) => (
+        <Fragment key={row.id}>{renderRow(row)}</Fragment>
+      ))}
     </>
   );
 }

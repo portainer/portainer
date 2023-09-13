@@ -3,14 +3,15 @@ package registries
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/gorilla/mux"
 )
 
 func hideFields(registry *portainer.Registry, hideAccesses bool) {
@@ -24,7 +25,7 @@ func hideFields(registry *portainer.Registry, hideAccesses bool) {
 // Handler is the HTTP handler used to handle registry operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer   *security.RequestBouncer
+	requestBouncer   security.BouncerService
 	DataStore        dataservices.DataStore
 	FileService      portainer.FileService
 	ProxyManager     *proxy.Manager
@@ -32,14 +33,14 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage registry operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := newHandler(bouncer)
 	h.initRouter(bouncer)
 
 	return h
 }
 
-func newHandler(bouncer *security.RequestBouncer) *Handler {
+func newHandler(bouncer security.BouncerService) *Handler {
 	return &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,

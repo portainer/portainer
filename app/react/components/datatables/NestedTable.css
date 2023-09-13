@@ -1,3 +1,7 @@
+.inner-datatable .widget {
+  border: 0 !important;
+}
+
 .inner-datatable {
   @apply rounded-md border border-solid border-gray-5 th-dark:border-gray-9;
   overflow: hidden;

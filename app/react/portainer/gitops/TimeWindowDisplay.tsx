@@ -36,8 +36,8 @@ function TimeWindowDisplay() {
   );
 
   return (
-    <TextTip color="orange">
-      A change window is enabled, automatic updates will not occur outside of{' '}
+    <TextTip color="orange" className="mb-2">
+      A change window is enabled, GitOps updates will not occur outside of{' '}
       <span className="font-bold">
         {shortTime(startTimeUtc)} - {shortTime(endTimeUtc)} UTC (
         {shortTime(startTimeLocal)} -{shortTime(endTimeLocal)}{' '}

@@ -7,24 +7,24 @@ import (
 	"net/http"
 	"strings"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/registryutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	dockertypes "github.com/docker/docker/api/types"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 )
 
 // @summary Execute a webhook
 // @description Acts on a passed in token UUID to restart the docker service
 // @description **Access policy**: public
 // @tags webhooks
-// @param token path string true "Webhook token"
+// @param id path string true "Webhook token"
 // @success 202 "Webhook executed"
 // @failure 400
 // @failure 500
-// @router /webhooks/{token} [post]
+// @router /webhooks/{id} [post]
 func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 
 	webhookToken, err := request.RetrieveRouteVariableValue(r, "token")
@@ -100,7 +100,7 @@ func (handler *Handler) executeServiceWebhook(
 	}
 
 	if registryID != 0 {
-		registry, err := handler.DataStore.Registry().Registry(registryID)
+		registry, err := handler.DataStore.Registry().Read(registryID)
 		if err != nil {
 			return httperror.InternalServerError("Error getting registry", err)
 		}

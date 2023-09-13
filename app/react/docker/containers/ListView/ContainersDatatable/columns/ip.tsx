@@ -1,12 +1,6 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
-
-export const ip: Column<DockerContainer> = {
-  Header: 'IP Address',
-  accessor: (row) => row.IP || '-',
+export const ip = columnHelper.accessor((row) => row.IP || '-', {
+  header: 'IP Address',
   id: 'ip',
-  disableFilters: true,
-  canHide: true,
-  Filter: () => null,
-};
+});

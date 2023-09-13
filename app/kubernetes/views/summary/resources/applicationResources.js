@@ -5,18 +5,14 @@ import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesService, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import {
-  KubernetesApplication,
-  KubernetesApplicationDeploymentTypes,
-  KubernetesApplicationPublishingTypes,
-  KubernetesApplicationTypes,
-} from 'Kubernetes/models/application/models';
+import { KubernetesApplication, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
+import { generateNewIngressesFromFormPaths } from '@/react/kubernetes/applications/CreateView/application-services/utils';
 
 const { CREATE, UPDATE, DELETE } = KubernetesResourceActions;
 
@@ -24,7 +20,7 @@ const { CREATE, UPDATE, DELETE } = KubernetesResourceActions;
  * Get summary of Kubernetes resources to be created, updated or deleted
  * @param {KubernetesApplicationFormValues} formValues
  */
-export default function (formValues, oldFormValues = {}) {
+export function getApplicationResources(formValues, oldFormValues = {}) {
   if (oldFormValues instanceof KubernetesApplicationFormValues) {
     const resourceSummary = getUpdatedApplicationResources(oldFormValues, formValues);
     return resourceSummary;
@@ -45,21 +41,16 @@ function getCreatedApplicationResources(formValues) {
   if (services) {
     services.forEach((service) => {
       resources.push({ action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: service.Name, type: service.Type || KubernetesServiceTypes.CLUSTER_IP });
-      if (formValues.OriginalIngresses.length !== 0) {
-        const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
-        resources.push(...getIngressUpdateSummary(formValues.OriginalIngresses, ingresses));
-      }
+      // Ingress
+      const newServicePorts = formValues.Services.flatMap((service) => service.Ports);
+      const newIngresses = generateNewIngressesFromFormPaths(formValues.OriginalIngresses, newServicePorts);
+      resources.push(...getIngressUpdateSummary(formValues.OriginalIngresses, newIngresses));
     });
   }
 
   if (service) {
     // Service
     resources.push({ action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: service.Name, type: service.Type || KubernetesServiceTypes.CLUSTER_IP });
-    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-      // Ingress
-      const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service.Name);
-      resources.push(...getIngressUpdateSummary(formValues.OriginalIngresses, ingresses));
-    }
   }
 
   if (app instanceof KubernetesStatefulSet) {
@@ -147,28 +138,18 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
       });
     }
 
-    if (newFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS || oldFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-      // Ingress
-      const oldIngresses = KubernetesIngressConverter.applicationFormValuesToIngresses(oldFormValues, oldService.Name);
-      const newIngresses = KubernetesIngressConverter.applicationFormValuesToIngresses(newFormValues, newService.Name);
-      resources.push(...getIngressUpdateSummary(oldIngresses, newIngresses));
-    }
+    // Ingress
+    const oldServicePorts = oldFormValues.Services.flatMap((service) => service.Ports);
+    const oldIngresses = generateNewIngressesFromFormPaths(oldFormValues.OriginalIngresses, oldServicePorts, oldServicePorts);
+    const newServicePorts = newFormValues.Services.flatMap((service) => service.Ports);
+    const newIngresses = generateNewIngressesFromFormPaths(newFormValues.OriginalIngresses, newServicePorts, oldServicePorts);
+    resources.push(...getIngressUpdateSummary(oldIngresses, newIngresses));
   } else if (!oldService && newService) {
     // Service
     resources.push({ action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: newService.Name, type: newService.Type || KubernetesServiceTypes.CLUSTER_IP });
-    if (newFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-      // Ingress
-      const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(newFormValues, newService.Name);
-      resources.push(...getIngressUpdateSummary(newFormValues.OriginalIngresses, ingresses));
-    }
   } else if (oldService && !newService) {
     // Service
     resources.push({ action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP });
-    if (oldFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-      // Ingress
-      const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(newFormValues, oldService.Name);
-      resources.push(...getIngressUpdateSummary(oldFormValues.OriginalIngresses, ingresses));
-    }
   }
 
   const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
@@ -209,7 +190,7 @@ function getApplicationResourceType(app) {
 function getIngressUpdateSummary(oldIngresses, newIngresses) {
   const ingressesSummaries = newIngresses
     .map((newIng) => {
-      const oldIng = _.find(oldIngresses, { Name: newIng.Name });
+      const oldIng = oldIngresses.find((oldIng) => oldIng.Name === newIng.Name);
       return getIngressUpdateResourceSummary(oldIng, newIng);
     })
     .filter((s) => s); // remove nulls

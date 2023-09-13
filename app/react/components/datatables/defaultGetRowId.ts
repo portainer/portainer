@@ -1,16 +1,17 @@
-export function defaultGetRowId<D extends Record<string, unknown>>(
-  row: D
-): string {
-  if (row.id && (typeof row.id === 'string' || typeof row.id === 'number')) {
-    return row.id.toString();
-  }
+import { DefaultType } from './types';
 
-  if (row.Id && (typeof row.Id === 'string' || typeof row.Id === 'number')) {
-    return row.Id.toString();
-  }
+/**
+ * gets row id by looking for one of id, Id, or ID keys on the object
+ */
+export function defaultGetRowId<D extends DefaultType>(row: D): string {
+  const key = ['id', 'Id', 'ID'].find((key) =>
+    Object.hasOwn(row, key)
+  ) as keyof D;
 
-  if (row.ID && (typeof row.ID === 'string' || typeof row.ID === 'number')) {
-    return row.ID.toString();
+  const value = row[key];
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value.toString();
   }
 
   return '';

@@ -1,7 +1,5 @@
 import _ from 'lodash';
 
-import { usePublicSettings } from '@/react/portainer/settings/queries';
-
 const categories = [
   'docker',
   'kubernetes',
@@ -9,7 +7,7 @@ const categories = [
   'portainer',
   'edge',
 ] as const;
-type Category = typeof categories[number];
+type Category = (typeof categories)[number];
 
 enum DimensionConfig {
   PortainerVersion = 1,
@@ -18,7 +16,7 @@ enum DimensionConfig {
   PortainerEndpointUserRole,
 }
 
-interface TrackEventProps {
+export interface TrackEventProps {
   category: Category;
   metadata?: Record<string, unknown>;
   value?: string | number;
@@ -60,20 +58,6 @@ export function push(
 ) {
   if (typeof window !== 'undefined') {
     window._paq.push([name, ...args]);
-  }
-}
-
-export function useAnalytics() {
-  const telemetryQuery = usePublicSettings({
-    select: (settings) => settings.EnableTelemetry,
-  });
-
-  return { trackEvent: handleTrackEvent };
-
-  function handleTrackEvent(...args: Parameters<typeof trackEvent>) {
-    if (telemetryQuery.data) {
-      trackEvent(...args);
-    }
   }
 }
 

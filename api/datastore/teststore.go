@@ -15,13 +15,15 @@ func (store *Store) GetConnection() portainer.Connection {
 	return store.connection
 }
 
-func MustNewTestStore(t testing.TB, init, secure bool) (bool, *Store, func()) {
+func MustNewTestStore(t testing.TB, init, secure bool) (bool, *Store) {
 	newStore, store, teardown, err := NewTestStore(t, init, secure)
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
 	}
 
-	return newStore, store, teardown
+	t.Cleanup(teardown)
+
+	return newStore, store
 }
 
 func NewTestStore(t testing.TB, init, secure bool) (bool, *Store, func(), error) {

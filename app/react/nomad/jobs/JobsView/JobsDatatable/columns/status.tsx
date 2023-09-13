@@ -1,11 +1,10 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Job } from '@/react/nomad/types';
-
-export const status: Column<Job> = {
-  Header: 'Job Status',
-  accessor: (row) => row.Status || '-',
-  id: 'statusName',
-  disableFilters: true,
-  canHide: true,
-};
+export const status = columnHelper.accessor('Status', {
+  header: 'Job Status',
+  id: 'status',
+  cell: ({ getValue }) => {
+    const value = getValue();
+    return value || '-';
+  },
+});

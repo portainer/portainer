@@ -16,7 +16,7 @@
 </td>
 <td ng-if="!allowCheckbox"></td>
 <td>
-  <a ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate : 40 }}</a>
+  <a ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate: 40 }}</a>
   <span style="margin-left: 10px" class="label label-info image-tag space-left" ng-if="item.ResourceControl.System">System</span>
 </td>
 <td>{{ item.StackName ? item.StackName : '-' }}</td>

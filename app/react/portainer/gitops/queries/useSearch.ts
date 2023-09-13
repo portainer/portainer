@@ -8,6 +8,7 @@ interface SearchPayload {
   reference?: string;
   username?: string;
   password?: string;
+  tlsSkipVerify?: boolean;
 }
 
 export function useSearch(payload: SearchPayload, enabled: boolean) {

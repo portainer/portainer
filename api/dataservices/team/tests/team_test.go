@@ -10,8 +10,7 @@ import (
 
 func Test_teamByName(t *testing.T) {
 	t.Run("When store is empty should return ErrObjectNotFound", func(t *testing.T) {
-		_, store, teardown := datastore.MustNewTestStore(t, true, true)
-		defer teardown()
+		_, store := datastore.MustNewTestStore(t, true, true)
 
 		_, err := store.Team().TeamByName("name")
 		assert.ErrorIs(t, err, errors.ErrObjectNotFound)
@@ -19,8 +18,7 @@ func Test_teamByName(t *testing.T) {
 	})
 
 	t.Run("When there is no object with the same name should return ErrObjectNotFound", func(t *testing.T) {
-		_, store, teardown := datastore.MustNewTestStore(t, true, true)
-		defer teardown()
+		_, store := datastore.MustNewTestStore(t, true, true)
 
 		teamBuilder := teamBuilder{
 			t:     t,
@@ -35,8 +33,7 @@ func Test_teamByName(t *testing.T) {
 	})
 
 	t.Run("When there is an object with the same name should return the object", func(t *testing.T) {
-		_, store, teardown := datastore.MustNewTestStore(t, true, true)
-		defer teardown()
+		_, store := datastore.MustNewTestStore(t, true, true)
 
 		teamBuilder := teamBuilder{
 			t:     t,

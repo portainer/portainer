@@ -20,7 +20,7 @@ func (hbpm *helmBinaryPackageManager) Get(getOpts options.GetOptions) ([]byte, e
 		args = append(args, "--namespace", getOpts.Namespace)
 	}
 
-	result, err := hbpm.runWithKubeConfig("get", args, getOpts.KubernetesClusterAccess)
+	result, err := hbpm.runWithKubeConfig("get", args, getOpts.KubernetesClusterAccess, getOpts.Env)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run helm get on specified args")
 	}

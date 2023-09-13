@@ -3,10 +3,10 @@ package helm
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/pkg/libhelm/options"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id HelmDelete
@@ -18,7 +18,7 @@ import (
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
 // @param release path string true "The name of the release/application to uninstall"
-// @param namespace query string true "An optional namespace"
+// @param namespace query string false "An optional namespace"
 // @success 204 "Success"
 // @failure 400 "Invalid environment(endpoint) id or bad request"
 // @failure 401 "Unauthorized"

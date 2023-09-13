@@ -137,7 +137,7 @@ angular.module('portainer.app').factory('RegistryService', [
           match4 = match4 || registry;
         }
 
-        if (_.includes(repository, getURL(registry))) {
+        if (repository.startsWith(getURL(registry))) {
           match3 = registry;
         }
       }

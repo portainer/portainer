@@ -4,12 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type teamMembershipUpdatePayload struct {
@@ -63,7 +63,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	membership, err := handler.DataStore.TeamMembership().TeamMembership(portainer.TeamMembershipID(membershipID))
+	membership, err := handler.DataStore.TeamMembership().Read(portainer.TeamMembershipID(membershipID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a team membership with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -85,7 +85,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 	membership.TeamID = portainer.TeamID(payload.TeamID)
 	membership.Role = portainer.MembershipRole(payload.Role)
 
-	err = handler.DataStore.TeamMembership().UpdateTeamMembership(membership.ID, membership)
+	err = handler.DataStore.TeamMembership().Update(membership.ID, membership)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist membership changes inside the database", err)
 	}

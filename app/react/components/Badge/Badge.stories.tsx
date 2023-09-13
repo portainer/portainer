@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 
-import { Badge, Props } from './Badge';
+import { Badge, BadgeType, Props } from './Badge';
 
 export default {
   component: Badge,
@@ -17,11 +17,15 @@ export default {
 
 // : JSX.IntrinsicAttributes & PropsWithChildren<Props>
 function Template({ type = 'success' }: Props) {
-  const message = {
+  const message: Record<BadgeType, string> = {
     success: 'success badge',
     danger: 'danger badge',
     warn: 'warn badge',
     info: 'info badge',
+    successSecondary: 'successSecondary badge',
+    dangerSecondary: 'dangerSecondary badge',
+    warnSecondary: 'warnSecondary badge',
+    infoSecondary: 'infoSecondary badge',
   };
   return <Badge type={type}>{message[type]}</Badge>;
 }

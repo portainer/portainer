@@ -1,12 +1,13 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/gofrs/uuid"
 )
@@ -38,7 +39,8 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if err = deployments.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-		if _, ok := err.(*deployments.StackAuthorMissingErr); ok {
+		var StackAuthorMissingErr *deployments.StackAuthorMissingErr
+		if errors.As(err, &StackAuthorMissingErr) {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Autoupdate for the stack isn't available", Err: err}
 		}
 

@@ -16,7 +16,7 @@ func isRegistryAssignedToNamespace(registry portainer.Registry, endpointID porta
 }
 
 func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, dataStore dataservices.DataStore, namespace string) (err error) {
-	registries, err := dataStore.Registry().Registries()
+	registries, err := dataStore.Registry().ReadAll()
 	if err != nil {
 		return
 	}

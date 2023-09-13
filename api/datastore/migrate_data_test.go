@@ -163,8 +163,7 @@ func TestMigrateData(t *testing.T) {
 }
 
 func Test_getBackupRestoreOptions(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, false, true)
-	defer teardown()
+	_, store := MustNewTestStore(t, false, true)
 
 	options := getBackupRestoreOptions(store.commonBackupDir())
 
@@ -182,8 +181,7 @@ func Test_getBackupRestoreOptions(t *testing.T) {
 func TestRollback(t *testing.T) {
 	t.Run("Rollback should restore upgrade after backup", func(t *testing.T) {
 		version := models.Version{SchemaVersion: "2.4.0"}
-		_, store, teardown := MustNewTestStore(t, true, false)
-		defer teardown()
+		_, store := MustNewTestStore(t, true, false)
 
 		err := store.VersionService.UpdateVersion(&version)
 		if err != nil {
@@ -240,7 +238,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 
 	// Parse source json to db.
 	// When we create a new test store, it sets its version field automatically to latest.
-	_, store, _ := MustNewTestStore(t, true, false)
+	_, store := MustNewTestStore(t, true, false)
 
 	fmt.Println("store.path=", store.GetConnection().GetDatabaseFilePath())
 	store.connection.DeleteObject("version", []byte("VERSION"))
@@ -288,7 +286,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 	// Convert database back to json.
 	databasePath := con.GetDatabaseFilePath()
 	if _, err := os.Stat(databasePath); err != nil {
-		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
+		return fmt.Errorf("stat on %s failed: %w", databasePath, err)
 	}
 
 	gotJSON, err := con.ExportJSON(databasePath, false)

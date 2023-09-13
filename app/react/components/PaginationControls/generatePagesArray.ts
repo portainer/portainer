@@ -12,12 +12,10 @@ export /**
  */
 function generatePagesArray(
   currentPage: number,
-  collectionLength: number,
-  rowsPerPage: number,
+  totalPages: number,
   paginationRange: number
 ): (number | '...')[] {
   const pages: (number | '...')[] = [];
-  const totalPages = Math.ceil(collectionLength / rowsPerPage);
   const halfWay = Math.ceil(paginationRange / 2);
 
   let position;

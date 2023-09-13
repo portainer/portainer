@@ -4,13 +4,14 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type userAccessTokenCreatePayload struct {
@@ -79,7 +80,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return httperror.Forbidden("Permission denied to create user access token", httperrors.ErrUnauthorized)
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if err != nil {
 		return httperror.BadRequest("Unable to find a user", err)
 	}

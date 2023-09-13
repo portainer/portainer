@@ -13,7 +13,7 @@ type Handler struct {
 }
 
 // NewHandler returns a new Handler
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}

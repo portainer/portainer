@@ -21,7 +21,7 @@ export function withLimitToBE<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     const isLimitedToBE = useLimitToBE(defaultPath);
 
     if (isLimitedToBE) {

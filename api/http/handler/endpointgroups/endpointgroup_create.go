@@ -4,11 +4,13 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type endpointGroupCreatePayload struct {
@@ -24,11 +26,13 @@ type endpointGroupCreatePayload struct {
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid environment group name")
+		return errors.New("invalid environment group name")
 	}
+
 	if payload.TagIDs == nil {
 		payload.TagIDs = []portainer.TagID{}
 	}
+
 	return nil
 }
 
@@ -52,6 +56,24 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
+	var endpointGroup *portainer.EndpointGroup
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		endpointGroup, err = handler.createEndpointGroup(tx, payload)
+		return err
+	})
+	if err != nil {
+		var httpErr *httperror.HandlerError
+		if errors.As(err, &httpErr) {
+			return httpErr
+		}
+
+		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	return response.JSON(w, endpointGroup)
+}
+
+func (handler *Handler) createEndpointGroup(tx dataservices.DataStoreTx, payload endpointGroupCreatePayload) (*portainer.EndpointGroup, error) {
 	endpointGroup := &portainer.EndpointGroup{
 		Name:               payload.Name,
 		Description:        payload.Description,
@@ -60,14 +82,14 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		TagIDs:             payload.TagIDs,
 	}
 
-	err = handler.DataStore.EndpointGroup().Create(endpointGroup)
+	err := tx.EndpointGroup().Create(endpointGroup)
 	if err != nil {
-		return httperror.InternalServerError("Unable to persist the environment group inside the database", err)
+		return nil, httperror.InternalServerError("Unable to persist the environment group inside the database", err)
 	}
 
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
+	endpoints, err := tx.Endpoint().Endpoints()
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environments from the database", err)
+		return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)
 	}
 
 	for _, id := range payload.AssociatedEndpoints {
@@ -75,14 +97,14 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 			if endpoint.ID == id {
 				endpoint.GroupID = endpointGroup.ID
 
-				err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
+				err := tx.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
-					return httperror.InternalServerError("Unable to update environment", err)
+					return nil, httperror.InternalServerError("Unable to update environment", err)
 				}
 
-				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
+				err = handler.updateEndpointRelations(tx, &endpoint, endpointGroup)
 				if err != nil {
-					return httperror.InternalServerError("Unable to persist environment relations changes inside the database", err)
+					return nil, httperror.InternalServerError("Unable to persist environment relations changes inside the database", err)
 				}
 
 				break
@@ -91,16 +113,18 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	}
 
 	for _, tagID := range endpointGroup.TagIDs {
-		err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
-			tag.EndpointGroups[endpointGroup.ID] = true
-		})
+		tag, err := tx.Tag().Read(tagID)
+		if err != nil {
+			return nil, httperror.InternalServerError("Unable to find a tag inside the database", err)
+		}
 
-		if handler.DataStore.IsErrObjectNotFound(err) {
-			return httperror.InternalServerError("Unable to find a tag inside the database", err)
-		} else if err != nil {
-			return httperror.InternalServerError("Unable to persist tag changes inside the database", err)
+		tag.EndpointGroups[endpointGroup.ID] = true
+
+		err = tx.Tag().Update(tagID, tag)
+		if err != nil {
+			return nil, httperror.InternalServerError("Unable to persist tag changes inside the database", err)
 		}
 	}
 
-	return response.JSON(w, endpointGroup)
+	return endpointGroup, nil
 }

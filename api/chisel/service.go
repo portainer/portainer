@@ -3,6 +3,7 @@ package chisel
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -11,8 +12,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 
-	"github.com/dchest/uniuri"
 	chserver "github.com/jpillora/chisel/server"
+	"github.com/jpillora/chisel/share/ccrypto"
 	"github.com/rs/zerolog/log"
 )
 
@@ -35,14 +36,16 @@ type Service struct {
 	shutdownCtx       context.Context
 	ProxyManager      *proxy.Manager
 	mu                sync.Mutex
+	fileService       portainer.FileService
 }
 
 // NewService returns a pointer to a new instance of Service
-func NewService(dataStore dataservices.DataStore, shutdownCtx context.Context) *Service {
+func NewService(dataStore dataservices.DataStore, shutdownCtx context.Context, fileService portainer.FileService) *Service {
 	return &Service{
 		tunnelDetailsMap: make(map[portainer.EndpointID]*portainer.TunnelDetails),
 		dataStore:        dataStore,
 		shutdownCtx:      shutdownCtx,
+		fileService:      fileService,
 	}
 }
 
@@ -58,7 +61,11 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 	httpClient := &http.Client{
 		Timeout: 3 * time.Second,
 	}
-	_, err = httpClient.Do(req)
+
+	resp, err := httpClient.Do(req)
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+
 	return err
 }
 
@@ -112,14 +119,15 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 // It starts the tunnel status verification process in the background.
 // The snapshotter is used in the tunnel status verification process.
 func (service *Service) StartTunnelServer(addr, port string, snapshotService portainer.SnapshotService) error {
-	keySeed, err := service.retrievePrivateKeySeed()
+	privateKeyFile, err := service.retrievePrivateKeyFile()
+
 	if err != nil {
 		return err
 	}
 
 	config := &chserver.Config{
 		Reverse: true,
-		KeySeed: keySeed,
+		KeyFile: privateKeyFile,
 	}
 
 	chiselServer, err := chserver.NewServer(config)
@@ -155,26 +163,41 @@ func (service *Service) StopTunnelServer() error {
 	return service.chiselServer.Close()
 }
 
-func (service *Service) retrievePrivateKeySeed() (string, error) {
-	var serverInfo *portainer.TunnelServerInfo
+func (service *Service) retrievePrivateKeyFile() (string, error) {
+	privateKeyFile := service.fileService.GetDefaultChiselPrivateKeyPath()
 
-	serverInfo, err := service.dataStore.TunnelServer().Info()
-	if service.dataStore.IsErrObjectNotFound(err) {
-		keySeed := uniuri.NewLen(16)
+	exist, _ := service.fileService.FileExists(privateKeyFile)
+	if !exist {
+		log.Debug().
+			Str("private-key", privateKeyFile).
+			Msg("Chisel private key file does not exist")
 
-		serverInfo = &portainer.TunnelServerInfo{
-			PrivateKeySeed: keySeed,
-		}
-
-		err := service.dataStore.TunnelServer().UpdateInfo(serverInfo)
+		privateKey, err := ccrypto.GenerateKey("")
 		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("Failed to generate chisel private key")
 			return "", err
 		}
-	} else if err != nil {
-		return "", err
+
+		err = service.fileService.StoreChiselPrivateKey(privateKey)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("Failed to save Chisel private key to disk")
+			return "", err
+		} else {
+			log.Info().
+				Str("private-key", privateKeyFile).
+				Msg("Generated a new Chisel private key file")
+		}
+	} else {
+		log.Info().
+			Str("private-key", privateKeyFile).
+			Msg("Found Chisel private key file on disk")
 	}
 
-	return serverInfo.PrivateKeySeed, nil
+	return privateKeyFile, nil
 }
 
 func (service *Service) startTunnelVerificationLoop() {
@@ -266,14 +289,7 @@ func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tun
 		return err
 	}
 
-	endpointURL := endpoint.URL
-
 	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
-	err = service.snapshotService.SnapshotEndpoint(endpoint)
-	if err != nil {
-		return err
-	}
 
-	endpoint.URL = endpointURL
-	return service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	return service.snapshotService.SnapshotEndpoint(endpoint)
 }

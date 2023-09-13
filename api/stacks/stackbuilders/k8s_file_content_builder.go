@@ -5,13 +5,13 @@ import (
 	"strconv"
 	"sync"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 type K8sStackFileContentBuilder struct {
@@ -53,6 +53,7 @@ func (b *K8sStackFileContentBuilder) SetUniqueInfo(payload *StackPayload) FileCo
 	b.stack.Namespace = payload.Namespace
 	b.stack.CreatedBy = b.User.Username
 	b.stack.IsComposeFormat = payload.ComposeFormat
+	b.stack.FromAppTemplate = payload.FromAppTemplate
 	return b
 }
 

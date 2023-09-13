@@ -46,6 +46,13 @@ class KubernetesDeployController {
       template: null,
       baseWebhookUrl: baseStackWebhookUrl(),
       webhookId: createWebhookId(),
+      templateLoadFailed: false,
+      isEditorReadOnly: false,
+    };
+
+    this.currentUser = {
+      isAdmin: false,
+      id: null,
     };
 
     this.formValues = {
@@ -59,6 +66,7 @@ class KubernetesDeployController {
       ComposeFilePathInRepository: '',
       Variables: {},
       AutoUpdate: parseAutoUpdateResponse(),
+      TLSSkipVerify: false,
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
@@ -94,7 +102,7 @@ class KubernetesDeployController {
     const metadata = {
       type: buildLabel(this.state.BuildMethod),
       format: formatLabel(this.state.DeployType),
-      role: roleLabel(this.Authentication.isAdmin()),
+      role: roleLabel(this.currentUser.isAdmin),
       'automatic-updates': automaticUpdatesLabel(this.formValues.RepositoryAutomaticUpdates, this.formValues.RepositoryMechanism),
     };
 
@@ -182,9 +190,15 @@ class KubernetesDeployController {
       this.state.template = template;
 
       try {
-        const fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
-        this.state.templateContent = fileContent;
-        this.onChangeFileContent(fileContent);
+        try {
+          this.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
+          this.onChangeFileContent(this.state.templateContent);
+
+          this.state.isEditorReadOnly = true;
+        } catch (err) {
+          this.state.templateLoadFailed = true;
+          throw err;
+        }
 
         if (template.Variables && template.Variables.length > 0) {
           const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
@@ -248,6 +262,7 @@ class KubernetesDeployController {
       };
 
       if (method === KubernetesDeployRequestMethods.REPOSITORY) {
+        payload.TLSSkipVerify = this.formValues.TLSSkipVerify;
         payload.RepositoryURL = this.formValues.RepositoryURL;
         payload.RepositoryReferenceName = this.formValues.RepositoryReferenceName;
         payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;
@@ -266,8 +281,19 @@ class KubernetesDeployController {
 
       await this.StackService.kubernetesDeploy(this.endpoint.Id, method, payload);
 
-      this.Notifications.success('Success', 'Manifest successfully deployed');
+      this.Notifications.success('Success', 'Request to deploy manifest successfully submitted');
       this.state.isEditorDirty = false;
+
+      if (this.$state.params.referrer && this.$state.params.tab) {
+        this.$state.go(this.$state.params.referrer, { tab: this.$state.params.tab });
+        return;
+      }
+
+      if (this.$state.params.referrer) {
+        this.$state.go(this.$state.params.referrer);
+        return;
+      }
+
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Unable to deploy manifest', err, 'Unable to deploy resources');
@@ -316,6 +342,9 @@ class KubernetesDeployController {
 
   $onInit() {
     return this.$async(async () => {
+      this.currentUser.isAdmin = this.Authentication.isAdmin();
+      this.currentUser.id = this.Authentication.getUserDetails().ID;
+
       this.formValues.namespace_toggle = false;
       await this.getNamespaces();
 

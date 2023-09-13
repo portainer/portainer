@@ -60,7 +60,7 @@
                           <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
                           <span ng-if="!item.Unique">The image name must be unique</span>
                           <span ng-if="item.Unique"
-                            >The image name must consist of between 2 and 255 lowercase alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span
+                            >The image name must consist of between 2 and 255 lowercase alphanumeric characters, '.', '_', or '-' (e.g. 'my-name', or 'abc-123').</span
                           >
                         </div>
                       </div>
@@ -73,6 +73,7 @@
               <box-selector options="options" slim="true" value="state.BuildType" on-change="(onChangeBuildType)"></box-selector>
 
               <!-- web-editor -->
+              <!-- TODO use web-editor-form component -->
               <div ng-show="state.BuildType === 'editor'">
                 <div class="col-sm-12 form-section-title"> Web editor </div>
                 <div class="form-group">
@@ -86,7 +87,7 @@
                     <code-editor
                       identifier="image-build-editor"
                       placeholder="Define or paste the content of your Dockerfile here"
-                      yml="false"
+                      docker-file="true"
                       on-change="(editorUpdate)"
                     ></code-editor>
                   </div>

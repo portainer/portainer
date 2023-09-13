@@ -5,11 +5,10 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
 	"github.com/portainer/portainer/api/kubernetes/cli"
-
-	"github.com/portainer/portainer/api/docker"
 )
 
 const azureAPIBaseURL = "https://management.azure.com"
@@ -20,7 +19,7 @@ type (
 		dataStore                   dataservices.DataStore
 		signatureService            portainer.DigitalSignatureService
 		reverseTunnelService        portainer.ReverseTunnelService
-		dockerClientFactory         *docker.ClientFactory
+		dockerClientFactory         *dockerclient.ClientFactory
 		kubernetesClientFactory     *cli.ClientFactory
 		kubernetesTokenCacheManager *kubernetes.TokenCacheManager
 		gitService                  portainer.GitService
@@ -28,7 +27,7 @@ type (
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager, gitService portainer.GitService) *ProxyFactory {
+func NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *dockerclient.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager, gitService portainer.GitService) *ProxyFactory {
 	return &ProxyFactory{
 		dataStore:                   dataStore,
 		signatureService:            signatureService,

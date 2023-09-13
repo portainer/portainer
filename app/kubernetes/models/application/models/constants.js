@@ -28,7 +28,6 @@ export const KubernetesApplicationPublishingTypes = Object.freeze({
   CLUSTER_IP: 1,
   NODE_PORT: 2,
   LOAD_BALANCER: 3,
-  INGRESS: 4,
 });
 
 export const KubernetesApplicationPlacementTypes = Object.freeze({

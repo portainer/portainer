@@ -3,7 +3,7 @@ import { useRouter } from '@uirouter/react';
 import _ from 'lodash';
 import { Wand2 } from 'lucide-react';
 
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';

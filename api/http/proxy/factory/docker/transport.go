@@ -15,8 +15,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	dataerrors "github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/portainer/portainer/api/docker"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -35,7 +34,7 @@ type (
 		dataStore            dataservices.DataStore
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
-		dockerClientFactory  *docker.ClientFactory
+		dockerClientFactory  *dockerclient.ClientFactory
 		gitService           portainer.GitService
 	}
 
@@ -45,7 +44,7 @@ type (
 		DataStore            dataservices.DataStore
 		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
-		DockerClientFactory  *docker.ClientFactory
+		DockerClientFactory  *dockerclient.ClientFactory
 	}
 
 	restrictedDockerOperationContext struct {
@@ -180,7 +179,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 		}
 
 		if registryID != 0 {
-			registry, err = transport.dataStore.Registry().Registry(portainer.RegistryID(registryID))
+			registry, err = transport.dataStore.Registry().Read(portainer.RegistryID(registryID))
 			if err != nil {
 				return nil, fmt.Errorf("failed fetching registry: %w", err)
 			}
@@ -395,7 +394,7 @@ func (transport *Transport) updateDefaultGitBranch(request *http.Request) error 
 	remote := request.URL.Query().Get("remote")
 	if strings.HasSuffix(remote, ".git") {
 		repositoryURL := remote[:len(remote)-4]
-		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "")
+		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "", false)
 		if err != nil {
 			return err
 		}
@@ -471,7 +470,7 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 			return err
 		}
 
-		header := base64.StdEncoding.EncodeToString(headerData)
+		header := base64.URLEncoding.EncodeToString(headerData)
 
 		request.Header.Set("X-Registry-Auth", header)
 	}
@@ -508,7 +507,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
+		resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
 		if err != nil {
 			return nil, err
 		}
@@ -647,7 +646,7 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 	if response.StatusCode == http.StatusNoContent || response.StatusCode == http.StatusOK {
 		resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
 		if err != nil {
-			if err == dataerrors.ErrObjectNotFound {
+			if dataservices.IsErrObjectNotFound(err) {
 				return response, nil
 			}
 
@@ -655,7 +654,7 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 		}
 
 		if resourceControl != nil {
-			err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+			err = transport.dataStore.ResourceControl().Delete(resourceControl.ID)
 			if err != nil {
 				return response, err
 			}
@@ -671,7 +670,9 @@ func (transport *Transport) executeRequestAndRewriteResponse(request *http.Reque
 		return response, err
 	}
 
-	err = operation(response, executor)
+	if response.StatusCode == http.StatusOK {
+		err = operation(response, executor)
+	}
 	return response, err
 }
 
@@ -701,13 +702,13 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 		endpointID: transport.endpoint.ID,
 	}
 
-	user, err := transport.dataStore.User().User(tokenData.ID)
+	user, err := transport.dataStore.User().Read(tokenData.ID)
 	if err != nil {
 		return nil, err
 	}
 	accessContext.user = user
 
-	registries, err := transport.dataStore.Registry().Registries()
+	registries, err := transport.dataStore.Registry().ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -734,7 +735,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 		return nil, err
 	}
 
-	resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
 	if err != nil {
 		return nil, err
 	}

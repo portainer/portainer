@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"strings"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/rs/zerolog/log"
@@ -54,6 +54,7 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 // @tags intel
 // @security jwt
 // @produce json
+// @param guid path int true "Guid"
 // @param body body deviceConfigurePayload true "Device Configuration"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
@@ -77,7 +78,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(payload.ProfileID))
+	profile, err := handler.DataStore.FDOProfile().Read(portainer.FDOProfileID(payload.ProfileID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	} else if err != nil {

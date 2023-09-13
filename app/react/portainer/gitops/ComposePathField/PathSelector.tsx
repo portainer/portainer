@@ -35,6 +35,7 @@ export function PathSelector({
     repository: model.RepositoryURL,
     keyword: searchTerm,
     reference: model.RepositoryReferenceName,
+    tlsSkipVerify: model.TLSSkipVerify,
     ...creds,
   };
   const enabled = Boolean(

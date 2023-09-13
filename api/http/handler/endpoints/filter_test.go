@@ -5,7 +5,9 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,9 +41,7 @@ func Test_Filter_AgentVersion(t *testing.T) {
 		notAgentEnvironments,
 	}
 
-	handler, teardown := setupFilterTest(t, endpoints)
-
-	defer teardown()
+	handler := setupFilterTest(t, endpoints)
 
 	tests := []filterTest{
 		{
@@ -89,9 +89,7 @@ func Test_Filter_edgeFilter(t *testing.T) {
 		regularEndpoint,
 	}
 
-	handler, teardown := setupFilterTest(t, endpoints)
-
-	defer teardown()
+	handler := setupFilterTest(t, endpoints)
 
 	tests := []filterTest{
 		{
@@ -128,6 +126,28 @@ func Test_Filter_edgeFilter(t *testing.T) {
 	runTests(tests, t, handler, endpoints)
 }
 
+func Test_Filter_excludeIDs(t *testing.T) {
+	ids := []portainer.EndpointID{1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	environments := slices.Map(ids, func(id portainer.EndpointID) portainer.Endpoint {
+		return portainer.Endpoint{ID: id, GroupID: 1, Type: portainer.DockerEnvironment}
+	})
+
+	handler := setupFilterTest(t, environments)
+
+	tests := []filterTest{
+		{
+			title:    "should exclude IDs 2,5,8",
+			expected: []portainer.EndpointID{1, 3, 4, 6, 7, 9},
+			query: EnvironmentsQuery{
+				excludeIds: []portainer.EndpointID{2, 5, 8},
+			},
+		},
+	}
+
+	runTests(tests, t, handler, environments)
+}
+
 func runTests(tests []filterTest, t *testing.T, handler *Handler, endpoints []portainer.Endpoint) {
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
@@ -139,7 +159,13 @@ func runTests(tests []filterTest, t *testing.T, handler *Handler, endpoints []po
 func runTest(t *testing.T, test filterTest, handler *Handler, endpoints []portainer.Endpoint) {
 	is := assert.New(t)
 
-	filteredEndpoints, _, err := handler.filterEndpointsByQuery(endpoints, test.query, []portainer.EndpointGroup{}, &portainer.Settings{})
+	filteredEndpoints, _, err := handler.filterEndpointsByQuery(
+		endpoints,
+		test.query,
+		[]portainer.EndpointGroup{},
+		[]portainer.EdgeGroup{},
+		&portainer.Settings{},
+	)
 
 	is.NoError(err)
 
@@ -155,9 +181,9 @@ func runTest(t *testing.T, test filterTest, handler *Handler, endpoints []portai
 
 }
 
-func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
+func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) *Handler {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)
@@ -168,9 +194,9 @@ func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Han
 	is.NoError(err, "error creating a user")
 
 	bouncer := testhelpers.NewTestRequestBouncer()
-	handler = NewHandler(bouncer, nil)
+	handler := NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
 
-	return handler, teardown
+	return handler
 }

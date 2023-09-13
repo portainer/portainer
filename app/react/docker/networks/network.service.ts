@@ -1,5 +1,8 @@
 import { ContainerId } from '@/react/docker/containers/types';
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  agentTargetHeader,
+  parseAxiosError,
+} from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { NetworkId, DockerNetwork } from './types';
@@ -8,11 +11,19 @@ type NetworkAction = 'connect' | 'disconnect' | 'create';
 
 export async function getNetwork(
   environmentId: EnvironmentId,
-  networkId: NetworkId
+  networkId: NetworkId,
+  { nodeName }: { nodeName?: string } = {}
 ) {
   try {
     const { data: network } = await axios.get<DockerNetwork>(
-      buildUrl(environmentId, networkId)
+      buildUrl(environmentId, networkId),
+      nodeName
+        ? {
+            headers: {
+              [agentTargetHeader]: nodeName,
+            },
+          }
+        : undefined
     );
     return network;
   } catch (e) {

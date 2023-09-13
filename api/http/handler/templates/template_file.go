@@ -5,12 +5,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
 )
 
@@ -100,7 +100,7 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 
 	defer handler.cleanUp(projectPath)
 
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, "", "", "")
+	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, "", "", "", false)
 	if err != nil {
 		return httperror.InternalServerError("Unable to clone git repository", err)
 	}

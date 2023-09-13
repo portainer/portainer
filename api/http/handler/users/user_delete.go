@@ -4,11 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id UserDelete
@@ -45,7 +45,7 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 		return httperror.Forbidden("Cannot remove your own user account. Contact another administrator", errAdminCannotRemoveSelf)
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -64,7 +64,7 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 		return handler.deleteUser(w, user)
 	}
 
-	users, err := handler.DataStore.User().Users()
+	users, err := handler.DataStore.User().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
@@ -84,7 +84,7 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 }
 
 func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	err := handler.DataStore.User().DeleteUser(user.ID)
+	err := handler.DataStore.User().Delete(user.ID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove user from the database", err)
 	}

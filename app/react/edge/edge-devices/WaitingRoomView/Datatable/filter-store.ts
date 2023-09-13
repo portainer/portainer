@@ -10,6 +10,8 @@ interface TableFiltersStore {
   setEdgeGroups(value: number[]): void;
   tags: number[];
   setTags(value: number[]): void;
+  checkIn: number;
+  setCheckIn(value: number): void;
 }
 
 export const useFilterStore = createStore<TableFiltersStore>()(
@@ -26,6 +28,10 @@ export const useFilterStore = createStore<TableFiltersStore>()(
       tags: [],
       setTags(tags: number[]) {
         set({ tags });
+      },
+      checkIn: 0,
+      setCheckIn(checkIn: number) {
+        set({ checkIn });
       },
     }),
     {

@@ -2,9 +2,9 @@ import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
-import { StackStatus, StackType } from '@/react/docker/stacks/types';
+import { StackStatus, StackType } from '@/react/common/stacks/types';
 import { extractContainerNames } from '@/portainer/helpers/stackHelper';
-import { confirmStackUpdate } from '@/react/docker/stacks/common/confirm-stack-update';
+import { confirmStackUpdate } from '@/react/common/stacks/common/confirm-stack-update';
 import { confirm, confirmDelete, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
@@ -293,7 +293,7 @@ angular.module('portainer.app').controller('StackController', [
 
       $scope.state.actionInProgress = true;
       try {
-        await StackService.stop($scope.stack.Id);
+        await StackService.stop(endpoint.Id, $scope.stack.Id);
         $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to stop stack');
@@ -309,7 +309,7 @@ angular.module('portainer.app').controller('StackController', [
       $scope.state.actionInProgress = true;
       const id = $scope.stack.Id;
       try {
-        await StackService.start(id);
+        await StackService.start(endpoint.Id, id);
         $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to start stack');

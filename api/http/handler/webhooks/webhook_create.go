@@ -4,23 +4,23 @@ import (
 	"errors"
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gofrs/uuid"
 )
 
 type webhookCreatePayload struct {
-	ResourceID  string
-	EndpointID  int
-	RegistryID  portainer.RegistryID
-	WebhookType int
+	ResourceID string
+	EndpointID portainer.EndpointID
+	RegistryID portainer.RegistryID
+	// Type of webhook (1 - service)
+	WebhookType portainer.WebhookType
 }
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
@@ -30,7 +30,7 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	if payload.EndpointID == 0 {
 		return errors.New("Invalid EndpointID")
 	}
-	if payload.WebhookType != 1 {
+	if payload.WebhookType != portainer.ServiceWebhook {
 		return errors.New("Invalid WebhookType")
 	}
 	return nil
@@ -64,7 +64,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A webhook for this resource already exists", Err: errors.New("A webhook for this resource already exists")}
 	}
 
-	endpointID := portainer.EndpointID(payload.EndpointID)
+	endpointID := payload.EndpointID
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
@@ -97,7 +97,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		ResourceID:  payload.ResourceID,
 		EndpointID:  endpointID,
 		RegistryID:  payload.RegistryID,
-		WebhookType: portainer.WebhookType(payload.WebhookType),
+		WebhookType: payload.WebhookType,
 	}
 
 	err = handler.DataStore.Webhook().Create(webhook)

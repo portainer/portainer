@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id openAMTActivate
@@ -20,7 +19,7 @@ import (
 // @tags intel
 // @security jwt
 // @produce json
-// @param id path int true "Environment(Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
@@ -33,7 +32,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)

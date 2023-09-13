@@ -3,20 +3,21 @@ import moment from 'moment';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { PORTAINER_FADEOUT } from '@/constants';
+import { getMetricsForNode } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesNodeStatsController {
   /* @ngInject */
-  constructor($async, $state, $interval, $document, Notifications, KubernetesNodeService, KubernetesMetricsService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesNodeService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
     this.$document = $document;
     this.Notifications = Notifications;
     this.KubernetesNodeService = KubernetesNodeService;
-    this.KubernetesMetricsService = KubernetesMetricsService;
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
+    this.initCharts = this.initCharts.bind(this);
   }
 
   changeUpdateRepeater() {
@@ -63,28 +64,31 @@ class KubernetesNodeStatsController {
   }
 
   initCharts() {
-    const cpuChartCtx = $('#cpuChart');
-    const cpuChart = this.ChartService.CreateCPUChart(cpuChartCtx);
-    this.cpuChart = cpuChart;
-
-    const memoryChartCtx = $('#memoryChart');
-    const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
-    this.memoryChart = memoryChart;
-
-    this.updateCPUChart();
-    this.updateMemoryChart();
-    this.setUpdateRepeater();
+    const findCharts = setInterval(() => {
+      let cpuChartCtx = $('#cpuChart');
+      let memoryChartCtx = $('#memoryChart');
+      if (cpuChartCtx.length !== 0 && memoryChartCtx.length !== 0) {
+        const cpuChart = this.ChartService.CreateCPUChart(cpuChartCtx);
+        this.cpuChart = cpuChart;
+        const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
+        this.memoryChart = memoryChart;
+        this.updateCPUChart();
+        this.updateMemoryChart();
+        this.setUpdateRepeater();
+        clearInterval(findCharts);
+      }
+    }, 200);
   }
 
   getStats() {
     return this.$async(async () => {
       try {
-        const stats = await this.KubernetesMetricsService.getNode(this.state.transition.nodeName);
+        const stats = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
         if (stats) {
           const memory = filesizeParser(stats.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
           this.stats = {
-            read: stats.creationTimestamp,
+            read: stats.metadata.creationTimestamp,
             MemoryUsage: memory,
             CPUUsage: (cpu / this.nodeCPU) * 100,
           };
@@ -111,19 +115,13 @@ class KubernetesNodeStatsController {
     };
 
     try {
-      const nodeMetrics = await this.KubernetesMetricsService.getNode(this.state.transition.nodeName);
+      const nodeMetrics = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
 
       if (nodeMetrics) {
         const node = await this.KubernetesNodeService.get(this.state.transition.nodeName);
         this.nodeCPU = node.CPU || 1;
 
         await this.getStats();
-
-        if (this.state.getMetrics) {
-          this.$document.ready(() => {
-            this.initCharts();
-          });
-        }
       } else {
         this.state.getMetrics = false;
       }
@@ -132,6 +130,11 @@ class KubernetesNodeStatsController {
       this.Notifications.error('Failure', err, 'Unable to retrieve node stats');
     } finally {
       this.state.viewReady = true;
+      if (this.state.getMetrics) {
+        this.$document.ready(() => {
+          this.initCharts();
+        });
+      }
     }
   }
 

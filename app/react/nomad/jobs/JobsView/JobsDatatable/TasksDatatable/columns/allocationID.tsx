@@ -1,11 +1,10 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Task } from '@/react/nomad/types';
-
-export const allocationID: Column<Task> = {
-  Header: 'Allocation ID',
-  accessor: (row) => row.AllocationID || '-',
+export const allocationID = columnHelper.accessor('AllocationID', {
+  header: 'Allocation ID',
   id: 'allocationID',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ getValue }) => {
+    const value = getValue();
+    return value || '-';
+  },
+});

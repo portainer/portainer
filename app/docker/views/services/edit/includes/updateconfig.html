@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-header icon="list" title-text="Update configuration"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
-      <table class="table">
+      <table class="mb-0 table">
         <tbody>
           <tr>
             <td>Update Parallelism</td>
@@ -38,8 +38,8 @@
           <tr>
             <td>Update Failure Action</td>
             <td>
-              <div class="form-group">
-                <label class="radio-inline">
+              <div class="form-group !mb-0">
+                <label class="radio-inline align-baseline">
                   <input
                     type="radio"
                     name="failure_action"
@@ -50,7 +50,7 @@
                   />
                   Continue
                 </label>
-                <label class="radio-inline">
+                <label class="radio-inline align-baseline">
                   <input
                     type="radio"
                     name="failure_action"
@@ -70,7 +70,7 @@
           <tr ng-if="applicationState.endpoint.apiVersion >= 1.29">
             <td>Order</td>
             <td>
-              <div class="form-group">
+              <div class="form-group !mb-0">
                 <label class="radio-inline">
                   <input
                     type="radio"

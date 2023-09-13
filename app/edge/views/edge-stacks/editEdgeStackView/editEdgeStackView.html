@@ -12,11 +12,14 @@
 
             <div style="padding: 20px">
               <edit-edge-stack-form
+                ng-if="$ctrl.edgeGroups && $ctrl.stack && $ctrl.formValues.content !== null"
                 edge-groups="$ctrl.edgeGroups"
-                model="$ctrl.formValues"
-                action-in-progress="$ctrl.state.actionInProgress"
-                submit-action="$ctrl.deployStack"
-                is-editor-dirty="$ctrl.state.isEditorDirty"
+                edge-stack="$ctrl.stack"
+                is-submitting="$ctrl.state.actionInProgress"
+                on-submit="($ctrl.deployStack)"
+                on-editor-change="($ctrl.onEditorChange)"
+                file-content="$ctrl.formValues.content"
+                allow-kube-to-select-compose="$ctrl.allowKubeToSelectCompose"
               ></edit-edge-stack-form>
             </div>
           </uib-tab>
@@ -26,17 +29,7 @@
             </uib-tab-heading>
 
             <div style="margin-top: 25px">
-              <edge-stack-endpoints-datatable
-                title-text="Environments Status"
-                dataset="$ctrl.endpoints"
-                title-icon="hard-drive"
-                table-key="edgeStackEndpoints"
-                order-by="Name"
-                retrieve-page="$ctrl.getPaginatedEndpoints"
-                edge-stack-id="$ctrl.stack.Id"
-                endpoints-status="$ctrl.stack.Status"
-              >
-              </edge-stack-endpoints-datatable>
+              <edge-stack-environments-datatable></edge-stack-environments-datatable>
             </div>
           </uib-tab>
         </uib-tabset>

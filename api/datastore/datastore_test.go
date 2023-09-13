@@ -27,8 +27,7 @@ const (
 // TestStoreFull an eventually comprehensive set of tests for the Store.
 // The idea is what we write to the store, we should read back.
 func TestStoreFull(t *testing.T) {
-	_, store, teardown := MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := MustNewTestStore(t, true, true)
 
 	testCases := map[string]func(t *testing.T){
 		"User Accounts": func(t *testing.T) {
@@ -151,7 +150,7 @@ func (store *Store) CreateEndpoint(t *testing.T, name string, endpointType porta
 		expectedEndpoint = newEndpoint(endpointType, id, name, URL, tls)
 
 	case portainer.EdgeAgentOnKubernetesEnvironment:
-		cs := chisel.NewService(store, nil)
+		cs := chisel.NewService(store, nil, nil)
 		expectedEndpoint = newEndpoint(endpointType, id, name, URL, tls)
 		edgeKey := cs.GenerateEdgeKey(URL, "", int(id))
 		expectedEndpoint.EdgeKey = edgeKey
@@ -317,7 +316,7 @@ func (store *Store) testCustomTemplates(t *testing.T) {
 
 	customTemplate.Create(expectedTemplate)
 
-	actualTemplate, err := customTemplate.CustomTemplate(expectedTemplate.ID)
+	actualTemplate, err := customTemplate.Read(expectedTemplate.ID)
 	is.NoError(err, "CustomTemplate should not return an error")
 	is.Equal(expectedTemplate, actualTemplate, "expected and actual template do not match")
 }
@@ -351,11 +350,11 @@ func (store *Store) testRegistries(t *testing.T) {
 	err = regService.Create(reg2)
 	is.NoError(err)
 
-	actualReg1, err := regService.Registry(reg1.ID)
+	actualReg1, err := regService.Read(reg1.ID)
 	is.NoError(err)
 	is.Equal(reg1, actualReg1, "registries differ")
 
-	actualReg2, err := regService.Registry(reg2.ID)
+	actualReg2, err := regService.Read(reg2.ID)
 	is.NoError(err)
 	is.Equal(reg2, actualReg2, "registries differ")
 }
@@ -407,11 +406,11 @@ func (store *Store) testTags(t *testing.T) {
 	err = tags.Create(tag2)
 	is.NoError(err, "Tags.Create should succeed")
 
-	actual, err := tags.Tag(tag1.ID)
+	actual, err := tags.Read(tag1.ID)
 	is.NoError(err, "tag1 should be found")
 	is.Equal(tag1, actual, "tags differ")
 
-	actual, err = tags.Tag(tag2.ID)
+	actual, err = tags.Read(tag2.ID)
 	is.NoError(err, "tag2 should be found")
 	is.Equal(tag2, actual, "tags differ")
 }

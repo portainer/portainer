@@ -60,7 +60,7 @@ function BuildImageController($scope, $async, $window, BuildService, Notificatio
     // Validation
     const parts = item.Name.split('/');
     const repository = parts[parts.length - 1];
-    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
+    const repositoryRegExp = RegExp('^[a-z0-9-_.]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
     item.Valid = repositoryRegExp.test(repository);
   };
 
@@ -81,17 +81,17 @@ function BuildImageController($scope, $async, $window, BuildService, Notificatio
 
     if (buildType === 'upload') {
       var file = $scope.formValues.UploadFile;
-      return BuildService.buildImageFromUpload(names, file, dockerfilePath);
+      return BuildService.buildImageFromUpload(endpoint.Id, names, file, dockerfilePath);
     } else if (buildType === 'url') {
       var URL = $scope.formValues.URL;
-      return BuildService.buildImageFromURL(names, URL, dockerfilePath);
+      return BuildService.buildImageFromURL(endpoint.Id, names, URL, dockerfilePath);
     } else {
       var dockerfileContent = $scope.formValues.DockerFileContent;
       if ($scope.formValues.AdditionalFiles.length === 0) {
-        return BuildService.buildImageFromDockerfileContent(names, dockerfileContent);
+        return BuildService.buildImageFromDockerfileContent(endpoint.Id, names, dockerfileContent);
       } else {
         var additionalFiles = $scope.formValues.AdditionalFiles;
-        return BuildService.buildImageFromDockerfileContentAndFiles(names, dockerfileContent, additionalFiles);
+        return BuildService.buildImageFromDockerfileContentAndFiles(endpoint.Id, names, dockerfileContent, additionalFiles);
       }
     }
   }

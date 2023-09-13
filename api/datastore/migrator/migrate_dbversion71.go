@@ -1,7 +1,7 @@
 package migrator
 
 import (
-	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/rs/zerolog/log"
 )
@@ -9,7 +9,7 @@ import (
 func (m *Migrator) migrateDBVersionToDB71() error {
 	log.Info().Msg("removing orphaned snapshots")
 
-	snapshots, err := m.snapshotService.Snapshots()
+	snapshots, err := m.snapshotService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -19,14 +19,14 @@ func (m *Migrator) migrateDBVersionToDB71() error {
 		if err == nil {
 			log.Debug().Int("endpoint_id", int(s.EndpointID)).Msg("keeping snapshot")
 			continue
-		} else if err != errors.ErrObjectNotFound {
+		} else if !dataservices.IsErrObjectNotFound(err) {
 			log.Debug().Int("endpoint_id", int(s.EndpointID)).Err(err).Msg("database error")
 			return err
 		}
 
 		log.Debug().Int("endpoint_id", int(s.EndpointID)).Msg("removing snapshot")
 
-		err = m.snapshotService.DeleteSnapshot(s.EndpointID)
+		err = m.snapshotService.Delete(s.EndpointID)
 		if err != nil {
 			return err
 		}

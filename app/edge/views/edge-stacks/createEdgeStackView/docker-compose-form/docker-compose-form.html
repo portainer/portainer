@@ -8,7 +8,7 @@
   on-change="($ctrl.onChangeFileContent)"
   ng-required="true"
   yml="true"
-  placeholder="# Define or paste the content of your docker compose file here"
+  placeholder="Define or paste the content of your docker compose file here"
 >
   <editor-description>
     You can get more information about Compose file format in the
@@ -21,7 +21,14 @@
   <file-upload-description> You can upload a Compose file from your computer. </file-upload-description>
 </file-upload-form>
 
-<git-form ng-if="$ctrl.state.Method === 'repository'" value="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+<git-form
+  ng-if="$ctrl.state.Method === 'repository'"
+  value="$ctrl.formValues"
+  on-change="($ctrl.onChangeFormValues)"
+  base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+  webhook-id="{{ $ctrl.state.webhookId }}"
+  docs-links
+></git-form>
 
 <!-- template -->
 <div ng-if="$ctrl.state.Method === 'template'">
@@ -55,7 +62,7 @@
     value="$ctrl.formValues.StackFileContent"
     on-change="($ctrl.onChangeFileContent)"
     yml="true"
-    placeholder="# Define or paste the content of your docker compose file here"
+    placeholder="Define or paste the content of your docker compose file here"
     ng-required="true"
   >
   </web-editor-form>

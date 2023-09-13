@@ -2,6 +2,7 @@ import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
+import { withError } from '@/react-tools/react-query';
 
 import {
   getNamespaces,
@@ -10,13 +11,16 @@ import {
 } from './service';
 import { Namespaces } from './types';
 
-export function useNamespaces(environmentId: EnvironmentId) {
+export function useNamespaces(
+  environmentId: EnvironmentId,
+  options?: { autoRefreshRate?: number }
+) {
   return useQuery(
     ['environments', environmentId, 'kubernetes', 'namespaces'],
     async () => {
       const namespaces = await getNamespaces(environmentId);
       const namespaceNames = Object.keys(namespaces);
-      // use seflsubjectaccess reviews to avoid forbidden requests
+      // use selfsubjectaccess reviews to avoid forbidden requests
       const allNamespaceAccessReviews = await Promise.all(
         namespaceNames.map((namespaceName) =>
           getSelfSubjectAccessReview(environmentId, namespaceName)
@@ -34,8 +38,9 @@ export function useNamespaces(environmentId: EnvironmentId) {
       return allowedNamespaces;
     },
     {
-      onError: (err) => {
-        notifyError('Failure', err as Error, 'Unable to get namespaces.');
+      ...withError('Unable to get namespaces.'),
+      refetchInterval() {
+        return options?.autoRefreshRate ?? false;
       },
     }
   );

@@ -7,10 +7,19 @@
 
 .btn-none:focus {
   outline: none;
+  color: inherit;
 }
 
+/* used for BE teaser. Dark theme specs defined by EE-5621 */
 .btn-warninglight {
   @apply border-warning-5 bg-warning-2 text-black;
-  @apply th-dark:bg-warning-5 th-dark:bg-opacity-10 th-dark:text-white;
+  @apply th-dark:border-blue-8 th-dark:bg-blue-8 th-dark:bg-opacity-10 th-dark:text-white;
   @apply th-highcontrast:bg-warning-5 th-highcontrast:bg-opacity-10 th-highcontrast:text-white;
+}
+
+.btn-none:active {
+  outline: none;
+  background-color: transparent;
+  box-shadow: none;
+  -webkit-box-shadow: none;
 }

@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { Profile } from '@/portainer/hostmanagement/fdo/model';
+
+import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
 import { created } from './created';
-import { name } from './name';
 
-export function useColumns() {
-  return useMemo(() => [name, created], []);
-}
+export const columns = [
+  buildNameColumn<Profile>('name', 'portainer.endpoints.profile.edit'),
+  created,
+];

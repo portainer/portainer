@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/database/models"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
@@ -48,13 +48,16 @@ func (store *Store) MigrateData() error {
 
 	err = store.FailSafeMigrate(migrator, version)
 	if err != nil {
+		err = errors.Wrap(err, "failed to migrate database")
+
+		log.Warn().Err(err).Msg("migration failed, restoring database to previous version")
 		err = store.restoreWithOptions(&BackupOptions{BackupPath: backupPath})
 		if err != nil {
 			return errors.Wrap(err, "failed to restore database")
 		}
 
 		log.Info().Msg("database restored to previous version")
-		return errors.Wrap(err, "failed to migrate database")
+		return err
 	}
 
 	return nil
@@ -83,6 +86,7 @@ func (store *Store) newMigratorParameters(version *models.Version) *migrator.Mig
 		AuthorizationService:    authorization.NewService(store),
 		EdgeStackService:        store.EdgeStackService,
 		EdgeJobService:          store.EdgeJobService,
+		TunnelServerService:     store.TunnelServerService,
 	}
 }
 
@@ -106,7 +110,7 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models
 		return errors.Wrap(err, "while updating version")
 	}
 
-	log.Info().Msg("migrating database from version " + version.SchemaVersion + " to " + portaineree.APIVersion)
+	log.Info().Msg("migrating database from version " + version.SchemaVersion + " to " + portainer.APIVersion)
 
 	err = migrator.Migrate()
 	if err != nil {

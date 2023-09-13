@@ -8,6 +8,7 @@ export const gitForm: IComponentOptions = {
   <react-git-form 
     value="$ctrl.value"
     on-change="$ctrl.handleChange"
+    environment-type="$ctrl.environmentType"
     is-docker-standalone="$ctrl.isDockerStandalone"
     deploy-method="$ctrl.deployMethod"
     is-additional-files-field-visible="$ctrl.isAdditionalFilesFieldVisible"
@@ -22,6 +23,7 @@ export const gitForm: IComponentOptions = {
   bindings: {
     value: '<',
     onChange: '<',
+    environmentType: '@',
     isDockerStandalone: '<',
     deployMethod: '@',
     baseWebhookUrl: '@',

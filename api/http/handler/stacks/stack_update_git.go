@@ -4,10 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pkg/errors"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/git/update"
@@ -15,6 +11,11 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 )
 
 type stackGitUpdatePayload struct {
@@ -25,6 +26,7 @@ type stackGitUpdatePayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
+	TLSSkipVerify            bool
 }
 
 func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
@@ -64,7 +66,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
+	stack, err := handler.DataStore.Stack().Read(portainer.StackID(stackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -102,7 +104,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return httperror.BadRequest("Cannot find context user", errors.Wrap(err, "failed to fetch the user"))
 	}
@@ -138,6 +140,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	//update retrieved stack data based on the payload
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
+	stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
 	stack.AutoUpdate = payload.AutoUpdate
 	stack.Env = payload.Env
 	stack.UpdatedBy = user.Username
@@ -151,6 +154,9 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	if payload.RepositoryAuthentication {
 		password := payload.RepositoryPassword
+
+		// When the existing stack is using the custom username/password and the password is not updated,
+		// the stack should keep using the saved username/password
 		if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 			password = stack.GitConfig.Authentication.Password
 		}
@@ -158,7 +164,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 			Username: payload.RepositoryUsername,
 			Password: password,
 		}
-		_, err = handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
+		_, err = handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password, stack.GitConfig.TLSSkipVerify)
 		if err != nil {
 			return httperror.InternalServerError("Unable to fetch git repository", err)
 		}
@@ -176,7 +182,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	}
 
 	//save the updated stack to DB
-	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
+	err = handler.DataStore.Stack().Update(stack.ID, stack)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}

@@ -7,13 +7,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/docker/docker/api/types"
-	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -21,16 +17,21 @@ import (
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/docker/docker/api/types"
+	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 )
 
 // Handler is the HTTP handler used to handle stack operations.
 type Handler struct {
 	stackCreationMutex *sync.Mutex
 	stackDeletionMutex *sync.Mutex
-	requestBouncer     *security.RequestBouncer
+	requestBouncer     security.BouncerService
 	*mux.Router
 	DataStore               dataservices.DataStore
-	DockerClientFactory     *docker.ClientFactory
+	DockerClientFactory     *dockerclient.ClientFactory
 	FileService             portainer.FileService
 	GitService              portainer.GitService
 	SwarmStackManager       portainer.SwarmStackManager
@@ -48,14 +49,15 @@ func stackExistsError(name string) *httperror.HandlerError {
 }
 
 // NewHandler creates a handler to manage stack operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		stackCreationMutex: &sync.Mutex{},
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
 	}
-	h.Handle("/stacks",
+
+	h.Handle("/stacks/create/{type}/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
 	h.Handle("/stacks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackList))).Methods(http.MethodGet)
@@ -80,13 +82,13 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/stacks/{id}/stop",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackStop))).Methods(http.MethodPost)
 	h.Handle("/stacks/webhooks/{webhookID}",
-		httperror.LoggerHandler(h.webhookInvoke)).Methods(http.MethodPost)
+		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInvoke))).Methods(http.MethodPost)
 
 	return h
 }
 
 func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID, resourceControl *portainer.ResourceControl) (bool, error) {
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return false, err
 	}
@@ -104,7 +106,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 }
 
 func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return false, err
 	}
@@ -115,7 +117,7 @@ func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
 }
 
 func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
-	user, err := handler.DataStore.User().User(securityContext.UserID)
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return false, err
 	}
@@ -135,7 +137,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpoint.ID))
 
 		if err != nil {
-			return false, fmt.Errorf("Failed to get user from the database: %w", err)
+			return false, fmt.Errorf("failed to get user from the database: %w", err)
 		}
 
 		return canCreate, nil
@@ -144,7 +146,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 }
 
 func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID) (bool, error) {
-	stacks, err := handler.DataStore.Stack().Stacks()
+	stacks, err := handler.DataStore.Stack().ReadAll()
 	if err != nil {
 		return false, err
 	}

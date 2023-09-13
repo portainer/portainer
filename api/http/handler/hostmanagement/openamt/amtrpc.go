@@ -8,12 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/hostmanagement/openamt"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -48,6 +47,7 @@ const (
 // @tags intel
 // @security jwt
 // @produce json
+// @param id path int true "Environment identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
@@ -62,7 +62,7 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 	log.Info().Int("endpointID", endpointID).Msg("OpenAMTHostInfo")
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)

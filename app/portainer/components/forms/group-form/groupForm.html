@@ -1,4 +1,4 @@
-<form class="form-horizontal" name="endpointGroupForm">
+<form class="form-horizontal" name="endpointGroupForm" ng-if="$ctrl.model">
   <!-- name-input -->
   <div class="form-group">
     <label for="group_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
@@ -29,68 +29,19 @@
 
   <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)" allow-create="$ctrl.state.allowCreateTag"> </tag-selector>
 
-  <!-- environments -->
-  <div ng-if="$ctrl.model.Id !== 1">
-    <div class="col-sm-12 form-section-title"> Associated environments </div>
-    <div class="form-group">
-      <div class="col-sm-12 small text-muted">
-        You can select which environment should be part of this group by moving them to the associated environments table. Simply click on any environment entry to move it from one
-        table to the other.
-      </div>
-      <div class="col-sm-12" style="margin-top: 20px">
-        <!-- available-endpoints -->
-        <div class="table-row-container">
-          <div class="datatable table-in-row">
-            <group-association-table
-              loaded="$ctrl.loaded"
-              page-type="$ctrl.pageType"
-              table-type="available"
-              retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
-              dataset="$ctrl.availableEndpoints"
-              entry-click="$ctrl.associateEndpoint"
-              pagination-state="$ctrl.state.available"
-              empty-dataset-message="No environment available"
-              title="Available environments"
-              cy-value="available-endpoints"
-            ></group-association-table>
-          </div>
-          <!-- !available-endpoints -->
-          <!-- associated-endpoints -->
-          <div class="table-in-row">
-            <group-association-table
-              loaded="$ctrl.loaded"
-              page-type="$ctrl.pageType"
-              table-type="associated"
-              retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
-              dataset="$ctrl.associatedEndpoints"
-              entry-click="$ctrl.dissociateEndpoint"
-              pagination-state="$ctrl.state.associated"
-              empty-dataset-message="No associated environment"
-              has-backend-pagination="this.pageType !== 'create'"
-              title="Associated environments"
-              cy-value="associated-endpoints"
-            ></group-association-table>
-          </div>
-        </div>
-        <!-- !associated-endpoints -->
-      </div>
-    </div>
+  <div class="form-group" ng-if="$ctrl.model.Id !== 1">
+    <associated-endpoints-selector value="$ctrl.associatedEndpoints" on-change="($ctrl.onChangeEnvironments)"></associated-endpoints-selector>
   </div>
-  <div ng-if="$ctrl.model.Id === 1">
-    <div class="table-in-row">
-      <group-association-table
-        loaded="$ctrl.loaded"
-        page-type="$ctrl.pageType"
-        table-type="associated"
-        retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
-        dataset="$ctrl.associatedEndpoints"
-        pagination-state="$ctrl.state.associated"
-        empty-dataset-message="No environment available"
-        title="Unassociated environments"
-      ></group-association-table>
-    </div>
+
+  <div class="-mx-[15px]">
+    <group-association-table
+      ng-if="$ctrl.model.Id === 1"
+      title="'Unassociated environments'"
+      empty-content-message="'No environment available'"
+      query="$ctrl.unassociatedQuery"
+    ></group-association-table>
   </div>
-  <!-- !endpoints -->
+
   <!-- actions -->
   <div class="col-sm-12 form-section-title"> Actions </div>
   <div class="form-group">

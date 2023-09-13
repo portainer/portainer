@@ -86,8 +86,8 @@ overrides:
       no-plusplus: off
       func-style: [error, 'declaration']
       import/prefer-default-export: off
-      no-use-before-define: ['error', { functions: false }]
-      '@typescript-eslint/no-use-before-define': ['error', { functions: false }]
+      no-use-before-define: "off"
+      '@typescript-eslint/no-use-before-define': ['error', { functions: false, "allowNamedExports": true }]
       no-shadow: 'off'
       '@typescript-eslint/no-shadow': off
       jsx-a11y/no-autofocus: warn

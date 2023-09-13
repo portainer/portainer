@@ -3,8 +3,8 @@ package edgejobs
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id EdgeJobList
@@ -21,7 +21,7 @@ import (
 // @router /edge_jobs [get]
 // GET request on /api/edge_jobs
 func (handler *Handler) edgeJobList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
+	edgeJobs, err := handler.DataStore.EdgeJob().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
 	}

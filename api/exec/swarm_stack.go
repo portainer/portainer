@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/registryutils"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
 )
 
 // SwarmStackManager represents a service for managing stacks.
@@ -64,16 +65,35 @@ func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoin
 		if registry.Authentication {
 			err = registryutils.EnsureRegTokenValid(manager.dataStore, &registry)
 			if err != nil {
-				return err
+				log.
+					Warn().
+					Err(err).
+					Str("RegistryName", registry.Name).
+					Msg("Failed to validate registry token. Skip logging with this registry.")
+
+				continue
 			}
 
 			username, password, err := registryutils.GetRegEffectiveCredential(&registry)
 			if err != nil {
-				return err
+				log.
+					Warn().
+					Err(err).
+					Str("RegistryName", registry.Name).
+					Msg("Failed to get effective credential. Skip logging with this registry.")
+
+				continue
 			}
 
 			registryArgs := append(args, "login", "--username", username, "--password", password, registry.URL)
-			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
+			err = runCommandAndCaptureStdErr(command, registryArgs, nil, "")
+			if err != nil {
+				log.
+					Warn().
+					Err(err).
+					Str("RegistryName", registry.Name).
+					Msg("Failed to login.")
+			}
 		}
 	}
 
@@ -94,7 +114,7 @@ func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, pullImage bool, endpoint *portainer.Endpoint) error {
-	filePaths := stackutils.GetStackFilePaths(stack, false)
+	filePaths := stackutils.GetStackFilePaths(stack, true)
 	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	if err != nil {
 		return err

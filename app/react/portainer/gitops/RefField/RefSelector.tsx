@@ -1,4 +1,4 @@
-import { StackId } from '@/react/docker/stacks/types';
+import { StackId } from '@/react/common/stacks/types';
 import { useGitRefs } from '@/react/portainer/gitops/queries/useGitRefs';
 
 import { Select } from '@@/form-components/Input';
@@ -24,6 +24,7 @@ export function RefSelector({
   const payload = {
     repository: model.RepositoryURL,
     stackId,
+    tlsSkipVerify: model.TLSSkipVerify,
     ...creds,
   };
 

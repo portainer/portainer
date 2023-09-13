@@ -1,11 +1,10 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Job } from '@/react/nomad/types';
-
-export const namespace: Column<Job> = {
-  Header: 'Namespace',
-  accessor: (row) => row.Namespace || '-',
+export const namespace = columnHelper.accessor('Namespace', {
+  header: 'Namespace',
   id: 'namespace',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ getValue }) => {
+    const value = getValue();
+    return value || '-';
+  },
+});

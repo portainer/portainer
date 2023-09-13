@@ -1,14 +1,17 @@
-import { Row } from 'react-table';
+import { Row } from '@tanstack/react-table';
 
-export function multiple<
-  D extends Record<string, unknown> = Record<string, unknown>
->(rows: Row<D>[], columnIds: string[], filterValue: string[] = []) {
-  if (filterValue.length === 0 || columnIds.length === 0) {
-    return rows;
+import { DefaultType } from './types';
+
+export function multiple<D extends DefaultType = DefaultType>(
+  { getValue }: Row<D>,
+  columnId: string,
+  filterValue: string[]
+): boolean {
+  if (filterValue.length === 0) {
+    return true;
   }
 
-  return rows.filter((row) => {
-    const value = row.values[columnIds[0]];
-    return filterValue.includes(value);
-  });
+  const value = getValue(columnId) as string;
+
+  return filterValue.includes(value);
 }

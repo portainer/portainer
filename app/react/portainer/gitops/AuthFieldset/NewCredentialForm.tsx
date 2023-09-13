@@ -43,7 +43,7 @@ export function NewCredentialForm({
             )}
 
             {value.SaveCredential && (
-              <TextTip color="blue" className="!mb-0">
+              <TextTip color="blue">
                 This git credential can be managed through your account page
               </TextTip>
             )}

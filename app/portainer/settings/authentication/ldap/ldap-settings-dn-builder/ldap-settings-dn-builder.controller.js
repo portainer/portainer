@@ -41,7 +41,7 @@ export default class LdapSettingsBaseDnBuilderController {
   }
 
   getOUValues(dn, domainSuffix = '') {
-    const regex = /(\w+)=(\w*),?/;
+    const regex = /(\w+)=([a-zA-Z0-9_ ]*),?/;
     let ouValues = [];
     let left = dn;
     let match = left.match(regex);
@@ -49,7 +49,7 @@ export default class LdapSettingsBaseDnBuilderController {
       const [, type, value] = match;
       ouValues.push({ type, value });
       left = left.replace(regex, '');
-      match = left.match(/(\w+)=(\w+),?/);
+      match = left.match(regex);
     }
     return ouValues;
   }

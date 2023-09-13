@@ -31,3 +31,12 @@ export interface Rule {
 export interface ServicePorts {
   [serviceName: string]: Option<string>[];
 }
+
+interface ServiceOption extends Option<string> {
+  selectedLabel: string;
+}
+
+export type GroupedServiceOptions = {
+  label: string;
+  options: ServiceOption[];
+}[];

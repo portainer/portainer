@@ -3,10 +3,10 @@ package customtemplates
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type fileResponse struct {
@@ -33,14 +33,18 @@ func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Reques
 		return httperror.BadRequest("Invalid custom template identifier route variable", err)
 	}
 
-	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
+	customTemplate, err := handler.DataStore.CustomTemplate().Read(portainer.CustomTemplateID(customTemplateID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a custom template with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find a custom template with the specified identifier inside the database", err)
 	}
 
-	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, customTemplate.EntryPoint)
+	entryPath := customTemplate.EntryPoint
+	if customTemplate.GitConfig != nil {
+		entryPath = customTemplate.GitConfig.ConfigFilePath
+	}
+	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, entryPath)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom template file from disk", err)
 	}

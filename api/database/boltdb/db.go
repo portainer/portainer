@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path"
 	"time"
@@ -182,7 +183,7 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 func (connection *DbConnection) ExportRaw(filename string) error {
 	databasePath := connection.GetDatabaseFilePath()
 	if _, err := os.Stat(databasePath); err != nil {
-		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
+		return fmt.Errorf("stat on %s failed, error: %w", databasePath, err)
 	}
 
 	b, err := connection.ExportJSON(databasePath, true)
@@ -199,6 +200,20 @@ func (connection *DbConnection) ConvertToKey(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
+}
+
+// keyToString Converts a key to a string value suitable for logging
+func keyToString(b []byte) string {
+	if len(b) != 8 {
+		return string(b)
+	}
+
+	v := binary.BigEndian.Uint64(b)
+	if v <= math.MaxInt32 {
+		return fmt.Sprintf("%d", v)
+	}
+
+	return string(b)
 }
 
 // CreateBucket is a generic function used to create a bucket inside a database.
@@ -237,7 +252,7 @@ func (connection *DbConnection) UpdateObjectFunc(bucketName string, key []byte, 
 
 		data := bucket.Get(key)
 		if data == nil {
-			return dserrors.ErrObjectNotFound
+			return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 		}
 
 		err := connection.UnmarshalObjectWithJsoniter(data, object)

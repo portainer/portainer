@@ -1,5 +1,9 @@
+import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
-export function TableFooter({ children }: PropsWithChildren<unknown>) {
-  return <footer className="footer">{children}</footer>;
+export function TableFooter({
+  children,
+  className,
+}: PropsWithChildren<unknown> & { className?: string }) {
+  return <footer className={clsx('footer', className)}>{children}</footer>;
 }

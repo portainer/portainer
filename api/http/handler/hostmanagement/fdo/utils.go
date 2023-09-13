@@ -1,7 +1,7 @@
 package fdo
 
 func (handler *Handler) checkUniqueProfileName(name string, id int) (bool, error) {
-	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	profiles, err := handler.DataStore.FDOProfile().ReadAll()
 	if err != nil {
 		return false, err
 	}

@@ -7,7 +7,6 @@ angular.module('portainer.edge').component('edgeGroupForm', {
   controller: EdgeGroupFormController,
   bindings: {
     model: '<',
-    groups: '<',
     formActionLabel: '@',
     formAction: '<',
     actionInProgress: '<',

@@ -3,11 +3,11 @@ package endpointedge
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
 )
@@ -15,14 +15,14 @@ import (
 // Handler is the HTTP handler used to handle edge environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer       *security.RequestBouncer
+	requestBouncer       security.BouncerService
 	DataStore            dataservices.DataStore
 	FileService          portainer.FileService
 	ReverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) *Handler {
 	h := &Handler{
 		Router:               mux.NewRouter(),
 		requestBouncer:       bouncer,

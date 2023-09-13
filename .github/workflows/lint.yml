@@ -21,13 +21,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
           cache: 'yarn'
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.19.4
+          go-version: 1.21.0
       - run: yarn --frozen-lockfile
-
       - name: Run linters
         uses: wearerequired/lint-action@v1
         with:
@@ -42,6 +41,6 @@ jobs:
       - name: GolangCI-Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: latest
+          version: v1.52.2
           working-directory: api
-          args: -c .golangci.yaml
+          args: --timeout=10m -c .golangci.yaml

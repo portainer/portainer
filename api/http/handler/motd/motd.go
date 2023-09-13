@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/portainer/libcrypto"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/pkg/libcrypto"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type motdResponse struct {

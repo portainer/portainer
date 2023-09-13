@@ -3,6 +3,7 @@ package archive
 import (
 	"archive/tar"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -84,7 +85,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 	for {
 		header, err := tarReader.Next()
 
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 
@@ -109,7 +110,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 			}
 			outFile.Close()
 		default:
-			return fmt.Errorf("Tar: uknown type: %v in %s",
+			return fmt.Errorf("tar: unknown type: %v in %s",
 				header.Typeflag,
 				header.Name)
 		}

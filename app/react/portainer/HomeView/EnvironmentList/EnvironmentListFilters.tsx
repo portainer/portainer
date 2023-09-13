@@ -6,6 +6,10 @@ import { useAgentVersionsList } from '../../environments/queries/useAgentVersion
 import { EnvironmentStatus, PlatformType } from '../../environments/types';
 import { isBE } from '../../feature-flags/feature-flags.service';
 import { useGroups } from '../../environments/environment-groups/queries';
+import {
+  SortOptions,
+  SortType,
+} from '../../environments/queries/useEnvironmentList';
 
 import { HomepageFilter } from './HomepageFilter';
 import { SortbySelector } from './SortbySelector';
@@ -17,7 +21,7 @@ const status = [
   { value: EnvironmentStatus.Down, label: 'Down' },
 ];
 
-const sortByOptions = ['Name', 'Group', 'Status'].map((v) => ({
+const sortByOptions = SortOptions.map((v) => ({
   value: v,
   label: v,
 }));
@@ -60,8 +64,8 @@ export function EnvironmentListFilters({
   setAgentVersions: (value: string[]) => void;
   agentVersions: string[];
 
-  sortByState: string;
-  sortOnChange: (value: string) => void;
+  sortByState?: SortType;
+  sortOnChange: (value: SortType) => void;
 
   sortOnDescending: () => void;
   sortByDescending: boolean;

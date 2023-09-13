@@ -1,4 +1,8 @@
+import _ from 'lodash';
+
 import { EditorType } from '@/react/edge/edge-stacks/types';
+import NomadIcon from '@/assets/ico/vendor/nomad.svg?c';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { BoxSelector } from '@@/BoxSelector';
 import { BoxSelectorOption } from '@@/BoxSelector/types';
@@ -12,6 +16,7 @@ interface Props {
   onChange(value: number): void;
   hasDockerEndpoint: boolean;
   hasKubeEndpoint: boolean;
+  hasNomadEndpoint: boolean;
   allowKubeToSelectCompose?: boolean;
 }
 
@@ -20,29 +25,45 @@ export function EdgeStackDeploymentTypeSelector({
   onChange,
   hasDockerEndpoint,
   hasKubeEndpoint,
+  hasNomadEndpoint,
   allowKubeToSelectCompose,
 }: Props) {
-  const deploymentOptions: BoxSelectorOption<number>[] = [
+  const deploymentOptions: BoxSelectorOption<number>[] = _.compact([
     {
       ...compose,
       value: EditorType.Compose,
-      disabled: () => (allowKubeToSelectCompose ? false : hasKubeEndpoint),
+      disabled: () =>
+        allowKubeToSelectCompose
+          ? hasNomadEndpoint
+          : hasNomadEndpoint || hasKubeEndpoint,
       tooltip: () =>
-        hasKubeEndpoint
-          ? 'Cannot use this option with Edge Kubernetes environments'
+        hasNomadEndpoint || hasKubeEndpoint
+          ? 'Cannot use this option with Edge Kubernetes or Edge Nomad environments'
           : '',
     },
     {
       ...kubernetes,
       value: EditorType.Kubernetes,
-      disabled: () => hasDockerEndpoint,
+      disabled: () => hasDockerEndpoint || hasNomadEndpoint,
       tooltip: () =>
-        hasDockerEndpoint
-          ? 'Cannot use this option with Edge Docker environments'
+        hasDockerEndpoint || hasNomadEndpoint
+          ? 'Cannot use this option with Edge Docker or Edge Nomad environments'
           : '',
       iconType: 'logo',
     },
-  ];
+    isBE && {
+      id: 'deployment_nomad',
+      icon: NomadIcon,
+      label: 'Nomad',
+      description: 'Nomad HCL format',
+      value: EditorType.Nomad,
+      disabled: () => hasDockerEndpoint || hasKubeEndpoint,
+      tooltip: () =>
+        hasDockerEndpoint || hasKubeEndpoint
+          ? 'Cannot use this option with Edge Docker or Edge Kubernetes environments'
+          : '',
+    },
+  ]);
 
   return (
     <>

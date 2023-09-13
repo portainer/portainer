@@ -3,18 +3,17 @@ package edgegroups
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/internal/slices"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
 	HasEdgeStack  bool `json:"HasEdgeStack"`
-	HasEdgeGroup  bool `json:"HasEdgeGroup"`
+	HasEdgeJob    bool `json:"HasEdgeJob"`
 	EndpointTypes []portainer.EndpointType
 }
 
@@ -30,14 +29,26 @@ type decoratedEdgeGroup struct {
 // @failure 503 "Edge compute features are disabled"
 // @router /edge_groups [get]
 func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
+	var decoratedEdgeGroups []decoratedEdgeGroup
+	var err error
+
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		decoratedEdgeGroups, err = getEdgeGroupList(tx)
+		return err
+	})
+
+	return txResponse(w, decoratedEdgeGroups, err)
+}
+
+func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error) {
+	edgeGroups, err := tx.EdgeGroup().ReadAll()
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
+		return nil, httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
 	}
 
-	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
+	edgeStacks, err := tx.EdgeStack().EdgeStacks()
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve Edge stacks from the database", err)
+		return nil, httperror.InternalServerError("Unable to retrieve Edge stacks from the database", err)
 	}
 
 	usedEdgeGroups := make(map[portainer.EdgeGroupID]bool)
@@ -48,9 +59,9 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 		}
 	}
 
-	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
+	edgeJobs, err := tx.EdgeJob().ReadAll()
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
+		return nil, httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
 	}
 
 	decoratedEdgeGroups := []decoratedEdgeGroup{}
@@ -68,35 +79,33 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 			EndpointTypes: []portainer.EndpointType{},
 		}
 		if edgeGroup.Dynamic {
-			endpointIDs, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
+			endpointIDs, err := GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
+				return nil, httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
 			}
 
 			edgeGroup.Endpoints = endpointIDs
 		}
 
-		endpointTypes, err := getEndpointTypes(handler.DataStore.Endpoint(), edgeGroup.Endpoints)
+		endpointTypes, err := getEndpointTypes(tx, edgeGroup.Endpoints)
 		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve environment types for Edge group", err)
+			return nil, httperror.InternalServerError("Unable to retrieve environment types for Edge group", err)
 		}
 
 		edgeGroup.EndpointTypes = endpointTypes
-
 		edgeGroup.HasEdgeStack = usedEdgeGroups[edgeGroup.ID]
-
-		edgeGroup.HasEdgeGroup = usedByEdgeJob
+		edgeGroup.HasEdgeJob = usedByEdgeJob
 
 		decoratedEdgeGroups = append(decoratedEdgeGroups, edgeGroup)
 	}
 
-	return response.JSON(w, decoratedEdgeGroups)
+	return decoratedEdgeGroups, nil
 }
 
-func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds []portainer.EndpointID) ([]portainer.EndpointType, error) {
+func getEndpointTypes(tx dataservices.DataStoreTx, endpointIds []portainer.EndpointID) ([]portainer.EndpointType, error) {
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointID := range endpointIds {
-		endpoint, err := endpointService.Endpoint(endpointID)
+		endpoint, err := tx.Endpoint().Endpoint(endpointID)
 		if err != nil {
 			return nil, fmt.Errorf("failed fetching environment: %w", err)
 		}

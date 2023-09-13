@@ -1,6 +1,7 @@
 import {
   AriaAttributes,
   ComponentType,
+  forwardRef,
   MouseEventHandler,
   PropsWithChildren,
   ReactNode,
@@ -39,8 +40,16 @@ export interface Props<TasProps = unknown>
   type?: Type;
   as?: ComponentType<TasProps> | string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  mRef?: React.ForwardedRef<HTMLButtonElement>;
   props?: TasProps;
 }
+
+export const ButtonWithRef = forwardRef<HTMLButtonElement, Omit<Props, 'mRef'>>(
+  (props, ref) => (
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    <Button {...props} mRef={ref} />
+  )
+);
 
 export function Button<TasProps = unknown>({
   type = 'button',
@@ -54,15 +63,19 @@ export function Button<TasProps = unknown>({
   children,
   as = 'button',
   props,
+  mRef,
   ...ariaProps
 }: PropsWithChildren<Props<TasProps>>) {
   const Component = as as 'button';
   return (
     <Component
+      ref={mRef}
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
-      className={clsx(`btn btn-${color}`, sizeClass(size), className)}
+      className={clsx(`btn btn-${color}`, sizeClass(size), className, {
+        disabled,
+      })}
       onClick={(e) => {
         if (!disabled) {
           onClick?.(e);

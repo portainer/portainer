@@ -1,8 +1,13 @@
 linters:
-  # Disable all linters.
+  # Disable all linters, the defaults don't pass on our code yet
   disable-all: true
+
+  # Enable these for now
   enable:
     - depguard
+    - govet
+    - errorlint
+    - exportloopref
 linters-settings:
   depguard:
     list-type: denylist
@@ -10,17 +15,19 @@ linters-settings:
     packages:
       - github.com/sirupsen/logrus
       - golang.org/x/exp
+      - github.com/portainer/libcrypto
+      - github.com/portainer/libhttp
     packages-with-error-message:
       - github.com/sirupsen/logrus: 'logging is allowed only by github.com/rs/zerolog'
     ignore-file-rules:
-      - "**/*_test.go"
-    # Create additional guards that follow the same configuration pattern.
-    # Results from all guards are aggregated together.
-    # additional-guards:
-    #   - list-type: allowlist
-    #     include-go-root: false
-    #     packages:
-    #       - github.com/sirupsen/logrus
-    #     # Specify rules by which the linter ignores certain files for consideration.
-    #     ignore-file-rules:
-    #       - "!**/*_test.go"
+      - '**/*_test.go'
+      - '**/base.go'
+      - '**/base_tx.go'
+
+# errorlint is causing a typecheck error for some reason. The go compiler will report these
+# anyway, so ignore them from the linter
+issues:
+  exclude-rules:
+    - path: ./
+      linters:
+        - typecheck

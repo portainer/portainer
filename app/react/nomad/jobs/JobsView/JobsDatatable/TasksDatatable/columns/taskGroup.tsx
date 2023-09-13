@@ -1,11 +1,10 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { Task } from '@/react/nomad/types';
-
-export const taskGroup: Column<Task> = {
-  Header: 'Task Group',
-  accessor: (row) => row.TaskGroup || '-',
+export const taskGroup = columnHelper.accessor('TaskGroup', {
+  header: 'Task Group',
   id: 'taskGroup',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ getValue }) => {
+    const value = getValue();
+    return value || '-';
+  },
+});

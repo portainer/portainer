@@ -3,10 +3,10 @@ package endpoints
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/set"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id AgentVersions
@@ -22,7 +22,7 @@ import (
 // @router /endpoints/agent_versions [get]
 
 func (handler *Handler) agentVersions(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

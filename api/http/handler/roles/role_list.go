@@ -3,8 +3,8 @@ package roles
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id RoleList
@@ -19,7 +19,7 @@ import (
 // @failure 500 "Server error"
 // @router /roles [get]
 func (handler *Handler) roleList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	roles, err := handler.DataStore.Role().Roles()
+	roles, err := handler.DataStore.Role().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve authorization sets from the database", err)
 	}

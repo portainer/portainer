@@ -36,7 +36,12 @@
             <button type="button" class="btn btn-sm btn-secondary !ml-0" ui-sref="kubernetes.resourcePools.new" data-cy="k8sNamespace-addNamespaceWithFormButton">
               <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Add with form
             </button>
-            <button type="button" class="btn btn-sm btn-primary !ml-0" ui-sref="kubernetes.deploy" data-cy="k8sNamespace-deployFromManifestButton">
+            <button
+              type="button"
+              class="btn btn-sm btn-primary !ml-0"
+              ui-sref="kubernetes.deploy({ referrer: 'kubernetes.resourcePools' })"
+              data-cy="k8sNamespace-deployFromManifestButton"
+            >
               <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>Create from manifest
             </button>
           </div>

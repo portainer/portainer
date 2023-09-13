@@ -1,29 +1,40 @@
 import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  agentTargetHeader,
+  parseAxiosError,
+} from '@/portainer/services/axios';
+import { withGlobalError } from '@/react-tools/react-query';
 
 import { urlBuilder } from '../containers.service';
 import { DockerContainerResponse } from '../types/response';
-import { parseViewModel } from '../utils';
+import { parseListViewModel } from '../utils';
 
 import { Filters } from './types';
 import { queryKeys } from './query-keys';
 
+interface UseContainers {
+  all?: boolean;
+  filters?: Filters;
+  nodeName?: string;
+}
+
 export function useContainers(
   environmentId: EnvironmentId,
-  all = true,
-  filters?: Filters,
-  autoRefreshRate?: number
+  {
+    autoRefreshRate,
+
+    ...params
+  }: UseContainers & {
+    autoRefreshRate?: number;
+  } = {}
 ) {
   return useQuery(
-    queryKeys.filters(environmentId, all, filters),
-    () => getContainers(environmentId, all, filters),
+    queryKeys.filters(environmentId, params),
+    () => getContainers(environmentId, params),
     {
-      meta: {
-        title: 'Failure',
-        message: 'Unable to retrieve containers',
-      },
+      ...withGlobalError('Unable to retrieve containers'),
       refetchInterval() {
         return autoRefreshRate ?? false;
       },
@@ -33,17 +44,21 @@ export function useContainers(
 
 async function getContainers(
   environmentId: EnvironmentId,
-  all = true,
-  filters?: Filters
+  { all = true, filters, nodeName }: UseContainers = {}
 ) {
   try {
     const { data } = await axios.get<DockerContainerResponse[]>(
       urlBuilder(environmentId, undefined, 'json'),
       {
         params: { all, filters: filters && JSON.stringify(filters) },
+        headers: nodeName
+          ? {
+              [agentTargetHeader]: nodeName,
+            }
+          : undefined,
       }
     );
-    return data.map((c) => parseViewModel(c));
+    return data.map((c) => parseListViewModel(c));
   } catch (error) {
     throw parseAxiosError(error as Error, 'Unable to retrieve containers');
   }

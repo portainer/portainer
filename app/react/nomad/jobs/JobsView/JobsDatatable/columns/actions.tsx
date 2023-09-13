@@ -1,25 +1,22 @@
-import { CellProps, Column } from 'react-table';
 import { Clock } from 'lucide-react';
 
-import { Job } from '@/react/nomad/types';
+import { Icon } from '@@/Icon';
 
-export const actions: Column<Job> = {
-  Header: 'Job Actions',
+import { columnHelper } from './helper';
+
+export const actions = columnHelper.display({
+  header: 'Job Actions',
   id: 'actions',
-  disableFilters: true,
-  canHide: true,
-  disableResizing: true,
-  width: '110px',
-  sortType: 'string',
-  Filter: () => null,
-  Cell: ActionsCell,
-};
+  meta: {
+    width: '110px',
+  },
+  cell: ActionsCell,
+});
 
-export function ActionsCell({ row }: CellProps<Job>) {
+export function ActionsCell() {
   return (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <div className="text-center" {...row.getToggleRowExpandedProps()}>
-      <Clock className="lucide" />
+    <div className="text-center">
+      <Icon icon={Clock} />
     </div>
   );
 }

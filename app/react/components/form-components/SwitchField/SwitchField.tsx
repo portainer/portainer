@@ -1,5 +1,6 @@
 import clsx from 'clsx';
-import { ComponentProps } from 'react';
+import uuid from 'uuid';
+import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -11,8 +12,9 @@ import { Switch } from './Switch';
 export interface Props {
   label: string;
   checked: boolean;
-  onChange(value: boolean): void;
+  onChange(value: boolean, index?: number): void;
 
+  index?: number;
   name?: string;
   tooltip?: ComponentProps<typeof Tooltip>['message'];
   setTooltipHtmlMessage?: ComponentProps<typeof Tooltip>['setHtmlMessage'];
@@ -22,13 +24,15 @@ export interface Props {
   dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
+  valueExplanation?: ReactNode;
 }
 
 export function SwitchField({
   tooltip,
   checked,
   label,
-  name,
+  index,
+  name = uuid(),
   labelClass,
   fieldClass,
   dataCy,
@@ -37,19 +41,21 @@ export function SwitchField({
   featureId,
   switchClass,
   setTooltipHtmlMessage,
-}: Props) {
+  valueExplanation,
+}: PropsWithChildren<Props>) {
   const toggleName = name ? `toggle_${name}` : '';
 
   return (
-    <label className={clsx(styles.root, fieldClass)}>
-      <span
+    <div className={clsx(styles.root, fieldClass)}>
+      <label
         className={clsx('space-right control-label !p-0 text-left', labelClass)}
+        htmlFor={toggleName}
       >
         {label}
         {tooltip && (
           <Tooltip message={tooltip} setHtmlMessage={setTooltipHtmlMessage} />
         )}
-      </span>
+      </label>
       <Switch
         className={clsx('space-right', switchClass)}
         name={toggleName}
@@ -57,9 +63,11 @@ export function SwitchField({
         checked={checked}
         disabled={disabled}
         onChange={onChange}
+        index={index}
         featureId={featureId}
         dataCy={dataCy}
       />
-    </label>
+      {valueExplanation && <span>{valueExplanation}</span>}
+    </div>
   );
 }

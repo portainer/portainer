@@ -8,22 +8,18 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
           cache: 'yarn'
       - run: yarn --frozen-lockfile
 
       - name: Run tests
-        run: yarn test:client
-  # test-server:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     GOPRIVATE: "github.com/portainer"
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-go@v3
-  #       with:
-  #         go-version: '1.18'
-  #     - name: Run tests
-  #       run: |
-  #         cd api
-  #         go test ./...
+        run: make test-client ARGS="--maxWorkers=2"
+  test-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.21.0
+      - name: Run tests
+        run: make test-server

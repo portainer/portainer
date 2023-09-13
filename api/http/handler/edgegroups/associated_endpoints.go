@@ -2,16 +2,18 @@ package edgegroups
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type endpointSetType map[portainer.EndpointID]bool
 
-func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
+func GetEndpointsByTags(tx dataservices.DataStoreTx, tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
 	if len(tagIDs) == 0 {
 		return []portainer.EndpointID{}, nil
 	}
 
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
+	endpoints, err := tx.Endpoint().Endpoints()
 	if err != nil {
 		return nil, err
 	}
@@ -20,10 +22,11 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 	tags := []portainer.Tag{}
 	for _, tagID := range tagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
+		tag, err := tx.Tag().Read(tagID)
 		if err != nil {
 			return nil, err
 		}
+
 		tags = append(tags, *tag)
 	}
 
@@ -38,7 +41,7 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 	results := []portainer.EndpointID{}
 	for _, endpoint := range endpoints {
-		if _, ok := endpointSet[endpoint.ID]; ok && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
+		if _, ok := endpointSet[endpoint.ID]; ok && endpointutils.IsEdgeEndpoint(&endpoint) && endpoint.UserTrusted {
 			results = append(results, endpoint.ID)
 		}
 	}
@@ -48,25 +51,31 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 func mapEndpointGroupToEndpoints(endpoints []portainer.Endpoint) map[portainer.EndpointGroupID]endpointSetType {
 	groupEndpoints := map[portainer.EndpointGroupID]endpointSetType{}
+
 	for _, endpoint := range endpoints {
 		groupID := endpoint.GroupID
 		if groupEndpoints[groupID] == nil {
 			groupEndpoints[groupID] = endpointSetType{}
 		}
+
 		groupEndpoints[groupID][endpoint.ID] = true
 	}
+
 	return groupEndpoints
 }
 
 func mapTagsToEndpoints(tags []portainer.Tag, groupEndpoints map[portainer.EndpointGroupID]endpointSetType) []endpointSetType {
 	sets := []endpointSetType{}
+
 	for _, tag := range tags {
 		set := tag.Endpoints
+
 		for groupID := range tag.EndpointGroups {
 			for endpointID := range groupEndpoints[groupID] {
 				set[endpointID] = true
 			}
 		}
+
 		sets = append(sets, set)
 	}
 

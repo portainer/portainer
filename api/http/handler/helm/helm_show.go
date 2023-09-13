@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhelm/options"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

@@ -1,15 +1,17 @@
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
-import { ColumnInstance } from 'react-table';
+import { Column } from '@tanstack/react-table';
 import { Check, Filter } from 'lucide-react';
+
+import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 
 import { Icon } from '@@/Icon';
 
-export const DefaultFilter = filterHOC('Filter by state');
+import { DefaultType } from './types';
 
 interface MultipleSelectionFilterProps {
-  options: string[];
+  options: Array<string> | ReadonlyArray<string>;
   value: string[];
   filterKey: string;
   onChange: (value: string[]) => void;
@@ -28,12 +30,12 @@ export function MultipleSelectionFilter({
     <div>
       <Menu>
         <MenuButton
-          className={clsx('table-filter flex items-center', {
+          className={clsx('table-filter flex items-center gap-1', {
             'filter-active': enabled,
           })}
         >
           Filter
-          <Icon icon={enabled ? Check : Filter} className="!ml-1" />
+          <Icon icon={enabled ? Check : Filter} />
         </MenuButton>
         <MenuPopover className="dropdown-menu">
           <div className="tableMenu">
@@ -70,25 +72,34 @@ export function MultipleSelectionFilter({
   }
 }
 
-export function filterHOC(menuTitle: string) {
+export function filterHOC<TData extends DefaultType>(menuTitle: string) {
   return function Filter({
-    column: { filterValue, setFilter, preFilteredRows, id },
+    column: { getFilterValue, setFilterValue, getFacetedRowModel, id },
   }: {
-    column: ColumnInstance;
+    column: Column<TData>;
   }) {
+    const { flatRows } = getFacetedRowModel();
+
     const options = useMemo(() => {
       const options = new Set<string>();
-      preFilteredRows.forEach((row) => {
-        options.add(row.values[id]);
+      flatRows.forEach(({ getValue }) => {
+        const value = getValue<string>(id);
+
+        options.add(value);
       });
       return Array.from(options);
-    }, [id, preFilteredRows]);
+    }, [flatRows, id]);
+
+    const value = getFilterValue();
+
+    const valueAsArray = getValueAsArrayOfStrings(value);
+
     return (
       <MultipleSelectionFilter
         options={options}
         filterKey={id}
-        value={filterValue}
-        onChange={setFilter}
+        value={valueAsArray}
+        onChange={setFilterValue}
         menuTitle={menuTitle}
       />
     );

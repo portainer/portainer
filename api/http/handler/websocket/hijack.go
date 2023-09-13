@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -11,7 +12,7 @@ import (
 func hijackRequest(websocketConn *websocket.Conn, httpConn *httputil.ClientConn, request *http.Request) error {
 	// Server hijacks the connection, error 'connection closed' expected
 	resp, err := httpConn.Do(request)
-	if err != httputil.ErrPersistEOF {
+	if !errors.Is(err, httputil.ErrPersistEOF) {
 		if err != nil {
 			return err
 		}

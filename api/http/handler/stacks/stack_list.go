@@ -3,14 +3,13 @@ package stacks
 import (
 	"net/http"
 
-	httperrors "github.com/portainer/portainer/api/http/errors"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type stackListOperationFilters struct {
@@ -46,13 +45,13 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to retrieve environments from database", err)
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	stacks, err := handler.DataStore.Stack().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve stacks from the database", err)
 	}
 	stacks = filterStacks(stacks, &filters, endpoints)
 
-	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
+	resourceControls, err := handler.DataStore.ResourceControl().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
 	}
@@ -69,7 +68,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			return httperror.Forbidden("Permission denied to access orphaned stacks", httperrors.ErrUnauthorized)
 		}
 
-		user, err := handler.DataStore.User().User(securityContext.UserID)
+		user, err := handler.DataStore.User().Read(securityContext.UserID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
 		}

@@ -23,7 +23,7 @@ func (hbpm *helmBinaryPackageManager) List(listOpts options.ListOptions) ([]rele
 		args = append(args, "--namespace", listOpts.Namespace)
 	}
 
-	result, err := hbpm.runWithKubeConfig("list", args, listOpts.KubernetesClusterAccess)
+	result, err := hbpm.runWithKubeConfig("list", args, listOpts.KubernetesClusterAccess, listOpts.Env)
 	if err != nil {
 		return []release.ReleaseElement{}, errors.Wrap(err, "failed to run helm list on specified args")
 	}

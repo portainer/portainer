@@ -3,12 +3,12 @@ package auth
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
 )
@@ -27,7 +27,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage authentication operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, passwordStrengthChecker security.PasswordStrengthChecker) *Handler {
+func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimiter, passwordStrengthChecker security.PasswordStrengthChecker) *Handler {
 	h := &Handler{
 		Router:                  mux.NewRouter(),
 		passwordStrengthChecker: passwordStrengthChecker,

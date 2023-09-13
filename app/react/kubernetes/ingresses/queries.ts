@@ -7,6 +7,7 @@ import {
   withInvalidate,
 } from '@/react-tools/react-query';
 import { getServices } from '@/react/kubernetes/networks/services/service';
+import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import {
   getIngresses,
@@ -54,7 +55,8 @@ export function useIngress(
 
 export function useIngresses(
   environmentId: EnvironmentId,
-  namespaces: string[]
+  namespaces?: string[],
+  options?: { autoRefreshRate?: number }
 ) {
   return useQuery(
     [
@@ -66,6 +68,9 @@ export function useIngresses(
       'ingress',
     ],
     async () => {
+      if (!namespaces?.length) {
+        return [];
+      }
       const settledIngressesPromise = await Promise.allSettled(
         namespaces.map((namespace) => getIngresses(environmentId, namespace))
       );
@@ -88,29 +93,34 @@ export function useIngresses(
         .flat();
 
       // check if each ingress path service has a service that still exists
-      filteredIngresses.forEach((ing, iIndex) => {
-        const servicesInNamespace = services?.filter(
-          (service) => service?.Namespace === ing?.Namespace
-        );
-        const serviceNamesInNamespace = servicesInNamespace?.map(
-          (service) => service.Name
-        );
-        ing.Paths?.forEach((path, pIndex) => {
-          if (
-            !serviceNamesInNamespace?.includes(path.ServiceName) &&
-            filteredIngresses[iIndex].Paths
-          ) {
-            filteredIngresses[iIndex].Paths[pIndex].HasService = false;
-          } else {
-            filteredIngresses[iIndex].Paths[pIndex].HasService = true;
-          }
-        });
-      });
-      return filteredIngresses;
+      const updatedFilteredIngresses: Ingress[] = filteredIngresses.map(
+        (ing) => {
+          const servicesInNamespace = services?.filter(
+            (service) => service?.Namespace === ing?.Namespace
+          );
+          const serviceNamesInNamespace = servicesInNamespace?.map(
+            (service) => service.Name
+          );
+
+          const updatedPaths =
+            ing.Paths?.map((path) => {
+              const hasService = serviceNamesInNamespace?.includes(
+                path.ServiceName
+              );
+              return { ...path, HasService: hasService };
+            }) || null;
+
+          return { ...ing, Paths: updatedPaths };
+        }
+      );
+      return updatedFilteredIngresses;
     },
     {
-      enabled: namespaces.length > 0,
+      enabled: !!namespaces?.length,
       ...withError('Unable to get ingresses'),
+      refetchInterval() {
+        return options?.autoRefreshRate ?? false;
+      },
     }
   );
 }
@@ -171,7 +181,7 @@ export function useDeleteIngresses() {
  */
 export function useIngressControllers(
   environmentId: EnvironmentId,
-  namespace: string
+  namespace?: string
 ) {
   return useQuery(
     [
@@ -182,20 +192,11 @@ export function useIngressControllers(
       namespace,
       'ingresscontrollers',
     ],
-    async () => {
-      const ing = await getIngressControllers(environmentId, namespace);
-      return ing;
-    },
+    async () =>
+      namespace ? getIngressControllers(environmentId, namespace) : [],
     {
       enabled: !!namespace,
-      cacheTime: 0,
       ...withError('Unable to get ingress controllers'),
     }
   );
-}
-
-function isFulfilled<T>(
-  input: PromiseSettledResult<T>
-): input is PromiseFulfilledResult<T> {
-  return input.status === 'fulfilled';
 }

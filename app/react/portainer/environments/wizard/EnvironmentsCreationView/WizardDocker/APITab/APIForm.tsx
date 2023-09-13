@@ -8,30 +8,31 @@ import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
+import { TLSFieldset } from '@/react/components/TLSFieldset/TLSFieldset';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
-import { InsightsBox } from '@@/InsightsBox';
 
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { useValidation } from './APIForm.validation';
 import { FormValues } from './types';
-import { TLSFieldset } from './TLSFieldset';
 
 interface Props {
   onCreate(environment: Environment): void;
-  isDockerStandalone?: boolean;
 }
 
-export function APIForm({ onCreate, isDockerStandalone }: Props) {
+export function APIForm({ onCreate }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const initialValues: FormValues = {
     url: '',
     name: '',
-    tls: false,
+    tlsConfig: {
+      tls: false,
+      skipVerify: false,
+    },
     meta: {
       groupId: 1,
       tagIds: [],
@@ -52,7 +53,7 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
       validateOnMount
       key={formKey}
     >
-      {({ isValid, dirty }) => (
+      {({ values, errors, setFieldValue, isValid, dirty }) => (
         <Form>
           <NameField />
 
@@ -70,37 +71,17 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
             />
           </FormControl>
 
-          <TLSFieldset />
+          <TLSFieldset
+            values={values.tlsConfig}
+            onChange={(value) =>
+              Object.entries(value).forEach(([key, value]) =>
+                setFieldValue(`tlsConfig.${key}`, value)
+              )
+            }
+            errors={errors.tlsConfig}
+          />
 
-          <MoreSettingsSection>
-            {isDockerStandalone && (
-              <InsightsBox
-                content={
-                  <>
-                    <p>
-                      From 2.18 on, the set-up of available GPUs for a Docker
-                      Standalone environment has been shifted from Add
-                      environment and Environment details to Host -&gt; Setup,
-                      so as to align with other settings.
-                    </p>
-                    <p>
-                      A toggle has been introduced for enabling/disabling
-                      management of GPU settings in the Portainer UI - to
-                      alleviate the performance impact of showing those
-                      settings.
-                    </p>
-                    <p>
-                      The UI has been updated to clarify that GPU settings
-                      support is only for Docker Standalone (and not Docker
-                      Swarm, which was never supported in the UI).
-                    </p>
-                  </>
-                }
-                header="GPU settings update"
-                insightCloseId="gpu-settings-update-closed"
-              />
-            )}
-          </MoreSettingsSection>
+          <MoreSettingsSection />
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -141,24 +122,24 @@ export function APIForm({ onCreate, isDockerStandalone }: Props) {
       }
     );
     function getTlsValues() {
-      if (!values.tls) {
+      if (!values.tlsConfig.tls) {
         return undefined;
       }
 
       return {
-        skipVerify: values.skipVerify,
+        skipVerify: values.tlsConfig.skipVerify,
         ...getCertFiles(),
       };
 
       function getCertFiles() {
-        if (values.skipVerify) {
+        if (values.tlsConfig.skipVerify) {
           return {};
         }
 
         return {
-          caCertFile: values.caCertFile,
-          certFile: values.certFile,
-          keyFile: values.keyFile,
+          caCertFile: values.tlsConfig.caCertFile,
+          certFile: values.tlsConfig.certFile,
+          keyFile: values.tlsConfig.keyFile,
         };
       }
     }

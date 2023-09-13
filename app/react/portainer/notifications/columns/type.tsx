@@ -1,11 +1,13 @@
-import { Column } from 'react-table';
+import _ from 'lodash';
 
-import { ToastNotification } from '../types';
+import { columnHelper } from './helper';
 
-export const type: Column<ToastNotification> = {
-  Header: 'Type',
-  accessor: (row) => row.type.charAt(0).toUpperCase() + row.type.slice(1),
+export const type = columnHelper.accessor('type', {
+  header: 'Type',
   id: 'type',
-  disableFilters: true,
-  canHide: true,
-};
+  cell: ({ getValue }) => {
+    const value = getValue();
+
+    return _.capitalize(value);
+  },
+});

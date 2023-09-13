@@ -3,8 +3,8 @@ package tags
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id TagList
@@ -19,7 +19,7 @@ import (
 // @failure 500 "Server error"
 // @router /tags [get]
 func (handler *Handler) tagList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	tags, err := handler.DataStore.Tag().Tags()
+	tags, err := handler.DataStore.Tag().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve tags from the database", err)
 	}

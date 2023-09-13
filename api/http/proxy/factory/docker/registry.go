@@ -37,6 +37,7 @@ func createRegistryAuthenticationHeader(
 	} else { // any "custom" registry
 		var matchingRegistry *portainer.Registry
 		for _, registry := range accessContext.registries {
+			registry := registry
 			if registry.ID == registryId &&
 				(accessContext.isAdmin ||
 					security.AuthorizedRegistryAccess(&registry, accessContext.user, accessContext.teamMemberships, accessContext.endpointID)) {

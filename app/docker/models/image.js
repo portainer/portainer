@@ -5,7 +5,7 @@ export function ImageViewModel(data) {
   this.Created = data.Created;
   this.Checked = false;
   this.RepoTags = data.RepoTags;
-  if (!this.RepoTags && data.RepoDigests) {
+  if ((!this.RepoTags || this.RepoTags.length === 0) && data.RepoDigests) {
     this.RepoTags = [];
     for (var i = 0; i < data.RepoDigests.length; i++) {
       var digest = data.RepoDigests[i];
@@ -15,7 +15,7 @@ export function ImageViewModel(data) {
   }
 
   this.VirtualSize = data.VirtualSize;
-  this.ContainerCount = data.ContainerCount;
+  this.Used = data.Used;
 
   if (data.Portainer && data.Portainer.Agent && data.Portainer.Agent.NodeName) {
     this.NodeName = data.Portainer.Agent.NodeName;

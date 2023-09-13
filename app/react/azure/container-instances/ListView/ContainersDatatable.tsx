@@ -1,5 +1,4 @@
 import { Box, Plus, Trash2 } from 'lucide-react';
-import { useStore } from 'zustand';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { Authorized } from '@/react/hooks/useUser';
@@ -9,7 +8,7 @@ import { Datatable } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { createPersistedStore } from '@@/datatables/types';
-import { useSearchBarState } from '@@/datatables/SearchBar';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { columns } from './columns';
 
@@ -22,19 +21,13 @@ export interface Props {
 }
 
 export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(tableKey);
+  const tableState = useTableState(settingsStore, tableKey);
 
   return (
     <Datatable
       dataset={dataset}
       columns={columns}
-      initialPageSize={settings.pageSize}
-      onPageSizeChange={settings.setPageSize}
-      initialSortBy={settings.sortBy}
-      onSortByChange={settings.setSortBy}
-      searchValue={search}
-      onSearchChange={setSearch}
+      settingsManager={tableState}
       title="Containers"
       titleIcon={Box}
       getRowId={(container) => container.id}

@@ -9,7 +9,7 @@ import { Link } from '@@/Link';
 
 import styles from './ContainerQuickActions.module.css';
 
-interface QuickActionsState {
+export interface QuickActionsState {
   showQuickActionAttach: boolean;
   showQuickActionExec: boolean;
   showQuickActionInspect: boolean;
@@ -17,31 +17,25 @@ interface QuickActionsState {
   showQuickActionStats: boolean;
 }
 
-interface Props {
-  taskId?: string;
-  containerId?: string;
-  nodeName: string;
-  state: QuickActionsState;
-  status: ContainerStatus;
-}
-
 export function ContainerQuickActions({
-  taskId,
+  status,
   containerId,
   nodeName,
   state,
-  status,
-}: Props) {
-  if (taskId) {
-    return <TaskQuickActions taskId={taskId} state={state} />;
-  }
-
-  const isActive = [
-    ContainerStatus.Starting,
-    ContainerStatus.Running,
-    ContainerStatus.Healthy,
-    ContainerStatus.Unhealthy,
-  ].includes(status);
+}: {
+  containerId: string;
+  nodeName: string;
+  status: ContainerStatus;
+  state: QuickActionsState;
+}) {
+  const isActive =
+    !!status &&
+    [
+      ContainerStatus.Starting,
+      ContainerStatus.Running,
+      ContainerStatus.Healthy,
+      ContainerStatus.Unhealthy,
+    ].includes(status);
 
   return (
     <div className={clsx('space-x-1', styles.root)}>
@@ -101,37 +95,6 @@ export function ContainerQuickActions({
             title="Attach Console"
           >
             <Icon icon={Paperclip} className="space-right" />
-          </Link>
-        </Authorized>
-      )}
-    </div>
-  );
-}
-
-interface TaskProps {
-  taskId: string;
-  state: QuickActionsState;
-}
-
-function TaskQuickActions({ taskId, state }: TaskProps) {
-  return (
-    <div className={clsx('space-x-1', styles.root)}>
-      {state.showQuickActionLogs && (
-        <Authorized authorizations="DockerTaskLogs">
-          <Link
-            to="docker.tasks.task.logs"
-            params={{ id: taskId }}
-            title="Logs"
-          >
-            <Icon icon={FileText} className="space-right" />
-          </Link>
-        </Authorized>
-      )}
-
-      {state.showQuickActionInspect && (
-        <Authorized authorizations="DockerTaskInspect">
-          <Link to="docker.tasks.task" params={{ id: taskId }} title="Inspect">
-            <Icon icon={Info} className="space-right" />
           </Link>
         </Authorized>
       )}

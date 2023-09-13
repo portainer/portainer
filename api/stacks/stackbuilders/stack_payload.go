@@ -17,7 +17,7 @@ type StackPayload struct {
 	Webhook          string
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
-	// Optional auto update configuration
+	// Optional GitOps update configuration
 	AutoUpdate *portainer.AutoUpdateSettings
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
@@ -52,4 +52,6 @@ type RepositoryConfigPayload struct {
 	// Password used in basic authentication. Required when RepositoryAuthentication is true
 	// and RepositoryGitCredentialID is 0
 	Password string `example:"myGitPassword"`
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }

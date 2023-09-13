@@ -50,13 +50,16 @@ func Union(sets ...tagSet) tagSet {
 
 // Contains return true if setA contains setB
 func Contains(setA tagSet, setB tagSet) bool {
-	containedTags := 0
+	if len(setA) == 0 || len(setB) == 0 {
+		return false
+	}
+
 	for tag := range setB {
-		if setA[tag] {
-			containedTags++
+		if !setA[tag] {
+			return false
 		}
 	}
-	return containedTags == len(setA)
+	return true
 }
 
 // Difference returns the set difference tagsA - tagsB

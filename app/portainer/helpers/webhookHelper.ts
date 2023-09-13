@@ -1,6 +1,10 @@
 import uuid from 'uuid';
 
-import { API_ENDPOINT_STACKS, API_ENDPOINT_WEBHOOKS } from '@/constants';
+import {
+  API_ENDPOINT_EDGE_STACKS,
+  API_ENDPOINT_STACKS,
+  API_ENDPOINT_WEBHOOKS,
+} from '@/constants';
 
 import { baseHref } from './pathHelper';
 
@@ -20,6 +24,10 @@ export function stackWebhookUrl(token: string) {
 
 export function createWebhookId() {
   return uuid();
+}
+
+export function baseEdgeStackWebhookUrl() {
+  return `${baseUrl}${API_ENDPOINT_EDGE_STACKS}/webhooks`;
 }
 
 /* @ngInject */
@@ -42,7 +50,8 @@ function getBaseUrl() {
   const port = parseInt(window.location.port, 10);
   const displayPort =
     (protocol === 'http' && port === 80) ||
-    (protocol === 'https' && port === 443)
+    (protocol === 'https' && port === 443) ||
+    Number.isNaN(port)
       ? ''
       : `:${port}`;
   return `${protocol}://${hostname}${displayPort}${baseHref()}`;

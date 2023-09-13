@@ -45,24 +45,42 @@ export function parseOwnershipParameters(
   };
 }
 
+export function defaultValues(
+  isAdmin: boolean,
+  currentUserId: UserId
+): AccessControlFormData {
+  if (!isAdmin) {
+    return {
+      ownership: ResourceControlOwnership.PRIVATE,
+      authorizedTeams: [],
+      authorizedUsers: [currentUserId],
+    };
+  }
+
+  return {
+    ownership: ResourceControlOwnership.ADMINISTRATORS,
+    authorizedTeams: [],
+    authorizedUsers: [],
+  };
+}
+
 export function parseAccessControlFormData(
   isAdmin: boolean,
+  currentUserId: UserId,
   resourceControl?: ResourceControlViewModel
 ): AccessControlFormData {
-  let ownership =
-    resourceControl?.Ownership || ResourceControlOwnership.PRIVATE;
-  if (isAdmin) {
-    if (!resourceControl) {
-      ownership = ResourceControlOwnership.ADMINISTRATORS;
-    } else if (ownership === ResourceControlOwnership.PRIVATE) {
-      ownership = ResourceControlOwnership.RESTRICTED;
-    }
+  if (!resourceControl) {
+    return defaultValues(isAdmin, currentUserId);
+  }
+
+  let ownership = resourceControl.Ownership;
+  if (isAdmin && ownership === ResourceControlOwnership.PRIVATE) {
+    ownership = ResourceControlOwnership.RESTRICTED;
   }
 
   let authorizedTeams: TeamId[] = [];
   let authorizedUsers: UserId[] = [];
   if (
-    resourceControl &&
     [
       ResourceControlOwnership.PRIVATE,
       ResourceControlOwnership.RESTRICTED,

@@ -1,14 +1,15 @@
 package websocket
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 // Handler is the HTTP handler used to handle websocket operations.
@@ -18,13 +19,13 @@ type Handler struct {
 	SignatureService            portainer.DigitalSignatureService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	KubernetesClientFactory     *cli.ClientFactory
-	requestBouncer              *security.RequestBouncer
+	requestBouncer              security.BouncerService
 	connectionUpgrader          websocket.Upgrader
 	kubernetesTokenCacheManager *kubernetes.TokenCacheManager
 }
 
 // NewHandler creates a handler to manage websocket operations.
-func NewHandler(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, bouncer *security.RequestBouncer) *Handler {
+func NewHandler(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:                      mux.NewRouter(),
 		connectionUpgrader:          websocket.Upgrader{},

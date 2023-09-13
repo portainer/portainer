@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	snapshotutils "github.com/portainer/portainer/api/internal/snapshot"
 
@@ -41,7 +41,7 @@ func (m *Migrator) migrateDBVersionToDB32() error {
 func (m *Migrator) updateRegistriesToDB32() error {
 	log.Info().Msg("updating registries")
 
-	registries, err := m.registryService.Registries()
+	registries, err := m.registryService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (m *Migrator) updateRegistriesToDB32() error {
 				Namespaces:         []string{},
 			}
 		}
-		m.registryService.UpdateRegistry(registry.ID, &registry)
+		m.registryService.Update(registry.ID, &registry)
 	}
 	return nil
 }
@@ -86,7 +86,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 	log.Info().Msg("updating dockerhub")
 
 	dockerhub, err := m.dockerhubService.DockerHub()
-	if err == errors.ErrObjectNotFound {
+	if dataservices.IsErrObjectNotFound(err) {
 		return nil
 	} else if err != nil {
 		return err
@@ -111,7 +111,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 	// we only have one migrated registry entry. Duplicates will be removed
 	// if they exist and which has been happening due to earlier migration bugs
 	migrated := false
-	registries, _ := m.registryService.Registries()
+	registries, _ := m.registryService.ReadAll()
 	for _, r := range registries {
 		if r.Type == registry.Type &&
 			r.Name == registry.Name &&
@@ -123,7 +123,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 				migrated = true
 			} else {
 				// delete subsequent duplicates
-				m.registryService.DeleteRegistry(portainer.RegistryID(r.ID))
+				m.registryService.Delete(portainer.RegistryID(r.ID))
 			}
 		}
 	}
@@ -180,7 +180,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 		return fmt.Errorf("failed fetching environments: %w", err)
 	}
 
-	resourceControls, err := m.resourceControlService.ResourceControls()
+	resourceControls, err := m.resourceControlService.ReadAll()
 	if err != nil {
 		return fmt.Errorf("failed fetching resource controls: %w", err)
 	}
@@ -228,12 +228,12 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 		if newResourceID, ok := toUpdate[resourceControl.ID]; ok {
 			resourceControl.ResourceID = newResourceID
 
-			err := m.resourceControlService.UpdateResourceControl(resourceControl.ID, resourceControl)
+			err := m.resourceControlService.Update(resourceControl.ID, resourceControl)
 			if err != nil {
 				return fmt.Errorf("failed updating resource control %d: %w", resourceControl.ID, err)
 			}
 		} else {
-			err := m.resourceControlService.DeleteResourceControl(resourceControl.ID)
+			err := m.resourceControlService.Delete(resourceControl.ID)
 			if err != nil {
 				return fmt.Errorf("failed deleting resource control %d: %w", resourceControl.ID, err)
 			}

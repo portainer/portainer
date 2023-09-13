@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 
 import { keyBuilder } from '@/react/hooks/useLocalStorage';
 
+export type DefaultType = object;
+
 export interface PaginationTableSettings {
   pageSize: number;
   setPageSize: (pageSize: number) => void;
@@ -13,30 +15,34 @@ export type ZustandSetFunc<T> = (
   replace?: boolean | undefined
 ) => void;
 
-export function paginationSettings(
-  set: ZustandSetFunc<PaginationTableSettings>
+export function paginationSettings<T extends PaginationTableSettings>(
+  set: ZustandSetFunc<T>
 ): PaginationTableSettings {
   return {
     pageSize: 10,
-    setPageSize: (pageSize: number) => set({ pageSize }),
+    setPageSize: (pageSize: number) => set((s) => ({ ...s, pageSize })),
   };
 }
 
 export interface SortableTableSettings {
-  sortBy: { id: string; desc: boolean };
-  setSortBy: (id: string, desc: boolean) => void;
+  sortBy: { id: string; desc: boolean } | undefined;
+  setSortBy: (id: string | undefined, desc: boolean) => void;
 }
 
-export function sortableSettings(
-  set: ZustandSetFunc<SortableTableSettings>,
-  initialSortBy: string | { id: string; desc: boolean }
+export function sortableSettings<T extends SortableTableSettings>(
+  set: ZustandSetFunc<T>,
+  initialSortBy?: string | { id: string; desc: boolean }
 ): SortableTableSettings {
   return {
     sortBy:
       typeof initialSortBy === 'string'
         ? { id: initialSortBy, desc: false }
         : initialSortBy,
-    setSortBy: (id: string, desc: boolean) => set({ sortBy: { id, desc } }),
+    setSortBy: (id: string | undefined, desc: boolean) =>
+      set((s) => ({
+        ...s,
+        sortBy: typeof id === 'string' ? { id, desc } : id,
+      })),
   };
 }
 
@@ -45,12 +51,13 @@ export interface SettableColumnsTableSettings {
   setHiddenColumns: (hiddenColumns: string[]) => void;
 }
 
-export function hiddenColumnsSettings(
-  set: ZustandSetFunc<SettableColumnsTableSettings>
+export function hiddenColumnsSettings<T extends SettableColumnsTableSettings>(
+  set: ZustandSetFunc<T>
 ): SettableColumnsTableSettings {
   return {
     hiddenColumns: [],
-    setHiddenColumns: (hiddenColumns: string[]) => set({ hiddenColumns }),
+    setHiddenColumns: (hiddenColumns: string[]) =>
+      set((s) => ({ ...s, hiddenColumns })),
   };
 }
 
@@ -59,12 +66,13 @@ export interface RefreshableTableSettings {
   setAutoRefreshRate: (autoRefreshRate: number) => void;
 }
 
-export function refreshableSettings(
-  set: ZustandSetFunc<RefreshableTableSettings>
+export function refreshableSettings<T extends RefreshableTableSettings>(
+  set: ZustandSetFunc<T>
 ): RefreshableTableSettings {
   return {
     autoRefreshRate: 0,
-    setAutoRefreshRate: (autoRefreshRate: number) => set({ autoRefreshRate }),
+    setAutoRefreshRate: (autoRefreshRate: number) =>
+      set((s) => ({ ...s, autoRefreshRate })),
   };
 }
 
@@ -74,23 +82,20 @@ export interface BasicTableSettings
 
 export function createPersistedStore<T extends BasicTableSettings>(
   storageKey: string,
-  initialSortBy: string | { id: string; desc: boolean } = 'name',
+  initialSortBy?: string | { id: string; desc: boolean },
   create: (set: ZustandSetFunc<T>) => Omit<T, keyof BasicTableSettings> = () =>
-    ({} as T)
+    ({}) as T
 ) {
   return createStore<T>()(
     persist(
       (set) =>
         ({
-          ...sortableSettings(
-            set as ZustandSetFunc<SortableTableSettings>,
-            initialSortBy
-          ),
-          ...paginationSettings(set as ZustandSetFunc<PaginationTableSettings>),
+          ...sortableSettings<T>(set, initialSortBy),
+          ...paginationSettings<T>(set),
           ...create(set),
-        } as T),
+        }) as T,
       {
-        name: keyBuilder(storageKey),
+        name: `datatable_settings_${keyBuilder(storageKey)}`,
       }
     )
   );

@@ -10,7 +10,7 @@ export function withHideOnExtension<T>(
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  function WrapperComponent(props: T) {
+  function WrapperComponent(props: T & JSX.IntrinsicAttributes) {
     if (window.ddExtension) {
       return null;
     }

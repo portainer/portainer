@@ -2,37 +2,32 @@ package edgejobs
 
 import (
 	"errors"
+	"maps"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/maps"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/asaskevich/govalidator"
 )
 
-// @id EdgeJobCreate
-// @summary Create an EdgeJob
-// @description **Access policy**: administrator
-// @tags edge_jobs
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param method query string true "Creation Method" Enums(file, string)
-// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
-// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
-// @success 200 {object} portainer.EdgeGroup
-// @failure 503 "Edge compute features are disabled"
-// @failure 500
-// @router /edge_jobs [post]
+type edgeJobBasePayload struct {
+	Name           string
+	CronExpression string
+	Recurring      bool
+	Endpoints      []portainer.EndpointID
+	EdgeGroups     []portainer.EdgeGroupID
+}
+
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	method, err := request.RetrieveQueryParameter(r, "method", false)
+	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
@@ -48,12 +43,8 @@ func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *h
 }
 
 type edgeJobCreateFromFileContentPayload struct {
-	Name           string
-	CronExpression string
-	Recurring      bool
-	Endpoints      []portainer.EndpointID
-	EdgeGroups     []portainer.EdgeGroupID
-	FileContent    string
+	edgeJobBasePayload
+	FileContent string
 }
 
 func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) error {
@@ -80,6 +71,18 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 	return nil
 }
 
+// @id EdgeJobCreateString
+// @summary Create an EdgeJob from a text
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @router /edge_jobs/create/string [post]
 func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload edgeJobCreateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -87,32 +90,40 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	edgeJob := handler.createEdgeJobObjectFromFileContentPayload(&payload)
+	var edgeJob *portainer.EdgeJob
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, []byte(payload.FileContent))
+
+		return err
+	})
+
+	return txResponse(w, edgeJob, err)
+}
+
+func (handler *Handler) createEdgeJob(tx dataservices.DataStoreTx, payload *edgeJobBasePayload, fileContent []byte) (*portainer.EdgeJob, error) {
+	var err error
+
+	edgeJob := handler.createEdgeJobObjectFromPayload(tx, payload)
 
 	var endpoints []portainer.EndpointID
 	if len(edgeJob.EdgeGroups) > 0 {
-		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, handler.DataStore)
+		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, tx)
 		if err != nil {
-			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
+			return nil, httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 		}
 	}
 
-	err = handler.addAndPersistEdgeJob(edgeJob, []byte(payload.FileContent), endpoints)
-
+	err = handler.addAndPersistEdgeJob(tx, edgeJob, fileContent, endpoints)
 	if err != nil {
-		return httperror.InternalServerError("Unable to schedule Edge job", err)
+		return nil, httperror.InternalServerError("Unable to schedule Edge job", err)
 	}
 
-	return response.JSON(w, edgeJob)
+	return edgeJob, nil
 }
 
 type edgeJobCreateFromFilePayload struct {
-	Name           string
-	CronExpression string
-	Recurring      bool
-	Endpoints      []portainer.EndpointID
-	EdgeGroups     []portainer.EdgeGroupID
-	File           []byte
+	edgeJobBasePayload
+	File []byte
 }
 
 func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
@@ -159,6 +170,24 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id EdgeJobCreateFile
+// @summary Create an EdgeJob from a file
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @accept multipart/form-data
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param file formData file true "Content of the Stack file"
+// @param Name formData string true "Name of the stack"
+// @param CronExpression formData string true "A cron expression to schedule this job"
+// @param EdgeGroups formData string true "JSON stringified array of Edge Groups ids"
+// @param Endpoints formData string true "JSON stringified array of Environment ids"
+// @param Recurring formData bool false "If recurring"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @router /edge_jobs/create/file [post]
 func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &edgeJobCreateFromFilePayload{}
 	err := payload.Validate(r)
@@ -166,66 +195,31 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	edgeJob := handler.createEdgeJobObjectFromFilePayload(payload)
+	var edgeJob *portainer.EdgeJob
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, payload.File)
 
-	var endpoints []portainer.EndpointID
-	if len(edgeJob.EdgeGroups) > 0 {
-		endpoints, err = edge.GetEndpointsFromEdgeGroups(payload.EdgeGroups, handler.DataStore)
-		if err != nil {
-			return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
-		}
-	}
+		return err
+	})
 
-	err = handler.addAndPersistEdgeJob(edgeJob, payload.File, endpoints)
-
-	if err != nil {
-		return httperror.InternalServerError("Unable to schedule Edge job", err)
-	}
-
-	return response.JSON(w, edgeJob)
+	return txResponse(w, edgeJob, err)
 }
 
-func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *portainer.EdgeJob {
-	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
-
-	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
-
-	edgeJob := &portainer.EdgeJob{
-		ID:                  edgeJobIdentifier,
+func (handler *Handler) createEdgeJobObjectFromPayload(tx dataservices.DataStoreTx, payload *edgeJobBasePayload) *portainer.EdgeJob {
+	return &portainer.EdgeJob{
+		ID:                  portainer.EdgeJobID(tx.EdgeJob().GetNextIdentifier()),
 		Name:                payload.Name,
 		CronExpression:      payload.CronExpression,
 		Recurring:           payload.Recurring,
 		Created:             time.Now().Unix(),
-		Endpoints:           endpoints,
+		Endpoints:           convertEndpointsToMetaObject(payload.Endpoints),
 		EdgeGroups:          payload.EdgeGroups,
 		Version:             1,
 		GroupLogsCollection: map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{},
 	}
-
-	return edgeJob
 }
 
-func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *portainer.EdgeJob {
-	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
-
-	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
-
-	edgeJob := &portainer.EdgeJob{
-		ID:                  edgeJobIdentifier,
-		Name:                payload.Name,
-		CronExpression:      payload.CronExpression,
-		Recurring:           payload.Recurring,
-		Created:             time.Now().Unix(),
-		Endpoints:           endpoints,
-		EdgeGroups:          payload.EdgeGroups,
-		Version:             1,
-		GroupLogsCollection: map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{},
-	}
-
-	return edgeJob
-}
-
-func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []byte, endpointsFromGroups []portainer.EndpointID) error {
+func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJob *portainer.EdgeJob, file []byte, endpointsFromGroups []portainer.EndpointID) error {
 	edgeCronExpression := strings.Split(edgeJob.CronExpression, " ")
 	if len(edgeCronExpression) == 6 {
 		edgeCronExpression = edgeCronExpression[1:]
@@ -233,7 +227,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 	edgeJob.CronExpression = strings.Join(edgeCronExpression, " ")
 
 	for ID := range edgeJob.Endpoints {
-		endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
+		endpoint, err := tx.Endpoint().Endpoint(ID)
 		if err != nil {
 			return err
 		}
@@ -254,7 +248,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		endpointsMap = convertEndpointsToMetaObject(endpointsFromGroups)
 
 		for ID := range endpointsMap {
-			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
+			endpoint, err := tx.Endpoint().Endpoint(ID)
 			if err != nil {
 				return err
 			}
@@ -274,7 +268,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 	}
 
 	for endpointID := range endpointsMap {
-		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+		endpoint, err := tx.Endpoint().Endpoint(endpointID)
 		if err != nil {
 			return err
 		}
@@ -282,5 +276,5 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
 	}
 
-	return handler.DataStore.EdgeJob().Create(edgeJob.ID, edgeJob)
+	return tx.EdgeJob().CreateWithID(edgeJob.ID, edgeJob)
 }

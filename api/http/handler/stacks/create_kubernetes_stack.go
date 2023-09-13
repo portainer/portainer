@@ -4,18 +4,20 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/git/update"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type kubernetesStringDeploymentPayload struct {
@@ -23,14 +25,17 @@ type kubernetesStringDeploymentPayload struct {
 	ComposeFormat    bool
 	Namespace        string
 	StackFileContent string
+	// Whether the stack is from a app template
+	FromAppTemplate bool `example:"false"`
 }
 
-func createStackPayloadFromK8sFileContentPayload(name, namespace, fileContent string, composeFormat bool) stackbuilders.StackPayload {
+func createStackPayloadFromK8sFileContentPayload(name, namespace, fileContent string, composeFormat, fromAppTemplate bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		StackName:        name,
 		Namespace:        namespace,
 		StackFileContent: fileContent,
 		ComposeFormat:    composeFormat,
+		FromAppTemplate:  fromAppTemplate,
 	}
 }
 
@@ -46,9 +51,11 @@ type kubernetesGitDeploymentPayload struct {
 	ManifestFile             string
 	AdditionalFiles          []string
 	AutoUpdate               *portainer.AutoUpdateSettings
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
-func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication, composeFormat bool, namespace, manifest string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings) stackbuilders.StackPayload {
+func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication, composeFormat bool, namespace, manifest string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, repoSkipSSLVerify bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		StackName: name,
 		RepositoryConfigPayload: stackbuilders.RepositoryConfigPayload{
@@ -57,6 +64,7 @@ func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsern
 			Authentication: repoAuthentication,
 			Username:       repoUsername,
 			Password:       repoPassword,
+			TLSSkipVerify:  repoSkipSSLVerify,
 		},
 		Namespace:       namespace,
 		ComposeFormat:   composeFormat,
@@ -125,13 +133,31 @@ type createKubernetesStackResponse struct {
 	Output string `json:"Output"`
 }
 
+// @id StackCreateKubernetesFile
+// @summary Deploy a new kubernetes stack from a file
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body kubernetesStringDeploymentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/kubernetes/string [post]
 func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	if !endpointutils.IsKubernetesEndpoint(endpoint) {
+		return httperror.BadRequest("Environment type does not match", errors.New("Environment type does not match"))
+	}
+
 	var payload kubernetesStringDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
@@ -143,13 +169,21 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: stackutils.ErrStackAlreadyExists}
 	}
 
-	stackPayload := createStackPayloadFromK8sFileContentPayload(payload.StackName, payload.Namespace, payload.StackFileContent, payload.ComposeFormat)
+	stackPayload := createStackPayloadFromK8sFileContentPayload(payload.StackName, payload.Namespace, payload.StackFileContent, payload.ComposeFormat, payload.FromAppTemplate)
 
 	k8sStackBuilder := stackbuilders.CreateK8sStackFileContentBuilder(handler.DataStore,
 		handler.FileService,
 		handler.StackDeployer,
 		handler.KubernetesDeployer,
 		user)
+
+	// Refresh ECR registry secret if needed
+	// RefreshEcrSecret method checks if the namespace has any ECR registry
+	// otherwise return nil
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	if err == nil {
+		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace)
+	}
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
 	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
@@ -164,13 +198,31 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	return response.JSON(w, resp)
 }
 
+// @id StackCreateKubernetesGit
+// @summary Deploy a new kubernetes stack from a git repository
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body kubernetesGitDeploymentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/kubernetes/repository [post]
 func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	if !endpointutils.IsKubernetesEndpoint(endpoint) {
+		return httperror.BadRequest("Environment type does not match", errors.New("Environment type does not match"))
+	}
+
 	var payload kubernetesGitDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
@@ -203,7 +255,9 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		payload.Namespace,
 		payload.ManifestFile,
 		payload.AdditionalFiles,
-		payload.AutoUpdate)
+		payload.AutoUpdate,
+		payload.TLSSkipVerify,
+	)
 
 	k8sStackBuilder := stackbuilders.CreateKubernetesStackGitBuilder(handler.DataStore,
 		handler.FileService,
@@ -226,13 +280,27 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	return response.JSON(w, resp)
 }
 
+// @id StackCreateKubernetesUrl
+// @summary Deploy a new kubernetes stack from a url
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param body body kubernetesManifestURLDeploymentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/kubernetes/url [post]
 func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesManifestURLDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	user, err := handler.DataStore.User().User(userID)
+	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}

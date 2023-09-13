@@ -2,7 +2,12 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle vertical-center"> <pr-icon icon="'layout-grid'"></pr-icon> Edge Groups </div>
+        <div class="toolBarTitle vertical-center">
+          <div class="widget-icon space-right">
+            <pr-icon icon="'layout-grid'"></pr-icon>
+          </div>
+          Edge Groups
+        </div>
         <div class="searchBar vertical-center leading-none">
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
@@ -78,13 +83,13 @@
                     id="select_{{ $index }}"
                     type="checkbox"
                     ng-model="item.Checked"
-                    ng-disabled="item.HasEdgeStack || item.HasEdgeGroup"
+                    ng-disabled="item.HasEdgeStack || item.HasEdgeJob"
                     ng-click="$ctrl.selectItem(item, $event)"
                   />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="edge.groups.edit({groupId: item.Id})">{{ item.Name }}</a>
-                <span ng-if="item.HasEdgeStack || item.HasEdgeGroup" class="label label-info image-tag space-left">in use</span>
+                <span ng-if="item.HasEdgeStack || item.HasEdgeJob" class="label label-info image-tag space-left">in use</span>
               </td>
               <td>{{ item.Endpoints.length }}</td>
               <td>{{ item.Dynamic ? 'Dynamic' : 'Static' }}</td>

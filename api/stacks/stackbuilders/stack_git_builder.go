@@ -1,16 +1,17 @@
 package stackbuilders
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 type GitMethodStackBuildProcess interface {
@@ -67,6 +68,8 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 
 	repoConfig.URL = payload.URL
 	repoConfig.ReferenceName = payload.ReferenceName
+	repoConfig.TLSSkipVerify = payload.TLSSkipVerify
+
 	repoConfig.ConfigFilePath = payload.ComposeFile
 	if payload.ComposeFile == "" {
 		repoConfig.ConfigFilePath = filesystem.ComposeFileDefaultName
@@ -80,7 +83,12 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 	// Set the project path on the disk
 	b.stack.ProjectPath = b.fileService.GetStackProjectPath(stackFolder)
 
-	commitHash, err := stackutils.DownloadGitRepository(b.stack.ID, repoConfig, b.gitService, b.fileService)
+	getProjectPath := func() string {
+		stackFolder := fmt.Sprintf("%d", b.stack.ID)
+		return b.fileService.GetStackProjectPath(stackFolder)
+	}
+
+	commitHash, err := stackutils.DownloadGitRepository(repoConfig, b.gitService, getProjectPath)
 	if err != nil {
 		b.err = httperror.InternalServerError(err.Error(), err)
 		return b

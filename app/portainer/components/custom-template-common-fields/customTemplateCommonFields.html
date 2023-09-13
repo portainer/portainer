@@ -21,7 +21,7 @@
               <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Title is required. </p>
               <p class="vertical-center" ng-message="pattern">
                 <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').
+                {{ $ctrl.nameRegexError }}
               </p>
             </div>
           </div>

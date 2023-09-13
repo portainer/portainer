@@ -8,5 +8,6 @@ angular.module('portainer.kubernetes').component('kubernetesConfigurationData', 
     isValid: '=',
     isCreation: '=',
     isEditorDirty: '=',
+    type: '<',
   },
 });

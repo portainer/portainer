@@ -1,4 +1,4 @@
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { HubspotForm } from '@@/HubspotForm';
 import { Modal } from '@@/modals/Modal';

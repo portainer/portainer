@@ -37,23 +37,14 @@
       <!-- network-card-input -->
       <!-- nodes-selector -->
       <div ng-if="$ctrl.applicationState.endpoint.mode.agentProxy && $ctrl.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-        <div class="form-group">
-          <div class="col-sm-12">
-            <macvlan-nodes-datatable
-              title-text="Select the nodes where you want to deploy the local configuration"
-              title-icon="hard-drive"
-              dataset="$ctrl.nodes"
-              table-key="nodes"
-              state="$ctrl.data.DatatableState"
-              order-by="Hostname"
-              show-ip-address-column="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
-              access-to-node-details="$ctrl.isAdmin"
-              name="node_selector"
-              ng-model="tmp"
-              ng-required="$ctrl.requiredNodeSelection()"
-            ></macvlan-nodes-datatable>
-          </div>
-        </div>
+        <macvlan-nodes-selector
+          dataset="$ctrl.nodes"
+          is-ip-column-visible="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
+          have-access-to-node="$ctrl.isAdmin"
+          value="$ctrl.data.DatatableState.selectedItems"
+          on-change="($ctrl.onChangeSelectedNodes)"
+        ></macvlan-nodes-selector>
+
         <div class="form-group" ng-show="macvlanConfigurationForm.node_selector.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="macvlanConfigurationForm.node_selector.$error">

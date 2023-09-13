@@ -15,6 +15,15 @@
   // 	],
   // 	"description": "Log output to console"
   // }
+  "React Named Export Component": {
+    "prefix": "rnec",
+    "body": [
+      "export function $TM_FILENAME_BASE() {",
+      "  return <div>$TM_FILENAME_BASE</div>;",
+      "}"
+    ],
+    "description": "React Named Export Component"
+  },
   "Component": {
     "scope": "javascript",
     "prefix": "mycomponent",

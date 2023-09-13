@@ -131,15 +131,15 @@ type stubUserService struct {
 }
 
 func (s *stubUserService) BucketName() string                                      { return "users" }
-func (s *stubUserService) User(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
+func (s *stubUserService) Read(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
 func (s *stubUserService) UserByUsername(username string) (*portainer.User, error) { return nil, nil }
-func (s *stubUserService) Users() ([]portainer.User, error)                        { return s.users, nil }
+func (s *stubUserService) ReadAll() ([]portainer.User, error)                      { return s.users, nil }
 func (s *stubUserService) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	return s.users, nil
 }
-func (s *stubUserService) Create(user *portainer.User) error                          { return nil }
-func (s *stubUserService) UpdateUser(ID portainer.UserID, user *portainer.User) error { return nil }
-func (s *stubUserService) DeleteUser(ID portainer.UserID) error                       { return nil }
+func (s *stubUserService) Create(user *portainer.User) error                      { return nil }
+func (s *stubUserService) Update(ID portainer.UserID, user *portainer.User) error { return nil }
+func (s *stubUserService) Delete(ID portainer.UserID) error                       { return nil }
 
 // WithUsers testDatastore option that will instruct testDatastore to return provided users
 func WithUsers(us []portainer.User) datastoreOption {
@@ -152,22 +152,25 @@ type stubEdgeJobService struct {
 	jobs []portainer.EdgeJob
 }
 
-func (s *stubEdgeJobService) BucketName() string                     { return "edgejob" }
-func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.jobs, nil }
-func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
+func (s *stubEdgeJobService) BucketName() string                    { return "edgejobs" }
+func (s *stubEdgeJobService) ReadAll() ([]portainer.EdgeJob, error) { return s.jobs, nil }
+func (s *stubEdgeJobService) Read(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	return nil, nil
 }
-func (s *stubEdgeJobService) Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+func (s *stubEdgeJobService) Create(edgeJob *portainer.EdgeJob) error {
 	return nil
 }
-func (s *stubEdgeJobService) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+func (s *stubEdgeJobService) CreateWithID(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+	return nil
+}
+func (s *stubEdgeJobService) Update(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	return nil
 }
 func (s *stubEdgeJobService) UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error {
 	return nil
 }
-func (s *stubEdgeJobService) DeleteEdgeJob(ID portainer.EdgeJobID) error { return nil }
-func (s *stubEdgeJobService) GetNextIdentifier() int                     { return 0 }
+func (s *stubEdgeJobService) Delete(ID portainer.EdgeJobID) error { return nil }
+func (s *stubEdgeJobService) GetNextIdentifier() int              { return 0 }
 
 // WithEdgeJobs option will instruct testDatastore to return provided jobs
 func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {

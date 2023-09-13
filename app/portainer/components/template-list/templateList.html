@@ -71,7 +71,7 @@
         </template-item>
         <div ng-if="!$ctrl.templates" class="text-muted text-center"> Loading... </div>
         <div
-          ng-if="($ctrl.templates | filter : $ctrl.filterByTemplateType | filter : $ctrl.filterByCategory | filter : $ctrl.state.textFilter).length === 0"
+          ng-if="($ctrl.templates | filter: $ctrl.filterByTemplateType | filter: $ctrl.filterByCategory | filter: $ctrl.state.textFilter).length === 0"
           class="text-muted text-center"
         >
           No templates available.

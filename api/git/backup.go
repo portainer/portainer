@@ -20,6 +20,8 @@ type CloneOptions struct {
 	ReferenceName string
 	Username      string
 	Password      string
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
 }
 
 func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) (clean func(), err error) {
@@ -43,7 +45,7 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 
 	cleanUp = true
 
-	err = gitService.CloneRepository(options.ProjectPath, options.URL, options.ReferenceName, options.Username, options.Password)
+	err = gitService.CloneRepository(options.ProjectPath, options.URL, options.ReferenceName, options.Username, options.Password, options.TLSSkipVerify)
 	if err != nil {
 		cleanUp = false
 		restoreError := filesystem.MoveDirectory(backupProjectPath, options.ProjectPath)
@@ -51,7 +53,7 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
 		}
 
-		if err == gittypes.ErrAuthenticationFailure {
+		if errors.Is(err, gittypes.ErrAuthenticationFailure) {
 			return cleanFn, errors.WithMessage(err, ErrInvalidGitCredential.Error())
 		}
 

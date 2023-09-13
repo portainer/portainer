@@ -9,6 +9,7 @@ import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { validateForm } from '@@/form-components/validate-form';
+import { SwitchField } from '@@/form-components/SwitchField';
 
 import { GitCredential } from '../account/git-credentials/types';
 
@@ -21,6 +22,7 @@ import { refFieldValidation } from './RefField/RefField';
 interface Props {
   value: GitFormModel;
   onChange: (value: Partial<GitFormModel>) => void;
+  environmentType?: 'DOCKER' | 'KUBERNETES' | undefined;
   deployMethod?: 'compose' | 'nomad' | 'manifest';
   isDockerStandalone?: boolean;
   isAdditionalFilesFieldVisible?: boolean;
@@ -35,6 +37,7 @@ interface Props {
 export function GitForm({
   value,
   onChange,
+  environmentType = 'DOCKER',
   deployMethod = 'compose',
   isDockerStandalone = false,
   isAdditionalFilesFieldVisible,
@@ -50,7 +53,7 @@ export function GitForm({
       <AuthFieldset
         value={value}
         onChange={handleChange}
-        isExplanationVisible={isAuthExplanationVisible}
+        isAuthExplanationVisible={isAuthExplanationVisible}
         errors={errors}
       />
 
@@ -93,6 +96,7 @@ export function GitForm({
 
       {value.AutoUpdate && (
         <AutoUpdateFieldset
+          environmentType={environmentType}
           webhookId={webhookId}
           baseWebhookUrl={baseWebhookUrl}
           value={value.AutoUpdate}
@@ -104,6 +108,19 @@ export function GitForm({
       )}
 
       <TimeWindowDisplay />
+
+      <div className="form-group">
+        <div className="col-sm-12">
+          <SwitchField
+            label="Skip TLS Verification"
+            checked={value.TLSSkipVerify}
+            onChange={(value) => handleChange({ TLSSkipVerify: value })}
+            name="TLSSkipVerify"
+            tooltip="Enabling this will allow skipping TLS validation for any self-signed certificate."
+            labelClass="col-sm-3 col-lg-2"
+          />
+        </div>
+      </div>
     </FormSection>
   );
 
@@ -127,7 +144,18 @@ export function buildGitValidationSchema(
 ): SchemaOf<GitFormModel> {
   return object({
     RepositoryURL: string()
-      .url('Invalid Url')
+      .test('valid URL', 'The URL must be a valid URL', (value) => {
+        if (!value) {
+          return true;
+        }
+
+        try {
+          const url = new URL(value);
+          return !!url.hostname;
+        } catch {
+          return false;
+        }
+      })
       .required('Repository URL is required'),
     RepositoryReferenceName: refFieldValidation(),
     ComposeFilePathInRepository: string().required(
@@ -136,5 +164,6 @@ export function buildGitValidationSchema(
     AdditionalFiles: array(string().required('Path is required')).default([]),
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
-  }).concat(gitAuthValidation(gitCredentials));
+    TLSSkipVerify: boolean().default(false),
+  }).concat(gitAuthValidation(gitCredentials, false));
 }

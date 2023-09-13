@@ -21,8 +21,7 @@ import (
 func Test_userCreateAccessToken(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
-	defer teardown()
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	// create admin and standard user(s)
 	adminUser := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}

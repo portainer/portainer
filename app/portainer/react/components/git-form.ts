@@ -18,6 +18,7 @@ export const gitFormModule = angular
     r2a(withUIRouter(withReactQuery(withCurrentUser(GitForm))), [
       'value',
       'onChange',
+      'environmentType',
       'isDockerStandalone',
       'deployMethod',
       'isAdditionalFilesFieldVisible',
@@ -56,7 +57,7 @@ export const gitFormModule = angular
     'reactGitFormAuthFieldset',
     r2a(withUIRouter(withReactQuery(withCurrentUser(AuthFieldset))), [
       'value',
-      'isExplanationVisible',
+      'isAuthExplanationVisible',
       'onChange',
       'errors',
     ])

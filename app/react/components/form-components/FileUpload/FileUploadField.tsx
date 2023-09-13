@@ -1,5 +1,5 @@
-import { ChangeEvent, createRef } from 'react';
-import { XCircle } from 'lucide-react';
+import { ChangeEvent, ComponentProps, createRef } from 'react';
+import { Upload, XCircle } from 'lucide-react';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -8,11 +8,13 @@ import styles from './FileUploadField.module.css';
 
 export interface Props {
   onChange(value: File): void;
-  value?: File;
+  value?: File | null;
   accept?: string;
   title?: string;
   required?: boolean;
   inputId: string;
+  color?: ComponentProps<typeof Button>['color'];
+  name?: string;
 }
 
 export function FileUploadField({
@@ -22,11 +24,13 @@ export function FileUploadField({
   title = 'Select a file',
   required = false,
   inputId,
+  color = 'primary',
+  name,
 }: Props) {
   const fileRef = createRef<HTMLInputElement>();
 
   return (
-    <div className="file-upload-field vertical-center">
+    <div className="file-upload-field flex gap-2">
       <input
         id={inputId}
         ref={fileRef}
@@ -36,18 +40,20 @@ export function FileUploadField({
         className={styles.fileInput}
         onChange={changeHandler}
         aria-label="file-input"
+        name={name}
       />
       <Button
         size="small"
-        color="primary"
+        color={color}
         onClick={handleButtonClick}
         className={styles.fileButton}
+        icon={Upload}
       >
         {title}
       </Button>
 
       <span className="vertical-center">
-        {value ? value.name : <Icon icon={XCircle} mode="danger" />}
+        {value ? value.name : required && <Icon icon={XCircle} mode="danger" />}
       </span>
     </div>
   );

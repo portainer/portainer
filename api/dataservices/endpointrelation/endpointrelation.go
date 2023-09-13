@@ -1,9 +1,8 @@
 package endpointrelation
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 
 	"github.com/rs/zerolog/log"
@@ -14,16 +13,21 @@ const BucketName = "endpoint_relations"
 
 // Service represents a service for managing environment(endpoint) relation data.
 type Service struct {
-	connection    portainer.Connection
-	updateStackFn func(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
+	connection      portainer.Connection
+	updateStackFn   func(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
+	updateStackFnTx func(tx portainer.Transaction, ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error
 }
 
 func (service *Service) BucketName() string {
 	return BucketName
 }
 
-func (service *Service) RegisterUpdateStackFunction(updateFunc func(ID portainer.EdgeStackID, updateFunc func(edgeStack *portainer.EdgeStack)) error) {
+func (service *Service) RegisterUpdateStackFunction(
+	updateFunc func(portainer.EdgeStackID, func(*portainer.EdgeStack)) error,
+	updateFuncTx func(portainer.Transaction, portainer.EdgeStackID, func(*portainer.EdgeStack)) error,
+) {
 	service.updateStackFn = updateFunc
+	service.updateStackFnTx = updateFuncTx
 }
 
 // NewService creates a new instance of a service.
@@ -49,22 +53,11 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	var all = make([]portainer.EndpointRelation, 0)
 
-	err := service.connection.GetAll(
+	return all, service.connection.GetAll(
 		BucketName,
 		&portainer.EndpointRelation{},
-		func(obj interface{}) (interface{}, error) {
-			r, ok := obj.(*portainer.EndpointRelation)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
-				return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
-			}
-
-			all = append(all, *r)
-
-			return &portainer.EndpointRelation{}, nil
-		})
-
-	return all, err
+		dataservices.AppendFn(&all),
+	)
 }
 
 // EndpointRelation returns a Environment(Endpoint) relation object by EndpointID

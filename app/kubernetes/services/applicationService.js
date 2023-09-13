@@ -4,7 +4,6 @@ import PortainerError from 'Portainer/error';
 
 import { KubernetesApplication, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesApplicationRollbackHelper from 'Kubernetes/helpers/application/rollback';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
@@ -14,6 +13,8 @@ import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-p
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import KubernetesPodConverter from 'Kubernetes/pod/converter';
 import { notifyError } from '@/portainer/services/notifications';
+import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import { generateNewIngressesFromFormPaths } from '@/react/kubernetes/applications/CreateView/application-services/utils';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */
@@ -29,7 +30,6 @@ class KubernetesApplicationService {
     KubernetesPersistentVolumeClaimService,
     KubernetesNamespaceService,
     KubernetesPodService,
-    KubernetesHistoryService,
     KubernetesHorizontalPodAutoScalerService,
     KubernetesIngressService
   ) {
@@ -43,7 +43,6 @@ class KubernetesApplicationService {
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesPodService = KubernetesPodService;
-    this.KubernetesHistoryService = KubernetesHistoryService;
     this.KubernetesHorizontalPodAutoScalerService = KubernetesHorizontalPodAutoScalerService;
     this.KubernetesIngressService = KubernetesIngressService;
 
@@ -52,7 +51,6 @@ class KubernetesApplicationService {
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
     this.patchPartialAsync = this.patchPartialAsync.bind(this);
-    this.rollbackAsync = this.rollbackAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
   /* #endregion */
@@ -74,6 +72,12 @@ class KubernetesApplicationService {
     return apiService;
   }
 
+  _generateIngressPatchPromises(oldIngresses, newIngresses) {
+    return _.map(newIngresses, (newIng) => {
+      const oldIng = _.find(oldIngresses, { Name: newIng.Name });
+      return this.KubernetesIngressService.patch(oldIng, newIng);
+    });
+  }
   /* #endregion */
 
   /* #region  GET */
@@ -122,8 +126,6 @@ class KubernetesApplicationService {
     const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(namespace, boundScaler.Name) : undefined;
     application.AutoScaler = scaler;
     application.Ingresses = ingresses;
-
-    await this.KubernetesHistoryService.get(application);
 
     if (service.Yaml) {
       application.Yaml += '---\n' + service.Yaml;
@@ -220,6 +222,18 @@ class KubernetesApplicationService {
           notifyError('Unable to create service', error);
         }
       });
+
+      try {
+        //Generate all ingresses from current form by passing services object
+        const newServicePorts = formValues.Services.flatMap((service) => service.Ports);
+        const newIngresses = generateNewIngressesFromFormPaths(formValues.OriginalIngresses, newServicePorts);
+        if (newIngresses) {
+          //Update original ingress with current ingress
+          await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, newIngresses));
+        }
+      } catch (error) {
+        notifyError('Unable to update service', error);
+      }
     }
 
     const apiService = this._getApplicationApiService(app);
@@ -262,7 +276,7 @@ class KubernetesApplicationService {
    *    To synchronise with kubernetes resource creation, update and delete summary output, any new resources created
    *    in this method should also be displayed in the summary output (getUpdatedApplicationResources)
    */
-  async patchAsync(oldFormValues, newFormValues) {
+  async patchAsync(oldFormValues, newFormValues, originalServicePorts) {
     const [oldApp, oldHeadlessService, oldServices, , oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
     const [newApp, newHeadlessService, newServices, , newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
     const oldApiService = this._getApplicationApiService(oldApp);
@@ -347,6 +361,21 @@ class KubernetesApplicationService {
       });
     }
 
+    // Update ingresses
+    if (newServices) {
+      try {
+        //Generate all ingresses from current form by passing services object
+        const newServicePorts = newFormValues.Services.flatMap((service) => service.Ports);
+        const newIngresses = generateNewIngressesFromFormPaths(newFormValues.OriginalIngresses, newServicePorts, originalServicePorts);
+        if (newIngresses) {
+          //Update original ingress with current ingress
+          await Promise.all(this._generateIngressPatchPromises(newFormValues.OriginalIngresses, newIngresses));
+        }
+      } catch (error) {
+        notifyError('Unable to update service', error);
+      }
+    }
+
     const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
     const newAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(newFormValues, newKind);
     if (!oldFormValues.AutoScaler.IsUsed) {
@@ -390,11 +419,11 @@ class KubernetesApplicationService {
   //
   // patch(oldValues: KubernetesApplication, newValues: KubernetesApplication, partial: (undefined | false)): Promise<unknown>
   // patch(oldValues: KubernetesApplicationFormValues, newValues: KubernetesApplicationFormValues, partial: true): Promise<unknown>
-  patch(oldValues, newValues, partial = false) {
+  patch(oldValues, newValues, partial = false, originalServicePorts) {
     if (partial) {
       return this.$async(this.patchPartialAsync, oldValues, newValues);
     }
-    return this.$async(this.patchAsync, oldValues, newValues);
+    return this.$async(this.patchAsync, oldValues, newValues, originalServicePorts);
   }
   /* #endregion */
 
@@ -418,6 +447,16 @@ class KubernetesApplicationService {
     if (application.ServiceType) {
       // delete headless service && non-headless service
       await this.KubernetesServiceService.delete(application.Services);
+      if (application.Ingresses.length) {
+        const originalIngresses = await this.KubernetesIngressService.get(payload.Namespace);
+        const formValues = {
+          OriginalIngresses: originalIngresses,
+          PublishedPorts: KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(application.ServiceType, application.PublishedPorts),
+        };
+        const ingresses = KubernetesIngressConverter.applicationFormValuesToDeleteIngresses(formValues, application);
+
+        await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
+      }
     }
     if (!_.isEmpty(application.AutoScaler)) {
       await this.KubernetesHorizontalPodAutoScalerService.delete(application.AutoScaler);
@@ -426,18 +465,6 @@ class KubernetesApplicationService {
 
   delete(application) {
     return this.$async(this.deleteAsync, application);
-  }
-  /* #endregion */
-
-  /* #region  ROLLBACK */
-  async rollbackAsync(application, targetRevision) {
-    const payload = KubernetesApplicationRollbackHelper.getPatchPayload(application, targetRevision);
-    const apiService = this._getApplicationApiService(application);
-    await apiService.rollback(application.ResourcePool, application.Name, payload);
-  }
-
-  rollback(application, targetRevision) {
-    return this.$async(this.rollbackAsync, application, targetRevision);
   }
   /* #endregion */
 }

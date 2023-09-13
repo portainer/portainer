@@ -292,7 +292,6 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 			defer server.Close()
 
 			a := &azureClient{
-				client:  server.Client(),
 				baseUrl: server.URL,
 			}
 
@@ -329,7 +328,6 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 	defer server.Close()
 
 	a := &azureClient{
-		client:  server.Client(),
 		baseUrl: server.URL,
 	}
 
@@ -442,6 +440,7 @@ func Test_listRefs_azure(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+
 	tests := []struct {
 		name   string
 		args   baseOption

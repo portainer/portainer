@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type fileResponse struct {
@@ -20,8 +20,8 @@ type fileResponse struct {
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param id path string true "EdgeJob Id"
-// @param taskID path string true "Task Id"
+// @param id path int true "EdgeJob Id"
+// @param taskID path int true "Task Id"
 // @success 200 {object} fileResponse
 // @failure 500
 // @failure 400

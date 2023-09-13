@@ -100,6 +100,7 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 		endpointGroup := getAssociatedGroup(&endpoint, groups)
 
 		if AuthorizedEndpointAccess(&endpoint, endpointGroup, context.UserID, context.UserMemberships) {
+			endpoint.UserAccessPolicies = nil
 			endpoints[n] = endpoint
 			n++
 		}

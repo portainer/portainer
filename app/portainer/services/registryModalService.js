@@ -11,7 +11,7 @@ function RegistryModalService(RegistryService) {
     const defaultValue = _.get(registryModel, 'Registry.Id', 0);
 
     const registryId = await selectRegistry(registries, defaultValue);
-    if (!registryId) {
+    if (registryId === undefined) {
       return null;
     }
 

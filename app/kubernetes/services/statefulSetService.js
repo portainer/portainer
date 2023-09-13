@@ -14,7 +14,6 @@ class KubernetesStatefulSetService {
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
-    this.rollbackAsync = this.rollbackAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -121,23 +120,6 @@ class KubernetesStatefulSetService {
 
   delete(statefulSet) {
     return this.$async(this.deleteAsync, statefulSet);
-  }
-
-  /**
-   * ROLLBACK
-   */
-  async rollbackAsync(namespace, name, payload) {
-    try {
-      const params = new KubernetesCommonParams();
-      params.id = name;
-      await this.KubernetesStatefulSets(namespace).rollback(params, payload).$promise;
-    } catch (err) {
-      throw new PortainerError('Unable to rollback statefulSet', err);
-    }
-  }
-
-  rollback(namespace, name, payload) {
-    return this.$async(this.rollbackAsync, namespace, name, payload);
   }
 }
 

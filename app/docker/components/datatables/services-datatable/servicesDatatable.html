@@ -11,12 +11,23 @@
         <div class="searchBar vertical-center">
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
+            ng-if="!$ctrl.notAutoFocus"
+            auto-focus
             type="text"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search for a service..."
-            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="service-searchInput"
+          />
+          <input
+            ng-if="$ctrl.notAutoFocus"
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a service..."
             ng-model-options="{ debounce: 300 }"
             data-cy="service-searchInput"
           />
@@ -167,32 +178,11 @@
               </td>
               <td ng-if="$ctrl.showStackColumn">{{ item.StackName ? item.StackName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.image.display">{{ item.Image | hideshasum }}</td>
-              <td ng-controller="ServicesDatatableActionsController as actionCtrl">
+              <td>
                 {{ item.Mode }}
-                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount : item) }}</code>
-                <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
-                  <a class="interactive vertical-center" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
-                    <pr-icon icon="'minimize-2'"></pr-icon>
-                    Scale
-                  </a>
-                </span>
-                <span ng-if="item.Mode === 'replicated' && item.Scale">
-                  <input
-                    class="input-sm"
-                    type="number"
-                    min="0"
-                    step="1"
-                    ng-model="item.Replicas"
-                    on-enter-key="actionCtrl.scaleAction(item)"
-                    auto-focus
-                    ng-click="$event.stopPropagation();"
-                  />
-                  <a class="interactive vertical-center" ng-click="item.Scale = false; $event.stopPropagation();">
-                    <pr-icon icon="'x'"></pr-icon>
-                  </a>
-                  <a class="interactive vertical-center" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();">
-                    <pr-icon icon="'check-square'"></pr-icon>
-                  </a>
+                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
+                <span ng-if="item.Mode === 'replicated'">
+                  <docker-services-datatable-scale-service-button service="item"></docker-services-datatable-scale-service-button>
                 </span>
               </td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
@@ -220,16 +210,7 @@
             <tr dir-paginate-end ng-show="item.Expanded">
               <td></td>
               <td colspan="8">
-                <service-tasks-datatable
-                  dataset="item.Tasks"
-                  service-id="item.Id"
-                  table-key="service-tasks"
-                  order-by="Status.State"
-                  nodes="$ctrl.nodes"
-                  agent-proxy="$ctrl.agentProxy"
-                  show-task-logs-button="$ctrl.showTaskLogsButton"
-                  text-filter="$ctrl.state.textFilter"
-                ></service-tasks-datatable>
+                <docker-service-tasks-datatable dataset="item.Tasks" search="$ctrl.state.textFilter"></docker-service-tasks-datatable>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

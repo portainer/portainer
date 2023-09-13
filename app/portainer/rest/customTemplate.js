@@ -7,12 +7,13 @@ function CustomTemplatesFactory($resource, API_ENDPOINT_CUSTOM_TEMPLATES) {
     API_ENDPOINT_CUSTOM_TEMPLATES + '/:id/:action',
     {},
     {
-      create: { method: 'POST', ignoreLoadingBar: true },
+      create: { method: 'POST', ignoreLoadingBar: true, params: { id: 'create', action: '@method' } },
       query: { method: 'GET', isArray: true },
       get: { method: 'GET', params: { id: '@id' } },
       update: { method: 'PUT', params: { id: '@id' } },
       remove: { method: 'DELETE', params: { id: '@id' } },
       file: { method: 'GET', params: { id: '@id', action: 'file' } },
+      gitFetch: { method: 'PUT', params: { id: '@id', action: 'git_fetch' } },
     }
   );
 }

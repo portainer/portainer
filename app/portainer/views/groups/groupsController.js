@@ -1,5 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
+import { confirmDestructive } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.app').controller('GroupsController', GroupsController);
 
@@ -11,6 +13,16 @@ function GroupsController($scope, $state, $async, GroupService, Notifications) {
   }
 
   async function removeActionAsync(selectedItems) {
+    const confirmed = await confirmDestructive({
+      title: 'Are you sure?',
+      message: 'Are you sure you want to remove the selected environment group(s)?',
+      confirmButton: buildConfirmButton('Remove', 'danger'),
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     for (let group of selectedItems) {
       try {
         await GroupService.deleteGroup(group.Id);

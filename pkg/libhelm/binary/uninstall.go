@@ -20,7 +20,7 @@ func (hbpm *helmBinaryPackageManager) Uninstall(uninstallOpts options.UninstallO
 		args = append(args, "--namespace", uninstallOpts.Namespace)
 	}
 
-	_, err := hbpm.runWithKubeConfig("uninstall", args, uninstallOpts.KubernetesClusterAccess)
+	_, err := hbpm.runWithKubeConfig("uninstall", args, uninstallOpts.KubernetesClusterAccess, uninstallOpts.Env)
 	if err != nil {
 		return errors.Wrap(err, "failed to run helm uninstall on specified args")
 	}

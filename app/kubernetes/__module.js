@@ -53,7 +53,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             try {
               await getSelfSubjectAccessReview(endpoint.Id, 'default');
             } catch (e) {
-              throw new Error('Environment is unreachable.');
+              throw new Error(`The environment named ${endpoint.Name} is unreachable.`);
             }
           } catch (e) {
             let params = {};
@@ -151,10 +151,10 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const application = {
       name: 'kubernetes.applications.application',
-      url: '/:namespace/:name',
+      url: '/:namespace/:name?resource-type&tab',
       views: {
         'content@': {
-          component: 'kubernetesApplicationView',
+          component: 'applicationDetailsView',
         },
       },
     };
@@ -174,7 +174,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       url: '/:pod/:container/console',
       views: {
         'content@': {
-          component: 'kubernetesApplicationConsoleView',
+          component: 'kubernetesConsoleView',
         },
       },
     };
@@ -223,30 +223,64 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const configurations = {
       name: 'kubernetes.configurations',
-      url: '/configurations',
+      url: '/configurations?tab',
       views: {
         'content@': {
-          component: 'kubernetesConfigurationsView',
+          component: 'kubernetesConfigMapsAndSecretsView',
         },
       },
+      params: {
+        tab: null,
+      },
+    };
+    const configmaps = {
+      name: 'kubernetes.configmaps',
+      url: '/configmaps',
+      abstract: true,
     };
 
-    const configurationCreation = {
-      name: 'kubernetes.configurations.new',
+    const configMapCreation = {
+      name: 'kubernetes.configmaps.new',
       url: '/new',
       views: {
         'content@': {
-          component: 'kubernetesCreateConfigurationView',
+          component: 'kubernetesCreateConfigMapView',
         },
       },
     };
 
-    const configuration = {
-      name: 'kubernetes.configurations.configuration',
+    const configMap = {
+      name: 'kubernetes.configmaps.configmap',
       url: '/:namespace/:name',
       views: {
         'content@': {
-          component: 'kubernetesConfigurationView',
+          component: 'kubernetesConfigMapView',
+        },
+      },
+    };
+
+    const secrets = {
+      name: 'kubernetes.secrets',
+      url: '/secrets',
+      abstract: true,
+    };
+
+    const secretCreation = {
+      name: 'kubernetes.secrets.new',
+      url: '/new',
+      views: {
+        'content@': {
+          component: 'kubernetesCreateSecretView',
+        },
+      },
+    };
+
+    const secret = {
+      name: 'kubernetes.secrets.secret',
+      url: '/:namespace/:name',
+      views: {
+        'content@': {
+          component: 'kubernetesSecretView',
         },
       },
     };
@@ -293,14 +327,11 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const deploy = {
       name: 'kubernetes.deploy',
-      url: '/deploy?templateId',
+      url: '/deploy?templateId&referrer&tab',
       views: {
         'content@': {
           component: 'kubernetesDeployView',
         },
-      },
-      params: {
-        templateId: '',
       },
     };
 
@@ -389,9 +420,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       url: '/configure',
       views: {
         'content@': {
-          templateUrl: './views/configure/configure.html',
-          controller: 'KubernetesConfigureController',
-          controllerAs: 'ctrl',
+          component: 'kubernetesConfigureView',
         },
       },
     };
@@ -421,8 +450,12 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(stack);
     $stateRegistryProvider.register(stackLogs);
     $stateRegistryProvider.register(configurations);
-    $stateRegistryProvider.register(configurationCreation);
-    $stateRegistryProvider.register(configuration);
+    $stateRegistryProvider.register(configmaps);
+    $stateRegistryProvider.register(configMapCreation);
+    $stateRegistryProvider.register(secrets);
+    $stateRegistryProvider.register(secretCreation);
+    $stateRegistryProvider.register(configMap);
+    $stateRegistryProvider.register(secret);
     $stateRegistryProvider.register(cluster);
     $stateRegistryProvider.register(dashboard);
     $stateRegistryProvider.register(deploy);

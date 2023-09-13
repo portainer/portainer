@@ -3,9 +3,9 @@ package endpointgroups
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id EndpointGroupList
@@ -22,7 +22,7 @@ import (
 // @failure 500 "Server error"
 // @router /endpoint_groups [get]
 func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}

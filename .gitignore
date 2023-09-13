@@ -11,8 +11,10 @@ storybook-static
 *.DS_Store
 
 .eslintcache
-__debug_bin
+__debug_bin*
 
 api/docs
 .idea
 .env
+go.work.sum
+

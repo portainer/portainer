@@ -3,52 +3,26 @@ package stacks
 import (
 	"net/http"
 
-	"github.com/pkg/errors"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 )
 
-// @id StackCreate
-// @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
-// @description **Access policy**: authenticated
-// @tags stacks
-// @security ApiKeyAuth
-// @security jwt
-// @accept json,multipart/form-data
-// @produce json
-// @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack), 2 (Compose stack) or 3 (Kubernetes stack)." Enums(1,2,3)
-// @param method query string true "Stack deployment method. Possible values: file, string, repository or url." Enums(string, file, repository, url)
-// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
-// @param body_swarm_string body swarmStackFromFileContentPayload false "Required when using method=string and type=1"
-// @param body_swarm_repository body swarmStackFromGitRepositoryPayload false "Required when using method=repository and type=1"
-// @param body_compose_string body composeStackFromFileContentPayload false "Required when using method=string and type=2"
-// @param body_compose_repository body composeStackFromGitRepositoryPayload false "Required when using method=repository and type=2"
-// @param body_kubernetes_string body kubernetesStringDeploymentPayload false "Required when using method=string and type=3"
-// @param body_kubernetes_repository body kubernetesGitDeploymentPayload false "Required when using method=repository and type=3"
-// @param body_kubernetes_url body kubernetesManifestURLDeploymentPayload false "Required when using method=url and type=3"
-// @param Name formData string false "Name of the stack. required when method is file"
-// @param SwarmID formData string false "Swarm cluster identifier. Required when method equals file and type equals 1. required when method is file"
-// @param Env formData string false "Environment(Endpoint) variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
-// @param file formData file false "Stack file. required when method is file"
-// @success 200 {object} portainer.CustomTemplate
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
-// @router /stacks [post]
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
+	stackType, err := request.RetrieveRouteVariableValue(r, "type")
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: type", err)
+		return httperror.BadRequest("Invalid path parameter: type", err)
 	}
 
-	method, err := request.RetrieveQueryParameter(r, "method", false)
+	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: method", err)
+		return httperror.BadRequest("Invalid path parameter: method", err)
 	}
 
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
@@ -87,12 +61,12 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.InternalServerError("Unable to retrieve user details from authentication token", err)
 	}
 
-	switch portainer.StackType(stackType) {
-	case portainer.DockerSwarmStack:
+	switch stackType {
+	case "swarm":
 		return handler.createSwarmStack(w, r, method, endpoint, tokenData.ID)
-	case portainer.DockerComposeStack:
+	case "standalone":
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
-	case portainer.KubernetesStack:
+	case "kubernetes":
 		return handler.createKubernetesStack(w, r, method, endpoint, tokenData.ID)
 	}
 
@@ -100,7 +74,6 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 }
 
 func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
-
 	switch method {
 	case "string":
 		return handler.createComposeStackFromFileContent(w, r, endpoint, userID)
@@ -135,6 +108,7 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 	case "url":
 		return handler.createKubernetesStackFromManifestURL(w, r, endpoint, userID)
 	}
+
 	return httperror.BadRequest("Invalid value for query parameter: method. Value must be one of: string or repository", errors.New(request.ErrInvalidQueryParameter))
 }
 

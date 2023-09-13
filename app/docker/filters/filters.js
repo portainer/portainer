@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { joinCommand, trimSHA } from './utils';
+import { joinCommand, taskStatusBadge, nodeStatusBadge, trimSHA, dockerNodeAvailabilityBadge } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -49,22 +49,7 @@ angular
   })
   .filter('taskstatusbadge', function () {
     'use strict';
-    return function (text) {
-      var status = _.toLower(text);
-      var labelStyle = 'default';
-      if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'preparing', 'ready', 'starting', 'remove'])) {
-        labelStyle = 'info';
-      } else if (includeString(status, ['pending'])) {
-        labelStyle = 'warning';
-      } else if (includeString(status, ['shutdown', 'failed', 'rejected', 'orphaned'])) {
-        labelStyle = 'danger';
-      } else if (includeString(status, ['complete'])) {
-        labelStyle = 'primary';
-      } else if (includeString(status, ['running'])) {
-        labelStyle = 'success';
-      }
-      return labelStyle;
-    };
+    return taskStatusBadge;
   })
   .filter('taskhaslogs', function () {
     'use strict';
@@ -90,26 +75,8 @@ angular
       return 'success';
     };
   })
-  .filter('nodestatusbadge', function () {
-    'use strict';
-    return function (text) {
-      if (text === 'down' || text === 'Unhealthy') {
-        return 'danger';
-      }
-      return 'success';
-    };
-  })
-  .filter('dockerNodeAvailabilityBadge', function () {
-    'use strict';
-    return function (text) {
-      if (text === 'pause') {
-        return 'warning';
-      } else if (text === 'drain') {
-        return 'danger';
-      }
-      return 'success';
-    };
-  })
+  .filter('nodestatusbadge', () => nodeStatusBadge)
+  .filter('dockerNodeAvailabilityBadge', () => dockerNodeAvailabilityBadge)
   .filter('trimcontainername', function () {
     'use strict';
     return function (name) {
@@ -243,6 +210,9 @@ angular
   .filter('imagelayercommand', function () {
     'use strict';
     return function (createdBy) {
+      if (!createdBy) {
+        return '';
+      }
       return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
     };
   })

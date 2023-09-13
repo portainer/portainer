@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
@@ -56,6 +57,7 @@ type Handler struct {
 	EndpointHandler        *endpoints.Handler
 	EndpointHelmHandler    *helm.Handler
 	EndpointProxyHandler   *endpointproxy.Handler
+	GitOperationHandler    *gitops.Handler
 	HelmTemplatesHandler   *helm.Handler
 	KubernetesHandler      *kubernetes.Handler
 	FileHandler            *file.Handler
@@ -82,7 +84,7 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.19.0
+// @version 2.20.0
 // @description.markdown api-description.md
 // @termsOfService
 
@@ -97,7 +99,7 @@ type Handler struct {
 
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
+// @name X-API-KEY
 
 // @securitydefinitions.apikey jwt
 // @in header
@@ -105,8 +107,14 @@ type Handler struct {
 
 // @tag.name auth
 // @tag.description Authenticate against Portainer HTTP API
+// @tag.name backup
+// @tag.description Manage backups
 // @tag.name custom_templates
 // @tag.description Manage Custom Templates
+// @tag.name docker
+// @tag.description Manage Docker resources
+// @tag.name edge
+// @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name edge_groups
 // @tag.description Manage Edge Groups
 // @tag.name edge_jobs
@@ -115,14 +123,20 @@ type Handler struct {
 // @tag.description Manage Edge Stacks
 // @tag.name edge_templates
 // @tag.description Manage Edge Templates
-// @tag.name edge
-// @tag.description Manage Edge related environment(endpoint) settings
-// @tag.name endpoints
-// @tag.description Manage Docker environments(endpoints)
 // @tag.name endpoint_groups
 // @tag.description Manage environment(endpoint) groups
+// @tag.name endpoints
+// @tag.description Manage Docker environments(endpoints)
+// @tag.name gitops
+// @tag.description Operate git repository
+// @tag.name helm
+// @tag.description Manage Helm charts
+// @tag.name intel
+// @tag.description Manage Intel AMT settings
 // @tag.name kubernetes
 // @tag.description Manage Kubernetes cluster
+// @tag.name ldap
+// @tag.description Manage LDAP settings
 // @tag.name motd
 // @tag.description Fetch the message of the day
 // @tag.name registries
@@ -133,30 +147,30 @@ type Handler struct {
 // @tag.description Manage roles
 // @tag.name settings
 // @tag.description Manage Portainer settings
-// @tag.name users
-// @tag.description Manage users
-// @tag.name tags
-// @tag.description Manage tags
-// @tag.name teams
-// @tag.description Manage teams
-// @tag.name team_memberships
-// @tag.description Manage team memberships
-// @tag.name templates
-// @tag.description Manage App Templates
-// @tag.name stacks
-// @tag.description Manage stacks
 // @tag.name ssl
 // @tag.description Manage ssl settings
-// @tag.name upload
-// @tag.description Upload files
-// @tag.name webhooks
-// @tag.description Manage webhooks
-// @tag.name websocket
-// @tag.description Create exec sessions using websockets
+// @tag.name stacks
+// @tag.description Manage stacks
 // @tag.name status
 // @tag.description Information about the Portainer instance
 // @tag.name system
 // @tag.description Manage Portainer system
+// @tag.name tags
+// @tag.description Manage tags
+// @tag.name team_memberships
+// @tag.description Manage team memberships
+// @tag.name teams
+// @tag.description Manage teams
+// @tag.name templates
+// @tag.description Manage App Templates
+// @tag.name upload
+// @tag.description Upload files
+// @tag.name users
+// @tag.description Manage users
+// @tag.name webhooks
+// @tag.description Manage webhooks
+// @tag.name websocket
+// @tag.description Create exec sessions using websockets
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -203,6 +217,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
+	case strings.HasPrefix(r.URL.Path, "/api/gitops"):
+		http.StripPrefix("/api", h.GitOperationHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/ldap"):
 		http.StripPrefix("/api", h.LDAPHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):

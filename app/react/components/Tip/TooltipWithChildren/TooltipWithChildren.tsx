@@ -69,6 +69,7 @@ export function TooltipWithChildren({
       arrow
       allowHTML
       interactive
+      disabled={!message}
     >
       {children}
     </Tippy>

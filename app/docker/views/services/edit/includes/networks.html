@@ -23,7 +23,7 @@
             <td>
               <select
                 ng-if="network.Editable"
-                class="form-control"
+                class="form-control !h-[30px] !rounded !text-[13px]"
                 ng-model="network.Id"
                 ng-change="updateNetwork(service)"
                 ng-options="net.Id as net.Name for net in filterNetworks(swarmNetworks, network)"
@@ -42,7 +42,7 @@
             </td>
             <td ng-if="network.Editable" authorization="DockerServiceUpdate">
               <span class="input-group-btn">
-                <button class="btn btn-dangerlight" type="button" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
+                <button class="btn btn-sm btn-dangerlight" type="button" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
                   <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                 </button>
               </span>

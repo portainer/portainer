@@ -14,7 +14,7 @@ func hasPermission(
 	endpointID portainer.EndpointID,
 	registry *portainer.Registry,
 ) (hasPermission bool, err error) {
-	user, err := dataStore.User().User(userID)
+	user, err := dataStore.User().Read(userID)
 	if err != nil {
 		return
 	}
@@ -41,7 +41,7 @@ func GetAccessibleRegistry(
 	registryID portainer.RegistryID,
 ) (registry *portainer.Registry, err error) {
 
-	registry, err = dataStore.Registry().Registry(registryID)
+	registry, err = dataStore.Registry().Read(registryID)
 	if err != nil {
 		return
 	}

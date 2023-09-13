@@ -176,11 +176,17 @@ type (
 		// Valid values are: 1 - 'linux', 2 - 'windows'
 		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
 		// URL of the template's logo
-		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
-		// Type of created stack (1 - swarm, 2 - compose)
-		Type            StackType        `json:"Type" example:"1"`
+		Logo string `json:"Logo" example:"https://portainer.io/img/logo.svg"`
+		// Type of created stack:
+		// * 1 - swarm
+		// * 2 - compose
+		// * 3 - kubernetes
+		Type            StackType        `json:"Type" example:"1" enums:"1,2,3"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
+		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
+		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
+		IsComposeFormat bool `example:"false"`
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -293,18 +299,29 @@ type (
 		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
+	// StackDeploymentInfo records the information of a deployed stack
+	StackDeploymentInfo struct {
+		// Version is the version of the stack and also is the deployed version in edge agent
+		Version int `json:"Version"`
+		// FileVersion is the version of the stack file, used to detect changes
+		FileVersion int `json:"FileVersion"`
+		// ConfigHash is the commit hash of the git repository used for deploying the stack
+		ConfigHash string `json:"ConfigHash"`
+	}
+
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
-		ID             EdgeStackID                    `json:"Id" example:"1"`
-		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
-		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
-		ProjectPath    string                         `json:"ProjectPath"`
-		EntryPoint     string                         `json:"EntryPoint"`
-		Version        int                            `json:"Version"`
-		NumDeployments int                            `json:"NumDeployments"`
+		ID     EdgeStackID                    `json:"Id" example:"1"`
+		Name   string                         `json:"Name"`
+		Status map[EndpointID]EdgeStackStatus `json:"Status"`
+		// StatusArray    map[EndpointID][]EdgeStackStatus `json:"StatusArray"`
+		CreationDate   int64         `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID `json:"EdgeGroups"`
+		ProjectPath    string        `json:"ProjectPath"`
+		EntryPoint     string        `json:"EntryPoint"`
+		Version        int           `json:"Version"`
+		NumDeployments int           `json:"NumDeployments"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
 		// Uses the manifest's namespaces instead of the default one
@@ -331,16 +348,36 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Details    EdgeStackStatusDetails `json:"Details"`
-		Error      string                 `json:"Error"`
-		EndpointID EndpointID             `json:"EndpointID"`
+		Status     []EdgeStackDeploymentStatus
+		EndpointID EndpointID
+		// EE only feature
+		DeploymentInfo StackDeploymentInfo
 
+		// Deprecated
+		Details EdgeStackStatusDetails
+		// Deprecated
+		Error string
 		// Deprecated
 		Type EdgeStackStatusType `json:"Type"`
 	}
 
+	// EdgeStackDeploymentStatus represents an edge stack deployment status
+	EdgeStackDeploymentStatus struct {
+		Time  int64
+		Type  EdgeStackStatusType
+		Error string
+		// EE only feature
+		RollbackTo *int
+	}
+
 	//EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
+
+	EndpointPendingActions struct {
+		CleanNAPWithOverridePolicies struct {
+			EndpointGroups []EndpointGroupID `json:"EndpointGroups"`
+		} `json:"CleanNAPWithOverridePolicies"`
+	}
 
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
@@ -388,12 +425,17 @@ type (
 		LastCheckInDate int64
 		// QueryDate of each query with the endpoints list
 		QueryDate int64
+		// Heartbeat indicates the heartbeat status of an edge environment
+		Heartbeat bool `json:"Heartbeat" example:"true"`
 
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
+
+		// Whether we need to run any action when an endpoint is back online.
+		PendingActions *EndpointPendingActions `json:"PendingActions"`
 
 		Edge EnvironmentEdgeSettings
 
@@ -959,6 +1001,8 @@ type (
 		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
 		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
 		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
+
+		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
@@ -1007,7 +1051,7 @@ type (
 		UpdatedBy string `example:"bob"`
 		// Only applies when deploying stack with multiple files
 		AdditionalFiles []string `json:"AdditionalFiles"`
-		// The auto update settings of a git stack
+		// The GitOps update settings of a git stack
 		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`
@@ -1100,7 +1144,7 @@ type (
 		// Mandatory container/stack fields
 		// Template Identifier
 		ID TemplateID `json:"Id" example:"1"`
-		// Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)
+		// Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack), 4 (Compose edge stack)
 		Type TemplateType `json:"type" example:"1"`
 		// Title of the template
 		Title string `json:"title" example:"Nginx"`
@@ -1124,7 +1168,7 @@ type (
 		// Default name for the stack/container to be used on deployment
 		Name string `json:"name,omitempty" example:"mystackname"`
 		// URL of the template's logo
-		Logo string `json:"logo,omitempty" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		Logo string `json:"logo,omitempty" example:"https://portainer.io/img/logo.svg"`
 		// A list of environment(endpoint) variables used during the template deployment
 		Env []TemplateEnv `json:"env,omitempty"`
 		// A note that will be displayed in the UI. Supports HTML content
@@ -1296,11 +1340,12 @@ type (
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
 		// Webhook Identifier
-		ID          WebhookID   `json:"Id" example:"1"`
-		Token       string      `json:"Token"`
-		ResourceID  string      `json:"ResourceId"`
-		EndpointID  EndpointID  `json:"EndpointId"`
-		RegistryID  RegistryID  `json:"RegistryId"`
+		ID         WebhookID  `json:"Id" example:"1"`
+		Token      string     `json:"Token"`
+		ResourceID string     `json:"ResourceId"`
+		EndpointID EndpointID `json:"EndpointId"`
+		RegistryID RegistryID `json:"RegistryId"`
+		// Type of webhook (1 - service)
 		WebhookType WebhookType `json:"Type"`
 	}
 
@@ -1326,7 +1371,7 @@ type (
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
@@ -1363,12 +1408,20 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
+		GetStackProjectPathByVersion(stackIdentifier string, version int, commitHash string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error)
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
+		RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
+		RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
+		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string
+		StoreEdgeStackFileFromBytesByVersion(edgeStackIdentifier, fileName string, version int, data []byte) (string, error)
+		FormProjectPathByVersion(projectPath string, version int, commitHash string) string
+		SafeMoveDirectory(src, dst string) error
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
@@ -1391,14 +1444,16 @@ type (
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
+		GetDefaultChiselPrivateKeyPath() string
+		StoreChiselPrivateKey(privateKey []byte) error
 	}
 
 	// GitService represents a service for managing Git
 	GitService interface {
-		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
-		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
-		ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error)
-		ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includeExts []string) ([]string, error)
+		CloneRepository(destination string, repositoryURL, referenceName, username, password string, tlsSkipVerify bool) error
+		LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error)
+		ListRefs(repositoryURL, username, password string, hardRefresh bool, tlsSkipVerify bool) ([]string, error)
+		ListFiles(repositoryURL, referenceName, username, password string, dirOnly, hardRefresh bool, includeExts []string, tlsSkipVerify bool) ([]string, error)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT
@@ -1513,7 +1568,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.19.0"
+	APIVersion = "2.20.0"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1560,8 +1615,12 @@ const (
 )
 
 // List of supported features
+const (
+	FeatureFdo = "fdo"
+)
+
 var SupportedFeatureFlags = []featureflags.Feature{
-	"fdo",
+	FeatureFdo,
 }
 
 const (
@@ -1610,18 +1669,24 @@ const (
 const (
 	// EdgeStackStatusPending represents a pending edge stack
 	EdgeStackStatusPending EdgeStackStatusType = iota
-	//EdgeStackStatusOk represents a successfully deployed edge stack
-	EdgeStackStatusOk
-	//EdgeStackStatusError represents an edge environment(endpoint) which failed to deploy its edge stack
+	//EdgeStackStatusDeploymentReceived represents an edge environment which received the edge stack deployment
+	EdgeStackStatusDeploymentReceived
+	//EdgeStackStatusError represents an edge environment which failed to deploy its edge stack
 	EdgeStackStatusError
 	//EdgeStackStatusAcknowledged represents an acknowledged edge stack
 	EdgeStackStatusAcknowledged
-	//EdgeStackStatusRemove represents a removed edge stack (status isn't persisted)
-	EdgeStackStatusRemove
+	//EdgeStackStatusRemoved represents a removed edge stack
+	EdgeStackStatusRemoved
 	// StatusRemoteUpdateSuccess represents a successfully updated edge stack
 	EdgeStackStatusRemoteUpdateSuccess
 	// EdgeStackStatusImagesPulled represents a successfully images-pulling
 	EdgeStackStatusImagesPulled
+	// EdgeStackStatusRunning represents a running Edge stack
+	EdgeStackStatusRunning
+	// EdgeStackStatusDeploying represents an Edge stack which is being deployed
+	EdgeStackStatusDeploying
+	// EdgeStackStatusRemoving represents an Edge stack which is being removed
+	EdgeStackStatusRemoving
 )
 
 const (
@@ -1999,7 +2064,28 @@ const (
 	OperationIntegrationStoridgeAdmin         Authorization = "IntegrationStoridgeAdmin"
 )
 
+// GetEditionLabel returns the portainer edition label
+func (e SoftwareEdition) GetEditionLabel() string {
+	switch e {
+	case PortainerCE:
+		return "CE"
+	case PortainerBE:
+		return "BE"
+	case PortainerEE:
+		return "EE"
+	}
+
+	return "CE"
+}
+
 const (
 	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
 	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
+)
+
+type PerDevConfigsFilterType string
+
+const (
+	PerDevConfigsTypeFile PerDevConfigsFilterType = "file"
+	PerDevConfigsTypeDir  PerDevConfigsFilterType = "dir"
 )

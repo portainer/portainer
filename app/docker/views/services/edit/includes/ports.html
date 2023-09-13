@@ -25,7 +25,7 @@
           <tr ng-repeat="portBinding in service.Ports">
             <td>
               <div class="input-group input-group-sm">
-                <span class="input-group-addon">host</span>
+                <span class="input-group-addon !leading-none">host</span>
                 <input
                   type="number"
                   class="form-control"
@@ -39,7 +39,7 @@
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <span class="input-group-addon">container</span>
+                <span class="input-group-addon !leading-none">container</span>
                 <input
                   type="number"
                   class="form-control"
@@ -54,7 +54,7 @@
             <td>
               <div class="input-group input-group-sm">
                 <select
-                  class="selectpicker form-control"
+                  class="selectpicker form-control !rounded"
                   ng-model="portBinding.Protocol"
                   ng-change="updatePublishedPort(service, mapping)"
                   ng-disabled="isUpdating"
@@ -68,7 +68,7 @@
             <td>
               <div class="input-group input-group-sm">
                 <select
-                  class="selectpicker form-control"
+                  class="selectpicker form-control !rounded"
                   ng-model="portBinding.PublishMode"
                   ng-change="updatePublishedPort(service, mapping)"
                   ng-disabled="isUpdating"
@@ -81,7 +81,7 @@
             </td>
             <td authorization="DockerServiceUpdate">
               <span class="input-group-btn">
-                <button class="btn btn-dangerlight" type="button" ng-click="removePortPublishedBinding(service, $index)" ng-disabled="isUpdating">
+                <button class="btn btn-sm btn-dangerlight" type="button" ng-click="removePortPublishedBinding(service, $index)" ng-disabled="isUpdating">
                   <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
                 </button>
               </span>

@@ -19,20 +19,28 @@ interface DefaultOption {
 type RegularProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
-> = { isCreatable?: false } & ReactSelectProps<Option, IsMulti, Group> &
+  Group extends GroupBase<Option> = GroupBase<Option>,
+> = { isCreatable?: false; size?: 'sm' | 'md' } & ReactSelectProps<
+  Option,
+  IsMulti,
+  Group
+> &
   RefAttributes<ReactSelectType<Option, IsMulti, Group>>;
 
 type CreatableProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
-> = { isCreatable: true } & ReactSelectCreatableProps<Option, IsMulti, Group>;
+  Group extends GroupBase<Option> = GroupBase<Option>,
+> = { isCreatable: true; size?: 'sm' | 'md' } & ReactSelectCreatableProps<
+  Option,
+  IsMulti,
+  Group
+>;
 
 type Props<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > =
   | CreatableProps<Option, IsMulti, Group>
   | RegularProps<Option, IsMulti, Group>;
@@ -40,13 +48,18 @@ type Props<
 export function Select<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
->({ className, isCreatable = false, ...props }: Props<Option, IsMulti, Group>) {
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>({
+  className,
+  isCreatable = false,
+  size = 'md',
+  ...props
+}: Props<Option, IsMulti, Group>) {
   const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
 
   return (
     <Component
-      className={clsx(className, 'portainer-selector-root')}
+      className={clsx(className, 'portainer-selector-root', size)}
       classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
@@ -57,7 +70,7 @@ export function Select<
 export function Creatable<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({ className, ...props }: ReactSelectCreatableProps<Option, IsMulti, Group>) {
   return (
     <ReactSelectCreatable

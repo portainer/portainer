@@ -6,16 +6,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pkg/errors"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/validation"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/release"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -151,7 +152,7 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to retrieve user details from authentication token")
 	}
-	user, err := handler.dataStore.User().User(tokenData.ID)
+	user, err := handler.dataStore.User().Read(tokenData.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to load user information from the database")
 	}

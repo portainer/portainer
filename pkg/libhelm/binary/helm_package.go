@@ -2,6 +2,7 @@ package binary
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
 	"path"
 	"runtime"
@@ -21,7 +22,7 @@ func NewHelmBinaryPackageManager(binaryPath string) *helmBinaryPackageManager {
 }
 
 // runWithKubeConfig will execute run against the provided Kubernetes cluster with kubeconfig as cli arguments.
-func (hbpm *helmBinaryPackageManager) runWithKubeConfig(command string, args []string, kca *options.KubernetesClusterAccess) ([]byte, error) {
+func (hbpm *helmBinaryPackageManager) runWithKubeConfig(command string, args []string, kca *options.KubernetesClusterAccess, env []string) ([]byte, error) {
 	cmdArgs := make([]string, 0)
 	if kca != nil {
 		cmdArgs = append(cmdArgs, "--kube-apiserver", kca.ClusterServerURL)
@@ -29,13 +30,13 @@ func (hbpm *helmBinaryPackageManager) runWithKubeConfig(command string, args []s
 		cmdArgs = append(cmdArgs, "--kube-ca-file", kca.CertificateAuthorityFile)
 	}
 	cmdArgs = append(cmdArgs, args...)
-	return hbpm.run(command, cmdArgs)
+	return hbpm.run(command, cmdArgs, env)
 }
 
 // run will execute helm command against the provided Kubernetes cluster.
 // The endpointId and authToken are dynamic params (based on the user) that allow helm to execute commands
 // in the context of the current user against specified k8s cluster.
-func (hbpm *helmBinaryPackageManager) run(command string, args []string) ([]byte, error) {
+func (hbpm *helmBinaryPackageManager) run(command string, args []string, env []string) ([]byte, error) {
 	cmdArgs := make([]string, 0)
 	cmdArgs = append(cmdArgs, command)
 	cmdArgs = append(cmdArgs, args...)
@@ -48,6 +49,9 @@ func (hbpm *helmBinaryPackageManager) run(command string, args []string) ([]byte
 	var stderr bytes.Buffer
 	cmd := exec.Command(helmPath, cmdArgs...)
 	cmd.Stderr = &stderr
+
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, env...)
 
 	output, err := cmd.Output()
 	if err != nil {

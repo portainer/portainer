@@ -30,7 +30,12 @@
           <pr-icon icon="'trash-2'"></pr-icon>
           Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary vertical-center !ml-0" ui-sref="kubernetes.deploy" data-cy="k8sVolume-deployFromManifestButton">
+        <button
+          type="button"
+          class="btn btn-sm btn-primary vertical-center !ml-0"
+          ui-sref="kubernetes.deploy({ referrer: 'kubernetes.volumes' })"
+          data-cy="k8sVolume-deployFromManifestButton"
+        >
           <pr-icon icon="'plus'" class-name="'!h-3'"></pr-icon>
           Create from manifest
         </button>

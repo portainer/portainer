@@ -1,29 +1,29 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Database } from 'lucide-react';
-import { useStore } from 'zustand';
+import { Database, AlertTriangle } from 'lucide-react';
 
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { Datatable } from '@@/datatables';
 import { Button, ButtonGroup } from '@@/buttons';
 import { Icon } from '@@/Icon';
-import { useSearchBarState } from '@@/datatables/SearchBar';
 import { createPersistedStore } from '@@/datatables/types';
 import { buildConfirmButton } from '@@/modals/utils';
+import { useTableState } from '@@/datatables/useTableState';
 
-import { IngressControllerClassMap } from '../types';
+import { IngressControllerClassMapRowData } from '../types';
 
-import { useColumns } from './columns';
+import { columns } from './columns';
 
 const storageKey = 'ingressClasses';
-const settingsStore = createPersistedStore(storageKey);
+const settingsStore = createPersistedStore(storageKey, 'name');
 
 interface Props {
   onChangeControllers: (
-    controllerClassMap: IngressControllerClassMap[]
+    controllerClassMap: IngressControllerClassMapRowData[]
   ) => void; // angular function to save the ingress class list
   description: string;
-  ingressControllers: IngressControllerClassMap[] | undefined;
+  ingressControllers: IngressControllerClassMapRowData[] | undefined;
+  initialIngressControllers: IngressControllerClassMapRowData[] | undefined;
   allowNoneIngressClass: boolean;
   isLoading: boolean;
   noIngressControllerLabel: string;
@@ -33,25 +33,36 @@ interface Props {
 export function IngressClassDatatable({
   onChangeControllers,
   description,
+  initialIngressControllers,
   ingressControllers,
   allowNoneIngressClass,
   isLoading,
   noIngressControllerLabel,
   view,
 }: Props) {
-  const settings = useStore(settingsStore);
-  const [search, setSearch] = useSearchBarState(storageKey);
+  const tableState = useTableState(settingsStore, storageKey);
+
   const [ingControllerFormValues, setIngControllerFormValues] = useState(
     ingressControllers || []
   );
-  const columns = useColumns();
+
+  // set the ingress controller form values when the ingress controller list changes
+  // and the ingress controller form values are not set
+  useEffect(() => {
+    if (
+      ingressControllers &&
+      ingControllerFormValues.length !== ingressControllers.length
+    ) {
+      setIngControllerFormValues(ingressControllers);
+    }
+  }, [ingressControllers, ingControllerFormValues]);
 
   useEffect(() => {
-    if (allowNoneIngressClass === undefined) {
+    if (allowNoneIngressClass === undefined || isLoading) {
       return;
     }
 
-    let newIngFormValues: IngressControllerClassMap[];
+    let newIngFormValues: IngressControllerClassMapRowData[];
     const isCustomTypeExist = ingControllerFormValues.some(
       (ic) => ic.Type === 'custom'
     );
@@ -81,6 +92,7 @@ export function IngressClassDatatable({
   return (
     <div className="-mx-[15px]">
       <Datatable
+        settingsManager={tableState}
         dataset={ingControllerFormValues || []}
         columns={columns}
         isLoading={isLoading}
@@ -90,17 +102,13 @@ export function IngressClassDatatable({
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
-        initialPageSize={settings.pageSize}
-        onPageSizeChange={settings.setPageSize}
-        initialSortBy={settings.sortBy}
-        onSortByChange={settings.setSortBy}
-        searchValue={search}
-        onSearchChange={setSearch}
       />
     </div>
   );
 
-  function renderTableActions(selectedRows: IngressControllerClassMap[]) {
+  function renderTableActions(
+    selectedRows: IngressControllerClassMapRowData[]
+  ) {
     return (
       <div className="flex items-start">
         <ButtonGroup>
@@ -147,9 +155,12 @@ export function IngressClassDatatable({
     return (
       <div className="text-muted flex w-full flex-col !text-xs">
         <div className="mt-1">{description}</div>
-        {ingressControllers &&
+        {initialIngressControllers &&
           ingControllerFormValues &&
-          isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
+          isUnsavedChanges(
+            initialIngressControllers,
+            ingControllerFormValues
+          ) && (
             <span className="text-warning mt-1 flex items-center">
               <Icon icon={AlertTriangle} className="!mr-1" />
               <span className="text-warning">Unsaved changes.</span>
@@ -160,8 +171,8 @@ export function IngressClassDatatable({
   }
 
   async function updateIngressControllers(
-    selectedRows: IngressControllerClassMap[],
-    ingControllerFormValues: IngressControllerClassMap[],
+    selectedRows: IngressControllerClassMapRowData[],
+    ingControllerFormValues: IngressControllerClassMapRowData[],
     availability: boolean
   ) {
     const updatedIngressControllers = getUpdatedIngressControllers(
@@ -206,7 +217,7 @@ export function IngressClassDatatable({
               </p>
               <ul className="ml-6">
                 {usedControllersToDisallow.map((controller) => (
-                  <li key={controller.ClassName}>${controller.ClassName}</li>
+                  <li key={controller.ClassName}>{controller.ClassName}</li>
                 ))}
               </ul>
               <p>
@@ -229,8 +240,8 @@ export function IngressClassDatatable({
 }
 
 function isUnsavedChanges(
-  oldIngressControllers: IngressControllerClassMap[],
-  newIngressControllers: IngressControllerClassMap[]
+  oldIngressControllers: IngressControllerClassMapRowData[],
+  newIngressControllers: IngressControllerClassMapRowData[]
 ) {
   if (oldIngressControllers.length !== newIngressControllers.length) {
     return true;
@@ -247,8 +258,8 @@ function isUnsavedChanges(
 }
 
 function getUpdatedIngressControllers(
-  selectedRows: IngressControllerClassMap[],
-  allRows: IngressControllerClassMap[],
+  selectedRows: IngressControllerClassMapRowData[],
+  allRows: IngressControllerClassMapRowData[],
   allow: boolean
 ) {
   const selectedRowClassNames = selectedRows.map((row) => row.ClassName);

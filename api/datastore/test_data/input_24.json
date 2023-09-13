@@ -37,6 +37,7 @@
       "EdgeKey": "",
       "Extensions": [],
       "GroupId": 1,
+      "Heartbeat": false,
       "Id": 1,
       "Name": "local",
       "PublicURL": "",

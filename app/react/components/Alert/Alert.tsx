@@ -1,10 +1,10 @@
 import clsx from 'clsx';
-import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { AlertCircle, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { PropsWithChildren, ReactNode } from 'react';
 
 import { Icon } from '@@/Icon';
 
-type AlertType = 'success' | 'error' | 'info';
+type AlertType = 'success' | 'error' | 'info' | 'warn';
 
 const alertSettings: Record<
   AlertType,
@@ -31,22 +31,47 @@ const alertSettings: Record<
     body: 'text-blue-7',
     icon: AlertCircle,
   },
+  warn: {
+    container:
+      'border-warning-4 bg-warning-2 th-dark:bg-warning-3 th-dark:border-warning-5',
+    header: 'text-warning-8',
+    body: 'text-warning-7',
+    icon: AlertTriangle,
+  },
 };
 
 export function Alert({
   color,
   title,
+  className,
   children,
-}: PropsWithChildren<{ color: AlertType; title: string }>) {
+}: PropsWithChildren<{
+  color: AlertType;
+  title?: string;
+  className?: string;
+}>) {
   const { container, header, body, icon } = alertSettings[color];
 
   return (
-    <AlertContainer className={container}>
-      <AlertHeader className={header}>
-        <Icon icon={icon} />
-        {title}
-      </AlertHeader>
-      <AlertBody className={body}>{children}</AlertBody>
+    <AlertContainer className={clsx(container, className)}>
+      {title ? (
+        <>
+          <AlertHeader className={header}>
+            <Icon icon={icon} />
+            {title}
+          </AlertHeader>
+          <AlertBody className={body} hasTitle={!!title}>
+            {children}
+          </AlertBody>
+        </>
+      ) : (
+        <AlertBody
+          className={clsx(body, 'flex items-start gap-2')}
+          hasTitle={!!title}
+        >
+          <Icon icon={icon} className="!mt-0.5 flex-none" /> {children}
+        </AlertBody>
+      )}
     </AlertContainer>
   );
 }
@@ -68,7 +93,11 @@ function AlertHeader({
 }: PropsWithChildren<{ className?: string }>) {
   return (
     <h4
-      className={clsx('text-base', '!m-0 flex items-center gap-2', className)}
+      className={clsx(
+        'text-base',
+        '!m-0 mb-2 flex items-center gap-2',
+        className
+      )}
     >
       {children}
     </h4>
@@ -77,7 +106,12 @@ function AlertHeader({
 
 function AlertBody({
   className,
+  hasTitle,
   children,
-}: PropsWithChildren<{ className?: string }>) {
-  return <div className={clsx('ml-6 mt-2 text-sm', className)}>{children}</div>;
+}: PropsWithChildren<{ className?: string; hasTitle: boolean }>) {
+  return (
+    <div className={clsx('text-sm', className, { 'ml-6': hasTitle })}>
+      {children}
+    </div>
+  );
 }

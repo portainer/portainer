@@ -3,48 +3,27 @@ package customtemplates
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
 )
 
-// @id CustomTemplateCreate
-// @summary Create a custom template
-// @description Create a custom template.
-// @description **Access policy**: authenticated
-// @tags custom_templates
-// @security ApiKeyAuth
-// @security jwt
-// @accept json,multipart/form-data
-// @produce json
-// @param method query string true "method for creating template" Enums(string, file, repository)
-// @param body_string body customTemplateFromFileContentPayload false "Required when using method=string"
-// @param body_repository body customTemplateFromGitRepositoryPayload false "Required when using method=repository"
-// @param Title formData string false "Title of the template. required when method is file"
-// @param Description formData string false "Description of the template. required when method is file"
-// @param Note formData string false "A note that will be displayed in the UI. Supports HTML content"
-// @param Platform formData int false "Platform associated to the template (1 - 'linux', 2 - 'windows'). required when method is file" Enums(1,2)
-// @param Type formData int false "Type of created stack (1 - swarm, 2 - compose), required when method is file" Enums(1,2)
-// @param file formData file false "required when method is file"
-// @success 200 {object} portainer.CustomTemplate
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
-// @router /custom_templates [post]
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	method, err := request.RetrieveQueryParameter(r, "method", false)
+	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
@@ -61,7 +40,7 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 
 	customTemplate.CreatedByUserID = tokenData.ID
 
-	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
+	customTemplates, err := handler.DataStore.CustomTemplate().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 	}
@@ -103,7 +82,7 @@ func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*p
 
 type customTemplateFromFileContentPayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer.io/img/logo.svg"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template
@@ -114,7 +93,10 @@ type customTemplateFromFileContentPayload struct {
 	// Valid values are: 1 - 'linux', 2 - 'windows'
 	// Required for Docker stacks
 	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
-	// Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)
+	// Type of created stack:
+	// * 1 - swarm
+	// * 2 - compose
+	// * 3 - kubernetes
 	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
 	// Content of stack file
 	FileContent string `validate:"required"`
@@ -135,6 +117,7 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
+	// Platform validation is only for docker related stack (docker standalone and docker swarm)
 	if payload.Type != portainer.KubernetesStack && payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
@@ -153,6 +136,20 @@ func isValidNote(note string) bool {
 	return !match
 }
 
+// @id CustomTemplateCreateString
+// @summary Create a custom template
+// @description Create a custom template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body customTemplateFromFileContentPayload true "body"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /custom_templates/string [post]
 func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -185,7 +182,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 
 type customTemplateFromGitRepositoryPayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer.io/img/logo.svg"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template
@@ -196,7 +193,10 @@ type customTemplateFromGitRepositoryPayload struct {
 	// Valid values are: 1 - 'linux', 2 - 'windows'
 	// Required for Docker stacks
 	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
-	// Type of created stack (1 - swarm, 2 - compose)
+	// Type of created stack:
+	// * 1 - swarm
+	// * 2 - compose
+	// * 3 - kubernetes
 	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
 
 	// URL of a Git repository hosting the Stack file
@@ -213,6 +213,10 @@ type customTemplateFromGitRepositoryPayload struct {
 	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
+	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	TLSSkipVerify bool `example:"false"`
+	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
+	IsComposeFormat bool `example:"false"`
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -232,14 +236,11 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
-	if payload.Type == portainer.KubernetesStack {
-		return errors.New("Creating a Kubernetes custom template from git is not supported")
-	}
-
-	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+	// Platform validation is only for docker related stack (docker standalone and docker swarm)
+	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
-	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
+	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack && payload.Type != portainer.KubernetesStack {
 		return errors.New("Invalid custom template type")
 	}
 	if !isValidNote(payload.Note) {
@@ -249,6 +250,20 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	return validateVariablesDefinitions(payload.Variables)
 }
 
+// @id CustomTemplateCreateRepository
+// @summary Create a custom template
+// @description Create a custom template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body customTemplateFromGitRepositoryPayload true "Required when using method=repository"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /custom_templates/repository [post]
 func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -258,34 +273,44 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:          portainer.CustomTemplateID(customTemplateID),
-		Title:       payload.Title,
-		EntryPoint:  payload.ComposeFilePathInRepository,
-		Description: payload.Description,
-		Note:        payload.Note,
-		Platform:    payload.Platform,
-		Type:        payload.Type,
-		Logo:        payload.Logo,
-		Variables:   payload.Variables,
+		ID:              portainer.CustomTemplateID(customTemplateID),
+		Title:           payload.Title,
+		Description:     payload.Description,
+		Note:            payload.Note,
+		Platform:        payload.Platform,
+		Type:            payload.Type,
+		Logo:            payload.Logo,
+		Variables:       payload.Variables,
+		IsComposeFormat: payload.IsComposeFormat,
 	}
 
-	projectPath := handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
+	getProjectPath := func() string {
+		return handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
+	}
+	projectPath := getProjectPath()
 	customTemplate.ProjectPath = projectPath
 
-	repositoryUsername := payload.RepositoryUsername
-	repositoryPassword := payload.RepositoryPassword
-	if !payload.RepositoryAuthentication {
-		repositoryUsername = ""
-		repositoryPassword = ""
+	gitConfig := &gittypes.RepoConfig{
+		URL:            payload.RepositoryURL,
+		ReferenceName:  payload.RepositoryReferenceName,
+		ConfigFilePath: payload.ComposeFilePathInRepository,
+		TLSSkipVerify:  payload.TLSSkipVerify,
 	}
 
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
-	if err != nil {
-		if err == gittypes.ErrAuthenticationFailure {
-			return nil, fmt.Errorf("invalid git credential")
+	if payload.RepositoryAuthentication {
+		gitConfig.Authentication = &gittypes.GitAuthentication{
+			Username: payload.RepositoryUsername,
+			Password: payload.RepositoryPassword,
 		}
+	}
+
+	commitHash, err := stackutils.DownloadGitRepository(*gitConfig, handler.GitService, getProjectPath)
+	if err != nil {
 		return nil, err
 	}
+
+	gitConfig.ConfigHash = commitHash
+	customTemplate.GitConfig = gitConfig
 
 	isValidProject := true
 	defer func() {
@@ -296,7 +321,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		}
 	}()
 
-	entryPath := filesystem.JoinPaths(projectPath, customTemplate.EntryPoint)
+	entryPath := filesystem.JoinPaths(projectPath, gitConfig.ConfigFilePath)
 
 	exists, err := handler.FileService.FileExists(entryPath)
 	if err != nil || !exists {
@@ -308,6 +333,9 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	}
 
 	if !exists {
+		if payload.Type == portainer.KubernetesStack {
+			return nil, errors.New("Invalid Manifest file, ensure that the Manifest file path is correct")
+		}
 		return nil, errors.New("Invalid Compose file, ensure that the Compose file path is correct")
 	}
 
@@ -330,6 +358,10 @@ type customTemplateFromFileUploadPayload struct {
 	Description string
 	Note        string
 	Platform    portainer.CustomTemplatePlatform
+	// Type of created stack:
+	// * 1 - swarm
+	// * 2 - compose
+	// * 3 - kubernetes
 	Type        portainer.StackType
 	FileContent []byte
 	// Definitions of variables in the stack file
@@ -367,6 +399,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 
 	platform, _ := request.RetrieveNumericMultiPartFormValue(r, "Platform", true)
 	templatePlatform := portainer.CustomTemplatePlatform(platform)
+	// Platform validation is only for docker related stack (docker standalone and docker swarm)
 	if templateType != portainer.KubernetesStack && templatePlatform != portainer.CustomTemplatePlatformLinux && templatePlatform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
@@ -390,6 +423,27 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	return nil
 }
 
+// @id CustomTemplateCreateFile
+// @summary Create a custom template
+// @description Create a custom template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @accept multipart/form-data
+// @produce json
+// @param Title formData string true "Title of the template"
+// @param Description formData string true "Description of the template"
+// @param Note formData string true "A note that will be displayed in the UI. Supports HTML content"
+// @param Platform formData int true "Platform associated to the template (1 - 'linux', 2 - 'windows')" Enums(1,2)
+// @param Type formData int true "Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)" Enums(1,2,3)
+// @param File formData file true "File"
+// @param Logo formData string false "URL of the template's logo" example:"https://portainer.io/img/logo.svg"
+// @param Variables formData string false "A json array of variables definitions" example:"[{\"label\":\"image\",\"description\":\"Image name\",\"defaultValue\":\"nginx:latest\",\"name\":\"image\"}]"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /custom_templates/file [post]
 func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*portainer.CustomTemplate, error) {
 	payload := &customTemplateFromFileUploadPayload{}
 	err := payload.Validate(r)

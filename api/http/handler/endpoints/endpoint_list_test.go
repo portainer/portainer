@@ -22,7 +22,6 @@ type endpointListTest struct {
 }
 
 func Test_EndpointList_AgentVersion(t *testing.T) {
-
 	version1Endpoint := portainer.Endpoint{
 		ID:      1,
 		GroupID: 1,
@@ -39,14 +38,12 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 	noVersionEndpoint := portainer.Endpoint{ID: 3, Type: portainer.AgentOnDockerEnvironment, GroupID: 1}
 	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}
 
-	handler, teardown := setup(t, []portainer.Endpoint{
+	handler := setupEndpointListHandler(t, []portainer.Endpoint{
 		notAgentEnvironments,
 		version1Endpoint,
 		version2Endpoint,
 		noVersionEndpoint,
 	})
-
-	defer teardown()
 
 	type endpointListAgentVersionTest struct {
 		endpointListTest
@@ -111,15 +108,13 @@ func Test_endpointList_edgeFilter(t *testing.T) {
 	regularTrustedEdgeStandard := portainer.Endpoint{ID: 4, UserTrusted: true, Edge: portainer.EnvironmentEdgeSettings{AsyncMode: false}, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
 	regularEndpoint := portainer.Endpoint{ID: 5, GroupID: 1, Type: portainer.DockerEnvironment}
 
-	handler, teardown := setup(t, []portainer.Endpoint{
+	handler := setupEndpointListHandler(t, []portainer.Endpoint{
 		trustedEdgeAsync,
 		untrustedEdgeAsync,
 		regularUntrustedEdgeStandard,
 		regularTrustedEdgeStandard,
 		regularEndpoint,
 	})
-
-	defer teardown()
 
 	type endpointListEdgeTest struct {
 		endpointListTest
@@ -184,9 +179,9 @@ func Test_endpointList_edgeFilter(t *testing.T) {
 	}
 }
 
-func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
+func setupEndpointListHandler(t *testing.T, endpoints []portainer.Endpoint) *Handler {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(t, true, true)
+	_, store := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)
@@ -197,13 +192,13 @@ func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, tear
 	is.NoError(err, "error creating a user")
 
 	bouncer := testhelpers.NewTestRequestBouncer()
-	handler = NewHandler(bouncer, nil)
+
+	handler := NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
-
 	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil)
 
-	return handler, teardown
+	return handler
 }
 
 func buildEndpointListRequest(query string) *http.Request {

@@ -42,11 +42,24 @@ func (tx *StoreTx) EndpointRelation() dataservices.EndpointRelationService {
 
 func (tx *StoreTx) FDOProfile() dataservices.FDOProfileService                 { return nil }
 func (tx *StoreTx) HelmUserRepository() dataservices.HelmUserRepositoryService { return nil }
-func (tx *StoreTx) Registry() dataservices.RegistryService                     { return nil }
-func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService       { return nil }
-func (tx *StoreTx) Role() dataservices.RoleService                             { return nil }
-func (tx *StoreTx) APIKeyRepository() dataservices.APIKeyRepository            { return nil }
-func (tx *StoreTx) Settings() dataservices.SettingsService                     { return nil }
+
+func (tx *StoreTx) Registry() dataservices.RegistryService {
+	return tx.store.RegistryService.Tx(tx.tx)
+}
+
+func (tx *StoreTx) ResourceControl() dataservices.ResourceControlService {
+	return tx.store.ResourceControlService.Tx(tx.tx)
+}
+
+func (tx *StoreTx) Role() dataservices.RoleService {
+	return tx.store.RoleService.Tx(tx.tx)
+}
+
+func (tx *StoreTx) APIKeyRepository() dataservices.APIKeyRepository { return nil }
+
+func (tx *StoreTx) Settings() dataservices.SettingsService {
+	return tx.store.SettingsService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) Snapshot() dataservices.SnapshotService {
 	return tx.store.SnapshotService.Tx(tx.tx)
@@ -59,9 +72,16 @@ func (tx *StoreTx) Tag() dataservices.TagService {
 	return tx.store.TagService.Tx(tx.tx)
 }
 
-func (tx *StoreTx) TeamMembership() dataservices.TeamMembershipService { return nil }
-func (tx *StoreTx) Team() dataservices.TeamService                     { return nil }
-func (tx *StoreTx) TunnelServer() dataservices.TunnelServerService     { return nil }
-func (tx *StoreTx) User() dataservices.UserService                     { return nil }
-func (tx *StoreTx) Version() dataservices.VersionService               { return nil }
-func (tx *StoreTx) Webhook() dataservices.WebhookService               { return nil }
+func (tx *StoreTx) TeamMembership() dataservices.TeamMembershipService {
+	return tx.store.TeamMembershipService.Tx(tx.tx)
+}
+
+func (tx *StoreTx) Team() dataservices.TeamService                 { return nil }
+func (tx *StoreTx) TunnelServer() dataservices.TunnelServerService { return nil }
+
+func (tx *StoreTx) User() dataservices.UserService {
+	return tx.store.UserService.Tx(tx.tx)
+}
+
+func (tx *StoreTx) Version() dataservices.VersionService { return nil }
+func (tx *StoreTx) Webhook() dataservices.WebhookService { return nil }

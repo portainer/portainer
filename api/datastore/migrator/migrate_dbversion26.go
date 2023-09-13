@@ -2,7 +2,7 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/rs/zerolog/log"
@@ -11,7 +11,7 @@ import (
 func (m *Migrator) updateStackResourceControlToDB27() error {
 	log.Info().Msg("updating stack resource controls")
 
-	resourceControls, err := m.resourceControlService.ResourceControls()
+	resourceControls, err := m.resourceControlService.ReadAll()
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (m *Migrator) updateStackResourceControlToDB27() error {
 
 		stack, err := m.stackService.StackByName(stackName)
 		if err != nil {
-			if err == errors.ErrObjectNotFound {
+			if dataservices.IsErrObjectNotFound(err) {
 				continue
 			}
 
@@ -34,7 +34,7 @@ func (m *Migrator) updateStackResourceControlToDB27() error {
 
 		resource.ResourceID = stackutils.ResourceControlID(stack.EndpointID, stack.Name)
 
-		err = m.resourceControlService.UpdateResourceControl(resource.ID, &resource)
+		err = m.resourceControlService.Update(resource.ID, &resource)
 		if err != nil {
 			return err
 		}

@@ -1,14 +1,11 @@
-import { Column } from 'react-table';
+import { columnHelper } from './helper';
 
-import { ToastNotification } from '../types';
-
-export const details: Column<ToastNotification> = {
-  Header: 'Details',
-  accessor: 'details',
+export const details = columnHelper.accessor('details', {
+  header: 'Details',
   id: 'details',
-  disableFilters: true,
-  canHide: true,
-  Cell: ({ value }: { value: string }) => (
-    <div className="whitespace-normal">{value}</div>
-  ),
-};
+  cell: ({ getValue }) => {
+    const value = getValue();
+
+    return <div className="whitespace-normal">{value}</div>;
+  },
+});

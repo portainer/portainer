@@ -1,13 +1,26 @@
-import { InformationPanel } from '@@/InformationPanel';
+import { ReactNode } from 'react';
+
+import betaIcon from '@/assets/ico/beta.svg?c';
+
 import { TextTip } from '@@/Tip/TextTip';
 
-export function BetaAlert() {
+interface Props {
+  message: ReactNode;
+  className?: string;
+  isHtml?: boolean;
+}
+
+export function BetaAlert({ message, className, isHtml }: Props) {
   return (
-    <InformationPanel title="Limited Feature">
-      <TextTip>
-        This feature is currently in beta and is limited to standalone linux
-        edge devices.
-      </TextTip>
-    </InformationPanel>
+    <TextTip icon={betaIcon} className={className}>
+      <div className="text-warning">
+        {isHtml && typeof message === 'string' ? (
+          // eslint-disable-next-line react/no-danger
+          <span dangerouslySetInnerHTML={{ __html: message }} />
+        ) : (
+          message
+        )}
+      </div>
+    </TextTip>
   );
 }
