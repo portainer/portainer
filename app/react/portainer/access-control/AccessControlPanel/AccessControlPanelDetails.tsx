@@ -8,8 +8,6 @@ import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
-import { useCurrentUser } from '@/react/hooks/useUser';
-import { pluralize } from '@/portainer/helpers/strings';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -31,8 +29,6 @@ export function AccessControlPanelDetails({
   resourceControl,
   resourceType,
 }: Props) {
-  const { isAdmin } = useCurrentUser();
-
   const inheritanceMessage = getInheritanceMessage(
     resourceType,
     resourceControl
@@ -44,30 +40,8 @@ export function AccessControlPanelDetails({
     TeamAccesses: restrictedToTeams = [],
   } = resourceControl || {};
 
-  const users = useAuthorizedUsers(
-    restrictedToUsers.map((ra) => ra.UserId),
-    isAdmin
-  );
+  const users = useAuthorizedUsers(restrictedToUsers.map((ra) => ra.UserId));
   const teams = useAuthorizedTeams(restrictedToTeams.map((ra) => ra.TeamId));
-
-  const teamsLength = teams.data ? teams.data.length : 0;
-  const unauthoisedTeams = restrictedToTeams.length - teamsLength;
-
-  let teamsMessage = teams.data && teams.data.join(', ');
-  if (unauthoisedTeams > 0 && teams.isFetched) {
-    teamsMessage += teamsLength > 0 ? ' and' : '';
-    teamsMessage += ` ${unauthoisedTeams} ${pluralize(
-      unauthoisedTeams,
-      'team'
-    )} you are not part of`;
-  }
-
-  const userMessage = isAdmin
-    ? (users.data && users.data.join(', ')) || ''
-    : `${restrictedToUsers.length} ${pluralize(
-        restrictedToUsers.length,
-        'user'
-      )}`;
 
   return (
     <table className="table">
@@ -88,13 +62,17 @@ export function AccessControlPanelDetails({
         {restrictedToUsers.length > 0 && (
           <tr data-cy="access-authorisedUsers">
             <td>Authorized users</td>
-            <td aria-label="authorized-users">{userMessage}</td>
+            <td aria-label="authorized-users">
+              {users.data && users.data.join(', ')}
+            </td>
           </tr>
         )}
         {restrictedToTeams.length > 0 && (
           <tr data-cy="access-authorisedTeams">
             <td>Authorized teams</td>
-            <td aria-label="authorized-teams">{teamsMessage}</td>
+            <td aria-label="authorized-teams">
+              {teams.data && teams.data.join(', ')}
+            </td>
           </tr>
         )}
       </tbody>
