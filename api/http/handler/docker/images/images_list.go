@@ -1,11 +1,11 @@
-package containers
+package images
 
 import (
 	"net/http"
 
 	"github.com/docker/docker/api/types"
-	"github.com/portainer/portainer-ee/api/http/handler/docker"
-	"github.com/portainer/portainer-ee/api/internal/set"
+	"github.com/portainer/portainer/api/http/handler/docker/utils"
+	"github.com/portainer/portainer/api/internal/set"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -15,9 +15,12 @@ type ImageResponse struct {
 	Created  int64    `json:"created"`
 	NodeName string   `json:"nodeName"`
 	ID       string   `json:"id"`
-	Used     bool     `json:"used"`
 	Size     int64    `json:"size"`
 	Tags     []string `json:"tags"`
+
+	// Used is true if the image is used by at least one container
+	// supplied only when withUsage is true
+	Used bool `json:"used"`
 }
 
 // @id dockerImagesList
@@ -34,7 +37,7 @@ type ImageResponse struct {
 // @failure 500 "Internal server error"
 // @router /docker/{environmentId}/images [get]
 func (handler *Handler) imagesList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli, httpErr := docker.GetClient(r, handler.dockerClientFactory)
+	cli, httpErr := utils.GetClient(r, handler.dockerClientFactory)
 	if httpErr != nil {
 		return httpErr
 	}

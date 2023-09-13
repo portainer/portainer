@@ -1,12 +1,12 @@
-package docker
+package utils
 
 import (
 	"net/http"
 
 	dockerclient "github.com/docker/docker/client"
-	portaineree "github.com/portainer/portainer-ee/api"
-	prclient "github.com/portainer/portainer-ee/api/docker/client"
-	"github.com/portainer/portainer-ee/api/http/middlewares"
+	portainer "github.com/portainer/portainer/api"
+	prclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/http/middlewares"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
@@ -17,7 +17,7 @@ func GetClient(r *http.Request, dockerClientFactory *prclient.ClientFactory) (*d
 		return nil, httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
-	agentTargetHeader := r.Header.Get(portaineree.PortainerAgentTargetHeader)
+	agentTargetHeader := r.Header.Get(portainer.PortainerAgentTargetHeader)
 
 	cli, err := dockerClientFactory.CreateClient(endpoint, agentTargetHeader, nil)
 	if err != nil {
