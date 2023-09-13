@@ -17,7 +17,7 @@ function ImageHelperFactory() {
   /**
    *
    * @param {import('@/react/docker/images/queries/useImages').ImagesListResponse[]} images
-   * @returns
+   * @returns {{names: string[]}}}
    */
   function getImagesNamesForDownload(images) {
     var names = images.map(function (image) {
