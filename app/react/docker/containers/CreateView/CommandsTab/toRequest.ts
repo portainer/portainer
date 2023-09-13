@@ -20,14 +20,18 @@ export function toRequest(
     User: values.user,
     WorkingDir: values.workingDir,
     ...getConsoleConfig(values.console),
-  };
+  } satisfies CreateContainerRequest;
 
   if (values.cmd) {
     config.Cmd = commandStringToArray(values.cmd);
+  } else if (values.cmd === null) {
+    delete config.Cmd;
   }
 
   if (values.entrypoint) {
     config.Entrypoint = commandStringToArray(values.entrypoint);
+  } else if (values.entrypoint === null) {
+    delete config.Entrypoint;
   }
 
   return config;
