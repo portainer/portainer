@@ -1,26 +1,23 @@
-import { Filter, List, Trash2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { List } from 'lucide-react';
 
-import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
+import { useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { systemResourcesSettings } from '@/react/kubernetes/datatables/SystemResourcesSettings';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { createPersistedStore, refreshableSettings } from '@@/datatables/types';
-import { Button } from '@@/buttons';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
-import { InputGroup } from '@@/form-components/InputGroup';
-import { Icon } from '@@/Icon';
 import { InsightsBox } from '@@/InsightsBox';
-import { Select } from '@@/form-components/Input';
 
 import { KubernetesStack } from '../../types';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
-import { TableSettings } from './types';
+import { Namespace, TableSettings } from './types';
 import { StacksSettingsMenu } from './StacksSettingsMenu';
+import { NamespaceFilter } from './NamespaceFilter';
+import { TableActions } from './TableActions';
 
 const storageKey = 'kubernetes.applications.stacks';
 
@@ -32,13 +29,6 @@ const settingsStore = createPersistedStore<TableSettings>(
     ...refreshableSettings(set),
   })
 );
-
-interface Namespace {
-  Id: string;
-  Name: string;
-  Yaml: string;
-  IsSystem?: boolean;
-}
 
 interface Props {
   dataset: Array<KubernetesStack>;
@@ -94,23 +84,19 @@ export function ApplicationsStacksDatatable({
           </div>
         </div>
       }
-      renderTableActions={(selectedRows) => (
-        <Authorized authorizations="K8sApplicationsW">
-          <Button
-            disabled={selectedRows.length === 0}
-            color="dangerlight"
-            onClick={() => onRemove(selectedRows)}
-            icon={Trash2}
-            data-cy="k8sApp-removeStackButton"
-          >
-            Remove
-          </Button>
-        </Authorized>
+      renderTableActions={(selectedItems) => (
+        <TableActions selectedItems={selectedItems} onRemove={onRemove} />
       )}
       renderTableSettings={() => <StacksSettingsMenu settings={tableState} />}
-      renderHeaderRightSide={(searchBar, tableActions, tableTitleSettings) => (
-        <>
-          <div className="mr-2">
+      renderSidebar={({ searchBar, tableActions, tableTitleSettings }) => (
+        <div className="inline-flex flex-row-reverse flex-wrap gap-x-5 gap-y-3">
+          {tableTitleSettings}
+
+          {tableActions}
+
+          {searchBar}
+
+          <div className="min-w-[140px]">
             <NamespaceFilter
               namespaces={namespaces}
               value={namespace}
@@ -118,65 +104,9 @@ export function ApplicationsStacksDatatable({
               showSystem={tableState.showSystemResources}
             />
           </div>
-          {searchBar}
-          {tableActions}
-          {tableTitleSettings}
-        </>
+        </div>
       )}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
     />
-  );
-}
-
-function transformNamespaces(namespaces: Namespace[], showSystem: boolean) {
-  return namespaces
-    .filter((ns) => showSystem || !ns.IsSystem)
-    .map(({ Name, IsSystem }) => ({
-      label: IsSystem ? `${Name} - system` : Name,
-      value: Name,
-    }));
-}
-
-function NamespaceFilter({
-  namespaces,
-  value,
-  onChange,
-  showSystem,
-}: {
-  namespaces: Namespace[];
-  value: string;
-  onChange: (value: string) => void;
-  showSystem: boolean;
-}) {
-  const transformedNamespaces = transformNamespaces(namespaces, showSystem);
-
-  // sync value with displayed namespaces
-  useEffect(() => {
-    const names = transformedNamespaces.map((ns) => ns.value);
-    if (value && !names.find((ns) => ns === value)) {
-      onChange(
-        names.length > 0 ? names.find((ns) => ns === 'default') || names[0] : ''
-      );
-    }
-  }, [value, onChange, transformedNamespaces]);
-
-  return (
-    <InputGroup>
-      <InputGroup.Addon>
-        <div className="flex items-center gap-1">
-          <Icon icon={Filter} />
-          Namespace
-        </div>
-      </InputGroup.Addon>
-      <Select
-        className="!h-[30px] py-1"
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-        options={[
-          { label: 'All namespaces', value: '' },
-          ...transformedNamespaces,
-        ]}
-      />
-    </InputGroup>
   );
 }
