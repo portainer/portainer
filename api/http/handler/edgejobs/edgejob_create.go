@@ -288,8 +288,7 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 // @security jwt
 // @produce json
 // @param method query string true "Creation Method" Enums(file, string)
-// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
-// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
+// @param body body object true "for body documentation see the relevant /edge_jobs/create/{method} endpoint"
 // @success 200 {object} portainer.EdgeGroup
 // @failure 503 "Edge compute features are disabled"
 // @failure 500
