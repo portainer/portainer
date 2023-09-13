@@ -16,10 +16,7 @@ import (
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveRouteVariableValue(r, "method")
 	if err != nil {
-		method, err = request.RetrieveQueryParameter(r, "method", true)
-		if err != nil {
-			return httperror.BadRequest("Invalid query parameter: method", err)
-		}
+		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
 	dryrun, _ := request.RetrieveBooleanQueryParameter(r, "dryrun", true)
