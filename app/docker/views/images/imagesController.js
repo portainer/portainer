@@ -164,8 +164,6 @@ angular.module('portainer.docker').controller('ImagesController', [
         ImageService.deleteImage(image.id, force)
           .then(function success() {
             Notifications.success('Image successfully removed', image.id);
-            var index = $scope.images.indexOf(image);
-            $scope.images.splice(index, 1);
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove image');
