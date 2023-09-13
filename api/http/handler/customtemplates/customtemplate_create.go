@@ -484,14 +484,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 // @accept json,multipart/form-data
 // @produce json
 // @param method query string true "method for creating template" Enums(string, file, repository)
-// @param body_string body customTemplateFromFileContentPayload false "Required when using method=string"
-// @param body_repository body customTemplateFromGitRepositoryPayload false "Required when using method=repository"
-// @param Title formData string false "Title of the template. required when method is file"
-// @param Description formData string false "Description of the template. required when method is file"
-// @param Note formData string false "A note that will be displayed in the UI. Supports HTML content"
-// @param Platform formData int false "Platform associated to the template (1 - 'linux', 2 - 'windows'). required when method is file" Enums(1,2)
-// @param Type formData int false "Type of created stack (1 - swarm, 2 - compose), required when method is file" Enums(1,2)
-// @param file formData file false "required when method is file"
+// @param body body object true "for body documentation see the relevant /custom_templates/{method} endpoint"
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

@@ -71,9 +71,7 @@ func (handler *Handler) createSwarmStack(tx dataservices.DataStoreTx, method str
 // @security jwt
 // @produce json
 // @param method query string true "Creation Method" Enums(file,string,repository)
-// @param body_string body edgeStackFromFileUploadPayload true "Required when using method=string"
-// @param body_file body edgeStackFromFileUploadPayload true "Required when using method=file"
-// @param body_repository body edgeStackFromGitRepositoryPayload true "Required when using method=repository"
+// @param body body object true "for body documentation see the relevant /edge_stacks/create/{method} endpoint"
 // @success 200 {object} portainer.EdgeStack
 // @failure 500
 // @failure 503 "Edge compute features are disabled"
