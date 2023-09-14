@@ -12,7 +12,7 @@ import {
   RefreshableTableSettings,
 } from '@@/datatables/types';
 import { Button } from '@@/buttons';
-import { TableSettingsMenu } from '@@/datatables';
+import { TableRow, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
@@ -63,32 +63,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
         <>
           {row.original.Subs &&
             row.original.Subs.map((network, idx) => (
-              <tr
-                key={`${network.Id}-${idx}`}
-                className={clsx({
-                  'datatable-highlighted': row.original.Highlighted,
-                  'datatable-unhighlighted': !row.original.Highlighted,
-                })}
-              >
-                <td />
-                <td>TEST</td>
-                {/* <td colSpan={row.cells.length - 1}>
-                <Link
-                  to="kubernetes.applications.application"
-                  params={{ name: app.Name, namespace: app.ResourcePool }}
-                >
-                  {app.Name}
-                </Link>
-                {KubernetesNamespaceHelper.isSystemNamespace(
-                  app.ResourcePool
-                ) &&
-                  KubernetesApplicationHelper.isExternalApplication(app) && (
-                    <span className="space-left label label-primary image-tag">
-                      external
-                    </span>
-                  )}
-              </td> */}
-              </tr>
+              <TableRow<D> cells={cells} />
             ))}
         </>
       )}
