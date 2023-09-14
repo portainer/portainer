@@ -11,7 +11,6 @@ import { DecoratedVolume } from '../../types';
 import { columnHelper } from './helper';
 import { name } from './name';
 
-
 export function useColumns() {
   const environmentId = useEnvironmentId();
   const isSwarm = useIsSwarm(environmentId);

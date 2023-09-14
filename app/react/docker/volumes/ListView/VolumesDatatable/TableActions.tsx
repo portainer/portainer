@@ -7,7 +7,6 @@ import { Button } from '@@/buttons';
 
 import { DecoratedVolume } from '../types';
 
-
 export function TableActions({
   selectedItems,
   onRemove,
