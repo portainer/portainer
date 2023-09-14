@@ -47,6 +47,9 @@ function config($stateRegistryProvider: StateRegistry) {
         component: 'containerInstancesView',
       },
     },
+    data: {
+      docs: '/user/aci/containers',
+    },
   };
 
   const containerInstance = {
@@ -76,6 +79,9 @@ function config($stateRegistryProvider: StateRegistry) {
       'content@': {
         component: 'dashboardView',
       },
+    },
+    data: {
+      docs: '/user/aci/dashboard',
     },
   };
 

@@ -105,48 +105,7 @@ const definitions: DocumentationDefinitions[] = [
     locationRegex: /#!\/\d+\/kubernetes\/registries/,
     examples: ['#!/1/kubernetes/registries'],
   },
-  {
-    desc: 'Azure ACI / Dashboard',
-    docURL: '/user/aci/dashboard',
-    locationRegex: /#!\/\d+\/azure\/dashboard/,
-    examples: ['#!/26/azure/dashboard'],
-  },
-  {
-    desc: 'Azure ACI / Container instances',
-    docURL: '/user/aci/containers',
-    locationRegex: /#!\/\d+\/azure\/containerinstances/,
-    examples: ['#!/26/azure/containerinstances'],
-  },
-  {
-    desc: 'Edge Compute / Edge Devices',
-    docURL: '/user/edge/devices',
-    locationRegex: /#!\/edge\/devices/,
-    examples: ['#!/edge/devices', '#!/edge/devices/waiting-room'],
-  },
-  {
-    desc: 'Edge Compute / Edge Groups',
-    docURL: '/user/edge/groups',
-    locationRegex: /#!\/edge\/groups/,
-    examples: ['#!/edge/groups', '#!/edge/groups/new'],
-  },
-  {
-    desc: 'Edge Compute / Edge Stacks ',
-    docURL: '/user/edge/stacks',
-    locationRegex: /#!\/edge\/stacks/,
-    examples: ['#!/edge/stacks', '#!/edge/stacks/new'],
-  },
-  {
-    desc: 'Edge Compute / Edge Jobs',
-    docURL: '/user/edge/jobs',
-    locationRegex: /#!\/edge\/jobs/,
-    examples: ['#!/edge/jobs', '#!/edge/jobs/new'],
-  },
-  {
-    desc: 'Edge Compute / Edge Configurations',
-    docURL: '/user/edge/configurations',
-    locationRegex: /#!\/edge\/configurations/,
-    examples: ['#!/edge/configurations', '#!/edge/configurations/new'],
-  },
+
   {
     desc: 'Nomad / Dashboard',
     docURL: '/user/nomad/dashboard',
@@ -288,7 +247,7 @@ export function getDocURL(): Documentation {
   const { hash } = window.location;
 
   let doc: Documentation | undefined = definitions.find((def) =>
-    hash.match(def.locationRegex),
+    hash.match(def.locationRegex)
   );
   if (!doc) {
     doc = DEFAULT_DOC;
