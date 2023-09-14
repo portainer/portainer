@@ -26,23 +26,24 @@ import (
 // @failure 500 "Server error"
 // @router /users [get]
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
-	}
-
-	if !securityContext.IsAdmin {
-		return httperror.Forbidden("Permission denied to access users list", err)
-	}
-
 	users, err := handler.DataStore.User().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	availableUsers := security.FilterUsers(users, securityContext)
+	for i := range availableUsers {
+		hideFields(&availableUsers[i])
+	}
+
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
-		return response.JSON(w, users)
+		return response.JSON(w, availableUsers)
 	}
 
 	// filter out users who do not have access to the specific endpoint
@@ -57,7 +58,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	canAccessEndpoint := make([]portainer.User, 0)
-	for _, user := range users {
+	for _, user := range availableUsers {
 		// the users who have the endpoint authorization
 		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
 			canAccessEndpoint = append(canAccessEndpoint, user)
