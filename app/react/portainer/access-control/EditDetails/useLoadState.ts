@@ -4,7 +4,6 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 export function useLoadState(environmentId?: EnvironmentId) {
   const teams = useTeams(false, environmentId);
-
   const users = useUsers(false, environmentId);
 
   return {
