@@ -3,4 +3,5 @@ import { DockerContainer } from '@/react/docker/containers/types';
 
 export type DecoratedTask = TaskViewModel & {
   Container?: DockerContainer;
+  ServiceName: string;
 };
