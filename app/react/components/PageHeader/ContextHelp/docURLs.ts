@@ -7,30 +7,6 @@ type DocumentationDefinitions = {
 
 const definitions: DocumentationDefinitions[] = [
   {
-    desc: 'Docker / Events',
-    docURL: '/user/docker/events',
-    locationRegex: /#!\/\d+\/docker\/events/,
-    examples: ['#!/10/docker/events'],
-  },
-  {
-    desc: 'Docker / Host / Registries',
-    docURL: '/user/docker/host/registries',
-    locationRegex: /#!\/\d+\/docker\/host\/registries/,
-    examples: ['#!/10/docker/registries'],
-  },
-  {
-    desc: 'Docker / Host / Setup',
-    docURL: '/user/docker/host/setup',
-    locationRegex: /#!\/\d+\/docker\/host\/feat-config/,
-    examples: ['#!/10/docker/feat-config'],
-  },
-  {
-    desc: 'Docker / Host',
-    docURL: '/user/docker/host',
-    locationRegex: /#!\/\d+\/docker\/host/,
-    examples: ['#!/10/docker/host'],
-  },
-  {
     desc: 'Kubernetes / Dashboard',
     docURL: '/user/kubernetes/dashboard',
     locationRegex: /#!\/\d+\/kubernetes\/dashboard/,
@@ -312,7 +288,7 @@ export function getDocURL(): Documentation {
   const { hash } = window.location;
 
   let doc: Documentation | undefined = definitions.find((def) =>
-    hash.match(def.locationRegex)
+    hash.match(def.locationRegex),
   );
   if (!doc) {
     doc = DEFAULT_DOC;

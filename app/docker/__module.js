@@ -168,6 +168,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           component: 'hostView',
         },
       },
+      data: {
+        docs: '/user/docker/host',
+      },
     };
 
     var hostBrowser = {
@@ -188,6 +191,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: './views/events/events.html',
           controller: 'EventsController',
         },
+      },
+      data: {
+        docs: '/user/docker/events',
       },
     };
 
@@ -558,7 +564,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         },
       },
       data: {
-        docs: '/user/docker/swarm/setup',
+        docs: '/user/docker/host/setup',
       },
     };
 
@@ -570,6 +576,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           component: 'dockerFeaturesConfigurationView',
         },
       },
+      data: {
+        docs: '/user/docker/swarm/setup',
+      },
     };
 
     const dockerRegistries = {
@@ -579,6 +588,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         'content@': {
           component: 'endpointRegistriesView',
         },
+      },
+      data: {
+        docs: '/user/docker/host/registries',
       },
     };
 
