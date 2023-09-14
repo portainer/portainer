@@ -3,15 +3,14 @@ import { Search } from 'lucide-react';
 
 import { truncate } from '@/portainer/filters/filters';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
-import { Authorized, useCurrentUser } from '@/react/hooks/useUser';
-import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
-import { isAgentEnvironment } from '@/react/portainer/environments/utils';
+import { Authorized } from '@/react/hooks/useUser';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
 
 import { DecoratedVolume } from '../../types';
+import { getTableMeta } from '../tableMeta';
 
 import { columnHelper } from './helper';
 
@@ -69,8 +68,11 @@ function FilterByUsage<TData extends { Used: boolean }>({
 function Cell({
   getValue,
   row: { original: item },
+  table: {
+    options: { meta },
+  },
 }: CellContext<DecoratedVolume, string>) {
-  const isBrowseVisible = useIsBrowseAllowed();
+  const { isBrowseVisible } = getTableMeta(meta);
   const name = getValue();
 
   return (
@@ -96,17 +98,5 @@ function Cell({
         <span className="label label-warning image-tag ml-2">Unused</span>
       )}
     </>
-  );
-}
-
-function useIsBrowseAllowed() {
-  const environmentQuery = useCurrentEnvironment();
-  const { isAdmin } = useCurrentUser();
-  const env = environmentQuery.data;
-
-  return (
-    !!env &&
-    isAgentEnvironment(env.Type) &&
-    (isAdmin || env.SecuritySettings.allowVolumeBrowserForRegularUsers)
   );
 }

@@ -10,6 +10,7 @@ import {
 } from '@@/datatables/types';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
+import { withMeta } from '@@/datatables/extend-options/withMeta';
 
 import { DecoratedVolume } from '../types';
 
@@ -31,10 +32,12 @@ export function VolumesDatatable({
   dataset,
   onRemove,
   onRefresh,
+  isBrowseVisible,
 }: {
   dataset?: Array<DecoratedVolume>;
   onRemove(items: Array<DecoratedVolume>): void;
   onRefresh(): Promise<void>;
+  isBrowseVisible: boolean;
 }) {
   const tableState = useTableState(store, storageKey);
   useRepeater(tableState.autoRefreshRate, onRefresh);
@@ -60,6 +63,10 @@ export function VolumesDatatable({
           />
         </TableSettingsMenu>
       )}
+      extendTableOptions={withMeta({
+        table: 'volumes',
+        isBrowseVisible,
+      })}
     />
   );
 }
