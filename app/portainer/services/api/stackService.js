@@ -193,7 +193,7 @@ angular.module('portainer.app').factory('StackService', [
         })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            return new StackViewModel(item, item.EndpointId == endpointId);
+            return new StackViewModel(item, item.EndpointId != endpointId);
           });
 
           var externalStacks = data.externalStacks;
