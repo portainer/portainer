@@ -79,7 +79,7 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Execute endpoint pending actions
-	handler.PendingActionsService.Execute(portainer.EndpointID(endpoint.ID))
+	handler.PendingActionsService.Execute(endpoint.ID)
 
 	return response.JSON(w, endpoint)
 }

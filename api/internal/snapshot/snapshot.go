@@ -312,7 +312,7 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 
 	// Run the pending actions
 	if latestEndpointReference.Status == portainer.EndpointStatusUp {
-		pendingActionsService.Execute(portainer.EndpointID(endpoint.ID))
+		pendingActionsService.Execute(endpoint.ID)
 	}
 }
 
