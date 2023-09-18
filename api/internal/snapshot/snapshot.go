@@ -36,7 +36,7 @@ func NewService(
 	dockerSnapshotter portainer.DockerSnapshotter,
 	kubernetesSnapshotter portainer.KubernetesSnapshotter,
 	shutdownCtx context.Context,
-	pendingActionService *pendingactions.PendingActionsService,
+	pendingActionsService *pendingactions.PendingActionsService,
 ) (*Service, error) {
 	interval, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
 	if err != nil {
@@ -50,7 +50,7 @@ func NewService(
 		dockerSnapshotter:         dockerSnapshotter,
 		kubernetesSnapshotter:     kubernetesSnapshotter,
 		shutdownCtx:               shutdownCtx,
-		pendingActionsService:     pendingActionService,
+		pendingActionsService:     pendingActionsService,
 	}, nil
 }
 

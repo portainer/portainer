@@ -459,9 +459,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	authorizationService := authorization.NewService(dataStore)
 	authorizationService.K8sClientFactory = kubernetesClientFactory
 
-	pendingActionService := pendingactions.NewService(dataStore, kubernetesClientFactory, authorizationService, shutdownCtx)
+	pendingActionsService := pendingactions.NewService(dataStore, kubernetesClientFactory, authorizationService, shutdownCtx)
 
-	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx, pendingActionService)
+	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx, pendingActionsService)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing snapshot service")
 	}
@@ -626,7 +626,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		DemoService:                 demoService,
 		UpgradeService:              upgradeService,
 		AdminCreationDone:           adminCreationDone,
-		PendingActionsService:       pendingActionService,
+		PendingActionsService:       pendingActionsService,
 	}
 }
 
