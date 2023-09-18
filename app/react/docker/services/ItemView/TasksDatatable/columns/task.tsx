@@ -33,9 +33,7 @@ function Cell({
   const value = getValue();
   const isAgent = isAgentEnvironment(environmentQuery.data.Type);
 
-  const name = `${serviceName}${
-    item.Slot ? `.${item.Slot}` : ''
-  }${`.${value}`}`;
+  const name = `${serviceName}${item.Slot ? `.${item.Slot}` : ''}.${value}`;
 
   return isAgent && item.Container ? (
     <Link
