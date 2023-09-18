@@ -14,7 +14,7 @@ import {
   getExpandedRowModel,
   TableOptions,
 } from '@tanstack/react-table';
-import { ComponentProps, ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import clsx from 'clsx';
 import _ from 'lodash';
 
@@ -50,10 +50,6 @@ export type PaginationProps =
 export interface Props<D extends DefaultType> extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
-  /**
-   * can be used to customize the sidebar. receives the search bar, table actions and table settings elements.
-   */
-  renderSidebar?: ComponentProps<typeof DatatableHeader>['renderSidebar'];
   renderTableSettings?(instance: TableInstance<D>): ReactNode;
   renderTableActions?(selectedRows: D[]): ReactNode;
   disableSelect?: boolean;
@@ -98,7 +94,6 @@ export function Datatable<D extends DefaultType>({
   totalCount = dataset.length,
   isServerSidePagination = false,
   extendTableOptions = (value) => value,
-  renderSidebar,
 }: Props<D> & PaginationProps) {
   const pageCount = useMemo(
     () => Math.ceil(totalCount / settings.pageSize),
@@ -181,7 +176,6 @@ export function Datatable<D extends DefaultType>({
         description={description}
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
-        renderSidebar={renderSidebar}
       />
 
       <DatatableContent<D>

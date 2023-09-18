@@ -70,33 +70,8 @@ export function ApplicationsStacksDatatable({
       noWidget
       emptyContentLabel="No stack available."
       description={
-        <div className="w-full space-y-2">
-          <SystemResourceDescription
-            showSystemResources={tableState.showSystemResources}
-          />
-
-          <div className="w-fit">
-            <InsightsBox
-              type="slim"
-              header="From 2.18 on, you can filter this view by namespace."
-              insightCloseId="k8s-namespace-filtering"
-            />
-          </div>
-        </div>
-      }
-      renderTableActions={(selectedItems) => (
-        <TableActions selectedItems={selectedItems} onRemove={onRemove} />
-      )}
-      renderTableSettings={() => <StacksSettingsMenu settings={tableState} />}
-      renderSidebar={({ searchBar, tableActions, tableTitleSettings }) => (
-        <div className="inline-flex flex-row-reverse flex-wrap gap-x-5 gap-y-3">
-          {tableTitleSettings}
-
-          {tableActions}
-
-          {searchBar}
-
-          <div className="min-w-[140px]">
+        <div className="w-full">
+          <div className="min-w-[140px] float-right">
             <NamespaceFilter
               namespaces={namespaces}
               value={namespace}
@@ -104,8 +79,26 @@ export function ApplicationsStacksDatatable({
               showSystem={tableState.showSystemResources}
             />
           </div>
+
+          <div className="space-y-2">
+            <SystemResourceDescription
+              showSystemResources={tableState.showSystemResources}
+            />
+
+            <div className="w-fit">
+              <InsightsBox
+                type="slim"
+                header="From 2.18 on, you can filter this view by namespace."
+                insightCloseId="k8s-namespace-filtering"
+              />
+            </div>
+          </div>
         </div>
+      }
+      renderTableActions={(selectedItems) => (
+        <TableActions selectedItems={selectedItems} onRemove={onRemove} />
       )}
+      renderTableSettings={() => <StacksSettingsMenu settings={tableState} />}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
     />
   );

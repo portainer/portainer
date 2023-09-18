@@ -1,7 +1,7 @@
 <div class="datatable">
   <!-- toolbar header actions and settings -->
-  <div ng-if="$ctrl.isPrimary" class="toolBar !flex-col !gap-0">
-    <div class="toolBar w-full !items-start !gap-x-5 !p-0">
+  <div ng-if="$ctrl.isPrimary">
+    <div class="toolBar">
       <div class="toolBarTitle vertical-center">
         <div class="widget-icon space-right">
           <pr-icon icon="'box'"></pr-icon>
@@ -109,12 +109,17 @@
             data-cy="k8sApp-searchApplicationsInput"
           />
         </div>
-
-        <div class="form-group namespaces !mb-0 !mr-0 !h-[30px] min-w-[140px]">
+      </div>
+    </div>
+    <div class="toolBar !pt-0">
+      <div class="w-full">
+        <div class="form-group !h-[30px] min-w-[140px] float-right">
           <div class="input-group">
             <span class="input-group-addon">
-              <pr-icon icon="'filter'" size="'sm'"></pr-icon>
-              Namespace
+              <div className="flex items-center gap-1">
+                <pr-icon icon="'filter'" size="'sm'"></pr-icon>
+                Namespace
+              </div>
             </span>
             <select
               class="form-control !h-[30px] !py-1"
@@ -126,17 +131,18 @@
             </select>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="flex w-full flex-row" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-      <span class="small text-muted vertical-center mt-1">
-        <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-        System resources are hidden, this can be changed in the table settings.
-      </span>
-    </div>
-    <div class="w-full">
-      <div class="w-fit">
-        <insights-box class-name="'mt-2'" type="'slim'" header="'From 2.18 on, you can filter this view by namespace.'" insight-close-id="'k8s-namespace-filtering'"></insights-box>
+
+        <div class="space-y-2">
+          <div class="flex flex-row" authorization="K8sAccessSystemNamespaces" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+            <span class="small vertical-center text-xs">
+              <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+              <span class="text-muted">System resources are hidden, this can be changed in the table settings.</span>
+            </span>
+          </div>
+          <div class="w-fit">
+            <insights-box type="'slim'" header="'From 2.18 on, you can filter this view by namespace.'" insight-close-id="'k8s-namespace-filtering'"></insights-box>
+          </div>
+        </div>
       </div>
     </div>
   </div>
