@@ -12,6 +12,7 @@ export const servicesModule = angular
   .component(
     'dockerServiceTasksDatatable',
     r2a(withUIRouter(withCurrentUser(TasksDatatable)), [
+      'serviceName',
       'dataset',
       'isSlotColumnVisible',
     ])
