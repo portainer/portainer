@@ -64,6 +64,7 @@ import (
 	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/libhelm"
@@ -110,6 +111,7 @@ type Server struct {
 	DemoService                 *demo.Service
 	UpgradeService              upgrade.Service
 	AdminCreationDone           chan struct{}
+	PendingActionsService       *pendingactions.PendingActionsService
 }
 
 // Start starts the HTTP server
@@ -178,12 +180,14 @@ func (server *Server) Start() error {
 	endpointHandler.AuthorizationService = server.AuthorizationService
 	endpointHandler.BindAddress = server.BindAddress
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
+	endpointHandler.PendingActionsService = server.PendingActionsService
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = server.AuthorizationService
 	endpointGroupHandler.DataStore = server.DataStore
+	endpointGroupHandler.PendingActionsService = server.PendingActionsService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.DataStore = server.DataStore

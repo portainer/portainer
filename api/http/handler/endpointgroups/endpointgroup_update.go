@@ -7,7 +7,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/tag"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -156,9 +155,12 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(tx, &endpoint, endpointGroup)
 					if err != nil {
 						// Update flag with endpoint and continue
-						endpoint.PendingActions = utils.GetUpdatedEndpointPendingActions(&endpoint, "CleanNAPWithOverridePolicies", endpointGroup.ID)
-						err = tx.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
-						log.Warn().Err(err).Msgf("Unable to update user authorizations for endpoint (%d) and endpopint group (%d)", endpoint.ID, endpointGroup.ID)
+						handler.PendingActionsService.Create(portainer.PendingActions{
+							EndpointID: endpoint.ID,
+							Action:     "CleanNAPWithOverridePolicies",
+							ActionData: endpointGroup.ID,
+						})
+						log.Warn().Err(err).Msgf("Unable to update user authorizations for endpoint (%d) and endpoint group (%d).", endpoint.ID, endpointGroup.ID)
 					}
 				}
 			}
