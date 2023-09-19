@@ -1,7 +1,7 @@
 package datastore
 
 import (
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
 )
@@ -72,7 +72,7 @@ func dbVersionToSemanticVersion(dbVersion int) string {
 func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
 	// Very old versions of portainer did not have a version bucket, lets set some defaults
 	dbVersion := 24
-	edition := int(portaineree.PortainerCE)
+	edition := int(portainer.PortainerCE)
 	instanceId := ""
 
 	// If we already have a version key, we don't need to migrate
