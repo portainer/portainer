@@ -4,18 +4,18 @@ import { useMemo } from 'react';
 import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
 
 import { buildExpandColumn } from '@@/datatables/expand-column';
-import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
 import { DecoratedNetwork } from '../types';
 
 import { columnHelper } from './helper';
+import { name } from './name';
 
 export function useColumns(isHostColumnVisible?: boolean) {
   return useMemo(
     () =>
       _.compact([
         buildExpandColumn<DecoratedNetwork>(),
-        buildNameColumn<DecoratedNetwork>('Name', '.network'),
+        name,
         columnHelper.accessor((item) => item.StackName || '-', {
           header: 'Stack',
         }),

@@ -62,6 +62,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
       getRowCanExpand={({ original: item }) =>
         !!(item.Subs && item.Subs?.length > 0)
       }
+      isRowSelectable={({ original: item }) => !item.ResourceControl?.System}
       renderSubRow={(row) => (
         <>
           {row.original.Subs && (
