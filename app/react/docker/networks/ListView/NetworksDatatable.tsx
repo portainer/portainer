@@ -1,5 +1,4 @@
 import { Plus, Share2, Trash2 } from 'lucide-react';
-import clsx from 'clsx';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -12,7 +11,7 @@ import {
   RefreshableTableSettings,
 } from '@@/datatables/types';
 import { Button } from '@@/buttons';
-import { TableRow, TableSettingsMenu } from '@@/datatables';
+import { TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
@@ -20,8 +19,9 @@ import { Link } from '@@/Link';
 
 import { useIsSwarm } from '../../proxy/queries/useInfo';
 
-import { DockerNetworkViewModel } from './types';
 import { useColumns } from './columns';
+import { DecoratedNetwork } from './types';
+import { NestedNetworksDatatable } from './NestedNetwordsTable';
 
 const storageKey = 'docker.networks';
 
@@ -35,7 +35,7 @@ const settingsStore = createPersistedStore<TableSettings>(
   })
 );
 
-type DatasetType = Array<DockerNetworkViewModel>;
+type DatasetType = Array<DecoratedNetwork>;
 interface Props {
   dataset: DatasetType;
   onRemove(selectedItems: DatasetType): void;
@@ -43,14 +43,17 @@ interface Props {
 }
 
 export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
-  const environmentId = useEnvironmentId();
   const settings = useTableState(settingsStore, storageKey);
+
+  const environmentId = useEnvironmentId();
   const isSwarm = useIsSwarm(environmentId);
+
   const columns = useColumns(isSwarm);
+
   useRepeater(settings.autoRefreshRate, onRefresh);
 
   return (
-    <ExpandableDatatable<DockerNetworkViewModel>
+    <ExpandableDatatable<DecoratedNetwork>
       settingsManager={settings}
       title="Networks"
       titleIcon={Share2}
@@ -61,10 +64,13 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
       }
       renderSubRow={(row) => (
         <>
-          {row.original.Subs &&
-            row.original.Subs.map((network, idx) => (
-              <TableRow<D> cells={cells} />
-            ))}
+          {row.original.Subs && (
+            <tr>
+              <td colSpan={Number.MAX_SAFE_INTEGER}>
+                <NestedNetworksDatatable dataset={row.original.Subs} />
+              </td>
+            </tr>
+          )}
         </>
       )}
       emptyContentLabel="No networks available."

@@ -6,7 +6,7 @@ import { createOwnershipColumn } from '@/react/docker/components/datatable/creat
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
-import { DockerNetworkViewModel } from '../types';
+import { DecoratedNetwork } from '../types';
 
 import { columnHelper } from './helper';
 
@@ -14,8 +14,8 @@ export function useColumns(isHostColumnVisible?: boolean) {
   return useMemo(
     () =>
       _.compact([
-        buildExpandColumn<DockerNetworkViewModel>(),
-        buildNameColumn<DockerNetworkViewModel>('Name', '.network'),
+        buildExpandColumn<DecoratedNetwork>(),
+        buildNameColumn<DecoratedNetwork>('Name', '.network'),
         columnHelper.accessor((item) => item.StackName || '-', {
           header: 'Stack',
         }),
@@ -29,25 +29,25 @@ export function useColumns(isHostColumnVisible?: boolean) {
           header: 'IPAM Driver',
         }),
         columnHelper.accessor(
-          (item) => item.IPAM?.IPV4Configs[0]?.Subnet ?? '-',
+          (item) => item.IPAM?.IPV4Configs?.[0]?.Subnet ?? '-',
           {
             header: 'IPV4 IPAM Subnet',
           }
         ),
         columnHelper.accessor(
-          (item) => item.IPAM?.IPV4Configs[0]?.Gateway ?? '-',
+          (item) => item.IPAM?.IPV4Configs?.[0]?.Gateway ?? '-',
           {
             header: 'IPV4 IPAM Gateway',
           }
         ),
         columnHelper.accessor(
-          (item) => item.IPAM?.IPV6Configs[0]?.Subnet ?? '-',
+          (item) => item.IPAM?.IPV6Configs?.[0]?.Subnet ?? '-',
           {
             header: 'IPV6 IPAM Subnet',
           }
         ),
         columnHelper.accessor(
-          (item) => item.IPAM?.IPV6Configs[0]?.Gateway ?? '-',
+          (item) => item.IPAM?.IPV6Configs?.[0]?.Gateway ?? '-',
           {
             header: 'IPV6 IPAM Gateway',
           }
@@ -56,7 +56,7 @@ export function useColumns(isHostColumnVisible?: boolean) {
           columnHelper.accessor('NodeName', {
             header: 'Node',
           }),
-        createOwnershipColumn<DockerNetworkViewModel>(),
+        createOwnershipColumn<DecoratedNetwork>(),
       ]),
     [isHostColumnVisible]
   );
