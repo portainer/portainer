@@ -1,11 +1,11 @@
-import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
+import { IPAMConfig } from 'docker-types/generated/1.41';
 
-import { DockerNetwork } from '../types';
+import { NetworkViewModel } from '@/docker/models/network';
 
-export type DockerNetworkViewModel = DockerNetwork & {
-  StackName?: string;
-  ResourceControl?: ResourceControlViewModel;
-  NodeName?: string;
-  Subs?: DockerNetworkViewModel[];
-  Highlighted: boolean;
+export type DecoratedNetwork = NetworkViewModel & {
+  Subs?: DecoratedNetwork[];
+  IPAM: NetworkViewModel['IPAM'] & {
+    IPV4Configs?: Array<IPAMConfig>;
+    IPV6Configs?: Array<IPAMConfig>;
+  };
 };
