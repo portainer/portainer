@@ -1,5 +1,6 @@
 // Disabled StackId , because of the following error:
 // https://github.com/portainer/portainer/issues/10235
+// https://github.com/portainer/portainer/issues/10340
 // import { StackId } from '@/react/common/stacks/types';
 import { useGitRefs } from '@/react/portainer/gitops/queries/useGitRefs';
 
@@ -13,9 +14,8 @@ export function RefSelector({
   model,
   value,
   onChange,
-  isUrlValid,
-} // stackId,
-: {
+  isUrlValid, // stackId,
+}: {
   model: RefFieldModel;
   value: string;
   // stackId?: StackId;
