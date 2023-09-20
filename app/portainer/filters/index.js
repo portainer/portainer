@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import { ownershipIcon } from '@/react/docker/components/datatables/createOwnershipColumn';
+import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
 import {
   arrayToStr,
   environmentTypeIcon,
