@@ -87,7 +87,7 @@
 
   --orange-1: #e86925;
 
-  --BE-only: var(--ui-warning-7);
+  --BE-only: var(--ui-gray-6);
 
   --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
   --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
@@ -259,8 +259,7 @@
 
 /* Dark Theme */
 [theme='dark'] {
-  --BE-only: var(--ui-blue-8);
-  --bg-BE-only: rgba(225, 223, 223, 0.08);
+  --BE-only: var(--ui-gray-6);
 
   --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
   --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
@@ -434,6 +433,7 @@
 
 /* High Contrast Theme */
 [theme='highcontrast'] {
+  --BE-only: var(--ui-gray-6);
   --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
   --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
   --text-log-viewer-color-json-yellow: var(--text-log-viewer-color);

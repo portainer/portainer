@@ -36,9 +36,5 @@
 }
 
 .tooltip-beteaser {
-  @apply text-warning-5 th-dark:text-blue-8;
-}
-
-.tooltip-beteaser:hover {
-  @apply text-warning-5 th-dark:text-blue-8;
+  @apply text-blue-8 hover:text-blue-9;
 }
