@@ -26,6 +26,7 @@ class KubernetesCreateResourcePoolController {
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
+    this.EndpointService = EndpointService;
     this.LBQuotaFeatureId = FeatureId.K8S_RESOURCE_POOL_LB_QUOTA;
 
     this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
@@ -175,7 +176,7 @@ class KubernetesCreateResourcePoolController {
   $onInit() {
     return this.$async(async () => {
       try {
-        const endpoint = this.endpoint;
+        const endpoint = await this.EndpointService.endpoint(this.endpoint.Id);
         this.defaults = KubernetesResourceQuotaDefaults;
         this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
         this.formValues.EndpointId = this.endpoint.Id;

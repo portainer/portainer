@@ -37,17 +37,4 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-sm-12">
-    <nodes-datatable
-      title-text="Nodes"
-      title-icon="trello"
-      dataset="nodes"
-      table-key="nodes"
-      order-by="Hostname"
-      show-ip-address-column="applicationState.endpoint.apiVersion >= 1.25"
-      access-to-node-details="isAdmin"
-      refresh-callback="getNodes"
-    ></nodes-datatable>
-  </div>
-</div>
+<nodes-datatable dataset="nodes" is-ip-column-visible="applicationState.endpoint.apiVersion >= 1.25" have-access-to-node="isAdmin" on-refresh="(getNodes)"></nodes-datatable>

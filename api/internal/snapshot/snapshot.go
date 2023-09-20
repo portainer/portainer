@@ -10,9 +10,8 @@ import (
 	"github.com/portainer/portainer/api/agent"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/utils"
-	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/pendingactions"
 
 	"github.com/rs/zerolog/log"
 )
@@ -27,10 +26,18 @@ type Service struct {
 	dockerSnapshotter         portainer.DockerSnapshotter
 	kubernetesSnapshotter     portainer.KubernetesSnapshotter
 	shutdownCtx               context.Context
+	pendingActionsService     *pendingactions.PendingActionsService
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
+func NewService(
+	snapshotIntervalFromFlag string,
+	dataStore dataservices.DataStore,
+	dockerSnapshotter portainer.DockerSnapshotter,
+	kubernetesSnapshotter portainer.KubernetesSnapshotter,
+	shutdownCtx context.Context,
+	pendingActionsService *pendingactions.PendingActionsService,
+) (*Service, error) {
 	interval, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
 	if err != nil {
 		return nil, err
@@ -43,6 +50,7 @@ func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStor
 		dockerSnapshotter:         dockerSnapshotter,
 		kubernetesSnapshotter:     kubernetesSnapshotter,
 		shutdownCtx:               shutdownCtx,
+		pendingActionsService:     pendingActionsService,
 	}, nil
 }
 
@@ -263,7 +271,7 @@ func (service *Service) snapshotEndpoints() error {
 		snapshotError := service.SnapshotEndpoint(&endpoint)
 
 		service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			updateEndpointStatus(tx, &endpoint, snapshotError)
+			updateEndpointStatus(tx, &endpoint, snapshotError, service.pendingActionsService)
 			return nil
 		})
 	}
@@ -271,7 +279,7 @@ func (service *Service) snapshotEndpoints() error {
 	return nil
 }
 
-func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, snapshotError error) {
+func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, snapshotError error, pendingActionsService *pendingactions.PendingActionsService) {
 	latestEndpointReference, err := tx.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
 		log.Debug().
@@ -304,7 +312,7 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 
 	// Run the pending actions
 	if latestEndpointReference.Status == portainer.EndpointStatusUp {
-		utils.RunPendingActions(latestEndpointReference, tx, authorization.NewService(tx))
+		pendingActionsService.Execute(endpoint.ID)
 	}
 }
 

@@ -113,6 +113,14 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Username = payload.Username
 	}
 
+	if payload.Password != "" && payload.NewPassword == "" {
+		if tokenData.Role == portainer.AdministratorRole {
+			return httperror.BadRequest("Existing password field specified without new password field.", errors.New("To change the password as an admin, you only need 'newPassword' in your request"))
+		}
+
+		return httperror.BadRequest("Existing password field specified without new password field.", errors.New("To change the password, you must include both 'password' and 'newPassword' in your request"))
+	}
+
 	if payload.NewPassword != "" {
 		// Non-admins need to supply the previous password
 		if tokenData.Role != portainer.AdministratorRole {

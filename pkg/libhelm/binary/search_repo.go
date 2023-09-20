@@ -57,7 +57,8 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		// I'm seeing 3 - 4s over wifi.
 		// Give ample time but timeout for now.  Can be improved in the future
 		client = &http.Client{
-			Timeout: 60 * time.Second,
+			Timeout:   60 * time.Second,
+			Transport: http.DefaultTransport,
 		}
 	}
 
