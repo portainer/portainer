@@ -30,7 +30,7 @@ div.limited-be {
 }
 
 .limited-be-content {
-  @apply bg-gray-6/50 opacity-50 text-xs p-2.5;
+  @apply border-gray-6 p-2.5 text-xs opacity-50;
 }
 
 .limited-be-link {
