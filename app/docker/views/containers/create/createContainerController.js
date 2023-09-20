@@ -124,7 +124,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function handleEnvVarsChange(value) {
       return $scope.$evalAsync(() => {
-        console.log({ value });
         $scope.formValues.envVars = value;
       });
     }
