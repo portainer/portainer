@@ -34,3 +34,15 @@ type Patch = {
 }[];
 
 export type ApplicationPatch = Patch | RawExtension;
+
+export type KubernetesStack = {
+  Name: string;
+  ResourcePool: string;
+  Applications: Array<
+    Application & {
+      Name: string;
+      ResourcePool: string;
+    }
+  >;
+  Highlighted: boolean;
+};

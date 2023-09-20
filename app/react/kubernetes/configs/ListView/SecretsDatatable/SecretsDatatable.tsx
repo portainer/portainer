@@ -91,17 +91,12 @@ export function SecretsDatatable() {
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings
-            settings={tableState}
-            hideShowSystemResources={!canAccessSystemResources}
-          />
+          <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
       description={
         <SystemResourceDescription
-          showSystemResources={
-            tableState.showSystemResources || !canAccessSystemResources
-          }
+          showSystemResources={tableState.showSystemResources}
         />
       }
     />
