@@ -434,13 +434,12 @@
             <!-- !tab-labels -->
             <!-- tab-env -->
             <div class="tab-pane" id="env">
-              <div class="form-horizontal">
-                <environment-variables-panel
-                  values="formValues.Env"
-                  explanation="'These values will be applied to the container when deployed'"
-                  on-change="(handleEnvVarChange)"
-                ></environment-variables-panel>
-              </div>
+              <docker-create-container-env-vars-tab
+                ng-if="state.containerIsLoaded"
+                values="formValues.envVars"
+                api-version="applicationState.endpoint.apiVersion"
+                on-change="(handleEnvVarsChange)"
+              ></docker-create-container-env-vars-tab>
             </div>
             <!-- !tab-env -->
             <!-- tab-restart-policy -->

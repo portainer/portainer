@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 
-import * as envVarsUtils from '@/react/components/form-components/EnvironmentVariablesFieldset/utils';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 import { confirmDestructive } from '@@/modals/confirm';
@@ -13,6 +12,7 @@ import { AccessControlFormData } from '@/portainer/components/accessControlForm/
 import { ContainerDetailsViewModel } from '@/docker/models/container';
 
 import './createcontainer.css';
+import { envVarsTabUtils } from '@/react/docker/containers/CreateView/EnvVarsTab';
 
 angular.module('portainer.docker').controller('CreateContainerController', [
   '$q',
@@ -89,12 +89,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       MemoryLimit: 0,
       MemoryReservation: 0,
       ShmSize: 64,
-      Env: [],
       NodeName: null,
       capabilities: [],
       Sysctls: [],
       RegistryModel: new PorImageRegistryModel(),
       commands: commandsTabUtils.getDefaultViewModel(),
+      envVars: envVarsTabUtils.getDefaultViewModel(),
     };
 
     $scope.extraNetworks = {};
@@ -114,10 +114,18 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.handlePrivilegedChange = handlePrivilegedChange;
     $scope.handleInitChange = handleInitChange;
     $scope.handleCommandsChange = handleCommandsChange;
+    $scope.handleEnvVarsChange = handleEnvVarsChange;
 
     function handleCommandsChange(commands) {
       return $scope.$evalAsync(() => {
         $scope.formValues.commands = commands;
+      });
+    }
+
+    function handleEnvVarsChange(value) {
+      return $scope.$evalAsync(() => {
+        console.log({ value });
+        $scope.formValues.envVars = value;
       });
     }
 
@@ -149,11 +157,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       return $scope.$evalAsync(() => {
         $scope.config.HostConfig.Init = checked;
       });
-    }
-
-    $scope.handleEnvVarChange = handleEnvVarChange;
-    function handleEnvVarChange(value) {
-      $scope.formValues.Env = value;
     }
 
     $scope.refreshSlider = function () {
@@ -279,10 +282,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       config.ExposedPorts = {};
       _.forEach(bindings, (_, key) => (config.ExposedPorts[key] = {}));
       config.HostConfig.PortBindings = bindings;
-    }
-
-    function prepareEnvironmentVariables(config) {
-      config.Env = envVarsUtils.convertToArrayOfStrings($scope.formValues.Env);
     }
 
     function prepareVolumes(config) {
@@ -462,11 +461,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     function prepareConfiguration() {
       var config = angular.copy($scope.config);
       config = commandsTabUtils.toRequest(config, $scope.formValues.commands);
+      config = envVarsTabUtils.toRequest(config, $scope.formValues.envVars);
 
       prepareNetworkConfig(config);
       prepareImageConfig(config);
       preparePortBindings(config);
-      prepareEnvironmentVariables(config);
       prepareVolumes(config);
       prepareLabels(config);
       prepareDevices(config);
@@ -559,10 +558,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         }
         $scope.config.HostConfig.ExtraHosts = [];
       }
-    }
-
-    function loadFromContainerEnvironmentVariables() {
-      $scope.formValues.Env = envVarsUtils.parseArrayOfStrings($scope.config.Env);
     }
 
     function loadFromContainerLabels() {
@@ -687,11 +682,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
 
           $scope.formValues.commands = commandsTabUtils.toViewModel(d);
+          $scope.formValues.envVars = envVarsTabUtils.toViewModel(d);
 
           loadFromContainerPortBindings(d);
           loadFromContainerVolumes(d);
           loadFromContainerNetworkConfig(d);
-          loadFromContainerEnvironmentVariables(d);
+
           loadFromContainerLabels(d);
           loadFromContainerDevices(d);
           loadFromContainerDeviceRequests(d);
