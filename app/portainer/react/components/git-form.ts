@@ -68,7 +68,7 @@ export const gitFormModule = angular
       'error',
       'model',
       'onChange',
-      'stackId',
+      // 'stackId',
       'value',
       'isUrlValid',
     ])

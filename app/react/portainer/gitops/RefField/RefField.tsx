@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactNode } from 'react';
 import { SchemaOf, string } from 'yup';
 
-import { StackId } from '@/react/common/stacks/types';
+// import { StackId } from '@/react/common/stacks/types';
 import { useStateWrapper } from '@/react/hooks/useStateWrapper';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -19,7 +19,7 @@ interface Props {
   model: RefFieldModel;
   error?: string;
   isUrlValid: boolean;
-  stackId?: StackId;
+  // stackId?: StackId;
 }
 
 export function RefField({
@@ -28,8 +28,8 @@ export function RefField({
   model,
   error,
   isUrlValid,
-  stackId,
-}: Props) {
+} // stackId,
+: Props) {
   const [inputValue, updateInputValue] = useStateWrapper(value, onChange);
 
   return isBE ? (
@@ -48,7 +48,7 @@ export function RefField({
         onChange={onChange}
         model={model}
         isUrlValid={isUrlValid}
-        stackId={stackId}
+        // stackId={stackId}
       />
     </Wrapper>
   ) : (
