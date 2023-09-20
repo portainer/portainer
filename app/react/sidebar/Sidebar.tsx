@@ -25,7 +25,7 @@ export function Sidebar() {
     return null;
   }
 
-  const { EnableEdgeComputeFeatures, LogoURL } = settingsQuery.data;
+  const { LogoURL } = settingsQuery.data;
 
   return (
     /* in the future (when we remove r2a) this should wrap the whole app - to change root styles */
@@ -50,7 +50,7 @@ export function Sidebar() {
                 data-cy="portainerSidebar-home"
               />
               <EnvironmentSidebar />
-              {isAdmin && EnableEdgeComputeFeatures && <EdgeComputeSidebar />}
+              {isAdmin && <EdgeComputeSidebar />}
               <SettingsSidebar isAdmin={isAdmin} isTeamLeader={isTeamLeader} />
             </ul>
           </div>
