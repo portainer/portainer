@@ -29,7 +29,7 @@ export function BEFeatureIndicator({
   }
   return (
     <a
-      className={clsx('be-indicator vertical-center', className)}
+      className={clsx('be-indicator vertical-center text-xs', className)}
       href={url}
       target="_blank"
       rel="noopener noreferrer"

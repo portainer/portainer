@@ -81,7 +81,7 @@ export function KubeConfigTeaserForm() {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
-                className="wizard-connect-button"
+                className="wizard-connect-button !ml-0"
                 loadingText="Connecting environment..."
                 isLoading={false}
                 disabled

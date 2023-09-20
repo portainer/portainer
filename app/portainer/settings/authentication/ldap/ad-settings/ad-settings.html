@@ -1,9 +1,6 @@
 <ng-form class="ad-settings" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-class="limited-be">
-  <div class="overlay">
-    <div class="limited-be-link vertical-center"
-      ><be-feature-indicator feature="$ctrl.limitedFeatureId"></be-feature-indicator
-      ><portainer-tooltip message="'This feature is currently limited to Business Edition users only. '"></portainer-tooltip
-    ></div>
+  <div>
+    <div class="limited-be-link vertical-center"><be-feature-indicator feature="$ctrl.limitedFeatureId"></be-feature-indicator></div>
     <div class="limited-be-content">
       <auto-user-provision-toggle ng-model="$ctrl.settings.AutoCreateUsers">
         <field-description>

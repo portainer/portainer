@@ -71,7 +71,6 @@ export const ngModule = angular
       'message',
       'buttonText',
       'className',
-      'icon',
       'buttonClassName',
     ])
   )
