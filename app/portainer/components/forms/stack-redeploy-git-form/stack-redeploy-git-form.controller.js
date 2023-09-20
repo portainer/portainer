@@ -179,6 +179,14 @@ class StackRedeployGitFormController {
     });
   }
 
+  disablePullAndRedeployButton() {
+    return this.isSubmitButtonDisabled() || this.state.hasUnsavedChanges || !this.redeployGitForm.$valid;
+  }
+
+  disableSaveSettingsButton() {
+    return this.isSubmitButtonDisabled() || !this.state.hasUnsavedChanges || !this.redeployGitForm.$valid;
+  }
+
   isSubmitButtonDisabled() {
     return this.state.inProgress || this.state.redeployInProgress;
   }
