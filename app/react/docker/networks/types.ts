@@ -32,7 +32,7 @@ export type NetworkResponseContainers = Record<
   NetworkResponseContainer
 >;
 
-export type DockerNetwork = {
+export interface DockerNetwork {
   Name: string;
   Id: NetworkId;
   Driver: string;
@@ -56,4 +56,4 @@ export type DockerNetwork = {
   ConfigOnly: boolean;
   Created: string;
   EnableIPv6: boolean;
-};
+}
