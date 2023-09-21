@@ -202,7 +202,7 @@
           <li ng-if="areContainerCapabilitiesEnabled" class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
-        <div class="form-horizontal">
+        <div class="form-horizontal" ng-if="state.containerIsLoaded">
           <div class="tab-content">
             <!-- tab-command -->
             <div class="tab-pane active" id="command">
@@ -220,122 +220,10 @@
               </docker-create-container-volumes-tab>
             </div>
 
-            <!-- tab-network -->
             <div class="tab-pane" id="network">
-              <form class="form-horizontal" style="margin-top: 15px">
-                <div class="form-group" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE'">
-                  <div class="col-sm-12">
-                    <span class="small text-muted">You don't have any shared networks. Head over to the <a ui-sref="docker.networks">networks view</a> to create one.</span>
-                  </div>
-                </div>
-                <!-- network-input -->
-                <div class="form-group">
-                  <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
-                  <div class="col-sm-9">
-                    <select
-                      class="form-control"
-                      ng-options="net.Name as net.Name for net in availableNetworks"
-                      ng-model="config.HostConfig.NetworkMode"
-                      id="container_network"
-                      ng-change="resetNetworkConfig()"
-                    >
-                      <option selected disabled hidden value="">Select a network</option>
-                    </select>
-                  </div>
-                </div>
-                <!-- !network-input -->
-                <!-- container-name-input -->
-                <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
-                  <label for="container_network_container" class="col-sm-2 col-lg-1 control-label text-left">Container</label>
-                  <div class="col-sm-9">
-                    <select ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
-                      <option selected disabled hidden value="">Select a container</option>
-                    </select>
-                  </div>
-                </div>
-                <!-- !container-name-input -->
-                <!-- hostname-input -->
-                <div class="form-group">
-                  <label for="container_hostname" class="col-sm-2 col-lg-1 control-label text-left">Hostname</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="config.Hostname" id="container_hostname" placeholder="e.g. web01" />
-                  </div>
-                </div>
-                <!-- !hostname-input -->
-                <!-- domainname-input -->
-                <div class="form-group">
-                  <label for="container_domainname" class="col-sm-2 col-lg-1 control-label text-left">Domain Name</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="config.Domainname" id="container_domainname" placeholder="e.g. example.com" />
-                  </div>
-                </div>
-                <!-- !domainname -->
-                <!-- mac-address-input -->
-                <div class="form-group">
-                  <label for="container_macaddress" class="col-sm-2 col-lg-1 control-label text-left">Mac Address</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="formValues.MacAddress" id="container_macaddress" placeholder="e.g. 12-34-56-78-9a-bc" />
-                  </div>
-                </div>
-                <!-- !mac-address-input -->
-                <!-- ipv4-input -->
-                <div class="form-group">
-                  <label for="container_ipv4" class="col-sm-2 col-lg-1 control-label text-left">IPv4 Address</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="formValues.IPv4" id="container_ipv4" placeholder="e.g. 172.20.0.7" />
-                  </div>
-                </div>
-                <!-- !ipv4-input -->
-                <!-- ipv6-input -->
-                <div class="form-group">
-                  <label for="container_ipv6" class="col-sm-2 col-lg-1 control-label text-left">IPv6 Address</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="formValues.IPv6" id="container_ipv6" placeholder="e.g. a:b:c:d::1234" />
-                  </div>
-                </div>
-                <!-- !ipv6-input -->
-                <!-- dns-primary-input -->
-                <div class="form-group">
-                  <label for="container_dns_primary" class="col-sm-2 col-lg-1 control-label text-left">Primary DNS Server</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="formValues.DnsPrimary" id="container_dns_primary" placeholder="e.g. 1.1.1.1, 2606:4700:4700::1111" />
-                  </div>
-                </div>
-                <!-- !dns-primary-input -->
-                <!-- dns-secondary-input -->
-                <div class="form-group">
-                  <label for="container_dns_secondary" class="col-sm-2 col-lg-1 control-label text-left">Secondary DNS Server</label>
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control" ng-model="formValues.DnsSecondary" id="container_dns_secondary" placeholder="e.g. 1.0.0.1, 2606:4700:4700::1001" />
-                  </div>
-                </div>
-                <!-- !dns-secondary-input -->
-                <!-- extra-hosts-variables -->
-                <div class="form-group">
-                  <div class="col-sm-12" style="margin-top: 5px">
-                    <label class="control-label text-left">Hosts file entries</label>
-                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addExtraHost()">
-                      <pr-icon icon="'plus'" mode="'alt'"></pr-icon> add additional entry
-                    </span>
-                  </div>
-                  <!-- extra-hosts-input-list -->
-                  <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                    <div ng-repeat="variable in formValues.ExtraHosts" style="margin-top: 2px">
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon">value</span>
-                        <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
-                      </div>
-                      <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                        <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- !extra-hosts-input-list -->
-                </div>
-                <!-- !extra-hosts-variables -->
-              </form>
+              <docker-create-container-network-tab values="formValues.network" on-change="(onNetworkChange)"> </docker-create-container-network-tab>
             </div>
-            <!-- !tab-network -->
+
             <!-- tab-labels -->
             <div class="tab-pane" id="labels">
               <form class="form-horizontal" style="margin-top: 15px">

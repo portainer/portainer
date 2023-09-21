@@ -1,6 +1,6 @@
 interface Filters {
   /* dangling=<boolean> When set to true (or 1), returns all networks that are not in use by a container. When set to false (or 0), only networks that are in use by one or more containers are returned. */
-  dangling?: boolean[];
+  dangling?: [boolean];
   // Matches a network's driver
   driver?: string[];
   // Matches all or part of a network ID
