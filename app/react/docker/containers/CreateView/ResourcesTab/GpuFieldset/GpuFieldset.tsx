@@ -6,20 +6,13 @@ import {
   OnChangeValue,
 } from 'react-select/dist/declarations/src/types';
 import { OptionProps } from 'react-select/dist/declarations/src/components/Option';
-import { array, bool, object, SchemaOf, string } from 'yup';
-import { DeviceRequest } from 'docker-types/generated/1.41';
 
 import { Select } from '@@/form-components/ReactSelect';
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
-export interface Values {
-  enabled: boolean;
-  useSpecific: boolean;
-  selectedGPUs: string[];
-  capabilities: string[];
-}
+import { Values } from './types';
 
 interface GpuOption {
   value: string;
@@ -27,7 +20,7 @@ interface GpuOption {
   description?: string;
 }
 
-export interface GPU {
+interface GPU {
   value: string;
   name: string;
 }
@@ -75,33 +68,7 @@ const NvidiaCapabilitiesOptions = [
   },
 ] as const;
 
-function Option(props: OptionProps<GpuOption, true>) {
-  const {
-    data: { value, description },
-  } = props;
-
-  return (
-    <div>
-      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-      <components.Option {...props}>
-        {`${value} - ${description}`}
-      </components.Option>
-    </div>
-  );
-}
-
-function MultiValueRemove(props: MultiValueRemoveProps<GpuOption, true>) {
-  const {
-    selectProps: { value },
-  } = props;
-  if (value && (value as MultiValue<GpuOption>).length === 1) {
-    return null;
-  }
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <components.MultiValueRemove {...props} />;
-}
-
-export function Gpu({
+export function GpuFieldset({
   values,
   onChange,
   gpus = [],
@@ -125,43 +92,6 @@ export function Gpu({
 
     return options;
   }, [gpus, usedGpus, usedAllGpus]);
-
-  function onChangeValues(key: string, newValue: boolean | string[]) {
-    const newValues = {
-      ...values,
-      [key]: newValue,
-    };
-    onChange(newValues);
-  }
-
-  function toggleEnableGpu() {
-    onChangeValues('enabled', !values.enabled);
-  }
-
-  function onChangeSelectedGpus(
-    newValue: OnChangeValue<GpuOption, true>,
-    actionMeta: ActionMeta<GpuOption>
-  ) {
-    let { useSpecific } = values;
-    let selectedGPUs = newValue.map((option) => option.value);
-
-    if (actionMeta.action === 'select-option') {
-      useSpecific = actionMeta.option?.value !== 'all';
-      selectedGPUs = selectedGPUs.filter((value) =>
-        useSpecific ? value !== 'all' : value === 'all'
-      );
-    }
-
-    const newValues = { ...values, selectedGPUs, useSpecific };
-    onChange(newValues);
-  }
-
-  function onChangeSelectedCaps(newValue: OnChangeValue<GpuOption, true>) {
-    onChangeValues(
-      'capabilities',
-      newValue.map((option) => option.value)
-    );
-  }
 
   const gpuCmd = useMemo(() => {
     const devices = values.selectedGPUs.join(',');
@@ -252,68 +182,67 @@ export function Gpu({
       )}
     </div>
   );
-}
 
-export function toViewModel(deviceRequests: Array<DeviceRequest> = []): Values {
-  const deviceRequest = deviceRequests.find(
-    (o) => o.Driver === 'nvidia' || o.Capabilities?.[0]?.[0] === 'gpu'
-  );
-  if (!deviceRequest) {
-    return {
-      enabled: false,
-      useSpecific: false,
-      selectedGPUs: ['all'],
-      capabilities: ['compute', 'utility'],
+  function onChangeValues(key: string, newValue: boolean | string[]) {
+    const newValues = {
+      ...values,
+      [key]: newValue,
     };
+    onChange(newValues);
   }
 
-  const useSpecific = deviceRequest.Count !== -1;
+  function toggleEnableGpu() {
+    onChangeValues('enabled', !values.enabled);
+  }
 
-  return {
-    enabled: true,
-    useSpecific,
-    selectedGPUs: useSpecific ? deviceRequest.DeviceIDs || [] : ['all'],
-    capabilities: deviceRequest.Capabilities?.[0] || [],
-  };
+  function onChangeSelectedGpus(
+    newValue: OnChangeValue<GpuOption, true>,
+    actionMeta: ActionMeta<GpuOption>
+  ) {
+    let { useSpecific } = values;
+    let selectedGPUs = newValue.map((option) => option.value);
+
+    if (actionMeta.action === 'select-option') {
+      useSpecific = actionMeta.option?.value !== 'all';
+      selectedGPUs = selectedGPUs.filter((value) =>
+        useSpecific ? value !== 'all' : value === 'all'
+      );
+    }
+
+    const newValues = { ...values, selectedGPUs, useSpecific };
+    onChange(newValues);
+  }
+
+  function onChangeSelectedCaps(newValue: OnChangeValue<GpuOption, true>) {
+    onChangeValues(
+      'capabilities',
+      newValue.map((option) => option.value)
+    );
+  }
 }
 
-export function toRequest(
-  deviceRequests: Array<DeviceRequest>,
-  gpu: Values
-): Array<DeviceRequest> {
-  const driver = 'nvidia';
+function Option(props: OptionProps<GpuOption, true>) {
+  const {
+    data: { value, description },
+  } = props;
 
-  const otherDeviceRequests = deviceRequests.filter(
-    (deviceRequest) => deviceRequest.Driver !== driver
+  return (
+    <div>
+      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+      <components.Option {...props}>
+        {`${value} - ${description}`}
+      </components.Option>
+    </div>
   );
-
-  if (!gpu.enabled) {
-    return otherDeviceRequests;
-  }
-
-  const deviceRequest: DeviceRequest = {
-    Driver: driver,
-    Count: -1,
-    DeviceIDs: [], // must be empty if Count != 0 https://github.com/moby/moby/blob/master/daemon/nvidia_linux.go#L50
-    Capabilities: [], // array of ORed arrays of ANDed capabilites = [ [c1 AND c2] OR [c1 AND c3] ] : https://github.com/moby/moby/blob/master/api/types/container/host_config.go#L272
-  };
-
-  if (gpu.useSpecific) {
-    deviceRequest.DeviceIDs = gpu.selectedGPUs;
-    deviceRequest.Count = 0;
-  }
-  deviceRequest.Capabilities = [gpu.capabilities];
-
-  return [...otherDeviceRequests, deviceRequest];
 }
 
-export function gpuValidation(): SchemaOf<Values> {
-  return object({
-    capabilities: array()
-      .of(string().default(''))
-      .default(['compute', 'utility']),
-    enabled: bool().default(false),
-    selectedGPUs: array().of(string()).default(['all']),
-    useSpecific: bool().default(false),
-  });
+function MultiValueRemove(props: MultiValueRemoveProps<GpuOption, true>) {
+  const {
+    selectProps: { value },
+  } = props;
+  if (value && (value as MultiValue<GpuOption>).length === 1) {
+    return null;
+  }
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <components.MultiValueRemove {...props} />;
 }

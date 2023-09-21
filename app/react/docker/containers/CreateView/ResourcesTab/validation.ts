@@ -1,7 +1,7 @@
 import { number, object, SchemaOf } from 'yup';
 
 import { devicesValidation } from './DevicesField';
-import { gpuValidation } from './Gpu';
+import { gpuFieldsetUtils } from './GpuFieldset';
 import { resourcesValidation } from './ResourcesFieldset';
 import { Values } from './ResourcesTab';
 import { runtimeValidation } from './RuntimeSection';
@@ -19,7 +19,7 @@ export function validation({
     devices: devicesValidation(),
     sysctls: sysctlsValidation(),
     sharedMemorySize: number().min(0).default(0),
-    gpu: gpuValidation(),
+    gpu: gpuFieldsetUtils.validation(),
     resources: resourcesValidation({ maxMemory, maxCpu }),
   });
 }

@@ -1,6 +1,6 @@
 import { CreateContainerRequest } from '../types';
 
-import { toRequest as toGPURequest } from './Gpu';
+import { gpuFieldsetUtils } from './GpuFieldset';
 import { toConfigMemory } from './memory-utils';
 import { Values } from './ResourcesTab';
 import { toRequest as toResourcesRequest } from './ResourcesFieldset';
@@ -25,7 +25,7 @@ export function toRequest(
         values.sysctls.map((sysctl) => [sysctl.name, sysctl.value])
       ),
       ShmSize: toConfigMemory(values.sharedMemorySize),
-      DeviceRequests: toGPURequest(
+      DeviceRequests: gpuFieldsetUtils.toRequest(
         oldConfig.HostConfig.DeviceRequests || [],
         values.gpu
       ),

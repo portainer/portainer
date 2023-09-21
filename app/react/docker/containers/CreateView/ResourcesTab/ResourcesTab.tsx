@@ -9,7 +9,7 @@ import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
-import { Gpu, Values as GPUValues } from './Gpu';
+import { GpuFieldset, GpuFieldsetValues } from './GpuFieldset';
 import { Values as RuntimeValues, RuntimeSection } from './RuntimeSection';
 import { DevicesField, Values as Devices } from './DevicesField';
 import { SysctlsField, Values as Sysctls } from './SysctlsField';
@@ -28,7 +28,7 @@ export interface Values {
 
   sharedMemorySize: number;
 
-  gpu: GPUValues;
+  gpu: GpuFieldsetValues;
 
   resources: ResourcesValues;
 }
@@ -113,7 +113,7 @@ export function ResourcesTab({
       </FormControl>
 
       {isStandalone && (
-        <Gpu
+        <GpuFieldset
           values={values.gpu}
           onChange={(gpu) => handleChange({ gpu })}
           gpus={environment.Gpus}
