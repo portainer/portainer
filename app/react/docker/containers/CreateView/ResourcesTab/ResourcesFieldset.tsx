@@ -6,8 +6,8 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
-import { Input } from '@@/form-components/Input';
 import { Slider } from '@@/form-components/Slider';
+import { SliderWithInput } from '@@/form-components/Slider/SliderWithInput';
 
 import { CreateContainerRequest } from '../types';
 
@@ -64,42 +64,6 @@ export function ResourceFieldset({
         />
       </FormControl>
     </FormSection>
-  );
-}
-
-function SliderWithInput({
-  value,
-  onChange,
-  max,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-  max: number;
-}) {
-  return (
-    <div className="flex items-center gap-4">
-      {max && (
-        <div className="mr-2 flex-1">
-          <Slider
-            onChange={(value) =>
-              onChange(typeof value === 'number' ? value : value[0])
-            }
-            value={value}
-            min={0}
-            max={max}
-            step={256}
-          />
-        </div>
-      )}
-      <Input
-        type="number"
-        min="0"
-        max={max}
-        value={value}
-        onChange={(e) => onChange(e.target.valueAsNumber)}
-        className="w-32"
-      />
-    </div>
   );
 }
 
