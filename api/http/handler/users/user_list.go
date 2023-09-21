@@ -26,14 +26,18 @@ import (
 // @failure 500 "Server error"
 // @router /users [get]
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	users, err := handler.DataStore.User().ReadAll()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve users from the database", err)
-	}
-
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+		return httperror.Forbidden("Permission denied to access users list", err)
+	}
+
+	users, err := handler.DataStore.User().ReadAll()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
 
 	availableUsers := security.FilterUsers(users, securityContext)
@@ -43,7 +47,8 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
-		return response.JSON(w, availableUsers)
+		sanitizeUsers(users, securityContext.IsAdmin)
+		return response.JSON(w, users)
 	}
 
 	// filter out users who do not have access to the specific endpoint
@@ -61,6 +66,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	for _, user := range availableUsers {
 		// the users who have the endpoint authorization
 		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
+			sanitizeUser(&user, securityContext.IsAdmin)
 			canAccessEndpoint = append(canAccessEndpoint, user)
 			continue
 		}
@@ -72,9 +78,28 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		}
 
 		if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
+			sanitizeUser(&user, securityContext.IsAdmin)
 			canAccessEndpoint = append(canAccessEndpoint, user)
 		}
 	}
 
 	return response.JSON(w, canAccessEndpoint)
+}
+
+func sanitizeUser(user *portainer.User, isAdmin bool) {
+	user.Password = ""
+	user.EndpointAuthorizations = nil
+	user.ThemeSettings = portainer.UserThemeSettings{}
+	user.PortainerAuthorizations = nil
+	user.UserTheme = ""
+	user.TokenIssueAt = 0
+}
+
+func sanitizeUsers(users []portainer.User, isAdmin bool) {
+	if isAdmin {
+		return
+	}
+	for i := range users {
+		sanitizeUser(&users[i], isAdmin)
+	}
 }

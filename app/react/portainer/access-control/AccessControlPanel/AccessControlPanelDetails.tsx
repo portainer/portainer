@@ -8,7 +8,6 @@ import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
-import { useCurrentUser } from '@/react/hooks/useUser';
 import { pluralize } from '@/portainer/helpers/strings';
 
 import { Link } from '@@/Link';
@@ -31,8 +30,6 @@ export function AccessControlPanelDetails({
   resourceControl,
   resourceType,
 }: Props) {
-  const { isAdmin } = useCurrentUser();
-
   const inheritanceMessage = getInheritanceMessage(
     resourceType,
     resourceControl
@@ -44,10 +41,7 @@ export function AccessControlPanelDetails({
     TeamAccesses: restrictedToTeams = [],
   } = resourceControl || {};
 
-  const users = useAuthorizedUsers(
-    restrictedToUsers.map((ra) => ra.UserId),
-    isAdmin
-  );
+  const users = useAuthorizedUsers(restrictedToUsers.map((ra) => ra.UserId));
   const teams = useAuthorizedTeams(restrictedToTeams.map((ra) => ra.TeamId));
 
   const teamsLength = teams.data ? teams.data.length : 0;
@@ -62,8 +56,8 @@ export function AccessControlPanelDetails({
     )} you are not part of`;
   }
 
-  const userMessage = isAdmin
-    ? (users.data && users.data.join(', ')) || ''
+  const userMessage = users.data
+    ? users.data.join(', ')
     : `${restrictedToUsers.length} ${pluralize(
         restrictedToUsers.length,
         'user'
