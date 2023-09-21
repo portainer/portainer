@@ -66,14 +66,6 @@ async function renderComponent(isAdmin: boolean, network: DockerNetwork) {
 
 function getNetwork(networkName: string): DockerNetwork {
   return {
-    ConfigFrom: {
-      Network: '',
-    },
-    ConfigOnly: false,
-    Created: '',
-    EnableIPv6: false,
-    Ingress: false,
-    Labels: {},
     Attachable: false,
     Containers: {
       a761fcafdae3bdae42cf3702c8554b3e1b0334f85dd6b65b3584aff7246279e4: {
@@ -95,8 +87,6 @@ function getNetwork(networkName: string): DockerNetwork {
       ],
       Driver: 'default',
       Options: null,
-      IPV4Configs: [],
-      IPV6Configs: [],
     },
     Id: '4c52a72e3772fdfb5823cf519b759e3f716e6d98cfb3bfef056e32c9c878329f',
     Internal: false,

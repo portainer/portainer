@@ -43,17 +43,8 @@ export interface DockerNetwork {
     Config: IPConfig[];
     Driver: string;
     Options: IpamOptions;
-    IPV4Configs: IPConfig[];
-    IPV6Configs: IPConfig[];
   };
   Portainer?: PortainerMetadata;
   Options: NetworkOptions;
   Containers: NetworkResponseContainers;
-
-  Ingress: boolean;
-  Labels: Record<string, string | undefined>;
-  ConfigFrom: { Network: string };
-  ConfigOnly: boolean;
-  Created: string;
-  EnableIPv6: boolean;
 }
