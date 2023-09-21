@@ -214,77 +214,12 @@
               ></docker-create-container-commands-tab>
             </div>
             <!-- !tab-command -->
-            <!-- tab-volume -->
+
             <div class="tab-pane" id="volumes">
-              <form class="form-horizontal" style="margin-top: 15px">
-                <!-- volumes -->
-                <div class="form-group">
-                  <div class="col-sm-12" style="margin-top: 5px">
-                    <label class="control-label text-left">Volume mapping</label>
-                    <span class="label label-default interactive" style="margin-left: 10px" ng-click="addVolume()">
-                      <pr-icon icon="'plus'" mode="'alt'"></pr-icon> map additional volume
-                    </span>
-                  </div>
-                  <!-- volumes-input-list -->
-                  <div class="form-inline" style="margin-top: 10px">
-                    <div ng-repeat="volume in formValues.Volumes">
-                      <!-- volume-line1 -->
-                      <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                        <!-- container-path -->
-                        <div class="input-group input-group-sm col-sm-6">
-                          <span class="input-group-addon">container</span>
-                          <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container" />
-                        </div>
-                        <!-- !container-path -->
-                        <!-- volume-type -->
-                        <div class="input-group col-sm-5" style="margin-left: 5px">
-                          <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
-                            <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                            <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
-                          </div>
-                          <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                            <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
-                          </button>
-                        </div>
-                        <!-- !volume-type -->
-                      </div>
-                      <!-- !volume-line1 -->
-                      <!-- volume-line2 -->
-                      <div class="col-sm-12 form-inline" style="margin-top: 5px">
-                        <pr-icon icon="'arrow-right'"></pr-icon>
-                        <!-- volume -->
-                        <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
-                          <span class="input-group-addon">volume</span>
-                          <select class="form-control" ng-model="volume.name">
-                            <option selected disabled hidden value="">Select a volume</option>
-                            <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
-                          </select>
-                        </div>
-                        <!-- !volume -->
-                        <!-- bind -->
-                        <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
-                          <span class="input-group-addon">host</span>
-                          <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host" />
-                        </div>
-                        <!-- !bind -->
-                        <!-- read-only -->
-                        <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px">
-                          <div class="btn-group btn-group-sm">
-                            <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                            <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
-                          </div>
-                        </div>
-                        <!-- !read-only -->
-                      </div>
-                      <!-- !volume-line2 -->
-                    </div>
-                  </div>
-                  <!-- !volumes-input-list -->
-                </div>
-              </form>
-              <!-- !volumes -->
+              <docker-create-container-volumes-tab ng-if="state.containerIsLoaded" values="formValues.volumes" on-change="(onVolumesChange)" allow-bind-mounts="allowBindMounts">
+              </docker-create-container-volumes-tab>
             </div>
-            <!-- !tab-volume -->
+
             <!-- tab-network -->
             <div class="tab-pane" id="network">
               <form class="form-horizontal" style="margin-top: 15px">
