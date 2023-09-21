@@ -12,6 +12,11 @@ import {
 import { r2a } from '@/react-tools/react2angular';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { ContainerNetworksDatatable } from '@/react/docker/containers/ItemView/ContainerNetworksDatatable';
+import {
+  EnvVarsTab,
+  Values as EnvVarsTabValues,
+  envVarsTabUtils,
+} from '@/react/docker/containers/CreateView/EnvVarsTab';
 
 const ngModule = angular
   .module('portainer.docker.react.components.containers', [])
@@ -32,4 +37,12 @@ withFormValidation<ComponentProps<typeof CommandsTab>, CommandsTabValues>(
   'dockerCreateContainerCommandsTab',
   ['apiVersion'],
   commandsTabValidation
+);
+
+withFormValidation<ComponentProps<typeof EnvVarsTab>, EnvVarsTabValues>(
+  ngModule,
+  withUIRouter(withReactQuery(EnvVarsTab)),
+  'dockerCreateContainerEnvVarsTab',
+  [],
+  envVarsTabUtils.validation
 );
