@@ -25,6 +25,11 @@ import {
   NetworkTab,
   type NetworkTabValues,
 } from '@/react/docker/containers/CreateView/NetworkTab';
+import {
+  ResourcesTab,
+  resourcesTabUtils,
+  type ResourcesTabValues,
+} from '@/react/docker/containers/CreateView/ResourcesTab';
 
 const ngModule = angular
   .module('portainer.docker.react.components.containers', [])
@@ -69,4 +74,20 @@ withFormValidation<ComponentProps<typeof NetworkTab>, NetworkTabValues>(
   'dockerCreateContainerNetworkTab',
   [],
   networkTabUtils.validation
+);
+
+withFormValidation<ComponentProps<typeof ResourcesTab>, ResourcesTabValues>(
+  ngModule,
+  withUIRouter(withReactQuery(ResourcesTab)),
+  'dockerCreateContainerResourcesTab',
+  [
+    'allowPrivilegedMode',
+    'isDevicesFieldVisible',
+    'isInitFieldVisible',
+    'isSysctlFieldVisible',
+    'isDuplicate',
+    'isImageInvalid',
+    'redeploy',
+  ],
+  resourcesTabUtils.validation
 );

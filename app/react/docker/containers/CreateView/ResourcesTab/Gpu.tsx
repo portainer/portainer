@@ -6,13 +6,15 @@ import {
   OnChangeValue,
 } from 'react-select/dist/declarations/src/types';
 import { OptionProps } from 'react-select/dist/declarations/src/components/Option';
+import { array, bool, object, SchemaOf, string } from 'yup';
+import { DeviceRequest } from 'docker-types/generated/1.41';
 
 import { Select } from '@@/form-components/ReactSelect';
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
-interface Values {
+export interface Values {
   enabled: boolean;
   useSpecific: boolean;
   selectedGPUs: string[];
@@ -71,7 +73,7 @@ const NvidiaCapabilitiesOptions = [
     label: 'display',
     description: 'required for leveraging X11 display',
   },
-];
+] as const;
 
 function Option(props: OptionProps<GpuOption, true>) {
   const {
@@ -250,4 +252,68 @@ export function Gpu({
       )}
     </div>
   );
+}
+
+export function toViewModel(deviceRequests: Array<DeviceRequest> = []): Values {
+  const deviceRequest = deviceRequests.find(
+    (o) => o.Driver === 'nvidia' || o.Capabilities?.[0]?.[0] === 'gpu'
+  );
+  if (!deviceRequest) {
+    return {
+      enabled: false,
+      useSpecific: false,
+      selectedGPUs: ['all'],
+      capabilities: ['compute', 'utility'],
+    };
+  }
+
+  const useSpecific = deviceRequest.Count !== -1;
+
+  return {
+    enabled: true,
+    useSpecific,
+    selectedGPUs: useSpecific ? deviceRequest.DeviceIDs || [] : ['all'],
+    capabilities: deviceRequest.Capabilities?.[0] || [],
+  };
+}
+
+export function toRequest(
+  deviceRequests: Array<DeviceRequest>,
+  gpu: Values
+): Array<DeviceRequest> {
+  const driver = 'nvidia';
+
+  const otherDeviceRequests = deviceRequests.filter(
+    (deviceRequest) => deviceRequest.Driver !== driver
+  );
+
+  if (!gpu.enabled) {
+    return otherDeviceRequests;
+  }
+
+  const deviceRequest: DeviceRequest = {
+    Driver: driver,
+    Count: -1,
+    DeviceIDs: [], // must be empty if Count != 0 https://github.com/moby/moby/blob/master/daemon/nvidia_linux.go#L50
+    Capabilities: [], // array of ORed arrays of ANDed capabilites = [ [c1 AND c2] OR [c1 AND c3] ] : https://github.com/moby/moby/blob/master/api/types/container/host_config.go#L272
+  };
+
+  if (gpu.useSpecific) {
+    deviceRequest.DeviceIDs = gpu.selectedGPUs;
+    deviceRequest.Count = 0;
+  }
+  deviceRequest.Capabilities = [gpu.capabilities];
+
+  return [...otherDeviceRequests, deviceRequest];
+}
+
+export function gpuValidation(): SchemaOf<Values> {
+  return object({
+    capabilities: array()
+      .of(string().default(''))
+      .default(['compute', 'utility']),
+    enabled: bool().default(false),
+    selectedGPUs: array().of(string()).default(['all']),
+    useSpecific: bool().default(false),
+  });
 }

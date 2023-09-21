@@ -1,9 +1,11 @@
-import { useCallback } from 'react';
+import { ReactElement } from 'react';
 import RcSlider from 'rc-slider';
+import { HandleProps } from 'rc-slider/lib/Handles/Handle';
 
 import { SliderTooltip } from '@@/Tip/SliderTooltip';
 
 import styles from './Slider.module.css';
+
 import 'rc-slider/assets/index.css';
 
 export interface Props {
@@ -12,8 +14,8 @@ export interface Props {
   step: number;
   value: number;
   onChange: (value: number | number[]) => void;
+  dataCy?: string;
   // true if you want to always show the tooltip
-  dataCy: string;
   visibleTooltip?: boolean;
 }
 
@@ -30,17 +32,6 @@ export function Slider({
     [min]: visible && value / max < 0.1 ? '' : translateMinValue(min),
     [max]: visible && value / max > 0.9 ? '' : max.toString(),
   };
-
-  const sliderTooltip = useCallback(
-    (node, handleProps) => (
-      <SliderTooltip
-        value={translateMinValue(handleProps.value)}
-        child={node}
-        delay={0}
-      />
-    ),
-    []
-  );
 
   return (
     <div className={styles.root}>
@@ -63,4 +54,17 @@ function translateMinValue(value: number) {
     return 'unlimited';
   }
   return value.toString();
+}
+
+function sliderTooltip(
+  node: ReactElement<HandleProps>,
+  handleProps: { value: number }
+) {
+  return (
+    <SliderTooltip
+      value={translateMinValue(handleProps.value)}
+      child={node}
+      delay={0}
+    />
+  );
 }
