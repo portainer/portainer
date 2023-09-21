@@ -1178,6 +1178,11 @@ class KubernetesCreateApplicationController {
 
         if (this.state.isEdit) {
           this.nodesLimits.excludesPods(this.application.Pods, this.formValues.CpuLimit, KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit));
+
+          // Workaround for EE-6118
+          if (this.stack && !this.stack.EndpointId) {
+            this.stack.EndpointId = this.endpoint.Id;
+          }
         }
 
         this.oldFormValues = angular.copy(this.formValues);
