@@ -47,7 +47,9 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
-		sanitizeUsers(users, securityContext.IsAdmin)
+		if securityContext.IsAdmin {
+			sanitizeUsers(users)
+		}
 		return response.JSON(w, users)
 	}
 
@@ -66,7 +68,9 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	for _, user := range availableUsers {
 		// the users who have the endpoint authorization
 		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
-			sanitizeUser(&user, securityContext.IsAdmin)
+			if securityContext.IsAdmin {
+				sanitizeUser(&user)
+			}
 			canAccessEndpoint = append(canAccessEndpoint, user)
 			continue
 		}
@@ -78,7 +82,9 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		}
 
 		if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
-			sanitizeUser(&user, securityContext.IsAdmin)
+			if securityContext.IsAdmin {
+				sanitizeUser(&user)
+			}
 			canAccessEndpoint = append(canAccessEndpoint, user)
 		}
 	}
@@ -86,7 +92,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	return response.JSON(w, canAccessEndpoint)
 }
 
-func sanitizeUser(user *portainer.User, isAdmin bool) {
+func sanitizeUser(user *portainer.User) {
 	user.Password = ""
 	user.EndpointAuthorizations = nil
 	user.ThemeSettings = portainer.UserThemeSettings{}
@@ -95,11 +101,8 @@ func sanitizeUser(user *portainer.User, isAdmin bool) {
 	user.TokenIssueAt = 0
 }
 
-func sanitizeUsers(users []portainer.User, isAdmin bool) {
-	if isAdmin {
-		return
-	}
+func sanitizeUsers(users []portainer.User) {
 	for i := range users {
-		sanitizeUser(&users[i], isAdmin)
+		sanitizeUser(&users[i])
 	}
 }
