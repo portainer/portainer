@@ -155,12 +155,16 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(tx, &endpoint, endpointGroup)
 					if err != nil {
 						// Update flag with endpoint and continue
-						handler.PendingActionsService.Create(portainer.PendingActions{
-							EndpointID: endpoint.ID,
-							Action:     "CleanNAPWithOverridePolicies",
-							ActionData: endpointGroup.ID,
-						})
-						log.Warn().Err(err).Msgf("Unable to update user authorizations for endpoint (%d) and endpoint group (%d).", endpoint.ID, endpointGroup.ID)
+						go func(endpointID portainer.EndpointID, endpointGroupID portainer.EndpointGroupID) {
+							err := handler.PendingActionsService.Create(portainer.PendingActions{
+								EndpointID: endpointID,
+								Action:     "CleanNAPWithOverridePolicies",
+								ActionData: endpointGroupID,
+							})
+							if err != nil {
+								log.Error().Err(err).Msgf("Unable to create pending action to clean NAP with override policies for endpoint (%d) and endpoint group (%d).", endpointID, endpointGroupID)
+							}
+						}(endpoint.ID, endpointGroup.ID)
 					}
 				}
 			}
