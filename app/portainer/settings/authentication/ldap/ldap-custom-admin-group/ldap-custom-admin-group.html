@@ -2,73 +2,71 @@
   Auto-populate team admins <be-feature-indicator feature="$ctrl.limitedFeatureId" class="space-left" ng-if="$ctrl.isLimitedFeatureSelfContained"></be-feature-indicator>
 </div>
 
-<rd-widget ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)">
-  <rd-widget-body>
-    <div class="form-group mb-3" ng-if="$index > 0">
-      <span class="col-sm-12 text-muted small"> Extra search configuration </span>
+<div class="w-full px-5 pt-3" ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)">
+  <div class="form-group mb-3" ng-if="$index > 0">
+    <span class="col-sm-12 text-muted small"> Extra search configuration </span>
+  </div>
+
+  <div class="form-group">
+    <label for="ldap_admin_group_basedn_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+      Group Base DN
+      <portainer-tooltip message="'The distinguished name of the element from which the LDAP server will search for groups.'"></portainer-tooltip>
+    </label>
+    <div class="col-sm-8 col-md-4">
+      <input
+        type="text"
+        class="form-control"
+        id="ldap_admin_group_basedn_{{ $index }}"
+        ng-model="config.GroupBaseDN"
+        placeholder="dc=ldap,dc=domain,dc=tld"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+        ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+        limited-feature-tabindex="-1"
+      />
     </div>
 
-    <div class="form-group">
-      <label for="ldap_admin_group_basedn_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
-        Group Base DN
-        <portainer-tooltip message="'The distinguished name of the element from which the LDAP server will search for groups.'"></portainer-tooltip>
-      </label>
-      <div class="col-sm-8 col-md-4">
-        <input
-          type="text"
-          class="form-control"
-          id="ldap_admin_group_basedn_{{ $index }}"
-          ng-model="config.GroupBaseDN"
-          placeholder="dc=ldap,dc=domain,dc=tld"
-          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-          limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
-          ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
-          limited-feature-tabindex="-1"
-        />
-      </div>
-
-      <label for="ldap_admin_group_att_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
-        Group Membership Attribute
-        <portainer-tooltip message="'LDAP attribute which denotes the group membership.'"></portainer-tooltip>
-      </label>
-      <div class="col-sm-8 col-md-4">
-        <input
-          type="text"
-          class="form-control"
-          id="ldap_admin_group_att_{{ $index }}"
-          ng-model="config.GroupAttribute"
-          placeholder="member"
-          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-          limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
-          ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
-          limited-feature-tabindex="-1"
-        />
-      </div>
+    <label for="ldap_admin_group_att_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+      Group Membership Attribute
+      <portainer-tooltip message="'LDAP attribute which denotes the group membership.'"></portainer-tooltip>
+    </label>
+    <div class="col-sm-8 col-md-4">
+      <input
+        type="text"
+        class="form-control"
+        id="ldap_admin_group_att_{{ $index }}"
+        ng-model="config.GroupAttribute"
+        placeholder="member"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+        ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+        limited-feature-tabindex="-1"
+      />
     </div>
-    <div class="form-group">
-      <label for="ldap_admin_group_filter_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
-        Group Filter
-        <portainer-tooltip message="'The LDAP search filter used to select group elements, optional.'"></portainer-tooltip>
-      </label>
-      <div class="col-sm-8 col-md-10 vertical-center">
-        <input
-          type="text"
-          class="form-control"
-          id="ldap_admin_group_filter_{{ $index }}"
-          ng-model="config.GroupFilter"
-          placeholder="(objectClass=groupOfNames)"
-          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-          limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
-          ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
-          limited-feature-tabindex="-1"
-        />
-        <button class="btn btn-md btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)" ng-if="$index > 0">
-          <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
-        </button>
-      </div>
+  </div>
+  <div class="form-group">
+    <label for="ldap_admin_group_filter_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+      Group Filter
+      <portainer-tooltip message="'The LDAP search filter used to select group elements, optional.'"></portainer-tooltip>
+    </label>
+    <div class="col-sm-8 col-md-10 vertical-center">
+      <input
+        type="text"
+        class="form-control"
+        id="ldap_admin_group_filter_{{ $index }}"
+        ng-model="config.GroupFilter"
+        placeholder="(objectClass=groupOfNames)"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+        ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+        limited-feature-tabindex="-1"
+      />
+      <button class="btn btn-md btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)" ng-if="$index > 0">
+        <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+      </button>
     </div>
-  </rd-widget-body>
-</rd-widget>
+  </div>
+</div>
 
 <div class="form-group mt-3">
   <div class="col-sm-12">

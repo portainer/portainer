@@ -1,16 +1,18 @@
+import clsx from 'clsx';
+
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
-import { Tooltip } from '@@/Tip/Tooltip';
-
-import { BEFeatureIndicator } from '.';
+import { BEFeatureIndicator } from './BEFeatureIndicator';
 
 export function BEOverlay({
   featureId,
   children,
+  className,
 }: {
   featureId: FeatureId;
   children: React.ReactNode;
+  className?: string;
 }) {
   const isLimited = isLimitedToBE(featureId);
   if (!isLimited) {
@@ -19,13 +21,10 @@ export function BEOverlay({
 
   return (
     <div className="be-indicator-container limited-be">
-      <div className="overlay">
-        <div className="limited-be-link vertical-center">
-          <BEFeatureIndicator featureId={FeatureId.CA_FILE} />
-          <Tooltip message="This feature is currently limited to Business Edition users only. " />
-        </div>
-        <div className="limited-be-content">{children}</div>
+      <div className="limited-be-link vertical-center">
+        <BEFeatureIndicator featureId={featureId} />
       </div>
+      <div className={clsx('limited-be-content', className)}>{children}</div>
     </div>
   );
 }

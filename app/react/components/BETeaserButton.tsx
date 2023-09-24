@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { Briefcase } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -11,7 +11,6 @@ interface Props {
   message: string;
   buttonText: string;
   className?: string;
-  icon?: ReactNode;
   buttonClassName?: string;
 }
 
@@ -21,7 +20,6 @@ export function BETeaserButton({
   message,
   buttonText,
   className,
-  icon,
   buttonClassName,
 }: Props) {
   return (
@@ -34,9 +32,9 @@ export function BETeaserButton({
       <span>
         <Button
           className={buttonClassName}
-          icon={icon}
+          icon={Briefcase}
           type="button"
-          color="warninglight"
+          color="default"
           size="small"
           onClick={() => {}}
           disabled
