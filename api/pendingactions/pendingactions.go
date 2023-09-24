@@ -6,10 +6,16 @@ import (
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
+	portaineree "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/rs/zerolog/log"
+)
+
+const (
+	CleanNAPWithOverridePolicies      = "CleanNAPWithOverridePolicies"
+	DeletePortainerK8sRegistrySecrets = "DeletePortainerK8sRegistrySecrets"
 )
 
 type (
@@ -91,23 +97,66 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 	}()
 
 	switch pendingAction.Action {
-	case "CleanNAPWithOverridePolicies":
+	case CleanNAPWithOverridePolicies:
 		if (pendingAction.ActionData == nil) || (pendingAction.ActionData.(portainer.EndpointGroupID) == 0) {
 			service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, nil)
-		} else {
-			endpointGroupID := pendingAction.ActionData.(portainer.EndpointGroupID)
-			endpointGroup, err := service.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
-			if err != nil {
-				log.Error().Err(err).Msgf("Error reading endpoint group to clean NAP with override policies for endpoint %d and endpoint group %d", endpoint.ID, endpointGroup.ID)
-				return fmt.Errorf("failed to retrieve endpoint group %d: %w", endpointGroupID, err)
-			}
-			err = service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, endpointGroup)
-			if err != nil {
-				log.Error().Err(err).Msgf("Error cleaning NAP with override policies for endpoint %d and endpoint group %d", endpoint.ID, endpointGroup.ID)
-				return fmt.Errorf("failed to clean NAP with override policies for endpoint %d and endpoint group %d: %w", endpoint.ID, endpointGroup.ID, err)
+			return nil
+		}
+
+		endpointGroupID := pendingAction.ActionData.(portainer.EndpointGroupID)
+		endpointGroup, err := service.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
+		if err != nil {
+			log.Error().Err(err).Msgf("Error reading endpoint group to clean NAP with override policies for endpoint %d and endpoint group %d", endpoint.ID, endpointGroup.ID)
+			return fmt.Errorf("failed to retrieve endpoint group %d: %w", endpointGroupID, err)
+		}
+		err = service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, endpointGroup)
+		if err != nil {
+			log.Error().Err(err).Msgf("Error cleaning NAP with override policies for endpoint %d and endpoint group %d", endpoint.ID, endpointGroup.ID)
+			return fmt.Errorf("failed to clean NAP with override policies for endpoint %d and endpoint group %d: %w", endpoint.ID, endpointGroup.ID, err)
+		}
+
+		return nil
+	case DeletePortainerK8sRegistrySecrets:
+		if pendingAction.ActionData == nil {
+			return nil
+		}
+
+		var registryData DeletePortainerK8sRegistrySecretsData
+
+		data, ok := pendingAction.ActionData.(map[string]interface{})
+		if !ok {
+			log.Warn().Msgf("Unable to parse pending action data")
+			return nil
+		}
+
+		for key, value := range data {
+			switch key {
+			case "Namespaces":
+				if namespaces, ok := value.([]interface{}); ok {
+					registryData.Namespaces = make([]string, len(namespaces))
+					for i, ns := range namespaces {
+						if namespace, ok := ns.(string); ok {
+							registryData.Namespaces[i] = namespace
+						}
+					}
+				}
+			case "RegistryID":
+				if registryID, ok := value.(float64); ok {
+					registryData.RegistryID = portaineree.RegistryID(registryID)
+				}
 			}
 		}
+
+		log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: %+v", registryData)
+
+		err := service.DeleteKubernetesRegistrySecrets(endpoint, registryData)
+		if err != nil {
+			log.Warn().Err(err).Int("endpoint_id", int(endpoint.ID)).Msgf("Unable to delete kubernetes registry secrets")
+			return fmt.Errorf("failed to delete kubernetes registry secrets for endpoint %d: %w", endpoint.ID, err)
+		}
+
 		return nil
 	}
+
 	return nil
 }
