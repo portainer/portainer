@@ -78,8 +78,7 @@ function UpgradeBEBanner() {
         <ArrowUpCircle
           className={clsx(
             'lucide text-lg',
-            'fill-warning-6 stroke-[#023959] th-dark:stroke-black',
-            'th-highcontrast:fill-warning-6  th-highcontrast:stroke-black'
+            'fill-gray-6 stroke-[#023959] th-dark:stroke-black th-highcontrast:stroke-black'
           )}
         />
         {isSidebarOpen && <>Upgrade to Business Edition</>}

@@ -169,68 +169,46 @@
 
   <oauth-providers-selector on-change="($ctrl.onSelectProvider)" value="$ctrl.state.provider"></oauth-providers-selector>
 
-  <div class="col-sm-12 form-section-title">OAuth Configuration</div>
-
-  <div class="form-group" ng-if="$ctrl.state.provider == 'microsoft'">
-    <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
-      Tenant ID
-      <portainer-tooltip message="'ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID'"></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input
-        type="text"
-        class="form-control"
-        id="oauth_microsoft_tenant_id"
-        placeholder="xxxxxxxxxxxxxxxxxxxx"
-        ng-model="$ctrl.state.microsoftTenantID"
-        ng-change="$ctrl.onMicrosoftTenantIDChange()"
-        limited-feature-dir="{{::$ctrl.limitedFeature}}"
-        limited-feature-class="limited-be"
-        limited-feature-disabled
-        limited-feature-tabindex="-1"
-        required
-      />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
-      {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
-      <portainer-tooltip message="'Public identifier of the OAuth application'"></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input
-        type="text"
-        id="oauth_client_id"
-        ng-model="$ctrl.settings.ClientID"
-        placeholder="xxxxxxxxxxxxxxxxxxxx"
-        ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
-        ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
-        tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
-      />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-      {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input
-        type="password"
-        class="form-control"
-        id="oauth_client_secret"
-        ng-model="$ctrl.settings.ClientSecret"
-        placeholder="xxxxxxxxxxxxxxxxxxxx"
-        autocomplete="new-password"
-        ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
-        ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
-        tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
-      />
-    </div>
-  </div>
-
   <div ng-if="$ctrl.state.provider == 'custom' || $ctrl.state.overrideConfiguration">
+    <div class="col-sm-12 form-section-title">OAuth Configuration</div>
+
+    <div class="form-group">
+      <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
+        {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
+        <portainer-tooltip message="'Public identifier of the OAuth application'"></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input
+          type="text"
+          id="oauth_client_id"
+          ng-model="$ctrl.settings.ClientID"
+          placeholder="xxxxxxxxxxxxxxxxxxxx"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+          tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
+        {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input
+          type="password"
+          class="form-control"
+          id="oauth_client_secret"
+          ng-model="$ctrl.settings.ClientSecret"
+          placeholder="xxxxxxxxxxxxxxxxxxxx"
+          autocomplete="new-password"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+          tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
+        />
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
         Authorization URL
@@ -363,26 +341,100 @@
         />
       </div>
     </div>
+    <save-auth-settings-button
+      on-save-settings="($ctrl.onSaveSettings)"
+      save-button-state="($ctrl.saveButtonState)"
+      save-button-disabled="!$ctrl.isOAuthTeamMembershipFormValid() || oauthSettingsForm.$invalid"
+      limited-feature-id="$ctrl.limitedFeature"
+      limited-feature-class="$ctrl.limitedFeatureClass"
+      class-name="'oauth-save-settings-button'"
+    ></save-auth-settings-button>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider != 'custom'">
-    <div class="col-sm-12">
-      <a class="small interactive vertical-center" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
-        <pr-icon icon="'wrench'"></pr-icon>
-        Override default configuration
-      </a>
-      <a class="small interactive vertical-center" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.useDefaultProviderConfiguration($ctrl.state.provider)">
-        <pr-icon icon="'settings'"></pr-icon>
-        Use default configuration
-      </a>
+  <div ng-if="$ctrl.state.provider != 'custom'" class="limited-be">
+    <div class="limited-be-link vertical-center"><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator></div>
+    <div class="limited-be-content">
+      <div class="col-sm-12 form-section-title">OAuth Configuration</div>
+
+      <div class="form-group" ng-if="$ctrl.state.provider == 'microsoft'">
+        <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
+          Tenant ID
+          <portainer-tooltip message="'ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID'"></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input
+            type="text"
+            class="form-control"
+            id="oauth_microsoft_tenant_id"
+            placeholder="xxxxxxxxxxxxxxxxxxxx"
+            ng-model="$ctrl.state.microsoftTenantID"
+            ng-change="$ctrl.onMicrosoftTenantIDChange()"
+            limited-feature-dir="{{::$ctrl.limitedFeature}}"
+            limited-feature-class="limited-be"
+            limited-feature-disabled
+            limited-feature-tabindex="-1"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
+          {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
+          <portainer-tooltip message="'Public identifier of the OAuth application'"></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input
+            type="text"
+            id="oauth_client_id"
+            ng-model="$ctrl.settings.ClientID"
+            placeholder="xxxxxxxxxxxxxxxxxxxx"
+            ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+            ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+            tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
+          {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input
+            type="password"
+            class="form-control"
+            id="oauth_client_secret"
+            ng-model="$ctrl.settings.ClientSecret"
+            placeholder="xxxxxxxxxxxxxxxxxxxx"
+            autocomplete="new-password"
+            ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+            ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+            tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-12">
+          <a class="small interactive vertical-center" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+            <pr-icon icon="'wrench'"></pr-icon>
+            Override default configuration
+          </a>
+          <a class="small interactive vertical-center" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.useDefaultProviderConfiguration($ctrl.state.provider)">
+            <pr-icon icon="'settings'"></pr-icon>
+            Use default configuration
+          </a>
+        </div>
+      </div>
+      <save-auth-settings-button
+        on-save-settings="($ctrl.onSaveSettings)"
+        save-button-state="($ctrl.saveButtonState)"
+        save-button-disabled="!$ctrl.isOAuthTeamMembershipFormValid() || oauthSettingsForm.$invalid"
+        limited-feature-id="$ctrl.limitedFeature"
+        limited-feature-class="$ctrl.limitedFeatureClass"
+        class-name="'oauth-save-settings-button'"
+      ></save-auth-settings-button>
     </div>
   </div>
-  <save-auth-settings-button
-    on-save-settings="($ctrl.onSaveSettings)"
-    save-button-state="($ctrl.saveButtonState)"
-    save-button-disabled="!$ctrl.isOAuthTeamMembershipFormValid() || oauthSettingsForm.$invalid"
-    limited-feature-id="$ctrl.limitedFeature"
-    limited-feature-class="$ctrl.limitedFeatureClass"
-    class-name="'oauth-save-settings-button'"
-  ></save-auth-settings-button>
 </ng-form>

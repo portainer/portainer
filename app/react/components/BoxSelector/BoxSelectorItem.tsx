@@ -9,7 +9,7 @@ import { getFeatureDetails } from '@@/BEFeatureIndicator/utils';
 
 import styles from './BoxSelectorItem.module.css';
 import { BoxSelectorOption, Value } from './types';
-import { LimitedToBeIndicator } from './LimitedToBeIndicator';
+import { LimitedToBeBoxSelectorIndicator } from './LimitedToBeBoxSelectorIndicator';
 import { BoxOption } from './BoxOption';
 import { LogoIcon } from './LogoIcon';
 
@@ -40,8 +40,6 @@ export function BoxSelectorItem<T extends Value>({
     option.feature
   );
 
-  const beIndicatorTooltipId = `box-selector-item-${radioName}-${option.id}-limited`;
-
   const ContentBox = slim ? 'div' : Fragment;
 
   return (
@@ -59,14 +57,9 @@ export function BoxSelectorItem<T extends Value>({
       type={type}
       checkIcon={checkIcon}
     >
-      {limitedToBE && (
-        <LimitedToBeIndicator
-          tooltipId={beIndicatorTooltipId}
-          url={featureUrl}
-        />
-      )}
+      {limitedToBE && <LimitedToBeBoxSelectorIndicator url={featureUrl} />}
       <div
-        className={clsx('flex gap-2', {
+        className={clsx('flex min-w-[140px] gap-2', {
           'opacity-30': limitedToBE,
           'h-full flex-col justify-start': !slim,
           'slim items-center': slim,
