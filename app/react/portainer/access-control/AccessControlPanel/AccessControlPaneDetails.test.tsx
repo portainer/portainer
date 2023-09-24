@@ -4,6 +4,7 @@ import { createMockTeams, createMockUsers } from '@/react-tools/test-mocks';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { rest, server } from '@/setup-tests/server';
 import { Role } from '@/portainer/users/types';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
 
 import {
   ResourceControlOwnership,
@@ -143,11 +144,9 @@ async function renderComponent(
   resourceType: ResourceControlType = ResourceControlType.Container,
   resourceControl?: ResourceControlViewModel
 ) {
+  const WithUser = withUserProvider(AccessControlPanelDetails);
   const queries = renderWithQueryClient(
-    <AccessControlPanelDetails
-      resourceControl={resourceControl}
-      resourceType={resourceType}
-    />
+    <WithUser resourceControl={resourceControl} resourceType={resourceType} />
   );
   await expect(queries.findByText('Ownership')).resolves.toBeVisible();
 
