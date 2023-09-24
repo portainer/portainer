@@ -40,14 +40,14 @@ export function Tooltip({
   }, [setHtmlMessage, message]);
 
   return (
-    <TooltipWithChildren
-      message={htmlMessage || message}
-      position={position}
-      className={className}
-    >
-      <span className={clsx('inline-flex', sizeClasses[size])}>
-        <HelpCircle className="lucide ml-1" aria-hidden="true" />
-      </span>
-    </TooltipWithChildren>
+    <span className={clsx('ml-1 inline-flex items-center', sizeClasses[size])}>
+      <TooltipWithChildren
+        message={htmlMessage || message}
+        position={position}
+        className={className}
+      >
+        <HelpCircle className="lucide" aria-hidden="true" />
+      </TooltipWithChildren>
+    </span>
   );
 }
