@@ -1,8 +1,6 @@
 package websocket
 
 import (
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -11,9 +9,11 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
 )
 
 // @summary Attach a websocket
