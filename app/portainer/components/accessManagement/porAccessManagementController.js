@@ -76,7 +76,7 @@ class PorAccessManagementController {
     }
 
     if (this.isRoleLimitedToBE(role)) {
-      return `${role.Name} (Business Edition Feature)`;
+      return `${role.Name} (Business Feature)`;
     }
 
     return `${role.Name} (Default)`;

@@ -59,7 +59,7 @@ export function BoxSelectorItem<T extends Value>({
     >
       {limitedToBE && <LimitedToBeBoxSelectorIndicator url={featureUrl} />}
       <div
-        className={clsx('flex gap-2', {
+        className={clsx('flex min-w-[140px] gap-2', {
           'opacity-30': limitedToBE,
           'h-full flex-col justify-start': !slim,
           'slim items-center': slim,
