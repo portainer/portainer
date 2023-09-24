@@ -23,7 +23,7 @@ export function ScreenBannerFieldset() {
           <SwitchField
             labelClass="col-sm-3 col-lg-2"
             label="Login screen banner"
-            checked
+            checked={isEnabled}
             name="toggle_login_banner"
             disabled={isDemoQuery.data}
             onChange={(checked) => setIsEnabled(checked)}
