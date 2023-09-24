@@ -113,7 +113,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function handleCommandsChange(commands) {
       return $scope.$evalAsync(() => {
-        console.log('handleCommandsChange', commands);
         $scope.formValues.commands = commands;
       });
     }
