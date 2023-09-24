@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
-	portaineree "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
@@ -121,35 +120,12 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 			return nil
 		}
 
-		var registryData DeletePortainerK8sRegistrySecretsData
-
-		data, ok := pendingAction.ActionData.(map[string]interface{})
-		if !ok {
-			log.Warn().Msgf("Unable to parse pending action data")
-			return nil
+		registryData, err := convertToDeletePortainerK8sRegistrySecretsData(pendingAction.ActionData)
+		if err != nil {
+			return fmt.Errorf("failed to convert parse pendingActionData: %w", err)
 		}
 
-		for key, value := range data {
-			switch key {
-			case "Namespaces":
-				if namespaces, ok := value.([]interface{}); ok {
-					registryData.Namespaces = make([]string, len(namespaces))
-					for i, ns := range namespaces {
-						if namespace, ok := ns.(string); ok {
-							registryData.Namespaces[i] = namespace
-						}
-					}
-				}
-			case "RegistryID":
-				if registryID, ok := value.(float64); ok {
-					registryData.RegistryID = portaineree.RegistryID(registryID)
-				}
-			}
-		}
-
-		log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: %+v", registryData)
-
-		err := service.DeleteKubernetesRegistrySecrets(endpoint, registryData)
+		err = service.DeleteKubernetesRegistrySecrets(endpoint, registryData)
 		if err != nil {
 			log.Warn().Err(err).Int("endpoint_id", int(endpoint.ID)).Msgf("Unable to delete kubernetes registry secrets")
 			return fmt.Errorf("failed to delete kubernetes registry secrets for endpoint %d: %w", endpoint.ID, err)
