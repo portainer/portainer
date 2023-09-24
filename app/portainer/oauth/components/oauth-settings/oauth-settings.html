@@ -171,18 +171,18 @@
 
   <div ng-if="$ctrl.state.provider == 'custom' || $ctrl.state.overrideConfiguration">
     <div class="col-sm-12 form-section-title">OAuth Configuration</div>
+
     <div class="form-group">
-      <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-        {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
+      <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
+        {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
+        <portainer-tooltip message="'Public identifier of the OAuth application'"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <input
-          type="password"
-          class="form-control"
-          id="oauth_client_secret"
-          ng-model="$ctrl.settings.ClientSecret"
+          type="text"
+          id="oauth_client_id"
+          ng-model="$ctrl.settings.ClientID"
           placeholder="xxxxxxxxxxxxxxxxxxxx"
-          autocomplete="new-password"
           ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
           ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
           tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
@@ -397,16 +397,17 @@
       </div>
 
       <div class="form-group">
-        <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
-          {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
-          <portainer-tooltip message="'Public identifier of the OAuth application'"></portainer-tooltip>
+        <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
+          {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
         </label>
         <div class="col-sm-9 col-lg-10">
           <input
-            type="text"
-            id="oauth_client_id"
-            ng-model="$ctrl.settings.ClientID"
+            type="password"
+            class="form-control"
+            id="oauth_client_secret"
+            ng-model="$ctrl.settings.ClientSecret"
             placeholder="xxxxxxxxxxxxxxxxxxxx"
+            autocomplete="new-password"
             ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
             ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
             tabindex="{{ $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' ? -1 : 0 }}"
