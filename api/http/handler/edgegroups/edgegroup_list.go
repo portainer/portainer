@@ -12,9 +12,10 @@ import (
 
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
-	HasEdgeStack  bool `json:"HasEdgeStack"`
-	HasEdgeJob    bool `json:"HasEdgeJob"`
-	EndpointTypes []portainer.EndpointType
+	HasEdgeStack          bool `json:"HasEdgeStack"`
+	HasEdgeJob            bool `json:"HasEdgeJob"`
+	EndpointTypes         []portainer.EndpointType
+	TrustedEndpointsCount int `json:"TrustedEndpointsCount"`
 }
 
 // @id EdgeGroupList
@@ -92,9 +93,15 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 			return nil, httperror.InternalServerError("Unable to retrieve environment types for Edge group", err)
 		}
 
+		trustedEndpointsCount, err := getTrustedEndpointsCount(tx, edgeGroup.Endpoints)
+		if err != nil {
+			return nil, httperror.InternalServerError("Unable to retrieve environment count for Edge group", err)
+		}
+
 		edgeGroup.EndpointTypes = endpointTypes
 		edgeGroup.HasEdgeStack = usedEdgeGroups[edgeGroup.ID]
 		edgeGroup.HasEdgeJob = usedByEdgeJob
+		edgeGroup.TrustedEndpointsCount = trustedEndpointsCount
 
 		decoratedEdgeGroups = append(decoratedEdgeGroups, edgeGroup)
 	}
@@ -119,4 +126,22 @@ func getEndpointTypes(tx dataservices.DataStoreTx, endpointIds []portainer.Endpo
 	}
 
 	return endpointTypes, nil
+}
+
+func getTrustedEndpointsCount(tx dataservices.DataStoreTx, endpointsIds []portainer.EndpointID) (int, error) {
+	count := 0
+	for _, endpointID := range endpointsIds {
+		endpoint, err := tx.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return 0, fmt.Errorf("failed fetching environment: %w", err)
+		}
+
+		if !endpoint.UserTrusted {
+			continue
+		}
+
+		count++
+	}
+
+	return count, nil
 }
