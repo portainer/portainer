@@ -132,6 +132,9 @@ export function ConsoleView() {
                     value={command}
                     onChange={(e) => setCommand(e.target.value)}
                     id="consoleCommand"
+                    // disable eslint because we want to autofocus
+                    // this is ok because we only have one input on the page
+                    // https://portainer.atlassian.net/browse/EE-5752
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
                   />
