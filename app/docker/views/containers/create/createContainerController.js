@@ -441,9 +441,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           networks.push({ Name: 'container' });
           $scope.availableNetworks = networks.sort((a, b) => a.Name.localeCompare(b.Name));
 
-          if (_.find(networks, { Name: 'nat' })) {
-            $scope.config.HostConfig.NetworkMode = 'nat';
-          }
+          $scope.formValues.network = networkTabUtils.getDefaultViewModel(networks.some((network) => network.Name === 'bridge'));
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve networks');
