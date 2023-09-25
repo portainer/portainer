@@ -129,6 +129,8 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 		return errors.Errorf("cannot update stack, type %v is unsupported", stack.Type)
 	}
 
+	stack.Status = portainer.StackStatusActive
+
 	if err := datastore.Stack().Update(stack.ID, stack); err != nil {
 		return errors.WithMessagef(err, "failed to update the stack %v", stack.ID)
 	}
