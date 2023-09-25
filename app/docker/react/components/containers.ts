@@ -34,6 +34,10 @@ import {
   CapabilitiesTab,
   capabilitiesTabUtils,
 } from '@/react/docker/containers/CreateView/CapabilitiesTab';
+import {
+  RestartPolicyTab,
+  restartPolicyTabUtils,
+} from '@/react/docker/containers/CreateView/RestartPolicyTab';
 
 const ngModule = angular
   .module('portainer.docker.react.components.containers', [])
@@ -102,4 +106,11 @@ withFormValidation(
   'dockerCreateContainerCapabilitiesTab',
   [],
   capabilitiesTabUtils.validation
+);
+withFormValidation(
+  ngModule,
+  RestartPolicyTab,
+  'dockerCreateContainerRestartPolicyTab',
+  [],
+  restartPolicyTabUtils.validation
 );
