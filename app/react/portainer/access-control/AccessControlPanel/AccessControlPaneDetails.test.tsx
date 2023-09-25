@@ -145,6 +145,7 @@ async function renderComponent(
   resourceControl?: ResourceControlViewModel,
 ) {
   const WithUser = withUserProvider(AccessControlPanelDetails);
+
   const queries = renderWithQueryClient(
     <WithUser resourceControl={resourceControl} resourceType={resourceType} />,
   );
