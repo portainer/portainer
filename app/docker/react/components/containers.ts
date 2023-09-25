@@ -30,6 +30,10 @@ import {
   resourcesTabUtils,
   type ResourcesTabValues,
 } from '@/react/docker/containers/CreateView/ResourcesTab';
+import {
+  CapabilitiesTab,
+  capabilitiesTabUtils,
+} from '@/react/docker/containers/CreateView/CapabilitiesTab';
 
 const ngModule = angular
   .module('portainer.docker.react.components.containers', [])
@@ -90,4 +94,12 @@ withFormValidation<ComponentProps<typeof ResourcesTab>, ResourcesTabValues>(
     'redeploy',
   ],
   resourcesTabUtils.validation
+);
+
+withFormValidation(
+  ngModule,
+  CapabilitiesTab,
+  'dockerCreateContainerCapabilitiesTab',
+  [],
+  capabilitiesTabUtils.validation
 );
