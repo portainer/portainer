@@ -80,10 +80,14 @@ func shouldIncludeEntry(dirEntry DirEntry, deviceName, configPath string, filter
 		return shouldIncludeFile(dirEntry, deviceName, configPath)
 	}
 
-	// Include:
-	// dir entry A/B/C/<deviceName>
-	// all entries A/B/C/<deviceName>/*
-	return shouldIncludeDir(dirEntry, deviceName, configPath)
+	if filterType == portainer.PerDevConfigsTypeDir {
+		// Include:
+		// dir entry A/B/C/<deviceName>
+		// all entries A/B/C/<deviceName>/*
+		return shouldIncludeDir(dirEntry, deviceName, configPath)
+	}
+
+	return false
 }
 
 func isInConfigRootDir(dirEntry DirEntry, configPath string) bool {
