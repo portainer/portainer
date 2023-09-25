@@ -52,6 +52,7 @@ export function AccessControlPanel({
       <AccessControlPanelDetails
         resourceType={resourceType}
         resourceControl={resourceControl}
+        isAuthorisedToFetchUsers={isAdmin || isLeaderOfAnyRestrictedTeams}
       />
 
       {!isEditDisabled && !isEditMode && (
