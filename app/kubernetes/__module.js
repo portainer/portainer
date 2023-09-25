@@ -345,12 +345,12 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
-    const resourcePoolCreation = {
+    const namespaceCreation = {
       name: 'kubernetes.resourcePools.new',
       url: '/new',
       views: {
         'content@': {
-          component: 'kubernetesCreateResourcePoolView',
+          component: 'kubernetesCreateNamespaceView',
         },
       },
     };
@@ -462,7 +462,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(node);
     $stateRegistryProvider.register(nodeStats);
     $stateRegistryProvider.register(resourcePools);
-    $stateRegistryProvider.register(resourcePoolCreation);
+    $stateRegistryProvider.register(namespaceCreation);
     $stateRegistryProvider.register(resourcePool);
     $stateRegistryProvider.register(resourcePoolAccess);
     $stateRegistryProvider.register(volumes);

@@ -181,7 +181,8 @@ export function useDeleteIngresses() {
  */
 export function useIngressControllers(
   environmentId: EnvironmentId,
-  namespace?: string
+  namespace?: string,
+  allowedOnly?: boolean
 ) {
   return useQuery(
     [
@@ -193,7 +194,9 @@ export function useIngressControllers(
       'ingresscontrollers',
     ],
     async () =>
-      namespace ? getIngressControllers(environmentId, namespace) : [],
+      namespace
+        ? getIngressControllers(environmentId, namespace, allowedOnly)
+        : [],
     {
       enabled: !!namespace,
       ...withError('Unable to get ingress controllers'),

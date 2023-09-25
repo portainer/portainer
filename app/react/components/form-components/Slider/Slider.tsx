@@ -36,7 +36,7 @@ export function Slider({
   return (
     <div className={styles.root}>
       <RcSlider
-        handleRender={sliderTooltip}
+        handleRender={visible ? sliderTooltip : undefined}
         min={min}
         max={max}
         marks={marks}

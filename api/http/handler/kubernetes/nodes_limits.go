@@ -51,3 +51,37 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 
 	return response.JSON(w, nodesLimits)
 }
+
+func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+	}
+
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	if err != nil {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			err,
+		)
+	}
+
+	overCommit := endpoint.Kubernetes.Configuration.EnableResourceOverCommit
+	overCommitPercent := endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage
+
+	resourceLimit, err := cli.GetMaxResourceLimits("", overCommit, overCommitPercent)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve max resource limit", err)
+	}
+
+	return response.JSON(w, resourceLimit)
+}

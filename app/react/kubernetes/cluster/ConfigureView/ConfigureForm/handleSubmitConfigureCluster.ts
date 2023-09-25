@@ -8,8 +8,6 @@ import { UpdateEnvironmentPayload } from '@/react/portainer/environments/queries
 import { Environment } from '@/react/portainer/environments/types';
 import { TrackEventProps } from '@/angulartics.matomo/analytics-services';
 
-import { IngressControllerClassMapRowData } from '../../ingressClass/types';
-
 import { ConfigureFormValues, StorageClassFormValues } from './types';
 import { ConfigureClusterPayloads } from './useConfigureClusterMutation';
 
@@ -64,10 +62,8 @@ export async function handleSubmitConfigureCluster(
     {
       id: environment.Id,
       updateEnvironmentPayload: updatedEnvironment,
-      initialIngressControllers:
-        initialValues?.ingressClasses as IngressControllerClassMapRowData[],
-      ingressControllers:
-        values.ingressClasses as IngressControllerClassMapRowData[],
+      initialIngressControllers: initialValues?.ingressClasses ?? [],
+      ingressControllers: values.ingressClasses,
       storageClassPatches,
     },
     {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, ReactNode, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
@@ -22,8 +22,15 @@ import {
   useUpdateIngress,
   useIngressControllers,
 } from '../queries';
+import { Annotation } from '../../annotations/types';
 
-import { Rule, Path, Host, GroupedServiceOptions } from './types';
+import {
+  Rule,
+  Path,
+  Host,
+  GroupedServiceOptions,
+  IngressErrors,
+} from './types';
 import { IngressForm } from './IngressForm';
 import {
   prepareTLS,
@@ -32,7 +39,6 @@ import {
   prepareRuleFromIngress,
   checkIfPathExistsWithHost,
 } from './utils';
-import { Annotation } from './Annotations/types';
 
 export function CreateIngressView() {
   const environmentId = useEnvironmentId();
@@ -56,9 +62,7 @@ export function CreateIngressView() {
   // isEditClassNameSet is used to prevent premature validation of the classname in the edit view
   const [isEditClassNameSet, setIsEditClassNameSet] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<Record<string, ReactNode>>(
-    {} as Record<string, string>
-  );
+  const [errors, setErrors] = useState<IngressErrors>({});
 
   const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
 

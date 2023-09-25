@@ -50,7 +50,7 @@ export type IngressClass = {
   Type: string;
 };
 
-interface StorageClass {
+export interface StorageClass {
   Name: string;
   AccessModes: string[];
   AllowVolumeExpansion: boolean;

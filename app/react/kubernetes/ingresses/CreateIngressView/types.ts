@@ -1,6 +1,8 @@
+import { ReactNode } from 'react';
+
 import { Option } from '@@/form-components/Input/Select';
 
-import { Annotation } from './Annotations/types';
+import { Annotation, AnnotationErrors } from '../../annotations/types';
 
 export interface Path {
   Key: string;
@@ -40,3 +42,7 @@ export type GroupedServiceOptions = {
   label: string;
   options: ServiceOption[];
 }[];
+
+export type IngressErrors = Record<string, ReactNode> & {
+  annotations?: AnnotationErrors;
+};

@@ -2,6 +2,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Namespaces, SelfSubjectAccessReviewResponse } from './types';
+import { CreateNamespacePayload } from './CreateView/types';
 
 // getNamespace is used to retrieve a namespace using the Portainer backend
 export async function getNamespace(
@@ -27,6 +28,22 @@ export async function getNamespaces(environmentId: EnvironmentId) {
     return namespaces;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to retrieve namespaces');
+  }
+}
+
+// createNamespace is used to create a namespace using the Portainer backend
+export async function createNamespace(
+  environmentId: EnvironmentId,
+  payload: CreateNamespacePayload
+) {
+  try {
+    const { data: ns } = await axios.post<Namespaces>(
+      buildUrl(environmentId),
+      payload
+    );
+    return ns;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to create namespace');
   }
 }
 

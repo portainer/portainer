@@ -29,13 +29,19 @@ type OptionalReadonly<T> = T | Readonly<T>;
 
 export function withInvalidate(
   queryClient: QueryClient,
-  queryKeysToInvalidate: Array<OptionalReadonly<Array<string | number>>>
+  queryKeysToInvalidate: Array<OptionalReadonly<Array<string | number>>>,
+  // skipRefresh will set the mutation state to success without waiting for the invalidated queries to refresh
+  // see the following for info: https://tkdodo.eu/blog/mastering-mutations-in-react-query#awaited-promises
+  { skipRefresh }: { skipRefresh?: boolean } = {}
 ) {
   return {
     onSuccess() {
-      return Promise.all(
+      const promise = Promise.all(
         queryKeysToInvalidate.map((keys) => queryClient.invalidateQueries(keys))
       );
+      return skipRefresh
+        ? undefined // don't wait for queries to refresh before setting state to success
+        : promise; // stay loading until all queries are refreshed
     },
   };
 }

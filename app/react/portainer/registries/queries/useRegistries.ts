@@ -22,6 +22,16 @@ export function useRegistries<T = Registry[]>(
   );
 }
 
+/**
+ * @field hideDefault - is used to hide the default registry from the list of registries, regardless of the user's settings. Kubernetes views use this.
+ */
+export type GenericRegistriesQueryOptions<T> = {
+  enabled?: boolean;
+  select?: (registries: Registry[]) => T;
+  onSuccess?: (data: T) => void;
+  hideDefault?: boolean;
+};
+
 export function useGenericRegistriesQuery<T = Registry[]>(
   queryKey: QueryKey,
   fetcher: () => Promise<Array<Registry>>,
@@ -29,18 +39,15 @@ export function useGenericRegistriesQuery<T = Registry[]>(
     enabled,
     select,
     onSuccess,
-  }: {
-    enabled?: boolean;
-    select?: (registries: Registry[]) => T;
-    onSuccess?: (data: T) => void;
-  } = {}
+    hideDefault: hideDefaultOverride,
+  }: GenericRegistriesQueryOptions<T> = {}
 ) {
   const hideDefaultRegistryQuery = usePublicSettings({
     select: (settings) => settings.DefaultRegistry?.Hide,
     enabled,
   });
 
-  const hideDefault = !!hideDefaultRegistryQuery.data;
+  const hideDefault = hideDefaultOverride || !!hideDefaultRegistryQuery.data;
 
   return useQuery(
     queryKey,
