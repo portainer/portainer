@@ -24,11 +24,13 @@ import { ResourceControlViewModel } from '../models/ResourceControlViewModel';
 interface Props {
   resourceControl?: ResourceControlViewModel;
   resourceType: ResourceControlType;
+  isAuthorisedToFetchUsers?: boolean;
 }
 
 export function AccessControlPanelDetails({
   resourceControl,
   resourceType,
+  isAuthorisedToFetchUsers = false,
 }: Props) {
   const inheritanceMessage = getInheritanceMessage(
     resourceType,
@@ -41,7 +43,10 @@ export function AccessControlPanelDetails({
     TeamAccesses: restrictedToTeams = [],
   } = resourceControl || {};
 
-  const users = useAuthorizedUsers(restrictedToUsers.map((ra) => ra.UserId));
+  const users = useAuthorizedUsers(
+    restrictedToUsers.map((ra) => ra.UserId),
+    isAuthorisedToFetchUsers
+  );
   const teams = useAuthorizedTeams(restrictedToTeams.map((ra) => ra.TeamId));
 
   const teamsLength = teams.data ? teams.data.length : 0;
