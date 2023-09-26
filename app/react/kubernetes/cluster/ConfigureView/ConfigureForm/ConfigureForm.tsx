@@ -248,7 +248,7 @@ function InnerForm({
                 name="changeWindow.Enabled"
                 data-cy="kubeSetup-changeWindowEnabledToggle"
                 label="Enable Change Window"
-                tooltip="GitOps updates to stacks or applications outside the defined change window will not occur.'"
+                tooltip="GitOps updates to stacks or applications outside the defined change window will not occur."
                 labelClass="col-sm-5 col-lg-4"
                 checked={false}
                 featureId={FeatureId.HIDE_AUTO_UPDATE_WINDOW}
