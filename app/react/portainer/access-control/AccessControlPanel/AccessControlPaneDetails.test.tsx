@@ -27,20 +27,20 @@ test.each([
     const resourceControl = buildViewModel(ownership);
     const { queryByLabelText } = await renderComponent(
       ResourceControlType.Container,
-      resourceControl,
+      resourceControl
     );
 
     expect(queryByLabelText('ownership')).toHaveTextContent(ownership);
-  },
+  }
 );
 
 test('when resource control is not supplied, show administrators', async () => {
   const { queryByLabelText } = await renderComponent(
-    ResourceControlType.Container,
+    ResourceControlType.Container
   );
 
   expect(queryByLabelText('ownership')).toHaveTextContent(
-    ResourceControlOwnership.ADMINISTRATORS,
+    ResourceControlOwnership.ADMINISTRATORS
   );
 });
 
@@ -71,12 +71,12 @@ for (let i = 0; i < inheritanceTests.length; i += 1) {
   test(`when resource is ${ResourceControlType[resourceType]} and resource control is ${ResourceControlType[parentType]}, show message`, async () => {
     const resourceControl = buildViewModel(
       ResourceControlOwnership.ADMINISTRATORS,
-      parentType,
+      parentType
     );
 
     const { queryByLabelText } = await renderComponent(
       resourceType,
-      resourceControl,
+      resourceControl
     );
     const inheritanceMessage = queryByLabelText('inheritance-message');
     expect(inheritanceMessage).toBeVisible();
@@ -96,18 +96,18 @@ test('when resource is limited to specific users, show number of users', async (
     restrictedToUsers.map((user) => ({
       UserId: user.Id,
       AccessLevel: 1,
-    })),
+    }))
   );
 
   const { queryByText, findByLabelText } = await renderComponent(
     undefined,
-    resourceControl,
+    resourceControl
   );
 
   expect(queryByText(/Authorized users/)).toBeVisible();
 
   await expect(findByLabelText('authorized-users')).resolves.toHaveTextContent(
-    `${restrictedToUsers.length} users`,
+    `${restrictedToUsers.length} users`
   );
 });
 
@@ -125,28 +125,28 @@ test('when resource is limited to specific teams, show comma separated list of t
     restrictedToTeams.map((team) => ({
       TeamId: team.Id,
       AccessLevel: 1,
-    })),
+    }))
   );
 
   const { queryByText, findByLabelText } = await renderComponent(
     undefined,
-    resourceControl,
+    resourceControl
   );
 
   expect(queryByText(/Authorized teams/)).toBeVisible();
 
   await expect(findByLabelText('authorized-teams')).resolves.toHaveTextContent(
-    restrictedToTeams.map((team) => team.Name).join(', '),
+    restrictedToTeams.map((team) => team.Name).join(', ')
   );
 });
 
 async function renderComponent(
   resourceType: ResourceControlType = ResourceControlType.Container,
-  resourceControl?: ResourceControlViewModel,
+  resourceControl?: ResourceControlViewModel
 ) {
   const WithUser = withUserProvider(AccessControlPanelDetails);
   const queries = renderWithQueryClient(
-    <WithUser resourceControl={resourceControl} resourceType={resourceType} />,
+    <WithUser resourceControl={resourceControl} resourceType={resourceType} />
   );
   await expect(queries.findByText('Ownership')).resolves.toBeVisible();
 
@@ -157,7 +157,7 @@ function buildViewModel(
   ownership: ResourceControlOwnership,
   type: ResourceControlType = ResourceControlType.Config,
   users: UserResourceAccess[] = [],
-  teams: TeamResourceAccess[] = [],
+  teams: TeamResourceAccess[] = []
 ): ResourceControlViewModel {
   return {
     Id: 0,
