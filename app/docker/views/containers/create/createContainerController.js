@@ -313,6 +313,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       prepareImageConfig(config);
       preparePortBindings(config);
+      return config;
     }
 
     function loadFromContainerPortBindings() {
