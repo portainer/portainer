@@ -83,7 +83,7 @@ for (let i = 0; i < inheritanceTests.length; i += 1) {
   });
 }
 
-test('when resource is limited to specific users, show comma separated list of their names', async () => {
+test('when resource is limited to specific users, show number of users', async () => {
   const users = createMockUsers(10, Role.Standard);
 
   server.use(rest.get('/api/users', (req, res, ctx) => res(ctx.json(users))));
@@ -107,7 +107,7 @@ test('when resource is limited to specific users, show comma separated list of t
   expect(queryByText(/Authorized users/)).toBeVisible();
 
   await expect(findByLabelText('authorized-users')).resolves.toHaveTextContent(
-    restrictedToUsers.map((user) => user.Username).join(', ')
+    `${restrictedToUsers.length} users`
   );
 });
 
