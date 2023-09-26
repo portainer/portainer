@@ -9,6 +9,7 @@ import { NodeSelector } from '@/react/docker/agent/NodeSelector';
 import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { isAgentEnvironment } from '@/react/portainer/environments/utils';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
@@ -119,6 +120,7 @@ export function BaseForm({
                     onChange={(enableWebhook) =>
                       onChange({ ...values, enableWebhook })
                     }
+                    featureId={FeatureId.CONTAINER_WEBHOOK}
                   />
                 </div>
               </div>

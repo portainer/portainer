@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
 import { confirmDestructive } from '@@/modals/confirm';
-import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { buildConfirmButton } from '@@/modals/utils';
 
 import { commandsTabUtils } from '@/react/docker/containers/CreateView/CommandsTab';
@@ -77,9 +76,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     $scope.create = create;
     $scope.endpoint = endpoint;
-    $scope.containerWebhookFeature = FeatureId.CONTAINER_WEBHOOK;
+
     $scope.isAdmin = Authentication.isAdmin();
-    const userDetails = this.Authentication.getUserDetails();
+    const userDetails = Authentication.getUserDetails();
 
     $scope.formValues = {
       commands: commandsTabUtils.getDefaultViewModel(),
