@@ -133,6 +133,6 @@ export function validation(): SchemaOf<LogConfig> {
         value: string().required('Value is required'),
       })
     ),
-    type: string().default('none'),
+    type: string().default(''),
   });
 }
