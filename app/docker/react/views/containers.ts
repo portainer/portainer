@@ -6,12 +6,20 @@ import { ListView } from '@/react/docker/containers/ListView';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { LogView } from '@/react/docker/containers/LogView';
 
 export const containersModule = angular
   .module('portainer.docker.react.views.containers', [])
   .component(
     'containersView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ListView))), ['endpoint'])
+  )
+  // the view only contains the information panel when logging is disabled
+  // this is a temporary solution to avoid creating a publicly exposed component
+  // or an AngularJS component until the logs view is migrated to React
+  .component(
+    'containerLogView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(LogView))), [])
   )
 
   .config(config).name;

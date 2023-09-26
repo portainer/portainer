@@ -10,9 +10,11 @@
 >
 </page-header>
 
+<container-log-view ng-if="!logsEnabled"></container-log-view>
+
 <log-viewer
   data="logs"
-  ng-if="logs"
+  ng-if="logs && logsEnabled"
   log-collection-change="changeLogCollection"
   display-timestamps="state.displayTimestamps"
   line-count="state.lineCount"

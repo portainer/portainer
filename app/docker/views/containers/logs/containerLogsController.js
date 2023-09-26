@@ -75,7 +75,13 @@ angular.module('portainer.docker').controller('ContainerLogsController', [
         .then(function success(data) {
           var container = data;
           $scope.container = container;
-          startLogPolling(!container.Config.Tty);
+
+          const logsEnabled = container.HostConfig && container.HostConfig.LogConfig && container.HostConfig.LogConfig.Type && container.HostConfig.LogConfig.Type !== 'none';
+          $scope.logsEnabled = logsEnabled;
+
+          if (logsEnabled) {
+            startLogPolling(!container.Config.Tty);
+          }
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container information');
