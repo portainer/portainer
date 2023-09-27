@@ -4,7 +4,7 @@ import { Edit, Eye } from 'lucide-react';
 import { useUser } from '@/react/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
-import { useUserMembership } from '@/portainer/users/queries';
+import { useIsTeamLeader, useUserMembership } from '@/portainer/users/queries';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { TableContainer, TableTitle } from '@@/datatables';
@@ -34,7 +34,7 @@ export function AccessControlPanel({
   onUpdateSuccess,
 }: Props) {
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
-  const { isAdmin } = useUser();
+  const { user, isAdmin } = useUser();
 
   const isInherited = checkIfInherited();
 
@@ -46,13 +46,15 @@ export function AccessControlPanel({
     isInherited ||
     (!isAdmin && !isPartOfRestrictedUsers && !isLeaderOfAnyRestrictedTeams);
 
+  const isTeamLeader = useIsTeamLeader(user) as boolean;
+
   return (
     <TableContainer>
       <TableTitle label="Access control" icon={Eye} />
       <AccessControlPanelDetails
         resourceType={resourceType}
         resourceControl={resourceControl}
-        isAuthorisedToFetchUsers={isAdmin || isLeaderOfAnyRestrictedTeams}
+        isAuthorisedToFetchUsers={isAdmin || isTeamLeader}
       />
 
       {!isEditDisabled && !isEditMode && (
