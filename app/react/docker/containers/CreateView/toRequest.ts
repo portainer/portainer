@@ -31,6 +31,4 @@ export function toRequest(values: Values, registry?: Registry) {
   config.Image = buildImageFullURI(values.image.image, registry);
 
   return config;
-
-  return config;
 }
