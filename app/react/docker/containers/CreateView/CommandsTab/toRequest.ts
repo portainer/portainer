@@ -34,6 +34,11 @@ export function toRequest(
     delete config.Entrypoint;
   }
 
+  // don't include LogConfig object if "Default logging driver" (type === '') is selected
+  if (values.logConfig.type === '') {
+    delete config.HostConfig.LogConfig;
+  }
+
   return config;
 
   function getLogConfig(
