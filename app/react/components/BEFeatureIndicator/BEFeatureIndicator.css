@@ -23,5 +23,5 @@
 }
 
 .be-indicator-container {
-  @apply relative border border-solid border-gray-6;
+  @apply relative;
 }
