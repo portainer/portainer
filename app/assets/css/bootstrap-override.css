@@ -73,6 +73,11 @@
   opacity: 0.3;
 }
 
+.switch input[type='checkbox']:disabled + .slider:is([theme='dark'] *),
+.switch input[type='checkbox']:disabled + .slider:is([theme='highcontrast'] *) {
+  opacity: 0.4;
+}
+
 .switch-values {
   font-style: normal;
   font-weight: 500;
@@ -91,8 +96,6 @@
   background-color: var(--bg-switch-box-color);
   -webkit-transition: 0.4s;
   transition: 0.4s;
-  @apply th-dark:bg-gray-warm-9;
-  @apply th-highcontrast:bg-gray-warm-9;
 }
 
 .slider:hover {
