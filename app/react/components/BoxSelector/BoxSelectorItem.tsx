@@ -37,7 +37,7 @@ export function BoxSelectorItem<T extends Value>({
   checkIcon = Check,
 }: Props<T>) {
   const { limitedToBE = false, url: featureUrl } = getFeatureDetails(
-    option.feature,
+    option.feature
   );
 
   const ContentBox = slim ? 'div' : Fragment;

@@ -48,7 +48,7 @@ export function RollbackApplicationButton({
     appName,
     app?.metadata?.uid,
     labelSelector,
-    app?.kind,
+    app?.kind
   );
   const appRevisionList = appRevisionListQuery.data;
   const appRevisions = appRevisionList?.items;
@@ -58,7 +58,7 @@ export function RollbackApplicationButton({
   const patchAppMutation = usePatchApplicationMutation(
     environmentId,
     namespace,
-    appName,
+    appName
   );
 
   const isRollbackNotAvailable =
@@ -131,9 +131,9 @@ export function RollbackApplicationButton({
             notifyError(
               'Failure',
               error as Error,
-              'Unable to rollback the application',
+              'Unable to rollback the application'
             ),
-        },
+        }
       );
     } catch (error) {
       notifyError('Failure', error as Error);
