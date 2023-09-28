@@ -7,10 +7,7 @@
   devices="$ctrl.devices"
   refresh-url="docker.nodes.node"
   browse-url="docker.nodes.node.browse"
-  is-job-enabled="$ctrl.state.isAdmin && $ctrl.state.isAgent"
   host-features-enabled="$ctrl.state.enableHostManagementFeatures"
-  job-url="docker.nodes.node.job"
-  jobs="$ctrl.jobs"
 >
   <swarm-node-details-panel details="$ctrl.nodeDetails" original-node="$ctrl.originalNode"></swarm-node-details-panel>
 </host-overview>

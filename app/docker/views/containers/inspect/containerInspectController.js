@@ -4,7 +4,8 @@ angular.module('portainer.docker').controller('ContainerInspectController', [
   'Notifications',
   'ContainerService',
   'HttpRequestHelper',
-  function ($scope, $transition$, Notifications, ContainerService, HttpRequestHelper) {
+  'endpoint',
+  function ($scope, $transition$, Notifications, ContainerService, HttpRequestHelper, endpoint) {
     $scope.state = {
       DisplayTextView: false,
     };
@@ -12,7 +13,7 @@ angular.module('portainer.docker').controller('ContainerInspectController', [
 
     function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-      ContainerService.inspect($transition$.params().id)
+      ContainerService.inspect(endpoint.Id, $transition$.params().id)
         .then(function success(d) {
           $scope.containerInfo = d;
         })

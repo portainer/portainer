@@ -9,7 +9,8 @@ angular.module('portainer.docker').controller('VolumeController', [
   'ContainerService',
   'Notifications',
   'HttpRequestHelper',
-  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper) {
+  'endpoint',
+  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper, endpoint) {
     $scope.resourceType = ResourceControlType.Volume;
 
     $scope.onUpdateResourceControlSuccess = function () {
@@ -46,7 +47,7 @@ angular.module('portainer.docker').controller('VolumeController', [
           $scope.volume = volume;
           var containerFilter = { volume: [volume.Id] };
 
-          return ContainerService.containers(1, containerFilter);
+          return ContainerService.containers(endpoint.Id, 1, containerFilter);
         })
         .then(function success(data) {
           var dataContainers = $scope.isCioDriver ? data.containers : data;

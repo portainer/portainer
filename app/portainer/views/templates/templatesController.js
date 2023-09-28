@@ -110,7 +110,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           return ImageService.pullImage(template.RegistryModel, true);
         })
         .then(function success() {
-          return ContainerService.createAndStartContainer(templateConfiguration);
+          return ContainerService.createAndStartContainer(endpoint.Id, templateConfiguration);
         })
         .then(function success(data) {
           const resourceControl = data.Portainer.ResourceControl;
