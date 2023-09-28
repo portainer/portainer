@@ -11,6 +11,7 @@ import { Icon } from '@@/Icon';
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import {
   useApplicationRevisionList,
@@ -47,7 +48,7 @@ export function RollbackApplicationButton({
     appName,
     app?.metadata?.uid,
     labelSelector,
-    app?.kind
+    app?.kind,
   );
   const appRevisionList = appRevisionListQuery.data;
   const appRevisions = appRevisionList?.items;
@@ -57,30 +58,41 @@ export function RollbackApplicationButton({
   const patchAppMutation = usePatchApplicationMutation(
     environmentId,
     namespace,
-    appName
+    appName,
+  );
+
+  const isRollbackNotAvailable =
+    !app ||
+    !appRevisions ||
+    appRevisions?.length < 2 ||
+    appDeployMethod !== 'application form' ||
+    patchAppMutation.isLoading;
+
+  const rollbackButton = (
+    <Button
+      ng-if="!ctrl.isExternalApplication()"
+      type="button"
+      color="light"
+      size="small"
+      className="!ml-0"
+      disabled={isRollbackNotAvailable}
+      onClick={() => rollbackApplication()}
+      data-cy="k8sAppDetail-rollbackButton"
+    >
+      <Icon icon={RotateCcw} className="mr-1" />
+      Rollback to previous configuration
+    </Button>
   );
 
   return (
     <Authorized authorizations="K8sApplicationDetailsW">
-      <Button
-        ng-if="!ctrl.isExternalApplication()"
-        type="button"
-        color="light"
-        size="small"
-        className="!ml-0"
-        disabled={
-          !app ||
-          !appRevisions ||
-          appRevisions?.length < 2 ||
-          appDeployMethod !== 'application form' ||
-          patchAppMutation.isLoading
-        }
-        onClick={() => rollbackApplication()}
-        data-cy="k8sAppDetail-rollbackButton"
-      >
-        <Icon icon={RotateCcw} className="mr-1" />
-        Rollback to previous configuration
-      </Button>
+      {isRollbackNotAvailable ? (
+        <TooltipWithChildren message="Cannot roll back to previous configuration as none currently exists">
+          <span>{rollbackButton}</span>
+        </TooltipWithChildren>
+      ) : (
+        rollbackButton
+      )}
     </Authorized>
   );
 
@@ -119,9 +131,9 @@ export function RollbackApplicationButton({
             notifyError(
               'Failure',
               error as Error,
-              'Unable to rollback the application'
+              'Unable to rollback the application',
             ),
-        }
+        },
       );
     } catch (error) {
       notifyError('Failure', error as Error);
