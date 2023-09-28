@@ -76,6 +76,13 @@
 .switch input[type='checkbox']:disabled + .slider:is([theme='dark'] *),
 .switch input[type='checkbox']:disabled + .slider:is([theme='highcontrast'] *) {
   opacity: 0.4;
+  background-color: var(--ui-gray-warm-6);
+}
+
+.switch input[type='checkbox']:disabled:is(:checked) + .slider:is([theme='dark'] *),
+.switch input[type='checkbox']:disabled:is(:checked) + .slider:is([theme='highcontrast'] *) {
+  opacity: 0.4;
+  background-color: var(--ui-blue-9);
 }
 
 .switch-values {
