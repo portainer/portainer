@@ -51,24 +51,19 @@
 
 <div class="form-group" style="margin-top: 10px">
   <div class="col-sm-12">
-    <button class="label label-default interactive vertical-center" style="border: 0" ng-click="$ctrl.onAddClick()">
-      <pr-icon icon="'plus-circle'"></pr-icon>
-      add group search configuration
+    <button class="btn btn-sm btn-light vertical-center !ml-0" ng-click="$ctrl.onAddClick()">
+      <pr-icon icon="'plus'"></pr-icon>
+      Add group search configuration
     </button>
   </div>
   <div class="col-sm-12" style="margin-top: 10px">
-    <button
-      class="btn btm-sm btn-primary"
-      type="button"
-      ng-click="$ctrl.search()"
-      limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
-      limited-feature-tabindex="-1"
-      limited-feature-disabled
-      limited-feature-class="limited-be"
-    >
-      Display User/Group matching
-    </button>
-    <be-feature-indicator feature="$ctrl.limitedFeatureId" class="space-left"></be-feature-indicator>
+    <be-teaser-button
+      feature-id="$ctrl.limitedFeatureId"
+      heading="'Display User/Group matching'"
+      message="'Show the list of users and groups that match the Portainer search configurations'"
+      button-text="'Display User/Group matching'"
+      button-class-name="'!ml-0'"
+    ></be-teaser-button>
   </div>
 </div>
 

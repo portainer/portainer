@@ -57,7 +57,13 @@ export function BoxSelectorItem<T extends Value>({
       type={type}
       checkIcon={checkIcon}
     >
-      {limitedToBE && <LimitedToBeBoxSelectorIndicator url={featureUrl} />}
+      {limitedToBE && (
+        <LimitedToBeBoxSelectorIndicator
+          url={featureUrl}
+          // show tooltip only for radio type options because be-only checkbox options can't be selected
+          showTooltip={type === 'radio'}
+        />
+      )}
       <div
         className={clsx('flex min-w-[140px] gap-2', {
           'opacity-30': limitedToBE,
