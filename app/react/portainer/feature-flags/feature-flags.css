@@ -30,14 +30,14 @@ div.limited-be {
 }
 
 .limited-be-content {
-  @apply border-gray-6 p-2.5 text-xs opacity-50;
+  @apply border-gray-6 p-2.5 opacity-50;
 }
 
 .limited-be-link {
   padding: 10px;
   width: inherit;
   z-index: 5;
-  position: relative;
+  position: absolute;
   top: 0px;
   right: 0px;
   float: right;

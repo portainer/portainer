@@ -1,6 +1,6 @@
 .be-indicator {
-  @apply border-solid border border-gray-6;
-  @apply text-gray-6 text-xs;
+  @apply border border-solid border-gray-6;
+  @apply text-xs text-gray-6;
   border-radius: 15px;
   padding: 5px 10px;
   font-weight: 400;
@@ -23,5 +23,5 @@
 }
 
 .be-indicator-container {
-  @apply border-solid border border-gray-6;
+  @apply relative;
 }

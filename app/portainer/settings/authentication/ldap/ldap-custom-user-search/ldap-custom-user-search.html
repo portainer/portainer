@@ -40,24 +40,19 @@
 
 <div class="form-group" style="margin-top: 10px">
   <div class="col-sm-12">
-    <button class="label label-default interactive vertical-center" style="border: 0" ng-click="$ctrl.onAddClick()">
-      <pr-icon icon="'plus-circle'"></pr-icon>
-      add user search configuration
+    <button class="btn btn-sm btn-light vertical-center !ml-0" ng-click="$ctrl.onAddClick()">
+      <pr-icon icon="'plus'"></pr-icon>
+      Add user search configuration
     </button>
   </div>
   <div class="col-sm-12" style="margin-top: 10px">
-    <button
-      class="btn btm-sm btn-primary"
-      type="button"
-      ng-click="$ctrl.search()"
-      limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
-      limited-feature-disabled
-      limited-feature-class="limited-be"
-      limited-feature-tabindex="-1"
-    >
-      Display Users
-    </button>
-    <be-feature-indicator feature="$ctrl.limitedFeatureId" class="space-left"></be-feature-indicator>
+    <be-teaser-button
+      feature-id="$ctrl.limitedFeatureId"
+      heading="'Display Users'"
+      message="'Allows you to display users from your LDAP server'"
+      button-text="'Display Users'"
+      button-class-name="'!ml-0'"
+    ></be-teaser-button>
   </div>
 </div>
 
