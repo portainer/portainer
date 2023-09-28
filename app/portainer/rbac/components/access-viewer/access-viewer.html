@@ -1,24 +1,26 @@
 <div class="col-sm-12" style="margin-bottom: 0px">
-  <rd-widget>
-    <rd-widget-header icon="user-x">
-      <header-title>
-        Effective access viewer
-        <be-feature-indicator feature="$ctrl.limitedFeature" class="space-left"></be-feature-indicator>
-      </header-title>
-    </rd-widget-header>
-    <rd-widget-body>
-      <form class="form-horizontal">
-        <div class="col-sm-12 form-section-title"> User </div>
-        <div class="form-group">
-          <div class="col-sm-12">
-            <span class="small text-muted" ng-if="$ctrl.users.length === 0"> No user available </span>
+  <div class="be-indicator-container limited-be">
+    <div class="limited-be-link vertical-center"><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator></div>
+    <div class="limited-be-content">
+      <rd-widget>
+        <rd-widget-header icon="user-x">
+          <header-title> Effective access viewer </header-title>
+        </rd-widget-header>
+        <rd-widget-body>
+          <form class="form-horizontal">
+            <div class="col-sm-12 form-section-title"> User </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted" ng-if="$ctrl.users.length === 0"> No user available </span>
 
-            <por-select ng-if="$ctrl.users.length > 0" value="$ctrl.selectedUserId" options="$ctrl.users" on-change="($ctrl.onUserSelect)" placeholder="'Select a user'">
-            </por-select>
-          </div>
-        </div>
-        <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName" is-admin="$ctrl.isAdmin"> </access-viewer-datatable>
-      </form>
-    </rd-widget-body>
-  </rd-widget>
+                <por-select ng-if="$ctrl.users.length > 0" value="$ctrl.selectedUserId" options="$ctrl.users" on-change="($ctrl.onUserSelect)" placeholder="'Select a user'">
+                </por-select>
+              </div>
+            </div>
+            <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName" is-admin="$ctrl.isAdmin"> </access-viewer-datatable>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
 </div>
