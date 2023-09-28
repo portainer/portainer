@@ -41,7 +41,7 @@ angular.module('portainer.app').factory('Authentication', [
     }
 
     async function logoutAsync(performApiLogout) {
-      if (performApiLogout) {
+      if (performApiLogout && isAuthenticated()) {
         await Auth.logout().$promise;
       }
 

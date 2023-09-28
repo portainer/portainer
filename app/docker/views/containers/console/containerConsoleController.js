@@ -67,7 +67,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           }
 
           const params = {
-            token: LocalStorage.getJWT(),
             endpointId: $state.params.endpointId,
             id: attachId,
           };
@@ -108,7 +107,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       ContainerService.createExec(execConfig)
         .then(function success(data) {
           const params = {
-            token: LocalStorage.getJWT(),
             endpointId: $state.params.endpointId,
             id: data.Id,
           };
@@ -167,6 +165,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
       }
+
+      url += '&token=' + LocalStorage.getJWT();
+
       if (url.indexOf('https') > -1) {
         url = url.replace('https://', 'wss://');
       } else {
