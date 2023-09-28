@@ -320,6 +320,10 @@ github.com/portainer/portainer/pkg/featureflags v0.0.0-20230711022654-64b227b2e1
 github.com/portainer/portainer/pkg/featureflags v0.0.0-20230711022654-64b227b2e146/go.mod h1:x4Lpq/BjFhZmuNB8e8FO0ObRPQ/Z/V9rTe54bMedf1A=
 github.com/portainer/portainer/pkg/libhelm v0.0.0-20230711022654-64b227b2e146 h1:1qW7quKyFG4tOnMcnnqyYsDVfL09etO1h/Cu/3ak7KU=
 github.com/portainer/portainer/pkg/libhelm v0.0.0-20230711022654-64b227b2e146/go.mod h1:cFRD6PvOwpd2pf/O1r/IMKl+ZB12pWfo/Evleh3aCfM=
+github.com/portainer/portainer/pkg/libhelm v0.0.0-20230919060741-8f42ba025479 h1:DbmhSQZpDo5f0cr+CKLJqoqhQiuxp8QFXdZsjPS1lI4=
+github.com/portainer/portainer/pkg/libhelm v0.0.0-20230919060741-8f42ba025479/go.mod h1:cFRD6PvOwpd2pf/O1r/IMKl+ZB12pWfo/Evleh3aCfM=
+github.com/portainer/portainer/pkg/libhelm v0.0.0-20230928223730-157393c965ce h1:DQTMXYH1zn2DzuAe+4rT40JqdHLhpHHJ2pzRFhvZ/+c=
+github.com/portainer/portainer/pkg/libhelm v0.0.0-20230928223730-157393c965ce/go.mod h1:cFRD6PvOwpd2pf/O1r/IMKl+ZB12pWfo/Evleh3aCfM=
 github.com/portainer/portainer/pkg/libstack v0.0.0-20230711022654-64b227b2e146 h1:ZGj+j5HoajaO+mXgCm6NzOU+zUdIlJK2amagB+QIDvc=
 github.com/portainer/portainer/pkg/libstack v0.0.0-20230711022654-64b227b2e146/go.mod h1:+zCK2UbsH6A3yEGi0yZ45ec5VFRP7svob5Q2lW6LFgk=
 github.com/portainer/portainer/third_party/digest v0.0.0-20221201002639-8fd0efa34f73 h1:7bPOnwucE0nor0so1BQJxQKCL5t+vCWO4nAz/S0lci0=
