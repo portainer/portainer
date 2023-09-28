@@ -53,6 +53,10 @@ export function InnerForm({
           <div>
             <BaseForm
               onChangeName={onChangeName}
+              onChangeImageName={() => {
+                setFieldValue('commands.cmd', null);
+                setFieldValue('commands.entrypoint', null);
+              }}
               isLoading={isLoading}
               isValid={isValid}
             />

@@ -32,11 +32,13 @@ export function SimpleForm({
   values,
   errors,
   fieldNamespace,
+  onChangeImage,
 }: {
   autoComplete?: boolean;
   values: Values;
   errors?: FormikErrors<Values>;
   fieldNamespace?: string;
+  onChangeImage?: (name: string) => void;
 }) {
   const { setFieldValue } = useFormikContext<Values>();
 
@@ -66,7 +68,10 @@ export function SimpleForm({
           <InputGroup.Addon>{registryUrl}</InputGroup.Addon>
 
           <ImageField
-            onChange={(value) => setFieldValue(namespaced('image'), value)}
+            onChange={(value) => {
+              setFieldValue(namespaced('image'), value);
+              onChangeImage?.(value);
+            }}
             value={values.image}
             registry={registry}
             autoComplete={autoComplete}

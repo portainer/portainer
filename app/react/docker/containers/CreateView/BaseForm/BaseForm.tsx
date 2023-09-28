@@ -53,10 +53,12 @@ export function BaseForm({
   isValid,
   isLoading,
   onChangeName,
+  onChangeImageName,
 }: {
   isValid: boolean;
   isLoading: boolean;
   onChangeName: (value: string) => void;
+  onChangeImageName: () => void;
 }) {
   const { setFieldValue, values, errors, setFieldError } =
     useFormikContext<Values>();
@@ -94,6 +96,7 @@ export function BaseForm({
             autoComplete
             checkRateLimits={values.alwaysPull}
             errors={errors?.image}
+            onChangeImage={onChangeImageName}
           >
             <div className="form-group">
               <div className="col-sm-12">

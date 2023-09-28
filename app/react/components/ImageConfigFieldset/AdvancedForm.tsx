@@ -10,10 +10,12 @@ export function AdvancedForm({
   values,
   errors,
   fieldNamespace,
+  onChangeImage,
 }: {
   values: Values;
   errors?: FormikErrors<Values>;
   fieldNamespace?: string;
+  onChangeImage?: (name: string) => void;
 }) {
   const { setFieldValue } = useFormikContext<Values>();
 
@@ -27,7 +29,11 @@ export function AdvancedForm({
         <Input
           id="image-field"
           value={values.image}
-          onChange={(e) => setFieldValue(namespaced('image'), e.target.value)}
+          onChange={(e) => {
+            const { value } = e.target;
+            setFieldValue(namespaced('image'), value);
+            onChangeImage?.(value);
+          }}
           placeholder="e.g. registry:port/my-image:my-tag"
           required
         />

@@ -17,6 +17,7 @@ export function ImageConfigFieldset({
   fieldNamespace,
   values,
   errors,
+  onChangeImage,
 }: PropsWithChildren<{
   values: Values;
   errors?: FormikErrors<Values>;
@@ -24,6 +25,7 @@ export function ImageConfigFieldset({
   checkRateLimits?: boolean;
   autoComplete?: boolean;
   setValidity: (error?: string) => void;
+  onChangeImage?: (name: string) => void;
 }>) {
   const { setFieldValue } = useFormikContext<Values>();
 
@@ -36,6 +38,7 @@ export function ImageConfigFieldset({
         fieldNamespace={fieldNamespace}
         values={values}
         errors={errors}
+        onChangeImage={onChangeImage}
       />
 
       <div className="form-group">
