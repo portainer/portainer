@@ -1,3 +1,4 @@
+import { ChangeEvent } from 'react';
 import {
   Combobox,
   ComboboxInput,
@@ -6,7 +7,6 @@ import {
   ComboboxPopover,
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
-import { ChangeEvent } from 'react';
 import clsx from 'clsx';
 
 import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
@@ -22,11 +22,15 @@ export function PathSelector({
   onChange,
   placeholder,
   model,
+  dirOnly,
+  readOnly,
 }: {
   value: string;
   onChange(value: string): void;
   placeholder: string;
   model: GitFormModel;
+  dirOnly?: boolean;
+  readOnly?: boolean;
 }) {
   const [searchTerm, setSearchTerm] = useDebounce(value, onChange);
 
@@ -36,6 +40,7 @@ export function PathSelector({
     keyword: searchTerm,
     reference: model.RepositoryReferenceName,
     tlsSkipVerify: model.TLSSkipVerify,
+    dirOnly,
     ...creds,
   };
   const enabled = Boolean(
@@ -51,10 +56,11 @@ export function PathSelector({
       data-cy="component-gitComposeInput"
     >
       <ComboboxInput
+        value={searchTerm}
         className="form-control"
         onChange={handleChange}
         placeholder={placeholder}
-        value={searchTerm}
+        readOnly={readOnly}
       />
       {searchResults && searchResults.length > 0 && (
         <ComboboxPopover>

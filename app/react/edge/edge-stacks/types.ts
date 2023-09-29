@@ -83,6 +83,12 @@ export type EdgeStack = {
   Webhook?: string;
   StackFileVersion?: number;
   EnvVars?: EnvVar[];
+  SupportRelativePath: boolean;
+  FilesystemPath?: string;
+  SupportPerDeviceConfigs?: boolean;
+  PerDeviceConfigsPath?: string;
+  PerDeviceConfigsMatchType?: string;
+  PerDeviceConfigsGroupMatchType?: string;
 };
 
 export enum EditorType {
