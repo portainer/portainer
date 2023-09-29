@@ -17,4 +17,5 @@ export interface BoxSelectorOption<T extends Value> extends IconProps {
   readonly disabledWhenLimited?: boolean;
   readonly hide?: boolean;
   readonly iconType?: 'raw' | 'badge' | 'logo';
+  readonly iconClass?: string;
 }

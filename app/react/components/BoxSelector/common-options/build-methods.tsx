@@ -53,10 +53,11 @@ export const customTemplate: BoxSelectorOption<'template'> = {
 export const helm: BoxSelectorOption<'helm'> = {
   id: 'method_helm',
   icon: Helm,
-  iconType: 'logo',
+  iconType: 'raw',
   label: 'Helm',
   description: 'Use a Helm chart',
   value: 'helm',
+  iconClass: 'icon-helm',
 };
 
 export const url: BoxSelectorOption<'url'> = {

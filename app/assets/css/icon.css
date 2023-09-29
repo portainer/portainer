@@ -128,3 +128,9 @@ pr-icon {
 .btn-only-icon pr-icon {
   margin-top: 0;
 }
+
+.icon-helm {
+  color: #0f1689;
+  @apply th-dark:text-white;
+  @apply th-highcontrast:text-white;
+}
