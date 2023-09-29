@@ -61,7 +61,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError("An error occurred retrieving webhooks from the database", err)
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A webhook for this resource already exists", Err: errors.New("A webhook for this resource already exists")}
+		return httperror.Conflict("A webhook for this resource already exists", errors.New("A webhook for this resource already exists"))
 	}
 
 	endpointID := payload.EndpointID

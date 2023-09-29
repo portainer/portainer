@@ -78,7 +78,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
 	}
 	if rc != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A resource control is already associated to this resource", Err: errResourceControlAlreadyExists}
+		return httperror.Conflict("A resource control is already associated to this resource", errResourceControlAlreadyExists)
 	}
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)

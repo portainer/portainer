@@ -74,7 +74,7 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 		if settings.AuthenticationMethod == portainer.AuthenticationInternal ||
 			settings.AuthenticationMethod == portainer.AuthenticationOAuth ||
 			(settings.AuthenticationMethod == portainer.AuthenticationLDAP && !settings.LDAPSettings.AutoCreateUsers) {
-			return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Invalid credentials", Err: httperrors.ErrUnauthorized}
+			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 		}
 	}
 
@@ -83,14 +83,14 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationOAuth {
-		return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Only initial admin is allowed to login without oauth", Err: httperrors.ErrUnauthorized}
+		return httperror.NewError(http.StatusUnprocessableEntity, "Only initial admin is allowed to login without oauth", httperrors.ErrUnauthorized)
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
 		return handler.authenticateLDAP(rw, user, payload.Username, payload.Password, &settings.LDAPSettings)
 	}
 
-	return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Login method is not supported", Err: httperrors.ErrUnauthorized}
+	return httperror.NewError(http.StatusUnprocessableEntity, "Login method is not supported", httperrors.ErrUnauthorized)
 }
 
 func isUserInitialAdmin(user *portainer.User) bool {
@@ -100,7 +100,7 @@ func isUserInitialAdmin(user *portainer.User) bool {
 func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
 	err := handler.CryptoService.CompareHashAndData(user.Password, password)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Invalid credentials", Err: httperrors.ErrUnauthorized}
+		return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 	}
 
 	forceChangePassword := !handler.passwordStrengthChecker.Check(password)

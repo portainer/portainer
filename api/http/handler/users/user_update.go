@@ -107,7 +107,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 			return httperror.InternalServerError("Unable to retrieve users from the database", err)
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another user with the same username already exists", Err: errUserAlreadyExists}
+			return httperror.Conflict("Another user with the same username already exists", errUserAlreadyExists)
 		}
 
 		user.Username = payload.Username
