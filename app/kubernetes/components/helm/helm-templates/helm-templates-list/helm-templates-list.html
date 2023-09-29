@@ -1,53 +1,54 @@
 <div class="datatable">
-  <rd-widget>
-    <rd-widget-body classes="no-padding">
-      <div class="toolBar vertical-center relative w-full flex-wrap !gap-x-5 !gap-y-1">
-        <div class="toolBarTitle vertical-center">
-          <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon"></pr-icon>
-          </div>
+  <div class="toolBar vertical-center relative w-full flex-wrap !gap-x-5 !gap-y-1 !px-0">
+    <div class="toolBarTitle vertical-center">
+      {{ $ctrl.titleText }}
+    </div>
 
-          {{ $ctrl.titleText }}
-        </div>
+    <div class="searchBar vertical-center !mr-0">
+      <pr-icon icon="'search'" class="searchIcon"></pr-icon>
+      <input
+        type="text"
+        class="searchInput"
+        ng-model="$ctrl.state.textFilter"
+        ng-change="$ctrl.onTextFilterChange()"
+        placeholder="Search for a chart..."
+        auto-focus
+        ng-model-options="{ debounce: 300 }"
+      />
+    </div>
+    <div class="w-1/5">
+      <por-select
+        placeholder="'Select a category'"
+        value="$ctrl.state.selectedCategory"
+        options="$ctrl.state.categories"
+        on-change="($ctrl.onCategoryChange)"
+        is-clearable="true"
+        bind-to-body="true"
+      ></por-select>
+    </div>
+  </div>
+  <div class="w-full">
+    <div class="mb-2 small"
+      >Select the Helm chart to use. Bring further Helm charts into your selection list via <a ui-sref="portainer.account">User settings - Helm repositories</a>.</div
+    >
+    <beta-alert
+      is-html="true"
+      message="'Beta feature - so far, this functionality has been tested in limited scenarios. For more information, see this <a href=\'https://www.portainer.io/blog/portainer-now-with-helm-support\' target=\'_blank\' class=\'hyperlink\'>blog post on Portainer Helm support</a>.'"
+    ></beta-alert>
+  </div>
 
-        <div class="searchBar vertical-center !mr-0">
-          <pr-icon icon="'search'" class="searchIcon"></pr-icon>
-          <input
-            type="text"
-            class="searchInput"
-            ng-model="$ctrl.state.textFilter"
-            ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search for a chart..."
-            auto-focus
-            ng-model-options="{ debounce: 300 }"
-          />
-        </div>
-        <div class="w-1/5">
-          <por-select
-            placeholder="'Select a category'"
-            value="$ctrl.state.selectedCategory"
-            options="$ctrl.state.categories"
-            on-change="($ctrl.onCategoryChange)"
-            is-clearable="true"
-            bind-to-body="true"
-          ></por-select>
-        </div>
-      </div>
-
-      <div class="blocklist">
-        <helm-templates-list-item
-          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory"
-          model="chart"
-          type-label="helm"
-          on-select="($ctrl.selectAction)"
-        >
-        </helm-templates-list-item>
-        <div ng-if="$ctrl.loading" class="text-muted text-center">
-          Loading...
-          <div class="text-muted text-center"> Initial download of Helm Charts can take a few minutes </div>
-        </div>
-        <div ng-if="!$ctrl.loading && $ctrl.charts.length === 0" class="text-muted text-center"> No helm charts available. </div>
-      </div>
-    </rd-widget-body>
-  </rd-widget>
+  <div class="blocklist !px-0">
+    <helm-templates-list-item
+      ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory"
+      model="chart"
+      type-label="helm"
+      on-select="($ctrl.selectAction)"
+    >
+    </helm-templates-list-item>
+    <div ng-if="$ctrl.loading" class="text-muted text-center">
+      Loading...
+      <div class="text-muted text-center"> Initial download of Helm Charts can take a few minutes </div>
+    </div>
+    <div ng-if="!$ctrl.loading && $ctrl.charts.length === 0" class="text-muted text-center"> No helm charts available. </div>
+  </div>
 </div>

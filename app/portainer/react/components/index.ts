@@ -8,6 +8,7 @@ import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsB
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
 import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
+import { HelmRepositoryDatatable } from '@/react/portainer/account/AccountView/HelmRepositoryDatatable';
 
 import {
   EnvironmentVariablesFieldset,
@@ -223,6 +224,13 @@ export const ngModule = angular
   .component(
     'associatedEndpointsSelector',
     r2a(withReactQuery(AssociatedEnvironmentsSelector), ['onChange', 'value'])
+  )
+  .component(
+    'helmRepositoryDatatable',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(HelmRepositoryDatatable))),
+      []
+    )
   );
 
 export const componentsModule = ngModule.name;

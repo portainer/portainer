@@ -50,11 +50,11 @@ export default class HelmTemplatesController {
     this.state.actionInProgress = true;
     try {
       const payload = {
-        Name: this.state.appName,
+        Name: this.stackName,
         Repo: this.state.chart.repo,
         Chart: this.state.chart.name,
         Values: this.state.values,
-        Namespace: this.state.resourcePool.Namespace.Name,
+        Namespace: this.namespace,
       };
       await this.HelmService.install(this.endpoint.Id, payload);
       this.Notifications.success('Success', 'Helm Chart successfully installed');
@@ -96,7 +96,7 @@ export default class HelmTemplatesController {
     this.state.reposLoading = true;
     try {
       // fetch globally set helm repo and user helm repos (parallel)
-      const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
+      const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.user.ID);
       this.state.globalRepository = GlobalRepository;
       const userHelmReposUrls = UserRepositories.map((repo) => repo.URL);
       const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()).filter((url) => url); // remove duplicates and blank, to lowercase
@@ -155,6 +155,8 @@ export default class HelmTemplatesController {
 
   $onInit() {
     return this.$async(async () => {
+      this.user = this.Authentication.getUserDetails();
+
       this.state = {
         appName: '',
         chart: null,
@@ -177,6 +179,13 @@ export default class HelmTemplatesController {
 
       const helmRepos = await this.getHelmRepoURLs();
       await Promise.all([this.getLatestCharts(helmRepos), this.getResourcePools()]);
+
+      if (this.state.charts.length > 0 && this.$state.params.chartName) {
+        const chart = this.state.charts.find((chart) => chart.name === this.$state.params.chartName);
+        if (chart) {
+          this.selectHelmChart(chart);
+        }
+      }
 
       this.state.viewReady = true;
     });

@@ -327,7 +327,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const deploy = {
       name: 'kubernetes.deploy',
-      url: '/deploy?templateId&referrer&tab',
+      url: '/deploy?templateId&referrer&tab&buildMethod&chartName',
       views: {
         'content@': {
           component: 'kubernetesDeployView',

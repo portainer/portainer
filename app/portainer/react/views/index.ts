@@ -12,6 +12,7 @@ import { EdgeAutoCreateScriptView } from '@/react/portainer/environments/EdgeAut
 import { ListView as EnvironmentsListView } from '@/react/portainer/environments/ListView';
 import { BackupSettingsPanel } from '@/react/portainer/settings/SettingsView/BackupSettingsView/BackupSettingsPanel';
 import { SettingsView } from '@/react/portainer/settings/SettingsView/SettingsView';
+import { CreateHelmRepositoriesView } from '@/react/portainer/account/help-repositories/CreateHelmRepositoryView';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -59,4 +60,11 @@ export const viewsModule = angular
   .component(
     'settingsView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(SettingsView))), [])
+  )
+  .component(
+    'createHelmRepositoryView',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(CreateHelmRepositoriesView))),
+      []
+    )
   ).name;

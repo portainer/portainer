@@ -7,6 +7,7 @@ export const KubernetesDeployBuildMethods = Object.freeze({
   WEB_EDITOR: 2,
   CUSTOM_TEMPLATE: 3,
   URL: 4,
+  HELM: 5,
 });
 
 export const KubernetesDeployRequestMethods = Object.freeze({
