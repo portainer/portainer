@@ -1,4 +1,4 @@
-package users
+package helm
 
 import (
 	"net/http"
@@ -36,13 +36,14 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "User identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @param payload body addHelmRepoUrlPayload true "Helm Repository"
-// @success 200 {object} portaineree.HelmUserRepository "Success"
+// @success 200 {object} portainer.HelmUserRepository "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
-// @router /users/{id}/helm/repositories [post]
+// @deprecated
+// @router /endpoints/{id}/kubernetes/helm/repositories [post]
 func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
@@ -59,7 +60,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	// lowercase, remove trailing slash
 	p.URL = strings.TrimSuffix(strings.ToLower(p.URL), "/")
 
-	records, err := handler.DataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
+	records, err := handler.dataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to access the DataStore", err)
 	}
@@ -77,7 +78,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 		URL:    p.URL,
 	}
 
-	err = handler.DataStore.HelmUserRepository().Create(&record)
+	err = handler.dataStore.HelmUserRepository().Create(&record)
 	if err != nil {
 		return httperror.InternalServerError("Unable to save a user Helm repository URL", err)
 	}
@@ -98,7 +99,8 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
-// @router /users/{id}/helm/repositories [get]
+// @deprecated
+// @router /endpoints/{id}/kubernetes/helm/repositories [get]
 func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
@@ -106,12 +108,12 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	}
 	userID := portainer.UserID(tokenData.ID)
 
-	settings, err := handler.DataStore.Settings().Settings()
+	settings, err := handler.dataStore.Settings().Settings()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
-	userRepos, err := handler.DataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
+	userRepos, err := handler.dataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to get user Helm repositories", err)
 	}
@@ -122,47 +124,4 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	}
 
 	return response.JSON(w, resp)
-}
-
-// @id HelmUserRepositoryDelete
-// @summary Delete a users helm repositoryies
-// @description **Access policy**: authenticated
-// @tags helm
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param id path int true "User identifier"
-// @param repositoryID path int true "Repository identifier"
-// @success 204 "Success"
-// @failure 400 "Invalid request"
-// @failure 403 "Permission denied"
-// @failure 500 "Server error"
-// @router /users/{id}/helm/repositories/{repositoryID} [delete]
-func (handler *Handler) userDeleteHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
-	}
-	userID := portainer.UserID(tokenData.ID)
-
-	repositoryID, err := request.RetrieveNumericRouteVariableValue(r, "repositoryID")
-	if err != nil {
-		return httperror.BadRequest("Invalid user identifier route variable", err)
-	}
-
-	userRepos, err := handler.DataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
-	if err != nil {
-		return httperror.InternalServerError("Unable to get user Helm repositories", err)
-	}
-
-	for _, repo := range userRepos {
-		if repo.ID == portainer.HelmUserRepositoryID(repositoryID) && repo.UserID == userID {
-			err = handler.DataStore.HelmUserRepository().Delete(portainer.HelmUserRepositoryID(repositoryID))
-			if err != nil {
-				return httperror.InternalServerError("Unable to delete user Helm repository", err)
-			}
-		}
-	}
-
-	return response.JSON(w, nil)
 }

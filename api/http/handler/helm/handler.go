@@ -52,6 +52,11 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	h.Handle("/{id}/kubernetes/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmInstall))).Methods(http.MethodPost)
 
+	h.Handle("/{id}/kubernetes/helm/repositories",
+		httperror.LoggerHandler(h.userGetHelmRepos)).Methods(http.MethodGet)
+	h.Handle("/{id}/kubernetes/helm/repositories",
+		httperror.LoggerHandler(h.userCreateHelmRepo)).Methods(http.MethodPost)
+
 	return h
 }
 
