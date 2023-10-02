@@ -26,7 +26,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     HttpRequestHelper,
     LocalStorage,
     CONSOLE_COMMANDS_LABEL_PREFIX,
-    SidebarService,
+    SidebarService
   ) {
     var socket, term;
 
