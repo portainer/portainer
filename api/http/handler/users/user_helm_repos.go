@@ -27,7 +27,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
-// @id HelmUserRepositoryCreate
+// @id HelmUserRepositoryCreateV2
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
@@ -85,7 +85,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	return response.JSON(w, record)
 }
 
-// @id HelmUserRepositoriesList
+// @id HelmUserRepositoriesListV2
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated
@@ -124,7 +124,7 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	return response.JSON(w, resp)
 }
 
-// @id HelmUserRepositoryDelete
+// @id HelmUserRepositoryDeleteV2
 // @summary Delete a users helm repositoryies
 // @description **Access policy**: authenticated
 // @tags helm
