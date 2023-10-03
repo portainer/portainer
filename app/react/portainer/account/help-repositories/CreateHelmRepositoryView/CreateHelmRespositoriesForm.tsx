@@ -4,7 +4,7 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 
 import {
   CreateHelmRepositoryPayload,
-  CreateHelmRepositoryFormValues,
+  HelmRepositoryFormValues,
 } from '../../AccountView/HelmRepositoryDatatable/types';
 import {
   useHelmRepositories,
@@ -27,7 +27,7 @@ export function CreateHelmRepositoryForm() {
     />
   );
 
-  function onSubmit(values: CreateHelmRepositoryFormValues) {
+  function onSubmit(values: HelmRepositoryFormValues) {
     const payload: CreateHelmRepositoryPayload = {
       ...values,
       UserId: currentUser.user.Id,

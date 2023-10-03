@@ -1,27 +1,24 @@
 import { Field, Form, Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
-
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Button } from '@@/buttons';
 
-import { CreateHelmRepositoryPayload } from '../../AccountView/HelmRepositoryDatatable/types';
+import { HelmRepositoryFormValues } from '../../AccountView/HelmRepositoryDatatable/types';
 
 import { validationSchema } from './CreateHelmRepositoryForm.validation';
 
 type Props = {
   isEditing?: boolean;
   isLoading: boolean;
-  onSubmit: (formValues: CreateHelmRepositoryPayload) => void;
+  onSubmit: (formValues: HelmRepositoryFormValues) => void;
   URLs: string[];
 };
 
-const defaultInitialValues = {
+const defaultInitialValues: HelmRepositoryFormValues = {
   URL: '',
-  UserId: 0,
 };
 
 export function HelmRepositoryForm({
@@ -32,11 +29,8 @@ export function HelmRepositoryForm({
 }: Props) {
   const router = useRouter();
 
-  const { user } = useCurrentUser();
-  defaultInitialValues.UserId = user.Id;
-
   return (
-    <Formik
+    <Formik<HelmRepositoryFormValues>
       initialValues={defaultInitialValues}
       enableReinitialize
       validationSchema={() => validationSchema(URLs)}

@@ -3,7 +3,7 @@ export interface CreateHelmRepositoryPayload {
   URL: string;
 }
 
-export interface CreateHelmRepositoryFormValues {
+export interface HelmRepositoryFormValues {
   URL: string;
 }
 
