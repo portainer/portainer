@@ -2,7 +2,10 @@ import { useRouter } from '@uirouter/react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 
-import { CreateHelmRepositoryPayload } from '../../AccountView/HelmRepositoryDatatable/types';
+import {
+  CreateHelmRepositoryPayload,
+  CreateHelmRepositoryFormValues,
+} from '../../AccountView/HelmRepositoryDatatable/types';
 import {
   useHelmRepositories,
   useCreateHelmRepositoryMutation,
@@ -24,7 +27,7 @@ export function CreateHelmRepositoryForm() {
     />
   );
 
-  function onSubmit(values: CreateHelmRepositoryPayload) {
+  function onSubmit(values: CreateHelmRepositoryFormValues) {
     const payload: CreateHelmRepositoryPayload = {
       ...values,
       UserId: currentUser.user.Id,

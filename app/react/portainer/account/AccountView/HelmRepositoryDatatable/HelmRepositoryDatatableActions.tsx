@@ -4,7 +4,6 @@ import { Plus, Trash2 } from 'lucide-react';
 import { pluralize } from '@/portainer/helpers/strings';
 
 import { confirmDestructive } from '@@/modals/confirm';
-import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
 
 import { HelmRepository } from './types';
@@ -25,7 +24,7 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
         color="dangerlight"
         onClick={() => onDeleteClick(selectedItems)}
         data-cy="credentials-deleteButton"
-        icon={<Icon icon={Trash2} />}
+        icon={Trash2}
       >
         Remove
       </Button>
@@ -35,7 +34,7 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
           router.stateService.go('portainer.account.createHelmRepository')
         }
         data-cy="credentials-addButton"
-        icon={<Icon icon={Plus} />}
+        icon={Plus}
       >
         Add Helm Repository
       </Button>

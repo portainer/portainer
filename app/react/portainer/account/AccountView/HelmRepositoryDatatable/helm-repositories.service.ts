@@ -58,9 +58,7 @@ export function useDeleteHelmRepositoryMutation() {
       notifySuccess('Helm repository deleted successfully', helmRepository.URL);
       return queryClient.invalidateQueries(['helmrepositories']);
     },
-    meta: {
-      ...withError('Unable to delete Helm repository'),
-    },
+    ...withError('Unable to delete Helm repository'),
   });
 }
 
@@ -79,18 +77,14 @@ export function useDeleteHelmRepositoriesMutation() {
       );
       return queryClient.invalidateQueries(['helmrepositories']);
     },
-    meta: {
-      ...withError('Unable to delete Helm repositories'),
-    },
+    ...withError('Unable to delete Helm repositories'),
   });
 }
 
 export function useHelmRepositories(userId: number) {
   return useQuery('helmrepositories', () => getHelmRepositories(userId), {
     staleTime: 20,
-    meta: {
-      ...withError('Unable to retrieve Helm repositories'),
-    },
+    ...withError('Unable to retrieve Helm repositories'),
   });
 }
 
@@ -102,9 +96,7 @@ export function useCreateHelmRepositoryMutation() {
       notifySuccess('Helm repository created successfully', payload.URL);
       return queryClient.invalidateQueries(['helmrepositories']);
     },
-    meta: {
-      ...withError('Unable to create Helm repository'),
-    },
+    ...withError('Unable to create Helm repository'),
   });
 }
 

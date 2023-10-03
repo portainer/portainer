@@ -3,6 +3,10 @@ export interface CreateHelmRepositoryPayload {
   URL: string;
 }
 
+export interface CreateHelmRepositoryFormValues {
+  URL: string;
+}
+
 export interface HelmRepository {
   Id: number;
   UserId: number;
