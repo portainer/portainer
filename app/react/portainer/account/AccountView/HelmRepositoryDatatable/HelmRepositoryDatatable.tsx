@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useCurrentUser } from '@/react/hooks/useUser';
 import helm from '@/assets/ico/helm.svg?c';
 
@@ -20,17 +22,22 @@ export function HelmRepositoryDatatable() {
 
   const tableState = useTableState(settingsStore, storageKey);
 
-  let helmRepos = [];
-  if (helmReposQuery.data?.GlobalRepository) {
-    const helmrepository: HelmRepository = {
-      Global: true,
-      URL: helmReposQuery.data.GlobalRepository,
-      Id: 0,
-      UserId: 0,
-    };
-    helmRepos.push(helmrepository);
-  }
-  helmRepos = [...helmRepos, ...(helmReposQuery.data?.UserRepositories ?? [])];
+  const helmRepos = useMemo(() => {
+    const helmRepos = [];
+    if (helmReposQuery.data?.GlobalRepository) {
+      const helmrepository: HelmRepository = {
+        Global: true,
+        URL: helmReposQuery.data.GlobalRepository,
+        Id: 0,
+        UserId: 0,
+      };
+      helmRepos.push(helmrepository);
+    }
+    return [...helmRepos, ...(helmReposQuery.data?.UserRepositories ?? [])];
+  }, [
+    helmReposQuery.data?.GlobalRepository,
+    helmReposQuery.data?.UserRepositories,
+  ]);
 
   return (
     <Datatable
