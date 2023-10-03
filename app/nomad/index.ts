@@ -81,6 +81,9 @@ function config($stateRegistryProvider: StateRegistry) {
         component: 'nomadDashboardView',
       },
     },
+    data: {
+      docs: '/user/nomad/dashboard',
+    },
   };
 
   const jobs = {
@@ -90,6 +93,9 @@ function config($stateRegistryProvider: StateRegistry) {
       'content@': {
         component: 'nomadJobsView',
       },
+    },
+    data: {
+      docs: '/user/nomad/jobs',
     },
   };
 
