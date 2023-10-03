@@ -139,7 +139,7 @@
     "@storybook/addon-styling": "^1.0.8",
     "@storybook/react": "^7.0.18",
     "@storybook/react-webpack5": "^7.0.18",
-    "@svgr/webpack": "^8.0.1",
+    "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
