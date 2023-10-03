@@ -73,7 +73,6 @@
       },
       "LastCheckInDate": 0,
       "Name": "local",
-      "PendingActions": null,
       "PostInitMigrations": {
         "MigrateGPUs": true,
         "MigrateIngresses": true

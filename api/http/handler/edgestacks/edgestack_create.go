@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -17,6 +18,7 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
+
 	dryrun, _ := request.RetrieveBooleanQueryParameter(r, "dryrun", true)
 
 	tokenData, err := security.RetrieveTokenData(r)
@@ -54,4 +56,27 @@ func (handler *Handler) createSwarmStack(tx dataservices.DataStoreTx, method str
 	}
 
 	return nil, httperrors.NewInvalidPayloadError("Invalid value for query parameter: method. Value must be one of: string, repository or file")
+}
+
+// @id EdgeStackCreate
+// @summary Create an EdgeStack
+// @description **Access policy**: administrator
+// @tags edge_stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file,string,repository)
+// @param body body object true "for body documentation see the relevant /edge_stacks/create/{method} endpoint"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @deprecated
+// @router /edge_stacks [post]
+func deprecatedEdgeStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
+	method, err := request.RetrieveQueryParameter(r, "method", false)
+	if err != nil {
+		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
+	}
+
+	return fmt.Sprintf("/edge_stacks/create/%s", method), nil
 }

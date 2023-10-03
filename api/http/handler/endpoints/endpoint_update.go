@@ -12,6 +12,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 type endpointUpdatePayload struct {
@@ -264,7 +265,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 			err = handler.AuthorizationService.CleanNAPWithOverridePolicies(handler.DataStore, endpoint, nil)
 			if err != nil {
-				return httperror.InternalServerError("Unable to update user authorizations", err)
+				handler.PendingActionsService.Create(portainer.PendingActions{
+					EndpointID: endpoint.ID,
+					Action:     "CleanNAPWithOverridePolicies",
+					ActionData: nil,
+				})
+				log.Warn().Err(err).Msgf("Unable to clean NAP with override policies for endpoint (%d). Will try to update when endpoint is online.", endpoint.ID)
 			}
 		}
 	}

@@ -30,7 +30,7 @@ export function HelmCertPanel() {
   };
 
   return (
-    <BEOverlay featureId={FeatureId.CA_FILE}>
+    <BEOverlay featureId={FeatureId.CA_FILE} className="!p-0">
       <Widget>
         <Widget.Title
           icon={Key}

@@ -176,7 +176,7 @@ angular.module('portainer.app').controller('StackController', [
       // The EndpointID property is not available for these stacks, we can pass
       // the current endpoint identifier as a part of the migrate request. It will be used if
       // the EndpointID property is not defined on the stack.
-      if (stack.EndpointId === 0) {
+      if (!stack.EndpointId) {
         stack.EndpointId = endpoint.Id;
       }
 
@@ -248,7 +248,7 @@ angular.module('portainer.app').controller('StackController', [
         // The EndpointID property is not available for these stacks, we can pass
         // the current endpoint identifier as a part of the update request. It will be used if
         // the EndpointID property is not defined on the stack.
-        if (stack.EndpointId === 0) {
+        if (!stack.EndpointId) {
           stack.EndpointId = endpoint.Id;
         }
 
@@ -345,6 +345,11 @@ angular.module('portainer.app').controller('StackController', [
             let resourcesPromise = Promise.resolve({});
             if (!stack.Status || stack.Status === 1) {
               resourcesPromise = stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name);
+            }
+
+            // Workaround for EE-6118
+            if (!stack.EndpointId) {
+              stack.EndpointId = endpoint.Id;
             }
 
             return $q.all({

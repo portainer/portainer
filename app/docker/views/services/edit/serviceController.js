@@ -92,6 +92,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     endpoint
   ) {
     $scope.resourceType = ResourceControlType.Service;
+    $scope.WebhookExists = false;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
@@ -463,6 +464,27 @@ angular.module('portainer.docker').controller('ServiceController', [
 
       config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
       config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
+
+      // support removal and (future) editing of credential specs
+      const credSpec = service.ServiceConfigs.find((config) => config.credSpec);
+      const credSpecId = credSpec ? credSpec.Id : '';
+      const oldCredSpecId =
+        (config.TaskTemplate.ContainerSpec.Privileges &&
+          config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec &&
+          config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec.Config) ||
+        '';
+      if (oldCredSpecId && !credSpecId) {
+        delete config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec;
+      } else if (oldCredSpecId !== credSpec) {
+        config.TaskTemplate.ContainerSpec.Privileges = {
+          ...(config.TaskTemplate.ContainerSpec.Privileges || {}),
+          CredentialSpec: {
+            ...((config.TaskTemplate.ContainerSpec.Privileges && config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec) || {}),
+            Config: credSpec,
+          },
+        };
+      }
+
       config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
 
       if (service.Mode === 'replicated') {
@@ -583,8 +605,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.updateService = function updateService(service) {
-      let config = {};
-      service, (config = buildChanges(service));
+      const config = buildChanges(service);
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
@@ -736,7 +757,6 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
           $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');
-          $scope.WebhookExists = false;
 
           const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks || []), 'Target');
           const networks = _.filter(
@@ -831,6 +851,11 @@ angular.module('portainer.docker').controller('ServiceController', [
     $scope.filterNetworks = filterNetworks;
     function filterNetworks(networks, current) {
       return networks.filter((network) => !network.Ingress && (network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id)));
+    }
+
+    $scope.filterConfigs = filterConfigs;
+    function filterConfigs(configs) {
+      return configs.filter((config) => $scope.service.ServiceConfigs.every((serviceConfig) => config.Id !== serviceConfig.Id));
     }
 
     function updateServiceArray(service, name) {

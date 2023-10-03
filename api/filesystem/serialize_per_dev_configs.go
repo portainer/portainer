@@ -9,6 +9,39 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+type MultiFilterArgs []struct {
+	FilterKey  string
+	FilterType portainer.PerDevConfigsFilterType
+}
+
+// MultiFilterDirForPerDevConfigs filers the given dirEntries with multiple filter args, returns the merged entries for the given device
+func MultiFilterDirForPerDevConfigs(dirEntries []DirEntry, configPath string, multiFilterArgs MultiFilterArgs) []DirEntry {
+	var filteredDirEntries []DirEntry
+
+	for _, multiFilterArg := range multiFilterArgs {
+		tmp := FilterDirForPerDevConfigs(dirEntries, multiFilterArg.FilterKey, configPath, multiFilterArg.FilterType)
+		filteredDirEntries = append(filteredDirEntries, tmp...)
+	}
+
+	return deduplicate(filteredDirEntries)
+}
+
+func deduplicate(dirEntries []DirEntry) []DirEntry {
+	var deduplicatedDirEntries []DirEntry
+
+	marks := make(map[string]struct{})
+
+	for _, dirEntry := range dirEntries {
+		_, ok := marks[dirEntry.Name]
+		if !ok {
+			marks[dirEntry.Name] = struct{}{}
+			deduplicatedDirEntries = append(deduplicatedDirEntries, dirEntry)
+		}
+	}
+
+	return deduplicatedDirEntries
+}
+
 // FilterDirForPerDevConfigs filers the given dirEntries, returns entries for the given device
 // For given configPath A/B/C, return entries:
 //  1. all entries outside of dir A
@@ -47,10 +80,14 @@ func shouldIncludeEntry(dirEntry DirEntry, deviceName, configPath string, filter
 		return shouldIncludeFile(dirEntry, deviceName, configPath)
 	}
 
-	// Include:
-	// dir entry A/B/C/<deviceName>
-	// all entries A/B/C/<deviceName>/*
-	return shouldIncludeDir(dirEntry, deviceName, configPath)
+	if filterType == portainer.PerDevConfigsTypeDir {
+		// Include:
+		// dir entry A/B/C/<deviceName>
+		// all entries A/B/C/<deviceName>/*
+		return shouldIncludeDir(dirEntry, deviceName, configPath)
+	}
+
+	return false
 }
 
 func isInConfigRootDir(dirEntry DirEntry, configPath string) bool {

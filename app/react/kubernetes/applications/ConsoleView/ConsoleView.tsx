@@ -3,7 +3,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { Terminal as TerminalIcon } from 'lucide-react';
 import { Terminal } from 'xterm';
 
-import { useLocalStorage } from '@/react/hooks/useLocalStorage';
+import { get } from '@/react/hooks/useLocalStorage';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifyError } from '@/portainer/services/notifications';
 
@@ -27,7 +27,6 @@ export function ConsoleView() {
     },
   } = useCurrentStateAndParams();
 
-  const [jwtToken] = useLocalStorage('JWT', '');
   const [command, setCommand] = useState('/bin/sh');
   const [connectionStatus, setConnectionStatus] = useState('closed');
   const [terminal, setTerminal] = useState(null as Terminal | null);
@@ -132,6 +131,9 @@ export function ConsoleView() {
                     value={command}
                     onChange={(e) => setCommand(e.target.value)}
                     id="consoleCommand"
+                    // disable eslint because we want to autofocus
+                    // this is ok because we only have one input on the page
+                    // https://portainer.atlassian.net/browse/EE-5752
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
                   />
@@ -167,6 +169,8 @@ export function ConsoleView() {
   );
 
   function connectConsole() {
+    const jwtToken = get('JWT', '');
+
     const params: StringDictionary = {
       token: jwtToken,
       endpointId: environmentId,

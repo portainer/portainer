@@ -56,9 +56,9 @@
                 <table-column-header
                   col-title="'Environments Count'"
                   can-sort="true"
-                  is-sorted="$ctrl.state.orderBy === 'Endpoints.length'"
-                  is-sorted-desc="$ctrl.state.orderBy === 'Endpoints.length' && $ctrl.state.reverseOrder"
-                  ng-click="$ctrl.changeOrderBy('Endpoints.length')"
+                  is-sorted="$ctrl.state.orderBy === 'TrustedEndpoints.length'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'TrustedEndpoints.length' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('TrustedEndpoints.length')"
                 ></table-column-header>
               </th>
               <th>
@@ -91,7 +91,7 @@
                 <a ui-sref="edge.groups.edit({groupId: item.Id})">{{ item.Name }}</a>
                 <span ng-if="item.HasEdgeStack || item.HasEdgeJob" class="label label-info image-tag space-left">in use</span>
               </td>
-              <td>{{ item.Endpoints.length }}</td>
+              <td>{{ item.TrustedEndpoints.length }}</td>
               <td>{{ item.Dynamic ? 'Dynamic' : 'Static' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

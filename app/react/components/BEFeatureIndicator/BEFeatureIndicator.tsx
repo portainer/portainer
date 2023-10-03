@@ -29,16 +29,14 @@ export function BEFeatureIndicator({
   }
   return (
     <a
-      className={clsx('be-indicator vertical-center', className)}
+      className={clsx('be-indicator vertical-center text-xs', className)}
       href={url}
       target="_blank"
       rel="noopener noreferrer"
     >
       {children}
       {showIcon && <Icon icon={Briefcase} className="be-indicator-icon mr-1" />}
-      <span className="be-indicator-label break-words">
-        Business Edition Feature
-      </span>
+      <span className="be-indicator-label break-words">Business Feature</span>
     </a>
   );
 }

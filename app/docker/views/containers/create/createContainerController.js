@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 
-import * as envVarsUtils from '@/react/components/form-components/EnvironmentVariablesFieldset/utils';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 import { confirmDestructive } from '@@/modals/confirm';
@@ -8,11 +7,18 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { buildConfirmButton } from '@@/modals/utils';
 
 import { commandsTabUtils } from '@/react/docker/containers/CreateView/CommandsTab';
-import { ContainerCapabilities, ContainerCapability } from '@/docker/models/containerCapabilities';
+import { volumesTabUtils } from '@/react/docker/containers/CreateView/VolumesTab';
+import { networkTabUtils } from '@/react/docker/containers/CreateView/NetworkTab';
+import { capabilitiesTabUtils } from '@/react/docker/containers/CreateView/CapabilitiesTab';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '@/docker/models/container';
+import { labelsTabUtils } from '@/react/docker/containers/CreateView/LabelsTab';
 
 import './createcontainer.css';
+import { envVarsTabUtils } from '@/react/docker/containers/CreateView/EnvVarsTab';
+import { getContainers } from '@/react/docker/containers/queries/containers';
+import { resourcesTabUtils } from '@/react/docker/containers/CreateView/ResourcesTab';
+import { restartPolicyTabUtils } from '@/react/docker/containers/CreateView/RestartPolicyTab';
 
 angular.module('portainer.docker').controller('CreateContainerController', [
   '$q',
@@ -25,7 +31,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'Container',
   'ContainerHelper',
   'ImageHelper',
-  'Volume',
   'NetworkService',
   'ResourceControlService',
   'Authentication',
@@ -49,7 +54,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     Container,
     ContainerHelper,
     ImageHelper,
-    Volume,
     NetworkService,
     ResourceControlService,
     Authentication,
@@ -64,7 +68,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     endpoint
   ) {
     $scope.create = create;
-    $scope.update = update;
     $scope.endpoint = endpoint;
     $scope.containerWebhookFeature = FeatureId.CONTAINER_WEBHOOK;
     $scope.formValues = {
@@ -75,9 +78,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         selectedGPUs: ['all'],
         capabilities: ['compute', 'utility'],
       },
-      Volumes: [],
-      NetworkContainer: null,
-      Labels: [],
       ExtraHosts: [],
       MacAddress: '',
       IPv4: '',
@@ -85,19 +85,18 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       DnsPrimary: '',
       DnsSecondary: '',
       AccessControlData: new AccessControlFormData(),
-      CpuLimit: 0,
-      MemoryLimit: 0,
-      MemoryReservation: 0,
-      ShmSize: 64,
-      Env: [],
       NodeName: null,
-      capabilities: [],
-      Sysctls: [],
       RegistryModel: new PorImageRegistryModel(),
-      commands: commandsTabUtils.getDefaultViewModel(),
-    };
 
-    $scope.extraNetworks = {};
+      commands: commandsTabUtils.getDefaultViewModel(),
+      envVars: envVarsTabUtils.getDefaultViewModel(),
+      volumes: volumesTabUtils.getDefaultViewModel(),
+      network: networkTabUtils.getDefaultViewModel(),
+      resources: resourcesTabUtils.getDefaultViewModel(),
+      capabilities: capabilitiesTabUtils.getDefaultViewModel(),
+      restartPolicy: restartPolicyTabUtils.getDefaultViewModel(),
+      labels: labelsTabUtils.getDefaultViewModel(),
+    };
 
     $scope.state = {
       formValidationError: '',
@@ -114,12 +113,53 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.handlePrivilegedChange = handlePrivilegedChange;
     $scope.handleInitChange = handleInitChange;
     $scope.handleCommandsChange = handleCommandsChange;
+    $scope.handleEnvVarsChange = handleEnvVarsChange;
 
     function handleCommandsChange(commands) {
       return $scope.$evalAsync(() => {
         $scope.formValues.commands = commands;
       });
     }
+
+    function handleEnvVarsChange(value) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.envVars = value;
+      });
+    }
+
+    $scope.onVolumesChange = function (volumes) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.volumes = volumes;
+      });
+    };
+    $scope.onNetworkChange = function (network) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.network = network;
+      });
+    };
+    $scope.onLabelsChange = function (labels) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.labels = labels;
+      });
+    };
+
+    $scope.onResourcesChange = function (resources) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.resources = resources;
+      });
+    };
+
+    $scope.onCapabilitiesChange = function (capabilities) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.capabilities = capabilities;
+      });
+    };
+
+    $scope.onRestartPolicyChange = function (restartPolicy) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.restartPolicy = restartPolicy;
+      });
+    };
 
     function onAlwaysPullChange(checked) {
       return $scope.$evalAsync(() => {
@@ -149,11 +189,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       return $scope.$evalAsync(() => {
         $scope.config.HostConfig.Init = checked;
       });
-    }
-
-    $scope.handleEnvVarChange = handleEnvVarChange;
-    function handleEnvVarChange(value) {
-      $scope.formValues.Env = value;
     }
 
     $scope.refreshSlider = function () {
@@ -213,28 +248,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       Labels: {},
     };
 
-    $scope.addVolume = function () {
-      $scope.formValues.Volumes.push({ name: '', containerPath: '', readOnly: false, type: 'volume' });
-    };
-
-    $scope.removeVolume = function (index) {
-      $scope.formValues.Volumes.splice(index, 1);
-    };
-
     $scope.addPortBinding = function () {
       $scope.config.HostConfig.PortBindings.push({ hostPort: '', containerPort: '', protocol: 'tcp' });
     };
 
     $scope.removePortBinding = function (index) {
       $scope.config.HostConfig.PortBindings.splice(index, 1);
-    };
-
-    $scope.addLabel = function () {
-      $scope.formValues.Labels.push({ name: '', value: '' });
-    };
-
-    $scope.removeLabel = function (index) {
-      $scope.formValues.Labels.splice(index, 1);
     };
 
     $scope.addExtraHost = function () {
@@ -281,335 +300,25 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       config.HostConfig.PortBindings = bindings;
     }
 
-    function prepareEnvironmentVariables(config) {
-      config.Env = envVarsUtils.convertToArrayOfStrings($scope.formValues.Env);
-    }
-
-    function prepareVolumes(config) {
-      var binds = [];
-      var volumes = {};
-
-      $scope.formValues.Volumes.forEach(function (volume) {
-        var name = volume.name;
-        var containerPath = volume.containerPath;
-        if (name && containerPath) {
-          var bind = name + ':' + containerPath;
-          volumes[containerPath] = {};
-          if (volume.readOnly) {
-            bind += ':ro';
-          }
-          binds.push(bind);
-        }
-      });
-      config.HostConfig.Binds = binds;
-      config.Volumes = volumes;
-    }
-
-    function prepareNetworkConfig(config) {
-      var mode = config.HostConfig.NetworkMode;
-      var container = $scope.formValues.NetworkContainer;
-      var containerName = container;
-      if (container && typeof container === 'object') {
-        containerName = container.Names[0];
-      }
-      var networkMode = mode;
-      if (containerName) {
-        networkMode += ':' + containerName;
-        config.Hostname = '';
-      }
-      config.HostConfig.NetworkMode = networkMode;
-      config.MacAddress = $scope.formValues.MacAddress;
-
-      config.NetworkingConfig.EndpointsConfig[networkMode] = {
-        IPAMConfig: {
-          IPv4Address: $scope.formValues.IPv4,
-          IPv6Address: $scope.formValues.IPv6,
-        },
-      };
-
-      if (networkMode && _.get($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')) {
-        var aliases = $scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases;
-        config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = _.filter(aliases, (o) => {
-          return !_.startsWith($scope.fromContainer.Id, o);
-        });
-      }
-
-      var dnsServers = [];
-      if ($scope.formValues.DnsPrimary) {
-        dnsServers.push($scope.formValues.DnsPrimary);
-      }
-      if ($scope.formValues.DnsSecondary) {
-        dnsServers.push($scope.formValues.DnsSecondary);
-      }
-      config.HostConfig.Dns = dnsServers;
-
-      config.HostConfig.ExtraHosts = _.map(
-        _.filter($scope.formValues.ExtraHosts, (v) => v.value),
-        'value'
-      );
-    }
-
-    function prepareLabels(config) {
-      var labels = {};
-      $scope.formValues.Labels.forEach(function (label) {
-        if (label.name) {
-          if (label.value) {
-            labels[label.name] = label.value;
-          } else {
-            labels[label.name] = '';
-          }
-        }
-      });
-      config.Labels = labels;
-    }
-
-    function prepareDevices(config) {
-      var path = [];
-      config.HostConfig.Devices.forEach(function (p) {
-        if (p.pathOnHost) {
-          if (p.pathInContainer === '') {
-            p.pathInContainer = p.pathOnHost;
-          }
-          path.push({ PathOnHost: p.pathOnHost, PathInContainer: p.pathInContainer, CgroupPermissions: 'rwm' });
-        }
-      });
-      config.HostConfig.Devices = path;
-    }
-
-    function prepareSysctls(config) {
-      var sysctls = {};
-      $scope.formValues.Sysctls.forEach(function (sysctl) {
-        if (sysctl.name && sysctl.value) {
-          sysctls[sysctl.name] = sysctl.value;
-        }
-      });
-      config.HostConfig.Sysctls = sysctls;
-    }
-
-    function prepareResources(config) {
-      // Shared Memory Size - Round to 0.125
-      if ($scope.formValues.ShmSize >= 0) {
-        var shmSize = (Math.round($scope.formValues.ShmSize * 8) / 8).toFixed(3);
-        shmSize *= 1024 * 1024;
-        config.HostConfig.ShmSize = shmSize;
-      }
-
-      // Memory Limit - Round to 0.125
-      if ($scope.formValues.MemoryLimit >= 0) {
-        var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
-        memoryLimit *= 1024 * 1024;
-        config.HostConfig.Memory = memoryLimit;
-      }
-
-      // Memory Resevation - Round to 0.125
-      if ($scope.formValues.MemoryReservation >= 0) {
-        var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
-        memoryReservation *= 1024 * 1024;
-        config.HostConfig.MemoryReservation = memoryReservation;
-      }
-
-      // CPU Limit
-      if ($scope.formValues.CpuLimit >= 0) {
-        config.HostConfig.NanoCpus = $scope.formValues.CpuLimit * 1000000000;
-      }
-    }
-
-    function prepareCapabilities(config) {
-      var allowed = $scope.formValues.capabilities.filter(function (item) {
-        return item.allowed === true;
-      });
-      var notAllowed = $scope.formValues.capabilities.filter(function (item) {
-        return item.allowed === false;
-      });
-
-      var getCapName = function (item) {
-        return item.capability;
-      };
-      config.HostConfig.CapAdd = allowed.map(getCapName);
-      config.HostConfig.CapDrop = notAllowed.map(getCapName);
-    }
-
-    function prepareGPUOptions(config) {
-      const driver = 'nvidia';
-      const gpuOptions = $scope.formValues.GPU;
-      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, { Driver: driver });
-      if (existingDeviceRequest) {
-        _.pullAllBy(config.HostConfig.DeviceRequests, [existingDeviceRequest], 'Driver');
-      }
-      if (!gpuOptions.enabled) {
-        return;
-      }
-      const deviceRequest = {
-        Driver: driver,
-        Count: -1,
-        DeviceIDs: [], // must be empty if Count != 0 https://github.com/moby/moby/blob/master/daemon/nvidia_linux.go#L50
-        Capabilities: [], // array of ORed arrays of ANDed capabilites = [ [c1 AND c2] OR [c1 AND c3] ] : https://github.com/moby/moby/blob/master/api/types/container/host_config.go#L272
-        // Options: { property1: "string", property2: "string" }, // seems to never be evaluated/used in docker API ?
-      };
-      if (gpuOptions.useSpecific) {
-        deviceRequest.DeviceIDs = gpuOptions.selectedGPUs;
-        deviceRequest.Count = 0;
-      }
-      deviceRequest.Capabilities = [gpuOptions.capabilities];
-
-      if (config.HostConfig.DeviceRequests) {
-        config.HostConfig.DeviceRequests.push(deviceRequest);
-      } else {
-        config.HostConfig.DeviceRequests = [deviceRequest];
-      }
-    }
-
     function prepareConfiguration() {
       var config = angular.copy($scope.config);
       config = commandsTabUtils.toRequest(config, $scope.formValues.commands);
+      config = envVarsTabUtils.toRequest(config, $scope.formValues.envVars);
+      config = volumesTabUtils.toRequest(config, $scope.formValues.volumes);
+      config = networkTabUtils.toRequest(config, $scope.formValues.network, $scope.fromContainer.Id);
+      config = resourcesTabUtils.toRequest(config, $scope.formValues.resources);
+      config = capabilitiesTabUtils.toRequest(config, $scope.formValues.capabilities);
+      config = restartPolicyTabUtils.toRequest(config, $scope.formValues.restartPolicy);
+      config = labelsTabUtils.toRequest(config, $scope.formValues.labels);
 
-      prepareNetworkConfig(config);
       prepareImageConfig(config);
       preparePortBindings(config);
-      prepareEnvironmentVariables(config);
-      prepareVolumes(config);
-      prepareLabels(config);
-      prepareDevices(config);
-      prepareResources(config);
-      prepareCapabilities(config);
-      prepareSysctls(config);
-      prepareGPUOptions(config);
       return config;
     }
 
     function loadFromContainerPortBindings() {
       const bindings = ContainerHelper.sortAndCombinePorts($scope.config.HostConfig.PortBindings);
       $scope.config.HostConfig.PortBindings = bindings;
-    }
-
-    function loadFromContainerVolumes(d) {
-      for (var v in d.Mounts) {
-        if ({}.hasOwnProperty.call(d.Mounts, v)) {
-          var mount = d.Mounts[v];
-          var volume = {
-            type: mount.Type,
-            name: mount.Name || mount.Source,
-            containerPath: mount.Destination,
-            readOnly: mount.RW === false,
-          };
-          $scope.formValues.Volumes.push(volume);
-        }
-      }
-    }
-
-    $scope.resetNetworkConfig = function () {
-      $scope.config.NetworkingConfig = {
-        EndpointsConfig: {},
-      };
-    };
-
-    function loadFromContainerNetworkConfig(d) {
-      $scope.config.NetworkingConfig = {
-        EndpointsConfig: {},
-      };
-      var networkMode = d.HostConfig.NetworkMode;
-      if (networkMode === 'default') {
-        $scope.config.HostConfig.NetworkMode = 'bridge';
-        if (!_.find($scope.availableNetworks, { Name: 'bridge' })) {
-          $scope.config.HostConfig.NetworkMode = 'nat';
-        }
-      }
-      if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
-        var netContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
-        $scope.config.HostConfig.NetworkMode = 'container';
-        for (var c in $scope.runningContainers) {
-          if ($scope.runningContainers[c].Id == netContainer) {
-            $scope.formValues.NetworkContainer = $scope.runningContainers[c];
-          }
-        }
-      }
-      $scope.fromContainerMultipleNetworks = Object.keys(d.NetworkSettings.Networks).length >= 2;
-      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
-        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
-          if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
-            $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
-          }
-          if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address) {
-            $scope.formValues.IPv6 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address;
-          }
-        }
-      }
-      $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode];
-      if (Object.keys(d.NetworkSettings.Networks).length > 1) {
-        var firstNetwork = d.NetworkSettings.Networks[Object.keys(d.NetworkSettings.Networks)[0]];
-        $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = firstNetwork;
-        $scope.extraNetworks = angular.copy(d.NetworkSettings.Networks);
-        delete $scope.extraNetworks[Object.keys(d.NetworkSettings.Networks)[0]];
-      }
-      $scope.formValues.MacAddress = d.Config.MacAddress;
-
-      if (d.HostConfig.Dns && d.HostConfig.Dns[0]) {
-        $scope.formValues.DnsPrimary = d.HostConfig.Dns[0];
-        if (d.HostConfig.Dns[1]) {
-          $scope.formValues.DnsSecondary = d.HostConfig.Dns[1];
-        }
-      }
-
-      // ExtraHosts
-      if ($scope.config.HostConfig.ExtraHosts) {
-        var extraHosts = $scope.config.HostConfig.ExtraHosts;
-        for (var i = 0; i < extraHosts.length; i++) {
-          var host = extraHosts[i];
-          $scope.formValues.ExtraHosts.push({ value: host });
-        }
-        $scope.config.HostConfig.ExtraHosts = [];
-      }
-    }
-
-    function loadFromContainerEnvironmentVariables() {
-      $scope.formValues.Env = envVarsUtils.parseArrayOfStrings($scope.config.Env);
-    }
-
-    function loadFromContainerLabels() {
-      for (var l in $scope.config.Labels) {
-        if ({}.hasOwnProperty.call($scope.config.Labels, l)) {
-          $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l] });
-        }
-      }
-    }
-
-    function loadFromContainerDevices() {
-      var path = [];
-      for (var dev in $scope.config.HostConfig.Devices) {
-        if ({}.hasOwnProperty.call($scope.config.HostConfig.Devices, dev)) {
-          var device = $scope.config.HostConfig.Devices[dev];
-          path.push({ pathOnHost: device.PathOnHost, pathInContainer: device.PathInContainer });
-        }
-      }
-      $scope.config.HostConfig.Devices = path;
-    }
-
-    function loadFromContainerDeviceRequests() {
-      const deviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
-        return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
-      });
-      if (deviceRequest) {
-        $scope.formValues.GPU.enabled = true;
-        $scope.formValues.GPU.useSpecific = deviceRequest.Count !== -1;
-        $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs || [];
-        if ($scope.formValues.GPU.useSpecific) {
-          $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs;
-        } else {
-          $scope.formValues.GPU.selectedGPUs = ['all'];
-        }
-        // we only support a single set of capabilities for now
-        // UI needs to be reworked in order to support OR combinations of AND capabilities
-        $scope.formValues.GPU.capabilities = deviceRequest.Capabilities[0];
-        $scope.formValues.GPU = { ...$scope.formValues.GPU };
-      }
-    }
-
-    function loadFromContainerSysctls() {
-      for (var s in $scope.config.HostConfig.Sysctls) {
-        if ({}.hasOwnProperty.call($scope.config.HostConfig.Sysctls, s)) {
-          $scope.formValues.Sysctls.push({ name: s, value: $scope.config.HostConfig.Sysctls[s] });
-        }
-      }
     }
 
     function loadFromContainerImageConfig() {
@@ -620,50 +329,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve registry');
         });
-    }
-
-    function loadFromContainerResources(d) {
-      if (d.HostConfig.NanoCpus) {
-        $scope.formValues.CpuLimit = d.HostConfig.NanoCpus / 1000000000;
-      }
-      if (d.HostConfig.Memory) {
-        $scope.formValues.MemoryLimit = d.HostConfig.Memory / 1024 / 1024;
-      }
-      if (d.HostConfig.MemoryReservation) {
-        $scope.formValues.MemoryReservation = d.HostConfig.MemoryReservation / 1024 / 1024;
-      }
-      if (d.HostConfig.ShmSize) {
-        $scope.formValues.ShmSize = d.HostConfig.ShmSize / 1024 / 1024;
-      }
-    }
-
-    function loadFromContainerCapabilities(d) {
-      if (d.HostConfig.CapAdd) {
-        d.HostConfig.CapAdd.forEach(function (cap) {
-          $scope.formValues.capabilities.push(new ContainerCapability(cap, true));
-        });
-      }
-      if (d.HostConfig.CapDrop) {
-        d.HostConfig.CapDrop.forEach(function (cap) {
-          $scope.formValues.capabilities.push(new ContainerCapability(cap, false));
-        });
-      }
-
-      function hasCapability(item) {
-        return item.capability === cap.capability;
-      }
-
-      var capabilities = new ContainerCapabilities();
-      for (var i = 0; i < capabilities.length; i++) {
-        var cap = capabilities[i];
-        if (!_.find($scope.formValues.capabilities, hasCapability)) {
-          $scope.formValues.capabilities.push(cap);
-        }
-      }
-
-      $scope.formValues.capabilities.sort(function (a, b) {
-        return a.capability < b.capability ? -1 : 1;
-      });
     }
 
     function loadFromContainerSpec() {
@@ -684,21 +349,20 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
           $scope.fromContainer = fromContainer;
           $scope.state.mode = 'duplicate';
-          $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
+          $scope.config = ContainerHelper.configFromContainer(angular.copy(d));
 
           $scope.formValues.commands = commandsTabUtils.toViewModel(d);
+          $scope.formValues.envVars = envVarsTabUtils.toViewModel(d);
+          $scope.formValues.volumes = volumesTabUtils.toViewModel(d);
+          $scope.formValues.network = networkTabUtils.toViewModel(d, $scope.availableNetworks, $scope.runningContainers);
+          $scope.formValues.resources = resourcesTabUtils.toViewModel(d);
+          $scope.formValues.capabilities = capabilitiesTabUtils.toViewModel(d);
+          $scope.formValues.labels = labelsTabUtils.toViewModel(d);
+
+          $scope.formValues.restartPolicy = restartPolicyTabUtils.toViewModel(d);
 
           loadFromContainerPortBindings(d);
-          loadFromContainerVolumes(d);
-          loadFromContainerNetworkConfig(d);
-          loadFromContainerEnvironmentVariables(d);
-          loadFromContainerLabels(d);
-          loadFromContainerDevices(d);
-          loadFromContainerDeviceRequests(d);
           loadFromContainerImageConfig(d);
-          loadFromContainerResources(d);
-          loadFromContainerCapabilities(d);
-          loadFromContainerSysctls(d);
         })
         .then(() => {
           $scope.state.containerIsLoaded = true;
@@ -715,21 +379,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       $scope.isAdmin = Authentication.isAdmin();
       $scope.showDeviceMapping = await shouldShowDevices();
-      $scope.showSysctls = await shouldShowSysctls();
+      $scope.allowSysctl = await shouldShowSysctls();
       $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
       $scope.isAdminOrEndpointAdmin = Authentication.isAdmin();
-
-      Volume.query(
-        {},
-        function (d) {
-          $scope.availableVolumes = d.Volumes.sort((vol1, vol2) => {
-            return vol1.Name.localeCompare(vol2.Name);
-          });
-        },
-        function (e) {
-          Notifications.error('Failure', e, 'Unable to retrieve volumes');
-        }
-      );
 
       var provider = $scope.applicationState.endpoint.mode.provider;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
@@ -738,18 +390,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           networks.push({ Name: 'container' });
           $scope.availableNetworks = networks.sort((a, b) => a.Name.localeCompare(b.Name));
 
-          if (_.find(networks, { Name: 'nat' })) {
-            $scope.config.HostConfig.NetworkMode = 'nat';
-          }
+          $scope.formValues.network = networkTabUtils.getDefaultViewModel(networks.some((network) => network.Name === 'bridge'));
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve networks');
         });
-
-      Container.query(
-        {},
-        function (d) {
-          var containers = d;
+      getContainers(endpoint.Id)
+        .then((containers) => {
           $scope.runningContainers = containers;
           $scope.gpuUseAll = _.get($scope, 'endpoint.Snapshots[0].GpuUseAll', false);
           $scope.gpuUseList = _.get($scope, 'endpoint.Snapshots[0].GpuUseList', []);
@@ -758,13 +405,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           } else {
             $scope.state.containerIsLoaded = true;
             $scope.fromContainer = {};
-            $scope.formValues.capabilities = $scope.areContainerCapabilitiesEnabled ? new ContainerCapabilities() : [];
+            if ($scope.areContainerCapabilitiesEnabled) {
+              $scope.formValues.capabilities = capabilitiesTabUtils.getDefaultViewModel();
+            }
           }
-        },
-        function (e) {
+        })
+        .catch((e) => {
           Notifications.error('Failure', e, 'Unable to retrieve running containers');
-        }
-      );
+        });
 
       SystemService.info()
         .then(function success(data) {
@@ -810,27 +458,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
     }
 
-    async function updateLimits(config) {
-      try {
-        if ($scope.state.settingUnlimitedResources) {
-          create();
-        } else {
-          await ContainerService.updateLimits($transition$.params().from, config);
-          $scope.config = config;
-          Notifications.success('Success', 'Limits updated');
-        }
-      } catch (err) {
-        Notifications.error('Failure', err, 'Update Limits fail');
-      }
-    }
-
-    async function update() {
-      $scope.state.actionInProgress = true;
-      var config = angular.copy($scope.config);
-      prepareResources(config);
-      await updateLimits(config);
-      $scope.state.actionInProgress = false;
-    }
+    $scope.redeployUnlimitedResources = function (resources) {
+      return $async(async () => {
+        $scope.formValues.resources = resources;
+        return create();
+      });
+    };
 
     function create() {
       var oldContainer = null;
@@ -982,11 +615,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
 
       function connectToExtraNetworks(newContainerId) {
-        if (!$scope.extraNetworks) {
+        if (!$scope.formValues.network.extraNetworks) {
           return $q.when();
         }
 
-        var connectionPromises = _.forOwn($scope.extraNetworks, function (network, networkName) {
+        var connectionPromises = _.forOwn($scope.formValues.network.extraNetworks, function (network, networkName) {
           if (_.has(network, 'Aliases')) {
             var aliases = _.filter(network.Aliases, (o) => {
               return !_.startsWith($scope.fromContainer.Id, o);

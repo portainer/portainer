@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Database, AlertTriangle } from 'lucide-react';
+
+import Route from '@/assets/ico/route.svg?c';
 
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { Datatable } from '@@/datatables';
 import { Button, ButtonGroup } from '@@/buttons';
-import { Icon } from '@@/Icon';
 import { createPersistedStore } from '@@/datatables/types';
 import { buildConfirmButton } from '@@/modals/utils';
 import { useTableState } from '@@/datatables/useTableState';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { IngressControllerClassMapRowData } from '../types';
 
@@ -98,7 +99,7 @@ export function IngressClassDatatable({
         isLoading={isLoading}
         emptyContentLabel={noIngressControllerLabel}
         title="Ingress Controllers"
-        titleIcon={Database}
+        titleIcon={Route}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
@@ -160,12 +161,7 @@ export function IngressClassDatatable({
           isUnsavedChanges(
             initialIngressControllers,
             ingControllerFormValues
-          ) && (
-            <span className="text-warning mt-1 flex items-center">
-              <Icon icon={AlertTriangle} className="!mr-1" />
-              <span className="text-warning">Unsaved changes.</span>
-            </span>
-          )}
+          ) && <TextTip>Unsaved changes.</TextTip>}
       </div>
     );
   }

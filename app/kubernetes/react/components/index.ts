@@ -21,6 +21,7 @@ import { ApplicationContainersDatatable } from '@/react/kubernetes/applications/
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
+import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -134,6 +135,18 @@ export const ngModule = angular
       withUIRouter(withReactQuery(withCurrentUser(ApplicationEventsDatatable))),
       []
     )
+  )
+  .component(
+    'kubernetesApplicationsStacksDatatable',
+    r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
+      'dataset',
+      'onRefresh',
+      'onRemove',
+      'namespace',
+      'namespaces',
+      'onNamespaceChange',
+      'isLoading',
+    ])
   );
 
 export const componentsModule = ngModule.name;

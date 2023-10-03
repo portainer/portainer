@@ -30,18 +30,15 @@
             </uib-tab>
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading class="vertical-center"> <pr-icon icon="'list'"></pr-icon> Stacks </uib-tab-heading>
+
               <kubernetes-applications-stacks-datatable
                 dataset="ctrl.state.stacks"
-                table-key="kubernetes.applications.stacks"
-                order-by="Name"
-                refresh-callback="ctrl.getApplications"
-                remove-action="ctrl.removeStacksAction"
+                on-refresh="(ctrl.getApplications)"
+                on-remove="(ctrl.removeStacksAction)"
                 namespaces="ctrl.state.namespaces"
                 namespace="ctrl.state.namespaceName"
-                on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
-                is-apps-loading="ctrl.state.isAppsLoading"
-                is-system-resources="ctrl.state.isSystemResources"
-                set-system-resources="(ctrl.setSystemResources)"
+                is-loading="ctrl.state.isAppsLoading"
+                on-namespace-change="(ctrl.onChangeNamespaceDropdown)"
               >
               </kubernetes-applications-stacks-datatable>
             </uib-tab>

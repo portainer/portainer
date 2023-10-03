@@ -13,6 +13,11 @@ const mockUser: User = {
   },
 };
 
+/**
+ * A helper function to wrap a component with a UserContext.Provider.
+ *
+ * should only be used in tests
+ */
 export function withUserProvider<T>(
   WrappedComponent: ComponentType<T>,
   user = mockUser

@@ -18,7 +18,7 @@ export function ListView() {
     <>
       <PageHeader title="Teams" breadcrumbs={[{ label: 'Teams management' }]} />
 
-      {usersQuery.data && teamsQuery.data && (
+      {isAdmin && usersQuery.data && teamsQuery.data && (
         <CreateTeamForm users={usersQuery.data} teams={teamsQuery.data} />
       )}
 

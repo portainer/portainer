@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/pendingactions"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
@@ -25,18 +26,19 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer       security.BouncerService
-	demoService          *demo.Service
-	DataStore            dataservices.DataStore
-	FileService          portainer.FileService
-	ProxyManager         *proxy.Manager
-	ReverseTunnelService portainer.ReverseTunnelService
-	SnapshotService      portainer.SnapshotService
-	K8sClientFactory     *cli.ClientFactory
-	ComposeStackManager  portainer.ComposeStackManager
-	AuthorizationService *authorization.Service
-	BindAddress          string
-	BindAddressHTTPS     string
+	requestBouncer        security.BouncerService
+	demoService           *demo.Service
+	DataStore             dataservices.DataStore
+	FileService           portainer.FileService
+	ProxyManager          *proxy.Manager
+	ReverseTunnelService  portainer.ReverseTunnelService
+	SnapshotService       portainer.SnapshotService
+	K8sClientFactory      *cli.ClientFactory
+	ComposeStackManager   portainer.ComposeStackManager
+	AuthorizationService  *authorization.Service
+	BindAddress           string
+	BindAddressHTTPS      string
+	PendingActionsService *pendingactions.PendingActionsService
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.

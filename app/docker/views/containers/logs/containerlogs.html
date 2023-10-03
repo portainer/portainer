@@ -5,14 +5,16 @@
     { 
       label:(container.Name | trimcontainername),
       link: 'docker.containers.container', 
-      linkParams:container.Id
+      linkParams: { id: container.Id }
     }, 'Logs']"
 >
 </page-header>
 
+<container-log-view ng-if="!logsEnabled"></container-log-view>
+
 <log-viewer
   data="logs"
-  ng-if="logs"
+  ng-if="logs && logsEnabled"
   log-collection-change="changeLogCollection"
   display-timestamps="state.displayTimestamps"
   line-count="state.lineCount"

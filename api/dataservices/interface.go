@@ -35,6 +35,7 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+		PendingActions() PendingActionsService
 	}
 
 	DataStore interface {
@@ -69,6 +70,11 @@ type (
 		BaseCRUD[portainer.EdgeJob, portainer.EdgeJobID]
 		CreateWithID(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error
+		GetNextIdentifier() int
+	}
+
+	PendingActionsService interface {
+		BaseCRUD[portainer.PendingActions, portainer.PendingActionsID]
 		GetNextIdentifier() int
 	}
 
