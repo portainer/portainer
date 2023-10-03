@@ -7,10 +7,10 @@ export function CreateHelmRepositoriesView() {
   return (
     <>
       <PageHeader
-        title="Create helm repository"
+        title="Create Helm repository"
         breadcrumbs={[
           { label: 'My account', link: 'portainer.account' },
-          { label: 'Create helm repository' },
+          { label: 'Create Helm repository' },
         ]}
       />
 
@@ -18,7 +18,7 @@ export function CreateHelmRepositoriesView() {
         <div className="col-sm-12">
           <Widget>
             <WidgetBody>
-              <CreateHelmRepositoryForm routeOnSuccess="portainer.account" />
+              <CreateHelmRepositoryForm />
             </WidgetBody>
           </Widget>
         </div>

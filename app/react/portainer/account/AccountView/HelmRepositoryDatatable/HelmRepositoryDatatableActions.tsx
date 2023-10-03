@@ -8,7 +8,7 @@ import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
 
 import { HelmRepository } from './types';
-import { useDeleteHelmRepositoryMutation } from './helm-repositories.service';
+import { useDeleteHelmRepositoriesMutation } from './helm-repositories.service';
 
 interface Props {
   selectedItems: HelmRepository[];
@@ -16,7 +16,7 @@ interface Props {
 
 export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
   const router = useRouter();
-  const deleteHelmRepoMutation = useDeleteHelmRepositoryMutation();
+  const deleteHelmRepoMutation = useDeleteHelmRepositoriesMutation();
 
   return (
     <>
@@ -25,8 +25,8 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
         color="dangerlight"
         onClick={() => onDeleteClick(selectedItems)}
         data-cy="credentials-deleteButton"
+        icon={<Icon icon={Trash2} />}
       >
-        <Icon icon={Trash2} className="vertical-center" />
         Remove
       </Button>
 
@@ -35,8 +35,8 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
           router.stateService.go('portainer.account.createHelmRepository')
         }
         data-cy="credentials-addButton"
+        icon={<Icon icon={Plus} />}
       >
-        <Icon icon={Plus} className="vertical-center" />
         Add Helm Repository
       </Button>
     </>
@@ -45,7 +45,7 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
   async function onDeleteClick(selectedItems: HelmRepository[]) {
     const confirmed = await confirmDestructive({
       title: 'Confirm action',
-      message: `Are you sure you want to remove the selected helm ${pluralize(
+      message: `Are you sure you want to remove the selected Helm ${pluralize(
         selectedItems.length,
         'repository',
         'repositories'
@@ -56,8 +56,6 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
       return;
     }
 
-    selectedItems.forEach((item) => {
-      deleteHelmRepoMutation.mutate(item);
-    });
+    deleteHelmRepoMutation.mutate(selectedItems);
   }
 }

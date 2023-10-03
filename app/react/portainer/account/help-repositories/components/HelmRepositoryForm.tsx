@@ -1,6 +1,8 @@
 import { Field, Form, Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
 
+import { useCurrentUser } from '@/react/hooks/useUser';
+
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { LoadingButton } from '@@/buttons/LoadingButton';
@@ -15,7 +17,6 @@ type Props = {
   isLoading: boolean;
   onSubmit: (formValues: CreateHelmRepositoryPayload) => void;
   URLs: string[];
-  initialValues?: CreateHelmRepositoryPayload;
 };
 
 const defaultInitialValues = {
@@ -28,13 +29,15 @@ export function HelmRepositoryForm({
   isLoading,
   onSubmit,
   URLs,
-  initialValues = defaultInitialValues,
 }: Props) {
   const router = useRouter();
 
+  const { user } = useCurrentUser();
+  defaultInitialValues.UserId = user.Id;
+
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={defaultInitialValues}
       enableReinitialize
       validationSchema={() => validationSchema(URLs)}
       onSubmit={(values) => onSubmit(values)}
@@ -56,9 +59,9 @@ export function HelmRepositoryForm({
               <LoadingButton
                 disabled={!isValid || !dirty}
                 isLoading={isLoading}
-                loadingText="Saving helm repository..."
+                loadingText="Saving Helm repository..."
               >
-                {isEditing ? 'Update helm repository' : 'Save helm repository'}
+                {isEditing ? 'Update Helm repository' : 'Save Helm repository'}
               </LoadingButton>
               {isEditing && (
                 <Button

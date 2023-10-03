@@ -9,11 +9,7 @@ import {
 } from '../../AccountView/HelmRepositoryDatatable/helm-repositories.service';
 import { HelmRepositoryForm } from '../components/HelmRepositoryForm';
 
-type Props = {
-  routeOnSuccess?: string;
-};
-
-export function CreateHelmRepositoryForm({ routeOnSuccess }: Props) {
+export function CreateHelmRepositoryForm() {
   const router = useRouter();
   const currentUser = useCurrentUser();
 
@@ -35,9 +31,7 @@ export function CreateHelmRepositoryForm({ routeOnSuccess }: Props) {
     };
     createHelmRepositoryMutation.mutate(payload, {
       onSuccess: () => {
-        if (routeOnSuccess) {
-          router.stateService.go(routeOnSuccess);
-        }
+        router.stateService.go('portainer.account');
       },
     });
   }

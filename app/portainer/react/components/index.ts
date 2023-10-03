@@ -138,6 +138,7 @@ export const ngModule = angular
       'isLoading',
       'isRefetching',
       'dataCy',
+      'iconClass',
     ])
   )
   .component(
@@ -151,7 +152,7 @@ export const ngModule = angular
       'className',
     ])
   )
-  .component('badgeIcon', r2a(BadgeIcon, ['icon', 'size']))
+  .component('badgeIcon', r2a(BadgeIcon, ['icon', 'size', 'iconClass']))
   .component(
     'teamsSelector',
     r2a(TeamsSelector, [

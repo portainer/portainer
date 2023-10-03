@@ -22,10 +22,13 @@ export function HelmRepositoryDatatable() {
 
   let helmRepos = [];
   if (helmReposQuery.data?.GlobalRepository) {
-    helmRepos.push({
+    const helmrepository: HelmRepository = {
       Global: true,
       URL: helmReposQuery.data.GlobalRepository,
-    } as HelmRepository);
+      Id: 0,
+      UserId: 0,
+    };
+    helmRepos.push(helmrepository);
   }
   helmRepos = [...helmRepos, ...(helmReposQuery.data?.UserRepositories ?? [])];
 
@@ -39,7 +42,7 @@ export function HelmRepositoryDatatable() {
       renderTableActions={(selectedRows) => (
         <HelmRepositoryDatatableActions selectedItems={selectedRows} />
       )}
-      emptyContentLabel="No helm repository found"
+      emptyContentLabel="No Helm repository found"
       isLoading={helmReposQuery.isLoading}
       isRowSelectable={(row) => !row.original.Global}
     />
