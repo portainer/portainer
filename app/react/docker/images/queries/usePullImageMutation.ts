@@ -7,7 +7,7 @@ import { Registry } from '@/react/portainer/registries/types/registry';
 import { buildImageFullURI } from '../utils';
 
 import { encodeRegistryCredentials } from './encodeRegistryCredentials';
-import { buildUrl } from './build-url';
+import { buildProxyUrl } from './build-url';
 
 interface PullImageOptions {
   environmentId: EnvironmentId;
@@ -40,7 +40,7 @@ export async function pullImage({
   }
 
   try {
-    await axios.post(buildUrl(environmentId, { action: 'create' }), null, {
+    await axios.post(buildProxyUrl(environmentId, { action: 'create' }), null, {
       params: {
         fromImage: imageURI,
       },
