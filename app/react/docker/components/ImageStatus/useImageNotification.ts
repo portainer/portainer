@@ -1,12 +1,40 @@
+import { useQuery } from 'react-query';
+
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios from '@/portainer/services/axios';
 import { ServiceId } from '@/react/docker/services/types';
+import { ContainerId } from '@/react/docker/containers/types';
 
-import { ContainerId } from '../containers/types';
+import { ImageStatus, ResourceID, ResourceType } from './types';
 
-import { ImageStatus } from './types';
+export function useImageNotification(
+  environmentId: number,
+  resourceId: ResourceID,
+  resourceType: ResourceType,
+  nodeName: string,
+  enabled = false
+) {
+  return useQuery(
+    [
+      'environments',
+      environmentId,
+      'docker',
+      'images',
+      resourceType,
+      resourceId,
+      'status',
+    ],
+    () =>
+      resourceType === ResourceType.SERVICE
+        ? getServiceImagesStatus(environmentId, resourceId)
+        : getContainerImagesStatus(environmentId, resourceId, nodeName),
+    {
+      enabled,
+    }
+  );
+}
 
-export async function getContainerImagesStatus(
+async function getContainerImagesStatus(
   environmentId: EnvironmentId,
   containerID: ContainerId,
   nodeName: string
@@ -29,7 +57,7 @@ export async function getContainerImagesStatus(
   }
 }
 
-export async function getServiceImagesStatus(
+async function getServiceImagesStatus(
   environmentId: EnvironmentId,
   serviceID: ServiceId
 ) {

@@ -1,21 +1,21 @@
 import { CellContext, Column } from '@tanstack/react-table';
 import { useSref } from '@uirouter/react';
 
-import { DockerImage } from '@/react/docker/images/types';
 import { truncate } from '@/portainer/filters/filters';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
+import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
 
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
 
 import { columnHelper } from './helper';
 
-export const id = columnHelper.accessor('Id', {
+export const id = columnHelper.accessor('id', {
   id: 'id',
   header: 'Id',
   cell: Cell,
   enableColumnFilter: true,
   filterFn: (
-    { original: { Used } },
+    { original: { used } },
     columnId,
     filterValue: Array<'Used' | 'Unused'>
   ) => {
@@ -23,11 +23,11 @@ export const id = columnHelper.accessor('Id', {
       return true;
     }
 
-    if (filterValue.includes('Used') && Used) {
+    if (filterValue.includes('Used') && used) {
       return true;
     }
 
-    if (filterValue.includes('Unused') && !Used) {
+    if (filterValue.includes('Unused') && !used) {
       return true;
     }
 
@@ -63,12 +63,12 @@ function FilterByUsage<TData extends { Used: boolean }>({
 function Cell({
   getValue,
   row: { original: image },
-}: CellContext<DockerImage, string>) {
+}: CellContext<ImagesListResponse, string>) {
   const name = getValue();
 
   const linkProps = useSref('.image', {
-    id: image.Id,
-    imageId: image.Id,
+    id: image.id,
+    imageId: image.id,
   });
 
   return (
@@ -76,7 +76,7 @@ function Cell({
       <a href={linkProps.href} onClick={linkProps.onClick} title={name}>
         {truncate(name, 40)}
       </a>
-      {!image.Used && (
+      {!image.used && (
         <span className="label label-warning image-tag ml-2">Unused</span>
       )}
     </>
