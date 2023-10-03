@@ -273,7 +273,9 @@ export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
   }
 
   if (Array.isArray(value)) {
-    return value.some((item) => item.toLowerCase().includes(filterValueLower));
+    return value.some((item) =>
+      item.toString().toLowerCase().includes(filterValueLower)
+    );
   }
 
   return false;
