@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { EdgeUpdateListItemResponse } from '../../queries/list';
+import { DecoratedItem } from '../types';
 
-export const columnHelper = createColumnHelper<EdgeUpdateListItemResponse>();
+export const columnHelper = createColumnHelper<DecoratedItem>();
