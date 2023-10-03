@@ -10,19 +10,21 @@ linters:
     - exportloopref
 linters-settings:
   depguard:
-    list-type: denylist
-    include-go-root: true
-    packages:
-      - github.com/sirupsen/logrus
-      - golang.org/x/exp
-      - github.com/portainer/libcrypto
-      - github.com/portainer/libhttp
-    packages-with-error-message:
-      - github.com/sirupsen/logrus: 'logging is allowed only by github.com/rs/zerolog'
-    ignore-file-rules:
-      - '**/*_test.go'
-      - '**/base.go'
-      - '**/base_tx.go'
+    rules:
+      main:
+        deny:
+          - pkg: 'github.com/sirupsen/logrus'
+            desc: 'logging is allowed only by github.com/rs/zerolog'
+          - pkg: 'golang.org/x/exp'
+            desc: 'exp is not allowed'
+          - pkg: 'github.com/portainer/libcrypto'
+            desc: 'use github.com/portainer/portainer/pkg/libcrypto'
+          - pkg: 'github.com/portainer/libhttp'
+            desc: 'use github.com/portainer/portainer/pkg/libhttp'
+        files:
+          - '!**/*_test.go'
+          - '!**/base.go'
+          - '!**/base_tx.go'
 
 # errorlint is causing a typecheck error for some reason. The go compiler will report these
 # anyway, so ignore them from the linter
