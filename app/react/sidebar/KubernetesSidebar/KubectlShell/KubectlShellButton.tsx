@@ -1,37 +1,53 @@
-import clsx from 'clsx';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Terminal } from 'lucide-react';
+import clsx from 'clsx';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { Button } from '@@/buttons';
-import { Icon } from '@@/Icon';
+
+import { useSidebarState } from '../../useSidebarState';
+import { SidebarTooltip } from '../../SidebarItem/SidebarTooltip';
 
 import { KubeCtlShell } from './KubectlShell';
-import styles from './KubectlShellButton.module.css';
 
 interface Props {
   environmentId: EnvironmentId;
 }
 export function KubectlShellButton({ environmentId }: Props) {
+  const { isOpen: isSidebarOpen } = useSidebarState();
+
   const [open, setOpen] = useState(false);
   const { trackEvent } = useAnalytics();
+
+  const button = (
+    <Button
+      color="primary"
+      size="small"
+      disabled={open}
+      data-cy="k8sSidebar-shellButton"
+      onClick={() => handleOpen()}
+      className={clsx('sidebar', !isSidebarOpen && '!p-1')}
+      icon={Terminal}
+    >
+      {isSidebarOpen ? 'kubectl shell' : ''}
+    </Button>
+  );
+
   return (
     <>
-      <Button
-        color="primary"
-        size="small"
-        disabled={open}
-        data-cy="k8sSidebar-shellButton"
-        onClick={() => handleOpen()}
-        className={clsx(styles.root, '!flex')}
-      >
-        <Icon icon={Terminal} className="vertical-center" size="md" /> kubectl
-        shell
-      </Button>
-
+      {!isSidebarOpen && (
+        <SidebarTooltip
+          content={
+            <span className="text-sm whitespace-nowrap">Kubectl Shell</span>
+          }
+        >
+          <span className="flex w-full justify-center">{button}</span>
+        </SidebarTooltip>
+      )}
+      {isSidebarOpen && button}
       {open &&
         createPortal(
           <KubeCtlShell
