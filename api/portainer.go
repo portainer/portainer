@@ -1415,9 +1415,9 @@ type (
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, commitHash string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
-		RemoveStackFileBackupByVersion(stackIdentifier string, version int, commitHash, fileName string) error
+		RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
-		RollbackStackFileByVersion(stackIdentifier string, version int, commitHash, fileName string) error
+		RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		GetEdgeStackProjectPathByVersion(edgeStackIdentifier string, version int, commitHash string) string
