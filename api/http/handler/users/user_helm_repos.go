@@ -38,7 +38,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @produce json
 // @param id path int true "User identifier"
 // @param payload body addHelmRepoUrlPayload true "Helm Repository"
-// @success 200 {object} portaineree.HelmUserRepository "Success"
+// @success 200 {object} portainer.HelmUserRepository "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
