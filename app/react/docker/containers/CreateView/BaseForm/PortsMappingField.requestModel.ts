@@ -16,19 +16,12 @@ export function parsePortBindingRequest(portBindings: Values): PortMap {
       return;
     }
 
-    let { hostPort } = portBinding;
-    const containerPortRange = parsePortRange(portBinding.containerPort);
-    if (!isValidPortRange(containerPortRange)) {
-      throw new Error(
-        `Invalid port specification: ${portBinding.containerPort}`
-      );
-    }
-
     const portInfo = extractPortInfo(portBinding);
     if (!portInfo) {
       return;
     }
 
+    let { hostPort } = portBinding;
     const { endHostPort, endPort, hostIp, startHostPort, startPort } = portInfo;
     _.range(startPort, endPort + 1).forEach((containerPort) => {
       const bindKey: PortKey = `${containerPort}/${portBinding.protocol}`;
@@ -87,8 +80,6 @@ function extractPortInfo(portBinding: PortMapping) {
   const startPort = containerPortRange.start;
   const endPort = containerPortRange.end;
   let hostIp = '';
-  let startHostPort = 0;
-  let endHostPort = 0;
   let { hostPort } = portBinding;
   if (!hostPort) {
     return null;
@@ -114,8 +105,7 @@ function extractPortInfo(portBinding: PortMapping) {
     throw new Error(`Invalid port specification: ${hostPort}`);
   }
 
-  startHostPort = hostPortRange.start;
-  endHostPort = hostPortRange.end;
+  const { start: startHostPort, end: endHostPort } = hostPortRange;
   if (
     endPort !== startPort &&
     endPort - startPort !== endHostPort - startHostPort

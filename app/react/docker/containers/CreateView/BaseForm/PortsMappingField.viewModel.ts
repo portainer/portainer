@@ -8,6 +8,15 @@ export type Range = {
   end: number;
 };
 
+// transient type used for parsing, sorting and grouping of port mapping
+type PortBinding<T> = {
+  hostPort: T;
+  protocol: Protocol;
+  containerPort: T;
+};
+
+type NumericPortBinding = PortBinding<number>;
+
 export function toViewModel(portBindings: PortMap): Values {
   const parsedPorts = parsePorts(portBindings);
   const sortedPorts = sortPorts(parsedPorts);
@@ -18,11 +27,7 @@ export function toViewModel(portBindings: PortMap): Values {
     return value === 'tcp' || value === 'udp';
   }
 
-  function parsePorts(portBindings: PortMap): Array<{
-    hostPort: number;
-    protocol: Protocol;
-    containerPort: number;
-  }> {
+  function parsePorts(portBindings: PortMap): Array<NumericPortBinding> {
     return Object.entries(portBindings).flatMap(([key, bindings]) => {
       const [containerPort, protocol] = key.split('/');
 
@@ -42,23 +47,11 @@ export function toViewModel(portBindings: PortMap): Values {
     });
   }
 
-  function sortPorts(
-    ports: Array<{
-      hostPort: number;
-      protocol: Protocol;
-      containerPort: number;
-    }>
-  ) {
+  function sortPorts(ports: Array<NumericPortBinding>) {
     return _.sortBy(ports, ['containerPort', 'hostPort', 'protocol']);
   }
 
-  function combinePorts(
-    ports: Array<{
-      hostPort: number;
-      protocol: Protocol;
-      containerPort: number;
-    }>
-  ) {
+  function combinePorts(ports: Array<NumericPortBinding>) {
     return ports
       .reduce(
         (acc, port) => {
@@ -90,11 +83,7 @@ export function toViewModel(portBindings: PortMap): Values {
             },
           ];
         },
-        [] as Array<{
-          hostPort: Range;
-          containerPort: Range;
-          protocol: Protocol;
-        }>
+        [] as Array<PortBinding<Range>>
       )
       .map(({ protocol, containerPort, hostPort }) => ({
         hostPort: getRange(hostPort.start, hostPort.end),
