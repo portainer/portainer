@@ -94,9 +94,7 @@ func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) erro
 	if govalidator.IsNull(payload.StackFileContent) {
 		return errors.New("Invalid stack file content")
 	}
-	if govalidator.IsNull(payload.StackName) {
-		return errors.New("Invalid stack name")
-	}
+
 	return nil
 }
 
@@ -113,18 +111,12 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
-	if govalidator.IsNull(payload.StackName) {
-		return errors.New("Invalid stack name")
-	}
 	return nil
 }
 
 func (payload *kubernetesManifestURLDeploymentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ManifestURL) || !govalidator.IsURL(payload.ManifestURL) {
 		return errors.New("Invalid manifest URL")
-	}
-	if govalidator.IsNull(payload.StackName) {
-		return errors.New("Invalid stack name")
 	}
 	return nil
 }

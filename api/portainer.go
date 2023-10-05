@@ -933,6 +933,11 @@ type (
 		RetryInterval int
 	}
 
+	// GlobalDeploymentOptions hides manual deployment forms globally, to enforce infrastructure as code practices
+	GlobalDeploymentOptions struct {
+		HideStacksFunctionality bool `json:"hideStacksFunctionality" example:"false"`
+	}
+
 	// Settings represents the application settings
 	Settings struct {
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
@@ -951,6 +956,8 @@ type (
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
 		TemplatesURL string `json:"TemplatesURL" example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
+		// Deployment options for encouraging git ops workflows
+		GlobalDeploymentOptions GlobalDeploymentOptions `json:"GlobalDeploymentOptions"`
 		// The default check in interval for edge agent (in seconds)
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
 		// Show the Kompose build option (discontinued in 2.18)

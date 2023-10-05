@@ -16,6 +16,7 @@ export function validation(): SchemaOf<FormValues> {
       hideWebEditor: boolean().required(),
       hideFileUpload: boolean().required(),
       requireNoteOnApplications: boolean().required(),
+      hideStacksFunctionality: boolean().required(),
       minApplicationNoteLength: number()
         .typeError('Must be a number')
         .default(0)

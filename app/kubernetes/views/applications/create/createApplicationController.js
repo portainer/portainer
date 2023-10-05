@@ -1140,6 +1140,8 @@ class KubernetesCreateApplicationController {
             this.nodesLabels,
             this.ingresses
           );
+
+          this.formValues.Services = this.formValues.Services || [];
           this.originalServicePorts = structuredClone(this.formValues.Services.flatMap((service) => service.Ports));
           this.originalIngressPaths = structuredClone(this.originalServicePorts.flatMap((port) => port.ingressPaths).filter((ingressPath) => ingressPath.Host));
 
