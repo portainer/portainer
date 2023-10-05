@@ -13,7 +13,7 @@ HELM_DIST="helm-$HELM_VERSION-$PLATFORM-$ARCH"
 
 
 if [[ ${PLATFORM} == "windows" ]]; then
-  wget -O tmp.zip "https://get.helm.sh/${HELM_DIST}.zip" && unzip -o -j tmp.zip "${PLATFORM}-${ARCH}/helm.exe" -d dist && rm -f tmp.zip
+  wget --tries=3 --waitretry=30 --quiet  -O tmp.zip "https://get.helm.sh/${HELM_DIST}.zip" && unzip -o -j tmp.zip "${PLATFORM}-${ARCH}/helm.exe" -d dist && rm -f tmp.zip
 else
   wget -qO- "https://get.helm.sh/${HELM_DIST}.tar.gz" | tar -x -z --strip-components 1 "${PLATFORM}-${ARCH}/helm"
   mv "helm" "dist/helm"
