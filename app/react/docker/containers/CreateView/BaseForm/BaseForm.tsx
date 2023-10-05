@@ -90,7 +90,9 @@ export function BaseForm({
         <FormSection title="Image Configuration">
           <ImageConfigFieldset
             values={values.image}
-            fieldNamespace="image"
+            setFieldValue={(field, value) =>
+              setFieldValue(`image.${field}`, value)
+            }
             autoComplete
             onRateLimit={values.alwaysPull ? onRateLimit : undefined}
             errors={errors?.image}
