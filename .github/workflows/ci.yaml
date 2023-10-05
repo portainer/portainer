@@ -15,7 +15,7 @@ on:
     - "refactor/*"
 
 env:
-  DOCKER_HUB_REPO: portainerci/portainer-ee
+  DOCKER_HUB_REPO: portainerci/portainer
   NODE_ENV: testing
   GO_VERSION: 1.21.0
   NODE_VERSION: 18.x
