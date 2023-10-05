@@ -302,6 +302,38 @@ func (service *Service) UpdateStoreStackFileFromBytes(stackIdentifier, fileName 
 	return service.wrapFileStore(stackStorePath), nil
 }
 
+// UpdateStoreStackFileFromBytesByVersion makes stack file backup and updates a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, commitHash string, data []byte) (string, error) {
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	if commitHash != "" {
+		versionStr = commitHash
+	}
+
+	if versionStr != "" {
+		stackStorePath = JoinPaths(stackStorePath, versionStr)
+	}
+
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	err := service.createBackupFileInStore(composeFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
 // RemoveStackFileBackup removes the stack file backup in the ComposeStorePath.
 func (service *Service) RemoveStackFileBackup(stackIdentifier, fileName string) error {
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)

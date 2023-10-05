@@ -1413,6 +1413,7 @@ type (
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error)
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, commitHash string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
 		RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
