@@ -216,7 +216,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if !isUnique {
-		return httperror.NewError(http.StatusConflict, "Name is not unique", nil)
+		return httperror.Conflict("Name is not unique", nil)
 	}
 
 	endpoint, endpointCreationError := handler.createEndpoint(handler.DataStore, payload)

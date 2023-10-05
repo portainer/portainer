@@ -36,7 +36,7 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 		case httperrors.IsInvalidPayloadError(err):
 			return httperror.BadRequest("Invalid payload", err)
 		case httperrors.IsConflictError(err):
-			return httperror.NewError(http.StatusConflict, err.Error(), err)
+			return httperror.Conflict(err.Error(), err)
 		default:
 			return httperror.InternalServerError("Unable to create Edge stack", err)
 		}

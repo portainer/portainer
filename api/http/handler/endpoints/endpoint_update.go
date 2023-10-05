@@ -100,7 +100,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 
 		if !isUnique {
-			return httperror.NewError(http.StatusConflict, "Name is not unique", nil)
+			return httperror.Conflict("Name is not unique", nil)
 		}
 
 		endpoint.Name = name
