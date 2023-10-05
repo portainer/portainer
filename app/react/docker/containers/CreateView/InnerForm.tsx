@@ -27,12 +27,14 @@ export function InnerForm({
   isLoading,
   isDuplicate,
   onChangeName,
+  onRateLimit,
 }: {
   isDuplicate: boolean;
   isLoading: boolean;
   onChangeName: (value: string) => void;
+  onRateLimit: (limited?: boolean) => void;
 }) {
-  const { values, setFieldValue, errors, isValid, submitForm } =
+  const { values, setFieldValue, errors, submitForm } =
     useFormikContext<Values>();
   const environmentId = useEnvironmentId();
   const [tab, setTab] = useState('commands');
@@ -58,7 +60,7 @@ export function InnerForm({
                 setFieldValue('commands.entrypoint', null);
               }}
               isLoading={isLoading}
-              isValid={isValid}
+              onRateLimit={onRateLimit}
             />
 
             <div className="mt-4">

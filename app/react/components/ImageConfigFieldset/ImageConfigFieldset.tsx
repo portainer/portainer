@@ -10,10 +10,9 @@ import { AdvancedForm } from './AdvancedForm';
 import { RateLimits } from './RateLimits';
 
 export function ImageConfigFieldset({
-  checkRateLimits,
+  onRateLimit,
   children,
   autoComplete,
-  setValidity,
   fieldNamespace,
   values,
   errors,
@@ -22,9 +21,8 @@ export function ImageConfigFieldset({
   values: Values;
   errors?: FormikErrors<Values>;
   fieldNamespace?: string;
-  checkRateLimits?: boolean;
   autoComplete?: boolean;
-  setValidity: (error?: string) => void;
+  onRateLimit?: (limited?: boolean) => void;
   onChangeImage?: (name: string) => void;
 }>) {
   const { setFieldValue } = useFormikContext<Values>();
@@ -69,8 +67,8 @@ export function ImageConfigFieldset({
 
       {children}
 
-      {checkRateLimits && values.useRegistry && (
-        <RateLimits registryId={values.registryId} setValidity={setValidity} />
+      {onRateLimit && values.useRegistry && (
+        <RateLimits registryId={values.registryId} onRateLimit={onRateLimit} />
       )}
     </div>
   );

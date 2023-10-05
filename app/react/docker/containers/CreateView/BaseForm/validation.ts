@@ -12,11 +12,18 @@ export function validation(
     isAdmin,
     isDuplicating,
     isDuplicatingPortainer,
+    isDockerhubRateLimited,
   }: {
     isAdmin: boolean;
     isDuplicating: boolean | undefined;
     isDuplicatingPortainer: boolean | undefined;
-  } = { isAdmin: false, isDuplicating: false, isDuplicatingPortainer: false }
+    isDockerhubRateLimited: boolean;
+  } = {
+    isAdmin: false,
+    isDuplicating: false,
+    isDuplicatingPortainer: false,
+    isDockerhubRateLimited: false,
+  }
 ): SchemaOf<Values> {
   return object({
     name: string()
@@ -29,7 +36,7 @@ export function validation(
     nodeName: string().default(''),
     ports: portsSchema(),
     publishAllPorts: boolean().default(false),
-    image: imageConfigValidation().test(
+    image: imageConfigValidation(isDockerhubRateLimited).test(
       'duplicate-must-have-registry',
       'Duplicate is only possible when registry is selected',
       (value) => !isDuplicating || typeof value.registryId !== 'undefined'

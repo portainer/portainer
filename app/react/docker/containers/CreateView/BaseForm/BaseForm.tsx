@@ -50,18 +50,17 @@ function useIsAgentOnSwarm() {
 }
 
 export function BaseForm({
-  isValid,
   isLoading,
   onChangeName,
   onChangeImageName,
+  onRateLimit,
 }: {
-  isValid: boolean;
   isLoading: boolean;
   onChangeName: (value: string) => void;
   onChangeImageName: () => void;
+  onRateLimit: (limited?: boolean) => void;
 }) {
-  const { setFieldValue, values, errors, setFieldError } =
-    useFormikContext<Values>();
+  const { setFieldValue, values, errors, isValid } = useFormikContext<Values>();
   const environmentQuery = useCurrentEnvironment();
   const isAgentOnSwarm = useIsAgentOnSwarm();
   if (!environmentQuery.data) {
@@ -91,10 +90,9 @@ export function BaseForm({
         <FormSection title="Image Configuration">
           <ImageConfigFieldset
             values={values.image}
-            setValidity={(valid) => setFieldError('image', valid)}
             fieldNamespace="image"
             autoComplete
-            checkRateLimits={values.alwaysPull}
+            onRateLimit={values.alwaysPull ? onRateLimit : undefined}
             errors={errors?.image}
             onChangeImage={onChangeImageName}
           >
