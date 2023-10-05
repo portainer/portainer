@@ -151,7 +151,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	}
 
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{StatusCode: http.StatusUnauthorized, Message: "Permission denied to delete the stack", Err: httperrors.ErrUnauthorized}
+		return httperror.Unauthorized("Permission denied to delete the stack", httperrors.ErrUnauthorized)
 	}
 
 	stack, err := handler.DataStore.Stack().StackByName(stackName)

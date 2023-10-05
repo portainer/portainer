@@ -128,10 +128,10 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	}
 	for _, r := range registries {
 		if r.Name == registry.Name {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another registry with the same name already exists", Err: errors.New("A registry is already defined with this name")}
+			return httperror.Conflict("Another registry with the same name already exists", errors.New("A registry is already defined with this name"))
 		}
 		if handler.registriesHaveSameURLAndCredentials(&r, registry) {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another registry with the same URL and credentials already exists", Err: errors.New("A registry is already defined for this URL and credentials")}
+			return httperror.Conflict("Another registry with the same URL and credentials already exists", errors.New("A registry is already defined for this URL and credentials"))
 		}
 	}
 

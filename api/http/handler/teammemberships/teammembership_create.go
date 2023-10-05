@@ -75,7 +75,7 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 	if len(memberships) > 0 {
 		for _, membership := range memberships {
 			if membership.UserID == portainer.UserID(payload.UserID) && membership.TeamID == portainer.TeamID(payload.TeamID) {
-				return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Team membership already registered", Err: errors.New("Team membership already exists for this user and team")}
+				return httperror.Conflict("Team membership already registered", errors.New("Team membership already exists for this user and team"))
 			}
 		}
 	}

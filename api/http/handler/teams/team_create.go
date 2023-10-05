@@ -53,7 +53,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 		return httperror.InternalServerError("Unable to retrieve teams from the database", err)
 	}
 	if team != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A team with the same name already exists", Err: errors.New("Team already exists")}
+		return httperror.Conflict("A team with the same name already exists", errors.New("Team already exists"))
 	}
 
 	team = &portainer.Team{

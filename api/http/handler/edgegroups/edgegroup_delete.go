@@ -59,7 +59,7 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 	for _, edgeStack := range edgeStacks {
 		for _, groupID := range edgeStack.EdgeGroups {
 			if groupID == ID {
-				return httperror.NewError(http.StatusConflict, "Edge group is used by an Edge stack", errors.New("edge group is used by an Edge stack"))
+				return httperror.Conflict("Edge group is used by an Edge stack", errors.New("edge group is used by an Edge stack"))
 			}
 		}
 	}
@@ -72,7 +72,7 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 	for _, edgeJob := range edgeJobs {
 		for _, groupID := range edgeJob.EdgeGroups {
 			if groupID == ID {
-				return httperror.NewError(http.StatusConflict, "Edge group is used by an Edge job", errors.New("edge group is used by an Edge job"))
+				return httperror.Conflict("Edge group is used by an Edge job", errors.New("edge group is used by an Edge job"))
 			}
 		}
 	}
