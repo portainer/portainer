@@ -12,7 +12,6 @@ import { PortainerResponse } from '@/react/docker/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { ContainerId } from '@/react/docker/containers/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 import { urlBuilder } from '../containers.service';
 
@@ -100,19 +99,8 @@ async function getContainer(
     const { data } = await axios.get<ContainerResponse>(
       urlBuilder(environmentId, containerId, 'json')
     );
-    return toViewModel(data);
+    return data;
   } catch (error) {
     throw parseAxiosError(error as Error, 'Unable to retrieve container');
   }
-}
-
-export function toViewModel(response: ContainerResponse) {
-  const resourceControl =
-    response.Portainer?.ResourceControl &&
-    new ResourceControlViewModel(response?.Portainer?.ResourceControl);
-
-  return {
-    ...response,
-    ResourceControl: resourceControl,
-  };
 }
