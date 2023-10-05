@@ -81,12 +81,12 @@ export function DeploymentOptionsSection() {
           <SwitchField
             label="Allow stacks functionality with Kubernetes environments"
             checked={!values.hideStacksFunctionality}
-            onChange={(value) => {
+            onChange={(value) =>
               setFieldValue(
                 'globalDeploymentOptions.hideStacksFunctionality',
                 !value
-              );
-            }}
+              )
+            }
             name="toggle_stacksFunctionality"
             labelClass="col-sm-3 col-lg-2"
             tooltip="This allows you to group your applications/workloads into a single ‘stack’, and then view or delete an entire stack. If disabled, stacks functionality will not show in the UI."
