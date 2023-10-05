@@ -162,7 +162,7 @@ function useRateLimits(
     }
 
     if (query.data) {
-      onRateLimit(query.data.limit === 0 || query.data.remaining >= 0);
+      onRateLimit(query.data.limit > 0 && query.data.remaining === 0);
     }
   }, [isValidForPull, onRateLimit, query.data, query.isError]);
 
