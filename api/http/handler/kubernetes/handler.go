@@ -111,6 +111,9 @@ func kubeOnlyMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// getProxyKubeClient gets a kubeclient for the user.  It's generally what you want as it retrieves the kubeclient
+// from the Authorization token of the currently logged in user.  The kubeclient that is not from the proxy is actually using
+// admin permissions.  If you're unsure which one to use, use this.
 func (h *Handler) getProxyKubeClient(r *http.Request) (*cli.KubeClient, *httperror.HandlerError) {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
