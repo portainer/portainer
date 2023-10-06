@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"net/http"
-	"strconv"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -25,30 +24,14 @@ import (
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces [get]
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	namespaces, err := cli.GetNamespaces()
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to retrieve namespaces",
-			err,
-		)
+		return httperror.InternalServerError("Unable to retrieve namespaces", err)
 	}
 
 	return response.JSON(w, namespaces)
@@ -70,24 +53,6 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace} [get]
 func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
-	}
-
 	ns, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
 		return httperror.BadRequest(
@@ -95,12 +60,15 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 			err,
 		)
 	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
 	namespace, err := cli.GetNamespace(ns)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to retrieve namespace",
-			err,
-		)
+		return httperror.InternalServerError("Unable to retrieve namespace", err)
 	}
 
 	return response.JSON(w, namespace)
@@ -123,39 +91,20 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces [post]
 func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
-	}
-
 	var payload models.K8sNamespaceDetails
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid request payload",
-			err,
-		)
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	err = cli.CreateNamespace(payload)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to create namespace",
-			err,
-		)
+		return httperror.InternalServerError("Unable to create namespace", err)
 	}
 
 	return nil
@@ -177,38 +126,25 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace} [delete]
 func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	var payload models.K8sNamespaceDetails
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	err = cli.DeleteNamespace(namespace)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to delete namespace",
-			err,
-		)
+		return httperror.InternalServerError("Unable to delete namespace", err)
 	}
 
 	return nil
@@ -231,28 +167,15 @@ func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace} [put]
 func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
-	}
-
 	var payload models.K8sNamespaceDetails
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	err = cli.UpdateNamespace(payload)

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/middlewares"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -396,42 +397,20 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresscontrollers [put]
 func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
-	} else if err != nil {
-		return httperror.InternalServerError(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
+		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
 	var payload models.K8sIngressControllers
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid request payload",
-			err,
-		)
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
@@ -497,18 +476,13 @@ PayloadLoop:
 			updatedClasses = append(updatedClasses, existingClass)
 		}
 	}
-
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.DataStore.Endpoint().UpdateEndpoint(
-		portainer.EndpointID(endpointID),
-		endpoint,
-	)
+
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to update the BlockedIngressClasses inside the database",
-			err,
-		)
+		return httperror.InternalServerError("Unable to update the BlockedIngressClasses inside the database", err)
 	}
+
 	return response.Empty(w)
 }
 
@@ -531,36 +505,17 @@ PayloadLoop:
 func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	ingresses, err := cli.GetIngresses(namespace)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to retrieve ingresses",
-			err,
-		)
+		return httperror.InternalServerError("Unable to retrieve ingresses", err)
 	}
 
 	return response.JSON(w, ingresses)
@@ -585,27 +540,13 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
 	var payload models.K8sIngressInfo
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid request payload",
-			err,
-		)
-	}
-
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	owner := "admin"
@@ -614,23 +555,16 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 		owner = tokenData.Username
 	}
 
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	err = cli.CreateIngress(namespace, payload, owner)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to retrieve the ingress",
-			err,
-		)
+		return httperror.InternalServerError("Unable to retrieve the ingress", err)
 	}
+
 	return response.Empty(w)
 }
 
@@ -650,37 +584,22 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/ingresses/delete [post]
 func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	var payload models.K8sIngressDeleteRequests
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	err = cli.DeleteIngresses(payload)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to delete ingresses",
-			err,
-		)
+		return httperror.InternalServerError("Unable to delete ingresses", err)
 	}
+
 	return response.Empty(w)
 }
 
@@ -703,45 +622,24 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
 	var payload models.K8sIngressInfo
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid request payload",
-			err,
-		)
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	err = cli.UpdateIngress(namespace, payload)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to update the ingress",
-			err,
-		)
+		return httperror.InternalServerError("Unable to update the ingress", err)
 	}
+
 	return response.Empty(w)
 }
