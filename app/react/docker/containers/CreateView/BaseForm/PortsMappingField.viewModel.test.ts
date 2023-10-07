@@ -30,6 +30,25 @@ test('basic', () => {
   ]);
 });
 
+test('already combined', () => {
+  expect(
+    toViewModel({
+      '80/tcp': [
+        {
+          HostIp: '',
+          HostPort: '7000-7999',
+        },
+      ],
+    })
+  ).toStrictEqual([
+    {
+      hostPort: '7000-7999',
+      containerPort: '80',
+      protocol: 'tcp',
+    },
+  ]);
+});
+
 test('simple combine ports', () => {
   expect(
     toViewModel({
