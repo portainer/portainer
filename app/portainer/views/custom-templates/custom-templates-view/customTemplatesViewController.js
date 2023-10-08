@@ -177,12 +177,11 @@ class CustomTemplatesViewController {
     }
   }
 
-  unselectTemplate(template) {
+  unselectTemplate() {
     // wrapping unselect with async to make a digest cycle run between unselect to select
-    return this.$async(this.unselectTemplateAsync, template);
+    return this.$async(this.unselectTemplateAsync);
   }
-  async unselectTemplateAsync(template) {
-    template.Selected = false;
+  async unselectTemplateAsync() {
     this.state.selectedTemplate = null;
 
     this.formValues = {
@@ -194,15 +193,15 @@ class CustomTemplatesViewController {
     };
   }
 
-  selectTemplate(template) {
-    return this.$async(this.selectTemplateAsync, template);
+  selectTemplate(templateId) {
+    return this.$async(this.selectTemplateAsync, templateId);
   }
-  async selectTemplateAsync(template) {
+  async selectTemplateAsync(templateId) {
     if (this.state.selectedTemplate) {
       await this.unselectTemplate(this.state.selectedTemplate);
     }
 
-    template.Selected = true;
+    const template = _.find(this.templates, { Id: templateId });
 
     try {
       this.state.templateContent = this.formValues.fileContent = await this.CustomTemplateService.customTemplateFile(template.Id, template.GitConfig !== null);
