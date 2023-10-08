@@ -30,40 +30,41 @@ export function CustomTemplatesListItem({
       typeLabel={getTypeLabel(template.Type)}
       onSelect={() => onSelect(template.Id)}
       isSelected={isSelected}
-    >
-      <div>
-        {isEditAllowed && (
-          <div className="vertical-center">
-            <Button
-              as={Link}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              color="secondary"
-              props={{
-                to: '.edit',
-                params: {
-                  id: template.Id,
-                },
-              }}
-              icon={Edit}
-            >
-              Edit
-            </Button>
-            <Button
-              onClick={(e) => {
-                onDelete(template.Id);
-                e.stopPropagation();
-              }}
-              color="dangerlight"
-              icon={Trash2}
-            >
-              Delete
-            </Button>
-          </div>
-        )}
-      </div>
-    </TemplateItem>
+      renderActions={
+        <div className="mr-4 mt-3">
+          {isEditAllowed && (
+            <div className="vertical-center">
+              <Button
+                as={Link}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                color="secondary"
+                props={{
+                  to: '.edit',
+                  params: {
+                    id: template.Id,
+                  },
+                }}
+                icon={Edit}
+              >
+                Edit
+              </Button>
+              <Button
+                onClick={(e) => {
+                  onDelete(template.Id);
+                  e.stopPropagation();
+                }}
+                color="dangerlight"
+                icon={Trash2}
+              >
+                Delete
+              </Button>
+            </div>
+          )}
+        </div>
+      }
+    />
   );
 }
 
