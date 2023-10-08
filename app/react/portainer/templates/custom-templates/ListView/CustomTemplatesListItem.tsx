@@ -2,11 +2,11 @@ import { Edit, Trash2 } from 'lucide-react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
+import { CustomTemplate } from '@/react/portainer/custom-templates/types';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
-import { CustomTemplate } from '../../../custom-templates/types';
 import { TemplateItem } from '../../components/TemplateItem';
 
 export function CustomTemplatesListItem({
