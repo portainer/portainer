@@ -142,10 +142,18 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User, 
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
-	token, err := handler.JWTService.GenerateToken(tokenData)
+	token, expirationTime, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Expires:  expirationTime,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
 }

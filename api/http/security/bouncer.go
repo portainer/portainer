@@ -32,7 +32,7 @@ type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
 		dataStore     dataservices.DataStore
-		jwtService    dataservices.JWTService
+		jwtService    portainer.JWTService
 		apiKeyService apikey.APIKeyService
 	}
 
@@ -52,7 +52,7 @@ type (
 const apiKeyHeader = "X-API-KEY"
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
+func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
 	return &RequestBouncer{
 		dataStore:     dataStore,
 		jwtService:    jwtService,
@@ -343,7 +343,7 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 		Username: user.Username,
 		Role:     user.Role,
 	}
-	if _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
+	if _, _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
 		return nil
 	}
 
@@ -358,7 +358,17 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 
 // extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
 func extractBearerToken(r *http.Request) (string, error) {
-	// Optionally, token might be set via the "token" query parameter.
+	// extract the API key from the cookie
+	cookieToken, err := extractKeyFromCookie(r)
+	if err != nil {
+		return "", err
+	}
+
+	if cookieToken != "" {
+		return cookieToken, nil
+	}
+
+	// Token might be set via the "token" query parameter.
 	// For example, in websocket requests
 	token := r.URL.Query().Get("token")
 
@@ -373,12 +383,25 @@ func extractBearerToken(r *http.Request) (string, error) {
 	return token, nil
 }
 
+func extractKeyFromCookie(r *http.Request) (string, error) {
+	cookie, err := r.Cookie("portainer_api_key")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			return "", nil
+		}
+
+		return "", err
+	}
+
+	return cookie.Value, nil
+}
+
 // extractAPIKey extracts the api key from the api key request header or query params.
-func extractAPIKey(r *http.Request) (apikey string, ok bool) {
+func extractAPIKey(r *http.Request) (string, bool) {
 	// extract the API key from the request header
-	apikey = r.Header.Get(apiKeyHeader)
-	if apikey != "" {
-		return apikey, true
+	apiKey := r.Header.Get(apiKeyHeader)
+	if apiKey != "" {
+		return apiKey, true
 	}
 
 	// extract the API key from query params.

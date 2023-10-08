@@ -1478,6 +1478,15 @@ type (
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
+	// JWTService represents a service for managing JWT tokens
+	JWTService interface {
+		GenerateToken(data *TokenData) (string, time.Time, error)
+		GenerateTokenForOAuth(data *TokenData) (string, time.Time, error)
+		GenerateTokenForKubeconfig(data *TokenData) (string, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
+		SetUserSessionDuration(userSessionDuration time.Duration)
+	}
+
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error

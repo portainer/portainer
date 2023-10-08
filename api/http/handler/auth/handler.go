@@ -18,7 +18,7 @@ type Handler struct {
 	*mux.Router
 	DataStore                   dataservices.DataStore
 	CryptoService               portainer.CryptoService
-	JWTService                  dataservices.JWTService
+	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	ProxyManager                *proxy.Manager

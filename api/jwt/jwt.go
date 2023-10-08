@@ -43,7 +43,7 @@ const (
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*Service, error) {
+func NewService(userSessionDuration string, dataStore dataservices.DataStore) (portainer.JWTService, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
 	if err != nil {
 		return nil, err
@@ -91,23 +91,25 @@ func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
 	return kubeSecret, nil
 }
 
-func (service *Service) defaultExpireAt() int64 {
-	return time.Now().Add(service.userSessionTimeout).Unix()
+func (service *Service) defaultExpireAt() time.Time {
+	return time.Now().Add(service.userSessionTimeout)
 }
 
 // GenerateToken generates a new JWT token.
-func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	return service.generateSignedToken(data, service.defaultExpireAt(), defaultScope)
+func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.Time, error) {
+	expiryTime := service.defaultExpireAt()
+	token, err := service.generateSignedToken(data, expiryTime.Unix(), defaultScope)
+	return token, expiryTime, err
 }
 
 // GenerateTokenForOAuth generates a new JWT token for OAuth login
 // token expiry time response from OAuth provider is considered
-func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
+func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData) (string, time.Time, error) {
 	expireAt := service.defaultExpireAt()
-	if expiryTime != nil && !expiryTime.IsZero() {
-		expireAt = expiryTime.Unix()
-	}
-	return service.generateSignedToken(data, expireAt, defaultScope)
+
+	token, err := service.generateSignedToken(data, expireAt.Unix(), defaultScope)
+
+	return token, expireAt, err
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
