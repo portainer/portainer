@@ -8,7 +8,7 @@ import KubernetesIcon from '@/assets/ico/vendor/kubernetes.svg?c';
 import { Icon } from '@@/Icon';
 import { FallbackImage } from '@@/FallbackImage';
 
-import { Platform } from '../types';
+import { Platform } from '../../custom-templates/types';
 
 // Import the Icon component
 type Value = {

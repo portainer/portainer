@@ -6,8 +6,8 @@ import { StackType } from '@/react/common/stacks/types';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
-import { CustomTemplate } from '../types';
-import { TemplateItem } from '../components/TemplateItem';
+import { CustomTemplate } from '../../../custom-templates/types';
+import { TemplateItem } from '../../components/TemplateItem';
 
 export function CustomTemplatesListItem({
   template,
