@@ -27,7 +27,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
-// @id HelmUserRepositoryCreate
+// @id HelmUserRepositoryCreateDeprecated
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
@@ -86,7 +86,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	return response.JSON(w, record)
 }
 
-// @id HelmUserRepositoriesList
+// @id HelmUserRepositoriesListDeprecated
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated

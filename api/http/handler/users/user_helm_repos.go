@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/pkg/libhelm"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -27,7 +28,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
-// @id HelmUserRepositoryCreateV2
+// @id HelmUserRepositoryCreate
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
@@ -44,11 +45,20 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @failure 500 "Server error"
 // @router /users/{id}/helm/repositories [post]
 func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	userIDEndpoint, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest("Invalid user identifier route variable", err)
+	}
+
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
-	userID := portainer.UserID(tokenData.ID)
+
+	userID := portainer.UserID(userIDEndpoint)
+	if tokenData.ID != userID {
+		return httperror.Forbidden("Couldn't create Helm repositories for another user", httperrors.ErrUnauthorized)
+	}
 
 	p := new(addHelmRepoUrlPayload)
 	err = request.DecodeAndValidateJSONPayload(r, p)
@@ -85,7 +95,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	return response.JSON(w, record)
 }
 
-// @id HelmUserRepositoriesListV2
+// @id HelmUserRepositoriesList
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated
@@ -100,11 +110,20 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @failure 500 "Server error"
 // @router /users/{id}/helm/repositories [get]
 func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	userIDEndpoint, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest("Invalid user identifier route variable", err)
+	}
+
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
-	userID := portainer.UserID(tokenData.ID)
+
+	userID := portainer.UserID(userIDEndpoint)
+	if tokenData.ID != userID {
+		return httperror.Forbidden("Couldn't create Helm repositories for another user", httperrors.ErrUnauthorized)
+	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
@@ -124,7 +143,7 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	return response.JSON(w, resp)
 }
 
-// @id HelmUserRepositoryDeleteV2
+// @id HelmUserRepositoryDelete
 // @summary Delete a users helm repositoryies
 // @description **Access policy**: authenticated
 // @tags helm
@@ -139,11 +158,20 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 // @failure 500 "Server error"
 // @router /users/{id}/helm/repositories/{repositoryID} [delete]
 func (handler *Handler) userDeleteHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	userIDEndpoint, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest("Invalid user identifier route variable", err)
+	}
+
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
-	userID := portainer.UserID(tokenData.ID)
+
+	userID := portainer.UserID(userIDEndpoint)
+	if tokenData.ID != userID {
+		return httperror.Forbidden("Couldn't create Helm repositories for another user", httperrors.ErrUnauthorized)
+	}
 
 	repositoryID, err := request.RetrieveNumericRouteVariableValue(r, "repositoryID")
 	if err != nil {
