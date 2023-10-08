@@ -1,4 +1,4 @@
-<page-header ng-if="ctrl.state.viewReady" title="'Advanced deployment'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Create from manifest'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -64,7 +64,7 @@
                   on-change="(ctrl.onChangeMethod)"
                 ></box-selector>
 
-                <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                   <div class="col-sm-12 form-section-title"> Deployment type </div>
                   <box-selector
                     radio-name="'deploy'"
@@ -165,9 +165,15 @@
                 </div>
                 <!-- !url -->
 
+                <!-- Helm -->
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
+                  <helm-templates-view endpoint="ctrl.endpoint" namespace="ctrl.formValues.Namespace" stack-name="ctrl.formValues.StackName"></helm-templates-view>
+                </div>
+                <!-- !Helm -->
+
                 <!-- actions -->
-                <div class="col-sm-12 form-section-title"> Actions </div>
-                <div class="form-group">
+                <div class="col-sm-12 form-section-title !mt-4" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"> Actions </div>
+                <div class="form-group" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                   <div class="col-sm-12">
                     <button
                       type="button"

@@ -37,6 +37,7 @@ type Handler struct {
 	CryptoService           portainer.CryptoService
 	passwordStrengthChecker security.PasswordStrengthChecker
 	AdminCreationDone       chan<- struct{}
+	FileService             portainer.FileService
 }
 
 // NewHandler creates a handler to manage user operations.
@@ -76,6 +77,11 @@ func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimit
 	authenticatedRouter.Handle("/users/{id}/passwd", rateLimiter.LimitAccess(httperror.LoggerHandler(h.userUpdatePassword))).Methods(http.MethodPut)
 	publicRouter.Handle("/users/admin/check", httperror.LoggerHandler(h.adminCheck)).Methods(http.MethodGet)
 	publicRouter.Handle("/users/admin/init", httperror.LoggerHandler(h.adminInit)).Methods(http.MethodPost)
+
+	// Helm repositories
+	authenticatedRouter.Handle("/users/{id}/helm/repositories", httperror.LoggerHandler(h.userGetHelmRepos)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/users/{id}/helm/repositories", httperror.LoggerHandler(h.userCreateHelmRepo)).Methods(http.MethodPost)
+	authenticatedRouter.Handle("/users/{id}/helm/repositories/{repositoryID}", httperror.LoggerHandler(h.userDeleteHelmRepo)).Methods(http.MethodDelete)
 
 	return h
 }

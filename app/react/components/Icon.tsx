@@ -7,6 +7,7 @@ import Svg, { SvgIcons } from './Svg';
 
 export interface IconProps {
   icon: ReactNode | ComponentType<unknown>;
+  iconClass?: string;
 }
 
 export type IconMode =

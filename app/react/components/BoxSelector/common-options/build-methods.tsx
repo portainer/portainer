@@ -1,6 +1,7 @@
 import { Edit, FileText, Globe, UploadCloud } from 'lucide-react';
 
 import GitIcon from '@/assets/ico/git.svg?c';
+import Helm from '@/assets/ico/helm.svg?c';
 
 import { BoxSelectorOption } from '../types';
 
@@ -47,6 +48,15 @@ export const customTemplate: BoxSelectorOption<'template'> = {
   label: 'Custom template',
   description: 'Use a custom template',
   value: 'template',
+};
+
+export const helm: BoxSelectorOption<'helm'> = {
+  id: 'method_helm',
+  icon: Helm,
+  label: 'Helm chart',
+  description: 'Use a Helm chart',
+  value: 'helm',
+  iconClass: '!text-[#0f1689] th-dark:!text-white th-highcontrast:!text-white',
 };
 
 export const url: BoxSelectorOption<'url'> = {

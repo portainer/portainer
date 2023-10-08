@@ -1,180 +1,108 @@
-<page-header title="'Helm'" breadcrumbs="['Charts']" reload="true"></page-header>
-
-<information-panel title-text="Information" ng-if="!$ctrl.state.chart">
-  <beta-alert
-    is-html="true"
-    message="'Beta feature - initial version of Helm charts functionality, for more information see this <a href=\'https://www.portainer.io/blog/portainer-now-with-helm-support\' target=\'_blank\' class=\'hyperlink\'>blog post</a>.'"
-  ></beta-alert>
-  <span class="small text-muted">
-    <p ng-if="$ctrl.state.globalRepository === ''" class="inline-flex items-center">
-      <pr-icon icon="'info'"></pr-icon>
-      <span>The Global Helm Repository is not configured.</span>
-      <a ng-if="$ctrl.state.isAdmin" ui-sref="portainer.settings">Configure Global Helm Repository in Settings</a>.
-    </p>
-  </span>
-</information-panel>
-
 <div class="row">
   <!-- helmchart-form -->
-  <div class="col-sm-12" ng-if="$ctrl.state.chart">
+  <div class="col-sm-12 p-0" ng-if="$ctrl.state.chart">
     <rd-widget>
-      <div class="toolBarTitle vertical-center px-5 pt-5 text-[16px] font-medium">
-        <fallback-image src="$ctrl.state.chart.icon" fallback-icon="'svg-helm'" class-name="'h-8 w-8'" size="'lg'"></fallback-image>
-        {{ $ctrl.state.chart.name }}
+      <div class="flex">
+        <div class="basis-3/4 rounded-[8px] m-2 bg-gray-4 th-highcontrast:bg-black th-highcontrast:text-white th-dark:bg-gray-iron-10 th-dark:text-white">
+          <div class="vertical-center p-5">
+            <fallback-image src="$ctrl.state.chart.icon" fallback-icon="'svg-helm'" class-name="'h-16 w-16'" size="'lg'"></fallback-image>
+            <div class="font-medium ml-4">
+              <div class="toolBarTitle text-[24px] mb-2">
+                {{ $ctrl.state.chart.name }}
+                <span class="space-left text-[14px] vertical-center font-normal">
+                  <pr-icon icon="'svg-helm'" mode="'primary'"></pr-icon>
+                  Helm
+                </span>
+              </div>
+              <div class="text-muted text-xs" ng-bind-html="$ctrl.state.chart.description"></div>
+            </div>
+          </div>
+        </div>
+        <div class="basis-1/4">
+          <div class="h-full w-full vertical-center justify-end pr-5">
+            <button type="button" class="btn btn-sm btn-link !text-gray-8 hover:no-underline th-highcontrast:!text-white th-dark:!text-white" ng-click="$ctrl.state.chart = null">
+              Clear selection
+              <pr-icon icon="'x'" class="ml-1"></pr-icon>
+            </button>
+          </div>
+        </div>
       </div>
-      <rd-widget-body classes="padding">
-        <form class="form-horizontal" name="$ctrl.helmTemplateCreationForm">
-          <!-- description -->
-          <div>
-            <div class="col-sm-12 form-section-title"> Description </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <div class="text-muted text-xs" ng-bind-html="$ctrl.state.chart.description"></div>
-              </div>
-            </div>
-          </div>
-          <!-- !description -->
-          <div class="col-sm-12 form-section-title"> Configuration </div>
-          <!-- namespace-input -->
-          <div class="form-group" ng-if="$ctrl.state.resourcePool">
-            <label for="resource-pool-selector" class="col-sm-2 control-label text-left">Namespace</label>
-            <div class="col-sm-10">
-              <select
-                class="form-control"
-                id="resource-pool-selector"
-                ng-model="$ctrl.state.resourcePool"
-                ng-options="resourcePool.Namespace.Name for resourcePool in $ctrl.state.resourcePools"
-                ng-change=""
-                ng-disabled="$ctrl.state.isEdit"
-              ></select>
-            </div>
-          </div>
-          <div class="form-group" ng-if="!$ctrl.state.resourcePool">
-            <div class="col-sm-12 small text-warning vertical-center">
-              <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-              You do not have access to any namespace. Contact your administrator to get access to a namespace.
-            </div>
-          </div>
-          <!-- !namespace-input -->
-          <!-- name-input -->
-          <div class="form-group mb-2">
-            <label for="release_name" class="col-sm-2 control-label required text-left">Name</label>
-            <div class="col-sm-10">
-              <input
-                type="text"
-                name="release_name"
-                class="form-control"
-                ng-model="$ctrl.state.appName"
-                placeholder="e.g. my-app"
-                required
-                ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
-              />
-            </div>
-          </div>
-          <div class="form-group" ng-show="$ctrl.helmTemplateCreationForm.release_name.$invalid">
-            <div class="small">
-              <div ng-messages="$ctrl.helmTemplateCreationForm.release_name.$error">
-                <div class="col-sm-2"></div>
-                <p class="vertical-center col-sm-10 text-warning" ng-message="required">
-                  <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon>
-                  This field is required.
-                </p>
-                <p class="vertical-center col-sm-10 text-warning" ng-message="pattern">
-                  <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon>
-                  This field must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name',
-                  or 'abc-123').
-                </p>
-              </div>
-            </div>
-          </div>
-          <!-- !name-input -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                ng-if="!$ctrl.state.showCustomValues && !$ctrl.state.loadingValues"
-                class="btn btn-xs btn-default vertical-center !ml-0 mr-2"
-                ng-click="$ctrl.state.showCustomValues = true;"
-              >
-                <pr-icon icon="'plus'" class="vertical-center"></pr-icon>
-                Show custom values
-              </button>
-              <span class="small interactive vertical-center" ng-if="$ctrl.state.loadingValues">
-                <pr-icon icon="'refresh-cw'" class="mr-1"></pr-icon>
-                Loading values.yaml...
-              </span>
-              <button ng-if="$ctrl.state.showCustomValues" class="btn btn-xs btn-default vertical-center !ml-0 mr-2" ng-click="$ctrl.state.showCustomValues = false;">
-                <pr-icon icon="'minus'" class="vertical-center"></pr-icon>
-                Hide custom values
-              </button>
-            </div>
-          </div>
-          <!-- values override -->
-          <div ng-if="$ctrl.state.showCustomValues">
-            <!-- web-editor -->
-            <div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <web-editor-form
-                    identifier="helm-app-creation-editor"
-                    value="$ctrl.state.values"
-                    on-change="($ctrl.editorUpdate)"
-                    yml="true"
-                    placeholder="Define or paste the content of your values yaml file here"
-                  >
-                    <editor-description class="vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      <span>
-                        You can get more information about Helm values file format in the
-                        <a href="https://helm.sh/docs/chart_template_guide/values_files/" target="_blank" class="text-blue-8 hover:text-blue-8 hover:underline"
-                          >official documentation</a
-                        >.
-                      </span>
-                    </editor-description>
-                  </web-editor-form>
-                </div>
-              </div>
-            </div>
-            <!-- !web-editor -->
-          </div>
-          <!-- !values override -->
-          <!-- helm actions -->
-          <div class="col-sm-12 form-section-title"> Actions </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm !ml-0"
-                ng-disabled="!($ctrl.state.appName && $ctrl.state.resourcePool && !$ctrl.state.loadingValues && !$ctrl.state.actionInProgress)"
-                ng-click="$ctrl.installHelmchart()"
-                button-spinner="$ctrl.state.actionInProgress"
-                data-cy="helm-install"
-              >
-                <span ng-hide="$ctrl.state.actionInProgress">Install</span>
-                <span ng-hide="!$ctrl.state.actionInProgress">Helm installing in progress</span>
-              </button>
-              <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.state.chart = null">Hide</button>
-            </div>
-          </div>
-          <!-- !helm actions -->
-        </form>
-      </rd-widget-body>
     </rd-widget>
+
+    <form class="form-horizontal" name="$ctrl.helmTemplateCreationForm">
+      <div class="form-group mt-4">
+        <div class="col-sm-12">
+          <button
+            ng-if="!$ctrl.state.showCustomValues && !$ctrl.state.loadingValues"
+            class="btn btn-xs btn-default vertical-center !ml-0 mr-2"
+            ng-click="$ctrl.state.showCustomValues = true;"
+          >
+            <pr-icon icon="'plus'" class="vertical-center"></pr-icon>
+            Show custom values
+          </button>
+          <span class="small interactive vertical-center" ng-if="$ctrl.state.loadingValues">
+            <pr-icon icon="'refresh-cw'" class="mr-1"></pr-icon>
+            Loading values.yaml...
+          </span>
+          <button ng-if="$ctrl.state.showCustomValues" class="btn btn-xs btn-default vertical-center !ml-0 mr-2" ng-click="$ctrl.state.showCustomValues = false;">
+            <pr-icon icon="'minus'" class="vertical-center"></pr-icon>
+            Hide custom values
+          </button>
+        </div>
+      </div>
+      <!-- values override -->
+      <div ng-if="$ctrl.state.showCustomValues">
+        <!-- web-editor -->
+        <div class="form-group">
+          <div class="col-sm-12">
+            <web-editor-form
+              identifier="helm-app-creation-editor"
+              value="$ctrl.state.values"
+              on-change="($ctrl.editorUpdate)"
+              yml="true"
+              placeholder="Define or paste the content of your values yaml file here"
+            >
+              <editor-description class="vertical-center">
+                <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                <span>
+                  You can get more information about Helm values file format in the
+                  <a href="https://helm.sh/docs/chart_template_guide/values_files/" target="_blank" class="hyperlink">official documentation</a>.
+                </span>
+              </editor-description>
+            </web-editor-form>
+          </div>
+        </div>
+        <!-- !web-editor -->
+      </div>
+      <!-- !values override -->
+      <!-- helm actions -->
+      <div class="col-sm-12 form-section-title"> Actions </div>
+      <div class="form-group">
+        <div class="col-sm-12">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm !ml-0"
+            ng-disabled="!($ctrl.stackName && $ctrl.state.resourcePool && !$ctrl.state.loadingValues && !$ctrl.state.actionInProgress)"
+            ng-click="$ctrl.installHelmchart()"
+            button-spinner="$ctrl.state.actionInProgress"
+            data-cy="helm-install"
+          >
+            <span ng-hide="$ctrl.state.actionInProgress">Install</span>
+            <span ng-hide="!$ctrl.state.actionInProgress">Helm installing in progress</span>
+          </button>
+        </div>
+      </div>
+      <!-- !helm actions -->
+    </form>
   </div>
   <!-- helmchart-form -->
-</div>
-
-<div class="row">
-  <div class="col-sm-12">
-    <helm-add-repository repos="$ctrl.state.repos" endpoint="$ctrl.endpoint"></helm-add-repository>
-  </div>
 </div>
 
 <!-- Helm Charts Component -->
-<div class="row">
-  <div class="col-sm-12">
+<div class="row" ng-if="!$ctrl.state.chart">
+  <div class="col-sm-12 p-0">
     <helm-templates-list
-      title-text="Charts"
-      title-icon="compass"
+      title-text="Helm chart"
       charts="$ctrl.state.charts"
       table-key="$ctrl.state.charts"
       select-action="$ctrl.selectHelmChart"

@@ -81,6 +81,7 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
+	UserHelmHandler        *helm.Handler
 }
 
 // @title PortainerCE API
