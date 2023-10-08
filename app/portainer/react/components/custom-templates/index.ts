@@ -7,6 +7,7 @@ import { withControlledInput } from '@/react-tools/withControlledInput';
 import { CustomTemplatesListItem } from '@/react/portainer/templates/custom-templates/ListView/CustomTemplatesListItem';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { AppTemplatesListItem } from '@/react/portainer/templates/app-templates/AppTemplatesListItem';
 
 import { VariablesFieldAngular } from './variables-field';
 
@@ -37,5 +38,14 @@ export const customTemplatesModule = angular
       'onSelect',
       'template',
       'isSelected',
+    ])
+  )
+  .component(
+    'appTemplatesListItem',
+    r2a(withUIRouter(withCurrentUser(AppTemplatesListItem)), [
+      'onSelect',
+      'template',
+      'isSelected',
+      'onDuplicate',
     ])
   ).name;

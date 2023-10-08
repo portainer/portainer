@@ -25,7 +25,6 @@ export function CustomTemplatesListItem({
 
   return (
     <TemplateItem
-      key={template.Id}
       template={template}
       typeLabel={getTypeLabel(template.Type)}
       onSelect={() => onSelect(template.Id)}

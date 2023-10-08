@@ -12,10 +12,10 @@ import { Platform } from '../../custom-templates/types';
 
 // Import the Icon component
 type Value = {
-  Id: number;
-  Logo: string;
+  Id: number | string;
+  Logo?: string;
   Title: string;
-  Platform: Platform;
+  Platform?: Platform;
   Description: string;
   Categories?: string[];
 };
