@@ -23,7 +23,7 @@ export function useResourceLimits(environmentId: EnvironmentId) {
     () => getResourceLimits(environmentId),
     {
       onError: (err) => {
-        notifyError('Failure', err as Error, 'Unable to get registries');
+        notifyError('Failure', err as Error, 'Unable to get resource limits');
       },
     }
   );
