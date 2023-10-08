@@ -184,6 +184,8 @@ class KubernetesCreateApplicationController {
 
   async updateApplicationViaWebEditor() {
     return this.$async(async () => {
+      // eslint-disable-next-line no-console
+      console.log(this.formValues.StackName);
       try {
         const confirmed = await confirm({
           title: 'Are you sure?',
@@ -196,7 +198,10 @@ class KubernetesCreateApplicationController {
         }
 
         this.state.updateWebEditorInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, { stackFile: this.stackFileContent });
+        await this.StackService.updateKubeStack(
+          { EndpointId: this.endpoint.Id, Id: this.application.StackId },
+          { stackFile: this.stackFileContent, stackName: this.formValues.StackName }
+        );
         this.state.isEditorDirty = false;
         await this.$state.reload(this.$state.current);
       } catch (err) {

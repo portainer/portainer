@@ -24,6 +24,8 @@ import (
 
 type kubernetesFileStackUpdatePayload struct {
 	StackFileContent string
+	// Name of the stack
+	StackName string `example:"myStack"`
 }
 
 type kubernetesGitStackUpdatePayload struct {
@@ -38,6 +40,9 @@ type kubernetesGitStackUpdatePayload struct {
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
 		return errors.New("Invalid stack file content")
+	}
+	if govalidator.IsNull(payload.StackName) {
+		return errors.New("Invalid stack name")
 	}
 	return nil
 }

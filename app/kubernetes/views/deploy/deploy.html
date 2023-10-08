@@ -54,16 +54,12 @@
                   <div class="col-sm-8"> Resource names specified in the manifest will be used </div>
                 </div>
 
-                <p class="vertical-center small text-muted mt-4" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
-                  <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                  A 'stack' groups multiple deployments together. Enter a new stack name.
-                </p>
-                <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
-                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label text-left">Stack</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" ng-model="ctrl.formValues.StackName" id="stack_name" placeholder="myStack" auto-focus />
-                  </div>
-                </div>
+                <kube-stack-name
+                  ng-if="!ctrl.deploymentOptions.hideStacksFunctionality"
+                  stack-name="ctrl.formValues.StackName"
+                  set-stack-name="(ctrl.setStackName)"
+                  is-admin="ctrl.currentUser.isAdmin"
+                ></kube-stack-name>
 
                 <div class="col-sm-12 form-section-title"> Deploy from </div>
                 <box-selector

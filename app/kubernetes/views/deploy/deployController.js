@@ -90,6 +90,7 @@ class KubernetesDeployController {
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onChangeDeployType = this.onChangeDeployType.bind(this);
     this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
+    this.setStackName = this.setStackName.bind(this);
   }
 
   onSelectHelmChart(chart) {
@@ -100,6 +101,10 @@ class KubernetesDeployController {
     this.onChangeFormValues({ Variables: value });
 
     this.renderTemplate();
+  }
+
+  setStackName(name) {
+    this.formValues.StackName = name;
   }
 
   renderTemplate() {
