@@ -1,6 +1,5 @@
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody } from '@@/Widget';
@@ -11,13 +10,17 @@ export function ConfigureView() {
   const { data: environment } = useCurrentEnvironment();
 
   useUnauthorizedRedirect(
-    'K8sClusterW',
-    'kubernetes.dashboard',
     {
-      id: environment?.Id,
+      authorizations: 'K8sClusterW',
+      forceEnvironmentId: environment?.Id,
+      adminOnlyCE: false,
     },
-    environment?.Id,
-    !isBE
+    {
+      params: {
+        id: environment?.Id,
+      },
+      to: 'kubernetes.dashboard',
+    }
   );
 
   return (

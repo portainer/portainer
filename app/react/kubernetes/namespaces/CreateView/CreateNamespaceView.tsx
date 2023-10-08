@@ -8,14 +8,19 @@ import { CreateNamespaceForm } from './CreateNamespaceForm';
 
 export function CreateNamespaceView() {
   const environmentId = useEnvironmentId();
+
   useUnauthorizedRedirect(
-    'K8sResourcePoolsW',
-    'kubernetes.resourcePools',
     {
-      id: environmentId,
+      authorizations: 'K8sResourcePoolsW',
+      forceEnvironmentId: environmentId,
+      adminOnlyCE: !isBE,
     },
-    environmentId,
-    !isBE
+    {
+      to: 'kubernetes.resourcePools',
+      params: {
+        id: environmentId,
+      },
+    }
   );
 
   return (

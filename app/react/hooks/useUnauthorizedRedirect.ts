@@ -5,20 +5,32 @@ import { EnvironmentId } from '../portainer/environments/types';
 
 import { useAuthorizations } from './useUser';
 
+type AuthorizationOptions = {
+  authorizations: string | string[];
+  forceEnvironmentId?: EnvironmentId;
+  adminOnlyCE?: boolean;
+};
+
+type RedirectOptions = {
+  to: string;
+  params: Record<string, unknown>;
+};
+
 /**
  * Redirects to the given route if the user is not authorized.
  * @param authorizations The authorizations to check.
- * @param redirectTo The route to redirect to.
- * @param redirectParams The params to pass to the route.
  * @param forceEnvironmentId The environment id to use for the check.
  * @param adminOnlyCE Whether to check only for admin authorizations in CE.
+ * @param to The route to redirect to.
+ * @param params The params to pass to the route.
  */
 export function useUnauthorizedRedirect(
-  authorizations: string | string[],
-  redirectTo: string,
-  redirectParams?: Record<string, unknown>,
-  forceEnvironmentId?: EnvironmentId,
-  adminOnlyCE = false
+  {
+    authorizations,
+    forceEnvironmentId,
+    adminOnlyCE = false,
+  }: AuthorizationOptions,
+  { to, params }: RedirectOptions
 ) {
   const router = useRouter();
 
@@ -30,7 +42,7 @@ export function useUnauthorizedRedirect(
 
   useEffect(() => {
     if (!isAuthorized) {
-      router.stateService.go(redirectTo, redirectParams);
+      router.stateService.go(to, params);
     }
-  }, [isAuthorized, redirectParams, redirectTo, router.stateService]);
+  }, [isAuthorized, params, to, router.stateService]);
 }
