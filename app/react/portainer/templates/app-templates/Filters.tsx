@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import { ListState, TemplateType } from './types';
-import { TemplateViewModel } from './template';
+import { TemplateViewModel } from './view-model';
 import { TemplateListSort } from './TemplateListSort';
 
 const orderByFields = ['Title', 'Categories', 'Description'] as const;

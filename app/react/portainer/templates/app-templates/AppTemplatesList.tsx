@@ -9,7 +9,7 @@ import { createPersistedStore } from '@@/datatables/types';
 import { DatatableFooter } from '@@/datatables/DatatableFooter';
 
 import { AppTemplatesListItem } from './AppTemplatesListItem';
-import { TemplateViewModel } from './template';
+import { TemplateViewModel } from './view-model';
 import { ListState } from './types';
 import { useSortAndFilterTemplates } from './useSortAndFilter';
 import { Filters } from './Filters';

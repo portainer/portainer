@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
-import { TemplateViewModel } from './template';
+import { TemplateViewModel } from './view-model';
 import { ListState, TemplateType } from './types';
 
 export function useSortAndFilterTemplates(

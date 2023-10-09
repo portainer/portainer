@@ -2,7 +2,7 @@ import { Button } from '@@/buttons';
 
 import { TemplateItem } from '../components/TemplateItem';
 
-import { TemplateViewModel } from './template';
+import { TemplateViewModel } from './view-model';
 import { TemplateType } from './types';
 
 export function AppTemplatesListItem({
