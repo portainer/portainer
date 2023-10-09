@@ -133,6 +133,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
             to="kubernetes.cluster.securityConstraint"
             params={{ endpointId: environmentId }}
             label="Security constraints"
+            isSubMenu
             data-cy="k8sSidebar-securityConstraints"
           />
         </Authorized>
