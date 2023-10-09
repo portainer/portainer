@@ -53,7 +53,7 @@ function InnerSidebar() {
         <div
           className={clsx(
             styles.navListContainer,
-            'mt-6 flex-1 overflow-y-auto th-dark:[color-scheme:dark] th-highcontrast:[color-scheme:dark]',
+            'mt-6 flex-1 overflow-y-auto [color-scheme:light] be:[color-scheme:dark] th-dark:[color-scheme:dark] th-highcontrast:[color-scheme:dark]',
             { 'pr-5 -mr-5': isOpen }
           )}
         >
