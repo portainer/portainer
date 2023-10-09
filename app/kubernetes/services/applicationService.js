@@ -210,9 +210,13 @@ class KubernetesApplicationService {
    *    To synchronise with kubernetes resource creation summary output, any new resources created in this method should
    *    also be displayed in the summary output (getCreatedApplicationResources)
    */
-  async createAsync(formValues) {
+  async createAsync(formValues, hideStacks) {
     // formValues -> Application
     let [app, headlessService, services, , claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+
+    if (hideStacks) {
+      app.StackName = '';
+    }
 
     if (services) {
       services.forEach(async (service) => {
@@ -264,8 +268,8 @@ class KubernetesApplicationService {
     await apiService.create(app);
   }
 
-  create(formValues) {
-    return this.$async(this.createAsync, formValues);
+  create(formValues, _, hideStacks) {
+    return this.$async(this.createAsync, formValues, hideStacks);
   }
   /* #endregion */
 

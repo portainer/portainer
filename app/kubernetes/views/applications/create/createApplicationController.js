@@ -5,6 +5,7 @@ import * as JsonPatch from 'fast-json-patch';
 import { RegistryTypes } from '@/portainer/models/registryTypes';
 import { getServices } from '@/react/kubernetes/networks/services/service';
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
+import { getGlobalDeploymentOptions } from '@/react/portainer/settings/settings.service';
 
 import {
   KubernetesApplicationDataAccessPolicies,
@@ -184,8 +185,6 @@ class KubernetesCreateApplicationController {
 
   async updateApplicationViaWebEditor() {
     return this.$async(async () => {
-      // eslint-disable-next-line no-console
-      console.log(this.formValues.StackName);
       try {
         const confirmed = await confirm({
           title: 'Are you sure?',
@@ -937,7 +936,7 @@ class KubernetesCreateApplicationController {
       this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
       // combine the secrets and configmap form values when submitting the form
       _.remove(this.formValues.Configurations, (item) => item.SelectedConfiguration === undefined);
-      await this.KubernetesApplicationService.create(this.formValues, this.originalServicePorts);
+      await this.KubernetesApplicationService.create(this.formValues, this.originalServicePorts, this.deploymentOptions.hideStacksFunctionality);
       this.Notifications.success('Request to deploy application successfully submitted', this.formValues.Name);
       this.$state.go('kubernetes.applications');
     } catch (err) {
@@ -1096,6 +1095,8 @@ class KubernetesCreateApplicationController {
         this.storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
         this.state.useLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
         this.state.useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+
+        this.deploymentOptions = await getGlobalDeploymentOptions();
 
         const [resourcePools, nodes, nodesLimits] = await Promise.all([
           this.KubernetesResourcePoolService.get(),

@@ -46,7 +46,9 @@ class KubernetesStatefulSetConverter {
     const payload = new KubernetesStatefulSetCreatePayload();
     payload.metadata.name = statefulSet.Name;
     payload.metadata.namespace = statefulSet.Namespace;
-    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = statefulSet.StackName;
+    if (statefulSet.StackName) {
+      payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = statefulSet.StackName;
+    }
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = statefulSet.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = statefulSet.ApplicationOwner;
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = statefulSet.Note;
