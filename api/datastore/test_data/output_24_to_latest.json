@@ -602,6 +602,9 @@
     "EnableTelemetry": true,
     "EnforceEdgeID": false,
     "FeatureFlagSettings": null,
+    "GlobalDeploymentOptions": {
+      "hideStacksFunctionality": false
+    },
     "HelmRepositoryURL": "https://charts.bitnami.com/bitnami",
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
