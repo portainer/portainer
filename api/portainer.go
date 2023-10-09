@@ -933,7 +933,6 @@ type (
 		RetryInterval int
 	}
 
-	// GlobalDeploymentOptions hides manual deployment forms globally, to enforce infrastructure as code practices
 	GlobalDeploymentOptions struct {
 		HideStacksFunctionality bool `json:"hideStacksFunctionality" example:"false"`
 	}
