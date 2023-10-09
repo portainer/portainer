@@ -1,10 +1,19 @@
+import { BasicTableSettings } from '@@/datatables/types';
+
 import { Pair } from '../../settings/types';
+
+export interface ListState extends BasicTableSettings {
+  category: string | null;
+  setCategory: (category: string | null) => void;
+  type: TemplateType | null;
+  setType: (type: TemplateType | null) => void;
+}
 
 export enum TemplateType {
   Container = 1,
   SwarmStack = 2,
   ComposeStack = 3,
-  ComposeEdgeStack = 4,
+  EdgeStack = 4,
 }
 
 /**
