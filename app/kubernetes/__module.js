@@ -1,5 +1,5 @@
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
-import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/service';
+import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/getSelfSubjectAccessReview';
 
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 

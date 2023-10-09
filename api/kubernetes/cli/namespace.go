@@ -80,7 +80,11 @@ func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) error {
 
 	_, err := kcl.cli.CoreV1().Namespaces().Create(context.Background(), &ns, metav1.CreateOptions{})
 	if err != nil {
-		log.Error().Msgf("Failed to create namespace %s: %s", info.Name, err)
+		log.Error().
+			Err(err).
+			Str("Namespace", info.Name).
+			Interface("ResourceQuota", resourceQuota).
+			Msg("Failed to create the namespace due to a resource quota issue.")
 		return err
 	}
 

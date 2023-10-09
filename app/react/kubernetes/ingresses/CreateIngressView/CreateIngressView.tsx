@@ -5,7 +5,6 @@ import { debounce } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
-import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useNamespaceServices } from '@/react/kubernetes/networks/services/queries';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
@@ -15,6 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
 
+import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 import { Ingress, IngressController } from '../types';
 import {
   useCreateIngress,
@@ -64,7 +64,8 @@ export function CreateIngressView() {
 
   const [errors, setErrors] = useState<IngressErrors>({});
 
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
 
   const { data: allServices } = useNamespaceServices(environmentId, namespace);
   const configResults = useConfigurations(environmentId, namespace);

@@ -78,6 +78,7 @@ func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r 
 	overCommit := endpoint.Kubernetes.Configuration.EnableResourceOverCommit
 	overCommitPercent := endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage
 
+	// name is set to "" so all namespaces resources are considered when calculating max resource limits
 	resourceLimit, err := cli.GetMaxResourceLimits("", overCommit, overCommitPercent)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve max resource limit", err)

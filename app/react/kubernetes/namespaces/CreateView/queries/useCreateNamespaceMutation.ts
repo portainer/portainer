@@ -1,44 +1,14 @@
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 
-import { EnvironmentId } from '@/react/portainer/environments/types';
-import { notifyError } from '@/portainer/services/notifications';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 import { updateEnvironmentRegistryAccess } from '@/react/portainer/environments/environment.service/registries';
-import { updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/useIngressControllerClassMap';
-import { IngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { createNamespace } from '../service';
-
-import { CreateNamespacePayload, UpdateRegistryPayload } from './types';
-
-type K8sNodeLimits = {
-  CPU: number;
-  Memory: number;
-};
-
-export function useResourceLimits(environmentId: EnvironmentId) {
-  return useQuery(
-    ['environments', environmentId, 'kubernetes', 'max_resource_limits'],
-    () => getResourceLimits(environmentId),
-    {
-      onError: (err) => {
-        notifyError('Failure', err as Error, 'Unable to get resource limits');
-      },
-    }
-  );
-}
-
-async function getResourceLimits(environmentId: EnvironmentId) {
-  try {
-    const { data: limits } = await axios.get<K8sNodeLimits>(
-      `/kubernetes/${environmentId}/max_resource_limits`
-    );
-    return limits;
-  } catch (e) {
-    throw parseAxiosError(e, 'Unable to retrieve resource limits');
-  }
-}
+import { IngressControllerClassMap } from '../../../cluster/ingressClass/types';
+import { updateIngressControllerClassMap } from '../../../cluster/ingressClass/useIngressControllerClassMap';
+import { Namespaces } from '../../types';
+import { CreateNamespacePayload, UpdateRegistryPayload } from '../types';
 
 export function useCreateNamespaceMutation(environmentId: EnvironmentId) {
   return useMutation(
@@ -80,4 +50,30 @@ export function useCreateNamespaceMutation(environmentId: EnvironmentId) {
       ...withError('Unable to create namespace'),
     }
   );
+}
+
+// createNamespace is used to create a namespace using the Portainer backend
+async function createNamespace(
+  environmentId: EnvironmentId,
+  payload: CreateNamespacePayload
+) {
+  try {
+    const { data: ns } = await axios.post<Namespaces>(
+      buildUrl(environmentId),
+      payload
+    );
+    return ns;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to create namespace');
+  }
+}
+
+function buildUrl(environmentId: EnvironmentId, namespace?: string) {
+  let url = `kubernetes/${environmentId}/namespaces`;
+
+  if (namespace) {
+    url += `/${namespace}`;
+  }
+
+  return url;
 }

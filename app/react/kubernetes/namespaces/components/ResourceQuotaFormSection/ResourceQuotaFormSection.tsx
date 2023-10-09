@@ -6,12 +6,12 @@ import { FormControl } from '@@/form-components/FormControl';
 import { FormError } from '@@/form-components/FormError';
 import { FormSection } from '@@/form-components/FormSection';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
-import { Input } from '@@/form-components/Input/Input';
 import { Slider } from '@@/form-components/Slider';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
+import { SliderWithInput } from '@@/form-components/Slider/SliderWithInput';
 
-import { useResourceLimits } from '../../CreateView/queries';
+import { useClusterResourceLimitsQuery } from '../../CreateView/queries/useResourceLimitsQuery';
 
 import { ResourceQuotaFormValues } from './types';
 
@@ -29,7 +29,7 @@ export function ResourceQuotaFormSection({
   enableResourceOverCommit,
 }: Props) {
   const environmentId = useEnvironmentId();
-  const resourceLimitsQuery = useResourceLimits(environmentId);
+  const resourceLimitsQuery = useClusterResourceLimitsQuery(environmentId);
   const cpuLimit = resourceLimitsQuery.data?.CPU ?? 0;
   const memoryLimit = resourceLimitsQuery.data?.Memory ?? 0;
 
@@ -67,47 +67,32 @@ export function ResourceQuotaFormSection({
           <div className="flex flex-row">
             <FormSectionTitle>Resource Limits</FormSectionTitle>
           </div>
+          {/* keep the FormError component present, but invisible to avoid layout shift */}
           <FormError
             className={typeof errors === 'string' ? 'visible' : 'invisible'}
           >
-            {typeof errors === 'string' ? errors : ''}
+            {/* 'error' keeps the formerror the exact same height while hidden so there is no layout shift */}
+            {errors || 'error'}
           </FormError>
           <FormControl
             className="flex flex-row"
             label="Memory limit (MB)"
             inputId="memory-limit"
           >
-            <div className="col-xs-6">
-              <Slider
-                min={0}
+            <div className="col-xs-8">
+              <SliderWithInput
+                value={Number(values.memory) ?? 0}
+                onChange={(value) =>
+                  onChange({ ...values, memory: `${value}` })
+                }
                 max={memoryLimit}
                 step={128}
-                value={Number(values.memory) ?? 0}
-                onChange={(memory) => {
-                  if (Array.isArray(memory)) {
-                    return;
-                  }
-                  onChange({ ...values, memory: memory.toString() });
-                }}
-                dataCy="k8sNamespaceCreate-memoryLimitSlider"
+                dataCy="k8sNamespaceCreate-memoryLimit"
                 visibleTooltip
               />
               {errors?.memory && (
                 <FormError className="pt-1">{errors.memory}</FormError>
               )}
-            </div>
-            <div className="col-sm-2 vertical-center pt-6">
-              <Input
-                id="memory-limit"
-                type="number"
-                min="0"
-                max={memoryLimit}
-                onChange={(event) =>
-                  onChange({ ...values, memory: event.target.value })
-                }
-                value={values.memory}
-                data-cy="k8sNamespaceCreate-memoryLimitInput"
-              />
             </div>
           </FormControl>
 

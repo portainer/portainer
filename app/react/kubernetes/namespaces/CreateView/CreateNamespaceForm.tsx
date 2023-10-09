@@ -16,15 +16,16 @@ import {
   CreateNamespacePayload,
   UpdateRegistryPayload,
 } from './types';
-import { useCreateNamespaceMutation, useResourceLimits } from './queries';
+import { useClusterResourceLimitsQuery } from './queries/useResourceLimitsQuery';
 import { getNamespaceValidationSchema } from './CreateNamespaceForm.validation';
 import { transformFormValuesToNamespacePayload } from './utils';
+import { useCreateNamespaceMutation } from './queries/useCreateNamespaceMutation';
 
 export function CreateNamespaceForm() {
   const router = useRouter();
   const environmentId = useEnvironmentId();
   const { data: environment, ...environmentQuery } = useCurrentEnvironment();
-  const resourceLimitsQuery = useResourceLimits(environmentId);
+  const resourceLimitsQuery = useClusterResourceLimitsQuery(environmentId);
   const { data: registries } = useEnvironmentRegistries(environmentId, {
     hideDefault: true,
   });

@@ -9,8 +9,8 @@ import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
-import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
 import { confirmDelete } from '@@/modals/confirm';
@@ -33,7 +33,8 @@ const settingsStore = createStore(storageKey);
 export function ServicesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const namespaceNames = (namespaces && Object.keys(namespaces)) || [];
   const { data: services, ...servicesQuery } = useServicesForCluster(
     environmentId,
