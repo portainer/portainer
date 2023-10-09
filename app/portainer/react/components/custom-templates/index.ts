@@ -15,6 +15,7 @@ import { PlatformField } from '@/react/portainer/custom-templates/components/Pla
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { AppTemplatesList } from '@/react/portainer/templates/app-templates/AppTemplatesList';
+import { CustomTemplatesList } from '@/react/portainer/templates/custom-templates/ListView/CustomTemplatesList';
 
 import { VariablesFieldAngular } from './variables-field';
 
@@ -47,7 +48,15 @@ export const ngModule = angular
       'isSelected',
     ])
   )
-
+  .component(
+    'customTemplatesList',
+    r2a(withUIRouter(withCurrentUser(CustomTemplatesList)), [
+      'onDelete',
+      'onSelect',
+      'templates',
+      'isSelected',
+    ])
+  )
   .component(
     'customTemplatesPlatformSelector',
     r2a(PlatformField, ['onChange', 'value'])

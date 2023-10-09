@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-angular.module('portainer.app').component('customTemplatesList', {
+angular.module('portainer.app').component('oldCustomTemplatesList', {
   templateUrl: './customTemplatesList.html',
   controller: 'CustomTemplatesListController',
   bindings: {
