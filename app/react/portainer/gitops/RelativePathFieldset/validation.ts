@@ -18,7 +18,7 @@ export function relativePathValidation(): SchemaOf<RelativePathModel> {
         then: string().required('Directory is required'),
       })
       .default(''),
-    PerDeviceConfigsMatchType: string(),
-    PerDeviceConfigsGroupMatchType: string(),
+    PerDeviceConfigsMatchType: string().oneOf(['', 'file', 'dir']),
+    PerDeviceConfigsGroupMatchType: string().oneOf(['', 'file', 'dir']),
   });
 }
