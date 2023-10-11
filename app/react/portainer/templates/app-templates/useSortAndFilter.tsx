@@ -20,11 +20,18 @@ export function useSortAndFilterTemplates(
   );
 
   const filterBySearch = useCallback(
-    (item: TemplateViewModel) =>
-      item.Title.includes(listState.search) ||
-      item.Description.includes(listState.search) ||
-      item.Categories.includes(listState.search) ||
-      item.Note?.includes(listState.search),
+    (item: TemplateViewModel) => {
+      const search = listState.search.toLowerCase();
+      return (
+        item.Title.toLowerCase().includes(search) ||
+        item.Description.toLowerCase().includes(search) ||
+        item.Categories.some((category) =>
+          category.toLowerCase().includes(search)
+        ) ||
+        item.Note?.toLowerCase().includes(search) ||
+        item.Name?.toLowerCase().includes(search)
+      );
+    },
     [listState.search]
   );
 
