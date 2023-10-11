@@ -24,31 +24,31 @@ export function useCreateNamespaceMutation(environmentId: EnvironmentId) {
       try {
         // create the namespace first, so that it exists before referencing it in the registry access request
         await createNamespace(environmentId, createNamespacePayload);
-
-        // collect promises
-        const updateRegistriesPromises = updateRegistriesPayload.map(
-          ({ Id, Namespaces }) =>
-            updateEnvironmentRegistryAccess(environmentId, Id, {
-              Namespaces,
-            })
-        );
-        const updateIngressControllerPromise =
-          namespaceIngressControllerPayload.length > 0
-            ? updateIngressControllerClassMap(
-                environmentId,
-                namespaceIngressControllerPayload,
-                createNamespacePayload.Name
-              )
-            : Promise.resolve();
-
-        // return combined promises
-        return await Promise.allSettled([
-          updateIngressControllerPromise,
-          ...updateRegistriesPromises,
-        ]);
       } catch (e) {
-        throw parseAxiosError(e as Error, 'Unable to create namespace');
+        throw new Error(e as string);
       }
+
+      // collect promises
+      const updateRegistriesPromises = updateRegistriesPayload.map(
+        ({ Id, Namespaces }) =>
+          updateEnvironmentRegistryAccess(environmentId, Id, {
+            Namespaces,
+          })
+      );
+      const updateIngressControllerPromise =
+        namespaceIngressControllerPayload.length > 0
+          ? updateIngressControllerClassMap(
+              environmentId,
+              namespaceIngressControllerPayload,
+              createNamespacePayload.Name
+            )
+          : Promise.resolve();
+
+      // return combined promises
+      return Promise.allSettled([
+        updateIngressControllerPromise,
+        ...updateRegistriesPromises,
+      ]);
     },
     {
       ...withError('Unable to create namespace'),
