@@ -23,12 +23,18 @@ export default class HelmTemplatesController {
     this.getHelmRepoURLs = this.getHelmRepoURLs.bind(this);
     this.getLatestCharts = this.getLatestCharts.bind(this);
     this.getResourcePools = this.getResourcePools.bind(this);
+    this.clearHelmChart = this.clearHelmChart.bind(this);
 
     $window.onbeforeunload = () => {
       if (this.state.isEditorDirty) {
         return '';
       }
     };
+  }
+
+  clearHelmChart() {
+    this.state.chart = null;
+    this.onSelectHelmChart('');
   }
 
   editorUpdate(contentvalues) {
@@ -85,6 +91,7 @@ export default class HelmTemplatesController {
     window.scrollTo(0, 0);
     this.state.showCustomValues = false;
     this.state.chart = chart;
+    this.onSelectHelmChart(chart.name);
     await this.getHelmValues();
   }
 

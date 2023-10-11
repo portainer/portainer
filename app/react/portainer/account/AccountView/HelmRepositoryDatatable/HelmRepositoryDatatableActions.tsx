@@ -55,6 +55,10 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
       return;
     }
 
-    deleteHelmRepoMutation.mutate(selectedItems);
+    deleteHelmRepoMutation.mutate(selectedItems, {
+      onSuccess: () => {
+        router.stateService.reload();
+      },
+    });
   }
 }

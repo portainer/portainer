@@ -41,6 +41,7 @@ export function HelmRepositoryDatatable() {
 
   return (
     <Datatable
+      getRowId={(row) => row.URL}
       dataset={helmRepos}
       settingsManager={tableState}
       columns={columns}
