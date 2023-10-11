@@ -19,11 +19,17 @@ export function CreateHelmRepositoryForm() {
   const createHelmRepositoryMutation = useCreateHelmRepositoryMutation();
   const helmReposQuery = useHelmRepositories(currentUser.user.Id);
 
+  const allRepositories =
+    helmReposQuery.data?.UserRepositories.map((x) => x.URL) || [];
+  if (helmReposQuery.data?.GlobalRepository) {
+    allRepositories.push(helmReposQuery.data?.GlobalRepository);
+  }
+
   return (
     <HelmRepositoryForm
       isLoading={createHelmRepositoryMutation.isLoading}
       onSubmit={onSubmit}
-      URLs={helmReposQuery.data?.UserRepositories.map((x) => x.URL) || []}
+      URLs={allRepositories}
     />
   );
 

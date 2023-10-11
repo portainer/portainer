@@ -32,7 +32,6 @@ class KubernetesDeployController {
       { ...git, value: KubernetesDeployBuildMethods.GIT },
       { ...editor, value: KubernetesDeployBuildMethods.WEB_EDITOR },
       { ...url, value: KubernetesDeployBuildMethods.URL },
-      { ...customTemplate, value: KubernetesDeployBuildMethods.CUSTOM_TEMPLATE },
       { ...customTemplate, description: 'Use custom template', value: KubernetesDeployBuildMethods.CUSTOM_TEMPLATE },
       { ...helm, value: KubernetesDeployBuildMethods.HELM },
     ];
@@ -55,6 +54,7 @@ class KubernetesDeployController {
       webhookId: createWebhookId(),
       templateLoadFailed: false,
       isEditorReadOnly: false,
+      selectedHelmChart: '',
     };
 
     this.currentUser = {
@@ -79,6 +79,7 @@ class KubernetesDeployController {
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
     this.BuildMethods = KubernetesDeployBuildMethods;
 
+    this.onSelectHelmChart = this.onSelectHelmChart.bind(this);
     this.onChangeTemplateId = this.onChangeTemplateId.bind(this);
     this.deployAsync = this.deployAsync.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
@@ -88,6 +89,10 @@ class KubernetesDeployController {
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onChangeDeployType = this.onChangeDeployType.bind(this);
     this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
+  }
+
+  onSelectHelmChart(chart) {
+    this.state.selectedHelmChart = chart;
   }
 
   onChangeTemplateVariables(value) {

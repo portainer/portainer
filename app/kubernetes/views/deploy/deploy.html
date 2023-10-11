@@ -54,7 +54,7 @@
                   </div>
                 </div>
 
-                <div class="col-sm-12 form-section-title"> Build method </div>
+                <div class="col-sm-12 form-section-title"> Deploy from </div>
                 <box-selector
                   slim="true"
                   radio-name="'method'"
@@ -167,7 +167,13 @@
 
                 <!-- Helm -->
                 <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
-                  <helm-templates-view endpoint="ctrl.endpoint" namespace="ctrl.formValues.Namespace" stack-name="ctrl.formValues.StackName"></helm-templates-view>
+                  <div class="col-sm-12 form-section-title" ng-if="ctrl.state.selectedHelmChart">Selected Helm chart</div>
+                  <helm-templates-view
+                    on-select-helm-chart="(ctrl.onSelectHelmChart)"
+                    endpoint="ctrl.endpoint"
+                    namespace="ctrl.formValues.Namespace"
+                    stack-name="ctrl.formValues.StackName"
+                  ></helm-templates-view>
                 </div>
                 <!-- !Helm -->
 
