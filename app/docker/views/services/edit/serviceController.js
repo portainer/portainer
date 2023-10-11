@@ -736,7 +736,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           return $q.all({
             volumes: VolumeService.volumes(),
             tasks: TaskService.tasks({ service: [service.Name] }),
-            containers: agentProxy ? ContainerService.containers() : [],
+            containers: agentProxy ? ContainerService.containers(endpoint.Id) : [],
             nodes: NodeService.nodes(),
             secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
             configs: apiVersion >= 1.3 ? ConfigService.configs(endpoint.Id) : [],

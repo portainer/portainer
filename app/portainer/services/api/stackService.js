@@ -126,10 +126,10 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.externalComposeStacks = function () {
+    service.externalComposeStacks = function (environmentId) {
       var deferred = $q.defer();
 
-      ContainerService.containers(1)
+      ContainerService.containers(environmentId, 1)
         .then(function success(containers) {
           deferred.resolve(StackHelper.getExternalStacksFromContainers(containers));
         })
@@ -160,7 +160,7 @@ angular.module('portainer.app').factory('StackService', [
 
       $q.all({
         stacks: Stack.query({ filters: filters }).$promise,
-        externalStacks: includeExternalStacks ? service.externalComposeStacks() : [],
+        externalStacks: includeExternalStacks ? service.externalComposeStacks(endpointId) : [],
       })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {

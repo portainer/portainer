@@ -345,7 +345,7 @@ angular
 
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
         try {
-          const containers = await ContainerService.containers(true);
+          const containers = await ContainerService.containers(endpoint.Id, true);
           $scope.containerNames = ContainerHelper.getContainerNames(containers);
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve Containers');

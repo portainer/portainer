@@ -528,7 +528,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       function removeNewContainer() {
         return findCurrentContainer().then(function onContainerLoaded(container) {
           if (container && (!oldContainer || container.Id !== oldContainer.Id)) {
-            return ContainerService.remove(container, true);
+            return ContainerService.remove(endpoint.Id, container, true);
           }
         });
       }
@@ -537,7 +537,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         if (!oldContainer) {
           return;
         }
-        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0]);
+        return ContainerService.renameContainer(endpoint.Id, oldContainer.Id, oldContainer.Names[0]);
       }
 
       function confirmCreateContainer(container) {
@@ -573,11 +573,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         if (oldContainer.State !== 'running') {
           return $q.when();
         }
-        return ContainerService.stopContainer(oldContainer.Id);
+        return ContainerService.stopContainer(endpoint.Id, oldContainer.Id);
       }
 
       function renameContainer() {
-        return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0] + '-old');
+        return ContainerService.renameContainer(endpoint.Id, oldContainer.Id, oldContainer.Names[0] + '-old');
       }
 
       function pullImageIfNeeded() {
@@ -587,7 +587,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       function createNewContainer() {
         return $async(async () => {
           const config = prepareConfiguration();
-          return await ContainerService.createAndStartContainer(config);
+          return await ContainerService.createAndStartContainer(endpoint.Id, config);
         });
       }
 
@@ -639,7 +639,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           return;
         }
 
-        ContainerService.remove(oldContainer, true).then(notifyOnRemoval).catch(notifyOnRemoveError);
+        ContainerService.remove(endpoint.Id, oldContainer, true).then(notifyOnRemoval).catch(notifyOnRemoveError);
 
         return deferred.promise;
 

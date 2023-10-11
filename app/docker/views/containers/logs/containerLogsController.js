@@ -7,7 +7,8 @@ angular.module('portainer.docker').controller('ContainerLogsController', [
   'ContainerService',
   'Notifications',
   'HttpRequestHelper',
-  function ($scope, $transition$, $interval, ContainerService, Notifications, HttpRequestHelper) {
+  'endpoint',
+  function ($scope, $transition$, $interval, ContainerService, Notifications, HttpRequestHelper, endpoint) {
     $scope.state = {
       refreshRate: 3,
       lineCount: 100,
@@ -39,6 +40,7 @@ angular.module('portainer.docker').controller('ContainerLogsController', [
       var refreshRate = $scope.state.refreshRate;
       $scope.repeater = $interval(function () {
         ContainerService.logs(
+          endpoint.Id,
           $transition$.params().id,
           1,
           1,
@@ -58,7 +60,16 @@ angular.module('portainer.docker').controller('ContainerLogsController', [
     }
 
     function startLogPolling(skipHeaders) {
-      ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, moment($scope.state.sinceTimestamp).unix(), $scope.state.lineCount, skipHeaders)
+      ContainerService.logs(
+        endpoint.Id,
+        $transition$.params().id,
+        1,
+        1,
+        $scope.state.displayTimestamps ? 1 : 0,
+        moment($scope.state.sinceTimestamp).unix(),
+        $scope.state.lineCount,
+        skipHeaders
+      )
         .then(function success(data) {
           $scope.logs = data;
           setUpdateRepeater(skipHeaders);
@@ -71,7 +82,7 @@ angular.module('portainer.docker').controller('ContainerLogsController', [
 
     function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-      ContainerService.container($transition$.params().id)
+      ContainerService.container(endpoint.Id, $transition$.params().id)
         .then(function success(data) {
           var container = data;
           $scope.container = container;
