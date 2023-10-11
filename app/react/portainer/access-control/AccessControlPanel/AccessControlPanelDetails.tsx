@@ -3,12 +3,13 @@ import { PropsWithChildren } from 'react';
 import _ from 'lodash';
 import { Info } from 'lucide-react';
 
-import { ownershipIcon, truncate } from '@/portainer/filters/filters';
+import { truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
 import { pluralize } from '@/portainer/helpers/strings';
+import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';

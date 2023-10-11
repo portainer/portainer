@@ -1,6 +1,6 @@
 import { CellContext, ColumnDef } from '@tanstack/react-table';
+import { Eye, EyeOff, Users } from 'lucide-react';
 
-import { ownershipIcon } from '@/portainer/filters/filters';
 import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
 
 import { Icon } from '@@/Icon';
@@ -34,5 +34,18 @@ export function createOwnershipColumn<D extends IResource>(
         {value}
       </span>
     );
+  }
+}
+
+export function ownershipIcon(ownership: ResourceControlOwnership) {
+  switch (ownership) {
+    case ResourceControlOwnership.PRIVATE:
+      return EyeOff;
+    case ResourceControlOwnership.ADMINISTRATORS:
+      return EyeOff;
+    case ResourceControlOwnership.RESTRICTED:
+      return Users;
+    default:
+      return Eye;
   }
 }

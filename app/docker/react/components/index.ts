@@ -28,6 +28,7 @@ import { containersModule } from './containers';
 import { servicesModule } from './services';
 import { networksModule } from './networks';
 import { swarmModule } from './swarm';
+import { volumesModule } from './volumes';
 
 const ngModule = angular
   .module('portainer.docker.react.components', [
@@ -35,6 +36,7 @@ const ngModule = angular
     servicesModule,
     networksModule,
     swarmModule,
+    volumesModule,
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))

@@ -2,8 +2,8 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { buildOption } from '@/portainer/components/BoxSelector';
-import { ownershipIcon } from '@/portainer/filters/filters';
 import { Team } from '@/react/portainer/users/teams/types';
+import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BadgeIcon } from '@@/BadgeIcon';
@@ -16,7 +16,7 @@ const publicOption: BoxSelectorOption<ResourceControlOwnership> = {
   id: 'access_public',
   description:
     'I want any user with access to this environment to be able to manage this resource',
-  icon: <BadgeIcon icon={ownershipIcon('public')} />,
+  icon: <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.PUBLIC)} />,
 };
 
 export function useOptions(
@@ -41,14 +41,16 @@ function adminOptions() {
   return [
     buildOption(
       'access_administrators',
-      <BadgeIcon icon={ownershipIcon('administrators')} />,
+      <BadgeIcon
+        icon={ownershipIcon(ResourceControlOwnership.ADMINISTRATORS)}
+      />,
       'Administrators',
       'I want to restrict the management of this resource to administrators only',
       ResourceControlOwnership.ADMINISTRATORS
     ),
     buildOption(
       'access_restricted',
-      <BadgeIcon icon={ownershipIcon('restricted')} />,
+      <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.RESTRICTED)} />,
       'Restricted',
       'I want to restrict the management of this resource to a set of users and/or teams',
       ResourceControlOwnership.RESTRICTED
@@ -59,7 +61,7 @@ function nonAdminOptions(teams?: Team[]) {
   return _.compact([
     buildOption(
       'access_private',
-      <BadgeIcon icon={ownershipIcon('private')} />,
+      <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.PRIVATE)} />,
       'Private',
       'I want to restrict this resource to be manageable by myself only',
       ResourceControlOwnership.PRIVATE
@@ -68,7 +70,7 @@ function nonAdminOptions(teams?: Team[]) {
       teams.length > 0 &&
       buildOption(
         'access_restricted',
-        <BadgeIcon icon={ownershipIcon('restricted')} />,
+        <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.RESTRICTED)} />,
         'Restricted',
         teams.length === 1 ? (
           <>
