@@ -1,6 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { IngressControllerClassMapRowData } from '../../types';
+import { IngressControllerClassMap } from '../../types';
 
-export const columnHelper =
-  createColumnHelper<IngressControllerClassMapRowData>();
+export const columnHelper = createColumnHelper<IngressControllerClassMap>();

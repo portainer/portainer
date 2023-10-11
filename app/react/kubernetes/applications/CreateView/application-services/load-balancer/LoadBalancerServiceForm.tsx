@@ -8,8 +8,9 @@ import { Button } from '@@/buttons';
 import { Widget } from '@@/Widget';
 import { Card } from '@@/Card';
 import { InputGroup } from '@@/form-components/InputGroup';
+import { isErrorType } from '@@/form-components/formikUtils';
 
-import { isErrorType, newPort } from '../utils';
+import { newPort } from '../utils';
 import { ContainerPortInput } from '../components/ContainerPortInput';
 import {
   ServiceFormValues,

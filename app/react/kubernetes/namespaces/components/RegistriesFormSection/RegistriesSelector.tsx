@@ -1,15 +1,17 @@
+import { MultiValue } from 'react-select';
+
 import { Registry } from '@/react/portainer/registries/types';
 
 import { Select } from '@@/form-components/ReactSelect';
 
 interface Props {
-  value: Registry[];
-  onChange(value: readonly Registry[]): void;
+  value: MultiValue<Registry>;
+  onChange(value: MultiValue<Registry>): void;
   options: Registry[];
   inputId?: string;
 }
 
-export function CreateNamespaceRegistriesSelector({
+export function RegistriesSelector({
   value,
   onChange,
   options,
@@ -26,7 +28,7 @@ export function CreateNamespaceRegistriesSelector({
       onChange={onChange}
       inputId={inputId}
       data-cy="namespaceCreate-registrySelect"
-      placeholder="Select one or more registry"
+      placeholder="Select one or more registries"
     />
   );
 }

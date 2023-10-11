@@ -1,11 +1,10 @@
-import { useState, useEffect, useMemo, ReactNode, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
-import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useNamespaceServices } from '@/react/kubernetes/networks/services/queries';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
@@ -15,6 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
 
+import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 import { Ingress, IngressController } from '../types';
 import {
   useCreateIngress,
@@ -22,8 +22,15 @@ import {
   useUpdateIngress,
   useIngressControllers,
 } from '../queries';
+import { Annotation } from '../../annotations/types';
 
-import { Rule, Path, Host, GroupedServiceOptions } from './types';
+import {
+  Rule,
+  Path,
+  Host,
+  GroupedServiceOptions,
+  IngressErrors,
+} from './types';
 import { IngressForm } from './IngressForm';
 import {
   prepareTLS,
@@ -32,7 +39,6 @@ import {
   prepareRuleFromIngress,
   checkIfPathExistsWithHost,
 } from './utils';
-import { Annotation } from './Annotations/types';
 
 export function CreateIngressView() {
   const environmentId = useEnvironmentId();
@@ -56,11 +62,10 @@ export function CreateIngressView() {
   // isEditClassNameSet is used to prevent premature validation of the classname in the edit view
   const [isEditClassNameSet, setIsEditClassNameSet] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<Record<string, ReactNode>>(
-    {} as Record<string, string>
-  );
+  const [errors, setErrors] = useState<IngressErrors>({});
 
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
 
   const { data: allServices } = useNamespaceServices(environmentId, namespace);
   const configResults = useConfigurations(environmentId, namespace);

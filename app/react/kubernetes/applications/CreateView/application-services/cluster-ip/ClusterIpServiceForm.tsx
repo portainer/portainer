@@ -7,8 +7,9 @@ import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector
 import { Button } from '@@/buttons';
 import { Card } from '@@/Card';
 import { Widget } from '@@/Widget';
+import { isErrorType } from '@@/form-components/formikUtils';
 
-import { isErrorType, newPort } from '../utils';
+import { newPort } from '../utils';
 import {
   ServiceFormValues,
   ServicePort,

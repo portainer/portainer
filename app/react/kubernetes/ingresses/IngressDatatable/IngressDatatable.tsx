@@ -3,7 +3,6 @@ import { useRouter } from '@uirouter/react';
 import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import Route from '@/assets/ico/route.svg?c';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
@@ -19,6 +18,7 @@ import { useTableState } from '@@/datatables/useTableState';
 
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
+import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 
 import { columns } from './columns';
 
@@ -39,7 +39,8 @@ export function IngressDatatable() {
   const canAccessSystemResources = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(
     environmentId,
     Object.keys(namespaces || {}),

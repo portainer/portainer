@@ -1,0 +1,24 @@
+import { Registry } from '@/react/portainer/registries/types';
+
+import { IngressControllerClassMap } from '../../cluster/ingressClass/types';
+import {
+  ResourceQuotaFormValues,
+  ResourceQuotaPayload,
+} from '../components/ResourceQuotaFormSection/types';
+
+export type CreateNamespaceFormValues = {
+  name: string;
+  resourceQuota: ResourceQuotaFormValues;
+  ingressClasses: IngressControllerClassMap[];
+  registries: Registry[];
+};
+
+export type CreateNamespacePayload = {
+  Name: string;
+  ResourceQuota: ResourceQuotaPayload;
+};
+
+export type UpdateRegistryPayload = {
+  Id: number;
+  Namespaces: string[];
+};

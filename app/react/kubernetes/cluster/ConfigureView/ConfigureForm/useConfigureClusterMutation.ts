@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { Operation } from 'fast-json-patch';
 import _ from 'lodash';
 
-import { withError } from '@/react-tools/react-query';
+import { withError, withInvalidate } from '@/react-tools/react-query';
 import { environmentQueryKeys } from '@/react/portainer/environments/queries/query-keys';
 import {
   UpdateEnvironmentPayload,
@@ -12,13 +12,13 @@ import axios from '@/portainer/services/axios';
 import { parseKubernetesAxiosError } from '@/react/kubernetes/axiosError';
 
 import { updateIngressControllerClassMap } from '../../ingressClass/useIngressControllerClassMap';
-import { IngressControllerClassMapRowData } from '../../ingressClass/types';
+import { IngressControllerClassMap } from '../../ingressClass/types';
 
 export type ConfigureClusterPayloads = {
   id: number;
   updateEnvironmentPayload: Partial<UpdateEnvironmentPayload>;
-  initialIngressControllers: IngressControllerClassMapRowData[];
-  ingressControllers: IngressControllerClassMapRowData[];
+  initialIngressControllers: IngressControllerClassMap[];
+  ingressControllers: IngressControllerClassMap[];
   storageClassPatches: {
     name: string;
     patch: Operation[];
@@ -48,10 +48,9 @@ export function useConfigureClusterMutation() {
       }
     },
     {
-      onSuccess: () => {
-        // not returning the promise here because we don't want to wait for the invalidateQueries to complete (longer than the mutation itself)
-        queryClient.invalidateQueries(environmentQueryKeys.base());
-      },
+      ...withInvalidate(queryClient, [environmentQueryKeys.base()], {
+        skipRefresh: true,
+      }),
       ...withError('Unable to apply configuration', 'Failure'),
     }
   );

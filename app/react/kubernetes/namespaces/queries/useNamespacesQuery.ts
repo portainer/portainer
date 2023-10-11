@@ -1,17 +1,13 @@
 import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { error as notifyError } from '@/portainer/services/notifications';
 import { withError } from '@/react-tools/react-query';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import {
-  getNamespaces,
-  getNamespace,
-  getSelfSubjectAccessReview,
-} from './service';
-import { Namespaces } from './types';
+import { Namespaces } from '../types';
+import { getSelfSubjectAccessReview } from '../getSelfSubjectAccessReview';
 
-export function useNamespaces(
+export function useNamespacesQuery(
   environmentId: EnvironmentId,
   options?: { autoRefreshRate?: number }
 ) {
@@ -46,14 +42,14 @@ export function useNamespaces(
   );
 }
 
-export function useNamespace(environmentId: EnvironmentId, namespace: string) {
-  return useQuery(
-    ['environments', environmentId, 'kubernetes', 'namespaces', namespace],
-    () => getNamespace(environmentId, namespace),
-    {
-      onError: (err) => {
-        notifyError('Failure', err as Error, 'Unable to get namespace.');
-      },
-    }
-  );
+// getNamespaces is used to retrieve namespaces using the Portainer backend with caching
+async function getNamespaces(environmentId: EnvironmentId) {
+  try {
+    const { data: namespaces } = await axios.get<Namespaces>(
+      `kubernetes/${environmentId}/namespaces`
+    );
+    return namespaces;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve namespaces');
+  }
 }

@@ -38,6 +38,8 @@ export function ResourceFieldset({
           value={values.reservation}
           onChange={(value) => onChange({ ...values, reservation: value })}
           max={maxMemory}
+          step={256}
+          dataCy="k8sNamespaceCreate-resourceReservationMemory"
         />
       </FormControl>
 
@@ -46,6 +48,8 @@ export function ResourceFieldset({
           value={values.limit}
           onChange={(value) => onChange({ ...values, limit: value })}
           max={maxMemory}
+          step={256}
+          dataCy="k8sNamespaceCreate-resourceLimitMemory"
         />
       </FormControl>
 

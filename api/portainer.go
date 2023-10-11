@@ -1495,6 +1495,7 @@ type (
 		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
+		GetMaxResourceLimits(name string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		DeleteRegistrySecret(registry *Registry, namespace string) error

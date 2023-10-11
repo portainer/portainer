@@ -121,7 +121,7 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /kubernetes/{id}/namespaces/{namespace} [post]
+// @router /kubernetes/{id}/namespaces [post]
 func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -157,6 +157,7 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 			err,
 		)
 	}
+
 	return nil
 }
 

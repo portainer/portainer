@@ -6,10 +6,16 @@ export function SliderWithInput({
   value,
   onChange,
   max,
+  step = 1,
+  dataCy,
+  visibleTooltip = false,
 }: {
   value: number;
   onChange: (value: number) => void;
   max: number;
+  dataCy: string;
+  step?: number;
+  visibleTooltip?: boolean;
 }) {
   return (
     <div className="flex items-center gap-4">
@@ -22,7 +28,9 @@ export function SliderWithInput({
             value={value}
             min={0}
             max={max}
-            step={256}
+            step={step}
+            dataCy={`${dataCy}Slider`}
+            visibleTooltip={visibleTooltip}
           />
         </div>
       )}
@@ -33,6 +41,7 @@ export function SliderWithInput({
         value={value}
         onChange={(e) => onChange(e.target.valueAsNumber)}
         className="w-32"
+        data-cy={`${dataCy}Input`}
       />
     </div>
   );

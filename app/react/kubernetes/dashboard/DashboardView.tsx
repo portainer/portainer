@@ -8,20 +8,21 @@ import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 import { DashboardItem } from '@@/DashboardItem/DashboardItem';
 import { PageHeader } from '@@/PageHeader';
 
-import { useNamespaces } from '../namespaces/queries';
 import { useApplicationsForCluster } from '../applications/application.queries';
 import { usePVCsForCluster } from '../volumes/queries';
 import { useServicesForCluster } from '../services/service';
 import { useIngresses } from '../ingresses/queries';
 import { useConfigMapsForCluster } from '../configs/configmap.service';
 import { useSecretsForCluster } from '../configs/secret.service';
+import { useNamespacesQuery } from '../namespaces/queries/useNamespacesQuery';
 
 import { EnvironmentInfo } from './EnvironmentInfo';
 
 export function DashboardView() {
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const namespaceNames = namespaces && Object.keys(namespaces);
   const { data: applications, ...applicationsQuery } =
     useApplicationsForCluster(environmentId, namespaceNames);
