@@ -108,7 +108,6 @@
   --bg-widget-table-color: var(--ui-gray-3);
   --bg-header-color: var(--white-color);
   --bg-hover-table-color: var(--grey-14);
-  --bg-switch-box-color: var(--ui-gray-5);
   --bg-input-group-addon-color: var(--ui-gray-3);
   --bg-btn-default-color: var(--ui-blue-10);
   --bg-blocklist-hover-color: var(--ui-blue-2);
@@ -284,7 +283,6 @@
   --bg-widget-table-color: var(--grey-3);
   --bg-header-color: var(--grey-2);
   --bg-hover-table-color: var(--grey-3);
-  --bg-switch-box-color: var(--grey-53);
   --bg-table-color: var(--grey-1);
   --bg-md-checkbox-color: var(--grey-31);
   --bg-form-control-disabled-color: var(--grey-3);
@@ -452,7 +450,6 @@
   --bg-widget-table-color: var(--black-color);
   --bg-header-color: var(--black-color);
   --bg-hover-table-color: var(--grey-3);
-  --bg-switch-box-color: var(--grey-53);
   --bg-panel-body-color: var(--black-color);
   --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-motd-body-color: var(--black-color);
