@@ -3,13 +3,18 @@ import { useRouter } from '@uirouter/react';
 
 import { AuthFieldset } from '@/react/portainer/gitops/AuthFieldset';
 import { AutoUpdateFieldset } from '@/react/portainer/gitops/AutoUpdateFieldset';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import {
   parseAutoUpdateResponse,
   transformAutoUpdateViewModel,
 } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { InfoPanel } from '@/react/portainer/gitops/InfoPanel';
 import { RefField } from '@/react/portainer/gitops/RefField';
-import { AutoUpdateModel, GitAuthModel } from '@/react/portainer/gitops/types';
+import {
+  AutoUpdateModel,
+  GitAuthModel,
+  RelativePathModel,
+} from '@/react/portainer/gitops/types';
 import {
   baseEdgeStackWebhookUrl,
   createWebhookId,
@@ -28,6 +33,8 @@ import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types';
 import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
+import { RelativePathFieldset } from '@/react/portainer/gitops/RelativePathFieldset/RelativePathFieldset';
+import { parseRelativePathResponse } from '@/react/portainer/gitops/RelativePathFieldset/utils';
 
 import { LoadingButton } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
@@ -53,6 +60,7 @@ interface FormValues {
   authentication: GitAuthModel;
   envVars: EnvVar[];
   privateRegistryId?: Registry['Id'];
+  relativePath: RelativePathModel;
 }
 
 export function GitForm({ stack }: { stack: EdgeStack }) {
@@ -73,6 +81,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
     autoUpdate: parseAutoUpdateResponse(stack.AutoUpdate),
     refName: stack.GitConfig.ReferenceName,
     authentication: parseAuthResponse(stack.GitConfig.Authentication),
+    relativePath: parseRelativePathResponse(stack),
     envVars: stack.EnvVars || [],
   };
 
@@ -269,6 +278,8 @@ function InnerForm({
           }
           errors={errors.authentication}
         />
+
+        {isBE && <RelativePathFieldset value={values.relativePath} readonly />}
 
         <EnvironmentVariablesPanel
           onChange={(value) => setFieldValue('envVars', value)}
