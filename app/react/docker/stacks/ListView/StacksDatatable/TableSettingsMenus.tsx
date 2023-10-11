@@ -1,7 +1,6 @@
 import { Table } from '@tanstack/react-table';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
 import { TableSettingsMenu } from '@@/datatables';
@@ -35,22 +34,21 @@ export function TableSettingsMenus({
         value={tableState.hiddenColumns}
       />
       <TableSettingsMenu>
-        {isBE && (
-          <Authorized authorizations="EndpointResourcesAccess">
-            <Checkbox
-              id="setting_all_orphaned_stacks"
-              label="Show all orphaned stacks"
-              checked={tableState.showOrphanedStacks}
-              onChange={(e) => {
-                tableState.setShowOrphanedStacks(e.target.checked);
-                tableInstance.setGlobalFilter((filter: object) => ({
-                  ...filter,
-                  showOrphanedStacks: e.target.checked,
-                }));
-              }}
-            />
-          </Authorized>
-        )}
+        <Authorized authorizations="EndpointResourcesAccess">
+          <Checkbox
+            id="setting_all_orphaned_stacks"
+            label="Show all orphaned stacks"
+            checked={tableState.showOrphanedStacks}
+            onChange={(e) => {
+              tableState.setShowOrphanedStacks(e.target.checked);
+              tableInstance.setGlobalFilter((filter: object) => ({
+                ...filter,
+                showOrphanedStacks: e.target.checked,
+              }));
+            }}
+          />
+        </Authorized>
+
         <TableSettingsMenuAutoRefresh
           value={tableState.autoRefreshRate}
           onChange={(value) => tableState.setAutoRefreshRate(value)}
