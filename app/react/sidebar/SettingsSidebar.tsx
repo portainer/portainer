@@ -29,7 +29,7 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
     !window.ddExtension && (isAdmin || (isTeamLeader && !teamSyncQuery.data));
 
   return (
-    <SidebarSection title="Settings">
+    <SidebarSection title="Administration">
       {showUsersSection && (
         <SidebarParent
           label="User-related"

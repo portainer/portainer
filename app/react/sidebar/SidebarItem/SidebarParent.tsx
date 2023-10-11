@@ -63,7 +63,7 @@ export function SidebarParent({
             to={to}
             params={params}
             className={clsx(
-              'w-full h-full font-medium items-center flex list-none border-none text-gray-5 hover:text-gray-5 hover:no-underline focus:text-gray-5 focus:no-underline',
+              'w-full h-full font-medium items-center flex list-none border-none text-inherit hover:text-inherit hover:no-underline focus:text-inherit focus:no-underline',
               {
                 'justify-start': isSidebarOpen,
                 'justify-center': !isSidebarOpen,
