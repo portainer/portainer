@@ -8,6 +8,6 @@ angular.module('portainer.kubernetes').component('helmTemplatesView', {
     endpoint: '<',
     namespace: '<',
     stackName: '<',
-    onSelectHelmChart: '=',
+    onSelectHelmChart: '<',
   },
 });
