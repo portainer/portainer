@@ -474,7 +474,7 @@ angular.module('portainer.docker').controller('ServiceController', [
         '';
       if (oldCredSpecId && !credSpecId) {
         delete config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec;
-      } else if (oldCredSpecId !== credSpec) {
+      } else if (credSpec && oldCredSpecId !== credSpec) {
         config.TaskTemplate.ContainerSpec.Privileges = {
           ...(config.TaskTemplate.ContainerSpec.Privileges || {}),
           CredentialSpec: {
@@ -854,6 +854,10 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.filterConfigs = filterConfigs;
     function filterConfigs(configs) {
+      if (!configs) {
+        return [];
+      }
+
       return configs.filter((config) => $scope.service.ServiceConfigs.every((serviceConfig) => config.Id !== serviceConfig.Id));
     }
 
