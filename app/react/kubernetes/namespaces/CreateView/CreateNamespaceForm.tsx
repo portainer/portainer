@@ -10,6 +10,7 @@ import { Widget, WidgetBody } from '@@/Widget';
 
 import { useIngressControllerClassMapQuery } from '../../cluster/ingressClass/useIngressControllerClassMap';
 import { NamespaceInnerForm } from '../components/NamespaceInnerForm';
+import { useNamespacesQuery } from '../queries/useNamespacesQuery';
 
 import {
   CreateNamespaceFormValues,
@@ -35,6 +36,9 @@ export function CreateNamespaceForm() {
     environmentId,
     allowedOnly: true,
   });
+
+  const { data: namespaces } = useNamespacesQuery(environmentId);
+  const namespaceNames = Object.keys(namespaces || {});
 
   const createNamespaceMutation = useCreateNamespaceMutation(environmentId);
 
@@ -63,7 +67,10 @@ export function CreateNamespaceForm() {
           initialValues={initialValues}
           onSubmit={handleSubmit}
           validateOnMount
-          validationSchema={getNamespaceValidationSchema(memoryLimit)}
+          validationSchema={getNamespaceValidationSchema(
+            memoryLimit,
+            namespaceNames
+          )}
         >
           {NamespaceInnerForm}
         </Formik>

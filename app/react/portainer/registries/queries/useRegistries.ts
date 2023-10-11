@@ -44,7 +44,8 @@ export function useGenericRegistriesQuery<T = Registry[]>(
 ) {
   const hideDefaultRegistryQuery = usePublicSettings({
     select: (settings) => settings.DefaultRegistry?.Hide,
-    enabled,
+    // We don't need the hideDefaultRegistry info if we're overriding it to true
+    enabled: enabled && !hideDefaultOverride,
   });
 
   const hideDefault = hideDefaultOverride || !!hideDefaultRegistryQuery.data;
@@ -73,7 +74,8 @@ export function useGenericRegistriesQuery<T = Registry[]>(
     {
       select,
       ...withError('Unable to retrieve registries'),
-      enabled: hideDefaultRegistryQuery.isSuccess && enabled,
+      enabled:
+        (hideDefaultOverride || hideDefaultRegistryQuery.isSuccess) && enabled,
       onSuccess,
     }
   );

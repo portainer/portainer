@@ -44,9 +44,9 @@ func (kcl *KubeClient) GetNodesLimits() (portainer.K8sNodesLimits, error) {
 	return nodesLimits, nil
 }
 
-// GetMaxResourceLimits gets the maximum CPU and Memory limits(unused resources) of all nodes in the current k8s environment(endpoint) connection, minus the accumulated resourcequotas for all namespaces except the one we're editing
-// if the name is set to "" then all namespaces are considered
-func (client *KubeClient) GetMaxResourceLimits(name string, overCommitEnabled bool, resourceOverCommitPercent int) (portainer.K8sNodeLimits, error) {
+// GetMaxResourceLimits gets the maximum CPU and Memory limits(unused resources) of all nodes in the current k8s environment(endpoint) connection, minus the accumulated resourcequotas for all namespaces except the one we're editing (skipNamespace)
+// if skipNamespace is set to "" then all namespaces are considered
+func (client *KubeClient) GetMaxResourceLimits(skipNamespace string, overCommitEnabled bool, resourceOverCommitPercent int) (portainer.K8sNodeLimits, error) {
 	limits := portainer.K8sNodeLimits{}
 	nodes, err := client.cli.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -72,7 +72,7 @@ func (client *KubeClient) GetMaxResourceLimits(name string, overCommitEnabled bo
 		reserved := portainer.K8sNodeLimits{}
 		for _, namespace := range namespaces.Items {
 			// skip the namespace we're editing
-			if namespace.Name == name {
+			if namespace.Name == skipNamespace {
 				continue
 			}
 
