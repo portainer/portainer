@@ -27,6 +27,9 @@ function config($stateRegistryProvider) {
         component: 'kubeCustomTemplatesView',
       },
     },
+    data: {
+      docs: '/user/kubernetes/templates',
+    },
   };
 
   const customTemplatesNew = {

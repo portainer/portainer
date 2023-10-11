@@ -77,6 +77,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesHelmApplicationView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/helm',
+      },
     };
 
     const helmTemplates = {
@@ -97,6 +100,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesServicesView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/services',
+      },
     };
 
     const ingresses = {
@@ -106,6 +112,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesIngressesView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/ingresses',
       },
     };
 
@@ -136,6 +145,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesApplicationsView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/applications',
       },
     };
 
@@ -232,11 +244,17 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       params: {
         tab: null,
       },
+      data: {
+        docs: '/user/kubernetes/configurations',
+      },
     };
     const configmaps = {
       name: 'kubernetes.configmaps',
       url: '/configmaps',
       abstract: true,
+      data: {
+        docs: '/user/kubernetes/configurations',
+      },
     };
 
     const configMapCreation = {
@@ -263,6 +281,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       name: 'kubernetes.secrets',
       url: '/secrets',
       abstract: true,
+      data: {
+        docs: '/user/kubernetes/configurations',
+      },
     };
 
     const secretCreation = {
@@ -292,6 +313,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesClusterView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/cluster',
       },
     };
 
@@ -323,6 +347,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesDashboardView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/dashboard',
+      },
     };
 
     const deploy = {
@@ -342,6 +369,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesResourcePoolsView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/namespaces',
       },
     };
 
@@ -383,6 +413,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesVolumesView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/volumes',
+      },
     };
 
     const volume = {
@@ -402,6 +435,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'endpointRegistriesView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/cluster/registries',
       },
     };
 
@@ -423,6 +459,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesConfigureView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/cluster/setup',
+      },
     };
 
     const endpointKubernetesSecurityConstraint = {
@@ -433,6 +472,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           templateUrl: '../kubernetes/views/security-constraint/constraint.html',
           controller: 'KubernetesSecurityConstraintController',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/cluster/security',
       },
     };
 

@@ -34,6 +34,9 @@ function config($stateRegistryProvider: StateRegistry) {
         component: 'containersView',
       },
     },
+    data: {
+      docs: '/user/docker/containers',
+    },
   });
 
   $stateRegistryProvider.register({

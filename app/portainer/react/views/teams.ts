@@ -29,6 +29,9 @@ function config($stateRegistryProvider: StateRegistry) {
         component: 'teamsView',
       },
     },
+    data: {
+      docs: '/admin/users/teams',
+    },
   });
 
   $stateRegistryProvider.register({

@@ -121,6 +121,9 @@ angular
             controller: 'AccountController',
           },
         },
+        data: {
+          docs: '/user/account-settings',
+        },
       };
 
       const tokenCreation = {
@@ -173,6 +176,9 @@ angular
           'content@': {
             component: 'environmentsListView',
           },
+        },
+        data: {
+          docs: '/admin/environments',
         },
       };
 
@@ -263,6 +269,9 @@ angular
             controller: 'GroupsController',
           },
         },
+        data: {
+          docs: '/admin/environments/groups',
+        },
       };
 
       var group = {
@@ -306,6 +315,9 @@ angular
             component: 'homeView',
           },
         },
+        data: {
+          docs: '/user/home',
+        },
       };
 
       var init = {
@@ -337,6 +349,9 @@ angular
             controller: 'RegistriesController',
           },
         },
+        data: {
+          docs: '/admin/registries',
+        },
       };
 
       var registry = {
@@ -367,6 +382,9 @@ angular
             component: 'settingsView',
           },
         },
+        data: {
+          docs: '/admin/settings',
+        },
       };
 
       var settingsAuthentication = {
@@ -378,6 +396,9 @@ angular
             controller: 'SettingsAuthenticationController',
           },
         },
+        data: {
+          docs: '/admin/settings/authentication',
+        },
       };
 
       var settingsEdgeCompute = {
@@ -387,6 +408,9 @@ angular
           'content@': {
             component: 'settingsEdgeComputeView',
           },
+        },
+        data: {
+          docs: '/admin/settings/edge',
         },
       };
 
@@ -399,6 +423,9 @@ angular
             controller: 'TagsController',
           },
         },
+        data: {
+          docs: '/admin/environments/tags',
+        },
       };
 
       var users = {
@@ -409,6 +436,9 @@ angular
             templateUrl: './views/users/users.html',
             controller: 'UsersController',
           },
+        },
+        data: {
+          docs: '/admin/users',
         },
       };
 

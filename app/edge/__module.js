@@ -22,6 +22,9 @@ angular
           component: 'edgeGroupsView',
         },
       },
+      data: {
+        docs: '/user/edge/groups',
+      },
     };
 
     const groupsNew = {
@@ -51,6 +54,9 @@ angular
         'content@': {
           component: 'edgeStacksView',
         },
+      },
+      data: {
+        docs: '/user/edge/stacks',
       },
     };
 
@@ -86,6 +92,9 @@ angular
         'content@': {
           component: 'edgeJobsView',
         },
+      },
+      data: {
+        docs: '/user/edge/jobs',
       },
     };
 
@@ -126,6 +135,9 @@ angular
           'content@': {
             component: 'waitingRoomView',
           },
+        },
+        data: {
+          docs: '/user/edge/devices',
         },
       });
     }
