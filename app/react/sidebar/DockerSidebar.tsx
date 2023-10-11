@@ -4,11 +4,11 @@ import {
   Layers,
   List,
   Lock,
-  Share2,
   Shuffle,
   Trello,
   Clipboard,
   Edit,
+  Network,
 } from 'lucide-react';
 
 import {
@@ -136,7 +136,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
       <SidebarItem
         to="docker.networks"
         params={{ endpointId: environmentId }}
-        icon={Share2}
+        icon={Network}
         label="Networks"
         data-cy="dockerSidebar-networks"
       />

@@ -19,6 +19,12 @@ html {
   overflow-y: scroll;
 }
 
+html[theme='dark'],
+html[theme='highcontrast'] {
+  /* make the scrollbars dark theme when in the dark modes */
+  color-scheme: dark;
+}
+
 body {
   background: var(--bg-body-color);
   font-family: 'Inter';
