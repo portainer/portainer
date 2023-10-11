@@ -22,6 +22,7 @@ import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
 import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
+import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -80,6 +81,10 @@ export const ngModule = angular
       'options',
       'value',
     ])
+  )
+  .component(
+    'kubeNodesDatatable',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(NodesDatatable))), [])
   )
   .component(
     'kubeApplicationAccessPolicySelector',

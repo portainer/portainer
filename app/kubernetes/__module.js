@@ -321,7 +321,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const node = {
       name: 'kubernetes.cluster.node',
-      url: '/:name',
+      url: '/:nodeName',
       views: {
         'content@': {
           component: 'kubernetesNodeView',
