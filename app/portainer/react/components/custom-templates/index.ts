@@ -7,7 +7,6 @@ import { withControlledInput } from '@/react-tools/withControlledInput';
 import { CustomTemplatesListItem } from '@/react/portainer/templates/custom-templates/ListView/CustomTemplatesListItem';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
-import { AppTemplatesListItem } from '@/react/portainer/templates/app-templates/AppTemplatesListItem';
 import {
   CommonFields,
   validation as commonFieldsValidation,
@@ -48,15 +47,7 @@ export const ngModule = angular
       'isSelected',
     ])
   )
-  .component(
-    'appTemplatesListItem',
-    r2a(withUIRouter(withCurrentUser(AppTemplatesListItem)), [
-      'onSelect',
-      'template',
-      'isSelected',
-      'onDuplicate',
-    ])
-  )
+
   .component(
     'customTemplatesPlatformSelector',
     r2a(PlatformField, ['onChange', 'value'])
