@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
-// @id getKubernetesNodesLimits
+// @id GetKubernetesNodesLimits
 // @summary Get CPU and memory limits of all nodes within k8s cluster
 // @description Get CPU and memory limits of all nodes within k8s cluster
 // @description **Access policy**: authenticated
@@ -45,26 +45,14 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 }
 
 func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			err,
-		)
+		return httperror.InternalServerError("Failed to lookup KubeClient", err)
 	}
 
 	overCommit := endpoint.Kubernetes.Configuration.EnableResourceOverCommit
