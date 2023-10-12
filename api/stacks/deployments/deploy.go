@@ -1,10 +1,13 @@
 package deployments
 
 import (
+	"crypto/tls"
 	"fmt"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/agent"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
@@ -68,6 +71,10 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 			Msg("cannot auto update a stack, stack author user is missing")
 
 		return &StackAuthorMissingErr{int(stack.ID), author}
+	}
+
+	if !isEnvironmentOnline(endpoint) {
+		return nil
 	}
 
 	var gitCommitChangedOrForceUpdate bool
@@ -161,4 +168,18 @@ func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, e
 	}
 
 	return filteredRegistries, nil
+}
+
+func isEnvironmentOnline(endpoint *portainer.Endpoint) bool {
+	var err error
+	var tlsConfig *tls.Config
+	if endpoint.TLSConfig.TLS {
+		tlsConfig, err = crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+		if err != nil {
+			return false
+		}
+	}
+
+	_, _, err = agent.GetAgentVersionAndPlatform(endpoint.URL, tlsConfig)
+	return err == nil
 }
