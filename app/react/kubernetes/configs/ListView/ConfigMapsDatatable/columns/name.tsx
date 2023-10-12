@@ -63,15 +63,15 @@ function Cell({ row }: CellContext<ConfigMapRowData, string>) {
         </Link>
         {isSystemConfigMap && (
           <Badge type="success" className="ml-2">
-            system
+            System
           </Badge>
         )}
         {!isSystemToken && !hasConfigurationOwner && (
-          <Badge className="ml-2">external</Badge>
+          <Badge className="ml-2">External</Badge>
         )}
         {!row.original.inUse && !isSystemConfigMap && (
           <Badge type="warn" className="ml-2">
-            unused
+            Unused
           </Badge>
         )}
       </div>
