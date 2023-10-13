@@ -56,7 +56,6 @@ export function UserMenu() {
           to="portainer.logout"
           label="Log out"
           data-cy="userMenu-logOut"
-          params={{ performApiLogout: true }}
         />
       </MenuList>
     </Menu>

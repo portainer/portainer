@@ -154,7 +154,6 @@ angular
         url: '/logout',
         params: {
           error: '',
-          performApiLogout: true,
         },
         views: {
           'content@': {
