@@ -2,10 +2,8 @@ package kubernetes
 
 import (
 	"net/http"
-	"strconv"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
-	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
@@ -22,26 +20,11 @@ import (
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/rbac_enabled [get]
 func (handler *Handler) isRBACEnabled(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	// with the endpoint id and user auth, create a kube client instance
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
-	}
-
-	// with the kube client instance, check if RBAC is enabled
 	isRBACEnabled, err := cli.IsRBACEnabled()
 	if err != nil {
 		return httperror.InternalServerError("Failed to check RBAC status", err)
