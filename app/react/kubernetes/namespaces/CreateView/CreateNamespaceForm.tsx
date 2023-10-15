@@ -5,6 +5,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Widget, WidgetBody } from '@@/Widget';
 
@@ -30,6 +31,7 @@ export function CreateNamespaceForm() {
   const { data: registries } = useEnvironmentRegistries(environmentId, {
     hideDefault: true,
   });
+  const { user } = useCurrentUser();
   // for namespace create, show ingress classes that are allowed in the current environment.
   // the ingressClasses show the none option, so we don't need to add it here.
   const { data: ingressClasses } = useIngressControllerClassMapQuery({
@@ -65,7 +67,7 @@ export function CreateNamespaceForm() {
         <Formik
           enableReinitialize
           initialValues={initialValues}
-          onSubmit={handleSubmit}
+          onSubmit={(values) => handleSubmit(values, user.Username)}
           validateOnMount
           validationSchema={getNamespaceValidationSchema(
             memoryLimit,
@@ -78,9 +80,9 @@ export function CreateNamespaceForm() {
     </Widget>
   );
 
-  function handleSubmit(values: CreateNamespaceFormValues) {
+  function handleSubmit(values: CreateNamespaceFormValues, userName: string) {
     const createNamespacePayload: CreateNamespacePayload =
-      transformFormValuesToNamespacePayload(values);
+      transformFormValuesToNamespacePayload(values, userName);
     const updateRegistriesPayload: UpdateRegistryPayload[] =
       values.registries.flatMap((registryFormValues) => {
         // find the matching registry from the cluster registries

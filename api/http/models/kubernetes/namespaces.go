@@ -11,6 +11,7 @@ type K8sNamespaceDetails struct {
 	Name          string            `json:"Name"`
 	Annotations   map[string]string `json:"Annotations"`
 	ResourceQuota *K8sResourceQuota `json:"ResourceQuota"`
+	Owner         string            `json:"Owner"`
 }
 
 type K8sResourceQuota struct {

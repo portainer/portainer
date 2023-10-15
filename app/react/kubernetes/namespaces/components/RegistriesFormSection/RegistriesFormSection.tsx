@@ -8,6 +8,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { InlineLoader } from '@@/InlineLoader';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { RegistriesSelector } from './RegistriesSelector';
 
@@ -24,10 +25,13 @@ export function RegistriesFormSection({ values, onChange, errors }: Props) {
   });
   return (
     <FormSection title="Registries">
+      <TextTip color="blue" className="mb-2">
+        Define which registries can be used by users who have access to this
+        namespace.
+      </TextTip>
       <FormControl
         inputId="registries"
         label="Select registries"
-        required
         errors={errors}
       >
         {registriesQuery.isLoading && (
