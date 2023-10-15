@@ -5,9 +5,9 @@ import { DockerContainer } from '../../types';
 
 import { CONTAINER_MODE, Values } from './types';
 
-export function getDefaultViewModel(hasBridgeNetwork: boolean) {
+export function getDefaultViewModel() {
   return {
-    networkMode: hasBridgeNetwork ? 'bridge' : 'nat',
+    networkMode: 'bridge',
     hostname: '',
     domain: '',
     macAddress: '',

@@ -84,16 +84,9 @@ export function useInitialValues(submitting: boolean) {
     return null;
   }
 
-  const hasBridgeNetwork = networksQuery.data.some((n) => n.Name === 'bridge');
-
   if (!from) {
     return {
-      initialValues: defaultValues(
-        isAdmin,
-        user.Id,
-        hasBridgeNetwork,
-        nodeName
-      ),
+      initialValues: defaultValues(isAdmin, user.Id, nodeName),
     };
   }
 
@@ -152,19 +145,18 @@ export function useInitialValues(submitting: boolean) {
     ),
   };
 
-  return { initialValues, isDuplicating: !!from, extraNetworks };
+  return { initialValues, isDuplicating: true, extraNetworks };
 }
 
 function defaultValues(
   isAdmin: boolean,
   currentUserId: UserId,
-  hasBridgeNetwork: boolean,
   nodeName: string
 ): Values {
   return {
     commands: commandsTabUtils.getDefaultViewModel(),
     volumes: volumesTabUtils.getDefaultViewModel(),
-    network: networkTabUtils.getDefaultViewModel(hasBridgeNetwork),
+    network: networkTabUtils.getDefaultViewModel(),
     labels: labelsTabUtils.getDefaultViewModel(),
     restartPolicy: restartPolicyTabUtils.getDefaultViewModel(),
     resources: resourcesTabUtils.getDefaultViewModel(),
