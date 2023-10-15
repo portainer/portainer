@@ -124,16 +124,17 @@ export function ApplicationSummaryWidget() {
                       </div>
                     </td>
                   </tr>
-                  {!globalDeploymentOptionsQuery?.data
-                    ?.hideStacksFunctionality && (
-                    <tr>
-                      <td>Stack</td>
-                      <td data-cy="k8sAppDetail-stackName">
-                        {application?.metadata?.labels?.[appStackNameLabel] ||
-                          '-'}
-                      </td>
-                    </tr>
-                  )}
+                  {globalDeploymentOptionsQuery.data &&
+                    !globalDeploymentOptionsQuery.data
+                      .hideStacksFunctionality && (
+                      <tr>
+                        <td>Stack</td>
+                        <td data-cy="k8sAppDetail-stackName">
+                          {application?.metadata?.labels?.[appStackNameLabel] ||
+                            '-'}
+                        </td>
+                      </tr>
+                    )}
                   <tr>
                     <td>Namespace</td>
                     <td>
