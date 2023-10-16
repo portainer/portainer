@@ -73,6 +73,10 @@ func (service *Service) IsUpdating() (bool, error) {
 
 // StoreIsUpdating store the database updating status.
 func (service *Service) StoreIsUpdating(isUpdating bool) error {
+	if isUpdating {
+		return service.connection.UpdateObject(BucketName, []byte(updatingKey), isUpdating)
+	}
+
 	return service.connection.DeleteObject(BucketName, []byte(updatingKey))
 }
 
