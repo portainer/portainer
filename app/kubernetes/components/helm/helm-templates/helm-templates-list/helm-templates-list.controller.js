@@ -40,8 +40,4 @@ export default class HelmTemplatesListController {
       this.updateCategories();
     }
   }
-
-  $onInit() {
-    return this.$async();
-  }
 }

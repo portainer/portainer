@@ -82,7 +82,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm !ml-0"
-            ng-disabled="!($ctrl.stackName && $ctrl.state.resourcePool && !$ctrl.state.loadingValues && !$ctrl.state.actionInProgress)"
+            ng-disabled="!$ctrl.state.resourcePool || $ctrl.state.loadingValues || $ctrl.state.actionInProgress"
             ng-click="$ctrl.installHelmchart()"
             button-spinner="$ctrl.state.actionInProgress"
             data-cy="helm-install"
