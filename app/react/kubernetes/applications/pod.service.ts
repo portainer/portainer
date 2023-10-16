@@ -1,7 +1,7 @@
 import { Pod, PodList } from 'kubernetes-types/core/v1';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -63,7 +63,7 @@ export async function patchPod(
       }
     );
   } catch (e) {
-    throw parseKubernetesAxiosError(e, 'Unable to update pod');
+    throw parseAxiosError(e, 'Unable to update pod');
   }
 }
 

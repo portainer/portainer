@@ -8,8 +8,7 @@ import {
   UpdateEnvironmentPayload,
   updateEnvironment,
 } from '@/react/portainer/environments/queries/useUpdateEnvironmentMutation';
-import axios from '@/portainer/services/axios';
-import { parseKubernetesAxiosError } from '@/react/kubernetes/axiosError';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { updateIngressControllerClassMap } from '../../ingressClass/useIngressControllerClassMap';
 import { IngressControllerClassMap } from '../../ingressClass/types';
@@ -72,6 +71,6 @@ async function patchStorageClass(
       }
     );
   } catch (e) {
-    throw parseKubernetesAxiosError(e, `Unable to patch StorageClass ${name}`);
+    throw parseAxiosError(e, `Unable to patch StorageClass ${name}`);
   }
 }

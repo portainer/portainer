@@ -230,7 +230,7 @@ async function patchApplicationByKind<T extends Application>(
     );
     return res;
   } catch (e) {
-    throw parseKubernetesAxiosError(e, 'Unable to patch application');
+    throw parseAxiosError(e, 'Unable to patch application');
   }
 }
 
