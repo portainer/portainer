@@ -97,9 +97,7 @@ export function NamespaceInnerForm({
         }
         errors={errors.registries}
       />
-      {storageClasses.length > 0 && (
-        <StorageQuotaFormSection storageClasses={storageClasses} />
-      )}
+      {storageClasses.length > 0 && <StorageQuotaFormSection />}
       <NamespaceSummary
         initialValues={initialValues}
         values={values}

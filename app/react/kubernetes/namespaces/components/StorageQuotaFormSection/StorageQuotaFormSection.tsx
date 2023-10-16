@@ -1,15 +1,9 @@
-import { StorageClass } from '@/react/portainer/environments/types';
-
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
 
 import { StorageQuotaItem } from './StorageQuotaItem';
 
-interface Props {
-  storageClasses: StorageClass[];
-}
-
-export function StorageQuotaFormSection({ storageClasses }: Props) {
+export function StorageQuotaFormSection() {
   return (
     <FormSection title="Storage">
       <TextTip color="blue">
@@ -19,9 +13,7 @@ export function StorageQuotaFormSection({ storageClasses }: Props) {
         this namespace.
       </TextTip>
 
-      {storageClasses.map((storageClass) => (
-        <StorageQuotaItem key={storageClass.Name} storageClass={storageClass} />
-      ))}
+      <StorageQuotaItem />
     </FormSection>
   );
 }

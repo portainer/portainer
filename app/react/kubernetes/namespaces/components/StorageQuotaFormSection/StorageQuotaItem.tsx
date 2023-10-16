@@ -1,23 +1,18 @@
 import { Database } from 'lucide-react';
 
-import { StorageClass } from '@/react/portainer/environments/types';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { Icon } from '@@/Icon';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { SwitchField } from '@@/form-components/SwitchField';
 
-type Props = {
-  storageClass: StorageClass;
-};
-
-export function StorageQuotaItem({ storageClass }: Props) {
+export function StorageQuotaItem() {
   return (
-    <div key={storageClass.Name}>
+    <div>
       <FormSectionTitle>
         <div className="vertical-center text-muted inline-flex gap-1 align-top">
           <Icon icon={Database} className="!mt-0.5 flex-none" />
-          <span>{storageClass.Name}</span>
+          <span>standard</span>
         </div>
       </FormSectionTitle>
       <hr className="mt-2 mb-0 w-full" />

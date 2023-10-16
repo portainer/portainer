@@ -35,22 +35,12 @@ export function ResourceQuotaFormSection({
 
   return (
     <FormSection title="Resource Quota">
-      {values.enabled ? (
-        <TextTip color="blue">
-          A namespace is a logical abstraction of a Kubernetes cluster, to
-          provide for more flexible management of resources. Best practice is to
-          set a quota assignment as this ensures greatest security/stability;
-          alternatively, you can disable assigning a quota for unrestricted
-          access (not recommended).
-        </TextTip>
-      ) : (
-        <TextTip color="blue">
-          A namespace is a logical abstraction of a Kubernetes cluster, to
-          provide for more flexible management of resources. Resource
-          over-commit is disabled, please assign a capped limit of resources to
-          this namespace.
-        </TextTip>
-      )}
+      <TextTip color="blue">
+        A resource quota sets boundaries on the compute resources a namespace
+        can use. It&apos;s good practice to set a quota for a namespace to
+        manage resources effectively. Alternatively, you can disable assigning a
+        quota for unrestricted access (not recommended).
+      </TextTip>
 
       <SwitchField
         data-cy="k8sNamespaceCreate-resourceAssignmentToggle"

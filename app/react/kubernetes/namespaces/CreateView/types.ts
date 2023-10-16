@@ -15,6 +15,7 @@ export type CreateNamespaceFormValues = {
 
 export type CreateNamespacePayload = {
   Name: string;
+  Owner: string;
   ResourceQuota: ResourceQuotaPayload;
 };
 
