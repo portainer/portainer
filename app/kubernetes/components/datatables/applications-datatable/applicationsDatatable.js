@@ -21,5 +21,6 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     isAppsLoading: '<',
     isSystemResources: '<',
     setSystemResources: '<',
+    hideStacksFunctionality: '<',
   },
 });

@@ -8,5 +8,6 @@ export interface FormValues {
     hideFileUpload: boolean;
     requireNoteOnApplications: boolean;
     minApplicationNoteLength: number;
+    hideStacksFunctionality: boolean;
   };
 }

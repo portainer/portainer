@@ -99,6 +99,54 @@
               </div>
               <!-- #endregion -->
 
+              <!-- #region STACK -->
+              <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
+                <div class="col-sm-12 small text-muted vertical-center">
+                  <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                  Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use
+                  the application name.
+                </div>
+              </div>
+
+              <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
+                <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">
+                  Stack
+                  <portainer-tooltip
+                    ng-if="!ctrl.isAdmin"
+                    message="'The stack field below was previously labelled \'Name\' but, in
+                    fact, it\'s always been the stack name (hence the relabelling).'"
+                    class-name="'[&>span]:!text-left'"
+                    set-html-message="true"
+                  >
+                  </portainer-tooltip>
+                  <portainer-tooltip
+                    ng-if="ctrl.isAdmin"
+                    message="'The stack field below was previously labelled \'Name\' but, in
+                    fact, it\'s always been the stack name (hence the relabelling).<br/>
+                    Kubernetes Stacks functionality can be turned off entirely via
+                    <a href=\'/#!/settings\' target=\'_blank\'>
+                      Kubernetes Settings
+                    </a>.'"
+                    class-name="'[&>span]:!text-left'"
+                    set-html-message="true"
+                  >
+                  </portainer-tooltip>
+                </label>
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="myStack"
+                    ng-model="ctrl.formValues.StackName"
+                    name="stack_name"
+                    uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
+                    typeahead-min-length="0"
+                    data-cy="k8sAppCreate-stackName"
+                  />
+                </div>
+              </div>
+              <!-- #endregion -->
+
               <!-- #region Git repository -->
               <kubernetes-redeploy-app-git-form
                 ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
@@ -218,7 +266,7 @@
 
                 <div ng-if="ctrl.formValues.ResourcePool">
                   <!-- #region STACK -->
-                  <div class="form-group">
+                  <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
                     <div class="col-sm-12 small text-muted vertical-center">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                       Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to
@@ -226,7 +274,7 @@
                     </div>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
                     <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">Stack</label>
                     <div class="col-sm-8">
                       <input
@@ -1401,7 +1449,7 @@
                   class="btn btn-sm btn-primary"
                   ng-click="ctrl.updateApplicationViaWebEditor()"
                   ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || !ctrl.state.isEditorDirty || ctrl.state.updateWebEditorInProgress"
+                  ng-disabled="kubernetesApplicationCreationForm.$valid && !ctrl.state.isEditorDirty && ctrl.savedFormValues.StackName === ctrl.formValues.StackName || ctrl.state.updateWebEditorInProgress"
                   style="margin-top: 7px; margin-left: 0"
                   button-spinner="ctrl.state.updateWebEditorInProgress"
                 >

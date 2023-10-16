@@ -172,7 +172,7 @@
               ng-click="$ctrl.changeOrderBy('Name')"
             ></table-column-header>
           </th>
-          <th>
+          <th ng-if="!$ctrl.hideStacksFunctionality">
             <table-column-header
               col-title="'Stack'"
               can-sort="true"
@@ -290,7 +290,7 @@
             <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
             <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
           </td>
-          <td>{{ item.StackName || '-' }}</td>
+          <td ng-if="!$ctrl.hideStacksFunctionality">{{ item.StackName || '-' }}</td>
           <td>
             <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
           </td>
@@ -330,6 +330,7 @@
                 refresh-callback="$ctrl.refreshCallback"
                 on-publishing-mode-click="($ctrl.onPublishingModeClick)"
                 is-primary="false"
+                hide-stacks-functionality="$ctrl.hideStacksFunctionality"
               >
               </kubernetes-applications-datatable>
             </span>

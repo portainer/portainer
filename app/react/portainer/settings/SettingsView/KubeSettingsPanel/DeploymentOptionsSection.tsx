@@ -14,6 +14,7 @@ export function DeploymentOptionsSection() {
     values: { globalDeploymentOptions: values },
     setFieldValue,
   } = useFormikContext<FormValues>();
+
   const limitedFeature = isLimitedToBE(FeatureId.ENFORCE_DEPLOYMENT_OPTIONS);
   return (
     <FormSection title="Deployment Options">
@@ -74,6 +75,24 @@ export function DeploymentOptionsSection() {
       )}
 
       <KubeNoteMinimumCharacters />
+
+      <div className="form-group">
+        <div className="col-sm-12">
+          <SwitchField
+            label="Allow stacks functionality with Kubernetes environments"
+            checked={!values.hideStacksFunctionality}
+            onChange={(value) =>
+              setFieldValue(
+                'globalDeploymentOptions.hideStacksFunctionality',
+                !value
+              )
+            }
+            name="toggle_stacksFunctionality"
+            labelClass="col-sm-3 col-lg-2"
+            tooltip="This allows you to group your applications/workloads into a single ‘stack’, and then view or delete an entire stack. If disabled, stacks functionality will not show in the UI."
+          />
+        </div>
+      </div>
     </FormSection>
   );
 

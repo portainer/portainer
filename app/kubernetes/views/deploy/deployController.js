@@ -5,6 +5,7 @@ import stripAnsi from 'strip-ansi';
 import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, customTemplate, url, helm } from '@@/BoxSelector/common-options/build-methods';
@@ -89,6 +90,7 @@ class KubernetesDeployController {
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onChangeDeployType = this.onChangeDeployType.bind(this);
     this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
+    this.setStackName = this.setStackName.bind(this);
   }
 
   onSelectHelmChart(chart) {
@@ -99,6 +101,10 @@ class KubernetesDeployController {
     this.onChangeFormValues({ Variables: value });
 
     this.renderTemplate();
+  }
+
+  setStackName(name) {
+    this.formValues.StackName = name;
   }
 
   renderTemplate() {
@@ -180,7 +186,7 @@ class KubernetesDeployController {
     const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
 
     const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
-    return !this.formValues.StackName || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress || isNamespaceInvalid;
+    return isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress || isNamespaceInvalid;
   }
 
   onChangeFormValues(newValues) {
@@ -359,6 +365,8 @@ class KubernetesDeployController {
 
       this.formValues.namespace_toggle = false;
       await this.getNamespaces();
+
+      this.deploymentOptions = await getDeploymentOptions(this.endpoint.Id);
 
       if (this.$state.params.templateId) {
         const templateId = parseInt(this.$state.params.templateId, 10);
