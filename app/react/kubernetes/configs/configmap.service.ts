@@ -10,6 +10,7 @@ import {
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
 import { pluralize } from '@/portainer/helpers/strings';
+import PortainerError from '@/portainer/error';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -127,7 +128,7 @@ async function getConfigMapsForCluster(
     );
     return configMaps.flat();
   } catch (e) {
-    throw parseKubernetesAxiosError(e, 'Unable to retrieve ConfigMaps');
+    throw new PortainerError('Unable to retrieve ConfigMaps', e);
   }
 }
 

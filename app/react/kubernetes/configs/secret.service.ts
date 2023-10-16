@@ -10,6 +10,7 @@ import {
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
 import { pluralize } from '@/portainer/helpers/strings';
+import PortainerError from '@/portainer/error';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -123,10 +124,7 @@ async function getSecretsForCluster(
     );
     return secrets.flat();
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve secrets for cluster'
-    );
+    throw new PortainerError('Unable to retrieve secrets for cluster', e);
   }
 }
 
