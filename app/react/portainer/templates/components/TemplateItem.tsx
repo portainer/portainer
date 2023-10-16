@@ -10,7 +10,7 @@ import { FallbackImage } from '@@/FallbackImage';
 import { BlocklistItem } from '@@/Blocklist/BlocklistItem';
 import { BadgeIcon } from '@@/BadgeIcon';
 
-import { Platform } from '../../custom-templates/types';
+import { Platform } from '../types';
 
 type Value = {
   Id: number | string;

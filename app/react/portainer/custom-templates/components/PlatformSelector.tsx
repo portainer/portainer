@@ -1,7 +1,7 @@
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
 
-import { Platform } from '../types';
+import { Platform } from '../../templates/types';
 
 const platformOptions = [
   { label: 'Linux', value: Platform.LINUX },

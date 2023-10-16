@@ -2,7 +2,7 @@ import { Edit, Plus } from 'lucide-react';
 import _ from 'lodash';
 import { useCallback, useState } from 'react';
 
-import { CustomTemplate } from '@/react/portainer/custom-templates/types';
+import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
 import { DatatableHeader } from '@@/datatables/DatatableHeader';
 import { Table } from '@@/datatables';
@@ -26,7 +26,7 @@ export function CustomTemplatesList({
   templates?: CustomTemplate[];
   onSelect: (template: CustomTemplate['Id']) => void;
   onDelete: (template: CustomTemplate['Id']) => void;
-  selectedId: CustomTemplate['Id'];
+  selectedId: CustomTemplate['Id'] | undefined;
 }) {
   const [page, setPage] = useState(0);
 

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 import { Pair } from '../../settings/types';
-import { Platform } from '../../custom-templates/types';
+import { Platform } from '../types';
 
 import {
   AppTemplate,

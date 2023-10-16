@@ -8,8 +8,8 @@ import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
-  constructor($state, $window, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope) {
-    Object.assign(this, { $state, $window, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope });
+  constructor($state, $window, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async, $scope) {
+    Object.assign(this, { $state, $window, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async, $scope });
 
     this.formValues = {
       Name: '',

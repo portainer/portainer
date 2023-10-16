@@ -93,7 +93,8 @@ class CustomTemplatesViewController {
   }
   async getTemplatesAsync() {
     try {
-      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
+      const templates = await this.CustomTemplateService.customTemplates([1, 2]);
+      this.templates = templates.filter((t) => !t.EdgeTemplate);
     } catch (err) {
       this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
     }

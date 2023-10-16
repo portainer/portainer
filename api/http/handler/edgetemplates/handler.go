@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
@@ -25,7 +26,7 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 	}
 
 	h.Handle("/edge_templates",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeTemplateList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(middlewares.Deprecated(httperror.LoggerHandler(h.edgeTemplateList), func(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) { return "", nil }))).Methods(http.MethodGet)
 
 	return h
 }

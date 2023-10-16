@@ -28,9 +28,9 @@ interface Props {
   isAdditionalFilesFieldVisible?: boolean;
   isForcePullVisible?: boolean;
   isAuthExplanationVisible?: boolean;
-  errors: FormikErrors<GitFormModel>;
-  baseWebhookUrl: string;
-  webhookId: string;
+  errors?: FormikErrors<GitFormModel>;
+  baseWebhookUrl?: string;
+  webhookId?: string;
   webhooksDocs?: string;
 }
 
@@ -97,8 +97,8 @@ export function GitForm({
       {value.AutoUpdate && (
         <AutoUpdateFieldset
           environmentType={environmentType}
-          webhookId={webhookId}
-          baseWebhookUrl={baseWebhookUrl}
+          webhookId={webhookId || ''}
+          baseWebhookUrl={baseWebhookUrl || ''}
           value={value.AutoUpdate}
           onChange={(value) => handleChange({ AutoUpdate: value })}
           isForcePullVisible={isForcePullVisible}

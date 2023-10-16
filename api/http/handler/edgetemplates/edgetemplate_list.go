@@ -18,6 +18,7 @@ type templateFileFormat struct {
 }
 
 // @id EdgeTemplateList
+// @deprecated
 // @summary Fetches the list of Edge Templates
 // @description **Access policy**: administrator
 // @tags edge_templates

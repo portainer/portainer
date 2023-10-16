@@ -2,7 +2,7 @@ import { Edit, Trash2 } from 'lucide-react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
-import { CustomTemplate } from '@/react/portainer/custom-templates/types';
+import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -36,6 +36,7 @@ export function CustomTemplatesListItem({
               <Button
                 as={Link}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                 }}
                 color="secondary"

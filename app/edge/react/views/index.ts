@@ -10,6 +10,8 @@ import { ListView as EdgeGroupsListView } from '@/react/edge/edge-groups/ListVie
 
 import { templatesModule } from './templates';
 
+import { templatesModule } from './templates';
+
 export const viewsModule = angular
   .module('portainer.edge.react.views', [templatesModule])
   .component(

@@ -4,7 +4,9 @@ import { FormikErrors } from 'formik';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
-interface Values {
+import { CustomTemplate } from '../../templates/custom-templates/types';
+
+export interface Values {
   Title: string;
   Description: string;
   Note: string;
@@ -87,11 +89,26 @@ export function CommonFields({
 }
 
 export function validation({
+  currentTemplateId,
+  templates = [],
   title,
 }: {
+  currentTemplateId?: CustomTemplate['Id'];
+  templates?: Array<CustomTemplate>;
   title?: { pattern: string; error: string };
 } = {}): SchemaOf<Values> {
-  let titleSchema = string().required('Title is required.');
+  let titleSchema = string()
+    .required('Title is required.')
+    .test(
+      'is-unique',
+      'Title must be unique',
+      (value) =>
+        !value ||
+        !templates.some(
+          (template) =>
+            template.Title === value && template.Id !== currentTemplateId
+        )
+    );
   if (title?.pattern) {
     const pattern = new RegExp(title.pattern);
     titleSchema = titleSchema.matches(pattern, title.error);
