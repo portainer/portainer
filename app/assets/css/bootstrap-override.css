@@ -156,6 +156,7 @@ input:checked + .slider:before {
   background-color: var(--bg-checkbox) !important;
   border: 1px solid var(--border-checkbox) !important;
   border-radius: 5px;
+  color: var(--black-color);
 }
 
 .md-checkbox input[type='checkbox']:disabled + label:before {

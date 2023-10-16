@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
-import helm from '@/assets/ico/helm.svg?c';
+import helm from '@/assets/ico/vendor/helm.svg?c';
 
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
@@ -41,7 +41,7 @@ export function HelmRepositoryDatatable() {
 
   return (
     <Datatable
-      getRowId={(row) => row.URL}
+      getRowId={(row) => String(row.Id)}
       dataset={helmRepos}
       settingsManager={tableState}
       columns={columns}
