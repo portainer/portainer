@@ -364,6 +364,7 @@ input:-webkit-autofill {
 .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow {
   width: 12px;
   height: 12px;
+  margin-left: -1px;
 }
 
 .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
@@ -373,6 +374,10 @@ input:-webkit-autofill {
 
 [theme='dark'] .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
   border-right: 8px solid var(--ui-gray-true-9);
+}
+
+[theme='highcontrast'] .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-white);
 }
 
 .sidebar .tippy-content {

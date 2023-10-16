@@ -1,5 +1,6 @@
 import { Icon as IconTest } from 'lucide-react';
 import clsx from 'clsx';
+import { MouseEventHandler, PropsWithChildren } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -37,35 +38,84 @@ export function SidebarItem({
     includePaths,
   });
 
-  const anchor = (
+  const sidebarAnchor = (
     <Wrapper label={label}>
-      <a
+      <ItemAnchor
         href={anchorProps.href}
         onClick={anchorProps.onClick}
-        className={clsx(
-          anchorProps.className,
-          'text-inherit no-underline hover:text-inherit hover:no-underline focus:text-inherit focus:no-underline',
-          'flex h-8 w-full flex-1 items-center space-x-4 rounded-md text-sm',
-          'transition-colors duration-200 hover:bg-blue-5/20 be:hover:bg-gray-5/20 th-dark:hover:bg-gray-true-5/20',
-          {
-            // submenu items are always expanded (in a tooltip or in the sidebar)
-            'w-full justify-start px-3': isOpen || isSubMenu,
-            'w-8 justify-center': !isOpen && !isSubMenu,
-          }
-        )}
-        data-cy={dataCy}
+        className={anchorProps.className}
+        dataCy={dataCy}
+        isOpen={isOpen}
+        isSubMenu={isSubMenu}
       >
         {!!icon && <Icon icon={icon} className={clsx('flex [&>svg]:w-4')} />}
         {(isOpen || isSubMenu) && <span>{label}</span>}
-      </a>
+      </ItemAnchor>
     </Wrapper>
   );
 
-  if (isOpen || isSubMenu) return anchor;
+  if (isOpen || isSubMenu) return sidebarAnchor;
 
   return (
-    <SidebarTooltip content={<span className="text-sm">{label}</span>}>
-      <span className="w-full">{anchor}</span>
+    <SidebarTooltip
+      content={
+        <div className="bg-blue-8 be:bg-gray-8 th-dark:bg-gray-true-8 th-highcontrast:bg-black th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white rounded">
+          <Wrapper label={label}>
+            <ItemAnchor
+              href={anchorProps.href}
+              onClick={anchorProps.onClick}
+              className={anchorProps.className}
+              dataCy={dataCy}
+              isOpen={isOpen}
+              isSubMenu={isSubMenu}
+            >
+              <span className="px-3">{label}</span>
+            </ItemAnchor>
+          </Wrapper>
+        </div>
+      }
+    >
+      <span className="w-full">{sidebarAnchor}</span>
     </SidebarTooltip>
+  );
+}
+
+type ItemAnchorProps = {
+  href?: string;
+  onClick: MouseEventHandler<unknown>;
+  className: string;
+  isOpen: boolean;
+  isSubMenu: boolean;
+  dataCy?: string;
+};
+
+function ItemAnchor({
+  href,
+  onClick,
+  className,
+  isOpen,
+  isSubMenu,
+  dataCy,
+  children,
+}: PropsWithChildren<ItemAnchorProps>) {
+  return (
+    <a
+      href={href}
+      onClick={onClick}
+      className={clsx(
+        className,
+        'text-inherit no-underline hover:text-inherit hover:no-underline focus:text-inherit focus:no-underline',
+        'flex h-8 w-full flex-1 items-center space-x-4 rounded-md text-sm',
+        'transition-colors duration-200 hover:bg-blue-5/20 be:hover:bg-gray-5/20 th-dark:hover:bg-gray-true-5/20',
+        {
+          // submenu items are always expanded (in a tooltip or in the sidebar)
+          'w-full justify-start px-3': isOpen || isSubMenu,
+          'w-8 justify-center': !isOpen && !isSubMenu,
+        }
+      )}
+      data-cy={dataCy}
+    >
+      {children}
+    </a>
   );
 }

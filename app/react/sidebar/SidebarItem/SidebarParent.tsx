@@ -71,7 +71,7 @@ export function SidebarParent({
             )}
           >
             <Icon icon={icon} />
-            {isSidebarOpen && <span className="ml-4">{title}</span>}
+            {isSidebarOpen && <span className="pl-4">{title}</span>}
           </Link>
         </button>
         {isSidebarOpen && (
@@ -123,7 +123,7 @@ export function SidebarParent({
           <li className="flex items-center space-x-2 text-sm mb-1">
             <span>{title}</span>
           </li>
-          <div className="bg-blue-8/50 be:bg-gray-8 th-dark:bg-gray-true-8 rounded">
+          <div className="bg-blue-8 be:bg-gray-8 th-dark:bg-gray-true-8 th-highcontrast:bg-black th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white rounded">
             {children}
           </div>
         </ul>
