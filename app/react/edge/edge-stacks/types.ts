@@ -30,6 +30,12 @@ export enum StatusType {
   Deploying,
   /** Removing represents an Edge stack which is being removed */
   Removing,
+  /** PausedDeploying represents an Edge stack which is paused for deployment */
+  PausedDeploying,
+  /** PausedRemoving represents an Edge stack which is being rolled back */
+  RollingBack,
+  /** PausedRemoving represents an Edge stack which has been rolled back */
+  RolledBack,
 }
 
 export interface DeploymentStatus {
