@@ -6,15 +6,7 @@
 
     <div class="searchBar vertical-center !mr-0">
       <pr-icon icon="'search'" class="searchIcon"></pr-icon>
-      <input
-        type="text"
-        class="searchInput"
-        ng-model="$ctrl.state.textFilter"
-        ng-change="$ctrl.onTextFilterChange()"
-        placeholder="Search for a chart..."
-        auto-focus
-        ng-model-options="{ debounce: 300 }"
-      />
+      <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search for a chart..." auto-focus ng-model-options="{ debounce: 300 }" />
     </div>
     <div class="w-1/5">
       <por-select
@@ -28,19 +20,24 @@
     </div>
   </div>
   <div class="w-full">
-    <div class="mb-2 small"
+    <div class="mb-2 small text-muted"
       >Select the Helm chart to use. Bring further Helm charts into your selection list via <a ui-sref="portainer.account">User settings - Helm repositories</a>.</div
     >
+    <beta-alert
+      is-html="true"
+      message="'Beta feature - so far, this functionality has been tested in limited scenarios. For more information, see this <a href=\'https://www.portainer.io/blog/portainer-now-with-helm-support\' target=\'_blank\' class=\'hyperlink\'>blog post on Portainer Helm support</a>.'"
+    ></beta-alert>
   </div>
 
   <div class="blocklist !px-0">
     <helm-templates-list-item
-      ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory"
+      ng-repeat="chart in allCharts = ($ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory)"
       model="chart"
       type-label="helm"
       on-select="($ctrl.selectAction)"
     >
     </helm-templates-list-item>
+    <div ng-if="!allCharts.length" class="text-muted small mt-4"> No Helm charts found </div>
     <div ng-if="$ctrl.loading" class="text-muted text-center">
       Loading...
       <div class="text-muted text-center"> Initial download of Helm Charts can take a few minutes </div>
