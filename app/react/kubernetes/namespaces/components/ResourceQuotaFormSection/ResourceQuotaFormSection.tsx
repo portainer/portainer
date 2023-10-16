@@ -37,7 +37,7 @@ export function ResourceQuotaFormSection({
     <FormSection title="Resource Quota">
       <TextTip color="blue">
         A resource quota sets boundaries on the compute resources a namespace
-        can use. It&apos;s a good practice to set a quota for a namespace to
+        can use. It&apos;s good practice to set a quota for a namespace to
         manage resources effectively. Alternatively, you can disable assigning a
         quota for unrestricted access (not recommended).
       </TextTip>
