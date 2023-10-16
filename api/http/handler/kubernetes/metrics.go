@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"net/http"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/middlewares"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -26,34 +26,19 @@ import (
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/nodes [get]
 func (handler *Handler) getKubernetesMetricsForAllNodes(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.CreateRemoteMetricsClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"failed to create metrics KubeClient",
-			nil,
-		)
+		return httperror.InternalServerError("failed to create metrics KubeClient", nil)
 	}
 
 	metrics, err := cli.MetricsV1beta1().NodeMetricses().List(r.Context(), v1.ListOptions{})
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to fetch metrics",
-			err,
-		)
+		return httperror.InternalServerError("Failed to fetch metrics", err)
 	}
 
 	return response.JSON(w, metrics)
@@ -75,34 +60,19 @@ func (handler *Handler) getKubernetesMetricsForAllNodes(w http.ResponseWriter, r
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/nodes/{name} [get]
 func (handler *Handler) getKubernetesMetricsForNode(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.CreateRemoteMetricsClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"failed to create metrics KubeClient",
-			nil,
-		)
+		return httperror.InternalServerError("failed to create metrics KubeClient", nil)
 	}
 
 	nodeName, err := request.RetrieveRouteVariableValue(r, "name")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid node identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid node identifier route variable", err)
 	}
 
 	metrics, err := cli.MetricsV1beta1().NodeMetricses().Get(
@@ -111,10 +81,7 @@ func (handler *Handler) getKubernetesMetricsForNode(w http.ResponseWriter, r *ht
 		v1.GetOptions{},
 	)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to fetch metrics",
-			err,
-		)
+		return httperror.InternalServerError("Failed to fetch metrics", err)
 	}
 
 	return response.JSON(w, metrics)
@@ -136,42 +103,24 @@ func (handler *Handler) getKubernetesMetricsForNode(w http.ResponseWriter, r *ht
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/pods/{namespace} [get]
 func (handler *Handler) getKubernetesMetricsForAllPods(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.CreateRemoteMetricsClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"failed to create metrics KubeClient",
-			nil,
-		)
+		return httperror.InternalServerError("failed to create metrics KubeClient", nil)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
 	metrics, err := cli.MetricsV1beta1().PodMetricses(namespace).List(r.Context(), v1.ListOptions{})
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to fetch metrics",
-			err,
-		)
+		return httperror.InternalServerError("Failed to fetch metrics", err)
 	}
 
 	return response.JSON(w, metrics)
@@ -194,54 +143,29 @@ func (handler *Handler) getKubernetesMetricsForAllPods(w http.ResponseWriter, r 
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/pods/{namespace}/{name} [get]
 func (handler *Handler) getKubernetesMetricsForPod(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.CreateRemoteMetricsClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"failed to create metrics KubeClient",
-			nil,
-		)
+		return httperror.InternalServerError("failed to create metrics KubeClient", nil)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
 	podName, err := request.RetrieveRouteVariableValue(r, "name")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid pod identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid pod identifier route variable", err)
 	}
 
-	metrics, err := cli.MetricsV1beta1().PodMetricses(namespace).Get(
-		r.Context(),
-		podName,
-		v1.GetOptions{},
-	)
+	metrics, err := cli.MetricsV1beta1().PodMetricses(namespace).Get(r.Context(), podName, v1.GetOptions{})
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to fetch metrics",
-			err,
-		)
+		return httperror.InternalServerError("Failed to fetch metrics", err)
 	}
 
 	return response.JSON(w, metrics)

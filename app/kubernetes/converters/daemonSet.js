@@ -42,7 +42,9 @@ class KubernetesDaemonSetConverter {
     const payload = new KubernetesDaemonSetCreatePayload();
     payload.metadata.name = daemonSet.Name;
     payload.metadata.namespace = daemonSet.Namespace;
-    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = daemonSet.StackName;
+    if (daemonSet.StackName) {
+      payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = daemonSet.StackName;
+    }
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = daemonSet.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = daemonSet.ApplicationOwner;
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = daemonSet.Note;

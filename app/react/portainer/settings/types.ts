@@ -145,7 +145,7 @@ export interface Settings {
   };
 }
 
-interface GlobalDeploymentOptions {
+export interface GlobalDeploymentOptions {
   /** Hide manual deploy forms in portainer */
   hideAddWithForm: boolean;
   /** Configure this per environment or globally */
@@ -157,6 +157,8 @@ interface GlobalDeploymentOptions {
   /** Make note on application add/edit screen required */
   requireNoteOnApplications: boolean;
   minApplicationNoteLength: number;
+
+  hideStacksFunctionality: boolean;
 }
 
 export interface PublicSettingsResponse {

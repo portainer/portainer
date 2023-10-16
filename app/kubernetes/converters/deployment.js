@@ -45,7 +45,9 @@ class KubernetesDeploymentConverter {
     const payload = new KubernetesDeploymentCreatePayload();
     payload.metadata.name = deployment.Name;
     payload.metadata.namespace = deployment.Namespace;
-    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
+    if (deployment.StackName) {
+      payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
+    }
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = deployment.ApplicationOwner;
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = deployment.Note;

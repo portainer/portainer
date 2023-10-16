@@ -23,7 +23,7 @@ import { createOwnershipColumn } from '../../components/datatable/createOwnershi
 const columnHelper = createColumnHelper<SecretViewModel>();
 
 const columns = [
-  buildNameColumn<SecretViewModel>('Name', 'Id', '.secret'),
+  buildNameColumn<SecretViewModel>('Name', '.secret'),
   columnHelper.accessor((item) => isoDate(item.CreatedAt), {
     header: 'Creation Date',
   }),

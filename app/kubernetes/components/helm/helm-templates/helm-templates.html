@@ -20,7 +20,7 @@
         </div>
         <div class="basis-1/4">
           <div class="h-full w-full vertical-center justify-end pr-5">
-            <button type="button" class="btn btn-sm btn-link !text-gray-8 hover:no-underline th-highcontrast:!text-white th-dark:!text-white" ng-click="$ctrl.state.chart = null">
+            <button type="button" class="btn btn-sm btn-link !text-gray-8 hover:no-underline th-highcontrast:!text-white th-dark:!text-white" ng-click="$ctrl.clearHelmChart()">
               Clear selection
               <pr-icon icon="'x'" class="ml-1"></pr-icon>
             </button>
@@ -82,7 +82,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm !ml-0"
-            ng-disabled="!($ctrl.stackName && $ctrl.state.resourcePool && !$ctrl.state.loadingValues && !$ctrl.state.actionInProgress)"
+            ng-disabled="!$ctrl.state.resourcePool || $ctrl.state.loadingValues || $ctrl.state.actionInProgress"
             ng-click="$ctrl.installHelmchart()"
             button-spinner="$ctrl.state.actionInProgress"
             data-cy="helm-install"

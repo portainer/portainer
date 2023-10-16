@@ -24,6 +24,8 @@ import (
 
 type kubernetesFileStackUpdatePayload struct {
 	StackFileContent string
+	// Name of the stack
+	StackName string
 }
 
 type kubernetesGitStackUpdatePayload struct {
@@ -38,6 +40,9 @@ type kubernetesGitStackUpdatePayload struct {
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
 		return errors.New("Invalid stack file content")
+	}
+	if govalidator.IsNull(payload.StackName) {
+		return errors.New("Invalid stack name")
 	}
 	return nil
 }
@@ -112,6 +117,14 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
 		return httperror.InternalServerError("Failed to persist deployment file in a temp directory", err)
+	}
+
+	if payload.StackName != stack.Name {
+		stack.Name = payload.StackName
+		err := handler.DataStore.Stack().Update(stack.ID, stack)
+		if err != nil {
+			return httperror.InternalServerError("Failed to update stack name", err)
+		}
 	}
 
 	// Refresh ECR registry secret if needed

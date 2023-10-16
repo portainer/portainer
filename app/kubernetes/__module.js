@@ -1,5 +1,5 @@
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
-import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/service';
+import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/getSelfSubjectAccessReview';
 
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
@@ -79,16 +79,6 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
       data: {
         docs: '/user/kubernetes/helm',
-      },
-    };
-
-    const helmTemplates = {
-      name: 'kubernetes.templates.helm',
-      url: '/helm',
-      views: {
-        'content@': {
-          component: 'helmTemplatesView',
-        },
       },
     };
 
@@ -375,12 +365,12 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
-    const resourcePoolCreation = {
+    const namespaceCreation = {
       name: 'kubernetes.resourcePools.new',
       url: '/new',
       views: {
         'content@': {
-          component: 'kubernetesCreateResourcePoolView',
+          component: 'kubernetesCreateNamespaceView',
         },
       },
     };
@@ -480,7 +470,6 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(helmApplication);
-    $stateRegistryProvider.register(helmTemplates);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);
     $stateRegistryProvider.register(application);
@@ -504,7 +493,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(node);
     $stateRegistryProvider.register(nodeStats);
     $stateRegistryProvider.register(resourcePools);
-    $stateRegistryProvider.register(resourcePoolCreation);
+    $stateRegistryProvider.register(namespaceCreation);
     $stateRegistryProvider.register(resourcePool);
     $stateRegistryProvider.register(resourcePoolAccess);
     $stateRegistryProvider.register(volumes);

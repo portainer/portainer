@@ -4,7 +4,7 @@ import { Check, X } from 'lucide-react';
 import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';
 
-import type { IngressControllerClassMapRowData } from '../../types';
+import type { IngressControllerClassMap } from '../../types';
 
 import { columnHelper } from './helper';
 
@@ -16,9 +16,7 @@ export const availability = columnHelper.accessor('Availability', {
   sortingFn: 'basic',
 });
 
-function Cell({
-  getValue,
-}: CellContext<IngressControllerClassMapRowData, boolean>) {
+function Cell({ getValue }: CellContext<IngressControllerClassMap, boolean>) {
   const availability = getValue();
 
   return (

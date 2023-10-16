@@ -22,7 +22,7 @@ function Cell({ row, getValue }: CellContext<Ingress, string>) {
   const isSystemIngress = isSystemNamespace(namespace);
 
   return (
-    <div className="flex whitespace-nowrap">
+    <div className="flex flex-nowrap whitespace-nowrap">
       <Authorized authorizations="K8sIngressesW" childrenUnauthorized={name}>
         <Link
           to="kubernetes.ingresses.edit"
@@ -38,7 +38,7 @@ function Cell({ row, getValue }: CellContext<Ingress, string>) {
       </Authorized>
       {isSystemIngress && (
         <Badge type="success" className="ml-2">
-          system
+          System
         </Badge>
       )}
     </div>

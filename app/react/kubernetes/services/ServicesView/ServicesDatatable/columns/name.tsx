@@ -1,6 +1,8 @@
 import { Authorized } from '@/react/hooks/useUser';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 
+import { Badge } from '@@/Badge';
+
 import { columnHelper } from './helper';
 
 export const name = columnHelper.accessor(
@@ -32,21 +34,21 @@ export const name = columnHelper.accessor(
         !row.original.Labels['io.portainer.kubernetes.application.owner'];
 
       return (
-        <Authorized authorizations="K8sServiceW" childrenUnauthorized={name}>
-          {name}
+        <div className="flex">
+          <Authorized authorizations="K8sServiceW" childrenUnauthorized={name}>
+            {name}
 
-          {isSystem && (
-            <span className="label label-info image-tag label-margins">
-              system
-            </span>
-          )}
+            {isSystem && (
+              <Badge type="success" className="ml-2">
+                System
+              </Badge>
+            )}
 
-          {isExternal && !isSystem && (
-            <span className="label label-primary image-tag label-margins">
-              external
-            </span>
-          )}
-        </Authorized>
+            {isExternal && !isSystem && (
+              <Badge className="ml-2">External</Badge>
+            )}
+          </Authorized>
+        </div>
       );
     },
   }

@@ -1,10 +1,11 @@
-import { ChangeEvent, ReactNode } from 'react';
+import { ChangeEvent } from 'react';
 import { Trash2 } from 'lucide-react';
 
 import { FormError } from '@@/form-components/FormError';
 import { Button } from '@@/buttons';
+import { isArrayErrorType } from '@@/form-components/formikUtils';
 
-import { Annotation } from './types';
+import { Annotation, AnnotationErrors } from './types';
 
 interface Props {
   annotations: Annotation[];
@@ -14,17 +15,21 @@ interface Props {
     val: string
   ) => void;
   removeAnnotation: (index: number) => void;
-  errors: Record<string, ReactNode>;
+  errors: AnnotationErrors;
   placeholder: string[];
 }
 
-export function Annotations({
+export function AnnotationsForm({
   annotations,
   handleAnnotationChange,
   removeAnnotation,
   errors,
   placeholder,
 }: Props) {
+  const annotationErrors = isArrayErrorType<Annotation>(errors)
+    ? errors
+    : undefined;
+
   return (
     <>
       {annotations.map((annotation, i) => (
@@ -43,9 +48,9 @@ export function Annotations({
                 }
               />
             </div>
-            {errors[`annotations.key[${i}]`] && (
-              <FormError className="!mb-0 mt-1">
-                {errors[`annotations.key[${i}]`]}
+            {annotationErrors?.[i]?.Key && (
+              <FormError className="mt-1 !mb-0">
+                {annotationErrors[i]?.Key}
               </FormError>
             )}
           </div>
@@ -63,9 +68,9 @@ export function Annotations({
                 }
               />
             </div>
-            {errors[`annotations.value[${i}]`] && (
-              <FormError className="!mb-0 mt-1">
-                {errors[`annotations.value[${i}]`]}
+            {annotationErrors?.[i]?.Value && (
+              <FormError className="mt-1 !mb-0">
+                {annotationErrors[i]?.Value}
               </FormError>
             )}
           </div>

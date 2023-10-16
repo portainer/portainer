@@ -1,4 +1,5 @@
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
+import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody } from '@@/Widget';
@@ -8,7 +9,19 @@ import { ConfigureForm } from './ConfigureForm';
 export function ConfigureView() {
   const { data: environment } = useCurrentEnvironment();
 
-  // get the initial values
+  useUnauthorizedRedirect(
+    {
+      authorizations: 'K8sClusterW',
+      forceEnvironmentId: environment?.Id,
+      adminOnlyCE: false,
+    },
+    {
+      params: {
+        id: environment?.Id,
+      },
+      to: 'kubernetes.dashboard',
+    }
+  );
 
   return (
     <>

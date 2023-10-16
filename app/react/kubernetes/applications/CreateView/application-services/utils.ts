@@ -1,14 +1,6 @@
-import { FormikErrors } from 'formik';
-
 import { Ingress } from '@/react/kubernetes/ingresses/types';
 
 import { ServiceFormValues, ServicePort } from './types';
-
-export function isErrorType<T>(
-  error: string | FormikErrors<T> | undefined
-): error is FormikErrors<T> {
-  return error !== undefined && typeof error !== 'string';
-}
 
 export function newPort(serviceName?: string) {
   return {

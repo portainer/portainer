@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"net/http"
-	"strconv"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -10,38 +9,19 @@ import (
 )
 
 func (handler *Handler) getKubernetesConfigMapsAndSecrets(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
-	}
-
-	cli, ok := handler.KubernetesClientFactory.GetProxyKubeClient(
-		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
-	)
-	if !ok {
-		return httperror.InternalServerError(
-			"Failed to lookup KubeClient",
-			nil,
-		)
-	}
-
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
 	}
 
 	configmaps, err := cli.GetConfigMapsAndSecrets(namespace)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to retrieve configmaps and secrets",
-			err,
-		)
+		return httperror.InternalServerError("Unable to retrieve configmaps and secrets", err)
 	}
 
 	return response.JSON(w, configmaps)

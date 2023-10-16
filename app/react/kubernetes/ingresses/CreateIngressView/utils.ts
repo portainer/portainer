@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { SupportedIngControllerTypes } from '@/react/kubernetes/cluster/ingressClass/types';
 
 import { TLS, Ingress } from '../types';
+import { Annotation } from '../../annotations/types';
 
-import { Annotation } from './Annotations/types';
 import { Host, Rule } from './types';
 
 const ignoreAnnotationsForEdit = [

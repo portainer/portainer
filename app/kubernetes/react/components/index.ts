@@ -1,11 +1,11 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
-import { IngressClassDatatable } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable';
+import { IngressClassDatatableAngular } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable/IngressClassDatatableAngular';
 import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessView/NamespacesSelector';
 import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/ConfigureForm/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
-import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceRegistriesSelector';
+import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/RegistriesFormSection/RegistriesSelector';
 import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
@@ -23,12 +23,13 @@ import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
 import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
+import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [])
   .component(
     'ingressClassDatatable',
-    r2a(IngressClassDatatable, [
+    r2a(IngressClassDatatableAngular, [
       'onChangeControllers',
       'description',
       'ingressControllers',
@@ -75,12 +76,7 @@ export const ngModule = angular
   )
   .component(
     'createNamespaceRegistriesSelector',
-    r2a(CreateNamespaceRegistriesSelector, [
-      'inputId',
-      'onChange',
-      'options',
-      'value',
-    ])
+    r2a(RegistriesSelector, ['inputId', 'onChange', 'options', 'value'])
   )
   .component(
     'kubeNodesDatatable',
@@ -109,6 +105,14 @@ export const ngModule = angular
       'identifier',
       'data',
       'hideMessage',
+    ])
+  )
+  .component(
+    'kubeStackName',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(StackName))), [
+      'setStackName',
+      'isAdmin',
+      'stackName',
     ])
   )
   .component(

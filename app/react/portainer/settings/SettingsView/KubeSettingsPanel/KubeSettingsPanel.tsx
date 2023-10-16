@@ -29,13 +29,17 @@ export function KubeSettingsPanel() {
   const initialValues: FormValues = {
     helmRepositoryUrl: settingsQuery.data.HelmRepositoryURL || '',
     kubeconfigExpiry: settingsQuery.data.KubeconfigExpiry || '0',
-    globalDeploymentOptions: settingsQuery.data.GlobalDeploymentOptions || {
-      requireNoteOnApplications: false,
-      minApplicationNoteLength: 0,
-      hideAddWithForm: false,
-      hideFileUpload: false,
-      hideWebEditor: false,
-      perEnvOverride: false,
+    globalDeploymentOptions: {
+      ...{
+        requireNoteOnApplications: false,
+        minApplicationNoteLength: 0,
+        hideAddWithForm: false,
+        hideFileUpload: false,
+        hideWebEditor: false,
+        perEnvOverride: false,
+        hideStacksFunctionality: false,
+      },
+      ...settingsQuery.data.GlobalDeploymentOptions,
     },
   };
 

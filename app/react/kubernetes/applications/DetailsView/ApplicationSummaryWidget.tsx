@@ -6,6 +6,8 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
+import { GlobalDeploymentOptions } from '@/react/portainer/settings/types';
 
 import { DetailsTable } from '@@/DetailsTable';
 import { Badge } from '@@/Badge';
@@ -69,6 +71,11 @@ export function ApplicationSummaryWidget() {
     setApplicationNoteFormValues(applicationNote || '');
   }, [applicationNote]);
 
+  const globalDeploymentOptionsQuery =
+    usePublicSettings<GlobalDeploymentOptions>({
+      select: (settings) => settings.GlobalDeploymentOptions,
+    });
+
   const failedCreateCondition = application?.status?.conditions?.find(
     (condition) => condition.reason === 'FailedCreate'
   );
@@ -117,13 +124,17 @@ export function ApplicationSummaryWidget() {
                       </div>
                     </td>
                   </tr>
-                  <tr>
-                    <td>Stack</td>
-                    <td data-cy="k8sAppDetail-stackName">
-                      {application?.metadata?.labels?.[appStackNameLabel] ||
-                        '-'}
-                    </td>
-                  </tr>
+                  {globalDeploymentOptionsQuery.data &&
+                    !globalDeploymentOptionsQuery.data
+                      .hideStacksFunctionality && (
+                      <tr>
+                        <td>Stack</td>
+                        <td data-cy="k8sAppDetail-stackName">
+                          {application?.metadata?.labels?.[appStackNameLabel] ||
+                            '-'}
+                        </td>
+                      </tr>
+                    )}
                   <tr>
                     <td>Namespace</td>
                     <td>

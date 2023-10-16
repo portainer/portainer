@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode, useEffect } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { Plus, RefreshCw, Trash2 } from 'lucide-react';
 
 import Route from '@/assets/ico/route.svg?c';
@@ -16,8 +16,14 @@ import { InputGroup } from '@@/form-components/InputGroup';
 import { InlineLoader } from '@@/InlineLoader';
 import { Select } from '@@/form-components/ReactSelect';
 
-import { Annotations } from './Annotations';
-import { GroupedServiceOptions, Rule, ServicePorts } from './types';
+import { AnnotationsForm } from '../../annotations/AnnotationsForm';
+
+import {
+  GroupedServiceOptions,
+  IngressErrors,
+  Rule,
+  ServicePorts,
+} from './types';
 
 import '../style.css';
 
@@ -36,7 +42,7 @@ interface Props {
   environmentID: number;
   rule: Rule;
 
-  errors: Record<string, ReactNode>;
+  errors: IngressErrors;
   isEdit: boolean;
   namespace: string;
 
@@ -298,12 +304,12 @@ export function IngressForm({
             </div>
 
             {rule?.Annotations && (
-              <Annotations
+              <AnnotationsForm
                 placeholder={placeholderAnnotation}
                 annotations={rule.Annotations}
                 handleAnnotationChange={handleAnnotationChange}
                 removeAnnotation={removeAnnotation}
-                errors={errors}
+                errors={errors.annotations}
               />
             )}
 
