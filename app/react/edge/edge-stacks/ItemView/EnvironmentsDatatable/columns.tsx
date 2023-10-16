@@ -155,6 +155,15 @@ function endpointStatusLabel(statusArray: Array<DeploymentStatus>) {
     if (status.Type === StatusType.Error) {
       labels.push('Failed');
     }
+    if (status.Type === StatusType.PausedDeploying) {
+      labels.push('Paused');
+    }
+    if (status.Type === StatusType.RollingBack) {
+      labels.push('Rolling Back');
+    }
+    if (status.Type === StatusType.RolledBack) {
+      labels.push('Rolled Back');
+    }
   });
 
   if (!labels.length) {
@@ -283,6 +292,9 @@ function getStateColor(type: StatusType): 'orange' | 'green' | 'red' {
     case StatusType.Pending:
     case StatusType.Deploying:
     case StatusType.Removing:
+    case StatusType.PausedDeploying:
+    case StatusType.RollingBack:
+    case StatusType.RolledBack:
     default:
       return 'orange';
   }
