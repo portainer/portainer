@@ -52,16 +52,7 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-nodes-datatable
-        title-text="Nodes"
-        title-icon="hard-drive"
-        dataset="ctrl.nodes"
-        table-key="kubernetes.nodes"
-        order-by="Name"
-        refresh-callback="ctrl.getNodes"
-        is-admin="ctrl.isAdmin"
-        use-server-metrics="ctrl.state.useServerMetrics"
-      ></kubernetes-nodes-datatable>
+      <kube-nodes-datatable></kube-nodes-datatable>
     </div>
   </div>
 </div>

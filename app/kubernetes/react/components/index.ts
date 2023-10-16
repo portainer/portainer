@@ -22,6 +22,7 @@ import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
 import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
+import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
 
 export const ngModule = angular
@@ -76,6 +77,10 @@ export const ngModule = angular
   .component(
     'createNamespaceRegistriesSelector',
     r2a(RegistriesSelector, ['inputId', 'onChange', 'options', 'value'])
+  )
+  .component(
+    'kubeNodesDatatable',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(NodesDatatable))), [])
   )
   .component(
     'kubeApplicationAccessPolicySelector',
