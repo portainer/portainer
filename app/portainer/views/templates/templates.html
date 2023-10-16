@@ -272,7 +272,7 @@
 
 <app-templates-list
   templates="templates"
-  on-select="(selectAction)"
+  on-select="(selectTemplate)"
   on-duplicate="(duplicateTemplate)"
   is-selected="isSelected"
   show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
