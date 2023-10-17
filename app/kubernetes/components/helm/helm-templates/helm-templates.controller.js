@@ -56,7 +56,7 @@ export default class HelmTemplatesController {
     this.state.actionInProgress = true;
     try {
       const payload = {
-        Name: this.stackName,
+        Name: this.name,
         Repo: this.state.chart.repo,
         Chart: this.state.chart.name,
         Values: this.state.values,
