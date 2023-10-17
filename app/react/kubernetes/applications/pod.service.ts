@@ -23,7 +23,10 @@ export async function getNamespacePods(
     );
     return data.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(e, 'Unable to retrieve pods');
+    throw parseKubernetesAxiosError(
+      e,
+      `Unable to retrieve pods in namespace '${namespace}'`
+    );
   }
 }
 
