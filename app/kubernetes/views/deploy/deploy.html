@@ -50,12 +50,28 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
-                  <div class="col-sm-8"> Resource names specified in the manifest will be used </div>
+                  <label for="name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
+                  <div class="col-sm-8" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"> Resource names specified in the manifest will be used </div>
+                  <div class="col-sm-8" ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="ctrl.formValues.Name"
+                      id="name"
+                      name="name"
+                      placeholder="name"
+                      required="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                    />
+                    <div class="small text-warning mt-2">
+                      <div ng-messages="ctrl.deploymentForm.name.$error">
+                        <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <kube-stack-name
-                  ng-if="!ctrl.deploymentOptions.hideStacksFunctionality"
+                  ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                   stack-name="ctrl.formValues.StackName"
                   set-stack-name="(ctrl.setStackName)"
                   is-admin="ctrl.currentUser.isAdmin"
@@ -180,6 +196,7 @@
                     endpoint="ctrl.endpoint"
                     namespace="ctrl.formValues.Namespace"
                     stack-name="ctrl.formValues.StackName"
+                    name="ctrl.formValues.Name"
                   ></helm-templates-view>
                 </div>
                 <!-- !Helm -->

@@ -75,6 +75,7 @@ class KubernetesDeployController {
       Variables: {},
       AutoUpdate: parseAutoUpdateResponse(),
       TLSSkipVerify: false,
+      Name: '',
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
