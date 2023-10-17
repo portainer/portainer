@@ -5,11 +5,17 @@ import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withError } from '@/react-tools/react-query';
 
+import { parseKubernetesAxiosError } from '../axiosError';
+
 async function getKubernetesEndpoints(environmentId: EnvironmentId) {
-  const { data: endpointsList } = await axios.get<EndpointsList>(
-    `/endpoints/${environmentId}/kubernetes/api/v1/endpoints`
-  );
-  return endpointsList.items;
+  try {
+    const { data: endpointsList } = await axios.get<EndpointsList>(
+      `/endpoints/${environmentId}/kubernetes/api/v1/endpoints`
+    );
+    return endpointsList.items;
+  } catch (e) {
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve endpoints');
+  }
 }
 
 export function useKubernetesEndpointsQuery(

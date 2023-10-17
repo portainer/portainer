@@ -72,9 +72,6 @@ async function patchStorageClass(
       }
     );
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      `Unable to patch StorageClass ${name}`
-    );
+    throw parseKubernetesAxiosError(e, `Unable to patch StorageClass ${name}`);
   }
 }

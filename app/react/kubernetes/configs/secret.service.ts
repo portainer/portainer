@@ -138,7 +138,7 @@ async function getSecrets(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve secrets');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve secrets');
   }
 }
 
@@ -150,7 +150,7 @@ async function deleteSecret(
   try {
     await axios.delete(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to remove secret');
+    throw parseKubernetesAxiosError(e, 'Unable to remove secret');
   }
 }
 

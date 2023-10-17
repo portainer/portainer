@@ -13,6 +13,8 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
+import { parseKubernetesAxiosError } from '../axiosError';
+
 import { getPod, getNamespacePods, patchPod } from './pod.service';
 import { filterRevisionsByOwnerUid, getNakedPods } from './utils';
 import {
@@ -228,7 +230,7 @@ async function patchApplicationByKind<T extends Application>(
     );
     return res;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to patch application');
+    throw parseKubernetesAxiosError(e, 'Unable to patch application');
   }
 }
 
@@ -250,7 +252,7 @@ async function getApplicationByKind<
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve application');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve application');
   }
 }
 
@@ -265,7 +267,7 @@ async function getApplicationsByKind<T extends ApplicationList>(
     );
     return data.items as T['items'];
   } catch (e) {
-    throw parseAxiosError(e as Error, `Unable to retrieve ${appKind}s`);
+    throw parseKubernetesAxiosError(e, `Unable to retrieve ${appKind}s`);
   }
 }
 
@@ -350,7 +352,7 @@ export async function getReplicaSetList(
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve ReplicaSets');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve ReplicaSets');
   }
 }
 
@@ -370,7 +372,10 @@ export async function getControllerRevisionList(
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve ControllerRevisions');
+    throw parseKubernetesAxiosError(
+      e,
+      'Unable to retrieve ControllerRevisions'
+    );
   }
 }
 

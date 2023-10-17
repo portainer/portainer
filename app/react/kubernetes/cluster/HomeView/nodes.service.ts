@@ -5,6 +5,8 @@ import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withError } from '@/react-tools/react-query';
 
+import { parseKubernetesAxiosError } from '../../axiosError';
+
 const queryKeys = {
   node: (environmentId: number, nodeName: string) => [
     'environments',
@@ -22,10 +24,14 @@ const queryKeys = {
 };
 
 async function getNode(environmentId: EnvironmentId, nodeName: string) {
-  const { data: node } = await axios.get<Node>(
-    `/endpoints/${environmentId}/kubernetes/api/v1/nodes/${nodeName}`
-  );
-  return node;
+  try {
+    const { data: node } = await axios.get<Node>(
+      `/endpoints/${environmentId}/kubernetes/api/v1/nodes/${nodeName}`
+    );
+    return node;
+  } catch (e) {
+    throw parseKubernetesAxiosError(e, 'Unable to get node details');
+  }
 }
 
 export function useNodeQuery(environmentId: EnvironmentId, nodeName: string) {
@@ -33,20 +39,21 @@ export function useNodeQuery(environmentId: EnvironmentId, nodeName: string) {
     queryKeys.node(environmentId, nodeName),
     () => getNode(environmentId, nodeName),
     {
-      ...withError(
-        'Unable to get node details from the Kubernetes api',
-        'Failed to get node details'
-      ),
+      ...withError('Unable to get node details'),
     }
   );
 }
 
 // getNodes is used to get a list of nodes using the kubernetes API
 async function getNodes(environmentId: EnvironmentId) {
-  const { data: nodeList } = await axios.get<NodeList>(
-    `/endpoints/${environmentId}/kubernetes/api/v1/nodes`
-  );
-  return nodeList.items;
+  try {
+    const { data: nodeList } = await axios.get<NodeList>(
+      `/endpoints/${environmentId}/kubernetes/api/v1/nodes`
+    );
+    return nodeList.items;
+  } catch (e) {
+    throw parseKubernetesAxiosError(e, 'Unable to get nodes');
+  }
 }
 
 // useNodesQuery is used to get an array of nodes using the kubernetes API

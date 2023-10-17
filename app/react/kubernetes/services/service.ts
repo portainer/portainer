@@ -100,7 +100,7 @@ export async function getServices(
     );
     return services;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve services');
+    throw parseAxiosError(e, 'Unable to retrieve services');
   }
 }
 
@@ -120,7 +120,7 @@ export async function getNamespaceServices(
     );
     return services.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve services');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve services');
   }
 }
 
@@ -141,7 +141,7 @@ async function getService<T extends Service | string = Service>(
     );
     return service;
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve service');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve service');
   }
 }
 
