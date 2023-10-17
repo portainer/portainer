@@ -101,3 +101,30 @@ export function isAxiosError<
 >(error: unknown): error is AxiosError<ResponseType> {
   return axiosOrigin.isAxiosError(error);
 }
+
+export function arrayToJson<T>(arr?: Array<T>) {
+  if (!arr) {
+    return '';
+  }
+
+  return JSON.stringify(arr);
+}
+
+export function json2formData(json: Record<string, unknown>) {
+  const formData = new FormData();
+
+  Object.entries(json).forEach(([key, value]) => {
+    if (typeof value === 'undefined' || value === null) {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      formData.append(key, arrayToJson(value));
+      return;
+    }
+
+    formData.append(key, value as string);
+  });
+
+  return formData;
+}
