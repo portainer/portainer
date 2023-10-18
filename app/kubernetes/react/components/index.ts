@@ -76,7 +76,12 @@ export const ngModule = angular
   )
   .component(
     'createNamespaceRegistriesSelector',
-    r2a(RegistriesSelector, ['inputId', 'onChange', 'options', 'value'])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(RegistriesSelector))), [
+      'inputId',
+      'onChange',
+      'options',
+      'value',
+    ])
   )
   .component(
     'kubeNodesDatatable',
