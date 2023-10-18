@@ -1696,6 +1696,12 @@ const (
 	EdgeStackStatusDeploying
 	// EdgeStackStatusRemoving represents an Edge stack which is being removed
 	EdgeStackStatusRemoving
+	// EdgeStackStatusPausedDeploying represents a paused Edge stack
+	EdgeStackStatusPausedDeploying
+	// EdgeStackStatusRollingBack represents an Edge stack which is being rolled back
+	EdgeStackStatusRollingBack
+	// EdgeStackStatusRolledBack represents an Edge stack which has rolled back
+	EdgeStackStatusRolledBack
 )
 
 const (
