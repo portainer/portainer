@@ -112,7 +112,7 @@ class KubeEditCustomTemplateViewController {
       return;
     }
 
-    const variables = getTemplateVariables(templateStr);
+    const [variables] = getTemplateVariables(templateStr);
 
     const isValid = !!variables;
 
