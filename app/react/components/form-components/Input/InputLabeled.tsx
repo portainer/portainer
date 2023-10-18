@@ -7,6 +7,7 @@ export function InputLabeled({
   className,
   size,
   id,
+  required,
   ...props
 }: {
   label: string;
@@ -15,7 +16,7 @@ export function InputLabeled({
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'children'>) {
   return (
     <InputGroup className={className} size={size}>
-      <InputGroup.Addon as="label" htmlFor={id}>
+      <InputGroup.Addon as="label" htmlFor={id} required={required}>
         {label}
       </InputGroup.Addon>
       <InputGroup.Input

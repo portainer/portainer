@@ -24,6 +24,9 @@ import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
 import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
+import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/ApplicationForm/kubeEnvVarValidationSchema';
+
+import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -166,4 +169,13 @@ withFormValidation(
   'kubeServicesForm',
   ['values', 'onChange', 'appName', 'selector', 'isEditMode', 'namespace'],
   kubeServicesValidation
+);
+
+withFormValidation(
+  ngModule,
+  EnvironmentVariablesFieldset,
+  'kubeEnvironmentVariablesFieldset',
+  [],
+  // use kubeEnvVarValidationSchema instead of envVarValidation to add a regex matches rule
+  kubeEnvVarValidationSchema
 );

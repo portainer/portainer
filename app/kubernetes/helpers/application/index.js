@@ -108,14 +108,14 @@ class KubernetesApplicationHelper {
 
   /* #region  ENV VARIABLES FV <> ENV */
   static generateEnvFromEnvVariables(envVariables) {
-    _.remove(envVariables, (item) => item.NeedsDeletion);
+    _.remove(envVariables, (item) => item.needsDeletion);
     const env = _.map(envVariables, (item) => {
       const res = new KubernetesApplicationEnvPayload();
-      res.name = item.Name;
-      if (item.Value === undefined) {
+      res.name = item.name;
+      if (item.value === undefined) {
         delete res.value;
       } else {
-        res.value = item.Value;
+        res.value = item.value;
       }
       return res;
     });
@@ -128,10 +128,10 @@ class KubernetesApplicationHelper {
         return;
       }
       const res = new KubernetesApplicationEnvironmentVariableFormValue();
-      res.Name = item.name;
-      res.Value = item.value;
-      res.IsNew = false;
-      res.NameIndex = item.name;
+      res.name = item.name;
+      res.value = item.value;
+      res.isNew = false;
+      res.nameIndex = item.name;
       return res;
     });
     return _.without(envVariables, undefined);

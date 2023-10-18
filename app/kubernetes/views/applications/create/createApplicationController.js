@@ -154,6 +154,7 @@ class KubernetesCreateApplicationController {
     this.supportGlobalDeployment = this.supportGlobalDeployment.bind(this);
     this.onChangePlacementType = this.onChangePlacementType.bind(this);
     this.onServicesChange = this.onServicesChange.bind(this);
+    this.onEnvironmentVariableChange = this.onEnvironmentVariableChange.bind(this);
   }
   /* #endregion */
 
@@ -359,30 +360,15 @@ class KubernetesCreateApplicationController {
   /* #endregion */
 
   /* #region  ENVIRONMENT UI MANAGEMENT */
-  addEnvironmentVariable() {
-    this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
-  }
-
-  restoreEnvironmentVariable(item) {
-    item.NeedsDeletion = false;
-  }
-
-  removeEnvironmentVariable(item) {
-    const index = this.formValues.EnvironmentVariables.indexOf(item);
-    if (index !== -1) {
-      const envVar = this.formValues.EnvironmentVariables[index];
-      if (!envVar.IsNew) {
-        envVar.NeedsDeletion = true;
-      } else {
-        this.formValues.EnvironmentVariables.splice(index, 1);
-      }
-    }
-    this.onChangeEnvironmentName();
-  }
-
-  onChangeEnvironmentName() {
-    this.state.duplicates.environmentVariables.refs = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, 'Name'));
-    this.state.duplicates.environmentVariables.hasRefs = Object.keys(this.state.duplicates.environmentVariables.refs).length > 0;
+  onEnvironmentVariableChange(enviromnentVariables) {
+    return this.$async(async () => {
+      const newEnvVars = enviromnentVariables.map((envVar) => {
+        const newEnvVar = new KubernetesApplicationEnvironmentVariableFormValue();
+        return { newEnvVar, ...envVar };
+      });
+      this.formValues.EnvironmentVariables = newEnvVars;
+      this.onChangeEnvironmentName();
+    });
   }
   /* #endregion */
 

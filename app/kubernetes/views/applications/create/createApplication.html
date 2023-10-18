@@ -296,103 +296,11 @@
                     <div class="col-sm-12 vertical-center">
                       <label class="control-label !pt-0 text-left">Environment variables</label>
                     </div>
-
-                    <div class="col-sm-12 form-inline mt-2">
-                      <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables | orderBy: 'NameIndex'" class="mt-2">
-                        <div style="margin-top: 2px">
-                          <div class="col-sm-4 input-group input-group-sm mr-2">
-                            <div class="input-group col-sm-12 input-group-sm" ng-class="{ striked: envVar.NeedsDeletion }">
-                              <span class="input-group-addon required">name</span>
-                              <input
-                                type="text"
-                                name="environment_variable_name_{{ $index }}"
-                                class="form-control"
-                                ng-model="envVar.Name"
-                                ng-change="ctrl.onChangeEnvironmentName()"
-                                ng-pattern="/^[-._a-zA-Z][-._a-zA-Z0-9]*$/"
-                                placeholder="foo"
-                                ng-disabled="ctrl.formValues.Containers.length > 1"
-                                data-cy="k8sAppCreate-envVarName_{{ $index }}"
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div class="col-sm-4 input-group input-group-sm mr-2" ng-class="{ striked: envVar.NeedsDeletion }">
-                            <span class="input-group-addon">value</span>
-                            <input
-                              type="text"
-                              name="environment_variable_value_{{ $index }}"
-                              class="form-control"
-                              ng-model="envVar.Value"
-                              placeholder="bar"
-                              ng-disabled="ctrl.formValues.Containers.length > 1"
-                              data-cy="k8sAppCreate-envVarValue_{{ $index }}"
-                            />
-                          </div>
-
-                          <div class="col-sm-2 input-group input-group-sm" ng-if="ctrl.formValues.Containers.length <= 1">
-                            <button
-                              ng-if="!envVar.NeedsDeletion"
-                              class="btn btn-md btn-dangerlight btn-only-icon !ml-0"
-                              type="button"
-                              ng-click="ctrl.removeEnvironmentVariable(envVar)"
-                            >
-                              <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
-                            </button>
-                            <button
-                              ng-if="envVar.NeedsDeletion"
-                              class="btn btn-sm btn-light btn-only-icon"
-                              type="button"
-                              ng-click="ctrl.restoreEnvironmentVariable(envVar)"
-                              data-cy="k8sAppCreate-removeEnvVarButton_{{ $index }}"
-                            >
-                              <pr-icon icon="'rotate-cw'" size="'md'"></pr-icon>
-                            </button>
-                          </div>
-                        </div>
-                        <div
-                          ng-show="
-                            kubernetesApplicationCreationForm['environment_variable_name_' + $index].$invalid ||
-                            ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined
-                          "
-                        >
-                          <div class="col-sm-8 input-group input-group-sm">
-                            <div
-                              class="small"
-                              style="margin-top: 5px"
-                              ng-show="
-                                kubernetesApplicationCreationForm['environment_variable_name_' + $index].$invalid ||
-                                ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined
-                              "
-                            >
-                              <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
-                                <p ng-message="required" class="text-warning vertical-center"
-                                  ><pr-icon icon="'alert-triangle'" mode="'warning'" class-="vertical-center"></pr-icon> Environment variable name is required.</p
-                                >
-                                <p ng-message="pattern" class="text-warning vertical-center"
-                                  ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field must consist of alphabetic characters, digits, '_', '-', or '.', and must
-                                  not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
-                                >
-                              </ng-messages>
-                              <p class="text-warning vertical-center" ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"
-                                ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This environment variable is already defined.</p
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="col-sm-12 mt-2">
-                      <span
-                        ng-if="ctrl.formValues.Containers.length <= 1"
-                        class="btn btn-primary btn-sm btn btn-sm btn-light mb-2 !ml-0"
-                        ng-click="ctrl.addEnvironmentVariable()"
-                        data-cy="k8sAppCreate-addEnvVarButton"
-                      >
-                        <pr-icon icon="'plus'" size="'sm'"></pr-icon> Add environment variable
-                      </span>
+                    <div class="col-sm-11 col-lg-10 mt-2">
+                      <kube-environment-variables-fieldset
+                        values="ctrl.formValues.EnvironmentVariables"
+                        on-change="(ctrl.onEnvironmentVariableChange)"
+                      ></kube-environment-variables-fieldset>
                     </div>
                   </div>
                   <!-- #endregion -->
