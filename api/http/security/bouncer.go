@@ -305,7 +305,7 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 // JWTAuthLookup looks up a valid bearer in the request.
 func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
 	// get token from the Authorization header or query parameter
-	token, err := extractBearerToken(r)
+	token, err := extractKeyFromCookie(r)
 	if err != nil {
 		return nil
 	}
@@ -356,40 +356,11 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 	return tokenData
 }
 
-// extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
-func extractBearerToken(r *http.Request) (string, error) {
-	// extract the API key from the cookie
-	cookieToken, err := extractKeyFromCookie(r)
-	if err != nil {
-		return "", err
-	}
-
-	if cookieToken != "" {
-		return cookieToken, nil
-	}
-
-	// Token might be set via the "token" query parameter.
-	// For example, in websocket requests
-	token := r.URL.Query().Get("token")
-
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == "" {
-		return "", httperrors.ErrUnauthorized
-	}
-	return token, nil
-}
+const CookieKey = "portainer_api_key"
 
 func extractKeyFromCookie(r *http.Request) (string, error) {
 	cookie, err := r.Cookie("portainer_api_key")
 	if err != nil {
-		if errors.Is(err, http.ErrNoCookie) {
-			return "", nil
-		}
-
 		return "", err
 	}
 

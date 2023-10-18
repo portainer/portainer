@@ -29,6 +29,7 @@ angular.module('portainer.app').factory('LocalStorage', [
       getUIState: function () {
         return localStorageService.get('UI_STATE');
       },
+      // TODO, while we want to remove this storage, we need to keep the logged in state in a way, to prevent needing to send a request to the API to check if the user is logged in
       storeJWT: function (jwt) {
         localStorageService.set('JWT', jwt);
       },
