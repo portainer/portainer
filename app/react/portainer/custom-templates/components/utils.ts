@@ -4,31 +4,40 @@ import Mustache from 'mustache';
 import { VariableDefinition } from './CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 
 export function getTemplateVariables(templateStr: string) {
-  const template = validateAndParse(templateStr);
+  const [template, error] = validateAndParse(templateStr);
 
   if (!template) {
-    return null;
+    return [null, error] as const;
   }
 
-  return template
-    .filter(([type, value]) => type === 'name' && value)
-    .map(([, value]) => ({
-      name: value,
-      label: '',
-      defaultValue: '',
-      description: '',
-    }));
+  return [
+    template
+      .filter(([type, value]) => type === 'name' && value)
+      .map(([, value]) => ({
+        name: value,
+        label: '',
+        defaultValue: '',
+        description: '',
+      })),
+    null,
+  ] as const;
 }
-
-function validateAndParse(templateStr: string) {
+type TemplateSpans = ReturnType<typeof Mustache.parse>;
+function validateAndParse(
+  templateStr: string
+): readonly [TemplateSpans, null] | readonly [null, string] {
   if (!templateStr) {
-    return [];
+    return [[] as TemplateSpans, null] as const;
   }
 
   try {
-    return Mustache.parse(templateStr);
+    return [Mustache.parse(templateStr), null] as const;
   } catch (e) {
-    return null;
+    if (!(e instanceof Error)) {
+      return [null, 'Parse error'] as const;
+    }
+
+    return [null, e.message] as const;
   }
 }
 
