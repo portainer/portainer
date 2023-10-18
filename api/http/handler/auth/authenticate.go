@@ -151,6 +151,7 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 	http.SetCookie(w, &http.Cookie{
 		Name:     security.CookieKey,
 		Value:    token,
+		Path:     "/",
 		Expires:  expirationTime,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,

@@ -10,15 +10,6 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
 
   localStorageServiceProvider.setPrefix('portainer');
 
-  jwtOptionsProvider.config({
-    tokenGetter: /* @ngInject */ function tokenGetter(LocalStorage) {
-      return LocalStorage.getJWT();
-    },
-    whiteListedDomains: ['localhost'],
-  });
-
-  $httpProvider.interceptors.push('jwtInterceptor');
-
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
   $httpProvider.defaults.headers.put['Content-Type'] = 'application/json';
   $httpProvider.defaults.headers.patch['Content-Type'] = 'application/json';

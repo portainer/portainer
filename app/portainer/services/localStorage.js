@@ -39,6 +39,17 @@ angular.module('portainer.app').factory('LocalStorage', [
       deleteJWT: function () {
         localStorageService.remove('JWT');
       },
+
+      getUserId() {
+        localStorageService.get('USER_ID');
+      },
+      storeUserId: function (userId) {
+        localStorageService.set('USER_ID', userId);
+      },
+      deleteUserId: function () {
+        localStorageService.remove('USER_ID');
+      },
+
       storePaginationLimit: function (key, count) {
         localStorageService.set('datatable_pagination_' + key, count);
       },

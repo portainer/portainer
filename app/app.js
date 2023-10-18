@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 /* @ngInject */
-export function onStartupAngular($rootScope, $state, LocalStorage, cfpLoadingBar, $transitions, HttpRequestHelper) {
+export function onStartupAngular($rootScope, $state, cfpLoadingBar, $transitions, HttpRequestHelper) {
   $rootScope.$state = $state;
 
   // Workaround to prevent the loading bar from going backward
@@ -23,6 +23,5 @@ export function onStartupAngular($rootScope, $state, LocalStorage, cfpLoadingBar
     if (type && hasNoContentType) {
       jqXhr.setRequestHeader('Content-Type', 'application/json');
     }
-    jqXhr.setRequestHeader('Authorization', 'Bearer ' + LocalStorage.getJWT());
   });
 }

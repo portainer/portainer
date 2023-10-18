@@ -3,7 +3,6 @@ import { loadProgressBar } from 'axios-progress-bar';
 
 import 'axios-progress-bar/dist/nprogress.css';
 import PortainerError from '@/portainer/error';
-import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
 
 import {
   portainerAgentManagerOperation,
@@ -15,17 +14,6 @@ const axios = axiosOrigin.create({ baseURL: 'api' });
 loadProgressBar(undefined, axios);
 
 export default axios;
-
-axios.interceptors.request.use(async (config) => {
-  const newConfig = { headers: config.headers || {}, ...config };
-
-  const jwt = localStorageGet('JWT', '');
-  if (jwt) {
-    newConfig.headers.Authorization = `Bearer ${jwt}`;
-  }
-
-  return newConfig;
-});
 
 export const agentTargetHeader = 'X-PortainerAgent-Target';
 
@@ -48,8 +36,33 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 }
 
 axios.interceptors.request.use(agentInterceptor);
+axios.interceptors.response.use(undefined, (error) => {
+  if (
+    error.response?.status === 401 &&
+    !error.config.url.includes('/v2/') &&
+    !error.config.url.includes('/api/v4/') &&
+    isTransitionRequiresAuthentication()
+  ) {
+    // eslint-disable-next-line no-console
+    console.error('Unauthorized request, logging out');
+    window.location.hash = '/logout';
+    window.location.reload();
+  }
 
-export const AXIOS_UNAUTHENTICATED = '__axios__unauthenticated__';
+  return Promise.reject(error);
+});
+
+const UNAUTHENTICATED_ROUTES = [
+  '/logout',
+  '/internal-auth',
+  '/auth',
+  '/init/admin',
+];
+function isTransitionRequiresAuthentication() {
+  return !UNAUTHENTICATED_ROUTES.some((route) =>
+    window.location.hash.includes(route)
+  );
+}
 
 /**
  * Parses an Axios error and returns a PortainerError.
@@ -73,16 +86,6 @@ export function parseAxiosError(
       resultMsg = `${msg}: ${details}`;
     } else {
       resultMsg = msg || details;
-    }
-    // dispatch an event for unauthorized errors that AngularJS can catch
-    if (err.response?.status === 401) {
-      dispatchEvent(
-        new CustomEvent(AXIOS_UNAUTHENTICATED, {
-          detail: {
-            err,
-          },
-        })
-      );
     }
   }
 
