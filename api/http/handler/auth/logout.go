@@ -27,7 +27,7 @@ func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperro
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     security.CookieKey,
+		Name:     security.AuthCookieKey,
 		Value:    "",
 		Expires:  time.Unix(0, 0),
 		Path:     "/",

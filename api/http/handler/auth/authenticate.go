@@ -149,7 +149,7 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     security.CookieKey,
+		Name:     security.AuthCookieKey,
 		Value:    token,
 		Path:     "/",
 		Expires:  expirationTime,

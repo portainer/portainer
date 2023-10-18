@@ -356,10 +356,10 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 	return tokenData
 }
 
-const CookieKey = "portainer_api_key"
+const AuthCookieKey = "portainer_api_key"
 
 func extractKeyFromCookie(r *http.Request) (string, error) {
-	cookie, err := r.Cookie("portainer_api_key")
+	cookie, err := r.Cookie(AuthCookieKey)
 	if err != nil {
 		return "", err
 	}
