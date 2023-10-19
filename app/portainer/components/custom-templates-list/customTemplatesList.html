@@ -29,25 +29,15 @@
       </div>
 
       <div class="blocklist gap-y-2 !px-[20px] !pb-[20px]">
-        <template-item
+        <custom-templates-list-item
           ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter"
-          model="template"
-          type-label="{{ $ctrl.typeLabel(template.Type) }}"
+          template="template"
           on-select="($ctrl.onSelectClick)"
+          on-delete="($ctrl.onDeleteClick)"
+          is-selected="$ctrl.isSelected(template)"
         >
-          <template-item-actions>
-            <div ng-if="$ctrl.isEditAllowed(template)" class="vertical-center">
-              <a ui-state="$ctrl.editPath" ui-state-params="{id: template.Id}" ng-click="$event.stopPropagation();" class="btn btn-secondary btn-sm vertical-center">
-                <pr-icon icon="'edit'"></pr-icon>
-                Edit
-              </a>
-              <button class="btn btn-dangerlight btn-sm vertical-center" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">
-                <pr-icon icon="'trash-2'"></pr-icon>
-                Delete
-              </button>
-            </div>
-          </template-item-actions>
-        </template-item>
+        </custom-templates-list-item>
+
         <div ng-if="!$ctrl.templates" class="text-muted text-center"> Loading... </div>
         <div ng-if="($ctrl.templates | filter: $ctrl.state.textFilter).length === 0" class="text-muted text-center"> No templates available. </div>
       </div>

@@ -4,7 +4,7 @@ import { BadgeIcon, BadgeSize } from './BadgeIcon/BadgeIcon';
 
 interface Props {
   // props for the image to load
-  src: string; // a link to an external image
+  src?: string; // a link to an external image
   fallbackIcon: string;
   alt?: string;
   size?: BadgeSize;

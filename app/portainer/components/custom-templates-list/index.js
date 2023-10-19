@@ -14,5 +14,6 @@ angular.module('portainer.app').component('customTemplatesList', {
     isEditAllowed: '<',
     createPath: '@',
     editPath: '@',
+    isSelected: '<',
   },
 });

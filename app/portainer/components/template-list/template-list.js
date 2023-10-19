@@ -8,5 +8,6 @@ angular.module('portainer.app').component('templateList', {
     tableKey: '@',
     selectAction: '<',
     showSwarmStacks: '<',
+    isSelected: '<',
   },
 });
