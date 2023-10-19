@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
 )
@@ -41,15 +42,15 @@ func Test_userRemoveAccessToken(t *testing.T) {
 	h.DataStore = store
 
 	// generate standard and admin user tokens
-	adminJWT, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})
-	jwt, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role})
+	adminJWT, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})
+	jwt, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role})
 
 	t.Run("standard user can successfully delete API key", func(t *testing.T) {
 		_, apiKey, err := apiKeyService.GenerateApiKey(*user, "test-delete-token")
 		is.NoError(err)
 
 		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("%s/%d", "/users/2/tokens", apiKey.ID), nil)
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+		testhelpers.AddTestSecurityCookie(req, jwt)
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)
@@ -67,7 +68,7 @@ func Test_userRemoveAccessToken(t *testing.T) {
 		is.NoError(err)
 
 		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("%s/%d", "/users/2/tokens", apiKey.ID), nil)
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
+		testhelpers.AddTestSecurityCookie(req, adminJWT)
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)

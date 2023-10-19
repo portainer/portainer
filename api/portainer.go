@@ -1636,6 +1636,8 @@ const (
 	DefaultKubectlShellImage = "portainer/kubectl-shell"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
+	// AuthCookieName is the name of the cookie used to store the JWT token
+	AuthCookieKey = "portainer_api_key"
 )
 
 // List of supported features

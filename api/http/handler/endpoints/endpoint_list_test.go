@@ -211,7 +211,7 @@ func buildEndpointListRequest(query string) *http.Request {
 	restrictedCtx := security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
 	req = req.WithContext(restrictedCtx)
 
-	req.Header.Add("Authorization", "Bearer dummytoken")
+	testhelpers.AddTestSecurityCookie(req, "Bearer dummytoken")
 
 	return req
 }

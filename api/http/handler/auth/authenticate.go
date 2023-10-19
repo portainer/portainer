@@ -6,7 +6,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -149,7 +148,7 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     security.AuthCookieKey,
+		Name:     portainer.AuthCookieKey,
 		Value:    token,
 		Path:     "/",
 		Expires:  expirationTime,

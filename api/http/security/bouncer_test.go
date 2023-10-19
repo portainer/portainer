@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
-	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
 
 	"github.com/stretchr/testify/assert"
@@ -21,7 +21,7 @@ var testHandler200 = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 })
 
-func tokenLookupSucceed(dataStore dataservices.DataStore, jwtService dataservices.JWTService) tokenLookup {
+func tokenLookupSucceed(dataStore dataservices.DataStore, jwtService portainer.JWTService) tokenLookup {
 	return func(r *http.Request) *portainer.TokenData {
 		uid := portainer.UserID(1)
 		dataStore.User().Create(&portainer.User{ID: uid})
@@ -101,54 +101,38 @@ func Test_mwAuthenticateFirst(t *testing.T) {
 	}
 }
 
-func Test_extractBearerToken(t *testing.T) {
+func Test_extractKeyFromCookie(t *testing.T) {
 	is := assert.New(t)
 
 	tt := []struct {
-		name               string
-		requestHeader      string
-		requestHeaderValue string
-		wantToken          string
-		succeeds           bool
+		name     string
+		token    string
+		succeeds bool
 	}{
 		{
-			name:               "missing request header",
-			requestHeader:      "",
-			requestHeaderValue: "",
-			wantToken:          "",
-			succeeds:           false,
+			name:     "missing cookie",
+			token:    "",
+			succeeds: false,
 		},
+
 		{
-			name:               "invalid authorization request header",
-			requestHeader:      "authorisation", // note: `s`
-			requestHeaderValue: "abc",
-			wantToken:          "",
-			succeeds:           false,
-		},
-		{
-			name:               "valid authorization request header",
-			requestHeader:      "AUTHORIZATION",
-			requestHeaderValue: "abc",
-			wantToken:          "abc",
-			succeeds:           true,
-		},
-		{
-			name:               "valid authorization request header case-insensitive canonical check",
-			requestHeader:      "authorization",
-			requestHeaderValue: "def",
-			wantToken:          "def",
-			succeeds:           true,
+			name:     "valid cookie",
+			token:    "abc",
+			succeeds: true,
 		},
 	}
 
 	for _, test := range tt {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		req.Header.Set(test.requestHeader, test.requestHeaderValue)
-		apiKey, err := extractBearerToken(req)
-		is.Equal(test.wantToken, apiKey)
+		if test.token != "" {
+			testhelpers.AddTestSecurityCookie(req, test.token)
+		}
+
+		apiKey, err := extractKeyFromCookie(req)
+		is.Equal(test.token, apiKey)
 		if !test.succeeds {
 			is.Error(err, "Should return error")
-			is.ErrorIs(err, httperrors.ErrUnauthorized)
+			is.ErrorIs(err, http.ErrNoCookie)
 		} else {
 			is.NoError(err)
 		}
@@ -274,7 +258,7 @@ func Test_apiKeyLookup(t *testing.T) {
 
 	t.Run("missing x-api-key header fails api-key lookup", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		// req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+		// testhelpers.AddTestSecurityCookie(req, jwt)
 		token := bouncer.apiKeyLookup(req)
 		is.Nil(token)
 	})

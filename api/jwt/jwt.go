@@ -43,7 +43,7 @@ const (
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService(userSessionDuration string, dataStore dataservices.DataStore) (portainer.JWTService, error) {
+func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*Service, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
 	if err != nil {
 		return nil, err

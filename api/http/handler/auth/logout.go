@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/logoutcontext"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -27,7 +28,7 @@ func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperro
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     security.AuthCookieKey,
+		Name:     portainer.AuthCookieKey,
 		Value:    "",
 		Expires:  time.Unix(0, 0),
 		Path:     "/",
