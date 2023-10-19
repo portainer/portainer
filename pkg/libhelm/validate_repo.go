@@ -33,16 +33,15 @@ func ValidateHelmRepositoryURL(repoUrl string, client *http.Client) error {
 		}
 	}
 
-	const invalidChartRepo = "%s is not a valid chart repository or cannot be reached: %w"
 	response, err := client.Head(url.String())
 	if err != nil {
-		return fmt.Errorf(invalidChartRepo, repoUrl, err)
+		return fmt.Errorf("%s is not a valid chart repository or cannot be reached: %w", repoUrl, err)
 	}
 
 	// Success is indicated with 2xx status codes. 3xx status codes indicate a redirect.
 	statusOK := response.StatusCode >= 200 && response.StatusCode < 300
 	if !statusOK {
-		return fmt.Errorf(invalidChartRepo, repoUrl, err)
+		return fmt.Errorf("%s is not a valid chart repository or cannot be reached", repoUrl)
 	}
 
 	return nil
