@@ -1,5 +1,6 @@
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import { csrfInterceptor, csrfTokenReaderInterceptorAngular } from './portainer/services/csrf';
 import { agentInterceptor } from './portainer/services/axios';
 
 /* @ngInject */
@@ -16,6 +17,11 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
 
   $httpProvider.interceptors.push(() => ({
     request: agentInterceptor,
+  }));
+
+  $httpProvider.interceptors.push(() => ({
+    response: csrfTokenReaderInterceptorAngular,
+    request: csrfInterceptor,
   }));
 
   Terminal.applyAddon(fit);

@@ -36,6 +36,7 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 }
 
 axios.interceptors.request.use(agentInterceptor);
+
 axios.interceptors.response.use(undefined, (error) => {
   if (
     error.response?.status === 401 &&
