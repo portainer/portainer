@@ -24,11 +24,6 @@ type authenticatePayload struct {
 	Password string `example:"mypassword" validate:"required"`
 }
 
-type authenticateResponse struct {
-	// JWT token used to authenticate against the API
-	JWT string `json:"jwt" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"`
-}
-
 func (payload *authenticatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Username) {
 		return errors.New("Invalid username")
@@ -49,7 +44,7 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param body body authenticatePayload true "Credentials used for authentication"
-// @success 200 {object} authenticateResponse "Success"
+// @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 422 "Invalid Credentials"
 // @failure 500 "Server error"
@@ -150,7 +145,8 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 
 	security.AddAuthCookie(w, token, expirationTime)
 
-	return response.JSON(w, &authenticateResponse{JWT: token})
+	return response.Empty(w)
+
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {
