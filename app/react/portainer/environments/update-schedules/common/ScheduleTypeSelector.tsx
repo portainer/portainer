@@ -3,6 +3,7 @@ import { number } from 'yup';
 import { useEffect } from 'react';
 
 import { NavTabs } from '@@/NavTabs';
+import { NavContainer } from '@@/NavTabs/NavContainer';
 
 import { ScheduleType } from '../types';
 
@@ -37,35 +38,37 @@ export function ScheduleTypeSelector() {
   return (
     <div className="form-group">
       <div className="col-sm-12">
-        <NavTabs
-          options={[
-            {
-              id: ScheduleType.Update,
-              label: 'Update',
-              children: (
-                <UpdateScheduleDetailsFieldset
-                  environments={environments}
-                  hasTimeZone={hasTimeZone}
-                  hasNoTimeZone={hasNoTimeZone}
-                  hasGroupSelected={hasGroupSelected}
-                  version={values.version}
-                />
-              ),
-            },
-            {
-              id: ScheduleType.Rollback,
-              label: 'Rollback',
-              children: (
-                <RollbackScheduleDetailsFieldset
-                  hasTimeZone={hasTimeZone}
-                  hasGroupSelected={hasGroupSelected}
-                />
-              ),
-            },
-          ]}
-          selectedId={values.type}
-          onSelect={handleChangeType}
-        />
+        <NavContainer>
+          <NavTabs
+            options={[
+              {
+                id: ScheduleType.Update,
+                label: 'Update',
+                children: (
+                  <UpdateScheduleDetailsFieldset
+                    environments={environments}
+                    hasTimeZone={hasTimeZone}
+                    hasNoTimeZone={hasNoTimeZone}
+                    hasGroupSelected={hasGroupSelected}
+                    version={values.version}
+                  />
+                ),
+              },
+              {
+                id: ScheduleType.Rollback,
+                label: 'Rollback',
+                children: (
+                  <RollbackScheduleDetailsFieldset
+                    hasTimeZone={hasTimeZone}
+                    hasGroupSelected={hasGroupSelected}
+                  />
+                ),
+              },
+            ]}
+            selectedId={values.type}
+            onSelect={handleChangeType}
+          />
+        </NavContainer>
       </div>
     </div>
   );

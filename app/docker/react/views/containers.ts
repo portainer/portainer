@@ -7,9 +7,14 @@ import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { LogView } from '@/react/docker/containers/LogView';
+import { CreateView } from '@/react/docker/containers/CreateView';
 
 export const containersModule = angular
   .module('portainer.docker.react.views.containers', [])
+  .component(
+    'createContainerView',
+    r2a(withUIRouter(withCurrentUser(CreateView)), [])
+  )
   .component(
     'containersView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ListView))), ['endpoint'])
@@ -77,8 +82,7 @@ function config($stateRegistryProvider: StateRegistry) {
     url: '/new?nodeName&from',
     views: {
       'content@': {
-        templateUrl: '~@/docker/views/containers/create/createcontainer.html',
-        controller: 'CreateContainerController',
+        component: 'createContainerView',
       },
     },
   });

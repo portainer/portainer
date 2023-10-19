@@ -1,5 +1,4 @@
 import { FormikErrors } from 'formik';
-import { useState } from 'react';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -12,16 +11,14 @@ import { Values } from './types';
 export function CommandsTab({
   apiVersion,
   values,
-  onChange,
+  setFieldValue,
   errors,
 }: {
   apiVersion: number;
   values: Values;
-  onChange: (values: Values) => void;
+  setFieldValue: (field: string, value: unknown) => void;
   errors?: FormikErrors<Values>;
 }) {
-  const [controlledValues, setControlledValues] = useState(values);
-
   return (
     <div className="mt-3">
       <FormControl
@@ -31,8 +28,8 @@ export function CommandsTab({
         errors={errors?.cmd}
       >
         <OverridableInput
-          value={controlledValues.cmd}
-          onChange={(cmd) => handleChange({ cmd })}
+          value={values.cmd}
+          onChange={(cmd) => setFieldValue('cmd', cmd)}
           id="command-input"
           placeholder="e.g. '-logtostderr' '--housekeeping_interval=5s' or /usr/bin/nginx -t -c /mynginx.conf"
         />
@@ -46,8 +43,8 @@ export function CommandsTab({
         errors={errors?.entrypoint}
       >
         <OverridableInput
-          value={controlledValues.entrypoint}
-          onChange={(entrypoint) => handleChange({ entrypoint })}
+          value={values.entrypoint}
+          onChange={(entrypoint) => setFieldValue('entrypoint', entrypoint)}
           id="entrypoint-input"
           placeholder="e.g. /bin/sh -c"
         />
@@ -61,8 +58,8 @@ export function CommandsTab({
           errors={errors?.workingDir}
         >
           <Input
-            value={controlledValues.workingDir}
-            onChange={(e) => handleChange({ workingDir: e.target.value })}
+            value={values.workingDir}
+            onChange={(e) => setFieldValue('workingDir', e.target.value)}
             placeholder="e.g. /myapp"
           />
         </FormControl>
@@ -73,33 +70,24 @@ export function CommandsTab({
           errors={errors?.user}
         >
           <Input
-            value={controlledValues.user}
-            onChange={(e) => handleChange({ user: e.target.value })}
+            value={values.user}
+            onChange={(e) => setFieldValue('user', e.target.value)}
             placeholder="e.g. nginx"
           />
         </FormControl>
       </div>
 
       <ConsoleSettings
-        value={controlledValues.console}
-        onChange={(console) => handleChange({ console })}
+        value={values.console}
+        onChange={(console) => setFieldValue('console', console)}
       />
 
       <LoggerConfig
         apiVersion={apiVersion}
-        value={controlledValues.logConfig}
-        onChange={(logConfig) =>
-          handleChange({
-            logConfig,
-          })
-        }
+        value={values.logConfig}
+        onChange={(logConfig) => setFieldValue('logConfig', logConfig)}
         errors={errors?.logConfig}
       />
     </div>
   );
-
-  function handleChange(newValues: Partial<Values>) {
-    onChange({ ...values, ...newValues });
-    setControlledValues((values) => ({ ...values, ...newValues }));
-  }
 }

@@ -87,13 +87,6 @@ code {
   background-color: var(--bg-code-color);
 }
 
-.nav-container {
-  border: 1px solid var(--border-nav-container-color);
-  background-color: var(--bg-nav-container-color);
-  border-radius: 8px;
-  padding: 10px;
-}
-
 .nav-tabs {
   border-bottom: 1px solid var(--border-navtabs-color);
 }

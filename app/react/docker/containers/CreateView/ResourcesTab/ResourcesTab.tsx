@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { FormikErrors } from 'formik';
-import { useState } from 'react';
+import { ReactNode } from 'react';
 
 import { useIsStandAlone } from '@/react/docker/proxy/queries/useInfo';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -17,7 +17,6 @@ import {
   ResourceFieldset,
   Values as ResourcesValues,
 } from './ResourcesFieldset';
-import { EditResourcesForm } from './EditResourceForm';
 
 export interface Values {
   runtime: RuntimeValues;
@@ -34,29 +33,24 @@ export interface Values {
 }
 
 export function ResourcesTab({
-  values: initialValues,
-  onChange,
+  values,
+  setFieldValue,
+  errors,
   allowPrivilegedMode,
   isInitFieldVisible,
   isDevicesFieldVisible,
   isSysctlFieldVisible,
-  errors,
-  isDuplicate,
-  redeploy,
-  isImageInvalid,
+  renderLimits,
 }: {
   values: Values;
-  onChange: (values: Values) => void;
+  setFieldValue: (field: string, value: unknown) => void;
+  errors?: FormikErrors<Values>;
   allowPrivilegedMode: boolean;
   isInitFieldVisible: boolean;
   isDevicesFieldVisible: boolean;
   isSysctlFieldVisible: boolean;
-  errors?: FormikErrors<Values>;
-  isDuplicate?: boolean;
-  redeploy: (values: Values) => Promise<void>;
-  isImageInvalid: boolean;
+  renderLimits?: (values: ResourcesValues) => ReactNode;
 }) {
-  const [values, setControlledValues] = useState(initialValues);
   const environmentId = useEnvironmentId();
 
   const environmentQuery = useCurrentEnvironment();
@@ -75,7 +69,7 @@ export function ResourcesTab({
     <div className="mt-3">
       <RuntimeSection
         values={values.runtime}
-        onChange={(runtime) => handleChange({ runtime })}
+        onChange={(runtime) => setFieldValue('runtime', runtime)}
         allowPrivilegedMode={allowPrivilegedMode}
         isInitFieldVisible={isInitFieldVisible}
       />
@@ -83,14 +77,14 @@ export function ResourcesTab({
       {isDevicesFieldVisible && (
         <DevicesField
           values={values.devices}
-          onChange={(devices) => handleChange({ devices })}
+          onChange={(devices) => setFieldValue('devices', devices)}
         />
       )}
 
       {isSysctlFieldVisible && (
         <SysctlsField
           values={values.sysctls}
-          onChange={(sysctls) => handleChange({ sysctls })}
+          onChange={(sysctls) => setFieldValue('sysctls', sysctls)}
         />
       )}
 
@@ -102,7 +96,7 @@ export function ResourcesTab({
             min="1"
             value={values.sharedMemorySize}
             onChange={(e) =>
-              handleChange({ sharedMemorySize: e.target.valueAsNumber })
+              setFieldValue('sharedMemorySize', e.target.valueAsNumber)
             }
             className="w-32"
           />
@@ -115,7 +109,7 @@ export function ResourcesTab({
       {isStandalone && (
         <GpuFieldset
           values={values.gpu}
-          onChange={(gpu) => handleChange({ gpu })}
+          onChange={(gpu) => setFieldValue('gpu', gpu)}
           gpus={environment.Gpus}
           enableGpuManagement={environment.EnableGPUManagement}
           usedGpus={gpuUseList}
@@ -123,26 +117,15 @@ export function ResourcesTab({
         />
       )}
 
-      {isDuplicate ? (
-        <EditResourcesForm
-          initialValues={values.resources}
-          redeploy={(newValues) =>
-            redeploy({ ...values, resources: newValues })
-          }
-          isImageInvalid={isImageInvalid}
-        />
+      {renderLimits ? (
+        renderLimits(values.resources)
       ) : (
         <ResourceFieldset
           values={values.resources}
-          onChange={(resources) => handleChange({ resources })}
+          onChange={(resources) => setFieldValue('resources', resources)}
           errors={errors?.resources}
         />
       )}
     </div>
   );
-
-  function handleChange(newValues: Partial<Values>) {
-    onChange({ ...values, ...newValues });
-    setControlledValues({ ...values, ...newValues });
-  }
 }

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
+import { NavContainer } from '@@/NavTabs/NavContainer';
 
 const deployments = [
   {
@@ -27,11 +28,13 @@ export function DeploymentScripts() {
   }));
 
   return (
-    <NavTabs
-      options={options}
-      onSelect={(id: string) => setDeployType(id)}
-      selectedId={deployType}
-    />
+    <NavContainer>
+      <NavTabs
+        options={options}
+        onSelect={(id: string) => setDeployType(id)}
+        selectedId={deployType}
+      />
+    </NavContainer>
   );
 }
 

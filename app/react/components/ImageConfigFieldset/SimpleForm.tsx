@@ -1,4 +1,4 @@
-import { FormikErrors, useFormikContext } from 'formik';
+import { FormikErrors } from 'formik';
 import _ from 'lodash';
 import { useMemo } from 'react';
 
@@ -31,15 +31,15 @@ export function SimpleForm({
   autoComplete,
   values,
   errors,
-  fieldNamespace,
+  onChangeImage,
+  setFieldValue,
 }: {
   autoComplete?: boolean;
   values: Values;
   errors?: FormikErrors<Values>;
-  fieldNamespace?: string;
+  onChangeImage?: (name: string) => void;
+  setFieldValue: <T>(field: string, value: T) => void;
 }) {
-  const { setFieldValue } = useFormikContext<Values>();
-
   const registryQuery = useRegistry(values.registryId);
 
   const registry = registryQuery.data;
@@ -55,7 +55,7 @@ export function SimpleForm({
         errors={errors?.registryId}
       >
         <RegistrySelector
-          onChange={(value) => setFieldValue(namespaced('registryId'), value)}
+          onChange={(value) => setFieldValue('registryId', value)}
           value={values.registryId}
           inputId="registry-field"
         />
@@ -66,7 +66,10 @@ export function SimpleForm({
           <InputGroup.Addon>{registryUrl}</InputGroup.Addon>
 
           <ImageField
-            onChange={(value) => setFieldValue(namespaced('image'), value)}
+            onChange={(value) => {
+              setFieldValue('image', value);
+              onChangeImage?.(value);
+            }}
             value={values.image}
             registry={registry}
             autoComplete={autoComplete}
@@ -94,10 +97,6 @@ export function SimpleForm({
       </FormControl>
     </>
   );
-
-  function namespaced(field: string) {
-    return fieldNamespace ? `${fieldNamespace}.${field}` : field;
-  }
 }
 
 function getImagesForRegistry(
