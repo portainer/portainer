@@ -76,8 +76,8 @@
 }
 
 .switch input[type='checkbox']:disabled:is(:checked) + .slider {
-  @apply th-dark:bg-blue-9 th-dark:opacity-60;
-  @apply th-highcontrast:bg-blue-9 th-highcontrast:opacity-60;
+  @apply th-dark:!bg-blue-8 th-dark:!opacity-60;
+  @apply th-highcontrast:!bg-blue-8 th-highcontrast:!opacity-60;
 }
 
 .switch-values {
