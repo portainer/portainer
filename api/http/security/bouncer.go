@@ -356,6 +356,32 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 	return tokenData
 }
 
+// AddAuthCookie adds the jwt token to the response cookie.
+func AddAuthCookie(w http.ResponseWriter, token string, expirationTime time.Time) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     portainer.AuthCookieKey,
+		Value:    token,
+		Path:     "/",
+		Expires:  expirationTime,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+}
+
+// RemoveAuthCookie removes the jwt token from the response cookie.
+func RemoveAuthCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     portainer.AuthCookieKey,
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		MaxAge:   -1,
+		SameSite: http.SameSiteStrictMode,
+	})
+}
+
+// extractKeyFromCookie extracts the jwt token from the cookie.
 func extractKeyFromCookie(r *http.Request) (string, error) {
 	cookie, err := r.Cookie(portainer.AuthCookieKey)
 	if err != nil {
