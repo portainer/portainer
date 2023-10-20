@@ -156,7 +156,6 @@ function EdgeKeyInfo({
       <EdgeScriptForm
         edgeInfo={{ key: edgeKey }}
         commands={commands}
-        isNomadTokenVisible
         asyncMode={asyncMode}
         showMetaFields
       >

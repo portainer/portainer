@@ -60,8 +60,6 @@ export enum DeploymentType {
   Compose,
   /** represent an edge stack deployed using a kubernetes manifest file */
   Kubernetes,
-  /** represent an edge stack deployed using a nomad hcl job file */
-  Nomad,
 }
 
 export type EdgeStack = {
@@ -100,5 +98,4 @@ export type EdgeStack = {
 export enum EditorType {
   Compose,
   Kubernetes,
-  Nomad,
 }

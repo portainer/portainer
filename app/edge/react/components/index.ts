@@ -35,7 +35,6 @@ export const componentsModule = angular
     r2a(withReactQuery(EdgeScriptForm), [
       'edgeInfo',
       'commands',
-      'isNomadTokenVisible',
       'asyncMode',
       'showMetaFields',
     ])
@@ -69,7 +68,6 @@ export const componentsModule = angular
       'onChange',
       'hasDockerEndpoint',
       'hasKubeEndpoint',
-      'hasNomadEndpoint',
       'allowKubeToSelectCompose',
     ])
   )
