@@ -8,10 +8,17 @@ import { CustomTemplatesListItem } from '@/react/portainer/templates/custom-temp
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { AppTemplatesListItem } from '@/react/portainer/templates/app-templates/AppTemplatesListItem';
+import {
+  CommonFields,
+  validation as commonFieldsValidation,
+} from '@/react/portainer/custom-templates/components/CommonFields';
+import { PlatformField } from '@/react/portainer/custom-templates/components/PlatformSelector';
+import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
+import { withFormValidation } from '@/react-tools/withFormValidation';
 
 import { VariablesFieldAngular } from './variables-field';
 
-export const customTemplatesModule = angular
+export const ngModule = angular
   .module('portainer.app.react.components.custom-templates', [])
   .component(
     'customTemplatesVariablesFieldReact',
@@ -48,4 +55,22 @@ export const customTemplatesModule = angular
       'isSelected',
       'onDuplicate',
     ])
-  ).name;
+  )
+  .component(
+    'customTemplatesPlatformSelector',
+    r2a(PlatformField, ['onChange', 'value'])
+  )
+  .component(
+    'customTemplatesTypeSelector',
+    r2a(TemplateTypeSelector, ['onChange', 'value'])
+  );
+
+withFormValidation(
+  ngModule,
+  withControlledInput(CommonFields, { values: 'onChange' }),
+  'customTemplatesCommonFields',
+  [],
+  commonFieldsValidation
+);
+
+export const customTemplatesModule = ngModule.name;

@@ -54,8 +54,14 @@ class CreateCustomTemplateViewController {
       fromStack: false,
       loading: true,
       isEditorDirty: false,
-      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
       isTemplateValid: true,
+    };
+
+    this.validationData = {
+      title: {
+        pattern: TEMPLATE_NAME_VALIDATION_REGEX,
+        error: "This field must consist of lower-case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').",
+      },
     };
 
     this.templates = [];
@@ -71,10 +77,20 @@ class CreateCustomTemplateViewController {
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onVariablesChange = this.onVariablesChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.onChangePlatform = this.onChangePlatform.bind(this);
+    this.onChangeType = this.onChangeType.bind(this);
   }
 
   onVariablesChange(value) {
     this.handleChange({ Variables: value });
+  }
+
+  onChangePlatform(value) {
+    this.handleChange({ Platform: value });
+  }
+
+  onChangeType(value) {
+    this.handleChange({ Type: value });
   }
 
   handleChange(values) {

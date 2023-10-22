@@ -16,6 +16,10 @@ class KubeEditCustomTemplateViewController {
     this.formValues = {
       Variables: [],
       TLSSkipVerify: false,
+      Title: '',
+      Description: '',
+      Note: '',
+      Logo: '',
     };
     this.state = {
       formValidationError: '',
@@ -25,9 +29,16 @@ class KubeEditCustomTemplateViewController {
       templateLoadFailed: false,
       templatePreviewFailed: false,
       templatePreviewError: '',
-      templateNameRegex: KUBE_TEMPLATE_NAME_VALIDATION_REGEX,
     };
     this.templates = [];
+
+    this.validationData = {
+      title: {
+        pattern: KUBE_TEMPLATE_NAME_VALIDATION_REGEX,
+        error:
+          "This field must consist of lower-case alphanumeric characters, '.', '_' or '-', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').",
+      },
+    };
 
     this.getTemplate = this.getTemplate.bind(this);
     this.submitAction = this.submitAction.bind(this);
@@ -36,6 +47,16 @@ class KubeEditCustomTemplateViewController {
     this.handleChange = this.handleChange.bind(this);
     this.onVariablesChange = this.onVariablesChange.bind(this);
     this.previewFileFromGitRepository = this.previewFileFromGitRepository.bind(this);
+    this.onChangePlatform = this.onChangePlatform.bind(this);
+    this.onChangeType = this.onChangeType.bind(this);
+  }
+
+  onChangePlatform(value) {
+    this.handleChange({ Platform: value });
+  }
+
+  onChangeType(value) {
+    this.handleChange({ Type: value });
   }
 
   getTemplate() {
