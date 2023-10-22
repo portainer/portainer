@@ -29,17 +29,6 @@ angular.module('portainer.app').factory('LocalStorage', [
       getUIState: function () {
         return localStorageService.get('UI_STATE');
       },
-      // TODO, while we want to remove this storage, we need to keep the logged in state in a way, to prevent needing to send a request to the API to check if the user is logged in
-      storeJWT: function (jwt) {
-        localStorageService.set('JWT', jwt);
-      },
-      getJWT: function () {
-        return localStorageService.get('JWT');
-      },
-      deleteJWT: function () {
-        localStorageService.remove('JWT');
-      },
-
       getUserId() {
         localStorageService.get('USER_ID');
       },
@@ -49,7 +38,6 @@ angular.module('portainer.app').factory('LocalStorage', [
       deleteUserId: function () {
         localStorageService.remove('USER_ID');
       },
-
       storePaginationLimit: function (key, count) {
         localStorageService.set('datatable_pagination_' + key, count);
       },
@@ -131,7 +119,7 @@ angular.module('portainer.app').factory('LocalStorage', [
         localStorageService.clearAll();
       },
       cleanAuthData() {
-        localStorageService.remove('JWT', 'APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
+        localStorageService.remove('APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
       },
       storeKubernetesSummaryToggle(value) {
         localStorageService.set('kubernetes_summary_expanded', value);
