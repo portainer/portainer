@@ -15,6 +15,13 @@ jobs:
       - name: Run tests
         run: make test-client ARGS="--maxWorkers=2"
   test-server:
+    strategy:
+      matrix:
+        config:
+          - { platform: linux, arch: amd64 }
+          - { platform: linux, arch: arm64 }
+          - { platform: windows, arch: amd64, version: 1809 }
+          - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
