@@ -9,7 +9,10 @@ import {
   buildAction,
   QuickActionsSettings,
 } from '@@/datatables/QuickActionsSettings';
-import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
+import {
+  ColumnVisibilityMenu,
+  getColumnVisibilityState,
+} from '@@/datatables/ColumnVisibilityMenu';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
 
@@ -66,41 +69,26 @@ export function ContainersDatatable({
           )}
           isLoading={containersQuery.isLoading}
           isRowSelectable={(row) => !row.original.IsPortainer}
-          initialTableState={{
-            columnVisibility: Object.fromEntries(
-              tableState.hiddenColumns.map((col) => [col, false])
-            ),
-          }}
-          renderTableSettings={(tableInstance) => {
-            const columnsToHide = tableInstance
-              .getAllColumns()
-              .filter((col) => col.getCanHide());
-
-            return (
-              <>
-                <ColumnVisibilityMenu<DockerContainer>
-                  columns={columnsToHide}
-                  onChange={(hiddenColumns) => {
-                    tableState.setHiddenColumns(hiddenColumns);
-                    tableInstance.setColumnVisibility(
-                      Object.fromEntries(
-                        hiddenColumns.map((col) => [col, false])
-                      )
-                    );
-                  }}
-                  value={tableState.hiddenColumns}
+          initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
+          renderTableSettings={(tableInstance) => (
+            <>
+              <ColumnVisibilityMenu<DockerContainer>
+                table={tableInstance}
+                onChange={(hiddenColumns) => {
+                  tableState.setHiddenColumns(hiddenColumns);
+                }}
+                value={tableState.hiddenColumns}
+              />
+              <Table.SettingsMenu
+                quickActions={<QuickActionsSettings actions={actions} />}
+              >
+                <ContainersDatatableSettings
+                  isRefreshVisible
+                  settings={tableState}
                 />
-                <Table.SettingsMenu
-                  quickActions={<QuickActionsSettings actions={actions} />}
-                >
-                  <ContainersDatatableSettings
-                    isRefreshVisible
-                    settings={tableState}
-                  />
-                </Table.SettingsMenu>
-              </>
-            );
-          }}
+              </Table.SettingsMenu>
+            </>
+          )}
           dataset={containersQuery.data || []}
           emptyContentLabel="No containers found"
         />

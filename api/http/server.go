@@ -175,6 +175,7 @@ func (server *Server) Start() error {
 	endpointHandler.ProxyManager = server.ProxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.K8sClientFactory = server.KubernetesClientFactory
+	endpointHandler.DockerClientFactory = server.DockerClientFactory
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
 	endpointHandler.AuthorizationService = server.AuthorizationService

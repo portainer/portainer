@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { joinCommand, taskStatusBadge, nodeStatusBadge, trimSHA, dockerNodeAvailabilityBadge } from './utils';
+import { hideShaSum, joinCommand, nodeStatusBadge, taskStatusBadge, trimSHA } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -76,7 +76,6 @@ angular
     };
   })
   .filter('nodestatusbadge', () => nodeStatusBadge)
-  .filter('dockerNodeAvailabilityBadge', () => dockerNodeAvailabilityBadge)
   .filter('trimcontainername', function () {
     'use strict';
     return function (name) {
@@ -159,44 +158,7 @@ angular
   .filter('command', function () {
     return joinCommand;
   })
-  .filter('hideshasum', function () {
-    'use strict';
-    return function (imageName) {
-      if (imageName) {
-        return imageName.split('@sha')[0];
-      }
-      return '';
-    };
-  })
-  .filter('availablenodecount', [
-    'ConstraintsHelper',
-    function (ConstraintsHelper) {
-      'use strict';
-      return function (nodes, service) {
-        var availableNodes = 0;
-        for (var i = 0; i < nodes.length; i++) {
-          var node = nodes[i];
-          if (node.Availability === 'active' && node.Status === 'ready' && ConstraintsHelper.matchesServiceConstraints(service, node)) {
-            availableNodes++;
-          }
-        }
-        return availableNodes;
-      };
-    },
-  ])
-  .filter('runningtaskscount', function () {
-    'use strict';
-    return function (tasks) {
-      var runningTasks = 0;
-      for (var i = 0; i < tasks.length; i++) {
-        var task = tasks[i];
-        if (task.Status.State === 'running' && task.DesiredState === 'running') {
-          runningTasks++;
-        }
-      }
-      return runningTasks;
-    };
-  })
+  .filter('hideshasum', () => hideShaSum)
   .filter('tasknodename', function () {
     'use strict';
     return function (nodeId, nodes) {

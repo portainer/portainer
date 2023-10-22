@@ -23,7 +23,7 @@ export function ExpandableDatatableTableRow<D extends DefaultType>({
         cells={cells}
         onClick={expandOnClick ? () => row.toggleExpanded() : undefined}
       />
-      {row.getIsExpanded() && renderSubRow(row)}
+      {row.getIsExpanded() && row.getCanExpand() && renderSubRow(row)}
     </>
   );
 }
