@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -10,6 +11,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -41,10 +43,8 @@ func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *
 	}
 
 	registry, err := handler.DataStore.Registry().Read(portainer.RegistryID(registryID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find a registry with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find a registry with the specified identifier inside the database", err)
+	if err != nil {
+		return httperror.InternalServerError(fmt.Sprintf("Unable to load registry %q from the database", registry.Name), err)
 	}
 
 	err = handler.DataStore.Registry().Delete(portainer.RegistryID(registryID))
@@ -67,35 +67,37 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 			// Obtain a kubeclient for the endpoint
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointId)
 			if err != nil {
-				// Skip environments that can't be loaded. Log an error unless they don't exist.
-				if !handler.DataStore.IsErrObjectNotFound(err) {
-					log.Warn().Err(err).Msgf("Unable to load the environment with id %d from the database", endpointId)
-				}
+				// Skip environments that can't be loaded from the DB
+				log.Warn().Err(err).Msgf("Unable to load the environment with id %d from the database", endpointId)
 				continue
 			}
 
 			cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
 			if err != nil {
-				log.Warn().Err(err).Msgf("Unable to get kubernetes client for environment %d, err: %v", endpointId, err)
+				// Skip environments that can't get a kubeclient from
+				log.Warn().Err(err).Msgf("Unable to get kubernetes client for environment %d", endpointId)
 				continue
 			}
 
-			namespaces := make([]string, 0)
+			failedNamespaces := make([]string, 0)
 			for _, ns := range access.Namespaces {
 				err = cli.DeleteRegistrySecret(registry.ID, ns)
 				if err != nil {
-					namespaces = append(namespaces, ns)
-					log.Warn().Err(err).Msgf("Unable to delete registry secret %s from namespace %s for environment %d. Retrying offline", cli.RegistrySecretName(registry.ID), ns, endpointId)
+					failedNamespaces = append(failedNamespaces, ns)
+					log.Warn().Err(err).Msgf("Unable to delete registry secret %q from namespace %q for environment %d. Retrying offline", cli.RegistrySecretName(registry.ID), ns, endpointId)
 				}
 			}
 
-			if len(namespaces) > 0 {
+			if len(failedNamespaces) > 0 {
 				handler.PendingActionsService.Create(portainer.PendingActions{
 					EndpointID: endpointId,
 					Action:     pendingactions.DeletePortainerK8sRegistrySecrets,
+
+					// When extracting the data, this is the type we need to pull out
+					// i.e. pendingactions.DeletePortainerK8sRegistrySecretsData
 					ActionData: pendingactions.DeletePortainerK8sRegistrySecretsData{
 						RegistryID: registry.ID,
-						Namespaces: namespaces,
+						Namespaces: failedNamespaces,
 					},
 				})
 			}
