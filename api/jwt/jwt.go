@@ -102,16 +102,6 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.T
 	return token, expiryTime, err
 }
 
-// GenerateTokenForOAuth generates a new JWT token for OAuth login
-// token expiry time response from OAuth provider is considered
-func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData) (string, time.Time, error) {
-	expireAt := service.defaultExpireAt()
-
-	token, err := service.generateSignedToken(data, expireAt.Unix(), defaultScope)
-
-	return token, expireAt, err
-}
-
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
 func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
 	scope := parseScope(token)
