@@ -1,3 +1,8 @@
 <page-header title="'Custom Templates'" breadcrumbs="['Custom Templates']" reload="true"></page-header>
 
-<custom-templates-list templates="$ctrl.templates" on-select="($ctrl.selectTemplate)" on-delete="($ctrl.confirmDelete)" is-selected="$ctrl.isSelected"></custom-templates-list>
+<custom-templates-list
+  templates="$ctrl.templates"
+  on-select="($ctrl.selectTemplate)"
+  on-delete="($ctrl.confirmDelete)"
+  selected-id="$ctrl.state.selectedTemplate.Id"
+></custom-templates-list>

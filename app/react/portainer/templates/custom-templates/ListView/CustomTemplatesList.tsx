@@ -20,13 +20,13 @@ const store = createPersistedStore(tableKey);
 export function CustomTemplatesList({
   templates,
   onSelect,
-  isSelected,
   onDelete,
+  selectedId,
 }: {
   templates?: CustomTemplate[];
   onSelect: (template: CustomTemplate['Id']) => void;
-  isSelected: (template: CustomTemplate['Id']) => boolean;
   onDelete: (template: CustomTemplate['Id']) => void;
+  selectedId: CustomTemplate['Id'];
 }) {
   const [page, setPage] = useState(0);
 
@@ -65,7 +65,7 @@ export function CustomTemplatesList({
             key={template.Id}
             template={template}
             onSelect={onSelect}
-            isSelected={isSelected(template.Id)}
+            isSelected={template.Id === selectedId}
             onDelete={onDelete}
           />
         ))}

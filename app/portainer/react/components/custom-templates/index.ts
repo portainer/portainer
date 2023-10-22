@@ -44,7 +44,7 @@ export const ngModule = angular
       'onDelete',
       'onSelect',
       'templates',
-      'isSelected',
+      'selectedId',
     ])
   )
   .component(
