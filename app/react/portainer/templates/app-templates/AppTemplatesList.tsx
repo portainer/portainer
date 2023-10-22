@@ -25,13 +25,13 @@ const store = createPersistedStore<ListState>(tableKey, undefined, (set) => ({
 export function AppTemplatesList({
   templates,
   onSelect,
-  isSelected,
+  selectedId,
   onDuplicate,
   showSwarmStacks,
 }: {
   templates?: TemplateViewModel[];
   onSelect: (template: TemplateViewModel) => void;
-  isSelected: (template: TemplateViewModel) => boolean;
+  selectedId?: TemplateViewModel['Id'];
   onDuplicate: (template: TemplateViewModel) => void;
   showSwarmStacks?: boolean;
 }) {
@@ -66,7 +66,7 @@ export function AppTemplatesList({
             template={template}
             onSelect={onSelect}
             onDuplicate={onDuplicate}
-            isSelected={isSelected(template)}
+            isSelected={selectedId === template.Id}
           />
         ))}
         {!templates && <div className="text-muted text-center">Loading...</div>}

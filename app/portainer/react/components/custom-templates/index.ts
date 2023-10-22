@@ -61,7 +61,7 @@ export const ngModule = angular
     r2a(withUIRouter(withCurrentUser(AppTemplatesList)), [
       'onSelect',
       'templates',
-      'isSelected',
+      'selectedId',
       'onDuplicate',
       'showSwarmStacks',
     ])
