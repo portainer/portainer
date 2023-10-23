@@ -82,11 +82,6 @@ class CustomTemplatesViewController {
     this.isEditAllowed = this.isEditAllowed.bind(this);
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
     this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
-    this.isSelected = this.isSelected.bind(this);
-  }
-
-  isSelected(templateId) {
-    return this.state.selectedTemplate && this.state.selectedTemplate.Id === templateId;
   }
 
   isEditAllowed(template) {
@@ -260,7 +255,7 @@ class CustomTemplatesViewController {
       var template = _.find(this.templates, { Id: templateId });
       await this.CustomTemplateService.remove(templateId);
       this.Notifications.success('Template successfully deleted', template && template.Title);
-      _.remove(this.templates, { Id: templateId });
+      this.templates = this.templates.filter((template) => template.Id !== templateId);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Failed to delete template');
     }
