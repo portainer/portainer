@@ -10,6 +10,7 @@ import {
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
 import { pluralize } from '@/portainer/helpers/strings';
+import PortainerError from '@/portainer/error';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -123,10 +124,7 @@ async function getSecretsForCluster(
     );
     return secrets.flat();
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve secrets for cluster'
-    );
+    throw new PortainerError('Unable to retrieve secrets for cluster', e);
   }
 }
 
@@ -138,7 +136,7 @@ async function getSecrets(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve secrets');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve secrets');
   }
 }
 
@@ -150,7 +148,7 @@ async function deleteSecret(
   try {
     await axios.delete(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to remove secret');
+    throw parseKubernetesAxiosError(e, 'Unable to remove secret');
   }
 }
 

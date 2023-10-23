@@ -2,8 +2,10 @@ import { EventList } from 'kubernetes-types/core/v1';
 import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
+
+import { parseKubernetesAxiosError } from '../../axiosError';
 
 async function getNamespaceEvents(
   environmentId: EnvironmentId,
@@ -21,7 +23,7 @@ async function getNamespaceEvents(
     );
     return data.items;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve events');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve events');
   }
 }
 

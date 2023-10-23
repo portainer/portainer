@@ -65,10 +65,7 @@ async function getStorageClasses(
     );
     return storageClassList.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve Storage Classes'
-    );
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve Storage Classes');
   }
 }
 

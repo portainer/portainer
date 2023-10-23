@@ -55,7 +55,7 @@ export async function getNamespaceHorizontalPodAutoscalers(
     return autoScalarList.items;
   } catch (e) {
     throw parseKubernetesAxiosError(
-      e as Error,
+      e,
       'Unable to retrieve horizontal pod autoscalers'
     );
   }
@@ -81,7 +81,7 @@ export async function getNamespaceHorizontalPodAutoscaler<
     return autoScalar;
   } catch (e) {
     throw parseKubernetesAxiosError(
-      e as Error,
+      e,
       'Unable to retrieve horizontal pod autoscaler'
     );
   }

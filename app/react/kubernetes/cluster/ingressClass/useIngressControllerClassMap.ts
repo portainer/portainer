@@ -1,8 +1,7 @@
 import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import PortainerError from '@/portainer/error';
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
 import { IngressControllerClassMap } from './types';
@@ -61,7 +60,7 @@ export async function getIngressControllerClassMap({
     );
     return controllerMaps;
   } catch (e) {
-    throw new PortainerError('Unable to get ingress controllers.', e as Error);
+    throw parseAxiosError(e, 'Unable to get ingress controllers.');
   }
 }
 
@@ -77,10 +76,7 @@ export async function updateIngressControllerClassMap(
     >(buildUrl(environmentId, namespace), ingressControllerClassMap);
     return controllerMaps;
   } catch (e) {
-    throw new PortainerError(
-      'Unable to update ingress controllers.',
-      e as Error
-    );
+    throw parseAxiosError(e, 'Unable to update ingress controllers.');
   }
 }
 

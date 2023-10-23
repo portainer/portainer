@@ -10,6 +10,7 @@ import {
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
 import { pluralize } from '@/portainer/helpers/strings';
+import PortainerError from '@/portainer/error';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -127,10 +128,7 @@ async function getConfigMapsForCluster(
     );
     return configMaps.flat();
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve ConfigMaps for cluster'
-    );
+    throw new PortainerError('Unable to retrieve ConfigMaps', e);
   }
 }
 
@@ -142,10 +140,7 @@ async function getConfigMaps(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve ConfigMaps'
-    );
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve ConfigMaps');
   }
 }
 
@@ -157,7 +152,7 @@ async function deleteConfigMap(
   try {
     await axios.delete(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to remove ConfigMap');
+    throw parseKubernetesAxiosError(e, 'Unable to remove ConfigMap');
   }
 }
 

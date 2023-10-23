@@ -3,6 +3,8 @@ import { Pod, PodList } from 'kubernetes-types/core/v1';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
+import { parseKubernetesAxiosError } from '../axiosError';
+
 import { ApplicationPatch } from './types';
 
 export async function getNamespacePods(
@@ -21,7 +23,10 @@ export async function getNamespacePods(
     );
     return data.items;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve pods');
+    throw parseKubernetesAxiosError(
+      e,
+      `Unable to retrieve pods in namespace '${namespace}'`
+    );
   }
 }
 
@@ -40,7 +45,7 @@ export async function getPod<T extends Pod | string = Pod>(
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve pod');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve pod');
   }
 }
 
@@ -61,7 +66,7 @@ export async function patchPod(
       }
     );
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to update pod');
+    throw parseAxiosError(e, 'Unable to update pod');
   }
 }
 
@@ -73,7 +78,7 @@ export async function deletePod(
   try {
     return await axios.delete<Pod>(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to delete pod');
+    throw parseKubernetesAxiosError(e as Error, 'Unable to delete pod');
   }
 }
 
