@@ -1,6 +1,7 @@
 import { Edit } from 'lucide-react';
 import _ from 'lodash';
 import { useState } from 'react';
+import { useRouter } from '@uirouter/react';
 
 import { DatatableHeader } from '@@/datatables/DatatableHeader';
 import { Table } from '@@/datatables';
@@ -13,6 +14,7 @@ import { TemplateViewModel } from './view-model';
 import { ListState } from './types';
 import { useSortAndFilterTemplates } from './useSortAndFilter';
 import { Filters } from './Filters';
+import { useFetchTemplateInfo } from './useFetchTemplateInfo';
 
 const tableKey = 'app-templates-list';
 const store = createPersistedStore<ListState>(tableKey, undefined, (set) => ({
@@ -26,15 +28,15 @@ export function AppTemplatesList({
   templates,
   onSelect,
   selectedId,
-  onDuplicate,
   showSwarmStacks,
 }: {
   templates?: TemplateViewModel[];
   onSelect: (template: TemplateViewModel) => void;
   selectedId?: TemplateViewModel['Id'];
-  onDuplicate: (template: TemplateViewModel) => void;
   showSwarmStacks?: boolean;
 }) {
+  const fetchTemplateInfoMutation = useFetchTemplateInfo();
+  const router = useRouter();
   const [page, setPage] = useState(0);
 
   const listState = useTableState(store, tableKey);
@@ -93,5 +95,16 @@ export function AppTemplatesList({
   function handleSearchChange(search: string) {
     listState.setSearch(search);
     setPage(0);
+  }
+
+  function onDuplicate(template: TemplateViewModel) {
+    fetchTemplateInfoMutation.mutate(template, {
+      onSuccess({ fileContent, type }) {
+        router.stateService.go('.custom.new', {
+          fileContent,
+          type,
+        });
+      },
+    });
   }
 }

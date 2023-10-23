@@ -62,7 +62,6 @@ export const ngModule = angular
       'onSelect',
       'templates',
       'selectedId',
-      'onDuplicate',
       'showSwarmStacks',
     ])
   );
