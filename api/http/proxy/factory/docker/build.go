@@ -2,7 +2,6 @@ package docker
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"io"
 	"mime"
@@ -11,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/archive"
 
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 const OneMegabyte = 1024768

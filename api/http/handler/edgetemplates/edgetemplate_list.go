@@ -1,13 +1,14 @@
 package edgetemplates
 
 import (
-	"encoding/json"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/segmentio/encoding/json"
 )
 
 type templateFileFormat struct {

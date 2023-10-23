@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 const (

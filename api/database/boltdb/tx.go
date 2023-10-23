@@ -28,7 +28,7 @@ func (tx *DbTransaction) GetObject(bucketName string, key []byte, object interfa
 		return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 	}
 
-	return tx.conn.UnmarshalObjectWithJsoniter(value, object)
+	return tx.conn.UnmarshalObject(value, object)
 }
 
 func (tx *DbTransaction) UpdateObject(bucketName string, key []byte, object interface{}) error {
@@ -134,7 +134,7 @@ func (tx *DbTransaction) GetAllWithJsoniter(bucketName string, obj interface{}, 
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
 	return bucket.ForEach(func(k []byte, v []byte) error {
-		err := tx.conn.UnmarshalObjectWithJsoniter(v, obj)
+		err := tx.conn.UnmarshalObject(v, obj)
 		if err == nil {
 			obj, err = appendFn(obj)
 		}
@@ -147,7 +147,7 @@ func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte
 	cursor := tx.tx.Bucket([]byte(bucketName)).Cursor()
 
 	for k, v := cursor.Seek(keyPrefix); k != nil && bytes.HasPrefix(k, keyPrefix); k, v = cursor.Next() {
-		err := tx.conn.UnmarshalObjectWithJsoniter(v, obj)
+		err := tx.conn.UnmarshalObject(v, obj)
 		if err != nil {
 			return err
 		}

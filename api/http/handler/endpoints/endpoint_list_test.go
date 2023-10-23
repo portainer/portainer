@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +12,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,13 +28,13 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 		GroupID: 1,
 		Type:    portainer.AgentOnDockerEnvironment,
 		Agent: struct {
-			Version string "example:\"1.0.0\""
+			Version string `json:"Version,omitempty" example:"1.0.0"`
 		}{
 			Version: "1.0.0",
 		},
 	}
 	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Type: portainer.AgentOnDockerEnvironment, Agent: struct {
-		Version string "example:\"1.0.0\""
+		Version string `json:"Version,omitempty" example:"1.0.0"`
 	}{Version: "2.0.0"}}
 	noVersionEndpoint := portainer.Endpoint{ID: 3, Type: portainer.AgentOnDockerEnvironment, GroupID: 1}
 	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}

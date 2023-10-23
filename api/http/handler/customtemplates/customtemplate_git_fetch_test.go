@@ -2,7 +2,6 @@ package customtemplates
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
@@ -20,6 +19,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/jwt"
+
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 

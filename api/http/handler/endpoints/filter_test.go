@@ -22,12 +22,12 @@ func Test_Filter_AgentVersion(t *testing.T) {
 	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,
 		Agent: struct {
-			Version string "example:\"1.0.0\""
+			Version string `json:"Version,omitempty" example:"1.0.0"`
 		}{Version: "1.0.0"}}
 	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,
 		Agent: struct {
-			Version string "example:\"1.0.0\""
+			Version string `json:"Version,omitempty" example:"1.0.0"`
 		}{Version: "2.0.0"}}
 	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,

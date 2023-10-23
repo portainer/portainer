@@ -255,7 +255,7 @@ func (connection *DbConnection) UpdateObjectFunc(bucketName string, key []byte, 
 			return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 		}
 
-		err := connection.UnmarshalObjectWithJsoniter(data, object)
+		err := connection.UnmarshalObject(data, object)
 		if err != nil {
 			return err
 		}

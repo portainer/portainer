@@ -3,22 +3,21 @@ package docker
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+
+	"github.com/docker/docker/client"
+	"github.com/segmentio/encoding/json"
 )
 
-const (
-	containerObjectIdentifier = "Id"
-)
+const containerObjectIdentifier = "Id"
 
 func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, endpointID portainer.EndpointID, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	container, err := dockerClient.ContainerInspect(context.Background(), containerID)

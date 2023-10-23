@@ -1,19 +1,18 @@
 package oauthtest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 
-	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/gorilla/mux"
+	"github.com/segmentio/encoding/json"
 )
 
-const (
-	AccessToken = "test-token"
-)
+const AccessToken = "test-token"
 
 // OAuthRoutes is an OAuth 2.0 compliant handler
 func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {

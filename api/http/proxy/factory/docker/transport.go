@@ -3,7 +3,6 @@ package docker
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -15,12 +14,13 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)

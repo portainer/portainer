@@ -2,12 +2,13 @@
 package response
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/segmentio/encoding/json"
 )
 
 // JSON encodes data to rw in JSON format. Returns a pointer to a
@@ -15,7 +16,11 @@ import (
 func JSON(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
 	rw.Header().Set("Content-Type", "application/json")
 
-	err := json.NewEncoder(rw).Encode(data)
+	enc := json.NewEncoder(rw)
+	enc.SetSortMapKeys(false)
+	enc.SetAppendNewline(false)
+
+	err := enc.Encode(data)
 	if err != nil {
 		return httperror.InternalServerError("Unable to write JSON response", err)
 	}
