@@ -270,18 +270,9 @@
   <!-- container-form -->
 </div>
 
-<div class="row">
-  <div class="col-sm-12">
-    <template-list
-      ng-if="templates"
-      title-text="Templates"
-      title-icon="edit"
-      templates="templates"
-      table-key="templates"
-      select-action="selectTemplate"
-      is-selected="isSelected"
-      show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
-    >
-    </template-list>
-  </div>
-</div>
+<app-templates-list
+  templates="templates"
+  on-select="(selectTemplate)"
+  selected-id="state.selectedTemplate.Id"
+  show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
+></app-templates-list>

@@ -1,4 +1,4 @@
-import { NodeStatus, TaskState, NodeSpec } from 'docker-types/generated/1.41';
+import { NodeStatus, TaskState } from 'docker-types/generated/1.41';
 import _ from 'lodash';
 
 export function trimSHA(imageName: string) {
@@ -62,14 +62,6 @@ export function nodeStatusBadge(text: NodeStatus['State']) {
   return 'success';
 }
 
-export function dockerNodeAvailabilityBadge(text: NodeSpec['Availability']) {
-  if (text === 'pause') {
-    return 'warning';
-  }
-
-  if (text === 'drain') {
-    return 'danger';
-  }
-
-  return 'success';
+export function hideShaSum(imageName = '') {
+  return imageName.split('@sha')[0];
 }

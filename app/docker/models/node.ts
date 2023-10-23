@@ -10,9 +10,7 @@ import {
   ResourceObject,
 } from 'docker-types/generated/1.41';
 
-type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
-  [Property in Key]-?: Type[Property];
-};
+import { WithRequiredProperty } from '@/types';
 
 export class NodeViewModel {
   Model: Node;

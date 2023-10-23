@@ -1,10 +1,8 @@
-import { Service } from 'docker-types/generated/1.41';
-
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 export function urlBuilder(
   endpointId: EnvironmentId,
-  id?: Service['ID'],
+  id?: string,
   action?: string
 ) {
   let url = `/endpoints/${endpointId}/docker/services`;

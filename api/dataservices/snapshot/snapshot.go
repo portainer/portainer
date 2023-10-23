@@ -5,9 +5,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
-const (
-	BucketName = "snapshots"
-)
+const BucketName = "snapshots"
 
 type Service struct {
 	dataservices.BaseDataService[portainer.Snapshot, portainer.EndpointID]

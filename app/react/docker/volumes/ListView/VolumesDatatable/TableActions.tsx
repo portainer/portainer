@@ -36,7 +36,7 @@ export function TableActions({
           className="!m-0"
           data-cy="volume-addVolumeButton"
         >
-          Add secret
+          Add volume
         </Button>
       </Authorized>
     </div>

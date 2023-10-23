@@ -4,19 +4,14 @@ import { StackType } from '@/react/common/stacks/types';
 import { ResourceControlResponse } from '../access-control/types';
 import { RepoConfigResponse } from '../gitops/types';
 
+import { VariableDefinition } from './components/CustomTemplatesVariablesDefinitionField';
+
 export enum Platform {
   LINUX = 1,
   WINDOWS,
 }
 
-export /**
- * CustomTemplate represents a custom template.
- */
-interface CustomTemplate {
-  /**
-   * CustomTemplate Identifier.
-   * @example 1
-   */
+export type CustomTemplate = {
   Id: number;
 
   /**
@@ -82,6 +77,8 @@ interface CustomTemplate {
    */
   ResourceControl?: ResourceControlResponse;
 
+  Variables: VariableDefinition[];
+
   /**
    * GitConfig for the template.
    */
@@ -92,7 +89,7 @@ interface CustomTemplate {
    * @example false
    */
   IsComposeFormat: boolean;
-}
+};
 
 export type CustomTemplateFileContent = {
   FileContent: string;

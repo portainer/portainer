@@ -9,7 +9,7 @@ export interface Props {
 }
 
 export function ButtonGroup({
-  size = 'small',
+  size,
   children,
   className,
   'aria-label': ariaLabel,

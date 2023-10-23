@@ -62,20 +62,10 @@
     </advanced-form>
   </stack-from-template-form>
 </div>
-<div class="row">
-  <div class="col-sm-12">
-    <custom-templates-list
-      ng-if="$ctrl.templates"
-      title-text="Templates"
-      title-icon="edit"
-      templates="$ctrl.templates"
-      table-key="customTemplates"
-      create-path="docker.templates.custom.new"
-      edit-path="docker.templates.custom.edit"
-      is-edit-allowed="$ctrl.isEditAllowed"
-      on-select-click="($ctrl.selectTemplate)"
-      on-delete-click="($ctrl.confirmDelete)"
-      is-selected="($ctrl.isSelected)"
-    ></custom-templates-list>
-  </div>
-</div>
+
+<custom-templates-list
+  templates="$ctrl.templates"
+  on-select="($ctrl.selectTemplate)"
+  on-delete="($ctrl.confirmDelete)"
+  selected-id="$ctrl.state.selectedTemplate.Id"
+></custom-templates-list>

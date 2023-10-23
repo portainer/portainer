@@ -17,19 +17,12 @@ export function TableSettingsMenus({
   tableInstance: Table<DecoratedStack>;
   tableState: TableSettings;
 }) {
-  const columnsToHide = tableInstance
-    .getAllColumns()
-    .filter((col) => col.getCanHide());
-
   return (
     <>
       <ColumnVisibilityMenu<DecoratedStack>
-        columns={columnsToHide}
+        table={tableInstance}
         onChange={(hiddenColumns) => {
           tableState.setHiddenColumns(hiddenColumns);
-          tableInstance.setColumnVisibility(
-            Object.fromEntries(hiddenColumns.map((col) => [col, false]))
-          );
         }}
         value={tableState.hiddenColumns}
       />

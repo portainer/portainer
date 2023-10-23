@@ -1,14 +1,6 @@
-<div ng-if="tasks.length > 0 && nodes" id="service-tasks">
-  <tasks-datatable
-    title-text="Tasks"
-    title-icon="list"
-    dataset="tasks"
-    table-key="service-tasks"
-    order-by="Updated"
-    reverse-order="true"
-    nodes="nodes"
-    show-slot-column="service.Mode !== 'global'"
-    show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
-    agent-proxy="applicationState.endpoint.mode.agentProxy"
-  ></tasks-datatable>
-</div>
+<docker-service-tasks-datatable
+  ng-if="tasks.length > 0"
+  dataset="tasks"
+  is-slot-column-visible="service.Mode !== 'global'"
+  service-name="service.Name"
+></docker-service-tasks-datatable>

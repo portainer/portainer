@@ -3,9 +3,6 @@ import angular from 'angular';
 import { r2a } from '@/react-tools/react2angular';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 import { StackContainersDatatable } from '@/react/common/stacks/ItemView/StackContainersDatatable';
-import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
-import { TemplateListDropdownAngular } from '@/react/docker/app-templates/TemplateListDropdown';
-import { TemplateListSortAngular } from '@/react/docker/app-templates/TemplateListSort';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
@@ -20,9 +17,9 @@ import { ConfigsDatatable } from '@/react/docker/configs/ListView/ConfigsDatatab
 import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowser';
 import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
 import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
-import { ScaleServiceButton } from '@/react/docker/services/ListView/ServicesDatatable/columns/schedulingMode/ScaleServiceButton';
 import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatable';
 import { StacksDatatable } from '@/react/docker/stacks/ListView/StacksDatatable';
+import { NetworksDatatable } from '@/react/docker/networks/ListView/NetworksDatatable';
 
 import { containersModule } from './containers';
 import { servicesModule } from './services';
@@ -41,22 +38,19 @@ const ngModule = angular
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
   .component(
-    'containerQuickActions',
-    r2a(withUIRouter(withCurrentUser(ContainerQuickActions)), [
-      'containerId',
-      'nodeName',
-      'state',
-      'status',
-    ])
-  )
-  .component('templateListDropdown', TemplateListDropdownAngular)
-  .component('templateListSort', TemplateListSortAngular)
-  .component(
     'stackContainersDatatable',
     r2a(
       withUIRouter(withReactQuery(withCurrentUser(StackContainersDatatable))),
       ['environment', 'stackName']
     )
+  )
+  .component(
+    'networksDatatable',
+    r2a(withUIRouter(withCurrentUser(NetworksDatatable)), [
+      'dataset',
+      'onRefresh',
+      'onRemove',
+    ])
   )
   .component(
     'gpusList',
@@ -123,10 +117,6 @@ const ngModule = angular
   .component(
     'dockerContainerProcessesDatatable',
     r2a(ProcessesDatatable, ['dataset', 'headers'])
-  )
-  .component(
-    'dockerServicesDatatableScaleServiceButton',
-    r2a(withUIRouter(withCurrentUser(ScaleServiceButton)), ['service'])
   )
   .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
   .component(

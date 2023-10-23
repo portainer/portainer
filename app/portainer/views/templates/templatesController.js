@@ -224,10 +224,6 @@ angular.module('portainer.app').controller('TemplatesController', [
       }
     };
 
-    $scope.isSelected = function (template) {
-      return $scope.state.selectedTemplate && $scope.state.selectedTemplate.Id === template.Id;
-    };
-
     $scope.unselectTemplate = function () {
       return $async(async () => {
         $scope.state.selectedTemplate = null;
@@ -237,7 +233,7 @@ angular.module('portainer.app').controller('TemplatesController', [
     $scope.selectTemplate = function (template) {
       return $async(async () => {
         if ($scope.state.selectedTemplate) {
-          $scope.unselectTemplate($scope.state.selectedTemplate);
+          await $scope.unselectTemplate($scope.state.selectedTemplate);
         }
 
         if (template.Network) {
