@@ -1,53 +1,50 @@
 import clsx from 'clsx';
 
 import { TableHeaderSortIcons } from '@@/datatables/TableHeaderSortIcons';
-
-import { TemplateListDropdown } from '../TemplateListDropdown';
+import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import styles from './TemplateListSort.module.css';
 
 interface Props {
-  options: string[];
-  onChange: (value: string | null) => void;
-  onDescending: () => void;
+  options: ReadonlyArray<string>;
+  onChange: (value: { id: string; desc: boolean } | undefined) => void;
   placeholder?: string;
-  sortByDescending: boolean;
-  sortByButton: boolean;
-  value: string;
+  value: { id: string; desc: boolean } | undefined;
 }
 
 export function TemplateListSort({
   options,
   onChange,
-  onDescending,
   placeholder,
-  sortByDescending,
-  sortByButton,
   value,
 }: Props) {
   return (
     <div className={styles.sortByContainer}>
       <div className={styles.sortByElement}>
-        <TemplateListDropdown
+        <PortainerSelect
           placeholder={placeholder}
-          options={options}
-          onChange={onChange}
-          value={value}
+          options={options.map((id) => ({ label: id, value: id }))}
+          onChange={(id) =>
+            onChange(id ? { id, desc: value?.desc ?? false } : undefined)
+          }
+          bindToBody
+          value={value?.id ?? null}
+          isClearable
         />
       </div>
       <div className={styles.sortByElement}>
         <button
           className={clsx(styles.sortButton, 'h-[34px]')}
           type="button"
-          disabled={!sortByButton || !value}
+          disabled={!value?.id}
           onClick={(e) => {
             e.preventDefault();
-            onDescending();
+            onChange(value ? { id: value.id, desc: !value.desc } : undefined);
           }}
         >
           <TableHeaderSortIcons
-            sorted={sortByButton && !!value}
-            descending={sortByDescending}
+            sorted={!!value}
+            descending={value?.desc ?? false}
           />
         </button>
       </div>

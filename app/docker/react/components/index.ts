@@ -3,8 +3,6 @@ import angular from 'angular';
 import { r2a } from '@/react-tools/react2angular';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 import { StackContainersDatatable } from '@/react/common/stacks/ItemView/StackContainersDatatable';
-import { TemplateListDropdownAngular } from '@/react/docker/app-templates/TemplateListDropdown';
-import { TemplateListSortAngular } from '@/react/docker/app-templates/TemplateListSort';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
@@ -39,8 +37,6 @@ const ngModule = angular
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
-  .component('templateListDropdown', TemplateListDropdownAngular)
-  .component('templateListSort', TemplateListSortAngular)
   .component(
     'stackContainersDatatable',
     r2a(
