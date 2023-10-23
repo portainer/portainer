@@ -1,6 +1,5 @@
 import { TagId } from '@/portainer/tags/types';
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
-import { Job } from '@/react/nomad/types';
 import { DockerSnapshot } from '@/react/docker/snapshots/types';
 
 export type EnvironmentId = number;
@@ -72,20 +71,6 @@ export interface KubernetesSettings {
   Configuration: KubernetesConfiguration;
 }
 
-export interface NomadSnapshot {
-  JobCount: number;
-  GroupCount: number;
-  TaskCount: number;
-  RunningTaskCount: number;
-  NodeCount: number;
-  Time: number;
-  Jobs: Job[];
-}
-
-export interface NomadSettings {
-  Snapshots: NomadSnapshot[];
-}
-
 export type EnvironmentEdge = {
   AsyncMode: boolean;
   PingInterval: number;
@@ -153,7 +138,6 @@ export type Environment = {
   URL: string;
   Snapshots: DockerSnapshot[];
   Kubernetes: KubernetesSettings;
-  Nomad: NomadSettings;
   PublicURL?: string;
   UserTrusted: boolean;
   AMTDeviceGUID?: string;

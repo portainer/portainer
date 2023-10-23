@@ -13,7 +13,6 @@ const edgePropertiesFormInitialValues: ScriptFormValues = {
   envVars: '',
   os: 'linux' as OS,
   platform: 'k8s' as Platform,
-  nomadToken: '',
   authEnabled: true,
   tlsEnabled: false,
   edgeGroupsIds: [],

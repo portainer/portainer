@@ -31,7 +31,7 @@ export function EdgeStackDeploymentTypeSelector({
       disabled: () => !allowKubeToSelectCompose && hasKubeEndpoint,
       tooltip: () =>
         hasKubeEndpoint
-          ? 'Cannot use this option with Edge Kubernetes or Edge Nomad environments'
+          ? 'Cannot use this option with Edge Kubernetes environments'
           : '',
     },
     {
@@ -40,7 +40,7 @@ export function EdgeStackDeploymentTypeSelector({
       disabled: () => hasDockerEndpoint,
       tooltip: () =>
         hasDockerEndpoint
-          ? 'Cannot use this option with Edge Docker or Edge Nomad environments'
+          ? 'Cannot use this option with Edge Docker environments'
           : '',
       iconType: 'logo',
     },

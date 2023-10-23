@@ -46,12 +46,7 @@
           </span>
 
           <div class="col-sm-12 form-section-title"> Edge agent deployment script </div>
-          <edge-script-form
-            edge-info="{ key: endpoint.EdgeKey, id: endpoint.EdgeID }"
-            commands="state.edgeScriptCommands"
-            is-nomad-token-visible="state.showNomad"
-            async-mode="endpoint.Edge.AsyncMode"
-          ></edge-script-form>
+          <edge-script-form edge-info="{ key: endpoint.EdgeKey, id: endpoint.EdgeID }" commands="state.edgeScriptCommands" async-mode="endpoint.Edge.AsyncMode"></edge-script-form>
 
           <edge-key-display edge-key="endpoint.EdgeKey"> </edge-key-display>
         </rd-widget-body>

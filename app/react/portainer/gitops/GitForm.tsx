@@ -23,7 +23,7 @@ interface Props {
   value: GitFormModel;
   onChange: (value: Partial<GitFormModel>) => void;
   environmentType?: 'DOCKER' | 'KUBERNETES' | undefined;
-  deployMethod?: 'compose' | 'nomad' | 'manifest';
+  deployMethod?: 'compose' | 'manifest';
   isDockerStandalone?: boolean;
   isAdditionalFilesFieldVisible?: boolean;
   isForcePullVisible?: boolean;
