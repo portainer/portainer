@@ -50,6 +50,7 @@ type (
 )
 
 const apiKeyHeader = "X-API-KEY"
+const jwtTokenHeader = "Authorization"
 
 // NewRequestBouncer initializes a new RequestBouncer
 func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
@@ -385,7 +386,7 @@ func extractBearerToken(r *http.Request) (string, error) {
 		r.URL.RawQuery = query.Encode()
 	}
 
-	tokens, ok := r.Header["Authorization"]
+	tokens, ok := r.Header[jwtTokenHeader]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
@@ -505,4 +506,19 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// HasOnlyApiKey checks if the request has only an API key
+// and no other authentication method
+func HasOnlyApiKey(r *http.Request) bool {
+	apiKey := r.Header.Get(apiKeyHeader)
+	hasApiKey := apiKey != ""
+
+	authHeader := r.Header.Get(jwtTokenHeader)
+	hasAuthHeader := authHeader != ""
+
+	cookie, _ := r.Cookie(portaineree.AuthCookieKey)
+	hasCookie := cookie != nil
+
+	return hasApiKey && !hasAuthHeader && !hasCookie
 }
