@@ -14,7 +14,7 @@ import { TemplateViewModel } from './view-model';
 import { ListState } from './types';
 import { useSortAndFilterTemplates } from './useSortAndFilter';
 import { Filters } from './Filters';
-import { useFetchTemplateInfo } from './useFetchTemplateInfo';
+import { useFetchTemplateInfoMutation } from './useFetchTemplateInfoMutation';
 
 const tableKey = 'app-templates-list';
 const store = createPersistedStore<ListState>(tableKey, undefined, (set) => ({
@@ -35,7 +35,7 @@ export function AppTemplatesList({
   selectedId?: TemplateViewModel['Id'];
   showSwarmStacks?: boolean;
 }) {
-  const fetchTemplateInfoMutation = useFetchTemplateInfo();
+  const fetchTemplateInfoMutation = useFetchTemplateInfoMutation();
   const router = useRouter();
   const [page, setPage] = useState(0);
 

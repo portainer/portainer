@@ -7,7 +7,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { TemplateType } from './types';
 import { TemplateViewModel } from './view-model';
 
-export function useFetchTemplateInfo() {
+export function useFetchTemplateInfoMutation() {
   return useMutation(
     getTemplateInfo,
     mutationOptions(withGlobalError('Unable to fetch template info'))
