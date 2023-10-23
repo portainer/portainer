@@ -106,7 +106,6 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 	}
 
 	return nil, err
-
 }
 
 // RefreshableStacks returns stacks that are configured for a periodic update

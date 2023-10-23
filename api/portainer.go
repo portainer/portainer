@@ -477,7 +477,9 @@ type (
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
 	EndpointAuthorizations map[EndpointID]Authorizations
 
-	// EndpointGroup represents a group of environments(endpoints)
+	// EndpointGroup represents a group of environments(endpoints).
+	//
+	// An environment(endpoint) may belong to only 1 environment(endpoint) group.
 	EndpointGroup struct {
 		// Environment(Endpoint) group Identifier
 		ID EndpointGroupID `json:"Id" example:"1"`
@@ -1123,7 +1125,9 @@ type (
 	// TeamID represents a team identifier
 	TeamID int
 
-	// TeamMembership represents a membership association between a user and a team
+	// TeamMembership represents a membership association between a user and a team.
+	//
+	// A user may belong to multiple teams.
 	TeamMembership struct {
 		// Membership Identifier
 		ID TeamMembershipID `json:"Id" example:"1"`
