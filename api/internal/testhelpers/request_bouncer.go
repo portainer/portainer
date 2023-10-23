@@ -50,7 +50,7 @@ func (testRequestBouncer) TrustedEdgeEnvironmentAccess(tx dataservices.DataStore
 	return nil
 }
 
-func (testRequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
+func (testRequestBouncer) CookieAuthLookup(r *http.Request) *portainer.TokenData {
 	return nil
 }
 

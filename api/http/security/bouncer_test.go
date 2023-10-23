@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
 
@@ -133,6 +134,60 @@ func Test_extractKeyFromCookie(t *testing.T) {
 		if !test.succeeds {
 			is.Error(err, "Should return error")
 			is.ErrorIs(err, http.ErrNoCookie)
+		} else {
+			is.NoError(err)
+		}
+	}
+}
+
+func Test_extractBearerToken(t *testing.T) {
+	is := assert.New(t)
+
+	tt := []struct {
+		name               string
+		requestHeader      string
+		requestHeaderValue string
+		wantToken          string
+		succeeds           bool
+	}{
+		{
+			name:               "missing request header",
+			requestHeader:      "",
+			requestHeaderValue: "",
+			wantToken:          "",
+			succeeds:           false,
+		},
+		{
+			name:               "invalid authorization request header",
+			requestHeader:      "authorisation", // note: `s`
+			requestHeaderValue: "abc",
+			wantToken:          "",
+			succeeds:           false,
+		},
+		{
+			name:               "valid authorization request header",
+			requestHeader:      "AUTHORIZATION",
+			requestHeaderValue: "abc",
+			wantToken:          "abc",
+			succeeds:           true,
+		},
+		{
+			name:               "valid authorization request header case-insensitive canonical check",
+			requestHeader:      "authorization",
+			requestHeaderValue: "def",
+			wantToken:          "def",
+			succeeds:           true,
+		},
+	}
+
+	for _, test := range tt {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(test.requestHeader, test.requestHeaderValue)
+		apiKey, err := extractBearerToken(req)
+		is.Equal(test.wantToken, apiKey)
+		if !test.succeeds {
+			is.Error(err, "Should return error")
+			is.ErrorIs(err, httperrors.ErrUnauthorized)
 		} else {
 			is.NoError(err)
 		}

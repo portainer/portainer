@@ -106,7 +106,7 @@ func Test_userCreateAccessToken(t *testing.T) {
 
 		body, err := io.ReadAll(rr.Body)
 		is.NoError(err, "ReadAll should not return error")
-		is.Equal(`{"message":"Auth not supported","details":"JWT Authentication required"}`, string(body))
+		is.Equal(`{"message":"Auth not supported","details":"Cookie Authentication required"}`, string(body))
 	})
 }
 

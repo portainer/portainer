@@ -55,9 +55,9 @@ type accessTokenResponse struct {
 // @failure 500 "Server error"
 // @router /users/{id}/tokens [post]
 func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	// specifically require JWT auth for this endpoint since API-Key based auth is not supported
-	if jwt := handler.bouncer.JWTAuthLookup(r); jwt == nil {
-		return httperror.Unauthorized("Auth not supported", errors.New("JWT Authentication required"))
+	// specifically require Cookie auth for this endpoint since API-Key based auth is not supported
+	if jwt := handler.bouncer.CookieAuthLookup(r); jwt == nil {
+		return httperror.Unauthorized("Auth not supported", errors.New("Cookie Authentication required"))
 	}
 
 	var payload userAccessTokenCreatePayload

@@ -26,7 +26,7 @@ type (
 		AuthorizedEndpointOperation(*http.Request, *portainer.Endpoint) error
 		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
 		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
-		JWTAuthLookup(*http.Request) *portainer.TokenData
+		CookieAuthLookup(*http.Request) *portainer.TokenData
 	}
 
 	// RequestBouncer represents an entity that manages API request accesses
@@ -188,6 +188,7 @@ func (bouncer *RequestBouncer) TrustedEdgeEnvironmentAccess(tx dataservices.Data
 // - authenticating the request with a valid token
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
 	h = bouncer.mwAuthenticateFirst([]tokenLookup{
+		bouncer.CookieAuthLookup,
 		bouncer.JWTAuthLookup,
 		bouncer.apiKeyLookup,
 	}, h)
@@ -303,9 +304,25 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 }
 
 // JWTAuthLookup looks up a valid bearer in the request.
-func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
+func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) *portainer.TokenData {
 	// get token from the Authorization header or query parameter
 	token, err := extractKeyFromCookie(r)
+	if err != nil {
+		return nil
+	}
+
+	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	if err != nil {
+		return nil
+	}
+
+	return tokenData
+}
+
+// JWTAuthLookup looks up a valid bearer in the request.
+func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
+	// get token from the Authorization header or query parameter
+	token, err := extractBearerToken(r)
 	if err != nil {
 		return nil
 	}
@@ -354,6 +371,29 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 	}
 
 	return tokenData
+}
+
+// extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
+func extractBearerToken(r *http.Request) (string, error) {
+	// Token might be set via the "token" query parameter.
+	// For example, in websocket requests
+	// For these cases, hide the token from the query
+	query := r.URL.Query()
+	token := query.Get("token")
+	if token != "" {
+		query.Del("token")
+		r.URL.RawQuery = query.Encode()
+	}
+
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	if token == "" {
+		return "", httperrors.ErrUnauthorized
+	}
+	return token, nil
 }
 
 // AddAuthCookie adds the jwt token to the response cookie.
