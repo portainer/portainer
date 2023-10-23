@@ -140,7 +140,7 @@ func (handler *Handler) updateKubeAccess(endpoint *portainer.Endpoint, registry 
 	}
 
 	for namespace := range namespacesToRemove {
-		err := cli.DeleteRegistrySecret(registry, namespace)
+		err := cli.DeleteRegistrySecret(registry.ID, namespace)
 		if err != nil {
 			return err
 		}

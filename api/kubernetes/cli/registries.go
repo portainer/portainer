@@ -32,8 +32,8 @@ type (
 	}
 )
 
-func (kcl *KubeClient) DeleteRegistrySecret(registry *portainer.Registry, namespace string) error {
-	err := kcl.cli.CoreV1().Secrets(namespace).Delete(context.TODO(), registrySecretName(registry), metav1.DeleteOptions{})
+func (kcl *KubeClient) DeleteRegistrySecret(registry portainer.RegistryID, namespace string) error {
+	err := kcl.cli.CoreV1().Secrets(namespace).Delete(context.TODO(), kcl.RegistrySecretName(registry), metav1.DeleteOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {
 		return errors.Wrap(err, "failed removing secret")
 	}
@@ -64,7 +64,7 @@ func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namesp
 	secret := &v1.Secret{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: registrySecretName(registry),
+			Name: kcl.RegistrySecretName(registry.ID),
 			Labels: map[string]string{
 				labelRegistryType: strconv.Itoa(int(registry.Type)),
 			},
@@ -103,6 +103,6 @@ func (cli *KubeClient) IsRegistrySecret(namespace, secretName string) (bool, err
 
 }
 
-func registrySecretName(registry *portainer.Registry) string {
-	return fmt.Sprintf("registry-%d", registry.ID)
+func (*KubeClient) RegistrySecretName(registryID portainer.RegistryID) string {
+	return fmt.Sprintf("registry-%d", registryID)
 }
