@@ -6,17 +6,21 @@ import { isAgentEnvironment } from '@/react/portainer/environments/utils';
 import { Link } from '@@/Link';
 
 import { DecoratedTask } from '../types';
+import { getTableMeta } from '../meta';
 
 import { columnHelper } from './helper';
 
 export const task = columnHelper.accessor('Id', {
-  header: 'Task',
+  header: 'Id',
   cell: Cell,
 });
 
 function Cell({
   getValue,
   row: { original: item },
+  table: {
+    options: { meta },
+  },
 }: CellContext<DecoratedTask, string>) {
   const environmentQuery = useCurrentEnvironment();
 
@@ -24,8 +28,12 @@ function Cell({
     return null;
   }
 
+  const { serviceName } = getTableMeta(meta);
+
   const value = getValue();
   const isAgent = isAgentEnvironment(environmentQuery.data.Type);
+
+  const name = `${serviceName}${item.Slot ? `.${item.Slot}` : ''}.${value}`;
 
   return isAgent && item.Container ? (
     <Link
@@ -33,15 +41,11 @@ function Cell({
       params={{ id: item.Container.Id, nodeName: item.Container.NodeName }}
       className="monospaced"
     >
-      {value}
+      {name}
     </Link>
   ) : (
-    <Link
-      to="docker.tasks.task"
-      params={{ id: item.Id }}
-      className="monospaced"
-    >
-      {value}
+    <Link to="docker.tasks.task" params={{ id: value }} className="monospaced">
+      {name}
     </Link>
   );
 }

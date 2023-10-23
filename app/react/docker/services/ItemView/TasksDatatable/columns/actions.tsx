@@ -24,7 +24,7 @@ function Cell({
     return null;
   }
   const state: QuickActionsState = {
-    showQuickActionAttach: true,
+    showQuickActionAttach: false,
     showQuickActionExec: true,
     showQuickActionInspect: true,
     showQuickActionLogs: true,

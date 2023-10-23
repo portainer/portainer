@@ -19,6 +19,8 @@ import { getColumnVisibilityState } from '@@/datatables/ColumnVisibilityMenu';
 import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 import { withGlobalFilter } from '@@/datatables/extend-options/withGlobalFilter';
 
+import { DecoratedTask } from '../../ItemView/TasksDatatable/types';
+
 import { useColumns } from './columns';
 import { TasksDatatable } from './TasksDatatable';
 import { TableActions } from './TableActions';
@@ -72,7 +74,10 @@ export function ServicesDatatable({
         <tr>
           <td />
           <td colSpan={Number.MAX_SAFE_INTEGER}>
-            <TasksDatatable dataset={item.Tasks} search={tableState.search} />
+            <TasksDatatable
+              dataset={item.Tasks as Array<DecoratedTask>}
+              search={tableState.search}
+            />
           </td>
         </tr>
       )}
