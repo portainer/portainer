@@ -50,12 +50,16 @@ export function AppTemplatesList({
   return (
     <Table.Container>
       <DatatableHeader
-        onSearchChange={listState.setSearch}
+        onSearchChange={handleSearchChange}
         searchValue={listState.search}
         title="Templates"
         titleIcon={Edit}
         description={
-          <Filters listState={listState} templates={templates || []} />
+          <Filters
+            listState={listState}
+            templates={templates || []}
+            onChange={() => setPage(0)}
+          />
         }
       />
 
@@ -85,4 +89,9 @@ export function AppTemplatesList({
       />
     </Table.Container>
   );
+
+  function handleSearchChange(search: string) {
+    listState.setSearch(search);
+    setPage(0);
+  }
 }

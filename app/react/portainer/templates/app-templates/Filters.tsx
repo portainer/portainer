@@ -15,9 +15,11 @@ const typeFilters = [
 export function Filters({
   templates,
   listState,
+  onChange,
 }: {
   templates: TemplateViewModel[];
   listState: ListState & { search: string };
+  onChange(): void;
 }) {
   const categories = _.sortBy(
     _.uniq(templates?.flatMap((template) => template.Categories))
@@ -28,7 +30,10 @@ export function Filters({
       <div className="w-1/4">
         <PortainerSelect
           options={categories}
-          onChange={listState.setCategory}
+          onChange={(category) => {
+            listState.setCategory(category);
+            onChange();
+          }}
           placeholder="Category"
           value={listState.category}
           bindToBody
@@ -38,7 +43,10 @@ export function Filters({
       <div className="w-1/4">
         <PortainerSelect
           options={typeFilters}
-          onChange={listState.setType}
+          onChange={(type) => {
+            listState.setType(type);
+            onChange();
+          }}
           placeholder="Type"
           value={listState.type}
           bindToBody
@@ -47,9 +55,10 @@ export function Filters({
       </div>
       <div className="w-1/4 ml-auto">
         <TemplateListSort
-          onChange={(value) =>
-            listState.setSortBy(value?.id, value?.desc ?? false)
-          }
+          onChange={(value) => {
+            listState.setSortBy(value?.id, value?.desc ?? false);
+            onChange();
+          }}
           options={orderByFields}
           placeholder="Sort By"
           value={listState.sortBy}
