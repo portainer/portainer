@@ -26,7 +26,7 @@ type (
 		AuthorizedEndpointOperation(*http.Request, *portainer.Endpoint) error
 		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
 		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
-		CookieAuthLookup(*http.Request) *portainer.TokenData
+		CookieAuthLookup(*http.Request) (*portainer.TokenData, error)
 	}
 
 	// RequestBouncer represents an entity that manages API request accesses
@@ -46,7 +46,7 @@ type (
 	}
 
 	// tokenLookup looks up a token in the request
-	tokenLookup func(*http.Request) *portainer.TokenData
+	tokenLookup func(*http.Request) (*portainer.TokenData, error)
 )
 
 const apiKeyHeader = "X-API-KEY"
@@ -189,9 +189,9 @@ func (bouncer *RequestBouncer) TrustedEdgeEnvironmentAccess(tx dataservices.Data
 // - authenticating the request with a valid token
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
 	h = bouncer.mwAuthenticateFirst([]tokenLookup{
+		bouncer.apiKeyLookup,
 		bouncer.CookieAuthLookup,
 		bouncer.JWTAuthLookup,
-		bouncer.apiKeyLookup,
 	}, h)
 	h = mwSecureHeaders(h)
 	return h
@@ -278,24 +278,26 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 		var token *portainer.TokenData
 
 		for _, lookup := range tokenLookups {
-			token = lookup(r)
+			resultToken, err := lookup(r)
+			if err != nil {
+				httperror.WriteError(w, http.StatusUnauthorized, "Invalid API key", httperrors.ErrUnauthorized)
+				return
+			}
 
-			if token != nil {
+			if resultToken != nil {
+				token = resultToken
 				break
 			}
 		}
 
 		if token == nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "A valid authorisation token is missing", httperrors.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusUnauthorized, "A valid authorization token is missing", httperrors.ErrUnauthorized)
 			return
 		}
 
-		_, err := bouncer.dataStore.User().Read(token.ID)
-		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
-			return
-		} else if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
+		user, _ := bouncer.dataStore.User().Read(token.ID)
+		if user == nil {
+			httperror.WriteError(w, http.StatusUnauthorized, "An authorization token is invalid", httperrors.ErrUnauthorized)
 			return
 		}
 
@@ -305,36 +307,38 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 }
 
 // JWTAuthLookup looks up a valid bearer in the request.
-func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) *portainer.TokenData {
+func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.TokenData, error) {
 	// get token from the Authorization header or query parameter
 	token, err := extractKeyFromCookie(r)
 	if err != nil {
-		return nil
+		return nil, nil
 	}
 
 	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
-		return nil
+		return nil, ErrInvalidKey
 	}
 
-	return tokenData
+	return tokenData, nil
 }
 
 // JWTAuthLookup looks up a valid bearer in the request.
-func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
+func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenData, error) {
 	// get token from the Authorization header or query parameter
-	token, err := extractBearerToken(r)
-	if err != nil {
-		return nil
+	token, ok := extractBearerToken(r)
+	if !ok {
+		return nil, nil
 	}
 
 	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
-		return nil
+		return nil, ErrInvalidKey
 	}
 
-	return tokenData
+	return tokenData, nil
 }
+
+var ErrInvalidKey = errors.New("Invalid API key")
 
 // apiKeyLookup looks up an verifies an api-key by:
 // - computing the digest of the raw api-key
@@ -343,17 +347,17 @@ func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenDa
 // If the key is valid/verified, the last updated time of the key is updated.
 // Successful verification of the key will return a TokenData object - since the downstream handlers
 // utilise the token injected in the request context.
-func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenData {
+func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenData, error) {
 	rawAPIKey, ok := extractAPIKey(r)
 	if !ok {
-		return nil
+		return nil, nil
 	}
 
 	digest := bouncer.apiKeyService.HashRaw(rawAPIKey)
 
 	user, apiKey, err := bouncer.apiKeyService.GetDigestUserAndKey(digest)
 	if err != nil {
-		return nil
+		return nil, ErrInvalidKey
 	}
 
 	tokenData := &portainer.TokenData{
@@ -362,7 +366,7 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 		Role:     user.Role,
 	}
 	if _, _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
-		return nil
+		return nil, ErrInvalidKey
 	}
 
 	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
@@ -371,11 +375,11 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 		bouncer.apiKeyService.UpdateAPIKey(&apiKey)
 	}
 
-	return tokenData
+	return tokenData, nil
 }
 
 // extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
-func extractBearerToken(r *http.Request) (string, error) {
+func extractBearerToken(r *http.Request) (string, bool) {
 	// Token might be set via the "token" query parameter.
 	// For example, in websocket requests
 	// For these cases, hide the token from the query
@@ -384,17 +388,18 @@ func extractBearerToken(r *http.Request) (string, error) {
 	if token != "" {
 		query.Del("token")
 		r.URL.RawQuery = query.Encode()
+		return token, true
 	}
 
 	tokens, ok := r.Header[jwtTokenHeader]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
+	if !ok || len(tokens) == 0 {
+		return "", false
 	}
-	if token == "" {
-		return "", httperrors.ErrUnauthorized
-	}
-	return token, nil
+
+	token = tokens[0]
+	token = strings.TrimPrefix(token, "Bearer ")
+
+	return token, true
 }
 
 // AddAuthCookie adds the jwt token to the response cookie.
@@ -508,17 +513,19 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 	})
 }
 
-// HasOnlyApiKey checks if the request has only an API key
-// and no other authentication method
-func HasOnlyApiKey(r *http.Request) bool {
+// ShouldSkipCSRFCheck checks if the CSRF check should be skipped
+//
+// It checks if the request has eithr an API key or bearer token
+// a bearer token is needed for kubectl access
+func ShouldSkipCSRFCheck(r *http.Request) bool {
 	apiKey := r.Header.Get(apiKeyHeader)
 	hasApiKey := apiKey != ""
 
 	authHeader := r.Header.Get(jwtTokenHeader)
 	hasAuthHeader := authHeader != ""
 
-	cookie, _ := r.Cookie(portaineree.AuthCookieKey)
-	hasCookie := cookie != nil
+	cookie, _ := r.Cookie(portainer.AuthCookieKey)
+	hasCookie := cookie != nil && cookie.Value != ""
 
-	return hasApiKey && !hasAuthHeader && !hasCookie
+	return (hasApiKey || hasAuthHeader) && !hasCookie
 }

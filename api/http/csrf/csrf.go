@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	gorillacsrf "github.com/gorilla/csrf"
-	"github.com/portainer/portainer-ee/api/http/security"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func WithProtect(handler http.Handler) (http.Handler, error) {
@@ -34,7 +34,7 @@ func withSendCSRFToken(handler http.Handler) http.Handler {
 func withSkipCSRF(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if security.HasOnlyApiKey(r) {
+		if security.ShouldSkipCSRFCheck(r) {
 			r = gorillacsrf.UnsafeSkipCheck(r)
 		}
 
