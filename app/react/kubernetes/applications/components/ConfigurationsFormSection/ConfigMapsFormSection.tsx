@@ -24,7 +24,6 @@ export function ConfigMapsFormSection({
   errors,
   namespace,
 }: Props) {
-  console.log(values);
   const configMapsQuery = useConfigMaps(useEnvironmentId(), namespace);
   const configMaps = configMapsQuery.data || [];
 
