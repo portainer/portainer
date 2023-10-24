@@ -1,4 +1,4 @@
-import { ConfigMapList } from 'kubernetes-types/core/v1';
+import { ConfigMap, ConfigMapList } from 'kubernetes-types/core/v1';
 import { useMutation, useQuery } from 'react-query';
 
 import { queryClient, withError } from '@/react-tools/react-query';
@@ -133,7 +133,11 @@ async function getConfigMaps(environmentId: EnvironmentId, namespace: string) {
     const { data } = await axios.get<ConfigMapList>(
       buildUrl(environmentId, namespace)
     );
-    return data.items;
+    const configMapsWithKind: ConfigMap[] = data.items.map((configmap) => ({
+      ...configmap,
+      kind: 'ConfigMap',
+    }));
+    return configMapsWithKind;
   } catch (e) {
     throw parseKubernetesAxiosError(e, 'Unable to retrieve ConfigMaps');
   }

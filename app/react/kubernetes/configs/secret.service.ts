@@ -1,4 +1,4 @@
-import { SecretList } from 'kubernetes-types/core/v1';
+import { Secret, SecretList } from 'kubernetes-types/core/v1';
 import { useMutation, useQuery } from 'react-query';
 
 import { queryClient, withError } from '@/react-tools/react-query';
@@ -129,7 +129,11 @@ async function getSecrets(environmentId: EnvironmentId, namespace: string) {
     const { data } = await axios.get<SecretList>(
       buildUrl(environmentId, namespace)
     );
-    return data.items;
+    const secretsWithKind: Secret[] = data.items.map((secret) => ({
+      ...secret,
+      kind: 'Secret',
+    }));
+    return secretsWithKind;
   } catch (e) {
     throw parseKubernetesAxiosError(e, 'Unable to retrieve secrets');
   }

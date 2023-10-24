@@ -30,19 +30,13 @@ export function KubernetesApplicationFormValues() {
   this.OriginalIngresses = undefined;
 }
 
-export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({
-  NONE: 0,
-  ENVIRONMENT: 1,
-  FILESYSTEM: 2,
-});
-
 /**
  * KubernetesApplicationConfigurationFormValueOverridenKey Model
  */
 const _KubernetesApplicationConfigurationFormValueOverridenKey = Object.freeze({
-  Key: '',
-  Path: '',
-  Type: KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT,
+  key: '',
+  path: '',
+  type: 'ENVIRONMENT',
 });
 
 export class KubernetesApplicationConfigurationFormValueOverridenKey {
@@ -55,9 +49,9 @@ export class KubernetesApplicationConfigurationFormValueOverridenKey {
  * KubernetesApplicationConfigurationFormValue Model
  */
 const _KubernetesApplicationConfigurationFormValue = Object.freeze({
-  SelectedConfiguration: undefined,
-  Overriden: false,
-  OverridenKeys: [], // KubernetesApplicationConfigurationFormValueOverridenKey list
+  selectedConfiguration: undefined,
+  overriden: false,
+  overridenKeys: [], // KubernetesApplicationConfigurationFormValueOverridenKey list
 });
 
 export class KubernetesApplicationConfigurationFormValue {

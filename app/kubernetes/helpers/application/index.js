@@ -6,7 +6,6 @@ import {
   KubernetesApplicationAutoScalerFormValue,
   KubernetesApplicationConfigurationFormValue,
   KubernetesApplicationConfigurationFormValueOverridenKey,
-  KubernetesApplicationConfigurationFormValueOverridenKeyTypes,
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPlacementFormValue,
@@ -169,21 +168,25 @@ class KubernetesApplicationHelper {
       const overrideThreshold = max - _.max(_.map(keys, 'VolCount'));
       const res = _.map(new Array(max), () => new KubernetesApplicationConfigurationFormValue());
       _.forEach(res, (item, index) => {
-        item.SelectedConfiguration = cfg;
+        item.selectedConfiguration = cfg;
+        // workaround to load configurations in the app in the select inputs
+        // this should be removed when the edit parent view is migrated to react
+        item.selectedConfiguration.metadata = {};
+        item.selectedConfiguration.metadata.name = cfg.Name;
         const overriden = index >= overrideThreshold;
         if (overriden) {
-          item.Overriden = true;
-          item.OverridenKeys = _.map(keys, (k) => {
+          item.overriden = true;
+          item.overridenKeys = _.map(keys, (k) => {
             const fvKey = new KubernetesApplicationConfigurationFormValueOverridenKey();
-            fvKey.Key = k.Key;
+            fvKey.key = k.Key;
             if (!k.Count) {
-              // !k.Count indicates k.Key is new added to the configuration and has not been loaded to the application yet
-              fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.NONE;
+              // !k.Count indicates k.key is new added to the configuration and has not been loaded to the application yet
+              fvKey.type = 'NONE';
             } else if (index < k.EnvCount) {
-              fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT;
+              fvKey.type = 'ENVIRONMENT';
             } else {
-              fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM;
-              fvKey.Path = k.Sum[index].rootMountPath;
+              fvKey.type = 'FILESYSTEM';
+              fvKey.path = k.Sum[index].rootMountPath;
             }
             return fvKey;
           });
@@ -201,46 +204,46 @@ class KubernetesApplicationHelper {
     let finalMounts = [];
 
     _.forEach(configurations, (config) => {
-      const isBasic = config.SelectedConfiguration.Kind === KubernetesConfigurationKinds.CONFIGMAP;
+      const isBasic = config.selectedConfiguration.kind === 'ConfigMap';
 
-      if (!config.Overriden) {
-        const envKeys = _.keys(config.SelectedConfiguration.Data);
+      if (!config.overriden) {
+        const envKeys = _.keys(config.selectedConfiguration.data);
         _.forEach(envKeys, (item) => {
           const res = isBasic ? new KubernetesApplicationEnvConfigMapPayload() : new KubernetesApplicationEnvSecretPayload();
           res.name = item;
           if (isBasic) {
-            res.valueFrom.configMapKeyRef.name = config.SelectedConfiguration.Name;
+            res.valueFrom.configMapKeyRef.name = config.selectedConfiguration.metadata.name;
             res.valueFrom.configMapKeyRef.key = item;
           } else {
-            res.valueFrom.secretKeyRef.name = config.SelectedConfiguration.Name;
+            res.valueFrom.secretKeyRef.name = config.selectedConfiguration.metadata.name;
             res.valueFrom.secretKeyRef.key = item;
           }
           finalEnv.push(res);
         });
       } else {
-        const envKeys = _.filter(config.OverridenKeys, (item) => item.Type === KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT);
+        const envKeys = _.filter(config.overridenKeys, (item) => item.type === 'ENVIRONMENT');
         _.forEach(envKeys, (item) => {
           const res = isBasic ? new KubernetesApplicationEnvConfigMapPayload() : new KubernetesApplicationEnvSecretPayload();
-          res.name = item.Key;
+          res.name = item.key;
           if (isBasic) {
-            res.valueFrom.configMapKeyRef.name = config.SelectedConfiguration.Name;
-            res.valueFrom.configMapKeyRef.key = item.Key;
+            res.valueFrom.configMapKeyRef.name = config.selectedConfiguration.metadata.name;
+            res.valueFrom.configMapKeyRef.key = item.key;
           } else {
-            res.valueFrom.secretKeyRef.name = config.SelectedConfiguration.Name;
-            res.valueFrom.secretKeyRef.key = item.Key;
+            res.valueFrom.secretKeyRef.name = config.selectedConfiguration.metadata.name;
+            res.valueFrom.secretKeyRef.key = item.key;
           }
           finalEnv.push(res);
         });
 
-        const volKeys = _.filter(config.OverridenKeys, (item) => item.Type === KubernetesApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM);
-        const groupedVolKeys = _.groupBy(volKeys, 'Path');
+        const volKeys = _.filter(config.overridenKeys, (item) => item.type === 'FILESYSTEM');
+        const groupedVolKeys = _.groupBy(volKeys, 'path');
         _.forEach(groupedVolKeys, (items, path) => {
           const volumeName = KubernetesVolumeHelper.generatedApplicationConfigVolumeName(app.Name);
-          const configurationName = config.SelectedConfiguration.Name;
+          const configurationName = config.selectedConfiguration.metadata.name;
           const itemsMap = _.map(items, (item) => {
             const entry = new KubernetesApplicationVolumeEntryPayload();
-            entry.key = item.Key;
-            entry.path = item.Key;
+            entry.key = item.key;
+            entry.path = item.key;
             return entry;
           });
 
