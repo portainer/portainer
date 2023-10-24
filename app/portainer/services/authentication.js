@@ -33,7 +33,7 @@ angular.module('portainer.app').factory('Authentication', [
           return true;
         }
         await tryAutoLoginExtension();
-        await setUser();
+        await loadUserData();
         return true;
       } catch (error) {
         return tryAutoLoginExtension();
@@ -63,7 +63,7 @@ angular.module('portainer.app').factory('Authentication', [
 
     async function OAuthLoginAsync(code) {
       await OAuth.validate({ code: code }).$promise;
-      await setUser();
+      await loadUserData();
     }
 
     function OAuthLogin(code) {
@@ -72,7 +72,7 @@ angular.module('portainer.app').factory('Authentication', [
 
     async function loginAsync(username, password) {
       await Auth.login({ username: username, password: password }).$promise;
-      await setUser();
+      await loadUserData();
     }
 
     function login(username, password) {
@@ -87,7 +87,12 @@ angular.module('portainer.app').factory('Authentication', [
       return user;
     }
 
-    async function retrievePermissions(userData) {
+    async function loadUserData() {
+      const userData = await getCurrentUser();
+      user.username = userData.Username;
+      user.ID = userData.Id;
+      user.role = userData.Role;
+      user.forceChangePassword = userData.forceChangePassword;
       user.endpointAuthorizations = userData.EndpointAuthorizations;
       user.portainerAuthorizations = userData.PortainerAuthorizations;
 
@@ -98,15 +103,7 @@ angular.module('portainer.app').factory('Authentication', [
       } else {
         ThemeManager.setTheme(userTheme);
       }
-    }
 
-    async function setUser() {
-      const userData = await getCurrentUser();
-      user.username = userData.Username;
-      user.ID = userData.Id;
-      user.role = userData.Role;
-      user.forceChangePassword = userData.forceChangePassword;
-      await retrievePermissions(userData);
       LocalStorage.storeUserId(userData.Id);
     }
 
