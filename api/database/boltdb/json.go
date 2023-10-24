@@ -1,34 +1,41 @@
 package boltdb
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/json"
 	"fmt"
 	"io"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
+	"github.com/segmentio/encoding/json"
 )
 
 var errEncryptedStringTooShort = fmt.Errorf("encrypted string too short")
 
 // MarshalObject encodes an object to binary format
-func (connection *DbConnection) MarshalObject(object interface{}) (data []byte, err error) {
+func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error) {
+	buf := &bytes.Buffer{}
+
 	// Special case for the VERSION bucket. Here we're not using json
 	if v, ok := object.(string); ok {
-		data = []byte(v)
+		buf.WriteString(v)
 	} else {
-		data, err = json.Marshal(object)
-		if err != nil {
-			return data, err
+		enc := json.NewEncoder(buf)
+		enc.SetSortMapKeys(false)
+		enc.SetAppendNewline(false)
+
+		if err := enc.Encode(object); err != nil {
+			return nil, err
 		}
 	}
+
 	if connection.getEncryptionKey() == nil {
-		return data, nil
+		return buf.Bytes(), nil
 	}
-	return encrypt(data, connection.getEncryptionKey())
+
+	return encrypt(buf.Bytes(), connection.getEncryptionKey())
 }
 
 // UnmarshalObject decodes an object from binary data
@@ -52,31 +59,6 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 		*s = string(data)
 	}
 	return err
-}
-
-// UnmarshalObjectWithJsoniter decodes an object from binary data
-// using the jsoniter library. It is mainly used to accelerate environment(endpoint)
-// decoding at the moment.
-func (connection *DbConnection) UnmarshalObjectWithJsoniter(data []byte, object interface{}) error {
-	if connection.getEncryptionKey() != nil {
-		var err error
-		data, err = decrypt(data, connection.getEncryptionKey())
-		if err != nil {
-			return err
-		}
-	}
-	var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
-	err := jsoni.Unmarshal(data, &object)
-	if err != nil {
-		if s, ok := object.(*string); ok {
-			*s = string(data)
-			return nil
-		}
-
-		return err
-	}
-
-	return nil
 }
 
 // mmm, don't have a KMS .... aes GCM seems the most likely from

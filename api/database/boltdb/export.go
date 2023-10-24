@@ -1,10 +1,10 @@
 package boltdb
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 	bolt "go.etcd.io/bbolt"
 )
 

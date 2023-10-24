@@ -1,10 +1,10 @@
 package request
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/segmentio/encoding/json"
 )
 
 // PayloadValidation is an interface used to validate the payload of a request.

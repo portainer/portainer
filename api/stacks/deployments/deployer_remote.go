@@ -3,7 +3,6 @@ package deployments
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
@@ -11,16 +10,17 @@ import (
 	"strings"
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/swarm"
+	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/filesystem"
 	"github.com/rs/zerolog/log"
-
-	dockerclient "github.com/docker/docker/client"
+	"github.com/segmentio/encoding/json"
 )
 
 const (

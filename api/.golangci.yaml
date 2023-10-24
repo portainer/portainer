@@ -13,6 +13,8 @@ linters-settings:
     rules:
       main:
         deny:
+          - pkg: 'encoding/json'
+            desc: 'use github.com/segmentio/encoding/json'
           - pkg: 'github.com/sirupsen/logrus'
             desc: 'logging is allowed only by github.com/rs/zerolog'
           - pkg: 'golang.org/x/exp'

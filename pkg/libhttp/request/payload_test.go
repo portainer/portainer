@@ -2,13 +2,13 @@ package request_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 
