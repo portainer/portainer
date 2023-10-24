@@ -4,7 +4,7 @@ import { csrfInterceptor, csrfTokenReaderInterceptorAngular } from './portainer/
 import { agentInterceptor } from './portainer/services/axios';
 
 /* @ngInject */
-export function configApp($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
+export function configApp($urlRouterProvider, $httpProvider, localStorageServiceProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
   if (process.env.NODE_ENV === 'testing') {
     $compileProvider.debugInfoEnabled(false);
   }
