@@ -199,11 +199,7 @@ func Test_extractBearerToken(t *testing.T) {
 			req.Header.Set(test.requestHeader, test.requestHeaderValue)
 			apiKey, ok := extractBearerToken(req)
 			is.Equal(test.wantToken, apiKey)
-			if !test.succeeds {
-				is.False(ok)
-			} else {
-				is.True(ok)
-			}
+			is.Equal(test.succeeds, ok)
 		})
 	}
 }
