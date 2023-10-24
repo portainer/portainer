@@ -4,12 +4,12 @@ set -euo pipefail
 mkdir -p dist
 
 # populate tool versions
-BUILDNUMBER="N/A"
-CONTAINER_IMAGE_TAG="N/A"
-NODE_VERSION="0"
-YARN_VERSION="0"
-WEBPACK_VERSION="0"
-GO_VERSION="0"
+BUILDNUMBER=${BUILDNUMBER:-"N/A"}
+CONTAINER_IMAGE_TAG=${CONTAINER_IMAGE_TAG:-"N/A"}
+NODE_VERSION=${NODE_VERSION:-"N/A"}
+YARN_VERSION=${YARN_VERSION:-"N/A"}
+WEBPACK_VERSION=${WEBPACK_VERSION:-"N/A"}
+GO_VERSION=${GO_VERSION:-"N/A"}
 
 # copy templates
 cp -r "./mustache-templates" "./dist"

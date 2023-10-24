@@ -2,5 +2,6 @@
   "docker": "v20.10.21",
   "dockerCompose": "v2.20.3",
   "helm": "v3.12.3",
-  "kubectl": "v1.28.1"
+  "kubectl": "v1.28.1",
+  "mingit": "2.42.0.2"
 }
