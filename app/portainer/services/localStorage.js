@@ -119,7 +119,7 @@ angular.module('portainer.app').factory('LocalStorage', [
         localStorageService.clearAll();
       },
       cleanAuthData() {
-        localStorageService.remove('APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
+        localStorageService.remove('USER_ID', 'APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
       },
       storeKubernetesSummaryToggle(value) {
         localStorageService.set('kubernetes_summary_expanded', value);
