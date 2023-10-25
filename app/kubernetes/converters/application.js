@@ -284,7 +284,7 @@ class KubernetesApplicationConverter {
     res.ApplicationType = app.ApplicationType;
     res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
     res.Name = app.Name;
-    res.Services = KubernetesApplicationHelper.generateServicesFormValuesFromServices(app);
+    res.Services = KubernetesApplicationHelper.generateServicesFormValuesFromServices(app, ingresses);
     res.Selector = KubernetesApplicationHelper.generateSelectorFromService(app);
     res.StackName = app.StackName;
     res.ApplicationOwner = app.ApplicationOwner;
