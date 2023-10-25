@@ -44,6 +44,7 @@ export function NodesDatatable() {
 
   return (
     <Datatable<IndexOptional<NodeRowData>>
+      disableSelect
       dataset={nodeRowData ?? []}
       columns={getColumns(isServerMetricsEnabled)}
       settingsManager={tableState}
