@@ -55,7 +55,6 @@
 }
 
 .switch.limited {
-  pointer-events: none;
   touch-action: none;
 }
 
