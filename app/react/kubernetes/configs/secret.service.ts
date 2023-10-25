@@ -10,7 +10,6 @@ import {
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
 import { pluralize } from '@/portainer/helpers/strings';
-import PortainerError from '@/portainer/error';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -118,14 +117,10 @@ async function getSecretsForCluster(
   environmentId: EnvironmentId,
   namespaces: string[]
 ) {
-  try {
-    const secrets = await Promise.all(
-      namespaces.map((namespace) => getSecrets(environmentId, namespace))
-    );
-    return secrets.flat();
-  } catch (e) {
-    throw new PortainerError('Unable to retrieve secrets for cluster', e);
-  }
+  const secrets = await Promise.all(
+    namespaces.map((namespace) => getSecrets(environmentId, namespace))
+  );
+  return secrets.flat();
 }
 
 // get all secrets for a namespace
