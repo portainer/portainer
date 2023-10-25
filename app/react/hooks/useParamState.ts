@@ -2,7 +2,8 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 
 export function useParamState<T>(
   param: string,
-  parseParam: (param: string | undefined) => T | undefined
+  parseParam: (param: string | undefined) => T | undefined = (param) =>
+    param as unknown as T
 ) {
   const {
     params: { [param]: paramValue },
@@ -12,7 +13,7 @@ export function useParamState<T>(
 
   return [
     state,
-    (value: T | undefined) => {
+    (value?: T) => {
       router.stateService.go('.', { [param]: value });
     },
   ] as const;

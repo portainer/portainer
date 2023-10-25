@@ -1,10 +1,11 @@
-import { Box, Clock, LayoutGrid, Layers, Puzzle } from 'lucide-react';
+import { Box, Clock, LayoutGrid, Layers, Puzzle, Edit } from 'lucide-react';
 
 import { isBE } from '../portainer/feature-flags/feature-flags.service';
 import { useSettings } from '../portainer/settings/queries';
 
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
+import { SidebarParent } from './SidebarItem/SidebarParent';
 
 export function EdgeComputeSidebar() {
   // this sidebar is rendered only for admins, so we can safely assume that settingsQuery will succeed
@@ -52,6 +53,26 @@ export function EdgeComputeSidebar() {
           data-cy="portainerSidebar-edgeDevicesWaitingRoom"
         />
       )}
+      <SidebarParent
+        icon={Edit}
+        label="Templates"
+        to="edge.templates"
+        data-cy="edgeSidebar-templates"
+      >
+        <SidebarItem
+          label="Application"
+          to="edge.templates"
+          ignorePaths={['edge.templates.custom']}
+          isSubMenu
+          data-cy="edgeSidebar-appTemplates"
+        />
+        {/* <SidebarItem
+          label="Custom"
+          to="edge.templates.custom"
+          isSubMenu
+          data-cy="edgeSidebar-customTemplates"
+        /> */}
+      </SidebarParent>
     </SidebarSection>
   );
 }

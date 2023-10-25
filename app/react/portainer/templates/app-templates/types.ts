@@ -5,15 +5,14 @@ import { Pair } from '../../settings/types';
 export interface ListState extends BasicTableSettings {
   category: string | null;
   setCategory: (category: string | null) => void;
-  type: TemplateType | null;
-  setType: (type: TemplateType | null) => void;
+  types: ReadonlyArray<TemplateType>;
+  setTypes: (value: ReadonlyArray<TemplateType>) => void;
 }
 
 export enum TemplateType {
   Container = 1,
   SwarmStack = 2,
   ComposeStack = 3,
-  EdgeStack = 4,
 }
 
 /**
@@ -21,7 +20,12 @@ export enum TemplateType {
  */
 export interface AppTemplate {
   /**
-   * Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack), 4 (Compose edge stack).
+   * Unique identifier of the template.
+   */
+  id: number;
+
+  /**
+   * Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack)
    * @example 1
    */
   type: TemplateType;

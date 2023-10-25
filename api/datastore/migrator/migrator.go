@@ -229,6 +229,10 @@ func (m *Migrator) initMigrations() {
 		m.updateEdgeStackStatusForDB100,
 	)
 
+	m.addMigrations("2.20",
+		m.updateAppTemplatesVersionForDB110,
+	)
+
 	// Add new migrations below...
 	// One function per migration, each versions migration funcs in the same file.
 }

@@ -122,16 +122,12 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
 
     const customTemplatesNew = {
       name: 'docker.templates.custom.new',
-      url: '/new?fileContent&type',
+      url: '/new?appTemplateId&type',
 
       views: {
         'content@': {
           component: 'createCustomTemplateView',
         },
-      },
-      params: {
-        fileContent: '',
-        type: '',
       },
     };
 

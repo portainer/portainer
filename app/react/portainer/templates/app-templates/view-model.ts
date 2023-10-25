@@ -12,7 +12,7 @@ import {
 } from './types';
 
 export class TemplateViewModel {
-  Id!: string;
+  Id!: number;
 
   Title!: string;
 
@@ -65,46 +65,56 @@ export class TemplateViewModel {
     protocol: string;
   }[];
 
-  constructor(data: AppTemplate, version: string) {
+  constructor(template: AppTemplate, version: string) {
     switch (version) {
       case '2':
-        this.setTemplatesV2(data);
+        setTemplatesV2.call(this, template);
+        break;
+      case '3':
+        setTemplatesV3.call(this, template);
         break;
       default:
         throw new Error('Unsupported template version');
     }
   }
+}
 
-  setTemplatesV2(template: AppTemplate) {
-    this.Id = _.uniqueId();
-    this.Title = template.title;
-    this.Type = template.type;
-    this.Description = template.description;
-    this.AdministratorOnly = template.administrator_only;
-    this.Name = template.name;
-    this.Note = template.note;
-    this.Categories = template.categories ? template.categories : [];
-    this.Platform = getPlatform(template.platform);
-    this.Logo = template.logo;
-    this.Repository = template.repository;
-    this.Hostname = template.hostname;
-    this.RegistryModel = new PorImageRegistryModel();
-    this.RegistryModel.Image = template.image;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.RegistryModel.Registry.URL = template.registry || '';
-    this.Command = template.command ? template.command : '';
-    this.Network = template.network ? template.network : '';
-    this.Privileged = template.privileged ? template.privileged : false;
-    this.Interactive = template.interactive ? template.interactive : false;
-    this.RestartPolicy = template.restart_policy
-      ? template.restart_policy
-      : 'always';
-    this.Labels = template.labels ? template.labels : [];
-    this.Env = templateEnv(template);
-    this.Volumes = templateVolumes(template);
-    this.Ports = templatePorts(template);
-  }
+function setTemplatesV3(this: TemplateViewModel, template: AppTemplate) {
+  setTemplatesV2.call(this, template);
+  this.Id = template.id;
+}
+
+let templateV2ID = 0;
+
+function setTemplatesV2(this: TemplateViewModel, template: AppTemplate) {
+  this.Id = templateV2ID++;
+  this.Title = template.title;
+  this.Type = template.type;
+  this.Description = template.description;
+  this.AdministratorOnly = template.administrator_only;
+  this.Name = template.name;
+  this.Note = template.note;
+  this.Categories = template.categories ? template.categories : [];
+  this.Platform = getPlatform(template.platform);
+  this.Logo = template.logo;
+  this.Repository = template.repository;
+  this.Hostname = template.hostname;
+  this.RegistryModel = new PorImageRegistryModel();
+  this.RegistryModel.Image = template.image;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  this.RegistryModel.Registry.URL = template.registry || '';
+  this.Command = template.command ? template.command : '';
+  this.Network = template.network ? template.network : '';
+  this.Privileged = template.privileged ? template.privileged : false;
+  this.Interactive = template.interactive ? template.interactive : false;
+  this.RestartPolicy = template.restart_policy
+    ? template.restart_policy
+    : 'always';
+  this.Labels = template.labels ? template.labels : [];
+  this.Env = templateEnv(template);
+  this.Volumes = templateVolumes(template);
+  this.Ports = templatePorts(template);
 }
 
 function templatePorts(data: AppTemplate) {

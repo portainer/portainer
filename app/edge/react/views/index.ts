@@ -8,8 +8,10 @@ import { WaitingRoomView } from '@/react/edge/edge-devices/WaitingRoomView';
 import { ListView as EdgeStacksListView } from '@/react/edge/edge-stacks/ListView';
 import { ListView as EdgeGroupsListView } from '@/react/edge/edge-groups/ListView';
 
+import { templatesModule } from './templates';
+
 export const viewsModule = angular
-  .module('portainer.edge.react.views', [])
+  .module('portainer.edge.react.views', [templatesModule])
   .component(
     'waitingRoomView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(WaitingRoomView))), [])

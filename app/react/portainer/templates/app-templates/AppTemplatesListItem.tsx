@@ -1,4 +1,7 @@
+import { StackType } from '@/react/common/stacks/types';
+
 import { Button } from '@@/buttons';
+import { Link } from '@@/Link';
 
 import { TemplateItem } from '../components/TemplateItem';
 
@@ -8,14 +11,16 @@ import { TemplateType } from './types';
 export function AppTemplatesListItem({
   template,
   onSelect,
-  onDuplicate,
   isSelected,
+  hideDuplicate = false,
 }: {
   template: TemplateViewModel;
   onSelect: (template: TemplateViewModel) => void;
-  onDuplicate: (template: TemplateViewModel) => void;
   isSelected: boolean;
+  hideDuplicate?: boolean;
 }) {
+  const duplicateCustomTemplateType = getCustomTemplateType(template.Type);
+
   return (
     <TemplateItem
       template={template}
@@ -25,21 +30,39 @@ export function AppTemplatesListItem({
       onSelect={() => onSelect(template)}
       isSelected={isSelected}
       renderActions={
-        template.Type === TemplateType.SwarmStack ||
-        (template.Type === TemplateType.ComposeStack && (
+        !hideDuplicate &&
+        duplicateCustomTemplateType && (
           <div className="mr-5 mt-3">
             <Button
+              as={Link}
               size="xsmall"
               onClick={(e) => {
                 e.stopPropagation();
-                onDuplicate(template);
+              }}
+              props={{
+                to: '.custom.new',
+                params: {
+                  appTemplateId: template.Id,
+                  type: duplicateCustomTemplateType,
+                },
               }}
             >
               Copy as Custom
             </Button>
           </div>
-        ))
+        )
       }
     />
   );
+}
+
+function getCustomTemplateType(type: TemplateType): StackType | null {
+  switch (type) {
+    case TemplateType.SwarmStack:
+      return StackType.DockerSwarm;
+    case TemplateType.ComposeStack:
+      return StackType.DockerCompose;
+    default:
+      return null;
+  }
 }

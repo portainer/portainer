@@ -1,3 +1,4 @@
+import { fetchFilePreview } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateInfoMutation';
 import { editor, git, edgeStackTemplate, upload } from '@@/BoxSelector/common-options/build-methods';
 
 class DockerComposeFormController {
@@ -35,7 +36,7 @@ class DockerComposeFormController {
     return this.$async(async () => {
       this.formValues.StackFileContent = '';
       try {
-        const fileContent = await this.EdgeTemplateService.edgeTemplate(template);
+        const fileContent = await fetchFilePreview(template.id);
         this.formValues.StackFileContent = fileContent;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve Template');

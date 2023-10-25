@@ -1,29 +1,44 @@
 import _ from 'lodash';
 
-import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import { ListState, TemplateType } from './types';
 import { TemplateViewModel } from './view-model';
 import { TemplateListSort } from './TemplateListSort';
 
 const orderByFields = ['Title', 'Categories', 'Description'] as const;
-const typeFilters = [
+const typeFilters: ReadonlyArray<Option<TemplateType>> = [
   { label: 'Container', value: TemplateType.Container },
-  { label: 'Stack', value: TemplateType.SwarmStack },
+  { label: 'Swarm Stack', value: TemplateType.SwarmStack },
+  { label: 'Compose Stack', value: TemplateType.ComposeStack },
 ] as const;
 
 export function Filters({
   templates,
   listState,
   onChange,
+  disabledTypes = [],
+  fixedCategories = [],
 }: {
   templates: TemplateViewModel[];
   listState: ListState & { search: string };
   onChange(): void;
+  disabledTypes?: Array<TemplateType>;
+  fixedCategories?: Array<string>;
 }) {
   const categories = _.sortBy(
     _.uniq(templates?.flatMap((template) => template.Categories))
-  ).map((category) => ({ label: category, value: category }));
+  )
+    .filter((category) => !fixedCategories.includes(category))
+    .map((category) => ({ label: category, value: category }));
+
+  const typeFiltersEnabled =
+    disabledTypes.length > 0
+      ? typeFilters.map((type) => ({
+          ...type,
+          disabled: disabledTypes.includes(type.value),
+        }))
+      : typeFilters;
 
   return (
     <div className="flex gap-4 w-full">
@@ -41,14 +56,15 @@ export function Filters({
         />
       </div>
       <div className="w-1/4">
-        <PortainerSelect
-          options={typeFilters}
-          onChange={(type) => {
-            listState.setType(type);
+        <PortainerSelect<TemplateType>
+          isMulti
+          options={typeFiltersEnabled}
+          onChange={(types) => {
+            listState.setTypes(types);
             onChange();
           }}
           placeholder="Type"
-          value={listState.type}
+          value={listState.types}
           bindToBody
           isClearable
         />

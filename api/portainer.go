@@ -1153,7 +1153,7 @@ type (
 	Template struct {
 		// Mandatory container/stack fields
 		// Template Identifier
-		ID TemplateID `json:"Id" example:"1"`
+		ID TemplateID `json:"id" example:"1"`
 		// Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack), 4 (Compose edge stack)
 		Type TemplateType `json:"type" example:"1"`
 		// Title of the template
@@ -1614,7 +1614,7 @@ const (
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
-	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/v3/templates.json"
 	// DefaultHelmrepositoryURL represents the URL to the official templates supported by Bitnami
 	DefaultHelmRepositoryURL = "https://charts.bitnami.com/bitnami"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
@@ -1829,8 +1829,6 @@ const (
 	SwarmStackTemplate
 	// ComposeStackTemplate represents a template used to deploy a Compose stack
 	ComposeStackTemplate
-	// EdgeStackTemplate represents a template used to deploy an Edge stack
-	EdgeStackTemplate
 )
 
 const (

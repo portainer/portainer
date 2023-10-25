@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { TemplateType } from '@/react/portainer/templates/app-templates/types';
 import { AccessControlFormData } from '../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app').controller('TemplatesController', [
@@ -47,6 +48,8 @@ angular.module('portainer.app').controller('TemplatesController', [
       formValidationError: '',
       actionInProgress: false,
     };
+
+    $scope.enabledTypes = [TemplateType.Container, TemplateType.ComposeStack];
 
     $scope.formValues = {
       network: '',
@@ -281,6 +284,10 @@ angular.module('portainer.app').controller('TemplatesController', [
       var endpointMode = $scope.applicationState.endpoint.mode;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
       const endpointId = +$state.params.endpointId;
+
+      const showSwarmStacks = endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25;
+
+      $scope.disabledTypes = !showSwarmStacks ? [TemplateType.SwarmStack] : [];
 
       $q.all({
         templates: TemplateService.templates(endpointId),

@@ -23,12 +23,11 @@ export function TemplatesUrlSection() {
         </span>
       </div>
 
-      <FormControl label="URL" inputId="templates_url" required errors={error}>
+      <FormControl label="URL" inputId="templates_url" errors={error}>
         <Field
           as={Input}
           id="templates_url"
           placeholder="https://myserver.mydomain/templates.json"
-          required
           data-cy="settings-templateUrl"
           name={name}
         />
