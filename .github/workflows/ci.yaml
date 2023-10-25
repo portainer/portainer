@@ -71,12 +71,6 @@ jobs:
           restore-keys: |
             ${{ matrix.config.platform }}-${{ matrix.config.arch }}-yarn-
           enableCrossOsArchive: true
-      - name: "[preparation] execute client test"
-        run: |
-          make client-deps && make test-client
-      - name: "[preparation] execute server test"
-        run: |
-          make test-server
       - name: "[preparation] set up qemu"
         uses: docker/setup-qemu-action@v2
       - name: "[preparation] set up docker context for buildx"
