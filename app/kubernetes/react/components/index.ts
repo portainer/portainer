@@ -160,6 +160,7 @@ export const ngModule = angular
       'namespaces',
       'onNamespaceChange',
       'isLoading',
+      'isVisible',
     ])
   );
 
