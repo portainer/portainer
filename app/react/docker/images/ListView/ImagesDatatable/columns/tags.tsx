@@ -15,11 +15,12 @@ function Cell({ getValue }: CellContext<ImagesListResponse, string[]>) {
 
   return (
     <>
-      {repoTags.map((tag, idx) => (
-        <span key={idx} className="label label-primary image-tag" title={tag}>
-          {tag}
-        </span>
-      ))}
+      {repoTags &&
+        repoTags.map((tag, idx) => (
+          <span key={idx} className="label label-primary image-tag" title={tag}>
+            {tag}
+          </span>
+        ))}
     </>
   );
 }
