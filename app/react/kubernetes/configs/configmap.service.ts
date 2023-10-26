@@ -10,7 +10,6 @@ import {
 } from '@/portainer/services/notifications';
 import { isFulfilled, isRejected } from '@/portainer/helpers/promise-utils';
 import { pluralize } from '@/portainer/helpers/strings';
-import PortainerError from '@/portainer/error';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -122,14 +121,10 @@ async function getConfigMapsForCluster(
   environmentId: EnvironmentId,
   namespaces: string[]
 ) {
-  try {
-    const configMaps = await Promise.all(
-      namespaces.map((namespace) => getConfigMaps(environmentId, namespace))
-    );
-    return configMaps.flat();
-  } catch (e) {
-    throw new PortainerError('Unable to retrieve ConfigMaps', e);
-  }
+  const configMaps = await Promise.all(
+    namespaces.map((namespace) => getConfigMaps(environmentId, namespace))
+  );
+  return configMaps.flat();
 }
 
 // get all configmaps for a namespace
