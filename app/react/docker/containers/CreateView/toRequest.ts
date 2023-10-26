@@ -13,7 +13,11 @@ import { restartPolicyTabUtils } from './RestartPolicyTab';
 import { envVarsTabUtils } from './EnvVarsTab';
 import { Values } from './useInitialValues';
 
-export function toRequest(values: Values, registry?: Registry) {
+export function toRequest(
+  values: Values,
+  registry?: Registry,
+  ignoreCapabilities?: boolean
+) {
   let config: CreateContainerRequest = {
     HostConfig: {},
     NetworkingConfig: {},
@@ -25,7 +29,11 @@ export function toRequest(values: Values, registry?: Registry) {
   config = labelsTabUtils.toRequest(config, values.labels);
   config = restartPolicyTabUtils.toRequest(config, values.restartPolicy);
   config = resourcesTabUtils.toRequest(config, values.resources);
-  config = capabilitiesTabUtils.toRequest(config, values.capabilities);
+  config = capabilitiesTabUtils.toRequest(
+    config,
+    values.capabilities,
+    !!ignoreCapabilities
+  );
   config = baseFormUtils.toRequest(config, values);
   config = envVarsTabUtils.toRequest(config, values.env);
   config.Image = buildImageFullURI(values.image.image, registry);
