@@ -69,6 +69,7 @@ func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimit
 	restrictedRouter.Handle("/users", httperror.LoggerHandler(h.userList)).Methods(http.MethodGet)
 
 	authenticatedRouter.Handle("/users/me", httperror.LoggerHandler(h.userInspectMe)).Methods(http.MethodGet)
+	restrictedRouter.Handle("/users/me", httperror.LoggerHandler(h.userInspectMe)).Methods(http.MethodGet)
 	restrictedRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userInspect)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userUpdate)).Methods(http.MethodPut)
 	adminRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userDelete)).Methods(http.MethodDelete)
