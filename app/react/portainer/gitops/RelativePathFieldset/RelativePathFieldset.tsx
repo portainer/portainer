@@ -37,15 +37,6 @@ export function RelativePathFieldset({
     <>
       <div className="form-group">
         <div className="col-sm-12">
-          <TextTip color="blue">
-            &apos;Gitops Edge Configuration&apos; requires relative path volumes
-            to be enabled first, as it uses this feature as the base mechanism.
-          </TextTip>
-        </div>
-      </div>
-
-      <div className="form-group">
-        <div className="col-sm-12">
           <SwitchField
             name="EnableRelativePaths"
             label="Enable relative path volumes"
