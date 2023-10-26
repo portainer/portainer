@@ -46,6 +46,7 @@ func Test_userRemoveAccessToken(t *testing.T) {
 	jwt, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role})
 
 	t.Run("standard user can successfully delete API key", func(t *testing.T) {
+		is := assert.New(t)
 		_, apiKey, err := apiKeyService.GenerateApiKey(*user, "test-delete-token")
 		is.NoError(err)
 
@@ -64,6 +65,7 @@ func Test_userRemoveAccessToken(t *testing.T) {
 	})
 
 	t.Run("admin can delete a standard user API Key", func(t *testing.T) {
+		is := assert.New(t)
 		_, apiKey, err := apiKeyService.GenerateApiKey(*user, "test-admin-delete-token")
 		is.NoError(err)
 
@@ -82,6 +84,7 @@ func Test_userRemoveAccessToken(t *testing.T) {
 	})
 
 	t.Run("user can delete API Key using api-key auth", func(t *testing.T) {
+		is := assert.New(t)
 		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test-api-key-auth-deletion")
 		is.NoError(err)
 
