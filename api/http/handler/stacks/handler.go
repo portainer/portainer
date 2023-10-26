@@ -70,6 +70,8 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackDelete))).Methods(http.MethodDelete)
 	h.Handle("/stacks/{id}/associate",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.stackAssociate))).Methods(http.MethodPut)
+	h.Handle("/stacks/name/{name}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackDeleteKubernetesByName))).Methods(http.MethodDelete)
 	h.Handle("/stacks/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackUpdate))).Methods(http.MethodPut)
 	h.Handle("/stacks/{id}/git",
@@ -161,31 +163,6 @@ func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name 
 	}
 
 	return true, nil
-}
-
-func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, namespace string) (bool, error) {
-	isUniqueStackName, err := handler.checkUniqueStackName(endpoint, name, stackID)
-	if err != nil {
-		return false, err
-	}
-
-	if !isUniqueStackName {
-		// Check if this stack name is really used in the kubernetes.
-		// Because the stack with this name could be removed via kubectl cli outside and the datastore does not be informed of this action.
-		if namespace == "" {
-			namespace = "default"
-		}
-
-		kubeCli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
-		if err != nil {
-			return false, err
-		}
-		isUniqueStackName, err = kubeCli.HasStackName(namespace, name)
-		if err != nil {
-			return false, err
-		}
-	}
-	return isUniqueStackName, nil
 }
 
 func (handler *Handler) checkUniqueStackNameInDocker(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, swarmMode bool) (bool, error) {

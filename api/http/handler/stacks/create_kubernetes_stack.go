@@ -153,13 +153,6 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
-	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
-		return httperror.Conflict(fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), stackutils.ErrStackAlreadyExists)
-	}
 
 	stackPayload := createStackPayloadFromK8sFileContentPayload(payload.StackName, payload.Namespace, payload.StackFileContent, payload.ComposeFormat, payload.FromAppTemplate)
 
@@ -217,13 +210,6 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
-	}
-	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
-		return httperror.Conflict(fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), stackutils.ErrStackAlreadyExists)
 	}
 
 	//make sure the webhook ID is unique
@@ -295,13 +281,6 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
-	}
-	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
-		return httperror.Conflict(fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), stackutils.ErrStackAlreadyExists)
 	}
 
 	stackPayload := createStackPayloadFromK8sUrlPayload(payload.StackName,

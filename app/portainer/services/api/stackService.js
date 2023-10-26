@@ -6,12 +6,13 @@ angular.module('portainer.app').factory('StackService', [
   '$q',
   '$async',
   'Stack',
+  'StackByName',
   'FileUploadService',
   'StackHelper',
   'ServiceService',
   'ContainerService',
   'SwarmService',
-  function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
+  function StackServiceFactory($q, $async, Stack, StackByName, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
     'use strict';
     var service = {
       updateGit,
@@ -211,6 +212,22 @@ angular.module('portainer.app').factory('StackService', [
       var deferred = $q.defer();
 
       Stack.remove({ id: stack.Id ? stack.Id : stack.Name, external: external, endpointId: endpointId })
+        .$promise.then(function success() {
+          deferred.resolve();
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to remove the stack', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.removeKubernetesStacksByName = function (name, external, endpointId) {
+      var deferred = $q.defer();
+      // eslint-disable-next-line no-console
+      console.log({ name: name, external: external, endpointId: endpointId });
+
+      StackByName.remove({ name: name, external: external, endpointId: endpointId })
         .$promise.then(function success() {
           deferred.resolve();
         })
