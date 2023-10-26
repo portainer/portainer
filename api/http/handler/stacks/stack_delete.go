@@ -286,6 +286,11 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 		return httperror.BadRequest("Invalid query parameter: endpointId", err)
 	}
 
+	namespace, err := request.RetrieveQueryParameter(r, "namespace", false)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: namespace", err)
+	}
+
 	stacks, err := handler.DataStore.Stack().StacksByName(stackName)
 	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.InternalServerError("Unable to check for stack existence inside the database", err)
@@ -306,6 +311,11 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 	// check authorizations on all the stacks one by one
 	stacksToDelete := make([]portainer.Stack, 0)
 	for _, stack := range stacks {
+		// only delete stacks for the specified namespace
+		if stack.Namespace != namespace {
+			continue
+		}
+
 		isOrphaned := portainer.EndpointID(endpointID) != stack.EndpointID
 		if stack.Type != portainer.KubernetesStack {
 			return httperror.BadRequest("Only Kubernetes stacks can be deleted by name", errors.New("Only Kubernetes stacks can be deleted by name"))

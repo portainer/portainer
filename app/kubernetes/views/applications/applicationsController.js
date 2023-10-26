@@ -63,7 +63,7 @@ class KubernetesApplicationsController {
           await Promise.all(promises);
         }
 
-        await this.StackService.removeKubernetesStacksByName(stack.Name, false, this.endpoint.Id);
+        await this.StackService.removeKubernetesStacksByName(stack.Name, stack.ResourcePool, false, this.endpoint.Id);
 
         this.Notifications.success('Stack successfully removed', stack.Name);
         _.remove(this.state.stacks, { Name: stack.Name });

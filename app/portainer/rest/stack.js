@@ -30,7 +30,7 @@ function StackByNameFactory($resource, API_ENDPOINT_STACKS) {
     API_ENDPOINT_STACKS + '/name/:name',
     {},
     {
-      remove: { method: 'DELETE', params: { name: '@name', external: '@external', endpointId: '@endpointId' } },
+      remove: { method: 'DELETE', params: { name: '@name', external: '@external', endpointId: '@endpointId', namespace: '@namespace' } },
     }
   );
 }
