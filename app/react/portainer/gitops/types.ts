@@ -26,6 +26,7 @@ export interface RepoConfigResponse {
   ConfigFilePath: string;
   Authentication?: GitAuthenticationResponse;
   ConfigHash: string;
+  TLSSkipVerify: boolean;
 }
 
 export type AutoUpdateModel = {
@@ -52,11 +53,11 @@ export type GitAuthModel = GitCredentialsModel & GitNewCredentialModel;
 
 export interface GitFormModel extends GitAuthModel {
   RepositoryURL: string;
-  RepositoryURLValid: boolean;
+  RepositoryURLValid?: boolean;
   ComposeFilePathInRepository: string;
   RepositoryAuthentication: boolean;
   RepositoryReferenceName?: string;
-  AdditionalFiles: string[];
+  AdditionalFiles?: string[];
 
   SaveCredential?: boolean;
   NewCredentialName?: string;

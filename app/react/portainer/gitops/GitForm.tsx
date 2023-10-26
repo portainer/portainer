@@ -88,7 +88,7 @@ export function GitForm({
 
       {isAdditionalFilesFieldVisible && (
         <AdditionalFileField
-          value={value.AdditionalFiles}
+          value={value.AdditionalFiles || []}
           onChange={(value) => handleChange({ AdditionalFiles: value })}
           errors={errors.AdditionalFiles}
         />
@@ -165,5 +165,5 @@ export function buildGitValidationSchema(
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials, false));
+  }).concat(gitAuthValidation(gitCredentials, false)) as SchemaOf<GitFormModel>;
 }
