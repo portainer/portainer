@@ -7,6 +7,7 @@ import (
 
 	gorillacsrf "github.com/gorilla/csrf"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/urfave/negroni"
 )
 
 func WithProtect(handler http.Handler) (http.Handler, error) {
@@ -25,9 +26,19 @@ func WithProtect(handler http.Handler) (http.Handler, error) {
 
 func withSendCSRFToken(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		csrfToken := gorillacsrf.Token(r)
-		w.Header().Set("X-CSRF-Token", csrfToken)
-		handler.ServeHTTP(w, r)
+
+		sw := negroni.NewResponseWriter(w)
+
+		sw.Before(func(sw negroni.ResponseWriter) {
+			statusCode := sw.Status()
+			if statusCode >= 200 && statusCode < 300 {
+				csrfToken := gorillacsrf.Token(r)
+				sw.Header().Set("X-CSRF-Token", csrfToken)
+			}
+		})
+
+		handler.ServeHTTP(sw, r)
+
 	})
 }
 

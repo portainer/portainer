@@ -41,6 +41,7 @@ require (
 	github.com/rs/zerolog v1.29.0
 	github.com/segmentio/encoding v0.3.6
 	github.com/stretchr/testify v1.8.4
+	github.com/urfave/negroni v1.0.0
 	github.com/viney-shih/go-lock v1.1.1
 	go.etcd.io/bbolt v1.3.7
 	golang.org/x/crypto v0.14.0
