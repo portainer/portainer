@@ -24,7 +24,8 @@ export function EdgeScriptSettingsFieldset({
   hideIdGetter,
   showMetaFields,
 }: Props) {
-  const { values, setFieldValue } = useFormikContext<ScriptFormValues>();
+  const { values, setFieldValue, errors } =
+    useFormikContext<ScriptFormValues>();
 
   return (
     <>
@@ -50,8 +51,10 @@ export function EdgeScriptSettingsFieldset({
         <>
           <FormControl
             label="Edge ID Generator"
-            tooltip="A bash script one liner that will generate the edge id and will be assigned to the PORTAINER_EDGE_ID environment variable"
+            tooltip="Enter a single-line bash command that generates a unique Edge ID. For example, you can use 'uuidgen' or 'uuid'. The result will be assigned to the 'PORTAINER_EDGE_ID' environment variable."
             inputId="edge-id-generator-input"
+            required
+            errors={errors.edgeIdGenerator}
           >
             <Input
               type="text"
