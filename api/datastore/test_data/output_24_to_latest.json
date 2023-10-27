@@ -27,7 +27,9 @@
   ],
   "endpoints": [
     {
-      "Agent": {},
+      "Agent": {
+        "Version": ""
+      },
       "AuthorizedTeams": null,
       "AuthorizedUsers": null,
       "AzureCredentials": {
@@ -36,36 +38,62 @@
         "TenantID": ""
       },
       "ComposeSyntaxMaxVersion": "",
-      "Edge": {},
+      "Edge": {
+        "AsyncMode": false,
+        "CommandInterval": 0,
+        "PingInterval": 0,
+        "SnapshotInterval": 0
+      },
       "EdgeCheckinInterval": 0,
+      "EdgeKey": "",
       "Gpus": [],
       "GroupId": 1,
+      "Heartbeat": false,
       "Id": 1,
       "Kubernetes": {
         "Configuration": {
+          "AllowNoneIngressClass": false,
+          "EnableResourceOverCommit": false,
           "IngressAvailabilityPerNamespace": true,
           "IngressClasses": null,
-          "StorageClasses": null
+          "ResourceOverCommitPercentage": 0,
+          "RestrictDefaultNamespace": false,
+          "StorageClasses": null,
+          "UseLoadBalancer": false,
+          "UseServerMetrics": false
         },
-        "Flags": {},
+        "Flags": {
+          "IsServerIngressClassDetected": false,
+          "IsServerMetricsDetected": false,
+          "IsServerStorageDetected": false
+        },
         "Snapshots": []
       },
+      "LastCheckInDate": 0,
       "Name": "local",
       "PostInitMigrations": {
         "MigrateGPUs": true,
         "MigrateIngresses": true
       },
+      "PublicURL": "",
+      "QueryDate": 0,
       "SecuritySettings": {
         "allowBindMountsForRegularUsers": true,
         "allowContainerCapabilitiesForRegularUsers": true,
         "allowDeviceMappingForRegularUsers": true,
         "allowHostNamespaceForRegularUsers": true,
         "allowPrivilegedModeForRegularUsers": true,
-        "allowStackManagementForRegularUsers": true
+        "allowStackManagementForRegularUsers": true,
+        "allowSysctlSettingForRegularUsers": false,
+        "allowVolumeBrowserForRegularUsers": false,
+        "enableHostManagementFeatures": false
       },
       "Snapshots": [],
       "Status": 1,
-      "TLSConfig": {},
+      "TLSConfig": {
+        "TLS": false,
+        "TLSSkipVerify": false
+      },
       "TagIds": [],
       "Tags": null,
       "TeamAccessPolicies": {},
@@ -79,6 +107,7 @@
       "Authentication": true,
       "AuthorizedTeams": null,
       "AuthorizedUsers": null,
+      "BaseURL": "",
       "Ecr": {
         "Region": ""
       },
@@ -121,28 +150,34 @@
       "UserAccesses": []
     },
     {
+      "AdministratorsOnly": false,
       "Id": 3,
       "Public": true,
       "ResourceId": "1_alpine",
       "SubResourceIds": [],
+      "System": false,
       "TeamAccesses": [],
       "Type": 6,
       "UserAccesses": []
     },
     {
+      "AdministratorsOnly": false,
       "Id": 4,
       "Public": true,
       "ResourceId": "1_redis",
       "SubResourceIds": [],
+      "System": false,
       "TeamAccesses": [],
       "Type": 6,
       "UserAccesses": []
     },
     {
+      "AdministratorsOnly": false,
       "Id": 5,
       "Public": false,
       "ResourceId": "1_nginx",
       "SubResourceIds": [],
+      "System": false,
       "TeamAccesses": [
         {
           "AccessLevel": 1,
@@ -538,6 +573,7 @@
     }
   ],
   "settings": {
+    "AgentSecret": "",
     "AllowBindMountsForRegularUsers": true,
     "AllowContainerCapabilitiesForRegularUsers": true,
     "AllowDeviceMappingForRegularUsers": true,
@@ -553,9 +589,14 @@
       "SnapshotInterval": 0
     },
     "EdgeAgentCheckinInterval": 5,
+    "EdgePortainerUrl": "",
+    "EnableEdgeComputeFeatures": false,
     "EnableTelemetry": true,
+    "EnforceEdgeID": false,
     "FeatureFlagSettings": null,
-    "GlobalDeploymentOptions": {},
+    "GlobalDeploymentOptions": {
+      "hideStacksFunctionality": false
+    },
     "HelmRepositoryURL": "https://charts.bitnami.com/bitnami",
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
@@ -568,7 +609,8 @@
       "GroupSearchSettings": [
         {
           "GroupAttribute": "",
-          "GroupBaseDN": ""
+          "GroupBaseDN": "",
+          "GroupFilter": ""
         }
       ],
       "ReaderDN": "",
@@ -579,9 +621,14 @@
           "UserNameAttribute": ""
         }
       ],
-      "TLSConfig": {},
+      "StartTLS": false,
+      "TLSConfig": {
+        "TLS": false,
+        "TLSSkipVerify": false
+      },
       "URL": ""
     },
+    "LogoURL": "",
     "OAuthSettings": {
       "AccessTokenURI": "",
       "AuthorizationURI": "",
@@ -596,8 +643,10 @@
       "Scopes": "",
       "UserIdentifier": ""
     },
+    "ShowKomposeBuildOption": false,
     "SnapshotInterval": "5m",
     "TemplatesURL": "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json",
+    "TrustOnFirstConnect": false,
     "UserSessionTimeout": "8h",
     "fdoConfiguration": {
       "enabled": false,
@@ -736,23 +785,34 @@
         "UnhealthyContainerCount": 0,
         "VolumeCount": 10
       },
-      "EndpointId": 1
+      "EndpointId": 1,
+      "Kubernetes": null
     }
   ],
   "ssl": {
-    "httpEnabled": true
+    "certPath": "",
+    "httpEnabled": true,
+    "keyPath": "",
+    "selfSigned": false
   },
   "stacks": [
     {
       "AdditionalFiles": null,
+      "AutoUpdate": null,
       "CreatedBy": "",
       "CreationDate": 0,
       "EndpointId": 1,
       "EntryPoint": "docker/alpine37-compose.yml",
       "Env": [],
+      "FromAppTemplate": false,
+      "GitConfig": null,
       "Id": 2,
+      "IsComposeFormat": false,
       "Name": "alpine",
+      "Namespace": "",
+      "Option": null,
       "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/2",
+      "ResourceControl": null,
       "Status": 1,
       "SwarmId": "s3fd604zdba7z13tbq2x6lyue",
       "Type": 1,
@@ -761,30 +821,46 @@
     },
     {
       "AdditionalFiles": null,
+      "AutoUpdate": null,
       "CreatedBy": "",
       "CreationDate": 0,
       "EndpointId": 1,
       "EntryPoint": "docker-compose.yml",
       "Env": [],
+      "FromAppTemplate": false,
+      "GitConfig": null,
       "Id": 5,
+      "IsComposeFormat": false,
       "Name": "redis",
+      "Namespace": "",
+      "Option": null,
       "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/5",
+      "ResourceControl": null,
       "Status": 1,
+      "SwarmId": "",
       "Type": 2,
       "UpdateDate": 0,
       "UpdatedBy": ""
     },
     {
       "AdditionalFiles": null,
+      "AutoUpdate": null,
       "CreatedBy": "",
       "CreationDate": 0,
       "EndpointId": 1,
       "EntryPoint": "docker-compose.yml",
       "Env": [],
+      "FromAppTemplate": false,
+      "GitConfig": null,
       "Id": 6,
+      "IsComposeFormat": false,
       "Name": "nginx",
+      "Namespace": "",
+      "Option": null,
       "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/6",
+      "ResourceControl": null,
       "Status": 1,
+      "SwarmId": "",
       "Type": 2,
       "UpdateDate": 0,
       "UpdatedBy": ""
@@ -796,7 +872,9 @@
       "Name": "hello"
     }
   ],
-  "tunnel_server": {},
+  "tunnel_server": {
+    "PrivateKeySeed": ""
+  },
   "users": [
     {
       "EndpointAuthorizations": null,
@@ -821,7 +899,9 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
-      "ThemeSettings": {},
+      "ThemeSettings": {
+        "color": ""
+      },
       "TokenIssueAt": 0,
       "Username": "admin"
     },
@@ -848,7 +928,9 @@
         "PortainerUserRevokeToken": true
       },
       "Role": 1,
-      "ThemeSettings": {},
+      "ThemeSettings": {
+        "color": ""
+      },
       "TokenIssueAt": 0,
       "Username": "prabhat"
     }
