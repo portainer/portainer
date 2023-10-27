@@ -4,20 +4,20 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - "develop"
-    - "!release/*"
+      - 'develop'
+      - '!release/*'
   pull_request:
     branches:
-    - "develop"
-    - "release/*"
-    - "feat/*"
-    - "fix/*"
-    - "refactor/*"
+      - 'develop'
+      - 'release/*'
+      - 'feat/*'
+      - 'fix/*'
+      - 'refactor/*'
 
 env:
   DOCKER_HUB_REPO: portainerci/portainer
   NODE_ENV: testing
-  GO_VERSION: 1.21.0
+  GO_VERSION: 1.21.3
   NODE_VERSION: 18.x
 
 jobs:
@@ -31,22 +31,22 @@ jobs:
           - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: arc-runner-set
     steps:
-      - name: "[preparation] checkout the current branch"
+      - name: '[preparation] checkout the current branch'
         uses: actions/checkout@v3.5.3
         with:
           ref: ${{ github.event.inputs.branch }}
-      - name: "[preparation] set up golang"
+      - name: '[preparation] set up golang'
         uses: actions/setup-go@v4.0.1
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: false
-      - name: "[preparation] cache paths"
+      - name: '[preparation] cache paths'
         id: cache-dir-path
         run: |
           echo "yarn-cache-dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
           echo "go-build-dir=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
           echo "go-mod-dir=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
-      - name: "[preparation] cache go"
+      - name: '[preparation] cache go'
         uses: actions/cache@v3
         with:
           path: |
@@ -56,12 +56,12 @@ jobs:
           restore-keys: |
             ${{ matrix.config.platform }}-${{ matrix.config.arch }}-go-
           enableCrossOsArchive: true
-      - name: "[preparation] set up node.js"
+      - name: '[preparation] set up node.js'
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: ''
-      - name: "[preparation] cache yarn"
+      - name: '[preparation] cache yarn'
         uses: actions/cache@v3
         with:
           path: |
@@ -71,35 +71,35 @@ jobs:
           restore-keys: |
             ${{ matrix.config.platform }}-${{ matrix.config.arch }}-yarn-
           enableCrossOsArchive: true
-      - name: "[preparation] set up qemu"
+      - name: '[preparation] set up qemu'
         uses: docker/setup-qemu-action@v2
-      - name: "[preparation] set up docker context for buildx"
+      - name: '[preparation] set up docker context for buildx'
         run: docker context create builders
-      - name: "[preparation] set up docker buildx"
+      - name: '[preparation] set up docker buildx'
         uses: docker/setup-buildx-action@v2
         with:
           endpoint: builders
-      - name: "[preparation] docker login"
+      - name: '[preparation] docker login'
         uses: docker/login-action@v2.2.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      - name: "[preparation] set the container image tag"
+      - name: '[preparation] set the container image tag'
         run: |
           if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             CONTAINER_IMAGE_TAG="pr${{ github.event.number }}"
           else
             CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//-/g')
           fi
-          
+
           if [ "${{ matrix.config.platform }}" == "windows" ]; then
             CONTAINER_IMAGE_TAG="${CONTAINER_IMAGE_TAG}-${{ matrix.config.platform }}${{ matrix.config.version }}-${{ matrix.config.arch }}"
           else 
             CONTAINER_IMAGE_TAG="${CONTAINER_IMAGE_TAG}-${{ matrix.config.platform }}-${{ matrix.config.arch }}"
           fi
-          
+
           echo "CONTAINER_IMAGE_TAG=${CONTAINER_IMAGE_TAG}" >> $GITHUB_ENV
-      - name: "[execution] build linux & windows portainer binaries"
+      - name: '[execution] build linux & windows portainer binaries'
         run: |
           export YARN_VERSION=$(yarn --version)
           export WEBPACK_VERSION=$(yarn list webpack --depth=0 | grep webpack | awk -F@ '{print $2}')
@@ -107,8 +107,8 @@ jobs:
           make build-all PLATFORM=${{ matrix.config.platform }} ARCH=${{ matrix.config.arch }} ENV=${NODE_ENV}
         env:
           CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
-      - name: "[execution] build and push docker images"
-        run: |          
+      - name: '[execution] build and push docker images'
+        run: |
           if [ "${{ matrix.config.platform }}" == "windows" ]; then
             mv dist/portainer dist/portainer.exe
             docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} --build-arg OSVERSION=${{ matrix.config.version }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
@@ -122,25 +122,25 @@ jobs:
     runs-on: arc-runner-set
     needs: [build_images]
     steps:
-      - name: "[preparation] docker login"
+      - name: '[preparation] docker login'
         uses: docker/login-action@v2.2.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      - name: "[preparation] set up docker context for buildx"
+      - name: '[preparation] set up docker context for buildx'
         run: docker version && docker context create builders
-      - name: "[preparation] set up docker buildx"
+      - name: '[preparation] set up docker buildx'
         uses: docker/setup-buildx-action@v2
         with:
           endpoint: builders
-      - name: "[execution] build and push manifests"
+      - name: '[execution] build and push manifests'
         run: |
           if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             CONTAINER_IMAGE_TAG="pr${{ github.event.number }}"
           else
             CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//-/g')
           fi
-          
+
           docker buildx imagetools create -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \

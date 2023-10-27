@@ -5,6 +5,9 @@ on:
     - cron: '0 20 * * *'
   workflow_dispatch:
 
+env:
+  GO_VERSION: 1.21.3
+
 jobs:
   client-dependencies:
     name: Client Dependency Check
@@ -25,7 +28,7 @@ jobs:
         with:
           json: true
 
-      - name: upload scan result as develop artifact 
+      - name: upload scan result as develop artifact
         uses: actions/upload-artifact@v3
         with:
           name: js-security-scan-develop-result
@@ -41,7 +44,7 @@ jobs:
           name: html-js-result-${{github.run_id}}
           path: js-result.html
 
-      - name: analyse vulnerabilities 
+      - name: analyse vulnerabilities
         id: set-matrix
         run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=snyk --path="/data/snyk.json" --output-type=matrix)
@@ -58,10 +61,10 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@master
 
-      - name: install Go 
+      - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.21.0'
+          go-version: ${{ env.GO_VERSION }}
 
       - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
@@ -74,7 +77,7 @@ jobs:
           yarn global add snyk
           snyk test --file=./go.mod --json-file-output=snyk.json 2>/dev/null || :
 
-      - name: upload scan result as develop artifact 
+      - name: upload scan result as develop artifact
         uses: actions/upload-artifact@v3
         with:
           name: go-security-scan-develop-result
@@ -104,7 +107,7 @@ jobs:
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
     steps:
-      - name: scan vulnerabilities by Trivy 
+      - name: scan vulnerabilities by Trivy
         uses: docker://docker.io/aquasec/trivy:latest
         continue-on-error: true
         with:
@@ -153,8 +156,8 @@ jobs:
           echo "${{ matrix.go.summary }}"
           echo "${{ matrix.image.summary }}"
 
-      - name: send message to Slack 
-        if: >- 
+      - name: send message to Slack
+        if: >-
           matrix.js.status == 'failure' ||
           matrix.go.status == 'failure' || 
           matrix.image.status == 'failure'
