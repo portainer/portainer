@@ -40,8 +40,8 @@ angular.module('portainer.app').factory('Authentication', [
       }
     }
 
-    async function logoutAsync(performApiLogout) {
-      if (performApiLogout && isAuthenticated()) {
+    async function logoutAsync() {
+      if (isAuthenticated()) {
         await Auth.logout().$promise;
       }
 
@@ -53,8 +53,8 @@ angular.module('portainer.app').factory('Authentication', [
       tryAutoLoginExtension();
     }
 
-    function logout(performApiLogout) {
-      return $async(logoutAsync, performApiLogout);
+    function logout() {
+      return $async(logoutAsync);
     }
 
     function init() {

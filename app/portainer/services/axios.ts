@@ -49,6 +49,8 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 
 axios.interceptors.request.use(agentInterceptor);
 
+export const AXIOS_UNAUTHENTICATED = '__axios__unauthenticated__';
+
 /**
  * Parses an Axios error and returns a PortainerError.
  * @param err The original error.
@@ -71,6 +73,16 @@ export function parseAxiosError(
       resultMsg = `${msg}: ${details}`;
     } else {
       resultMsg = msg || details;
+    }
+    // dispatch an event for unauthorized errors that AngularJS can catch
+    if (err.response?.status === 401) {
+      dispatchEvent(
+        new CustomEvent(AXIOS_UNAUTHENTICATED, {
+          detail: {
+            err,
+          },
+        })
+      );
     }
   }
 

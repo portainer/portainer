@@ -25,11 +25,10 @@ class LogoutController {
    */
   async logoutAsync() {
     const error = this.$transition$.params().error;
-    const performApiLogout = this.$transition$.params().performApiLogout;
     const settings = await this.SettingsService.publicSettings();
 
     try {
-      await this.Authentication.logout(performApiLogout);
+      await this.Authentication.logout();
     } finally {
       this.LocalStorage.storeLogoutReason(error);
       if (settings.OAuthLogoutURI && this.Authentication.getUserDetails().ID !== 1) {
