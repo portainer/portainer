@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import angular from 'angular';
 
 import { configureFDO } from '@/portainer/hostmanagement/fdo/fdo.service';
@@ -43,7 +44,22 @@ export default function SettingsEdgeComputeController($q, $async, $state, Notifi
   function initView() {
     $async(async () => {
       try {
-        ctrl.settings = await SettingsService.settings();
+        const settings = await SettingsService.settings();
+
+        const defaultMTLS = {
+          ..._.get(settings, 'Edge.MTLS', {}),
+          UseSeparateCert: _.get(settings, 'Edge.MTLS.UseSeparateCert', false),
+        };
+
+        ctrl.settings = {
+          ...settings,
+          EnableEdgeComputeFeatures: !!settings.EnableEdgeComputeFeatures,
+          EnforceEdgeID: !!settings.EnforceEdgeID,
+          Edge: {
+            ...settings.Edge,
+            MTLS: defaultMTLS,
+          },
+        };
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve application settings');
       }
