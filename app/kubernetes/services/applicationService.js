@@ -125,7 +125,6 @@ class KubernetesApplicationService {
     const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers.value, application);
     const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(namespace, boundScaler.Name) : undefined;
     application.AutoScaler = scaler;
-    application.Ingresses = ingresses;
 
     if (service.Yaml) {
       application.Yaml += '---\n' + service.Yaml;
@@ -183,7 +182,6 @@ class KubernetesApplicationService {
             const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers, application);
             const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(ns, boundScaler.Name) : undefined;
             application.AutoScaler = scaler;
-            application.Ingresses = await this.KubernetesIngressService.get(ns);
           })
         );
         return applications;
@@ -451,7 +449,8 @@ class KubernetesApplicationService {
     if (application.ServiceType) {
       // delete headless service && non-headless service
       await this.KubernetesServiceService.delete(application.Services);
-      if (application.Ingresses.length) {
+      const appHasIngressPath = application.PublishedPorts && application.PublishedPorts.flatMap((pp) => pp.IngressRules).length >= 1;
+      if (appHasIngressPath) {
         const originalIngresses = await this.KubernetesIngressService.get(payload.Namespace);
         const formValues = {
           OriginalIngresses: originalIngresses,
