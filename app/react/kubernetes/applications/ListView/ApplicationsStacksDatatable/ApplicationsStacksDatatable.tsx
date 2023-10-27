@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
@@ -32,7 +31,8 @@ interface Props {
   namespaces: Array<Namespace>;
   onNamespaceChange(namespace: string): void;
   isLoading?: boolean;
-  isVisible: boolean;
+  showSystem?: boolean;
+  setSystemResources(showSystem: boolean): void;
 }
 
 export function ApplicationsStacksDatatable({
@@ -43,25 +43,15 @@ export function ApplicationsStacksDatatable({
   namespaces,
   onNamespaceChange,
   isLoading,
-  isVisible,
+  showSystem,
+  setSystemResources,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
 
-  // sync showSystem state with the angular table settings
-  // when the applications table is migrated, the same table state can be shared
-  // useTableState isn't used because the app datatable settings are in a different format
-  const appTableState = localStorageGet<{
-    showSystem: boolean;
-  }>('datatable_settings_kubernetes.applications', {
-    showSystem: false,
-  });
-
   useEffect(() => {
-    if (appTableState.showSystem !== undefined) {
-      tableState.setShowSystemResources(appTableState.showSystem);
-    }
+    tableState.setShowSystemResources(showSystem || false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible]);
+  }, [showSystem]);
 
   const authorized = useAuthorizations('K8sApplicationsW');
   useRepeater(tableState.autoRefreshRate, onRefresh);
@@ -110,7 +100,12 @@ export function ApplicationsStacksDatatable({
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} onRemove={onRemove} />
       )}
-      renderTableSettings={() => <StacksSettingsMenu settings={tableState} />}
+      renderTableSettings={() => (
+        <StacksSettingsMenu
+          setSystemResources={setSystemResources}
+          settings={tableState}
+        />
+      )}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
     />
   );
