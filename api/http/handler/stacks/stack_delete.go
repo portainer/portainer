@@ -274,7 +274,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	log.Debug().Msgf("Trying to delete Kubernetes stack `%s`", stackName)
+	log.Debug().Msgf("Trying to delete Kubernetes stack %q", stackName)
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
@@ -306,7 +306,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 		return httperror.InternalServerError("Unable to find the endpoint associated to the stack inside the database", err)
 	}
 
-	log.Debug().Msgf("Trying to delete Kubernetes stack `%s` for endpoint `%d`", stackName, endpointID)
+	log.Debug().Msgf("Trying to delete Kubernetes stack %q for endpoint `%d`", stackName, endpointID)
 
 	// check authorizations on all the stacks one by one
 	stacksToDelete := make([]portainer.Stack, 0)

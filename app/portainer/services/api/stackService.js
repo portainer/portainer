@@ -224,9 +224,6 @@ angular.module('portainer.app').factory('StackService', [
 
     service.removeKubernetesStacksByName = function (name, namespace, external, endpointId) {
       var deferred = $q.defer();
-      // eslint-disable-next-line no-console
-      console.log({ name: name, external: external, endpointId: endpointId });
-
       StackByName.remove({ name: name, external: external, endpointId: endpointId, namespace: namespace })
         .$promise.then(function success() {
           deferred.resolve();
