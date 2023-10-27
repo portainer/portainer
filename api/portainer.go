@@ -237,7 +237,7 @@ type (
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
 		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
 		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
 		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
 		Info       types.Info                `json:"Info" swaggerignore:"true"`

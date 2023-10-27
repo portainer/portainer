@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	_container "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
@@ -240,7 +240,7 @@ func snapshotImages(snapshot *portainer.DockerSnapshot, cli *client.Client) erro
 }
 
 func snapshotVolumes(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
-	volumes, err := cli.VolumeList(context.Background(), filters.Args{})
+	volumes, err := cli.VolumeList(context.Background(), volume.ListOptions{})
 	if err != nil {
 		return err
 	}
