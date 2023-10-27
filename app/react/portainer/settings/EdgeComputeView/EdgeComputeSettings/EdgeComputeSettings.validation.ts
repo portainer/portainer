@@ -9,8 +9,8 @@ import { FormValues } from './types';
 export function validationSchema(): SchemaOf<FormValues> {
   return object()
     .shape({
-      EnableEdgeComputeFeatures: boolean().default(false),
-      EnforceEdgeID: boolean().default(false),
+      EnableEdgeComputeFeatures: boolean().required('This field is required.'),
+      EnforceEdgeID: boolean().required('This field is required.'),
     })
     .concat(
       isBE
