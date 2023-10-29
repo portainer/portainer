@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
-
+import { HelmIcon } from './HelmIcon';
 export default class HelmTemplatesController {
   /* @ngInject */
   constructor($analytics, $async, $state, $window, $anchorScroll, Authentication, HelmService, KubernetesResourcePoolService, Notifications) {
@@ -14,6 +14,8 @@ export default class HelmTemplatesController {
     this.HelmService = HelmService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.Notifications = Notifications;
+
+    this.fallbackIcon = HelmIcon;
 
     this.editorUpdate = this.editorUpdate.bind(this);
     this.uiCanExit = this.uiCanExit.bind(this);

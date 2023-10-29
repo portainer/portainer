@@ -118,7 +118,7 @@ export const ngModule = angular
   )
   .component(
     'fallbackImage',
-    r2a(FallbackImage, ['src', 'fallbackIcon', 'alt', 'size', 'className'])
+    r2a(FallbackImage, ['src', 'fallbackIcon', 'alt', 'className'])
   )
   .component('prIcon', r2a(Icon, ['className', 'icon', 'mode', 'size', 'spin']))
   .component(
