@@ -1,7 +1,6 @@
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
+import { getTemplateVariables, intersectVariables, isTemplateVariablesEnabled } from '@/react/portainer/custom-templates/components/utils';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { getFilePreview } from '@/react/portainer/gitops/gitops.service';
 import { KUBE_TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
@@ -11,7 +10,7 @@ class KubeEditCustomTemplateViewController {
   constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
 
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.formValues = {
       Variables: [],

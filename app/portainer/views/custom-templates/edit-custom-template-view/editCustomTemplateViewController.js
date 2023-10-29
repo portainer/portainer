@@ -4,8 +4,7 @@ import { ResourceControlViewModel } from '@/react/portainer/access-control/model
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { getTemplateVariables, intersectVariables, isTemplateVariablesEnabled } from '@/react/portainer/custom-templates/components/utils';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class EditCustomTemplateViewController {
@@ -13,7 +12,7 @@ class EditCustomTemplateViewController {
   constructor($async, $state, $window, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, $window, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
 
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.formValues = {
       Variables: [],
