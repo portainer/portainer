@@ -26,6 +26,7 @@ export const ngModule = angular
       'value',
       'onChange',
       'definitions',
+      'errors',
     ])
   )
   .component('customTemplatesVariablesField', VariablesFieldAngular)

@@ -1,6 +1,5 @@
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
-import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { getTemplateVariables, intersectVariables, isTemplateVariablesEnabled } from '@/react/portainer/custom-templates/components/utils';
 import { editor, upload, git } from '@@/BoxSelector/common-options/build-methods';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { KUBE_TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
@@ -13,7 +12,7 @@ class KubeCreateCustomTemplateViewController {
     this.methodOptions = [editor, upload, git];
 
     this.templates = null;
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.state = {
       method: 'editor',
