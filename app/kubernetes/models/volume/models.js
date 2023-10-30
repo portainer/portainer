@@ -11,6 +11,7 @@ const _KubernetesPersistentVolumeClaim = Object.freeze({
   StorageClass: {}, // KubernetesStorageClass
   CreationDate: '',
   ApplicationOwner: '',
+  AccessModes: [],
   ApplicationName: '',
   MountPath: '', // used for Application creation from ApplicationFormValues | not used from API conversion
   Yaml: '',
