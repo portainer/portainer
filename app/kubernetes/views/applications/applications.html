@@ -24,6 +24,7 @@
                 on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
                 is-apps-loading="ctrl.state.isAppsLoading"
                 is-system-resources="ctrl.state.isSystemResources"
+                is-visible="ctrl.state.activeTab === 0"
                 set-system-resources="(ctrl.setSystemResources)"
                 hide-stacks-functionality="ctrl.deploymentOptions.hideStacksFunctionality"
               >
@@ -40,6 +41,8 @@
                 namespace="ctrl.state.namespaceName"
                 is-loading="ctrl.state.isAppsLoading"
                 on-namespace-change="(ctrl.onChangeNamespaceDropdown)"
+                show-system="ctrl.state.isSystemResources"
+                set-system-resources="(ctrl.setSystemResources)"
               >
               </kubernetes-applications-stacks-datatable>
             </uib-tab>

@@ -95,7 +95,7 @@ export function createPersistedStore<T extends BasicTableSettings>(
           ...create(set),
         }) as T,
       {
-        name: `datatable_settings_${keyBuilder(storageKey)}`,
+        name: keyBuilder(`datatable_settings_${storageKey}`),
       }
     )
   );

@@ -1,11 +1,11 @@
 import { List } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { systemResourcesSettings } from '@/react/kubernetes/datatables/SystemResourcesSettings';
+import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
-import { createPersistedStore, refreshableSettings } from '@@/datatables/types';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
 import { InsightsBox } from '@@/InsightsBox';
@@ -14,21 +14,14 @@ import { KubernetesStack } from '../../types';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
-import { Namespace, TableSettings } from './types';
+import { Namespace } from './types';
 import { StacksSettingsMenu } from './StacksSettingsMenu';
 import { NamespaceFilter } from './NamespaceFilter';
 import { TableActions } from './TableActions';
 
 const storageKey = 'kubernetes.applications.stacks';
 
-const settingsStore = createPersistedStore<TableSettings>(
-  storageKey,
-  'name',
-  (set) => ({
-    ...systemResourcesSettings(set),
-    ...refreshableSettings(set),
-  })
-);
+const settingsStore = createStore(storageKey);
 
 interface Props {
   dataset: Array<KubernetesStack>;
@@ -38,6 +31,8 @@ interface Props {
   namespaces: Array<Namespace>;
   onNamespaceChange(namespace: string): void;
   isLoading?: boolean;
+  showSystem?: boolean;
+  setSystemResources(showSystem: boolean): void;
 }
 
 export function ApplicationsStacksDatatable({
@@ -48,8 +43,15 @@ export function ApplicationsStacksDatatable({
   namespaces,
   onNamespaceChange,
   isLoading,
+  showSystem,
+  setSystemResources,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
+
+  useEffect(() => {
+    tableState.setShowSystemResources(showSystem || false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSystem]);
 
   const authorized = useAuthorizations('K8sApplicationsW');
   useRepeater(tableState.autoRefreshRate, onRefresh);
@@ -98,7 +100,12 @@ export function ApplicationsStacksDatatable({
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} onRemove={onRemove} />
       )}
-      renderTableSettings={() => <StacksSettingsMenu settings={tableState} />}
+      renderTableSettings={() => (
+        <StacksSettingsMenu
+          setSystemResources={setSystemResources}
+          settings={tableState}
+        />
+      )}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
     />
   );

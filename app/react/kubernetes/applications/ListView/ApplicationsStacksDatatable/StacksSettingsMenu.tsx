@@ -5,12 +5,21 @@ import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAut
 
 import { type TableSettings } from './types';
 
-export function StacksSettingsMenu({ settings }: { settings: TableSettings }) {
+export function StacksSettingsMenu({
+  settings,
+  setSystemResources,
+}: {
+  settings: TableSettings;
+  setSystemResources(showSystem: boolean): void;
+}) {
   return (
     <TableSettingsMenu>
       <SystemResourcesSettings
         value={settings.showSystemResources}
-        onChange={(value) => settings.setShowSystemResources(value)}
+        onChange={(value) => {
+          setSystemResources(value);
+          settings.setShowSystemResources(value);
+        }}
       />
 
       <TableSettingsMenuAutoRefresh
