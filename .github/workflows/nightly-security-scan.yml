@@ -105,7 +105,8 @@ jobs:
     if: >-
       github.ref == 'refs/heads/develop'
     outputs:
-      image: ${{ steps.set-matrix.outputs.image_result }}
+      image-trivy: ${{ steps.set-trivy-matrix.outputs.image_trivy_result }}
+      image-docker-scout: ${{ steps.set-docker-scout-matrix.outputs.image_docker_scout_result }}
     steps:
       - name: scan vulnerabilities by Trivy
         uses: docker://docker.io/aquasec/trivy:latest
@@ -113,27 +114,59 @@ jobs:
         with:
           args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress portainerci/portainer:develop
 
-      - name: upload image security scan result as artifact
+      - name: upload Trivy image security scan result as artifact
         uses: actions/upload-artifact@v3
         with:
           name: image-security-scan-develop-result
           path: image-trivy.json
 
-      - name: develop scan report export to html
+      - name: develop Trivy scan report export to html
         run: |
-          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=table --export --export-filename="/data/image-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=table --export --export-filename="/data/image-trivy-result")
 
-      - name: upload html file as artifact
+      - name: upload html file as Trivy artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-image-result-${{github.run_id}}
-          path: image-result.html
+          path: image-trivy-result.html
 
-      - name: analyse vulnerabilities
-        id: set-matrix
+      - name: analyse vulnerabilities from Trivy
+        id: set-trivy-matrix
         run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=trivy --path="/data/image-trivy.json" --output-type=matrix)
-          echo "image_result=${result}" >> $GITHUB_OUTPUT
+          echo "image_trivy_result=${result}" >> $GITHUB_OUTPUT
+
+      - name: scan vulnerabilities by Docker Scout
+        uses: docker/scout-action@v1
+        continue-on-error: true
+        with:
+          command: cves
+          image: portainerci/portainer:develop
+          sarif-file: image-docker-scout.json
+          dockerhub-user: ${{ secrets.DOCKER_HUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKER_HUB_PASSWORD }} 
+
+      - name: upload Docker Scout image security scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-security-scan-develop-result
+          path: image-docker-scout.json
+
+      - name: develop Docker Scout scan report export to html
+        run: |
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=docker-scout --path="/data/image-docker-scout.json" --output-type=table --export --export-filename="/data/image-docker-scout-result")
+
+      - name: upload html file as Docker Scout artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-image-result-${{github.run_id}}
+          path: image-docker-scout-result.html
+
+      - name: analyse vulnerabilities from Docker Scout
+        id: set-docker-scout-matrix
+        run: |
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest summary --report-type=docker-scout --path="/data/image-docker-scout.json" --output-type=matrix)
+          echo "image_docker_scout_result=${result}" >> $GITHUB_OUTPUT
 
   result-analysis:
     name: Analyse Scan Results
@@ -145,22 +178,26 @@ jobs:
       matrix:
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
         go: ${{fromJson(needs.server-dependencies.outputs.go)}}
-        image: ${{fromJson(needs.image-vulnerability.outputs.image)}}
+        image-trivy: ${{fromJson(needs.image-vulnerability.outputs.image-trivy)}}
+        image-docker-scout: ${{fromJson(needs.image-vulnerability.outputs.image-docker-scout)}}
     steps:
       - name: display the results of js, Go, and image scan
         run: |
           echo "${{ matrix.js.status }}"
           echo "${{ matrix.go.status }}"
-          echo "${{ matrix.image.status }}"
+          echo "${{ matrix.image-trivy.status }}"
+          echo "${{ matrix.image-docker-scout.status }}"
           echo "${{ matrix.js.summary }}"
           echo "${{ matrix.go.summary }}"
-          echo "${{ matrix.image.summary }}"
+          echo "${{ matrix.image-trivy.summary }}"
+          echo "${{ matrix.image-docker-scout.summary }}"
 
       - name: send message to Slack
         if: >-
           matrix.js.status == 'failure' ||
           matrix.go.status == 'failure' || 
-          matrix.image.status == 'failure'
+          matrix.image-trivy.status == 'failure' || 
+          matrix.image-docker-scout.status == 'failure' 
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -196,7 +233,14 @@ jobs:
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "*Image vulnerability check*: *${{ matrix.image.status }}*\n${{ matrix.image.summary }}\n"
+                        "text": "*Image Trivy vulnerability check*: *${{ matrix.image-trivy.status }}*\n${{ matrix.image-trivy.summary }}\n"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Image Docker Scout vulnerability check*: *${{ matrix.image-docker-scout.status }}*\n${{ matrix.image-docker-scout.summary }}\n"
                       }
                     }
                   ]
