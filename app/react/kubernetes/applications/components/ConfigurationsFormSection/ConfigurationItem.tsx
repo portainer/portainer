@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { List, RotateCw, Trash2 } from 'lucide-react';
 import { ConfigMap, Secret } from 'kubernetes-types/core/v1';
+import { SingleValue } from 'react-select';
 
 import { InputGroup } from '@@/form-components/InputGroup';
 import { Select } from '@@/form-components/ReactSelect';
@@ -33,7 +34,7 @@ export function ConfigurationItem({
 }: Props) {
   // rule out the error being of type string
   const formikError = isErrorType(error) ? error : undefined;
-  const configMapData = item.selectedConfiguration.data || {};
+  const configurationData = item.selectedConfiguration.data || {};
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -51,22 +52,7 @@ export function ConfigurationItem({
                   configuration.metadata?.name ===
                   item.selectedConfiguration.metadata?.name
               )}
-              onChange={(configMap) => {
-                if (configMap) {
-                  onChange({
-                    ...item,
-                    overriden: false,
-                    selectedConfiguration: configMap,
-                    overridenKeys: Object.keys(configMap.data || {}).map(
-                      (key) => ({
-                        key,
-                        path: '',
-                        type: 'NONE',
-                      })
-                    ),
-                  });
-                }
-              }}
+              onChange={onSelectConfigMap}
               size="sm"
               data-cy={`k8sAppCreate-add${dataCyType}Select_${index}`}
             />
@@ -81,17 +67,7 @@ export function ConfigurationItem({
               color="light"
               size="medium"
               className={clsx('!ml-0', { active: !item.overriden })}
-              onClick={() =>
-                onChange({
-                  ...item,
-                  overriden: false,
-                  overridenKeys: Object.keys(configMapData).map((key) => ({
-                    key,
-                    path: '',
-                    type: 'NONE',
-                  })),
-                })
-              }
+              onClick={() => onToggleOverride(false)}
               icon={RotateCw}
             >
               Auto
@@ -100,17 +76,7 @@ export function ConfigurationItem({
               color="light"
               size="medium"
               className={clsx('!ml-0 mr-1', { active: item.overriden })}
-              onClick={() =>
-                onChange({
-                  ...item,
-                  overriden: true,
-                  overridenKeys: Object.keys(configMapData).map((key) => ({
-                    key,
-                    path: '',
-                    type: 'ENVIRONMENT',
-                  })),
-                })
-              }
+              onClick={() => onToggleOverride(true)}
               icon={List}
             >
               Override
@@ -143,4 +109,31 @@ export function ConfigurationItem({
         ))}
     </div>
   );
+
+  function onSelectConfigMap(configMap: SingleValue<ConfigMap | Secret>) {
+    if (configMap) {
+      onChange({
+        ...item,
+        overriden: false,
+        selectedConfiguration: configMap,
+        overridenKeys: Object.keys(configMap.data || {}).map((key) => ({
+          key,
+          path: '',
+          type: 'NONE',
+        })),
+      });
+    }
+  }
+
+  function onToggleOverride(overriden: boolean) {
+    onChange({
+      ...item,
+      overriden,
+      overridenKeys: Object.keys(configurationData).map((key) => ({
+        key,
+        path: '',
+        type: overriden ? 'ENVIRONMENT' : 'NONE',
+      })),
+    });
+  }
 }

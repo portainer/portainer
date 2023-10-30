@@ -51,7 +51,7 @@ export class KubernetesApplicationConfigurationFormValueOverridenKey {
 const _KubernetesApplicationConfigurationFormValue = Object.freeze({
   selectedConfiguration: undefined,
   overriden: false,
-  overridenKeys: [], // KubernetesApplicationConfigurationFormValueOverridenKey list
+  overridenKeys: [],
 });
 
 export class KubernetesApplicationConfigurationFormValue {
