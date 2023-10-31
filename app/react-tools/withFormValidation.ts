@@ -10,7 +10,8 @@ import { validateForm } from '@@/form-components/validate-form';
 import { ArrayError } from '@@/form-components/InputList/InputList';
 
 interface FormFieldProps<TValue> {
-  onChange(values: TValue): void; // update the values for the entire form object used in yup validation, not just one input.
+  onChange?(values: TValue): void; // update the values for the entire form object used in yup validation, not just one input.
+  setFieldValue?(name: string, value: unknown): void; // update the value for one input
   values: TValue; // current values
   errors?: FormikErrors<TValue> | ArrayError<TValue>;
 }
@@ -47,7 +48,13 @@ export function withFormValidation<TProps, TValue, TData = never>(
   ngModule
     .component(
       reactComponentName,
-      r2a(Component, ['errors', 'onChange', 'values', ...propNames])
+      r2a(Component, [
+        'errors',
+        'onChange',
+        'values',
+        'setFieldValue',
+        ...propNames,
+      ])
     )
     .component(
       componentName,
@@ -70,15 +77,18 @@ export function createFormValidationComponent<TFormModel, TData = never>(
   return {
     template: `<ng-form name="$ctrl.form">
       <${kebabName} ${propsWithErrors
-        .filter((p) => p !== 'onChange')
+        .filter((p) => p !== 'onChange' && p !== 'setFieldValue')
         .map((p) => `${_.kebabCase(p)}="$ctrl.${p}"`)
         .join(' ')}
         on-change="($ctrl.handleChange)"
+        set-field-value="($ctrl.handleSetFieldValue)"
       ></${kebabName}>
     </ng-form>`,
     controller: createFormValidatorController(schemaBuilder),
     bindings: Object.fromEntries(
-      [...propsWithErrors, 'validationData', 'onChange'].map((p) => [p, '<'])
+      [...propsWithErrors, 'validationData', 'onChange', 'setFieldValue'].map(
+        (p) => [p, '<']
+      )
     ),
   };
 }
@@ -99,18 +109,28 @@ function createFormValidatorController<TFormModel, TData = never>(
 
     onChange?: (value: TFormModel) => void;
 
+    setFieldValue?: (name: string, value: unknown) => void;
+
     /* @ngInject */
     constructor($async: <T>(fn: () => Promise<T>) => Promise<T>) {
       this.$async = $async;
 
       this.handleChange = this.handleChange.bind(this);
       this.runValidation = this.runValidation.bind(this);
+      this.handleSetFieldValue = this.handleSetFieldValue.bind(this);
     }
 
     async handleChange(newValues: TFormModel) {
       return this.$async(async () => {
         this.onChange?.(newValues);
         await this.runValidation(newValues);
+      });
+    }
+
+    async handleSetFieldValue(name: string, value: unknown) {
+      return this.$async(async () => {
+        this.setFieldValue?.(name, value);
+        await this.runValidation(this.values!);
       });
     }
 
