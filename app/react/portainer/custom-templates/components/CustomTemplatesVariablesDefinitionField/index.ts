@@ -1,2 +1,8 @@
-export { CustomTemplatesVariablesDefinitionField } from './CustomTemplatesVariablesDefinitionField';
-export type { VariableDefinition } from './CustomTemplatesVariablesDefinitionField';
+export {
+  CustomTemplatesVariablesDefinitionField,
+  validation as variablesValidation,
+} from './CustomTemplatesVariablesDefinitionField';
+export type {
+  VariableDefinition,
+  Values as DefinitionFieldValues,
+} from './CustomTemplatesVariablesDefinitionField';
