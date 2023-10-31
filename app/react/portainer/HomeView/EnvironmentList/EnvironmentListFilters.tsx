@@ -4,7 +4,6 @@ import { useTags } from '@/portainer/tags/queries';
 
 import { useAgentVersionsList } from '../../environments/queries/useAgentVersionsList';
 import { EnvironmentStatus, PlatformType } from '../../environments/types';
-import { isBE } from '../../feature-flags/feature-flags.service';
 import { useGroups } from '../../environments/environment-groups/queries';
 import {
   SortOptions,
@@ -188,10 +187,6 @@ function getConnectionTypeOptions(platformTypes: PlatformType[]) {
       ConnectionType.EdgeAgentStandard,
       ConnectionType.EdgeAgentAsync,
     ],
-    [PlatformType.Nomad]: [
-      ConnectionType.EdgeAgentStandard,
-      ConnectionType.EdgeAgentAsync,
-    ],
   };
 
   const connectionTypesDefaultOptions = [
@@ -219,13 +214,6 @@ function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
     { value: PlatformType.Kubernetes, label: 'Kubernetes' },
   ];
 
-  if (isBE) {
-    platformDefaultOptions.push({
-      value: PlatformType.Nomad,
-      label: 'Nomad',
-    });
-  }
-
   if (connectionTypes.length === 0) {
     return platformDefaultOptions;
   }
@@ -235,11 +223,9 @@ function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
     [ConnectionType.Agent]: [PlatformType.Docker, PlatformType.Kubernetes],
     [ConnectionType.EdgeAgentStandard]: [
       PlatformType.Kubernetes,
-      PlatformType.Nomad,
       PlatformType.Docker,
     ],
     [ConnectionType.EdgeAgentAsync]: [
-      PlatformType.Nomad,
       PlatformType.Docker,
       PlatformType.Kubernetes,
     ],

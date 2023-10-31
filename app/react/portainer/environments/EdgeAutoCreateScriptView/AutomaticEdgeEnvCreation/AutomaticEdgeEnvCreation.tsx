@@ -23,7 +23,6 @@ const commands = {
     commandsTabs.k8sLinux,
     commandsTabs.swarmLinux,
     commandsTabs.standaloneLinux,
-    commandsTabs.nomadLinux,
   ],
   win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
 };
@@ -156,7 +155,6 @@ function EdgeKeyInfo({
       <EdgeScriptForm
         edgeInfo={{ key: edgeKey }}
         commands={commands}
-        isNomadTokenVisible
         asyncMode={asyncMode}
         showMetaFields
       >

@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 
 import { withError } from '@/react-tools/react-query';
 
-import { EnvironmentStatus } from '../types';
+import { EnvironmentStatus, EnvironmentType } from '../types';
 import {
   EnvironmentsQueryParams,
   getEnvironments,
@@ -71,6 +71,24 @@ export function useEnvironmentList(
     ],
     async () => {
       const start = (page - 1) * pageLimit + 1;
+
+      // Workaround for EE-6060: filter out Nomad results when no filter is applied.
+      // Remove when cleaning up API.
+      if (!query.types || query.types.length === 0) {
+        const environmentTypesArray: EnvironmentType[] = [
+          EnvironmentType.Docker,
+          EnvironmentType.AgentOnDocker,
+          EnvironmentType.Azure,
+          EnvironmentType.EdgeAgentOnDocker,
+          EnvironmentType.KubernetesLocal,
+          EnvironmentType.AgentOnKubernetes,
+          EnvironmentType.EdgeAgentOnKubernetes,
+        ];
+
+        // eslint-disable-next-line no-param-reassign
+        query.types = environmentTypesArray;
+      }
+
       return getEnvironments({
         start,
         limit: pageLimit,

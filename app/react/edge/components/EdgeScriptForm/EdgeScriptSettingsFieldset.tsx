@@ -10,17 +10,14 @@ import { TagSelector } from '@@/TagSelector';
 
 import { EdgeGroupsSelector } from '../../edge-stacks/components/EdgeGroupsSelector';
 
-import { NomadTokenField } from './NomadTokenField';
 import { ScriptFormValues } from './types';
 
 interface Props {
-  isNomadTokenVisible?: boolean;
   hideIdGetter?: boolean;
   showMetaFields?: boolean;
 }
 
 export function EdgeScriptSettingsFieldset({
-  isNomadTokenVisible,
   hideIdGetter,
   showMetaFields,
 }: Props) {
@@ -70,23 +67,6 @@ export function EdgeScriptSettingsFieldset({
                 <code>PORTAINER_EDGE_ID</code> environment variable is required
                 to successfully connect the edge agent to Portainer
               </TextTip>
-            </div>
-          </div>
-        </>
-      )}
-
-      {isNomadTokenVisible && (
-        <>
-          <NomadTokenField />
-
-          <div className="form-group">
-            <div className="col-sm-12">
-              <SwitchField
-                label="TLS"
-                labelClass="col-sm-3 col-lg-2"
-                checked={values.tlsEnabled}
-                onChange={(checked) => setFieldValue('tlsEnabled', checked)}
-              />
             </div>
           </div>
         </>

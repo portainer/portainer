@@ -9,7 +9,6 @@ export interface AnalyticsState {
   kaasAgent: number;
   aciApi: number;
   localEndpoint: number;
-  nomadEdgeAgentStandard: number;
 }
 
 export type AnalyticsStateKey = keyof AnalyticsState;

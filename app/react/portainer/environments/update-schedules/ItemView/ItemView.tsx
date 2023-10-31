@@ -82,7 +82,7 @@ function ItemView() {
 
       <BetaAlert
         className="mb-2 ml-[15px]"
-        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+        message="Beta feature - currently limited to standalone Linux edge devices."
       />
 
       <div className="row">

@@ -14,16 +14,10 @@ import { EdgeAgentForm } from './EdgeAgentForm';
 interface Props {
   onCreate: (environment: Environment) => void;
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
-  isNomadTokenVisible?: boolean;
   asyncMode?: boolean;
 }
 
-export function EdgeAgentTab({
-  onCreate,
-  commands,
-  isNomadTokenVisible,
-  asyncMode = false,
-}: Props) {
+export function EdgeAgentTab({ onCreate, commands, asyncMode = false }: Props) {
   const [edgeInfo, setEdgeInfo] = useState<EdgeInfo>();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
@@ -49,7 +43,6 @@ export function EdgeAgentTab({
           <EdgeScriptForm
             edgeInfo={edgeInfo}
             commands={commands}
-            isNomadTokenVisible={isNomadTokenVisible}
             asyncMode={asyncMode}
           />
 

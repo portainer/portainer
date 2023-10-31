@@ -1,6 +1,0 @@
-<!--
-This exists because it has 'fill:currentColor' unlike the other nomad icon asset
--->
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12.0046 0L1.74048 6V18L11.9954 24L22.2596 18V6L12.0046 0ZM16.5848 13.2046L13.8504 14.8031L10.5435 12.971V16.8L7.44277 18.7924V10.8L9.90689 9.27023L13.3237 11.0977V7.19084L16.5848 5.20763V13.2046Z" fill="currentColor" />
-</svg>

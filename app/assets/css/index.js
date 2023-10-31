@@ -15,7 +15,6 @@ import './app.css';
 
 import './theme.css';
 import './vendor-override.css';
-import '../fonts/nomad-icon.css';
 import './bootstrap-override.css';
 import './icon.css';
 import './button.css';

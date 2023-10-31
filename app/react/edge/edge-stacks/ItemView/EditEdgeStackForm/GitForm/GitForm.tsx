@@ -44,7 +44,6 @@ import { EnvironmentVariablesPanel } from '@@/form-components/EnvironmentVariabl
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { useValidateEnvironmentTypes } from '../useEdgeGroupHasType';
-import { atLeastTwo } from '../atLeastTwo';
 import { PrivateRegistryFieldset } from '../../../components/PrivateRegistryFieldset';
 
 import {
@@ -201,7 +200,6 @@ function InnerForm({
 
   const hasKubeEndpoint = hasType(EnvironmentType.EdgeAgentOnKubernetes);
   const hasDockerEndpoint = hasType(EnvironmentType.EdgeAgentOnDocker);
-  const hasNomadEndpoint = hasType(EnvironmentType.EdgeAgentOnNomad);
 
   return (
     <Form className="form-horizontal" onSubmit={handleSubmit}>
@@ -211,7 +209,7 @@ function InnerForm({
         error={errors.groupIds}
       />
 
-      {atLeastTwo(hasKubeEndpoint, hasDockerEndpoint, hasNomadEndpoint) && (
+      {hasKubeEndpoint && hasDockerEndpoint && (
         <TextTip>
           There are no available deployment types when there is more than one
           type of environment in your edge group selection (e.g. Kubernetes and
@@ -231,7 +229,6 @@ function InnerForm({
         value={values.deploymentType}
         hasDockerEndpoint={hasType(EnvironmentType.EdgeAgentOnDocker)}
         hasKubeEndpoint={hasType(EnvironmentType.EdgeAgentOnKubernetes)}
-        hasNomadEndpoint={hasType(EnvironmentType.EdgeAgentOnNomad)}
         onChange={(value) => {
           setFieldValue('deploymentType', value);
         }}
