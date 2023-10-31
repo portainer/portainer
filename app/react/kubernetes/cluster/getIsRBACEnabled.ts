@@ -1,7 +1,6 @@
 import { useQuery } from 'react-query';
 
-import PortainerError from '@/portainer/error';
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withError } from '@/react-tools/react-query';
 
@@ -23,6 +22,6 @@ export async function getIsRBACEnabled(environmentId: EnvironmentId) {
     );
     return data;
   } catch (e) {
-    throw new PortainerError('Unable to check if RBAC is enabled.', e as Error);
+    throw parseAxiosError(e, 'Unable to check if RBAC is enabled.');
   }
 }

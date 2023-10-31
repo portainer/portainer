@@ -2,7 +2,6 @@ package users
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
+
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -105,7 +106,7 @@ func Test_userCreateAccessToken(t *testing.T) {
 
 		body, err := io.ReadAll(rr.Body)
 		is.NoError(err, "ReadAll should not return error")
-		is.Equal("{\"message\":\"Auth not supported\",\"details\":\"JWT Authentication required\"}\n", string(body))
+		is.Equal(`{"message":"Auth not supported","details":"JWT Authentication required"}`, string(body))
 	})
 }
 

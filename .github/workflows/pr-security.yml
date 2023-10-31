@@ -14,6 +14,10 @@ on:
       - 'build/windows/Dockerfile'
       - '.github/workflows/pr-security.yml'
 
+env:
+  GO_VERSION: 1.21.3
+  NODE_VERSION: 18.x
+
 jobs:
   client-dependencies:
     name: Client Dependency Check
@@ -84,7 +88,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.21.0'
+          go-version: ${{ env.GO_VERSION }}
 
       - name: download Go modules
         run: cd ./api && go get -t -v -d ./...
@@ -143,15 +147,15 @@ jobs:
       - name: checkout code
         uses: actions/checkout@master
 
-      - name: install Go 1.21.0
+      - name: install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.21.0'
+          go-version: ${{ env.GO_VERSION }}
 
-      - name: install Node.js 18.x
+      - name: install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install packages
         run: yarn --frozen-lockfile

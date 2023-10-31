@@ -1,11 +1,12 @@
 package openamt
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/segmentio/encoding/json"
 )
 
 func (service *Service) enableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) error {

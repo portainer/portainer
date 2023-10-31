@@ -12,6 +12,9 @@ on:
       - develop
       - release/*
 
+env:
+  GO_VERSION: 1.21.3
+
 jobs:
   run-linters:
     name: Run linters
@@ -25,7 +28,7 @@ jobs:
           cache: 'yarn'
       - uses: actions/setup-go@v4
         with:
-          go-version: 1.21.0
+          go-version: ${{ env.GO_VERSION }}
       - run: yarn --frozen-lockfile
       - name: Run linters
         uses: wearerequired/lint-action@v1

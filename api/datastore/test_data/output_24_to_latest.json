@@ -46,12 +46,10 @@
       },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
-      "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
       "Heartbeat": false,
       "Id": 1,
-      "IsEdgeDevice": false,
       "Kubernetes": {
         "Configuration": {
           "AllowNoneIngressClass": false,
@@ -101,8 +99,7 @@
       "TeamAccessPolicies": {},
       "Type": 1,
       "URL": "unix:///var/run/docker.sock",
-      "UserAccessPolicies": {},
-      "UserTrusted": false
+      "UserAccessPolicies": {}
     }
   ],
   "registries": [
@@ -124,8 +121,7 @@
       "Name": "canister.io",
       "Password": "MjWbx8A6YK7cw7",
       "Quay": {
-        "OrganisationName": "",
-        "UseOrganisation": false
+        "OrganisationName": ""
       },
       "RegistryAccesses": {
         "1": {
@@ -584,11 +580,8 @@
     "AllowHostNamespaceForRegularUsers": true,
     "AllowPrivilegedModeForRegularUsers": true,
     "AllowStackManagementForRegularUsers": true,
-    "AllowVolumeBrowserForRegularUsers": false,
     "AuthenticationMethod": 1,
     "BlackListedLabels": [],
-    "DisplayDonationHeader": false,
-    "DisplayExternalContributors": false,
     "Edge": {
       "AsyncMode": false,
       "CommandInterval": 0,
@@ -598,7 +591,6 @@
     "EdgeAgentCheckinInterval": 5,
     "EdgePortainerUrl": "",
     "EnableEdgeComputeFeatures": false,
-    "EnableHostManagementFeatures": false,
     "EnableTelemetry": true,
     "EnforceEdgeID": false,
     "FeatureFlagSettings": null,
@@ -609,7 +601,6 @@
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
     },
-    "IsDockerDesktopExtension": false,
     "KubeconfigExpiry": "0",
     "KubectlShellImage": "portainer/kubectl-shell",
     "LDAPSettings": {
@@ -912,7 +903,6 @@
         "color": ""
       },
       "TokenIssueAt": 0,
-      "UserTheme": "",
       "Username": "admin"
     },
     {
@@ -942,7 +932,6 @@
         "color": ""
       },
       "TokenIssueAt": 0,
-      "UserTheme": "",
       "Username": "prabhat"
     }
   ],

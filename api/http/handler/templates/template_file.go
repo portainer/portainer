@@ -1,7 +1,6 @@
 package templates
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -12,6 +11,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 type filePayload struct {

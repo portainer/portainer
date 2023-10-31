@@ -38,7 +38,7 @@
                       ng-model="ctrl.formValues.Namespace"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
                     ></select>
-                    <span ng-if="ctrl.formValues.namespace_toggle">Namespaces specified in the manifest will be used</span>
+                    <span ng-if="ctrl.formValues.namespace_toggle" class="small text-muted pt-[7px]">Namespaces specified in the manifest will be used</span>
                   </div>
                 </div>
 
@@ -51,7 +51,9 @@
 
                 <div class="form-group">
                   <label for="name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
-                  <div class="col-sm-8" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"> Resource names specified in the manifest will be used </div>
+                  <div class="col-sm-8 small text-muted pt-[7px]" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
+                    Resource names specified in the manifest will be used
+                  </div>
                   <div class="col-sm-8" ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
                     <input
                       type="text"
@@ -59,7 +61,7 @@
                       ng-model="ctrl.formValues.Name"
                       id="name"
                       name="name"
-                      placeholder="name"
+                      placeholder="e.g. my-app"
                       required="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
                     />
                     <div class="small text-warning mt-2">

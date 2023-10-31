@@ -237,7 +237,7 @@ type (
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
 		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
 		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
 		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
 		Info       types.Info                `json:"Info" swaggerignore:"true"`
@@ -328,7 +328,7 @@ type (
 		UseManifestNamespaces bool
 
 		// Deprecated
-		Prune bool `json:"Prune"`
+		Prune bool `json:"Prune,omitempty"`
 	}
 
 	EdgeStackDeploymentType int
@@ -432,7 +432,7 @@ type (
 		Heartbeat bool `json:"Heartbeat" example:"true"`
 
 		// Whether the device has been trusted or not by the user
-		UserTrusted bool
+		UserTrusted bool `json:"UserTrusted,omitempty"`
 
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
@@ -443,7 +443,7 @@ type (
 			Version string `example:"1.0.0"`
 		}
 
-		EnableGPUManagement bool `json:"EnableGPUManagement"`
+		EnableGPUManagement bool `json:"EnableGPUManagement,omitempty"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -460,7 +460,7 @@ type (
 		Tags []string `json:"Tags"`
 
 		// Deprecated v2.18
-		IsEdgeDevice bool
+		IsEdgeDevice bool `json:"IsEdgeDevice,omitempty"`
 	}
 
 	EnvironmentEdgeSettings struct {
@@ -500,7 +500,7 @@ type (
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags"`
+		Tags []string `json:"Tags,omitempty"`
 	}
 
 	// EndpointGroupID represents an environment(endpoint) group identifier
@@ -598,7 +598,7 @@ type (
 
 	// QuayRegistryData represents data required for Quay registry to work
 	QuayRegistryData struct {
-		UseOrganisation  bool   `json:"UseOrganisation"`
+		UseOrganisation  bool   `json:"UseOrganisation,omitempty"`
 		OrganisationName string `json:"OrganisationName"`
 	}
 
@@ -997,20 +997,20 @@ type (
 		}
 
 		// Deprecated fields
-		DisplayDonationHeader       bool
-		DisplayExternalContributors bool
+		DisplayDonationHeader       bool `json:"DisplayDonationHeader,omitempty"`
+		DisplayExternalContributors bool `json:"DisplayExternalContributors,omitempty"`
 
 		// Deprecated fields v26
-		EnableHostManagementFeatures              bool `json:"EnableHostManagementFeatures"`
-		AllowVolumeBrowserForRegularUsers         bool `json:"AllowVolumeBrowserForRegularUsers"`
-		AllowBindMountsForRegularUsers            bool `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers        bool `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowHostNamespaceForRegularUsers         bool `json:"AllowHostNamespaceForRegularUsers"`
-		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
-		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
-		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
+		EnableHostManagementFeatures              bool `json:"EnableHostManagementFeatures,omitempty"`
+		AllowVolumeBrowserForRegularUsers         bool `json:"AllowVolumeBrowserForRegularUsers,omitempty"`
+		AllowBindMountsForRegularUsers            bool `json:"AllowBindMountsForRegularUsers,omitempty"`
+		AllowPrivilegedModeForRegularUsers        bool `json:"AllowPrivilegedModeForRegularUsers,omitempty"`
+		AllowHostNamespaceForRegularUsers         bool `json:"AllowHostNamespaceForRegularUsers,omitempty"`
+		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers,omitempty"`
+		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers,omitempty"`
+		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers,omitempty"`
 
-		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension"`
+		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension,omitempty"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
@@ -1319,7 +1319,7 @@ type (
 		// Deprecated fields
 
 		// Deprecated
-		UserTheme string `example:"dark"`
+		UserTheme string `json:"UserTheme,omitempty" example:"dark"`
 		// Deprecated in DBVersion == 25
 		PortainerAuthorizations Authorizations
 		// Deprecated in DBVersion == 25
@@ -1508,7 +1508,7 @@ type (
 		GetMaxResourceLimits(name string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
-		DeleteRegistrySecret(registry *Registry, namespace string) error
+		DeleteRegistrySecret(registry RegistryID, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error

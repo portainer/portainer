@@ -16,7 +16,7 @@ export interface ScriptFormValues {
   os: OS;
   platform: Platform;
 
-  edgeIdGenerator?: string;
+  edgeIdGenerator: string;
 
   group: EnvironmentGroupId;
   edgeGroupsIds: Array<EdgeGroup['Id']>;

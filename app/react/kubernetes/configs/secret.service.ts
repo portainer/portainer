@@ -117,17 +117,10 @@ async function getSecretsForCluster(
   environmentId: EnvironmentId,
   namespaces: string[]
 ) {
-  try {
-    const secrets = await Promise.all(
-      namespaces.map((namespace) => getSecrets(environmentId, namespace))
-    );
-    return secrets.flat();
-  } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve secrets for cluster'
-    );
-  }
+  const secrets = await Promise.all(
+    namespaces.map((namespace) => getSecrets(environmentId, namespace))
+  );
+  return secrets.flat();
 }
 
 // get all secrets for a namespace
@@ -138,7 +131,7 @@ async function getSecrets(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve secrets');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve secrets');
   }
 }
 
@@ -150,7 +143,7 @@ async function deleteSecret(
   try {
     await axios.delete(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to remove secret');
+    throw parseKubernetesAxiosError(e, 'Unable to remove secret');
   }
 }
 

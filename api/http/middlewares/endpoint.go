@@ -13,9 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	contextEndpoint = "endpoint"
-)
+const contextEndpoint = "endpoint"
 
 func WithEndpoint(endpointService dataservices.EndpointService, endpointIDParam string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {

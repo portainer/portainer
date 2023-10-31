@@ -1,5 +1,7 @@
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+
+import { parseKubernetesAxiosError } from '../axiosError';
 
 interface SelfSubjectAccessReviewResponse {
   status: {
@@ -43,8 +45,8 @@ export async function getSelfSubjectAccessReview(
       );
     return accessReview;
   } catch (e) {
-    throw parseAxiosError(
-      e as Error,
+    throw parseKubernetesAxiosError(
+      e,
       'Unable to retrieve self subject access review'
     );
   }

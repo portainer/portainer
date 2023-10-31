@@ -2,20 +2,20 @@ package websocket
 
 import (
 	"bytes"
-	"encoding/json"
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 type execStartOperationPayload struct {

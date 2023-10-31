@@ -60,15 +60,15 @@ func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices
 	}
 }
 
-// PublicAccess defines a security check for public API environments(endpoints).
-// No authentication is required to access these environments(endpoints).
+// PublicAccess defines a security check for public API endpoints.
+// No authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 	return mwSecureHeaders(h)
 }
 
-// AdminAccess defines a security check for API environments(endpoints) that require an authorization check.
-// Authentication is required to access these environments(endpoints).
-// The administrator role is required to use these environments(endpoints).
+// AdminAccess defines a security check for API endpoints that require an authorization check.
+// Authentication is required to access these endpoints.
+// The administrator role is required to use these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
@@ -79,8 +79,8 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 	return h
 }
 
-// RestrictedAccess defines a security check for restricted API environments(endpoints).
-// Authentication is required to access these environments(endpoints).
+// RestrictedAccess defines a security check for restricted API endpoints.
+// Authentication is required to access these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
@@ -104,8 +104,8 @@ func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 	return h
 }
 
-// AuthenticatedAccess defines a security check for restricted API environments(endpoints).
-// Authentication is required to access these environments(endpoints).
+// AuthenticatedAccess defines a security check for restricted API endpoints.
+// Authentication is required to access these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.

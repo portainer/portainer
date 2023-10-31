@@ -16,10 +16,10 @@ fi
 
 
 if [[ "$PLATFORM" == "windows" ]]; then
-    wget -O "docker-compose.exe" "https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-windows-${ARCH}.exe"
+    wget --tries=3 --waitretry=30 --quiet  -O "docker-compose.exe" "https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-windows-${ARCH}.exe"
     chmod +x "docker-compose.exe"
 else
-    wget -O "docker-compose" "https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-${PLATFORM}-${ARCH}"
+    wget --tries=3 --waitretry=30 --quiet  -O "docker-compose" "https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-${PLATFORM}-${ARCH}"
     chmod +x "docker-compose"
 fi
 

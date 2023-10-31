@@ -1,7 +1,6 @@
 package motd
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -9,6 +8,8 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/pkg/libcrypto"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/segmentio/encoding/json"
 )
 
 type motdResponse struct {

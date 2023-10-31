@@ -2,12 +2,13 @@ package composeplugin
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/portainer/portainer/pkg/libstack"
+
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 type publisher struct {

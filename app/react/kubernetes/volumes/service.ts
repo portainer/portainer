@@ -1,23 +1,18 @@
 import { PersistentVolumeClaimList } from 'kubernetes-types/core/v1';
 
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+
+import { parseKubernetesAxiosError } from '../axiosError';
 
 export async function getPVCsForCluster(
   environmentId: EnvironmentId,
   namespaces: string[]
 ) {
-  try {
-    const pvcs = await Promise.all(
-      namespaces.map((namespace) => getPVCs(environmentId, namespace))
-    );
-    return pvcs.flat();
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to retrieve persistent volume claims for cluster'
-    );
-  }
+  const pvcs = await Promise.all(
+    namespaces.map((namespace) => getPVCs(environmentId, namespace))
+  );
+  return pvcs.flat();
 }
 
 // get all persistent volume claims for a namespace
@@ -28,8 +23,8 @@ export async function getPVCs(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseAxiosError(
-      e as Error,
+    throw parseKubernetesAxiosError(
+      e,
       'Unable to retrieve persistent volume claims'
     );
   }

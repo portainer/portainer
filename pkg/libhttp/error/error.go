@@ -2,11 +2,11 @@
 package error
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 type (
@@ -36,7 +36,11 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(err.StatusCode)
 
-	json.NewEncoder(rw).Encode(&errorResponse{Message: err.Message, Details: err.Err.Error()})
+	enc := json.NewEncoder(rw)
+	enc.SetSortMapKeys(false)
+	enc.SetAppendNewline(false)
+
+	enc.Encode(&errorResponse{Message: err.Message, Details: err.Err.Error()})
 }
 
 // WriteError is a convenience function that creates a new HandlerError before calling writeErrorResponse.

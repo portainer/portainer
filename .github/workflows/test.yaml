@@ -1,5 +1,11 @@
 name: Test
+
 on: push
+
+env:
+  GO_VERSION: 1.21.3
+  NODE_VERSION: 18.x
+
 jobs:
   test-client:
     runs-on: ubuntu-latest
@@ -8,18 +14,25 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - run: yarn --frozen-lockfile
 
       - name: Run tests
         run: make test-client ARGS="--maxWorkers=2"
   test-server:
+    strategy:
+      matrix:
+        config:
+          - { platform: linux, arch: amd64 }
+          - { platform: linux, arch: arm64 }
+          - { platform: windows, arch: amd64, version: 1809 }
+          - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.21.0
+          go-version: ${{ env.GO_VERSION }}
       - name: Run tests
         run: make test-server

@@ -160,6 +160,8 @@ export const ngModule = angular
       'namespaces',
       'onNamespaceChange',
       'isLoading',
+      'showSystem',
+      'setSystemResources',
     ])
   );
 

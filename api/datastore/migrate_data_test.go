@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -11,10 +10,11 @@ import (
 	"testing"
 
 	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/database/models"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/portainer/portainer/api/database/models"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 // testVersion is a helper which tests current store version against wanted version

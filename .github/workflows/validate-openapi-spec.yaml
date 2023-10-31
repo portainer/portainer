@@ -7,6 +7,10 @@ on:
       - develop
       - 'release/*'
 
+env:
+  GO_VERSION: 1.21.3
+  NODE_VERSION: 18.x
+
 jobs:
   openapi-spec:
     runs-on: ubuntu-latest
@@ -15,13 +19,13 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.21.0'
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Download golang modules
         run: cd ./api && go get -t -v -d ./...
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - run: yarn --frozen-lockfile
 

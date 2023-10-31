@@ -116,11 +116,16 @@ export function GpuFieldset({
 
   return (
     <div>
+      <TextTip inline={false} color="blue">
+        <p>GPU support is currently limited to NVIDIA graphics cards only.</p>
+      </TextTip>
+
       {!enableGpuManagement && (
         <TextTip color="blue">
           GPU in the UI is not currently enabled for this environment.
         </TextTip>
       )}
+
       <div className="form-group">
         <div className="col-sm-3 col-lg-2 control-label text-left">
           Enable GPU

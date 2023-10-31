@@ -1,13 +1,14 @@
 package test
 
 import (
-	"encoding/json"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/portainer/portainer/pkg/libhelm"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/release"
+
+	"github.com/pkg/errors"
+	"github.com/segmentio/encoding/json"
 	"gopkg.in/yaml.v3"
 )
 

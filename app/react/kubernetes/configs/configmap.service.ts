@@ -121,17 +121,10 @@ async function getConfigMapsForCluster(
   environmentId: EnvironmentId,
   namespaces: string[]
 ) {
-  try {
-    const configMaps = await Promise.all(
-      namespaces.map((namespace) => getConfigMaps(environmentId, namespace))
-    );
-    return configMaps.flat();
-  } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve ConfigMaps for cluster'
-    );
-  }
+  const configMaps = await Promise.all(
+    namespaces.map((namespace) => getConfigMaps(environmentId, namespace))
+  );
+  return configMaps.flat();
 }
 
 // get all configmaps for a namespace
@@ -142,10 +135,7 @@ async function getConfigMaps(environmentId: EnvironmentId, namespace: string) {
     );
     return data.items;
   } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve ConfigMaps'
-    );
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve ConfigMaps');
   }
 }
 
@@ -157,7 +147,7 @@ async function deleteConfigMap(
   try {
     await axios.delete(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to remove ConfigMap');
+    throw parseKubernetesAxiosError(e, 'Unable to remove ConfigMap');
   }
 }
 

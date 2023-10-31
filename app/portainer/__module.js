@@ -12,18 +12,33 @@ import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
 import { helpersModule } from './helpers';
+import { AXIOS_UNAUTHENTICATED } from './services/axios';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
+
+  function handleUnauthenticated(data, performReload) {
+    if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/') && isTransitionRequiresAuthentication($state.transition)) {
+      $state.go('portainer.logout', { error: 'Your session has expired' });
+      if (performReload) {
+        window.location.reload();
+      }
+    }
+  }
+
   // The unauthenticated event is broadcasted by the jwtInterceptor when
   // hitting a 401. We're using this instead of the usual combination of
   // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
   // to have more controls on which URL should trigger the unauthenticated state.
   $rootScope.$on('unauthenticated', function (event, data) {
-    if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/') && isTransitionRequiresAuthentication($state.transition)) {
-      $state.go('portainer.logout', { error: 'Your session has expired' });
-      window.location.reload();
-    }
+    handleUnauthenticated(data, true);
+  });
+
+  // the AXIOS_UNAUTHENTICATED event is emitted by axios when a request returns with a 401 code
+  // the event contains the entire AxiosError in detail.err
+  window.addEventListener(AXIOS_UNAUTHENTICATED, (event) => {
+    const data = event.detail.err;
+    handleUnauthenticated(data);
   });
 
   return await Authentication.init();
@@ -157,7 +172,6 @@ angular
         url: '/logout',
         params: {
           error: '',
-          performApiLogout: true,
         },
         views: {
           'content@': {
