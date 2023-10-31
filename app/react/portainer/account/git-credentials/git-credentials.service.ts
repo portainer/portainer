@@ -2,6 +2,9 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { success as notifySuccess } from '@/portainer/services/notifications';
+import { UserId } from '@/portainer/users/types';
+
+import { isBE } from '../../feature-flags/feature-flags.service';
 
 import {
   CreateGitCredentialPayload,
@@ -112,9 +115,12 @@ export function useDeleteGitCredentialMutation() {
   });
 }
 
-export function useGitCredentials(userId: number) {
+export function useGitCredentials(
+  userId: UserId,
+  { enabled }: { enabled?: boolean } = {}
+) {
   return useQuery('gitcredentials', () => getGitCredentials(userId), {
-    staleTime: 20,
+    enabled: isBE && enabled,
     meta: {
       error: {
         title: 'Failure',
