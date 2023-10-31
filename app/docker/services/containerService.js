@@ -158,9 +158,10 @@ function ContainerServiceFactory($q, Container, $timeout) {
       timestamps: timestamps || 0,
       since: since || 0,
       tail: tail || 'all',
+      environmentId,
     };
 
-    Container.logs(environmentId, parameters)
+    Container.logs(parameters)
       .$promise.then(function success(data) {
         var logs = formatLogs(data.logs, { stripHeaders, withTimestamps: !!timestamps });
         deferred.resolve(logs);
