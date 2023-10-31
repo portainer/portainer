@@ -1,9 +1,9 @@
-import { FormikErrors } from 'formik';
+import { SchemaOf, array, object, string } from 'yup';
 
 import { FormError } from '@@/form-components/FormError';
 import { Input } from '@@/form-components/Input';
 import { InputList } from '@@/form-components/InputList';
-import { ItemProps } from '@@/form-components/InputList/InputList';
+import { ArrayError, ItemProps } from '@@/form-components/InputList/InputList';
 
 export interface VariableDefinition {
   name: string;
@@ -12,10 +12,12 @@ export interface VariableDefinition {
   description: string;
 }
 
+export type Values = VariableDefinition[];
+
 interface Props {
-  value: VariableDefinition[];
-  onChange: (value: VariableDefinition[]) => void;
-  errors?: FormikErrors<VariableDefinition>[];
+  value: Values;
+  onChange: (value: Values) => void;
+  errors?: ArrayError<Values>;
   isVariablesNamesFromParent?: boolean;
 }
 
@@ -106,4 +108,17 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     onChange({ ...item, [e.target.name]: e.target.value });
   }
+}
+
+function itemValidation(): SchemaOf<VariableDefinition> {
+  return object().shape({
+    name: string().required('Name is required'),
+    label: string().required('Label is required'),
+    defaultValue: string().default(''),
+    description: string().default(''),
+  });
+}
+
+export function validation(): SchemaOf<Values> {
+  return array().of(itemValidation());
 }
