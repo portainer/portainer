@@ -367,7 +367,6 @@ class KubernetesCreateApplicationController {
         return { newEnvVar, ...envVar };
       });
       this.formValues.EnvironmentVariables = newEnvVars;
-      this.onChangeEnvironmentName();
     });
   }
   /* #endregion */

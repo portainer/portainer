@@ -23,6 +23,7 @@ export function EnvironmentVariableItem({
             value={item.name}
             onChange={(e) => handleChange({ name: e.target.value })}
             disabled={disabled}
+            needsDeletion={item.needsDeletion}
             readOnly={readOnly}
             placeholder="e.g. FOO"
             size="small"
@@ -42,6 +43,7 @@ export function EnvironmentVariableItem({
           value={item.value}
           onChange={(e) => handleChange({ value: e.target.value })}
           disabled={disabled}
+          needsDeletion={item.needsDeletion}
           readOnly={readOnly}
           placeholder="e.g. bar"
           size="small"

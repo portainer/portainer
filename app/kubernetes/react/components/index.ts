@@ -175,7 +175,7 @@ withFormValidation(
   ngModule,
   EnvironmentVariablesFieldset,
   'kubeEnvironmentVariablesFieldset',
-  [],
+  ['canUndoDelete'],
   // use kubeEnvVarValidationSchema instead of envVarValidation to add a regex matches rule
   kubeEnvVarValidationSchema
 );

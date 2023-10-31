@@ -18,11 +18,13 @@ export function SimpleMode({
   onChange,
   onAdvancedModeClick,
   errors,
+  canUndoDelete,
 }: {
   value: Value;
   onChange: (value: Value) => void;
   onAdvancedModeClick: () => void;
   errors?: ArrayError<Value>;
+  canUndoDelete?: boolean;
 }) {
   return (
     <>
@@ -47,11 +49,14 @@ export function SimpleMode({
         isAddButtonHidden
         item={EnvironmentVariableItem}
         errors={errors}
+        canUndoDelete={canUndoDelete}
       />
 
       <div className="flex gap-2">
         <Button
-          onClick={() => onChange([...value, { name: '', value: '' }])}
+          onClick={() =>
+            onChange([...value, { name: '', value: '', needsDeletion: false }])
+          }
           className="!ml-0"
           color="default"
           icon={Plus}

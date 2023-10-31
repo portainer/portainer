@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { array, object, SchemaOf, string } from 'yup';
+import { array, boolean, object, SchemaOf, string } from 'yup';
 
 import { ArrayError } from '../InputList/InputList';
 import { buildUniquenessTest } from '../validate-unique';
@@ -12,10 +12,12 @@ export function EnvironmentVariablesFieldset({
   onChange,
   values,
   errors,
+  canUndoDelete,
 }: {
   values: Value;
   onChange(value: Value): void;
   errors?: ArrayError<Value>;
+  canUndoDelete?: boolean;
 }) {
   const [simpleMode, setSimpleMode] = useState(true);
 
@@ -27,6 +29,7 @@ export function EnvironmentVariablesFieldset({
           onChange={onChange}
           value={values}
           errors={errors}
+          canUndoDelete={canUndoDelete}
         />
       ) : (
         <AdvancedMode
@@ -44,6 +47,7 @@ export function envVarValidation(): SchemaOf<Value> {
     object({
       name: string().required('Name is required'),
       value: string().default(''),
+      needsDeletion: boolean().default(false),
     })
   ).test(
     'unique',

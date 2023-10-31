@@ -1,4 +1,4 @@
-import { SchemaOf, array, object, string } from 'yup';
+import { SchemaOf, array, bool, object, string } from 'yup';
 
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 import { buildUniquenessTest } from '@@/form-components/validate-unique';
@@ -13,6 +13,7 @@ export function kubeEnvVarValidationSchema(): SchemaOf<EnvVar[]> {
           `This field must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.`
         ),
       value: string().default(''),
+      needsDeletion: bool().default(false),
     })
   ).test(
     'unique',
