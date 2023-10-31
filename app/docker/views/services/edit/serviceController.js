@@ -661,7 +661,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     function forceUpdateService(service, pullImage) {
-      var config = ServiceHelper.serviceToConfig(service.Model);
+      var config = convertServiceToConfig(service.Model);
       if (pullImage) {
         config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
       }
