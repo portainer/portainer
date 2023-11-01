@@ -1,4 +1,4 @@
-import { SchemaOf, array, object, string } from 'yup';
+import { array, object, string } from 'yup';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection/FormSection';
@@ -95,13 +95,10 @@ function getError(errors: ArrayError<Values> | undefined, index: number) {
 
   return typeof error === 'object' ? error.value : error;
 }
-
-export function validation(
-  definitions: VariableDefinition[]
-): SchemaOf<Values> {
+export function validation(definitions: VariableDefinition[]) {
   return array(
     object({
-      key: string().required(),
+      key: string().default(''),
       value: string().default(''),
     }).test('required-if-no-default-value', 'This field is required', (obj) => {
       const definition = definitions.find((d) => d.name === obj.key);
