@@ -24,6 +24,10 @@ export function isSortType(value?: string): value is SortType {
   return SortOptions.includes(value as SortType);
 }
 
+export function getSortType(value?: string): SortType | undefined {
+  return isSortType(value) ? value : undefined;
+}
+
 export type Query = EnvironmentsQueryParams & {
   page?: number;
   pageLimit?: number;

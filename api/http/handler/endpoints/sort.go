@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"slices"
-	"strings"
 
 	"github.com/fvbommel/sortorder"
 	portainer "github.com/portainer/portainer/api"
@@ -21,6 +20,10 @@ func stringComp(a, b string) int {
 }
 
 func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroups []portainer.EndpointGroup, sortField sortKey, isSortDesc bool) {
+	if sortField == "" {
+		return
+	}
+
 	var less comp[portainer.Endpoint]
 	switch sortField {
 	case sortKeyName:
@@ -66,31 +69,6 @@ func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroup
 		return less(a, b) * mul
 	})
 
-}
-
-type EnvironmentsByKey struct {
-	environments []portainer.Endpoint
-	valueGetter  func(portainer.Endpoint) string
-	desc         bool
-}
-
-func (e EnvironmentsByKey) Len() int {
-	return len(e.environments)
-}
-
-func (e EnvironmentsByKey) Swap(i, j int) {
-	e.environments[i], e.environments[j] = e.environments[j], e.environments[i]
-}
-
-func (e EnvironmentsByKey) Less(i, j int) bool {
-	vi := strings.ToLower(e.valueGetter(e.environments[i]))
-	vj := strings.ToLower(e.valueGetter(e.environments[j]))
-
-	if e.desc {
-		return sortorder.NaturalLess(vj, vi)
-	} else {
-		return sortorder.NaturalLess(vi, vj)
-	}
 }
 
 type sortKey string

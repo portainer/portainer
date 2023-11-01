@@ -6,6 +6,10 @@ import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { EdgeTypes } from '@/react/portainer/environments/types';
+import {
+  Query,
+  getSortType,
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 
 import { WaitingRoomEnvironment } from '../types';
 
@@ -14,9 +18,11 @@ import { useFilterStore } from './filter-store';
 export function useEnvironments({
   pageLimit = 10,
   search,
+  sortBy,
 }: {
   pageLimit: number;
   search: string;
+  sortBy: { id: string; desc: boolean } | undefined;
 }) {
   const [page, setPage] = useState(0);
   const filterStore = useFilterStore();
@@ -35,7 +41,7 @@ export function useEnvironments({
     [edgeGroupsQuery.data, filterStore.edgeGroups]
   );
 
-  const query = useMemo(
+  const query: Partial<Query> = useMemo(
     () => ({
       pageLimit,
       edgeDeviceUntrusted: true,
@@ -46,6 +52,8 @@ export function useEnvironments({
       endpointIds: filterByEnvironmentsIds,
       edgeCheckInPassedSeconds: filterStore.checkIn,
       search,
+      sort: getSortType(sortBy?.id),
+      order: sortBy?.desc ? 'desc' : 'asc',
     }),
     [
       filterByEnvironmentsIds,
@@ -54,6 +62,7 @@ export function useEnvironments({
       filterStore.tags,
       pageLimit,
       search,
+      sortBy,
     ]
   );
 
