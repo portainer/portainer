@@ -5,13 +5,9 @@ import { useTags } from '@/portainer/tags/queries';
 import { useAgentVersionsList } from '../../environments/queries/useAgentVersionsList';
 import { EnvironmentStatus, PlatformType } from '../../environments/types';
 import { useGroups } from '../../environments/environment-groups/queries';
-import {
-  SortOptions,
-  SortType,
-} from '../../environments/queries/useEnvironmentList';
 
 import { HomepageFilter } from './HomepageFilter';
-import { SortbySelector } from './SortbySelector';
+import { ListSortType, SortbySelector } from './SortbySelector';
 import { ConnectionType } from './types';
 import styles from './EnvironmentList.module.css';
 
@@ -19,11 +15,6 @@ const status = [
   { value: EnvironmentStatus.Up, label: 'Up' },
   { value: EnvironmentStatus.Down, label: 'Down' },
 ];
-
-const sortByOptions = SortOptions.map((v) => ({
-  value: v,
-  label: v,
-}));
 
 export function EnvironmentListFilters({
   agentVersions,
@@ -63,8 +54,8 @@ export function EnvironmentListFilters({
   setAgentVersions: (value: string[]) => void;
   agentVersions: string[];
 
-  sortByState?: SortType;
-  sortOnChange: (value: SortType) => void;
+  sortByState?: ListSortType;
+  sortOnChange: (value: ListSortType) => void;
 
   sortOnDescending: () => void;
   sortByDescending: boolean;
@@ -160,7 +151,6 @@ export function EnvironmentListFilters({
 
       <div className={styles.filterRight}>
         <SortbySelector
-          filterOptions={sortByOptions}
           onChange={sortOnChange}
           onDescending={sortOnDescending}
           placeHolder="Sort By"
