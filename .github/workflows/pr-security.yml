@@ -8,7 +8,6 @@ on:
     paths:
       - 'package.json'
       - 'go.mod'
-      - 'gruntfile.js'
       - 'build/linux/Dockerfile'
       - 'build/linux/alpine.Dockerfile'
       - 'build/windows/Dockerfile'
@@ -142,7 +141,8 @@ jobs:
       github.event.pull_request &&
       github.event.review.body == '/scan'
     outputs:
-      imagediff: ${{ steps.set-diff-matrix.outputs.image_diff_result }}
+      imagediff-trivy: ${{ steps.set-diff-trivy-matrix.outputs.image_diff_trivy_result }}
+      imagediff-docker-scout: ${{ steps.set-diff-docker-scout-matrix.outputs.image_diff_docker_scout_result }}
     steps:
       - name: checkout code
         uses: actions/checkout@master
@@ -171,26 +171,26 @@ jobs:
         with:
           context: .
           file: build/linux/Dockerfile
-          tags: trivy-portainer:${{ github.sha }}
-          outputs: type=docker,dest=/tmp/trivy-portainer-image.tar
+          tags: local-portainer:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/local-portainer-image.tar
 
       - name: load docker image
         run: |
-          docker load --input /tmp/trivy-portainer-image.tar
+          docker load --input /tmp/local-portainer-image.tar
 
       - name: scan vulnerabilities by Trivy
         uses: docker://docker.io/aquasec/trivy:latest
         continue-on-error: true
         with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}
+          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress local-portainer:${{ github.sha }}
 
-      - name: upload image security scan result as artifact
+      - name: upload Trivy image security scan result as artifact
         uses: actions/upload-artifact@v3
         with:
           name: image-security-scan-feature-result
           path: image-trivy.json
 
-      - name: download artifacts from develop branch built by nightly scan
+      - name: download Trivy artifacts from develop branch built by nightly scan
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -202,21 +202,65 @@ jobs:
             echo "null" > ./image-trivy-develop.json
           fi
 
-      - name: pr vs develop scan report comparison export to html
+      - name: pr vs develop Trivy scan report comparison export to html
         run: |
-          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest diff --report-type=trivy --path="/data/image-trivy-feature.json" --compare-to="/data/image-trivy-develop.json" --output-type=table --export --export-filename="/data/image-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest diff --report-type=trivy --path="/data/image-trivy-feature.json" --compare-to="/data/image-trivy-develop.json" --output-type=table --export --export-filename="/data/image-trivy-result")
 
-      - name: upload html file as artifact
+      - name: upload html file as Trivy artifact
         uses: actions/upload-artifact@v3
         with:
           name: html-image-result-compare-to-develop-${{github.run_id}}
-          path: image-result.html
+          path: image-trivy-result.html
 
-      - name: analyse different vulnerabilities against develop branch
-        id: set-diff-matrix
+      - name: analyse different vulnerabilities against develop branch by Trivy
+        id: set-diff-trivy-matrix
         run: |
           result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest diff --report-type=trivy --path="/data/image-trivy-feature.json" --compare-to="/data/image-trivy-develop.json" --output-type=matrix)
-          echo "image_diff_result=${result}" >> $GITHUB_OUTPUT
+          echo "image_diff_trivy_result=${result}" >> $GITHUB_OUTPUT
+
+      - name: scan vulnerabilities by Docker Scout
+        uses: docker/scout-action@v1
+        continue-on-error: true
+        with:
+          command: cves
+          image: local-portainer:${{ github.sha }}
+          sarif-file: image-docker-scout.json
+          dockerhub-user: ${{ secrets.DOCKER_HUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: upload Docker Scout image security scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-security-scan-feature-result
+          path: image-docker-scout.json
+
+      - name: download Docker Scout artifacts from develop branch built by nightly scan
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mv ./image-docker-scout.json ./image-docker-scout-feature.json
+          (gh run download -n image-security-scan-develop-result -R ${{ github.repository }} 2>&1 >/dev/null) || :
+          if [[ -e ./image-docker-scout.json ]]; then
+            mv ./image-docker-scout.json ./image-docker-scout-develop.json
+          else
+            echo "null" > ./image-docker-scout-develop.json
+          fi
+
+      - name: pr vs develop Docker Scout scan report comparison export to html
+        run: |
+          $(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest diff --report-type=docker-scout --path="/data/image-docker-scout-feature.json" --compare-to="/data/image-docker-scout-develop.json" --output-type=table --export --export-filename="/data/image-docker-scout-result")
+
+      - name: upload html file as Docker Scout artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-image-result-compare-to-develop-${{github.run_id}}
+          path: image-docker-scout-result.html
+
+      - name: analyse different vulnerabilities against develop branch by Docker Scout
+        id: set-diff-docker-scout-matrix
+        run: |
+          result=$(docker run --rm -v ${{ github.workspace }}:/data portainerci/code-security-report:latest diff --report-type=docker-scout --path="/data/image-docker-scout-feature.json" --compare-to="/data/image-docker-scout-develop.json" --output-type=matrix)
+          echo "image_diff_docker_scout_result=${result}" >> $GITHUB_OUTPUT
 
   result-analysis:
     name: Analyse Scan Result Against develop Branch
@@ -229,18 +273,22 @@ jobs:
       matrix:
         jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}
         godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
-        imagediff: ${{fromJson(needs.image-vulnerability.outputs.imagediff)}}
+        imagediff-trivy: ${{fromJson(needs.image-vulnerability.outputs.imagediff-trivy)}}
+        imagediff-docker-scout: ${{fromJson(needs.image-vulnerability.outputs.imagediff-docker-scout)}}
     steps:
       - name: check job status of diff result
         if: >-
           matrix.jsdiff.status == 'failure' ||
           matrix.godiff.status == 'failure' ||
-          matrix.imagediff.status == 'failure'
+          matrix.imagediff-trivy.status == 'failure' ||
+          matrix.imagediff-docker-scout.status == 'failure'
         run: |
           echo "${{ matrix.jsdiff.status }}"
           echo "${{ matrix.godiff.status }}"
-          echo "${{ matrix.imagediff.status }}"
+          echo "${{ matrix.imagediff-trivy.status }}"
+          echo "${{ matrix.imagediff-docker-scout.status }}"
           echo "${{ matrix.jsdiff.summary }}"
           echo "${{ matrix.godiff.summary }}"
-          echo "${{ matrix.imagediff.summary }}"
+          echo "${{ matrix.imagediff-trivy.summary }}"
+          echo "${{ matrix.imagediff-docker-scout.summary }}"
           exit 1
