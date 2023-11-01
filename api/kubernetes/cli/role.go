@@ -12,7 +12,7 @@ func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
 	return []rbacv1.PolicyRule{
 		{
 			Verbs:     []string{"list", "get"},
-			Resources: []string{"namespaces", "nodes"},
+			Resources: []string{"namespaces", "nodes", "endpoints"},
 			APIGroups: []string{""},
 		},
 		{
