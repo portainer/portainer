@@ -28,6 +28,16 @@ func TestSortEndpointsByField(t *testing.T) {
 		expected   []portainer.EndpointID
 	}{
 		{
+			name:      "sort without value",
+			sortField: "",
+			expected: []portainer.EndpointID{
+				environments[0].ID,
+				environments[1].ID,
+				environments[2].ID,
+				environments[3].ID,
+			},
+		},
+		{
 			name:       "sort by name ascending",
 			sortField:  "Name",
 			isSortDesc: false,
