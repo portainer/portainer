@@ -40,12 +40,12 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
 
+	availableUsers := security.FilterUsers(users, securityContext)
+
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
-		if securityContext.IsAdmin {
-			sanitizeUsers(users)
-		}
-		return response.JSON(w, users)
+		sanitizeUsers(availableUsers)
+		return response.JSON(w, availableUsers)
 	}
 
 	// filter out users who do not have access to the specific endpoint
@@ -60,12 +60,10 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	canAccessEndpoint := make([]portainer.User, 0)
-	for _, user := range users {
+	for _, user := range availableUsers {
 		// the users who have the endpoint authorization
 		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
-			if securityContext.IsAdmin {
-				sanitizeUser(&user)
-			}
+			sanitizeUser(&user)
 			canAccessEndpoint = append(canAccessEndpoint, user)
 			continue
 		}
@@ -77,9 +75,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		}
 
 		if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
-			if securityContext.IsAdmin {
-				sanitizeUser(&user)
-			}
+			sanitizeUser(&user)
 			canAccessEndpoint = append(canAccessEndpoint, user)
 		}
 	}
