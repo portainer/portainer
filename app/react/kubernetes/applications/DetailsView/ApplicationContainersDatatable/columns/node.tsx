@@ -12,6 +12,7 @@ export const node = columnHelper.accessor('nodeName', {
       <Authorized
         authorizations="K8sClusterNodeR"
         childrenUnauthorized={nodeName}
+        adminOnlyCE
       >
         <Link to="kubernetes.cluster.node" params={{ nodeName }}>
           <div className="max-w-xs truncate" title={nodeName}>
