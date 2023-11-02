@@ -10,6 +10,13 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+type User struct {
+	ID       portainer.UserID `json:"Id" example:"1"`
+	Username string           `json:"Username" example:"bob"`
+	// User role (1 for administrator account and 2 for regular account)
+	Role portainer.UserRole `json:"Role" example:"1"`
+}
+
 // @id UserList
 // @summary List users
 // @description List Portainer users.
@@ -41,16 +48,10 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	availableUsers := security.FilterUsers(users, securityContext)
-	for i := range availableUsers {
-		hideFields(&availableUsers[i])
-	}
 
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
-		if securityContext.IsAdmin {
-			sanitizeUsers(users)
-		}
-		return response.JSON(w, users)
+		return response.JSON(w, sanitizeUsers(availableUsers))
 	}
 
 	// filter out users who do not have access to the specific endpoint
@@ -64,14 +65,11 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}
 
-	canAccessEndpoint := make([]portainer.User, 0)
+	canAccessEndpoint := make([]User, 0)
 	for _, user := range availableUsers {
 		// the users who have the endpoint authorization
 		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
-			if securityContext.IsAdmin {
-				sanitizeUser(&user)
-			}
-			canAccessEndpoint = append(canAccessEndpoint, user)
+			canAccessEndpoint = append(canAccessEndpoint, sanitizeUser(user))
 			continue
 		}
 
@@ -82,27 +80,25 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		}
 
 		if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
-			if securityContext.IsAdmin {
-				sanitizeUser(&user)
-			}
-			canAccessEndpoint = append(canAccessEndpoint, user)
+			canAccessEndpoint = append(canAccessEndpoint, sanitizeUser(user))
 		}
 	}
 
 	return response.JSON(w, canAccessEndpoint)
 }
 
-func sanitizeUser(user *portainer.User) {
-	user.Password = ""
-	user.EndpointAuthorizations = nil
-	user.ThemeSettings = portainer.UserThemeSettings{}
-	user.PortainerAuthorizations = nil
-	user.UserTheme = ""
-	user.TokenIssueAt = 0
+func sanitizeUser(user portainer.User) User {
+	return User{
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
 }
 
-func sanitizeUsers(users []portainer.User) {
+func sanitizeUsers(users []portainer.User) []User {
+	u := make([]User, len(users))
 	for i := range users {
-		sanitizeUser(&users[i])
+		u[i] = sanitizeUser(users[i])
 	}
+	return u
 }
