@@ -41,15 +41,10 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	availableUsers := security.FilterUsers(users, securityContext)
-	for i := range availableUsers {
-		hideFields(&availableUsers[i])
-	}
 
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
-		if securityContext.IsAdmin {
-			sanitizeUsers(users)
-		}
+		sanitizeUsers(users)
 		return response.JSON(w, users)
 	}
 
@@ -68,9 +63,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 	for _, user := range availableUsers {
 		// the users who have the endpoint authorization
 		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
-			if securityContext.IsAdmin {
-				sanitizeUser(&user)
-			}
+			sanitizeUser(&user)
 			canAccessEndpoint = append(canAccessEndpoint, user)
 			continue
 		}
@@ -82,9 +75,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		}
 
 		if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
-			if securityContext.IsAdmin {
-				sanitizeUser(&user)
-			}
+			sanitizeUser(&user)
 			canAccessEndpoint = append(canAccessEndpoint, user)
 		}
 	}
