@@ -1,6 +1,7 @@
 import { FormikErrors } from 'formik';
 import _ from 'lodash';
 import { useMemo } from 'react';
+import { trimSHA, trimVersionTag } from 'Docker/filters/utils';
 
 import DockerIcon from '@/assets/ico/vendor/docker.svg?c';
 import { useImages } from '@/react/docker/proxy/queries/images/useImages';
@@ -83,7 +84,9 @@ export function SimpleForm({
                 title="Search image on Docker Hub"
                 color="default"
                 props={{
-                  href: 'https://hub.docker.com/search?type=image&q={ $ctrl.model.Image | trimshasum | trimversiontag }',
+                  href: `https://hub.docker.com/search?type=image&q=${trimVersionTag(
+                    trimSHA(values.image)
+                  )}`,
                   target: '_blank',
                   rel: 'noreferrer',
                 }}

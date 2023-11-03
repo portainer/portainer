@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { hideShaSum, joinCommand, nodeStatusBadge, taskStatusBadge, trimSHA } from './utils';
+import { hideShaSum, joinCommand, nodeStatusBadge, taskStatusBadge, trimSHA, trimVersionTag } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -184,20 +184,7 @@ angular
   })
   .filter('trimversiontag', function () {
     'use strict';
-    return function trimversiontag(fullName) {
-      if (!fullName) {
-        return fullName;
-      }
-      var versionIdx = fullName.lastIndexOf(':');
-      if (versionIdx < 0) {
-        return fullName;
-      }
-      var hostIdx = fullName.indexOf('/');
-      if (hostIdx > versionIdx) {
-        return fullName;
-      }
-      return fullName.substring(0, versionIdx);
-    };
+    return trimVersionTag;
   })
   .filter('unique', function () {
     return _.uniqBy;
