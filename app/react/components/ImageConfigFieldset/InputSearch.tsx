@@ -22,6 +22,7 @@ export function InputSearch({
 
   return (
     <Select
+      isCreatable
       options={options}
       value={selectValue}
       onChange={(option) => option && onChange(option.value)}
