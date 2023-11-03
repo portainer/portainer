@@ -17,10 +17,8 @@ export function InputSearch({
   placeholder?: string;
   inputId?: string;
 } & AutomationTestingProps) {
-  const selectValue = options.find((option) => option.value === value) || {
-    value: '',
-    label: value,
-  };
+  const selectValue =
+    options.find((option) => option.value === value) || undefined;
 
   return (
     <Select
