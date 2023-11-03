@@ -1351,16 +1351,18 @@
                 </div>
 
                 <!-- kubernetes services options -->
-                <kube-services-form
-                  on-change="(ctrl.onServicesChange)"
-                  values="ctrl.formValues.Services"
-                  load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
-                  app-name="ctrl.formValues.Name"
-                  selector="ctrl.formValues.Selector"
-                  validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
-                  is-edit-mode="ctrl.state.isEdit"
-                  namespace="ctrl.formValues.ResourcePool.Namespace.Name"
-                ></kube-services-form>
+                <div ng-if="ctrl.formValues.ResourcePool">
+                  <kube-services-form
+                    on-change="(ctrl.onServicesChange)"
+                    values="ctrl.formValues.Services"
+                    load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+                    app-name="ctrl.formValues.Name"
+                    selector="ctrl.formValues.Selector"
+                    validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
+                    is-edit-mode="ctrl.state.isEdit"
+                    namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                  ></kube-services-form>
+                </div>
                 <!-- kubernetes services options -->
 
                 <!-- summary -->
@@ -1402,15 +1404,17 @@
                 </div>
               </div>
               <!-- kubernetes services options -->
-              <kube-services-form
-                on-change="(ctrl.onServicesChange)"
-                values="ctrl.formValues.Services"
-                app-name="ctrl.formValues.Name"
-                selector="ctrl.formValues.Selector"
-                validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
-                is-edit-mode="ctrl.state.isEdit"
-                namespace="ctrl.formValues.ResourcePool.Namespace.Name"
-              ></kube-services-form>
+              <div ng-if="ctrl.formValues.ResourcePool">
+                <kube-services-form
+                  on-change="(ctrl.onServicesChange)"
+                  values="ctrl.formValues.Services"
+                  app-name="ctrl.formValues.Name"
+                  selector="ctrl.formValues.Selector"
+                  validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
+                  is-edit-mode="ctrl.state.isEdit"
+                  namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                ></kube-services-form>
+              </div>
               <!-- kubernetes services options -->
             </div>
 
