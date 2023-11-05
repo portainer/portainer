@@ -12,12 +12,14 @@ export function AddButton({
   params,
   children,
   color = 'primary',
+  disabled,
   'data-cy': dataCy,
 }: PropsWithChildren<
   {
     to?: string;
     params?: object;
     color?: ComponentProps<typeof Button>['color'];
+    disabled?: boolean;
   } & AutomationTestingProps
 >) {
   return (
@@ -28,6 +30,7 @@ export function AddButton({
       className="!m-0"
       data-cy={dataCy}
       color={color}
+      disabled={disabled}
     >
       {children || 'Add'}
     </Button>
