@@ -29,7 +29,9 @@ export function EdgeGroupsDatatable() {
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />
       )}
-      isRowSelectable={({ original: item }) => !item.HasEdgeStack}
+      isRowSelectable={({ original: item }) =>
+        !(item.HasEdgeStack || item.HasEdgeJob || item.HasEdgeConfig)
+      }
     />
   );
 }

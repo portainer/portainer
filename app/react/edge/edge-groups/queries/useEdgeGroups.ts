@@ -13,8 +13,9 @@ import { buildUrl } from './build-url';
 
 export interface EdgeGroupListItemResponse extends EdgeGroup {
   EndpointTypes: Array<EnvironmentType>;
-  HasEdgeStack: boolean;
-  HasEdgeJob: boolean;
+  HasEdgeStack?: boolean;
+  HasEdgeJob?: boolean;
+  HasEdgeConfig?: boolean;
   TrustedEndpoints: Array<EnvironmentId>;
 }
 
