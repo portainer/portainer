@@ -167,7 +167,7 @@ function ImageField({
   onChange: (value: string) => void;
   registry?: Registry;
   autoComplete?: boolean;
-  inputId?: string;
+  inputId: string;
 }) {
   return autoComplete ? (
     <ImageFieldAutoComplete
@@ -194,7 +194,7 @@ function ImageFieldAutoComplete({
   value: string;
   onChange: (value: string) => void;
   registry?: Registry;
-  inputId?: string;
+  inputId: string;
 }) {
   const environmentId = useEnvironmentId();
 

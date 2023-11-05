@@ -17,14 +17,14 @@ interface Props {
   value: RelativePathModel;
   gitModel?: GitFormModel;
   onChange?: (value: Partial<RelativePathModel>) => void;
-  readonly?: boolean;
+  isEditing?: boolean;
 }
 
 export function RelativePathFieldset({
   value,
   gitModel,
   onChange,
-  readonly,
+  isEditing,
 }: Props) {
   const innerOnChange = useCallback(
     (value: Partial<RelativePathModel>) => onChange && onChange(value),
@@ -42,7 +42,7 @@ export function RelativePathFieldset({
             label="Enable relative path volumes"
             labelClass="col-sm-3 col-lg-2"
             tooltip="Enabling this means you can specify relative path volumes in your Compose files, with Portainer pulling the content from your git repository to the environment the stack is deployed to."
-            disabled={readonly}
+            disabled={isEditing}
             checked={value.SupportRelativePath}
             onChange={(value) => innerOnChange({ SupportRelativePath: value })}
           />
@@ -69,7 +69,7 @@ export function RelativePathFieldset({
                 <Input
                   name="FilesystemPath"
                   placeholder="/mnt"
-                  disabled={readonly}
+                  disabled={isEditing}
                   value={value.FilesystemPath}
                   onChange={(e) =>
                     innerOnChange({ FilesystemPath: e.target.value })
@@ -95,7 +95,7 @@ export function RelativePathFieldset({
                 label="GitOps Edge configurations"
                 labelClass="col-sm-3 col-lg-2"
                 tooltip="By enabling the GitOps Edge Configurations feature, you gain the ability to define relative path volumes in your configuration files. Portainer will then automatically fetch the content from your git repository by matching the folder name or file name with the Portainer Edge ID, and apply it to the environment where the stack is deployed"
-                disabled={readonly}
+                disabled={isEditing}
                 checked={!!value.SupportPerDeviceConfigs}
                 onChange={(value) =>
                   innerOnChange({ SupportPerDeviceConfigs: value })
@@ -121,6 +121,7 @@ export function RelativePathFieldset({
                   <FormControl
                     label="Directory"
                     errors={errors.PerDeviceConfigsPath}
+                    inputId="per_device_configs_path_input"
                   >
                     <PathSelector
                       value={value.PerDeviceConfigsPath || ''}
@@ -129,8 +130,9 @@ export function RelativePathFieldset({
                       }
                       placeholder="config"
                       model={gitModel || dummyGitForm}
-                      readOnly={readonly}
+                      readOnly={isEditing}
                       dirOnly
+                      inputId="per_device_configs_path_input"
                     />
                   </FormControl>
                 </div>
@@ -173,7 +175,7 @@ export function RelativePathFieldset({
                           value: 'dir',
                         },
                       ]}
-                      disabled={readonly}
+                      disabled={isEditing}
                     />
                   </FormControl>
                 </div>
@@ -203,7 +205,7 @@ export function RelativePathFieldset({
                           value: 'dir',
                         },
                       ]}
-                      disabled={readonly}
+                      disabled={isEditing}
                     />
                   </FormControl>
                 </div>
