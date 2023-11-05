@@ -17,6 +17,8 @@ import { FormActions } from '@@/form-components/FormActions';
 import { Button } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
 
+import { EdgeSettingsFieldset } from '../CreateView/EdgeSettingsFieldset';
+
 import { FormValues } from './types';
 
 export function InnerForm({
@@ -74,7 +76,11 @@ export function InnerForm({
         value={gitFileContent || values.FileContent}
         onChange={handleChangeFileContent}
         yaml
-        placeholder="Define or paste the content of your docker compose file here"
+        placeholder={
+          gitFileContent
+            ? 'Preview of the file from git repository'
+            : 'Define or paste the content of your docker compose file here'
+        }
         error={errors.FileContent}
         readonly={isEditorReadonly}
       >
@@ -90,6 +96,15 @@ export function InnerForm({
           .
         </p>
       </WebEditorForm>
+
+      {isTemplateVariablesEnabled && (
+        <CustomTemplatesVariablesDefinitionField
+          value={values.Variables}
+          onChange={(values) => setFieldValue('Variables', values)}
+          isVariablesNamesFromParent={!isEditorReadonly}
+          errors={errors.Variables}
+        />
+      )}
 
       {values.Git && (
         <>
@@ -121,12 +136,24 @@ export function InnerForm({
         </>
       )}
 
-      {isTemplateVariablesEnabled && (
-        <CustomTemplatesVariablesDefinitionField
-          value={values.Variables}
-          onChange={(values) => setFieldValue('Variables', values)}
-          isVariablesNamesFromParent={!isEditorReadonly}
-          errors={errors.Variables}
+      {values.EdgeSettings && (
+        <EdgeSettingsFieldset
+          setValues={(edgeValues) =>
+            setValues((values) => ({
+              ...values,
+              EdgeSettings:
+                typeof edgeValues === 'function'
+                  ? edgeValues(values.EdgeSettings)
+                  : edgeValues,
+            }))
+          }
+          gitConfig={values.Git}
+          fileValues={{
+            fileContent: values.FileContent,
+          }}
+          values={values.EdgeSettings}
+          errors={errors.EdgeSettings}
+          setFieldError={setFieldError}
         />
       )}
 

@@ -12,9 +12,9 @@ import { EditTemplateForm } from './EditTemplateForm';
 export function EditView() {
   const router = useRouter();
   const {
-    params: { id },
+    params: { templateId },
   } = useCurrentStateAndParams();
-  const customTemplateQuery = useCustomTemplate(id);
+  const customTemplateQuery = useCustomTemplate(templateId);
 
   useEffect(() => {
     if (customTemplateQuery.data && !customTemplateQuery.data.EdgeTemplate) {

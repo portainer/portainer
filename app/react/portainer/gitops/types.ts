@@ -1,4 +1,6 @@
 export type AutoUpdateMechanism = 'Webhook' | 'Interval';
+export { type RelativePathModel } from './RelativePathFieldset/types';
+
 export interface AutoUpdateResponse {
   /* Auto update interval */
   Interval: string;
@@ -68,15 +70,6 @@ export interface GitFormModel extends GitAuthModel {
    * if undefined, GitForm won't show the AutoUpdate fieldset
    */
   AutoUpdate?: AutoUpdateModel;
-}
-
-export interface RelativePathModel {
-  SupportRelativePath: boolean;
-  FilesystemPath?: string;
-  SupportPerDeviceConfigs?: boolean;
-  PerDeviceConfigsPath?: string;
-  PerDeviceConfigsMatchType?: string;
-  PerDeviceConfigsGroupMatchType?: string;
 }
 
 export function toGitFormModel(response?: RepoConfigResponse): GitFormModel {

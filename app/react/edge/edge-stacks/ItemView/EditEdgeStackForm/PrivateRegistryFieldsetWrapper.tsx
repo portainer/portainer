@@ -2,29 +2,32 @@ import _ from 'lodash';
 
 import { notifyError } from '@/portainer/services/notifications';
 import { PrivateRegistryFieldset } from '@/react/edge/edge-stacks/components/PrivateRegistryFieldset';
-import { useCreateEdgeStackFromFileContent } from '@/react/edge/edge-stacks/queries/useCreateEdgeStackFromFileContent';
 import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+
+import { useParseRegistries } from '../../queries/useParseRegistries';
 
 import { FormValues } from './types';
 
 export function PrivateRegistryFieldsetWrapper({
   value,
-  isValid,
   error,
   onChange,
-  values,
-  stackName,
   onFieldError,
+  values,
+  isGit,
 }: {
   value: FormValues['privateRegistryId'];
-  isValid: boolean;
   error?: string;
   onChange: (value?: number) => void;
-  values: FormValues;
-  stackName: string;
+  values: {
+    fileContent?: string;
+    file?: File;
+  };
   onFieldError: (message: string) => void;
+  isGit?: boolean;
 }) {
-  const dryRunMutation = useCreateEdgeStackFromFileContent();
+  const dryRunMutation = useParseRegistries();
 
   const registriesQuery = useRegistries();
 
@@ -35,34 +38,37 @@ export function PrivateRegistryFieldsetWrapper({
   return (
     <PrivateRegistryFieldset
       value={value}
-      formInvalid={!isValid}
+      formInvalid={!values.file && !values.fileContent && !isGit}
       errorMessage={error}
       registries={registriesQuery.data}
-      onChange={() => matchRegistry()}
+      onChange={() => matchRegistry(values)}
       onSelect={(value) => onChange(value)}
       isActive={!!value}
       clearRegistries={() => onChange(undefined)}
+      method={isGit ? 'repository' : 'file'}
     />
   );
 
-  async function matchRegistry() {
-    try {
-      const response = await dryRunMutation.mutateAsync({
-        name: `${stackName}-dryrun`,
-        stackFileContent: values.content,
-        edgeGroups: values.edgeGroups,
-        deploymentType: values.deploymentType,
-        dryRun: true,
-      });
+  async function matchRegistry(values: { fileContent?: string; file?: File }) {
+    if (isGit) {
+      return;
+    }
 
-      if (response.Registries.length === 0) {
+    try {
+      if (!isBE) {
+        return;
+      }
+
+      const registries = await dryRunMutation.mutateAsync(values);
+
+      if (registries.length === 0) {
         onChange(undefined);
         return;
       }
 
-      const validRegistry = onlyOne(response.Registries);
+      const validRegistry = onlyOne(registries);
       if (validRegistry) {
-        onChange(response.Registries[0]);
+        onChange(registries[0]);
       } else {
         onChange(undefined);
         onFieldError(

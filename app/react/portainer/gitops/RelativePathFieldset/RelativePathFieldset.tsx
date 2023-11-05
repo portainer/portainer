@@ -1,9 +1,6 @@
 import { useCallback } from 'react';
 
-import {
-  GitFormModel,
-  RelativePathModel,
-} from '@/react/portainer/gitops/types';
+import { GitFormModel } from '@/react/portainer/gitops/types';
 import { PathSelector } from '@/react/portainer/gitops/ComposePathField/PathSelector';
 import { dummyGitForm } from '@/react/portainer/gitops/RelativePathFieldset/utils';
 import { useValidation } from '@/react/portainer/gitops/RelativePathFieldset/useValidation';
@@ -12,6 +9,8 @@ import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input, Select } from '@@/form-components/Input';
+
+import { RelativePathModel, getPerDevConfigsFilterType } from './types';
 
 interface Props {
   value: RelativePathModel;
@@ -156,7 +155,9 @@ export function RelativePathFieldset({
                       value={value.PerDeviceConfigsMatchType}
                       onChange={(e) =>
                         innerOnChange({
-                          PerDeviceConfigsMatchType: e.target.value,
+                          PerDeviceConfigsMatchType: getPerDevConfigsFilterType(
+                            e.target.value
+                          ),
                         })
                       }
                       options={[
@@ -186,7 +187,8 @@ export function RelativePathFieldset({
                       value={value.PerDeviceConfigsGroupMatchType}
                       onChange={(e) =>
                         innerOnChange({
-                          PerDeviceConfigsGroupMatchType: e.target.value,
+                          PerDeviceConfigsGroupMatchType:
+                            getPerDevConfigsFilterType(e.target.value),
                         })
                       }
                       options={[

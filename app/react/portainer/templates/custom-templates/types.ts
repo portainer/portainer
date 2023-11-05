@@ -2,9 +2,11 @@ import { UserId } from '@/portainer/users/types';
 import { StackType } from '@/react/common/stacks/types';
 
 import { ResourceControlResponse } from '../../access-control/types';
-import { RepoConfigResponse } from '../../gitops/types';
+import { RelativePathModel, RepoConfigResponse } from '../../gitops/types';
 import { VariableDefinition } from '../../custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { Platform } from '../types';
+import { RegistryId } from '../../registries/types';
+import { getDefaultRelativePathModel } from '../../gitops/RelativePathFieldset/types';
 
 export type CustomTemplate = {
   Id: number;
@@ -87,16 +89,34 @@ export type CustomTemplate = {
 
   /** EdgeTemplate indicates if this template purpose for Edge Stack */
   EdgeTemplate: boolean;
+
+  EdgeSettings?: EdgeTemplateSettings;
+};
+
+/**
+ * EdgeTemplateSettings represents the configuration of a custom template for Edge
+ */
+export type EdgeTemplateSettings = {
+  PrePullImage: boolean;
+
+  RetryDeploy: boolean;
+
+  PrivateRegistryId: RegistryId | undefined;
+
+  RelativePathSettings: RelativePathModel;
 };
 
 export type CustomTemplateFileContent = {
   FileContent: string;
 };
 
-export const CustomTemplateKubernetesType = 3;
+export const CustomTemplateKubernetesType = StackType.Kubernetes;
 
-export enum Types {
-  SWARM = 1,
-  STANDALONE,
-  KUBERNETES,
+export function getDefaultEdgeTemplateSettings() {
+  return {
+    PrePullImage: false,
+    RetryDeploy: false,
+    PrivateRegistryId: undefined,
+    RelativePathSettings: getDefaultRelativePathModel(),
+  };
 }

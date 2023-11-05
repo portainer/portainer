@@ -11,6 +11,8 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { Platform } from '@/react/portainer/templates/types';
 
+import { edgeFieldsetValidation } from '../CreateView/EdgeSettingsFieldset.validation';
+
 export function useValidation(
   currentTemplateId: CustomTemplate['Id'],
   isGit: boolean
@@ -40,6 +42,7 @@ export function useValidation(
           ? buildGitValidationSchema(gitCredentialsQuery.data || [])
           : mixed(),
         Variables: variablesValidation(),
+        EdgeSettings: edgeFieldsetValidation(),
       }).concat(
         commonFieldsValidation({
           templates: customTemplatesQuery.data,

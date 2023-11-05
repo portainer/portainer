@@ -6,6 +6,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { useCreateTemplateMutation } from '@/react/portainer/templates/custom-templates/queries/useCreateTemplateMutation';
 import { Platform } from '@/react/portainer/templates/types';
 import { useFetchTemplateFile } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
+import { getDefaultEdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
 
 import { editor } from '@@/BoxSelector/common-options/build-methods';
 
@@ -47,6 +48,7 @@ export function CreateTemplateForm() {
       RepositoryURLValid: true,
       TLSSkipVerify: false,
     },
+    EdgeSettings: getDefaultEdgeTemplateSettings(),
   };
 
   return (
