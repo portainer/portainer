@@ -70,13 +70,7 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
               label="Tags"
               data-cy="portainerSidebar-environmentTags"
             />
-            {isBE && (
-              <SidebarItem
-                to="portainer.endpoints.updateSchedules"
-                label="Update & Rollback"
-                data-cy="portainerSidebar-updateSchedules"
-              />
-            )}
+            <EdgeUpdatesSidebarItem />
           </SidebarItem>
 
           <SidebarItem
@@ -159,5 +153,21 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
         </SidebarItem>
       )}
     </SidebarSection>
+  );
+}
+
+function EdgeUpdatesSidebarItem() {
+  const settingsQuery = usePublicSettings();
+
+  if (!isBE || !settingsQuery.data?.EnableEdgeComputeFeatures) {
+    return null;
+  }
+
+  return (
+    <SidebarItem
+      to="portainer.endpoints.updateSchedules"
+      label="Update & Rollback"
+      data-cy="portainerSidebar-updateSchedules"
+    />
   );
 }
