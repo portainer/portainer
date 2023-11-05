@@ -5,7 +5,7 @@ package request
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -33,7 +33,7 @@ func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) (
 	}
 	defer file.Close()
 
-	fileContent, err := ioutil.ReadAll(file)
+	fileContent, err := io.ReadAll(file)
 	if err != nil {
 		return nil, "", err
 	}
