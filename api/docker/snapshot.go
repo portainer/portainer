@@ -174,7 +174,12 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 				if !snapshot.Swarm {
 					return err
 				} else {
-					log.Info().Str("container", container.ID).Err(err).Msg("unable to inspect container in other Swarm nodes")
+					if !strings.Contains(err.Error(), "No such container") {
+						return err
+					}
+					// It is common to have containers running on different Swarm nodes,
+					// so we just log the error in the debug level
+					log.Debug().Str("container", container.ID).Err(err).Msg("unable to inspect container in other Swarm nodes")
 				}
 			} else {
 				var gpuOptions *_container.DeviceRequest = nil
