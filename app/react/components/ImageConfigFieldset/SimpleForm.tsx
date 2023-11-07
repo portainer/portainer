@@ -143,6 +143,14 @@ function RegistrySelector({
           label: registry.Name,
           value: registry.Id,
         })),
+    onSuccess: (options) => {
+      if (options && options.length) {
+        const idx = options.findIndex((v) => v.value === value);
+        if (idx === -1) {
+          onChange(options[0].value);
+        }
+      }
+    },
   });
 
   return (
