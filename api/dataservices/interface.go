@@ -97,6 +97,7 @@ type (
 		DeleteEndpoint(ID portainer.EndpointID) error
 		GetNextIdentifier() int
 		BucketName() string
+		EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error)
 	}
 
 	// EndpointGroupService represents a service for managing environment(endpoint) group data
