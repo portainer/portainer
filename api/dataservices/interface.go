@@ -95,6 +95,7 @@ type (
 	EndpointService interface {
 		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
 		EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool)
+		EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error)
 		Heartbeat(endpointID portainer.EndpointID) (int64, bool)
 		UpdateHeartbeat(endpointID portainer.EndpointID)
 		Endpoints() ([]portainer.Endpoint, error)
@@ -103,7 +104,6 @@ type (
 		DeleteEndpoint(ID portainer.EndpointID) error
 		GetNextIdentifier() int
 		BucketName() string
-		EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error)
 	}
 
 	// EndpointGroupService represents a service for managing environment(endpoint) group data

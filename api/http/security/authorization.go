@@ -4,9 +4,6 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/kubernetes/cli"
-	"github.com/rs/zerolog/log"
 )
 
 // IsAdmin returns true if the logged-in user is an admin
@@ -162,45 +159,4 @@ func AuthorizedAccess(userID portainer.UserID, memberships []portainer.TeamMembe
 	}
 
 	return false
-}
-
-func UpdateUserServiceAccountsForEndpoint(endpointID portainer.EndpointID, dataStore dataservices.DataStore, k8sClientFactory *cli.ClientFactory) {
-	endpoint, err := dataStore.Endpoint().Endpoint(endpointID)
-	if err != nil {
-		log.Error().Err(err).Msgf("failed fetching endpoint %d", endpointID)
-		return
-	}
-
-	restrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
-	userIDs := func() []portainer.UserID {
-		userIDs := make([]portainer.UserID, 0)
-		for u := range endpoint.UserAccessPolicies {
-			userIDs = append(userIDs, u)
-		}
-		for t := range endpoint.TeamAccessPolicies {
-			memberships, _ := dataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(t))
-			for _, membership := range memberships {
-				userIDs = append(userIDs, membership.UserID)
-			}
-		}
-		return userIDs
-	}
-
-	kubecli, err := k8sClientFactory.GetKubeClient(endpoint)
-	if err != nil {
-		log.Error().Err(err).Msgf("failed fetching kube client for endpoint %d", endpointID)
-		return
-	}
-	for _, userID := range userIDs() {
-		memberships, _ := dataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(userID))
-		teamIds := make([]int, 0, len(memberships))
-		for _, membership := range memberships {
-			teamIds = append(teamIds, int(membership.TeamID))
-		}
-
-		err := kubecli.SetupUserServiceAccount(int(userID), teamIds, restrictDefaultNamespace)
-		if err != nil {
-			log.Error().Err(err).Msgf("failed setting-up service account for user %d", userID)
-		}
-	}
 }
