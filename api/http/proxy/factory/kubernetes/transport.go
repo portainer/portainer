@@ -59,7 +59,7 @@ func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*
 	log.Debug().Msgf("proxying request to %s, method %s", request.URL.Path, request.Method)
 
 	switch {
-	case requestPath == "/namespaces/portainer/configmaps/portainer-config" && (request.Method == "PUT" || request.Method == "POST"):
+	case strings.EqualFold(requestPath, "/namespaces/portainer/configmaps/portainer-config") && (request.Method == "PUT" || request.Method == "POST"):
 		defer transport.tokenManager.UpdateUserServiceAccountsForEndpoint(portainer.EndpointID(endpointID))
 		return transport.executeKubernetesRequest(request)
 	case strings.EqualFold(requestPath, "/namespaces"):
