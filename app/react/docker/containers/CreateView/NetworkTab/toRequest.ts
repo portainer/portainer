@@ -17,6 +17,7 @@ export function toRequest(
   return {
     ...oldConfig,
     Hostname: hostName,
+    Domainname: values.domain,
     MacAddress: values.macAddress,
     HostConfig: {
       ...oldConfig.HostConfig,
