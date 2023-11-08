@@ -1429,7 +1429,7 @@
                   ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
                   type="button"
                   class="btn btn-primary btn-sm !ml-0"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid() || ctrl.hasPortErrors()"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid() || ctrl.hasPortErrors() || !ctrl.formValues.ResourcePool"
                   ng-click="ctrl.deployApplication()"
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sAppCreate-deployButton"
