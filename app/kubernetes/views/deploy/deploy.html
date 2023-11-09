@@ -13,7 +13,19 @@
             <uib-tab index="0">
               <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
               <form class="form-horizontal mt-6" name="ctrl.deploymentForm">
-                <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                <div class="col-sm-12 form-section-title"> Deploy from </div>
+                <box-selector
+                  slim="true"
+                  radio-name="'method'"
+                  value="ctrl.state.BuildMethod"
+                  options="ctrl.methodOptions"
+                  data-cy="k8sAppDeploy-buildSelector"
+                  on-change="(ctrl.onChangeMethod)"
+                ></box-selector>
+
+                <!-- namespace -->
+                <div class="col-sm-12 form-section-title !mt-4"> Namespace </div>
+                <div class="form-group" ng-if="ctrl.formValues.Namespace && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                   <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
                     Use namespace(s) specified from manifest
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
@@ -24,21 +36,22 @@
                       <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
                       <span class="slider round"></span>
                     </label>
-                    <!-- <span class="ml-2 mb-1 switch-values" ng-if="ctrl.formValues.namespace_toggle">Yes</span>
-                    <span class="ml-2 mb-1 switch-values" ng-if="!ctrl.formValues.namespace_toggle">No</span> -->
                   </div>
                 </div>
+
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
                   <div class="col-sm-8">
                     <select
-                      ng-if="!ctrl.formValues.namespace_toggle"
-                      ng-disabled="ctrl.formValues.namespace_toggle"
+                      ng-if="!ctrl.formValues.namespace_toggle || ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                      ng-disabled="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                       class="form-control"
                       ng-model="ctrl.formValues.Namespace"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
                     ></select>
-                    <span ng-if="ctrl.formValues.namespace_toggle" class="small text-muted pt-[7px]">Namespaces specified in the manifest will be used</span>
+                    <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.buildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
+                      >Namespaces specified in the manifest will be used</span
+                    >
                   </div>
                 </div>
 
@@ -78,27 +91,7 @@
                   set-stack-name="(ctrl.setStackName)"
                   is-admin="ctrl.currentUser.isAdmin"
                 ></kube-stack-name>
-
-                <div class="col-sm-12 form-section-title"> Deploy from </div>
-                <box-selector
-                  slim="true"
-                  radio-name="'method'"
-                  value="ctrl.state.BuildMethod"
-                  options="ctrl.methodOptions"
-                  data-cy="k8sAppDeploy-buildSelector"
-                  on-change="(ctrl.onChangeMethod)"
-                ></box-selector>
-
-                <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
-                  <div class="col-sm-12 form-section-title"> Deployment type </div>
-                  <box-selector
-                    radio-name="'deploy'"
-                    value="ctrl.state.DeployType"
-                    options="ctrl.deployOptions"
-                    data-cy="k8sAppDeploy-deploymentSelector"
-                    on-change="(ctrl.onChangeDeployType)"
-                  ></box-selector>
-                </div>
+                <!-- !namespace -->
 
                 <!-- repository -->
                 <git-form
@@ -117,6 +110,8 @@
                 <!-- !repository -->
 
                 <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                  <div class="col-sm-12 form-section-title !mt-4"> Custom template </div>
+
                   <custom-template-selector
                     new-template-path="kubernetes.templates.custom.new"
                     stack-type="3"
