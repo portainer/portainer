@@ -40,7 +40,7 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 func (handler *Handler) updateUserServiceAccounts(membership *portainer.TeamMembership) {
 	endpoints, err := handler.DataStore.Endpoint().EndpointsByTeamID(membership.TeamID)
 	if err != nil {
-		log.Error().Err(err).Msgf("failed fetching endpoints for team %d", membership.TeamID)
+		log.Error().Err(err).Msgf("failed fetching environments for team %d", membership.TeamID)
 		return
 	}
 	for _, endpoint := range endpoints {
