@@ -95,7 +95,7 @@ func (manager *tokenManager) GetUserServiceAccountToken(userID int, endpointID p
 	tokenFunc := func() (string, error) {
 		endpoint, err := manager.dataStore.Endpoint().Endpoint(endpointID)
 		if err != nil {
-			log.Error().Err(err).Msgf("failed fetching endpoint %d", endpointID)
+			log.Error().Err(err).Msgf("failed fetching environment %d", endpointID)
 			return "", err
 		}
 
