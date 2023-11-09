@@ -52,5 +52,7 @@ func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Requ
 		return httperror.InternalServerError("Unable to remove the team membership from the database", err)
 	}
 
+	defer handler.updateUserServiceAccounts(membership)
+
 	return response.Empty(w)
 }
