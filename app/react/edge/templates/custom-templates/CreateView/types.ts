@@ -23,5 +23,5 @@ export interface FormValues extends CommonFieldsValues {
   File: File | undefined;
   Git: GitFormModel;
   Variables: DefinitionFieldValues;
-  EdgeSettings: EdgeTemplateSettings;
+  EdgeSettings?: EdgeTemplateSettings;
 }

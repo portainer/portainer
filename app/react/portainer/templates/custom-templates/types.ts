@@ -7,6 +7,7 @@ import { VariableDefinition } from '../../custom-templates/components/CustomTemp
 import { Platform } from '../types';
 import { RegistryId } from '../../registries/types';
 import { getDefaultRelativePathModel } from '../../gitops/RelativePathFieldset/types';
+import { isBE } from '../../feature-flags/feature-flags.service';
 
 export type CustomTemplate = {
   Id: number;
@@ -113,6 +114,10 @@ export type CustomTemplateFileContent = {
 export const CustomTemplateKubernetesType = StackType.Kubernetes;
 
 export function getDefaultEdgeTemplateSettings() {
+  if (!isBE) {
+    return undefined;
+  }
+
   return {
     PrePullImage: false,
     RetryDeploy: false,

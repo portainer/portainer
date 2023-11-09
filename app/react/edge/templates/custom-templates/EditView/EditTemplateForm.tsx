@@ -2,10 +2,7 @@ import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import {
-  CustomTemplate,
-  getDefaultEdgeTemplateSettings,
-} from '@/react/portainer/templates/custom-templates/types';
+import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 import { useCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
 import { useUpdateTemplateMutation } from '@/react/portainer/templates/custom-templates/queries/useUpdateTemplateMutation';
 import {
@@ -41,7 +38,7 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
 
     FileContent: fileQuery.data || '',
     Git: template.GitConfig ? toGitFormModel(template.GitConfig) : undefined,
-    EdgeSettings: template.EdgeSettings || getDefaultEdgeTemplateSettings(),
+    EdgeSettings: template.EdgeSettings,
   };
 
   return (

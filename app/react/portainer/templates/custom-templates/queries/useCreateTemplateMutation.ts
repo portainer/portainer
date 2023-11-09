@@ -47,10 +47,14 @@ function createTemplate({
       return createTemplateFromGit({
         ...values,
         ...Git,
-        EdgeSettings: {
-          ...values.EdgeSettings,
-          ...values.EdgeSettings.RelativePathSettings,
-        },
+        ...(values.EdgeSettings
+          ? {
+              EdgeSettings: {
+                ...values.EdgeSettings,
+                ...values.EdgeSettings.RelativePathSettings,
+              },
+            }
+          : {}),
       });
     default:
       throw new Error('Unknown method');

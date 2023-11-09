@@ -1,4 +1,4 @@
-import { Form, useFormikContext } from 'formik';
+import { Form, FormikErrors, useFormikContext } from 'formik';
 import { RefreshCw } from 'lucide-react';
 
 import { CommonFields } from '@/react/portainer/custom-templates/components/CommonFields';
@@ -11,6 +11,8 @@ import {
   isTemplateVariablesEnabled,
 } from '@/react/portainer/custom-templates/components/utils';
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
+import { applySetStateAction } from '@/react-tools/apply-set-state-action';
+import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
 
 import { WebEditorForm, usePreventExit } from '@@/WebEditorForm';
 import { FormActions } from '@@/form-components/FormActions';
@@ -139,20 +141,17 @@ export function InnerForm({
       {values.EdgeSettings && (
         <EdgeSettingsFieldset
           setValues={(edgeValues) =>
-            setValues((values) => ({
-              ...values,
-              EdgeSettings:
-                typeof edgeValues === 'function'
-                  ? edgeValues(values.EdgeSettings)
-                  : edgeValues,
-            }))
+            setFieldValue(
+              'EdgeSettings',
+              applySetStateAction(edgeValues, values.EdgeSettings)
+            )
           }
           gitConfig={values.Git}
           fileValues={{
             fileContent: values.FileContent,
           }}
           values={values.EdgeSettings}
-          errors={errors.EdgeSettings}
+          errors={errors.EdgeSettings as FormikErrors<EdgeTemplateSettings>}
           setFieldError={setFieldError}
         />
       )}

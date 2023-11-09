@@ -1,4 +1,4 @@
-import { Form, useFormikContext } from 'formik';
+import { Form, FormikErrors, useFormikContext } from 'formik';
 
 import { CommonFields } from '@/react/portainer/custom-templates/components/CommonFields';
 import { CustomTemplatesVariablesDefinitionField } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
@@ -10,6 +10,8 @@ import {
   isTemplateVariablesEnabled,
 } from '@/react/portainer/custom-templates/components/utils';
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
+import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
+import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 
 import { BoxSelector } from '@@/BoxSelector';
 import { WebEditorForm, usePreventExit } from '@@/WebEditorForm';
@@ -42,6 +44,8 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
     values.FileContent,
     values.Method === editor.value && !isSubmitting
   );
+
+  const isGit = values.Method === git.value;
   return (
     <Form className="form-horizontal">
       <CommonFields
@@ -104,6 +108,15 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
         />
       )}
 
+      {isTemplateVariablesEnabled && (
+        <CustomTemplatesVariablesDefinitionField
+          value={values.Variables}
+          onChange={(values) => setFieldValue('Variables', values)}
+          isVariablesNamesFromParent={values.Method === editor.value}
+          errors={errors.Variables}
+        />
+      )}
+
       {values.Method === git.value && (
         <GitForm
           value={values.Git}
@@ -117,33 +130,24 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
         />
       )}
 
-      {isTemplateVariablesEnabled && (
-        <CustomTemplatesVariablesDefinitionField
-          value={values.Variables}
-          onChange={(values) => setFieldValue('Variables', values)}
-          isVariablesNamesFromParent={values.Method === editor.value}
-          errors={errors.Variables}
-        />
-      )}
-
       {values.EdgeSettings && (
         <EdgeSettingsFieldset
-          setValues={(edgeValues) =>
+          setValues={(edgeSetValues) =>
             setValues((values) => ({
               ...values,
-              EdgeSettings:
-                typeof edgeValues === 'function'
-                  ? edgeValues(values.EdgeSettings)
-                  : edgeValues,
+              EdgeSettings: applySetStateAction(
+                edgeSetValues,
+                values.EdgeSettings
+              ),
             }))
           }
-          gitConfig={values.Git}
+          gitConfig={isGit ? values.Git : undefined}
           fileValues={{
             fileContent: values.FileContent,
             file: values.File,
           }}
           values={values.EdgeSettings}
-          errors={errors.EdgeSettings}
+          errors={errors.EdgeSettings as FormikErrors<EdgeTemplateSettings>}
           setFieldError={setFieldError}
         />
       )}
