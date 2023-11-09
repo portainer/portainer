@@ -56,8 +56,6 @@ func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*
 		endpointID, _ = strconv.Atoi(endpointIDMatch[0])
 	}
 
-	log.Debug().Msgf("proxying request to %s, method %s", request.URL.Path, request.Method)
-
 	switch {
 	case strings.EqualFold(requestPath, "/namespaces/portainer/configmaps/portainer-config") && (request.Method == "PUT" || request.Method == "POST"):
 		defer transport.tokenManager.UpdateUserServiceAccountsForEndpoint(portainer.EndpointID(endpointID))

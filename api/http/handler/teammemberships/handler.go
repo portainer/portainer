@@ -49,7 +49,7 @@ func (handler *Handler) updateUserServiceAccounts(membership *portainer.TeamMemb
 		if endpointutils.IsKubernetesEndpoint(&endpoint) {
 			kubecli, err := handler.K8sClientFactory.GetKubeClient(&endpoint)
 			if err != nil {
-				log.Error().Err(err).Msgf("failed getting kube client for endpoint %d", endpoint.ID)
+				log.Error().Err(err).Msgf("failed getting kube client for environment %d", endpoint.ID)
 				continue
 			}
 			teamIDs := []int{int(membership.TeamID)}
