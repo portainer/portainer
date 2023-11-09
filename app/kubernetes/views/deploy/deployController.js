@@ -183,7 +183,7 @@ class KubernetesDeployController {
 
   disableDeploy() {
     const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
-    const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.URL && _.isEmpty(this.formValues.ManifestURL);
+    const isURLFormInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.URL && _.isEmpty(this.formValues.ManifestURL);
     const isCustomTemplateInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.CUSTOM_TEMPLATE && _.isEmpty(this.formValues.EditorContent);
 
     const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
