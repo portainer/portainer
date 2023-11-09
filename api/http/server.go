@@ -264,6 +264,7 @@ func (server *Server) Start() error {
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
+	teamMembershipHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var systemHandler = system.NewHandler(requestBouncer,
 		server.Status,

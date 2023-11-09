@@ -306,6 +306,19 @@ func (s *stubEndpointService) GetNextIdentifier() int {
 	return len(s.endpoints)
 }
 
+func (s *stubEndpointService) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error) {
+	var endpoints = make([]portainer.Endpoint, 0)
+
+	for _, e := range s.endpoints {
+		for t := range e.TeamAccessPolicies {
+			if t == teamID {
+				endpoints = append(endpoints, e)
+			}
+		}
+	}
+	return endpoints, nil
+}
+
 // WithEndpoints option will instruct testDatastore to return provided environments(endpoints)
 func WithEndpoints(endpoints []portainer.Endpoint) datastoreOption {
 	return func(d *testDatastore) {

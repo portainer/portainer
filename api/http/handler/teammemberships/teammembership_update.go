@@ -90,5 +90,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return httperror.InternalServerError("Unable to persist membership changes inside the database", err)
 	}
 
+	defer handler.updateUserServiceAccounts(membership)
+
 	return response.JSON(w, membership)
 }

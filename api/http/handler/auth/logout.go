@@ -3,11 +3,9 @@ package auth
 import (
 	"net/http"
 
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/logoutcontext"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-	"github.com/rs/zerolog/log"
 )
 
 // @id Logout
@@ -21,10 +19,7 @@ import (
 // @router /auth/logout [post]
 
 func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		log.Warn().Err(err).Msg("unable to retrieve user details from authentication token")
-	}
+	tokenData := handler.bouncer.JWTAuthLookup(r)
 
 	if tokenData != nil {
 		handler.KubernetesTokenCacheManager.RemoveUserFromCache(tokenData.ID)

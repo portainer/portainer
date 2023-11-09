@@ -5,6 +5,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -142,6 +143,23 @@ func (service *Service) Create(endpoint *portainer.Endpoint) error {
 	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
 		return service.Tx(tx).Create(endpoint)
 	})
+}
+
+func (service *Service) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error) {
+	var endpoints = make([]portainer.Endpoint, 0)
+
+	return endpoints, service.connection.GetAll(
+		BucketName,
+		&portainer.Endpoint{},
+		dataservices.FilterFn(&endpoints, func(e portainer.Endpoint) bool {
+			for t := range e.TeamAccessPolicies {
+				if t == teamID {
+					return true
+				}
+			}
+			return false
+		}),
+	)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
