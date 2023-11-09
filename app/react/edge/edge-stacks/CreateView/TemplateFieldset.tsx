@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import sanitize from 'sanitize-html';
 
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
-import { useCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
+import { useCustomTemplateFileMutation } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
 import {
   CustomTemplatesVariablesField,
   VariablesFieldValue,
@@ -11,41 +11,31 @@ import {
 } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 
-import { WebEditorForm } from '@@/WebEditorForm';
 import { FormControl } from '@@/form-components/FormControl';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 export function TemplateFieldset({
-  value,
+  value: selectedTemplate,
   onChange,
+  onChangeFile,
 }: {
-  value: string;
-  onChange: (value: string) => void;
+  value: CustomTemplate | undefined;
+  onChange: (value?: CustomTemplate) => void;
+  onChangeFile: (value: string) => void;
 }) {
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<CustomTemplate | null>(null);
-  const fileQuery = useCustomTemplateFile(
-    selectedTemplate?.Id,
-    !!selectedTemplate?.GitConfig
-  );
-  const [variableValues, setVariableValues] = useState<VariablesFieldValue>([]);
+  const fetchFileMutation = useCustomTemplateFileMutation();
+  const [templateFile, setTemplateFile] = useState('');
+  const templatesQuery = useCustomTemplates({
+    select: (templates) =>
+      templates.filter((template) => template.EdgeTemplate),
+  });
 
-  useEffect(() => {
-    if (fileQuery.data && fileQuery.data !== value && selectedTemplate) {
-      onChange(
-        renderTemplate(
-          fileQuery.data,
-          variableValues,
-          selectedTemplate.Variables
-        )
-      );
-    }
-  }, [fileQuery.data, onChange, selectedTemplate, value, variableValues]);
+  const [variableValues, setVariableValues] = useState<VariablesFieldValue>([]);
 
   return (
     <>
       <TemplateSelector
-        value={selectedTemplate}
+        value={selectedTemplate?.Id}
         onChange={handleChangeTemplate}
       />
       {selectedTemplate && (
@@ -70,35 +60,49 @@ export function TemplateFieldset({
           <CustomTemplatesVariablesField
             onChange={(value) => {
               setVariableValues(value);
-              onChange(
-                renderTemplate(
-                  fileQuery.data || '',
-                  value,
-                  selectedTemplate.Variables
-                )
+              onChangeFile(
+                renderTemplate(templateFile, value, selectedTemplate.Variables)
               );
             }}
             value={variableValues}
             definitions={selectedTemplate.Variables}
-          />
-
-          <WebEditorForm
-            id="template-content-editor"
-            value={fileQuery.isLoading ? 'Loading...' : value}
-            onChange={onChange}
-            yaml
-            placeholder="Define or paste the content of your docker compose file here"
           />
         </>
       )}
     </>
   );
 
-  function handleChangeTemplate(template: CustomTemplate | null) {
-    setSelectedTemplate(template);
-    if (template) {
-      setVariableValues(getVariablesFieldDefaultValues(template.Variables));
+  function handleChangeTemplate(templateId: CustomTemplate['Id'] | undefined) {
+    const selectedTemplate = templatesQuery.data?.find(
+      (template) => template.Id === templateId
+    );
+    if (!selectedTemplate) {
+      setVariableValues([]);
+      onChange(undefined);
+      return;
     }
+
+    fetchFileMutation.mutate(
+      { id: selectedTemplate.Id, git: !!selectedTemplate.GitConfig },
+      {
+        onSuccess: (data) => {
+          setTemplateFile(data);
+          onChangeFile(
+            renderTemplate(
+              data,
+              getVariablesFieldDefaultValues(selectedTemplate.Variables),
+              selectedTemplate.Variables
+            )
+          );
+        },
+      }
+    );
+    setVariableValues(
+      selectedTemplate
+        ? getVariablesFieldDefaultValues(selectedTemplate.Variables)
+        : []
+    );
+    onChange(selectedTemplate);
   }
 }
 
@@ -106,14 +110,13 @@ function TemplateSelector({
   value,
   onChange,
 }: {
-  value: CustomTemplate | null;
-  onChange: (value: CustomTemplate | null) => void;
+  value: CustomTemplate['Id'] | undefined;
+  onChange: (value: CustomTemplate['Id'] | undefined) => void;
 }) {
   const templatesQuery = useCustomTemplates({
     select: (templates) =>
       templates.filter((template) => template.EdgeTemplate),
   });
-  const selectedId = value?.Id;
 
   if (!templatesQuery.data) {
     return null;
@@ -123,7 +126,7 @@ function TemplateSelector({
     <FormControl label="Template" inputId="stack_template">
       <PortainerSelect
         placeholder="Select an Edge stack template"
-        value={selectedId}
+        value={value}
         onChange={handleChange}
         options={templatesQuery.data.map((template) => ({
           label: `${template.Title} - ${template.Description}`,
@@ -134,8 +137,6 @@ function TemplateSelector({
   );
 
   function handleChange(value: CustomTemplate['Id']) {
-    const template =
-      templatesQuery.data?.find((template) => template.Id === value) || null;
-    onChange(template);
+    onChange(value);
   }
 }

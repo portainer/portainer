@@ -181,7 +181,7 @@ angular
 
     $stateRegistryProvider.register({
       name: 'edge.templates.custom.edit',
-      url: '/:id',
+      url: '/:templateId',
 
       views: {
         'content@': {

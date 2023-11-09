@@ -43,7 +43,7 @@ export function CustomTemplatesListItem({
                 props={{
                   to: '.edit',
                   params: {
-                    id: template.Id,
+                    templateId: template.Id,
                   },
                 }}
                 icon={Edit}

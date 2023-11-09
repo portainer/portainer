@@ -57,6 +57,8 @@
             ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Compose"
             form-values="$ctrl.formValues"
             state="$ctrl.state"
+            template="$ctrl.state.selectedTemplate"
+            on-change-template="($ctrl.onChangeTemplate)"
           ></edge-stacks-docker-compose-form>
 
           <edge-stacks-kube-manifest-form

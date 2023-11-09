@@ -10,6 +10,7 @@ import {
   intersectVariables,
   isTemplateVariablesEnabled,
 } from '@/react/portainer/custom-templates/components/utils';
+import { toGitFormModel } from '@/react/portainer/gitops/types';
 
 import { InnerForm } from './InnerForm';
 import { FormValues } from './types';
@@ -36,24 +37,7 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
     Variables: parseTemplate(fileQuery.data || ''),
 
     FileContent: fileQuery.data || '',
-    Git: template.GitConfig
-      ? {
-          RepositoryURL: template.GitConfig.URL,
-          RepositoryReferenceName: template.GitConfig.ReferenceName,
-          RepositoryAuthentication: !!template.GitConfig.Authentication,
-          RepositoryUsername: template.GitConfig.Authentication
-            ? template.GitConfig.Authentication.Username
-            : '',
-          RepositoryPassword: template.GitConfig.Authentication
-            ? template.GitConfig.Authentication.Password
-            : '',
-          RepositoryGitCredentialID: template.GitConfig.Authentication
-            ? template.GitConfig.Authentication.GitCredentialID
-            : 0,
-          ComposeFilePathInRepository: template.GitConfig.ConfigFilePath,
-          TLSSkipVerify: template.GitConfig.TLSSkipVerify,
-        }
-      : undefined,
+    Git: template.GitConfig ? toGitFormModel(template.GitConfig) : undefined,
   };
 
   return (
@@ -83,19 +67,12 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
         Description: values.Description,
         Title: values.Title,
         Type: values.Type,
-        ComposeFilePathInRepository: values.Git?.ComposeFilePathInRepository,
         Logo: values.Logo,
         FileContent: values.FileContent,
         Note: values.Note,
         Platform: values.Platform,
-        RepositoryAuthentication: values.Git?.RepositoryAuthentication,
-        RepositoryGitCredentialID: values.Git?.RepositoryGitCredentialID,
-        RepositoryPassword: values.Git?.RepositoryPassword,
-        RepositoryReferenceName: values.Git?.RepositoryReferenceName,
-        RepositoryURL: values.Git?.RepositoryURL,
-        RepositoryUsername: values.Git?.RepositoryUsername,
-        TLSSkipVerify: values.Git?.TLSSkipVerify,
         Variables: values.Variables,
+        ...values.Git,
       },
       {
         onSuccess() {

@@ -41,6 +41,8 @@ export default class CreateEdgeStackViewController {
       hasKubeEndpoint: false,
       endpointTypes: [],
       baseWebhookUrl: baseEdgeStackWebhookUrl(),
+      isEdit: false,
+      selectedTemplate: null,
     };
 
     this.edgeGroups = null;
@@ -57,6 +59,16 @@ export default class CreateEdgeStackViewController {
     this.hasType = this.hasType.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
     this.onEnvVarChange = this.onEnvVarChange.bind(this);
+    this.onChangeTemplate = this.onChangeTemplate.bind(this);
+  }
+
+  /**
+   * @param {import('@/react/portainer/templates/custom-templates/types').CustomTemplate} template
+   */
+  onChangeTemplate(template) {
+    return this.$scope.$evalAsync(() => {
+      this.state.selectedTemplate = template;
+    });
   }
 
   onEnvVarChange(envVars) {
@@ -70,7 +82,7 @@ export default class CreateEdgeStackViewController {
     const metadata = { type: methodLabel(this.state.Method), format };
 
     if (metadata.type === 'template') {
-      metadata.templateName = this.selectedTemplate.title;
+      metadata.templateName = this.state.selectedTemplate && this.state.selectedTemplate.title;
     }
 
     return { metadata };

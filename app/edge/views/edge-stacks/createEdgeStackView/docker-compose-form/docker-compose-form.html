@@ -1,14 +1,25 @@
 <div class="col-sm-12 form-section-title"> Build method </div>
 <box-selector slim="true" radio-name="'method'" value="$ctrl.state.Method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
+<!-- template -->
+<div ng-if="$ctrl.state.Method === 'template'">
+  <edge-stack-create-template-fieldset
+    value="$ctrl.template"
+    on-change="($ctrl.onChangeTemplate)"
+    on-change-file="($ctrl.onChangeFileContent)"
+  ></edge-stack-create-template-fieldset>
+</div>
+<!-- !template -->
+
 <web-editor-form
-  ng-if="$ctrl.state.Method === 'editor'"
+  ng-if="$ctrl.state.Method === 'editor' || ($ctrl.state.Method === 'template' && $ctrl.template)"
   identifier="stack-creation-editor"
   value="$ctrl.formValues.StackFileContent"
   on-change="($ctrl.onChangeFileContent)"
   ng-required="true"
   yml="true"
   placeholder="Define or paste the content of your docker compose file here"
+  read-only="$ctrl.state.Method === 'template' && $ctrl.template.GitConfig"
 >
   <editor-description>
     You can get more information about Compose file format in the
@@ -21,18 +32,12 @@
   <file-upload-description> You can upload a Compose file from your computer. </file-upload-description>
 </file-upload-form>
 
-<git-form
-  ng-if="$ctrl.state.Method === 'repository'"
-  value="$ctrl.formValues"
-  on-change="($ctrl.onChangeFormValues)"
-  base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
-  webhook-id="{{ $ctrl.state.webhookId }}"
-  docs-links
-></git-form>
-
-<!-- template -->
-<div ng-if="$ctrl.state.Method === 'template'">
-  <edge-stack-create-template-fieldset value="$ctrl.formValues.StackFileContent" on-change="($ctrl.onChangeFileContent)"></edge-stack-create-template-fieldset>
-
-  <!-- !template -->
+<div ng-if="$ctrl.state.Method == 'repository'">
+  <git-form
+    value="$ctrl.formValues"
+    on-change="($ctrl.onChangeFormValues)"
+    base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
+    webhook-id="{{ $ctrl.state.webhookId }}"
+    docs-links
+  ></git-form>
 </div>

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
@@ -15,7 +15,7 @@ type CustomTemplateFileContent = {
 export function useCustomTemplateFile(id?: CustomTemplate['Id'], git = false) {
   return useQuery(
     id ? queryKeys.file(id, { git }) : [],
-    () => getCustomTemplateFile(id!, git),
+    () => getCustomTemplateFile({ id: id!, git }),
     {
       ...withGlobalError('Failed to get custom template file'),
       enabled: !!id,
@@ -23,7 +23,20 @@ export function useCustomTemplateFile(id?: CustomTemplate['Id'], git = false) {
   );
 }
 
-export function getCustomTemplateFile(id: CustomTemplate['Id'], git = false) {
+export function useCustomTemplateFileMutation() {
+  return useMutation({
+    mutationFn: getCustomTemplateFile,
+    ...withGlobalError('Failed to get custom template file'),
+  });
+}
+
+export function getCustomTemplateFile({
+  git,
+  id,
+}: {
+  id: CustomTemplate['Id'];
+  git: boolean;
+}) {
   return git ? getCustomTemplateGitFetch(id) : getCustomTemplateFileContent(id);
 }
 
