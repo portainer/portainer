@@ -16,7 +16,6 @@ export function TableSettingsMenus({
 }) {
   return (
     <>
-      (
       <ColumnVisibilityMenu<DecoratedEdgeStack>
         table={tableInstance}
         onChange={(hiddenColumns) => {
@@ -24,7 +23,6 @@ export function TableSettingsMenus({
         }}
         value={tableState.hiddenColumns}
       />
-      )
       <TableSettingsMenu>
         <TableSettingsMenuAutoRefresh
           value={tableState.autoRefreshRate}
