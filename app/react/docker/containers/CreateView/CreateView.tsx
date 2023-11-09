@@ -137,14 +137,14 @@ function CreateForm() {
       });
 
       if (!confirmed) {
-        return;
+        return false;
       }
     }
 
     const registry = getRegistry(values.image, registriesQuery.data || []);
     const config = toRequest(values, registry, hideCapabilities);
 
-    mutation.mutate(
+    return mutation.mutate(
       { config, environment, values, registry, oldContainer, extraNetworks },
       {
         onSuccess() {

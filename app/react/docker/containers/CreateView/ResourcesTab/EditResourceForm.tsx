@@ -2,6 +2,7 @@ import { Formik } from 'formik';
 import { useMutation } from 'react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { useState } from 'react';
+import { FormikHelpers } from 'formik/dist/types';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { mutationOptions, withError } from '@/react-tools/react-query';
@@ -29,7 +30,7 @@ export function EditResourcesForm({
 }: {
   initialValues: Values;
   onChange: (values: Values) => void;
-  redeploy: () => Promise<void>;
+  redeploy: () => Promise<boolean>;
   isImageInvalid: boolean;
 }) {
   const {
@@ -37,7 +38,6 @@ export function EditResourcesForm({
   } = useCurrentStateAndParams();
 
   const [savedInitValues, setSavedInitValues] = useState(initialValues);
-  window.console.log('savedInitValues = ', savedInitValues);
 
   if (!containerId || typeof containerId !== 'string') {
     throw new Error('missing parameter "from"');
@@ -92,10 +92,13 @@ export function EditResourcesForm({
     </Formik>
   );
 
-  function handleSubmit(values: Values) {
+  function handleSubmit(values: Values, helper: FormikHelpers<Values>) {
     updateMutation.mutate(values, {
-      onSuccess: () => {
-        notifySuccess('Success', 'Limits updated');
+      onSuccess: (data) => {
+        if (data) {
+          notifySuccess('Success', 'Limits updated');
+          helper.resetForm({ values: initialValues });
+        }
       },
     });
   }
@@ -108,13 +111,24 @@ export function EditResourcesForm({
     );
   }
 
+  // return true only if limits are updated
+  // return false otherwise(container recreated, user canceled container recreation, etc.)
   async function updateLimitsOrCreate(values: Values) {
     if (settingUnlimitedResources(values)) {
-      await redeploy();
+      const ret = await redeploy();
+
+      if (ret === false) {
+        return false;
+      }
+
       setSavedInitValues(values);
+      return false;
     }
 
-    return updateLimits(environmentId, containerId, values);
+    setSavedInitValues(values);
+    await updateLimits(environmentId, containerId, values);
+
+    return true;
   }
 }
 

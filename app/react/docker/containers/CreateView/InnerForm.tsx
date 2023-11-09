@@ -192,7 +192,7 @@ export function InnerForm({
                                           values
                                         );
                                       }}
-                                      redeploy={() => submitForm()}
+                                      redeploy={submitForm}
                                       isImageInvalid={!!errors?.image}
                                     />
                                   )
