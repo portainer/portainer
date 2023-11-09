@@ -186,13 +186,13 @@ export function InnerForm({
                                 ? (values) => (
                                     <EditResourcesForm
                                       initialValues={values}
-                                      redeploy={(values) => {
+                                      onChange={(values) => {
                                         setFieldValue(
                                           'resources.resources',
                                           values
                                         );
-                                        return submitForm();
                                       }}
+                                      redeploy={() => submitForm()}
                                       isImageInvalid={!!errors?.image}
                                     />
                                   )

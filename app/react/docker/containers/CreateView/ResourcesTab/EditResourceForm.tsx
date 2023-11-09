@@ -1,6 +1,7 @@
 import { Formik } from 'formik';
 import { useMutation } from 'react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import { useState } from 'react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { mutationOptions, withError } from '@/react-tools/react-query';
@@ -21,17 +22,23 @@ import {
 import { toConfigCpu, toConfigMemory } from './memory-utils';
 
 export function EditResourcesForm({
+  onChange,
   redeploy,
   initialValues,
   isImageInvalid,
 }: {
   initialValues: Values;
-  redeploy: (values: Values) => Promise<void>;
+  onChange: (values: Values) => void;
+  redeploy: () => Promise<void>;
   isImageInvalid: boolean;
 }) {
   const {
     params: { from: containerId },
   } = useCurrentStateAndParams();
+
+  const [savedInitValues, setSavedInitValues] = useState(initialValues);
+  window.console.log('savedInitValues = ', savedInitValues);
+
   if (!containerId || typeof containerId !== 'string') {
     throw new Error('missing parameter "from"');
   }
@@ -54,7 +61,10 @@ export function EditResourcesForm({
         <div className="edit-resources p-5">
           <ResourceFieldset
             values={values}
-            onChange={setValues}
+            onChange={(values) => {
+              onChange(values);
+              setValues(values);
+            }}
             errors={errors}
           />
 
@@ -92,15 +102,16 @@ export function EditResourcesForm({
 
   function settingUnlimitedResources(values: Values) {
     return (
-      (initialValues.limit > 0 && values.limit === 0) ||
-      (initialValues.reservation > 0 && values.reservation === 0) ||
-      (initialValues.cpu > 0 && values.cpu === 0)
+      (savedInitValues.limit > 0 && values.limit === 0) ||
+      (savedInitValues.reservation > 0 && values.reservation === 0) ||
+      (savedInitValues.cpu > 0 && values.cpu === 0)
     );
   }
 
   async function updateLimitsOrCreate(values: Values) {
     if (settingUnlimitedResources(values)) {
-      return redeploy(values);
+      await redeploy();
+      setSavedInitValues(values);
     }
 
     return updateLimits(environmentId, containerId, values);
