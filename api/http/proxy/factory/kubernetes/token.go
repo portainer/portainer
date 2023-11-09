@@ -68,25 +68,22 @@ func (manager *tokenManager) setupUserServiceAccounts(userID portainer.UserID, e
 func (manager *tokenManager) UpdateUserServiceAccountsForEndpoint(endpointID portainer.EndpointID) {
 	endpoint, err := manager.dataStore.Endpoint().Endpoint(endpointID)
 	if err != nil {
-		log.Error().Err(err).Msgf("failed fetching endpoint %d", endpointID)
+		log.Error().Err(err).Msgf("failed fetching environments %d", endpointID)
 		return
 	}
 
-	userIDs := func() []portainer.UserID {
-		userIDs := make([]portainer.UserID, 0)
-		for u := range endpoint.UserAccessPolicies {
-			userIDs = append(userIDs, u)
+	userIDs := make([]portainer.UserID, 0)
+	for u := range endpoint.UserAccessPolicies {
+		userIDs = append(userIDs, u)
+	}
+	for t := range endpoint.TeamAccessPolicies {
+		memberships, _ := manager.dataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(t))
+		for _, membership := range memberships {
+			userIDs = append(userIDs, membership.UserID)
 		}
-		for t := range endpoint.TeamAccessPolicies {
-			memberships, _ := manager.dataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(t))
-			for _, membership := range memberships {
-				userIDs = append(userIDs, membership.UserID)
-			}
-		}
-		return userIDs
 	}
 
-	for _, userID := range userIDs() {
+	for _, userID := range userIDs {
 		if err := manager.setupUserServiceAccounts(userID, endpoint); err != nil {
 			log.Error().Err(err).Msgf("failed setting-up service account for user %d", userID)
 		}
