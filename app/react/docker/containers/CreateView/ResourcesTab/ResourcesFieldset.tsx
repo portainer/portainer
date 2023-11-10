@@ -35,6 +35,7 @@ export function ResourceFieldset({
     <FormSection title="Resources">
       <FormControl label="Memory reservation (MB)" errors={errors?.reservation}>
         <SliderWithInput
+          visibleTooltip
           value={values.reservation}
           onChange={(value) => onChange({ ...values, reservation: value })}
           max={maxMemory}
@@ -45,6 +46,7 @@ export function ResourceFieldset({
 
       <FormControl label="Memory limit (MB)" errors={errors?.limit}>
         <SliderWithInput
+          visibleTooltip
           value={values.limit}
           onChange={(value) => onChange({ ...values, limit: value })}
           max={maxMemory}
@@ -55,6 +57,7 @@ export function ResourceFieldset({
 
       <FormControl label="Maximum CPU usage" errors={errors?.cpu}>
         <Slider
+          visibleTooltip
           value={values.cpu}
           onChange={(value) =>
             onChange({
