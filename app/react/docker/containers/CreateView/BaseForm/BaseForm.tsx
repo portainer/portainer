@@ -169,6 +169,7 @@ export function BaseForm({
           }
           errors={errors?.accessControl}
           values={values.accessControl}
+          environmentId={environment.Id}
         />
 
         <div className="form-group">

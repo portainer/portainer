@@ -7,6 +7,7 @@ import { SwitchField } from '@@/form-components/SwitchField';
 
 import { EditDetails } from '../EditDetails';
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
+import { EnvironmentId } from '../../environments/types';
 
 export interface Props {
   values: AccessControlFormData;
@@ -14,6 +15,7 @@ export interface Props {
   hideTitle?: boolean;
   formNamespace?: string;
   errors?: FormikErrors<AccessControlFormData>;
+  environmentId: EnvironmentId;
 }
 
 export function AccessControlForm({
@@ -22,6 +24,7 @@ export function AccessControlForm({
   hideTitle,
   formNamespace,
   errors,
+  environmentId,
 }: Props) {
   const { isAdmin } = useUser();
 
@@ -50,6 +53,7 @@ export function AccessControlForm({
           values={values}
           errors={errors}
           formNamespace={formNamespace}
+          environmentId={environmentId}
         />
       )}
     </>

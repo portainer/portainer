@@ -315,6 +315,7 @@ async function renderComponent(
   const renderResult = renderWithQueryClient(
     <UserContext.Provider value={state}>
       <AccessControlForm
+        environmentId={1}
         errors={{}}
         values={values}
         onChange={onChange}
