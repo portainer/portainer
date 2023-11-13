@@ -96,7 +96,11 @@ export function InnerForm({
           <GitForm
             value={values.Git}
             onChange={(newValues) =>
-              setFieldValue('Git', { ...values.Git, ...newValues })
+              setValues((values) => ({
+                ...values,
+                // set ! for values.Git because this callback will only be called when it's defined (see L94)
+                Git: { ...values.Git!, ...newValues },
+              }))
             }
             errors={typeof errors.Git === 'object' ? errors.Git : undefined}
           />

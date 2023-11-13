@@ -107,7 +107,10 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
         <GitForm
           value={values.Git}
           onChange={(newValues) =>
-            setFieldValue('Git', { ...values.Git, ...newValues })
+            setValues((values) => ({
+              ...values,
+              Git: { ...values.Git, ...newValues },
+            }))
           }
           errors={errors.Git}
         />
