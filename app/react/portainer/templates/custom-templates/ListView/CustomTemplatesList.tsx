@@ -22,11 +22,16 @@ export function CustomTemplatesList({
   onSelect,
   onDelete,
   selectedId,
+  templateLinkParams,
 }: {
   templates?: CustomTemplate[];
-  onSelect: (template: CustomTemplate['Id']) => void;
+  onSelect?: (template: CustomTemplate['Id']) => void;
   onDelete: (template: CustomTemplate['Id']) => void;
-  selectedId: CustomTemplate['Id'] | undefined;
+  selectedId?: CustomTemplate['Id'];
+  templateLinkParams: (template: CustomTemplate) => {
+    to: string;
+    params: object;
+  };
 }) {
   const [page, setPage] = useState(0);
 
@@ -67,6 +72,7 @@ export function CustomTemplatesList({
             onSelect={onSelect}
             isSelected={template.Id === selectedId}
             onDelete={onDelete}
+            linkParams={templateLinkParams(template)}
           />
         ))}
         {!templates && <div className="text-muted text-center">Loading...</div>}

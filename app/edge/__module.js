@@ -62,7 +62,7 @@ angular
 
     const stacksNew = {
       name: 'edge.stacks.new',
-      url: '/new',
+      url: '/new?templateId',
       views: {
         'content@': {
           component: 'createEdgeStackView',
@@ -157,7 +157,7 @@ angular
 
     $stateRegistryProvider.register({
       name: 'edge.templates.custom',
-      url: '/custom?customTemplate',
+      url: '/custom',
       views: {
         'content@': {
           component: 'edgeCustomTemplatesView',

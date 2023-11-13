@@ -5,6 +5,9 @@ import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { getCustomTemplate } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplate';
+import { notifyError } from '@/portainer/services/notifications';
+import { getCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -107,11 +110,28 @@ export default class CreateEdgeStackViewController {
     }
   }
 
+  async preSelectTemplate(templateId) {
+    try {
+      this.state.Method = 'template';
+      const template = await getCustomTemplate(templateId);
+      this.onChangeTemplate(template);
+      const fileContent = await getCustomTemplateFile({ id: templateId, git: !!template.GitConfig });
+      this.formValues.StackFileContent = fileContent;
+    } catch (e) {
+      notifyError('Failed loading template', e);
+    }
+  }
+
   async $onInit() {
     try {
       this.edgeGroups = await this.EdgeGroupService.groups();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
+    }
+
+    const templateId = this.$state.params.templateId;
+    if (templateId) {
+      this.preSelectTemplate(templateId);
     }
 
     this.$window.onbeforeunload = () => {

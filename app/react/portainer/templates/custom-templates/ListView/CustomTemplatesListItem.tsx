@@ -14,11 +14,13 @@ export function CustomTemplatesListItem({
   onSelect,
   onDelete,
   isSelected,
+  linkParams,
 }: {
   template: CustomTemplate;
-  onSelect: (templateId: CustomTemplate['Id']) => void;
+  onSelect?: (templateId: CustomTemplate['Id']) => void;
   onDelete: (templateId: CustomTemplate['Id']) => void;
   isSelected: boolean;
+  linkParams?: { to: string; params: object };
 }) {
   const { isAdmin, user } = useCurrentUser();
   const isEditAllowed = isAdmin || template.CreatedByUserId === user.Id;
@@ -27,8 +29,9 @@ export function CustomTemplatesListItem({
     <TemplateItem
       template={template}
       typeLabel={getTypeLabel(template.Type)}
-      onSelect={() => onSelect(template.Id)}
+      onSelect={() => onSelect?.(template.Id)}
       isSelected={isSelected}
+      linkParams={linkParams}
       renderActions={
         <div className="mr-4 mt-3">
           {isEditAllowed && (

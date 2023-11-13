@@ -57,6 +57,7 @@ export const ngModule = angular
       'onSelect',
       'templates',
       'selectedId',
+      'templateLinkParams',
     ])
   )
   .component(
