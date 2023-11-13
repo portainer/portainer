@@ -32,43 +32,48 @@ export function Filters({
     .filter((category) => !fixedCategories.includes(category))
     .map((category) => ({ label: category, value: category }));
 
-  const typeFiltersEnabled =
-    disabledTypes.length > 0
-      ? typeFilters.map((type) => ({
-          ...type,
-          disabled: disabledTypes.includes(type.value),
-        }))
-      : typeFilters;
+  const templatesTypes = _.uniq(
+    templates?.flatMap((template) => template.Type)
+  );
+
+  const typeFiltersEnabled = typeFilters.filter(
+    (type) =>
+      !disabledTypes.includes(type.value) && templatesTypes.includes(type.value)
+  );
 
   return (
     <div className="flex gap-4 w-full">
-      <div className="w-1/4">
-        <PortainerSelect
-          options={categories}
-          onChange={(category) => {
-            listState.setCategory(category);
-            onChange();
-          }}
-          placeholder="Category"
-          value={listState.category}
-          bindToBody
-          isClearable
-        />
-      </div>
-      <div className="w-1/4">
-        <PortainerSelect<TemplateType>
-          isMulti
-          options={typeFiltersEnabled}
-          onChange={(types) => {
-            listState.setTypes(types);
-            onChange();
-          }}
-          placeholder="Type"
-          value={listState.types}
-          bindToBody
-          isClearable
-        />
-      </div>
+      {categories.length > 0 && (
+        <div className="w-1/4">
+          <PortainerSelect
+            options={categories}
+            onChange={(category) => {
+              listState.setCategory(category);
+              onChange();
+            }}
+            placeholder="Category"
+            value={listState.category}
+            bindToBody
+            isClearable
+          />
+        </div>
+      )}
+      {typeFiltersEnabled.length > 1 && (
+        <div className="w-1/4">
+          <PortainerSelect<TemplateType>
+            isMulti
+            options={typeFiltersEnabled}
+            onChange={(types) => {
+              listState.setTypes(types);
+              onChange();
+            }}
+            placeholder="Type"
+            value={listState.types}
+            bindToBody
+            isClearable
+          />
+        </div>
+      )}
       <div className="w-1/4 ml-auto">
         <TemplateListSort
           onChange={(value) => {
