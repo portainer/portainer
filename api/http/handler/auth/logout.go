@@ -17,7 +17,6 @@ import (
 // @success 204 "Success"
 // @failure 500 "Server error"
 // @router /auth/logout [post]
-
 func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData := handler.bouncer.JWTAuthLookup(r)
 
