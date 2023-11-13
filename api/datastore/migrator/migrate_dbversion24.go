@@ -14,7 +14,7 @@ func (m *Migrator) updateSettingsToDB25() error {
 		return err
 	}
 
-	// to keep the same migration functionality as before, we need to set the templates URL to v2
+	// to keep the same migration functionality as before 2.20.0, we need to set the templates URL to v2
 	version2URL := "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 	if legacySettings.TemplatesURL == "" {
 		legacySettings.TemplatesURL = version2URL
