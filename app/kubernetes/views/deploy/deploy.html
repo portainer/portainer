@@ -49,7 +49,7 @@
                       ng-model="ctrl.formValues.Namespace"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
                     ></select>
-                    <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.buildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
+                    <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
                       >Namespaces specified in the manifest will be used</span
                     >
                   </div>
