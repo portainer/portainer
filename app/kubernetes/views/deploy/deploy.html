@@ -24,7 +24,7 @@
                 ></box-selector>
 
                 <!-- namespace -->
-                <div class="col-sm-12 form-section-title !mt-4"> Namespace </div>
+                <div class="col-sm-12 form-section-title !mt-4"> Deploy to </div>
                 <div class="form-group" ng-if="ctrl.formValues.Namespace && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                   <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
                     Use namespace(s) specified from manifest
@@ -49,7 +49,7 @@
                       ng-model="ctrl.formValues.Namespace"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
                     ></select>
-                    <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.buildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
+                    <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
                       >Namespaces specified in the manifest will be used</span
                     >
                   </div>
