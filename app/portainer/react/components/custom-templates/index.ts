@@ -47,7 +47,6 @@ export const ngModule = angular
       'selectedId',
       'disabledTypes',
       'fixedCategories',
-      'hideDuplicate',
     ])
   )
   .component(

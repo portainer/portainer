@@ -170,7 +170,7 @@ angular
 
     $stateRegistryProvider.register({
       name: 'edge.templates.custom.new',
-      url: '/new?fileContent&type',
+      url: '/new?appTemplateId&type',
 
       views: {
         'content@': {

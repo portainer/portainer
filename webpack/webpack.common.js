@@ -179,7 +179,7 @@ module.exports = {
   },
   watchOptions: {
     ignored: /node_modules/,
-    aggregateTimeout: 500,
+    aggregateTimeout: 200,
   },
   resolve: {
     alias: {

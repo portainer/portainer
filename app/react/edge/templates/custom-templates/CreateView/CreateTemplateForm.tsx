@@ -5,6 +5,7 @@ import { StackType } from '@/react/common/stacks/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useCreateTemplateMutation } from '@/react/portainer/templates/custom-templates/queries/useCreateTemplateMutation';
 import { Platform } from '@/react/portainer/templates/types';
+import { useFetchTemplateFile } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
 
 import { editor } from '@@/BoxSelector/common-options/build-methods';
 
@@ -17,12 +18,18 @@ export function CreateTemplateForm() {
   const mutation = useCreateTemplateMutation();
   const validation = useValidation();
   const {
-    params: { fileContent = '', type = StackType.DockerCompose },
+    params: { type = StackType.DockerCompose, appTemplateId },
   } = useCurrentStateAndParams();
+
+  const fileContentQuery = useFetchTemplateFile(appTemplateId);
+
+  if (fileContentQuery.isLoading) {
+    return null;
+  }
 
   const initialValues: FormValues = {
     Title: '',
-    FileContent: fileContent,
+    FileContent: fileContentQuery.data ?? '',
     Type: type,
     File: undefined,
     Method: editor.value,

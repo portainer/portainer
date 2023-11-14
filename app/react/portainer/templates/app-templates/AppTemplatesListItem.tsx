@@ -12,12 +12,10 @@ export function AppTemplatesListItem({
   template,
   onSelect,
   isSelected,
-  hideDuplicate = false,
 }: {
   template: TemplateViewModel;
   onSelect: (template: TemplateViewModel) => void;
   isSelected: boolean;
-  hideDuplicate?: boolean;
 }) {
   const duplicateCustomTemplateType = getCustomTemplateType(template.Type);
 
@@ -30,7 +28,6 @@ export function AppTemplatesListItem({
       onSelect={() => onSelect(template)}
       isSelected={isSelected}
       renderActions={
-        !hideDuplicate &&
         duplicateCustomTemplateType && (
           <div className="mr-5 mt-3">
             <Button
