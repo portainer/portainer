@@ -67,7 +67,7 @@ export function EdgeComputeSidebar() {
           data-cy="edgeSidebar-appTemplates"
         />
         <SidebarItem
-          label="Edge Custom Templates"
+          label="Custom"
           to="edge.templates.custom"
           isSubMenu
           data-cy="edgeSidebar-customTemplates"
