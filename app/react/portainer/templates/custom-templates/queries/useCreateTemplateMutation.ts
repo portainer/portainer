@@ -101,6 +101,8 @@ interface CustomTemplateFromFilePayload {
   Logo?: string;
   /** Definitions of variables in the stack file */
   Variables?: VariableDefinition[];
+  /** Indicates if this template is for Edge Stack. */
+  EdgeTemplate?: boolean;
 }
 
 async function createTemplateFromFile(values: CustomTemplateFromFilePayload) {
@@ -109,20 +111,23 @@ async function createTemplateFromFile(values: CustomTemplateFromFilePayload) {
       throw new Error('No file provided');
     }
 
+    const payload = json2formData({
+      Platform: values.Platform,
+      Type: values.Type,
+      Title: values.Title,
+      Description: values.Description,
+      Note: values.Note,
+      Logo: values.Logo,
+      File: values.File,
+      Variables: values.Variables,
+      EdgeTemplate: values.EdgeTemplate,
+    });
+
     const { data } = await axios.post<CustomTemplate>(
       buildUrl({ action: 'create/file' }),
+      payload,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
-        data: json2formData({
-          Platform: values.Platform,
-          Type: values.Type,
-          Title: values.Title,
-          Description: values.Description,
-          Note: values.Note,
-          Logo: values.Logo,
-          File: values.File,
-          Variables: values.Variables,
-        }),
       }
     );
     return data;
