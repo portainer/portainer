@@ -39,7 +39,9 @@ export function SliderWithInput({
         min="0"
         max={max}
         value={value}
-        onChange={(e) => onChange(e.target.valueAsNumber)}
+        onChange={({ target: { valueAsNumber: value } }) =>
+          onChange(Number.isNaN(value) ? 0 : value)
+        }
         className="w-32"
         data-cy={`${dataCy}Input`}
       />

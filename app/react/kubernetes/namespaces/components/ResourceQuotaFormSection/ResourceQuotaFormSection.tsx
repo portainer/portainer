@@ -62,7 +62,7 @@ export function ResourceQuotaFormSection({
             className={typeof errors === 'string' ? 'visible' : 'invisible'}
           >
             {/* 'error' keeps the formerror the exact same height while hidden so there is no layout shift */}
-            {errors || 'error'}
+            {typeof errors === 'string' ? errors : 'error'}
           </FormError>
           <FormControl
             className="flex flex-row"
