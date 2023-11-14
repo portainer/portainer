@@ -427,7 +427,10 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 		if err != nil {
 			return errors.New("Invalid variables. Ensure that the variables are valid JSON")
 		}
-		return validateVariablesDefinitions(payload.Variables)
+		err = validateVariablesDefinitions(payload.Variables)
+		if err != nil {
+			return err
+		}
 	}
 
 	edgeTemplate, _ := request.RetrieveBooleanMultiPartFormValue(r, "EdgeTemplate", true)
