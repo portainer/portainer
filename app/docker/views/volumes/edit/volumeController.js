@@ -12,6 +12,7 @@ angular.module('portainer.docker').controller('VolumeController', [
   'endpoint',
   function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper, endpoint) {
     $scope.resourceType = ResourceControlType.Volume;
+    $scope.endpoint = endpoint;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();

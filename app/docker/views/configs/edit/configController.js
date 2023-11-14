@@ -9,6 +9,7 @@ angular.module('portainer.docker').controller('ConfigController', [
   'endpoint',
   function ($scope, $transition$, $state, ConfigService, Notifications, endpoint) {
     $scope.resourceType = ResourceControlType.Config;
+    $scope.endpoint = endpoint;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
