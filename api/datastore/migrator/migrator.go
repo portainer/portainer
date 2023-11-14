@@ -225,7 +225,7 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.18", m.migrateDBVersionToDB90)
 	m.addMigrations("2.19",
 		m.convertSeedToPrivateKeyForDB100,
-		m.migrateDockerDesktopExtentionSetting,
+		m.migrateDockerDesktopExtensionSetting,
 		m.updateEdgeStackStatusForDB100,
 	)
 
