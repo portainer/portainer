@@ -17,9 +17,7 @@ export function CreateTemplateForm() {
   const router = useRouter();
   const mutation = useCreateTemplateMutation();
   const validation = useValidation();
-  const {
-    params: { type = StackType.DockerCompose, appTemplateId },
-  } = useCurrentStateAndParams();
+  const { appTemplateId, type } = useParams();
 
   const fileContentQuery = useFetchTemplateFile(appTemplateId);
 
@@ -72,5 +70,38 @@ export function CreateTemplateForm() {
         },
       }
     );
+  }
+}
+
+function useParams() {
+  const {
+    params: { type = StackType.DockerCompose, appTemplateId },
+  } = useCurrentStateAndParams();
+
+  return {
+    type: getStackType(type),
+    appTemplateId: getTemplateId(appTemplateId),
+  };
+
+  function getStackType(type: string): StackType {
+    const typeNum = parseInt(type, 10);
+
+    if (
+      [
+        StackType.DockerSwarm,
+        StackType.DockerCompose,
+        StackType.Kubernetes,
+      ].includes(typeNum)
+    ) {
+      return typeNum;
+    }
+
+    return StackType.DockerCompose;
+  }
+
+  function getTemplateId(appTemplateId: string): number | undefined {
+    const id = parseInt(appTemplateId, 10);
+
+    return Number.isNaN(id) ? undefined : id;
   }
 }
