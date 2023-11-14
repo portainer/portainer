@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { notifyError } from '@/portainer/services/notifications';
 import { PrivateRegistryFieldset } from '@/react/edge/edge-stacks/components/PrivateRegistryFieldset';
-import { useCreateStackFromFileContent } from '@/react/edge/edge-stacks/queries/useCreateStackFromFileContent';
+import { useCreateEdgeStackFromFileContent } from '@/react/edge/edge-stacks/queries/useCreateEdgeStackFromFileContent';
 import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
 
 import { FormValues } from './types';
@@ -24,7 +24,7 @@ export function PrivateRegistryFieldsetWrapper({
   stackName: string;
   onFieldError: (message: string) => void;
 }) {
-  const dryRunMutation = useCreateStackFromFileContent();
+  const dryRunMutation = useCreateEdgeStackFromFileContent();
 
   const registriesQuery = useRegistries();
 

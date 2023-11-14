@@ -39,6 +39,17 @@ export const ngModule = angular
     ])
   )
   .component(
+    'appTemplatesList',
+    r2a(withUIRouter(withCurrentUser(AppTemplatesList)), [
+      'onSelect',
+      'templates',
+      'selectedId',
+      'disabledTypes',
+      'fixedCategories',
+      'hideDuplicate',
+    ])
+  )
+  .component(
     'customTemplatesList',
     r2a(withUIRouter(withCurrentUser(CustomTemplatesList)), [
       'onDelete',
@@ -54,15 +65,6 @@ export const ngModule = angular
   .component(
     'customTemplatesTypeSelector',
     r2a(TemplateTypeSelector, ['onChange', 'value'])
-  )
-  .component(
-    'appTemplatesList',
-    r2a(withUIRouter(withCurrentUser(AppTemplatesList)), [
-      'onSelect',
-      'templates',
-      'selectedId',
-      'showSwarmStacks',
-    ])
   );
 
 withFormValidation(

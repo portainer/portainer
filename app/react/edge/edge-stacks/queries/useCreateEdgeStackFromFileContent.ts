@@ -1,17 +1,21 @@
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { withError } from '@/react-tools/react-query';
+import { withError, withInvalidate } from '@/react-tools/react-query';
 import { RegistryId } from '@/react/portainer/registries/types';
 
 import { EdgeGroup } from '../../edge-groups/types';
 import { DeploymentType, EdgeStack } from '../types';
 
 import { buildUrl } from './buildUrl';
+import { queryKeys } from './query-keys';
 
-export function useCreateStackFromFileContent() {
-  return useMutation(createStackFromFileContent, {
+export function useCreateEdgeStackFromFileContent() {
+  const queryClient = useQueryClient();
+
+  return useMutation(createEdgeStackFromFileContent, {
     ...withError('Failed creating Edge stack'),
+    ...withInvalidate(queryClient, [queryKeys.base()]),
   });
 }
 
@@ -26,7 +30,7 @@ interface FileContentPayload {
   dryRun?: boolean;
 }
 
-export async function createStackFromFileContent({
+export async function createEdgeStackFromFileContent({
   dryRun,
   ...payload
 }: FileContentPayload) {

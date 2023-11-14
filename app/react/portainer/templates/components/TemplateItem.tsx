@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Rocket } from 'lucide-react';
 
 import LinuxIcon from '@/assets/ico/linux.svg?c';
 import MicrosoftIcon from '@/assets/ico/vendor/microsoft.svg?c';
@@ -7,6 +8,7 @@ import KubernetesIcon from '@/assets/ico/vendor/kubernetes.svg?c';
 import { Icon } from '@@/Icon';
 import { FallbackImage } from '@@/FallbackImage';
 import { BlocklistItem } from '@@/Blocklist/BlocklistItem';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 import { Platform } from '../../custom-templates/types';
 
@@ -38,9 +40,8 @@ export function TemplateItem({
         <div className="vertical-center min-w-[56px] justify-center">
           <FallbackImage
             src={template.Logo}
-            fallbackIcon="rocket"
+            fallbackIcon={<BadgeIcon icon={Rocket} size="3xl" />}
             className="blocklist-item-logo"
-            size="3xl"
           />
         </div>
         <div className="col-sm-12 flex justify-between flex-wrap">

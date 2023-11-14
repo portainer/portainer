@@ -1,5 +1,6 @@
 import angular from 'angular';
 import './helm-templates-list-item.css';
+import { HelmIcon } from '../../HelmIcon';
 
 angular.module('portainer.kubernetes').component('helmTemplatesListItem', {
   templateUrl: './helm-templates-list-item.html',
@@ -9,5 +10,8 @@ angular.module('portainer.kubernetes').component('helmTemplatesListItem', {
   },
   transclude: {
     actions: '?templateItemActions',
+  },
+  controller() {
+    this.fallbackIcon = HelmIcon;
   },
 });
