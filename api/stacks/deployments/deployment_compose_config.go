@@ -2,13 +2,14 @@ package deployments
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type ComposeStackDeploymentConfig struct {
@@ -55,13 +56,20 @@ func (config *ComposeStackDeploymentConfig) GetUsername() string {
 	if config.user != nil {
 		return config.user.Username
 	}
+
 	return ""
 }
 
 func (config *ComposeStackDeploymentConfig) Deploy() error {
 	if config.FileService == nil || config.StackDeployer == nil {
-		log.Println("[deployment, compose] file service or stack deployer is not initialised")
+		log.Error().Msg("file service or stack deployer is not initialised")
+
 		return errors.New("file service or stack deployer cannot be nil")
+	}
+
+	err := stackutils.ValidateStackFiles(config.stack, stackutils.IsValidBuildContext, config.FileService)
+	if err != nil {
+		return err
 	}
 
 	isAdminOrEndpointAdmin, err := stackutils.UserIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
@@ -79,11 +87,14 @@ func (config *ComposeStackDeploymentConfig) Deploy() error {
 		!securitySettings.AllowContainerCapabilitiesForRegularUsers) &&
 		!isAdminOrEndpointAdmin {
 
-		err = stackutils.ValidateStackFiles(config.stack, securitySettings, config.FileService)
+		validStackFn := stackutils.IsValidStackFileAdapter(securitySettings)
+
+		err = stackutils.ValidateStackFiles(config.stack, validStackFn, config.FileService)
 		if err != nil {
 			return err
 		}
 	}
+
 	if stackutils.IsRelativePathStack(config.stack) {
 		return config.StackDeployer.DeployRemoteComposeStack(config.stack, config.endpoint, config.registries, config.forcePullImage, config.ForceCreate)
 	}
