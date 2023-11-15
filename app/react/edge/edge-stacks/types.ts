@@ -1,6 +1,7 @@
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   AutoUpdateResponse,
+  RelativePathModel,
   RepoConfigResponse,
 } from '@/react/portainer/gitops/types';
 import { RegistryId } from '@/react/portainer/registries/types';
@@ -8,6 +9,13 @@ import { RegistryId } from '@/react/portainer/registries/types';
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { EdgeGroup } from '../edge-groups/types';
+
+export {
+  type StaggerConfig,
+  StaggerOption,
+  StaggerParallelOption,
+  UpdateFailureAction,
+} from './components/StaggerFieldset.types';
 
 export enum StatusType {
   /** Pending represents a pending edge stack */
@@ -62,7 +70,7 @@ export enum DeploymentType {
   Kubernetes,
 }
 
-export type EdgeStack = {
+export type EdgeStack = RelativePathModel & {
   Id: number;
   Name: string;
   Status: { [key: EnvironmentId]: EdgeStackStatus };
@@ -89,10 +97,6 @@ export type EdgeStack = {
   EnvVars?: EnvVar[];
   SupportRelativePath: boolean;
   FilesystemPath?: string;
-  SupportPerDeviceConfigs?: boolean;
-  PerDeviceConfigsPath?: string;
-  PerDeviceConfigsMatchType?: string;
-  PerDeviceConfigsGroupMatchType?: string;
 };
 
 export enum EditorType {

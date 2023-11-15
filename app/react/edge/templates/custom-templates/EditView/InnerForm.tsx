@@ -1,4 +1,4 @@
-import { Form, useFormikContext } from 'formik';
+import { Form, FormikErrors, useFormikContext } from 'formik';
 import { RefreshCw } from 'lucide-react';
 
 import { CommonFields } from '@/react/portainer/custom-templates/components/CommonFields';
@@ -11,11 +11,15 @@ import {
   isTemplateVariablesEnabled,
 } from '@/react/portainer/custom-templates/components/utils';
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
+import { applySetStateAction } from '@/react-tools/apply-set-state-action';
+import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
 
 import { WebEditorForm, usePreventExit } from '@@/WebEditorForm';
 import { FormActions } from '@@/form-components/FormActions';
 import { Button } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
+
+import { EdgeSettingsFieldset } from '../CreateView/EdgeSettingsFieldset';
 
 import { FormValues } from './types';
 
@@ -74,7 +78,11 @@ export function InnerForm({
         value={gitFileContent || values.FileContent}
         onChange={handleChangeFileContent}
         yaml
-        placeholder="Define or paste the content of your docker compose file here"
+        placeholder={
+          gitFileContent
+            ? 'Preview of the file from git repository'
+            : 'Define or paste the content of your docker compose file here'
+        }
         error={errors.FileContent}
         readonly={isEditorReadonly}
       >
@@ -90,6 +98,15 @@ export function InnerForm({
           .
         </p>
       </WebEditorForm>
+
+      {isTemplateVariablesEnabled && (
+        <CustomTemplatesVariablesDefinitionField
+          value={values.Variables}
+          onChange={(values) => setFieldValue('Variables', values)}
+          isVariablesNamesFromParent={!isEditorReadonly}
+          errors={errors.Variables}
+        />
+      )}
 
       {values.Git && (
         <>
@@ -121,12 +138,21 @@ export function InnerForm({
         </>
       )}
 
-      {isTemplateVariablesEnabled && (
-        <CustomTemplatesVariablesDefinitionField
-          value={values.Variables}
-          onChange={(values) => setFieldValue('Variables', values)}
-          isVariablesNamesFromParent={!isEditorReadonly}
-          errors={errors.Variables}
+      {values.EdgeSettings && (
+        <EdgeSettingsFieldset
+          setValues={(edgeValues) =>
+            setFieldValue(
+              'EdgeSettings',
+              applySetStateAction(edgeValues, values.EdgeSettings)
+            )
+          }
+          gitConfig={values.Git}
+          fileValues={{
+            fileContent: values.FileContent,
+          }}
+          values={values.EdgeSettings}
+          errors={errors.EdgeSettings as FormikErrors<EdgeTemplateSettings>}
+          setFieldError={setFieldError}
         />
       )}
 

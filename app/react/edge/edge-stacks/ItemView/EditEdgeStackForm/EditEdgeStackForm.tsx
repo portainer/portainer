@@ -20,6 +20,9 @@ import {
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 
+import { PrePullToggle } from '../../components/PrePullToggle';
+import { RetryDeployToggle } from '../../components/RetryDeployToggle';
+
 import { PrivateRegistryFieldsetWrapper } from './PrivateRegistryFieldsetWrapper';
 import { FormValues } from './types';
 import { ComposeForm } from './ComposeForm';
@@ -175,46 +178,30 @@ function InnerForm({
           <PrivateRegistryFieldsetWrapper
             value={values.privateRegistryId}
             onChange={(value) => setFieldValue('privateRegistryId', value)}
-            isValid={isValid}
-            values={values}
-            stackName={edgeStack.Name}
+            values={{
+              fileContent: values.content,
+            }}
             onFieldError={(error) => setFieldError('privateRegistryId', error)}
             error={errors.privateRegistryId}
           />
 
-          <EnvironmentVariablesPanel
-            onChange={(value) => setFieldValue('envVars', value)}
-            values={values.envVars}
-            errors={errors.envVars}
-          />
-
           {values.deploymentType === DeploymentType.Compose && (
             <>
-              <div className="form-group">
-                <div className="col-sm-12">
-                  <SwitchField
-                    checked={values.prePullImage}
-                    name="prePullImage"
-                    label="Pre-pull images"
-                    tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"
-                    labelClass="col-sm-3 col-lg-2"
-                    onChange={(value) => setFieldValue('prePullImage', value)}
-                  />
-                </div>
-              </div>
+              <EnvironmentVariablesPanel
+                onChange={(value) => setFieldValue('envVars', value)}
+                values={values.envVars}
+                errors={errors.envVars}
+              />
 
-              <div className="form-group">
-                <div className="col-sm-12">
-                  <SwitchField
-                    checked={values.retryDeploy}
-                    name="retryDeploy"
-                    label="Retry deployment"
-                    tooltip="When enabled, this will allow the edge agent to retry deployment if failed to deploy initially"
-                    labelClass="col-sm-3 col-lg-2"
-                    onChange={(value) => setFieldValue('retryDeploy', value)}
-                  />
-                </div>
-              </div>
+              <PrePullToggle
+                onChange={(value) => setFieldValue('prePullImage', value)}
+                value={values.prePullImage}
+              />
+
+              <RetryDeployToggle
+                onChange={(value) => setFieldValue('retryDeploy', value)}
+                value={values.retryDeploy}
+              />
             </>
           )}
         </>

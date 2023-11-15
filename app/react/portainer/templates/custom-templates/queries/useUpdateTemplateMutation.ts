@@ -9,7 +9,7 @@ import {
 import { StackType } from '@/react/common/stacks/types';
 import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 
-import { CustomTemplate } from '../types';
+import { CustomTemplate, EdgeTemplateSettings } from '../types';
 import { Platform } from '../../types';
 
 import { buildUrl } from './build-url';
@@ -75,6 +75,7 @@ interface CustomTemplateUpdatePayload {
   IsComposeFormat?: boolean;
   /** EdgeTemplate indicates if this template purpose for Edge Stack */
   EdgeTemplate?: boolean;
+  EdgeSettings?: EdgeTemplateSettings;
 }
 
 async function updateTemplate(

@@ -18,6 +18,7 @@ import {
 } from '@@/BoxSelector/common-options/build-methods';
 
 import { buildMethods } from './types';
+import { edgeFieldsetValidation } from './EdgeSettingsFieldset.validation';
 
 export function useValidation() {
   const { user } = useCurrentUser();
@@ -51,6 +52,7 @@ export function useValidation() {
           then: () => buildGitValidationSchema(gitCredentialsQuery.data || []),
         }),
         Variables: variablesValidation(),
+        EdgeSettings: edgeFieldsetValidation(),
       }).concat(
         commonFieldsValidation({ templates: customTemplatesQuery.data })
       ),

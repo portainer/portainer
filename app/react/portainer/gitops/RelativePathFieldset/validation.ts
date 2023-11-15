@@ -1,6 +1,6 @@
-import { boolean, object, SchemaOf, string } from 'yup';
+import { boolean, mixed, object, SchemaOf, string } from 'yup';
 
-import { RelativePathModel } from '@/react/portainer/gitops/types';
+import { PerDevConfigsFilterType, RelativePathModel } from './types';
 
 export function relativePathValidation(): SchemaOf<RelativePathModel> {
   return object({
@@ -18,7 +18,11 @@ export function relativePathValidation(): SchemaOf<RelativePathModel> {
         then: string().required('Directory is required'),
       })
       .default(''),
-    PerDeviceConfigsMatchType: string().oneOf(['', 'file', 'dir']),
-    PerDeviceConfigsGroupMatchType: string().oneOf(['', 'file', 'dir']),
+    PerDeviceConfigsMatchType: mixed<PerDevConfigsFilterType>()
+      .oneOf(['', 'file', 'dir'])
+      .default(''),
+    PerDeviceConfigsGroupMatchType: mixed<PerDevConfigsFilterType>()
+      .oneOf(['', 'file', 'dir'])
+      .default(''),
   });
 }

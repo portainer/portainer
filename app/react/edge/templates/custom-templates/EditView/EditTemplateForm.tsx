@@ -38,6 +38,7 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
 
     FileContent: fileQuery.data || '',
     Git: template.GitConfig ? toGitFormModel(template.GitConfig) : undefined,
+    EdgeSettings: template.EdgeSettings,
   };
 
   return (
@@ -72,6 +73,7 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
         Note: values.Note,
         Platform: values.Platform,
         Variables: values.Variables,
+        EdgeSettings: values.EdgeSettings,
         ...values.Git,
       },
       {

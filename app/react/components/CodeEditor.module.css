@@ -117,3 +117,9 @@
 .root :global(.cm-content[contenteditable='true']) {
   min-height: 100%;
 }
+
+.root :global(.cm-content[aria-readonly='true']) {
+  @apply bg-gray-3;
+  @apply th-dark:bg-gray-iron-10;
+  @apply th-highcontrast:bg-black;
+}
