@@ -28,7 +28,7 @@ export function CustomTemplatesList({
   onSelect?: (template: CustomTemplate['Id']) => void;
   onDelete: (template: CustomTemplate['Id']) => void;
   selectedId?: CustomTemplate['Id'];
-  templateLinkParams: (template: CustomTemplate) => {
+  templateLinkParams?: (template: CustomTemplate) => {
     to: string;
     params: object;
   };
@@ -72,7 +72,7 @@ export function CustomTemplatesList({
             onSelect={onSelect}
             isSelected={template.Id === selectedId}
             onDelete={onDelete}
-            linkParams={templateLinkParams(template)}
+            linkParams={templateLinkParams?.(template)}
           />
         ))}
         {!templates && <div className="text-muted text-center">Loading...</div>}
