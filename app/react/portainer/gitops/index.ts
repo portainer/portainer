@@ -15,6 +15,7 @@ export const ngModule = angular
       'gitModel',
       'onChange',
       'isEditing',
+      'hideEdgeConfigs',
     ])
   );
 

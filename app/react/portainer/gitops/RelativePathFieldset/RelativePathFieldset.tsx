@@ -4,6 +4,7 @@ import { GitFormModel } from '@/react/portainer/gitops/types';
 import { PathSelector } from '@/react/portainer/gitops/ComposePathField/PathSelector';
 import { dummyGitForm } from '@/react/portainer/gitops/RelativePathFieldset/utils';
 import { useValidation } from '@/react/portainer/gitops/RelativePathFieldset/useValidation';
+import { useEnableFsPath } from '@/react/portainer/gitops/RelativePathFieldset/useEnableFsPath';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
@@ -17,6 +18,7 @@ interface Props {
   gitModel?: GitFormModel;
   onChange?: (value: Partial<RelativePathModel>) => void;
   isEditing?: boolean;
+  hideEdgeConfigs?: boolean;
 }
 
 export function RelativePathFieldset({
@@ -24,6 +26,7 @@ export function RelativePathFieldset({
   gitModel,
   onChange,
   isEditing,
+  hideEdgeConfigs,
 }: Props) {
   const innerOnChange = useCallback(
     (value: Partial<RelativePathModel>) => onChange && onChange(value),
@@ -31,6 +34,15 @@ export function RelativePathFieldset({
   );
 
   const { errors } = useValidation(value);
+
+  const { enableFsPath0, enableFsPath1, toggleFsPath } = useEnableFsPath();
+
+  const pathTip0 =
+    'For relative path volumes use with Docker Swarm, you must have a network filesystem which all of your nodes can access.';
+  const pathTip1 =
+    'Relative path is active. When you set the ‘local filesystem path’, it will also be utilzed for GitOps Edge configuration.';
+  const pathTip2 =
+    'GitOps Edge configurations is active. When you set the ‘local filesystem path’, it will also be utilized for relative paths.';
 
   return (
     <>
@@ -43,7 +55,10 @@ export function RelativePathFieldset({
             tooltip="Enabling this means you can specify relative path volumes in your Compose files, with Portainer pulling the content from your git repository to the environment the stack is deployed to."
             disabled={isEditing}
             checked={value.SupportRelativePath}
-            onChange={(value) => innerOnChange({ SupportRelativePath: value })}
+            onChange={(value) => {
+              toggleFsPath(0, value);
+              innerOnChange({ SupportRelativePath: value });
+            }}
           />
         </div>
       </div>
@@ -53,8 +68,7 @@ export function RelativePathFieldset({
           <div className="form-group">
             <div className="col-sm-12">
               <TextTip color="blue">
-                For relative path volumes use with Docker Swarm, you must have a
-                network filesystem which all of your nodes can access.
+                {enableFsPath1 ? pathTip2 : pathTip0}
               </TextTip>
             </div>
           </div>
@@ -68,7 +82,7 @@ export function RelativePathFieldset({
                 <Input
                   name="FilesystemPath"
                   placeholder="/mnt"
-                  disabled={isEditing}
+                  disabled={isEditing || !enableFsPath0}
                   value={value.FilesystemPath}
                   onChange={(e) =>
                     innerOnChange({ FilesystemPath: e.target.value })
@@ -77,7 +91,11 @@ export function RelativePathFieldset({
               </FormControl>
             </div>
           </div>
+        </>
+      )}
 
+      {!hideEdgeConfigs && (
+        <>
           <div className="form-group">
             <div className="col-sm-12">
               <TextTip color="blue">
@@ -96,15 +114,47 @@ export function RelativePathFieldset({
                 tooltip="By enabling the GitOps Edge Configurations feature, you gain the ability to define relative path volumes in your configuration files. Portainer will then automatically fetch the content from your git repository by matching the folder name or file name with the Portainer Edge ID, and apply it to the environment where the stack is deployed"
                 disabled={isEditing}
                 checked={!!value.SupportPerDeviceConfigs}
-                onChange={(value) =>
-                  innerOnChange({ SupportPerDeviceConfigs: value })
-                }
+                onChange={(value) => {
+                  toggleFsPath(1, value);
+                  innerOnChange({ SupportPerDeviceConfigs: value });
+                }}
               />
             </div>
           </div>
 
           {value.SupportPerDeviceConfigs && (
             <>
+              {!isEditing && (
+                <div className="form-group">
+                  <div className="col-sm-12">
+                    <TextTip color="blue">
+                      {enableFsPath0 ? pathTip1 : pathTip0}
+                    </TextTip>
+                  </div>
+                </div>
+              )}
+
+              {!isEditing && (
+                <div className="form-group">
+                  <div className="col-sm-12">
+                    <FormControl
+                      label="Local filesystem path"
+                      errors={errors.FilesystemPath}
+                    >
+                      <Input
+                        name="FilesystemPath"
+                        placeholder="/mnt"
+                        disabled={isEditing || !enableFsPath1}
+                        value={value.FilesystemPath}
+                        onChange={(e) =>
+                          innerOnChange({ FilesystemPath: e.target.value })
+                        }
+                      />
+                    </FormControl>
+                  </div>
+                </div>
+              )}
+
               <div className="form-group">
                 <div className="col-sm-12">
                   <TextTip color="blue">
