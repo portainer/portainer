@@ -10,6 +10,5 @@ export function encodeRegistryCredentials(registryId: Registry['Id']) {
     registryId,
   };
 
-  const buf = Buffer.from(JSON.stringify(credentials));
-  return buf.toString('base64url');
+  return window.btoa(JSON.stringify(credentials));
 }

@@ -30,7 +30,7 @@ export function AdvancedForm({
           onChange={(e) => {
             const { value } = e.target;
             setFieldValue('image', value);
-            onChangeImage?.(value);
+            setTimeout(() => onChangeImage?.(value), 0);
           }}
           placeholder="e.g. registry:port/my-image:my-tag"
           required
