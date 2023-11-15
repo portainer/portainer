@@ -19,7 +19,7 @@ interface Props {
   isPublicVisible?: boolean;
   errors?: FormikErrors<AccessControlFormData>;
   formNamespace?: string;
-  environmentId?: EnvironmentId;
+  environmentId: EnvironmentId;
 }
 
 export function EditDetails({
