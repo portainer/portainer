@@ -23,3 +23,21 @@ func (migrator *Migrator) updateAppTemplatesVersionForDB110() error {
 
 	return migrator.settingsService.UpdateSettings(settings)
 }
+
+// setUseCacheForDB110 sets the user cache to true for all users
+func (migrator *Migrator) setUserCacheForDB110() error {
+	users, err := migrator.userService.ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for i := range users {
+		user := &users[i]
+		user.UseCache = true
+		if err := migrator.userService.Update(user.ID, user); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

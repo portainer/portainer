@@ -20,6 +20,7 @@ export type User = {
   EndpointAuthorizations: {
     [endpointId: EnvironmentId]: AuthorizationMap;
   };
+  UseCache: boolean;
   ThemeSettings: {
     color: 'dark' | 'light' | 'highcontrast' | 'auto';
   };

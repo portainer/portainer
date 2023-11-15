@@ -61,6 +61,7 @@ export function ItemView() {
             label: networkQuery.data.Name,
           },
         ]}
+        reload
       />
       <NetworkDetailsTable
         network={networkQuery.data}

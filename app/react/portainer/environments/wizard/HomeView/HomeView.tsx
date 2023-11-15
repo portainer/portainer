@@ -22,6 +22,7 @@ export function HomeView() {
       <PageHeader
         title="Quick Setup"
         breadcrumbs={[{ label: 'Environment Wizard' }]}
+        reload
       />
 
       <div className="row">
