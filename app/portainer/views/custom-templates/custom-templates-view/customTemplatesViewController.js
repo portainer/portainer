@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
-import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isTemplateVariablesEnabled, renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { confirmDelete } from '@@/modals/confirm';
+import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -34,7 +34,7 @@ class CustomTemplatesViewController {
     this.StateManager = StateManager;
     this.StackService = StackService;
 
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.DOCKER_STANDALONE = 'DOCKER_STANDALONE';
     this.DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
@@ -93,7 +93,8 @@ class CustomTemplatesViewController {
   }
   async getTemplatesAsync() {
     try {
-      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
+      const templates = await this.CustomTemplateService.customTemplates([1, 2]);
+      this.templates = templates.filter((t) => !t.EdgeTemplate);
     } catch (err) {
       this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
     }
@@ -221,7 +222,7 @@ class CustomTemplatesViewController {
     this.state.deployable = this.isDeployable(applicationState.endpoint, template.Type);
 
     if (template.Variables && template.Variables.length > 0) {
-      const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+      const variables = getVariablesFieldDefaultValues(template.Variables);
       this.onChangeTemplateVariables(variables);
     }
   }

@@ -59,6 +59,8 @@ type customTemplateUpdatePayload struct {
 	TLSSkipVerify bool `example:"false"`
 	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 	IsComposeFormat bool `example:"false"`
+	// EdgeTemplate indicates if this template purpose for Edge Stack
+	EdgeTemplate bool `example:"false"`
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
@@ -161,6 +163,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	customTemplate.Type = payload.Type
 	customTemplate.Variables = payload.Variables
 	customTemplate.IsComposeFormat = payload.IsComposeFormat
+	customTemplate.EdgeTemplate = payload.EdgeTemplate
 
 	if payload.RepositoryURL != "" {
 		if !govalidator.IsURL(payload.RepositoryURL) {

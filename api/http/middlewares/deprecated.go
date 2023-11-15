@@ -16,6 +16,12 @@ func Deprecated(router http.Handler, urlBuilder func(w http.ResponseWriter, r *h
 			return
 		}
 
+		if newUrl == "" {
+			log.Warn().Msg("This api is deprecated.")
+			router.ServeHTTP(w, r)
+			return
+		}
+
 		log.Warn().Msgf("This api is deprecated. Use %s instead", newUrl)
 
 		redirectedRequest := r.Clone(r.Context())

@@ -14,7 +14,7 @@ export function useAppTemplates() {
   const registriesQuery = useRegistries();
 
   return useQuery(
-    'templates',
+    ['templates'],
     () => getTemplatesWithRegistry(registriesQuery.data),
     {
       enabled: !!registriesQuery.data,

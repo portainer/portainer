@@ -1,4 +1,5 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect, useMemo } from 'react';
+import { useTransitionHook } from '@uirouter/react';
 
 import { BROWSER_OS_PLATFORM } from '@/react/constants';
 
@@ -6,6 +7,10 @@ import { CodeEditor } from '@@/CodeEditor';
 import { Tooltip } from '@@/Tip/Tooltip';
 
 import { FormSectionTitle } from './form-components/FormSectionTitle';
+import { FormError } from './form-components/FormError';
+import { confirm } from './modals/confirm';
+import { ModalType } from './modals';
+import { buildConfirmButton } from './modals/utils';
 
 const otherEditorConfig = {
   tooltip: (
@@ -91,6 +96,8 @@ export function WebEditorForm({
           </div>
         )}
 
+        {error && <FormError>{error}</FormError>}
+
         <div className="form-group">
           <div className="col-sm-12 col-lg-12">
             <CodeEditor
@@ -104,11 +111,59 @@ export function WebEditorForm({
             />
           </div>
         </div>
-
-        <div className="form-group">
-          <div className="col-sm-12 col-lg-12">{error}</div>
-        </div>
       </div>
     </div>
   );
+}
+
+export function usePreventExit(
+  initialValue: string,
+  value: string,
+  check: boolean
+) {
+  const isChanged = useMemo(
+    () => cleanText(initialValue) !== cleanText(value),
+    [initialValue, value]
+  );
+
+  const preventExit = check && isChanged;
+
+  // when navigating away from the page with unsaved changes, show a portainer prompt to confirm
+  useTransitionHook('onBefore', {}, async () => {
+    if (!preventExit) {
+      return true;
+    }
+    const confirmed = await confirm({
+      modalType: ModalType.Warn,
+      title: 'Are you sure?',
+      message:
+        'You currently have unsaved changes in the text editor. Are you sure you want to leave?',
+      confirmButton: buildConfirmButton('Yes', 'danger'),
+    });
+    return confirmed;
+  });
+
+  // when reloading or exiting the page with unsaved changes, show a browser prompt to confirm
+  useEffect(() => {
+    function handler(event: BeforeUnloadEvent) {
+      if (!preventExit) {
+        return undefined;
+      }
+
+      event.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = '';
+      return '';
+    }
+
+    // if the form is changed, then set the onbeforeunload
+    window.addEventListener('beforeunload', handler);
+    return () => {
+      window.removeEventListener('beforeunload', handler);
+    };
+  }, [preventExit]);
+}
+
+function cleanText(value: string) {
+  return value.replace(/(\r\n|\n|\r)/gm, '');
 }

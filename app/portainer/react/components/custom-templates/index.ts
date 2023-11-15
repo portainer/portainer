@@ -26,6 +26,7 @@ export const ngModule = angular
       'value',
       'onChange',
       'definitions',
+      'errors',
     ])
   )
   .component('customTemplatesVariablesField', VariablesFieldAngular)
@@ -46,7 +47,6 @@ export const ngModule = angular
       'selectedId',
       'disabledTypes',
       'fixedCategories',
-      'hideDuplicate',
     ])
   )
   .component(
@@ -56,6 +56,7 @@ export const ngModule = angular
       'onSelect',
       'templates',
       'selectedId',
+      'templateLinkParams',
     ])
   )
   .component(

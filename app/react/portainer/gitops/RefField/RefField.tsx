@@ -18,7 +18,7 @@ interface Props {
   onChange(value: string): void;
   model: RefFieldModel;
   error?: string;
-  isUrlValid: boolean;
+  isUrlValid?: boolean;
   stackId?: StackId;
 }
 

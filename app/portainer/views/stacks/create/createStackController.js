@@ -4,12 +4,12 @@ import { AccessControlFormData } from '@/portainer/components/accessControlForm/
 import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { isTemplateVariablesEnabled, renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { editor, upload, git, customTemplate } from '@@/BoxSelector/common-options/build-methods';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
+import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 
 angular
   .module('portainer.app')
@@ -28,13 +28,12 @@ angular
       FormHelper,
       StackHelper,
       ContainerHelper,
-      CustomTemplateService,
       ContainerService,
       endpoint
     ) {
       $scope.onChangeTemplateId = onChangeTemplateId;
       $scope.onChangeTemplateVariables = onChangeTemplateVariables;
-      $scope.isTemplateVariablesEnabled = isBE;
+      $scope.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
       $scope.buildAnalyticsProperties = buildAnalyticsProperties;
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.buildMethods = [editor, upload, git, customTemplate];
@@ -54,7 +53,7 @@ angular
         ComposeFilePathInRepository: 'docker-compose.yml',
         AccessControlData: new AccessControlFormData(),
         EnableWebhook: false,
-        Variables: {},
+        Variables: [],
         AutoUpdate: parseAutoUpdateResponse(),
         TLSSkipVerify: false,
       };
@@ -313,7 +312,7 @@ angular
             }
 
             if (template.Variables && template.Variables.length > 0) {
-              const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+              const variables = getVariablesFieldDefaultValues(template.Variables);
               onChangeTemplateVariables(variables);
             }
           } catch (err) {

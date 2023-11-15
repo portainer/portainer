@@ -28,14 +28,12 @@ export function AppTemplatesList({
   selectedId,
   disabledTypes,
   fixedCategories,
-  hideDuplicate,
 }: {
   templates?: TemplateViewModel[];
   onSelect: (template: TemplateViewModel) => void;
   selectedId?: TemplateViewModel['Id'];
   disabledTypes?: Array<TemplateType>;
   fixedCategories?: Array<string>;
-  hideDuplicate?: boolean;
 }) {
   const [page, setPage] = useState(0);
 
@@ -75,7 +73,6 @@ export function AppTemplatesList({
             template={template}
             onSelect={onSelect}
             isSelected={selectedId === template.Id}
-            hideDuplicate={hideDuplicate}
           />
         ))}
         {!templates && <div className="text-muted text-center">Loading...</div>}

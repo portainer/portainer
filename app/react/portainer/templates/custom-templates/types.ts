@@ -1,15 +1,10 @@
 import { UserId } from '@/portainer/users/types';
 import { StackType } from '@/react/common/stacks/types';
 
-import { ResourceControlResponse } from '../access-control/types';
-import { RepoConfigResponse } from '../gitops/types';
-
-import { VariableDefinition } from './components/CustomTemplatesVariablesDefinitionField';
-
-export enum Platform {
-  LINUX = 1,
-  WINDOWS,
-}
+import { ResourceControlResponse } from '../../access-control/types';
+import { RepoConfigResponse } from '../../gitops/types';
+import { VariableDefinition } from '../../custom-templates/components/CustomTemplatesVariablesDefinitionField';
+import { Platform } from '../types';
 
 export type CustomTemplate = {
   Id: number;
@@ -89,6 +84,9 @@ export type CustomTemplate = {
    * @example false
    */
   IsComposeFormat: boolean;
+
+  /** EdgeTemplate indicates if this template purpose for Edge Stack */
+  EdgeTemplate: boolean;
 };
 
 export type CustomTemplateFileContent = {

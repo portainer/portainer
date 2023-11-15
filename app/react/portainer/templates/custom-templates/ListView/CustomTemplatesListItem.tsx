@@ -2,7 +2,7 @@ import { Edit, Trash2 } from 'lucide-react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
-import { CustomTemplate } from '@/react/portainer/custom-templates/types';
+import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -14,11 +14,13 @@ export function CustomTemplatesListItem({
   onSelect,
   onDelete,
   isSelected,
+  linkParams,
 }: {
   template: CustomTemplate;
-  onSelect: (templateId: CustomTemplate['Id']) => void;
+  onSelect?: (templateId: CustomTemplate['Id']) => void;
   onDelete: (templateId: CustomTemplate['Id']) => void;
   isSelected: boolean;
+  linkParams?: { to: string; params: object };
 }) {
   const { isAdmin, user } = useCurrentUser();
   const isEditAllowed = isAdmin || template.CreatedByUserId === user.Id;
@@ -27,8 +29,9 @@ export function CustomTemplatesListItem({
     <TemplateItem
       template={template}
       typeLabel={getTypeLabel(template.Type)}
-      onSelect={() => onSelect(template.Id)}
+      onSelect={() => onSelect?.(template.Id)}
       isSelected={isSelected}
+      linkParams={linkParams}
       renderActions={
         <div className="mr-4 mt-3">
           {isEditAllowed && (
@@ -36,13 +39,14 @@ export function CustomTemplatesListItem({
               <Button
                 as={Link}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                 }}
                 color="secondary"
                 props={{
                   to: '.edit',
                   params: {
-                    id: template.Id,
+                    templateId: template.Id,
                   },
                 }}
                 icon={Edit}

@@ -12,25 +12,3 @@ export function buildUrl(id?: EnvironmentId, action?: string) {
 
   return baseUrl;
 }
-
-export function arrayToJson<T>(arr?: Array<T>) {
-  if (!arr) {
-    return '';
-  }
-
-  return JSON.stringify(arr);
-}
-
-export function json2formData(json: Record<string, unknown>) {
-  const formData = new FormData();
-
-  Object.entries(json).forEach(([key, value]) => {
-    if (typeof value === 'undefined' || value === null) {
-      return;
-    }
-
-    formData.append(key, value as string);
-  });
-
-  return formData;
-}

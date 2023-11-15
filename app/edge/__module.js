@@ -62,7 +62,7 @@ angular
 
     const stacksNew = {
       name: 'edge.stacks.new',
-      url: '/new',
+      url: '/new?templateId',
       views: {
         'content@': {
           component: 'createEdgeStackView',
@@ -148,6 +148,44 @@ angular
       views: {
         'content@': {
           component: 'edgeAppTemplatesView',
+        },
+      },
+      data: {
+        docs: '/user/edge/templates',
+      },
+    });
+
+    $stateRegistryProvider.register({
+      name: 'edge.templates.custom',
+      url: '/custom',
+      views: {
+        'content@': {
+          component: 'edgeCustomTemplatesView',
+        },
+      },
+      data: {
+        docs: '/user/edge/templates/custom',
+      },
+    });
+
+    $stateRegistryProvider.register({
+      name: 'edge.templates.custom.new',
+      url: '/new?appTemplateId&type',
+
+      views: {
+        'content@': {
+          component: 'edgeCreateCustomTemplatesView',
+        },
+      },
+    });
+
+    $stateRegistryProvider.register({
+      name: 'edge.templates.custom.edit',
+      url: '/:templateId',
+
+      views: {
+        'content@': {
+          component: 'edgeEditCustomTemplatesView',
         },
       },
     });

@@ -55,7 +55,7 @@ export function EdgeComputeSidebar() {
       )}
       <SidebarParent
         icon={Edit}
-        label="Templates"
+        label="Edge Templates"
         to="edge.templates"
         data-cy="edgeSidebar-templates"
       >
@@ -66,12 +66,12 @@ export function EdgeComputeSidebar() {
           isSubMenu
           data-cy="edgeSidebar-appTemplates"
         />
-        {/* <SidebarItem
+        <SidebarItem
           label="Custom"
           to="edge.templates.custom"
           isSubMenu
           data-cy="edgeSidebar-customTemplates"
-        /> */}
+        />
       </SidebarParent>
     </SidebarSection>
   );

@@ -28,9 +28,9 @@ interface Props {
   isAdditionalFilesFieldVisible?: boolean;
   isForcePullVisible?: boolean;
   isAuthExplanationVisible?: boolean;
-  errors: FormikErrors<GitFormModel>;
-  baseWebhookUrl: string;
-  webhookId: string;
+  errors?: FormikErrors<GitFormModel>;
+  baseWebhookUrl?: string;
+  webhookId?: string;
   webhooksDocs?: string;
 }
 
@@ -88,7 +88,7 @@ export function GitForm({
 
       {isAdditionalFilesFieldVisible && (
         <AdditionalFileField
-          value={value.AdditionalFiles}
+          value={value.AdditionalFiles || []}
           onChange={(value) => handleChange({ AdditionalFiles: value })}
           errors={errors.AdditionalFiles}
         />
@@ -97,8 +97,8 @@ export function GitForm({
       {value.AutoUpdate && (
         <AutoUpdateFieldset
           environmentType={environmentType}
-          webhookId={webhookId}
-          baseWebhookUrl={baseWebhookUrl}
+          webhookId={webhookId || ''}
+          baseWebhookUrl={baseWebhookUrl || ''}
           value={value.AutoUpdate}
           onChange={(value) => handleChange({ AutoUpdate: value })}
           isForcePullVisible={isForcePullVisible}
@@ -165,5 +165,5 @@ export function buildGitValidationSchema(
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials, false));
+  }).concat(gitAuthValidation(gitCredentials, false)) as SchemaOf<GitFormModel>;
 }
