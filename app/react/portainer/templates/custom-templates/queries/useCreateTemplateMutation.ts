@@ -174,7 +174,7 @@ interface CustomTemplateFromGitRepositoryPayload {
   /** Reference name of a Git repository hosting the Stack file. */
   RepositoryReferenceName?: string;
   /** Use basic authentication to clone the Git repository. */
-  RepositoryAuthentication: boolean;
+  RepositoryAuthentication?: boolean;
   /** Username used in basic authentication when RepositoryAuthentication is true. */
   RepositoryUsername?: string;
   /** Password used in basic authentication when RepositoryAuthentication is true. */
@@ -184,7 +184,7 @@ interface CustomTemplateFromGitRepositoryPayload {
   /** Definitions of variables in the stack file. */
   Variables: VariableDefinition[];
   /** Indicates whether to skip SSL verification when cloning the Git repository. */
-  TLSSkipVerify: boolean;
+  TLSSkipVerify?: boolean;
   /** Indicates if the Kubernetes template is created from a Docker Compose file. */
   IsComposeFormat?: boolean;
   /** Indicates if this template is for Edge Stack. */

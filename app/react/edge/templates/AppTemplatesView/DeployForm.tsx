@@ -23,7 +23,7 @@ import { EdgeGroup } from '../../edge-groups/types';
 import { DeploymentType, EdgeStack } from '../../edge-stacks/types';
 import { useEdgeStacks } from '../../edge-stacks/queries/useEdgeStacks';
 import { useEdgeGroups } from '../../edge-groups/queries/useEdgeGroups';
-import { useCreateEdgeStackFromGit } from '../../edge-stacks/queries/useCreateEdgeStackFromGit';
+import { useCreateEdgeStack } from '../../edge-stacks/queries/useCreateEdgeStack/useCreateEdgeStack';
 
 import { EnvVarsFieldset } from './EnvVarsFieldset';
 
@@ -70,7 +70,7 @@ function DeployForm({
   unselect: () => void;
 }) {
   const router = useRouter();
-  const mutation = useCreateEdgeStackFromGit();
+  const mutation = useCreateEdgeStack();
   const edgeStacksQuery = useEdgeStacks();
   const edgeGroupsQuery = useEdgeGroups({
     select: (groups) =>
@@ -139,15 +139,21 @@ function DeployForm({
   function handleSubmit(values: FormValues) {
     return mutation.mutate(
       {
-        name: values.name,
-        edgeGroups: values.edgeGroupIds,
-        deploymentType: DeploymentType.Compose,
-        repositoryURL: template.Repository.url,
-        filePathInRepository: template.Repository.stackfile,
-        envVars: Object.entries(values.envVars).map(([name, value]) => ({
-          name,
-          value,
-        })),
+        method: 'git',
+        payload: {
+          name: values.name,
+          edgeGroups: values.edgeGroupIds,
+          deploymentType: DeploymentType.Compose,
+
+          envVars: Object.entries(values.envVars).map(([name, value]) => ({
+            name,
+            value,
+          })),
+          git: {
+            RepositoryURL: template.Repository.url,
+            ComposeFilePathInRepository: template.Repository.stackfile,
+          },
+        },
       },
       {
         onSuccess() {

@@ -39,7 +39,7 @@ export type AutoUpdateModel = {
 };
 
 export type GitCredentialsModel = {
-  RepositoryAuthentication: boolean;
+  RepositoryAuthentication?: boolean;
   RepositoryUsername?: string;
   RepositoryPassword?: string;
   RepositoryGitCredentialID?: number;
@@ -56,13 +56,12 @@ export interface GitFormModel extends GitAuthModel {
   RepositoryURL: string;
   RepositoryURLValid?: boolean;
   ComposeFilePathInRepository: string;
-  RepositoryAuthentication: boolean;
   RepositoryReferenceName?: string;
   AdditionalFiles?: string[];
 
   SaveCredential?: boolean;
   NewCredentialName?: string;
-  TLSSkipVerify: boolean;
+  TLSSkipVerify?: boolean;
 
   /**
    * Auto update
