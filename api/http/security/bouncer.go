@@ -515,17 +515,15 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 
 // ShouldSkipCSRFCheck checks if the CSRF check should be skipped
 //
-// It checks if the request has eithr an API key or bearer token
-// a bearer token is needed for kubectl access
+// # It returns true if and only if the request has no cookie token
+//
+// we allow CSRF check to be skipped for the following reasons:
+// - public routes
+// - kubectl - a bearer token is needed, and no csrf token can be sent
+// - api token
 func ShouldSkipCSRFCheck(r *http.Request) bool {
-	apiKey := r.Header.Get(apiKeyHeader)
-	hasApiKey := apiKey != ""
-
-	authHeader := r.Header.Get(jwtTokenHeader)
-	hasAuthHeader := authHeader != ""
-
 	cookie, _ := r.Cookie(portainer.AuthCookieKey)
 	hasCookie := cookie != nil && cookie.Value != ""
 
-	return (hasApiKey || hasAuthHeader) && !hasCookie
+	return !hasCookie
 }

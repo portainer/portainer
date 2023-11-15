@@ -382,3 +382,61 @@ func Test_apiKeyLookup(t *testing.T) {
 		is.True(apiKeyUpdated.LastUsed > apiKey.LastUsed)
 	})
 }
+
+func Test_ShouldSkipCSRFCheck(t *testing.T) {
+
+	tt := []struct {
+		name           string
+		cookieValue    string
+		apiToken       string
+		bearerToken    string
+		expectedResult bool
+	}{
+		{
+			name:           "Should return true when no cookie is present",
+			cookieValue:    "",
+			expectedResult: true,
+		},
+		{
+			name:           "Should return true when cookie is empty",
+			cookieValue:    "",
+			expectedResult: true,
+		},
+		{
+			name:           "Should return false when cookie is not empty",
+			cookieValue:    "non-empty-cookie",
+			expectedResult: false,
+		},
+		{
+			name:           "Should return true when API token is present",
+			cookieValue:    "",
+			apiToken:       "api-token",
+			expectedResult: true,
+		},
+		{
+			name:           "Should return true when Bearer token is present",
+			cookieValue:    "",
+			bearerToken:    "bearer-token",
+			expectedResult: true,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.name, func(t *testing.T) {
+			is := assert.New(t)
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			if test.cookieValue != "" {
+				req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: test.cookieValue})
+			}
+			if test.apiToken != "" {
+				req.Header.Add(jwtTokenHeader, test.apiToken)
+			}
+			if test.bearerToken != "" {
+				req.Header.Add("Authorization", "Bearer "+test.bearerToken)
+			}
+
+			result := ShouldSkipCSRFCheck(req)
+			is.Equal(test.expectedResult, result)
+		})
+	}
+}
