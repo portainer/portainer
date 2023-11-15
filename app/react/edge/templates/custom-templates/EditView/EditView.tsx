@@ -12,7 +12,7 @@ import { EditTemplateForm } from './EditTemplateForm';
 export function EditView() {
   const router = useRouter();
   const {
-    params: { templateId },
+    params: { id: templateId },
   } = useCurrentStateAndParams();
   const customTemplateQuery = useCustomTemplate(templateId);
 
