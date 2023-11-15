@@ -90,6 +90,7 @@ function Cell({
       {isBrowseVisible && (
         <Authorized authorizations="DockerAgentBrowseList">
           <Button
+            className="ml-2"
             icon={Search}
             color="primary"
             size="xsmall"
