@@ -388,36 +388,38 @@ func Test_ShouldSkipCSRFCheck(t *testing.T) {
 	tt := []struct {
 		name           string
 		cookieValue    string
-		apiToken       string
-		bearerToken    string
+		apiKey         string
+		authHeader     string
 		expectedResult bool
+		expectedError  bool
 	}{
 		{
-			name:           "Should return true when no cookie is present",
+			name:        "Should return false when cookie is present",
+			cookieValue: "test-cookie",
+		},
+		{
+			name:           "Should return true when cookie is not present",
 			cookieValue:    "",
 			expectedResult: true,
 		},
 		{
-			name:           "Should return true when cookie is empty",
+			name:           "Should return true when api key is present",
 			cookieValue:    "",
+			apiKey:         "test-api-key",
 			expectedResult: true,
 		},
 		{
-			name:           "Should return false when cookie is not empty",
-			cookieValue:    "non-empty-cookie",
-			expectedResult: false,
-		},
-		{
-			name:           "Should return true when API token is present",
+			name:           "Should return true when auth header is present",
 			cookieValue:    "",
-			apiToken:       "api-token",
+			authHeader:     "test-auth-header",
 			expectedResult: true,
 		},
 		{
-			name:           "Should return true when Bearer token is present",
-			cookieValue:    "",
-			bearerToken:    "bearer-token",
-			expectedResult: true,
+			name:          "Should return false and error when both api key and auth header are present",
+			cookieValue:   "",
+			apiKey:        "test-api-key",
+			authHeader:    "test-auth-header",
+			expectedError: true,
 		},
 	}
 
@@ -428,15 +430,20 @@ func Test_ShouldSkipCSRFCheck(t *testing.T) {
 			if test.cookieValue != "" {
 				req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: test.cookieValue})
 			}
-			if test.apiToken != "" {
-				req.Header.Add(jwtTokenHeader, test.apiToken)
+			if test.apiKey != "" {
+				req.Header.Set(apiKeyHeader, test.apiKey)
 			}
-			if test.bearerToken != "" {
-				req.Header.Add("Authorization", "Bearer "+test.bearerToken)
+			if test.authHeader != "" {
+				req.Header.Set(jwtTokenHeader, test.authHeader)
 			}
 
-			result := ShouldSkipCSRFCheck(req)
+			result, err := ShouldSkipCSRFCheck(req)
 			is.Equal(test.expectedResult, result)
+			if test.expectedError {
+				is.Error(err)
+			} else {
+				is.NoError(err)
+			}
 		})
 	}
 }

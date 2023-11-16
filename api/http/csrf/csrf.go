@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
 	gorillacsrf "github.com/gorilla/csrf"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/urfave/negroni"
@@ -45,7 +47,13 @@ func withSendCSRFToken(handler http.Handler) http.Handler {
 func withSkipCSRF(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if security.ShouldSkipCSRFCheck(r) {
+		skip, err := security.ShouldSkipCSRFCheck(r)
+		if err != nil {
+			httperror.WriteError(w, http.StatusForbidden, err.Error(), err)
+			return
+		}
+
+		if skip {
 			r = gorillacsrf.UnsafeSkipCheck(r)
 		}
 
