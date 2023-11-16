@@ -515,7 +515,7 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 
 // ShouldSkipCSRFCheck checks if the CSRF check should be skipped
 //
-// # It returns true if the request has no cookie token and has either (but not both):
+// It returns true if the request has no cookie token and has either (but not both):
 // - an api key header
 // - an auth header
 // if it has both headers, an error is returned
