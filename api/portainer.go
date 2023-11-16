@@ -1561,7 +1561,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.19.2"
+	APIVersion = "2.19.3"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
