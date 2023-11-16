@@ -46,11 +46,58 @@ export function toViewModel(
       if (
         !lastPort ||
         lastPort.publishMode !== port.publishMode ||
-        lastPort.protocol !== port.protocol ||
-        !lastPort.hostPort ||
-        !port.hostPort
+        lastPort.protocol !== port.protocol
       ) {
         return [...acc, port] satisfies Array<Value>;
+      }
+
+      if (
+        typeof lastPort.hostPort === 'undefined' &&
+        typeof port.hostPort === 'undefined'
+      ) {
+        if (isRange(lastPort.containerPort)) {
+          if (lastPort.containerPort.end === port.containerPort) {
+            return acc;
+          }
+
+          if (lastPort.containerPort.end + 1 === port.containerPort) {
+            return [
+              ...acc.slice(0, acc.length - 1),
+              {
+                ...lastPort,
+                hostPort: undefined,
+                containerPort: {
+                  ...lastPort.containerPort,
+                  end: port.containerPort,
+                },
+              } satisfies Value,
+            ];
+          }
+
+          return [...acc, port];
+        }
+
+        if (typeof lastPort.containerPort === 'number') {
+          if (lastPort.containerPort === port.containerPort) {
+            return acc;
+          }
+
+          if (lastPort.containerPort + 1 === port.containerPort) {
+            return [
+              ...acc.slice(0, acc.length - 1),
+              {
+                ...lastPort,
+                hostPort: undefined,
+                containerPort: {
+                  start: lastPort.containerPort,
+                  end: port.containerPort,
+                },
+              } satisfies Value,
+            ];
+          }
+
+          return [...acc, port];
+        }
       }
 
       if (

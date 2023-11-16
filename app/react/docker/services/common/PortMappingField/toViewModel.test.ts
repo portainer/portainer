@@ -134,13 +134,10 @@ test('combine and sort', () => {
     },
     {
       hostPort: undefined,
-      containerPort: 83,
-      protocol: 'tcp',
-      publishMode: undefined,
-    },
-    {
-      hostPort: undefined,
-      containerPort: 84,
+      containerPort: {
+        start: 83,
+        end: 84,
+      },
       protocol: 'tcp',
       publishMode: undefined,
     },
@@ -206,6 +203,78 @@ test('non-sequential ports', () => {
       hostPort: 224,
       protocol: 'tcp',
       publishMode: undefined,
+    },
+  ]);
+});
+
+test('without host', () => {
+  expect(
+    toViewModel([
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39003,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39010,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39007,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39008,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39000,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39001,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39002,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39004,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39005,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39006,
+      },
+      {
+        Protocol: 'tcp',
+        PublishMode: 'ingress',
+        TargetPort: 39009,
+      },
+    ])
+  ).toStrictEqual([
+    {
+      protocol: 'tcp',
+      publishMode: 'ingress',
+      containerPort: {
+        start: 39000,
+        end: 39010,
+      },
+      hostPort: undefined,
     },
   ]);
 });
