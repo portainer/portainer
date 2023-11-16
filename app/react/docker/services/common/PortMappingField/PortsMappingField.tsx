@@ -1,11 +1,18 @@
-import { ArrowRight } from 'lucide-react';
+import { List, Plus } from 'lucide-react';
+
+import { Authorized } from '@/react/hooks/useUser';
 
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 import { FormError } from '@@/form-components/FormError';
-import { InputList } from '@@/form-components/InputList';
-import { ArrayError, ItemProps } from '@@/form-components/InputList/InputList';
-import { Icon } from '@@/Icon';
+import {
+  ArrayError,
+  ItemProps,
+  useInputList,
+} from '@@/form-components/InputList/InputList';
 import { InputLabeled } from '@@/form-components/Input/InputLabeled';
+import { Table } from '@@/datatables';
+import { Widget } from '@@/Widget';
+import { Button } from '@@/buttons';
 
 import { Protocol, Range, Value, isRange } from './types';
 
@@ -26,31 +33,73 @@ export function PortsMappingField({
   disabled,
   readOnly,
 }: Props) {
+  const { handleRemoveItem, handleAdd, handleChangeItem } = useInputList<Value>(
+    {
+      value,
+      onChange,
+      itemBuilder: () => ({
+        hostPort: 0,
+        containerPort: 0,
+        protocol: 'tcp',
+        publishMode: 'ingress',
+      }),
+    }
+  );
+
   return (
-    <>
-      <InputList<Value>
-        label="Port mapping"
-        value={value}
-        onChange={onChange}
-        addLabel="map additional port"
-        itemBuilder={() => ({
-          hostPort: 0,
-          containerPort: 0,
-          protocol: 'tcp',
-          publishMode: 'ingress',
-        })}
-        item={Item}
-        errors={errors}
-        disabled={disabled}
-        readOnly={readOnly}
-        tooltip="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."
-      />
-      {typeof errors === 'string' && (
-        <div className="form-group col-md-12">
-          <FormError>{errors}</FormError>
-        </div>
-      )}
-    </>
+    <Widget>
+      <Widget.Title icon={List} title="Published ports">
+        <Authorized authorizations="DockerServiceUpdate">
+          <Button
+            color="secondary"
+            size="small"
+            onClick={handleAdd}
+            icon={Plus}
+          >
+            port mapping
+          </Button>
+        </Authorized>
+      </Widget.Title>
+
+      <Widget.Body className="!p-0">
+        {value.length > 0 ? (
+          <Table>
+            <thead>
+              <tr>
+                <th>Host port</th>
+                <th>Container port</th>
+                <th>Protocol</th>
+                <th>Publish mode</th>
+                <Authorized authorizations="DockerServiceUpdate">
+                  <th>Actions</th>
+                </Authorized>
+              </tr>
+            </thead>
+
+            <tbody>
+              {value.map((item, index) => (
+                <Item
+                  key={index}
+                  item={item}
+                  index={index}
+                  onChange={(value) => handleChangeItem(index, value)}
+                  error={errors?.[index]}
+                  disabled={disabled}
+                  readOnly={readOnly}
+                />
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <p>This service has no ports published.</p>
+        )}
+        {typeof errors === 'string' && (
+          <div className="form-group col-md-12">
+            <FormError>{errors}</FormError>
+          </div>
+        )}
+      </Widget.Body>
+    </Widget>
   );
 }
 
@@ -63,35 +112,44 @@ function Item({
   index,
 }: ItemProps<Value>) {
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-2">
-        <RangeOrInput
-          value={item.hostPort}
-          onChange={(value) => handleChange('hostPort', value)}
-          id={`hostPort-${index}`}
-          label="Host"
-        />
-
-        <span className="mx-3">
-          <Icon icon={ArrowRight} />
-        </span>
-        <RangeOrInput
-          value={item.hostPort}
-          onChange={(value) => handleChange('containerPort', value)}
-          id={`containerPort-${index}`}
-          label="Container"
-        />
-
-        <ButtonSelector<Protocol>
-          onChange={(value) => handleChange('protocol', value)}
-          value={item.protocol}
-          options={[{ value: 'tcp' }, { value: 'udp' }]}
-          disabled={disabled}
-          readOnly={readOnly}
-        />
-      </div>
-      {!!error && <FormError>{Object.values(error)[0]}</FormError>}
-    </div>
+    <>
+      <tr>
+        <td>
+          <RangeOrInput
+            value={item.hostPort}
+            onChange={(value) => handleChange('hostPort', value)}
+            id={`hostPort-${index}`}
+            label="host"
+          />
+        </td>
+        <td>
+          <RangeOrInput
+            value={item.containerPort}
+            onChange={(value) => handleChange('containerPort', value)}
+            id={`containerPort-${index}`}
+            label="container"
+          />
+        </td>
+        <td>
+          <ButtonSelector<Protocol>
+            onChange={(value) => handleChange('protocol', value)}
+            value={item.protocol}
+            options={[{ value: 'tcp' }, { value: 'udp' }]}
+            disabled={disabled}
+            readOnly={readOnly}
+          />
+        </td>
+        <td />
+        <td />
+      </tr>
+      {error && (
+        <tr>
+          <td colSpan={5}>
+            <FormError>{error}</FormError>
+          </td>
+        </tr>
+      )}
+    </>
   );
 
   function handleChange(name: keyof Value, value: unknown) {
@@ -136,6 +194,8 @@ function RangeOrInput({
       disabled={disabled}
       readOnly={readOnly}
       id={id}
+      value={value}
+      onChange={(e) => onChange(getNumber(e.target.valueAsNumber))}
     />
   );
 }
@@ -156,8 +216,8 @@ function RangeInput({
   label: string;
 }) {
   return (
-    <div>
-      <label>{label}</label>
+    <div className="flex items-center gap-2">
+      <label className="font-normal">{label}</label>
       <InputLabeled
         label="from"
         size="small"
@@ -188,8 +248,8 @@ function RangeInput({
   function handleChange(range: Partial<Range>) {
     onChange({ ...value, ...range });
   }
+}
 
-  function getNumber(value: number) {
-    return Number.isNaN(value) ? 0 : value;
-  }
+function getNumber(value: number) {
+  return Number.isNaN(value) ? 0 : value;
 }

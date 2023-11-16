@@ -106,6 +106,21 @@ export function InputList<T = DefaultType>({
   const initialItemsCount = useRef(value.length);
   const isAddButtonVisible = !(isAddButtonHidden || readOnly);
   const isDeleteButtonVisible = !(isDeleteButtonHidden || readOnly);
+  const {
+    handleMoveUp,
+    handleMoveDown,
+    handleRemoveItem,
+    handleAdd,
+    handleChangeItem,
+    toggleNeedsDeletion,
+  } = useInputList<T>({
+    value,
+    onChange,
+    itemBuilder,
+    itemKeyGetter,
+    movable,
+  });
+
   return (
     <div className="form-group" aria-label={ariaLabel || label}>
       {label && (
@@ -187,7 +202,7 @@ export function InputList<T = DefaultType>({
                         itemIndex={index}
                         initialItemsCount={initialItemsCount.current}
                         handleRemoveItem={handleRemoveItem}
-                        handleToggleNeedsDeletion={handleToggleNeedsDeletion}
+                        handleToggleNeedsDeletion={toggleNeedsDeletion}
                         dataCy={`${deleteButtonDataCy}_${index}`}
                       />
                     )}
@@ -223,7 +238,21 @@ export function InputList<T = DefaultType>({
       )}
     </div>
   );
+}
 
+export function useInputList<T = DefaultType>({
+  value,
+  onChange,
+  itemBuilder = defaultItemBuilder as unknown as () => T,
+  itemKeyGetter = (item: T, index: number) => index,
+  movable = false,
+}: {
+  value: T[];
+  onChange(value: T[], e: OnChangeEvent<T>): void;
+  itemBuilder?(): T;
+  itemKeyGetter?(item: T, index: number): Key;
+  movable?: boolean;
+}) {
   function handleMoveUp(index: number) {
     if (index <= 0) {
       return;
@@ -260,7 +289,7 @@ export function InputList<T = DefaultType>({
     );
   }
 
-  function handleToggleNeedsDeletion(key: Key, item: CanUndoDeleteItem<T>) {
+  function toggleNeedsDeletion(key: Key, item: CanUndoDeleteItem<T>) {
     handleChangeItem(key, { ...item, needsDeletion: !item.needsDeletion });
   }
 
@@ -282,6 +311,15 @@ export function InputList<T = DefaultType>({
       item: newItemValue,
     });
   }
+
+  return {
+    handleMoveUp,
+    handleMoveDown,
+    handleRemoveItem,
+    handleAdd,
+    handleChangeItem,
+    toggleNeedsDeletion,
+  };
 }
 
 function defaultItemBuilder(): DefaultType {

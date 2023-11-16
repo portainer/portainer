@@ -27,6 +27,7 @@ import { confirm, confirmDelete } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 import { convertServiceToConfig } from '@/react/docker/services/common/convertServiceToConfig';
+import { portsMappingUtils } from '@/react/docker/services/common/PortMappingField';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -108,6 +109,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.formValues = {
       RegistryModel: new PorImageRegistryModel(),
+      ports: [],
     };
 
     $scope.tasks = [];
@@ -726,6 +728,8 @@ angular.module('portainer.docker').controller('ServiceController', [
           if (!$scope.isUpdating) {
             $scope.lastVersion = service.Version;
           }
+
+          $scope.formValues.ports = portsMappingUtils.toViewModel(service.Model.Spec.EndpointSpec.Ports);
 
           transformResources(service);
           translateServiceArrays(service);

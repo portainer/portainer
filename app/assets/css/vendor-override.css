@@ -42,6 +42,10 @@
   z-index: unset;
 }
 
+.input-group-sm > .input-group-addon {
+  line-height: 1;
+}
+
 .text-danger {
   color: var(--ui-error-9);
 }

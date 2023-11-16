@@ -29,7 +29,7 @@ export const servicesModule = angular
   )
   .component(
     'dockerServicePortsMappingField',
-    r2a(PortsMappingField, [
+    r2a(withUIRouter(withCurrentUser(PortsMappingField)), [
       'disabled',
       'value',
       'onChange',
