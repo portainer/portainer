@@ -128,15 +128,17 @@ export default class CreateEdgeStackViewController {
   }
 
   async preSelectTemplate(templateId) {
-    try {
-      this.state.Method = 'template';
-      const template = await getCustomTemplate(templateId);
-      this.onChangeTemplate(template);
-      const fileContent = await getCustomTemplateFile({ id: templateId, git: !!template.GitConfig });
-      this.formValues.StackFileContent = fileContent;
-    } catch (e) {
-      notifyError('Failed loading template', e);
-    }
+    return this.$async(async () => {
+      try {
+        this.state.Method = 'template';
+        const template = await getCustomTemplate(templateId);
+        this.onChangeTemplate(template);
+        const fileContent = await getCustomTemplateFile({ id: templateId, git: !!template.GitConfig });
+        this.formValues.StackFileContent = fileContent;
+      } catch (e) {
+        notifyError('Failed loading template', e);
+      }
+    });
   }
 
   async $onInit() {
