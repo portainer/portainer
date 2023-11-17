@@ -313,10 +313,10 @@ async function createContainerWebhook(
   }
 
   await createWebhook({
-    resourceId: containerId,
-    environmentId: environment.Id,
-    registryId,
-    webhookType: WebhookType.DockerContainer,
+    ResourceId: containerId,
+    EndpointID: environment.Id,
+    RegistryId: registryId,
+    WebhookType: WebhookType.DockerContainer,
   });
 }
 
