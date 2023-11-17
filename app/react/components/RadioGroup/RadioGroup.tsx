@@ -16,9 +16,9 @@ export function RadioGroup<T extends string | number = string>({
   return (
     <div>
       {options.map((option) => (
-        <span
+        <label
           key={option.value}
-          className="col-sm-3 col-lg-2 control-label !p-0 text-left"
+          className="col-sm-3 col-lg-2 control-label !p-0 text-left font-normal"
         >
           <input
             type="radio"
@@ -29,7 +29,7 @@ export function RadioGroup<T extends string | number = string>({
             style={{ margin: '0 4px 0 0' }}
           />
           {option.label}
-        </span>
+        </label>
       ))}
     </div>
   );
