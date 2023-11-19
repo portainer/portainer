@@ -6,7 +6,6 @@ import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector
 import { FormError } from '@@/form-components/FormError';
 import {
   ArrayError,
-  ItemError,
   ItemProps,
   useInputList,
 } from '@@/form-components/InputList/InputList';
@@ -62,6 +61,7 @@ export function PortsMappingField({
       hasChanges={hasChanges}
       onReset={onReset}
       onSubmit={onSubmit}
+      isValid={!!errors}
     >
       {values.length > 0 ? (
         <Table>
@@ -164,9 +164,26 @@ function Item({
       </tr>
       {error && (
         <tr>
-          <td colSpan={5}>
-            <FormError>{getError(error)}</FormError>
-          </td>
+          {typeof error === 'string' ? (
+            <td colSpan={5}>
+              <FormError>{error}</FormError>
+            </td>
+          ) : (
+            <>
+              <td>
+                <FormError>{rangeError(error.hostPort)}</FormError>
+              </td>
+              <td>
+                <FormError>{rangeError(error.containerPort)}</FormError>
+              </td>
+              <td>
+                <FormError>{error.protocol}</FormError>
+              </td>
+              <td>
+                <FormError>{error.publishMode}</FormError>
+              </td>
+            </>
+          )}
         </tr>
       )}
     </>
@@ -176,7 +193,7 @@ function Item({
     onChange({ ...item, [name]: value });
   }
 
-  function getError(error: ItemError<Value>) {
+  function rangeError(error?: string | { start?: string; end?: string }) {
     if (!error) {
       return null;
     }
@@ -185,11 +202,6 @@ function Item({
       return error;
     }
 
-    return (
-      error.hostPort ||
-      error.containerPort ||
-      error.protocol ||
-      error.publishMode
-    );
+    return error.start || error.end;
   }
 }

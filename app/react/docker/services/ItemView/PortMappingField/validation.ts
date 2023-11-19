@@ -18,7 +18,7 @@ export function validation() {
         is: (hostPort: Range | number | undefined) =>
           !hostPort || isRange(hostPort),
         then: rangeOrNumber(),
-        otherwise: number().typeError(
+        otherwise: port().typeError(
           'Container port must be a number when host port is not a range'
         ),
       }),
@@ -40,15 +40,25 @@ export function validation() {
   );
 }
 
+function port() {
+  return number()
+    .optional()
+    .min(0, 'Port must be a number between 0 to 65535')
+    .max(65535, 'Port must be a number between 0 to 65535');
+}
+
 function rangeOrNumber() {
   return lazy<SchemaOf<Range> | NumberSchema>(
-    (value: Range | number | undefined) => (isRange(value) ? range() : number())
+    (value: Range | number | undefined) => (isRange(value) ? range() : port())
   );
 }
 
 function range(): SchemaOf<Range> {
   return object({
-    start: number().required(),
-    end: number().required(),
+    start: port().required(),
+    end: port().required(),
+  }).test({
+    message: 'Start port must be less than end port',
+    test: (value) => !value.start || !value.end || value.start <= value.end,
   });
 }

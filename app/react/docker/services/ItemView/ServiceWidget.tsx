@@ -9,6 +9,9 @@ import { Widget } from '@@/Widget';
 import { Button, ButtonGroup } from '@@/buttons';
 import { ButtonWithRef } from '@@/buttons/Button';
 
+/**
+ * used for wrapping widget in the service item view
+ */
 export function ServiceWidget({
   titleIcon,
   title,
@@ -18,6 +21,7 @@ export function ServiceWidget({
   onReset,
   onSubmit,
   labelForAddButton,
+  isValid,
 }: PropsWithChildren<{
   titleIcon: ComponentProps<typeof Widget.Title>['icon'];
   title: string;
@@ -26,6 +30,7 @@ export function ServiceWidget({
   onReset(all?: boolean): void;
   onSubmit(): void;
   labelForAddButton: string;
+  isValid?: boolean;
 }>) {
   return (
     <Widget>
@@ -42,7 +47,11 @@ export function ServiceWidget({
       <Authorized authorizations="DockerServiceUpdate">
         <Widget.Footer>
           <ButtonGroup>
-            <Button type="button" onClick={onSubmit} disabled={!hasChanges}>
+            <Button
+              type="button"
+              onClick={onSubmit}
+              disabled={!hasChanges || !isValid}
+            >
               Apply changes
             </Button>
 
