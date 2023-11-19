@@ -9,7 +9,7 @@ export type PortBinding<THost = number, TContainer = number> = {
   hostPort: THost;
   protocol: Protocol;
   containerPort: TContainer;
-  publishMode: 'ingress' | 'host' | undefined;
+  publishMode: 'ingress' | 'host';
 };
 
 export type Value =

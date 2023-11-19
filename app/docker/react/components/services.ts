@@ -5,7 +5,7 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { ServicesDatatable } from '@/react/docker/services/ListView/ServicesDatatable';
 import { TasksDatatable } from '@/react/docker/services/ItemView/TasksDatatable';
-import { PortsMappingField } from '@/react/docker/services/common/PortMappingField';
+import { PortsMappingField } from '@/react/docker/services/ItemView/PortMappingField';
 
 export const servicesModule = angular
   .module('portainer.docker.react.components.services', [])
@@ -35,5 +35,8 @@ export const servicesModule = angular
       'onChange',
       'readOnly',
       'errors',
+      'hasChanges',
+      'onReset',
+      'onSubmit',
     ])
   ).name;

@@ -17,7 +17,7 @@ export function toViewModel(
       hostPort: binding.PublishedPort,
       protocol: isProtocol(binding.Protocol) ? binding.Protocol : 'tcp',
       containerPort: binding.TargetPort,
-      publishMode: binding.PublishMode,
+      publishMode: binding.PublishMode || 'ingress',
     }));
   }
 
@@ -26,7 +26,7 @@ export function toViewModel(
       hostPort: number | undefined;
       protocol: Protocol;
       containerPort: number | undefined;
-      publishMode: 'ingress' | 'host' | undefined;
+      publishMode: 'ingress' | 'host';
     }>
   ) {
     return _.sortBy(ports, [

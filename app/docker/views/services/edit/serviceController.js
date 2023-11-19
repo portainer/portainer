@@ -9,7 +9,6 @@ require('./includes/logging.html');
 require('./includes/mounts.html');
 require('./includes/networks.html');
 require('./includes/placementPreferences.html');
-require('./includes/ports.html');
 require('./includes/resources.html');
 require('./includes/restart.html');
 require('./includes/secrets.html');
@@ -27,7 +26,7 @@ import { confirm, confirmDelete } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 import { convertServiceToConfig } from '@/react/docker/services/common/convertServiceToConfig';
-import { portsMappingUtils } from '@/react/docker/services/common/PortMappingField';
+import { portsMappingUtils } from '@/react/docker/services/ItemView/PortMappingField';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -546,12 +545,8 @@ angular.module('portainer.docker').controller('ServiceController', [
         }
       }
 
-      if (service.Ports) {
-        service.Ports.forEach(function (binding) {
-          if (binding.PublishedPort === null || binding.PublishedPort === '') {
-            delete binding.PublishedPort;
-          }
-        });
+      if ($scope.hasChanges(service, ['Ports'])) {
+        service.Ports = portsMappingUtils.toRequest($scope.formValues.ports);
       }
 
       config.EndpointSpec = {
@@ -715,6 +710,25 @@ angular.module('portainer.docker').controller('ServiceController', [
       service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
       service.StopGracePeriod = service.StopGracePeriod ? ServiceHelper.translateNanosToHumanDuration(service.StopGracePeriod) : '';
     }
+
+    $scope.onChangePorts = function (ports) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.ports = ports;
+        updateServiceArray($scope.service, 'Ports');
+      });
+    };
+
+    $scope.onResetPorts = function (all = false) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.ports = portsMappingUtils.toViewModel($scope.service.Model.Spec.EndpointSpec.Ports);
+
+        $scope.cancelChanges($scope.service, all ? undefined : ['Ports']);
+      });
+    };
+
+    $scope.onSubmit = function () {
+      $scope.updateService($scope.service);
+    };
 
     function initView() {
       var apiVersion = $scope.applicationState.endpoint.apiVersion;

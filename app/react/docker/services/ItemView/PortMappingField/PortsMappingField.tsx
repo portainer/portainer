@@ -1,4 +1,4 @@
-import { List, Plus } from 'lucide-react';
+import { List, Trash2 } from 'lucide-react';
 
 import { Authorized } from '@/react/hooks/useUser';
 
@@ -11,28 +11,34 @@ import {
 } from '@@/form-components/InputList/InputList';
 import { InputLabeled } from '@@/form-components/Input/InputLabeled';
 import { Table } from '@@/datatables';
-import { Widget } from '@@/Widget';
 import { Button } from '@@/buttons';
+import { Select } from '@@/form-components/Input';
+
+import { ServiceWidget } from '../ServiceWidget';
 
 import { Protocol, Range, Value, isRange } from './types';
 
 export type Values = Array<Value>;
 
-interface Props {
-  value: Values;
-  onChange?(value: Values): void;
-  errors?: ArrayError<Values>;
-  disabled?: boolean;
-  readOnly?: boolean;
-}
-
 export function PortsMappingField({
   value,
-  onChange = () => {},
+  onChange,
   errors,
   disabled,
   readOnly,
-}: Props) {
+  hasChanges,
+  onReset,
+  onSubmit,
+}: {
+  value: Values;
+  onChange(value: Values): void;
+  errors?: ArrayError<Values>;
+  disabled?: boolean;
+  readOnly?: boolean;
+  hasChanges: boolean;
+  onReset(all?: boolean): void;
+  onSubmit(): void;
+}) {
   const { handleRemoveItem, handleAdd, handleChangeItem } = useInputList<Value>(
     {
       value,
@@ -47,59 +53,53 @@ export function PortsMappingField({
   );
 
   return (
-    <Widget>
-      <Widget.Title icon={List} title="Published ports">
-        <Authorized authorizations="DockerServiceUpdate">
-          <Button
-            color="secondary"
-            size="small"
-            onClick={handleAdd}
-            icon={Plus}
-          >
-            port mapping
-          </Button>
-        </Authorized>
-      </Widget.Title>
+    <ServiceWidget
+      titleIcon={List}
+      title="Published ports"
+      labelForAddButton="port mapping"
+      onAdd={handleAdd}
+      hasChanges={hasChanges}
+      onReset={onReset}
+      onSubmit={onSubmit}
+    >
+      {value.length > 0 ? (
+        <Table>
+          <thead>
+            <tr>
+              <th>Host port</th>
+              <th>Container port</th>
+              <th>Protocol</th>
+              <th>Publish mode</th>
+              <Authorized authorizations="DockerServiceUpdate">
+                <th>Actions</th>
+              </Authorized>
+            </tr>
+          </thead>
 
-      <Widget.Body className="!p-0">
-        {value.length > 0 ? (
-          <Table>
-            <thead>
-              <tr>
-                <th>Host port</th>
-                <th>Container port</th>
-                <th>Protocol</th>
-                <th>Publish mode</th>
-                <Authorized authorizations="DockerServiceUpdate">
-                  <th>Actions</th>
-                </Authorized>
-              </tr>
-            </thead>
-
-            <tbody>
-              {value.map((item, index) => (
-                <Item
-                  key={index}
-                  item={item}
-                  index={index}
-                  onChange={(value) => handleChangeItem(index, value)}
-                  error={errors?.[index]}
-                  disabled={disabled}
-                  readOnly={readOnly}
-                />
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          <p>This service has no ports published.</p>
-        )}
-        {typeof errors === 'string' && (
-          <div className="form-group col-md-12">
-            <FormError>{errors}</FormError>
-          </div>
-        )}
-      </Widget.Body>
-    </Widget>
+          <tbody>
+            {value.map((item, index) => (
+              <Item
+                key={index}
+                item={item}
+                index={index}
+                onChange={(value) => handleChangeItem(index, value)}
+                error={errors?.[index]}
+                disabled={disabled}
+                readOnly={readOnly}
+                onRemove={() => handleRemoveItem(index, item)}
+              />
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <p>This service has no ports published.</p>
+      )}
+      {typeof errors === 'string' && (
+        <div className="form-group col-md-12">
+          <FormError>{errors}</FormError>
+        </div>
+      )}
+    </ServiceWidget>
   );
 }
 
@@ -109,8 +109,9 @@ function Item({
   error,
   disabled,
   readOnly,
+  onRemove,
   index,
-}: ItemProps<Value>) {
+}: ItemProps<Value> & { onRemove(): void }) {
   return (
     <>
       <tr>
@@ -139,8 +140,24 @@ function Item({
             readOnly={readOnly}
           />
         </td>
-        <td />
-        <td />
+        <td>
+          <Select
+            onChange={(e) => handleChange('publishMode', e.target.value)}
+            value={item.publishMode}
+            options={[
+              { value: 'ingress', label: 'ingress' },
+              { value: 'host', label: 'host' },
+            ]}
+            disabled={disabled}
+          />
+        </td>
+        <td>
+          <Button
+            icon={Trash2}
+            color="dangerlight"
+            onClick={() => onRemove()}
+          />
+        </td>
       </tr>
       {error && (
         <tr>
@@ -194,7 +211,8 @@ function RangeOrInput({
       disabled={disabled}
       readOnly={readOnly}
       id={id}
-      value={value}
+      value={value || ''}
+      type="number"
       onChange={(e) => onChange(getNumber(e.target.valueAsNumber))}
     />
   );
@@ -221,7 +239,7 @@ function RangeInput({
       <InputLabeled
         label="from"
         size="small"
-        value={value.start}
+        value={value.start || ''}
         onChange={(e) =>
           handleChange({ start: getNumber(e.target.valueAsNumber) })
         }
@@ -234,7 +252,7 @@ function RangeInput({
       <InputLabeled
         label="to"
         size="small"
-        value={value.end}
+        value={value.end || ''}
         onChange={(e) =>
           handleChange({ end: getNumber(e.target.valueAsNumber) })
         }
