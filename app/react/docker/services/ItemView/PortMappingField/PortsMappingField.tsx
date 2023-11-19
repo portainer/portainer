@@ -6,22 +6,23 @@ import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector
 import { FormError } from '@@/form-components/FormError';
 import {
   ArrayError,
+  ItemError,
   ItemProps,
   useInputList,
 } from '@@/form-components/InputList/InputList';
-import { InputLabeled } from '@@/form-components/Input/InputLabeled';
 import { Table } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { Select } from '@@/form-components/Input';
 
 import { ServiceWidget } from '../ServiceWidget';
 
-import { Protocol, Range, Value, isRange } from './types';
+import { Protocol, Value } from './types';
+import { RangeOrNumberField } from './RangeOrNumberField';
 
 export type Values = Array<Value>;
 
 export function PortsMappingField({
-  value,
+  values,
   onChange,
   errors,
   disabled,
@@ -30,7 +31,7 @@ export function PortsMappingField({
   onReset,
   onSubmit,
 }: {
-  value: Values;
+  values: Values;
   onChange(value: Values): void;
   errors?: ArrayError<Values>;
   disabled?: boolean;
@@ -41,7 +42,7 @@ export function PortsMappingField({
 }) {
   const { handleRemoveItem, handleAdd, handleChangeItem } = useInputList<Value>(
     {
-      value,
+      value: values,
       onChange,
       itemBuilder: () => ({
         hostPort: 0,
@@ -62,7 +63,7 @@ export function PortsMappingField({
       onReset={onReset}
       onSubmit={onSubmit}
     >
-      {value.length > 0 ? (
+      {values.length > 0 ? (
         <Table>
           <thead>
             <tr>
@@ -77,7 +78,7 @@ export function PortsMappingField({
           </thead>
 
           <tbody>
-            {value.map((item, index) => (
+            {values.map((item, index) => (
               <Item
                 key={index}
                 item={item}
@@ -116,15 +117,17 @@ function Item({
     <>
       <tr>
         <td>
-          <RangeOrInput
-            value={item.hostPort}
-            onChange={(value) => handleChange('hostPort', value)}
-            id={`hostPort-${index}`}
-            label="host"
-          />
+          <div className="flex gap-2 items-center">
+            <RangeOrNumberField
+              value={item.hostPort}
+              onChange={(value) => handleChange('hostPort', value)}
+              id={`hostPort-${index}`}
+              label="host"
+            />
+          </div>
         </td>
         <td>
-          <RangeOrInput
+          <RangeOrNumberField
             value={item.containerPort}
             onChange={(value) => handleChange('containerPort', value)}
             id={`containerPort-${index}`}
@@ -162,7 +165,7 @@ function Item({
       {error && (
         <tr>
           <td colSpan={5}>
-            <FormError>{error}</FormError>
+            <FormError>{getError(error)}</FormError>
           </td>
         </tr>
       )}
@@ -172,102 +175,21 @@ function Item({
   function handleChange(name: keyof Value, value: unknown) {
     onChange({ ...item, [name]: value });
   }
-}
 
-function RangeOrInput({
-  value,
-  onChange,
-  disabled,
-  readOnly,
-  id,
-  label,
-}: {
-  value: Range | number | undefined;
-  onChange: (value: Range | number | undefined) => void;
-  disabled?: boolean;
-  readOnly?: boolean;
-  id: string;
-  label: string;
-}) {
-  if (isRange(value)) {
+  function getError(error: ItemError<Value>) {
+    if (!error) {
+      return null;
+    }
+
+    if (typeof error === 'string') {
+      return error;
+    }
+
     return (
-      <RangeInput
-        value={value}
-        onChange={onChange}
-        label={label}
-        disabled={disabled}
-        readOnly={readOnly}
-        id={id}
-      />
+      error.hostPort ||
+      error.containerPort ||
+      error.protocol ||
+      error.publishMode
     );
   }
-
-  return (
-    <InputLabeled
-      size="small"
-      placeholder="e.g. 80"
-      className="w-1/2"
-      label={label}
-      disabled={disabled}
-      readOnly={readOnly}
-      id={id}
-      value={value || ''}
-      type="number"
-      onChange={(e) => onChange(getNumber(e.target.valueAsNumber))}
-    />
-  );
-}
-
-function RangeInput({
-  value,
-  onChange,
-  disabled,
-  readOnly,
-  id,
-  label,
-}: {
-  value: Range;
-  onChange: (value: Range) => void;
-  disabled?: boolean;
-  readOnly?: boolean;
-  id: string;
-  label: string;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <label className="font-normal">{label}</label>
-      <InputLabeled
-        label="from"
-        size="small"
-        value={value.start || ''}
-        onChange={(e) =>
-          handleChange({ start: getNumber(e.target.valueAsNumber) })
-        }
-        disabled={disabled}
-        readOnly={readOnly}
-        id={id}
-        type="number"
-      />
-
-      <InputLabeled
-        label="to"
-        size="small"
-        value={value.end || ''}
-        onChange={(e) =>
-          handleChange({ end: getNumber(e.target.valueAsNumber) })
-        }
-        disabled={disabled}
-        readOnly={readOnly}
-        id={id}
-      />
-    </div>
-  );
-
-  function handleChange(range: Partial<Range>) {
-    onChange({ ...value, ...range });
-  }
-}
-
-function getNumber(value: number) {
-  return Number.isNaN(value) ? 0 : value;
 }

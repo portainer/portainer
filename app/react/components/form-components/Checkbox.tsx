@@ -13,7 +13,7 @@ interface Props extends HTMLProps<HTMLInputElement> {
   indeterminate?: boolean;
   title?: string;
   label?: string;
-  id: string;
+  id?: string;
   className?: string;
   role?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
@@ -51,7 +51,7 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
     }, [resolvedRef, indeterminate]);
 
     return (
-      <div className="md-checkbox flex" title={title || label}>
+      <div className="md-checkbox flex items-center" title={title || label}>
         <input
           id={id}
           type="checkbox"
@@ -61,7 +61,7 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...props}
         />
-        <label htmlFor={id} className={clsx({ '!font-normal': !bold })}>
+        <label htmlFor={id} className={clsx('m-0', { '!font-normal': !bold })}>
           {label}
         </label>
       </div>

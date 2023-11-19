@@ -15,19 +15,34 @@ export function validation() {
     object({
       hostPort: rangeOrNumber(),
       containerPort: mixed().when('hostPort', {
-        is: (hostPort: Range | number | undefined) => isRange(hostPort),
+        is: (hostPort: Range | number | undefined) =>
+          !hostPort || isRange(hostPort),
         then: rangeOrNumber(),
-        otherwise: number(),
+        otherwise: number().typeError(
+          'Container port must be a number when host port is not a range'
+        ),
       }),
       protocol: mixed().oneOf(['tcp', 'udp']),
       publishMode: mixed().oneOf(['ingress', 'host']),
+    }).test({
+      message:
+        'Invalid port specification: host port range must be equal to container port range',
+      test: (portBinding) => {
+        const hostPort = portBinding.hostPort as Range | number | undefined;
+        return !(
+          isRange(hostPort) &&
+          isRange(portBinding.containerPort) &&
+          hostPort.end - hostPort.start !==
+            portBinding.containerPort.end - portBinding.containerPort.start
+        );
+      },
     })
   );
 }
 
 function rangeOrNumber() {
-  return lazy<SchemaOf<Range> | NumberSchema>((value) =>
-    isRange(value) ? range() : number()
+  return lazy<SchemaOf<Range> | NumberSchema>(
+    (value: Range | number | undefined) => (isRange(value) ? range() : number())
   );
 }
 
