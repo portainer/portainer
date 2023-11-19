@@ -6,13 +6,13 @@ import { withError } from '@/react-tools/react-query';
 import { buildUrl } from '../user.service';
 import { User, UserId } from '../types';
 
-import { queryKeys } from './queryKeys';
+import { userQueryKeys } from './queryKeys';
 
 export function useUser(
   id: UserId,
   { staleTime }: { staleTime?: number } = {}
 ) {
-  return useQuery(queryKeys.user(id), () => getUser(id), {
+  return useQuery(userQueryKeys.user(id), () => getUser(id), {
     ...withError('Unable to retrieve user details'),
     staleTime,
   });

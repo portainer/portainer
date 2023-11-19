@@ -573,6 +573,7 @@ export function CreateIngressView() {
             label: isEdit ? 'Edit ingress' : 'Create ingress',
           },
         ]}
+        reload
       />
       <div className="row ingress-rules">
         <div className="col-sm-12">
