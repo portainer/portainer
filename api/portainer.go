@@ -1314,10 +1314,9 @@ type (
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" swaggerignore:"true"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role          UserRole          `json:"Role" example:"1"`
-		TokenIssueAt  int64             `json:"TokenIssueAt" example:"1"`
-		ThemeSettings UserThemeSettings `json:"ThemeSettings"`
-		UseCache      bool              `json:"UseCache" example:"true"`
+		Role          UserRole `json:"Role" example:"1"`
+		TokenIssueAt  int64    `json:"TokenIssueAt" example:"1"`
+		ThemeSettings UserThemeSettings
 
 		// Deprecated fields
 

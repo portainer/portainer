@@ -36,7 +36,6 @@ export function CreateView() {
           { label: 'Containers', link: 'docker.containers' },
           'Add container',
         ]}
-        reload
       />
 
       <CreateForm />

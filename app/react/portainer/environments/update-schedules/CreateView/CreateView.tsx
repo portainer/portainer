@@ -54,7 +54,6 @@ function CreateView() {
       <PageHeader
         title="Update & Rollback"
         breadcrumbs="Edge agent update and rollback"
-        reload
       />
 
       <BetaAlert

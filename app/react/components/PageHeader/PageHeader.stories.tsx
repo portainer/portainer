@@ -31,7 +31,6 @@ function Template({ title }: StoryProps) {
           { label: 'bread3' },
           { label: 'bread4' },
         ]}
-        reload
       />
     </UserContext.Provider>
   );

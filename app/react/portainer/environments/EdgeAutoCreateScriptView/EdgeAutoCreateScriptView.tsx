@@ -17,7 +17,6 @@ function EdgeAutoCreateScriptView() {
           { label: 'Environments', link: 'portainer.endpoints' },
           'Automatic Edge Environment Creation',
         ]}
-        reload
       />
 
       <div className="mx-3">

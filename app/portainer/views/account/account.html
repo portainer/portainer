@@ -1,4 +1,4 @@
-<page-header title="'User settings'" breadcrumbs="['User settings']" reload="true"> </page-header>
+<page-header title="'User settings'" breadcrumbs="['User settings']"> </page-header>
 
 <demo-feature-indicator ng-if="isDemoUser" content="'You cannot change the password of this account in the demo version of Portainer.'"> </demo-feature-indicator>
 
@@ -16,16 +16,16 @@
         <form name="form" class="form-horizontal" style="margin-top: 15px">
           <!-- current-password-input -->
           <div class="form-group">
-            <label for="current_password" class="col-sm-3 col-lg-2 control-label required text-left">Current password</label>
-            <div class="col-sm-9 col-lg-10">
+            <label for="current_password" class="col-sm-2 control-label required text-left">Current password</label>
+            <div class="col-sm-8">
               <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password" />
             </div>
           </div>
           <!-- !current-password-input -->
           <!-- new-password-input -->
           <div class="form-group">
-            <label for="new_password" class="col-sm-3 col-lg-2 control-label required text-left">New password</label>
-            <div class="col-sm-9 col-lg-10">
+            <label for="new_password" class="col-sm-2 control-label required text-left">New password</label>
+            <div class="col-sm-8">
               <input type="password" class="form-control" ng-model="formValues.newPassword" ng-minlength="requiredPasswordLength" id="new_password" name="new_password" />
             </div>
           </div>
@@ -33,8 +33,8 @@
 
           <!-- confirm-password-input -->
           <div class="form-group">
-            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label required text-left">Confirm password</label>
-            <div class="col-sm-9 col-lg-10">
+            <label for="confirm_password" class="col-sm-2 control-label required text-left">Confirm password</label>
+            <div class="col-sm-8">
               <div class="input-group">
                 <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
                 <span class="input-group-addon">
@@ -85,8 +85,6 @@
     </rd-widget>
   </div>
 </div>
-
-<application-settings-widget></application-settings-widget>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">

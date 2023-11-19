@@ -12,7 +12,6 @@ export function CreateView() {
           { link: 'azure.containerinstances', label: 'Container instances' },
           { label: 'Add container' },
         ]}
-        reload
       />
 
       <div className="row">

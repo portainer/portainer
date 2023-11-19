@@ -32,9 +32,9 @@ export function ListView() {
   return (
     <>
       <PageHeader
-        title="Container list"
         breadcrumbs="Container instances"
         reload
+        title="Container list"
       />
 
       <ContainersDatatable
