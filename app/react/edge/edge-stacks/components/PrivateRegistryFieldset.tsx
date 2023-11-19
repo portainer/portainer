@@ -41,6 +41,12 @@ export function PrivateRegistryFieldset({
     'This allows you to provide credentials when using a private registry that requires authentication';
 
   useEffect(() => {
+    if (isActive) {
+      setChecked(isActive);
+    }
+  }, [isActive]);
+
+  useEffect(() => {
     if (checked) {
       onChange();
     } else {

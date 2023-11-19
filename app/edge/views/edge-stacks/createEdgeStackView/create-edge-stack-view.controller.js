@@ -114,7 +114,7 @@ export default class CreateEdgeStackViewController {
           ? {
               PrePullImage: template.EdgeSettings.PrePullImage || false,
               RetryDeploy: template.EdgeSettings.RetryDeploy || false,
-              Registries: template.EdgeSettings.PrivateRegistryId ? [template.EdgeSettings.PrivateRegistryId] : [],
+              PrivateRegistryId: template.EdgeSettings.PrivateRegistryId || null,
               SupportRelativePath: template.EdgeSettings.RelativePathSettings.SupportRelativePath || false,
               FilesystemPath: template.EdgeSettings.RelativePathSettings.FilesystemPath || '',
             }
