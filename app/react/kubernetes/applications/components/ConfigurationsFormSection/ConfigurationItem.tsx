@@ -9,6 +9,7 @@ import { FormError } from '@@/form-components/FormError';
 import { ItemError } from '@@/form-components/InputList/InputList';
 import { isErrorType } from '@@/form-components/formikUtils';
 import { Button } from '@@/buttons';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { ConfigurationFormValues, ConfigurationOverrideKey } from './types';
 import { ConfigurationData } from './ConfigurationKey';
@@ -91,6 +92,19 @@ export function ConfigurationItem({
           icon={Trash2}
         />
       </div>
+      {!item.overriden && (
+        <TextTip color="blue">
+          The following keys will be loaded from the{' '}
+          <code>{item.selectedConfiguration.metadata?.name}</code>
+          ConfigMap as environment variables:
+          {Object.keys(configurationData).map((key, index) => (
+            <span key={key}>
+              <code>{key}</code>
+              {index < Object.keys(configurationData).length - 1 ? ', ' : ''}
+            </span>
+          ))}
+        </TextTip>
+      )}
       {item.overriden &&
         item.overridenKeys.map((overridenKey, keyIndex) => (
           <ConfigurationData
