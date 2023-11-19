@@ -3,16 +3,12 @@
 
 <!-- template -->
 <div ng-if="$ctrl.state.Method === 'template'">
-  <edge-stack-create-template-fieldset
-    value="$ctrl.template"
-    on-change="($ctrl.onChangeTemplate)"
-    on-change-file="($ctrl.onChangeFileContent)"
-  ></edge-stack-create-template-fieldset>
+  <edge-stack-create-template-fieldset values="$ctrl.templateValues" set-values="$ctrl.setTemplateValues"></edge-stack-create-template-fieldset>
 </div>
 <!-- !template -->
 
 <web-editor-form
-  ng-if="$ctrl.state.Method === 'editor' || ($ctrl.state.Method === 'template' && $ctrl.template)"
+  ng-if="$ctrl.state.Method === 'editor' || ($ctrl.state.Method === 'template' && $ctrl.templateValues.template)"
   identifier="stack-creation-editor"
   value="$ctrl.formValues.StackFileContent"
   on-change="($ctrl.onChangeFileContent)"

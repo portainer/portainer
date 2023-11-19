@@ -103,5 +103,5 @@ export const componentsModule = angular
   )
   .component(
     'edgeStackCreateTemplateFieldset',
-    r2a(withReactQuery(TemplateFieldset), ['onChange', 'value', 'onChangeFile'])
+    r2a(withReactQuery(TemplateFieldset), ['setValues', 'values', 'errors'])
   ).name;
