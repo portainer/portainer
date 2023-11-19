@@ -110,7 +110,7 @@ test('simple combine ports', () => {
         end: 75,
       },
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
   ]);
 });
@@ -130,7 +130,7 @@ test('combine and sort', () => {
       hostPort: { start: 81, end: 82 },
       containerPort: { start: 81, end: 82 },
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
     {
       hostPort: undefined,
@@ -139,13 +139,13 @@ test('combine and sort', () => {
         end: 84,
       },
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
     {
       hostPort: { start: 105, end: 106 },
       containerPort: { start: 3244, end: 3245 },
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
   ]);
 });
@@ -174,13 +174,13 @@ test('mixed protocols', () => {
       containerPort: 22,
       hostPort: 222,
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
     {
       containerPort: 23,
       hostPort: 223,
       protocol: 'udp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
   ]);
 });
@@ -196,13 +196,13 @@ test('non-sequential ports', () => {
       containerPort: 22,
       hostPort: 222,
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
     {
       containerPort: 24,
       hostPort: 224,
       protocol: 'tcp',
-      publishMode: undefined,
+      publishMode: 'ingress',
     },
   ]);
 });
