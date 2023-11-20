@@ -71,7 +71,6 @@ export function EnvironmentCreationView() {
       <PageHeader
         title="Quick Setup"
         breadcrumbs={[{ label: 'Environment Wizard' }]}
-        reload
       />
 
       <div className={styles.wizardWrapper}>

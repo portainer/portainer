@@ -1,21 +1,12 @@
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import { agentInterceptor } from './portainer/services/axios';
-import { dispatchCacheRefreshEventIfNeeded } from './portainer/services/http-request.helper';
 
 /* @ngInject */
 export function configApp($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
   if (process.env.NODE_ENV === 'testing') {
     $compileProvider.debugInfoEnabled(false);
   }
-
-  // ask to clear cache on mutation
-  $httpProvider.interceptors.push(() => ({
-    request: (reqConfig) => {
-      dispatchCacheRefreshEventIfNeeded(reqConfig);
-      return reqConfig;
-    },
-  }));
 
   localStorageServiceProvider.setPrefix('portainer');
 

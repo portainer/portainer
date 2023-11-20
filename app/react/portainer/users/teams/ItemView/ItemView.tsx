@@ -38,7 +38,6 @@ export function ItemView() {
       <PageHeader
         title="Team details"
         breadcrumbs={[{ label: 'Teams' }, { label: team.Name }]}
-        reload
       />
 
       {membershipsQuery.data && (

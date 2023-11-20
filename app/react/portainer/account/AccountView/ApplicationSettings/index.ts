@@ -1,1 +1,0 @@
-export { ApplicationSettingsWidget } from './ApplicationSettingsWidget';

@@ -27,6 +27,7 @@ export function ConfigureView() {
     <>
       <PageHeader
         title="Kubernetes features configuration"
+        reload
         breadcrumbs={[
           { label: 'Environments', link: 'portainer.endpoints' },
           {
@@ -36,7 +37,6 @@ export function ConfigureView() {
           },
           'Kubernetes configuration',
         ]}
-        reload
       />
       <div className="row">
         <div className="col-sm-12">

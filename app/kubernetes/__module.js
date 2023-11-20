@@ -1,51 +1,12 @@
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
 import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/getSelfSubjectAccessReview';
 
-import { updateAxiosAdapter } from '@/portainer/services/axios';
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
-import { CACHE_REFRESH_EVENT, CACHE_DURATION } from '../portainer/services/http-request.helper';
-import { cache } from '../portainer/services/axios';
 
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
 import { reactModule } from './react';
 import './views/kubernetes.css';
-
-// The angular-cache npm package didn't have exclude options, so implement a custom cache
-// with an added check to only cache kubernetes requests
-class ExpirationCache {
-  constructor() {
-    this.store = new Map();
-    this.timeout = CACHE_DURATION;
-  }
-
-  get(key) {
-    return this.store.get(key);
-  }
-
-  put(key, val) {
-    // only cache requests with 'kubernetes' in the url
-    if (key.includes('kubernetes')) {
-      this.store.set(key, val);
-      // remove it once it's expired
-      setTimeout(() => {
-        this.remove(key);
-      }, this.timeout);
-    }
-  }
-
-  remove(key) {
-    this.store.delete(key);
-  }
-
-  removeAll() {
-    this.store = new Map();
-  }
-
-  delete() {
-    // skip because this is standalone, not a part of $cacheFactory
-  }
-}
 
 angular.module('portainer.kubernetes', ['portainer.app', registriesModule, customTemplateModule, reactModule]).config([
   '$stateRegistryProvider',
@@ -58,31 +19,8 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       parent: 'endpoint',
       abstract: true,
 
-      onEnter: /* @ngInject */ function onEnter(
-        $async,
-        $state,
-        endpoint,
-        KubernetesHealthService,
-        KubernetesNamespaceService,
-        Notifications,
-        StateManager,
-        $http,
-        Authentication,
-        UserService
-      ) {
+      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, KubernetesHealthService, KubernetesNamespaceService, Notifications, StateManager) {
         return $async(async () => {
-          // if the user wants to use front end cache for performance, set the angular caching settings
-          const userDetails = Authentication.getUserDetails();
-          const user = await UserService.user(userDetails.ID);
-          updateAxiosAdapter(user.UseCache);
-          if (user.UseCache) {
-            $http.defaults.cache = new ExpirationCache();
-            window.addEventListener(CACHE_REFRESH_EVENT, () => {
-              $http.defaults.cache.removeAll();
-              cache.store.clear();
-            });
-          }
-
           const kubeTypes = [
             PortainerEndpointTypes.KubernetesLocalEnvironment,
             PortainerEndpointTypes.AgentOnKubernetesEnvironment,
