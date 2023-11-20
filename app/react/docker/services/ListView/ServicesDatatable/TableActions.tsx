@@ -1,4 +1,4 @@
-import { Trash2, Plus, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 
 import { ServiceViewModel } from '@/docker/models/service';
@@ -6,9 +6,8 @@ import { Authorized } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { notifySuccess } from '@/portainer/services/notifications';
 
-import { Link } from '@@/Link';
-import { Button, ButtonGroup } from '@@/buttons';
-import { confirmDelete } from '@@/modals/confirm';
+import { AddButton, Button, ButtonGroup } from '@@/buttons';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { confirmServiceForceUpdate } from '../../common/update-service-modal';
 
@@ -46,28 +45,18 @@ export function TableActions({
           </Authorized>
         )}
         <Authorized authorizations="DockerServiceDelete">
-          <Button
-            color="dangerlight"
+          <DeleteButton
             disabled={selectedItems.length === 0}
-            onClick={() => handleRemove(selectedItems)}
-            icon={Trash2}
+            onConfirmed={() => handleRemove(selectedItems)}
+            confirmMessage="Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too."
             data-cy="service-removeServiceButton"
-          >
-            Remove
-          </Button>
+          />
         </Authorized>
       </ButtonGroup>
 
       {isAddActionVisible && (
         <Authorized authorizations="DockerServiceCreate">
-          <Button
-            as={Link}
-            props={{ to: '.new' }}
-            icon={Plus}
-            className="!ml-0"
-          >
-            Add service
-          </Button>
+          <AddButton>Add service</AddButton>
         </Authorized>
       )}
     </div>
@@ -97,14 +86,6 @@ export function TableActions({
   }
 
   async function handleRemove(selectedItems: Array<ServiceViewModel>) {
-    const confirmed = await confirmDelete(
-      'Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.'
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     removeMutation.mutate(
       selectedItems.map((service) => service.Id),
       {

@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import { Lock, Plus, Trash2 } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 import { SecretViewModel } from '@/docker/models/secret';
 import { isoDate } from '@/portainer/filters/filters';
@@ -15,9 +15,9 @@ import {
 } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 import { useRepeater } from '@@/datatables/useRepeater';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { createOwnershipColumn } from '../../components/datatable/createOwnershipColumn';
 
@@ -96,28 +96,16 @@ function TableActions({
   return (
     <div className="flex items-center gap-2">
       <Authorized authorizations="DockerSecretDelete">
-        <Button
-          color="dangerlight"
+        <DeleteButton
           disabled={selectedItems.length === 0}
-          onClick={() => onRemove(selectedItems)}
-          icon={Trash2}
-          className="!m-0"
+          onConfirmed={() => onRemove(selectedItems)}
+          confirmMessage="Do you want to remove the selected secret(s)?"
           data-cy="secret-removeSecretButton"
-        >
-          Remove
-        </Button>
+        />
       </Authorized>
 
       <Authorized authorizations="DockerSecretCreate">
-        <Button
-          as={Link}
-          props={{ to: '.new' }}
-          icon={Plus}
-          className="!m-0"
-          data-cy="secret-addSecretButton"
-        >
-          Add secret
-        </Button>
+        <AddButton data-cy="secret-addSecretButton">Add secret</AddButton>
       </Authorized>
     </div>
   );
