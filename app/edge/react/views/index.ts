@@ -9,9 +9,10 @@ import { ListView as EdgeStacksListView } from '@/react/edge/edge-stacks/ListVie
 import { ListView as EdgeGroupsListView } from '@/react/edge/edge-groups/ListView';
 
 import { templatesModule } from './templates';
+import { jobsModule } from './jobs';
 
 export const viewsModule = angular
-  .module('portainer.edge.react.views', [templatesModule])
+  .module('portainer.edge.react.views', [templatesModule, jobsModule])
   .component(
     'waitingRoomView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(WaitingRoomView))), [])
