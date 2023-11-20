@@ -1,4 +1,4 @@
-import { Clock, Trash2 } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { useMemo } from 'react';
 import _ from 'lodash';
 
@@ -6,12 +6,11 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
-import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { useList } from '../queries/list';
 import { EdgeUpdateSchedule, StatusType } from '../types';
@@ -90,29 +89,16 @@ function TableActions({
   const removeMutation = useRemoveMutation();
   return (
     <>
-      <Button
-        icon={Trash2}
-        color="dangerlight"
-        onClick={() => handleRemove()}
+      <DeleteButton
+        onConfirmed={() => handleRemove()}
         disabled={selectedRows.length === 0}
-      >
-        Remove
-      </Button>
-
-      <Link to=".create">
-        <Button>Add update & rollback schedule</Button>
-      </Link>
+        confirmMessage="Are you sure you want to remove these schedules?"
+      />
+      <AddButton to=".create">Add update & rollback schedule</AddButton>
     </>
   );
 
   async function handleRemove() {
-    const confirmed = await confirmDelete(
-      'Are you sure you want to remove these?'
-    );
-    if (!confirmed) {
-      return;
-    }
-
     removeMutation.mutate(selectedRows, {
       onSuccess: () => {
         notifySuccess('Success', 'Schedules successfully removed');

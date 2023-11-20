@@ -1,13 +1,5 @@
 import { useRouter } from '@uirouter/react';
-import {
-  Pause,
-  Play,
-  Plus,
-  RefreshCw,
-  Slash,
-  Square,
-  Trash2,
-} from 'lucide-react';
+import { Pause, Play, RefreshCw, Slash, Square, Trash2 } from 'lucide-react';
 
 import * as notifications from '@/portainer/services/notifications';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
@@ -29,8 +21,7 @@ import {
 } from '@/react/docker/containers/containers.service';
 import type { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { Link } from '@@/Link';
-import { ButtonGroup, Button } from '@@/buttons';
+import { ButtonGroup, Button, AddButton } from '@@/buttons';
 
 type ContainerServiceAction = (
   endpointId: EnvironmentId,
@@ -166,11 +157,11 @@ export function ContainersDatatableActions({
         </Authorized>
       </ButtonGroup>
       {isAddActionVisible && (
-        <Authorized authorizations="DockerContainerCreate">
-          <Link to="docker.containers.new" className="space-left">
-            <Button icon={Plus}>Add container</Button>
-          </Link>
-        </Authorized>
+        <div className="space-left">
+          <Authorized authorizations="DockerContainerCreate">
+            <AddButton>Add container</AddButton>
+          </Authorized>
+        </div>
       )}
     </div>
   );

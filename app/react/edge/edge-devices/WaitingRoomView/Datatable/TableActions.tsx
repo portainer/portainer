@@ -1,4 +1,4 @@
-import { Check, CheckCircle, Trash2 } from 'lucide-react';
+import { Check, CheckCircle } from 'lucide-react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/queries/useDeleteEnvironmentsMutation';
@@ -7,10 +7,9 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { useIsPureAdmin } from '@/react/hooks/useUser';
 
 import { Button } from '@@/buttons';
-import { ModalType, openModal } from '@@/modals';
-import { confirm } from '@@/modals/confirm';
-import { buildConfirmButton } from '@@/modals/utils';
+import { openModal } from '@@/modals';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 import { WaitingRoomEnvironment } from '../types';
@@ -36,14 +35,13 @@ export function TableActions({
 
   return (
     <>
-      <Button
-        onClick={() => handleRemoveDevice(selectedRows)}
+      <DeleteButton
+        onConfirmed={() => handleRemoveDevice(selectedRows)}
         disabled={selectedRows.length === 0}
-        color="dangerlight"
-        icon={Trash2}
+        confirmMessage="You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup."
       >
         Remove Device
-      </Button>
+      </DeleteButton>
 
       <TooltipWithChildren
         message={
@@ -122,18 +120,6 @@ export function TableActions({
   }
 
   async function handleRemoveDevice(devices: Environment[]) {
-    const confirmed = await confirm({
-      title: 'Are you sure?',
-      message:
-        "You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup.",
-      confirmButton: buildConfirmButton('Remove', 'danger'),
-      modalType: ModalType.Destructive,
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
     removeMutation.mutate(
       devices.map((d) => d.Id),
       {

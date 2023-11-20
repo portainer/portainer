@@ -1,4 +1,4 @@
-import { Bell, Trash2 } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { useStore } from 'zustand';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
@@ -10,9 +10,9 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { PageHeader } from '@@/PageHeader';
 import { Datatable } from '@@/datatables';
-import { Button } from '@@/buttons';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { notificationsStore } from './notifications-store';
 import { ToastNotification } from './types';
@@ -62,14 +62,11 @@ function TableActions({ selectedRows }: { selectedRows: ToastNotification[] }) {
   const { user } = useUser();
   const notificationsStoreState = useStore(notificationsStore);
   return (
-    <Button
-      icon={Trash2}
-      color="dangerlight"
-      onClick={() => handleRemove()}
+    <DeleteButton
+      onConfirmed={() => handleRemove()}
       disabled={selectedRows.length === 0}
-    >
-      Remove
-    </Button>
+      confirmMessage="Are you sure you want to remove the selected notifications?"
+    />
   );
 
   function handleRemove() {

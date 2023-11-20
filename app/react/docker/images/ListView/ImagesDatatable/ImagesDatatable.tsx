@@ -1,11 +1,4 @@
-import {
-  ChevronDown,
-  Download,
-  List,
-  Plus,
-  Trash2,
-  Upload,
-} from 'lucide-react';
+import { ChevronDown, Download, List, Trash2, Upload } from 'lucide-react';
 import { Menu, MenuButton, MenuItem, MenuPopover } from '@reach/menu-button';
 import { positionRight } from '@reach/popover';
 import { useMemo } from 'react';
@@ -21,7 +14,7 @@ import {
   RefreshableTableSettings,
 } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
-import { Button, ButtonGroup, LoadingButton } from '@@/buttons';
+import { AddButton, Button, ButtonGroup, LoadingButton } from '@@/buttons';
 import { Link } from '@@/Link';
 import { ButtonWithRef } from '@@/buttons/Button';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
@@ -82,14 +75,12 @@ export function ImagesDatatable({
           />
 
           <Authorized authorizations="DockerImageBuild">
-            <Button
-              as={Link}
-              props={{ to: 'docker.images.build' }}
+            <AddButton
+              to="docker.images.build"
               data-cy="image-buildImageButton"
-              icon={Plus}
             >
               Build a new image
-            </Button>
+            </AddButton>
           </Authorized>
         </div>
       )}

@@ -50,7 +50,7 @@ function config($stateRegistryProvider: StateRegistry) {
 
   $stateRegistryProvider.register({
     name: 'portainer.wizard.endpoints',
-    url: '/endpoints',
+    url: '/endpoints?referrer',
     views: {
       'content@': {
         component: 'wizardEnvironmentTypeSelectView',

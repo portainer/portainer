@@ -1,4 +1,4 @@
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { Pod } from 'kubernetes-types/core/v1';
 
@@ -7,7 +7,7 @@ import { useStackFile } from '@/react/common/stacks/stack.service';
 import { useNamespaceQuery } from '@/react/kubernetes/namespaces/queries/useNamespaceQuery';
 
 import { Widget, WidgetBody } from '@@/Widget';
-import { Button } from '@@/buttons';
+import { AddButton, Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
 
@@ -102,23 +102,15 @@ export function ApplicationDetailsWidget() {
                   />
                 )}
                 {appStackFileQuery.data && (
-                  <Link
+                  <AddButton
                     to="kubernetes.templates.custom.new"
+                    data-cy="k8sAppDetail-createCustomTemplateButton"
                     params={{
                       fileContent: appStackFileQuery.data.StackFileContent,
                     }}
                   >
-                    <Button
-                      type="button"
-                      color="primary"
-                      size="small"
-                      className="hover:decoration-none !ml-0"
-                      data-cy="k8sAppDetail-createCustomTemplateButton"
-                    >
-                      <Icon icon={Plus} className="mr-1" />
-                      Create template from application
-                    </Button>
-                  </Link>
+                    Create template from application
+                  </AddButton>
                 )}
               </div>
             )}

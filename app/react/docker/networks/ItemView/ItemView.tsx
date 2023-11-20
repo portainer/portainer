@@ -8,7 +8,6 @@ import { DockerContainer } from '@/react/docker/containers/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { useContainers } from '@/react/docker/containers/queries/containers';
 
-import { confirmDelete } from '@@/modals/confirm';
 import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
@@ -95,19 +94,14 @@ export function ItemView() {
   );
 
   async function onRemoveNetworkClicked() {
-    const message = 'Do you want to delete the network?';
-    const confirmed = await confirmDelete(message);
-
-    if (confirmed) {
-      deleteNetworkMutation.mutate(
-        { environmentId, networkId },
-        {
-          onSuccess: () => {
-            router.stateService.go('docker.networks');
-          },
-        }
-      );
-    }
+    deleteNetworkMutation.mutate(
+      { environmentId, networkId },
+      {
+        onSuccess: () => {
+          router.stateService.go('docker.networks');
+        },
+      }
+    );
   }
 }
 
