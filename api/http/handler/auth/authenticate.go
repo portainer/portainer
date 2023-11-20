@@ -6,6 +6,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -142,12 +143,15 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User, 
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
-	token, err := handler.JWTService.GenerateToken(tokenData)
+	token, expirationTime, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
 
+	security.AddAuthCookie(w, token, expirationTime)
+
 	return response.JSON(w, &authenticateResponse{JWT: token})
+
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {

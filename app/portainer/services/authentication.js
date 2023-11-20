@@ -1,3 +1,4 @@
+import { getCurrentUser } from '../users/queries/useLoadCurrentUser';
 import { clear as clearSessionStorage } from './session-storage';
 
 const DEFAULT_USER = 'admin';
@@ -7,13 +8,11 @@ angular.module('portainer.app').factory('Authentication', [
   '$async',
   'Auth',
   'OAuth',
-  'jwtHelper',
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  'UserService',
   'ThemeManager',
-  function AuthenticationFactory($async, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService, ThemeManager) {
+  function AuthenticationFactory($async, Auth, OAuth, LocalStorage, StateManager, EndpointProvider, ThemeManager) {
     'use strict';
 
     var service = {};
@@ -29,11 +28,12 @@ angular.module('portainer.app').factory('Authentication', [
 
     async function initAsync() {
       try {
-        const jwt = LocalStorage.getJWT();
-        if (!jwt || jwtHelper.isTokenExpired(jwt)) {
-          return tryAutoLoginExtension();
+        const userId = LocalStorage.getUserId();
+        if (userId && user.ID === userId) {
+          return true;
         }
-        await setUser(jwt);
+        await tryAutoLoginExtension();
+        await loadUserData();
         return true;
       } catch (error) {
         return tryAutoLoginExtension();
@@ -62,16 +62,8 @@ angular.module('portainer.app').factory('Authentication', [
     }
 
     async function OAuthLoginAsync(code) {
-      const response = await OAuth.validate({ code: code }).$promise;
-      const jwt = setJWTFromResponse(response);
-      await setUser(jwt);
-    }
-
-    function setJWTFromResponse(response) {
-      const jwt = response.jwt;
-      LocalStorage.storeJWT(jwt);
-
-      return response.jwt;
+      await OAuth.validate({ code: code }).$promise;
+      await loadUserData();
     }
 
     function OAuthLogin(code) {
@@ -79,9 +71,8 @@ angular.module('portainer.app').factory('Authentication', [
     }
 
     async function loginAsync(username, password) {
-      const response = await Auth.login({ username: username, password: password }).$promise;
-      const jwt = setJWTFromResponse(response);
-      await setUser(jwt);
+      await Auth.login({ username: username, password: password }).$promise;
+      await loadUserData();
     }
 
     function login(username, password) {
@@ -89,33 +80,31 @@ angular.module('portainer.app').factory('Authentication', [
     }
 
     function isAuthenticated() {
-      var jwt = LocalStorage.getJWT();
-      return !!jwt && !jwtHelper.isTokenExpired(jwt);
+      return !!user.ID;
     }
 
     function getUserDetails() {
       return user;
     }
 
-    async function setUserTheme() {
-      const data = await UserService.user(user.ID);
+    async function loadUserData() {
+      const userData = await getCurrentUser();
+      user.username = userData.Username;
+      user.ID = userData.Id;
+      user.role = userData.Role;
+      user.forceChangePassword = userData.forceChangePassword;
+      user.endpointAuthorizations = userData.EndpointAuthorizations;
+      user.portainerAuthorizations = userData.PortainerAuthorizations;
 
       // Initialize user theme base on UserTheme from database
-      const userTheme = data.ThemeSettings ? data.ThemeSettings.color : 'auto';
+      const userTheme = userData.ThemeSettings ? userData.ThemeSettings.color : 'auto';
       if (userTheme === 'auto' || !userTheme) {
         ThemeManager.autoTheme();
       } else {
         ThemeManager.setTheme(userTheme);
       }
-    }
 
-    async function setUser(jwt) {
-      var tokenPayload = jwtHelper.decodeToken(jwt);
-      user.username = tokenPayload.username;
-      user.ID = tokenPayload.id;
-      user.role = tokenPayload.role;
-      user.forceChangePassword = tokenPayload.forceChangePassword;
-      await setUserTheme();
+      LocalStorage.storeUserId(userData.Id);
     }
 
     function tryAutoLoginExtension() {

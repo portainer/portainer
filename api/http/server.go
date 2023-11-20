@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/apikey"
@@ -15,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/http/csrf"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
@@ -91,7 +93,7 @@ type Server struct {
 	GitService                  portainer.GitService
 	OpenAMTService              portainer.OpenAMTService
 	APIKeyService               apikey.APIKeyService
-	JWTService                  dataservices.JWTService
+	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	SwarmStackManager           portainer.SwarmStackManager
@@ -341,6 +343,11 @@ func (server *Server) Start() error {
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 
 	handler = middlewares.WithSlowRequestsLogger(handler)
+
+	handler, err := csrf.WithProtect(handler)
+	if err != nil {
+		return errors.Wrap(err, "failed to create CSRF middleware")
+	}
 
 	if server.HTTPEnabled {
 		go func() {

@@ -3,7 +3,6 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { Terminal as TerminalIcon } from 'lucide-react';
 import { Terminal } from 'xterm';
 
-import { get } from '@/react/hooks/useLocalStorage';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifyError } from '@/portainer/services/notifications';
 
@@ -169,10 +168,7 @@ export function ConsoleView() {
   );
 
   function connectConsole() {
-    const jwtToken = get('JWT', '');
-
     const params: StringDictionary = {
-      token: jwtToken,
       endpointId: environmentId,
       namespace,
       podName: podID,

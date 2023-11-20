@@ -200,7 +200,7 @@ func initAPIKeyService(datastore dataservices.DataStore) apikey.APIKeyService {
 	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
 }
 
-func initJWTService(userSessionTimeout string, dataStore dataservices.DataStore) (dataservices.JWTService, error) {
+func initJWTService(userSessionTimeout string, dataStore dataservices.DataStore) (portainer.JWTService, error) {
 	if userSessionTimeout == "" {
 		userSessionTimeout = portainer.DefaultUserSessionTimeout
 	}

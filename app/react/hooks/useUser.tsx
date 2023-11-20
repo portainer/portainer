@@ -1,4 +1,3 @@
-import jwtDecode from 'jwt-decode';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import {
   createContext,
@@ -11,9 +10,7 @@ import {
 import { isAdmin } from '@/portainer/users/user.helpers';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { User } from '@/portainer/users/types';
-import { useUser as useLoadUser } from '@/portainer/users/queries/useUser';
-
-import { useLocalStorage } from './useLocalStorage';
+import { useLoadCurrentUser } from '@/portainer/users/queries/useLoadCurrentUser';
 
 interface State {
   user?: User;
@@ -163,20 +160,14 @@ interface UserProviderProps {
 }
 
 export function UserProvider({ children }: UserProviderProps) {
-  const [jwt] = useLocalStorage('JWT', '');
-
-  const tokenPayload = useMemo(() => jwtDecode(jwt) as { id: number }, [jwt]);
-
-  const userQuery = useLoadUser(tokenPayload.id, {
-    staleTime: Infinity, // should reload te user details only on page load
-  });
+  const userQuery = useLoadCurrentUser();
 
   const providerState = useMemo(
     () => ({ user: userQuery.data }),
     [userQuery.data]
   );
 
-  if (jwt === '' || !providerState.user) {
+  if (!providerState.user) {
     return null;
   }
 

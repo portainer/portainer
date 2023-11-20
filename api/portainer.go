@@ -1478,6 +1478,14 @@ type (
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
+	// JWTService represents a service for managing JWT tokens
+	JWTService interface {
+		GenerateToken(data *TokenData) (string, time.Time, error)
+		GenerateTokenForKubeconfig(data *TokenData) (string, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
+		SetUserSessionDuration(userSessionDuration time.Duration)
+	}
+
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
@@ -1627,6 +1635,8 @@ const (
 	DefaultKubectlShellImage = "portainer/kubectl-shell"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
+	// AuthCookieName is the name of the cookie used to store the JWT token
+	AuthCookieKey = "portainer_api_key"
 )
 
 // List of supported features

@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
@@ -48,7 +49,7 @@ func Test_helmDelete(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/1/kubernetes/helm/%s", options.Name), nil)
 		ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
 		req = req.WithContext(ctx)
-		req.Header.Add("Authorization", "Bearer dummytoken")
+		testhelpers.AddTestSecurityCookie(req, "Bearer dummytoken")
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)

@@ -6059,11 +6059,6 @@ angular-json-tree@1.1.0:
   resolved "https://registry.yarnpkg.com/angular-json-tree/-/angular-json-tree-1.1.0.tgz#d7faba97130fc273fa29ef517dbed10342cc645e"
   integrity sha512-HVLyrVkEoYVykcIgzMCdhtK2H8Y4jgNujGNqRXNG4x032tp2ZWp34j/hu/E7h6a7X+ODrSTAfRTbkF4f/JX/Fg==
 
-angular-jwt@~0.1.8:
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/angular-jwt/-/angular-jwt-0.1.11.tgz#a72b7583c7cf2f2d7acda169a4114141c83f9c91"
-  integrity sha512-793dv5vXOXaW5/cweMd+sqSf9dPhbazDya3szTVOQ84MDEj1nYLJrixBBa7WNtZeMqz7ylWX7djnFgqLjEWcHw==
-
 angular-loading-bar@~0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/angular-loading-bar/-/angular-loading-bar-0.9.0.tgz#37ef52c25f102c216e7b3cdfd2fc5a5df9628e45"
@@ -11882,11 +11877,6 @@ jsx-ast-utils@^3.3.3:
   dependencies:
     array-includes "^3.1.5"
     object.assign "^4.1.3"
-
-jwt-decode@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-3.1.2.tgz#3fb319f3675a2df0c2895c8f5e9fa4b67b04ed59"
-  integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
 
 kind-of@^6.0.2:
   version "6.0.3"

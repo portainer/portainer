@@ -91,23 +91,15 @@ func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
 	return kubeSecret, nil
 }
 
-func (service *Service) defaultExpireAt() int64 {
-	return time.Now().Add(service.userSessionTimeout).Unix()
+func (service *Service) defaultExpireAt() time.Time {
+	return time.Now().Add(service.userSessionTimeout)
 }
 
 // GenerateToken generates a new JWT token.
-func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	return service.generateSignedToken(data, service.defaultExpireAt(), defaultScope)
-}
-
-// GenerateTokenForOAuth generates a new JWT token for OAuth login
-// token expiry time response from OAuth provider is considered
-func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
-	expireAt := service.defaultExpireAt()
-	if expiryTime != nil && !expiryTime.IsZero() {
-		expireAt = expiryTime.Unix()
-	}
-	return service.generateSignedToken(data, expireAt, defaultScope)
+func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.Time, error) {
+	expiryTime := service.defaultExpireAt()
+	token, err := service.generateSignedToken(data, expiryTime.Unix(), defaultScope)
+	return token, expiryTime, err
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.

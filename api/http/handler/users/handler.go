@@ -67,6 +67,9 @@ func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimit
 
 	adminRouter.Handle("/users", httperror.LoggerHandler(h.userCreate)).Methods(http.MethodPost)
 	restrictedRouter.Handle("/users", httperror.LoggerHandler(h.userList)).Methods(http.MethodGet)
+
+	authenticatedRouter.Handle("/users/me", httperror.LoggerHandler(h.userInspectMe)).Methods(http.MethodGet)
+	restrictedRouter.Handle("/users/me", httperror.LoggerHandler(h.userInspectMe)).Methods(http.MethodGet)
 	restrictedRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userInspect)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userUpdate)).Methods(http.MethodPut)
 	adminRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userDelete)).Methods(http.MethodDelete)
@@ -75,6 +78,7 @@ func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimit
 	restrictedRouter.Handle("/users/{id}/tokens/{keyID}", httperror.LoggerHandler(h.userRemoveAccessToken)).Methods(http.MethodDelete)
 	restrictedRouter.Handle("/users/{id}/memberships", httperror.LoggerHandler(h.userMemberships)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/users/{id}/passwd", rateLimiter.LimitAccess(httperror.LoggerHandler(h.userUpdatePassword))).Methods(http.MethodPut)
+
 	publicRouter.Handle("/users/admin/check", httperror.LoggerHandler(h.adminCheck)).Methods(http.MethodGet)
 	publicRouter.Handle("/users/admin/init", httperror.LoggerHandler(h.adminInit)).Methods(http.MethodPost)
 
