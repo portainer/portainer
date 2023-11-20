@@ -41,16 +41,16 @@ export function isoDateFromTimestamp(timestamp) {
   return moment.unix(timestamp).format(TIME_FORMAT);
 }
 
-export function isoDate(date) {
-  return moment(date).format(TIME_FORMAT);
+export function isoDate(date, format = TIME_FORMAT) {
+  return moment(date).format(format);
 }
 
-export function parseIsoDate(date) {
-  return moment(date, TIME_FORMAT).toDate();
+export function parseIsoDate(date, format = TIME_FORMAT) {
+  return moment(date, format).toDate();
 }
 
-export function formatDate(date, strFormat = 'YYYY-MM-DD HH:mm:ss Z') {
-  return moment(date, strFormat).format(TIME_FORMAT);
+export function formatDate(date, strFormat = 'YYYY-MM-DD HH:mm:ss Z', outFormat = TIME_FORMAT) {
+  return moment(date, strFormat).format(outFormat);
 }
 
 export function getPairKey(pair, separator) {
