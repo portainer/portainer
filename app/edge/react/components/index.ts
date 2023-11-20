@@ -15,8 +15,10 @@ import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/Asso
 import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
 import { TemplateFieldset } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset';
 
+import { edgeJobsModule } from './edge-jobs';
+
 const ngModule = angular
-  .module('portainer.edge.react.components', [])
+  .module('portainer.edge.react.components', [edgeJobsModule])
   .component(
     'edgeStackEnvironmentsDatatable',
     r2a(withUIRouter(withReactQuery(EnvironmentsDatatable)), [])

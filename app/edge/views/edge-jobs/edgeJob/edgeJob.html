@@ -30,17 +30,13 @@
             </uib-tab-heading>
 
             <edge-job-results-datatable
+              class="mt-4 block"
               ng-if="$ctrl.results"
-              title-text="Results"
-              title-icon="list"
               dataset="$ctrl.results"
-              table-key="edge-job-results"
-              order-by="Status"
-              reverse-order="true"
-              refresh-callback="$ctrl.refresh"
-              on-download-logs-click="($ctrl.downloadLogs)"
-              on-collect-logs-click="($ctrl.collectLogs)"
-              on-clear-logs-click="($ctrl.clearLogs)"
+              on-refresh="($ctrl.refresh)"
+              on-download-logs="($ctrl.downloadLogs)"
+              on-collect-logs="($ctrl.collectLogs)"
+              on-clear-logs="($ctrl.clearLogs)"
             ></edge-job-results-datatable>
           </uib-tab>
         </uib-tabset>
