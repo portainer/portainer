@@ -273,8 +273,7 @@ angular
         url: '/groups',
         views: {
           'content@': {
-            templateUrl: './views/groups/groups.html',
-            controller: 'GroupsController',
+            component: 'environmentGroupsListView',
           },
         },
         data: {
