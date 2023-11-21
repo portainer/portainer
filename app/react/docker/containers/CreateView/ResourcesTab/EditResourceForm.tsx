@@ -4,6 +4,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { useState } from 'react';
 import { FormikHelpers } from 'formik/dist/types';
 
+import { invalidateContainer } from '@/react/docker/containers/queries/container';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { mutationOptions, withError } from '@/react-tools/react-query';
 import { useSystemLimits } from '@/react/docker/proxy/queries/useInfo';
@@ -98,6 +99,7 @@ export function EditResourcesForm({
         if (data) {
           notifySuccess('Success', 'Limits updated');
           helper.resetForm({ values: initialValues });
+          invalidateContainer(environmentId, containerId);
         }
       },
     });
