@@ -56,8 +56,8 @@ export function ListView() {
     <>
       <PageHeader
         title="Update & Rollback"
-        reload
         breadcrumbs="Update and rollback"
+        reload
       />
 
       <BetaAlert

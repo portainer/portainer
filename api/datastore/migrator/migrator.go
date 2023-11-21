@@ -228,9 +228,9 @@ func (m *Migrator) initMigrations() {
 		m.migrateDockerDesktopExtensionSetting,
 		m.updateEdgeStackStatusForDB100,
 	)
-
 	m.addMigrations("2.20",
 		m.updateAppTemplatesVersionForDB110,
+		m.setUserCacheForDB110,
 	)
 
 	// Add new migrations below...

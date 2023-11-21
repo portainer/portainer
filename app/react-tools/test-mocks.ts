@@ -17,6 +17,7 @@ export function createMockUsers(
     Checked: false,
     EndpointAuthorizations: {},
     PortainerAuthorizations: {},
+    UseCache: false,
     ThemeSettings: {
       color: 'auto',
     },
