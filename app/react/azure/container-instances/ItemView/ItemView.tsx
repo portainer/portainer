@@ -68,6 +68,7 @@ export function ItemView() {
           { link: 'azure.containerinstances', label: 'Container instances' },
           { label: container.name },
         ]}
+        reload
       />
 
       <div className="row">

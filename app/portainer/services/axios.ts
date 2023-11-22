@@ -1,15 +1,52 @@
 import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
+import { setupCache } from 'axios-cache-adapter';
 import { loadProgressBar } from 'axios-progress-bar';
 
 import 'axios-progress-bar/dist/nprogress.css';
 import PortainerError from '@/portainer/error';
 
 import {
+  CACHE_DURATION,
+  dispatchCacheRefreshEventIfNeeded,
   portainerAgentManagerOperation,
   portainerAgentTargetHeader,
 } from './http-request.helper';
 
+export const cache = setupCache({
+  maxAge: CACHE_DURATION,
+  debug: false, // set to true to print cache hits/misses
+  exclude: {
+    query: false, // include urls with query params
+    methods: ['put', 'patch', 'delete'],
+    filter: (req: AxiosRequestConfig) => {
+      // exclude caching get requests unless the path contains 'kubernetes'
+      if (!req.url?.includes('kubernetes') && req.method === 'get') {
+        return true;
+      }
+
+      // exclude caching post requests unless the path contains 'selfsubjectaccessreview'
+      if (
+        !req.url?.includes('selfsubjectaccessreview') &&
+        req.method === 'post'
+      ) {
+        return true;
+      }
+      return false;
+    },
+  },
+  // ask to clear cache on mutation
+  invalidate: async (_, req) => {
+    dispatchCacheRefreshEventIfNeeded(req);
+  },
+});
+
+// by default don't use the cache adapter
 const axios = axiosOrigin.create({ baseURL: 'api' });
+
+// when entering a kubernetes environment, or updating user settings, update the cache adapter
+export function updateAxiosAdapter(useCache: boolean) {
+  axios.defaults.adapter = useCache ? cache.adapter : undefined;
+}
 
 loadProgressBar(undefined, axios);
 

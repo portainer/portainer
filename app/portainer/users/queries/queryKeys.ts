@@ -1,7 +1,7 @@
 import { UserId } from '../types';
 
-export const queryKeys = {
+export const userQueryKeys = {
   base: () => ['users'] as const,
-  user: (id: UserId) => [...queryKeys.base(), id] as const,
-  me: () => [...queryKeys.base(), 'me'] as const,
+  user: (id: UserId) => [...userQueryKeys.base(), id] as const,
+  me: () => [...userQueryKeys.base(), 'me'] as const,
 };

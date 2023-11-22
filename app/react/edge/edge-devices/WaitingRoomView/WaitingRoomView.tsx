@@ -19,6 +19,7 @@ function WaitingRoomView() {
       <PageHeader
         title="Waiting Room"
         breadcrumbs={[{ label: 'Waiting Room' }]}
+        reload
       />
 
       <InformationPanel>

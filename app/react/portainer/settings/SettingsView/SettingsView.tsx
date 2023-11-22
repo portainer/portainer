@@ -18,7 +18,7 @@ import { ExperimentalFeatures } from './ExperimentalFeatures';
 export function SettingsView() {
   return (
     <>
-      <PageHeader title="Settings" breadcrumbs="Settings" />
+      <PageHeader title="Settings" breadcrumbs="Settings" reload />
 
       <div className="mx-4 space-y-4">
         <ApplicationSettingsPanel onSuccess={handleSuccess} />

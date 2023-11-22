@@ -12,6 +12,7 @@ export function CreateHelmRepositoriesView() {
           { label: 'My account', link: 'portainer.account' },
           { label: 'Create Helm repository' },
         ]}
+        reload
       />
 
       <div className="row">

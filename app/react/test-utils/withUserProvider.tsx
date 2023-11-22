@@ -8,6 +8,7 @@ const mockUser: User = {
   Id: 1,
   Role: 1,
   Username: 'mock',
+  UseCache: false,
   ThemeSettings: {
     color: 'auto',
   },
