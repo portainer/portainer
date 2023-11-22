@@ -198,11 +198,7 @@ export default class CreateEdgeStackViewController {
   createStack() {
     return this.$async(async () => {
       const name = this.formValues.Name;
-      let method = this.state.Method;
-
-      if (method === 'template') {
-        method = 'editor';
-      }
+      const method = getMethod(this.state.Method, this.state.selectedTemplate);
 
       if (!this.validateForm(method)) {
         return;
@@ -339,4 +335,21 @@ export default class CreateEdgeStackViewController {
       ('upload' === this.state.Method && !this.formValues.StackFile)
     );
   }
+}
+
+/**
+ *
+ * @param {'template'|'repository' | 'editor' | 'upload'} method
+ * @param {import('@/react/portainer/templates/custom-templates/types').CustomTemplate | undefined} template
+ * @returns 'repository' | 'editor' | 'upload'
+ */
+function getMethod(method, template) {
+  if (method !== 'template') {
+    return method;
+  }
+
+  if (template && template.GitConfig) {
+    return 'repository';
+  }
+  return 'editor';
 }
