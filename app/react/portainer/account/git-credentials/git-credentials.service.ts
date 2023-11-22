@@ -6,25 +6,7 @@ import { UserId } from '@/portainer/users/types';
 
 import { isBE } from '../../feature-flags/feature-flags.service';
 
-import {
-  CreateGitCredentialPayload,
-  GitCredential,
-  UpdateGitCredentialPayload,
-} from './types';
-
-export async function createGitCredential(
-  gitCredential: CreateGitCredentialPayload
-) {
-  try {
-    const { data } = await axios.post<{ gitCredential: GitCredential }>(
-      buildGitUrl(gitCredential.userId),
-      gitCredential
-    );
-    return data.gitCredential;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to create git credential');
-  }
-}
+import { GitCredential, UpdateGitCredentialPayload } from './types';
 
 export async function getGitCredentials(userId: number) {
   try {
@@ -141,24 +123,7 @@ export function useGitCredential(userId: number, id: number) {
   });
 }
 
-export function useCreateGitCredentialMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation(createGitCredential, {
-    onSuccess: (_, payload) => {
-      notifySuccess('Credentials created successfully', payload.name);
-      return queryClient.invalidateQueries(['gitcredentials']);
-    },
-    meta: {
-      error: {
-        title: 'Failure',
-        message: 'Unable to create credential',
-      },
-    },
-  });
-}
-
-function buildGitUrl(userId: number, credentialId?: number) {
+export function buildGitUrl(userId: number, credentialId?: number) {
   return credentialId
     ? `/users/${userId}/gitcredentials/${credentialId}`
     : `/users/${userId}/gitcredentials`;
