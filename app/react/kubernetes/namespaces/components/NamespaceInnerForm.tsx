@@ -103,15 +103,13 @@ export function NamespaceInnerForm({
         values={values}
         isValid={isValid}
       />
-      <FormSection title="Actions">
-        <FormActions
-          submitLabel="Create namespace"
-          loadingText="Creating namespace"
-          isLoading={isSubmitting}
-          isValid={isValid}
-          data-cy="k8sNamespaceCreate-submitButton"
-        />
-      </FormSection>
+      <FormActions
+        submitLabel="Create namespace"
+        loadingText="Creating namespace"
+        isLoading={isSubmitting}
+        isValid={isValid}
+        data-cy="k8sNamespaceCreate-submitButton"
+      />
     </Form>
   );
 }
