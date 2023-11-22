@@ -1,4 +1,4 @@
-import { SetStateAction } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import sanitize from 'sanitize-html';
 import { FormikErrors } from 'formik';
 
@@ -19,14 +19,22 @@ export interface Values {
 }
 
 export function TemplateFieldset({
-  values,
-  setValues,
+  values: initialValues,
+  setValues: setInitialValues,
   errors,
 }: {
   errors?: FormikErrors<Values>;
   values: Values;
   setValues: (values: SetStateAction<Values>) => void;
 }) {
+  const [values, setControlledValues] = useState(initialValues); // todo remove when all view is in react
+
+  useEffect(() => {
+    if (initialValues.template?.Id !== values.template?.Id) {
+      setControlledValues(initialValues);
+    }
+  }, [initialValues, values.template?.Id]);
+
   const templatesQuery = useCustomTemplates({
     select: (templates) =>
       templates.filter((template) => template.EdgeTemplate),
@@ -86,6 +94,11 @@ export function TemplateFieldset({
       )}
     </>
   );
+
+  function setValues(values: SetStateAction<Values>) {
+    setControlledValues(values);
+    setInitialValues(values);
+  }
 }
 
 function TemplateSelector({
