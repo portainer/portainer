@@ -108,16 +108,7 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
         />
       )}
 
-      {isTemplateVariablesEnabled && (
-        <CustomTemplatesVariablesDefinitionField
-          value={values.Variables}
-          onChange={(values) => setFieldValue('Variables', values)}
-          isVariablesNamesFromParent={values.Method === editor.value}
-          errors={errors.Variables}
-        />
-      )}
-
-      {values.Method === git.value && (
+      {isGit && (
         <GitForm
           value={values.Git}
           onChange={(newValues) =>
@@ -127,6 +118,15 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
             }))
           }
           errors={errors.Git}
+        />
+      )}
+
+      {isTemplateVariablesEnabled && (
+        <CustomTemplatesVariablesDefinitionField
+          value={values.Variables}
+          onChange={(values) => setFieldValue('Variables', values)}
+          isVariablesNamesFromParent={values.Method === editor.value}
+          errors={errors.Variables}
         />
       )}
 
