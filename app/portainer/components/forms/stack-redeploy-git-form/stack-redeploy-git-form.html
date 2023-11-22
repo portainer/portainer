@@ -61,6 +61,10 @@
     </div>
   </div>
 
+  <div ng-if="$ctrl.state.showConfig">
+    <relative-path-fieldset value="$ctrl.stack" git-model="$ctrl.stack" is-editing="true" hide-edge-configs="true"></relative-path-fieldset>
+  </div>
+
   <environment-variables-panel
     values="$ctrl.formValues.Env"
     explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
