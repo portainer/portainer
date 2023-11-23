@@ -2,6 +2,7 @@ import angular from 'angular';
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
+import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
 
 class KubernetesResourcePoolsController {
   /* @ngInject */
@@ -75,7 +76,11 @@ class KubernetesResourcePoolsController {
 
   async getResourcePoolsAsync() {
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
+      this.resourcePools = await this.KubernetesResourcePoolService.get('', { getQuota: true });
+      // make sure table refreshes with fresh data when namespaces are in a terminating state
+      if (this.resourcePools.some((namespace) => namespace.Namespace.Status === 'Terminating')) {
+        dispatchCacheRefreshEvent();
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive namespaces');
     }
