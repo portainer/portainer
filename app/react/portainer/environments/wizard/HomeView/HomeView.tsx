@@ -103,6 +103,8 @@ function getTypeLabel(type?: EnvironmentType) {
   switch (type) {
     case EnvironmentType.Docker:
       return 'Docker';
+    case EnvironmentType.AgentOnDocker:
+      return 'Docker Agent';
     case EnvironmentType.KubernetesLocal:
       return 'Kubernetes';
     default:
