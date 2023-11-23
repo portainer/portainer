@@ -76,7 +76,7 @@ class KubernetesResourcePoolsController {
 
   async getResourcePoolsAsync() {
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
+      this.resourcePools = await this.KubernetesResourcePoolService.get('', { getQuota: true });
       // make sure table refreshes with fresh data when namespaces are in a terminating state
       if (this.resourcePools.some((namespace) => namespace.Namespace.Status === 'Terminating')) {
         dispatchCacheRefreshEvent();
