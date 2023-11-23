@@ -518,7 +518,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       url: '/registries',
       views: {
         'content@': {
-          component: 'endpointRegistriesView',
+          component: 'environmentRegistriesView',
         },
       },
       data: {

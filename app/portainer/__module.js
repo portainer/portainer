@@ -357,8 +357,7 @@ angular
         url: '/registries',
         views: {
           'content@': {
-            templateUrl: './views/registries/registries.html',
-            controller: 'RegistriesController',
+            component: 'registriesView',
           },
         },
         data: {
