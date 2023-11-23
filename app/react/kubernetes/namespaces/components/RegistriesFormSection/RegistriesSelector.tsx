@@ -9,14 +9,14 @@ import { Link } from '@@/Link';
 interface Props {
   value: MultiValue<Registry>;
   onChange(value: MultiValue<Registry>): void;
-  options: Registry[];
+  options?: Registry[];
   inputId?: string;
 }
 
 export function RegistriesSelector({
   value,
   onChange,
-  options,
+  options = [],
   inputId,
 }: Props) {
   const { isAdmin } = useCurrentUser();
