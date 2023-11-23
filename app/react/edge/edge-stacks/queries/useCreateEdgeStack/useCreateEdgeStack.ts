@@ -1,7 +1,7 @@
 import { useMutation } from 'react-query';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
-import { RegistryId } from '@/react/portainer/registries/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
 import {
   GitFormModel,
