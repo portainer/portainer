@@ -1,4 +1,4 @@
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 
 import { IngressControllerClassMap } from '../../cluster/ingressClass/types';
 import {
