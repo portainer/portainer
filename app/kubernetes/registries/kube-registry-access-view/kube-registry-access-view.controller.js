@@ -1,5 +1,4 @@
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { confirmDeleteAccess } from '@/react/kubernetes/cluster/RegistryAccessView/ConfirmDeleteAccess';
 
 export default class KubernetesRegistryAccessController {
   /* @ngInject */
@@ -32,11 +31,7 @@ export default class KubernetesRegistryAccessController {
     const removeNamespaces = namespaces.map(({ value }) => value);
     const nsToUpdate = this.savedResourcePools.map(({ value }) => value).filter((value) => !removeNamespaces.includes(value));
 
-    confirmDeleteAccess().then((confirmed) => {
-      if (confirmed) {
-        return this.updateNamespaces(nsToUpdate);
-      }
-    });
+    return this.updateNamespaces(nsToUpdate);
   }
 
   updateNamespaces(namespaces) {
