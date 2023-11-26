@@ -135,7 +135,7 @@ export function GpuFieldset({
             checked={values.enabled && !!enableGpuManagement}
             onChange={toggleEnableGpu}
             className="ml-2"
-            disabled={enableGpuManagement === false}
+            disabled={!enableGpuManagement}
           />
         </div>
         {enableGpuManagement && values.enabled && (
