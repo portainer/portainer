@@ -153,6 +153,7 @@ class KubernetesCreateApplicationController {
     this.onEnvironmentVariableChange = this.onEnvironmentVariableChange.bind(this);
     this.onConfigMapsChange = this.onConfigMapsChange.bind(this);
     this.onSecretsChange = this.onSecretsChange.bind(this);
+    this.onChangePersistedFolder = this.onChangePersistedFolder.bind(this);
   }
   /* #endregion */
 
@@ -312,21 +313,21 @@ class KubernetesCreateApplicationController {
   }
 
   restorePersistedFolder(index) {
-    this.formValues.PersistedFolders[index].NeedsDeletion = false;
+    this.formValues.PersistedFolders[index].needsDeletion = false;
     this.validatePersistedFolders();
   }
 
   resetPersistedFolders() {
     this.formValues.PersistedFolders = _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
-      persistedFolder.ExistingVolume = null;
-      persistedFolder.UseNewVolume = true;
+      persistedFolder.existingVolume = null;
+      persistedFolder.useNewVolume = true;
     });
     this.validatePersistedFolders();
   }
 
   removePersistedFolder(index) {
-    if (this.state.isEdit && this.formValues.PersistedFolders[index].PersistentVolumeClaimName) {
-      this.formValues.PersistedFolders[index].NeedsDeletion = true;
+    if (this.state.isEdit && this.formValues.PersistedFolders[index].persistentVolumeClaimName) {
+      this.formValues.PersistedFolders[index].needsDeletion = true;
     } else {
       this.formValues.PersistedFolders.splice(index, 1);
     }
@@ -334,15 +335,15 @@ class KubernetesCreateApplicationController {
   }
 
   useNewVolume(index) {
-    this.formValues.PersistedFolders[index].UseNewVolume = true;
-    this.formValues.PersistedFolders[index].ExistingVolume = null;
-    this.state.persistedFoldersUseExistingVolumes = !_.reduce(this.formValues.PersistedFolders, (acc, pf) => acc && pf.UseNewVolume, true);
+    this.formValues.PersistedFolders[index].useNewVolume = true;
+    this.formValues.PersistedFolders[index].existingVolume = null;
+    this.state.persistedFoldersUseExistingVolumes = !_.reduce(this.formValues.PersistedFolders, (acc, pf) => acc && pf.useNewVolume, true);
     this.validatePersistedFolders();
   }
 
   useExistingVolume(index) {
-    this.formValues.PersistedFolders[index].UseNewVolume = false;
-    this.state.persistedFoldersUseExistingVolumes = _.find(this.formValues.PersistedFolders, { UseNewVolume: false }) ? true : false;
+    this.formValues.PersistedFolders[index].useNewVolume = false;
+    this.state.persistedFoldersUseExistingVolumes = _.find(this.formValues.PersistedFolders, { useNewVolume: false }) ? true : false;
     if (this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED) {
       this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.SHARED;
       this.resetDeploymentType();
@@ -360,22 +361,26 @@ class KubernetesCreateApplicationController {
   onChangePersistedFolderPath() {
     this.state.duplicates.persistedFolders.refs = KubernetesFormValidationHelper.getDuplicates(
       _.map(this.formValues.PersistedFolders, (persistedFolder) => {
-        if (persistedFolder.NeedsDeletion) {
+        if (persistedFolder.needsDeletion) {
           return undefined;
         }
-        return persistedFolder.ContainerPath;
+        return persistedFolder.containerPath;
       })
     );
     this.state.duplicates.persistedFolders.hasRefs = Object.keys(this.state.duplicates.persistedFolders.refs).length > 0;
   }
 
+  onChangePersistedFolder(values) {
+    this.formValues.PersistedFolders = values;
+  }
+
   onChangeExistingVolumeSelection() {
     this.state.duplicates.existingVolumes.refs = KubernetesFormValidationHelper.getDuplicates(
       _.map(this.formValues.PersistedFolders, (persistedFolder) => {
-        if (persistedFolder.NeedsDeletion) {
+        if (persistedFolder.needsDeletion) {
           return undefined;
         }
-        return persistedFolder.ExistingVolume ? persistedFolder.ExistingVolume.PersistentVolumeClaim.Name : '';
+        return persistedFolder.existingVolume ? persistedFolder.existingVolume.PersistentVolumeClaim.Name : '';
       })
     );
     this.state.duplicates.existingVolumes.hasRefs = Object.keys(this.state.duplicates.existingVolumes.refs).length > 0;
@@ -518,8 +523,8 @@ class KubernetesCreateApplicationController {
     for (let i = 0; i < this.formValues.PersistedFolders.length; i++) {
       const folder = this.formValues.PersistedFolders[i];
 
-      if (folder.StorageClass && _.isEqual(folder.StorageClass.AccessModes, ['RWO'])) {
-        storageOptions.push(folder.StorageClass.Name);
+      if (folder.storageClass && _.isEqual(folder.storageClass.AccessModes, ['RWO'])) {
+        storageOptions.push(folder.storageClass.Name);
       } else {
         storageOptions.push('<no storage option available>');
       }
@@ -612,7 +617,7 @@ class KubernetesCreateApplicationController {
 
   /* #region  PERSISTED FOLDERS */
   /* #region  BUTTONS STATES */
-  isAddPersistentFolderButtonShowed() {
+  isAddPersistentFolderButtonShown() {
     return !this.isEditAndStatefulSet() && this.formValues.Containers.length <= 1;
   }
 
@@ -630,7 +635,7 @@ class KubernetesCreateApplicationController {
   }
 
   isEditAndExistingPersistedFolder(index) {
-    return this.state.isEdit && this.formValues.PersistedFolders[index].PersistentVolumeClaimName;
+    return this.state.isEdit && this.formValues.PersistedFolders[index].persistentVolumeClaimName;
   }
   /* #endregion */
 
@@ -781,7 +786,7 @@ class KubernetesCreateApplicationController {
         this.volumes = volumes;
         const filteredVolumes = _.filter(this.volumes, (volume) => {
           const isUnused = !KubernetesVolumeHelper.isUsed(volume);
-          const isRWX = volume.PersistentVolumeClaim.StorageClass && _.includes(volume.PersistentVolumeClaim.StorageClass.AccessModes, 'RWX');
+          const isRWX = volume.PersistentVolumeClaim.storageClass && _.includes(volume.PersistentVolumeClaim.storageClass.AccessModes, 'RWX');
           return isUnused || isRWX;
         });
         this.availableVolumes = filteredVolumes;
@@ -873,7 +878,7 @@ class KubernetesCreateApplicationController {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues, false, this.originalServicePorts);
       this.Notifications.success('Success', 'Request to update application successfully submitted');
-      this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
+      this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool }, { inherit: false });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update application');
     } finally {
@@ -1087,13 +1092,14 @@ class KubernetesCreateApplicationController {
 
           if (this.application.ApplicationType !== KubernetesApplicationTypes.STATEFULSET) {
             _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
-              const volume = _.find(this.availableVolumes, ['PersistentVolumeClaim.Name', persistedFolder.PersistentVolumeClaimName]);
+              const volume = _.find(this.availableVolumes, ['PersistentVolumeClaim.Name', persistedFolder.persistentVolumeClaimName]);
               if (volume) {
-                persistedFolder.UseNewVolume = false;
-                persistedFolder.ExistingVolume = volume;
+                persistedFolder.useNewVolume = false;
+                persistedFolder.existingVolume = volume;
               }
             });
           }
+          this.formValues.OriginalPersistedFolders = this.formValues.PersistedFolders;
           await this.refreshNamespaceData(namespace);
         } else {
           this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);

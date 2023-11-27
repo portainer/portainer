@@ -28,6 +28,8 @@ import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/Appl
 import { SecretsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/SecretsFormSection';
 import { configurationsValidationSchema } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/configurationValidationSchema';
 import { ConfigMapsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/ConfigMapsFormSection';
+import { PersistedFoldersFormSection } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection';
+import { persistedFoldersValidation } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection/persistedFoldersValidation';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -204,4 +206,18 @@ withFormValidation(
   'secretsFormSection',
   ['values', 'onChange', 'namespace'],
   configurationsValidationSchema
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection))),
+  'persistedFoldersFormSection',
+  [
+    'isEdit',
+    'applicationValues',
+    'isAddPersistentFolderButtonShown',
+    'initialValues',
+    'availableVolumes',
+  ],
+  persistedFoldersValidation
 );

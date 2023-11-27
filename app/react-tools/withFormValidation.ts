@@ -129,9 +129,16 @@ function createFormValidatorController<TFormModel, TData = never>(
       });
     }
 
-    async $onChanges(changes: { values?: { currentValue: TFormModel } }) {
+    async $onChanges(changes: {
+      values?: { currentValue: TFormModel };
+      validationData?: { currentValue: TData };
+    }) {
       if (changes.values) {
         await this.runValidation(changes.values.currentValue);
+      }
+      // also run validation if validationData changes
+      if (changes.validationData) {
+        await this.runValidation(this.values!);
       }
     }
   };

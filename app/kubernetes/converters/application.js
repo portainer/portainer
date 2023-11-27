@@ -180,7 +180,7 @@ class KubernetesApplicationConverter {
         persistedFolder.MountPath = matchingVolumeMount.mountPath;
 
         if (volume.persistentVolumeClaim) {
-          persistedFolder.PersistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
+          persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
         } else {
           persistedFolder.HostPath = volume.hostPath.path;
         }

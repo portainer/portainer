@@ -8,8 +8,8 @@ import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 import { DashboardItem } from '@@/DashboardItem/DashboardItem';
 import { PageHeader } from '@@/PageHeader';
 
-import { useApplicationsForCluster } from '../applications/application.queries';
-import { usePVCsForCluster } from '../volumes/queries';
+import { useApplicationsQuery } from '../applications/application.queries';
+import { usePVCsQuery } from '../volumes/usePVCsQuery';
 import { useServicesForCluster } from '../services/service';
 import { useIngresses } from '../ingresses/queries';
 import { useConfigMapsForCluster } from '../configs/configmap.service';
@@ -24,9 +24,11 @@ export function DashboardView() {
   const { data: namespaces, ...namespacesQuery } =
     useNamespacesQuery(environmentId);
   const namespaceNames = namespaces && Object.keys(namespaces);
-  const { data: applications, ...applicationsQuery } =
-    useApplicationsForCluster(environmentId, namespaceNames);
-  const { data: pvcs, ...pvcsQuery } = usePVCsForCluster(
+  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
+    environmentId,
+    namespaceNames
+  );
+  const { data: pvcs, ...pvcsQuery } = usePVCsQuery(
     environmentId,
     namespaceNames
   );

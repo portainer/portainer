@@ -391,12 +391,12 @@ class KubernetesApplicationHelper {
   /* #region  PERSISTED FOLDERS FV <> VOLUMES */
   static generatePersistedFoldersFormValuesFromPersistedFolders(persistedFolders, persistentVolumeClaims) {
     const finalRes = _.map(persistedFolders, (folder) => {
-      const pvc = _.find(persistentVolumeClaims, (item) => _.startsWith(item.Name, folder.PersistentVolumeClaimName));
-      const res = new KubernetesApplicationPersistedFolderFormValue(pvc.StorageClass);
-      res.PersistentVolumeClaimName = folder.PersistentVolumeClaimName;
-      res.Size = parseInt(pvc.Storage, 10);
-      res.SizeUnit = pvc.Storage.slice(-2);
-      res.ContainerPath = folder.MountPath;
+      const pvc = _.find(persistentVolumeClaims, (item) => _.startsWith(item.Name, folder.persistentVolumeClaimName));
+      const res = new KubernetesApplicationPersistedFolderFormValue(pvc.storageClass);
+      res.persistentVolumeClaimName = folder.persistentVolumeClaimName;
+      res.size = pvc.Storage.slice(0, -2); // remove trailing units
+      res.sizeUnit = pvc.Storage.slice(-2);
+      res.containerPath = folder.MountPath;
       return res;
     });
     return finalRes;
@@ -420,11 +420,11 @@ class KubernetesApplicationHelper {
   }
 
   static hasRWOOnly(formValues) {
-    return _.find(formValues.PersistedFolders, (item) => item.StorageClass && _.isEqual(item.StorageClass.AccessModes, ['RWO']));
+    return _.find(formValues.PersistedFolders, (item) => item.storageClass && _.isEqual(item.storageClass.AccessModes, ['RWO']));
   }
 
   static hasRWX(claims) {
-    return _.find(claims, (item) => item.StorageClass && _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
+    return _.find(claims, (item) => item.storageClass && _.includes(item.storageClass.AccessModes, 'RWX')) !== undefined;
   }
   /* #endregion */
 

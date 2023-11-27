@@ -7,9 +7,9 @@ import { confirmDelete } from '@@/modals/confirm';
 
 function buildStorages(storages, volumes) {
   _.forEach(storages, (s) => {
-    const filteredVolumes = _.filter(volumes, ['PersistentVolumeClaim.StorageClass.Name', s.Name, 'PersistentVolumeClaim.StorageClass.Provisioner', s.Provisioner]);
+    const filteredVolumes = _.filter(volumes, ['PersistentVolumeClaim.storageClass.Name', s.Name, 'PersistentVolumeClaim.storageClass.Provisioner', s.Provisioner]);
     s.Volumes = filteredVolumes;
-    s.Size = computeSize(filteredVolumes);
+    s.size = computeSize(filteredVolumes);
   });
   return storages;
 }
@@ -17,7 +17,7 @@ function buildStorages(storages, volumes) {
 function computeSize(volumes) {
   const size = _.sumBy(volumes, (v) => filesizeParser(v.PersistentVolumeClaim.Storage, { base: 10 }));
   const format = KubernetesResourceQuotaHelper.formatBytes(size);
-  return `${format.Size}${format.SizeUnit}`;
+  return `${format.size}${format.sizeUnit}`;
 }
 
 class KubernetesVolumesController {

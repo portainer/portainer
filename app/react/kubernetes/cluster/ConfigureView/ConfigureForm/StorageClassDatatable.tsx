@@ -5,7 +5,7 @@ import { Switch } from '@@/form-components/SwitchField/Switch';
 
 import { StorageAccessModeSelector } from './StorageAccessModeSelector';
 import { ConfigureFormValues, StorageClassFormValues } from './types';
-import { availableStorageClassPolicies } from './useStorageClassesFormValues';
+import { availableStorageClassPolicies } from './useStorageClasses';
 
 type Props = {
   storageClassValues: StorageClassFormValues[];
