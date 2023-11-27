@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"os"
 	"runtime/debug"
 
 	portainer "github.com/portainer/portainer/api"
@@ -115,6 +116,11 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models
 	err = migrator.Migrate()
 	if err != nil {
 		return err
+	}
+
+	// Special test code to simulate a failure (used by migrate_data_test.go).  Do not remove...
+	if os.Getenv("PORTAINER_TEST_MIGRATE_FAIL") == "FAIL" {
+		panic("test migration failure")
 	}
 
 	err = store.VersionService.StoreIsUpdating(false)
