@@ -10,6 +10,9 @@ import { notifyError } from '@/portainer/services/notifications';
 import { getCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 import { StackType } from '@/react/common/stacks/types';
+import { applySetStateAction } from '@/react-tools/apply-set-state-action';
+import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -47,7 +50,11 @@ export default class CreateEdgeStackViewController {
       endpointTypes: [],
       baseWebhookUrl: baseEdgeStackWebhookUrl(),
       isEdit: false,
-      selectedTemplate: null,
+      templateValues: {
+        template: null,
+        variables: [],
+        file: '',
+      },
     };
 
     this.edgeGroups = null;
@@ -64,15 +71,40 @@ export default class CreateEdgeStackViewController {
     this.hasType = this.hasType.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
     this.onEnvVarChange = this.onEnvVarChange.bind(this);
+    this.setTemplateValues = this.setTemplateValues.bind(this);
     this.onChangeTemplate = this.onChangeTemplate.bind(this);
   }
 
   /**
-   * @param {import('@/react/portainer/templates/custom-templates/types').CustomTemplate} template
+   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset').Values>} templateAction
    */
+  setTemplateValues(templateAction) {
+    return this.$async(async () => {
+      const newTemplateValues = applySetStateAction(templateAction, this.state.templateValues);
+      const oldTemplateId = this.state.templateValues.template && this.state.templateValues.template.Id;
+      const newTemplateId = newTemplateValues.template && newTemplateValues.template.Id;
+      this.state.templateValues = newTemplateValues;
+      if (newTemplateId !== oldTemplateId) {
+        await this.onChangeTemplate(newTemplateValues.template);
+      }
+
+      const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, this.state.templateValues.template.Variables);
+
+      this.formValues.StackFileContent = newFile;
+    });
+  }
+
   onChangeTemplate(template) {
-    return this.$scope.$evalAsync(() => {
-      this.state.selectedTemplate = template;
+    return this.$async(async () => {
+      if (!template) {
+        return;
+      }
+
+      this.state.templateValues.template = template;
+      this.state.templateValues.variables = getVariablesFieldDefaultValues(template.Variables);
+
+      const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
+      this.state.templateValues.file = fileContent;
 
       this.formValues = {
         ...this.formValues,
@@ -82,7 +114,7 @@ export default class CreateEdgeStackViewController {
           ? {
               PrePullImage: template.EdgeSettings.PrePullImage || false,
               RetryDeploy: template.EdgeSettings.RetryDeploy || false,
-              Registries: template.EdgeSettings.PrivateRegistryId ? [template.EdgeSettings.PrivateRegistryId] : [],
+              PrivateRegistryId: template.EdgeSettings.PrivateRegistryId || null,
               SupportRelativePath: template.EdgeSettings.RelativePathSettings.SupportRelativePath || false,
               FilesystemPath: template.EdgeSettings.RelativePathSettings.FilesystemPath || '',
             }
@@ -128,15 +160,16 @@ export default class CreateEdgeStackViewController {
   }
 
   async preSelectTemplate(templateId) {
-    try {
-      this.state.Method = 'template';
-      const template = await getCustomTemplate(templateId);
-      this.onChangeTemplate(template);
-      const fileContent = await getCustomTemplateFile({ id: templateId, git: !!template.GitConfig });
-      this.formValues.StackFileContent = fileContent;
-    } catch (e) {
-      notifyError('Failed loading template', e);
-    }
+    return this.$async(async () => {
+      try {
+        this.state.Method = 'template';
+        const template = await getCustomTemplate(templateId);
+
+        this.setTemplateValues({ template });
+      } catch (e) {
+        notifyError('Failed loading template', e);
+      }
+    });
   }
 
   async $onInit() {

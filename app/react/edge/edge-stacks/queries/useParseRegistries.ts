@@ -15,17 +15,20 @@ export function useParseRegistries() {
   });
 }
 
-export async function parseRegistries(props: {
+export async function parseRegistries({
+  file,
+  fileContent,
+}: {
   file?: File;
   fileContent?: string;
 }) {
-  if (!props.file && !props.fileContent) {
+  if (!file && !fileContent) {
     throw new Error('File or fileContent must be provided');
   }
 
-  let currentFile = props.file;
-  if (!props.file && props.fileContent) {
-    currentFile = new File([props.fileContent], 'registries.yml');
+  let currentFile = file;
+  if (!file && fileContent) {
+    currentFile = new File([fileContent], 'registries.yml');
   }
   try {
     const { data } = await axios.post<Array<RegistryId>>(

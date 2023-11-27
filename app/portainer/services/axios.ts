@@ -159,12 +159,22 @@ export function json2formData(json: Record<string, unknown>) {
       return;
     }
 
+    if (value instanceof File) {
+      formData.append(key, value);
+      return;
+    }
+
     if (Array.isArray(value)) {
       formData.append(key, arrayToJson(value));
       return;
     }
 
-    formData.append(key, value as string);
+    if (typeof value === 'object') {
+      formData.append(key, JSON.stringify(value));
+      return;
+    }
+
+    formData.append(key, value.toString());
   });
 
   return formData;
