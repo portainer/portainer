@@ -7,20 +7,19 @@ import { ListState } from './types';
 export function useSortAndFilterTemplates(
   templates: Array<TemplateViewModel>,
   listState: ListState & { search: string },
-  disabledTypes: Array<TemplateViewModel['Type']> = [],
-  fixedCategories: Array<string> = []
+  disabledTypes: Array<TemplateViewModel['Type']> = []
 ) {
   const filterByCategory = useCallback(
     (item: TemplateViewModel) => {
-      if (!listState.category && !fixedCategories.length) {
+      if (!listState.category) {
         return true;
       }
 
-      return _.compact([...fixedCategories, listState.category]).every(
-        (category) => item.Categories.includes(category)
+      return _.compact([listState.category]).every((category) =>
+        item.Categories.includes(category)
       );
     },
-    [fixedCategories, listState.category]
+    [listState.category]
   );
 
   const filterBySearch = useCallback(
