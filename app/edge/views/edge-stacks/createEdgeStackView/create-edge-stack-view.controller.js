@@ -115,8 +115,7 @@ export default class CreateEdgeStackViewController {
               PrePullImage: template.EdgeSettings.PrePullImage || false,
               RetryDeploy: template.EdgeSettings.RetryDeploy || false,
               PrivateRegistryId: template.EdgeSettings.PrivateRegistryId || null,
-              SupportRelativePath: template.EdgeSettings.RelativePathSettings.SupportRelativePath || false,
-              FilesystemPath: template.EdgeSettings.RelativePathSettings.FilesystemPath || '',
+              ...template.EdgeSettings.RelativePathSettings,
             }
           : {}),
       };
@@ -198,7 +197,7 @@ export default class CreateEdgeStackViewController {
   createStack() {
     return this.$async(async () => {
       const name = this.formValues.Name;
-      const method = getMethod(this.state.Method, this.state.selectedTemplate);
+      const method = getMethod(this.state.Method, this.state.templateValues.template);
 
       if (!this.validateForm(method)) {
         return;
