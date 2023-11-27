@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/database/models"
 
@@ -55,111 +56,108 @@ func TestMigrateData(t *testing.T) {
 		})
 	}
 
-	// t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
-	// 	newStore, store, teardown := MustNewTestStore(t, true, false)
-	// 	defer teardown()
+	t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
+		newStore, store := MustNewTestStore(t, true, false)
 
-	// 	if !newStore {
-	// 		t.Error("Expect a new DB")
-	// 	}
+		if !newStore {
+			t.Error("Expect a new DB")
+		}
 
-	// 	testVersion(store, portainer.APIVersion, t)
-	// 	store.Close()
+		testVersion(store, portainer.APIVersion, t)
+		store.Close()
 
-	// 	newStore, _ = store.Open()
-	// 	if newStore {
-	// 		t.Error("Expect store to NOT be new DB")
-	// 	}
-	// })
+		newStore, _ = store.Open()
+		if newStore {
+			t.Error("Expect store to NOT be new DB")
+		}
+	})
 
-	// tests := []struct {
-	// 	version         string
-	// 	expectedVersion string
-	// }{
-	// 	{version: "1.24.1", expectedVersion: portainer.APIVersion},
-	// 	{version: "2.0.0", expectedVersion: portainer.APIVersion},
-	// }
-	// for _, tc := range tests {
-	// 	_, store, teardown := MustNewTestStore(t, true, true)
-	// 	defer teardown()
+	tests := []struct {
+		version         string
+		expectedVersion string
+	}{
+		{version: "1.24.1", expectedVersion: portainer.APIVersion},
+		{version: "2.0.0", expectedVersion: portainer.APIVersion},
+	}
+	for _, tc := range tests {
+		_, store := MustNewTestStore(t, true, true)
 
-	// 	// Setup data
-	// 	v := models.Version{SchemaVersion: tc.version}
-	// 	store.VersionService.UpdateVersion(&v)
+		// Setup data
+		v := models.Version{SchemaVersion: tc.version, Edition: int(portainer.PortainerCE)}
+		store.VersionService.UpdateVersion(&v)
 
-	// 	// Required roles by migrations 22.2
-	// 	store.RoleService.Create(&portainer.Role{ID: 1})
-	// 	store.RoleService.Create(&portainer.Role{ID: 2})
-	// 	store.RoleService.Create(&portainer.Role{ID: 3})
-	// 	store.RoleService.Create(&portainer.Role{ID: 4})
+		// Required roles by migrations 22.2
+		store.RoleService.Create(&portainer.Role{ID: 1})
+		store.RoleService.Create(&portainer.Role{ID: 2})
+		store.RoleService.Create(&portainer.Role{ID: 3})
+		store.RoleService.Create(&portainer.Role{ID: 4})
 
-	// 	t.Run(fmt.Sprintf("MigrateData for version %s", tc.version), func(t *testing.T) {
-	// 		store.MigrateData()
-	// 		testVersion(store, tc.expectedVersion, t)
-	// 	})
+		t.Run(fmt.Sprintf("MigrateData for version %s", tc.version), func(t *testing.T) {
+			store.MigrateData()
+			testVersion(store, tc.expectedVersion, t)
+		})
 
-	// 	t.Run(fmt.Sprintf("Restoring DB after migrateData for version %s", tc.version), func(t *testing.T) {
-	// 		store.Rollback(true)
-	// 		store.Open()
-	// 		testVersion(store, tc.version, t)
-	// 	})
-	// }
+		t.Run(fmt.Sprintf("Restoring DB after migrateData for version %s", tc.version), func(t *testing.T) {
+			store.Rollback(true)
+			store.Open()
+			testVersion(store, tc.version, t)
+		})
+	}
 
-	// t.Run("Error in MigrateData should restore backup before MigrateData", func(t *testing.T) {
-	// 	_, store, teardown := MustNewTestStore(t, false, true)
-	// 	defer teardown()
+	t.Run("Error in MigrateData should restore backup before MigrateData", func(t *testing.T) {
+		_, store := MustNewTestStore(t, false, false)
 
-	// 	v := models.Version{SchemaVersion: "1.24.1"}
-	// 	store.VersionService.UpdateVersion(&v)
+		v := models.Version{SchemaVersion: "1.24.1", Edition: int(portainer.PortainerCE)}
+		store.VersionService.UpdateVersion(&v)
 
-	// 	store.MigrateData()
+		store.MigrateData()
 
-	// 	testVersion(store, v.SchemaVersion, t)
-	// })
+		testVersion(store, v.SchemaVersion, t)
+	})
 
-	// t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
-	// 	_, store, teardown := MustNewTestStore(t, false, true)
-	// 	defer teardown()
+	t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
+		_, store := MustNewTestStore(t, false, false)
 
-	// 	v := models.Version{SchemaVersion: "0.0.0"}
-	// 	store.VersionService.UpdateVersion(&v)
+		v := models.Version{SchemaVersion: "0.0.0", Edition: int(portainer.PortainerCE)}
+		store.VersionService.UpdateVersion(&v)
 
-	// 	store.MigrateData()
+		store.MigrateData()
 
-	// 	options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
+		options := store.setDefaultBackupOptions(getBackupRestoreOptions(store.commonBackupDir()))
 
-	// 	if !isFileExist(options.BackupPath) {
-	// 		t.Errorf("Backup file should exist; file=%s", options.BackupPath)
-	// 	}
-	// })
+		if !isFileExist(options.BackupPath) {
+			t.Errorf("Backup file should exist; file=%s", options.BackupPath)
+		}
+	})
 
-	// t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
-	// 	_, store, teardown := MustNewTestStore(t, false, true)
-	// 	defer teardown()
+	t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
+		_, store := MustNewTestStore(t, false, false)
 
-	// 	store.VersionService.StoreIsUpdating(true)
+		store.VersionService.StoreIsUpdating(true)
 
-	// 	store.MigrateData()
+		store.MigrateData()
 
-	// 	options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
+		options := store.setDefaultBackupOptions(getBackupRestoreOptions(store.commonBackupDir()))
 
-	// 	if isFileExist(options.BackupPath) {
-	// 		t.Errorf("Backup file should not exist for dirty database; file=%s", options.BackupPath)
-	// 	}
-	// })
+		if isFileExist(options.BackupPath) {
+			t.Errorf("Backup file should not exist for dirty database; file=%s", options.BackupPath)
+		}
+	})
 
-	// t.Run("MigrateData should not create backup on startup if portainer version matches db", func(t *testing.T) {
-	// 	_, store, teardown := MustNewTestStore(t, false, true)
-	// 	defer teardown()
+	t.Run("MigrateData should recover and restore backup during migration critical failure", func(t *testing.T) {
+		os.Setenv("PORTAINER_TEST_MIGRATE_FAIL", "FAIL")
 
-	// 	store.MigrateData()
+		version := "2.15"
+		_, store := MustNewTestStore(t, true, false)
+		store.VersionService.UpdateVersion(&models.Version{SchemaVersion: version, Edition: int(portainer.PortainerCE)})
+		err := store.MigrateData()
+		if err == nil {
+			t.Errorf("Expect migration to fail")
+		}
 
-	// 	options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
-
-	// 	if isFileExist(options.BackupPath) {
-	// 		t.Errorf("Backup file should not exist for dirty database; file=%s", options.BackupPath)
-	// 	}
-	// })
+		store.Open()
+		testVersion(store, version, t)
+	})
 }
 
 func Test_getBackupRestoreOptions(t *testing.T) {
