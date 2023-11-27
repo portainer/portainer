@@ -47,7 +47,9 @@ class KubernetesPersistentVolumeClaimConverter {
       } else {
         if (item.persistentVolumeClaimName) {
           pvc.Name = item.persistentVolumeClaimName;
-          pvc.PreviousName = item.persistentVolumeClaimName;
+          if (!item.useNewVolume) {
+            pvc.PreviousName = item.persistentVolumeClaimName;
+          }
         } else {
           pvc.Name = formValues.Name + '-' + pvc.Name;
         }
