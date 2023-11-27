@@ -878,7 +878,11 @@ class KubernetesCreateApplicationController {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues, false, this.originalServicePorts);
       this.Notifications.success('Success', 'Request to update application successfully submitted');
-      this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool }, { inherit: false });
+      this.$state.go(
+        'kubernetes.applications.application',
+        { name: this.application.Name, namespace: this.application.ResourcePool, endpointId: this.endpoint.Id },
+        { inherit: false }
+      );
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update application');
     } finally {
