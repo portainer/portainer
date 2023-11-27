@@ -42,7 +42,7 @@ export function InnerForm({ isLoading }: { isLoading: boolean }) {
   usePreventExit(
     initialValues.FileContent,
     values.FileContent,
-    values.Method === editor.value && !isSubmitting
+    values.Method === editor.value && !isSubmitting && !isLoading
   );
 
   const isGit = values.Method === git.value;
