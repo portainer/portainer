@@ -6,7 +6,7 @@ import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessVie
 import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/ConfigureForm/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/RegistriesFormSection/RegistriesSelector';
-import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
+import { DataAccessPolicyFormSection } from '@/react/kubernetes/applications/CreateView/DataAccessPolicyFormSection';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
 import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
@@ -96,8 +96,8 @@ export const ngModule = angular
     r2a(withUIRouter(withReactQuery(withCurrentUser(NodesDatatable))), [])
   )
   .component(
-    'kubeApplicationAccessPolicySelector',
-    r2a(KubeApplicationAccessPolicySelector, [
+    'dataAccessPolicyFormSection',
+    r2a(DataAccessPolicyFormSection, [
       'value',
       'onChange',
       'isEdit',

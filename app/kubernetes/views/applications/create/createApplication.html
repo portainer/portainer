@@ -423,22 +423,12 @@
 
                   <!-- #region DATA ACCESS POLICY -->
                   <div ng-if="ctrl.showDataAccessPolicySection()">
-                    <div class="form-group">
-                      <div class="col-sm-12">
-                        <label class="control-label text-left">Data access policy</label>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <div class="col-sm-12 small text-muted"> Specify how the data will be used across instances. </div>
-                    </div>
-
-                    <kube-application-access-policy-selector
+                    <data-access-policy-form-section
                       value="ctrl.formValues.DataAccessPolicy"
                       on-change="(ctrl.onDataAccessPolicyChange)"
                       is-edit="ctrl.state.isEdit"
                       persisted-folders-use-existing-volumes="ctrl.state.persistedFoldersUseExistingVolumes"
-                    ></kube-application-access-policy-selector>
+                    ></data-access-policy-form-section>
                   </div>
                   <!-- #endregion -->
 

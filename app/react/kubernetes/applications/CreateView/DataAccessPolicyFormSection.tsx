@@ -11,7 +11,7 @@ interface Props {
   onChange(value: number): void;
 }
 
-export function KubeApplicationAccessPolicySelector({
+export function DataAccessPolicyFormSection({
   isEdit,
   persistedFoldersUseExistingVolumes,
   value,
