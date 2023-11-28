@@ -24,6 +24,11 @@ export const cache = setupCache({
         return true;
       }
 
+      // exclude caching get with yaml accept header
+      if (req.headers?.Accept.includes('application/yaml')) {
+        return true;
+      }
+
       // exclude caching post requests unless the path contains 'selfsubjectaccessreview'
       if (
         !req.url?.includes('selfsubjectaccessreview') &&
