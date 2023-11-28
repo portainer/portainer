@@ -30,6 +30,11 @@ type CurrentUserInspectResponse struct {
 // @failure 500 "Server error"
 // @router /users/me [get]
 func (handler *Handler) userInspectMe(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
+	}
+
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
@@ -42,8 +47,12 @@ func (handler *Handler) userInspectMe(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError("Unable to find a user with the specified identifier inside the database", err)
 	}
 
-	forceChangePassword := !handler.passwordStrengthChecker.Check(user.Password)
-
 	hideFields(user)
-	return response.JSON(w, &CurrentUserInspectResponse{User: user, ForceChangePassword: forceChangePassword})
+	return response.JSON(
+		w,
+		&CurrentUserInspectResponse{
+			User:                user,
+			ForceChangePassword: tokenData.ForceChangePassword,
+		},
+	)
 }
