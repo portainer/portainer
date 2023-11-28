@@ -14,19 +14,22 @@ export const columns = [
     header: 'Edge ID',
     id: 'EdgeID',
   }),
-  columnHelper.accessor((row) => row.EdgeGroups.join(', ') || '-', {
+  columnHelper.accessor((row) => row.EdgeGroups.join(', '), {
     header: 'Edge Groups',
     id: 'edge-groups',
     enableSorting: false,
+    cell: ({ getValue }) => getValue() || '-',
   }),
-  columnHelper.accessor((row) => row.Group || '-', {
+  columnHelper.accessor((row) => row.Group, {
     header: 'Group',
     id: 'Group',
+    cell: ({ getValue }) => getValue() || '-',
   }),
-  columnHelper.accessor((row) => row.Tags.join(', ') || '-', {
+  columnHelper.accessor((row) => row.Tags.join(', '), {
     header: 'Tags',
     id: 'tags',
     enableSorting: false,
+    cell: ({ getValue }) => getValue() || '-',
   }),
   columnHelper.accessor((row) => row.LastCheckInDate, {
     header: 'Last Check-in',

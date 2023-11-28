@@ -37,6 +37,9 @@ func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroup
 			environmentGroupNames[group.ID] = group.Name
 		}
 
+		// set the "unassigned" group name to be empty string
+		environmentGroupNames[1] = ""
+
 		less = func(a, b portainer.Endpoint) int {
 			aGroup := environmentGroupNames[a.GroupID]
 			bGroup := environmentGroupNames[b.GroupID]
