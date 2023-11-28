@@ -1045,19 +1045,13 @@
                   <!-- !cpu-limit-input -->
                   <!-- #endregion -->
 
-                  <div class="col-sm-12 form-section-title"> Deployment </div>
-                  <!-- #region DEPLOYMENT -->
-                  <div class="form-group">
-                    <div class="col-sm-12 small text-muted"> Select how you want to deploy your application inside the cluster. </div>
-                  </div>
-
                   <!-- deployment options -->
-                  <kube-application-deployment-type-selector
+                  <app-deployment-type-form-section
                     value="ctrl.formValues.DeploymentType"
                     on-change="(ctrl.onChangeDeploymentType)"
                     support-global-deployment="ctrl.supportGlobalDeployment()"
                     radio-name="'deploymentType'"
-                  ></kube-application-deployment-type-selector>
+                  ></app-deployment-type-form-section>
 
                   <!-- replica count -->
                   <div class="form-group" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
