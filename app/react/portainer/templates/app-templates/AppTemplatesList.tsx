@@ -1,6 +1,6 @@
 import { Edit } from 'lucide-react';
 import _ from 'lodash';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { DatatableHeader } from '@@/datatables/DatatableHeader';
 import { Table } from '@@/datatables';
@@ -23,7 +23,7 @@ const store = createPersistedStore<ListState>(tableKey, undefined, (set) => ({
 }));
 
 export function AppTemplatesList({
-  templates,
+  templates: initialTemplates,
   onSelect,
   selectedId,
   disabledTypes,
@@ -38,11 +38,25 @@ export function AppTemplatesList({
   const [page, setPage] = useState(0);
 
   const listState = useTableState(store, tableKey);
+
+  const templates = useMemo(() => {
+    if (!initialTemplates) {
+      return [];
+    }
+
+    if (!fixedCategories?.length) {
+      return initialTemplates;
+    }
+
+    return initialTemplates.filter((template) =>
+      fixedCategories.some((category) => template.Categories.includes(category))
+    );
+  }, [fixedCategories, initialTemplates]);
+
   const filteredTemplates = useSortAndFilterTemplates(
     templates || [],
     listState,
-    disabledTypes,
-    fixedCategories
+    disabledTypes
   );
 
   const pagedTemplates =
@@ -58,7 +72,7 @@ export function AppTemplatesList({
         description={
           <Filters
             listState={listState}
-            templates={filteredTemplates || []}
+            templates={templates || []}
             onChange={() => setPage(0)}
             disabledTypes={disabledTypes}
             fixedCategories={fixedCategories}
