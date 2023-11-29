@@ -137,3 +137,11 @@ function TemplateSelector({
     onChange(value);
   }
 }
+
+export function getInitialTemplateValues() {
+  return {
+    template: null,
+    variables: [],
+    file: '',
+  };
+}

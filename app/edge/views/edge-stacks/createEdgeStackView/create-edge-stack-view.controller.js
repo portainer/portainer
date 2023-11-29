@@ -13,6 +13,7 @@ import { StackType } from '@/react/common/stacks/types';
 import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -50,11 +51,7 @@ export default class CreateEdgeStackViewController {
       endpointTypes: [],
       baseWebhookUrl: baseEdgeStackWebhookUrl(),
       isEdit: false,
-      templateValues: {
-        template: null,
-        variables: [],
-        file: '',
-      },
+      templateValues: getInitialTemplateValues(),
     };
 
     this.edgeGroups = null;
@@ -328,6 +325,7 @@ export default class CreateEdgeStackViewController {
       this.formValues.DeploymentType = deploymentType;
       this.state.Method = 'editor';
       this.formValues.StackFileContent = '';
+      this.state.templateValues = getInitialTemplateValues();
     });
   }
 

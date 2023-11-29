@@ -1,3 +1,4 @@
+import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
 import { editor, git, edgeStackTemplate, upload } from '@@/BoxSelector/common-options/build-methods';
 
 class DockerComposeFormController {
@@ -25,6 +26,7 @@ class DockerComposeFormController {
   onChangeMethod(method) {
     this.state.Method = method;
     this.formValues.StackFileContent = '';
+    this.setTemplateValues(getInitialTemplateValues());
   }
 
   onChangeFileContent(value) {
