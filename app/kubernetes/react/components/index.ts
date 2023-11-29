@@ -34,6 +34,10 @@ import {
   ResourceReservationFormSection,
   resourceReservationValidation,
 } from '@/react/kubernetes/applications/components/ResourceReservationFormSection';
+import {
+  ReplicationFormSection,
+  replicationValidation,
+} from '@/react/kubernetes/applications/components/ReplicationFormSection';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -237,4 +241,17 @@ withFormValidation(
     'maxCpuLimit',
   ],
   resourceReservationValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection))),
+  'replicationFormSection',
+  [
+    'supportScalableReplicaDeployment',
+    'cpuLimit',
+    'memoryLimit',
+    'resourceReservationsOverflow',
+  ],
+  replicationValidation
 );
