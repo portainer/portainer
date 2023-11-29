@@ -49,15 +49,22 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Storage</td>
+                      <td>Storage Class</td>
                       <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
                     </tr>
                     <tr>
-                      <td>Shared Access Policy</td>
-                      <td data-cy="k8sVolDetail-volAccessPolicy"
-                        >{{ ctrl.state.volumeSharedAccessPolicy }}
-                        <portainer-tooltip ng-if="ctrl.state.volumeSharedAccessPolicyTooltip" message="ctrl.state.volumeSharedAccessPolicyTooltip"></portainer-tooltip
-                      ></td>
+                      <td>Access Modes</td>
+                      <td data-cy="k8sVolDetail-volAccessPolicy">
+                        <div ng-repeat="(index, accessPolicy) in ctrl.state.volumeSharedAccessPolicies" class="flex flex-col gap-y-1">
+                          <div class="items-center flex gap-x-1">
+                            {{ accessPolicy }}
+                            <portainer-tooltip
+                              ng-if="ctrl.state.volumeSharedAccessPolicyTooltips[index]"
+                              message="ctrl.state.volumeSharedAccessPolicyTooltips[index]"
+                            ></portainer-tooltip>
+                          </div>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td>Provisioner</td>
