@@ -1,7 +1,11 @@
 import { useState } from 'react';
 
-export function useEnableFsPath() {
-  const [state, setState] = useState<number[]>([]);
+import { RelativePathModel } from './types';
+
+export function useEnableFsPath(initialValue: RelativePathModel) {
+  const [state, setState] = useState<number[]>(() =>
+    initialValue.SupportPerDeviceConfigs ? [1] : []
+  );
 
   const enableFsPath0 = state.length && state[0] === 0;
   const enableFsPath1 = state.length && state[0] === 1;
