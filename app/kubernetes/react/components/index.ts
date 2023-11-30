@@ -38,6 +38,10 @@ import {
   ReplicationFormSection,
   replicationValidation,
 } from '@/react/kubernetes/applications/components/ReplicationFormSection';
+import {
+  AutoScalingFormSection,
+  autoScalingValidation,
+} from '@/react/kubernetes/applications/components/AutoScalingFormSection';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -254,4 +258,12 @@ withFormValidation(
     'resourceReservationsOverflow',
   ],
   replicationValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection))),
+  'autoScalingFormSection',
+  ['isMetricsEnabled'],
+  autoScalingValidation
 );

@@ -156,6 +156,7 @@ class KubernetesCreateApplicationController {
     this.onChangePersistedFolder = this.onChangePersistedFolder.bind(this);
     this.onChangeResourceReservation = this.onChangeResourceReservation.bind(this);
     this.onChangeReplicaCount = this.onChangeReplicaCount.bind(this);
+    this.onAutoScaleChange = this.onAutoScaleChange.bind(this);
   }
   /* #endregion */
 
@@ -237,6 +238,22 @@ class KubernetesCreateApplicationController {
     if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL) {
       this.formValues.AutoScaler.IsUsed = false;
     }
+  }
+
+  onAutoScaleChange(values) {
+    return this.$async(async () => {
+      if (!this.formValues.AutoScaler.IsUsed && values.isUsed) {
+        this.formValues.AutoScaler.IsUsed = values.isUsed;
+        this.formValues.AutoScaler.MinReplicas = 1;
+        this.formValues.AutoScaler.MaxReplicas = 3;
+        this.formValues.AutoScaler.TargetCPUUtilization = 50;
+        return;
+      }
+      this.formValues.AutoScaler.IsUsed = values.isUsed;
+      this.formValues.AutoScaler.MinReplicas = values.minReplicas;
+      this.formValues.AutoScaler.MaxReplicas = values.maxReplicas;
+      this.formValues.AutoScaler.TargetCPUUtilization = values.targetCpuUtilizationPercentage;
+    });
   }
   /* #endregion */
 
