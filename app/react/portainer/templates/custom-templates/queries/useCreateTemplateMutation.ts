@@ -10,55 +10,94 @@ import {
   withInvalidate,
 } from '@/react-tools/react-query';
 import { StackType } from '@/react/common/stacks/types';
-import { FormValues } from '@/react/edge/templates/custom-templates/CreateView/types';
 import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 import {
   CustomTemplate,
   EdgeTemplateSettings,
 } from '@/react/portainer/templates/custom-templates/types';
+import { GitFormModel } from '@/react/portainer/gitops/types';
+import { DefinitionFieldValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
+import { AccessControlFormData } from '@/react/portainer/access-control/types';
+import { applyResourceControl } from '@/react/portainer/access-control/access-control.service';
+import { useCurrentUser } from '@/react/hooks/useUser';
+import { UserId } from '@/portainer/users/types';
+import { saveGitCredentialsIfNeeded } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
 
 import { Platform } from '../../types';
 
 import { buildUrl } from './build-url';
+import { queryKeys } from './query-keys';
+
+interface CreateTemplatePayload {
+  EdgeTemplate?: boolean;
+  Platform: Platform;
+  Type: StackType;
+  Method: 'editor' | 'upload' | 'repository';
+  FileContent: string;
+  File: File | undefined;
+  Git: GitFormModel;
+  Variables: DefinitionFieldValues;
+  EdgeSettings?: EdgeTemplateSettings;
+  Title: string;
+  Description: string;
+  Note: string;
+  Logo: string;
+  AccessControl?: AccessControlFormData;
+}
 
 export function useCreateTemplateMutation() {
+  const { user } = useCurrentUser();
   const queryClient = useQueryClient();
 
   return useMutation(
-    createTemplate,
+    async (payload: CreateTemplatePayload) => {
+      const template = await createTemplate(user.Id, payload);
+      const resourceControl = template.ResourceControl;
+
+      if (resourceControl && payload.AccessControl) {
+        await applyResourceControl(payload.AccessControl, resourceControl.Id);
+      }
+
+      return template;
+    },
     mutationOptions(
-      withInvalidate(queryClient, [['custom-templates']]),
+      withInvalidate(queryClient, [queryKeys.base()]),
       withGlobalError('Failed to create template')
     )
   );
 }
 
-function createTemplate({
-  Method,
-  Git,
-  ...values
-}: FormValues & { EdgeTemplate?: boolean }) {
-  switch (Method) {
+function createTemplate(userId: UserId, payload: CreateTemplatePayload) {
+  switch (payload.Method) {
     case 'editor':
-      return createTemplateFromText(values);
+      return createTemplateFromText(payload);
     case 'upload':
-      return createTemplateFromFile(values);
+      return createTemplateFromFile(payload);
     case 'repository':
-      return createTemplateFromGit({
-        ...values,
-        ...Git,
-        ...(values.EdgeSettings
-          ? {
-              EdgeSettings: {
-                ...values.EdgeSettings,
-                ...values.EdgeSettings.RelativePathSettings,
-              },
-            }
-          : {}),
-      });
+      return createTemplateAndGitCredential(userId, payload);
     default:
       throw new Error('Unknown method');
   }
+}
+
+async function createTemplateAndGitCredential(
+  userId: UserId,
+  { Git: gitModel, ...values }: CreateTemplatePayload
+) {
+  const newGitModel = await saveGitCredentialsIfNeeded(userId, gitModel);
+
+  return createTemplateFromGit({
+    ...values,
+    ...newGitModel,
+    ...(values.EdgeSettings
+      ? {
+          EdgeSettings: {
+            ...values.EdgeSettings,
+            ...values.EdgeSettings.RelativePathSettings,
+          },
+        }
+      : {}),
+  });
 }
 
 /**
@@ -179,6 +218,10 @@ interface CustomTemplateFromGitRepositoryPayload {
   RepositoryUsername?: string;
   /** Password used in basic authentication when RepositoryAuthentication is true. */
   RepositoryPassword?: string;
+  /** GitCredentialID used to identify the bound git credential. Required when RepositoryAuthentication
+   * is true and RepositoryUsername/RepositoryPassword are not provided
+   */
+  RepositoryGitCredentialID?: number;
   /** Path to the Stack file inside the Git repository. */
   ComposeFilePathInRepository: string;
   /** Definitions of variables in the stack file. */

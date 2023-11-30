@@ -34,7 +34,7 @@ export function UsersField({ name, users, value, onChange, errors }: Props) {
         />
       ) : (
         <span className="small text-muted">
-          You have not yet created any users. Head over to the
+          You have not yet created any users. Head over to the{' '}
           <Link to="portainer.users">Users view</Link> to manage users.
         </span>
       )}

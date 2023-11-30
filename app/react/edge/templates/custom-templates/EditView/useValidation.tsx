@@ -10,8 +10,7 @@ import { useGitCredentials } from '@/react/portainer/account/git-credentials/git
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { Platform } from '@/react/portainer/templates/types';
-
-import { edgeFieldsetValidation } from '../CreateView/EdgeSettingsFieldset.validation';
+import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
 
 export function useValidation(
   currentTemplateId: CustomTemplate['Id'],

@@ -9,6 +9,7 @@ import { buildGitValidationSchema } from '@/react/portainer/gitops/GitForm';
 import { useGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
+import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
 
 import { file } from '@@/form-components/yup-file-validation';
 import {
@@ -17,10 +18,9 @@ import {
   upload,
 } from '@@/BoxSelector/common-options/build-methods';
 
-import { buildMethods } from './types';
-import { edgeFieldsetValidation } from './EdgeSettingsFieldset.validation';
+import { initialBuildMethods } from './types';
 
-export function useValidation() {
+export function useValidation(isEdge: boolean) {
   const { user } = useCurrentUser();
   const gitCredentialsQuery = useGitCredentials(user.Id);
   const customTemplatesQuery = useCustomTemplates();
@@ -38,7 +38,7 @@ export function useValidation() {
             StackType.Kubernetes,
           ])
           .default(StackType.DockerCompose),
-        Method: string().oneOf(buildMethods.map((m) => m.value)),
+        Method: string().oneOf(initialBuildMethods.map((m) => m.value)),
         FileContent: string().when('Method', {
           is: editor.value,
           then: (schema) => schema.required('Template is required.'),
@@ -52,10 +52,10 @@ export function useValidation() {
           then: () => buildGitValidationSchema(gitCredentialsQuery.data || []),
         }),
         Variables: variablesValidation(),
-        EdgeSettings: edgeFieldsetValidation(),
+        EdgeSettings: isEdge ? edgeFieldsetValidation() : mixed(),
       }).concat(
         commonFieldsValidation({ templates: customTemplatesQuery.data })
       ),
-    [customTemplatesQuery.data, gitCredentialsQuery.data]
+    [customTemplatesQuery.data, gitCredentialsQuery.data, isEdge]
   );
 }
