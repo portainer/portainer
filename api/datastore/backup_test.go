@@ -47,39 +47,34 @@ func TestBackup(t *testing.T) {
 	})
 }
 
-// func TestRestore(t *testing.T) {
-// 	editions := []portainer.SoftwareEdition{portaineree.PortainerCE, portaineree.PortainerEE}
+func TestRestore(t *testing.T) {
+	_, store := MustNewTestStore(t, true, false)
 
-// 	_, store := MustNewTestStore(t, true, false)
+	t.Run(fmt.Sprintf("Basic Restore"), func(t *testing.T) {
+		// override and set initial db version and edition
+		updateEdition(store, portainer.PortainerCE)
+		updateVersion(store, "2.4")
 
-// 	for _, e := range editions {
-// 		editionLabel := e.GetEditionLabel()
+		store.Backup()
+		updateVersion(store, "2.16")
+		testVersion(store, "2.16", t)
+		store.Restore()
 
-// 		t.Run(fmt.Sprintf("Basic Restore for %s", editionLabel), func(t *testing.T) {
-// 			// override and set initial db version and edition
-// 			updateEdition(store, e)
-// 			updateVersion(store, "2.4")
+		// check if the restore is successful and the version is correct
+		testVersion(store, "2.4", t)
+	})
 
-// 			store.Backup()
-// 			updateVersion(store, "2.16")
-// 			testVersion(store, "2.16", t)
-// 			store.Restore()
+	t.Run(fmt.Sprintf("Basic Restore After Multiple Backups"), func(t *testing.T) {
+		// override and set initial db version and edition
+		updateEdition(store, portainer.PortainerCE)
+		updateVersion(store, "2.4")
+		store.Backup()
+		updateVersion(store, "2.14")
+		updateVersion(store, "2.16")
+		testVersion(store, "2.16", t)
+		store.Restore()
 
-// 			// check if the restore is successful and the version is correct
-// 			testVersion(store, "2.4", t)
-// 		})
-// 		t.Run(fmt.Sprintf("Basic Restore After Multiple Backup for %s", editionLabel), func(t *testing.T) {
-// 			// override and set initial db version and edition
-// 			updateEdition(store, e)
-// 			updateVersion(store, "2.4")
-// 			store.Backup()
-// 			updateVersion(store, "2.14")
-// 			updateVersion(store, "2.16")
-// 			testVersion(store, "2.16", t)
-// 			store.Restore()
-
-// 			// check if the restore is successful and the version is correct
-// 			testVersion(store, "2.4", t)
-// 		})
-// 	}
-// }
+		// check if the restore is successful and the version is correct
+		testVersion(store, "2.4", t)
+	})
+}
