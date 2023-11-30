@@ -14,15 +14,13 @@ import { Link } from '@@/Link';
 
 import { CustomTemplatesListItem } from './CustomTemplatesListItem';
 
-const tableKey = 'custom-templates-list';
-const store = createPersistedStore(tableKey);
-
 export function CustomTemplatesList({
   templates,
   onSelect,
   onDelete,
   selectedId,
   templateLinkParams,
+  storageKey,
 }: {
   templates?: CustomTemplate[];
   onSelect?: (template: CustomTemplate['Id']) => void;
@@ -32,10 +30,11 @@ export function CustomTemplatesList({
     to: string;
     params: object;
   };
+  storageKey: string;
 }) {
   const [page, setPage] = useState(0);
-
-  const listState = useTableState(store, tableKey);
+  const [store] = useState(() => createPersistedStore(storageKey));
+  const listState = useTableState(store, storageKey);
 
   const filterBySearch = useCallback(
     (item: CustomTemplate) =>
