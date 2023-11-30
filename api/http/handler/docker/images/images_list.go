@@ -2,6 +2,7 @@ package images
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
@@ -66,6 +67,12 @@ func (handler *Handler) imagesList(w http.ResponseWriter, r *http.Request) *http
 
 	imagesList := make([]ImageResponse, len(images))
 	for i, image := range images {
+		if (image.RepoTags == nil || len(image.RepoTags) == 0) && (image.RepoDigests != nil && len(image.RepoDigests) > 0) {
+			for _, repoDigest := range image.RepoDigests {
+				image.RepoTags = append(image.RepoTags, repoDigest[0:strings.Index(repoDigest, "@")]+":<none>")
+			}
+		}
+
 		imagesList[i] = ImageResponse{
 			Created: image.Created,
 			ID:      image.ID,
