@@ -15,6 +15,7 @@ import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
 import { DeploymentStatus, EdgeStackStatus, StatusType } from '../../types';
+import { removeTrailingGitExtension } from '../../utils';
 
 import { EnvironmentActions } from './EnvironmentActions';
 import { ActionStatus } from './ActionStatus';
@@ -182,12 +183,16 @@ function TargetVersionCell({
     return '';
   }
 
+  console.log(removeTrailingGitExtension(row.original.GitConfigURL));
+
   return (
     <>
       {row.original.TargetCommitHash ? (
         <div>
           <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            href={`${removeTrailingGitExtension(
+              row.original.GitConfigURL
+            )}/commit/${row.original.TargetCommitHash}`}
             target="_blank"
             rel="noreferrer"
           >
@@ -236,7 +241,9 @@ function DeployedVersionCell({
         <div>
           {statusIcon}
           <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            href={`${removeTrailingGitExtension(
+              row.original.GitConfigURL
+            )}/commit/${row.original.TargetCommitHash}`}
             target="_blank"
             rel="noreferrer"
           >
