@@ -68,7 +68,10 @@ func (tx *StoreTx) Snapshot() dataservices.SnapshotService {
 }
 
 func (tx *StoreTx) SSLSettings() dataservices.SSLSettingsService { return nil }
-func (tx *StoreTx) Stack() dataservices.StackService             { return nil }
+
+func (tx *StoreTx) Stack() dataservices.StackService {
+	return tx.store.StackService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) Tag() dataservices.TagService {
 	return tx.store.TagService.Tx(tx.tx)
