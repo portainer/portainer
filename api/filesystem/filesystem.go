@@ -932,9 +932,13 @@ func FileExists(filePath string) (bool, error) {
 
 // SafeCopyDirectory copies a directory from src to dst in a safe way.
 func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
+	return safeMoveDirectory(originalPath, newPath, CopyDir)
+}
+
+func safeMoveDirectory(src, dst string, copyDirFunc func(string, string, bool) error) error {
 	// 1. Backup the source directory to a different folder
-	backupDir := fmt.Sprintf("%s-%s", filepath.Dir(originalPath), "backup")
-	err := MoveDirectory(originalPath, backupDir)
+	backupDir := fmt.Sprintf("%s-%s", src, "backup")
+	err := MoveDirectory(src, backupDir)
 	if err != nil {
 		return fmt.Errorf("failed to backup source directory: %w", err)
 	}
@@ -942,23 +946,23 @@ func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
 	defer func() {
 		if err != nil {
 			// If an error occurred, rollback the backup directory
-			restoreErr := restoreBackup(originalPath, backupDir)
+			restoreErr := restoreBackup(src, backupDir)
 			if restoreErr != nil {
 				log.Warn().Err(restoreErr).Msg("failed to restore backup during creating versioning folder")
 			}
 		}
+
+		// 3. Delete the backup directory
+		err = os.RemoveAll(backupDir)
+		if err != nil {
+			log.Warn().Err(err).Msg("failed to remove backup directory")
+		}
 	}()
 
 	// 2. Copy the backup directory to the destination directory
-	err = CopyDir(backupDir, newPath, false)
+	err = copyDirFunc(backupDir, dst, false)
 	if err != nil {
 		return fmt.Errorf("failed to copy backup directory to destination directory: %w", err)
-	}
-
-	// 3. Delete the backup directory
-	err = os.RemoveAll(backupDir)
-	if err != nil {
-		return fmt.Errorf("failed to delete backup directory: %w", err)
 	}
 
 	return nil
@@ -991,7 +995,11 @@ func MoveDirectory(originalPath, newPath string) error {
 	}
 
 	if alreadyExists {
-		return errors.New("Target path already exists")
+		log.Info().Msgf("Target path already exists, removing it: %s", newPath)
+		err := os.RemoveAll(newPath)
+		if err != nil {
+			log.Warn().Err(err).Msgf("Failed to remove existing target path: %s", newPath)
+		}
 	}
 
 	return os.Rename(originalPath, newPath)
