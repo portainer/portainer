@@ -183,8 +183,6 @@ function TargetVersionCell({
     return '';
   }
 
-  console.log(removeTrailingGitExtension(row.original.GitConfigURL));
-
   return (
     <>
       {row.original.TargetCommitHash ? (
