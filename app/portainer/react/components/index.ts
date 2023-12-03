@@ -9,6 +9,7 @@ import { withFormValidation } from '@/react-tools/withFormValidation';
 import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
 import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
 import { HelmRepositoryDatatable } from '@/react/portainer/account/AccountView/HelmRepositoryDatatable';
+import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import {
   EnvironmentVariablesFieldset,
@@ -240,7 +241,7 @@ export const componentsModule = ngModule.name;
 
 withFormValidation(
   ngModule,
-  EnvironmentVariablesFieldset,
+  withControlledInput(EnvironmentVariablesFieldset, { values: 'onChange' }),
   'environmentVariablesFieldset',
   ['canUndoDelete'],
   envVarValidation
@@ -248,7 +249,7 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  EnvironmentVariablesPanel,
+  withControlledInput(EnvironmentVariablesPanel, { values: 'onChange' }),
   'environmentVariablesPanel',
   ['explanation', 'showHelpMessage', 'isFoldable'],
   envVarValidation
