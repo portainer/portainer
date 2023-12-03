@@ -4,14 +4,14 @@ import { DockerImage } from '@/react/docker/images/types';
 
 import { columnHelper } from './helper';
 
-export const tags = columnHelper.accessor('RepoTags', {
+export const tags = columnHelper.accessor((item) => item.RepoTags.join(','), {
   id: 'tags',
   header: 'Tags',
   cell: Cell,
 });
 
-function Cell({ getValue }: CellContext<DockerImage, string[]>) {
-  const repoTags = getValue();
+function Cell({ row: { original: item } }: CellContext<DockerImage, unknown>) {
+  const repoTags = item.RepoTags;
 
   return (
     <>
