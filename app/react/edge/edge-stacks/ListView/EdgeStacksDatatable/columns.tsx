@@ -15,6 +15,22 @@ import { DeploymentCounter } from './DeploymentCounter';
 
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
+const getGitCommitUrl = (gitObj: {
+  URL: string;
+  ConfigHash?: string | null;
+}): string => {
+  if (gitObj.ConfigHash == null) {
+    return '';
+  }
+
+  const urlPaths = [gitObj.URL];
+  const isBitbucket = gitObj.URL.indexOf('bitbucket.org') !== -1;
+  urlPaths.push(isBitbucket ? 'commits' : 'commit');
+  urlPaths.push(gitObj.ConfigHash);
+
+  return urlPaths.join('/');
+};
+
 export const columns = _.compact([
   buildNameColumn<DecoratedEdgeStack>('Name', 'edge.stacks.edit', 'stackId'),
   columnHelper.accessor(
@@ -146,7 +162,7 @@ export const columns = _.compact([
               <div className="text-center">
                 <a
                   target="_blank"
-                  href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
+                  href={`${getGitCommitUrl(item.GitConfig)}`}
                   rel="noreferrer"
                 >
                   {item.GitConfig.ConfigHash.slice(0, 7)}

@@ -22,6 +22,22 @@ import { EdgeStackEnvironment } from './types';
 
 const columnHelper = createColumnHelper<EdgeStackEnvironment>();
 
+const getGitCommitUrl = (gitObj: {
+  GitConfigURL: string;
+  TargetCommitHash?: string | null;
+}): string => {
+  if (gitObj.TargetCommitHash == null) {
+    return '';
+  }
+
+  const urlPaths = [gitObj.GitConfigURL];
+  const isBitbucket = urlPaths[0].indexOf('bitbucket.org') !== -1;
+  urlPaths.push(isBitbucket ? 'commits' : 'commit');
+  urlPaths.push(gitObj.TargetCommitHash);
+
+  return urlPaths.join('/');
+};
+
 export const columns = _.compact([
   columnHelper.accessor('Name', {
     id: 'name',
@@ -187,7 +203,7 @@ function TargetVersionCell({
       {row.original.TargetCommitHash ? (
         <div>
           <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            href={`${getGitCommitUrl(row.original)}`}
             target="_blank"
             rel="noreferrer"
           >
@@ -236,7 +252,7 @@ function DeployedVersionCell({
         <div>
           {statusIcon}
           <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            href={`${getGitCommitUrl(row.original)}`}
             target="_blank"
             rel="noreferrer"
           >
