@@ -19,6 +19,8 @@ package endpoints
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/docker/v2/browse/put [post]
+//
+//lint:ignore U1000 Ignore unused code, for documentation purposes
 func _fileBrowseFileUploadV2() {
 	// dummy function to make swag pick up the above docs for the following REST call
 	// POST request on /browse/put?volumeID=:id

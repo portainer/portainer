@@ -56,13 +56,3 @@ func testVersion(store *Store, versionWant string, t *testing.T) {
 		t.Errorf("Expect store version to be %s but was %s", versionWant, v.SchemaVersion)
 	}
 }
-
-func testEdition(store *Store, editionWant portainer.SoftwareEdition, t *testing.T) {
-	v, err := store.VersionService.Version()
-	if err != nil {
-		log.Fatal().Err(err).Msg("")
-	}
-	if portainer.SoftwareEdition(v.Edition) != editionWant {
-		t.Errorf("Expect store edition to be %s but was %s", editionWant.GetEditionLabel(), portainer.SoftwareEdition(v.Edition).GetEditionLabel())
-	}
-}

@@ -20,7 +20,6 @@ var (
 	errAdminCannotRemoveSelf      = errors.New("Cannot remove your own user account. Contact another administrator")
 	errCannotRemoveLastLocalAdmin = errors.New("Cannot remove the last local administrator account")
 	errCryptoHashFailure          = errors.New("Unable to hash data")
-	errWrongPassword              = errors.New("Wrong password")
 )
 
 func hideFields(user *portainer.User) {
