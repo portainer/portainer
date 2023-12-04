@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Hash, Server, Tag, Wrench } from 'lucide-react';
+import { Database, GitCommit, Hash, Server, Tag, Wrench } from 'lucide-react';
 
 import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
@@ -81,6 +81,13 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
                     Image Tag: {Build.ImageTag}
                   </span>
                 </td>
+              </tr>
+              <tr>
+                <td>
+                  <GitCommit size="13" className="space-right" />
+                  Git Commit: {Build.GitCommit}
+                </td>
+                <td />
               </tr>
             </tbody>
           </table>

@@ -4,12 +4,14 @@ set -euo pipefail
 mkdir -p dist
 
 # populate tool versions
+
 BUILDNUMBER=${BUILDNUMBER:-"N/A"}
 CONTAINER_IMAGE_TAG=${CONTAINER_IMAGE_TAG:-"N/A"}
-NODE_VERSION=${NODE_VERSION:-"N/A"}
-YARN_VERSION=${YARN_VERSION:-"N/A"}
-WEBPACK_VERSION=${WEBPACK_VERSION:-"N/A"}
-GO_VERSION=${GO_VERSION:-"N/A"}
+NODE_VERSION=${NODE_VERSION:-$(node -v)}
+YARN_VERSION=${YARN_VERSION:-$(yarn --version))}
+WEBPACK_VERSION=${WEBPACK_VERSION:-$(yarn list webpack --depth=0 | grep webpack | awk -F@ '{print $2}')}
+GO_VERSION=${GO_VERSION:-$(go version | awk '{print $3}')}
+GIT_COMMIT_HASH=${GIT_COMMIT_HASH:-$(git rev-parse --short HEAD)}
 
 # copy templates
 cp -r "./mustache-templates" "./dist"
@@ -26,6 +28,7 @@ ldflags="-s -X 'github.com/portainer/liblicense.LicenseServerBaseURL=https://api
 -X 'github.com/portainer/portainer/api/build.NodejsVersion=${NODE_VERSION}' \
 -X 'github.com/portainer/portainer/api/build.YarnVersion=${YARN_VERSION}' \
 -X 'github.com/portainer/portainer/api/build.WebpackVersion=${WEBPACK_VERSION}' \
+-X 'github.com/portainer/portainer/api/build.GitCommit=${GIT_COMMIT_HASH}' \
 -X 'github.com/portainer/portainer/api/build.GoVersion=${GO_VERSION}'"
 
 BINARY_VERSION_FILE="../binary-version.json"

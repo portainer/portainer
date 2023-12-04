@@ -32,6 +32,7 @@ type BuildInfo struct {
 	YarnVersion    string
 	WebpackVersion string
 	GoVersion      string
+	GitCommit      string
 }
 
 // @id systemVersion
@@ -57,6 +58,7 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 			YarnVersion:    build.YarnVersion,
 			WebpackVersion: build.WebpackVersion,
 			GoVersion:      build.GoVersion,
+			GitCommit:      build.GitCommit,
 		},
 	}
 
