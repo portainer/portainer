@@ -4,14 +4,16 @@ import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
 
 import { columnHelper } from './helper';
 
-export const tags = columnHelper.accessor('tags', {
+export const tags = columnHelper.accessor((item) => item.tags.join(','), {
   id: 'tags',
   header: 'Tags',
   cell: Cell,
 });
 
-function Cell({ getValue }: CellContext<ImagesListResponse, string[]>) {
-  const repoTags = getValue();
+function Cell({
+  row: { original: item },
+}: CellContext<ImagesListResponse, unknown>) {
+  const repoTags = item.tags;
 
   return (
     <>
