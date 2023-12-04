@@ -938,7 +938,7 @@ func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
 func safeMoveDirectory(src, dst string, copyDirFunc func(string, string, bool) error) error {
 	// 1. Backup the source directory to a different folder
 	backupDir := fmt.Sprintf("%s-%s", src, "backup")
-	err := moveDirectoryForUpgrade(src, backupDir)
+	err := moveDirectoryAndOverwrite(src, backupDir)
 	if err != nil {
 		return fmt.Errorf("failed to backup source directory: %w", err)
 	}
@@ -1001,7 +1001,7 @@ func MoveDirectory(originalPath, newPath string) error {
 	return os.Rename(originalPath, newPath)
 }
 
-func moveDirectoryForUpgrade(originalPath, newPath string) error {
+func moveDirectoryAndOverwrite(originalPath, newPath string) error {
 	if _, err := os.Stat(originalPath); err != nil {
 		return err
 	}
