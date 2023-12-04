@@ -1,6 +1,8 @@
 package migrator
 
 import (
+	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/authorization"
 
@@ -56,6 +58,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	endpointAdministratorRole.Authorizations = authorization.DefaultEndpointAuthorizationsForEndpointAdministratorRole()
 
 	err = m.roleService.Update(endpointAdministratorRole.ID, endpointAdministratorRole)
+	if err != nil {
+		return fmt.Errorf("failed to update Administrator role: %w", err)
+	}
 
 	helpDeskRole, err := m.roleService.Read(portainer.RoleID(2))
 	if err != nil {
@@ -65,6 +70,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	helpDeskRole.Authorizations = authorization.DefaultEndpointAuthorizationsForHelpDeskRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.Update(helpDeskRole.ID, helpDeskRole)
+	if err != nil {
+		return fmt.Errorf("failed to update Help Desk role: %w", err)
+	}
 
 	standardUserRole, err := m.roleService.Read(portainer.RoleID(3))
 	if err != nil {
@@ -74,6 +82,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	standardUserRole.Authorizations = authorization.DefaultEndpointAuthorizationsForStandardUserRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.Update(standardUserRole.ID, standardUserRole)
+	if err != nil {
+		return fmt.Errorf("failed to update Standard User Role role: %w", err)
+	}
 
 	readOnlyUserRole, err := m.roleService.Read(portainer.RoleID(4))
 	if err != nil {
@@ -84,7 +95,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 
 	err = m.roleService.Update(readOnlyUserRole.ID, readOnlyUserRole)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update Readonly User Role role: %w", err)
 	}
 
 	return m.authorizationService.UpdateUsersAuthorizations()

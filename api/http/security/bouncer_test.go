@@ -344,6 +344,7 @@ func Test_apiKeyLookup(t *testing.T) {
 		req.Header.Add("x-api-key", rawAPIKey)
 
 		token, err := bouncer.apiKeyLookup(req)
+		is.NoError(err)
 
 		expectedToken := &portainer.TokenData{ID: user.ID, Username: user.Username, Role: portainer.StandardUserRole}
 		is.Equal(expectedToken, token)
@@ -358,6 +359,7 @@ func Test_apiKeyLookup(t *testing.T) {
 		req.Header.Add("x-api-key", rawAPIKey)
 
 		token, err := bouncer.apiKeyLookup(req)
+		is.NoError(err)
 
 		expectedToken := &portainer.TokenData{ID: user.ID, Username: user.Username, Role: portainer.StandardUserRole}
 		is.Equal(expectedToken, token)
@@ -372,6 +374,7 @@ func Test_apiKeyLookup(t *testing.T) {
 		req.Header.Add("x-api-key", rawAPIKey)
 
 		token, err := bouncer.apiKeyLookup(req)
+		is.NoError(err)
 
 		expectedToken := &portainer.TokenData{ID: user.ID, Username: user.Username, Role: portainer.StandardUserRole}
 		is.Equal(expectedToken, token)
