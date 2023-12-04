@@ -121,7 +121,7 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
           </div>
         </div>
 
-        {isAdmin && (
+        {isAdmin && Build.Env && (
           <div className={clsx(styles.toolsList, 'mt-3')}>
             <span className="inline-flex items-center ">
               <Variable size="13" className="space-right" />
