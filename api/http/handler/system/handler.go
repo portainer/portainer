@@ -47,7 +47,7 @@ func NewHandler(bouncer security.BouncerService,
 	authenticatedRouter := router.PathPrefix("/").Subrouter()
 	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
 
-	authenticatedRouter.Handle("/version", http.HandlerFunc(h.version)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/version", httperror.LoggerHandler(h.version)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/nodes", httperror.LoggerHandler(h.systemNodesCount)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/info", httperror.LoggerHandler(h.systemInfo)).Methods(http.MethodGet)
 

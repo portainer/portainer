@@ -22,6 +22,7 @@ export interface VersionResponse {
     WebpackVersion: string;
     GoVersion: string;
     GitCommit: string;
+    Env: string[];
   };
 }
 

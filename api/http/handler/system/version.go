@@ -2,10 +2,13 @@ package system
 
 import (
 	"net/http"
+	"os"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/build"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/coreos/go-semver/semver"
@@ -33,6 +36,7 @@ type BuildInfo struct {
 	WebpackVersion string
 	GoVersion      string
 	GitCommit      string
+	Env            []string `json:",omitempty"`
 }
 
 // @id systemVersion
@@ -45,7 +49,11 @@ type BuildInfo struct {
 // @produce json
 // @success 200 {object} versionResponse "Success"
 // @router /system/version [get]
-func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) version(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	isAdmin, err := security.IsAdmin(r)
+	if err != nil {
+		return httperror.Forbidden("Permission denied to access Portainer", err)
+	}
 
 	result := &versionResponse{
 		ServerVersion:   portainer.APIVersion,
@@ -62,13 +70,17 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	if isAdmin {
+		result.Build.Env = os.Environ()
+	}
+
 	latestVersion := GetLatestVersion()
 	if HasNewerVersion(portainer.APIVersion, latestVersion) {
 		result.UpdateAvailable = true
 		result.LatestVersion = latestVersion
 	}
 
-	response.JSON(w, &result)
+	return response.JSON(w, &result)
 }
 
 func GetLatestVersion() string {
