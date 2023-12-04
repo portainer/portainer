@@ -7,8 +7,11 @@ import { useCreateTemplateMutation } from '@/react/portainer/templates/custom-te
 import { Platform } from '@/react/portainer/templates/types';
 import { useFetchTemplateFile } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
 import { getDefaultEdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
+import { useSaveCredentialsIfRequired } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
 
 import { editor } from '@@/BoxSelector/common-options/build-methods';
+
+import { toGitRequest } from '../common/git';
 
 import { InnerForm } from './InnerForm';
 import { FormValues } from './types';
@@ -19,6 +22,8 @@ export function CreateTemplateForm() {
   const mutation = useCreateTemplateMutation();
   const validation = useValidation();
   const { appTemplateId, type } = useParams();
+  const { saveCredentials, isLoading: isSaveCredentialsLoading } =
+    useSaveCredentialsIfRequired();
 
   const fileContentQuery = useFetchTemplateFile(appTemplateId);
 
@@ -58,13 +63,19 @@ export function CreateTemplateForm() {
       validationSchema={validation}
       validateOnMount
     >
-      <InnerForm isLoading={mutation.isLoading} />
+      <InnerForm isLoading={mutation.isLoading || isSaveCredentialsLoading} />
     </Formik>
   );
 
-  function handleSubmit(values: FormValues) {
+  async function handleSubmit(values: FormValues) {
+    const credentialId = await saveCredentials(values.Git);
+
     mutation.mutate(
-      { ...values, EdgeTemplate: true },
+      {
+        ...values,
+        EdgeTemplate: true,
+        Git: toGitRequest(values.Git, credentialId),
+      },
       {
         onSuccess() {
           notifySuccess('Success', 'Template created');

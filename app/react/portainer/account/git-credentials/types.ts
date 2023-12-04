@@ -13,13 +13,6 @@ export interface GitCredentialFormValues {
   password: string;
 }
 
-export interface CreateGitCredentialPayload {
-  userId: number;
-  name: string;
-  username?: string;
-  password: string;
-}
-
 export interface UpdateGitCredentialPayload {
   name: string;
   username?: string;

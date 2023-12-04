@@ -51,7 +51,7 @@ export function InnerForm({
   usePreventExit(
     initialValues.FileContent,
     values.FileContent,
-    !isEditorReadonly && !isSubmitting
+    !isEditorReadonly && !isSubmitting && !isLoading
   );
   return (
     <Form className="form-horizontal">

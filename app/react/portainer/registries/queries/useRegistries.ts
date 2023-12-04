@@ -9,11 +9,7 @@ import { usePublicSettings } from '../../settings/queries';
 import { queryKeys } from './query-keys';
 
 export function useRegistries<T = Registry[]>(
-  queryOptions: {
-    enabled?: boolean;
-    select?: (registries: Registry[]) => T;
-    onSuccess?: (data: T) => void;
-  } = {}
+  queryOptions: GenericRegistriesQueryOptions<T> = {}
 ) {
   return useGenericRegistriesQuery(
     queryKeys.base(),
@@ -22,13 +18,11 @@ export function useRegistries<T = Registry[]>(
   );
 }
 
-/**
- * @field hideDefault - is used to hide the default registry from the list of registries, regardless of the user's settings. Kubernetes views use this.
- */
 export type GenericRegistriesQueryOptions<T> = {
   enabled?: boolean;
   select?: (registries: Registry[]) => T;
   onSuccess?: (data: T) => void;
+  /** is used to hide the default registry from the list of registries, regardless of the user's settings. Kubernetes views use this. */
   hideDefault?: boolean;
 };
 

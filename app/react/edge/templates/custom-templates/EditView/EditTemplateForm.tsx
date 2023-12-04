@@ -11,6 +11,9 @@ import {
   isTemplateVariablesEnabled,
 } from '@/react/portainer/custom-templates/components/utils';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
+import { useSaveCredentialsIfRequired } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
+
+import { toGitRequest } from '../common/git';
 
 import { InnerForm } from './InnerForm';
 import { FormValues } from './types';
@@ -22,6 +25,8 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
   const isGit = !!template.GitConfig;
   const validation = useValidation(template.Id, isGit);
   const fileQuery = useCustomTemplateFile(template.Id, isGit);
+  const { saveCredentials, isLoading: isSaveCredentialsLoading } =
+    useSaveCredentialsIfRequired();
 
   if (fileQuery.isLoading) {
     return null;
@@ -49,7 +54,7 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
       validateOnMount
     >
       <InnerForm
-        isLoading={mutation.isLoading}
+        isLoading={mutation.isLoading || isSaveCredentialsLoading}
         isEditorReadonly={isGit}
         gitFileContent={isGit ? fileQuery.data : ''}
         refreshGitFile={fileQuery.refetch}
@@ -60,7 +65,9 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
     </Formik>
   );
 
-  function handleSubmit(values: FormValues) {
+  async function handleSubmit(values: FormValues) {
+    const credentialId = await saveCredentials(values.Git);
+
     mutation.mutate(
       {
         id: template.Id,
@@ -74,7 +81,7 @@ export function EditTemplateForm({ template }: { template: CustomTemplate }) {
         Platform: values.Platform,
         Variables: values.Variables,
         EdgeSettings: values.EdgeSettings,
-        ...values.Git,
+        ...(values.Git ? toGitRequest(values.Git, credentialId) : {}),
       },
       {
         onSuccess() {
