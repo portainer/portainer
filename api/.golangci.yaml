@@ -5,9 +5,11 @@ linters:
   # Enable these for now
   enable:
     - depguard
+    - gosimple
     - govet
     - errorlint
     - exportloopref
+
 linters-settings:
   depguard:
     rules:

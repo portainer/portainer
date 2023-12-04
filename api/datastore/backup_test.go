@@ -50,7 +50,7 @@ func TestBackup(t *testing.T) {
 func TestRestore(t *testing.T) {
 	_, store := MustNewTestStore(t, true, false)
 
-	t.Run(fmt.Sprintf("Basic Restore"), func(t *testing.T) {
+	t.Run("Basic Restore", func(t *testing.T) {
 		// override and set initial db version and edition
 		updateEdition(store, portainer.PortainerCE)
 		updateVersion(store, "2.4")
@@ -64,7 +64,7 @@ func TestRestore(t *testing.T) {
 		testVersion(store, "2.4", t)
 	})
 
-	t.Run(fmt.Sprintf("Basic Restore After Multiple Backups"), func(t *testing.T) {
+	t.Run("Basic Restore After Multiple Backups", func(t *testing.T) {
 		// override and set initial db version and edition
 		updateEdition(store, portainer.PortainerCE)
 		updateVersion(store, "2.4")
