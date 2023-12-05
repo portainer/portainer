@@ -13,9 +13,9 @@ export function StackViewModel(data) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }
   this.Status = data.Status;
-  this.CreationDate = data.CreationDate;
+  this.CreationDate = data.CreationDate || undefined; // set undefined for angular sorting
   this.CreatedBy = data.CreatedBy;
-  this.UpdateDate = data.UpdateDate;
+  this.UpdateDate = data.UpdateDate || undefined; // set undefined for angular sorting
   this.UpdatedBy = data.UpdatedBy;
   this.Regular = true;
   this.External = false;
@@ -30,7 +30,7 @@ export function StackViewModel(data) {
 export function ExternalStackViewModel(name, type, creationDate) {
   this.Name = name;
   this.Type = type;
-  this.CreationDate = creationDate;
+  this.CreationDate = creationDate || undefined; // set undefined for angular sorting
 
   this.Regular = false;
   this.External = true;
@@ -50,9 +50,9 @@ export function OrphanedStackViewModel(data) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }
   this.Status = data.Status;
-  this.CreationDate = data.CreationDate;
+  this.CreationDate = data.CreationDate || undefined; // set undefined for angular sorting
   this.CreatedBy = data.CreatedBy;
-  this.UpdateDate = data.UpdateDate;
+  this.UpdateDate = data.UpdateDate || undefined; // set undefined for angular sorting
   this.UpdatedBy = data.UpdatedBy;
 
   this.Regular = false;
