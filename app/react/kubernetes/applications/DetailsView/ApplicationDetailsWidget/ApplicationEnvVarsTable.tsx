@@ -122,7 +122,7 @@ interface ContainerEnvVar {
   fieldPath?: string;
   containerName: string;
   isInitContainer: boolean;
-  type: string;
+  type: 'configMap' | 'secret';
   resourseName: string;
 }
 
@@ -142,7 +142,7 @@ function getApplicationEnvironmentVariables(
   // get all the environment variables for each container
   const appContainersEnvVars =
     appContainers?.flatMap((container) => {
-      const containerEnvVars =
+      const containerEnvVars: ContainerEnvVar[] =
         container?.env?.map((envVar) => ({
           key: envVar?.name,
           fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
@@ -155,8 +155,8 @@ function getApplicationEnvironmentVariables(
             '',
         })) || [];
 
-      const containerEnvFroms =
-        container?.envFrom?.flatMap((envFrom) => ({
+      const containerEnvFroms: ContainerEnvVar[] =
+        container?.envFrom?.map((envFrom) => ({
           name: '',
           resourseName:
             envFrom?.configMapRef?.name || envFrom?.secretRef?.name || '',
@@ -170,7 +170,7 @@ function getApplicationEnvironmentVariables(
 
   const appInitContainersEnvVars =
     appInitContainers?.flatMap((container) => {
-      const containerEnvVars =
+      const containerEnvVars: ContainerEnvVar[] =
         container?.env?.map((envVar) => ({
           key: envVar?.name,
           fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
@@ -183,8 +183,8 @@ function getApplicationEnvironmentVariables(
             '',
         })) || [];
 
-      const containerEnvFroms =
-        container?.envFrom?.flatMap((envFrom) => ({
+      const containerEnvFroms: ContainerEnvVar[] =
+        container?.envFrom?.map((envFrom) => ({
           name: '',
           resourseName:
             envFrom?.configMapRef?.name || envFrom?.secretRef?.name || '',
