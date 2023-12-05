@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { confirmDelete } from '@@/modals/confirm';
+import { AuthenticationMethod } from '@/react/portainer/settings/types';
 
 angular.module('portainer.app').controller('UsersController', [
   '$q',
@@ -91,12 +91,7 @@ angular.module('portainer.app').controller('UsersController', [
     }
 
     $scope.removeAction = function (selectedItems) {
-      confirmDelete('Do you want to remove the selected users? They will not be able to login into Portainer anymore.').then((confirmed) => {
-        if (!confirmed) {
-          return;
-        }
-        deleteSelectedUsers(selectedItems);
-      });
+      return deleteSelectedUsers(selectedItems);
     };
 
     function assignTeamLeaders(users, memberships) {
@@ -107,7 +102,6 @@ angular.module('portainer.app').controller('UsersController', [
           var membership = memberships[j];
           if (user.Id === membership.UserId && membership.Role === 1) {
             user.isTeamLeader = true;
-            user.RoleName = 'team leader';
             break;
           }
         }
@@ -125,11 +119,12 @@ angular.module('portainer.app').controller('UsersController', [
         settings: SettingsService.publicSettings(),
       })
         .then(function success(data) {
+          $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
           var users = data.users;
           assignTeamLeaders(users, data.memberships);
+          users = assignAuthMethod(users, $scope.AuthenticationMethod);
           $scope.users = users;
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
-          $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
           $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
           $scope.teamSync = data.settings.TeamSync;
         })
@@ -143,3 +138,10 @@ angular.module('portainer.app').controller('UsersController', [
     initView();
   },
 ]);
+
+function assignAuthMethod(users, authMethod) {
+  return users.map((u) => ({
+    ...u,
+    authMethod: AuthenticationMethod[u.Id === 1 ? AuthenticationMethod.Internal : authMethod],
+  }));
+}

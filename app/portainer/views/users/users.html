@@ -166,17 +166,4 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-sm-12">
-    <users-datatable
-      title-text="Users"
-      title-icon="user"
-      dataset="users"
-      table-key="users"
-      order-by="Username"
-      authentication-method="AuthenticationMethod"
-      remove-action="removeAction"
-      is-admin="isAdmin"
-    ></users-datatable>
-  </div>
-</div>
+<users-datatable dataset="users" on-remove="(removeAction)"></users-datatable>
