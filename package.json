@@ -98,7 +98,7 @@
     "js-base64": "^3.7.2",
     "js-yaml": "^3.14.0",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.101.0",
+    "lucide-react": "^0.258.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.40",
     "msw": "^2.0.11",
