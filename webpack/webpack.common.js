@@ -20,6 +20,7 @@ module.exports = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(projectRoot, 'dist/public'),
+    pathinfo: false,
   },
   module: {
     rules: [
