@@ -5,11 +5,7 @@ import { CommonFields } from '@/react/portainer/custom-templates/components/Comm
 import { CustomTemplatesVariablesDefinitionField } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { PlatformField } from '@/react/portainer/custom-templates/components/PlatformSelector';
 import { GitForm } from '@/react/portainer/gitops/GitForm';
-import {
-  getTemplateVariables,
-  intersectVariables,
-  isTemplateVariablesEnabled,
-} from '@/react/portainer/custom-templates/components/utils';
+import { isTemplateVariablesEnabled } from '@/react/portainer/custom-templates/components/utils';
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
 import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
@@ -24,6 +20,8 @@ import { WebEditorForm, usePreventExit } from '@@/WebEditorForm';
 import { FormActions } from '@@/form-components/FormActions';
 import { Button } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
+
+import { useParseTemplateOnFileChange } from '../useParseTemplateOnFileChange';
 
 import { FormValues } from './types';
 
@@ -59,6 +57,11 @@ export function InnerForm({
     values.FileContent,
     !isEditorReadonly && !isSubmitting && !isLoading
   );
+
+  const handleChangeFileContent = useParseTemplateOnFileChange(
+    values.Variables
+  );
+
   const texts = textByType[values.Type];
 
   return (
@@ -179,34 +182,4 @@ export function InnerForm({
       />
     </Form>
   );
-
-  function handleChangeFileContent(value: string) {
-    setFieldValue(
-      'FileContent',
-      value,
-      isTemplateVariablesEnabled ? !value : true
-    );
-    parseTemplate(value);
-  }
-
-  function parseTemplate(value: string) {
-    if (!isTemplateVariablesEnabled || value === '') {
-      setFieldValue('Variables', []);
-      return;
-    }
-
-    const [variables, validationError] = getTemplateVariables(value);
-    const isValid = !!variables;
-
-    setFieldError(
-      'FileContent',
-      validationError ? `Template invalid: ${validationError}` : undefined
-    );
-    if (isValid) {
-      setFieldValue(
-        'Variables',
-        intersectVariables(values.Variables, variables)
-      );
-    }
-  }
 }
