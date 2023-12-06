@@ -23,7 +23,7 @@ parserOptions:
     modules: true
 
 rules:
-  no-console: warn
+  no-console: error
   no-alert: error
   no-control-regex: 'off'
   no-empty: warn
