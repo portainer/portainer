@@ -25,7 +25,6 @@ export function CreateForm({
   const router = useRouter();
   const mutation = useCreateTemplateMutation();
   const validation = useValidation(isEdge);
-
   const buildMethods = useBuildMethods();
 
   const initialValues = useInitialValues({

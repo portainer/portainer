@@ -1,6 +1,7 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { StackType } from '@/react/common/stacks/types';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -8,7 +9,9 @@ import { Widget } from '@@/Widget';
 import { CreateForm } from './CreateForm';
 
 export function CreateView() {
-  const form = useTemplatePlatformType();
+  const defaultType = useDefaultType();
+  const environmentId = useEnvironmentId(false);
+
   return (
     <div>
       <PageHeader
@@ -22,7 +25,12 @@ export function CreateView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <Widget.Body>{form}</Widget.Body>
+            <Widget.Body>
+              <CreateForm
+                defaultType={defaultType}
+                environmentId={environmentId}
+              />
+            </Widget.Body>
           </Widget>
         </div>
       </div>
@@ -30,28 +38,14 @@ export function CreateView() {
   );
 }
 
-function useTemplatePlatformType() {
+function useDefaultType() {
   const {
-    params: { endpointId },
     state: { name },
   } = useCurrentStateAndParams();
   if (name?.includes('kubernetes')) {
-    return (
-      <CreateForm
-        defaultType={StackType.Kubernetes}
-        environmentId={endpointId}
-      />
-    );
+    return StackType.Kubernetes;
   }
 
-  if (name?.includes('edge')) {
-    return <CreateForm defaultType={StackType.DockerCompose} />;
-  }
-
-  return (
-    <CreateForm
-      defaultType={StackType.DockerCompose}
-      environmentId={endpointId}
-    />
-  );
+  // edge or docker
+  return StackType.DockerCompose;
 }

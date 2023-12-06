@@ -18,11 +18,14 @@ export function useInitialValues({
   defaultType: StackType;
   isEdge?: boolean;
   buildMethods: Array<Method>;
-}): FormValues {
+}): FormValues | undefined {
   const { user, isAdmin } = useCurrentUser();
   const { appTemplateId, type = defaultType } = useAppTemplateParams();
 
   const fileContentQuery = useFetchTemplateFile(appTemplateId);
+  if (fileContentQuery.isLoading) {
+    return undefined;
+  }
 
   return {
     Title: '',
