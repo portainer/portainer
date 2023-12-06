@@ -11,7 +11,10 @@ import { BackupFileForm } from './BackupFileForm';
 import { BackupS3Form } from './BackupS3Form';
 
 export function BackupSettingsPanel() {
-  const [backupType, setBackupType] = useBackupTypeState(options[0].value);
+  const [backupType, setBackupType] = useLocalStorage(
+    'settings_backup_type',
+    options[0].value
+  );
 
   return (
     <Widget>
@@ -41,15 +44,4 @@ export function BackupSettingsPanel() {
       </WidgetBody>
     </Widget>
   );
-}
-
-export function useBackupTypeState(
-  defaultValue: string
-): [string, (value: string) => void] {
-  const [value, setValue] = useLocalStorage(
-    'settings_backup_type',
-    defaultValue
-  );
-
-  return [value, setValue];
 }
