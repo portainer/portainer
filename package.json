@@ -184,7 +184,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-regex": "^1.10.0",
     "eslint-plugin-storybook": "^0.6.14",
-    "eslint-webpack-plugin": "^4.0.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^5.5.3",
     "husky": "^8.0.0",
