@@ -24,12 +24,12 @@ export function NewCredentialForm({
             <Checkbox
               id="repository-save-credential"
               label="save credential"
-              checked={value.SaveCredential}
+              checked={value.SaveCredential || false}
               className="[&+label]:mb-0"
               onChange={(e) => onChange({ SaveCredential: e.target.checked })}
             />
             <Input
-              value={value.NewCredentialName}
+              value={value.NewCredentialName || ''}
               name="new_credential_name"
               placeholder="credential name"
               className="ml-4 w-48"

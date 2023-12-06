@@ -3,7 +3,7 @@ import { type Values as CommonFieldsValues } from '@/react/portainer/custom-temp
 import { DefinitionFieldValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { Platform } from '@/react/portainer/templates/types';
 import { GitFormModel } from '@/react/portainer/gitops/types';
-import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
+import { AccessControlFormData } from '@/react/portainer/access-control/types';
 
 import {
   editor,
@@ -11,9 +11,11 @@ import {
   git,
 } from '@@/BoxSelector/common-options/build-methods';
 
-export const buildMethods = [editor, upload, git] as const;
+import { EdgeTemplateSettings } from '../types';
 
-export type Method = (typeof buildMethods)[number]['value'];
+export const initialBuildMethods = [editor, upload, git] as const;
+
+export type Method = (typeof initialBuildMethods)[number]['value'];
 
 export interface FormValues extends CommonFieldsValues {
   Platform: Platform;
@@ -23,5 +25,6 @@ export interface FormValues extends CommonFieldsValues {
   File: File | undefined;
   Git: GitFormModel;
   Variables: DefinitionFieldValues;
+  AccessControl?: AccessControlFormData;
   EdgeSettings?: EdgeTemplateSettings;
 }
