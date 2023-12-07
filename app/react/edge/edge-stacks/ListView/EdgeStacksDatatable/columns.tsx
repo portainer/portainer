@@ -8,7 +8,6 @@ import { buildNameColumn } from '@@/datatables/NameCell';
 import { Link } from '@@/Link';
 
 import { StatusType } from '../../types';
-import { removeTrailingGitExtension } from '../../utils';
 
 import { EdgeStackStatus } from './EdgeStacksStatus';
 import { DecoratedEdgeStack } from './types';
@@ -152,9 +151,7 @@ export const columns = _.compact([
               <div className="text-center">
                 <a
                   target="_blank"
-                  href={`${removeTrailingGitExtension(
-                    item.GitConfig.URL
-                  )}/commit/${item.GitConfig.ConfigHash}`}
+                  href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
                   rel="noreferrer"
                 >
                   {item.GitConfig.ConfigHash.slice(0, 7)}
