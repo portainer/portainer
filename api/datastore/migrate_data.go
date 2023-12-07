@@ -16,6 +16,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
+
 func (store *Store) MigrateData() error {
 	updating, err := store.VersionService.IsUpdating()
 	if err != nil {
@@ -40,7 +42,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	// before we alter anything in the DB, create a backup
-	_, err = store.Backup()
+	backupPath, err := store.Backup(version)
 	if err != nil {
 		return errors.Wrap(err, "while backing up database")
 	}
@@ -50,9 +52,9 @@ func (store *Store) MigrateData() error {
 		err = errors.Wrap(err, "failed to migrate database")
 
 		log.Warn().Err(err).Msg("migration failed, restoring database to previous version")
-		restoreErr := store.Restore()
-		if restoreErr != nil {
-			return errors.Wrap(restoreErr, "failed to restore database")
+		restorErr := store.restoreWithOptions(&BackupOptions{BackupPath: backupPath})
+		if restorErr != nil {
+			return errors.Wrap(restorErr, "failed to restore database")
 		}
 
 		log.Info().Msg("database restored to previous version")
@@ -139,7 +141,9 @@ func (store *Store) connectionRollback(force bool) error {
 		}
 	}
 
-	err := store.Restore()
+	options := getBackupRestoreOptions(store.commonBackupDir())
+
+	err := store.restoreWithOptions(options)
 	if err != nil {
 		return err
 	}
