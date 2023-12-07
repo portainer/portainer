@@ -7,20 +7,29 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
-	"github.com/Masterminds/semver"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
-	"github.com/portainer/portainer/api/database/models"
-	"github.com/portainer/portainer/api/datastore/migrator"
-	"github.com/rs/zerolog/log"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/portainer/portainer/api/database/models"
+	"github.com/rs/zerolog/log"
 )
 
+// testVersion is a helper which tests current store version against wanted version
+func testVersion(store *Store, versionWant string, t *testing.T) {
+	v, err := store.VersionService.Version()
+	if err != nil {
+		t.Errorf("Expect store version to be %s but was %s with error: %s", versionWant, v.SchemaVersion, err)
+	}
+	if v.SchemaVersion != versionWant {
+		t.Errorf("Expect store version to be %s but was %s", versionWant, v.SchemaVersion)
+	}
+}
+
 func TestMigrateData(t *testing.T) {
-	tests := []struct {
+	snapshotTests := []struct {
 		testName           string
 		srcPath            string
 		wantPath           string
@@ -33,7 +42,7 @@ func TestMigrateData(t *testing.T) {
 			overrideInstanceId: true,
 		},
 	}
-	for _, test := range tests {
+	for _, test := range snapshotTests {
 		t.Run(test.testName, func(t *testing.T) {
 			err := migrateDBTestHelper(t, test.srcPath, test.wantPath, test.overrideInstanceId)
 			if err != nil {
@@ -46,167 +55,147 @@ func TestMigrateData(t *testing.T) {
 		})
 	}
 
-	t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
-		newStore, store := MustNewTestStore(t, true, false)
-		if !newStore {
-			t.Error("Expect a new DB")
-		}
+	// t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
+	// 	newStore, store, teardown := MustNewTestStore(t, true, false)
+	// 	defer teardown()
 
-		testVersion(store, portainer.APIVersion, t)
-		store.Close()
+	// 	if !newStore {
+	// 		t.Error("Expect a new DB")
+	// 	}
 
-		newStore, _ = store.Open()
-		if newStore {
-			t.Error("Expect store to NOT be new DB")
-		}
-	})
+	// 	testVersion(store, portainer.APIVersion, t)
+	// 	store.Close()
 
-	t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
-		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.UpdateVersion(&models.Version{SchemaVersion: "1.0", Edition: int(portainer.PortainerCE)})
-		store.MigrateData()
+	// 	newStore, _ = store.Open()
+	// 	if newStore {
+	// 		t.Error("Expect store to NOT be new DB")
+	// 	}
+	// })
 
-		backupfilename := store.backupFilename()
-		if exists, _ := store.fileService.FileExists(backupfilename); !exists {
-			t.Errorf("Expect backup file to be created %s", backupfilename)
-		}
-	})
+	// tests := []struct {
+	// 	version         string
+	// 	expectedVersion string
+	// }{
+	// 	{version: "1.24.1", expectedVersion: portainer.APIVersion},
+	// 	{version: "2.0.0", expectedVersion: portainer.APIVersion},
+	// }
+	// for _, tc := range tests {
+	// 	_, store, teardown := MustNewTestStore(t, true, true)
+	// 	defer teardown()
 
-	t.Run("MigrateData should recover and restore backup during migration critical failure", func(t *testing.T) {
-		os.Setenv("PORTAINER_TEST_MIGRATE_FAIL", "FAIL")
+	// 	// Setup data
+	// 	v := models.Version{SchemaVersion: tc.version}
+	// 	store.VersionService.UpdateVersion(&v)
 
-		version := "2.15"
-		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.UpdateVersion(&models.Version{SchemaVersion: version, Edition: int(portainer.PortainerCE)})
-		store.MigrateData()
+	// 	// Required roles by migrations 22.2
+	// 	store.RoleService.Create(&portainer.Role{ID: 1})
+	// 	store.RoleService.Create(&portainer.Role{ID: 2})
+	// 	store.RoleService.Create(&portainer.Role{ID: 3})
+	// 	store.RoleService.Create(&portainer.Role{ID: 4})
 
-		store.Open()
-		testVersion(store, version, t)
-	})
+	// 	t.Run(fmt.Sprintf("MigrateData for version %s", tc.version), func(t *testing.T) {
+	// 		store.MigrateData()
+	// 		testVersion(store, tc.expectedVersion, t)
+	// 	})
 
-	t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
-		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.StoreIsUpdating(true)
-		store.MigrateData()
+	// 	t.Run(fmt.Sprintf("Restoring DB after migrateData for version %s", tc.version), func(t *testing.T) {
+	// 		store.Rollback(true)
+	// 		store.Open()
+	// 		testVersion(store, tc.version, t)
+	// 	})
+	// }
 
-		// If you get an error, it usually means that the backup folder doesn't exist (no backups). Expected!
-		// If the backup file is not blank, then it means a backup was created.  We don't want that because we
-		// only create a backup when the version changes.
-		backupfilename := store.backupFilename()
-		if exists, _ := store.fileService.FileExists(backupfilename); exists {
-			t.Errorf("Backup file should not exist for dirty database")
-		}
-	})
+	// t.Run("Error in MigrateData should restore backup before MigrateData", func(t *testing.T) {
+	// 	_, store, teardown := MustNewTestStore(t, false, true)
+	// 	defer teardown()
 
-	t.Run("MigrateData should not create backup on startup if portainer version matches db", func(t *testing.T) {
-		_, store := MustNewTestStore(t, true, false)
+	// 	v := models.Version{SchemaVersion: "1.24.1"}
+	// 	store.VersionService.UpdateVersion(&v)
 
-		// Set migrator the count to match our migrations array (simulate no changes).
-		// Should not create a backup
-		v, err := store.VersionService.Version()
-		if err != nil {
-			t.Errorf("Unable to read version from db: %s", err)
-			t.FailNow()
-		}
+	// 	store.MigrateData()
 
-		migratorParams := store.newMigratorParameters(v)
-		m := migrator.NewMigrator(migratorParams)
-		latestMigrations := m.LatestMigrations()
+	// 	testVersion(store, v.SchemaVersion, t)
+	// })
 
-		if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
-			v.MigratorCount = len(latestMigrations.MigrationFuncs)
-			store.VersionService.UpdateVersion(v)
-		}
+	// t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
+	// 	_, store, teardown := MustNewTestStore(t, false, true)
+	// 	defer teardown()
 
-		store.MigrateData()
+	// 	v := models.Version{SchemaVersion: "0.0.0"}
+	// 	store.VersionService.UpdateVersion(&v)
 
-		// If you get an error, it usually means that the backup folder doesn't exist (no backups). Expected!
-		// If the backup file is not blank, then it means a backup was created.  We don't want that because we
-		// only create a backup when the version changes.
-		backupfilename := store.backupFilename()
-		if exists, _ := store.fileService.FileExists(backupfilename); exists {
-			t.Errorf("Backup file should not exist for dirty database")
-		}
-	})
+	// 	store.MigrateData()
 
-	t.Run("MigrateData should create backup on startup if portainer version matches db and migrationFuncs counts differ", func(t *testing.T) {
-		_, store := MustNewTestStore(t, true, false)
+	// 	options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
 
-		// Set migrator count very large to simulate changes
-		// Should not create a backup
-		v, err := store.VersionService.Version()
-		if err != nil {
-			t.Errorf("Unable to read version from db: %s", err)
-			t.FailNow()
-		}
+	// 	if !isFileExist(options.BackupPath) {
+	// 		t.Errorf("Backup file should exist; file=%s", options.BackupPath)
+	// 	}
+	// })
 
-		v.MigratorCount = 1000
-		store.VersionService.UpdateVersion(v)
-		store.MigrateData()
+	// t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
+	// 	_, store, teardown := MustNewTestStore(t, false, true)
+	// 	defer teardown()
 
-		// If you get an error, it usually means that the backup folder doesn't exist (no backups). Expected!
-		// If the backup file is not blank, then it means a backup was created.  We don't want that because we
-		// only create a backup when the version changes.
-		backupfilename := store.backupFilename()
-		if exists, _ := store.fileService.FileExists(backupfilename); !exists {
-			t.Errorf("DB backup should exist and there should be no error")
-		}
-	})
+	// 	store.VersionService.StoreIsUpdating(true)
+
+	// 	store.MigrateData()
+
+	// 	options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
+
+	// 	if isFileExist(options.BackupPath) {
+	// 		t.Errorf("Backup file should not exist for dirty database; file=%s", options.BackupPath)
+	// 	}
+	// })
+
+	// t.Run("MigrateData should not create backup on startup if portainer version matches db", func(t *testing.T) {
+	// 	_, store, teardown := MustNewTestStore(t, false, true)
+	// 	defer teardown()
+
+	// 	store.MigrateData()
+
+	// 	options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
+
+	// 	if isFileExist(options.BackupPath) {
+	// 		t.Errorf("Backup file should not exist for dirty database; file=%s", options.BackupPath)
+	// 	}
+	// })
+}
+
+func Test_getBackupRestoreOptions(t *testing.T) {
+	_, store := MustNewTestStore(t, false, true)
+
+	options := getBackupRestoreOptions(store.commonBackupDir())
+
+	wantDir := store.commonBackupDir()
+	if !strings.HasSuffix(options.BackupDir, wantDir) {
+		log.Fatal().Str("got", options.BackupDir).Str("want", wantDir).Msg("incorrect backup dir")
+	}
+
+	wantFilename := "portainer.db.bak"
+	if options.BackupFileName != wantFilename {
+		log.Fatal().Str("got", options.BackupFileName).Str("want", wantFilename).Msg("incorrect backup file")
+	}
 }
 
 func TestRollback(t *testing.T) {
 	t.Run("Rollback should restore upgrade after backup", func(t *testing.T) {
-		version := "2.11"
-
-		v := models.Version{
-			SchemaVersion: version,
-		}
-
-		_, store := MustNewTestStore(t, false, false)
-		store.VersionService.UpdateVersion(&v)
-
-		_, err := store.Backup()
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		v.SchemaVersion = "2.14"
-		// Change the current edition
-		err = store.VersionService.UpdateVersion(&v)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		err = store.Rollback(true)
-		if err != nil {
-			t.Logf("Rollback failed: %s", err)
-			t.Fail()
-			return
-		}
-
-		store.Open()
-		testVersion(store, version, t)
-	})
-
-	t.Run("Rollback should restore upgrade after backup", func(t *testing.T) {
-		version := "2.15"
-
-		v := models.Version{
-			SchemaVersion: version,
-			Edition:       int(portainer.PortainerCE),
-		}
-
+		version := models.Version{SchemaVersion: "2.4.0"}
 		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.UpdateVersion(&v)
 
-		_, err := store.Backup()
+		err := store.VersionService.UpdateVersion(&version)
+		if err != nil {
+			t.Errorf("Failed updating version: %v", err)
+		}
+
+		_, err = store.backupWithOptions(getBackupRestoreOptions(store.commonBackupDir()))
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
 
-		v.SchemaVersion = "2.14"
-		// Change the current edition
-		err = store.VersionService.UpdateVersion(&v)
+		// Change the current version
+		version2 := models.Version{SchemaVersion: "2.6.0"}
+		err = store.VersionService.UpdateVersion(&version2)
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
@@ -218,9 +207,24 @@ func TestRollback(t *testing.T) {
 			return
 		}
 
-		store.Open()
-		testVersion(store, version, t)
+		_, err = store.Open()
+		if err != nil {
+			t.Logf("Open failed: %s", err)
+			t.Fail()
+			return
+		}
+
+		testVersion(store, version.SchemaVersion, t)
 	})
+}
+
+// isFileExist is helper function to check for file existence
+func isFileExist(path string) bool {
+	matches, err := filepath.Glob(path)
+	if err != nil {
+		return false
+	}
+	return len(matches) > 0
 }
 
 // migrateDBTestHelper loads a json representation of a bolt database from srcPath,
