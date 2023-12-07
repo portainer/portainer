@@ -133,10 +133,6 @@ function SSLSettingsPanel() {
   );
 
   function handleSubmit({ certFile, forceHTTPS, keyFile }: FormValues) {
-    // certFile and keyFile can be null, because if the forceHTTPS is
-    // true, and no certFile and keyFile are provided, the server will
-    // generate a self-signed certificate.
-
     mutation.mutate(
       { certFile, httpEnabled: !forceHTTPS, keyFile },
       {
