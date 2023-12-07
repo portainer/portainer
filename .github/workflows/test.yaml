@@ -16,6 +16,7 @@ on:
 jobs:
   test-client:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v2
@@ -36,6 +37,8 @@ jobs:
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
