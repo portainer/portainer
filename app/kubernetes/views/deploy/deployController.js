@@ -194,7 +194,7 @@ class KubernetesDeployController {
           this.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
           this.onChangeFileContent(this.state.templateContent);
 
-          this.state.isEditorReadOnly = true;
+          this.state.isEditorReadOnly = false;
         } catch (err) {
           this.state.templateLoadFailed = true;
           throw err;
