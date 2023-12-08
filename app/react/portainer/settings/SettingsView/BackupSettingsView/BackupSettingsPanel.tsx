@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react';
-import { useState } from 'react';
+
+import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
@@ -10,7 +11,10 @@ import { BackupFileForm } from './BackupFileForm';
 import { BackupS3Form } from './BackupS3Form';
 
 export function BackupSettingsPanel() {
-  const [backupType, setBackupType] = useState(options[0].value);
+  const [backupType, setBackupType] = useLocalStorage(
+    'settings_backup_type',
+    options[0].value
+  );
 
   return (
     <Widget>
