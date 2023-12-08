@@ -250,7 +250,12 @@ async function getApplicationsByKind<T extends ApplicationList>(
     const { data } = await axios.get<T>(
       buildUrl(environmentId, namespace, `${appKind}s`)
     );
-    return data.items as T['items'];
+    const items = (data.items || []).map((app) => ({
+      ...app,
+      kind: appKind,
+      apiVersion: data.apiVersion,
+    }));
+    return items as T['items'];
   } catch (e) {
     throw parseAxiosError(e as Error, `Unable to retrieve ${appKind}s`);
   }
