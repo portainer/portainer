@@ -14,7 +14,7 @@ export function BackupSettingsPanel() {
 
   return (
     <Widget>
-      <WidgetTitle icon={Download} title="Backup up Portainer" />
+      <WidgetTitle icon={Download} title="Back up Portainer" />
       <WidgetBody>
         <div className="form-horizontal">
           <FormSection title="Backup configuration">
