@@ -94,6 +94,7 @@ class PorAccessManagementController {
       const roles = await this.RoleService.roles();
       this.roles = _.orderBy(roles, 'Priority', 'asc');
       this.formValues = {
+        multiselectOutput: [],
         selectedRole: this.roles.find((role) => !this.isRoleLimitedToBE(role)),
       };
 
