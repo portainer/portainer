@@ -21,7 +21,15 @@ export async function getNamespacePods(
         },
       }
     );
-    return data.items;
+    const items = (data.items || []).map(
+      (pod) =>
+        <Pod>{
+          ...pod,
+          kind: 'Pod',
+          apiVersion: data.apiVersion,
+        }
+    );
+    return items;
   } catch (e) {
     throw parseKubernetesAxiosError(
       e,

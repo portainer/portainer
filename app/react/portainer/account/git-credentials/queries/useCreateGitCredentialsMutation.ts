@@ -2,8 +2,9 @@ import { useQueryClient, useMutation } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
-import { GitAuthModel } from '@/react/portainer/gitops/types';
+import { GitAuthModel, GitFormModel } from '@/react/portainer/gitops/types';
 import { useCurrentUser } from '@/react/hooks/useUser';
+import { UserId } from '@/portainer/users/types';
 
 import { GitCredential } from '../types';
 import { buildGitUrl } from '../git-credentials.service';
@@ -79,4 +80,41 @@ export function useSaveCredentialsIfRequired() {
       return undefined;
     }
   }
+}
+
+export async function saveGitCredentialsIfNeeded(
+  userId: UserId,
+  gitModel: GitFormModel
+) {
+  let credentialsId = gitModel.RepositoryGitCredentialID;
+  let username = gitModel.RepositoryUsername;
+  let password = gitModel.RepositoryPassword;
+  if (
+    gitModel.SaveCredential &&
+    gitModel.RepositoryAuthentication &&
+    password &&
+    username &&
+    gitModel.NewCredentialName
+  ) {
+    const cred = await createGitCredential({
+      name: gitModel.NewCredentialName,
+      password,
+      username,
+      userId,
+    });
+    credentialsId = cred.id;
+  }
+
+  // clear username and password if credentials are provided
+  if (credentialsId && username) {
+    username = '';
+    password = '';
+  }
+
+  return {
+    ...gitModel,
+    RepositoryGitCredentialID: credentialsId,
+    RepositoryUsername: username,
+    RepositoryPassword: password,
+  };
 }

@@ -13,13 +13,12 @@ import {
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
 import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
+import { EdgeSettingsFieldset } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset';
 
 import { WebEditorForm, usePreventExit } from '@@/WebEditorForm';
 import { FormActions } from '@@/form-components/FormActions';
 import { Button } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
-
-import { EdgeSettingsFieldset } from '../CreateView/EdgeSettingsFieldset';
 
 import { FormValues } from './types';
 
