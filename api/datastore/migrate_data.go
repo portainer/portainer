@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"os"
 	"runtime/debug"
 
 	portainer "github.com/portainer/portainer/api"
@@ -14,8 +15,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
-
-const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 
 func (store *Store) MigrateData() error {
 	updating, err := store.VersionService.IsUpdating()
@@ -41,7 +40,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	// before we alter anything in the DB, create a backup
-	backupPath, err := store.Backup(version)
+	_, err = store.Backup()
 	if err != nil {
 		return errors.Wrap(err, "while backing up database")
 	}
@@ -51,9 +50,9 @@ func (store *Store) MigrateData() error {
 		err = errors.Wrap(err, "failed to migrate database")
 
 		log.Warn().Err(err).Msg("migration failed, restoring database to previous version")
-		restorErr := store.restoreWithOptions(&BackupOptions{BackupPath: backupPath})
-		if restorErr != nil {
-			return errors.Wrap(restorErr, "failed to restore database")
+		restoreErr := store.Restore()
+		if restoreErr != nil {
+			return errors.Wrap(restoreErr, "failed to restore database")
 		}
 
 		log.Info().Msg("database restored to previous version")
@@ -117,6 +116,11 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models
 		return err
 	}
 
+	// Special test code to simulate a failure (used by migrate_data_test.go).  Do not remove...
+	if os.Getenv("PORTAINER_TEST_MIGRATE_FAIL") == "FAIL" {
+		panic("test migration failure")
+	}
+
 	err = store.VersionService.StoreIsUpdating(false)
 	if err != nil {
 		return errors.Wrap(err, "failed to update the store")
@@ -135,9 +139,7 @@ func (store *Store) connectionRollback(force bool) error {
 		}
 	}
 
-	options := getBackupRestoreOptions(store.commonBackupDir())
-
-	err := store.restoreWithOptions(options)
+	err := store.Restore()
 	if err != nil {
 		return err
 	}
