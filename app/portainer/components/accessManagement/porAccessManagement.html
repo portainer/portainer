@@ -62,23 +62,17 @@
     </rd-widget>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-12">
-    <access-datatable
-      ng-if="ctrl.authorizedUsersAndTeams"
-      title-text="Access"
-      title-icon="user-x"
-      table-key="{{ 'access_' + ctrl.entityType }}"
-      order-by="Name"
-      show-warning="ctrl.entityType !== 'registry'"
-      is-update-enabled="ctrl.entityType !== 'registry'"
-      show-roles="ctrl.entityType !== 'registry'"
-      roles="ctrl.roles"
-      inherit-from="ctrl.inheritFrom"
-      dataset="ctrl.authorizedUsersAndTeams"
-      update-action="ctrl.updateAction"
-      remove-action="ctrl.unauthorizeAccess"
-    >
-    </access-datatable>
-  </div>
-</div>
+
+<access-datatable
+  ng-if="ctrl.authorizedUsersAndTeams"
+  table-key="'access_' + ctrl.entityType"
+  show-warning="ctrl.entityType !== 'registry'"
+  is-update-enabled="ctrl.entityType !== 'registry'"
+  show-roles="ctrl.entityType !== 'registry'"
+  roles="ctrl.roles"
+  inherit-from="ctrl.inheritFrom"
+  dataset="ctrl.authorizedUsersAndTeams"
+  on-update="(ctrl.updateAction)"
+  on-remove="(ctrl.unauthorizeAccess)"
+>
+</access-datatable>

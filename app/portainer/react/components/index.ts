@@ -48,6 +48,7 @@ import { registriesModule } from './registries';
 import { accountModule } from './account';
 import { usersModule } from './users';
 import { activityLogsModule } from './activity-logs';
+import { rbacModule } from './rbac';
 
 export const ngModule = angular
   .module('portainer.app.react.components', [
@@ -60,6 +61,7 @@ export const ngModule = angular
     accountModule,
     usersModule,
     activityLogsModule,
+    rbacModule,
   ])
   .component(
     'tagSelector',
