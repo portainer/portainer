@@ -188,6 +188,7 @@ export function InputList<T = DefaultType>({
                         initialItemsCount={initialItemsCount.current}
                         handleRemoveItem={handleRemoveItem}
                         handleToggleNeedsDeletion={handleToggleNeedsDeletion}
+                        dataCy={`${deleteButtonDataCy}_${index}`}
                       />
                     )}
                 </div>
@@ -325,6 +326,7 @@ type CanUndoDeleteButtonProps<T> = {
   initialItemsCount: number;
   handleRemoveItem(key: Key, item: T): void;
   handleToggleNeedsDeletion(key: Key, item: T): void;
+  dataCy: string;
 };
 
 function CanUndoDeleteButton<T>({
@@ -333,6 +335,7 @@ function CanUndoDeleteButton<T>({
   initialItemsCount,
   handleRemoveItem,
   handleToggleNeedsDeletion,
+  dataCy,
 }: CanUndoDeleteButtonProps<T>) {
   return (
     <div className="items-start">
@@ -343,6 +346,7 @@ function CanUndoDeleteButton<T>({
           onClick={handleDeleteClick}
           className="vertical-center btn-only-icon"
           icon={Trash2}
+          data-cy={`${dataCy}_delete`}
         />
       )}
       {item.needsDeletion && (
@@ -352,6 +356,7 @@ function CanUndoDeleteButton<T>({
           onClick={handleDeleteClick}
           className="vertical-center btn-only-icon"
           icon={RotateCw}
+          data-cy={`${dataCy}_undo_delete`}
         />
       )}
     </div>

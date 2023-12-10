@@ -13,14 +13,12 @@ import {
   KubernetesApplicationPublishingTypes,
   KubernetesApplicationQuotaDefaults,
   KubernetesApplicationTypes,
-  KubernetesApplicationPlacementTypes,
   KubernetesDeploymentTypes,
 } from 'Kubernetes/models/application/models';
 import {
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
   KubernetesApplicationPersistedFolderFormValue,
-  KubernetesApplicationPlacementFormValue,
   KubernetesFormValidationReferences,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
@@ -36,7 +34,6 @@ import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateV
 import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
-import { placementOptions } from '@/react/kubernetes/applications/CreateView/placementTypes';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -80,12 +77,9 @@ class KubernetesCreateApplicationController {
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
-    this.ApplicationPlacementTypes = KubernetesApplicationPlacementTypes;
     this.ApplicationTypes = KubernetesApplicationTypes;
     this.ServiceTypes = KubernetesServiceTypes;
     this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
-
-    this.placementOptions = placementOptions;
 
     this.state = {
       appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
@@ -148,7 +142,6 @@ class KubernetesCreateApplicationController {
     this.onDataAccessPolicyChange = this.onDataAccessPolicyChange.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
     this.supportGlobalDeployment = this.supportGlobalDeployment.bind(this);
-    this.onChangePlacementType = this.onChangePlacementType.bind(this);
     this.onServicesChange = this.onServicesChange.bind(this);
     this.onEnvironmentVariableChange = this.onEnvironmentVariableChange.bind(this);
     this.onConfigMapsChange = this.onConfigMapsChange.bind(this);
@@ -157,12 +150,14 @@ class KubernetesCreateApplicationController {
     this.onChangeResourceReservation = this.onChangeResourceReservation.bind(this);
     this.onChangeReplicaCount = this.onChangeReplicaCount.bind(this);
     this.onAutoScaleChange = this.onAutoScaleChange.bind(this);
+    this.onChangePlacements = this.onChangePlacements.bind(this);
   }
   /* #endregion */
 
-  onChangePlacementType(value) {
-    this.$scope.$evalAsync(() => {
-      this.formValues.PlacementType = value;
+  onChangePlacements(values) {
+    return this.$async(async () => {
+      this.formValues.Placements = values.placements;
+      this.formValues.PlacementType = values.placementType;
     });
   }
 
@@ -410,50 +405,6 @@ class KubernetesCreateApplicationController {
   }
   /* #endregion */
 
-  /* #region  PLACEMENT UI MANAGEMENT */
-  addPlacement() {
-    const placement = new KubernetesApplicationPlacementFormValue();
-    const label = this.nodesLabels[0];
-    placement.Label = label;
-    placement.Value = label.Values[0];
-    this.formValues.Placements.push(placement);
-    this.onChangePlacement();
-  }
-
-  restorePlacement(index) {
-    this.formValues.Placements[index].NeedsDeletion = false;
-    this.onChangePlacement();
-  }
-
-  removePlacement(index) {
-    if (this.state.isEdit && !this.formValues.Placements[index].IsNew) {
-      this.formValues.Placements[index].NeedsDeletion = true;
-    } else {
-      this.formValues.Placements.splice(index, 1);
-    }
-    this.onChangePlacement();
-  }
-
-  // call all validation functions when a placement is added/removed/restored
-  onChangePlacement() {
-    this.onChangePlacementLabelValidate();
-  }
-
-  onChangePlacementLabel(index) {
-    this.formValues.Placements[index].Value = this.formValues.Placements[index].Label.Values[0];
-    this.onChangePlacementLabelValidate();
-  }
-
-  onChangePlacementLabelValidate() {
-    const state = this.state.duplicates.placements;
-    const source = _.map(this.formValues.Placements, (p) => (p.NeedsDeletion ? undefined : p.Label.Key));
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
-    state.refs = duplicates;
-    state.hasRefs = Object.keys(duplicates).length > 0;
-  }
-
-  /* #endregion */
-
   /* #region SERVICES UI MANAGEMENT */
   onServicesChange(services) {
     return this.$async(async () => {
@@ -674,15 +625,6 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && this.formValues.PersistedFolders[index].persistentVolumeClaimName;
   }
   /* #endregion */
-
-  isEditAndNotNewPlacement(index) {
-    return this.state.isEdit && !this.formValues.Placements[index].IsNew;
-  }
-
-  showPlacementPolicySection() {
-    const placements = _.filter(this.formValues.Placements, { NeedsDeletion: false });
-    return placements.length !== 0;
-  }
 
   isNonScalable() {
     const scalable = this.supportScalableReplicaDeployment();

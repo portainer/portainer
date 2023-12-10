@@ -22,7 +22,7 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
@@ -429,31 +429,29 @@ class KubernetesApplicationHelper {
   /* #endregion */
 
   /* #region  PLACEMENTS FV <> AFFINITY */
-  static generatePlacementsFormValuesFromAffinity(formValues, podAffinity, nodesLabels) {
+  static generatePlacementsFormValuesFromAffinity(formValues, podAffinity) {
     let placements = formValues.Placements;
     let type = formValues.PlacementType;
     const affinity = podAffinity.nodeAffinity;
     if (affinity && affinity.requiredDuringSchedulingIgnoredDuringExecution) {
-      type = KubernetesApplicationPlacementTypes.MANDATORY;
+      type = 'mandatory';
       _.forEach(affinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms, (term) => {
         _.forEach(term.matchExpressions, (exp) => {
           const placement = new KubernetesApplicationPlacementFormValue();
-          const label = _.find(nodesLabels, { Key: exp.key });
-          placement.Label = label;
-          placement.Value = exp.values[0];
-          placement.IsNew = false;
+          placement.label = exp.key;
+          placement.value = exp.values[0];
+          placement.isNew = false;
           placements.push(placement);
         });
       });
     } else if (affinity && affinity.preferredDuringSchedulingIgnoredDuringExecution) {
-      type = KubernetesApplicationPlacementTypes.PREFERRED;
+      type = 'preferred';
       _.forEach(affinity.preferredDuringSchedulingIgnoredDuringExecution, (term) => {
         _.forEach(term.preference.matchExpressions, (exp) => {
           const placement = new KubernetesApplicationPlacementFormValue();
-          const label = _.find(nodesLabels, { Key: exp.key });
-          placement.Label = label;
-          placement.Value = exp.values[0];
-          placement.IsNew = false;
+          placement.label = exp.key;
+          placement.value = exp.values[0];
+          placement.isNew = false;
           placements.push(placement);
         });
       });
@@ -467,12 +465,12 @@ class KubernetesApplicationHelper {
       const placements = formValues.Placements;
       const res = new KubernetesPodNodeAffinityPayload();
       let expressions = _.map(placements, (p) => {
-        if (!p.NeedsDeletion) {
+        if (!p.needsDeletion) {
           const exp = new KubernetesNodeSelectorRequirementPayload();
-          exp.key = p.Label.Key;
-          if (p.Value) {
+          exp.key = p.label;
+          if (p.value) {
             exp.operator = KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN;
-            exp.values = [p.Value];
+            exp.values = [p.value];
           } else {
             exp.operator = KubernetesPodNodeAffinityNodeSelectorRequirementOperators.EXISTS;
             delete exp.values;
@@ -482,12 +480,12 @@ class KubernetesApplicationHelper {
       });
       expressions = _.without(expressions, undefined);
       if (expressions.length) {
-        if (formValues.PlacementType === KubernetesApplicationPlacementTypes.MANDATORY) {
+        if (formValues.PlacementType === 'mandatory') {
           const term = new KubernetesNodeSelectorTermPayload();
           term.matchExpressions = expressions;
           res.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.push(term);
           delete res.preferredDuringSchedulingIgnoredDuringExecution;
-        } else if (formValues.PlacementType === KubernetesApplicationPlacementTypes.PREFERRED) {
+        } else if (formValues.PlacementType === 'preferred') {
           const term = new KubernetesPreferredSchedulingTermPayload();
           term.preference = new KubernetesNodeSelectorTermPayload();
           term.preference.matchExpressions = expressions;
