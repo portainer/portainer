@@ -144,6 +144,8 @@ func (connection *DbConnection) Open() error {
 // Close closes the BoltDB database.
 // Safe to being called multiple times.
 func (connection *DbConnection) Close() error {
+	log.Info().Msg("closing PortainerDB")
+
 	if connection.DB != nil {
 		return connection.DB.Close()
 	}

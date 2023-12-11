@@ -43,11 +43,12 @@ func (store *Store) Restore() error {
 }
 
 func (store *Store) RestoreFromFile(backupFilename string) error {
+	store.Close()
 	if err := store.fileService.Copy(backupFilename, store.connection.GetDatabaseFilePath(), true); err != nil {
 		return fmt.Errorf("unable to restore backup file %q. err: %w", backupFilename, err)
 	}
 
-	log.Info().Str("from", store.connection.GetDatabaseFilePath()).Str("to", backupFilename).Msgf("database restored")
+	log.Info().Str("from", backupFilename).Str("to", store.connection.GetDatabaseFilePath()).Msgf("database restored")
 
 	_, err := store.Open()
 	if err != nil {
@@ -61,7 +62,7 @@ func (store *Store) RestoreFromFile(backupFilename string) error {
 	}
 
 	editionLabel := portainer.SoftwareEdition(version.Edition).GetEditionLabel()
-	log.Info().Str("version", version.SchemaVersion).Msgf("Restored database version: Portainer %s %s ", editionLabel, version.SchemaVersion)
+	log.Info().Msgf("Restored database version: Portainer %s %s", editionLabel, version.SchemaVersion)
 	return nil
 }
 
