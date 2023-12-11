@@ -71,7 +71,7 @@ export function useAddMemberMutation(teamId: TeamId) {
         notifyError('Failure', error as Error, 'Failure to add membership');
       },
       onSuccess() {
-        return queryClient.invalidateQueries(['teams', teamId, 'memberships']);
+        queryClient.invalidateQueries(['teams', teamId, 'memberships']);
       },
     }
   );
