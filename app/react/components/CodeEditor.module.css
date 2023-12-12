@@ -123,3 +123,18 @@
   @apply th-dark:bg-gray-iron-10;
   @apply th-highcontrast:bg-black;
 }
+
+.root :global(.cm-textfield) {
+  border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-inputbox);
+  color: var(--text-form-control-color);
+  @apply text-xs;
+}
+
+.root :global(.cm-button) {
+  @apply text-xs;
+}
+
+.root :global(.cm-panel.cm-search label) {
+  @apply text-xs;
+}
