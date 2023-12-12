@@ -55,6 +55,11 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     terminal.setOption('cursorBlink', true);
     terminal.focus();
     fit(terminal);
+    if (socket) {
+      socket.send('export LANG=C.UTF-8\n');
+      socket.send('export LC_ALL=C.UTF-8\n');
+      socket.send('clear\n');
+    }
     terminal.writeln('#Run kubectl commands inside here');
     terminal.writeln('#e.g. kubectl get all');
     terminal.writeln('');

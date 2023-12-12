@@ -8,6 +8,7 @@ import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsB
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
 import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
+import { TerminalTooltip } from '@/react/kubernetes/applications/ConsoleView/ConsoleView';
 import { HelmRepositoryDatatable } from '@/react/portainer/account/AccountView/HelmRepositoryDatatable';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 
@@ -84,6 +85,7 @@ export const ngModule = angular
     'portainerTooltip',
     r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage', 'size'])
   )
+  .component('terminalTooltip', r2a(TerminalTooltip, []))
   .component('badge', r2a(Badge, ['type', 'className']))
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
