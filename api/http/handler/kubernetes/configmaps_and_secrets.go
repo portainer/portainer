@@ -19,7 +19,7 @@ import (
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
 // @param namespace path string true "Namespace name"
-// @success 200 {array} models.K8sConfigMapOrSecret "Success"
+// @success 200 {array} []kubernetes.K8sConfigMapOrSecret "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @deprecated

@@ -266,7 +266,7 @@ export function CreateIngressView() {
     ingressRule.IngressClassName,
   ]);
 
-  const matchedConfigs = secretsResults?.data?.filter(
+  const secrets = secretsResults?.data?.filter(
     (config) =>
       config.type === 'kubernetes.io/tls' &&
       config.metadata?.namespace === namespace
@@ -274,12 +274,12 @@ export function CreateIngressView() {
   const tlsOptions: Option<string>[] = useMemo(
     () => [
       { label: 'No TLS', value: '' },
-      ...(matchedConfigs?.map((config) => ({
+      ...(secrets?.map((config) => ({
         label: config.metadata?.name as string,
         value: config.metadata?.name as string,
       })) || []),
     ],
-    [matchedConfigs]
+    [secrets]
   );
 
   useEffect(() => {
