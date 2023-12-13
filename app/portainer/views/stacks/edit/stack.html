@@ -109,24 +109,27 @@
                 </form>
               </div>
               <!-- !associate -->
-              <stack-redeploy-git-form
-                ng-if="stack.GitConfig && !stack.FromAppTemplate && !state.actionInProgress"
-                model="stack.GitConfig"
-                stack="stack"
-                authorization="PortainerStackUpdate"
-                endpoint="applicationState.endpoint"
-              >
-              </stack-redeploy-git-form>
-              <stack-duplication-form
-                ng-if="regular && endpoints.length > 0"
-                endpoints="endpoints"
-                groups="groups"
-                current-endpoint-id="endpoint.Id"
-                on-duplicate="duplicateStack(name, endpointId)"
-                on-migrate="migrateStack(name, endpointId)"
-                yaml-error="state.yamlError"
-              >
-              </stack-duplication-form>
+
+              <div ng-if="!orphaned">
+                <stack-redeploy-git-form
+                  ng-if="stack.GitConfig && !stack.FromAppTemplate && !state.actionInProgress"
+                  model="stack.GitConfig"
+                  stack="stack"
+                  authorization="PortainerStackUpdate"
+                  endpoint="applicationState.endpoint"
+                >
+                </stack-redeploy-git-form>
+                <stack-duplication-form
+                  ng-if="regular && endpoints.length > 0"
+                  endpoints="endpoints"
+                  groups="groups"
+                  current-endpoint-id="endpoint.Id"
+                  on-duplicate="duplicateStack(name, endpointId)"
+                  on-migrate="migrateStack(name, endpointId)"
+                  yaml-error="state.yamlError"
+                >
+                </stack-duplication-form>
+              </div>
             </div>
           </uib-tab>
           <!-- !tab-info -->
