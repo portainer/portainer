@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-import { parseAxiosError } from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { EnvironmentId } from '../../../environments/types';
 import { RegistryId } from '../../types/registry';
@@ -44,6 +42,8 @@ export interface ImageConfigs {
     type: string;
     diff_ids: string[];
   };
+  docker_version?: string;
+  container_config?: unknown;
 }
 
 export async function getRegistryBlob(params: Params) {
