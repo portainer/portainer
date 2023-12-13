@@ -79,7 +79,7 @@ export function ResourceReservationFormSection({
               onChange(
                 typeof value === 'number'
                   ? { ...values, cpuLimit: value }
-                  : { ...values, cpuLimit: value[0] }
+                  : { ...values, cpuLimit: value[0] ?? 0 }
               )
             }
             value={values.cpuLimit}
