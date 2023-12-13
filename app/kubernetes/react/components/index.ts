@@ -17,6 +17,7 @@ import {
   ApplicationDetailsWidget,
   ApplicationEventsDatatable,
 } from '@/react/kubernetes/applications/DetailsView';
+import { RedeployGitAppForm } from '@/react/kubernetes/applications/components/RedeployGitAppForm';
 import { ApplicationContainersDatatable } from '@/react/kubernetes/applications/DetailsView/ApplicationContainersDatatable';
 import {
   PlacementFormSection,
@@ -186,6 +187,13 @@ export const ngModule = angular
       'isLoading',
       'showSystem',
       'setSystemResources',
+    ])
+  )
+  .component(
+    'kubeRedeployGitAppForm',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(RedeployGitAppForm))), [
+      'namespaceName',
+      'stackId',
     ])
   );
 

@@ -58,7 +58,7 @@ export async function checkRepo(
       if (
         (!(creds.username && creds.password) || !creds.gitCredentialId) &&
         details ===
-          'authentication failed, please ensure that the git credentials are correct'
+          'Authentication failed, please ensure that the git credentials are correct'
       ) {
         details =
           'Git repository could not be found or is private, please ensure that the URL is correct or credentials are provided.';

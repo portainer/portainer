@@ -150,7 +150,7 @@
             <div ng-if="!ctrl.isExternalApplication()">
               <git-form-info-panel
                 ng-if="ctrl.state.appType == ctrl.KubernetesDeploymentTypes.GIT"
-                class-name="'text-muted'"
+                class-name="'text-muted text-xs'"
                 url="ctrl.stack.GitConfig.URL"
                 config-file-path="ctrl.stack.GitConfig.ConfigFilePath"
                 additional-files="ctrl.stack.AdditionalFiles"
@@ -235,11 +235,11 @@
               <!-- #endregion -->
 
               <!-- #region Git repository -->
-              <kubernetes-redeploy-app-git-form
+              <kube-redeploy-git-app-form
                 ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
-                stack="ctrl.stack"
+                stack-id="ctrl.stack.Id"
                 namespace="ctrl.formValues.ResourcePool.Namespace.Name"
-              ></kubernetes-redeploy-app-git-form>
+              ></kube-redeploy-git-app-form>
               <!-- #endregion -->
 
               <!-- #region web editor -->
