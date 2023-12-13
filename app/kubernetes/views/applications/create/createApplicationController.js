@@ -243,16 +243,20 @@ class KubernetesCreateApplicationController {
   onAutoScaleChange(values) {
     return this.$async(async () => {
       if (!this.formValues.AutoScaler.IsUsed && values.isUsed) {
-        this.formValues.AutoScaler.IsUsed = values.isUsed;
-        this.formValues.AutoScaler.MinReplicas = 1;
-        this.formValues.AutoScaler.MaxReplicas = 3;
-        this.formValues.AutoScaler.TargetCPUUtilization = 50;
+        this.formValues.AutoScaler = {
+          IsUsed: values.isUsed,
+          MinReplicas: 1,
+          MaxReplicas: 3,
+          TargetCPUUtilization: 50,
+        };
         return;
       }
-      this.formValues.AutoScaler.IsUsed = values.isUsed;
-      this.formValues.AutoScaler.MinReplicas = values.minReplicas;
-      this.formValues.AutoScaler.MaxReplicas = values.maxReplicas;
-      this.formValues.AutoScaler.TargetCPUUtilization = values.targetCpuUtilizationPercentage;
+      this.formValues.AutoScaler = {
+        IsUsed: values.isUsed,
+        MinReplicas: values.minReplicas,
+        MaxReplicas: values.maxReplicas,
+        TargetCPUUtilization: values.targetCpuUtilizationPercentage,
+      };
     });
   }
   /* #endregion */
