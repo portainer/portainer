@@ -20,8 +20,8 @@ import { useUpdateSSLConfigMutation } from '../useUpdateSSLConfigMutation';
 import { useSSLSettings } from '../../queries/useSSLSettings';
 
 interface FormValues {
-  certFile: File | null;
-  keyFile: File | null;
+  certFile?: File;
+  keyFile?: File;
   forceHTTPS: boolean;
 }
 
@@ -37,8 +37,8 @@ function SSLSettingsPanel() {
   }
 
   const initialValues: FormValues = {
-    certFile: null,
-    keyFile: null,
+    certFile: undefined,
+    keyFile: undefined,
     forceHTTPS: !settingsQuery.data.httpEnabled,
   };
 
@@ -52,7 +52,7 @@ function SSLSettingsPanel() {
           validationSchema={validation}
           validateOnMount
         >
-          {({ values, setFieldValue, isValid, errors }) => (
+          {({ values, setFieldValue, isValid, errors, dirty }) => (
             <Form className="form-horizontal">
               <div className="form-group">
                 <div className="col-sm-12">
@@ -92,7 +92,6 @@ function SSLSettingsPanel() {
                 errors={errors.certFile}
               >
                 <FileUploadField
-                  required={typeof errors.certFile !== 'undefined'}
                   inputId="ca-cert-field"
                   name="certFile"
                   onChange={(file) => setFieldValue('certFile', file)}
@@ -107,7 +106,6 @@ function SSLSettingsPanel() {
                 errors={errors.keyFile}
               >
                 <FileUploadField
-                  required={typeof errors.keyFile !== 'undefined'}
                   inputId="ca-cert-field"
                   name="keyFile"
                   onChange={(file) => setFieldValue('keyFile', file)}
@@ -119,7 +117,7 @@ function SSLSettingsPanel() {
                 <div className="col-sm-12">
                   <LoadingButton
                     isLoading={mutation.isLoading || reloadingPage}
-                    disabled={!isValid}
+                    disabled={!dirty || !isValid}
                     loadingText={reloadingPage ? 'Reloading' : 'Saving'}
                     className="!ml-0"
                   >
@@ -135,16 +133,12 @@ function SSLSettingsPanel() {
   );
 
   function handleSubmit({ certFile, forceHTTPS, keyFile }: FormValues) {
-    if (!certFile || !keyFile) {
-      return;
-    }
-
     mutation.mutate(
       { certFile, httpEnabled: !forceHTTPS, keyFile },
       {
         async onSuccess() {
           await new Promise((resolve) => {
-            setTimeout(resolve, 5000);
+            setTimeout(resolve, 10000);
           });
           window.location.reload();
           setReloadingPage(true);
@@ -156,10 +150,13 @@ function SSLSettingsPanel() {
 
 function validation(): SchemaOf<FormValues> {
   return object({
-    certFile: withFileExtension(file(), ['pem', 'crt', 'cer', 'cert']).required(
-      ''
-    ),
-    keyFile: withFileExtension(file(), ['pem', 'key']).required(''),
+    certFile: withFileExtension(file(), [
+      'pem',
+      'crt',
+      'cer',
+      'cert',
+    ]).optional(),
+    keyFile: withFileExtension(file(), ['pem', 'key']).optional(),
     forceHTTPS: bool().required(),
   });
 }
