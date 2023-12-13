@@ -337,13 +337,13 @@ class KubernetesCreateApplicationController {
   useNewVolume(index) {
     this.formValues.PersistedFolders[index].useNewVolume = true;
     this.formValues.PersistedFolders[index].existingVolume = null;
-    this.state.persistedFoldersUseExistingVolumes = _.every(this.formValues.PersistedFolders, { useNewVolume: false });
+    this.state.persistedFoldersUseExistingVolumes = _.some(this.formValues.PersistedFolders, { useNewVolume: false });
     this.validatePersistedFolders();
   }
 
   useExistingVolume(index) {
     this.formValues.PersistedFolders[index].useNewVolume = false;
-    this.state.persistedFoldersUseExistingVolumes = _.every(this.formValues.PersistedFolders, { useNewVolume: false });
+    this.state.persistedFoldersUseExistingVolumes = _.some(this.formValues.PersistedFolders, { useNewVolume: false });
     if (this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED) {
       this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.SHARED;
       this.resetDeploymentType();
