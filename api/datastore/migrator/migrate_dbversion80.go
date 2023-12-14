@@ -93,7 +93,9 @@ func (m *Migrator) updateEdgeStackStatusForDB80() error {
 			edgeStack.Status[endpointId] = status
 		}
 
-		err = m.edgeStackService.UpdateEdgeStack(edgeStack.ID, &edgeStack)
+		err = m.edgeStackService.UpdateEdgeStackFunc(edgeStack.ID, func(stack *portainer.EdgeStack) {
+			stack.Status = edgeStack.Status
+		})
 		if err != nil {
 			return err
 		}
