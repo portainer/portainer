@@ -1,6 +1,7 @@
 import { Form, Formik, FormikHelpers, useFormikContext } from 'formik';
 import { useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { useRouter } from '@uirouter/react';
 
 import { Stack, StackId } from '@/react/common/stacks/types';
 import {
@@ -192,6 +193,7 @@ function RedeployGitAppInnerForm({
   namespaceName: string;
   webhookId: string;
 }) {
+  const router = useRouter();
   const environmentId = useEnvironmentId();
   const redeployKubeGitStackMutation = useRedeployKubeGitStackMutation(
     stack.Id,
@@ -323,6 +325,9 @@ function RedeployGitAppInnerForm({
     await redeployKubeGitStackMutation.mutateAsync(redeployPayload, {
       onSuccess: () => {
         notifySuccess('Success', 'Application redeployed successfully.');
+        router.stateService.go('kubernetes.applications.application', {
+          id: stack.Id,
+        });
       },
     });
 
