@@ -198,7 +198,6 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 		Str("cmd", strings.Join(cmd, " ")).
 		Msg("running unpacker")
 
-	rand.Seed(time.Now().UnixNano())
 	unpackerContainer, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: image,
 		Cmd:   cmd,
