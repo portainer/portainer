@@ -13,7 +13,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const contextEndpoint = "endpoint"
+// Note: context keys must be distinct types to prevent collisions. They are NOT key/value map's internally
+// See: https://go.dev/blog/context#TOC_3.2.
+
+// This avoids staticcheck error:
+// SA1029: should not use built-in type string as key for value; define your own type to avoid collisions (staticcheck)
+// https://stackoverflow.com/questions/40891345/fix-should-not-use-basic-type-string-as-key-in-context-withvalue-golint
+type key int
+
+const contextEndpoint key = 0
 
 func WithEndpoint(endpointService dataservices.EndpointService, endpointIDParam string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
