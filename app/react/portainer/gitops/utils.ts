@@ -39,3 +39,15 @@ export function cleanGitRepoUrl(url: string) {
     .replace(/\/$/, '') // if there's a trailing slash, remove it
     .replace(/\.git$/, ''); // if there's a trailing .git extension, remove it
 }
+
+export function getGitRepoCommitUrl(url: string, hash: string) {
+  const cleanedUrl = cleanGitRepoUrl(url);
+
+  if (cleanedUrl.startsWith('https://bitbucket.org')) {
+    return `${cleanedUrl}/commits/${hash}`;
+  }
+
+  // this is a fallback for any other git repo
+  // the tested repo includes gitlab, github, and azure devops
+  return `${cleanedUrl}/commit/${hash}`;
+}
