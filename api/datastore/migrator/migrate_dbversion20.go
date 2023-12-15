@@ -56,6 +56,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	endpointAdministratorRole.Authorizations = authorization.DefaultEndpointAuthorizationsForEndpointAdministratorRole()
 
 	err = m.roleService.Update(endpointAdministratorRole.ID, endpointAdministratorRole)
+	if err != nil {
+		return err
+	}
 
 	helpDeskRole, err := m.roleService.Read(portainer.RoleID(2))
 	if err != nil {
@@ -65,6 +68,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	helpDeskRole.Authorizations = authorization.DefaultEndpointAuthorizationsForHelpDeskRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.Update(helpDeskRole.ID, helpDeskRole)
+	if err != nil {
+		return err
+	}
 
 	standardUserRole, err := m.roleService.Read(portainer.RoleID(3))
 	if err != nil {
@@ -74,6 +80,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	standardUserRole.Authorizations = authorization.DefaultEndpointAuthorizationsForStandardUserRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.Update(standardUserRole.ID, standardUserRole)
+	if err != nil {
+		return err
+	}
 
 	readOnlyUserRole, err := m.roleService.Read(portainer.RoleID(4))
 	if err != nil {

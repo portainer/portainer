@@ -8,6 +8,8 @@ linters:
     - govet
     - errorlint
     - exportloopref
+    - staticcheck
+
 linters-settings:
   depguard:
     rules:
