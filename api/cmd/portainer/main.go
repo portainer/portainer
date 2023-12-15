@@ -455,6 +455,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
 	kubernetesClientFactory, err := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, dataStore, instanceID, *flags.AddrHTTPS, settings.UserSessionTimeout)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed initializing kubernetes client factory")
+	}
 
 	authorizationService := authorization.NewService(dataStore)
 	authorizationService.K8sClientFactory = kubernetesClientFactory
