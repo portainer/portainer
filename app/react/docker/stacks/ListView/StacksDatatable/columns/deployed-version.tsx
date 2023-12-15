@@ -1,4 +1,5 @@
 import { isExternalStack } from '@/react/docker/stacks/view-models/utils';
+import { cleanGitRepoUrl } from '@/react/portainer/gitops/utils';
 
 import { columnHelper } from './helper';
 
@@ -23,7 +24,9 @@ export const deployedVersion = columnHelper.accessor(
           <div className="text-center">
             <a
               target="_blank"
-              href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
+              href={`${cleanGitRepoUrl(item.GitConfig.URL)}/commit/${
+                item.GitConfig.ConfigHash
+              }`}
               rel="noreferrer"
             >
               {item.GitConfig.ConfigHash.slice(0, 7)}
