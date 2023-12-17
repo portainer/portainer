@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"net/http"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -189,27 +188,4 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 	}
 
 	return newRelatedEnvironmentIDs, endpointsToAdd, nil
-}
-
-func newStatus(oldStatus map[portainer.EndpointID]portainer.EdgeStackStatus, relatedEnvironmentIds []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeStackStatus {
-	newStatus := make(map[portainer.EndpointID]portainer.EdgeStackStatus)
-	for _, endpointID := range relatedEnvironmentIds {
-		newEnvStatus := portainer.EdgeStackStatus{}
-
-		oldEnvStatus, ok := oldStatus[endpointID]
-		if ok {
-			newEnvStatus = oldEnvStatus
-		}
-
-		newEnvStatus.Status = []portainer.EdgeStackDeploymentStatus{
-			{
-				Time: time.Now().Unix(),
-				Type: portainer.EdgeStackStatusPending,
-			},
-		}
-
-		newStatus[endpointID] = newEnvStatus
-	}
-
-	return newStatus
 }

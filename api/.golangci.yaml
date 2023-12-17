@@ -4,6 +4,7 @@ linters:
 
   # Enable these for now
   enable:
+    - unused
     - depguard
     - gosimple
     - govet
