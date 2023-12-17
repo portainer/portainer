@@ -200,7 +200,7 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 
 func teamExists(teamName string, ldapGroups []string) bool {
 	for _, group := range ldapGroups {
-		if strings.ToLower(group) == strings.ToLower(teamName) {
+		if strings.EqualFold(group, teamName) {
 			return true
 		}
 	}
