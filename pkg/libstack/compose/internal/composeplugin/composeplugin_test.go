@@ -66,15 +66,15 @@ func Test_UpAndDown(t *testing.T) {
 services:
   busybox:
     image: "alpine:3.7"
-    container_name: "test_container_one"`
+    container_name: "plugintest_container_one"`
 
 	const overrideComposeFileContent = `version: "3.9"
 services:
   busybox:
     image: "alpine:latest"
-    container_name: "test_container_two"`
+    container_name: "plugintest_container_two"`
 
-	const composeContainerName = "test_container_two"
+	const composeContainerName = "plugintest_container_two"
 
 	w := setup(t)
 

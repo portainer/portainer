@@ -30,7 +30,7 @@ func Test_UpAndDown(t *testing.T) {
     services:
       busybox:
         image: "alpine:3.7"
-        container_name: "test_container_one"
+        container_name: "binarytest_container_one"
     `
 
 	const overrideComposeFileContent = `
@@ -38,10 +38,10 @@ func Test_UpAndDown(t *testing.T) {
     services:
       busybox:
         image: "alpine:latest"
-        container_name: "test_container_two"
+        container_name: "binarytest_container_two"
     `
 
-	const composeContainerName = "test_container_two"
+	const composeContainerName = "binarytest_container_two"
 
 	dir := t.TempDir()
 
