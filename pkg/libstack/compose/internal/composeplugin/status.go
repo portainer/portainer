@@ -3,6 +3,7 @@ package composeplugin
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -143,7 +144,7 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 				var svc service
 
 				err := dec.Decode(&svc)
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					break
 				}
 				if err != nil {
