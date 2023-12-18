@@ -45,7 +45,7 @@ function config($stateRegistryProvider) {
 
     views: {
       'content@': {
-        component: 'editCustomTemplateView',
+        component: 'editCustomTemplatesView',
       },
     },
   };
