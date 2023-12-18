@@ -903,7 +903,7 @@
         "color": ""
       },
       "TokenIssueAt": 0,
-      "UseCache": true,
+      "UseCache": false,
       "Username": "admin"
     },
     {
@@ -933,11 +933,11 @@
         "color": ""
       },
       "TokenIssueAt": 0,
-      "UseCache": true,
+      "UseCache": false,
       "Username": "prabhat"
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.20.0\",\"MigratorCount\":2,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.20.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

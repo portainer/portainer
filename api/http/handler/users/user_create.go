@@ -65,7 +65,6 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	user = &portainer.User{
 		Username: payload.Username,
 		Role:     portainer.UserRole(payload.Role),
-		UseCache: true,
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
