@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from '@uirouter/react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { Widget, WidgetBody } from '@@/Widget';
 import { FormControl } from '@@/form-components/FormControl';
@@ -25,6 +26,7 @@ export function CreateUserAccessToken() {
   const mutation = useCreateUserAccessTokenMutation();
   const { user } = useCurrentUser();
   const [newAPIToken, setNewAPIToken] = useState('');
+  const { trackEvent } = useAnalytics();
 
   return (
     <>
@@ -34,6 +36,7 @@ export function CreateUserAccessToken() {
           { label: 'My account', link: 'portainer.account' },
           { label: 'Add access token' },
         ]}
+        reload
       />
 
       <div className="row">
@@ -67,6 +70,10 @@ export function CreateUserAccessToken() {
         },
       }
     );
+
+    trackEvent('portainer-account-access-token-create', {
+      category: 'portainer',
+    });
   }
 }
 
