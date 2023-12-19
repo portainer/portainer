@@ -90,8 +90,14 @@ services:
 		t.Fatal(err)
 	}
 
+	projectName := "plugintest"
+
 	ctx := context.Background()
-	err = w.Deploy(ctx, []string{filePathOriginal, filePathOverride}, libstack.DeployOptions{})
+	err = w.Deploy(ctx, []string{filePathOriginal, filePathOverride}, libstack.DeployOptions{
+		Options: libstack.Options{
+			ProjectName: projectName,
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +106,7 @@ services:
 		t.Fatal("container should exist")
 	}
 
-	err = w.Remove(ctx, "", []string{filePathOriginal, filePathOverride}, libstack.Options{})
+	err = w.Remove(ctx, projectName, []string{filePathOriginal, filePathOverride}, libstack.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}

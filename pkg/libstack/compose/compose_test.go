@@ -56,8 +56,13 @@ func Test_UpAndDown(t *testing.T) {
 	}
 
 	ctx := context.Background()
+	projectName := "binarytest"
 
-	err = deployer.Deploy(ctx, []string{filePathOriginal, filePathOverride}, libstack.DeployOptions{})
+	err = deployer.Deploy(ctx, []string{filePathOriginal, filePathOverride}, libstack.DeployOptions{
+		Options: libstack.Options{
+			ProjectName: projectName,
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +71,7 @@ func Test_UpAndDown(t *testing.T) {
 		t.Fatal("container should exist")
 	}
 
-	err = deployer.Remove(ctx, "", []string{filePathOriginal, filePathOverride}, libstack.Options{})
+	err = deployer.Remove(ctx, projectName, []string{filePathOriginal, filePathOverride}, libstack.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
