@@ -102,7 +102,6 @@ lint-client: ## Lint client code
 	yarn lint
 
 lint-server: ## Lint server code
-	go vet ./...
 	golangci-lint run --timeout=10m -c .golangci.yaml
 
 
