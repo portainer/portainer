@@ -1,4 +1,4 @@
-import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
+import axiosOrigin, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { setupCache } from 'axios-cache-adapter';
 import { loadProgressBar } from 'axios-progress-bar';
 
@@ -18,14 +18,18 @@ export const cache = setupCache({
   exclude: {
     query: false, // include urls with query params
     methods: ['put', 'patch', 'delete'],
-    filter: (req: AxiosRequestConfig) => {
+    filter: (req: InternalAxiosRequestConfig) => {
       // exclude caching get requests unless the path contains 'kubernetes'
       if (!req.url?.includes('kubernetes') && req.method === 'get') {
         return true;
       }
 
-      // exclude caching get with yaml accept header
-      if (req.headers?.Accept.includes('application/yaml')) {
+      const acceptHeader = req.headers?.Accept;
+      if (
+        acceptHeader &&
+        typeof acceptHeader === 'string' &&
+        acceptHeader.includes('application/yaml')
+      ) {
         return true;
       }
 
@@ -59,12 +63,12 @@ export default axios;
 
 export const agentTargetHeader = 'X-PortainerAgent-Target';
 
-export function agentInterceptor(config: AxiosRequestConfig) {
+export function agentInterceptor(config: InternalAxiosRequestConfig) {
   if (!config.url || !config.url.includes('/docker/')) {
     return config;
   }
 
-  const newConfig = { headers: config.headers || {}, ...config };
+  const newConfig = { ...config };
   const target = portainerAgentTargetHeader();
   if (target) {
     newConfig.headers[agentTargetHeader] = target;
@@ -135,16 +139,40 @@ export function parseAxiosError(
   return new PortainerError(resultMsg, resultErr);
 }
 
-export function defaultErrorParser(axiosError: AxiosError) {
-  const message = axiosError.response?.data.message || '';
-  const details = axiosError.response?.data.details || message;
-  const error = new Error(message);
+type DefaultAxiosErrorType = {
+  message: string;
+  details?: string;
+};
+
+export function defaultErrorParser(axiosError: AxiosError<unknown>) {
+  if (isDefaultResponse(axiosError.response?.data)) {
+    const message = axiosError.response?.data.message || '';
+    const details = axiosError.response?.data.details || message;
+    const error = new Error(message);
+    return { error, details };
+  }
+
+  const details = axiosError.response?.data
+    ? axiosError.response?.data.toString()
+    : '';
+  const error = new Error('Axios error');
   return { error, details };
 }
 
-export function isAxiosError<
-  ResponseType = { message: string; details: string },
->(error: unknown): error is AxiosError<ResponseType> {
+export function isDefaultResponse(
+  data: unknown
+): data is DefaultAxiosErrorType {
+  return (
+    !!data &&
+    typeof data === 'object' &&
+    'message' in data &&
+    typeof data.message === 'string'
+  );
+}
+
+export function isAxiosError<ResponseType>(
+  error: unknown
+): error is AxiosError<ResponseType> {
   return axiosOrigin.isAxiosError(error);
 }
 

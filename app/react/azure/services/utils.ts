@@ -1,9 +1,14 @@
 import { AxiosError } from 'axios';
 
 export function azureErrorParser(axiosError: AxiosError) {
+  const responseData = axiosError.response?.data;
   const message =
-    (axiosError.response?.data?.error?.message as string) ||
-    'Failed azure request';
+    responseData &&
+    typeof responseData === 'object' &&
+    'error' in responseData &&
+    typeof responseData.error === 'string'
+      ? responseData.error
+      : 'Failed azure request';
 
   return {
     error: new Error(message),

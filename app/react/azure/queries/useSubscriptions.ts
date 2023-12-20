@@ -29,7 +29,7 @@ async function getSubscriptions(environmentId: EnvironmentId) {
     return data.value;
   } catch (e) {
     throw parseAxiosError(
-      e as Error,
+      e,
       'Unable to retrieve subscriptions',
       azureErrorParser
     );
