@@ -25,6 +25,7 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesDeploymentConverter from 'Kubernetes/converters/deployment';
 import KubernetesDaemonSetConverter from 'Kubernetes/converters/daemonSet';
 import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
+import KubernetesPodConverter from 'Kubernetes/pod/converter';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
 import PortainerError from 'Portainer/error';
@@ -58,6 +59,8 @@ class KubernetesApplicationConverter {
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.Metadata = data.metadata;
+    res.ApplicationType = data.kind;
+    res.Labels = data.metadata.labels || {};
 
     if (data.metadata.labels) {
       const { labels } = data.metadata;
@@ -284,6 +287,7 @@ class KubernetesApplicationConverter {
     res.ApplicationType = app.ApplicationType;
     res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
     res.Name = app.Name;
+    res.Labels = app.Labels;
     res.Services = KubernetesApplicationHelper.generateServicesFormValuesFromServices(app, ingresses);
     res.Selector = KubernetesApplicationHelper.generateSelectorFromService(app);
     res.StackName = app.StackName;
@@ -353,6 +357,13 @@ class KubernetesApplicationConverter {
         (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && rwx))) ||
       formValues.ApplicationType === KubernetesApplicationTypes.DAEMONSET;
 
+    const pod = formValues.ApplicationType === KubernetesApplicationTypes.POD;
+
+    let serviceSelector = {};
+    if (formValues.Services.length) {
+      serviceSelector = formValues.Services[0].Selector || { app: formValues.Name };
+    }
+
     let app;
     if (deployment) {
       app = KubernetesDeploymentConverter.applicationFormValuesToDeployment(formValues, claims);
@@ -360,6 +371,8 @@ class KubernetesApplicationConverter {
       app = KubernetesStatefulSetConverter.applicationFormValuesToStatefulSet(formValues, claims);
     } else if (daemonSet) {
       app = KubernetesDaemonSetConverter.applicationFormValuesToDaemonSet(formValues, claims);
+    } else if (pod) {
+      app = KubernetesPodConverter.applicationFormValuesToPod(formValues, claims, serviceSelector);
     } else {
       throw new PortainerError('Unable to determine which association to use to convert form');
     }

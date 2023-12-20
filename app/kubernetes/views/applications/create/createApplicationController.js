@@ -154,6 +154,7 @@ class KubernetesCreateApplicationController {
     this.supportGlobalDeployment = this.supportGlobalDeployment.bind(this);
     this.onChangePlacementType = this.onChangePlacementType.bind(this);
     this.onServicesChange = this.onServicesChange.bind(this);
+    this.updateApplicationType = this.updateApplicationType.bind(this);
   }
   /* #endregion */
 
@@ -166,6 +167,26 @@ class KubernetesCreateApplicationController {
   onChangeDeploymentType(value) {
     this.$scope.$evalAsync(() => {
       this.formValues.DeploymentType = value;
+    });
+  }
+
+  // keep the application type up to date
+  updateApplicationType() {
+    this.$scope.$evalAsync(() => {
+      if (this.formValues.DeploymentType === KubernetesDeploymentTypes.GLOBAL) {
+        this.formValues.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
+        this.validatePersistedFolders();
+        return;
+      }
+      const persistedFolders = this.formValues.PersistedFolders && this.formValues.PersistedFolders.filter((pf) => !pf.NeedsDeletion);
+      if (persistedFolders && persistedFolders.length) {
+        this.formValues.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
+        this.validatePersistedFolders();
+        return;
+      }
+      this.formValues.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
+      this.validatePersistedFolders();
+      return;
     });
   }
 
@@ -396,11 +417,13 @@ class KubernetesCreateApplicationController {
     const newPf = new KubernetesApplicationPersistedFolderFormValue(storageClass);
     this.formValues.PersistedFolders.push(newPf);
     this.resetDeploymentType();
+    this.updateApplicationType();
   }
 
   restorePersistedFolder(index) {
     this.formValues.PersistedFolders[index].NeedsDeletion = false;
     this.validatePersistedFolders();
+    this.updateApplicationType();
   }
 
   resetPersistedFolders() {
@@ -409,6 +432,7 @@ class KubernetesCreateApplicationController {
       persistedFolder.UseNewVolume = true;
     });
     this.validatePersistedFolders();
+    this.updateApplicationType();
   }
 
   removePersistedFolder(index) {
@@ -418,6 +442,7 @@ class KubernetesCreateApplicationController {
       this.formValues.PersistedFolders.splice(index, 1);
     }
     this.validatePersistedFolders();
+    this.updateApplicationType();
   }
 
   useNewVolume(index) {
@@ -1170,7 +1195,6 @@ class KubernetesCreateApplicationController {
           this.savedFormValues = angular.copy(this.formValues);
           this.updateNamespaceLimits(this.namespaceWithQuota);
           this.updateSliders(this.namespaceWithQuota);
-          delete this.formValues.ApplicationType;
 
           if (this.application.ApplicationType !== KubernetesApplicationTypes.STATEFULSET) {
             _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {

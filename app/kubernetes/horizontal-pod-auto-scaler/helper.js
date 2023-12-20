@@ -4,6 +4,7 @@ import { KubernetesApplication, KubernetesApplicationTypes, KubernetesApplicatio
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
+import { KubernetesPod } from 'Kubernetes/pod/models';
 
 export class KubernetesHorizontalPodAutoScalerHelper {
   static findApplicationBoundScaler(sList, app) {
@@ -18,7 +19,7 @@ export class KubernetesHorizontalPodAutoScalerHelper {
       return KubernetesApplicationTypeStrings.DAEMONSET;
     } else if ((app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.STATEFULSET) || app instanceof KubernetesStatefulSet) {
       return KubernetesApplicationTypeStrings.STATEFULSET;
-    } else if (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.POD) {
+    } else if ((app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.POD) || app instanceof KubernetesPod) {
       return KubernetesApplicationTypeStrings.POD;
     } else {
       throw new PortainerError('Unable to determine application type');
