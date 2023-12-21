@@ -134,6 +134,8 @@ export interface AppTemplate {
    */
   labels?: Pair[];
 
+  hosts?: string[];
+
   /**
    * Whether the container should be started in privileged mode.
    * @example true
