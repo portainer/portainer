@@ -15,7 +15,7 @@ import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/Asso
 import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
 import { TemplateFieldset } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
 
-export const componentsModule = angular
+const ngModule = angular
   .module('portainer.edge.react.components', [])
   .component(
     'edgeStackEnvironmentsDatatable',
@@ -104,4 +104,6 @@ export const componentsModule = angular
   .component(
     'edgeStackCreateTemplateFieldset',
     r2a(withReactQuery(TemplateFieldset), ['setValues', 'values', 'errors'])
-  ).name;
+  );
+
+export const componentsModule = ngModule.name;
