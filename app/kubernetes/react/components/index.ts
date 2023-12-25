@@ -3,7 +3,6 @@ import angular from 'angular';
 import { r2a } from '@/react-tools/react2angular';
 import { IngressClassDatatable } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable';
 import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessView/NamespacesSelector';
-import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceRegistriesSelector';
 import { KubeApplicationAccessPolicySelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationAccessPolicySelector';
@@ -18,6 +17,7 @@ import {
 } from '@/react/kubernetes/applications/DetailsView';
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
+import { withControlledInput } from '@/react-tools/withControlledInput';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [])
@@ -43,16 +43,6 @@ export const ngModule = angular
       'onChange',
       'placeholder',
       'value',
-    ])
-  )
-  .component(
-    'storageAccessModeSelector',
-    r2a(StorageAccessModeSelector, [
-      'inputId',
-      'onChange',
-      'options',
-      'value',
-      'storageClassName',
     ])
   )
   .component(
@@ -112,7 +102,13 @@ export const componentsModule = ngModule.name;
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(KubeServicesForm))),
+  withUIRouter(
+    withCurrentUser(
+      withReactQuery(
+        withControlledInput(KubeServicesForm, { values: 'onChange' })
+      )
+    )
+  ),
   'kubeServicesForm',
   ['values', 'onChange', 'appName', 'selector', 'isEditMode', 'namespace'],
   kubeServicesValidation

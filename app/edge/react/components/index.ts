@@ -14,7 +14,7 @@ import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAsso
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
 import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
 
-export const componentsModule = angular
+const ngModule = angular
   .module('portainer.edge.react.components', [])
   .component(
     'edgeStackEnvironmentsDatatable',
@@ -100,4 +100,6 @@ export const componentsModule = angular
       'onChange',
       'value',
     ])
-  ).name;
+  );
+
+export const componentsModule = ngModule.name;

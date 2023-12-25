@@ -21,7 +21,6 @@ import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
 import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
-import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Badge } from '@@/Badge';
 import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
@@ -43,14 +42,12 @@ import { gitFormModule } from './git-form';
 import { settingsModule } from './settings';
 import { accessControlModule } from './access-control';
 import { environmentsModule } from './environments';
-import { envListModule } from './environments-list-view-components';
 import { registriesModule } from './registries';
 
 export const ngModule = angular
   .module('portainer.app.react.components', [
     accessControlModule,
     customTemplatesModule,
-    envListModule,
     environmentsModule,
     gitFormModule,
     registriesModule,
@@ -104,7 +101,6 @@ export const ngModule = angular
       'isSortedDesc',
     ])
   )
-  .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',
     r2a(withUIRouter(withReactQuery(withCurrentUser(PageHeader))), [
@@ -191,7 +187,6 @@ export const ngModule = angular
       'dataCy',
     ])
   )
-
   .component(
     'reactCodeEditor',
     r2a(CodeEditor, [
