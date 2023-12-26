@@ -196,7 +196,7 @@
     "msw-storybook-addon": "^1.8.0",
     "ngtemplate-loader": "^2.1.0",
     "plop": "^4.0.0",
-    "postcss": "^8.4.31",
+    "postcss": "^8.4.32",
     "postcss-loader": "^7.3.3",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.4",
