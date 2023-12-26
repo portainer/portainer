@@ -3,7 +3,7 @@ name: Test
 on: push
 
 env:
-  GO_VERSION: 1.21.3
+  GO_VERSION: 1.21.5
   NODE_VERSION: 18.x
 
 jobs:
