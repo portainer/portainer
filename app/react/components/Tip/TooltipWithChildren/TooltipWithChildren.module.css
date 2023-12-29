@@ -21,6 +21,11 @@
   opacity: 1 !important;
 }
 
+[theme='highcontrast'] .tooltip {
+  border: 1px solid var(--border-widget);
+  border-color: var(--white-color) !important;
+}
+
 .tooltip-container {
   line-height: 18px;
   padding: 8px 10px !important;

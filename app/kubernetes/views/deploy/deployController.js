@@ -4,14 +4,14 @@ import stripAnsi from 'strip-ansi';
 
 import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
-import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { isTemplateVariablesEnabled, renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 import { editor, git, customTemplate, url, helm } from '@@/BoxSelector/common-options/build-methods';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
+import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -25,7 +25,7 @@ class KubernetesDeployController {
     this.StackService = StackService;
     this.CustomTemplateService = CustomTemplateService;
 
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.deployOptions = [{ ...kubernetes, value: KubernetesDeployManifestTypes.KUBERNETES }];
 
@@ -72,7 +72,7 @@ class KubernetesDeployController {
       RepositoryPassword: '',
       AdditionalFiles: [],
       ComposeFilePathInRepository: '',
-      Variables: {},
+      Variables: [],
       AutoUpdate: parseAutoUpdateResponse(),
       TLSSkipVerify: false,
       Name: '',
@@ -182,12 +182,12 @@ class KubernetesDeployController {
   }
 
   disableDeploy() {
-    const isWebEditorInvalid =
-      this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
-    const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
+    const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
+    const isURLFormInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.URL && _.isEmpty(this.formValues.ManifestURL);
+    const isCustomTemplateInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.CUSTOM_TEMPLATE && _.isEmpty(this.formValues.EditorContent);
 
     const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
-    return isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress || isNamespaceInvalid;
+    return isWebEditorInvalid || isURLFormInvalid || isCustomTemplateInvalid || this.state.actionInProgress || isNamespaceInvalid;
   }
 
   onChangeFormValues(newValues) {
@@ -213,14 +213,14 @@ class KubernetesDeployController {
           this.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
           this.onChangeFileContent(this.state.templateContent);
 
-          this.state.isEditorReadOnly = true;
+          this.state.isEditorReadOnly = false;
         } catch (err) {
           this.state.templateLoadFailed = true;
           throw err;
         }
 
         if (template.Variables && template.Variables.length > 0) {
-          const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+          const variables = getVariablesFieldDefaultValues(template.Variables);
           this.onChangeTemplateVariables(variables);
         }
       } catch (err) {

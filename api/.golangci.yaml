@@ -4,10 +4,13 @@ linters:
 
   # Enable these for now
   enable:
+    - unused
     - depguard
+    - gosimple
     - govet
     - errorlint
     - exportloopref
+
 linters-settings:
   depguard:
     rules:

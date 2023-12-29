@@ -12,6 +12,7 @@ import { PortainerResponse } from '@/react/docker/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { ContainerId } from '@/react/docker/containers/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { queryClient } from '@/react-tools/react-query';
 
 import { urlBuilder } from '../containers.service';
 
@@ -86,6 +87,15 @@ export function useContainer(
       },
       enabled: enabled && !!containerId,
     }
+  );
+}
+
+export function invalidateContainer(
+  environmentId: EnvironmentId,
+  containerId?: ContainerId
+) {
+  return queryClient.invalidateQueries(
+    containerId ? queryKeys.container(environmentId, containerId) : []
   );
 }
 

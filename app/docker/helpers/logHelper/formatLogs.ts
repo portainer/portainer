@@ -34,7 +34,6 @@ export function formatLogs(
     logs = stripHeadersFunc(logs);
   }
   // if JSON logs come serialized 2 times, parse them once to unwrap them
-  // for example when retrieving Edge Agent logs on Nomad
   if (logs.startsWith('"')) {
     try {
       logs = JSON.parse(logs);

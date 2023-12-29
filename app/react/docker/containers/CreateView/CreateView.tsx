@@ -2,7 +2,7 @@ import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
 import { useEffect, useState } from 'react';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEnvironmentAdmin } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
@@ -36,6 +36,7 @@ export function CreateView() {
           { label: 'Containers', link: 'docker.containers' },
           'Add container',
         ]}
+        reload
       />
 
       <CreateForm />
@@ -48,6 +49,7 @@ function CreateForm() {
   const router = useRouter();
   const { trackEvent } = useAnalytics();
   const { isAdmin } = useCurrentUser();
+  const isEnvironmentAdmin = useIsEnvironmentAdmin();
   const [isDockerhubRateLimited, setIsDockerhubRateLimited] = useState(false);
 
   const mutation = useCreateOrReplaceMutation();
@@ -78,6 +80,10 @@ function CreateForm() {
   }
 
   const environment = envQuery.data;
+
+  const hideCapabilities =
+    !environment.SecuritySettings.allowContainerCapabilitiesForRegularUsers &&
+    !isEnvironmentAdmin;
 
   const {
     isDuplicating = false,
@@ -112,6 +118,7 @@ function CreateForm() {
         validationSchema={validationSchema}
       >
         <InnerForm
+          hideCapabilities={hideCapabilities}
           onChangeName={syncName}
           isDuplicate={isDuplicating}
           isLoading={mutation.isLoading}
@@ -131,14 +138,14 @@ function CreateForm() {
       });
 
       if (!confirmed) {
-        return;
+        return false;
       }
     }
 
     const registry = getRegistry(values.image, registriesQuery.data || []);
-    const config = toRequest(values, registry);
+    const config = toRequest(values, registry, hideCapabilities);
 
-    mutation.mutate(
+    return mutation.mutate(
       { config, environment, values, registry, oldContainer, extraNetworks },
       {
         onSuccess() {

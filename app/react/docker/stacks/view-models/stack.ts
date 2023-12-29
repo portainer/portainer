@@ -59,6 +59,10 @@ export class StackViewModel implements IResource {
 
   PreviousDeploymentInfo: unknown;
 
+  SupportRelativePath: boolean;
+
+  FilesystemPath: string;
+
   constructor(stack: Stack, orphaned = false) {
     this.Id = stack.Id;
     this.Type = stack.Type;
@@ -95,5 +99,8 @@ export class StackViewModel implements IResource {
     this.External = false;
     this.Orphaned = orphaned;
     this.OrphanedRunning = false;
+
+    this.SupportRelativePath = stack.SupportRelativePath;
+    this.FilesystemPath = stack.FilesystemPath;
   }
 }

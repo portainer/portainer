@@ -39,7 +39,7 @@ export function useUsers<T = User[]>(
   select: (data: User[]) => T = (data) => data as unknown as T
 ) {
   const users = useQuery(
-    ['users'],
+    ['users', { includeAdministrator, environmentId }],
     () => getUsers(includeAdministrator, environmentId),
     {
       meta: {

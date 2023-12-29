@@ -2,7 +2,6 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
-import Nomad from '@/assets/ico/vendor/nomad.svg?c';
 import KaaS from '@/assets/ico/vendor/kaas-icon.svg?c';
 import InstallK8s from '@/assets/ico/vendor/install-kubernetes.svg?c';
 
@@ -13,7 +12,6 @@ export type EnvironmentOptionValue =
   | 'dockerSwarm'
   | 'kubernetes'
   | 'aci'
-  | 'nomad'
   | 'kaas'
   | 'k8sInstall';
 
@@ -56,16 +54,6 @@ export const existingEnvironmentTypes: EnvironmentOption[] = [
     iconType: 'logo',
     icon: Azure,
   },
-  {
-    id: 'nomad',
-    value: 'nomad',
-    label: 'Nomad',
-    description: 'Connect to HashiCorp Nomad environment via API',
-    icon: Nomad,
-    iconType: 'logo',
-    feature: FeatureId.NOMAD,
-    disabledWhenLimited: true,
-  },
 ];
 
 export const newEnvironmentTypes: EnvironmentOption[] = [
@@ -102,7 +90,6 @@ export const formTitles: Record<EnvironmentOptionValue, string> = {
   dockerSwarm: 'Connect to your Docker Swarm environment',
   kubernetes: 'Connect to your Kubernetes environment',
   aci: 'Connect to your ACI environment',
-  nomad: 'Connect to your Nomad environment',
   kaas: 'Provision a KaaS environment',
   k8sInstall: 'Create a Kubernetes cluster',
 };

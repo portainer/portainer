@@ -1,12 +1,13 @@
 import { useCallback, useMemo } from 'react';
+import _ from 'lodash';
 
 import { TemplateViewModel } from './view-model';
-import { ListState, TemplateType } from './types';
+import { ListState } from './types';
 
 export function useSortAndFilterTemplates(
   templates: Array<TemplateViewModel>,
   listState: ListState & { search: string },
-  showSwarmStacks?: boolean
+  disabledTypes: Array<TemplateViewModel['Type']> = []
 ) {
   const filterByCategory = useCallback(
     (item: TemplateViewModel) => {
@@ -14,7 +15,9 @@ export function useSortAndFilterTemplates(
         return true;
       }
 
-      return item.Categories.includes(listState.category);
+      return _.compact([listState.category]).every((category) =>
+        item.Categories.includes(category)
+      );
     },
     [listState.category]
   );
@@ -37,29 +40,20 @@ export function useSortAndFilterTemplates(
 
   const filterByTemplateType = useCallback(
     (item: TemplateViewModel) => {
-      switch (item.Type) {
-        case TemplateType.Container:
-          return (
-            listState.type === TemplateType.Container || listState.type === null
-          );
-        case TemplateType.SwarmStack:
-          return (
-            showSwarmStacks &&
-            (listState.type === TemplateType.SwarmStack ||
-              listState.type === null)
-          );
-        case TemplateType.ComposeStack:
-          return (
-            listState.type === TemplateType.SwarmStack ||
-            listState.type === null
-          );
-        case TemplateType.EdgeStack:
-          return listState.type === TemplateType.EdgeStack;
-        default:
-          return false;
+      if (listState.types.length === 0 && disabledTypes.length === 0) {
+        return true;
       }
+
+      if (listState.types.length === 0) {
+        return !disabledTypes.includes(item.Type);
+      }
+
+      return (
+        listState.types.includes(item.Type) &&
+        !disabledTypes.includes(item.Type)
+      );
     },
-    [listState.type, showSwarmStacks]
+    [disabledTypes, listState.types]
   );
 
   const sort = useCallback(

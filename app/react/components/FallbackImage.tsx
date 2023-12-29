@@ -1,23 +1,14 @@
-import { useEffect, useState } from 'react';
-
-import { BadgeIcon, BadgeSize } from './BadgeIcon/BadgeIcon';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface Props {
   // props for the image to load
   src?: string; // a link to an external image
-  fallbackIcon: string;
+  fallbackIcon: ReactNode;
   alt?: string;
-  size?: BadgeSize;
   className?: string;
 }
 
-export function FallbackImage({
-  src,
-  fallbackIcon,
-  alt,
-  size,
-  className,
-}: Props) {
+export function FallbackImage({ src, fallbackIcon, alt, className }: Props) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -36,5 +27,5 @@ export function FallbackImage({
   }
 
   // fallback icon if there is an error loading the image
-  return <BadgeIcon icon={fallbackIcon} size={size} />;
+  return <>{fallbackIcon}</>;
 }

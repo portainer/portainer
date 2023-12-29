@@ -174,8 +174,8 @@ class KubernetesVolumeController {
       increaseSize: false,
       volumeSize: 0,
       volumeSizeUnit: 'GB',
-      volumeSharedAccessPolicy: '',
-      volumeSharedAccessPolicyTooltip: '',
+      volumeSharedAccessPolicies: [],
+      volumeSharedAccessPolicyTooltips: '',
       errors: {
         volumeSize: false,
       },
@@ -186,16 +186,12 @@ class KubernetesVolumeController {
     try {
       await this.getVolume();
       await this.getEvents();
-      if (this.volume.PersistentVolumeClaim.StorageClass !== undefined) {
-        this.state.volumeSharedAccessPolicy = this.volume.PersistentVolumeClaim.StorageClass.AccessModes[this.volume.PersistentVolumeClaim.StorageClass.AccessModes.length - 1];
-        let policies = KubernetesStorageClassAccessPolicies();
-
-        policies.forEach((policy) => {
-          if (policy.Name == this.state.volumeSharedAccessPolicy) {
-            this.state.volumeSharedAccessPolicyTooltip = policy.Description;
-          }
-        });
-      }
+      this.state.volumeSharedAccessPolicies = this.volume.PersistentVolumeClaim.AccessModes;
+      let policies = KubernetesStorageClassAccessPolicies();
+      this.state.volumeSharedAccessPolicyTooltips = this.state.volumeSharedAccessPolicies.map((policy) => {
+        const matchingPolicy = policies.find((p) => p.Name === policy);
+        return matchingPolicy ? matchingPolicy.Description : undefined;
+      });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

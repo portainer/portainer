@@ -102,8 +102,8 @@ func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (*Kube
 // GetProxyKubeClient retrieves a KubeClient from the cache. You should be
 // calling SetProxyKubeClient before first. It is normally, called the
 // kubernetes middleware.
-func (factory *ClientFactory) GetProxyKubeClient(endpointID, token string) (*KubeClient, bool) {
-	client, ok := factory.endpointProxyClients.Get(endpointID + "." + token)
+func (factory *ClientFactory) GetProxyKubeClient(endpointID, userID string) (*KubeClient, bool) {
+	client, ok := factory.endpointProxyClients.Get(endpointID + "." + userID)
 	if !ok {
 		return nil, false
 	}
@@ -112,8 +112,8 @@ func (factory *ClientFactory) GetProxyKubeClient(endpointID, token string) (*Kub
 }
 
 // SetProxyKubeClient stores a kubeclient in the cache.
-func (factory *ClientFactory) SetProxyKubeClient(endpointID, token string, cli *KubeClient) {
-	factory.endpointProxyClients.Set(endpointID+"."+token, cli, 0)
+func (factory *ClientFactory) SetProxyKubeClient(endpointID, userID string, cli *KubeClient) {
+	factory.endpointProxyClients.Set(endpointID+"."+userID, cli, 0)
 }
 
 // CreateKubeClientFromKubeConfig creates a KubeClient from a clusterID, and
@@ -255,32 +255,6 @@ func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*re
 	})
 
 	return config, nil
-}
-
-func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernetes.Clientset, error) {
-	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
-	if err != nil {
-		return nil, err
-	}
-
-	config.Insecure = true
-	config.QPS = DefaultKubeClientQPS
-	config.Burst = DefaultKubeClientBurst
-
-	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
-		return &agentHeaderRoundTripper{
-			signatureHeader: signature,
-			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
-			roundTripper:    rt,
-		}
-	})
-
-	return kubernetes.NewForConfig(config)
 }
 
 func (factory *ClientFactory) CreateRemoteMetricsClient(endpoint *portainer.Endpoint) (*metricsv.Clientset, error) {

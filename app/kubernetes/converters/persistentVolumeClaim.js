@@ -5,6 +5,11 @@ import { KubernetesPersistentVolumeClaim } from 'Kubernetes/models/volume/models
 import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/volume/payloads';
 import { KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNameLabel } from 'Kubernetes/models/application/models';
 
+const storageClassToPVCAccessModes = {
+  RWO: 'ReadWriteOnce',
+  RWX: 'ReadWriteMany',
+};
+
 class KubernetesPersistentVolumeClaimConverter {
   static apiToPersistentVolumeClaim(data, storageClasses, yaml) {
     const res = new KubernetesPersistentVolumeClaim();
@@ -13,6 +18,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
     res.Storage = `${data.spec.resources.requests.storage}B`;
+    res.AccessModes = data.spec.accessModes || [];
     res.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
     res.Yaml = yaml ? yaml.data : '';
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
@@ -63,6 +69,8 @@ class KubernetesPersistentVolumeClaimConverter {
     res.metadata.namespace = pvc.Namespace;
     res.spec.resources.requests.storage = pvc.Storage;
     res.spec.storageClassName = pvc.StorageClass ? pvc.StorageClass.Name : '';
+    const accessModes = pvc.StorageClass && pvc.StorageClass.AccessModes ? pvc.StorageClass.AccessModes.map((accessMode) => storageClassToPVCAccessModes[accessMode]) : [];
+    res.spec.accessModes = accessModes;
     res.metadata.labels.app = pvc.ApplicationName;
     res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pvc.ApplicationOwner;
     res.metadata.labels[KubernetesPortainerApplicationNameLabel] = pvc.ApplicationName;

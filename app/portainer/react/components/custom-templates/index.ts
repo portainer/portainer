@@ -26,6 +26,7 @@ export const ngModule = angular
       'value',
       'onChange',
       'definitions',
+      'errors',
     ])
   )
   .component('customTemplatesVariablesField', VariablesFieldAngular)
@@ -39,12 +40,23 @@ export const ngModule = angular
     ])
   )
   .component(
+    'appTemplatesList',
+    r2a(withUIRouter(withCurrentUser(AppTemplatesList)), [
+      'onSelect',
+      'templates',
+      'selectedId',
+      'disabledTypes',
+      'fixedCategories',
+    ])
+  )
+  .component(
     'customTemplatesList',
     r2a(withUIRouter(withCurrentUser(CustomTemplatesList)), [
       'onDelete',
       'onSelect',
       'templates',
       'selectedId',
+      'templateLinkParams',
     ])
   )
   .component(
@@ -54,15 +66,6 @@ export const ngModule = angular
   .component(
     'customTemplatesTypeSelector',
     r2a(TemplateTypeSelector, ['onChange', 'value'])
-  )
-  .component(
-    'appTemplatesList',
-    r2a(withUIRouter(withCurrentUser(AppTemplatesList)), [
-      'onSelect',
-      'templates',
-      'selectedId',
-      'showSwarmStacks',
-    ])
   );
 
 withFormValidation(

@@ -49,7 +49,17 @@ func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*
 	apiVersionRe := regexp.MustCompile(`^(/kubernetes)?/(api|apis/apps)/v[0-9](\.[0-9])?`)
 	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 
+	endpointRe := regexp.MustCompile(`([0-9]+)`)
+	endpointIDMatch := endpointRe.FindAllString(request.RequestURI, 1)
+	endpointID := 0
+	if len(endpointIDMatch) > 0 {
+		endpointID, _ = strconv.Atoi(endpointIDMatch[0])
+	}
+
 	switch {
+	case strings.EqualFold(requestPath, "/namespaces/portainer/configmaps/portainer-config") && (request.Method == "PUT" || request.Method == "POST"):
+		defer transport.tokenManager.UpdateUserServiceAccountsForEndpoint(portainer.EndpointID(endpointID))
+		return transport.executeKubernetesRequest(request)
 	case strings.EqualFold(requestPath, "/namespaces"):
 		return transport.executeKubernetesRequest(request)
 	case strings.HasPrefix(requestPath, "/namespaces"):

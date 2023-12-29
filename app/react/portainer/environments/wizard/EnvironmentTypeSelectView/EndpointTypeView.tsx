@@ -27,6 +27,7 @@ export function EnvironmentTypeSelectView() {
       <PageHeader
         title="Quick Setup"
         breadcrumbs={[{ label: 'Environment Wizard' }]}
+        reload
       />
 
       <div className="row">

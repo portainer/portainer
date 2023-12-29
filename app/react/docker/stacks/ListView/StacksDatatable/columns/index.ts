@@ -10,7 +10,6 @@ import { columnHelper } from './helper';
 import { name } from './name';
 import { imageNotificationColumn } from './image-notification';
 import { control } from './control';
-import { deployedVersion } from './deployed-version';
 
 export function useColumns(isImageNotificationEnabled: boolean) {
   return _.compact([
@@ -52,7 +51,6 @@ export function useColumns(isImageNotificationEnabled: boolean) {
         return `${isoDateFromTimestamp(value)} ${by}`.trim();
       },
     }),
-    deployedVersion,
     createOwnershipColumn<DecoratedStack>(false),
   ]);
 }

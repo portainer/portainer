@@ -50,6 +50,14 @@ func (testRequestBouncer) TrustedEdgeEnvironmentAccess(tx dataservices.DataStore
 	return nil
 }
 
-func (testRequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
-	return nil
+func (testRequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.TokenData, error) {
+	return nil, nil
+}
+
+// AddTestSecurityCookie adds a security cookie to the request
+func AddTestSecurityCookie(r *http.Request, jwt string) {
+	r.AddCookie(&http.Cookie{
+		Name:  portainer.AuthCookieKey,
+		Value: jwt,
+	})
 }

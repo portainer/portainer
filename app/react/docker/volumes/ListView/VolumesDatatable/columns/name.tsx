@@ -89,7 +89,20 @@ function Cell({
       </Link>
       {isBrowseVisible && (
         <Authorized authorizations="DockerAgentBrowseList">
-          <Button icon={Search} color="primary" size="xsmall" as={Link}>
+          <Button
+            className="ml-2"
+            icon={Search}
+            color="primary"
+            size="xsmall"
+            as={Link}
+            props={{
+              to: 'docker.volumes.volume.browse',
+              params: {
+                id: item.Id,
+                nodeName: item.NodeName,
+              },
+            }}
+          >
             browse
           </Button>
         </Authorized>

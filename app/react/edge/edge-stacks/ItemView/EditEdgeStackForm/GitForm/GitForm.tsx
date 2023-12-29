@@ -27,14 +27,13 @@ import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { DeploymentType, EdgeStack } from '@/react/edge/edge-stacks/types';
 import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
 import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/components/EdgeStackDeploymentTypeSelector';
-import { useCurrentUser } from '@/react/hooks/useUser';
-import { useCreateGitCredentialMutation } from '@/react/portainer/account/git-credentials/git-credentials.service';
-import { notifyError, notifySuccess } from '@/portainer/services/notifications';
+import { notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types';
 import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
 import { RelativePathFieldset } from '@/react/portainer/gitops/RelativePathFieldset/RelativePathFieldset';
 import { parseRelativePathResponse } from '@/react/portainer/gitops/RelativePathFieldset/utils';
+import { useSaveCredentialsIfRequired } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
 
 import { LoadingButton } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
@@ -44,7 +43,6 @@ import { EnvironmentVariablesPanel } from '@@/form-components/EnvironmentVariabl
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { useValidateEnvironmentTypes } from '../useEdgeGroupHasType';
-import { atLeastTwo } from '../atLeastTwo';
 import { PrivateRegistryFieldset } from '../../../components/PrivateRegistryFieldset';
 
 import {
@@ -66,8 +64,8 @@ interface FormValues {
 export function GitForm({ stack }: { stack: EdgeStack }) {
   const router = useRouter();
   const updateStackMutation = useUpdateEdgeStackGitMutation();
-  const saveCredentialsMutation = useCreateGitCredentialMutation();
-  const { user } = useCurrentUser();
+  const { saveCredentials, isLoading: isSaveCredentialsLoading } =
+    useSaveCredentialsIfRequired();
 
   if (!stack.GitConfig) {
     return null;
@@ -96,7 +94,9 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
             onUpdateSettingsClick={handleUpdateSettings}
             gitPath={gitConfig.ConfigFilePath}
             gitUrl={gitConfig.URL}
-            isLoading={updateStackMutation.isLoading}
+            isLoading={
+              updateStackMutation.isLoading || isSaveCredentialsLoading
+            }
             isUpdateVersion={!!updateStackMutation.variables?.updateVersion}
           />
         );
@@ -106,9 +106,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
             return;
           }
 
-          const credentialId = await saveCredentialsIfRequired(
-            values.authentication
-          );
+          const credentialId = await saveCredentials(values.authentication);
 
           updateStackMutation.mutate(getPayload(values, credentialId, false), {
             onSuccess() {
@@ -122,7 +120,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
   );
 
   async function handleSubmit(values: FormValues) {
-    const credentialId = await saveCredentialsIfRequired(values.authentication);
+    const credentialId = await saveCredentials(values.authentication);
 
     updateStackMutation.mutate(getPayload(values, credentialId, true), {
       onSuccess() {
@@ -152,29 +150,6 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
       ...values,
     };
   }
-
-  async function saveCredentialsIfRequired(authentication: GitAuthModel) {
-    if (
-      !authentication.SaveCredential ||
-      !authentication.RepositoryPassword ||
-      !authentication.NewCredentialName
-    ) {
-      return authentication.RepositoryGitCredentialID;
-    }
-
-    try {
-      const credential = await saveCredentialsMutation.mutateAsync({
-        userId: user.Id,
-        username: authentication.RepositoryUsername,
-        password: authentication.RepositoryPassword,
-        name: authentication.NewCredentialName,
-      });
-      return credential.id;
-    } catch (err) {
-      notifyError('Error', err as Error, 'Unable to save credentials');
-      return undefined;
-    }
-  }
 }
 
 function InnerForm({
@@ -201,7 +176,6 @@ function InnerForm({
 
   const hasKubeEndpoint = hasType(EnvironmentType.EdgeAgentOnKubernetes);
   const hasDockerEndpoint = hasType(EnvironmentType.EdgeAgentOnDocker);
-  const hasNomadEndpoint = hasType(EnvironmentType.EdgeAgentOnNomad);
 
   return (
     <Form className="form-horizontal" onSubmit={handleSubmit}>
@@ -211,7 +185,7 @@ function InnerForm({
         error={errors.groupIds}
       />
 
-      {atLeastTwo(hasKubeEndpoint, hasDockerEndpoint, hasNomadEndpoint) && (
+      {hasKubeEndpoint && hasDockerEndpoint && (
         <TextTip>
           There are no available deployment types when there is more than one
           type of environment in your edge group selection (e.g. Kubernetes and
@@ -231,7 +205,6 @@ function InnerForm({
         value={values.deploymentType}
         hasDockerEndpoint={hasType(EnvironmentType.EdgeAgentOnDocker)}
         hasKubeEndpoint={hasType(EnvironmentType.EdgeAgentOnKubernetes)}
-        hasNomadEndpoint={hasType(EnvironmentType.EdgeAgentOnNomad)}
         onChange={(value) => {
           setFieldValue('deploymentType', value);
         }}
@@ -279,7 +252,7 @@ function InnerForm({
           errors={errors.authentication}
         />
 
-        {isBE && <RelativePathFieldset value={values.relativePath} readonly />}
+        {isBE && <RelativePathFieldset value={values.relativePath} isEditing />}
 
         <EnvironmentVariablesPanel
           onChange={(value) => setFieldValue('envVars', value)}

@@ -45,7 +45,7 @@ export function AuthFieldset({
             label="Authentication"
             labelClass="col-sm-3 col-lg-2"
             name="authentication"
-            checked={value.RepositoryAuthentication}
+            checked={value.RepositoryAuthentication || false}
             onChange={(value) =>
               handleChange({ RepositoryAuthentication: value })
             }

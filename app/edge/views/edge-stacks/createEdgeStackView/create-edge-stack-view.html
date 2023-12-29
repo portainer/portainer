@@ -1,4 +1,4 @@
-<page-header title="'Create Edge stack'" breadcrumbs="[{label:'Edge Stacks', link:'edge.stacks'}, 'Create Edge stack']"> </page-header>
+<page-header title="'Create Edge stack'" breadcrumbs="[{label:'Edge Stacks', link:'edge.stacks'}, 'Create Edge stack']" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -50,7 +50,6 @@
             value="$ctrl.formValues.DeploymentType"
             has-docker-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnDocker)"
             has-kube-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnKubernetes)"
-            has-nomad-endpoint="$ctrl.hasType($ctrl.EnvironmentType.EdgeAgentOnNomad)"
             on-change="($ctrl.onChangeDeploymentType)"
           ></edge-stack-deployment-type-selector>
 
@@ -58,6 +57,8 @@
             ng-if="$ctrl.formValues.DeploymentType == $ctrl.EditorType.Compose"
             form-values="$ctrl.formValues"
             state="$ctrl.state"
+            template-values="$ctrl.state.templateValues"
+            set-template-values="$ctrl.setTemplateValues"
           ></edge-stacks-docker-compose-form>
 
           <edge-stacks-kube-manifest-form

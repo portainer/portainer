@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"crypto/sha256"
-	"math/rand"
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
@@ -200,7 +198,7 @@ func initAPIKeyService(datastore dataservices.DataStore) apikey.APIKeyService {
 	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
 }
 
-func initJWTService(userSessionTimeout string, dataStore dataservices.DataStore) (dataservices.JWTService, error) {
+func initJWTService(userSessionTimeout string, dataStore dataservices.DataStore) (portainer.JWTService, error) {
 	if userSessionTimeout == "" {
 		userSessionTimeout = portainer.DefaultUserSessionTimeout
 	}
@@ -631,8 +629,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	configureLogger()
 	setLoggingMode("PRETTY")
 

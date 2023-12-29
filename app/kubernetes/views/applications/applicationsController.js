@@ -61,12 +61,9 @@ class KubernetesApplicationsController {
         if (isAppFormCreated) {
           const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
           await Promise.all(promises);
-        } else {
-          const application = stack.Applications.find((x) => x.StackId !== null);
-          if (application && application.StackId) {
-            await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
-          }
         }
+
+        await this.StackService.removeKubernetesStacksByName(stack.Name, stack.ResourcePool, false, this.endpoint.Id);
 
         this.Notifications.success('Stack successfully removed', stack.Name);
         _.remove(this.state.stacks, { Name: stack.Name });

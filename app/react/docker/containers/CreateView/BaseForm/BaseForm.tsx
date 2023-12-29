@@ -107,6 +107,7 @@ export function BaseForm({
                   onChange={(alwaysPull) =>
                     setFieldValue('alwaysPull', alwaysPull)
                   }
+                  labelClass="col-sm-3 col-lg-2"
                 />
               </div>
             </div>
@@ -126,6 +127,7 @@ export function BaseForm({
                       setFieldValue('enableWebhook', enableWebhook)
                     }
                     featureId={FeatureId.CONTAINER_WEBHOOK}
+                    labelClass="col-sm-3 col-lg-2"
                   />
                 </div>
               </div>
@@ -143,6 +145,7 @@ export function BaseForm({
                 onChange={(publishAllPorts) =>
                   setFieldValue('publishAllPorts', publishAllPorts)
                 }
+                labelClass="col-sm-3 col-lg-2"
               />
             </div>
           </div>
@@ -169,6 +172,7 @@ export function BaseForm({
           }
           errors={errors?.accessControl}
           values={values.accessControl}
+          environmentId={environment.Id}
         />
 
         <div className="form-group">
@@ -178,6 +182,7 @@ export function BaseForm({
               tooltip="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."
               checked={values.autoRemove}
               onChange={(autoRemove) => setFieldValue('autoRemove', autoRemove)}
+              labelClass="col-sm-3 col-lg-2"
             />
           </div>
         </div>

@@ -4,15 +4,10 @@ import { useTags } from '@/portainer/tags/queries';
 
 import { useAgentVersionsList } from '../../environments/queries/useAgentVersionsList';
 import { EnvironmentStatus, PlatformType } from '../../environments/types';
-import { isBE } from '../../feature-flags/feature-flags.service';
 import { useGroups } from '../../environments/environment-groups/queries';
-import {
-  SortOptions,
-  SortType,
-} from '../../environments/queries/useEnvironmentList';
 
 import { HomepageFilter } from './HomepageFilter';
-import { SortbySelector } from './SortbySelector';
+import { ListSortType, SortbySelector } from './SortbySelector';
 import { ConnectionType } from './types';
 import styles from './EnvironmentList.module.css';
 
@@ -20,11 +15,6 @@ const status = [
   { value: EnvironmentStatus.Up, label: 'Up' },
   { value: EnvironmentStatus.Down, label: 'Down' },
 ];
-
-const sortByOptions = SortOptions.map((v) => ({
-  value: v,
-  label: v,
-}));
 
 export function EnvironmentListFilters({
   agentVersions,
@@ -64,8 +54,8 @@ export function EnvironmentListFilters({
   setAgentVersions: (value: string[]) => void;
   agentVersions: string[];
 
-  sortByState?: SortType;
-  sortOnChange: (value: SortType) => void;
+  sortByState?: ListSortType;
+  sortOnChange: (value: ListSortType) => void;
 
   sortOnDescending: () => void;
   sortByDescending: boolean;
@@ -161,7 +151,6 @@ export function EnvironmentListFilters({
 
       <div className={styles.filterRight}>
         <SortbySelector
-          filterOptions={sortByOptions}
           onChange={sortOnChange}
           onDescending={sortOnDescending}
           placeHolder="Sort By"
@@ -185,10 +174,6 @@ function getConnectionTypeOptions(platformTypes: PlatformType[]) {
     [PlatformType.Azure]: [ConnectionType.API],
     [PlatformType.Kubernetes]: [
       ConnectionType.Agent,
-      ConnectionType.EdgeAgentStandard,
-      ConnectionType.EdgeAgentAsync,
-    ],
-    [PlatformType.Nomad]: [
       ConnectionType.EdgeAgentStandard,
       ConnectionType.EdgeAgentAsync,
     ],
@@ -219,13 +204,6 @@ function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
     { value: PlatformType.Kubernetes, label: 'Kubernetes' },
   ];
 
-  if (isBE) {
-    platformDefaultOptions.push({
-      value: PlatformType.Nomad,
-      label: 'Nomad',
-    });
-  }
-
   if (connectionTypes.length === 0) {
     return platformDefaultOptions;
   }
@@ -235,11 +213,9 @@ function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
     [ConnectionType.Agent]: [PlatformType.Docker, PlatformType.Kubernetes],
     [ConnectionType.EdgeAgentStandard]: [
       PlatformType.Kubernetes,
-      PlatformType.Nomad,
       PlatformType.Docker,
     ],
     [ConnectionType.EdgeAgentAsync]: [
-      PlatformType.Nomad,
       PlatformType.Docker,
       PlatformType.Kubernetes,
     ],

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Rocket } from 'lucide-react';
 
 import LinuxIcon from '@/assets/ico/linux.svg?c';
 import MicrosoftIcon from '@/assets/ico/vendor/microsoft.svg?c';
@@ -7,8 +8,10 @@ import KubernetesIcon from '@/assets/ico/vendor/kubernetes.svg?c';
 import { Icon } from '@@/Icon';
 import { FallbackImage } from '@@/FallbackImage';
 import { BlocklistItem } from '@@/Blocklist/BlocklistItem';
+import { BadgeIcon } from '@@/BadgeIcon';
+import { Link } from '@@/Link';
 
-import { Platform } from '../../custom-templates/types';
+import { Platform } from '../types';
 
 type Value = {
   Id: number | string;
@@ -25,22 +28,29 @@ export function TemplateItem({
   onSelect,
   renderActions,
   isSelected,
+  linkParams,
 }: {
   template: Value;
   typeLabel: string;
   onSelect: () => void;
   renderActions: ReactNode;
   isSelected: boolean;
+  linkParams?: { to: string; params: object };
 }) {
   return (
     <div className="relative">
-      <BlocklistItem isSelected={isSelected} onClick={() => onSelect()}>
+      <BlocklistItem
+        isSelected={isSelected}
+        onClick={() => onSelect()}
+        as={linkParams ? Link : undefined}
+        to={linkParams?.to}
+        params={linkParams?.params}
+      >
         <div className="vertical-center min-w-[56px] justify-center">
           <FallbackImage
             src={template.Logo}
-            fallbackIcon="rocket"
+            fallbackIcon={<BadgeIcon icon={Rocket} size="3xl" />}
             className="blocklist-item-logo"
-            size="3xl"
           />
         </div>
         <div className="col-sm-12 flex justify-between flex-wrap">

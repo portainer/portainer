@@ -29,14 +29,14 @@ angular.module('portainer.app').factory('LocalStorage', [
       getUIState: function () {
         return localStorageService.get('UI_STATE');
       },
-      storeJWT: function (jwt) {
-        localStorageService.set('JWT', jwt);
+      getUserId() {
+        localStorageService.get('USER_ID');
       },
-      getJWT: function () {
-        return localStorageService.get('JWT');
+      storeUserId: function (userId) {
+        localStorageService.set('USER_ID', userId);
       },
-      deleteJWT: function () {
-        localStorageService.remove('JWT');
+      deleteUserId: function () {
+        localStorageService.remove('USER_ID');
       },
       storePaginationLimit: function (key, count) {
         localStorageService.set('datatable_pagination_' + key, count);
@@ -119,7 +119,7 @@ angular.module('portainer.app').factory('LocalStorage', [
         localStorageService.clearAll();
       },
       cleanAuthData() {
-        localStorageService.remove('JWT', 'APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
+        localStorageService.remove('USER_ID', 'APPLICATION_STATE', 'LOGIN_STATE_UUID', 'ALLOWED_NAMESPACES');
       },
       storeKubernetesSummaryToggle(value) {
         localStorageService.set('kubernetes_summary_expanded', value);

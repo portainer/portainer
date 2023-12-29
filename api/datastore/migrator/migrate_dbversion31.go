@@ -245,7 +245,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 	return nil
 }
 
-func findResourcesToUpdateForDB32(dockerID string, volumesData volume.VolumeListOKBody, toUpdate map[portainer.ResourceControlID]string, volumeResourceControls map[string]*portainer.ResourceControl) {
+func findResourcesToUpdateForDB32(dockerID string, volumesData volume.ListResponse, toUpdate map[portainer.ResourceControlID]string, volumeResourceControls map[string]*portainer.ResourceControl) {
 	volumes := volumesData.Volumes
 	for _, volume := range volumes {
 		volumeName := volume.Name

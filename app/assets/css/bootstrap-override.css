@@ -97,6 +97,8 @@
   bottom: 0;
   -webkit-transition: 0.4s;
   transition: 0.4s;
+  /* speed up the hover color changes to 200ms, while keeping the movement transition 400ms */
+  @apply transition-colors duration-200;
   @apply bg-gray-6;
   @apply th-dark:bg-gray-warm-8;
   @apply th-highcontrast:bg-gray-warm-8;

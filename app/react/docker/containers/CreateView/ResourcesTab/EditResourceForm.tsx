@@ -1,7 +1,10 @@
 import { Formik } from 'formik';
 import { useMutation } from 'react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import { useState } from 'react';
+import { FormikHelpers } from 'formik/dist/types';
 
+import { invalidateContainer } from '@/react/docker/containers/queries/container';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { mutationOptions, withError } from '@/react-tools/react-query';
 import { useSystemLimits } from '@/react/docker/proxy/queries/useInfo';
@@ -21,17 +24,22 @@ import {
 import { toConfigCpu, toConfigMemory } from './memory-utils';
 
 export function EditResourcesForm({
+  onChange,
   redeploy,
   initialValues,
   isImageInvalid,
 }: {
   initialValues: Values;
-  redeploy: (values: Values) => Promise<void>;
+  onChange: (values: Values) => void;
+  redeploy: () => Promise<boolean>;
   isImageInvalid: boolean;
 }) {
   const {
     params: { from: containerId },
   } = useCurrentStateAndParams();
+
+  const [savedInitValues, setSavedInitValues] = useState(initialValues);
+
   if (!containerId || typeof containerId !== 'string') {
     throw new Error('missing parameter "from"');
   }
@@ -54,7 +62,10 @@ export function EditResourcesForm({
         <div className="edit-resources p-5">
           <ResourceFieldset
             values={values}
-            onChange={setValues}
+            onChange={(values) => {
+              onChange(values);
+              setValues(values);
+            }}
             errors={errors}
           />
 
@@ -82,28 +93,44 @@ export function EditResourcesForm({
     </Formik>
   );
 
-  function handleSubmit(values: Values) {
+  function handleSubmit(values: Values, helper: FormikHelpers<Values>) {
     updateMutation.mutate(values, {
-      onSuccess: () => {
-        notifySuccess('Success', 'Limits updated');
+      onSuccess: (data) => {
+        if (data) {
+          notifySuccess('Success', 'Limits updated');
+          helper.resetForm({ values: initialValues });
+          invalidateContainer(environmentId, containerId);
+        }
       },
     });
   }
 
   function settingUnlimitedResources(values: Values) {
     return (
-      (initialValues.limit > 0 && values.limit === 0) ||
-      (initialValues.reservation > 0 && values.reservation === 0) ||
-      (initialValues.cpu > 0 && values.cpu === 0)
+      (savedInitValues.limit > 0 && values.limit === 0) ||
+      (savedInitValues.reservation > 0 && values.reservation === 0) ||
+      (savedInitValues.cpu > 0 && values.cpu === 0)
     );
   }
 
+  // return true only if limits are updated
+  // return false otherwise(container recreated, user canceled container recreation, etc.)
   async function updateLimitsOrCreate(values: Values) {
     if (settingUnlimitedResources(values)) {
-      return redeploy(values);
+      const ret = await redeploy();
+
+      if (ret === false) {
+        return false;
+      }
+
+      setSavedInitValues(values);
+      return false;
     }
 
-    return updateLimits(environmentId, containerId, values);
+    setSavedInitValues(values);
+    await updateLimits(environmentId, containerId, values);
+
+    return true;
   }
 }
 

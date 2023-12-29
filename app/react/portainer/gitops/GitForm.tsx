@@ -23,14 +23,14 @@ interface Props {
   value: GitFormModel;
   onChange: (value: Partial<GitFormModel>) => void;
   environmentType?: 'DOCKER' | 'KUBERNETES' | undefined;
-  deployMethod?: 'compose' | 'nomad' | 'manifest';
+  deployMethod?: 'compose' | 'manifest';
   isDockerStandalone?: boolean;
   isAdditionalFilesFieldVisible?: boolean;
   isForcePullVisible?: boolean;
   isAuthExplanationVisible?: boolean;
-  errors: FormikErrors<GitFormModel>;
-  baseWebhookUrl: string;
-  webhookId: string;
+  errors?: FormikErrors<GitFormModel>;
+  baseWebhookUrl?: string;
+  webhookId?: string;
   webhooksDocs?: string;
 }
 
@@ -88,7 +88,7 @@ export function GitForm({
 
       {isAdditionalFilesFieldVisible && (
         <AdditionalFileField
-          value={value.AdditionalFiles}
+          value={value.AdditionalFiles || []}
           onChange={(value) => handleChange({ AdditionalFiles: value })}
           errors={errors.AdditionalFiles}
         />
@@ -97,8 +97,8 @@ export function GitForm({
       {value.AutoUpdate && (
         <AutoUpdateFieldset
           environmentType={environmentType}
-          webhookId={webhookId}
-          baseWebhookUrl={baseWebhookUrl}
+          webhookId={webhookId || ''}
+          baseWebhookUrl={baseWebhookUrl || ''}
           value={value.AutoUpdate}
           onChange={(value) => handleChange({ AutoUpdate: value })}
           isForcePullVisible={isForcePullVisible}
@@ -113,7 +113,7 @@ export function GitForm({
         <div className="col-sm-12">
           <SwitchField
             label="Skip TLS Verification"
-            checked={value.TLSSkipVerify}
+            checked={value.TLSSkipVerify || false}
             onChange={(value) => handleChange({ TLSSkipVerify: value })}
             name="TLSSkipVerify"
             tooltip="Enabling this will allow skipping TLS validation for any self-signed certificate."
@@ -165,5 +165,5 @@ export function buildGitValidationSchema(
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials, false));
+  }).concat(gitAuthValidation(gitCredentials, false)) as SchemaOf<GitFormModel>;
 }

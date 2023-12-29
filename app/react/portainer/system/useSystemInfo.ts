@@ -12,8 +12,7 @@ export type ContainerPlatform =
   | 'Docker Standalone'
   | 'Docker Swarm'
   | 'Kubernetes'
-  | 'Podman'
-  | 'Nomad';
+  | 'Podman';
 
 export interface SystemInfoResponse {
   platform: ContainerPlatform;

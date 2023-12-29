@@ -27,7 +27,7 @@ export function DashboardView() {
 
   return (
     <>
-      <PageHeader title="Home" breadcrumbs={[{ label: 'Dashboard' }]} />
+      <PageHeader title="Home" breadcrumbs={[{ label: 'Dashboard' }]} reload />
 
       <div className="mx-4">
         {subscriptionsQuery.data && (

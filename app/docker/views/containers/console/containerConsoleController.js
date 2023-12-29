@@ -168,8 +168,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         url += '&nodeName=' + $transition$.params().nodeName;
       }
 
-      url += '&token=' + LocalStorage.getJWT();
-
       if (url.indexOf('https') > -1) {
         url = url.replace('https://', 'wss://');
       } else {

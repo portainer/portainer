@@ -71,6 +71,7 @@ export function EnvironmentCreationView() {
       <PageHeader
         title="Quick Setup"
         breadcrumbs={[{ label: 'Environment Wizard' }]}
+        reload
       />
 
       <div className={styles.wizardWrapper}>
@@ -210,7 +211,6 @@ function useAnalyticsState() {
     kaasAgent: 0,
     aciApi: 0,
     localEndpoint: 0,
-    nomadEdgeAgentStandard: 0,
     dockerEdgeAgentAsync: 0,
     dockerEdgeAgentStandard: 0,
   });

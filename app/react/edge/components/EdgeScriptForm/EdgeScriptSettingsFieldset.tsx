@@ -10,21 +10,19 @@ import { TagSelector } from '@@/TagSelector';
 
 import { EdgeGroupsSelector } from '../../edge-stacks/components/EdgeGroupsSelector';
 
-import { NomadTokenField } from './NomadTokenField';
 import { ScriptFormValues } from './types';
 
 interface Props {
-  isNomadTokenVisible?: boolean;
   hideIdGetter?: boolean;
   showMetaFields?: boolean;
 }
 
 export function EdgeScriptSettingsFieldset({
-  isNomadTokenVisible,
   hideIdGetter,
   showMetaFields,
 }: Props) {
-  const { values, setFieldValue } = useFormikContext<ScriptFormValues>();
+  const { values, setFieldValue, errors } =
+    useFormikContext<ScriptFormValues>();
 
   return (
     <>
@@ -50,8 +48,10 @@ export function EdgeScriptSettingsFieldset({
         <>
           <FormControl
             label="Edge ID Generator"
-            tooltip="A bash script one liner that will generate the edge id and will be assigned to the PORTAINER_EDGE_ID environment variable"
+            tooltip="Enter a single-line bash command that generates a unique Edge ID. For example, you can use 'uuidgen' or 'uuid'. The result will be assigned to the 'PORTAINER_EDGE_ID' environment variable."
             inputId="edge-id-generator-input"
+            required
+            errors={errors.edgeIdGenerator}
           >
             <Input
               type="text"
@@ -67,23 +67,6 @@ export function EdgeScriptSettingsFieldset({
                 <code>PORTAINER_EDGE_ID</code> environment variable is required
                 to successfully connect the edge agent to Portainer
               </TextTip>
-            </div>
-          </div>
-        </>
-      )}
-
-      {isNomadTokenVisible && (
-        <>
-          <NomadTokenField />
-
-          <div className="form-group">
-            <div className="col-sm-12">
-              <SwitchField
-                label="TLS"
-                labelClass="col-sm-3 col-lg-2"
-                checked={values.tlsEnabled}
-                onChange={(checked) => setFieldValue('tlsEnabled', checked)}
-              />
             </div>
           </div>
         </>

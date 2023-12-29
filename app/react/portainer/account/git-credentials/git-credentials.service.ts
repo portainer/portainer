@@ -2,26 +2,11 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { success as notifySuccess } from '@/portainer/services/notifications';
+import { UserId } from '@/portainer/users/types';
 
-import {
-  CreateGitCredentialPayload,
-  GitCredential,
-  UpdateGitCredentialPayload,
-} from './types';
+import { isBE } from '../../feature-flags/feature-flags.service';
 
-export async function createGitCredential(
-  gitCredential: CreateGitCredentialPayload
-) {
-  try {
-    const { data } = await axios.post<{ gitCredential: GitCredential }>(
-      buildGitUrl(gitCredential.userId),
-      gitCredential
-    );
-    return data.gitCredential;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to create git credential');
-  }
-}
+import { GitCredential, UpdateGitCredentialPayload } from './types';
 
 export async function getGitCredentials(userId: number) {
   try {
@@ -112,9 +97,12 @@ export function useDeleteGitCredentialMutation() {
   });
 }
 
-export function useGitCredentials(userId: number) {
+export function useGitCredentials(
+  userId: UserId,
+  { enabled }: { enabled?: boolean } = {}
+) {
   return useQuery('gitcredentials', () => getGitCredentials(userId), {
-    staleTime: 20,
+    enabled: isBE && enabled,
     meta: {
       error: {
         title: 'Failure',
@@ -135,24 +123,7 @@ export function useGitCredential(userId: number, id: number) {
   });
 }
 
-export function useCreateGitCredentialMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation(createGitCredential, {
-    onSuccess: (_, payload) => {
-      notifySuccess('Credentials created successfully', payload.name);
-      return queryClient.invalidateQueries(['gitcredentials']);
-    },
-    meta: {
-      error: {
-        title: 'Failure',
-        message: 'Unable to create credential',
-      },
-    },
-  });
-}
-
-function buildGitUrl(userId: number, credentialId?: number) {
+export function buildGitUrl(userId: number, credentialId?: number) {
   return credentialId
     ? `/users/${userId}/gitcredentials/${credentialId}`
     : `/users/${userId}/gitcredentials`;

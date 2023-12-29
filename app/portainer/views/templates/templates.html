@@ -270,9 +270,4 @@
   <!-- container-form -->
 </div>
 
-<app-templates-list
-  templates="templates"
-  on-select="(selectTemplate)"
-  selected-id="state.selectedTemplate.Id"
-  show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
-></app-templates-list>
+<app-templates-list templates="templates" on-select="(selectTemplate)" selected-id="state.selectedTemplate.Id" disabled-types="disabledTypes"></app-templates-list>

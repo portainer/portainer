@@ -23,6 +23,7 @@ function NameCell({
       <Authorized
         authorizations="K8sClusterNodeR"
         childrenUnauthorized={nodeName}
+        adminOnlyCE
       >
         <Link to="kubernetes.cluster.node" params={{ nodeName }}>
           {nodeName}

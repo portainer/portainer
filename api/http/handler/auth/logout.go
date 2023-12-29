@@ -11,7 +11,7 @@ import (
 
 // @id Logout
 // @summary Logout
-// @description **Access policy**: authenticated
+// @description **Access policy**: public
 // @security ApiKeyAuth
 // @security jwt
 // @tags auth
@@ -19,14 +19,14 @@ import (
 // @failure 500 "Server error"
 // @router /auth/logout [post]
 func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve user details from authentication token", err)
+	tokenData, _ := handler.bouncer.CookieAuthLookup(r)
+
+	if tokenData != nil {
+		handler.KubernetesTokenCacheManager.RemoveUserFromCache(tokenData.ID)
+		logoutcontext.Cancel(tokenData.Token)
 	}
 
-	handler.KubernetesTokenCacheManager.RemoveUserFromCache(tokenData.ID)
-
-	logoutcontext.Cancel(tokenData.Token)
+	security.RemoveAuthCookie(w)
 
 	return response.Empty(w)
 }

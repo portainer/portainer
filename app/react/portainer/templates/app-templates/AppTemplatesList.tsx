@@ -1,7 +1,6 @@
 import { Edit } from 'lucide-react';
 import _ from 'lodash';
-import { useState } from 'react';
-import { useRouter } from '@uirouter/react';
+import { useMemo, useState } from 'react';
 
 import { DatatableHeader } from '@@/datatables/DatatableHeader';
 import { Table } from '@@/datatables';
@@ -11,39 +10,53 @@ import { DatatableFooter } from '@@/datatables/DatatableFooter';
 
 import { AppTemplatesListItem } from './AppTemplatesListItem';
 import { TemplateViewModel } from './view-model';
-import { ListState } from './types';
+import { ListState, TemplateType } from './types';
 import { useSortAndFilterTemplates } from './useSortAndFilter';
 import { Filters } from './Filters';
-import { useFetchTemplateInfoMutation } from './useFetchTemplateInfoMutation';
 
 const tableKey = 'app-templates-list';
 const store = createPersistedStore<ListState>(tableKey, undefined, (set) => ({
   category: null,
   setCategory: (category: ListState['category']) => set({ category }),
-  type: null,
-  setType: (type: ListState['type']) => set({ type }),
+  types: [],
+  setTypes: (types: ListState['types']) => set({ types }),
 }));
 
 export function AppTemplatesList({
-  templates,
+  templates: initialTemplates,
   onSelect,
   selectedId,
-  showSwarmStacks,
+  disabledTypes,
+  fixedCategories,
 }: {
   templates?: TemplateViewModel[];
   onSelect: (template: TemplateViewModel) => void;
   selectedId?: TemplateViewModel['Id'];
-  showSwarmStacks?: boolean;
+  disabledTypes?: Array<TemplateType>;
+  fixedCategories?: Array<string>;
 }) {
-  const fetchTemplateInfoMutation = useFetchTemplateInfoMutation();
-  const router = useRouter();
   const [page, setPage] = useState(0);
 
   const listState = useTableState(store, tableKey);
+
+  const templates = useMemo(() => {
+    if (!initialTemplates) {
+      return [];
+    }
+
+    if (!fixedCategories?.length) {
+      return initialTemplates;
+    }
+
+    return initialTemplates.filter((template) =>
+      fixedCategories.some((category) => template.Categories.includes(category))
+    );
+  }, [fixedCategories, initialTemplates]);
+
   const filteredTemplates = useSortAndFilterTemplates(
     templates || [],
     listState,
-    showSwarmStacks
+    disabledTypes
   );
 
   const pagedTemplates =
@@ -61,6 +74,8 @@ export function AppTemplatesList({
             listState={listState}
             templates={templates || []}
             onChange={() => setPage(0)}
+            disabledTypes={disabledTypes}
+            fixedCategories={fixedCategories}
           />
         }
       />
@@ -71,7 +86,6 @@ export function AppTemplatesList({
             key={template.Id}
             template={template}
             onSelect={onSelect}
-            onDuplicate={onDuplicate}
             isSelected={selectedId === template.Id}
           />
         ))}
@@ -95,16 +109,5 @@ export function AppTemplatesList({
   function handleSearchChange(search: string) {
     listState.setSearch(search);
     setPage(0);
-  }
-
-  function onDuplicate(template: TemplateViewModel) {
-    fetchTemplateInfoMutation.mutate(template, {
-      onSuccess({ fileContent, type }) {
-        router.stateService.go('.custom.new', {
-          fileContent,
-          type,
-        });
-      },
-    });
   }
 }

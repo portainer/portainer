@@ -48,7 +48,7 @@ interface Args {
   isAdditionalFilesFieldVisible: boolean;
   isAuthExplanationVisible: boolean;
   isDockerStandalone: boolean;
-  deployMethod: 'compose' | 'nomad' | 'manifest';
+  deployMethod: 'compose' | 'manifest';
   isForcePullVisible: boolean;
 }
 

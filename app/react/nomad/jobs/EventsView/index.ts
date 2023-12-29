@@ -1,1 +1,0 @@
-export { EventsView } from './EventsView';

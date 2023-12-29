@@ -24,11 +24,13 @@ import { EnvVarsTab } from './EnvVarsTab';
 import { EditResourcesForm } from './ResourcesTab/EditResourceForm';
 
 export function InnerForm({
+  hideCapabilities = false,
   isLoading,
   isDuplicate,
   onChangeName,
   onRateLimit,
 }: {
+  hideCapabilities: boolean;
   isDuplicate: boolean;
   isLoading: boolean;
   onChangeName: (value: string) => void;
@@ -184,13 +186,13 @@ export function InnerForm({
                                 ? (values) => (
                                     <EditResourcesForm
                                       initialValues={values}
-                                      redeploy={(values) => {
+                                      onChange={(values) => {
                                         setFieldValue(
                                           'resources.resources',
                                           values
                                         );
-                                        return submitForm();
                                       }}
+                                      redeploy={submitForm}
                                       isImageInvalid={!!errors?.image}
                                     />
                                   )
@@ -202,6 +204,7 @@ export function InnerForm({
                       {
                         id: 'capabilities',
                         label: 'Capabilities',
+                        hidden: hideCapabilities,
                         children: (
                           <CapabilitiesTab
                             values={values.capabilities}

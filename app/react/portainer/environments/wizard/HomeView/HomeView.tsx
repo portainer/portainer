@@ -22,6 +22,7 @@ export function HomeView() {
       <PageHeader
         title="Quick Setup"
         breadcrumbs={[{ label: 'Environment Wizard' }]}
+        reload
       />
 
       <div className="row">
@@ -102,6 +103,8 @@ function getTypeLabel(type?: EnvironmentType) {
   switch (type) {
     case EnvironmentType.Docker:
       return 'Docker';
+    case EnvironmentType.AgentOnDocker:
+      return 'Docker Agent';
     case EnvironmentType.KubernetesLocal:
       return 'Kubernetes';
     default:

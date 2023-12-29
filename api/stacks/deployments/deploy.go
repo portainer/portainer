@@ -171,6 +171,11 @@ func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, e
 }
 
 func isEnvironmentOnline(endpoint *portainer.Endpoint) bool {
+	if endpoint.Type != portainer.AgentOnDockerEnvironment &&
+		endpoint.Type != portainer.AgentOnKubernetesEnvironment {
+		return true
+	}
+
 	var err error
 	var tlsConfig *tls.Config
 	if endpoint.TLSConfig.TLS {

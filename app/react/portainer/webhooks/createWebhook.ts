@@ -7,10 +7,10 @@ import { buildUrl } from './build-url';
 import { Webhook, WebhookType } from './types';
 
 interface CreateWebhookPayload {
-  resourceId: string;
-  environmentId: EnvironmentId;
-  registryId?: RegistryId;
-  webhookType: WebhookType;
+  ResourceId: string;
+  EndpointID: EnvironmentId;
+  RegistryId?: RegistryId;
+  WebhookType: WebhookType;
 }
 
 export async function createWebhook(payload: CreateWebhookPayload) {
