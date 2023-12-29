@@ -11,7 +11,7 @@ export interface ImagesListResponse {
   nodeName?: string;
   id: string;
   size: number;
-  tags: string[];
+  tags?: string[];
 
   /**
    * Used is true if the image is used by at least one container.
