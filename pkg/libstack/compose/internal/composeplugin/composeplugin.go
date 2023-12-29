@@ -55,6 +55,27 @@ func (wrapper *PluginWrapper) Deploy(ctx context.Context, filePaths []string, op
 	return err
 }
 
+func (wrapper *PluginWrapper) Run(ctx context.Context, filePaths []string, serviceName string, options libstack.RunOptions) error {
+
+	output, err := wrapper.command(newRunCommand(filePaths, serviceName, runOptions{
+		remove: options.Remove,
+		args:   options.Args,
+	}), options.Options)
+	if len(output) != 0 {
+		if err != nil {
+			return err
+		}
+
+		log.Info().Msg("Stack run successful")
+
+		log.Debug().
+			Str("output", string(output)).
+			Msg("docker compose")
+	}
+
+	return err
+}
+
 // Down stop and remove containers
 func (wrapper *PluginWrapper) Remove(ctx context.Context, projectName string, filePaths []string, options libstack.Options) error {
 	output, err := wrapper.command(newDownCommand(projectName, filePaths), options)
@@ -205,6 +226,24 @@ func newUpCommand(filePaths []string, options upOptions) composeCommand {
 	if options.forceRecreate {
 		args = append(args, "--force-recreate")
 	}
+	return newCommand(args, filePaths)
+}
+
+type runOptions struct {
+	remove bool
+	args   []string
+}
+
+func newRunCommand(filePaths []string, serviceName string, options runOptions) composeCommand {
+	args := []string{"run"}
+
+	if options.remove {
+		args = append(args, "--rm")
+	}
+
+	args = append(args, serviceName)
+	args = append(args, options.args...)
+
 	return newCommand(args, filePaths)
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/libstack"
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 )
@@ -52,6 +53,8 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 	if err != nil {
 		return errors.Wrap(err, "failed to create env file")
 	}
+
+	log.Debug().Msgf("Deploying stack named: %s", stack.Name)
 
 	filePaths := stackutils.GetStackFilePaths(stack, true)
 	err = manager.deployer.Deploy(ctx, filePaths, libstack.DeployOptions{

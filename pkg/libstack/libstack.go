@@ -6,6 +6,7 @@ import (
 
 type Deployer interface {
 	Deploy(ctx context.Context, filePaths []string, options DeployOptions) error
+	Run(ctx context.Context, filePaths []string, serviceName string, options RunOptions) error
 	// Remove stops and removes containers
 	//
 	// projectName or filePaths are required
@@ -46,4 +47,12 @@ type DeployOptions struct {
 	//
 	// When this is set, docker compose will output its logs to stdout
 	AbortOnContainerExit bool ``
+}
+
+type RunOptions struct {
+	Options
+	// Automatically remove the container when it exits
+	Remove bool
+	// A list of arguments to pass to the container
+	Args []string
 }
