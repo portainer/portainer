@@ -2,7 +2,6 @@ package compose_test
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -13,12 +12,11 @@ import (
 
 	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/portainer/portainer/pkg/libstack/compose"
+	"github.com/portainer/portainer/pkg/testhelpers"
 )
 
 func checkPrerequisites(t *testing.T) {
-	if _, err := os.Stat("docker-compose"); errors.Is(err, os.ErrNotExist) {
-		t.Fatal("docker-compose binary not found, please run download.sh and re-run this suite")
-	}
+	testhelpers.IntegrationTest(t)
 }
 
 func Test_UpAndDown(t *testing.T) {
@@ -31,7 +29,7 @@ func Test_UpAndDown(t *testing.T) {
     services:
       busybox:
         image: "alpine:3.7"
-        container_name: "test_container_one"
+        container_name: "binarytest_container_one"
     `
 
 	const overrideComposeFileContent = `
@@ -39,10 +37,10 @@ func Test_UpAndDown(t *testing.T) {
     services:
       busybox:
         image: "alpine:latest"
-        container_name: "test_container_two"
+        container_name: "binarytest_container_two"
     `
 
-	const composeContainerName = "test_container_two"
+	const composeContainerName = "binarytest_container_two"
 
 	dir := t.TempDir()
 
@@ -57,8 +55,13 @@ func Test_UpAndDown(t *testing.T) {
 	}
 
 	ctx := context.Background()
+	projectName := "binarytest"
 
-	err = deployer.Deploy(ctx, []string{filePathOriginal, filePathOverride}, libstack.DeployOptions{})
+	err = deployer.Deploy(ctx, []string{filePathOriginal, filePathOverride}, libstack.DeployOptions{
+		Options: libstack.Options{
+			ProjectName: projectName,
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +70,7 @@ func Test_UpAndDown(t *testing.T) {
 		t.Fatal("container should exist")
 	}
 
-	err = deployer.Remove(ctx, "", []string{filePathOriginal, filePathOverride}, libstack.Options{})
+	err = deployer.Remove(ctx, projectName, []string{filePathOriginal, filePathOverride}, libstack.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
