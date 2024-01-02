@@ -34,11 +34,13 @@ export function EnvironmentVariablesPanel({
           </div>
         )}
 
-        <EnvironmentVariablesFieldset
-          values={values}
-          onChange={onChange}
-          errors={errors}
-        />
+        <div className="col-sm-12">
+          <EnvironmentVariablesFieldset
+            values={values}
+            onChange={onChange}
+            errors={errors}
+          />
+        </div>
 
         {showHelpMessage && (
           <div className="col-sm-12">

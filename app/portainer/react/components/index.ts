@@ -242,7 +242,7 @@ withFormValidation(
   ngModule,
   EnvironmentVariablesFieldset,
   'environmentVariablesFieldset',
-  [],
+  ['canUndoDelete'],
   envVarValidation
 );
 

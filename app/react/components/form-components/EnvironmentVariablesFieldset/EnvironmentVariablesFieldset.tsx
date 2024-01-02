@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { array, object, SchemaOf, string } from 'yup';
+import { array, boolean, object, SchemaOf, string } from 'yup';
 
 import { ArrayError } from '../InputList/InputList';
+import { buildUniquenessTest } from '../validate-unique';
 
 import { AdvancedMode } from './AdvancedMode';
 import { SimpleMode } from './SimpleMode';
@@ -11,21 +12,24 @@ export function EnvironmentVariablesFieldset({
   onChange,
   values,
   errors,
+  canUndoDelete,
 }: {
   values: Value;
   onChange(value: Value): void;
   errors?: ArrayError<Value>;
+  canUndoDelete?: boolean;
 }) {
   const [simpleMode, setSimpleMode] = useState(true);
 
   return (
-    <div className="col-sm-12">
+    <>
       {simpleMode ? (
         <SimpleMode
           onAdvancedModeClick={() => setSimpleMode(false)}
           onChange={onChange}
           value={values}
           errors={errors}
+          canUndoDelete={canUndoDelete}
         />
       ) : (
         <AdvancedMode
@@ -34,7 +38,7 @@ export function EnvironmentVariablesFieldset({
           value={values}
         />
       )}
-    </div>
+    </>
   );
 }
 
@@ -43,6 +47,14 @@ export function envVarValidation(): SchemaOf<Value> {
     object({
       name: string().required('Name is required'),
       value: string().default(''),
+      needsDeletion: boolean().default(false),
     })
+  ).test(
+    'unique',
+    'This environment variable is already defined.',
+    buildUniquenessTest(
+      () => 'This environment variable is already defined.',
+      'name'
+    )
   );
 }
