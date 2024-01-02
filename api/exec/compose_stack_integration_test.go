@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/pkg/libstack/compose"
+	"github.com/portainer/portainer/pkg/testhelpers"
 
 	"github.com/rs/zerolog/log"
 )

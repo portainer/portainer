@@ -12,12 +12,11 @@ import (
 
 	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/portainer/portainer/pkg/libstack/compose"
+	"github.com/portainer/portainer/pkg/testhelpers"
 )
 
 func checkPrerequisites(t *testing.T) {
-	// if _, err := os.Stat("docker-compose"); errors.Is(err, os.ErrNotExist) {
-	// 	t.Fatal("docker-compose binary not found, please run download.sh and re-run this suite")
-	// }
+	testhelpers.IntegrationTest(t)
 }
 
 func Test_UpAndDown(t *testing.T) {
