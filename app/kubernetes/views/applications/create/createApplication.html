@@ -432,102 +432,15 @@
                   </div>
                   <!-- #endregion -->
 
-                  <div class="col-sm-12 form-section-title"> Resource reservations </div>
-                  <!-- #region RESOURCE RESERVATIONS -->
-                  <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      Resource reservations are applied per instance of the application.
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
-                      are inherited from the namespace quota.
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'danger'"></pr-icon>
-                      This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of
-                      the namespace.
-                    </div>
-                  </div>
-
-                  <!-- memory-limit-input -->
-                  <div
-                    class="form-group flex"
-                    ng-if="
-                      (!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1
-                    "
-                  >
-                    <label for="memory-limit" class="space-right col-sm-3 col-lg-2 control-label flex flex-row items-center text-left">
-                      Memory limit (MB)
-                      <portainer-tooltip
-                        message="'An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.'"
-                      >
-                      </portainer-tooltip>
-                    </label>
-                    <div class="col-sm-6">
-                      <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
-                    </div>
-                    <div class="col-sm-2 vertical-center">
-                      <input
-                        name="memory_limit"
-                        ng-model="ctrl.formValues.MemoryLimit"
-                        type="number"
-                        min="{{ ctrl.state.sliders.memory.min }}"
-                        max="{{ ctrl.state.sliders.memory.max }}"
-                        class="form-control"
-                        id="memory-limit"
-                        required
-                        data-cy="k8sAppCreate-memoryLimit"
-                      />
-                    </div>
-                  </div>
-                  <div class="form-group" ng-show="kubernetesApplicationCreationForm.memory_limit.$invalid">
-                    <div class="col-sm-3 col-lg-2"></div>
-                    <div class="col-sm-8 small text-warning">
-                      <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
-                        <p class="vertical-center"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between {{ ctrl.state.sliders.memory.min }} and
-                          {{ ctrl.state.sliders.memory.max }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- !memory-limit-input -->
-                  <!-- cpu-limit-input -->
-                  <div
-                    class="form-group flex"
-                    ng-if="
-                      (!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1
-                    "
-                  >
-                    <label for="cpu-limit" class="space-right col-sm-3 col-lg-2 control-label flex flex-row items-center text-left">
-                      CPU limit
-                      <portainer-tooltip
-                        message="'An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.'"
-                      >
-                      </portainer-tooltip>
-                    </label>
-                    <div class="col-sm-8">
-                      <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="ctrl.nodeLimitsOverflow()">
-                    <div class="col-sm-3 col-lg-2"></div>
-                    <div class="col-sm-8 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'danger'"></pr-icon>
-                      These reservations would exceed the resources currently available in the cluster.
-                    </div>
-                  </div>
-                  <!-- !cpu-limit-input -->
-                  <!-- #endregion -->
+                  <resource-reservation-form-section
+                    values="{memoryLimit: ctrl.formValues.MemoryLimit, cpuLimit: ctrl.formValues.CpuLimit}"
+                    on-change="(ctrl.onChangeResourceReservation)"
+                    namespace-has-quota="ctrl.state.resourcePoolHasQuota"
+                    max-memory-limit="ctrl.state.sliders.memory.max"
+                    max-cpu-limit="ctrl.state.sliders.cpu.max"
+                    validation-data="{maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max}"
+                    resource-quota-capacity-exceeded="ctrl.resourceQuotaCapacityExceeded()"
+                  ></resource-reservation-form-section>
 
                   <div class="col-sm-12 form-section-title"> Deployment </div>
                   <!-- #region DEPLOYMENT -->

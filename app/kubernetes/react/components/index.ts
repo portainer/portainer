@@ -30,6 +30,10 @@ import { configurationsValidationSchema } from '@/react/kubernetes/applications/
 import { ConfigMapsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/ConfigMapsFormSection';
 import { PersistedFoldersFormSection } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection';
 import { persistedFoldersValidation } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection/persistedFoldersValidation';
+import {
+  ResourceReservationFormSection,
+  resourceReservationValidation,
+} from '@/react/kubernetes/applications/components/ResourceReservationFormSection';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -220,4 +224,17 @@ withFormValidation(
     'availableVolumes',
   ],
   persistedFoldersValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withCurrentUser(withReactQuery(ResourceReservationFormSection))),
+  'resourceReservationFormSection',
+  [
+    'namespaceHasQuota',
+    'resourceQuotaCapacityExceeded',
+    'maxMemoryLimit',
+    'maxCpuLimit',
+  ],
+  resourceReservationValidation
 );
