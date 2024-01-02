@@ -20,7 +20,7 @@ export function replicationValidation(
   } = validationData || {};
   return object({
     replicaCount: number()
-      .min(1, 'Instance count must be greater than 0.')
+      .min(0, 'Instance count must be greater than or equal to 0.')
       .test(
         'overflow',
         'This application would exceed available resources. Please review resource reservations or the instance count.',

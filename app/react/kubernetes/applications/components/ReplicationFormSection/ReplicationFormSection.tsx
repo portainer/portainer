@@ -34,12 +34,12 @@ export function ReplicationFormSection({
       <FormControl label="Instance count" required>
         <Input
           type="number"
-          min="1"
+          min="0"
           max="9999"
           value={values.replicaCount}
           disabled={!supportScalableReplicaDeployment}
           onChange={(e) =>
-            onChange({ replicaCount: e.target.valueAsNumber || 1 })
+            onChange({ replicaCount: e.target.valueAsNumber || 0 })
           }
           className="w-1/4"
           data-cy="k8sAppCreate-replicaCountInput"
