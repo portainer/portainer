@@ -155,6 +155,7 @@ class KubernetesCreateApplicationController {
     this.onSecretsChange = this.onSecretsChange.bind(this);
     this.onChangePersistedFolder = this.onChangePersistedFolder.bind(this);
     this.onChangeResourceReservation = this.onChangeResourceReservation.bind(this);
+    this.onChangeReplicaCount = this.onChangeReplicaCount.bind(this);
   }
   /* #endregion */
 
@@ -515,6 +516,12 @@ class KubernetesCreateApplicationController {
       return true;
     }
     return false;
+  }
+
+  onChangeReplicaCount(values) {
+    return this.$async(async () => {
+      this.formValues.ReplicaCount = values.replicaCount;
+    });
   }
 
   // For each persisted folders, returns the non scalable deployments options (storage class that only supports RWO)

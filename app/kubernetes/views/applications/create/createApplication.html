@@ -451,71 +451,17 @@
                   ></app-deployment-type-form-section>
 
                   <!-- replica count -->
-                  <div class="form-group" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
-                    <label for="replica_count" class="col-sm-3 col-lg-2 control-label required text-left">Instance count </label>
-                    <div class="col-sm-2">
-                      <input
-                        type="number"
-                        name="replica_count"
-                        class="form-control"
-                        min="1"
-                        max="9999"
-                        placeholder="1"
-                        ng-model="ctrl.formValues.ReplicaCount"
-                        ng-disabled="!ctrl.supportScalableReplicaDeployment()"
-                        ng-change="ctrl.enforceReplicaCountMinimum()"
-                        required
-                        data-cy="k8sAppCreate-replicaCountInput"
-                      />
-                      <div class="help-block" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
-                        <div class="small text-warning whitespace-nowrap">
-                          <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
-                            <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Instance count is required.</p>
-                            <p class="vertical-center" ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Instance count must be greater than 0.</p>
-                          </ng-messages>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- !replica count -->
-
-                  <div
-                    class="form-group"
-                    ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
-                  >
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      <div>
-                        This application will reserve the following resources:
-                        <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
-                        <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'danger'"></pr-icon>
-                      This application would exceed available resources. Please review resource reservations or the instance count.
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="ctrl.state.storages.quotaExceeded">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                      This application would exceed available storage. Please review the persisted folders or the instance count.
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                      <div>
-                        The following storage option(s) do not support concurrent access from multiples instances:
-                        <code>{{ ctrl.getNonScalableStorage() }}</code
-                        >. You will not be able to scale that application.
-                      </div>
-                    </div>
+                  <div ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+                    <replication-form-section
+                      values="{replicaCount: ctrl.formValues.ReplicaCount}"
+                      on-change="(ctrl.onChangeReplicaCount)"
+                      support-scalable-replica-deployment="ctrl.supportScalableReplicaDeployment()"
+                      memory-limit="ctrl.formValues.MemoryLimit"
+                      cpu-limit="ctrl.formValues.CpuLimit"
+                      resource-reservations-overflow="ctrl.resourceReservationsOverflow()"
+                      non-scalable-storage="ctrl.getNonScalableStorage()"
+                      validation-data="{resourceReservationsOverflow: ctrl.resourceReservationsOverflow(), quotaExceeded: ctrl.state.storages.quotaExceeded, nonScalableStorage: ctrl.getNonScalableStorage(), supportScalableReplicaDeployment: ctrl.supportScalableReplicaDeployment()}"
+                    ></replication-form-section>
                   </div>
                   <!-- #endregion -->
 
