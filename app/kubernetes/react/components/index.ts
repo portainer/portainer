@@ -9,7 +9,7 @@ import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/Reg
 import { DataAccessPolicyFormSection } from '@/react/kubernetes/applications/CreateView/DataAccessPolicyFormSection';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
-import { KubeApplicationDeploymentTypeSelector } from '@/react/kubernetes/applications/CreateView/KubeApplicationDeploymentTypeSelector';
+import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/CreateView/AppDeploymentTypeFormSection';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import {
@@ -109,8 +109,8 @@ export const ngModule = angular
     ])
   )
   .component(
-    'kubeApplicationDeploymentTypeSelector',
-    r2a(KubeApplicationDeploymentTypeSelector, [
+    'appDeploymentTypeFormSection',
+    r2a(AppDeploymentTypeFormSection, [
       'value',
       'onChange',
       'supportGlobalDeployment',
