@@ -73,7 +73,7 @@
     "angularjs-scroll-glue": "^2.2.0",
     "angularjs-slider": "^6.4.0",
     "angulartics": "^1.6.0",
-    "axios": "^0.24.0",
+    "axios": "^1.6.2",
     "axios-cache-adapter": "^2.7.3",
     "axios-progress-bar": "^1.2.0",
     "babel-plugin-angularjs-annotate": "^0.10.0",

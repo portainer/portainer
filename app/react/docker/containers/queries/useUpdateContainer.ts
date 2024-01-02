@@ -1,5 +1,5 @@
 import { Resources, RestartPolicy } from 'docker-types/generated/1.41';
-import { AxiosRequestHeaders } from 'axios';
+import { RawAxiosRequestHeaders } from 'axios';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -22,7 +22,7 @@ export async function updateContainer(
   config: UpdateConfig,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;

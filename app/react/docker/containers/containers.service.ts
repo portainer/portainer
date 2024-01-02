@@ -1,4 +1,4 @@
-import { AxiosRequestHeaders } from 'axios';
+import { RawAxiosRequestHeaders } from 'axios';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
@@ -12,7 +12,7 @@ export async function startContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -34,7 +34,7 @@ export async function stopContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -49,7 +49,7 @@ export async function recreateContainer(
   pullImage: boolean,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -69,7 +69,7 @@ export async function restartContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -87,7 +87,7 @@ export async function killContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -101,7 +101,7 @@ export async function pauseContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -115,7 +115,7 @@ export async function resumeContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -134,7 +134,7 @@ export async function renameContainer(
   name: string,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;
@@ -156,7 +156,7 @@ export async function removeContainer(
   }: { removeVolumes?: boolean; nodeName?: string } = {}
 ) {
   try {
-    const headers: AxiosRequestHeaders = {};
+    const headers: RawAxiosRequestHeaders = {};
 
     if (nodeName) {
       headers['X-PortainerAgent-Target'] = nodeName;

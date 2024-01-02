@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { AxiosRequestHeaders } from 'axios';
+import { RawAxiosRequestHeaders } from 'axios';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import {
@@ -282,7 +282,7 @@ async function createContainer(
   { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    const headers: AxiosRequestHeaders = {};
+    const headers: RawAxiosRequestHeaders = {};
 
     if (nodeName) {
       headers['X-PortainerAgent-Target'] = nodeName;

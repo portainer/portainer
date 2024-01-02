@@ -37,7 +37,7 @@ describe('getLicenses', () => {
     const promise = getLicenses();
     await promise.then(thenFn, catchFn);
 
-    expect(catchFn).toHaveBeenCalledWith(new Error(message));
+    expect(catchFn).toHaveBeenCalledWith(new Error(details));
     expect(thenFn).not.toHaveBeenCalled();
   });
 });
