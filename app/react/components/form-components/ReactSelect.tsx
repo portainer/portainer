@@ -10,6 +10,7 @@ import { RefAttributes } from 'react';
 import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
 import './ReactSelect.css';
+import { AutomationTestingProps } from '@/types';
 
 interface DefaultOption {
   value: string;
@@ -25,7 +26,8 @@ type RegularProps<
   IsMulti,
   Group
 > &
-  RefAttributes<ReactSelectType<Option, IsMulti, Group>>;
+  RefAttributes<ReactSelectType<Option, IsMulti, Group>> &
+  AutomationTestingProps;
 
 type CreatableProps<
   Option = DefaultOption,
@@ -35,7 +37,8 @@ type CreatableProps<
   Option,
   IsMulti,
   Group
->;
+> &
+  AutomationTestingProps;
 
 type Props<
   Option = DefaultOption,
