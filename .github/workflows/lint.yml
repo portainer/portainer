@@ -11,6 +11,11 @@ on:
       - master
       - develop
       - release/*
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 env:
   GO_VERSION: 1.21.5
@@ -20,6 +25,7 @@ jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v2

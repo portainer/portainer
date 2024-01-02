@@ -13,6 +13,11 @@ on:
       - 'feat/*'
       - 'fix/*'
       - 'refactor/*'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 env:
   DOCKER_HUB_REPO: portainerci/portainer
@@ -30,6 +35,7 @@ jobs:
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: arc-runner-set
+    if: github.event.pull_request.draft == false
     steps:
       - name: '[preparation] checkout the current branch'
         uses: actions/checkout@v3.5.3
@@ -120,6 +126,7 @@ jobs:
           CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
   build_manifests:
     runs-on: arc-runner-set
+    if: github.event.pull_request.draft == false
     needs: [build_images]
     steps:
       - name: '[preparation] docker login'

@@ -1,14 +1,22 @@
 name: Test
 
-on: push
-
 env:
   GO_VERSION: 1.21.5
   NODE_VERSION: 18.x
 
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  push:
+    
 jobs:
   test-client:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v2
@@ -29,6 +37,8 @@ jobs:
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
