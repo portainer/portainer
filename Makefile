@@ -7,7 +7,7 @@ ARCH=$(shell go env GOARCH)
 # build target, can be one of "production", "testing", "development"
 ENV=development
 WEBPACK_CONFIG=webpack/webpack.$(ENV).js
-TAG=latest
+TAG=local
 
 SWAG=go run github.com/swaggo/swag/cmd/swag@v1.8.11 
 GOTESTSUM=go run gotest.tools/gotestsum@latest
