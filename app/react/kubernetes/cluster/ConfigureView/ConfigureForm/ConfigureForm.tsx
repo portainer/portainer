@@ -25,7 +25,7 @@ import { IngressControllerClassMap } from '../../ingressClass/types';
 import { useIsRBACEnabledQuery } from '../../getIsRBACEnabled';
 import { getIngressClassesFormValues } from '../../ingressClass/IngressClassDatatable/utils';
 
-import { useStorageClassesFormValues } from './useStorageClassesFormValues';
+import { useStorageClassesFormValues } from './useStorageClasses';
 import { ConfigureFormValues, StorageClassFormValues } from './types';
 import { configureValidationSchema } from './validation';
 import { RBACAlert } from './RBACAlert';

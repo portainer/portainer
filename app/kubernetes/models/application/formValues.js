@@ -81,20 +81,20 @@ export class KubernetesApplicationEnvironmentVariableFormValue {
  * KubernetesApplicationPersistedFolderFormValue Model
  */
 const _KubernetesApplicationPersistedFolderFormValue = Object.freeze({
-  PersistentVolumeClaimName: '', // will be empty for new volumes (create/edit app) and filled for existing ones (edit)
-  NeedsDeletion: false,
-  ContainerPath: '',
-  Size: '',
-  SizeUnit: 'GB',
-  StorageClass: {},
-  ExistingVolume: null,
-  UseNewVolume: true,
+  persistentVolumeClaimName: '', // will be empty for new volumes (create/edit app) and filled for existing ones (edit)
+  needsDeletion: false,
+  containerPath: '',
+  size: '',
+  sizeUnit: 'GB',
+  storageClass: {},
+  existingVolume: null,
+  useNewVolume: true,
 });
 
 export class KubernetesApplicationPersistedFolderFormValue {
   constructor(storageClass) {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPersistedFolderFormValue)));
-    this.StorageClass = storageClass;
+    this.storageClass = storageClass;
   }
 }
 

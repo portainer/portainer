@@ -26,9 +26,31 @@ export const availableStorageClassPolicies = [
   },
 ];
 
-export function useStorageClassesFormValues(
-  environment: Environment | null | undefined
-) {
+export function useStorageClasses(environment?: Environment | null) {
+  return useQuery(
+    [
+      'environments',
+      environment?.Id,
+      'kubernetes',
+      'storageclasses',
+      // include the storage classes in the cache key to force a refresh when the storage classes change in the environment object
+      JSON.stringify(environment?.Kubernetes.Configuration.StorageClasses),
+    ],
+    async () => {
+      if (!environment) {
+        return [];
+      }
+      const storageClasses = await getStorageClasses(environment.Id);
+      return storageClasses;
+    },
+    {
+      ...withError('Failure', `Unable to get Storage Classes`),
+      enabled: !!environment,
+    }
+  );
+}
+
+export function useStorageClassesFormValues(environment?: Environment | null) {
   return useQuery(
     [
       'environments',

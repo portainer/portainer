@@ -50,7 +50,7 @@
                     </tr>
                     <tr>
                       <td>Storage Class</td>
-                      <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
+                      <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.storageClass.Name }}</td>
                     </tr>
                     <tr>
                       <td>Access Modes</td>
@@ -69,7 +69,7 @@
                     <tr>
                       <td>Provisioner</td>
                       <td data-cy="k8sVolDetail-volProvisioner">{{
-                        ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-'
+                        ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner : '-'
                       }}</td>
                     </tr>
                     <tr>
@@ -77,14 +77,14 @@
                       <td data-cy="k8sVolDetail-volCreatedAt">{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
                     </tr>
                     <tr>
-                      <td>Size</td>
+                      <td>size</td>
                       <td ng-if="!ctrl.state.increaseSize">
                         {{ ctrl.volume.PersistentVolumeClaim.Storage }}
                         <button
                           type="button"
                           class="btn btn-sm btn-primary"
                           ng-click="ctrl.state.increaseSize = true"
-                          ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass.AllowVolumeExpansion"
+                          ng-if="ctrl.volume.PersistentVolumeClaim.storageClass.AllowVolumeExpansion"
                           data-cy="k8sVolDetail-increaseSizeButton"
                           >Increase size</button
                         >

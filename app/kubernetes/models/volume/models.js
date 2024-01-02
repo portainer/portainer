@@ -8,7 +8,7 @@ const _KubernetesPersistentVolumeClaim = Object.freeze({
   PreviousName: '',
   Namespace: '',
   Storage: 0,
-  StorageClass: {}, // KubernetesStorageClass
+  storageClass: {}, // KubernetesStorageClass
   CreationDate: '',
   ApplicationOwner: '',
   AccessModes: [],
