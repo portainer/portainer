@@ -19,8 +19,10 @@ import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 
+import { applicationsModule } from './applications';
+
 export const ngModule = angular
-  .module('portainer.kubernetes.react.components', [])
+  .module('portainer.kubernetes.react.components', [applicationsModule])
   .component(
     'ingressClassDatatable',
     r2a(IngressClassDatatable, [
