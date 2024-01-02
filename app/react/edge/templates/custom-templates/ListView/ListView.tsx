@@ -26,6 +26,7 @@ export function ListView() {
           to: 'edge.stacks.new',
           params: { templateId: template.Id },
         })}
+        storageKey="edge-custom-templates"
       />
     </>
   );
