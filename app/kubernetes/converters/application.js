@@ -325,7 +325,7 @@ class KubernetesApplicationConverter {
     }
 
     if (app.Pods && app.Pods.length) {
-      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
+      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity);
     }
 
     return res;

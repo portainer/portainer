@@ -57,7 +57,7 @@ export function Select<
   isCreatable = false,
   size = 'md',
   ...props
-}: Props<Option, IsMulti, Group>) {
+}: Props<Option, IsMulti, Group> & AutomationTestingProps) {
   const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
 
   return (
