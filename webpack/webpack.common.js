@@ -2,11 +2,9 @@ const path = require('path');
 const { ProvidePlugin, IgnorePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
-const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const ESLintPlugin = require('eslint-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
@@ -22,6 +20,7 @@ module.exports = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(projectRoot, 'dist/public'),
+    pathinfo: false,
   },
   module: {
     rules: [
@@ -108,7 +107,6 @@ module.exports = {
   },
   plugins: [
     new Dotenv({ defaults: true }),
-    new ESLintPlugin(),
     new HtmlWebpackPlugin({
       template: './app/index.html',
       templateParameters: {
@@ -130,7 +128,6 @@ module.exports = {
       logo: path.resolve('./assets/favicon-32x32.png'),
       suppressSuccess: true,
     }),
-    new CleanTerminalPlugin(),
     new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
