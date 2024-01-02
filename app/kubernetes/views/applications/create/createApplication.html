@@ -466,128 +466,13 @@
                   <!-- #endregion -->
 
                   <!-- #region AUTO SCALING -->
-
-                  <div class="form-group !mb-0" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && !ctrl.state.useServerMetrics">
-                    <div class="col-sm-12 small text-muted">
-                      <p ng-if="!ctrl.isAdmin"> This feature is currently disabled and must be enabled by an administrator user. </p>
-                      <p ng-if="ctrl.isAdmin">
-                        Server metrics features must be enabled in the
-                        <a ui-sref="kubernetes.cluster.setup" class="ctrl.isAdmin">environment configuration view</a>.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <div class="col-sm-12">
-                      <div class="col-sm-3 col-lg-2 pl-0 pt-0">
-                        <label for="enable_auto_scaling" class="control-label text-left"> Enable auto scaling for this application </label>
-                      </div>
-                      <label class="switch ml-4 mt-1">
-                        <input
-                          type="checkbox"
-                          class="form-control"
-                          name="enable_auto_scaling"
-                          ng-model="ctrl.formValues.AutoScaler.IsUsed"
-                          data-cy="k8sAppCreate-autoScaleCheckbox"
-                          ng-disabled="!(ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && ctrl.state.useServerMetrics)"
-                        />
-                        <span class="slider round"></span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="form-inline" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && ctrl.formValues.AutoScaler.IsUsed">
-                    <div class="row">
-                      <div class="col-sm-4 pl-0">
-                        <label class="control-label pb-2 text-left" for="auto_scaler_min">Minimum instances</label>
-                        <div class="input-group input-group-sm" style="width: 100%">
-                          <input
-                            type="number"
-                            class="form-control"
-                            name="auto_scaler_min"
-                            min="0"
-                            ng-max="ctrl.formValues.AutoScaler.MaxReplicas"
-                            ng-model="ctrl.formValues.AutoScaler.MinReplicas"
-                            data-cy="k8sAppCreate-autoScaleMin"
-                            required
-                          />
-                        </div>
-                        <span ng-show="kubernetesApplicationCreationForm['auto_scaler_min'].$invalid">
-                          <div class="small text-warning" style="margin-top: 5px">
-                            <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_min'].$error">
-                              <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Minimum instances is required. </p>
-                              <p ng-message="min" class="vertical-center">
-                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Minimum instances must be greater than 0.
-                              </p>
-                              <p ng-message="max" class="vertical-center">
-                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Minimum instances must be smaller than maximum instances.
-                              </p>
-                            </ng-messages>
-                          </div>
-                        </span>
-                      </div>
-                      <div class="col-sm-4 pl-0">
-                        <label class="control-label pb-2 text-left" for="auto_scaler_max">Maximum instances</label>
-                        <div class="input-group input-group-sm" style="width: 100%">
-                          <input
-                            type="number"
-                            class="form-control"
-                            name="auto_scaler_max"
-                            ng-min="ctrl.formValues.AutoScaler.MinReplicas"
-                            ng-model="ctrl.formValues.AutoScaler.MaxReplicas"
-                          />
-                        </div>
-                        <span ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid || ctrl.autoScalerOverflow()">
-                          <div class="small text-warning" style="margin-top: 5px">
-                            <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_max'].$error">
-                              <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Maximum instances is required. </p>
-                              <p ng-message="min" class="vertical-center">
-                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Maximum instances must be greater than minimum instances.
-                              </p>
-                            </ng-messages>
-                          </div>
-                        </span>
-                      </div>
-                      <div class="col-sm-4 pl-0">
-                        <label class="control-label pb-2 text-left" for="auto_scaler_cpu">
-                          Target CPU usage (<b>%</b>)
-                          <portainer-tooltip message="'The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.'">
-                          </portainer-tooltip>
-                        </label>
-                        <div class="input-group input-group-sm" style="width: 100%">
-                          <input
-                            type="number"
-                            class="form-control"
-                            name="auto_scaler_cpu"
-                            ng-model="ctrl.formValues.AutoScaler.TargetCPUUtilization"
-                            min="1"
-                            max="100"
-                            required
-                            data-cy="k8sAppCreate-targetCPUInput"
-                          />
-                        </div>
-                        <span ng-show="kubernetesApplicationCreationForm['auto_scaler_cpu'].$invalid">
-                          <div class="small text-warning" style="margin-top: 5px">
-                            <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_cpu'].$error">
-                              <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Target CPU usage is required. </p>
-                              <p ng-message="min" class="vertical-center">
-                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Target CPU usage must be greater than 0.
-                              </p>
-                              <p ng-message="max" class="vertical-center">
-                                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Target CPU usage must be smaller than 100.
-                              </p>
-                            </ng-messages>
-                          </div>
-                        </span>
-                      </div>
-                    </div>
-
-                    <div class="form-group" ng-if="ctrl.autoScalerOverflow()" style="margin-bottom: 10px">
-                      <div class="col-sm-12 small text-danger">
-                        <pr-icon icon="'alert-circle'" mode="'danger'"></pr-icon>
-                        This application would exceed available resources. Please review resource reservations or the maximum instance count of the auto-scaling policy.
-                      </div>
-                    </div>
+                  <div ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL">
+                    <auto-scaling-form-section
+                      values="{isUsed: ctrl.formValues.AutoScaler.IsUsed, minReplicas: ctrl.formValues.AutoScaler.MinReplicas, maxReplicas: ctrl.formValues.AutoScaler.MaxReplicas, targetCpuUtilizationPercentage: ctrl.formValues.AutoScaler.TargetCPUUtilization}"
+                      on-change="(ctrl.onAutoScaleChange)"
+                      validation-data="{autoScalerOverflow: ctrl.autoScalerOverflow()}"
+                      is-metrics-enabled="ctrl.state.useServerMetrics"
+                    ></auto-scaling-form-section>
                   </div>
                   <!-- #endregion -->
 
