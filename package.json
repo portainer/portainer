@@ -227,7 +227,7 @@
     "**/@uirouter/react": "^1.0.7",
     "**/@uirouter/angularjs": "1.0.11",
     "**/moment": "^2.21.0",
-    "wrap-ansi": "7.0.0"
+    "msw/**/wrap-ansi": "^7.0.0"
   },
   "browserslist": "last 2 versions"
 }
