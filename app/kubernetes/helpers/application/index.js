@@ -22,7 +22,8 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
+import { HelmApplication } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from '@/react/kubernetes/applications/constants';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
@@ -373,15 +374,15 @@ class KubernetesApplicationHelper {
   static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler, replicasCount) {
     const res = new KubernetesApplicationAutoScalerFormValue();
     if (autoScaler) {
-      res.IsUsed = true;
-      res.MinReplicas = autoScaler.MinReplicas;
-      res.MaxReplicas = autoScaler.MaxReplicas;
-      res.TargetCPUUtilization = autoScaler.TargetCPUUtilization;
-      res.ApiVersion = autoScaler.ApiVersion;
+      res.isUsed = true;
+      res.minReplicas = autoScaler.MinReplicas;
+      res.maxReplicas = autoScaler.MaxReplicas;
+      res.targetCpuUtilizationPercentage = autoScaler.TargetCPUUtilization;
+      res.apiVersion = autoScaler.ApiVersion;
     } else {
-      res.ApiVersion = 'apps/v1';
-      res.MinReplicas = replicasCount;
-      res.MaxReplicas = replicasCount;
+      res.apiVersion = 'apps/v1';
+      res.minReplicas = replicasCount;
+      res.maxReplicas = replicasCount;
     }
     return res;
   }
@@ -461,7 +462,7 @@ class KubernetesApplicationHelper {
   }
 
   static generateAffinityFromPlacements(app, formValues) {
-    if (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
+    if (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.Replicated) {
       const placements = formValues.Placements;
       const res = new KubernetesPodNodeAffinityPayload();
       let expressions = _.map(placements, (p) => {
@@ -545,7 +546,7 @@ class KubernetesApplicationHelper {
     const helmAppsList = helmAppsEntriesList.map(([helmInstance, applications]) => {
       const helmApp = new HelmApplication();
       helmApp.Name = helmInstance;
-      helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
+      helmApp.ApplicationType = KubernetesApplicationTypes.Helm;
       helmApp.ApplicationOwner = applications[0].ApplicationOwner;
       helmApp.KubernetesApplications = applications;
 

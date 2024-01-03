@@ -35,11 +35,7 @@ export function PlacementFormSection({ values, onChange, errors }: Props) {
 
   return (
     <div className="flex flex-col">
-      <FormSection
-        title="Placement preferences and constraints"
-        titleSize="sm"
-        titleClassName="control-label !text-[0.9em]"
-      >
+      <FormSection title="Placement preferences and constraints" titleSize="sm">
         {values.placements?.length > 0 && (
           <TextTip color="blue">
             Deploy this application on nodes that respect <b>ALL</b> of the

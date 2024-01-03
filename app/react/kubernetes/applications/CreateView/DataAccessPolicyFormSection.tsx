@@ -1,14 +1,14 @@
 import { Box, Boxes } from 'lucide-react';
 
-import { KubernetesApplicationDataAccessPolicies } from '@/kubernetes/models/application/models';
-
 import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
+
+import { AppDataAccessPolicy } from '../types';
 
 interface Props {
   isEdit: boolean;
   persistedFoldersUseExistingVolumes: boolean;
-  value: number;
-  onChange(value: number): void;
+  value: AppDataAccessPolicy;
+  onChange(value: AppDataAccessPolicy): void;
 }
 
 export function DataAccessPolicyFormSection({
@@ -31,13 +31,13 @@ export function DataAccessPolicyFormSection({
 }
 
 function getOptions(
-  value: number,
+  value: AppDataAccessPolicy,
   isEdit: boolean,
   persistedFoldersUseExistingVolumes: boolean
-): ReadonlyArray<BoxSelectorOption<number>> {
+): ReadonlyArray<BoxSelectorOption<AppDataAccessPolicy>> {
   return [
     {
-      value: KubernetesApplicationDataAccessPolicies.ISOLATED,
+      value: 'Isolated',
       id: 'data_access_isolated',
       icon: Boxes,
       iconType: 'badge',
@@ -49,12 +49,10 @@ function getOptions(
           ? 'Changing the data access policy is not allowed'
           : '',
       disabled: () =>
-        (isEdit &&
-          value !== KubernetesApplicationDataAccessPolicies.ISOLATED) ||
-        persistedFoldersUseExistingVolumes,
+        (isEdit && value !== 'Isolated') || persistedFoldersUseExistingVolumes,
     },
     {
-      value: KubernetesApplicationDataAccessPolicies.SHARED,
+      value: 'Shared',
       id: 'data_access_shared',
       icon: Box,
       iconType: 'badge',
@@ -63,8 +61,7 @@ function getOptions(
         'Application will be deployed as a Deployment with a shared storage access',
       tooltip: () =>
         isEdit ? 'Changing the data access policy is not allowed' : '',
-      disabled: () =>
-        isEdit && value !== KubernetesApplicationDataAccessPolicies.SHARED,
+      disabled: () => isEdit && value !== 'Shared',
     },
   ] as const;
 }

@@ -219,7 +219,7 @@
                   <div class="menuContent">
                     <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
                       <input id="filter_state_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
-                      <label for="filter_state_{{ $index }}">{{ filter.type | kubernetesApplicationTypeText }}</label>
+                      <label for="filter_state_{{ $index }}">{{ filter.type }}</label>
                     </div>
                   </div>
                   <div>
@@ -282,7 +282,7 @@
             </a>
             <a
               ng-if="!item.KubernetesApplications"
-              ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool, 'resource-type': $ctrl.applicationTypeEnumToParamMap[item.ApplicationType] })"
+              ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool, 'resource-type': item.ApplicationType })"
               ng-click="$event.stopPropagation()"
               class="hyperlink"
               >{{ item.Name }}
@@ -297,17 +297,17 @@
           <td title="{{ item.Image }}"
             >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
           >
-          <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
-          <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
+          <td>{{ item.ApplicationType }}</td>
+          <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.Pod">
             <status-indicator ok="(item.TotalPodsCount > 0 && item.TotalPodsCount === item.RunningPodsCount) || item.Status === 'Ready'"></status-indicator>
-            <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
-            <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
+            <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.Replicated">Replicated</span>
+            <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.Global">Global</span>
             <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0"
               ><code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></span
             >
             <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
           </td>
-          <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD">
+          <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.Pod">
             {{ item.Pods[0].Status }}
           </td>
           <td>

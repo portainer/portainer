@@ -1,4 +1,3 @@
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import clsx from 'clsx';
 
 import { StorageClass } from '@/react/portainer/environments/types';
@@ -221,8 +220,7 @@ export function PersistedFolderItem({
   function isToggleVolumeTypeVisible() {
     return (
       !(isEdit && isExistingPersistedFolder()) && // if it's not an edit of an existing persisted folder
-      applicationValues.ApplicationType !==
-        KubernetesApplicationTypes.STATEFULSET && // and if it's not a statefulset
+      applicationValues.ApplicationType !== 'StatefulSet' && // and if it's not a statefulset
       applicationValues.Containers.length <= 1 // and if there is only one container);
     );
   }

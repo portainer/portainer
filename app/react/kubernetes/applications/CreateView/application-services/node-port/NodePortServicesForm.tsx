@@ -1,8 +1,6 @@
 import { FormikErrors } from 'formik';
 import { Plus } from 'lucide-react';
 
-import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
-
 import { Card } from '@@/Card';
 import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
@@ -36,7 +34,7 @@ export function NodePortServicesForm({
   isEditMode,
 }: Props) {
   const nodePortServiceCount = services.filter(
-    (service) => service.Type === KubernetesApplicationPublishingTypes.NODE_PORT
+    (service) => service.Type === 'NodePort'
   ).length;
   return (
     <Card className="pb-5">
@@ -48,8 +46,7 @@ export function NodePortServicesForm({
         {nodePortServiceCount > 0 && (
           <div className="flex w-full flex-col gap-4">
             {services.map((service, index) =>
-              service.Type ===
-              KubernetesApplicationPublishingTypes.NODE_PORT ? (
+              service.Type === 'NodePort' ? (
                 <NodePortServiceForm
                   key={index}
                   serviceName={service.Name}
@@ -84,7 +81,7 @@ export function NodePortServicesForm({
                 services.length + 1,
                 services
               );
-              newService.Type = KubernetesApplicationPublishingTypes.NODE_PORT;
+              newService.Type = 'NodePort';
               const newServicePort = newPort(newService.Name);
               newService.Ports = [newServicePort];
               newService.Selector = selector;

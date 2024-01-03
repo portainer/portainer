@@ -1,12 +1,11 @@
 import { convertToArrayOfStrings } from '@@/form-components/EnvironmentVariablesFieldset/utils';
+import { EnvVarValues } from '@@/form-components/EnvironmentVariablesFieldset';
 
 import { CreateContainerRequest } from '../types';
 
-import { Values } from './types';
-
 export function toRequest(
   oldConfig: CreateContainerRequest,
-  values: Values
+  values: EnvVarValues
 ): CreateContainerRequest {
   return {
     ...oldConfig,

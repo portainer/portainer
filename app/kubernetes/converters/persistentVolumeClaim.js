@@ -71,7 +71,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.metadata.namespace = pvc.Namespace;
     res.spec.resources.requests.storage = pvc.Storage;
     res.spec.storageClassName = pvc.storageClass ? pvc.storageClass.Name : '';
-    const accessModes = pvc.StorageClass && pvc.StorageClass.AccessModes ? pvc.StorageClass.AccessModes.map((accessMode) => storageClassToPVCAccessModes[accessMode]) : [];
+    const accessModes = pvc.storageClass && pvc.storageClass.AccessModes ? pvc.storageClass.AccessModes.map((accessMode) => storageClassToPVCAccessModes[accessMode]) : [];
     res.spec.accessModes = accessModes;
     res.metadata.labels.app = pvc.ApplicationName;
     res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pvc.ApplicationOwner;

@@ -22,6 +22,7 @@ import {
   PlacementFormSection,
   placementValidation,
 } from '@/react/kubernetes/applications/components/PlacementFormSection';
+import { ApplicationSummarySection } from '@/react/kubernetes/applications/components/ApplicationSummarySection';
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
@@ -46,6 +47,7 @@ import {
   AutoScalingFormSection,
   autoScalingValidation,
 } from '@/react/kubernetes/applications/components/AutoScalingFormSection';
+import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -113,7 +115,7 @@ export const ngModule = angular
   )
   .component(
     'dataAccessPolicyFormSection',
-    r2a(DataAccessPolicyFormSection, [
+    r2a(withControlledInput(DataAccessPolicyFormSection), [
       'value',
       'onChange',
       'isEdit',
@@ -122,7 +124,7 @@ export const ngModule = angular
   )
   .component(
     'appDeploymentTypeFormSection',
-    r2a(AppDeploymentTypeFormSection, [
+    r2a(withControlledInput(AppDeploymentTypeFormSection), [
       'value',
       'onChange',
       'supportGlobalDeployment',
@@ -175,6 +177,13 @@ export const ngModule = angular
     )
   )
   .component(
+    'applicationSummarySection',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(ApplicationSummarySection))),
+      ['formValues', 'oldFormValues']
+    )
+  )
+  .component(
     'kubernetesApplicationsStacksDatatable',
     r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
       'dataset',
@@ -193,7 +202,9 @@ export const componentsModule = ngModule.name;
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(KubeServicesForm))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(KubeServicesForm)))
+  ),
   'kubeServicesForm',
   ['values', 'onChange', 'appName', 'selector', 'isEditMode', 'namespace'],
   kubeServicesValidation
@@ -201,7 +212,7 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  EnvironmentVariablesFieldset,
+  withControlledInput(EnvironmentVariablesFieldset),
   'kubeEnvironmentVariablesFieldset',
   ['canUndoDelete'],
   // use kubeEnvVarValidationSchema instead of envVarValidation to add a regex matches rule
@@ -210,7 +221,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection)))
+  ),
   'configMapsFormSection',
   ['values', 'onChange', 'namespace'],
   configurationsValidationSchema
@@ -218,7 +231,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(SecretsFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(SecretsFormSection)))
+  ),
   'secretsFormSection',
   ['values', 'onChange', 'namespace'],
   configurationsValidationSchema
@@ -226,7 +241,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection)))
+  ),
   'persistedFoldersFormSection',
   [
     'isEdit',
@@ -240,7 +257,11 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(ResourceReservationFormSection))),
+  withControlledInput(
+    withUIRouter(
+      withCurrentUser(withReactQuery(ResourceReservationFormSection))
+    )
+  ),
   'resourceReservationFormSection',
   [
     'namespaceHasQuota',
@@ -253,7 +274,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection)))
+  ),
   'replicationFormSection',
   [
     'supportScalableReplicaDeployment',
@@ -266,7 +289,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection)))
+  ),
   'autoScalingFormSection',
   ['isMetricsEnabled'],
   autoScalingValidation
@@ -274,7 +299,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(PlacementFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(PlacementFormSection)))
+  ),
   'placementFormSection',
   [],
   placementValidation
