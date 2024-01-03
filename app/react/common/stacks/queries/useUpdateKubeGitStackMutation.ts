@@ -1,44 +1,65 @@
 import { useMutation } from 'react-query';
 
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import {
   withError,
   withInvalidate,
   queryClient,
 } from '@/react-tools/react-query';
-import { StackId } from '@/react/common/stacks/types';
+import { Stack, StackId } from '@/react/common/stacks/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { AutoUpdateModel } from '@/react/portainer/gitops/types';
+import { stacksQueryKeys } from '@/react/common/stacks/queries/query-keys';
+import { buildStackUrl } from '@/react/common/stacks/queries/buildUrl';
+import {
+  AutoUpdateResponse,
+  GitAuthModel,
+  GitCredentialsModel,
+} from '@/react/portainer/gitops/types';
+import { saveGitCredentialsIfNeeded } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
 
-import { stacksQueryKeys } from './query-keys';
-import { buildStackUrl } from './buildUrl';
-
-type UpdateKubeGitStackPayload = {
-  AutoUpdate: AutoUpdateModel;
-  RepositoryAuthentication: boolean;
-  RepositoryGitCredentialID: number;
-  RepositoryPassword: string;
+export interface UpdateKubeGitStackPayload extends GitCredentialsModel {
+  AutoUpdate: AutoUpdateResponse | null;
   RepositoryReferenceName: string;
-  RepositoryUsername: string;
   TLSSkipVerify: boolean;
-};
+}
 
 // update a stack from a git repository
 export function useUpdateKubeGitStackMutation(
   stackId: StackId,
-  environmentId: EnvironmentId
+  environmentId: EnvironmentId,
+  userId: number
 ) {
   return useMutation(
-    (stack: UpdateKubeGitStackPayload) =>
-      updateGitStack({ stack, stackId, environmentId }),
+    async ({
+      stack,
+      authentication,
+    }: {
+      stack: UpdateKubeGitStackPayload;
+      authentication: GitAuthModel;
+    }) => {
+      // save the new git credentials if the user has selected to save them
+      const newGitAuth = await saveGitCredentialsIfNeeded(
+        userId,
+        authentication
+      );
+      const stackWithUpdatedAuth: UpdateKubeGitStackPayload = {
+        ...stack,
+        ...newGitAuth,
+      };
+      return updateGitStack({
+        stack: stackWithUpdatedAuth,
+        stackId,
+        environmentId,
+      });
+    },
     {
-      ...withError('Unable to update stack'),
+      ...withError('Unable to update application'),
       ...withInvalidate(queryClient, [stacksQueryKeys.stackFile(stackId)]),
     }
   );
 }
 
-function updateGitStack({
+async function updateGitStack({
   stackId,
   stack,
   environmentId,
@@ -47,7 +68,11 @@ function updateGitStack({
   stack: UpdateKubeGitStackPayload;
   environmentId: EnvironmentId;
 }) {
-  return axios.put(buildStackUrl(stackId), stack, {
-    params: { endpointId: environmentId },
-  });
+  try {
+    return await axios.post<Stack>(buildStackUrl(stackId, 'git'), stack, {
+      params: { endpointId: environmentId },
+    });
+  } catch (e) {
+    throw parseAxiosError(e, 'Unable to update stack');
+  }
 }

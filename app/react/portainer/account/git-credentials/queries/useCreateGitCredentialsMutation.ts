@@ -2,7 +2,7 @@ import { useQueryClient, useMutation } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
-import { GitAuthModel, GitFormModel } from '@/react/portainer/gitops/types';
+import { GitAuthModel } from '@/react/portainer/gitops/types';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { UserId } from '@/portainer/users/types';
 
@@ -84,8 +84,8 @@ export function useSaveCredentialsIfRequired() {
 
 export async function saveGitCredentialsIfNeeded(
   userId: UserId,
-  gitModel: GitFormModel
-) {
+  gitModel: GitAuthModel
+): Promise<GitAuthModel> {
   let credentialsId = gitModel.RepositoryGitCredentialID;
   let username = gitModel.RepositoryUsername;
   let password = gitModel.RepositoryPassword;

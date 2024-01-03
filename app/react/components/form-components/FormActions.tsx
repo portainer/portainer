@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -11,6 +11,7 @@ interface Props extends AutomationTestingProps {
   loadingText: string;
   isLoading: boolean;
   isValid: boolean;
+  submitButtonIcon?: ReactNode;
 }
 
 export function FormActions({
@@ -19,6 +20,7 @@ export function FormActions({
   isLoading,
   children,
   isValid,
+  submitButtonIcon,
   'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
@@ -30,6 +32,7 @@ export function FormActions({
             loadingText={loadingText}
             isLoading={isLoading}
             disabled={!isValid}
+            icon={submitButtonIcon}
             data-cy={dataCy}
           >
             {submitLabel}

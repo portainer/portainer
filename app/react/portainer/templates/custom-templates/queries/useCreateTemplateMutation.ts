@@ -84,7 +84,8 @@ async function createTemplateAndGitCredential(
   userId: UserId,
   { Git: gitModel, ...values }: CreateTemplatePayload
 ) {
-  const newGitModel = await saveGitCredentialsIfNeeded(userId, gitModel);
+  const newGitAuthModel = await saveGitCredentialsIfNeeded(userId, gitModel);
+  const newGitModel = { ...gitModel, ...newGitAuthModel };
 
   return createTemplateFromGit({
     ...values,

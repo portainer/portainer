@@ -3,7 +3,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { Pod } from 'kubernetes-types/core/v1';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { useStackFileQuery } from '@/react/common/stacks/queries/useStackQuery';
+import { useStackFile } from '@/react/common/stacks/queries/useStackFile';
 
 import { Widget, WidgetBody } from '@@/Widget';
 import { Button } from '@@/buttons';
@@ -48,7 +48,7 @@ export function ApplicationDetailsWidget() {
   );
   const externalApp = app && isExternalApplication(app);
   const appStackId = Number(app?.metadata?.labels?.[appStackIdLabel]);
-  const appStackFileQuery = useStackFileQuery(appStackId);
+  const appStackFileQuery = useStackFile(appStackId);
   const { data: appServices } = useApplicationServices(
     environmentId,
     namespace,
