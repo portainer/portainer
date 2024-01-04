@@ -101,7 +101,7 @@
     "lucide-react": "^0.101.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.40",
-    "msw": "^0.49.2",
+    "msw": "^2.0.11",
     "mustache": "^4.2.0",
     "ng-file-upload": "~12.2.13",
     "parse-duration": "^1.0.2",
@@ -209,6 +209,7 @@
     "tailwindcss": "3.3.3",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5.2.2",
+    "undici": "^6.2.1",
     "webpack": "^5.88.2",
     "webpack-build-notifier": "^2.3.0",
     "webpack-bundle-analyzer": "^4.9.1",
@@ -225,7 +226,8 @@
     "http-proxy": "^1.18.1",
     "**/@uirouter/react": "^1.0.7",
     "**/@uirouter/angularjs": "1.0.11",
-    "**/moment": "^2.21.0"
+    "**/moment": "^2.21.0",
+    "msw/**/wrap-ansi": "^7.0.0"
   },
   "browserslist": "last 2 versions"
 }

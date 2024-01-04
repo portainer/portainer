@@ -1,6 +1,8 @@
+import { http, HttpResponse } from 'msw';
+
 import { Tag, TagId } from '@/portainer/tags/types';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { server, rest } from '@/setup-tests/server';
+import { server } from '@/setup-tests/server';
 
 import { TagSelector } from './TagSelector';
 
@@ -49,7 +51,7 @@ async function renderComponent(
   } = {},
   tags: Tag[] = []
 ) {
-  server.use(rest.get('/api/tags', (_req, res, ctx) => res(ctx.json(tags))));
+  server.use(http.get('/api/tags', () => HttpResponse.json(tags)));
 
   const queries = renderWithQueryClient(
     <TagSelector value={value} allowCreate={allowCreate} onChange={onChange} />

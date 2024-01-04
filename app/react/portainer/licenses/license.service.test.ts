@@ -1,4 +1,6 @@
-import { server, rest } from '@/setup-tests/server';
+import { http, HttpResponse } from 'msw';
+
+import { server } from '@/setup-tests/server';
 
 import { getLicenses } from './license.service';
 import type { License } from './types';
@@ -9,9 +11,7 @@ describe('getLicenses', () => {
     const thenFn = jest.fn();
 
     const data: License[] = [];
-    server.use(
-      rest.get('/api/licenses', (req, res, ctx) => res(ctx.json(data)))
-    );
+    server.use(http.get('/api/licenses', () => HttpResponse.json(data)));
 
     const promise = getLicenses();
 
@@ -29,8 +29,8 @@ describe('getLicenses', () => {
     const details = 'details';
 
     server.use(
-      rest.get('/api/licenses', (req, res, ctx) =>
-        res(ctx.status(400), ctx.json({ message, details }))
+      http.get('/api/licenses', () =>
+        HttpResponse.json({ message, details }, { status: 400 })
       )
     );
 

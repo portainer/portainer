@@ -1,4 +1,6 @@
-import { server, rest } from '@/setup-tests/server';
+import { http, HttpResponse } from 'msw';
+
+import { server } from '@/setup-tests/server';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { isoDate } from '@/portainer/filters/filters';
 
@@ -7,8 +9,8 @@ import { BackupFailedPanel } from './BackupFailedPanel';
 test('when backup failed, should show message', async () => {
   const timestamp = 1500;
   server.use(
-    rest.get('/api/backup/s3/status', (req, res, ctx) =>
-      res(ctx.json({ Failed: true, TimestampUTC: timestamp }))
+    http.get('/api/backup/s3/status', () =>
+      HttpResponse.json({ Failed: true, TimestampUTC: timestamp })
     )
   );
 
@@ -26,8 +28,8 @@ test('when backup failed, should show message', async () => {
 
 test("when user is using less nodes then allowed he shouldn't see message", async () => {
   server.use(
-    rest.get('/api/backup/s3/status', (req, res, ctx) =>
-      res(ctx.json({ Failed: false }))
+    http.get('/api/backup/s3/status', () =>
+      HttpResponse.json({ Failed: false })
     )
   );
   const { findByText } = renderWithQueryClient(<BackupFailedPanel />);
