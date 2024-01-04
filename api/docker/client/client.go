@@ -1,15 +1,21 @@
 package client
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"maps"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"github.com/segmentio/encoding/json"
 )
 
 var errUnsupportedEnvironmentType = errors.New("Environment not supported")
@@ -150,8 +156,59 @@ func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.
 	)
 }
 
+type NodeNameTransport struct {
+	*http.Transport
+	nodeNames map[string]string
+}
+
+func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := t.Transport.RoundTrip(req)
+	if err != nil ||
+		resp.StatusCode != http.StatusOK ||
+		resp.ContentLength == 0 ||
+		!strings.HasSuffix(req.URL.Path, "/images/json") {
+		return resp, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		resp.Body.Close()
+		return resp, err
+	}
+
+	resp.Body.Close()
+
+	resp.Body = io.NopCloser(bytes.NewReader(body))
+
+	var rs []struct {
+		types.ImageSummary
+		Portainer struct {
+			Agent struct {
+				NodeName string
+			}
+		}
+	}
+
+	if err = json.Unmarshal(body, &rs); err != nil {
+		return resp, nil
+	}
+
+	t.nodeNames = make(map[string]string)
+	for _, r := range rs {
+		t.nodeNames[r.ID] = r.Portainer.Agent.NodeName
+	}
+
+	return resp, err
+}
+
+func (t *NodeNameTransport) NodeNames() map[string]string {
+	return maps.Clone(t.nodeNames)
+}
+
 func httpClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*http.Client, error) {
-	transport := &http.Transport{}
+	transport := &NodeNameTransport{
+		Transport: &http.Transport{},
+	}
 
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)

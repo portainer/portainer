@@ -1,4 +1,4 @@
-import { Plus, Share2, Trash2 } from 'lucide-react';
+import { Plus, Network, Trash2 } from 'lucide-react';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -56,7 +56,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
     <ExpandableDatatable<DecoratedNetwork>
       settingsManager={settings}
       title="Networks"
-      titleIcon={Share2}
+      titleIcon={Network}
       dataset={dataset}
       columns={columns}
       getRowCanExpand={({ original: item }) =>

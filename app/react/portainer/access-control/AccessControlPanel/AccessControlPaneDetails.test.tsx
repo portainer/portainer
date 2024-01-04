@@ -1,8 +1,9 @@
 import _ from 'lodash';
+import { http, HttpResponse } from 'msw';
 
 import { createMockTeams, createMockUsers } from '@/react-tools/test-mocks';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { rest, server } from '@/setup-tests/server';
+import { server } from '@/setup-tests/server';
 import { Role } from '@/portainer/users/types';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 
@@ -86,7 +87,7 @@ for (let i = 0; i < inheritanceTests.length; i += 1) {
 test('when resource is limited to specific users, show number of users', async () => {
   const users = createMockUsers(10, Role.Standard);
 
-  server.use(rest.get('/api/users', (req, res, ctx) => res(ctx.json(users))));
+  server.use(http.get('/api/users', () => HttpResponse.json(users)));
 
   const restrictedToUsers = _.sampleSize(users, 3);
 
@@ -114,7 +115,7 @@ test('when resource is limited to specific users, show number of users', async (
 test('when resource is limited to specific teams, show comma separated list of their names', async () => {
   const teams = createMockTeams(10);
 
-  server.use(rest.get('/api/teams', (req, res, ctx) => res(ctx.json(teams))));
+  server.use(http.get('/api/teams', () => HttpResponse.json(teams)));
 
   const restrictedToTeams = _.sampleSize(teams, 3);
 
