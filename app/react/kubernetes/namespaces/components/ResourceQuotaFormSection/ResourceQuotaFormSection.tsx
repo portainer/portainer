@@ -1,7 +1,9 @@
 import { FormikErrors } from 'formik';
+import { AlertTriangle } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
+import { Icon } from '@@/Icon';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormError } from '@@/form-components/FormError';
 import { FormSection } from '@@/form-components/FormSection';
@@ -57,13 +59,34 @@ export function ResourceQuotaFormSection({
           <div className="flex flex-row">
             <FormSectionTitle>Resource Limits</FormSectionTitle>
           </div>
+
+          {(!cpuLimit || !memoryLimit) && (
+            <div>
+              <div className="text-muted help-block !inline-flex gap-1 !align-top text-xs">
+                <Icon
+                  icon={AlertTriangle}
+                  mode="warning"
+                  size="sm"
+                  className="flex-none"
+                />
+                <div className="text-warning">
+                  Not enough resources available in the cluster to apply a
+                  resource reservation.
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* keep the FormError component present, but invisible to avoid layout shift */}
-          <FormError
-            className={typeof errors === 'string' ? 'visible' : 'invisible'}
-          >
-            {/* 'error' keeps the formerror the exact same height while hidden so there is no layout shift */}
-            {typeof errors === 'string' ? errors : 'error'}
-          </FormError>
+          {cpuLimit && memoryLimit ? (
+            <FormError
+              className={typeof errors === 'string' ? 'visible' : 'invisible'}
+            >
+              {/* 'error' keeps the formerror the exact same height while hidden so there is no layout shift */}
+              {typeof errors === 'string' ? errors : 'error'}
+            </FormError>
+          ) : null}
+
           <FormControl
             className="flex flex-row"
             label="Memory limit (MB)"
