@@ -34,6 +34,7 @@ export function EditForm({
   const fileContentQuery = useCustomTemplateFile(template.Id);
 
   const initialValues = useInitialValues({
+    isEdge,
     template,
     templateFile: fileContentQuery.data,
   });
@@ -78,6 +79,8 @@ export function EditForm({
         Platform: values.Platform,
         Variables: values.Variables,
         EdgeSettings: values.EdgeSettings,
+        AccessControl: values.AccessControl,
+        resourceControlId: template.ResourceControl?.Id,
         ...values.Git,
       },
       {

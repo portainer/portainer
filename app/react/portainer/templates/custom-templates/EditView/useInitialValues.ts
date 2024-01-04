@@ -10,9 +10,11 @@ import { FormValues } from './types';
 export function useInitialValues({
   template,
   templateFile,
+  isEdge,
 }: {
   template: CustomTemplate;
   templateFile: string | undefined;
+  isEdge: boolean;
 }): FormValues {
   const { user, isAdmin } = useCurrentUser();
 
@@ -26,13 +28,14 @@ export function useInitialValues({
     Logo: template.Logo,
     Variables: template.Variables,
     Git: template.GitConfig ? toGitFormModel(template.GitConfig) : undefined,
-    AccessControl: template.ResourceControl
-      ? parseAccessControlFormData(
-          isAdmin,
-          user.Id,
-          new ResourceControlViewModel(template.ResourceControl)
-        )
-      : undefined,
+    AccessControl:
+      !isEdge && template.ResourceControl
+        ? parseAccessControlFormData(
+            isAdmin,
+            user.Id,
+            new ResourceControlViewModel(template.ResourceControl)
+          )
+        : undefined,
     EdgeSettings: template.EdgeSettings,
   };
 }
