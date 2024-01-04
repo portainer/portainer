@@ -146,6 +146,8 @@ class KubernetesCreateApplicationController {
     this.onAutoScaleChange = this.onAutoScaleChange.bind(this);
     this.onChangePlacements = this.onChangePlacements.bind(this);
     this.updateApplicationType = this.updateApplicationType.bind(this);
+    this.getAppType = this.getAppType.bind(this);
+    this.showDataAccessPolicySection = this.showDataAccessPolicySection.bind(this);
   }
   /* #endregion */
 
@@ -165,20 +167,19 @@ class KubernetesCreateApplicationController {
 
   updateApplicationType() {
     return this.$scope.$evalAsync(() => {
-      if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
-        this.formValues.ApplicationType = this.ApplicationTypes.DaemonSet;
-        this.validatePersistedFolders();
-        return;
-      }
-      if (this.formValues.PersistedFolders && this.formValues.PersistedFolders.length) {
-        this.formValues.ApplicationType = this.ApplicationTypes.StatefulSet;
-        this.validatePersistedFolders();
-        return;
-      }
-      this.formValues.ApplicationType = this.ApplicationTypes.Deployment;
+      this.formValues.ApplicationType = this.getAppType();
       this.validatePersistedFolders();
-      return;
     });
+  }
+
+  getAppType() {
+    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
+      return this.ApplicationTypes.DaemonSet;
+    }
+    if (this.formValues.PersistedFolders && this.formValues.PersistedFolders.length) {
+      return this.ApplicationTypes.StatefulSet;
+    }
+    return this.ApplicationTypes.Deployment;
   }
 
   onChangeFileContent(value) {
@@ -422,10 +423,9 @@ class KubernetesCreateApplicationController {
     this.formValues.DeploymentType = this.ApplicationDeploymentTypes.Replicated;
   }
 
-  // The data access policy panel is not shown when:
-  // * There is not persisted folder specified
+  // // The data access policy panel is shown when a persisted folder is specified
   showDataAccessPolicySection() {
-    return this.formValues.PersistedFolders.length !== 0;
+    return this.formValues.PersistedFolders.length > 0;
   }
 
   // A global deployment is not available when either:

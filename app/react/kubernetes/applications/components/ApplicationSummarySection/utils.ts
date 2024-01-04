@@ -30,13 +30,13 @@ export function getArticle(
  * generateResourceSummaryList maps formValues to create and update summaries
  */
 export function getAppResourceSummaries(
-  formValues: ApplicationFormValues,
+  newFormValues: ApplicationFormValues,
   oldFormValues?: ApplicationFormValues
 ): Array<Summary> {
   if (!oldFormValues) {
-    return getCreatedApplicationResourcesNew(formValues);
+    return getCreatedApplicationResourcesNew(newFormValues);
   }
-  return getUpdatedApplicationResources(formValues, oldFormValues);
+  return getUpdatedApplicationResources(newFormValues, oldFormValues);
 }
 
 function getCreatedApplicationResourcesNew(
@@ -126,8 +126,8 @@ function getCreatedApplicationResourcesNew(
 }
 
 function getUpdatedApplicationResources(
-  oldFormValues: ApplicationFormValues,
-  newFormValues: ApplicationFormValues
+  newFormValues: ApplicationFormValues,
+  oldFormValues: ApplicationFormValues
 ) {
   // app summaries
   const updateAppSummaries: Array<Summary> =

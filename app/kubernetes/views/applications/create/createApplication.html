@@ -430,12 +430,12 @@
 
                   <!-- #region DATA ACCESS POLICY -->
                   <div ng-if="ctrl.showDataAccessPolicySection()">
-                    <data-access-policy-form-section
+                    <access-policy-form-section
                       value="ctrl.formValues.DataAccessPolicy"
                       on-change="(ctrl.onDataAccessPolicyChange)"
                       is-edit="ctrl.state.isEdit"
                       persisted-folders-use-existing-volumes="ctrl.state.persistedFoldersUseExistingVolumes"
-                    ></data-access-policy-form-section>
+                    ></access-policy-form-section>
                   </div>
                   <!-- #endregion -->
 

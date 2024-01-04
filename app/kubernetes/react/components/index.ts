@@ -6,7 +6,6 @@ import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessVie
 import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/ConfigureForm/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/RegistriesFormSection/RegistriesSelector';
-import { DataAccessPolicyFormSection } from '@/react/kubernetes/applications/CreateView/DataAccessPolicyFormSection';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/CreateView/AppDeploymentTypeFormSection';
@@ -34,6 +33,7 @@ import { SecretsFormSection } from '@/react/kubernetes/applications/components/C
 import { configurationsValidationSchema } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/configurationValidationSchema';
 import { ConfigMapsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/ConfigMapsFormSection';
 import { PersistedFoldersFormSection } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection';
+import { DataAccessPolicyFormSection } from '@/react/kubernetes/applications/CreateView/DataAccessPolicyFormSection';
 import { persistedFoldersValidation } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection/persistedFoldersValidation';
 import {
   ResourceReservationFormSection,
@@ -114,8 +114,8 @@ export const ngModule = angular
     r2a(withUIRouter(withReactQuery(withCurrentUser(NodesDatatable))), [])
   )
   .component(
-    'dataAccessPolicyFormSection',
-    r2a(withControlledInput(DataAccessPolicyFormSection), [
+    'accessPolicyFormSection',
+    r2a(DataAccessPolicyFormSection, [
       'value',
       'onChange',
       'isEdit',
@@ -124,7 +124,7 @@ export const ngModule = angular
   )
   .component(
     'appDeploymentTypeFormSection',
-    r2a(withControlledInput(AppDeploymentTypeFormSection), [
+    r2a(AppDeploymentTypeFormSection, [
       'value',
       'onChange',
       'supportGlobalDeployment',
@@ -241,9 +241,7 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withControlledInput(
-    withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection)))
-  ),
+  withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection))),
   'persistedFoldersFormSection',
   [
     'isEdit',
@@ -299,9 +297,7 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withControlledInput(
-    withUIRouter(withCurrentUser(withReactQuery(PlacementFormSection)))
-  ),
+  withUIRouter(withCurrentUser(withReactQuery(PlacementFormSection))),
   'placementFormSection',
   [],
   placementValidation

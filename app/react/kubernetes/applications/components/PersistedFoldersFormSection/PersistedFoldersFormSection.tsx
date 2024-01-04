@@ -1,5 +1,6 @@
 import { FormikErrors } from 'formik';
 import { useMemo } from 'react';
+import uuidv4 from 'uuid/v4';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { StorageClass } from '@/react/portainer/environments/types';
@@ -76,17 +77,21 @@ export function PersistedFoldersFormSection({
             initialValues={initialValues}
           />
         )}
-        itemBuilder={() => ({
-          persistentVolumeClaimName:
-            availableVolumes[0]?.PersistentVolumeClaim.Name || '',
-          containerPath: '',
-          size: '',
-          sizeUnit: 'GB',
-          storageClass: storageClasses[0],
-          useNewVolume: true,
-          existingVolume: undefined,
-          needsDeletion: false,
-        })}
+        itemBuilder={() => {
+          const newVolumeClaimName = `${applicationValues.Name}-${uuidv4()}`;
+          return {
+            persistentVolumeClaimName:
+              availableVolumes[0]?.PersistentVolumeClaim.Name ||
+              newVolumeClaimName,
+            containerPath: '',
+            size: '',
+            sizeUnit: 'GB',
+            storageClass: storageClasses[0],
+            useNewVolume: true,
+            existingVolume: undefined,
+            needsDeletion: false,
+          };
+        }}
         addLabel="Add persisted folder"
         canUndoDelete={isEdit}
       />

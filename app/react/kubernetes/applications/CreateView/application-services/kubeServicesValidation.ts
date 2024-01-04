@@ -112,7 +112,7 @@ export function kubeServicesValidation(
                 );
                 if (
                   matchingService === undefined ||
-                  matchingService.Type !== 'NodePort' // ignore validation unless the service is of type nodeport
+                  matchingService.Type !== 'NodePort'
                 ) {
                   return true;
                 }
@@ -138,7 +138,7 @@ export function kubeServicesValidation(
 
                 if (
                   matchingService === undefined ||
-                  matchingService.Type !== 'NodePort' // ignore validation unless the service is of type nodeport
+                  matchingService.Type !== 'NodePort'
                 ) {
                   return true;
                 }

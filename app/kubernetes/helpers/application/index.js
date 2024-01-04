@@ -288,13 +288,6 @@ class KubernetesApplicationHelper {
           svc.ApplicationOwner = app.ApplicationOwner;
           svc.ApplicationName = app.ApplicationName;
           svc.Type = service.spec.type;
-          if (service.spec.type === KubernetesServiceTypes.CLUSTER_IP) {
-            svc.Type = 1;
-          } else if (service.spec.type === KubernetesServiceTypes.NODE_PORT) {
-            svc.Type = 2;
-          } else if (service.spec.type === KubernetesServiceTypes.LOAD_BALANCER) {
-            svc.Type = 3;
-          }
 
           let ports = [];
           service.spec.ports.forEach(function (port) {
