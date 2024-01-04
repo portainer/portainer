@@ -33,11 +33,11 @@ angular.module('portainer.docker').factory('ImageService', [
       return deferred.promise;
     };
 
-    service.images = function (withUsage) {
+    service.images = function ({ environmentId, withUsage } = {}) {
       var deferred = $q.defer();
 
       $q.all({
-        containers: withUsage ? ContainerService.containers(1) : [],
+        containers: withUsage ? ContainerService.containers(environmentId, 1) : [],
         images: Image.query({}).$promise,
       })
         .then(function success(data) {

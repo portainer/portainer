@@ -12,7 +12,7 @@ const meta: Meta = {
 
 export default meta;
 
-export { Defaults, ListWithInputAndSelect };
+export { Defaults, ListWithInputAndSelect, ListWithUndoDeletion };
 
 function Defaults() {
   const [values, setValues] = useState<DefaultType[]>([{ value: '' }]);
@@ -22,6 +22,21 @@ function Defaults() {
       label="default example"
       value={values}
       onChange={(value) => setValues(value)}
+    />
+  );
+}
+
+function ListWithUndoDeletion() {
+  const [values, setValues] = useState<DefaultType[]>([
+    { value: 'Existing item', needsDeletion: false },
+  ]);
+
+  return (
+    <InputList
+      label="List with undo deletion"
+      value={values}
+      onChange={(value) => setValues(value)}
+      canUndoDelete
     />
   );
 }

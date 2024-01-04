@@ -3,9 +3,10 @@ import angular from 'angular';
 angular.module('portainer.kubernetes').factory('HelmFactory', HelmFactory);
 
 /* @ngInject */
-function HelmFactory($resource, API_ENDPOINT_ENDPOINTS) {
+function HelmFactory($resource, API_ENDPOINT_ENDPOINTS, API_ENDPOINT_USERS) {
   const helmUrl = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/helm';
   const templatesUrl = 'api/templates/helm';
+  const userHelmUrl = API_ENDPOINT_USERS + '/:userId/helm';
 
   return $resource(
     helmUrl,
@@ -27,11 +28,11 @@ function HelmFactory($resource, API_ENDPOINT_ENDPOINTS) {
       },
       getHelmRepositories: {
         method: 'GET',
-        url: `${helmUrl}/repositories`,
+        url: `${userHelmUrl}/repositories`,
       },
       addHelmRepository: {
         method: 'POST',
-        url: `${helmUrl}/repositories`,
+        url: `${userHelmUrl}/repositories`,
       },
       list: {
         method: 'GET',

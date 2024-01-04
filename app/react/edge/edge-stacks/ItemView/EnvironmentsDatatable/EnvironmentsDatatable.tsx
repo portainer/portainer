@@ -6,6 +6,7 @@ import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { useParamState } from '@/react/hooks/useParamState';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
@@ -78,6 +79,21 @@ export function EnvironmentsDatatable() {
     ]
   );
 
+  const envStatusSelectOptions = [
+    { value: StatusType.Pending, label: 'Pending' },
+    { value: StatusType.Acknowledged, label: 'Acknowledged' },
+    { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
+    { value: StatusType.Running, label: 'Deployed' },
+    { value: StatusType.Error, label: 'Failed' },
+  ];
+  if (isBE) {
+    envStatusSelectOptions.concat([
+      { value: StatusType.PausedDeploying, label: 'Paused' },
+      { value: StatusType.RollingBack, label: 'Rolling back' },
+      { value: StatusType.RolledBack, label: 'Rolled back' },
+    ]);
+  }
+
   return (
     <Datatable
       columns={columns}
@@ -99,13 +115,7 @@ export function EnvironmentsDatatable() {
             bindToBody
             value={statusFilter}
             onChange={(e) => setStatusFilter(e ?? undefined)}
-            options={[
-              { value: StatusType.Pending, label: 'Pending' },
-              { value: StatusType.Acknowledged, label: 'Acknowledged' },
-              { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
-              { value: StatusType.Running, label: 'Deployed' },
-              { value: StatusType.Error, label: 'Failed' },
-            ]}
+            options={envStatusSelectOptions}
           />
         </div>
       }

@@ -16,6 +16,9 @@ function config($stateRegistryProvider) {
         component: 'authLogsView',
       },
     },
+    data: {
+      docs: '/admin/logs',
+    },
   });
 
   $stateRegistryProvider.register({
@@ -25,6 +28,9 @@ function config($stateRegistryProvider) {
       'content@': {
         component: 'activityLogsView',
       },
+    },
+    data: {
+      docs: '/admin/logs/activity',
     },
   });
 
@@ -38,6 +44,9 @@ function config($stateRegistryProvider) {
     },
     params: {
       id: '',
+    },
+    data: {
+      docs: '/admin/notifications',
     },
   });
 }

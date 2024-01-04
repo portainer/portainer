@@ -2,7 +2,6 @@ package endpointedge
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 

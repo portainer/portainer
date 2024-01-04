@@ -2,9 +2,10 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+
+	"github.com/segmentio/encoding/json"
 )
 
 func (kcl *KubeClient) GetMetrics() (models.K8sMetrics, error) {

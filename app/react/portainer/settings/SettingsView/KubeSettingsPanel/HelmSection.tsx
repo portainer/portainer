@@ -12,7 +12,7 @@ export function HelmSection() {
     <FormSection title="Helm Repository">
       <div className="mb-2">
         <TextTip color="blue">
-          You can specify the URL to your own helm repository here. See the{' '}
+          You can specify the URL to your own Helm repository here. See the{' '}
           <a
             href="https://helm.sh/docs/topics/chart_repository/"
             target="_blank"

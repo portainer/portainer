@@ -61,6 +61,10 @@
     </div>
   </div>
 
+  <div ng-if="$ctrl.state.showConfig">
+    <relative-path-fieldset value="$ctrl.stack" git-model="$ctrl.stack" is-editing="true" hide-edge-configs="true"></relative-path-fieldset>
+  </div>
+
   <environment-variables-panel
     values="$ctrl.formValues.Env"
     explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
@@ -76,7 +80,7 @@
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.submit()"
-    ng-disabled="$ctrl.isSubmitButtonDisabled() || $ctrl.state.hasUnsavedChanges || !$ctrl.redeployGitForm.$valid"
+    ng-disabled="$ctrl.disablePullAndRedeployButton()"
     style="margin-top: 7px; margin-left: 0"
     button-spinner="$ctrl.state.redeployInProgress"
     analytics-on
@@ -93,7 +97,7 @@
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.saveGitSettings()"
-    ng-disabled="$ctrl.isSubmitButtonDisabled() || !$ctrl.state.hasUnsavedChanges || !$ctrl.redeployGitForm.$valid"
+    ng-disabled="$ctrl.disableSaveSettingsButton()"
     style="margin-top: 7px; margin-left: 0"
     button-spinner="$ctrl.state.inProgress"
     analytics-on

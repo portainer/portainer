@@ -20,29 +20,26 @@ export function toRequest(
     User: values.user,
     WorkingDir: values.workingDir,
     ...getConsoleConfig(values.console),
-  };
+  } satisfies CreateContainerRequest;
 
   if (values.cmd) {
     config.Cmd = commandStringToArray(values.cmd);
+  } else if (values.cmd === null) {
+    delete config.Cmd;
   }
 
   if (values.entrypoint) {
     config.Entrypoint = commandStringToArray(values.entrypoint);
+  } else if (values.entrypoint === null) {
+    delete config.Entrypoint;
+  }
+
+  // don't include LogConfig object if "Default logging driver" (type === '') is selected
+  if (values.logConfig.type === '') {
+    delete config.HostConfig.LogConfig;
   }
 
   return config;
-
-  function getLogConfig(
-    value: LogConfig
-  ): CreateContainerRequest['HostConfig']['LogConfig'] {
-    return {
-      Type: value.type,
-      Config: Object.fromEntries(
-        value.options.map(({ option, value }) => [option, value])
-      ),
-      // docker types - requires union while it should allow also custom string for custom plugins
-    } as CreateContainerRequest['HostConfig']['LogConfig'];
-  }
 
   function getConsoleConfig(value: ConsoleSetting): ConsoleConfig {
     switch (value) {
@@ -56,5 +53,17 @@ export function toRequest(
       default:
         return { OpenStdin: false, Tty: false };
     }
+  }
+
+  function getLogConfig(
+    value: LogConfig
+  ): CreateContainerRequest['HostConfig']['LogConfig'] {
+    return {
+      Type: value.type,
+      Config: Object.fromEntries(
+        value.options.map(({ option, value }) => [option, value])
+      ),
+      // docker types - requires union while it should allow also custom string for custom plugins
+    } as CreateContainerRequest['HostConfig']['LogConfig'];
   }
 }

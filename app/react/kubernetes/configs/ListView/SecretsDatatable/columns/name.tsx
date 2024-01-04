@@ -66,15 +66,15 @@ function Cell({ row }: CellContext<SecretRowData, string>) {
         </Link>
         {isSystemSecret && (
           <Badge type="success" className="ml-2">
-            system
+            System
           </Badge>
         )}
         {!isSystemToken && !hasConfigurationOwner && (
-          <Badge className="ml-2">external</Badge>
+          <Badge className="ml-2">External</Badge>
         )}
         {!row.original.inUse && !isSystemSecret && (
           <Badge type="warn" className="ml-2">
-            unused
+            Unused
           </Badge>
         )}
       </div>

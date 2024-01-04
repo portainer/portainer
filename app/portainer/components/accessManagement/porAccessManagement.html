@@ -42,7 +42,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-sm vertical-center"
-                ng-disabled="ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
+                ng-disabled="ctrl.availableUsersAndTeams.length === 0 || ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
                 ng-click="ctrl.authorizeAccess()"
                 button-spinner="ctrl.actionInProgress"
                 data-cy="access-createAccess"

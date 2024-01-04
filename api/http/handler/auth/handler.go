@@ -18,12 +18,13 @@ type Handler struct {
 	*mux.Router
 	DataStore                   dataservices.DataStore
 	CryptoService               portainer.CryptoService
-	JWTService                  dataservices.JWTService
+	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	passwordStrengthChecker     security.PasswordStrengthChecker
+	bouncer                     security.BouncerService
 }
 
 // NewHandler creates a handler to manage authentication operations.
@@ -31,6 +32,7 @@ func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimit
 	h := &Handler{
 		Router:                  mux.NewRouter(),
 		passwordStrengthChecker: passwordStrengthChecker,
+		bouncer:                 bouncer,
 	}
 
 	h.Handle("/auth/oauth/validate",
@@ -38,7 +40,6 @@ func NewHandler(bouncer security.BouncerService, rateLimiter *security.RateLimit
 	h.Handle("/auth",
 		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticate)))).Methods(http.MethodPost)
 	h.Handle("/auth/logout",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.logout))).Methods(http.MethodPost)
-
+		bouncer.PublicAccess(httperror.LoggerHandler(h.logout))).Methods(http.MethodPost)
 	return h
 }

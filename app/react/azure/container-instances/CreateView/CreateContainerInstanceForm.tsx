@@ -187,6 +187,7 @@ export function CreateContainerInstanceForm() {
             onChange={(values) => setFieldValue('accessControl', values)}
             values={values.accessControl}
             errors={errors.accessControl}
+            environmentId={environmentId}
           />
 
           <div className="form-group">

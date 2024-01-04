@@ -1,6 +1,6 @@
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { UserId } from './types/user-id';
+import { type UserId } from './types/user-id';
 
 export { type UserId };
 
@@ -20,6 +20,7 @@ export type User = {
   EndpointAuthorizations: {
     [endpointId: EnvironmentId]: AuthorizationMap;
   };
+  UseCache: boolean;
   ThemeSettings: {
     color: 'dark' | 'light' | 'highcontrast' | 'auto';
   };

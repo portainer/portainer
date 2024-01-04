@@ -23,6 +23,8 @@ parserOptions:
     modules: true
 
 rules:
+  no-console: error
+  no-alert: error
   no-control-regex: 'off'
   no-empty: warn
   no-empty-function: warn
@@ -86,8 +88,8 @@ overrides:
       no-plusplus: off
       func-style: [error, 'declaration']
       import/prefer-default-export: off
-      no-use-before-define: "off"
-      '@typescript-eslint/no-use-before-define': ['error', { functions: false, "allowNamedExports": true }]
+      no-use-before-define: 'off'
+      '@typescript-eslint/no-use-before-define': ['error', { functions: false, 'allowNamedExports': true }]
       no-shadow: 'off'
       '@typescript-eslint/no-shadow': off
       jsx-a11y/no-autofocus: warn

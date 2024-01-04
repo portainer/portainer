@@ -3,11 +3,13 @@ import { PropsWithChildren } from 'react';
 import _ from 'lodash';
 import { Info } from 'lucide-react';
 
-import { ownershipIcon, truncate } from '@/portainer/filters/filters';
+import { truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
+import { pluralize } from '@/portainer/helpers/strings';
+import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -23,11 +25,13 @@ import { ResourceControlViewModel } from '../models/ResourceControlViewModel';
 interface Props {
   resourceControl?: ResourceControlViewModel;
   resourceType: ResourceControlType;
+  isAuthorisedToFetchUsers?: boolean;
 }
 
 export function AccessControlPanelDetails({
   resourceControl,
   resourceType,
+  isAuthorisedToFetchUsers = false,
 }: Props) {
   const inheritanceMessage = getInheritanceMessage(
     resourceType,
@@ -40,8 +44,30 @@ export function AccessControlPanelDetails({
     TeamAccesses: restrictedToTeams = [],
   } = resourceControl || {};
 
-  const users = useAuthorizedUsers(restrictedToUsers.map((ra) => ra.UserId));
+  const users = useAuthorizedUsers(
+    restrictedToUsers.map((ra) => ra.UserId),
+    isAuthorisedToFetchUsers
+  );
   const teams = useAuthorizedTeams(restrictedToTeams.map((ra) => ra.TeamId));
+
+  const teamsLength = teams.data ? teams.data.length : 0;
+  const unauthoisedTeams = restrictedToTeams.length - teamsLength;
+
+  let teamsMessage = teams.data && teams.data.join(', ');
+  if (unauthoisedTeams > 0 && teams.isFetched) {
+    teamsMessage += teamsLength > 0 ? ' and' : '';
+    teamsMessage += ` ${unauthoisedTeams} ${pluralize(
+      unauthoisedTeams,
+      'team'
+    )} you are not part of`;
+  }
+
+  const userMessage = users.data
+    ? users.data.join(', ')
+    : `${restrictedToUsers.length} ${pluralize(
+        restrictedToUsers.length,
+        'user'
+      )}`;
 
   return (
     <table className="table">
@@ -62,17 +88,13 @@ export function AccessControlPanelDetails({
         {restrictedToUsers.length > 0 && (
           <tr data-cy="access-authorisedUsers">
             <td>Authorized users</td>
-            <td aria-label="authorized-users">
-              {users.data && users.data.join(', ')}
-            </td>
+            <td aria-label="authorized-users">{userMessage}</td>
           </tr>
         )}
         {restrictedToTeams.length > 0 && (
           <tr data-cy="access-authorisedTeams">
             <td>Authorized teams</td>
-            <td aria-label="authorized-teams">
-              {teams.data && teams.data.join(', ')}
-            </td>
+            <td aria-label="authorized-teams">{teamsMessage}</td>
           </tr>
         )}
       </tbody>
@@ -197,17 +219,22 @@ function useAuthorizedTeams(authorizedTeamIds: TeamId[]) {
   });
 }
 
-function useAuthorizedUsers(authorizedUserIds: UserId[]) {
-  return useUsers(false, 0, authorizedUserIds.length > 0, (users) => {
-    if (authorizedUserIds.length === 0) {
-      return [];
-    }
+function useAuthorizedUsers(authorizedUserIds: UserId[], enabled = true) {
+  return useUsers(
+    false,
+    0,
+    authorizedUserIds.length > 0 && enabled,
+    (users) => {
+      if (authorizedUserIds.length === 0) {
+        return [];
+      }
 
-    return _.compact(
-      authorizedUserIds.map((id) => {
-        const user = users.find((u) => u.Id === id);
-        return user?.Username;
-      })
-    );
-  });
+      return _.compact(
+        authorizedUserIds.map((id) => {
+          const user = users.find((u) => u.Id === id);
+          return user?.Username;
+        })
+      );
+    }
+  );
 }

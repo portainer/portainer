@@ -4,6 +4,7 @@ import { PropsWithChildren } from 'react';
 interface Props {
   htmlFor?: string;
   titleSize?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
 const tailwindTitleSize = {
@@ -16,6 +17,7 @@ export function FormSectionTitle({
   children,
   htmlFor,
   titleSize = 'md',
+  className,
 }: PropsWithChildren<Props>) {
   if (htmlFor) {
     return (
@@ -23,7 +25,8 @@ export function FormSectionTitle({
         htmlFor={htmlFor}
         className={clsx(
           'col-sm-12 mb-2 mt-1 flex cursor-pointer items-center pl-0 font-medium',
-          tailwindTitleSize[titleSize]
+          tailwindTitleSize[titleSize],
+          className
         )}
       >
         {children}
@@ -34,7 +37,8 @@ export function FormSectionTitle({
     <div
       className={clsx(
         'col-sm-12 mb-2 mt-4 pl-0 font-medium',
-        tailwindTitleSize[titleSize]
+        tailwindTitleSize[titleSize],
+        className
       )}
     >
       {children}

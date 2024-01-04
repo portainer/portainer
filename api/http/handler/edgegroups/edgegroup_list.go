@@ -12,9 +12,10 @@ import (
 
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
-	HasEdgeStack  bool `json:"HasEdgeStack"`
-	HasEdgeJob    bool `json:"HasEdgeJob"`
-	EndpointTypes []portainer.EndpointType
+	HasEdgeStack     bool `json:"HasEdgeStack"`
+	HasEdgeJob       bool `json:"HasEdgeJob"`
+	EndpointTypes    []portainer.EndpointType
+	TrustedEndpoints []portainer.EndpointID `json:"TrustedEndpoints"`
 }
 
 // @id EdgeGroupList
@@ -85,6 +86,14 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 			}
 
 			edgeGroup.Endpoints = endpointIDs
+			edgeGroup.TrustedEndpoints = endpointIDs
+		} else {
+			trustedEndpoints, err := getTrustedEndpoints(tx, edgeGroup.Endpoints)
+			if err != nil {
+				return nil, httperror.InternalServerError("Unable to retrieve environments for Edge group", err)
+			}
+
+			edgeGroup.TrustedEndpoints = trustedEndpoints
 		}
 
 		endpointTypes, err := getEndpointTypes(tx, edgeGroup.Endpoints)

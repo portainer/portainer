@@ -1,6 +1,24 @@
 import { NodeStatus, TaskState } from 'docker-types/generated/1.41';
 import _ from 'lodash';
 
+export function trimVersionTag(fullName: string) {
+  if (!fullName) {
+    return fullName;
+  }
+
+  const versionIdx = fullName.lastIndexOf(':');
+  if (versionIdx < 0) {
+    return fullName;
+  }
+
+  const hostIdx = fullName.indexOf('/');
+  if (hostIdx > versionIdx) {
+    return fullName;
+  }
+
+  return fullName.substring(0, versionIdx);
+}
+
 export function trimSHA(imageName: string) {
   if (!imageName) {
     return '';
@@ -60,4 +78,8 @@ export function nodeStatusBadge(text: NodeStatus['State']) {
   }
 
   return 'success';
+}
+
+export function hideShaSum(imageName = '') {
+  return imageName.split('@sha')[0];
 }

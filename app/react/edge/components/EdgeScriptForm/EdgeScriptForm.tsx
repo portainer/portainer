@@ -13,18 +13,17 @@ const edgePropertiesFormInitialValues: ScriptFormValues = {
   envVars: '',
   os: 'linux' as OS,
   platform: 'k8s' as Platform,
-  nomadToken: '',
   authEnabled: true,
   tlsEnabled: false,
   edgeGroupsIds: [],
   group: 0,
   tagsIds: [],
+  edgeIdGenerator: '',
 };
 
 interface Props {
   edgeInfo: EdgeInfo;
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
-  isNomadTokenVisible?: boolean;
   asyncMode?: boolean;
   showMetaFields?: boolean;
 }
@@ -32,7 +31,6 @@ interface Props {
 export function EdgeScriptForm({
   edgeInfo,
   commands,
-  isNomadTokenVisible,
   asyncMode,
   showMetaFields,
   children,
@@ -43,17 +41,15 @@ export function EdgeScriptForm({
     <div className="form-horizontal">
       <Formik
         initialValues={edgePropertiesFormInitialValues}
-        validationSchema={() => validationSchema(isNomadTokenVisible)}
+        validationSchema={() => validationSchema()}
         onSubmit={() => {}}
+        validateOnMount
       >
         {({ values, setFieldValue }) => (
           <>
             {children}
 
             <EdgeScriptSettingsFieldset
-              isNomadTokenVisible={
-                isNomadTokenVisible && values.platform === 'nomad'
-              }
               hideIdGetter={edgeInfo.id !== undefined}
               showMetaFields={showMetaFields}
             />

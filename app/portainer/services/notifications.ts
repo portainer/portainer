@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import toastr from 'toastr';
 import sanitize from 'sanitize-html';
-import jwtDecode from 'jwt-decode';
 import { v4 as uuid } from 'uuid';
 
 import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
@@ -109,11 +108,8 @@ function saveNotification(title: string, text: string, type: string) {
     type,
     timeStamp: new Date(),
   };
-  const jwt = localStorageGet('JWT', '');
-  if (jwt !== '') {
-    const { id } = jwtDecode(jwt) as { id: number };
-    if (id) {
-      addNotification(id, notif);
-    }
+  const userId = localStorageGet('USER_ID', '');
+  if (userId !== '') {
+    addNotification(userId, notif);
   }
 }

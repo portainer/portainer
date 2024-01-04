@@ -24,6 +24,6 @@ export function kubernetesErrorParser(axiosError: AxiosError) {
  * @param msg An optional error message to prepend.
  * @returns An error object with an error message and details.
  */
-export function parseKubernetesAxiosError(err: Error, msg = '') {
+export function parseKubernetesAxiosError(err: unknown, msg = '') {
   return parseAxiosError(err, msg, kubernetesErrorParser);
 }

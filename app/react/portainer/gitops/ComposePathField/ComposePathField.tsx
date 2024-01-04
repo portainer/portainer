@@ -63,6 +63,7 @@ export function ComposePathField({
               onChange={onChange}
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
               model={model}
+              inputId="stack_repository_path"
             />
           ) : (
             <Input
@@ -71,6 +72,7 @@ export function ComposePathField({
                 updateInputValue(e.target.value);
               }}
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
+              id="stack_repository_path"
             />
           )}
         </FormControl>

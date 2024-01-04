@@ -4,15 +4,16 @@ package binary
 // The functionality does not rely on the implementation of `HelmPackageManager`
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"path"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/portainer/portainer/pkg/libhelm/options"
+
+	"github.com/pkg/errors"
+	"github.com/segmentio/encoding/json"
 	"gopkg.in/yaml.v3"
 )
 
@@ -57,7 +58,8 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		// I'm seeing 3 - 4s over wifi.
 		// Give ample time but timeout for now.  Can be improved in the future
 		client = &http.Client{
-			Timeout: 60 * time.Second,
+			Timeout:   60 * time.Second,
+			Transport: http.DefaultTransport,
 		}
 	}
 

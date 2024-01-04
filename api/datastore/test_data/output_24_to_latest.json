@@ -46,12 +46,10 @@
       },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
-      "EnableGPUManagement": false,
       "Gpus": [],
       "GroupId": 1,
       "Heartbeat": false,
       "Id": 1,
-      "IsEdgeDevice": false,
       "Kubernetes": {
         "Configuration": {
           "AllowNoneIngressClass": false,
@@ -73,7 +71,6 @@
       },
       "LastCheckInDate": 0,
       "Name": "local",
-      "PendingActions": null,
       "PostInitMigrations": {
         "MigrateGPUs": true,
         "MigrateIngresses": true
@@ -102,8 +99,7 @@
       "TeamAccessPolicies": {},
       "Type": 1,
       "URL": "unix:///var/run/docker.sock",
-      "UserAccessPolicies": {},
-      "UserTrusted": false
+      "UserAccessPolicies": {}
     }
   ],
   "registries": [
@@ -125,8 +121,7 @@
       "Name": "canister.io",
       "Password": "MjWbx8A6YK7cw7",
       "Quay": {
-        "OrganisationName": "",
-        "UseOrganisation": false
+        "OrganisationName": ""
       },
       "RegistryAccesses": {
         "1": {
@@ -585,11 +580,8 @@
     "AllowHostNamespaceForRegularUsers": true,
     "AllowPrivilegedModeForRegularUsers": true,
     "AllowStackManagementForRegularUsers": true,
-    "AllowVolumeBrowserForRegularUsers": false,
     "AuthenticationMethod": 1,
     "BlackListedLabels": [],
-    "DisplayDonationHeader": false,
-    "DisplayExternalContributors": false,
     "Edge": {
       "AsyncMode": false,
       "CommandInterval": 0,
@@ -599,15 +591,16 @@
     "EdgeAgentCheckinInterval": 5,
     "EdgePortainerUrl": "",
     "EnableEdgeComputeFeatures": false,
-    "EnableHostManagementFeatures": false,
     "EnableTelemetry": true,
     "EnforceEdgeID": false,
     "FeatureFlagSettings": null,
+    "GlobalDeploymentOptions": {
+      "hideStacksFunctionality": false
+    },
     "HelmRepositoryURL": "https://charts.bitnami.com/bitnami",
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
     },
-    "IsDockerDesktopExtension": false,
     "KubeconfigExpiry": "0",
     "KubectlShellImage": "portainer/kubectl-shell",
     "LDAPSettings": {
@@ -652,7 +645,7 @@
     },
     "ShowKomposeBuildOption": false,
     "SnapshotInterval": "5m",
-    "TemplatesURL": "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json",
+    "TemplatesURL": "",
     "TrustOnFirstConnect": false,
     "UserSessionTimeout": "8h",
     "fdoConfiguration": {
@@ -910,7 +903,7 @@
         "color": ""
       },
       "TokenIssueAt": 0,
-      "UserTheme": "",
+      "UseCache": false,
       "Username": "admin"
     },
     {
@@ -940,11 +933,11 @@
         "color": ""
       },
       "TokenIssueAt": 0,
-      "UserTheme": "",
+      "UseCache": false,
       "Username": "prabhat"
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.20.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.20.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

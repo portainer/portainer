@@ -12,6 +12,7 @@ import { Select as ReactSelect } from '@@/form-components/ReactSelect';
 export interface Option<TValue> {
   value: TValue;
   label: string;
+  disabled?: boolean;
 }
 
 type Options<TValue> = OptionsOrGroups<
@@ -99,6 +100,7 @@ export function SingleSelect<TValue = string>({
       options={options}
       value={selectedValue}
       onChange={(option) => onChange(option ? option.value : null)}
+      isOptionDisabled={(option) => !!option.disabled}
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}
@@ -155,6 +157,7 @@ export function MultiSelect<TValue = string>({
       isClearable={isClearable}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => String(option.value)}
+      isOptionDisabled={(option) => !!option.disabled}
       options={options}
       value={selectedOptions}
       closeMenuOnSelect={false}

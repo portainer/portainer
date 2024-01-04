@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
+import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
 import {
   arrayToStr,
   environmentTypeIcon,
@@ -12,7 +13,6 @@ import {
   isoDate,
   isoDateFromTimestamp,
   labelsToStr,
-  ownershipIcon,
   stripProtocol,
   truncate,
   truncateLeftRight,

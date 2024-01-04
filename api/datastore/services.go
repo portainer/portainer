@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/extension"
 	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
+	"github.com/portainer/portainer/api/dataservices/pendingactions"
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
 	"github.com/portainer/portainer/api/dataservices/role"
@@ -37,6 +37,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/webhook"
 
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -72,6 +73,7 @@ type Store struct {
 	UserService               *user.Service
 	VersionService            *version.Service
 	WebhookService            *webhook.Service
+	PendingActionsService     *pendingactions.Service
 }
 
 func (store *Store) initServices() error {
@@ -238,7 +240,18 @@ func (store *Store) initServices() error {
 	}
 	store.ScheduleService = scheduleService
 
+	pendingActionsService, err := pendingactions.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.PendingActionsService = pendingActionsService
+
 	return nil
+}
+
+// PendingActions gives access to the PendingActions data management layer
+func (store *Store) PendingActions() dataservices.PendingActionsService {
+	return store.PendingActionsService
 }
 
 // CustomTemplate gives access to the CustomTemplate data management layer

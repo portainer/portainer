@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 const (
@@ -173,7 +173,7 @@ func (service *Service) GetStackProjectPathByVersion(stackIdentifier string, ver
 	}
 
 	if commitHash != "" {
-		versionStr = fmt.Sprintf("%s", commitHash)
+		versionStr = commitHash
 	}
 	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier, versionStr)
 }
@@ -287,6 +287,38 @@ func (service *Service) StoreStackFileFromBytesByVersion(stackIdentifier, fileNa
 // It returns the path to the folder where the file is stored.
 func (service *Service) UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	err := service.createBackupFileInStore(composeFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
+// UpdateStoreStackFileFromBytesByVersion makes stack file backup and updates a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, commitHash string, data []byte) (string, error) {
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+
+	versionStr := ""
+	if version != 0 {
+		versionStr = fmt.Sprintf("v%d", version)
+	}
+	if commitHash != "" {
+		versionStr = commitHash
+	}
+
+	if versionStr != "" {
+		stackStorePath = JoinPaths(stackStorePath, versionStr)
+	}
+
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	err := service.createBackupFileInStore(composeFilePath)
 	if err != nil {

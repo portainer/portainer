@@ -90,6 +90,7 @@ class KubernetesSecretConverter {
       }
       return entry;
     });
+    res.data = res.Data;
 
     return res;
   }

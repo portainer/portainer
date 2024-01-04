@@ -6,5 +6,9 @@ angular.module('portainer.kubernetes').component('helmTemplatesView', {
   controller,
   bindings: {
     endpoint: '<',
+    namespace: '<',
+    stackName: '<',
+    onSelectHelmChart: '<',
+    name: '<',
   },
 });

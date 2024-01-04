@@ -1,5 +1,5 @@
 import { Database, Globe } from 'lucide-react';
-import { FormikErrors, useFormikContext } from 'formik';
+import { FormikErrors } from 'formik';
 import { PropsWithChildren } from 'react';
 
 import { Button } from '@@/buttons';
@@ -10,32 +10,31 @@ import { AdvancedForm } from './AdvancedForm';
 import { RateLimits } from './RateLimits';
 
 export function ImageConfigFieldset({
-  checkRateLimits,
+  onRateLimit,
   children,
   autoComplete,
-  setValidity,
-  fieldNamespace,
   values,
   errors,
+  onChangeImage,
+  setFieldValue,
 }: PropsWithChildren<{
   values: Values;
   errors?: FormikErrors<Values>;
-  fieldNamespace?: string;
-  checkRateLimits?: boolean;
   autoComplete?: boolean;
-  setValidity: (error?: string) => void;
+  onRateLimit?: (limited?: boolean) => void;
+  onChangeImage?: (name: string) => void;
+  setFieldValue: <T>(field: string, value: T) => void;
 }>) {
-  const { setFieldValue } = useFormikContext<Values>();
-
   const Component = values.useRegistry ? SimpleForm : AdvancedForm;
 
   return (
     <div className="row">
       <Component
         autoComplete={autoComplete}
-        fieldNamespace={fieldNamespace}
         values={values}
         errors={errors}
+        onChangeImage={onChangeImage}
+        setFieldValue={setFieldValue}
       />
 
       <div className="form-group">
@@ -46,7 +45,7 @@ export function ImageConfigFieldset({
               color="link"
               icon={Globe}
               className="!ml-0 p-0 hover:no-underline"
-              onClick={() => setFieldValue(namespaced('useRegistry'), false)}
+              onClick={() => setFieldValue('useRegistry', false)}
             >
               Advanced mode
             </Button>
@@ -56,7 +55,7 @@ export function ImageConfigFieldset({
               color="link"
               icon={Database}
               className="!ml-0 p-0 hover:no-underline"
-              onClick={() => setFieldValue(namespaced('useRegistry'), true)}
+              onClick={() => setFieldValue('useRegistry', true)}
             >
               Simple mode
             </Button>
@@ -66,13 +65,9 @@ export function ImageConfigFieldset({
 
       {children}
 
-      {checkRateLimits && values.useRegistry && (
-        <RateLimits registryId={values.registryId} setValidity={setValidity} />
+      {onRateLimit && values.useRegistry && (
+        <RateLimits registryId={values.registryId} onRateLimit={onRateLimit} />
       )}
     </div>
   );
-
-  function namespaced(field: string) {
-    return fieldNamespace ? `${fieldNamespace}.${field}` : field;
-  }
 }

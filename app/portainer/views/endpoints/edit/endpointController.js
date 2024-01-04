@@ -34,8 +34,6 @@ function EndpointController(
   $scope.onChangeTags = onChangeTags;
   $scope.onChangeTLSConfigFormValues = onChangeTLSConfigFormValues;
 
-  const isBE = process.env.PORTAINER_EDITION === 'BE';
-
   $scope.state = {
     selectAll: false,
     // displayTextFilter: false,
@@ -53,10 +51,9 @@ function EndpointController(
     allowCreate: Authentication.isAdmin(),
     allowSelfSignedCerts: true,
     showAMTInfo: false,
-    showNomad: isBE,
     showTLSConfig: false,
     edgeScriptCommands: {
-      linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux, isBE && commandsTabs.nomadLinux]),
+      linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux]),
       win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
     },
   };

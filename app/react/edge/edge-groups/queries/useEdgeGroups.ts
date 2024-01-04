@@ -1,15 +1,22 @@
 import { useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { EnvironmentType } from '@/react/portainer/environments/types';
+import {
+  EnvironmentId,
+  EnvironmentType,
+} from '@/react/portainer/environments/types';
 
 import { EdgeGroup } from '../types';
 
 import { queryKeys } from './query-keys';
 import { buildUrl } from './build-url';
 
-interface EdgeGroupListItemResponse extends EdgeGroup {
+export interface EdgeGroupListItemResponse extends EdgeGroup {
   EndpointTypes: Array<EnvironmentType>;
+  HasEdgeStack?: boolean;
+  HasEdgeJob?: boolean;
+  HasEdgeConfig?: boolean;
+  TrustedEndpoints: Array<EnvironmentId>;
 }
 
 async function getEdgeGroups() {

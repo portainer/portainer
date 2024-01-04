@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { TemplateType } from '@/react/portainer/templates/app-templates/types';
 import { AccessControlFormData } from '../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app').controller('TemplatesController', [
@@ -18,6 +19,7 @@ angular.module('portainer.app').controller('TemplatesController', [
   'FormValidator',
   'StackService',
   'endpoint',
+  '$async',
   function (
     $scope,
     $q,
@@ -34,7 +36,8 @@ angular.module('portainer.app').controller('TemplatesController', [
     Authentication,
     FormValidator,
     StackService,
-    endpoint
+    endpoint,
+    $async
   ) {
     const DOCKER_STANDALONE = 'DOCKER_STANDALONE';
     const DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
@@ -45,6 +48,8 @@ angular.module('portainer.app').controller('TemplatesController', [
       formValidationError: '',
       actionInProgress: false,
     };
+
+    $scope.enabledTypes = [TemplateType.Container, TemplateType.ComposeStack];
 
     $scope.formValues = {
       network: '',
@@ -110,7 +115,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           return ImageService.pullImage(template.RegistryModel, true);
         })
         .then(function success() {
-          return ContainerService.createAndStartContainer(templateConfiguration);
+          return ContainerService.createAndStartContainer(endpoint.Id, templateConfiguration);
         })
         .then(function success(data) {
           const resourceControl = data.Portainer.ResourceControl;
@@ -222,31 +227,33 @@ angular.module('portainer.app').controller('TemplatesController', [
       }
     };
 
-    $scope.unselectTemplate = function (template) {
-      template.Selected = false;
-      $scope.state.selectedTemplate = null;
+    $scope.unselectTemplate = function () {
+      return $async(async () => {
+        $scope.state.selectedTemplate = null;
+      });
     };
 
     $scope.selectTemplate = function (template) {
-      if ($scope.state.selectedTemplate) {
-        $scope.unselectTemplate($scope.state.selectedTemplate);
-      }
+      return $async(async () => {
+        if ($scope.state.selectedTemplate) {
+          await $scope.unselectTemplate($scope.state.selectedTemplate);
+        }
 
-      template.Selected = true;
-      if (template.Network) {
-        $scope.formValues.network = _.find($scope.availableNetworks, function (o) {
-          return o.Name === template.Network;
-        });
-      } else {
-        $scope.formValues.network = _.find($scope.availableNetworks, function (o) {
-          return o.Name === 'bridge';
-        });
-      }
+        if (template.Network) {
+          $scope.formValues.network = _.find($scope.availableNetworks, function (o) {
+            return o.Name === template.Network;
+          });
+        } else {
+          $scope.formValues.network = _.find($scope.availableNetworks, function (o) {
+            return o.Name === 'bridge';
+          });
+        }
 
-      $scope.formValues.name = template.Name ? template.Name : '';
-      $scope.state.selectedTemplate = template;
-      $scope.state.deployable = isDeployable($scope.applicationState.endpoint, template.Type);
-      $anchorScroll('view-top');
+        $scope.formValues.name = template.Name ? template.Name : '';
+        $scope.state.selectedTemplate = template;
+        $scope.state.deployable = isDeployable($scope.applicationState.endpoint, template.Type);
+        $anchorScroll('view-top');
+      });
     };
 
     function isDeployable(endpoint, templateType) {
@@ -277,6 +284,10 @@ angular.module('portainer.app').controller('TemplatesController', [
       var endpointMode = $scope.applicationState.endpoint.mode;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
       const endpointId = +$state.params.endpointId;
+
+      const showSwarmStacks = endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25;
+
+      $scope.disabledTypes = !showSwarmStacks ? [TemplateType.SwarmStack] : [];
 
       $q.all({
         templates: TemplateService.templates(endpointId),

@@ -97,11 +97,6 @@ func (handler *Handler) clearEdgeJobTaskLogs(tx dataservices.DataStoreTx, edgeJo
 		return httperror.InternalServerError("Unable to persist Edge job changes in the database", err)
 	}
 
-	err = handler.FileService.ClearEdgeJobTaskLogs(strconv.Itoa(int(edgeJobID)), strconv.Itoa(int(endpointID)))
-	if err != nil {
-		return httperror.InternalServerError("Unable to clear log file from disk", err)
-	}
-
 	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return httperror.NotFound("Unable to retrieve environment from the database", err)

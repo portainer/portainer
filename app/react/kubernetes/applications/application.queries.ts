@@ -108,7 +108,7 @@ const queryKeys = {
 };
 
 // useQuery to get a list of all applications from an array of namespaces
-export function useApplicationsForCluster(
+export function useApplicationsQuery(
   environemtId: EnvironmentId,
   namespaces?: string[]
 ) {

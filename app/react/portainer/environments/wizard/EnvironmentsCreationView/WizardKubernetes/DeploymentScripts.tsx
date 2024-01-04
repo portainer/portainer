@@ -9,6 +9,7 @@ import { Code } from '@@/Code';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { NavTabs } from '@@/NavTabs';
 import { Icon } from '@@/Icon';
+import { NavContainer } from '@@/NavTabs/NavContainer';
 
 const deployments = [
   {
@@ -63,11 +64,13 @@ export function DeploymentScripts() {
         </span>
       </div>
 
-      <NavTabs
-        options={options}
-        onSelect={(id: string) => setDeployType(id)}
-        selectedId={deployType}
-      />
+      <NavContainer>
+        <NavTabs
+          options={options}
+          onSelect={(id: string) => setDeployType(id)}
+          selectedId={deployType}
+        />
+      </NavContainer>
     </>
   );
 }

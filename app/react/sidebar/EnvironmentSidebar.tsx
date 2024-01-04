@@ -11,7 +11,6 @@ import {
 } from '@/react/portainer/environments/types';
 import { getPlatformType } from '@/react/portainer/environments/utils';
 import { useEnvironment } from '@/react/portainer/environments/queries/useEnvironment';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { environmentStore } from '@/react/hooks/current-environment-store';
 
 import { Icon } from '@@/Icon';
@@ -24,7 +23,6 @@ import { DockerSidebar } from './DockerSidebar';
 import { KubernetesSidebar } from './KubernetesSidebar';
 import { SidebarSection, SidebarSectionTitle } from './SidebarSection';
 import { useSidebarState } from './useSidebarState';
-import { NomadSidebar } from './NomadSidebar';
 
 export function EnvironmentSidebar() {
   const { query: currentEnvironmentQuery, clearEnvironment } =
@@ -87,7 +85,6 @@ function Content({ environment, onClear }: ContentProps) {
       [PlatformType.Azure]: AzureSidebar,
       [PlatformType.Docker]: DockerSidebar,
       [PlatformType.Kubernetes]: KubernetesSidebar,
-      [PlatformType.Nomad]: isBE ? NomadSidebar : null,
     };
 
     return sidebar[platform];

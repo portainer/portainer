@@ -277,7 +277,7 @@ class KubernetesNodeController {
   async getNodesAsync() {
     try {
       this.state.dataLoading = true;
-      const nodeName = this.$transition$.params().name;
+      const nodeName = this.$transition$.params().nodeName;
       this.nodes = await this.KubernetesNodeService.get();
       this.node = _.find(this.nodes, { Name: nodeName });
       this.state.isDrainOperation = _.find(this.nodes, { Availability: this.availabilities.DRAIN });
@@ -298,7 +298,7 @@ class KubernetesNodeController {
 
   async getNodeUsageAsync() {
     try {
-      const nodeName = this.$transition$.params().name;
+      const nodeName = this.$transition$.params().nodeName;
       const node = await getMetricsForNode(this.$state.params.endpointId, nodeName);
       this.resourceUsage = new KubernetesResourceReservation();
       this.resourceUsage.CPU = KubernetesResourceReservationHelper.parseCPU(node.usage.cpu);

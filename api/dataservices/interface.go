@@ -2,7 +2,6 @@ package dataservices
 
 import (
 	"io"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
@@ -35,6 +34,7 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+		PendingActions() PendingActionsService
 	}
 
 	DataStore interface {
@@ -72,6 +72,11 @@ type (
 		GetNextIdentifier() int
 	}
 
+	PendingActionsService interface {
+		BaseCRUD[portainer.PendingActions, portainer.PendingActionsID]
+		GetNextIdentifier() int
+	}
+
 	// EdgeStackService represents a service to manage Edge stacks
 	EdgeStackService interface {
 		EdgeStacks() ([]portainer.EdgeStack, error)
@@ -89,6 +94,7 @@ type (
 	EndpointService interface {
 		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
 		EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool)
+		EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error)
 		Heartbeat(endpointID portainer.EndpointID) (int64, bool)
 		UpdateHeartbeat(endpointID portainer.EndpointID)
 		Endpoints() ([]portainer.Endpoint, error)
@@ -124,15 +130,6 @@ type (
 	HelmUserRepositoryService interface {
 		BaseCRUD[portainer.HelmUserRepository, portainer.HelmUserRepositoryID]
 		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
-	}
-
-	// JWTService represents a service for managing JWT tokens
-	JWTService interface {
-		GenerateToken(data *portainer.TokenData) (string, error)
-		GenerateTokenForOAuth(data *portainer.TokenData, expiryTime *time.Time) (string, error)
-		GenerateTokenForKubeconfig(data *portainer.TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*portainer.TokenData, error)
-		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
 	// RegistryService represents a service for managing registry data

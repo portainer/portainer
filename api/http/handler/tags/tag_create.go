@@ -62,7 +62,7 @@ func createTag(tx dataservices.DataStoreTx, payload tagCreatePayload) (*portaine
 
 	for _, tag := range tags {
 		if tag.Name == payload.Name {
-			return nil, &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "This name is already associated to a tag", Err: errors.New("a tag already exists with this name")}
+			return nil, httperror.Conflict("This name is already associated to a tag", errors.New("a tag already exists with this name"))
 		}
 	}
 

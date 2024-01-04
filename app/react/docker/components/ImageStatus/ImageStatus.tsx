@@ -1,16 +1,14 @@
-import { useQuery } from 'react-query';
 import { Loader } from 'lucide-react';
 
-import {
-  getContainerImagesStatus,
-  getServiceImagesStatus,
-} from '@/react/docker/images/image.service';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 import { statusIcon } from '@/react/docker/components/ImageStatus/helpers';
-import { ResourceID, ResourceType } from '@/react/docker/images/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Icon } from '@@/Icon';
+
+import { ResourceID, ResourceType } from './types';
+import { useImageNotification } from './useImageNotification';
 
 export interface Props {
   environmentId: EnvironmentId;
@@ -42,6 +40,10 @@ export function ImageStatus({
     return null;
   }
 
+  if (!isBE) {
+    return null;
+  }
+
   if (isLoading || !data) {
     return (
       <Icon
@@ -54,32 +56,5 @@ export function ImageStatus({
 
   return (
     <Icon icon={statusIcon(data)} size="sm" className="!mr-1 align-middle" />
-  );
-}
-
-export function useImageNotification(
-  environmentId: number,
-  resourceId: ResourceID,
-  resourceType: ResourceType,
-  nodeName: string,
-  enabled = false
-) {
-  return useQuery(
-    [
-      'environments',
-      environmentId,
-      'docker',
-      'images',
-      resourceType,
-      resourceId,
-      'status',
-    ],
-    () =>
-      resourceType === ResourceType.SERVICE
-        ? getServiceImagesStatus(environmentId, resourceId)
-        : getContainerImagesStatus(environmentId, resourceId, nodeName),
-    {
-      enabled,
-    }
   );
 }

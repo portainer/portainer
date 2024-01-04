@@ -1,5 +1,5 @@
 import axios from '@/portainer/services/axios';
-import { ImageStatus } from '@/react/docker/images/types';
+import { ImageStatus } from '@/react/docker/components/ImageStatus/types';
 
 export async function getStackImagesStatus(id: number) {
   try {

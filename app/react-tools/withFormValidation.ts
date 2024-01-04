@@ -10,8 +10,8 @@ import { validateForm } from '@@/form-components/validate-form';
 import { ArrayError } from '@@/form-components/InputList/InputList';
 
 interface FormFieldProps<TValue> {
-  onChange(values: TValue): void;
-  values: TValue;
+  onChange(values: TValue): void; // update the values for the entire form object used in yup validation, not just one input.
+  values: TValue; // current values
   errors?: FormikErrors<TValue> | ArrayError<TValue>;
 }
 
@@ -129,9 +129,16 @@ function createFormValidatorController<TFormModel, TData = never>(
       });
     }
 
-    async $onChanges(changes: { values?: { currentValue: TFormModel } }) {
+    async $onChanges(changes: {
+      values?: { currentValue: TFormModel };
+      validationData?: { currentValue: TData };
+    }) {
       if (changes.values) {
         await this.runValidation(changes.values.currentValue);
+      }
+      // also run validation if validationData changes
+      if (changes.validationData) {
+        await this.runValidation(this.values!);
       }
     }
   };

@@ -17,9 +17,10 @@ limitations under the License.
 package time
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 )
 
 var (

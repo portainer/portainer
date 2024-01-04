@@ -1,35 +1,38 @@
-import clsx from 'clsx';
-import { PlusCircle } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { ComponentProps, PropsWithChildren } from 'react';
 
-import { Icon } from '@/react/components/Icon';
+import { AutomationTestingProps } from '@/types';
 
-import styles from './AddButton.module.css';
+import { Link } from '@@/Link';
 
-export interface Props {
-  className?: string;
-  label: string;
-  disabled?: boolean;
-  onClick: () => void;
-}
+import { Button } from './Button';
 
-export function AddButton({ label, onClick, className, disabled }: Props) {
+export function AddButton({
+  to = '.new',
+  params,
+  children,
+  color = 'primary',
+  disabled,
+  'data-cy': dataCy,
+}: PropsWithChildren<
+  {
+    to?: string;
+    params?: object;
+    color?: ComponentProps<typeof Button>['color'];
+    disabled?: boolean;
+  } & AutomationTestingProps
+>) {
   return (
-    <button
-      className={clsx(
-        className,
-        'label',
-        'label-default',
-        'vertical-center',
-        'interactive',
-        'vertical-center',
-        styles.addButton
-      )}
-      type="button"
-      onClick={onClick}
+    <Button
+      as={Link}
+      props={{ to, params }}
+      icon={Plus}
+      className="!m-0"
+      data-cy={dataCy}
+      color={color}
       disabled={disabled}
     >
-      <Icon icon={PlusCircle} />
-      {label}
-    </button>
+      {children || 'Add'}
+    </Button>
   );
 }

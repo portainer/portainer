@@ -32,8 +32,9 @@ type settingsUpdatePayload struct {
 	SnapshotInterval *string `example:"5m"`
 	// URL to the templates that will be displayed in the UI when navigating to App Templates
 	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
-	// The default check in interval for edge agent (in seconds)
-	EdgeAgentCheckinInterval *int `example:"5"`
+	// Deployment options for encouraging deployment as code
+	GlobalDeploymentOptions  *portainer.GlobalDeploymentOptions // The default check in interval for edge agent (in seconds)
+	EdgeAgentCheckinInterval *int                               `example:"5"`
 	// Show the Kompose build option (discontinued in 2.18)
 	ShowKomposeBuildOption *bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
@@ -157,6 +158,11 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 
 	if payload.TemplatesURL != nil {
 		settings.TemplatesURL = *payload.TemplatesURL
+	}
+
+	// update the global deployment options, and the environment deployment options if they have changed
+	if payload.GlobalDeploymentOptions != nil {
+		settings.GlobalDeploymentOptions = *payload.GlobalDeploymentOptions
 	}
 
 	if payload.ShowKomposeBuildOption != nil {

@@ -40,3 +40,7 @@ func Unauthorized(message string, err error) *HandlerError {
 func Forbidden(message string, err error) *HandlerError {
 	return NewError(http.StatusForbidden, message, err)
 }
+
+func Conflict(message string, err error) *HandlerError {
+	return NewError(http.StatusConflict, message, err)
+}

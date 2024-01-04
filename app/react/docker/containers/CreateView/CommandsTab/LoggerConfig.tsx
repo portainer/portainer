@@ -58,7 +58,7 @@ export function LoggerConfig({
       <TextTip color="blue">
         Logging driver that will override the default docker daemon driver.
         Select Default logging driver if you don&apos;t want to override it.
-        Supported logging drivers can be found
+        Supported logging drivers can be found{' '}
         <a
           href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers"
           target="_blank"
@@ -133,6 +133,6 @@ export function validation(): SchemaOf<LogConfig> {
         value: string().required('Value is required'),
       })
     ),
-    type: string().default('none'),
+    type: string().default(''),
   });
 }

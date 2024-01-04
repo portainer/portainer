@@ -89,6 +89,16 @@
   min-height: 34px;
 }
 
+.input-group .portainer-selector-root .portainer-selector__control:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.input-group .portainer-selector-root .portainer-selector__control:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 .portainer-selector-root .portainer-selector__multi-value {
   background-color: var(--multi-value-tag-bg);
 }

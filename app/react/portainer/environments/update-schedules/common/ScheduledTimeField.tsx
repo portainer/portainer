@@ -20,11 +20,13 @@ interface Props {
   disabled?: boolean;
 }
 
+export const FORMAT = 'YYYY-MM-DD HH:mm';
+
 export function ScheduledTimeField({ disabled }: Props) {
   const [{ name, value }, { error }, { setValue }] =
     useField<FormValues['scheduledTime']>('scheduledTime');
 
-  const dateValue = useMemo(() => parseIsoDate(value), [value]);
+  const dateValue = useMemo(() => parseIsoDate(value, FORMAT), [value]);
 
   if (!value) {
     return null;
@@ -35,12 +37,12 @@ export function ScheduledTimeField({ disabled }: Props) {
       <FormControl label="Schedule date & time" errors={error}>
         {!disabled ? (
           <DateTimePicker
-            format="y-MM-dd HH:mm:ss"
+            format="y-MM-dd HH:mm"
             className="form-control [&>div]:border-0"
             onChange={(date) => {
               const dateToSave =
                 date || new Date(Date.now() + 24 * 60 * 60 * 1000);
-              setValue(isoDate(dateToSave.valueOf()));
+              setValue(isoDate(dateToSave.valueOf(), FORMAT));
             }}
             name={name}
             value={dateValue}
@@ -72,16 +74,16 @@ export function timeValidation() {
     )
     .test(
       'validDate',
-      `Scheduled time must be bigger then ${isoDate(
-        Date.now() - 24 * 60 * 60 * 1000
-      )}`,
+      `Scheduled time must be bigger then ${
+        (isoDate(Date.now() - 24 * 60 * 60 * 1000), FORMAT)
+      }`,
       (value) =>
         parseIsoDate(value).valueOf() > Date.now() - 24 * 60 * 60 * 1000
     );
 }
 
 export function defaultValue() {
-  return isoDate(Date.now() + 24 * 60 * 60 * 1000);
+  return isoDate(Date.now(), FORMAT);
 }
 
 function isValidDate(date: Date) {

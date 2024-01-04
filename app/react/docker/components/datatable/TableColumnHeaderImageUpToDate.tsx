@@ -3,6 +3,7 @@ import UpToDate from '@/assets/ico/icon_up-to-date.svg?c';
 import UpdatesUnknown from '@/assets/ico/icon_updates-unknown.svg?c';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -38,6 +39,10 @@ export function ImageUpToDateTooltip() {
   );
 
   if (!enableImageNotificationQuery.data) {
+    return null;
+  }
+
+  if (!isBE) {
     return null;
   }
 

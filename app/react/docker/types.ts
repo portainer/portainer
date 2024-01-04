@@ -11,4 +11,8 @@ export interface PortainerMetadata {
 
 export type PortainerResponse<T> = T & {
   Portainer?: PortainerMetadata;
+  /**
+   * will be true if the portainer is running in this resource
+   */
+  IsPortainer?: boolean;
 };

@@ -87,7 +87,7 @@
 
   --orange-1: #e86925;
 
-  --BE-only: var(--ui-warning-7);
+  --BE-only: var(--ui-gray-6);
 
   --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
   --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
@@ -108,7 +108,6 @@
   --bg-widget-table-color: var(--ui-gray-3);
   --bg-header-color: var(--white-color);
   --bg-hover-table-color: var(--grey-14);
-  --bg-switch-box-color: var(--ui-gray-5);
   --bg-input-group-addon-color: var(--ui-gray-3);
   --bg-btn-default-color: var(--ui-blue-10);
   --bg-blocklist-hover-color: var(--ui-blue-2);
@@ -116,7 +115,6 @@
   --bg-md-checkbox-color: var(--grey-12);
   --bg-form-control-disabled-color: var(--grey-11);
   --bg-modal-content-color: var(--white-color);
-  --bg-nav-container-color: var(--ui-gray-2);
   --bg-navtabs-hover-color: var(--grey-16);
   --bg-nav-tab-active-color: var(--ui-gray-4);
   --bg-table-selected-color: var(--grey-14);
@@ -233,7 +231,6 @@
   --border-blocklist: var(--ui-gray-5);
   --border-blocklist-item-selected-color: var(--grey-46);
   --border-widget: var(--ui-gray-5);
-  --border-nav-container-color: var(--ui-gray-5);
   --border-stepper-color: var(--ui-gray-4);
 
   --shadow-box-color: 0 3px 10px -2px var(--grey-50);
@@ -259,8 +256,7 @@
 
 /* Dark Theme */
 [theme='dark'] {
-  --BE-only: var(--ui-blue-8);
-  --bg-BE-only: rgba(225, 223, 223, 0.08);
+  --BE-only: var(--ui-gray-6);
 
   --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
   --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
@@ -285,12 +281,11 @@
   --bg-widget-table-color: var(--grey-3);
   --bg-header-color: var(--grey-2);
   --bg-hover-table-color: var(--grey-3);
-  --bg-switch-box-color: var(--grey-53);
   --bg-table-color: var(--grey-1);
   --bg-md-checkbox-color: var(--grey-31);
   --bg-form-control-disabled-color: var(--grey-3);
   --bg-modal-content-color: var(--grey-1);
-  --bg-nav-container-color: var(--ui-gray-iron-10);
+
   --bg-navtabs-hover-color: var(--grey-3);
   --bg-nav-tab-active-color: var(--grey-2);
   --bg-table-selected-color: var(--grey-3);
@@ -408,7 +403,6 @@
   --border-bootbox: var(--ui-gray-9);
   --border-widget: var(--grey-3);
   --border-pagination-color: var(--grey-1);
-  --border-nav-container-color: var(--ui-gray-neutral-8);
   --border-stepper-color: var(--ui-gray-warm-9);
 
   --blue-color: var(--blue-2);
@@ -434,6 +428,7 @@
 
 /* High Contrast Theme */
 [theme='highcontrast'] {
+  --BE-only: var(--ui-gray-6);
   --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
   --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
   --text-log-viewer-color-json-yellow: var(--text-log-viewer-color);
@@ -452,7 +447,6 @@
   --bg-widget-table-color: var(--black-color);
   --bg-header-color: var(--black-color);
   --bg-hover-table-color: var(--grey-3);
-  --bg-switch-box-color: var(--grey-53);
   --bg-panel-body-color: var(--black-color);
   --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-motd-body-color: var(--black-color);
@@ -484,7 +478,7 @@
   --bg-tooltip-color: var(--black-color);
   --bg-table-selected-color: var(--grey-3);
   --bg-pre-color: var(--grey-2);
-  --bg-nav-container-color: var(--ui-black);
+
   --bg-navtabs-hover-color: var(--grey-3);
   --bg-nav-tab-active-color: var(--ui-black);
   --bg-btn-default-color: var(--black-color);
@@ -570,8 +564,11 @@
   --border-bootbox: var(--black-color);
   --border-blocklist: var(--white-color);
   --border-widget: var(--white-color);
-  --border-nav-container-color: var(--ui-white);
   --border-stepper-color: var(--ui-gray-warm-9);
+
+  --button-close-color: var(--white-color);
+  --button-opacity: 1;
+  --button-opacity-hover: 0.7;
 
   --shadow-box-color: none;
   --shadow-boxselector-color: none;

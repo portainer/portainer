@@ -7,6 +7,10 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
+import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
 import { confirmDelete } from '@@/modals/confirm';
@@ -19,10 +23,6 @@ import {
   useServicesForCluster,
 } from '../../service';
 import { Service } from '../../types';
-import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSettings';
-import { isSystemNamespace } from '../../../namespaces/utils';
-import { useNamespaces } from '../../../namespaces/queries';
-import { SystemResourceDescription } from '../../../datatables/SystemResourceDescription';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
@@ -33,7 +33,8 @@ const settingsStore = createStore(storageKey);
 export function ServicesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const namespaceNames = (namespaces && Object.keys(namespaces)) || [];
   const { data: services, ...servicesQuery } = useServicesForCluster(
     environmentId,
@@ -71,10 +72,7 @@ export function ServicesDatatable() {
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings
-            settings={tableState}
-            hideShowSystemResources={!canAccessSystemResources}
-          />
+          <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
       description={

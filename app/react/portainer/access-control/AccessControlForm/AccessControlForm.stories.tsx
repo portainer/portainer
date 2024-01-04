@@ -43,7 +43,12 @@ function Template({ userRole }: Args) {
   return (
     <QueryClientProvider client={testQueryClient}>
       <UserContext.Provider value={userProviderState}>
-        <AccessControlForm values={value} onChange={setValue} errors={{}} />
+        <AccessControlForm
+          values={value}
+          onChange={setValue}
+          errors={{}}
+          environmentId={1}
+        />
       </UserContext.Provider>
     </QueryClientProvider>
   );

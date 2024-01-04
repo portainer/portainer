@@ -38,12 +38,12 @@
   padding-left: 20px;
 }
 
-/* used for BE teaser. Dark theme specs defined by EE-5621 */
+/* used for BE teaser */
 .box-selector-item.limited.business label,
 .box-selector-item.limited.business input:checked + label {
-  @apply border-warning-7 bg-warning-1 text-black;
-  @apply th-dark:border-blue-8 th-dark:bg-[color:var(--bg-BE-only)] th-dark:text-white;
-  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10 th-highcontrast:text-white;
+  @apply border-gray-6 bg-gray-6 bg-opacity-10;
+  @apply th-dark:border-gray-6 th-dark:bg-gray-6 th-dark:bg-opacity-10;
+  @apply th-highcontrast:border-gray-6 th-highcontrast:bg-gray-6 th-highcontrast:bg-opacity-10;
 
   filter: none;
 }

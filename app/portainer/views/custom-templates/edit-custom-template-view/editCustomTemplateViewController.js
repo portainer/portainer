@@ -4,8 +4,7 @@ import { ResourceControlViewModel } from '@/react/portainer/access-control/model
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { getTemplateVariables, intersectVariables, isTemplateVariablesEnabled } from '@/react/portainer/custom-templates/components/utils';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class EditCustomTemplateViewController {
@@ -13,12 +12,17 @@ class EditCustomTemplateViewController {
   constructor($async, $state, $window, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, $window, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
 
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.formValues = {
       Variables: [],
       TLSSkipVerify: false,
+      Title: '',
+      Description: '',
+      Note: '',
+      Logo: '',
     };
+
     this.state = {
       formValidationError: '',
       isEditorDirty: false,
@@ -27,8 +31,15 @@ class EditCustomTemplateViewController {
       templateLoadFailed: false,
       templatePreviewFailed: false,
       templatePreviewError: '',
-      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
+
+    this.validationData = {
+      title: {
+        pattern: TEMPLATE_NAME_VALIDATION_REGEX,
+        error: "This field must consist of lower-case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').",
+      },
+    };
+
     this.templates = [];
 
     this.getTemplate = this.getTemplate.bind(this);
@@ -39,6 +50,16 @@ class EditCustomTemplateViewController {
     this.onVariablesChange = this.onVariablesChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.previewFileFromGitRepository = this.previewFileFromGitRepository.bind(this);
+    this.onChangePlatform = this.onChangePlatform.bind(this);
+    this.onChangeType = this.onChangeType.bind(this);
+  }
+
+  onChangePlatform(value) {
+    this.handleChange({ Platform: value });
+  }
+
+  onChangeType(value) {
+    this.handleChange({ Type: value });
   }
 
   getTemplate() {
@@ -156,7 +177,7 @@ class EditCustomTemplateViewController {
       return;
     }
 
-    const variables = getTemplateVariables(templateStr);
+    const [variables] = getTemplateVariables(templateStr);
 
     const isValid = !!variables;
 

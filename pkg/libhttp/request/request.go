@@ -4,13 +4,13 @@
 package request
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/segmentio/encoding/json"
 )
 
 const (

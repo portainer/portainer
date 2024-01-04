@@ -34,6 +34,7 @@ type testDatastore struct {
 	user                    dataservices.UserService
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
+	pendingActionsService   dataservices.PendingActionsService
 }
 
 func (d *testDatastore) BackupTo(io.Writer) error                            { return nil }
@@ -81,6 +82,10 @@ func (d *testDatastore) TunnelServer() dataservices.TunnelServerService     { re
 func (d *testDatastore) User() dataservices.UserService                     { return d.user }
 func (d *testDatastore) Version() dataservices.VersionService               { return d.version }
 func (d *testDatastore) Webhook() dataservices.WebhookService               { return d.webhook }
+
+func (d *testDatastore) PendingActions() dataservices.PendingActionsService {
+	return d.pendingActionsService
+}
 
 func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false
@@ -299,6 +304,19 @@ func (s *stubEndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 
 func (s *stubEndpointService) GetNextIdentifier() int {
 	return len(s.endpoints)
+}
+
+func (s *stubEndpointService) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error) {
+	var endpoints = make([]portainer.Endpoint, 0)
+
+	for _, e := range s.endpoints {
+		for t := range e.TeamAccessPolicies {
+			if t == teamID {
+				endpoints = append(endpoints, e)
+			}
+		}
+	}
+	return endpoints, nil
 }
 
 // WithEndpoints option will instruct testDatastore to return provided environments(endpoints)

@@ -4,7 +4,7 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
-angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
+angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
@@ -175,8 +175,15 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       }
     };
 
-    this.$onChanges = function () {
-      if (typeof this.isSystemResources !== 'undefined') {
+    this.$onChanges = function (changes) {
+      // when the table is visible, sync the show system setting with the stack show system setting
+      if (changes.isVisible && changes.isVisible.currentValue) {
+        const storedStacksSettings = DatatableService.getDataTableSettings('kubernetes.applications.stacks');
+        if (storedStacksSettings && storedStacksSettings.state) {
+          this.settings.showSystem = storedStacksSettings.state.showSystemResources;
+          DatatableService.setDataTableSettings(this.settingsKey, this.settings);
+        }
+      } else if (typeof this.isSystemResources !== 'undefined') {
         this.settings.showSystem = this.isSystemResources;
         DatatableService.setDataTableSettings(this.settingsKey, this.settings);
       }
@@ -222,6 +229,12 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
+
+        // make show system in sync with the stack show system settings
+        const storedStacksSettings = DatatableService.getDataTableSettings('kubernetes.applications.stacks');
+        if (storedStacksSettings && storedStacksSettings.state) {
+          this.settings.showSystem = storedStacksSettings.state.showSystemResources;
+        }
 
         this.setSystemResources && this.setSystemResources(this.settings.showSystem);
       }

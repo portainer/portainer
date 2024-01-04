@@ -187,6 +187,8 @@ type (
 		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
 		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
+		// EdgeTemplate indicates if this template purpose for Edge Stack
+		EdgeTemplate bool `example:"false"`
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -237,7 +239,7 @@ type (
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
 		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
-		Volumes    volume.VolumeListOKBody   `json:"Volumes" swaggerignore:"true"`
+		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
 		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
 		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
 		Info       types.Info                `json:"Info" swaggerignore:"true"`
@@ -328,7 +330,7 @@ type (
 		UseManifestNamespaces bool
 
 		// Deprecated
-		Prune bool `json:"Prune"`
+		Prune bool `json:"Prune,omitempty"`
 	}
 
 	EdgeStackDeploymentType int
@@ -373,10 +375,13 @@ type (
 	//EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
-	EndpointPendingActions struct {
-		CleanNAPWithOverridePolicies struct {
-			EndpointGroups []EndpointGroupID `json:"EndpointGroups"`
-		} `json:"CleanNAPWithOverridePolicies"`
+	PendingActionsID int
+	PendingActions   struct {
+		ID         PendingActionsID `json:"ID"`
+		EndpointID EndpointID       `json:"EndpointID"`
+		Action     string           `json:"Action"`
+		ActionData interface{}      `json:"ActionData"`
+		CreatedAt  int64            `json:"CreatedAt"`
 	}
 
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
@@ -429,13 +434,10 @@ type (
 		Heartbeat bool `json:"Heartbeat" example:"true"`
 
 		// Whether the device has been trusted or not by the user
-		UserTrusted bool
+		UserTrusted bool `json:"UserTrusted,omitempty"`
 
 		// Whether we need to run any "post init migrations".
 		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
-
-		// Whether we need to run any action when an endpoint is back online.
-		PendingActions *EndpointPendingActions `json:"PendingActions"`
 
 		Edge EnvironmentEdgeSettings
 
@@ -443,7 +445,7 @@ type (
 			Version string `example:"1.0.0"`
 		}
 
-		EnableGPUManagement bool `json:"EnableGPUManagement"`
+		EnableGPUManagement bool `json:"EnableGPUManagement,omitempty"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -460,7 +462,7 @@ type (
 		Tags []string `json:"Tags"`
 
 		// Deprecated v2.18
-		IsEdgeDevice bool
+		IsEdgeDevice bool `json:"IsEdgeDevice,omitempty"`
 	}
 
 	EnvironmentEdgeSettings struct {
@@ -477,7 +479,9 @@ type (
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
 	EndpointAuthorizations map[EndpointID]Authorizations
 
-	// EndpointGroup represents a group of environments(endpoints)
+	// EndpointGroup represents a group of environments(endpoints).
+	//
+	// An environment(endpoint) may belong to only 1 environment(endpoint) group.
 	EndpointGroup struct {
 		// Environment(Endpoint) group Identifier
 		ID EndpointGroupID `json:"Id" example:"1"`
@@ -498,7 +502,7 @@ type (
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags"`
+		Tags []string `json:"Tags,omitempty"`
 	}
 
 	// EndpointGroupID represents an environment(endpoint) group identifier
@@ -596,7 +600,7 @@ type (
 
 	// QuayRegistryData represents data required for Quay registry to work
 	QuayRegistryData struct {
-		UseOrganisation  bool   `json:"UseOrganisation"`
+		UseOrganisation  bool   `json:"UseOrganisation,omitempty"`
 		OrganisationName string `json:"OrganisationName"`
 	}
 
@@ -933,6 +937,10 @@ type (
 		RetryInterval int
 	}
 
+	GlobalDeploymentOptions struct {
+		HideStacksFunctionality bool `json:"hideStacksFunctionality" example:"false"`
+	}
+
 	// Settings represents the application settings
 	Settings struct {
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
@@ -951,6 +959,8 @@ type (
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
 		TemplatesURL string `json:"TemplatesURL" example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
+		// Deployment options for encouraging git ops workflows
+		GlobalDeploymentOptions GlobalDeploymentOptions `json:"GlobalDeploymentOptions"`
 		// The default check in interval for edge agent (in seconds)
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
 		// Show the Kompose build option (discontinued in 2.18)
@@ -989,20 +999,20 @@ type (
 		}
 
 		// Deprecated fields
-		DisplayDonationHeader       bool
-		DisplayExternalContributors bool
+		DisplayDonationHeader       bool `json:"DisplayDonationHeader,omitempty"`
+		DisplayExternalContributors bool `json:"DisplayExternalContributors,omitempty"`
 
 		// Deprecated fields v26
-		EnableHostManagementFeatures              bool `json:"EnableHostManagementFeatures"`
-		AllowVolumeBrowserForRegularUsers         bool `json:"AllowVolumeBrowserForRegularUsers"`
-		AllowBindMountsForRegularUsers            bool `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers        bool `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowHostNamespaceForRegularUsers         bool `json:"AllowHostNamespaceForRegularUsers"`
-		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
-		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
-		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
+		EnableHostManagementFeatures              bool `json:"EnableHostManagementFeatures,omitempty"`
+		AllowVolumeBrowserForRegularUsers         bool `json:"AllowVolumeBrowserForRegularUsers,omitempty"`
+		AllowBindMountsForRegularUsers            bool `json:"AllowBindMountsForRegularUsers,omitempty"`
+		AllowPrivilegedModeForRegularUsers        bool `json:"AllowPrivilegedModeForRegularUsers,omitempty"`
+		AllowHostNamespaceForRegularUsers         bool `json:"AllowHostNamespaceForRegularUsers,omitempty"`
+		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers,omitempty"`
+		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers,omitempty"`
+		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers,omitempty"`
 
-		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension"`
+		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension,omitempty"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
@@ -1117,7 +1127,9 @@ type (
 	// TeamID represents a team identifier
 	TeamID int
 
-	// TeamMembership represents a membership association between a user and a team
+	// TeamMembership represents a membership association between a user and a team.
+	//
+	// A user may belong to multiple teams.
 	TeamMembership struct {
 		// Membership Identifier
 		ID TeamMembershipID `json:"Id" example:"1"`
@@ -1143,7 +1155,7 @@ type (
 	Template struct {
 		// Mandatory container/stack fields
 		// Template Identifier
-		ID TemplateID `json:"Id" example:"1"`
+		ID TemplateID `json:"id" example:"1"`
 		// Template type. Valid values are: 1 (container), 2 (Swarm stack), 3 (Compose stack), 4 (Compose edge stack)
 		Type TemplateType `json:"type" example:"1"`
 		// Title of the template
@@ -1278,6 +1290,7 @@ type (
 		Username            string
 		Role                UserRole
 		ForceChangePassword bool
+		Token               string
 	}
 
 	// TunnelDetails represents information associated to a tunnel
@@ -1301,14 +1314,15 @@ type (
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" swaggerignore:"true"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role          UserRole `json:"Role" example:"1"`
-		TokenIssueAt  int64    `json:"TokenIssueAt" example:"1"`
-		ThemeSettings UserThemeSettings
+		Role          UserRole          `json:"Role" example:"1"`
+		TokenIssueAt  int64             `json:"TokenIssueAt" example:"1"`
+		ThemeSettings UserThemeSettings `json:"ThemeSettings"`
+		UseCache      bool              `json:"UseCache" example:"true"`
 
 		// Deprecated fields
 
 		// Deprecated
-		UserTheme string `example:"dark"`
+		UserTheme string `json:"UserTheme,omitempty" example:"dark"`
 		// Deprecated in DBVersion == 25
 		PortainerAuthorizations Authorizations
 		// Deprecated in DBVersion == 25
@@ -1412,6 +1426,7 @@ type (
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		StoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, data []byte) (string, error)
 		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		UpdateStoreStackFileFromBytesByVersion(stackIdentifier, fileName string, version int, commitHash string, data []byte) (string, error)
 		RemoveStackFileBackup(stackIdentifier, fileName string) error
 		RemoveStackFileBackupByVersion(stackIdentifier string, version int, fileName string) error
 		RollbackStackFile(stackIdentifier, fileName string) error
@@ -1464,6 +1479,14 @@ type (
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
+	// JWTService represents a service for managing JWT tokens
+	JWTService interface {
+		GenerateToken(data *TokenData) (string, time.Time, error)
+		GenerateTokenForKubeconfig(data *TokenData) (string, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
+		SetUserSessionDuration(userSessionDuration time.Duration)
+	}
+
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
@@ -1493,9 +1516,10 @@ type (
 		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
+		GetMaxResourceLimits(name string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
-		DeleteRegistrySecret(registry *Registry, namespace string) error
+		DeleteRegistrySecret(registry RegistryID, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error
@@ -1601,7 +1625,7 @@ const (
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
-	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/v3/templates.json"
 	// DefaultHelmrepositoryURL represents the URL to the official templates supported by Bitnami
 	DefaultHelmRepositoryURL = "https://charts.bitnami.com/bitnami"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
@@ -1612,6 +1636,8 @@ const (
 	DefaultKubectlShellImage = "portainer/kubectl-shell"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
+	// AuthCookieName is the name of the cookie used to store the JWT token
+	AuthCookieKey = "portainer_api_key"
 )
 
 // List of supported features
@@ -1687,6 +1713,12 @@ const (
 	EdgeStackStatusDeploying
 	// EdgeStackStatusRemoving represents an Edge stack which is being removed
 	EdgeStackStatusRemoving
+	// EdgeStackStatusPausedDeploying represents a paused Edge stack
+	EdgeStackStatusPausedDeploying
+	// EdgeStackStatusRollingBack represents an Edge stack which is being rolled back
+	EdgeStackStatusRollingBack
+	// EdgeStackStatusRolledBack represents an Edge stack which has rolled back
+	EdgeStackStatusRolledBack
 )
 
 const (
@@ -1810,8 +1842,6 @@ const (
 	SwarmStackTemplate
 	// ComposeStackTemplate represents a template used to deploy a Compose stack
 	ComposeStackTemplate
-	// EdgeStackTemplate represents a template used to deploy an Edge stack
-	EdgeStackTemplate
 )
 
 const (

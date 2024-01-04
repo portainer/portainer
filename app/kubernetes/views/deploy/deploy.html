@@ -1,4 +1,4 @@
-<page-header ng-if="ctrl.state.viewReady" title="'Advanced deployment'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Create from manifest'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -13,7 +13,19 @@
             <uib-tab index="0">
               <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
               <form class="form-horizontal mt-6" name="ctrl.deploymentForm">
-                <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                <div class="col-sm-12 form-section-title"> Deploy from </div>
+                <box-selector
+                  slim="true"
+                  radio-name="'method'"
+                  value="ctrl.state.BuildMethod"
+                  options="ctrl.methodOptions"
+                  data-cy="k8sAppDeploy-buildSelector"
+                  on-change="(ctrl.onChangeMethod)"
+                ></box-selector>
+
+                <!-- namespace -->
+                <div class="col-sm-12 form-section-title !mt-4"> Deploy to </div>
+                <div class="form-group" ng-if="ctrl.formValues.Namespace && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                   <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
                     Use namespace(s) specified from manifest
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
@@ -24,19 +36,22 @@
                       <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
                       <span class="slider round"></span>
                     </label>
-                    <!-- <span class="ml-2 mb-1 switch-values" ng-if="ctrl.formValues.namespace_toggle">Yes</span>
-                    <span class="ml-2 mb-1 switch-values" ng-if="!ctrl.formValues.namespace_toggle">No</span> -->
                   </div>
                 </div>
+
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
                   <div class="col-sm-8">
                     <select
-                      ng-disabled="ctrl.formValues.namespace_toggle"
+                      ng-if="!ctrl.formValues.namespace_toggle || ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                      ng-disabled="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                       class="form-control"
                       ng-model="ctrl.formValues.Namespace"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
                     ></select>
+                    <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
+                      >Namespaces specified in the manifest will be used</span
+                    >
                   </div>
                 </div>
 
@@ -48,32 +63,35 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label required text-left">Name</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" ng-model="ctrl.formValues.StackName" id="stack_name" placeholder="my-app" auto-focus />
+                  <label for="name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
+                  <div class="col-sm-8 small text-muted pt-[7px]" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
+                    Resource names specified in the manifest will be used
+                  </div>
+                  <div class="col-sm-8" ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="ctrl.formValues.Name"
+                      id="name"
+                      name="name"
+                      placeholder="e.g. my-app"
+                      required="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                    />
+                    <div class="small text-warning mt-2">
+                      <div ng-messages="ctrl.deploymentForm.name.$error">
+                        <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="col-sm-12 form-section-title"> Build method </div>
-                <box-selector
-                  slim="true"
-                  radio-name="'method'"
-                  value="ctrl.state.BuildMethod"
-                  options="ctrl.methodOptions"
-                  data-cy="k8sAppDeploy-buildSelector"
-                  on-change="(ctrl.onChangeMethod)"
-                ></box-selector>
-
-                <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE">
-                  <div class="col-sm-12 form-section-title"> Deployment type </div>
-                  <box-selector
-                    radio-name="'deploy'"
-                    value="ctrl.state.DeployType"
-                    options="ctrl.deployOptions"
-                    data-cy="k8sAppDeploy-deploymentSelector"
-                    on-change="(ctrl.onChangeDeployType)"
-                  ></box-selector>
-                </div>
+                <kube-stack-name
+                  ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
+                  stack-name="ctrl.formValues.StackName"
+                  set-stack-name="(ctrl.setStackName)"
+                  is-admin="ctrl.currentUser.isAdmin"
+                ></kube-stack-name>
+                <!-- !namespace -->
 
                 <!-- repository -->
                 <git-form
@@ -92,6 +110,8 @@
                 <!-- !repository -->
 
                 <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                  <div class="col-sm-12 form-section-title !mt-4"> Custom template </div>
+
                   <custom-template-selector
                     new-template-path="kubernetes.templates.custom.new"
                     stack-type="3"
@@ -165,9 +185,22 @@
                 </div>
                 <!-- !url -->
 
+                <!-- Helm -->
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
+                  <div class="col-sm-12 form-section-title" ng-if="ctrl.state.selectedHelmChart">Selected Helm chart</div>
+                  <helm-templates-view
+                    on-select-helm-chart="(ctrl.onSelectHelmChart)"
+                    endpoint="ctrl.endpoint"
+                    namespace="ctrl.formValues.Namespace"
+                    stack-name="ctrl.formValues.StackName"
+                    name="ctrl.formValues.Name"
+                  ></helm-templates-view>
+                </div>
+                <!-- !Helm -->
+
                 <!-- actions -->
-                <div class="col-sm-12 form-section-title"> Actions </div>
-                <div class="form-group">
+                <div class="col-sm-12 form-section-title !mt-4" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"> Actions </div>
+                <div class="form-group" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                   <div class="col-sm-12">
                     <button
                       type="button"

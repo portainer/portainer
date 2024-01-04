@@ -6,6 +6,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -25,7 +26,7 @@ type authenticatePayload struct {
 
 type authenticateResponse struct {
 	// JWT token used to authenticate against the API
-	JWT string `json:"jwt" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"`
+	JWT string `json:"jwt" example:"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzAB"`
 }
 
 func (payload *authenticatePayload) Validate(r *http.Request) error {
@@ -74,7 +75,7 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 		if settings.AuthenticationMethod == portainer.AuthenticationInternal ||
 			settings.AuthenticationMethod == portainer.AuthenticationOAuth ||
 			(settings.AuthenticationMethod == portainer.AuthenticationLDAP && !settings.LDAPSettings.AutoCreateUsers) {
-			return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Invalid credentials", Err: httperrors.ErrUnauthorized}
+			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 		}
 	}
 
@@ -83,14 +84,14 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationOAuth {
-		return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Only initial admin is allowed to login without oauth", Err: httperrors.ErrUnauthorized}
+		return httperror.NewError(http.StatusUnprocessableEntity, "Only initial admin is allowed to login without oauth", httperrors.ErrUnauthorized)
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
 		return handler.authenticateLDAP(rw, user, payload.Username, payload.Password, &settings.LDAPSettings)
 	}
 
-	return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Login method is not supported", Err: httperrors.ErrUnauthorized}
+	return httperror.NewError(http.StatusUnprocessableEntity, "Login method is not supported", httperrors.ErrUnauthorized)
 }
 
 func isUserInitialAdmin(user *portainer.User) bool {
@@ -100,7 +101,7 @@ func isUserInitialAdmin(user *portainer.User) bool {
 func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
 	err := handler.CryptoService.CompareHashAndData(user.Password, password)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusUnprocessableEntity, Message: "Invalid credentials", Err: httperrors.ErrUnauthorized}
+		return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 	}
 
 	forceChangePassword := !handler.passwordStrengthChecker.Check(password)
@@ -142,12 +143,15 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User, 
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
-	token, err := handler.JWTService.GenerateToken(tokenData)
+	token, expirationTime, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
 
+	security.AddAuthCookie(w, token, expirationTime)
+
 	return response.JSON(w, &authenticateResponse{JWT: token})
+
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {
@@ -196,7 +200,7 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 
 func teamExists(teamName string, ldapGroups []string) bool {
 	for _, group := range ldapGroups {
-		if strings.ToLower(group) == strings.ToLower(teamName) {
+		if strings.EqualFold(group, teamName) {
 			return true
 		}
 	}

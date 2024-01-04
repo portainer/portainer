@@ -5,6 +5,7 @@ import { useAgentDetails } from '@/react/portainer/environments/queries/useAgent
 import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
+import { NavContainer } from '@@/NavTabs/NavContainer';
 
 const deploymentsStandalone = [
   {
@@ -61,11 +62,13 @@ export function DeploymentScripts({ isDockerStandalone }: Props) {
   });
 
   return (
-    <NavTabs
-      options={options}
-      onSelect={(id: string) => setDeployType(id)}
-      selectedId={deployType}
-    />
+    <NavContainer>
+      <NavTabs
+        options={options}
+        onSelect={(id: string) => setDeployType(id)}
+        selectedId={deployType}
+      />
+    </NavContainer>
   );
 }
 

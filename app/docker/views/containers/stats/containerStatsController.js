@@ -10,7 +10,8 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
   'ChartService',
   'Notifications',
   'HttpRequestHelper',
-  function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, HttpRequestHelper) {
+  'endpoint',
+  function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, HttpRequestHelper, endpoint) {
     $scope.state = {
       refreshRate: '5',
       networkStatsUnavailable: false,
@@ -95,8 +96,8 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
 
     function startChartUpdate(networkChart, cpuChart, memoryChart, ioChart) {
       $q.all({
-        stats: ContainerService.containerStats($transition$.params().id),
-        top: ContainerService.containerTop($transition$.params().id),
+        stats: ContainerService.containerStats(endpoint.Id, $transition$.params().id),
+        top: ContainerService.containerTop(endpoint.Id, $transition$.params().id),
       })
         .then(function success(data) {
           var stats = data.stats;
@@ -123,8 +124,8 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
       var refreshRate = $scope.state.refreshRate;
       $scope.repeater = $interval(function () {
         $q.all({
-          stats: ContainerService.containerStats($transition$.params().id),
-          top: ContainerService.containerTop($transition$.params().id),
+          stats: ContainerService.containerStats(endpoint.Id, $transition$.params().id),
+          top: ContainerService.containerTop(endpoint.Id, $transition$.params().id),
         })
           .then(function success(data) {
             var stats = data.stats;
@@ -163,7 +164,7 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
 
     function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-      ContainerService.container($transition$.params().id)
+      ContainerService.container(endpoint.Id, $transition$.params().id)
         .then(function success(data) {
           $scope.container = data;
         })

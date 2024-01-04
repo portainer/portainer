@@ -9,6 +9,7 @@ import styles from './ButtonSelector.module.css';
 export interface Option<T> {
   value: T;
   label?: ReactNode;
+  disabled?: boolean;
 }
 
 interface Props<T> {
@@ -19,9 +20,10 @@ interface Props<T> {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  'aria-label'?: string;
 }
 
-export function ButtonSelector<T extends string | number>({
+export function ButtonSelector<T extends string | number | boolean>({
   value,
   onChange,
   size,
@@ -29,15 +31,20 @@ export function ButtonSelector<T extends string | number>({
   disabled,
   readOnly,
   className,
+  'aria-label': ariaLabel,
 }: Props<T>) {
   return (
-    <ButtonGroup size={size} className={clsx(styles.group, className)}>
+    <ButtonGroup
+      size={size}
+      className={clsx(styles.group, className)}
+      aria-label={ariaLabel}
+    >
       {options.map((option) => (
         <OptionItem
-          key={option.value}
+          key={option.value.toString()}
           selected={value === option.value}
           onChange={() => onChange(option.value)}
-          disabled={disabled}
+          disabled={disabled || option.disabled}
           readOnly={readOnly}
         >
           {option.label || option.value.toString()}

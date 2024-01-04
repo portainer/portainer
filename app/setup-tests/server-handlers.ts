@@ -1,4 +1,4 @@
-import { DefaultBodyType, PathParams, rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 import {
   Edition,
@@ -35,64 +35,56 @@ const licenseInfo: LicenseInfo = {
 };
 
 export const handlers = [
-  rest.get('/api/teams', async (req, res, ctx) =>
-    res(ctx.json(createMockTeams(10)))
-  ),
+  http.get('/api/teams', async () => HttpResponse.json(createMockTeams(10))),
 
-  rest.post<{ name: string }>('/api/teams', (req, res, ctx) =>
-    res(ctx.status(204))
+  http.post<{ name: string }>('/api/teams', () =>
+    HttpResponse.json(null, { status: 204 })
   ),
-  rest.post<{ userId: UserId }>('/api/team_memberships', (req, res, ctx) =>
-    res(ctx.status(204))
+  http.post<never, { userId: UserId }>('/api/team_memberships', () =>
+    HttpResponse.json(null, { status: 204 })
   ),
   ...azureHandlers,
   ...dockerHandlers,
   ...userHandlers,
-  rest.get('/api/licenses/info', (req, res, ctx) => res(ctx.json(licenseInfo))),
-  rest.get('/api/status/nodes', (req, res, ctx) => res(ctx.json({ nodes: 3 }))),
-  rest.get('/api/backup/s3/status', (req, res, ctx) =>
-    res(ctx.json({ Failed: false }))
-  ),
-  rest.get('/api/endpoint_groups', (req, res, ctx) => res(ctx.json([]))),
-  rest.get('/api/endpoint_groups/:groupId', (req, res, ctx) => {
-    if (req.params.groupId instanceof Array) {
+  http.get('/api/licenses/info', () => HttpResponse.json(licenseInfo)),
+  http.get('/api/status/nodes', () => HttpResponse.json({ nodes: 3 })),
+  http.get('/api/backup/s3/status', () => HttpResponse.json({ Failed: false })),
+  http.get('/api/endpoint_groups', () => HttpResponse.json([])),
+  http.get('/api/endpoint_groups/:groupId', ({ params }) => {
+    if (params.groupId instanceof Array) {
       throw new Error('should be string');
     }
-    const id = parseInt(req.params.groupId, 10);
+    const id = parseInt(params.groupId, 10);
     const group: Partial<EnvironmentGroup> = {
       Id: id,
       Name: `group${id}`,
     };
-    return res(ctx.json(group));
+    return HttpResponse.json(group);
   }),
-  rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags))),
-  rest.post<{ name: string }>('/api/tags', (req, res, ctx) => {
-    const tagName = req.body.name;
+  http.get('/api/tags', () => HttpResponse.json(tags)),
+  http.post<never, { name: string }>('/api/tags', async ({ request }) => {
+    const body = await request.json();
+    const tagName = body.name;
     const tag = { ID: tags.length + 1, Name: tagName, Endpoints: {} };
     tags.push(tag);
-    return res(ctx.json(tag));
+    return HttpResponse.json(tag);
   }),
-  rest.get<DefaultBodyType, PathParams, Partial<PublicSettingsResponse>>(
+  http.get<never, never, Partial<PublicSettingsResponse>>(
     '/api/settings/public',
-    (req, res, ctx) =>
-      res(
-        ctx.json({
-          Edge: {
-            AsyncMode: false,
-            CheckinInterval: 60,
-            CommandInterval: 60,
-            PingInterval: 60,
-            SnapshotInterval: 60,
-          },
-        })
-      )
+    () =>
+      HttpResponse.json({
+        Edge: {
+          AsyncMode: false,
+          CheckinInterval: 60,
+          CommandInterval: 60,
+          PingInterval: 60,
+          SnapshotInterval: 60,
+        },
+      })
   ),
-  rest.get<DefaultBodyType, PathParams, Partial<StatusResponse>>(
-    '/api/status',
-    (req, res, ctx) => res(ctx.json({}))
+  http.get<never, never, Partial<StatusResponse>>('/api/status', () =>
+    HttpResponse.json({})
   ),
-  rest.get('/api/teams/:id/memberships', (req, res, ctx) => res(ctx.json([]))),
-  rest.get('/api/endpoints/agent_versions', (req, res, ctx) =>
-    res(ctx.json([]))
-  ),
+  http.get('/api/teams/:id/memberships', () => HttpResponse.json([])),
+  http.get('/api/endpoints/agent_versions', () => HttpResponse.json([])),
 ];

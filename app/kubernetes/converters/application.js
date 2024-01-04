@@ -180,7 +180,7 @@ class KubernetesApplicationConverter {
         persistedFolder.MountPath = matchingVolumeMount.mountPath;
 
         if (volume.persistentVolumeClaim) {
-          persistedFolder.PersistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
+          persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
         } else {
           persistedFolder.HostPath = volume.hostPath.path;
         }
@@ -284,7 +284,7 @@ class KubernetesApplicationConverter {
     res.ApplicationType = app.ApplicationType;
     res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
     res.Name = app.Name;
-    res.Services = KubernetesApplicationHelper.generateServicesFormValuesFromServices(app);
+    res.Services = KubernetesApplicationHelper.generateServicesFormValuesFromServices(app, ingresses);
     res.Selector = KubernetesApplicationHelper.generateSelectorFromService(app);
     res.StackName = app.StackName;
     res.ApplicationOwner = app.ApplicationOwner;
@@ -325,7 +325,7 @@ class KubernetesApplicationConverter {
     }
 
     if (app.Pods && app.Pods.length) {
-      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
+      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity);
     }
 
     return res;

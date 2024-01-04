@@ -1,9 +1,10 @@
-import { FormikErrors, useFormikContext } from 'formik';
+import { FormikErrors } from 'formik';
 import _ from 'lodash';
 import { useMemo } from 'react';
+import { trimSHA, trimVersionTag } from 'Docker/filters/utils';
 
 import DockerIcon from '@/assets/ico/vendor/docker.svg?c';
-import { useImages } from '@/react/docker/images/queries/useImages';
+import { useImages } from '@/react/docker/proxy/queries/images/useImages';
 import {
   imageContainsURL,
   getUniqueTagListFromImages,
@@ -31,15 +32,15 @@ export function SimpleForm({
   autoComplete,
   values,
   errors,
-  fieldNamespace,
+  onChangeImage,
+  setFieldValue,
 }: {
   autoComplete?: boolean;
   values: Values;
   errors?: FormikErrors<Values>;
-  fieldNamespace?: string;
+  onChangeImage?: (name: string) => void;
+  setFieldValue: <T>(field: string, value: T) => void;
 }) {
-  const { setFieldValue } = useFormikContext<Values>();
-
   const registryQuery = useRegistry(values.registryId);
 
   const registry = registryQuery.data;
@@ -55,7 +56,7 @@ export function SimpleForm({
         errors={errors?.registryId}
       >
         <RegistrySelector
-          onChange={(value) => setFieldValue(namespaced('registryId'), value)}
+          onChange={(value) => setFieldValue('registryId', value)}
           value={values.registryId}
           inputId="registry-field"
         />
@@ -66,7 +67,10 @@ export function SimpleForm({
           <InputGroup.Addon>{registryUrl}</InputGroup.Addon>
 
           <ImageField
-            onChange={(value) => setFieldValue(namespaced('image'), value)}
+            onChange={(value) => {
+              setFieldValue('image', value);
+              onChangeImage?.(value);
+            }}
             value={values.image}
             registry={registry}
             autoComplete={autoComplete}
@@ -80,7 +84,9 @@ export function SimpleForm({
                 title="Search image on Docker Hub"
                 color="default"
                 props={{
-                  href: 'https://hub.docker.com/search?type=image&q={ $ctrl.model.Image | trimshasum | trimversiontag }',
+                  href: `https://hub.docker.com/search?type=image&q=${trimVersionTag(
+                    trimSHA(values.image)
+                  )}`,
                   target: '_blank',
                   rel: 'noreferrer',
                 }}
@@ -94,10 +100,6 @@ export function SimpleForm({
       </FormControl>
     </>
   );
-
-  function namespaced(field: string) {
-    return fieldNamespace ? `${fieldNamespace}.${field}` : field;
-  }
 }
 
 function getImagesForRegistry(
@@ -141,6 +143,14 @@ function RegistrySelector({
           label: registry.Name,
           value: registry.Id,
         })),
+    onSuccess: (options) => {
+      if (options && options.length) {
+        const idx = options.findIndex((v) => v.value === value);
+        if (idx === -1) {
+          onChange(options[0].value);
+        }
+      }
+    },
   });
 
   return (
@@ -165,7 +175,7 @@ function ImageField({
   onChange: (value: string) => void;
   registry?: Registry;
   autoComplete?: boolean;
-  inputId?: string;
+  inputId: string;
 }) {
   return autoComplete ? (
     <ImageFieldAutoComplete
@@ -192,7 +202,7 @@ function ImageFieldAutoComplete({
   value: string;
   onChange: (value: string) => void;
   registry?: Registry;
-  inputId?: string;
+  inputId: string;
 }) {
   const environmentId = useEnvironmentId();
 

@@ -11,7 +11,7 @@ import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BoxSelector } from '@@/BoxSelector';
-import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
+import { BEOverlay } from '@@/BEFeatureIndicator/BEOverlay';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -112,11 +112,10 @@ export function WizardKubernetes({ onCreate }: Props) {
         );
       case 'kubeconfig':
         return (
-          <div className="border border-solid border-orange-1 px-1 py-5">
-            <BEFeatureIndicator
-              featureId={options.find((o) => o.value === type)?.feature}
-            />
-            <KubeConfigTeaserForm />
+          <div className="mb-3">
+            <BEOverlay featureId={FeatureId.K8S_CREATE_FROM_KUBECONFIG}>
+              <KubeConfigTeaserForm />
+            </BEOverlay>
           </div>
         );
       default:

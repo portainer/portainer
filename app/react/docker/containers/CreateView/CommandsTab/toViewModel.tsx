@@ -39,7 +39,7 @@ export function toViewModel(config: ContainerJSON): Values {
 function getLogConfig(value?: HostConfig['LogConfig']): LogConfig {
   if (!value || !value.Type) {
     return {
-      type: 'none',
+      type: '',
       options: [],
     };
   }

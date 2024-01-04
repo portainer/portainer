@@ -6,7 +6,6 @@ import { getPlatformType } from '@/react/portainer/environments/utils';
 
 import { EnvironmentStatsDocker } from './EnvironmentStatsDocker';
 import { EnvironmentStatsKubernetes } from './EnvironmentStatsKubernetes';
-import { EnvironmentStatsNomad } from './EnvironmentStatsNomad';
 
 interface Props {
   environment: Environment;
@@ -34,10 +33,6 @@ function getComponent(platform: PlatformType, environment: Environment) {
       );
     case PlatformType.Docker:
       return <EnvironmentStatsDocker snapshot={environment.Snapshots?.[0]} />;
-    case PlatformType.Nomad:
-      return (
-        <EnvironmentStatsNomad snapshot={environment.Nomad.Snapshots?.[0]} />
-      );
     default:
       return null;
   }

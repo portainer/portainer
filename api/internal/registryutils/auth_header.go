@@ -2,18 +2,17 @@ package registryutils
 
 import (
 	"encoding/base64"
-	"encoding/json"
 
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/segmentio/encoding/json"
 )
 
-type (
-	authHeader struct {
-		Username      string `json:"username"`
-		Password      string `json:"password"`
-		ServerAddress string `json:"serveraddress"`
-	}
-)
+type authHeader struct {
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	ServerAddress string `json:"serveraddress"`
+}
 
 // GetRegistryAuthHeader generate the X-Registry-Auth header from registry
 func GetRegistryAuthHeader(registry *portainer.Registry) (header string, err error) {

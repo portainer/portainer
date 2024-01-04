@@ -14,7 +14,7 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 	supportedFeatures := []Feature{"supported", "supported2", "supported3", "supported4", "supported5"}
 
 	t.Run("supported features should be supported", func(t *testing.T) {
-		Init(supportedFeatures)
+		initSupportedFeatures(supportedFeatures)
 
 		for _, featureFlag := range supportedFeatures {
 			is.True(IsSupported(featureFlag))
@@ -22,7 +22,7 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 	})
 
 	t.Run("unsupported features should not be supported", func(t *testing.T) {
-		Init(supportedFeatures)
+		initSupportedFeatures(supportedFeatures)
 
 		is.False(IsSupported("unsupported"))
 	})
@@ -35,13 +35,12 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		Init(supportedFeatures)
 
 		os.Unsetenv("PORTAINER_FEATURE_FLAGS")
 		os.Setenv("PORTAINER_FEATURE_FLAGS", strings.Join(test.envFeatureFlags, ","))
 
 		t.Run("testing", func(t *testing.T) {
-			Parse(test.cliFeatureFlags)
+			Parse(test.cliFeatureFlags, supportedFeatures)
 			supported := toFeatureMap(test.cliFeatureFlags, test.envFeatureFlags)
 
 			// add env flags to supported flags

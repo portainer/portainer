@@ -15,6 +15,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'LocalStorage',
   'CONSOLE_COMMANDS_LABEL_PREFIX',
   'SidebarService',
+  'endpoint',
   function (
     $scope,
     $state,
@@ -27,7 +28,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     HttpRequestHelper,
     LocalStorage,
     CONSOLE_COMMANDS_LABEL_PREFIX,
-    SidebarService
+    SidebarService,
+    endpoint
   ) {
     var socket, term;
 
@@ -58,7 +60,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
       let attachId = $transition$.params().id;
 
-      ContainerService.container(attachId)
+      ContainerService.container(endpoint.Id, attachId)
         .then((details) => {
           if (!details.State.Running) {
             Notifications.error('Failure', details, 'Container ' + attachId + ' is not running!');
@@ -67,7 +69,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           }
 
           const params = {
-            token: LocalStorage.getJWT(),
             endpointId: $state.params.endpointId,
             id: attachId,
           };
@@ -80,7 +81,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ContainerService.resizeTTY.bind(this, attachId));
+          initTerm(url, ContainerService.resizeTTY.bind(this, endpoint.Id, attachId));
         })
         .catch(function error(err) {
           Notifications.error('Error', err, 'Unable to retrieve container details');
@@ -105,10 +106,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         Cmd: commandStringToArray(command),
       };
 
-      ContainerService.createExec(execConfig)
+      ContainerService.createExec(endpoint.Id, execConfig)
         .then(function success(data) {
           const params = {
-            token: LocalStorage.getJWT(),
             endpointId: $state.params.endpointId,
             id: data.Id,
           };
@@ -171,6 +171,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
       }
+
       if (url.indexOf('https') > -1) {
         url = url.replace('https://', 'wss://');
       } else {
@@ -220,7 +221,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
     $scope.initView = function () {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-      return ContainerService.container($transition$.params().id)
+      return ContainerService.container(endpoint.Id, $transition$.params().id)
         .then(function success(data) {
           var container = data;
           $scope.container = container;

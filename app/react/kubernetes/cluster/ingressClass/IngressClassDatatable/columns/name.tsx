@@ -2,7 +2,7 @@ import { CellContext } from '@tanstack/react-table';
 
 import { Badge } from '@@/Badge';
 
-import type { IngressControllerClassMapRowData } from '../../types';
+import type { IngressControllerClassMap } from '../../types';
 
 import { columnHelper } from './helper';
 
@@ -15,7 +15,7 @@ export const name = columnHelper.accessor('ClassName', {
 function NameCell({
   row,
   getValue,
-}: CellContext<IngressControllerClassMapRowData, string>) {
+}: CellContext<IngressControllerClassMap, string>) {
   const className = getValue();
 
   return (

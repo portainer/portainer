@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
-import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isTemplateVariablesEnabled, renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { confirmDelete } from '@@/modals/confirm';
+import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -34,7 +34,7 @@ class CustomTemplatesViewController {
     this.StateManager = StateManager;
     this.StackService = StackService;
 
-    this.isTemplateVariablesEnabled = isBE;
+    this.isTemplateVariablesEnabled = isTemplateVariablesEnabled;
 
     this.DOCKER_STANDALONE = 'DOCKER_STANDALONE';
     this.DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
@@ -93,7 +93,8 @@ class CustomTemplatesViewController {
   }
   async getTemplatesAsync() {
     try {
-      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
+      const templates = await this.CustomTemplateService.customTemplates([1, 2]);
+      this.templates = templates.filter((t) => !t.EdgeTemplate);
     } catch (err) {
       this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
     }
@@ -177,12 +178,11 @@ class CustomTemplatesViewController {
     }
   }
 
-  unselectTemplate(template) {
+  unselectTemplate() {
     // wrapping unselect with async to make a digest cycle run between unselect to select
-    return this.$async(this.unselectTemplateAsync, template);
+    return this.$async(this.unselectTemplateAsync);
   }
-  async unselectTemplateAsync(template) {
-    template.Selected = false;
+  async unselectTemplateAsync() {
     this.state.selectedTemplate = null;
 
     this.formValues = {
@@ -194,15 +194,15 @@ class CustomTemplatesViewController {
     };
   }
 
-  selectTemplate(template) {
-    return this.$async(this.selectTemplateAsync, template);
+  selectTemplate(templateId) {
+    return this.$async(this.selectTemplateAsync, templateId);
   }
-  async selectTemplateAsync(template) {
+  async selectTemplateAsync(templateId) {
     if (this.state.selectedTemplate) {
       await this.unselectTemplate(this.state.selectedTemplate);
     }
 
-    template.Selected = true;
+    const template = _.find(this.templates, { Id: templateId });
 
     try {
       this.state.templateContent = this.formValues.fileContent = await this.CustomTemplateService.customTemplateFile(template.Id, template.GitConfig !== null);
@@ -222,7 +222,7 @@ class CustomTemplatesViewController {
     this.state.deployable = this.isDeployable(applicationState.endpoint, template.Type);
 
     if (template.Variables && template.Variables.length > 0) {
-      const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+      const variables = getVariablesFieldDefaultValues(template.Variables);
       this.onChangeTemplateVariables(variables);
     }
   }
@@ -256,7 +256,7 @@ class CustomTemplatesViewController {
       var template = _.find(this.templates, { Id: templateId });
       await this.CustomTemplateService.remove(templateId);
       this.Notifications.success('Template successfully deleted', template && template.Title);
-      _.remove(this.templates, { Id: templateId });
+      this.templates = this.templates.filter((template) => template.Id !== templateId);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Failed to delete template');
     }

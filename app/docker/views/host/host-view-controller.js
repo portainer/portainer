@@ -4,9 +4,8 @@ angular.module('portainer.docker').controller('HostViewController', [
   'Notifications',
   'StateManager',
   'AgentService',
-  'ContainerService',
   'Authentication',
-  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication) {
+  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, Authentication) {
     var ctrl = this;
 
     this.$onInit = initView;
@@ -32,12 +31,10 @@ angular.module('portainer.docker').controller('HostViewController', [
       $q.all({
         version: SystemService.version(),
         info: SystemService.info(),
-        jobs: ctrl.state.isAdmin ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : [],
       })
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
-          ctrl.jobs = data.jobs;
 
           if (ctrl.state.isAgent && agentApiVersion > 1 && ctrl.state.enableHostManagementFeatures) {
             return AgentService.hostInfo(ctrl.endpoint.Id).then(function onHostInfoLoad(agentHostInfo) {

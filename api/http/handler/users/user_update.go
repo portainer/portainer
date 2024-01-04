@@ -24,6 +24,7 @@ type userUpdatePayload struct {
 	Username    string `validate:"required" example:"bob"`
 	Password    string `validate:"required" example:"cg9Wgky3"`
 	NewPassword string `validate:"required" example:"asfj2emv"`
+	UseCache    *bool  `validate:"required" example:"true"`
 	Theme       *themePayload
 
 	// User role (1 for administrator account and 2 for regular account)
@@ -107,10 +108,18 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 			return httperror.InternalServerError("Unable to retrieve users from the database", err)
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another user with the same username already exists", Err: errUserAlreadyExists}
+			return httperror.Conflict("Another user with the same username already exists", errUserAlreadyExists)
 		}
 
 		user.Username = payload.Username
+	}
+
+	if payload.Password != "" && payload.NewPassword == "" {
+		if tokenData.Role == portainer.AdministratorRole {
+			return httperror.BadRequest("Existing password field specified without new password field.", errors.New("To change the password as an admin, you only need 'newPassword' in your request"))
+		}
+
+		return httperror.BadRequest("Existing password field specified without new password field.", errors.New("To change the password, you must include both 'password' and 'newPassword' in your request"))
 	}
 
 	if payload.NewPassword != "" {
@@ -137,6 +146,10 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		if payload.Theme.Color != nil {
 			user.ThemeSettings.Color = *payload.Theme.Color
 		}
+	}
+
+	if payload.UseCache != nil {
+		user.UseCache = *payload.UseCache
 	}
 
 	if payload.Role != 0 {

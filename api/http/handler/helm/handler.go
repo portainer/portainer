@@ -20,14 +20,14 @@ type Handler struct {
 	*mux.Router
 	requestBouncer           security.BouncerService
 	dataStore                dataservices.DataStore
-	jwtService               dataservices.JWTService
+	jwtService               portainer.JWTService
 	kubeClusterAccessService kubernetes.KubeClusterAccessService
 	kubernetesDeployer       portainer.KubernetesDeployer
 	helmPackageManager       libhelm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeClusterAccessService kubernetes.KubeClusterAccessService) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, jwtService portainer.JWTService, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeClusterAccessService kubernetes.KubeClusterAccessService) *Handler {
 	h := &Handler{
 		Router:                   mux.NewRouter(),
 		requestBouncer:           bouncer,
@@ -52,10 +52,11 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	h.Handle("/{id}/kubernetes/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmInstall))).Methods(http.MethodPost)
 
+	// Deprecated
 	h.Handle("/{id}/kubernetes/helm/repositories",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userGetHelmRepos))).Methods(http.MethodGet)
+		httperror.LoggerHandler(h.userGetHelmRepos)).Methods(http.MethodGet)
 	h.Handle("/{id}/kubernetes/helm/repositories",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userCreateHelmRepo))).Methods(http.MethodPost)
+		httperror.LoggerHandler(h.userCreateHelmRepo)).Methods(http.MethodPost)
 
 	return h
 }
@@ -92,7 +93,7 @@ func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.Kubernet
 		return nil, httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
 
-	bearerToken, err := handler.jwtService.GenerateToken(tokenData)
+	bearerToken, _, err := handler.jwtService.GenerateToken(tokenData)
 	if err != nil {
 		return nil, httperror.Unauthorized("Unauthorized", err)
 	}

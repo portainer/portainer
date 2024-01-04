@@ -74,7 +74,11 @@ function useFetchLocalEnvironment() {
     {
       page: 0,
       pageLimit: 1,
-      types: [EnvironmentType.Docker, EnvironmentType.KubernetesLocal],
+      types: [
+        EnvironmentType.Docker,
+        EnvironmentType.AgentOnDocker,
+        EnvironmentType.KubernetesLocal,
+      ],
     },
     {
       refetchInterval: false,
@@ -82,8 +86,21 @@ function useFetchLocalEnvironment() {
     }
   );
 
+  let environment: Environment | undefined;
+  environments.forEach((value) => {
+    if (!environment) {
+      if (value.Type === EnvironmentType.AgentOnDocker) {
+        if (value.Name === 'primary' && value.Id === 1) {
+          environment = value;
+        }
+      } else {
+        environment = value;
+      }
+    }
+  });
+
   return {
     isLoading,
-    environment: environments.length > 0 ? environments[0] : undefined,
+    environment,
   };
 }

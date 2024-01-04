@@ -1,13 +1,17 @@
 package deployments
 
 import (
+	"crypto/tls"
 	"fmt"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/agent"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/pkg/errors"
@@ -29,7 +33,9 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	log.Debug().Int("stack_id", int(stackID)).Msg("redeploying stack")
 
 	stack, err := datastore.Stack().Read(stackID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return scheduler.NewPermanentError(errors.WithMessagef(err, "failed to get the stack %v", stackID))
+	} else if err != nil {
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
 	}
 
@@ -38,7 +44,15 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	}
 
 	endpoint, err := datastore.Endpoint().Endpoint(stack.EndpointID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return scheduler.NewPermanentError(
+			errors.WithMessagef(err,
+				"failed to find the environment %v associated to the stack %v",
+				stack.EndpointID,
+				stack.ID,
+			),
+		)
+	} else if err != nil {
 		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
 	}
 
@@ -57,6 +71,10 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 			Msg("cannot auto update a stack, stack author user is missing")
 
 		return &StackAuthorMissingErr{int(stack.ID), author}
+	}
+
+	if !isEnvironmentOnline(endpoint) {
+		return nil
 	}
 
 	var gitCommitChangedOrForceUpdate bool
@@ -78,7 +96,9 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	}
 
 	registries, err := getUserRegistries(datastore, user, endpoint.ID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return scheduler.NewPermanentError(err)
+	} else if err != nil {
 		return err
 	}
 
@@ -116,6 +136,8 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 		return errors.Errorf("cannot update stack, type %v is unsupported", stack.Type)
 	}
 
+	stack.Status = portainer.StackStatusActive
+
 	if err := datastore.Stack().Update(stack.ID, stack); err != nil {
 		return errors.WithMessagef(err, "failed to update the stack %v", stack.ID)
 	}
@@ -146,4 +168,23 @@ func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, e
 	}
 
 	return filteredRegistries, nil
+}
+
+func isEnvironmentOnline(endpoint *portainer.Endpoint) bool {
+	if endpoint.Type != portainer.AgentOnDockerEnvironment &&
+		endpoint.Type != portainer.AgentOnKubernetesEnvironment {
+		return true
+	}
+
+	var err error
+	var tlsConfig *tls.Config
+	if endpoint.TLSConfig.TLS {
+		tlsConfig, err = crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+		if err != nil {
+			return false
+		}
+	}
+
+	_, _, err = agent.GetAgentVersionAndPlatform(endpoint.URL, tlsConfig)
+	return err == nil
 }

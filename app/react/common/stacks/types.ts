@@ -19,10 +19,6 @@ export enum StackType {
    * Represents a stack managed via kubectl
    */
   Kubernetes,
-  /**
-   * Represents a stack managed via Nomad
-   */
-  Nomad,
 }
 
 export enum StackStatus {

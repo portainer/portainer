@@ -55,7 +55,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Unable to create administrator user", Err: errAdminAlreadyInitialized}
+		return httperror.Conflict("Unable to create administrator user", errAdminAlreadyInitialized)
 	}
 
 	if !handler.passwordStrengthChecker.Check(payload.Password) {

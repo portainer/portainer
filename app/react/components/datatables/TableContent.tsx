@@ -26,8 +26,8 @@ export function TableContent<T extends DefaultType = DefaultType>({
 
   return (
     <>
-      {rows.map((row) => (
-        <Fragment key={row.id}>{renderRow(row)}</Fragment>
+      {rows.map((row, index) => (
+        <Fragment key={`${row.id}-${index}`}>{renderRow(row)}</Fragment>
       ))}
     </>
   );

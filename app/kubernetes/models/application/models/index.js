@@ -69,7 +69,7 @@ export class HelmApplication {
  */
 const _KubernetesApplicationPersistedFolder = Object.freeze({
   MountPath: '',
-  PersistentVolumeClaimName: '',
+  persistentVolumeClaimName: '',
   HostPath: '',
 });
 

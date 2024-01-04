@@ -85,7 +85,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 	if !isUnique {
 		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", stack.Name)
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: errorMessage, Err: errors.New(errorMessage)}
+		return httperror.Conflict(errorMessage, errors.New(errorMessage))
 	}
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)

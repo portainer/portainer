@@ -4,7 +4,7 @@ import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/C
 
 import {
   CustomTemplatesVariablesField,
-  Variables,
+  Values,
 } from './CustomTemplatesVariablesField';
 
 export default {
@@ -34,10 +34,8 @@ const definitions: VariableDefinition[] = [
 ];
 
 function Template() {
-  const [value, setValue] = useState<Variables>(
-    Object.fromEntries(
-      definitions.map((def) => [def.name, def.defaultValue || ''])
-    )
+  const [value, setValue] = useState<Values>(
+    definitions.map((def) => ({ key: def.name, value: def.defaultValue || '' }))
   );
 
   return (

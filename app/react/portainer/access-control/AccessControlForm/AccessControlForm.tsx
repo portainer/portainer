@@ -7,6 +7,7 @@ import { SwitchField } from '@@/form-components/SwitchField';
 
 import { EditDetails } from '../EditDetails';
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
+import { EnvironmentId } from '../../environments/types';
 
 export interface Props {
   values: AccessControlFormData;
@@ -14,6 +15,7 @@ export interface Props {
   hideTitle?: boolean;
   formNamespace?: string;
   errors?: FormikErrors<AccessControlFormData>;
+  environmentId: EnvironmentId;
 }
 
 export function AccessControlForm({
@@ -22,6 +24,7 @@ export function AccessControlForm({
   hideTitle,
   formNamespace,
   errors,
+  environmentId,
 }: Props) {
   const { isAdmin } = useUser();
 
@@ -34,12 +37,13 @@ export function AccessControlForm({
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
+            dataCy="portainer-accessMgmtToggle"
             checked={accessControlEnabled}
             name={withNamespace('accessControlEnabled')}
             label="Enable access control"
+            labelClass="col-sm-3 col-lg-2"
             tooltip="When enabled, you can restrict the access and management of this resource."
             onChange={handleToggleEnable}
-            dataCy="portainer-accessMgmtToggle"
           />
         </div>
       </div>
@@ -50,6 +54,7 @@ export function AccessControlForm({
           values={values}
           errors={errors}
           formNamespace={formNamespace}
+          environmentId={environmentId}
         />
       )}
     </>

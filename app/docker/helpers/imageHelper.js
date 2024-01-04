@@ -14,12 +14,17 @@ function ImageHelperFactory() {
     return tag.match(/^(?![\.\-])([a-zA-Z0-9\_\.\-])+$/g);
   }
 
+  /**
+   *
+   * @param {import('@/react/docker/images/queries/useImages').ImagesListResponse[]} images
+   * @returns {{names: string[]}}}
+   */
   function getImagesNamesForDownload(images) {
     var names = images.map(function (image) {
-      return image.RepoTags[0] !== '<none>:<none>' ? image.RepoTags[0] : image.Id;
+      return image.tags[0] !== '<none>:<none>' ? image.tags[0] : image.id;
     });
     return {
-      names: names,
+      names,
     };
   }
 

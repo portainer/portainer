@@ -6,6 +6,7 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 import { confirmDelete } from '@@/modals/confirm';
+import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
 
 class KubernetesApplicationsController {
   /* @ngInject */
@@ -60,12 +61,9 @@ class KubernetesApplicationsController {
         if (isAppFormCreated) {
           const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
           await Promise.all(promises);
-        } else {
-          const application = stack.Applications.find((x) => x.StackId !== null);
-          if (application && application.StackId) {
-            await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
-          }
         }
+
+        await this.StackService.removeKubernetesStacksByName(stack.Name, stack.ResourcePool, false, this.endpoint.Id);
 
         this.Notifications.success('Stack successfully removed', stack.Name);
         _.remove(this.state.stacks, { Name: stack.Name });
@@ -144,10 +142,12 @@ class KubernetesApplicationsController {
   }
 
   onChangeNamespaceDropdown(namespaceName) {
-    this.state.namespaceName = namespaceName;
-    // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
-    this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
-    return this.$async(this.getApplicationsAsync);
+    return this.$async(async () => {
+      this.state.namespaceName = namespaceName;
+      // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
+      this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
+      return this.getApplicationsAsync();
+    });
   }
 
   async getApplicationsAsync() {
@@ -193,6 +193,8 @@ class KubernetesApplicationsController {
       namespaceName: '',
       isSystemResources: undefined,
     };
+
+    this.deploymentOptions = await getDeploymentOptions();
 
     this.user = this.Authentication.getUserDetails();
     this.state.namespaces = await this.KubernetesNamespaceService.get();

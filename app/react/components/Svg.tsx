@@ -30,8 +30,6 @@ import helm from '@/assets/ico/vendor/helm.svg?c';
 import linode from '@/assets/ico/vendor/linode.svg?c';
 import microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import microsofticon from '@/assets/ico/vendor/microsoft-icon.svg?c';
-import nomad from '@/assets/ico/vendor/nomad.svg?c';
-import nomadicon from '@/assets/ico/vendor/nomad-icon.svg?c';
 import openldap from '@/assets/ico/vendor/openldap.svg?c';
 import proget from '@/assets/ico/vendor/proget.svg?c';
 import quay from '@/assets/ico/vendor/quay.svg?c';
@@ -67,8 +65,6 @@ export const SvgIcons = {
   linode,
   microsoft,
   microsofticon,
-  nomad,
-  nomadicon,
   openldap,
   proget,
   quay,

@@ -1,5 +1,8 @@
 import { useRouter } from '@uirouter/react';
+import { PropsWithChildren } from 'react';
 import { RefreshCw } from 'lucide-react';
+
+import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
 
 import { Button } from '../buttons';
 
@@ -24,12 +27,9 @@ export function PageHeader({
   reload,
   loading,
   onReload,
-}: Props) {
+  children,
+}: PropsWithChildren<Props>) {
   const router = useRouter();
-
-  function onClickedRefresh() {
-    return onReload ? onReload() : router.stateService.reload();
-  }
 
   return (
     <HeaderContainer id={id}>
@@ -47,7 +47,13 @@ export function PageHeader({
             <RefreshCw className="icon" />
           </Button>
         )}
+        {children}
       </HeaderTitle>
     </HeaderContainer>
   );
+
+  function onClickedRefresh() {
+    dispatchCacheRefreshEvent();
+    return onReload ? onReload() : router.stateService.reload();
+  }
 }

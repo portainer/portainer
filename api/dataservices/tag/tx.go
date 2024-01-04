@@ -22,7 +22,7 @@ func (service ServiceTx) Create(tag *portainer.Tag) error {
 	)
 }
 
-// UpdateTagFunc is a no-op inside a transaction
+// UpdateTagFunc is a no-op inside a transaction.
 func (service ServiceTx) UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error {
 	return errors.New("cannot be called inside a transaction")
 }

@@ -18,7 +18,7 @@ export function RefSelector({
   value: string;
   stackId?: StackId;
   onChange: (value: string) => void;
-  isUrlValid: boolean;
+  isUrlValid?: boolean;
 }) {
   const creds = getAuthentication(model);
   const payload = {

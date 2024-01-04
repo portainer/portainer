@@ -1,11 +1,15 @@
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  parseAxiosError,
+  json2formData,
+  arrayToJson,
+} from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
 import { EdgeAsyncIntervalsValues } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 
 import { type Environment, EnvironmentCreationTypes } from '../types';
 
-import { arrayToJson, buildUrl, json2formData } from './utils';
+import { buildUrl } from './utils';
 
 export interface EnvironmentMetadata {
   groupId?: EnvironmentGroupId;

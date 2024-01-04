@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +12,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,13 +28,13 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 		GroupID: 1,
 		Type:    portainer.AgentOnDockerEnvironment,
 		Agent: struct {
-			Version string "example:\"1.0.0\""
+			Version string `example:"1.0.0"`
 		}{
 			Version: "1.0.0",
 		},
 	}
 	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Type: portainer.AgentOnDockerEnvironment, Agent: struct {
-		Version string "example:\"1.0.0\""
+		Version string `example:"1.0.0"`
 	}{Version: "2.0.0"}}
 	noVersionEndpoint := portainer.Endpoint{ID: 3, Type: portainer.AgentOnDockerEnvironment, GroupID: 1}
 	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}
@@ -196,7 +197,7 @@ func setupEndpointListHandler(t *testing.T, endpoints []portainer.Endpoint) *Han
 	handler := NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
-	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil)
+	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil, nil)
 
 	return handler
 }
@@ -210,7 +211,7 @@ func buildEndpointListRequest(query string) *http.Request {
 	restrictedCtx := security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
 	req = req.WithContext(restrictedCtx)
 
-	req.Header.Add("Authorization", "Bearer dummytoken")
+	testhelpers.AddTestSecurityCookie(req, "Bearer dummytoken")
 
 	return req
 }

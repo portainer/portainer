@@ -12,7 +12,7 @@ import { PortainerResponse } from '@/react/docker/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { ContainerId } from '@/react/docker/containers/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
+import { queryClient } from '@/react-tools/react-query';
 
 import { urlBuilder } from '../containers.service';
 
@@ -74,17 +74,28 @@ export interface ContainerJSON {
 
 export function useContainer(
   environmentId: EnvironmentId,
-  containerId: ContainerId
+  containerId?: ContainerId,
+  { enabled }: { enabled?: boolean } = {}
 ) {
   return useQuery(
-    queryKeys.container(environmentId, containerId),
-    () => getContainer(environmentId, containerId),
+    containerId ? queryKeys.container(environmentId, containerId) : [],
+    () => (containerId ? getContainer(environmentId, containerId) : undefined),
     {
       meta: {
         title: 'Failure',
         message: 'Unable to retrieve container',
       },
+      enabled: enabled && !!containerId,
     }
+  );
+}
+
+export function invalidateContainer(
+  environmentId: EnvironmentId,
+  containerId?: ContainerId
+) {
+  return queryClient.invalidateQueries(
+    containerId ? queryKeys.container(environmentId, containerId) : []
   );
 }
 
@@ -98,19 +109,8 @@ async function getContainer(
     const { data } = await axios.get<ContainerResponse>(
       urlBuilder(environmentId, containerId, 'json')
     );
-    return parseViewModel(data);
+    return data;
   } catch (error) {
     throw parseAxiosError(error as Error, 'Unable to retrieve container');
   }
-}
-
-export function parseViewModel(response: ContainerResponse) {
-  const resourceControl =
-    response.Portainer?.ResourceControl &&
-    new ResourceControlViewModel(response?.Portainer?.ResourceControl);
-
-  return {
-    ...response,
-    ResourceControl: resourceControl,
-  };
 }

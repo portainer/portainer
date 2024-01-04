@@ -54,9 +54,10 @@ export function AppIngressPathsForm({
         ?.filter((ic) => ic.Availability)
         .map((ic) => ic.ClassName) || [];
     const allowedIngresses =
-      ingresses?.filter((ing) =>
-        allowedIngressClasses.includes(ing.ClassName)
-      ) || [];
+      ingresses?.filter((ing) => {
+        const className = ing.ClassName || 'none';
+        return allowedIngressClasses.includes(className);
+      }) || [];
     return allowedIngresses.flatMap((ing) =>
       ing.Hosts?.length
         ? ing.Hosts.map((host) => ({

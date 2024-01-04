@@ -9,7 +9,7 @@ import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
 import { withControlledSelected } from '@@/datatables/extend-options/withControlledSelected';
 
-import { useColumns } from './columns';
+import { useColumns } from './useColumns';
 
 const tableKey = 'macvlan-nodes-selector';
 const store = createPersistedStore(tableKey);
@@ -41,7 +41,7 @@ export function MacvlanNodesSelector({
       settingsManager={tableState}
       extendTableOptions={mergeOptions(
         withMeta({
-          table: 'macvlan-nodes',
+          table: 'nodes',
           haveAccessToNode,
         }),
         withControlledSelected(

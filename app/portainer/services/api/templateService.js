@@ -1,6 +1,6 @@
 import { commandStringToArray } from '@/docker/helpers/containers';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
 import { DockerHubViewModel } from 'Portainer/models/dockerhub';
-import { TemplateViewModel } from '../../models/template';
 
 angular.module('portainer.app').factory('TemplateService', TemplateServiceFactory);
 

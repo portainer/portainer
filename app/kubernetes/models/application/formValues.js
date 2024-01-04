@@ -1,5 +1,5 @@
 import { PorImageRegistryModel } from '@/docker/models/porImageRegistry';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes } from './models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
@@ -25,24 +25,18 @@ export function KubernetesApplicationFormValues() {
   this.ConfigMaps = [];
   this.Secrets = [];
   this.PublishedPorts = []; // KubernetesApplicationPublishedPortFormValue lis;
-  this.PlacementType = KubernetesApplicationPlacementTypes.PREFERRED;
+  this.PlacementType = 'preferred';
   this.Placements = []; // KubernetesApplicationPlacementFormValue lis;
   this.OriginalIngresses = undefined;
 }
-
-export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({
-  NONE: 0,
-  ENVIRONMENT: 1,
-  FILESYSTEM: 2,
-});
 
 /**
  * KubernetesApplicationConfigurationFormValueOverridenKey Model
  */
 const _KubernetesApplicationConfigurationFormValueOverridenKey = Object.freeze({
-  Key: '',
-  Path: '',
-  Type: KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT,
+  key: '',
+  path: '',
+  type: 'ENVIRONMENT',
 });
 
 export class KubernetesApplicationConfigurationFormValueOverridenKey {
@@ -55,9 +49,9 @@ export class KubernetesApplicationConfigurationFormValueOverridenKey {
  * KubernetesApplicationConfigurationFormValue Model
  */
 const _KubernetesApplicationConfigurationFormValue = Object.freeze({
-  SelectedConfiguration: undefined,
-  Overriden: false,
-  OverridenKeys: [], // KubernetesApplicationConfigurationFormValueOverridenKey list
+  selectedConfiguration: undefined,
+  overriden: false,
+  overridenKeys: [],
 });
 
 export class KubernetesApplicationConfigurationFormValue {
@@ -70,12 +64,11 @@ export class KubernetesApplicationConfigurationFormValue {
  * KubernetesApplicationEnvironmentVariableFormValue Model
  */
 const _KubernetesApplicationEnvironmentVariableFormValue = Object.freeze({
-  Name: '',
-  Value: '',
-  IsSecret: false,
-  NeedsDeletion: false,
-  IsNew: true,
-  NameIndex: '', // keep the original name for sorting
+  name: '',
+  value: '',
+  needsDeletion: false,
+  isNew: true,
+  nameIndex: '', // keep the original name for sorting
 });
 
 export class KubernetesApplicationEnvironmentVariableFormValue {
@@ -88,20 +81,20 @@ export class KubernetesApplicationEnvironmentVariableFormValue {
  * KubernetesApplicationPersistedFolderFormValue Model
  */
 const _KubernetesApplicationPersistedFolderFormValue = Object.freeze({
-  PersistentVolumeClaimName: '', // will be empty for new volumes (create/edit app) and filled for existing ones (edit)
-  NeedsDeletion: false,
-  ContainerPath: '',
-  Size: '',
-  SizeUnit: 'GB',
-  StorageClass: {},
-  ExistingVolume: null,
-  UseNewVolume: true,
+  persistentVolumeClaimName: '', // will be empty for new volumes (create/edit app) and filled for existing ones (edit)
+  needsDeletion: false,
+  containerPath: '',
+  size: '',
+  sizeUnit: 'GB',
+  storageClass: {},
+  existingVolume: null,
+  useNewVolume: true,
 });
 
 export class KubernetesApplicationPersistedFolderFormValue {
   constructor(storageClass) {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPersistedFolderFormValue)));
-    this.StorageClass = storageClass;
+    this.storageClass = storageClass;
   }
 }
 
@@ -126,10 +119,10 @@ export function KubernetesApplicationPublishedPortFormValue() {
 
 export function KubernetesApplicationPlacementFormValue() {
   return {
-    Label: {},
-    Value: '',
-    NeedsDeletion: false,
-    IsNew: true,
+    label: {},
+    value: '',
+    needsDeletion: false,
+    isNew: true,
   };
 }
 

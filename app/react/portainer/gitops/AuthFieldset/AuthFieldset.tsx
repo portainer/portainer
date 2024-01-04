@@ -45,7 +45,7 @@ export function AuthFieldset({
             label="Authentication"
             labelClass="col-sm-3 col-lg-2"
             name="authentication"
-            checked={value.RepositoryAuthentication}
+            checked={value.RepositoryAuthentication || false}
             onChange={(value) =>
               handleChange({ RepositoryAuthentication: value })
             }
@@ -165,7 +165,8 @@ export function gitAuthValidation(
     NewCredentialName: string()
       .default('')
       .when(['RepositoryAuthentication', 'SaveCredential'], {
-        is: true,
+        is: (RepositoryAuthentication: boolean, SaveCredential: boolean) =>
+          RepositoryAuthentication && SaveCredential && !isAuthEdit,
         then: string()
           .required('Name is required')
           .test(

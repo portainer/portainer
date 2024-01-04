@@ -12,8 +12,6 @@ export function getPlatformType(envType: EnvironmentType) {
       return PlatformType.Docker;
     case EnvironmentType.Azure:
       return PlatformType.Azure;
-    case EnvironmentType.EdgeAgentOnNomad:
-      return PlatformType.Nomad;
     default:
       throw new Error(`Environment Type ${envType} is not supported`);
   }
@@ -29,10 +27,6 @@ export function isKubernetesEnvironment(envType: EnvironmentType) {
 
 export function getPlatformTypeName(envType: EnvironmentType): string {
   return PlatformType[getPlatformType(envType)];
-}
-
-export function isNomadEnvironment(envType: EnvironmentType) {
-  return getPlatformType(envType) === PlatformType.Nomad;
 }
 
 export function isAgentEnvironment(envType: EnvironmentType) {
@@ -105,8 +99,6 @@ export function getDashboardRoute(environment: Environment) {
         return 'docker.dashboard';
       case PlatformType.Kubernetes:
         return 'kubernetes.dashboard';
-      case PlatformType.Nomad:
-        return 'nomad.dashboard';
       default:
         throw new Error(`Unsupported platform ${platform}`);
     }

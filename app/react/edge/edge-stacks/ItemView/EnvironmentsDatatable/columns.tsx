@@ -9,6 +9,7 @@ import UpToDate from '@/assets/ico/icon_up-to-date.svg?c';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { getDashboardRoute } from '@/react/portainer/environments/utils';
+import { cleanGitRepoUrl } from '@/react/portainer/gitops/utils';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -155,6 +156,15 @@ function endpointStatusLabel(statusArray: Array<DeploymentStatus>) {
     if (status.Type === StatusType.Error) {
       labels.push('Failed');
     }
+    if (status.Type === StatusType.PausedDeploying) {
+      labels.push('Paused');
+    }
+    if (status.Type === StatusType.RollingBack) {
+      labels.push('Rolling Back');
+    }
+    if (status.Type === StatusType.RolledBack) {
+      labels.push('Rolled Back');
+    }
   });
 
   if (!labels.length) {
@@ -178,7 +188,9 @@ function TargetVersionCell({
       {row.original.TargetCommitHash ? (
         <div>
           <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            href={`${cleanGitRepoUrl(row.original.GitConfigURL)}/commit/${
+              row.original.TargetCommitHash
+            }`}
             target="_blank"
             rel="noreferrer"
           >
@@ -227,7 +239,9 @@ function DeployedVersionCell({
         <div>
           {statusIcon}
           <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
+            href={`${cleanGitRepoUrl(row.original.GitConfigURL)}/commit/${
+              row.original.TargetCommitHash
+            }`}
             target="_blank"
             rel="noreferrer"
           >
@@ -283,6 +297,9 @@ function getStateColor(type: StatusType): 'orange' | 'green' | 'red' {
     case StatusType.Pending:
     case StatusType.Deploying:
     case StatusType.Removing:
+    case StatusType.PausedDeploying:
+    case StatusType.RollingBack:
+    case StatusType.RolledBack:
     default:
       return 'orange';
   }

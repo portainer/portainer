@@ -27,7 +27,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
-// @id HelmUserRepositoryCreate
+// @id HelmUserRepositoryCreateDeprecated
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
@@ -42,6 +42,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
+// @deprecated
 // @router /endpoints/{id}/kubernetes/helm/repositories [post]
 func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
@@ -85,7 +86,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	return response.JSON(w, record)
 }
 
-// @id HelmUserRepositoriesList
+// @id HelmUserRepositoriesListDeprecated
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated
@@ -98,6 +99,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
+// @deprecated
 // @router /endpoints/{id}/kubernetes/helm/repositories [get]
 func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)

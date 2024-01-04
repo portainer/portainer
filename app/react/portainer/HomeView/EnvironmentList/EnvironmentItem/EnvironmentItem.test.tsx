@@ -1,3 +1,5 @@
+import { http, HttpResponse } from 'msw';
+
 import {
   EnvironmentGroup,
   EnvironmentGroupId,
@@ -8,7 +10,7 @@ import { UserViewModel } from '@/portainer/models/user';
 import { Tag } from '@/portainer/tags/types';
 import { createMockEnvironment } from '@/react-tools/test-mocks';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { server, rest } from '@/setup-tests/server';
+import { server } from '@/setup-tests/server';
 
 import { EnvironmentItem } from './EnvironmentItem';
 
@@ -39,7 +41,7 @@ function renderComponent(
 ) {
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 
-  server.use(rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags))));
+  server.use(http.get('/api/tags', () => HttpResponse.json(tags)));
 
   return renderWithQueryClient(
     <UserContext.Provider value={{ user }}>

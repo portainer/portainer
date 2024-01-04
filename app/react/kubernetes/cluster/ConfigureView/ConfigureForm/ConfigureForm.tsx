@@ -21,13 +21,11 @@ import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 
 import { useIngressControllerClassMapQuery } from '../../ingressClass/useIngressControllerClassMap';
-import {
-  IngressControllerClassMap,
-  IngressControllerClassMapRowData,
-} from '../../ingressClass/types';
+import { IngressControllerClassMap } from '../../ingressClass/types';
 import { useIsRBACEnabledQuery } from '../../getIsRBACEnabled';
+import { getIngressClassesFormValues } from '../../ingressClass/IngressClassDatatable/utils';
 
-import { useStorageClassesFormValues } from './useStorageClassesFormValues';
+import { useStorageClassesFormValues } from './useStorageClasses';
 import { ConfigureFormValues, StorageClassFormValues } from './types';
 import { configureValidationSchema } from './validation';
 import { RBACAlert } from './RBACAlert';
@@ -176,15 +174,10 @@ function InnerForm({
         </FormSection>
         <FormSection title="Networking - Ingresses">
           <IngressClassDatatable
-            onChangeControllers={onChangeControllers}
+            onChange={onChangeControllers}
             description="Enabling ingress controllers in your cluster allows them to be available in the Portainer UI for users to publish applications over HTTP/HTTPS. A controller must have a class name for it to be included here."
-            ingressControllers={
-              values.ingressClasses as IngressControllerClassMapRowData[]
-            }
-            initialIngressControllers={
-              initialValues.ingressClasses as IngressControllerClassMapRowData[]
-            }
-            allowNoneIngressClass={values.allowNoneIngressClass}
+            values={values.ingressClasses}
+            initialValues={initialValues.ingressClasses}
             isLoading={isIngressClassesLoading}
             noIngressControllerLabel="No supported ingress controllers found."
             view="cluster"
@@ -198,9 +191,19 @@ function InnerForm({
                 tooltip='This allows users setting up ingresses to select "none" as the ingress class.'
                 labelClass="col-sm-5 col-lg-4"
                 checked={values.allowNoneIngressClass}
-                onChange={(checked) =>
-                  setFieldValue('allowNoneIngressClass', checked)
-                }
+                onChange={(checked) => {
+                  setFieldValue('allowNoneIngressClass', checked);
+                  // add or remove the none ingress class from the ingress classes list
+                  if (checked) {
+                    setFieldValue(
+                      'ingressClasses',
+                      getIngressClassesFormValues(
+                        checked,
+                        initialValues.ingressClasses
+                      )
+                    );
+                  }
+                }}
               />
             </div>
           </div>
@@ -248,7 +251,7 @@ function InnerForm({
                 name="changeWindow.Enabled"
                 data-cy="kubeSetup-changeWindowEnabledToggle"
                 label="Enable Change Window"
-                tooltip="GitOps updates to stacks or applications outside the defined change window will not occur.'"
+                tooltip="GitOps updates to stacks or applications outside the defined change window will not occur."
                 labelClass="col-sm-5 col-lg-4"
                 checked={false}
                 featureId={FeatureId.HIDE_AUTO_UPDATE_WINDOW}
@@ -376,12 +379,15 @@ function InnerForm({
 function useInitialValues(
   environment?: Environment | null,
   storageClassFormValues?: StorageClassFormValues[],
-  ingressClasses?: IngressControllerClassMapRowData[]
+  ingressClasses?: IngressControllerClassMap[]
 ): ConfigureFormValues | undefined {
   return useMemo(() => {
     if (!environment) {
       return undefined;
     }
+    const allowNoneIngressClass =
+      !!environment.Kubernetes.Configuration.AllowNoneIngressClass;
+
     return {
       storageClasses: storageClassFormValues || [],
       useLoadBalancer: !!environment.Kubernetes.Configuration.UseLoadBalancer,
@@ -396,9 +402,10 @@ function useInitialValues(
         !!environment.Kubernetes.Configuration.RestrictStandardUserIngressW,
       ingressAvailabilityPerNamespace:
         !!environment.Kubernetes.Configuration.IngressAvailabilityPerNamespace,
-      allowNoneIngressClass:
-        !!environment.Kubernetes.Configuration.AllowNoneIngressClass,
-      ingressClasses: ingressClasses || [],
+      allowNoneIngressClass,
+      ingressClasses:
+        getIngressClassesFormValues(allowNoneIngressClass, ingressClasses) ||
+        [],
     };
   }, [environment, ingressClasses, storageClassFormValues]);
 }

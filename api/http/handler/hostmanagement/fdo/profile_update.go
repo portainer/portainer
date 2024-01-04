@@ -49,7 +49,7 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError(err.Error(), err)
 	}
 	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
+		return httperror.Conflict(fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), errors.New("a profile already exists with this name"))
 	}
 
 	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), []byte(payload.ProfileFileContent))

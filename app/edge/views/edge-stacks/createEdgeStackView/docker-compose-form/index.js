@@ -7,5 +7,7 @@ export const edgeStacksDockerComposeForm = {
   bindings: {
     formValues: '=',
     state: '=',
+    templateValues: '<',
+    setTemplateValues: '<',
   },
 };
