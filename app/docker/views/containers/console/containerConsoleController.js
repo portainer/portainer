@@ -151,6 +151,10 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     };
 
     function resize(restcall, add) {
+      if ($scope.state != states.connected) {
+        return;
+      }
+
       add = add || 0;
 
       term.fit();
