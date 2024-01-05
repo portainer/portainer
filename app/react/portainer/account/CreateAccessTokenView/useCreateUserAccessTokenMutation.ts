@@ -4,7 +4,11 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 import { notifySuccess } from '@/portainer/services/notifications';
 
-import { ApiKeyFormValues, ApiKeyResponse } from './types';
+import { ApiKeyFormValues } from './types';
+
+export interface ApiKeyResponse {
+  rawAPIKey: string;
+}
 
 export function useCreateUserAccessTokenMutation() {
   return useMutation(createUserAccessToken, {
