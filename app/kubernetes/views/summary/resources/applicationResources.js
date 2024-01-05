@@ -3,7 +3,7 @@ import { KubernetesResourceTypes, KubernetesResourceActions } from 'Kubernetes/m
 import { KubernetesApplicationFormValues } from 'Kubernetes/models/application/formValues';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesService, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesApplicationDeploymentTypes } from '@/react/kubernetes/applications/constants';
+import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';

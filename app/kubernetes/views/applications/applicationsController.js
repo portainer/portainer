@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import { KubernetesApplicationTypes } from '@/react/kubernetes/applications/constants';
+import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 import { confirmDelete } from '@@/modals/confirm';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';

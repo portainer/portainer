@@ -5,4 +5,4 @@ export {
 
 export { EnvironmentVariablesPanel } from './EnvironmentVariablesPanel';
 
-export { type EnvVarValues } from './types';
+export { type Values as EnvVarValues } from './types';

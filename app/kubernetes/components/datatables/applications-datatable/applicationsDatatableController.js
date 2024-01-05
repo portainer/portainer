@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from '@/react/kubernetes/applications/constants';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 
 angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatableController', [
   '$scope',

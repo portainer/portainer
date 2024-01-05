@@ -6,7 +6,7 @@ import { buildUniquenessTest } from '../validate-unique';
 
 import { AdvancedMode } from './AdvancedMode';
 import { SimpleMode } from './SimpleMode';
-import { EnvVarValues } from './types';
+import { Values } from './types';
 
 export function EnvironmentVariablesFieldset({
   onChange,
@@ -14,9 +14,9 @@ export function EnvironmentVariablesFieldset({
   errors,
   canUndoDelete,
 }: {
-  values: EnvVarValues;
-  onChange(value: EnvVarValues): void;
-  errors?: ArrayError<EnvVarValues>;
+  values: Values;
+  onChange(value: Values): void;
+  errors?: ArrayError<Values>;
   canUndoDelete?: boolean;
 }) {
   const [simpleMode, setSimpleMode] = useState(true);
@@ -42,7 +42,7 @@ export function EnvironmentVariablesFieldset({
   );
 }
 
-export function envVarValidation(): SchemaOf<EnvVarValues> {
+export function envVarValidation(): SchemaOf<Values> {
   return array(
     object({
       name: string().required('Name is required'),

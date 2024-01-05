@@ -12,7 +12,7 @@ import KubernetesPodConverter from 'Kubernetes/pod/converter';
 import { notifyError } from '@/portainer/services/notifications';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { generateNewIngressesFromFormPaths } from '@/react/kubernetes/applications/CreateView/application-services/utils';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from '@/react/kubernetes/applications/constants';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */

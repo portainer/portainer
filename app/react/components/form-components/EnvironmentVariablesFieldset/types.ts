@@ -4,4 +4,4 @@ export interface EnvVar {
   needsDeletion?: boolean;
 }
 
-export type EnvVarValues = Array<EnvVar>;
+export type Values = Array<EnvVar>;

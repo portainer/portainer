@@ -1,6 +1,4 @@
-import { ServiceType } from '../services/types';
-
-import { AppDataAccessPolicy, AppKind, AppType, DeploymentType } from './types';
+import { AppKind, DeploymentType } from './types';
 
 // Portainer specific labels
 export const appStackNameLabel = 'io.portainer.kubernetes.application.stack';
@@ -33,39 +31,4 @@ export const appKindToDeploymentTypeMap: Record<
   StatefulSet: 'Replicated',
   DaemonSet: 'Global',
   Pod: null,
-} as const;
-
-// The following constants are used by angular views and can be removed once they are no longer referenced
-export const KubernetesApplicationTypes: Record<AppType, AppType> = {
-  Deployment: 'Deployment',
-  StatefulSet: 'StatefulSet',
-  DaemonSet: 'DaemonSet',
-  Pod: 'Pod',
-  Helm: 'Helm',
-} as const;
-
-export const KubernetesApplicationDeploymentTypes: Record<
-  DeploymentType,
-  DeploymentType
-> = {
-  Global: 'Global',
-  Replicated: 'Replicated',
-} as const;
-
-export const KubernetesApplicationDataAccessPolicies: Record<
-  AppDataAccessPolicy,
-  AppDataAccessPolicy
-> = {
-  Isolated: 'Isolated',
-  Shared: 'Shared',
-} as const;
-
-export const KubernetesApplicationServiceTypes: Record<
-  ServiceType,
-  ServiceType
-> = {
-  ClusterIP: 'ClusterIP',
-  NodePort: 'NodePort',
-  LoadBalancer: 'LoadBalancer',
-  ExternalName: 'ExternalName',
 } as const;

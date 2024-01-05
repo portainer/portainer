@@ -3,7 +3,7 @@ import { TextTip } from '@@/Tip/TextTip';
 
 import { ArrayError } from '../InputList/InputList';
 
-import { EnvVarValues } from './types';
+import { Values } from './types';
 import { EnvironmentVariablesFieldset } from './EnvironmentVariablesFieldset';
 
 export function EnvironmentVariablesPanel({
@@ -15,10 +15,10 @@ export function EnvironmentVariablesPanel({
   isFoldable = false,
 }: {
   explanation?: string;
-  values: EnvVarValues;
-  onChange(value: EnvVarValues): void;
+  values: Values;
+  onChange(value: Values): void;
   showHelpMessage?: boolean;
-  errors?: ArrayError<EnvVarValues>;
+  errors?: ArrayError<Values>;
   isFoldable?: boolean;
 }) {
   return (

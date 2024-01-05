@@ -12,7 +12,7 @@ import {
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationServiceTypes,
   KubernetesApplicationTypes,
-} from '@/react/kubernetes/applications/constants';
+} from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesApplicationQuotaDefaults, KubernetesDeploymentTypes } from 'Kubernetes/models/application/models';
 import { KubernetesApplicationEnvironmentVariableFormValue, KubernetesApplicationFormValues, KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';

@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from '@/react/kubernetes/applications/constants';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import {
   KubernetesApplication,
   KubernetesApplicationConfigurationVolume,

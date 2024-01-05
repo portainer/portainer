@@ -9,7 +9,7 @@ import { FileUploadField } from '@@/form-components/FileUpload';
 import { InputList } from '@@/form-components/InputList';
 import { ArrayError } from '@@/form-components/InputList/InputList';
 
-import type { EnvVarValues } from './types';
+import type { Values } from './types';
 import { parseDotEnvFile } from './utils';
 import { EnvironmentVariableItem } from './EnvironmentVariableItem';
 
@@ -20,10 +20,10 @@ export function SimpleMode({
   errors,
   canUndoDelete,
 }: {
-  value: EnvVarValues;
-  onChange: (value: EnvVarValues) => void;
+  value: Values;
+  onChange: (value: Values) => void;
   onAdvancedModeClick: () => void;
-  errors?: ArrayError<EnvVarValues>;
+  errors?: ArrayError<Values>;
   canUndoDelete?: boolean;
 }) {
   return (
@@ -70,11 +70,7 @@ export function SimpleMode({
   );
 }
 
-function FileEnv({
-  onChooseFile,
-}: {
-  onChooseFile: (file: EnvVarValues) => void;
-}) {
+function FileEnv({ onChooseFile }: { onChooseFile: (file: Values) => void }) {
   const [file, setFile] = useState<File | null>(null);
 
   const fileTooBig = file && file.size > 1024 * 1024;

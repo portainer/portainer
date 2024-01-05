@@ -23,7 +23,7 @@ import {
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import { HelmApplication } from 'Kubernetes/models/application/models';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from '@/react/kubernetes/applications/constants';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
