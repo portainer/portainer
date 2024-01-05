@@ -5,15 +5,15 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
 
 import { convertToArrayOfStrings, parseDotEnvFile } from './utils';
-import { type Value } from './types';
+import { type Values } from './types';
 
 export function AdvancedMode({
   value,
   onChange,
   onSimpleModeClick,
 }: {
-  value: Value;
-  onChange: (value: Value) => void;
+  value: Values;
+  onChange: (value: Values) => void;
   onSimpleModeClick: () => void;
 }) {
   const editorValue = convertToArrayOfStrings(value).join('\n');

@@ -2,11 +2,13 @@ import { BoxSelector } from '@@/BoxSelector';
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
 
+import { DeploymentType } from '../types';
+
 import { getDeploymentOptions } from './deploymentOptions';
 
 interface Props {
-  value: number;
-  onChange(value: number): void;
+  value: DeploymentType;
+  onChange(value: DeploymentType): void;
   supportGlobalDeployment: boolean;
 }
 

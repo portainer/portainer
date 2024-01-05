@@ -10,17 +10,11 @@ import { getGlobalDeploymentOptions } from '@/react/portainer/settings/settings.
 import {
   KubernetesApplicationDataAccessPolicies,
   KubernetesApplicationDeploymentTypes,
-  KubernetesApplicationPublishingTypes,
-  KubernetesApplicationQuotaDefaults,
+  KubernetesApplicationServiceTypes,
   KubernetesApplicationTypes,
-  KubernetesDeploymentTypes,
-} from 'Kubernetes/models/application/models';
-import {
-  KubernetesApplicationEnvironmentVariableFormValue,
-  KubernetesApplicationFormValues,
-  KubernetesApplicationPersistedFolderFormValue,
-  KubernetesFormValidationReferences,
-} from 'Kubernetes/models/application/formValues';
+} from 'Kubernetes/models/application/models/appConstants';
+import { KubernetesApplicationQuotaDefaults, KubernetesDeploymentTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationEnvironmentVariableFormValue, KubernetesApplicationFormValues, KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
@@ -76,7 +70,7 @@ class KubernetesCreateApplicationController {
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
-    this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
+    this.KubernetesApplicationServiceTypes = KubernetesApplicationServiceTypes;
     this.ApplicationTypes = KubernetesApplicationTypes;
     this.ServiceTypes = KubernetesServiceTypes;
     this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
@@ -151,6 +145,9 @@ class KubernetesCreateApplicationController {
     this.onChangeReplicaCount = this.onChangeReplicaCount.bind(this);
     this.onAutoScaleChange = this.onAutoScaleChange.bind(this);
     this.onChangePlacements = this.onChangePlacements.bind(this);
+    this.updateApplicationType = this.updateApplicationType.bind(this);
+    this.getAppType = this.getAppType.bind(this);
+    this.showDataAccessPolicySection = this.showDataAccessPolicySection.bind(this);
   }
   /* #endregion */
 
@@ -165,6 +162,24 @@ class KubernetesCreateApplicationController {
     this.$scope.$evalAsync(() => {
       this.formValues.DeploymentType = value;
     });
+    this.updateApplicationType();
+  }
+
+  updateApplicationType() {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.ApplicationType = this.getAppType();
+      this.validatePersistedFolders();
+    });
+  }
+
+  getAppType() {
+    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
+      return this.ApplicationTypes.DaemonSet;
+    }
+    if (this.formValues.PersistedFolders && this.formValues.PersistedFolders.length) {
+      return this.ApplicationTypes.StatefulSet;
+    }
+    return this.ApplicationTypes.Deployment;
   }
 
   onChangeFileContent(value) {
@@ -230,28 +245,23 @@ class KubernetesCreateApplicationController {
 
   /* #region  AUTO SCALER UI MANAGEMENT */
   unselectAutoScaler() {
-    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL) {
-      this.formValues.AutoScaler.IsUsed = false;
+    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
+      this.formValues.AutoScaler.isUsed = false;
     }
   }
 
   onAutoScaleChange(values) {
     return this.$async(async () => {
-      if (!this.formValues.AutoScaler.IsUsed && values.isUsed) {
+      if (!this.formValues.AutoScaler.isUsed && values.isUsed) {
         this.formValues.AutoScaler = {
-          IsUsed: values.isUsed,
-          MinReplicas: 1,
-          MaxReplicas: 3,
-          TargetCPUUtilization: 50,
+          isUsed: values.isUsed,
+          minReplicas: 1,
+          maxReplicas: 3,
+          targetCpuUtilizationPercentage: 50,
         };
         return;
       }
-      this.formValues.AutoScaler = {
-        IsUsed: values.isUsed,
-        MinReplicas: values.minReplicas,
-        MaxReplicas: values.maxReplicas,
-        TargetCPUUtilization: values.targetCpuUtilizationPercentage,
-      };
+      this.formValues.AutoScaler = values;
     });
   }
   /* #endregion */
@@ -319,53 +329,11 @@ class KubernetesCreateApplicationController {
   /* #endregion */
 
   /* #region  PERSISTENT FOLDERS UI MANAGEMENT */
-  addPersistedFolder() {
-    let storageClass = {};
-    if (this.storageClasses.length > 0) {
-      storageClass = this.storageClasses[0];
-    }
-
-    const newPf = new KubernetesApplicationPersistedFolderFormValue(storageClass);
-    this.formValues.PersistedFolders.push(newPf);
-    this.resetDeploymentType();
-  }
-
-  restorePersistedFolder(index) {
-    this.formValues.PersistedFolders[index].needsDeletion = false;
-    this.validatePersistedFolders();
-  }
-
   resetPersistedFolders() {
     this.formValues.PersistedFolders = _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
       persistedFolder.existingVolume = null;
       persistedFolder.useNewVolume = true;
     });
-    this.validatePersistedFolders();
-  }
-
-  removePersistedFolder(index) {
-    if (this.state.isEdit && this.formValues.PersistedFolders[index].persistentVolumeClaimName) {
-      this.formValues.PersistedFolders[index].needsDeletion = true;
-    } else {
-      this.formValues.PersistedFolders.splice(index, 1);
-    }
-    this.validatePersistedFolders();
-  }
-
-  useNewVolume(index) {
-    this.formValues.PersistedFolders[index].useNewVolume = true;
-    this.formValues.PersistedFolders[index].existingVolume = null;
-    this.state.persistedFoldersUseExistingVolumes = _.some(this.formValues.PersistedFolders, { useNewVolume: false });
-    this.validatePersistedFolders();
-  }
-
-  useExistingVolume(index) {
-    this.formValues.PersistedFolders[index].useNewVolume = false;
-    this.state.persistedFoldersUseExistingVolumes = _.some(this.formValues.PersistedFolders, { useNewVolume: false });
-    if (this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED) {
-      this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.SHARED;
-      this.resetDeploymentType();
-    }
     this.validatePersistedFolders();
   }
   /* #endregion */
@@ -389,7 +357,14 @@ class KubernetesCreateApplicationController {
   }
 
   onChangePersistedFolder(values) {
-    this.formValues.PersistedFolders = values;
+    this.$scope.$evalAsync(() => {
+      this.formValues.PersistedFolders = values;
+      if (values && values.length && !this.supportGlobalDeployment()) {
+        this.onChangeDeploymentType(this.ApplicationDeploymentTypes.Replicated);
+        return;
+      }
+      this.updateApplicationType();
+    });
   }
 
   onChangeExistingVolumeSelection() {
@@ -445,13 +420,12 @@ class KubernetesCreateApplicationController {
   }
 
   resetDeploymentType() {
-    this.formValues.DeploymentType = this.ApplicationDeploymentTypes.REPLICATED;
+    this.formValues.DeploymentType = this.ApplicationDeploymentTypes.Replicated;
   }
 
-  // The data access policy panel is not shown when:
-  // * There is not persisted folder specified
+  // // The data access policy panel is shown when a persisted folder is specified
   showDataAccessPolicySection() {
-    return this.formValues.PersistedFolders.length !== 0;
+    return this.formValues.PersistedFolders.length > 0;
   }
 
   // A global deployment is not available when either:
@@ -460,7 +434,7 @@ class KubernetesCreateApplicationController {
   supportGlobalDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
     const hasRWOOnly = KubernetesApplicationHelper.hasRWOOnly(this.formValues);
-    const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
+    const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.Isolated;
 
     if (hasFolders && (hasRWOOnly || isIsolated)) {
       return false;
@@ -469,9 +443,9 @@ class KubernetesCreateApplicationController {
     return true;
   }
 
-  // A StatefulSet is defined by DataAccessPolicy === ISOLATED
+  // A StatefulSet is defined by DataAccessPolicy === 'Isolated'
   isEditAndStatefulSet() {
-    return this.state.isEdit && this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
+    return this.state.isEdit && this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.Isolated;
   }
 
   // A scalable deployment is available when either:
@@ -482,7 +456,7 @@ class KubernetesCreateApplicationController {
   supportScalableReplicaDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
     const hasRWOOnly = KubernetesApplicationHelper.hasRWOOnly(this.formValues);
-    const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
+    const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.Isolated;
 
     if (!hasFolders || isIsolated || (hasFolders && !hasRWOOnly)) {
       return true;
@@ -540,7 +514,7 @@ class KubernetesCreateApplicationController {
   }
 
   effectiveInstances() {
-    return this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL ? this.nodeNumber : this.formValues.ReplicaCount;
+    return this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global ? this.nodeNumber : this.formValues.ReplicaCount;
   }
 
   hasPortErrors() {
@@ -564,11 +538,11 @@ class KubernetesCreateApplicationController {
       return true;
     }
 
-    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.REPLICATED) {
+    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Replicated) {
       return this.nodesLimits.overflowForReplica(cpu, memory, instances);
     }
 
-    // DeploymentType == GLOBAL
+    // DeploymentType == 'Global'
     return this.nodesLimits.overflowForGlobal(cpu, memory);
   }
 
@@ -613,7 +587,7 @@ class KubernetesCreateApplicationController {
   }
 
   isExistingVolumeButtonDisabled() {
-    return !this.hasAvailableVolumes() || (this.isEdit && this.application.ApplicationType === this.ApplicationTypes.STATEFULSET);
+    return !this.hasAvailableVolumes() || (this.isEdit && this.application.ApplicationType === this.ApplicationTypes.StatefulSet);
   }
   /* #endregion */
 
@@ -630,7 +604,7 @@ class KubernetesCreateApplicationController {
     const scalable = this.supportScalableReplicaDeployment();
     const global = this.supportGlobalDeployment();
     const replica = this.formValues.ReplicaCount > 1;
-    const replicated = this.formValues.DeploymentType === this.ApplicationDeploymentTypes.REPLICATED;
+    const replicated = this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Replicated;
     const res = (replicated && !scalable && replica) || (!replicated && !global);
     return res;
   }
@@ -784,7 +758,7 @@ class KubernetesCreateApplicationController {
           if (this.savedFormValues) {
             this.formValues.PublishingType = this.savedFormValues.PublishingType;
           } else {
-            this.formValues.PublishingType = this.ApplicationPublishingTypes.CLUSTER_IP;
+            this.formValues.PublishingType = this.KubernetesApplicationServiceTypes.ClusterIP;
           }
         }
         this.formValues.OriginalIngresses = this.ingresses;
@@ -1070,9 +1044,8 @@ class KubernetesCreateApplicationController {
           this.savedFormValues = angular.copy(this.formValues);
           this.updateNamespaceLimits(this.namespaceWithQuota);
           this.updateSliders(this.namespaceWithQuota);
-          delete this.formValues.ApplicationType;
 
-          if (this.application.ApplicationType !== KubernetesApplicationTypes.STATEFULSET) {
+          if (this.application.ApplicationType !== KubernetesApplicationTypes.StatefulSet) {
             _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
               const volume = _.find(this.availableVolumes, ['PersistentVolumeClaim.Name', persistedFolder.persistentVolumeClaimName]);
               if (volume) {

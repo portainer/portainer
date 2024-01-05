@@ -8,6 +8,8 @@ import { useSecrets } from '@/react/kubernetes/configs/secret.service';
 import { useNamespaceServices } from '@/react/kubernetes/networks/services/queries';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
+import { Annotation } from '@/react/kubernetes/annotations/types';
+import { prepareAnnotations } from '@/react/kubernetes/utils';
 
 import { Link } from '@@/Link';
 import { PageHeader } from '@@/PageHeader';
@@ -22,7 +24,6 @@ import {
   useUpdateIngress,
   useIngressControllers,
 } from '../queries';
-import { Annotation } from '../../annotations/types';
 
 import {
   Rule,
@@ -35,7 +36,6 @@ import { IngressForm } from './IngressForm';
 import {
   prepareTLS,
   preparePaths,
-  prepareAnnotations,
   prepareRuleFromIngress,
   checkIfPathExistsWithHost,
 } from './utils';

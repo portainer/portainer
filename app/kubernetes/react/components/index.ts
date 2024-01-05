@@ -6,7 +6,6 @@ import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessVie
 import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/ConfigureForm/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/RegistriesFormSection/RegistriesSelector';
-import { DataAccessPolicyFormSection } from '@/react/kubernetes/applications/CreateView/DataAccessPolicyFormSection';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/CreateView/AppDeploymentTypeFormSection';
@@ -22,6 +21,7 @@ import {
   PlacementFormSection,
   placementValidation,
 } from '@/react/kubernetes/applications/components/PlacementFormSection';
+import { ApplicationSummarySection } from '@/react/kubernetes/applications/components/ApplicationSummarySection';
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
@@ -33,6 +33,7 @@ import { SecretsFormSection } from '@/react/kubernetes/applications/components/C
 import { configurationsValidationSchema } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/configurationValidationSchema';
 import { ConfigMapsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/ConfigMapsFormSection';
 import { PersistedFoldersFormSection } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection';
+import { DataAccessPolicyFormSection } from '@/react/kubernetes/applications/CreateView/DataAccessPolicyFormSection';
 import { persistedFoldersValidation } from '@/react/kubernetes/applications/components/PersistedFoldersFormSection/persistedFoldersValidation';
 import {
   ResourceReservationFormSection,
@@ -46,6 +47,7 @@ import {
   AutoScalingFormSection,
   autoScalingValidation,
 } from '@/react/kubernetes/applications/components/AutoScalingFormSection';
+import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -112,7 +114,7 @@ export const ngModule = angular
     r2a(withUIRouter(withReactQuery(withCurrentUser(NodesDatatable))), [])
   )
   .component(
-    'dataAccessPolicyFormSection',
+    'accessPolicyFormSection',
     r2a(DataAccessPolicyFormSection, [
       'value',
       'onChange',
@@ -175,6 +177,13 @@ export const ngModule = angular
     )
   )
   .component(
+    'applicationSummarySection',
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(ApplicationSummarySection))),
+      ['formValues', 'oldFormValues']
+    )
+  )
+  .component(
     'kubernetesApplicationsStacksDatatable',
     r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
       'dataset',
@@ -193,7 +202,9 @@ export const componentsModule = ngModule.name;
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(KubeServicesForm))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(KubeServicesForm)))
+  ),
   'kubeServicesForm',
   ['values', 'onChange', 'appName', 'selector', 'isEditMode', 'namespace'],
   kubeServicesValidation
@@ -201,7 +212,7 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  EnvironmentVariablesFieldset,
+  withControlledInput(EnvironmentVariablesFieldset),
   'kubeEnvironmentVariablesFieldset',
   ['canUndoDelete'],
   // use kubeEnvVarValidationSchema instead of envVarValidation to add a regex matches rule
@@ -210,7 +221,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection)))
+  ),
   'configMapsFormSection',
   ['values', 'onChange', 'namespace'],
   configurationsValidationSchema
@@ -218,7 +231,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(SecretsFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(SecretsFormSection)))
+  ),
   'secretsFormSection',
   ['values', 'onChange', 'namespace'],
   configurationsValidationSchema
@@ -240,7 +255,11 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(ResourceReservationFormSection))),
+  withControlledInput(
+    withUIRouter(
+      withCurrentUser(withReactQuery(ResourceReservationFormSection))
+    )
+  ),
   'resourceReservationFormSection',
   [
     'namespaceHasQuota',
@@ -253,7 +272,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection)))
+  ),
   'replicationFormSection',
   [
     'supportScalableReplicaDeployment',
@@ -266,7 +287,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection)))
+  ),
   'autoScalingFormSection',
   ['isMetricsEnabled'],
   autoScalingValidation

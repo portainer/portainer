@@ -22,7 +22,8 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
+import { HelmApplication } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
@@ -287,13 +288,6 @@ class KubernetesApplicationHelper {
           svc.ApplicationOwner = app.ApplicationOwner;
           svc.ApplicationName = app.ApplicationName;
           svc.Type = service.spec.type;
-          if (service.spec.type === KubernetesServiceTypes.CLUSTER_IP) {
-            svc.Type = 1;
-          } else if (service.spec.type === KubernetesServiceTypes.NODE_PORT) {
-            svc.Type = 2;
-          } else if (service.spec.type === KubernetesServiceTypes.LOAD_BALANCER) {
-            svc.Type = 3;
-          }
 
           let ports = [];
           service.spec.ports.forEach(function (port) {
@@ -373,15 +367,15 @@ class KubernetesApplicationHelper {
   static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler, replicasCount) {
     const res = new KubernetesApplicationAutoScalerFormValue();
     if (autoScaler) {
-      res.IsUsed = true;
-      res.MinReplicas = autoScaler.MinReplicas;
-      res.MaxReplicas = autoScaler.MaxReplicas;
-      res.TargetCPUUtilization = autoScaler.TargetCPUUtilization;
-      res.ApiVersion = autoScaler.ApiVersion;
+      res.isUsed = true;
+      res.minReplicas = autoScaler.MinReplicas;
+      res.maxReplicas = autoScaler.MaxReplicas;
+      res.targetCpuUtilizationPercentage = autoScaler.TargetCPUUtilization;
+      res.apiVersion = autoScaler.ApiVersion;
     } else {
-      res.ApiVersion = 'apps/v1';
-      res.MinReplicas = replicasCount;
-      res.MaxReplicas = replicasCount;
+      res.apiVersion = 'apps/v1';
+      res.minReplicas = replicasCount;
+      res.maxReplicas = replicasCount;
     }
     return res;
   }
@@ -461,7 +455,7 @@ class KubernetesApplicationHelper {
   }
 
   static generateAffinityFromPlacements(app, formValues) {
-    if (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
+    if (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.Replicated) {
       const placements = formValues.Placements;
       const res = new KubernetesPodNodeAffinityPayload();
       let expressions = _.map(placements, (p) => {
@@ -545,7 +539,7 @@ class KubernetesApplicationHelper {
     const helmAppsList = helmAppsEntriesList.map(([helmInstance, applications]) => {
       const helmApp = new HelmApplication();
       helmApp.Name = helmInstance;
-      helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
+      helmApp.ApplicationType = KubernetesApplicationTypes.Helm;
       helmApp.ApplicationOwner = applications[0].ApplicationOwner;
       helmApp.KubernetesApplications = applications;
 

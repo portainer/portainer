@@ -1,9 +1,9 @@
 import { FormikErrors } from 'formik';
 import { useMemo } from 'react';
+import uuidv4 from 'uuid/v4';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { StorageClass } from '@/react/portainer/environments/types';
-import { KubernetesApplicationTypes } from '@/kubernetes/models/application/models';
 
 import { Option } from '@@/form-components/PortainerSelect';
 import { InlineLoader } from '@@/InlineLoader';
@@ -43,11 +43,7 @@ export function PersistedFoldersFormSection({
   const PVCOptions = usePVCOptions(availableVolumes);
 
   return (
-    <FormSection
-      title="Persisted folders"
-      titleSize="sm"
-      titleClassName="control-label !text-[0.9em]"
-    >
+    <FormSection title="Persisted folders" titleSize="sm">
       {storageClasses.length === 0 && (
         <TextTip color="blue">
           No storage option is available to persist data, contact your
@@ -81,17 +77,21 @@ export function PersistedFoldersFormSection({
             initialValues={initialValues}
           />
         )}
-        itemBuilder={() => ({
-          persistentVolumeClaimName:
-            availableVolumes[0]?.PersistentVolumeClaim.Name || '',
-          containerPath: '',
-          size: '',
-          sizeUnit: 'GB',
-          storageClass: storageClasses[0],
-          useNewVolume: true,
-          existingVolume: undefined,
-          needsDeletion: false,
-        })}
+        itemBuilder={() => {
+          const newVolumeClaimName = `${applicationValues.Name}-${uuidv4()}`;
+          return {
+            persistentVolumeClaimName:
+              availableVolumes[0]?.PersistentVolumeClaim.Name ||
+              newVolumeClaimName,
+            containerPath: '',
+            size: '',
+            sizeUnit: 'GB',
+            storageClass: storageClasses[0],
+            useNewVolume: true,
+            existingVolume: undefined,
+            needsDeletion: false,
+          };
+        }}
         addLabel="Add persisted folder"
         canUndoDelete={isEdit}
       />
@@ -100,9 +100,7 @@ export function PersistedFoldersFormSection({
 
   function isDeleteButtonHidden() {
     return (
-      (isEdit &&
-        applicationValues.ApplicationType ===
-          KubernetesApplicationTypes.STATEFULSET) ||
+      (isEdit && applicationValues.ApplicationType === 'StatefulSet') ||
       applicationValues.Containers.length >= 1
     );
   }

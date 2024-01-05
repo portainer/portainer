@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models/appConstants';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 

@@ -37,14 +37,6 @@ export function preparePaths(ingressName: string, hosts: Host[]) {
   );
 }
 
-export function prepareAnnotations(annotations: Annotation[]) {
-  const result: Record<string, string> = {};
-  annotations.forEach((a) => {
-    result[a.Key] = a.Value;
-  });
-  return result;
-}
-
 function getSecretByHost(host: string, tls?: TLS[]) {
   let secret = '';
   if (tls) {

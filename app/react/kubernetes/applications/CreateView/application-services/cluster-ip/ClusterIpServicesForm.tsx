@@ -1,8 +1,6 @@
 import { Plus } from 'lucide-react';
 import { FormikErrors } from 'formik';
 
-import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
-
 import { Card } from '@@/Card';
 import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
@@ -36,8 +34,7 @@ export function ClusterIpServicesForm({
   isEditMode,
 }: Props) {
   const clusterIPServiceCount = services.filter(
-    (service) =>
-      service.Type === KubernetesApplicationPublishingTypes.CLUSTER_IP
+    (service) => service.Type === 'ClusterIP'
   ).length;
   return (
     <Card className="pb-5">
@@ -50,8 +47,7 @@ export function ClusterIpServicesForm({
         {clusterIPServiceCount > 0 && (
           <div className="flex w-full flex-col gap-4">
             {services.map((service, index) =>
-              service.Type ===
-              KubernetesApplicationPublishingTypes.CLUSTER_IP ? (
+              service.Type === 'ClusterIP' ? (
                 <ClusterIpServiceForm
                   key={index}
                   serviceName={service.Name}
@@ -86,7 +82,7 @@ export function ClusterIpServicesForm({
                 services.length + 1,
                 services
               );
-              newService.Type = KubernetesApplicationPublishingTypes.CLUSTER_IP;
+              newService.Type = 'ClusterIP';
               const newServicePort = newPort(newService.Name);
               newService.Ports = [newServicePort];
               newService.Selector = selector;

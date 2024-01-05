@@ -1,11 +1,11 @@
 import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 
 class KubernetesVolumeHelper {
   // TODO: review
   // the following condition
-  // && (app.ApplicationType === KubernetesApplicationTypes.STATEFULSET ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true);
+  // && (app.ApplicationType === KubernetesApplicationTypes.StatefulSet ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true);
   // is made to enforce finding the good SFS when multiple SFS in the same namespace
   // are referencing an internal PVC using the same internal name
   // (PVC are not exposed to other apps so they can have the same name in differents SFS)
@@ -16,7 +16,7 @@ class KubernetesVolumeHelper {
       return (
         volume.ResourcePool.Namespace.Name === app.ResourcePool &&
         matchingNames.length &&
-        (app.ApplicationType === KubernetesApplicationTypes.STATEFULSET ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true)
+        (app.ApplicationType === KubernetesApplicationTypes.StatefulSet ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true)
       );
     });
   }

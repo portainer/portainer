@@ -103,9 +103,16 @@
                 ></kube-services-form>
               </div>
               <!-- kubernetes services options -->
-              <kubernetes-summary-view form-values="ctrl.formValues" old-form-values="ctrl.savedFormValues"></kubernetes-summary-view>
-              <!-- #region ACTIONS -->
+              <!-- kubernetes summary for external application -->
+              <application-summary-section
+                application-kind="ctrl.formValues.ApplicationType"
+                form-values="ctrl.formValues"
+                old-form-values="ctrl.savedFormValues"
+                ng-if="ctrl.isExternalApplication()"
+              ></application-summary-section>
+              <!-- kubernetes summary for external application -->
               <div class="col-sm-12 form-section-title !mt-6" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
+              <!-- #region ACTIONS -->
               <div class="form-group" ng-hide="ctrl.stack.IsComposeFormat">
                 <div class="col-sm-12">
                   <button
@@ -423,12 +430,12 @@
 
                   <!-- #region DATA ACCESS POLICY -->
                   <div ng-if="ctrl.showDataAccessPolicySection()">
-                    <data-access-policy-form-section
+                    <access-policy-form-section
                       value="ctrl.formValues.DataAccessPolicy"
                       on-change="(ctrl.onDataAccessPolicyChange)"
                       is-edit="ctrl.state.isEdit"
                       persisted-folders-use-existing-volumes="ctrl.state.persistedFoldersUseExistingVolumes"
-                    ></data-access-policy-form-section>
+                    ></access-policy-form-section>
                   </div>
                   <!-- #endregion -->
 
@@ -451,7 +458,7 @@
                   ></app-deployment-type-form-section>
 
                   <!-- replica count -->
-                  <div ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+                  <div ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated">
                     <replication-form-section
                       values="{replicaCount: ctrl.formValues.ReplicaCount}"
                       on-change="(ctrl.onChangeReplicaCount)"
@@ -466,9 +473,9 @@
                   <!-- #endregion -->
 
                   <!-- #region AUTO SCALING -->
-                  <div ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL">
+                  <div ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.Global">
                     <auto-scaling-form-section
-                      values="{isUsed: ctrl.formValues.AutoScaler.IsUsed, minReplicas: ctrl.formValues.AutoScaler.MinReplicas, maxReplicas: ctrl.formValues.AutoScaler.MaxReplicas, targetCpuUtilizationPercentage: ctrl.formValues.AutoScaler.TargetCPUUtilization}"
+                      values="ctrl.formValues.AutoScaler"
                       on-change="(ctrl.onAutoScaleChange)"
                       validation-data="{autoScalerOverflow: ctrl.autoScalerOverflow()}"
                       is-metrics-enabled="ctrl.state.useServerMetrics"
@@ -478,7 +485,7 @@
                 </div>
 
                 <placement-form-section
-                  ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED"
+                  ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated"
                   values="{placements: ctrl.formValues.Placements, placementType: ctrl.formValues.PlacementType}"
                   on-change="(ctrl.onChangePlacements)"
                 ></placement-form-section>
@@ -497,11 +504,12 @@
                   ></kube-services-form>
                 </div>
                 <!-- kubernetes services options -->
-                <kubernetes-summary-view
+                <application-summary-section
+                  application-kind="ctrl.formValues.ApplicationType"
                   ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
                   form-values="ctrl.formValues"
                   old-form-values="ctrl.savedFormValues"
-                ></kubernetes-summary-view>
+                ></application-summary-section>
               </div>
               <!-- #region ACTIONS -->
               <div class="col-sm-12 form-section-title !mt-6" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>

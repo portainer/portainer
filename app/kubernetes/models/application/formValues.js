@@ -1,11 +1,11 @@
 import { PorImageRegistryModel } from '@/docker/models/porImageRegistry';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from './models';
+import { KubernetesApplicationTypes, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models/appConstants';
 
 /**
  * KubernetesApplicationFormValues Model
  */
 export function KubernetesApplicationFormValues() {
-  this.ApplicationType = undefined; // will only exist for formValues generated from Application (app edit situation;
+  this.ApplicationType = KubernetesApplicationTypes.Deployment; // will only exist for formValues generated from Application (app edit situation;
   this.ResourcePool = {};
   this.Name = '';
   this.StackName = '';
@@ -14,13 +14,13 @@ export function KubernetesApplicationFormValues() {
   this.Note = '';
   this.MemoryLimit = 0;
   this.CpuLimit = 0;
-  this.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
+  this.DeploymentType = KubernetesApplicationDeploymentTypes.Replicated;
   this.ReplicaCount = 1;
   this.AutoScaler = {};
   this.Containers = [];
   this.Services = [];
   this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
-  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
+  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.Isolated;
   this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
   this.ConfigMaps = [];
   this.Secrets = [];
@@ -130,11 +130,11 @@ export function KubernetesApplicationPlacementFormValue() {
  * KubernetesApplicationAutoScalerFormValue Model
  */
 const _KubernetesApplicationAutoScalerFormValue = Object.freeze({
-  MinReplicas: 0,
-  MaxReplicas: 0,
-  TargetCPUUtilization: 50,
-  ApiVersion: '',
-  IsUsed: false,
+  minReplicas: 0,
+  maxReplicas: 0,
+  targetCpuUtilizationPercentage: 50,
+  apiVersion: '',
+  isUsed: false,
 });
 
 export class KubernetesApplicationAutoScalerFormValue {
