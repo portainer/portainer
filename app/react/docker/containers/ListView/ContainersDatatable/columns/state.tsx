@@ -38,9 +38,9 @@ function StatusCell({
 
   let transformedStatus = status;
   if (transformedStatus === ContainerStatus.Exited) {
-    transformedStatus = `${transformedStatus} (${extractExitCode(
+    transformedStatus = `${transformedStatus} - code ${extractExitCode(
       container.StatusText
-    )})` as ContainerStatus;
+    )}` as ContainerStatus;
   }
 
   return (
