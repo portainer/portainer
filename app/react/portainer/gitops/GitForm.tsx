@@ -1,5 +1,6 @@
 import { array, boolean, object, SchemaOf, string } from 'yup';
 import { FormikErrors } from 'formik';
+import { useState } from 'react';
 
 import { ComposePathField } from '@/react/portainer/gitops/ComposePathField';
 import { RefField } from '@/react/portainer/gitops/RefField';
@@ -35,7 +36,7 @@ interface Props {
 }
 
 export function GitForm({
-  value,
+  value: initialValue,
   onChange,
   environmentType = 'DOCKER',
   deployMethod = 'compose',
@@ -48,6 +49,7 @@ export function GitForm({
   webhookId,
   webhooksDocs,
 }: Props) {
+  const [value, setValue] = useState(initialValue); // TODO: remove this state when form is not inside angularjs
   return (
     <FormSection title="Git repository">
       <AuthFieldset
@@ -126,6 +128,7 @@ export function GitForm({
 
   function handleChange(partialValue: Partial<GitFormModel>) {
     onChange(partialValue);
+    setValue((value) => ({ ...value, ...partialValue }));
   }
 }
 
