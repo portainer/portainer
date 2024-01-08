@@ -12,15 +12,16 @@ import { useCustomTemplates } from '@/react/portainer/templates/custom-templates
 import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
 
 import { CustomTemplate } from '../types';
+import { TemplateViewType } from '../useViewType';
 
 export function useValidation({
-  isEdge,
   isGit,
   templateId,
+  viewType,
 }: {
-  isEdge: boolean;
   isGit: boolean;
   templateId: CustomTemplate['Id'];
+  viewType: TemplateViewType;
 }) {
   const { user } = useCurrentUser();
   const gitCredentialsQuery = useGitCredentials(user.Id);
@@ -45,19 +46,20 @@ export function useValidation({
           ? buildGitValidationSchema(gitCredentialsQuery.data || [])
           : mixed(),
         Variables: variablesValidation(),
-        EdgeSettings: isEdge ? edgeFieldsetValidation() : mixed(),
+        EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
       }).concat(
         commonFieldsValidation({
           templates: customTemplatesQuery.data,
           currentTemplateId: templateId,
+          viewType,
         })
       ),
     [
       customTemplatesQuery.data,
       gitCredentialsQuery.data,
-      isEdge,
       isGit,
       templateId,
+      viewType,
     ]
   );
 }

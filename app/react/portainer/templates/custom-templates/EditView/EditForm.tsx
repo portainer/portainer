@@ -10,6 +10,7 @@ import { isKubernetesEnvironment } from '@/react/portainer/environments/utils';
 import { CustomTemplate } from '../types';
 import { useUpdateTemplateMutation } from '../queries/useUpdateTemplateMutation';
 import { useCustomTemplateFile } from '../queries/useCustomTemplateFile';
+import { TemplateViewType } from '../useViewType';
 
 import { useInitialValues } from './useInitialValues';
 import { FormValues } from './types';
@@ -19,9 +20,11 @@ import { InnerForm } from './InnerForm';
 export function EditForm({
   template,
   environmentId,
+  viewType,
 }: {
   template: CustomTemplate;
   environmentId?: EnvironmentId;
+  viewType: TemplateViewType;
 }) {
   const isEdge = template.EdgeTemplate;
   const isGit = !!template.GitConfig;
@@ -29,7 +32,11 @@ export function EditForm({
   const router = useRouter();
   const disableEditor = useDisableEditor(isGit);
   const mutation = useUpdateTemplateMutation();
-  const validation = useValidation({ isEdge, isGit, templateId: template.Id });
+  const validation = useValidation({
+    viewType,
+    isGit,
+    templateId: template.Id,
+  });
 
   const fileContentQuery = useCustomTemplateFile(template.Id);
 
