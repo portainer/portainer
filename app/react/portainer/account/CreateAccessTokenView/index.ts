@@ -1,1 +1,1 @@
-export { CreateAccessToken } from './CreateAccessToken';
+export { CreateUserAccessToken } from './CreateUserAccessToken';
