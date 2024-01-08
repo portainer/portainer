@@ -6,7 +6,7 @@ import { UserContext } from '@/react/hooks/useUser';
 
 import { CreateUserAccessToken } from './CreateUserAccessToken';
 
-test('the button is disabled when description is missing and enabled when description is filled', async () => {
+test('the button is disabled when all fields are blank and enabled when all fields are filled', async () => {
   const { getByRole, getByLabelText } = renderComponent();
 
   const button = getByRole('button', { name: 'Add access token' });
