@@ -48,18 +48,6 @@ func TarGzDir(absolutePath string) (string, error) {
 }
 
 func addToArchive(tarWriter *tar.Writer, pathInArchive string, path string, info os.FileInfo) error {
-	header, err := tar.FileInfoHeader(info, info.Name())
-	if err != nil {
-		return err
-	}
-
-	header.Name = pathInArchive // use relative paths in archive
-
-	err = tarWriter.WriteHeader(header)
-	if err != nil {
-		return err
-	}
-
 	if info.IsDir() {
 		return nil
 	}
@@ -68,6 +56,26 @@ func addToArchive(tarWriter *tar.Writer, pathInArchive string, path string, info
 	if err != nil {
 		return err
 	}
+
+	stat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+
+	header, err := tar.FileInfoHeader(stat, stat.Name())
+	if err != nil {
+		return err
+	}
+	header.Name = pathInArchive // use relative paths in archive
+
+	err = tarWriter.WriteHeader(header)
+	if err != nil {
+		return err
+	}
+	if stat.IsDir() {
+		return nil
+	}
+
 	_, err = io.Copy(tarWriter, file)
 	return err
 }
@@ -98,7 +106,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 			// skip, dir will be created with a file
 		case tar.TypeReg:
 			p := filepath.Clean(filepath.Join(outputDirPath, header.Name))
-			if err := os.MkdirAll(filepath.Dir(p), 0744); err != nil {
+			if err := os.MkdirAll(filepath.Dir(p), 0o744); err != nil {
 				return fmt.Errorf("Failed to extract dir %s", filepath.Dir(p))
 			}
 			outFile, err := os.Create(p)
