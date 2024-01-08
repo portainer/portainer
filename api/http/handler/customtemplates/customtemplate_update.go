@@ -211,10 +211,12 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		customTemplate.GitConfig = gitConfig
 	} else {
 		templateFolder := strconv.Itoa(customTemplateID)
-		_, err = handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
+		projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist updated custom template file on disk", err)
 		}
+
+		customTemplate.ProjectPath = projectPath
 	}
 
 	err = handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate)
