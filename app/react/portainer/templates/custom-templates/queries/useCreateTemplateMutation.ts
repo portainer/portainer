@@ -42,7 +42,6 @@ interface CreateTemplatePayload {
   Description: string;
   Note: string;
   Logo: string;
-  AccessControl?: AccessControlFormData;
 }
 
 export function useCreateTemplateMutation() {
@@ -50,7 +49,9 @@ export function useCreateTemplateMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (payload: CreateTemplatePayload) => {
+    async (
+      payload: CreateTemplatePayload & { AccessControl?: AccessControlFormData }
+    ) => {
       const template = await createTemplate(user.Id, payload);
       const resourceControl = template.ResourceControl;
 

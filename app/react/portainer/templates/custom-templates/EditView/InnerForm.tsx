@@ -5,31 +5,36 @@ import { CommonFields } from '@/react/portainer/custom-templates/components/Comm
 import { CustomTemplatesVariablesDefinitionField } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { PlatformField } from '@/react/portainer/custom-templates/components/PlatformSelector';
 import { GitForm } from '@/react/portainer/gitops/GitForm';
-import {
-  getTemplateVariables,
-  intersectVariables,
-  isTemplateVariablesEnabled,
-} from '@/react/portainer/custom-templates/components/utils';
+import { isTemplateVariablesEnabled } from '@/react/portainer/custom-templates/components/utils';
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
 import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 import { EdgeTemplateSettings } from '@/react/portainer/templates/custom-templates/types';
 import { EdgeSettingsFieldset } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset';
+import { StackType } from '@/react/common/stacks/types';
+import { textByType } from '@/react/common/stacks/common/form-texts';
+import { EnvironmentId } from '@/react/portainer/environments/types';
+import { AccessControlForm } from '@/react/portainer/access-control';
+import { AccessControlFormData } from '@/react/portainer/access-control/types';
 
 import { WebEditorForm, usePreventExit } from '@@/WebEditorForm';
 import { FormActions } from '@@/form-components/FormActions';
 import { Button } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
 
+import { useParseTemplateOnFileChange } from '../useParseTemplateOnFileChange';
+
 import { FormValues } from './types';
 
 export function InnerForm({
   isLoading,
+  environmentId,
   isEditorReadonly,
   gitFileContent,
   gitFileError,
   refreshGitFile,
 }: {
   isLoading: boolean;
+  environmentId?: EnvironmentId;
   isEditorReadonly: boolean;
   gitFileContent?: string;
   gitFileError?: string;
@@ -42,9 +47,9 @@ export function InnerForm({
     errors,
     isValid,
     setFieldError,
+    setValues,
     isSubmitting,
     dirty,
-    setValues,
   } = useFormikContext<FormValues>();
 
   usePreventExit(
@@ -52,6 +57,13 @@ export function InnerForm({
     values.FileContent,
     !isEditorReadonly && !isSubmitting && !isLoading
   );
+
+  const handleChangeFileContent = useParseTemplateOnFileChange(
+    values.Variables
+  );
+
+  const texts = textByType[values.Type];
+
   return (
     <Form className="form-horizontal">
       <CommonFields
@@ -62,15 +74,19 @@ export function InnerForm({
         errors={errors}
       />
 
-      <PlatformField
-        value={values.Platform}
-        onChange={(value) => setFieldValue('Platform', value)}
-      />
+      {values.Type !== StackType.Kubernetes && (
+        <>
+          <PlatformField
+            value={values.Platform}
+            onChange={(value) => setFieldValue('Platform', value)}
+          />
 
-      <TemplateTypeSelector
-        value={values.Type}
-        onChange={(value) => setFieldValue('Type', value)}
-      />
+          <TemplateTypeSelector
+            value={values.Type}
+            onChange={(value) => setFieldValue('Type', value)}
+          />
+        </>
+      )}
 
       <WebEditorForm
         id="edit-custom-template-editor"
@@ -80,32 +96,13 @@ export function InnerForm({
         placeholder={
           gitFileContent
             ? 'Preview of the file from git repository'
-            : 'Define or paste the content of your docker compose file here'
+            : texts.editor.placeholder
         }
         error={errors.FileContent}
         readonly={isEditorReadonly}
       >
-        <p>
-          You can get more information about Compose file format in the{' '}
-          <a
-            href="https://docs.docker.com/compose/compose-file/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            official documentation
-          </a>
-          .
-        </p>
+        {texts.editor.description}
       </WebEditorForm>
-
-      {isTemplateVariablesEnabled && (
-        <CustomTemplatesVariablesDefinitionField
-          value={values.Variables}
-          onChange={(values) => setFieldValue('Variables', values)}
-          isVariablesNamesFromParent={!isEditorReadonly}
-          errors={errors.Variables}
-        />
-      )}
 
       {values.Git && (
         <>
@@ -117,6 +114,9 @@ export function InnerForm({
                 // set ! for values.Git because this callback will only be called when it's defined (see L94)
                 Git: { ...values.Git!, ...newValues },
               }))
+            }
+            deployMethod={
+              values.Type === StackType.Kubernetes ? 'manifest' : 'compose'
             }
             errors={typeof errors.Git === 'object' ? errors.Git : undefined}
           />
@@ -135,6 +135,25 @@ export function InnerForm({
             )}
           </div>
         </>
+      )}
+
+      {isTemplateVariablesEnabled && (
+        <CustomTemplatesVariablesDefinitionField
+          value={values.Variables}
+          onChange={(values) => setFieldValue('Variables', values)}
+          isVariablesNamesFromParent={!isEditorReadonly}
+          errors={errors.Variables}
+        />
+      )}
+
+      {!!values.AccessControl && (
+        <AccessControlForm
+          environmentId={environmentId || 0}
+          onChange={(values) => setFieldValue('AccessControl', values)}
+          values={values.AccessControl}
+          errors={errors.AccessControl as FormikErrors<AccessControlFormData>}
+          formNamespace="accessControl"
+        />
       )}
 
       {values.EdgeSettings && (
@@ -163,33 +182,4 @@ export function InnerForm({
       />
     </Form>
   );
-
-  function handleChangeFileContent(value: string) {
-    setFieldValue(
-      'FileContent',
-      value,
-      isTemplateVariablesEnabled ? !value : true
-    );
-    parseTemplate(value);
-  }
-
-  function parseTemplate(value: string) {
-    if (!isTemplateVariablesEnabled || value === '') {
-      setFieldValue('Variables', []);
-      return;
-    }
-
-    const [variables, validationError] = getTemplateVariables(value);
-
-    setFieldError(
-      'FileContent',
-      validationError ? `Template invalid: ${validationError}` : undefined
-    );
-    if (variables) {
-      setFieldValue(
-        'Variables',
-        intersectVariables(values.Variables, variables)
-      );
-    }
-  }
 }

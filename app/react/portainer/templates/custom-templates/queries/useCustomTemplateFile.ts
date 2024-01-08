@@ -19,6 +19,9 @@ export function useCustomTemplateFile(id?: CustomTemplate['Id'], git = false) {
     {
       ...withGlobalError('Failed to get custom template file'),
       enabled: !!id,
+      // there's nothing to do with a new file content, so we're disabling refetch
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
     }
   );
 }

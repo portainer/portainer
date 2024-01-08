@@ -16,19 +16,20 @@ import { InnerForm } from './InnerForm';
 
 export function CreateForm({
   environmentId,
-  defaultType,
+  viewType,
 }: {
   environmentId?: EnvironmentId;
-  defaultType: StackType;
+  viewType: 'kube' | 'docker' | 'edge';
 }) {
   const isEdge = !environmentId;
   const router = useRouter();
   const mutation = useCreateTemplateMutation();
-  const validation = useValidation(isEdge);
+  const validation = useValidation({ viewType });
   const buildMethods = useBuildMethods();
 
   const initialValues = useInitialValues({
-    defaultType,
+    defaultType:
+      viewType === 'kube' ? StackType.Kubernetes : StackType.DockerCompose,
     isEdge,
     buildMethods: buildMethods.map((method) => method.value),
   });

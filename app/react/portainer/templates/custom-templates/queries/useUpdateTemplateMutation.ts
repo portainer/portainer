@@ -8,6 +8,8 @@ import {
 } from '@/react-tools/react-query';
 import { StackType } from '@/react/common/stacks/types';
 import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
+import { AccessControlFormData } from '@/react/portainer/access-control/types';
+import { applyResourceControl } from '@/react/portainer/access-control/access-control.service';
 
 import { CustomTemplate, EdgeTemplateSettings } from '../types';
 import { Platform } from '../../types';
@@ -18,7 +20,21 @@ export function useUpdateTemplateMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(
-    updateTemplate,
+    async (
+      payload: CustomTemplateUpdatePayload & {
+        AccessControl?: AccessControlFormData;
+        resourceControlId?: number;
+      }
+    ) => {
+      await updateTemplate(payload);
+
+      if (payload.resourceControlId && payload.AccessControl) {
+        await applyResourceControl(
+          payload.AccessControl,
+          payload.resourceControlId
+        );
+      }
+    },
     mutationOptions(
       withInvalidate(queryClient, [['custom-templates']]),
       withGlobalError('Failed to update template')
@@ -30,6 +46,7 @@ export function useUpdateTemplateMutation() {
  * Payload for updating a custom template
  */
 interface CustomTemplateUpdatePayload {
+  id: CustomTemplate['Id'];
   /** URL of the template's logo */
   Logo?: string;
   /** Title of the template */
@@ -78,9 +95,7 @@ interface CustomTemplateUpdatePayload {
   EdgeSettings?: EdgeTemplateSettings;
 }
 
-async function updateTemplate(
-  values: CustomTemplateUpdatePayload & { id: CustomTemplate['Id'] }
-) {
+async function updateTemplate(values: CustomTemplateUpdatePayload) {
   try {
     const { data } = await axios.put<CustomTemplate>(
       buildUrl({ id: values.id }),

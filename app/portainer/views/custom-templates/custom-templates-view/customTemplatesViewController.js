@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { isTemplateVariablesEnabled, renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { confirmDelete } from '@@/modals/confirm';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/react/portainer/custom-templates/components/CommonFields';
 
 class CustomTemplatesViewController {
   /* @ngInject */

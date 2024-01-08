@@ -91,33 +91,52 @@ export function CommonFields({
 export function validation({
   currentTemplateId,
   templates = [],
-  title,
+  viewType = 'docker',
 }: {
   currentTemplateId?: CustomTemplate['Id'];
   templates?: Array<CustomTemplate>;
-  title?: { pattern: string; error: string };
+  viewType?: 'kube' | 'docker' | 'edge';
 } = {}): SchemaOf<Values> {
-  let titleSchema = string()
-    .required('Title is required.')
-    .test(
-      'is-unique',
-      'Title must be unique',
-      (value) =>
-        !value ||
-        !templates.some(
-          (template) =>
-            template.Title === value && template.Id !== currentTemplateId
-        )
-    );
-  if (title?.pattern) {
-    const pattern = new RegExp(title.pattern);
-    titleSchema = titleSchema.matches(pattern, title.error);
-  }
+  const titlePattern = titlePatternValidation(viewType);
 
   return object({
-    Title: titleSchema,
+    Title: string()
+      .required('Title is required.')
+      .test(
+        'is-unique',
+        'Title must be unique',
+        (value) =>
+          !value ||
+          !templates.some(
+            (template) =>
+              template.Title === value && template.Id !== currentTemplateId
+          )
+      )
+      .matches(titlePattern.pattern, titlePattern.error),
     Description: string().required('Description is required.'),
     Note: string().default(''),
     Logo: string().default(''),
   });
+}
+
+export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
+
+const KUBE_TEMPLATE_NAME_VALIDATION_REGEX =
+  '^(([a-z0-9](?:(?:[-a-z0-9_.]){0,61}[a-z0-9])?))$'; // alphanumeric, lowercase, can contain dashes, dots and underscores, max 63 characters
+
+function titlePatternValidation(type: 'kube' | 'docker' | 'edge') {
+  switch (type) {
+    case 'kube':
+      return {
+        pattern: new RegExp(KUBE_TEMPLATE_NAME_VALIDATION_REGEX),
+        error:
+          "This field must consist of lower-case alphanumeric characters, '.', '_' or '-', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').",
+      };
+    default:
+      return {
+        pattern: new RegExp(TEMPLATE_NAME_VALIDATION_REGEX),
+        error:
+          "This field must consist of lower-case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').",
+      };
+  }
 }

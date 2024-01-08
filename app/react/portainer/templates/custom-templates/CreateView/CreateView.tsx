@@ -1,15 +1,14 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
-
-import { StackType } from '@/react/common/stacks/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 
+import { useViewType } from '../useViewType';
+
 import { CreateForm } from './CreateForm';
 
 export function CreateView() {
-  const defaultType = useDefaultType();
+  const viewType = useViewType();
   const environmentId = useEnvironmentId(false);
 
   return (
@@ -26,26 +25,11 @@ export function CreateView() {
         <div className="col-sm-12">
           <Widget>
             <Widget.Body>
-              <CreateForm
-                defaultType={defaultType}
-                environmentId={environmentId}
-              />
+              <CreateForm viewType={viewType} environmentId={environmentId} />
             </Widget.Body>
           </Widget>
         </div>
       </div>
     </div>
   );
-}
-
-function useDefaultType() {
-  const {
-    state: { name },
-  } = useCurrentStateAndParams();
-  if (name?.includes('kubernetes')) {
-    return StackType.Kubernetes;
-  }
-
-  // edge or docker
-  return StackType.DockerCompose;
 }
