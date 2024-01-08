@@ -36,11 +36,11 @@ function StatusCell({
 
   const statusClassName = getClassName();
 
-  let transformedStatus = status;
+  let transformedStatus: ContainerStatus | string = status;
   if (transformedStatus === ContainerStatus.Exited) {
     transformedStatus = `${transformedStatus} - code ${extractExitCode(
       container.StatusText
-    )}` as ContainerStatus;
+    )}`;
   }
 
   return (
