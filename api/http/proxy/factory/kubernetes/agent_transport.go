@@ -57,5 +57,11 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
 	request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 
-	return transport.baseTransport.RoundTrip(request)
+	response, err := transport.baseTransport.RoundTrip(request)
+	if err != nil {
+		return response, err
+	}
+	response.Header.Set(portainer.PortainerCacheHeader, "true")
+
+	return response, err
 }

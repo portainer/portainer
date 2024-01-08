@@ -1,5 +1,9 @@
-import axiosOrigin, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { setupCache } from 'axios-cache-adapter';
+import Axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import {
+  setupCache,
+  buildMemoryStorage,
+  type CacheAxiosResponse,
+} from 'axios-cache-interceptor';
 import { loadProgressBar } from 'axios-progress-bar';
 
 import 'axios-progress-bar/dist/nprogress.css';
@@ -12,49 +16,59 @@ import {
   portainerAgentTargetHeader,
 } from './http-request.helper';
 
-export const cache = setupCache({
-  maxAge: CACHE_DURATION,
-  debug: false, // set to true to print cache hits/misses
-  exclude: {
-    query: false, // include urls with query params
-    methods: ['put', 'patch', 'delete'],
-    filter: (req: InternalAxiosRequestConfig) => {
-      // exclude caching get requests unless the path contains 'kubernetes'
-      if (!req.url?.includes('kubernetes') && req.method === 'get') {
-        return true;
-      }
+const portainerCacheHeader = 'X-Portainer-Cache';
 
-      const acceptHeader = req.headers?.Accept;
-      if (
-        acceptHeader &&
-        typeof acceptHeader === 'string' &&
-        acceptHeader.includes('application/yaml')
-      ) {
-        return true;
-      }
-
-      // exclude caching post requests unless the path contains 'selfsubjectaccessreview'
-      if (
-        !req.url?.includes('selfsubjectaccessreview') &&
-        req.method === 'post'
-      ) {
-        return true;
-      }
-      return false;
+const storage = buildMemoryStorage();
+// mock the cache adapter
+export const cache = {
+  store: {
+    clear: () => {
+      storage.data = {};
     },
   },
-  // ask to clear cache on mutation
-  invalidate: async (_, req) => {
-    dispatchCacheRefreshEventIfNeeded(req);
-  },
-});
+};
 
-// by default don't use the cache adapter
-const axios = axiosOrigin.create({ baseURL: 'api' });
+function headerInterpreter(headers?: CacheAxiosResponse['headers']) {
+  if (headers && headers[portainerCacheHeader]) {
+    return CACHE_DURATION / 1000; // in seconds
+  }
+
+  return 'not enough headers';
+}
+
+const axios = setupCache(Axios.create({ baseURL: 'api' }), {
+  storage,
+  ttl: 0, // default 0 for no cache
+  methods: ['get', 'head', 'options', 'post'],
+  cachePredicate: {
+    containsHeaders: {
+      accept: (header) => !header?.includes('application/yaml'),
+      [portainerCacheHeader]: () => true,
+    },
+    ignoreUrls: [/^(?!.*\bkubernetes\b).*$/gm],
+    responseMatch: (res) => {
+      if (res.config.method === 'post') {
+        // dont cache post request except for selfsubjectaccessreviews
+        if (res.config.url?.includes('selfsubjectaccessreviews')) {
+          return true;
+        }
+        return false;
+      }
+      return true;
+    },
+  },
+  headerInterpreter,
+});
+axios.interceptors.request.use((req) => {
+  dispatchCacheRefreshEventIfNeeded(req);
+  return req;
+});
 
 // when entering a kubernetes environment, or updating user settings, update the cache adapter
 export function updateAxiosAdapter(useCache: boolean) {
-  axios.defaults.adapter = useCache ? cache.adapter : undefined;
+  if (useCache) {
+    axios.defaults.cache.ttl = CACHE_DURATION;
+  }
 }
 
 loadProgressBar(undefined, axios);
@@ -173,7 +187,7 @@ export function isDefaultResponse(
 export function isAxiosError<ResponseType>(
   error: unknown
 ): error is AxiosError<ResponseType> {
-  return axiosOrigin.isAxiosError(error);
+  return Axios.isAxiosError(error);
 }
 
 export function arrayToJson<T>(arr?: Array<T>) {
