@@ -1,12 +1,18 @@
-import Axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import Axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import {
   setupCache,
   buildMemoryStorage,
-  type CacheAxiosResponse,
+  CacheAxiosResponse,
+  InterpreterResult,
+  AxiosCacheInstance,
 } from 'axios-cache-interceptor';
 import { loadProgressBar } from 'axios-progress-bar';
-
 import 'axios-progress-bar/dist/nprogress.css';
+
 import PortainerError from '@/portainer/error';
 
 import {
@@ -28,52 +34,72 @@ export const cache = {
   },
 };
 
-function headerInterpreter(headers?: CacheAxiosResponse['headers']) {
-  if (headers && headers[portainerCacheHeader]) {
+function headerInterpreter(
+  headers?: CacheAxiosResponse['headers']
+): InterpreterResult {
+  if (!headers) {
+    return 'not enough headers';
+  }
+
+  if (headers['content-type']?.includes('application/yaml')) {
+    return 'dont cache';
+  }
+
+  if (headers[portainerCacheHeader]) {
     return CACHE_DURATION / 1000; // in seconds
   }
 
   return 'not enough headers';
 }
 
-const axios = setupCache(Axios.create({ baseURL: 'api' }), {
-  storage,
-  ttl: 0, // default 0 for no cache
-  methods: ['get', 'head', 'options', 'post'],
-  cachePredicate: {
-    containsHeaders: {
-      accept: (header) => !header?.includes('application/yaml'),
-      [portainerCacheHeader]: () => true,
-    },
-    ignoreUrls: [/^(?!.*\bkubernetes\b).*$/gm],
-    responseMatch: (res) => {
-      if (res.config.method === 'post') {
-        // dont cache post request except for selfsubjectaccessreviews
-        if (res.config.url?.includes('selfsubjectaccessreviews')) {
-          return true;
-        }
-        return false;
-      }
-      return true;
-    },
-  },
-  headerInterpreter,
-});
+const axios = Axios.create({ baseURL: 'api' });
 axios.interceptors.request.use((req) => {
   dispatchCacheRefreshEventIfNeeded(req);
   return req;
 });
 
+// type guard the axios instance
+function isAxiosCacheInstance(
+  a: AxiosInstance | AxiosCacheInstance
+): a is AxiosCacheInstance {
+  return (a as AxiosCacheInstance).defaults.cache !== undefined;
+}
+
 // when entering a kubernetes environment, or updating user settings, update the cache adapter
 export function updateAxiosAdapter(useCache: boolean) {
   if (useCache) {
-    axios.defaults.cache.ttl = CACHE_DURATION;
+    if (isAxiosCacheInstance(axios)) {
+      return;
+    }
+
+    setupCache(axios, {
+      storage,
+      ttl: CACHE_DURATION,
+      methods: ['get', 'head', 'options', 'post'],
+      cachePredicate: {
+        containsHeaders: {
+          accept: (header) => !header?.includes('application/yaml'),
+          [portainerCacheHeader]: () => true,
+        },
+        ignoreUrls: [/^(?!.*\bkubernetes\b).*$/gm],
+        responseMatch: (res) => {
+          if (res.config.method === 'post') {
+            if (res.config.url?.includes('selfsubjectaccessreviews')) {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        },
+      },
+      headerInterpreter,
+    });
   }
 }
 
-loadProgressBar(undefined, axios);
-
 export default axios;
+
+loadProgressBar(undefined, axios);
 
 export const agentTargetHeader = 'X-PortainerAgent-Target';
 
