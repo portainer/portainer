@@ -76,6 +76,7 @@ export function updateAxiosAdapter(useCache: boolean) {
       storage,
       ttl: CACHE_DURATION,
       methods: ['get', 'head', 'options', 'post'],
+      // cachePredicate determines if the response should be cached based on response
       cachePredicate: {
         containsHeaders: {
           accept: (header) => !header?.includes('application/yaml'),
@@ -92,6 +93,7 @@ export function updateAxiosAdapter(useCache: boolean) {
           return true;
         },
       },
+      // headerInterpreter interprets the response headers to determine if the response should be cached
       headerInterpreter,
     });
   }
