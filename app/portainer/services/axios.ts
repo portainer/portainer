@@ -46,7 +46,7 @@ function headerInterpreter(
   }
 
   if (headers[portainerCacheHeader]) {
-    return CACHE_DURATION / 1000; // in seconds
+    return CACHE_DURATION;
   }
 
   return 'not enough headers';
