@@ -37,6 +37,7 @@ class KubernetesCreateApplicationController {
     $scope,
     $async,
     $state,
+    $timeout,
     Notifications,
     Authentication,
     KubernetesResourcePoolService,
@@ -54,6 +55,7 @@ class KubernetesCreateApplicationController {
     this.$scope = $scope;
     this.$async = $async;
     this.$state = $state;
+    this.$timeout = $timeout;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
@@ -148,8 +150,25 @@ class KubernetesCreateApplicationController {
     this.updateApplicationType = this.updateApplicationType.bind(this);
     this.getAppType = this.getAppType.bind(this);
     this.showDataAccessPolicySection = this.showDataAccessPolicySection.bind(this);
+    this.refreshReactComponent = this.refreshReactComponent.bind(this);
+
+    this.$scope.$watch(
+      () => this.formValues,
+      () => {
+        this.refreshReactComponent();
+      },
+      _.isEqual
+    );
   }
   /* #endregion */
+
+  refreshReactComponent() {
+    this.isTemporaryRefresh = true;
+
+    this.$timeout(() => {
+      this.isTemporaryRefresh = false;
+    }, 10);
+  }
 
   onChangePlacements(values) {
     return this.$async(async () => {
