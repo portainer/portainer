@@ -104,12 +104,22 @@
               </div>
               <!-- kubernetes services options -->
               <!-- kubernetes summary for external application -->
-              <application-summary-section
-                application-kind="ctrl.formValues.ApplicationType"
-                form-values="ctrl.formValues"
-                old-form-values="ctrl.savedFormValues"
-                ng-if="ctrl.isExternalApplication()"
-              ></application-summary-section>
+              <div ng-if="!ctrl.isTemporaryRefresh">
+                <application-summary-section
+                  application-kind="ctrl.formValues.ApplicationType"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                  ng-if="kubernetesApplicationCreationForm.$valid && ctrl.isExternalApplication()"
+                ></application-summary-section>
+              </div>
+              <div ng-if="ctrl.isTemporaryRefresh">
+                <application-summary-section
+                  application-kind="ctrl.formValues.ApplicationType"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                  ng-if="kubernetesApplicationCreationForm.$valid && ctrl.isExternalApplication()"
+                ></application-summary-section>
+              </div>
               <!-- kubernetes summary for external application -->
               <div class="col-sm-12 form-section-title !mt-6" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
               <!-- #region ACTIONS -->
@@ -504,12 +514,24 @@
                   ></kube-services-form>
                 </div>
                 <!-- kubernetes services options -->
-                <application-summary-section
-                  application-kind="ctrl.formValues.ApplicationType"
-                  ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
-                  form-values="ctrl.formValues"
-                  old-form-values="ctrl.savedFormValues"
-                ></application-summary-section>
+                <div ng-if="!ctrl.isTemporaryRefresh">
+                  <!-- summary -->
+                  <application-summary-section
+                    application-kind="ctrl.formValues.ApplicationType"
+                    ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
+                    form-values="ctrl.formValues"
+                    old-form-values="ctrl.savedFormValues"
+                  ></application-summary-section>
+                </div>
+                <div ng-if="ctrl.isTemporaryRefresh">
+                  <!-- summary -->
+                  <application-summary-section
+                    application-kind="ctrl.formValues.ApplicationType"
+                    ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
+                    form-values="ctrl.formValues"
+                    old-form-values="ctrl.savedFormValues"
+                  ></application-summary-section>
+                </div>
               </div>
               <!-- #region ACTIONS -->
               <div class="col-sm-12 form-section-title !mt-6" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
