@@ -4,6 +4,7 @@ type ValidationData = {
   hasQuota: boolean;
   isResourceQuotaCapacityExceeded: boolean;
   namespaceOptionCount: number;
+  isAdmin: boolean;
 };
 
 const emptyValue =
@@ -12,14 +13,22 @@ const emptyValue =
 export function namespaceSelectorValidation(
   validationData?: ValidationData
 ): SchemaOf<string> {
-  const { hasQuota, isResourceQuotaCapacityExceeded, namespaceOptionCount } =
-    validationData || {};
+  const {
+    hasQuota,
+    isResourceQuotaCapacityExceeded,
+    namespaceOptionCount,
+    isAdmin,
+  } = validationData || {};
   return string()
     .required(emptyValue)
     .typeError(emptyValue)
     .test(
       'resourceQuotaCapacityExceeded',
-      'This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the namespace.',
+      `This namespace has exhausted its resource capacity and you will not be able to deploy the application.${
+        isAdmin
+          ? ''
+          : ' Contact your administrator to expand the capacity of the namespace.'
+      }`,
       () => {
         const hasQuotaExceeded = hasQuota && isResourceQuotaCapacityExceeded;
         return !hasQuotaExceeded;

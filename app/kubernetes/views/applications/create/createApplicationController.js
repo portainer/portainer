@@ -37,6 +37,7 @@ class KubernetesCreateApplicationController {
     $scope,
     $async,
     $state,
+    $timeout,
     Notifications,
     Authentication,
     KubernetesResourcePoolService,
@@ -54,6 +55,7 @@ class KubernetesCreateApplicationController {
     this.$scope = $scope;
     this.$async = $async;
     this.$state = $state;
+    this.$timeout = $timeout;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
