@@ -41,10 +41,6 @@ function headerInterpreter(
     return 'not enough headers';
   }
 
-  if (headers['content-type']?.includes('application/yaml')) {
-    return 'dont cache';
-  }
-
   if (headers[portainerCacheHeader]) {
     return CACHE_DURATION;
   }
@@ -79,7 +75,6 @@ export function updateAxiosAdapter(useCache: boolean) {
       // cachePredicate determines if the response should be cached based on response
       cachePredicate: {
         containsHeaders: {
-          accept: (header) => !header?.includes('application/yaml'),
           [portainerCacheHeader]: () => true,
         },
         ignoreUrls: [/^(?!.*\bkubernetes\b).*$/gm],
