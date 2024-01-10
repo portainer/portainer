@@ -1,4 +1,5 @@
-import { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { CacheAxiosResponse } from 'axios-cache-interceptor';
 import { IHttpResponse } from 'angular';
 
 import axios from './axios';
@@ -8,7 +9,9 @@ axios.interceptors.request.use(csrfInterceptor);
 
 let csrfToken: string | null = null;
 
-export function csrfTokenReaderInterceptor(config: AxiosResponse) {
+export function csrfTokenReaderInterceptor(
+  config: CacheAxiosResponse | AxiosResponse
+) {
   const csrfTokenHeader = config.headers['x-csrf-token'];
   if (csrfTokenHeader) {
     csrfToken = csrfTokenHeader;

@@ -216,6 +216,14 @@ async function getApplicationByKind<
       buildUrl(environmentId, namespace, `${appKind}s`, name),
       {
         headers: { Accept: yaml ? 'application/yaml' : 'application/json' },
+        // this logic is to get the latest YAML response
+        // axios-cache-adapter looks for the response headers to determine if the response should be cached
+        // to avoid writing requestInterceptor, adding a query param to the request url
+        params: yaml
+          ? {
+              _: Date.now(),
+            }
+          : null,
       }
     );
     return data;

@@ -74,7 +74,7 @@
     "angularjs-slider": "^6.4.0",
     "angulartics": "^1.6.0",
     "axios": "^1.6.2",
-    "axios-cache-adapter": "^2.7.3",
+    "axios-cache-interceptor": "^1.4.1",
     "axios-progress-bar": "^1.2.0",
     "babel-plugin-angularjs-annotate": "^0.10.0",
     "bootstrap": "^3.4.0",

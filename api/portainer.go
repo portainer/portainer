@@ -1638,6 +1638,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token
 	AuthCookieKey = "portainer_api_key"
+	// PortainerCacheHeader is used to enabled FE caching for Kubernetes resources
+	PortainerCacheHeader = "X-Portainer-Cache"
 )
 
 // List of supported features

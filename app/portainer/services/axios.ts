@@ -1,8 +1,18 @@
-import axiosOrigin, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { setupCache } from 'axios-cache-adapter';
+import Axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from 'axios';
+import {
+  setupCache,
+  buildMemoryStorage,
+  CacheAxiosResponse,
+  InterpreterResult,
+  AxiosCacheInstance,
+} from 'axios-cache-interceptor';
 import { loadProgressBar } from 'axios-progress-bar';
-
 import 'axios-progress-bar/dist/nprogress.css';
+
 import PortainerError from '@/portainer/error';
 
 import {
@@ -12,54 +22,81 @@ import {
   portainerAgentTargetHeader,
 } from './http-request.helper';
 
-export const cache = setupCache({
-  maxAge: CACHE_DURATION,
-  debug: false, // set to true to print cache hits/misses
-  exclude: {
-    query: false, // include urls with query params
-    methods: ['put', 'patch', 'delete'],
-    filter: (req: InternalAxiosRequestConfig) => {
-      // exclude caching get requests unless the path contains 'kubernetes'
-      if (!req.url?.includes('kubernetes') && req.method === 'get') {
-        return true;
-      }
+const portainerCacheHeader = 'X-Portainer-Cache';
 
-      const acceptHeader = req.headers?.Accept;
-      if (
-        acceptHeader &&
-        typeof acceptHeader === 'string' &&
-        acceptHeader.includes('application/yaml')
-      ) {
-        return true;
-      }
-
-      // exclude caching post requests unless the path contains 'selfsubjectaccessreview'
-      if (
-        !req.url?.includes('selfsubjectaccessreview') &&
-        req.method === 'post'
-      ) {
-        return true;
-      }
-      return false;
+const storage = buildMemoryStorage();
+// mock the cache adapter
+export const cache = {
+  store: {
+    clear: () => {
+      storage.data = {};
     },
   },
-  // ask to clear cache on mutation
-  invalidate: async (_, req) => {
-    dispatchCacheRefreshEventIfNeeded(req);
-  },
+};
+
+function headerInterpreter(
+  headers?: CacheAxiosResponse['headers']
+): InterpreterResult {
+  if (!headers) {
+    return 'not enough headers';
+  }
+
+  if (headers[portainerCacheHeader]) {
+    return CACHE_DURATION;
+  }
+
+  return 'not enough headers';
+}
+
+const axios = Axios.create({ baseURL: 'api' });
+axios.interceptors.request.use((req) => {
+  dispatchCacheRefreshEventIfNeeded(req);
+  return req;
 });
 
-// by default don't use the cache adapter
-const axios = axiosOrigin.create({ baseURL: 'api' });
+// type guard the axios instance
+function isAxiosCacheInstance(
+  a: AxiosInstance | AxiosCacheInstance
+): a is AxiosCacheInstance {
+  return (a as AxiosCacheInstance).defaults.cache !== undefined;
+}
 
 // when entering a kubernetes environment, or updating user settings, update the cache adapter
 export function updateAxiosAdapter(useCache: boolean) {
-  axios.defaults.adapter = useCache ? cache.adapter : undefined;
+  if (useCache) {
+    if (isAxiosCacheInstance(axios)) {
+      return;
+    }
+
+    setupCache(axios, {
+      storage,
+      ttl: CACHE_DURATION,
+      methods: ['get', 'head', 'options', 'post'],
+      // cachePredicate determines if the response should be cached based on response
+      cachePredicate: {
+        containsHeaders: {
+          [portainerCacheHeader]: () => true,
+        },
+        ignoreUrls: [/^(?!.*\bkubernetes\b).*$/gm],
+        responseMatch: (res) => {
+          if (res.config.method === 'post') {
+            if (res.config.url?.includes('selfsubjectaccessreviews')) {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        },
+      },
+      // headerInterpreter interprets the response headers to determine if the response should be cached
+      headerInterpreter,
+    });
+  }
 }
 
-loadProgressBar(undefined, axios);
-
 export default axios;
+
+loadProgressBar(undefined, axios);
 
 export const agentTargetHeader = 'X-PortainerAgent-Target';
 
@@ -173,7 +210,7 @@ export function isDefaultResponse(
 export function isAxiosError<ResponseType>(
   error: unknown
 ): error is AxiosError<ResponseType> {
-  return axiosOrigin.isAxiosError(error);
+  return Axios.isAxiosError(error);
 }
 
 export function arrayToJson<T>(arr?: Array<T>) {
