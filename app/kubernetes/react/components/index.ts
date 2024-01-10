@@ -47,6 +47,15 @@ import {
   autoScalingValidation,
 } from '@/react/kubernetes/applications/components/AutoScalingFormSection';
 import { withControlledInput } from '@/react-tools/withControlledInput';
+import {
+  NamespaceSelector,
+  namespaceSelectorValidation,
+} from '@/react/kubernetes/applications/components/NamespaceSelector';
+import { EditYamlFormSection } from '@/react/kubernetes/applications/components/EditYamlFormSection';
+import {
+  NameFormSection,
+  appNameValidation,
+} from '@/react/kubernetes/applications/components/NameFormSection';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -135,8 +144,16 @@ export const ngModule = angular
       withUIRouter(
         withReactQuery(withCurrentUser(withControlledInput(StackName)))
       ),
-      ['setStackName', 'isAdmin', 'stackName']
+      ['setStackName', 'stackName', 'stacks', 'inputClassName']
     )
+  )
+  .component(
+    'editYamlFormSection',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(EditYamlFormSection))), [
+      'values',
+      'onChange',
+      'isComposeFormat',
+    ])
   )
   .component(
     'applicationSummaryWidget',
@@ -297,4 +314,22 @@ withFormValidation(
   'placementFormSection',
   [],
   placementValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withCurrentUser(NamespaceSelector)),
+  'namespaceSelector',
+  ['isEdit'],
+  namespaceSelectorValidation,
+  true
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(withCurrentUser(withReactQuery(NameFormSection))),
+  'nameFormSection',
+  ['isEdit'],
+  appNameValidation,
+  true
 );

@@ -2,6 +2,7 @@ import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 import clsx from 'clsx';
 
 import { Tooltip } from '@@/Tip/Tooltip';
+import { InlineLoader } from '@@/InlineLoader';
 
 import { FormError } from '../FormError';
 
@@ -17,6 +18,8 @@ export interface Props {
   errors?: ReactNode;
   required?: boolean;
   className?: string;
+  isLoading?: boolean; // whether to show an inline loader, instead of the children
+  loadingText?: ReactNode; // text to show when isLoading is true
 }
 
 export function FormControl({
@@ -29,6 +32,8 @@ export function FormControl({
   className,
   required = false,
   setTooltipHtmlMessage,
+  isLoading = false,
+  loadingText = 'Loading...',
 }: PropsWithChildren<Props>) {
   return (
     <div
@@ -52,7 +57,8 @@ export function FormControl({
       </label>
 
       <div className={sizeClassChildren(size)}>
-        {children}
+        {isLoading && <InlineLoader>{loadingText}</InlineLoader>}
+        {!isLoading && children}
         {errors && <FormError>{errors}</FormError>}
       </div>
     </div>
