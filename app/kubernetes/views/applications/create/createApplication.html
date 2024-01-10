@@ -103,7 +103,10 @@
                 ></kube-services-form>
               </div>
               <!-- kubernetes services options -->
+
               <!-- kubernetes summary for external application -->
+              <!--  below workaround is needed because we wanted react to render it again 
+                by hiding/showing it, but the page was fluctuating. so we added two blocks for both the conditions -->
               <div ng-if="!ctrl.isTemporaryRefresh">
                 <application-summary-section
                   application-kind="ctrl.formValues.ApplicationType"
@@ -514,6 +517,10 @@
                   ></kube-services-form>
                 </div>
                 <!-- kubernetes services options -->
+
+                <!-- application summary start -->
+                <!--  below workaround is needed because we wanted react to render it again 
+                  by hiding/showing it, but the page was fluctuating. so we added two blocks for both the conditions -->
                 <div ng-if="!ctrl.isTemporaryRefresh">
                   <!-- summary -->
                   <application-summary-section
@@ -532,6 +539,7 @@
                     old-form-values="ctrl.savedFormValues"
                   ></application-summary-section>
                 </div>
+                <!-- application summary end -->
               </div>
               <!-- #region ACTIONS -->
               <div class="col-sm-12 form-section-title !mt-6" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
