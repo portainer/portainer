@@ -8,7 +8,10 @@ export function RBACAlert() {
           Your cluster does not have Kubernetes role-based access control (RBAC)
           enabled.
         </p>
-        <p>This means you can&apos;t use Portainer RBAC functionality to</p>
+        <p>
+          This means you can&apos;t use Portainer RBAC functionality to regulate
+          access to environment resources based on user roles.
+        </p>
         <p className="mb-0">
           To enable RBAC, start the&nbsp;
           <a
