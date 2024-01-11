@@ -168,8 +168,7 @@ export async function patchApplication(
         namespace,
         appKind,
         name,
-        patch,
-        'application/strategic-merge-patch+json'
+        patch
       );
     case 'Pod':
       return patchPod(environmentId, namespace, name, patch);

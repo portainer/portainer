@@ -11,6 +11,9 @@ export function parseCpu(cpu: string) {
 }
 
 export function prepareAnnotations(annotations: Annotation[]) {
+  if (!annotations) {
+    return undefined;
+  }
   const result = annotations.reduce(
     (acc, a) => {
       acc[a.Key] = a.Value;
