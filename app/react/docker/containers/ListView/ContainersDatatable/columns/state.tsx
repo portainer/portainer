@@ -24,6 +24,7 @@ export const state = columnHelper.accessor('Status', {
 
 function StatusCell({
   getValue,
+  row: { original: container },
 }: CellContext<DockerContainer, ContainerStatus>) {
   const status = getValue();
 
@@ -35,6 +36,13 @@ function StatusCell({
 
   const statusClassName = getClassName();
 
+  let transformedStatus: ContainerStatus | string = status;
+  if (transformedStatus === ContainerStatus.Exited) {
+    transformedStatus = `${transformedStatus} - code ${extractExitCode(
+      container.StatusText
+    )}`;
+  }
+
   return (
     <span
       className={clsx('label', `label-${statusClassName}`, {
@@ -42,7 +50,7 @@ function StatusCell({
       })}
       title={hasHealthCheck ? 'This container has a health check' : ''}
     >
-      {status}
+      {transformedStatus}
     </span>
   );
 
@@ -63,5 +71,11 @@ function StatusCell({
       default:
         return 'success';
     }
+  }
+
+  function extractExitCode(statusText: string) {
+    const regex = /\((\d+)\)/;
+    const match = statusText.match(regex);
+    return match ? match[1] : '';
   }
 }
