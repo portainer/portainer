@@ -7,7 +7,7 @@ import { Button } from '@@/buttons';
 import { FormError } from '@@/form-components/FormError';
 import { isArrayErrorType } from '@@/form-components/formikUtils';
 
-import { ConfigurationOverrideKey } from './types';
+import { ConfigurationOverrideKey, ConfigurationType } from './types';
 
 type Props = {
   value: ConfigurationOverrideKey;
@@ -18,7 +18,7 @@ type Props = {
     | string
     | string[]
     | FormikErrors<ConfigurationOverrideKey>[];
-  dataCyType: 'config' | 'secret';
+  configurationType: ConfigurationType;
 };
 
 export function ConfigurationData({
@@ -27,8 +27,10 @@ export function ConfigurationData({
   overrideKeysErrors,
   configurationIndex,
   keyIndex,
-  dataCyType,
+  configurationType,
 }: Props) {
+  const dataCyType = configurationType.toLowerCase();
+
   // rule out the error (from formik) being of type string
   const overriddenKeyError = isArrayErrorType(overrideKeysErrors)
     ? overrideKeysErrors[keyIndex]

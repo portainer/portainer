@@ -62,7 +62,7 @@ export function SecretsFormSection({
             configurations={secrets}
             onRemoveItem={() => onRemoveItem(index)}
             index={index}
-            dataCyType="secret"
+            configurationType="Secret"
           />
         )}
         itemBuilder={() => ({
