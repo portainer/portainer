@@ -63,33 +63,12 @@
             <div ng-if="ctrl.isExternalApplication()">
               <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"> Namespace </div>
               <!-- #region NAMESPACE -->
-              <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
-                <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
-                <div class="col-sm-11">
-                  <select
-                    class="form-control"
-                    id="resource-pool-selector"
-                    ng-model="ctrl.formValues.ResourcePool"
-                    ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                    ng-change="ctrl.onResourcePoolSelectionChange()"
-                    ng-disabled="ctrl.state.isEdit"
-                    data-cy="k8sAppCreate-nsSelect"
-                  ></select>
-                </div>
-              </div>
-              <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
-                <div class="col-sm-12 small text-danger">
-                  <pr-icon icon="'alert-circle'" mode="'danger'"></pr-icon>
-                  This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-                  namespace.
-                </div>
-              </div>
-              <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
-                <div class="col-sm-12 small text-muted">
-                  <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                  You do not have access to any namespace. Contact your administrator to get access to a namespace.
-                </div>
-              </div>
+              <namespace-selector
+                values="ctrl.formValues.ResourcePool.Namespace.Name"
+                on-change="(ctrl.onChangeNamespaceName)"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isAdmin: ctrl.isAdmin}"
+                is-edit="ctrl.state.isEdit"
+              ></namespace-selector>
               <!-- kubernetes services options -->
               <div ng-if="ctrl.formValues.ResourcePool">
                 <kube-services-form
@@ -177,81 +156,22 @@
                 type="'application'"
               ></git-form-info-panel>
               <!-- #region NAMESPACE -->
-              <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
-                <label for="resource-pool-selector" class="col-sm-3 col-lg-2 control-label text-left">Namespace</label>
-                <div class="col-sm-8">
-                  <select
-                    class="form-control"
-                    id="resource-pool-selector"
-                    ng-model="ctrl.formValues.ResourcePool"
-                    ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                    ng-change="ctrl.onResourcePoolSelectionChange()"
-                    ng-disabled="ctrl.state.isEdit"
-                    data-cy="k8sAppCreate-nsSelect"
-                  ></select>
-                </div>
-              </div>
-              <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
-                <div class="col-sm-12 small text-danger">
-                  <pr-icon icon="'alert-triangle'"></pr-icon>
-                  This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-                  namespace.
-                </div>
-              </div>
-              <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
-                <div class="col-sm-12 small text-warning">
-                  <pr-icon icon="'alert-triangle'"></pr-icon>
-                  You do not have access to any namespace. Contact your administrator to get access to a namespace.
-                </div>
-              </div>
+              <namespace-selector
+                values="ctrl.formValues.ResourcePool.Namespace.Name"
+                on-change="(ctrl.onChangeNamespaceName)"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isAdmin: ctrl.isAdmin}"
+                is-edit="ctrl.state.isEdit"
+              ></namespace-selector>
               <!-- #endregion -->
 
               <!-- #region STACK -->
-              <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
-                <div class="col-sm-12 small text-muted vertical-center">
-                  <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                  Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use
-                  the application name.
-                </div>
-              </div>
-
-              <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
-                <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">
-                  Stack
-                  <portainer-tooltip
-                    ng-if="!ctrl.isAdmin"
-                    message="'The stack field below was previously labelled \'Name\' but, in
-                    fact, it\'s always been the stack name (hence the relabelling).'"
-                    class-name="'[&>span]:!text-left'"
-                    set-html-message="true"
-                  >
-                  </portainer-tooltip>
-                  <portainer-tooltip
-                    ng-if="ctrl.isAdmin"
-                    message="'The stack field below was previously labelled \'Name\' but, in
-                    fact, it\'s always been the stack name (hence the relabelling).<br/>
-                    Kubernetes Stacks functionality can be turned off entirely via
-                    <a href=\'/#!/settings\' target=\'_blank\'>
-                      Kubernetes Settings
-                    </a>.'"
-                    class-name="'[&>span]:!text-left'"
-                    set-html-message="true"
-                  >
-                  </portainer-tooltip>
-                </label>
-                <div class="col-sm-8">
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="myStack"
-                    ng-model="ctrl.formValues.StackName"
-                    name="stack_name"
-                    uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
-                    typeahead-min-length="0"
-                    data-cy="k8sAppCreate-stackName"
-                  />
-                </div>
-              </div>
+              <kube-stack-name
+                ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                stack-name="ctrl.formValues.StackName"
+                set-stack-name="(ctrl.onChangeStackName)"
+                stacks="ctrl.stacks"
+                input-class-name="'col-lg-10 col-sm-9'"
+              ></kube-stack-name>
               <!-- #endregion -->
 
               <!-- #region Git repository -->
@@ -263,89 +183,21 @@
               <!-- #endregion -->
 
               <!-- #region web editor -->
-              <web-editor-form
-                read-only="ctrl.stack.IsComposeFormat"
+              <edit-yaml-form-section
                 ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT"
-                value="ctrl.stackFileContent"
-                yml="true"
-                identifier="kubernetes-deploy-editor"
-                placeholder="Define or paste the content of your manifest file here"
+                values="ctrl.stackFileContent"
                 on-change="(ctrl.onChangeFileContent)"
-              >
-                <editor-description>
-                  <div class="flex gap-1" ng-show="ctrl.stack.IsComposeFormat">
-                    <pr-icon icon="'alert-circle'" mode="'warning'" class-name="'!mt-1'"></pr-icon>
-                    <div>
-                      <p>
-                        Portainer no longer supports <a href="https://docs.docker.com/compose/compose-file/" target="_blank">docker-compose</a> format manifests for Kubernetes
-                        deployments, and we have removed the <a href="https://kompose.io/" target="_blank">Kompose</a>
-                        conversion tool which enables this. The reason for this is because Kompose now poses a security risk, since it has a number of Common Vulnerabilities and
-                        Exposures (CVEs).
-                      </p>
-                      <p>
-                        Unfortunately, while the Kompose project has a maintainer and is part of the CNCF, it is not being actively maintained. Releases are very infrequent and new
-                        pull requests to the project (including ones we've submitted) are taking months to be merged, with new CVEs arising in the meantime.
-                      </p>
-                      <p>
-                        We advise installing your own instance of Kompose in a sandbox environment, performing conversions of your Docker Compose files to Kubernetes manifests and
-                        using those manifests to set up applications.
-                      </p>
-                    </div>
-                  </div>
-                  <span ng-show="!ctrl.stack.IsComposeFormat">
-                    <p class="vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
-                    </p>
-                    <p>
-                      You can get more information about Kubernetes file format in the
-                      <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-                    </p>
-                  </span>
-                </editor-description>
-              </web-editor-form>
+                is-compose-format="ctrl.stack.IsComposeFormat"
+              ></edit-yaml-form-section>
               <!-- #endregion -->
               <div ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
                 <!-- #region NAME FIELD -->
-                <div class="form-group">
-                  <label for="application_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
-                  <div class="col-sm-8">
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="application_name"
-                      ng-model="ctrl.formValues.Name"
-                      ng-change="ctrl.onChangeName()"
-                      placeholder="my-app"
-                      ng-pattern="/^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/"
-                      auto-focus
-                      required
-                      ng-disabled="ctrl.state.isEdit"
-                      data-cy="k8sAppCreate-applicationName"
-                    />
-                  </div>
-                </div>
-                <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.alreadyExists">
-                  <div class="small">
-                    <div class="col-sm-3 col-lg-2">&nbsp;</div>
-                    <div class="col-sm-8" ng-messages="kubernetesApplicationCreationForm.application_name.$error">
-                      <p class="text-warning vertical-center" ng-message="required"
-                        ><pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p
-                      >
-                      <p class="text-warning vertical-center" ng-message="pattern">
-                        <pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                        This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an
-                        alphanumeric character (e.g. 'my-name', or 'abc-123').
-                      </p>
-                    </div>
-                    <div class="col-sm-8" ng-if="ctrl.state.alreadyExists">
-                      <p class="text-warning vertical-center">
-                        <pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                        An application with the same name already exists inside the selected namespace.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <name-form-section
+                  values="ctrl.formValues.Name"
+                  on-change="(ctrl.onChangeAppName)"
+                  is-edit="ctrl.state.isEdit"
+                  validation-data="{existingNames: ctrl.applicationNames, isEdit: ctrl.state.isEdit, originalName: ctrl.application.Name}"
+                ></name-form-section>
                 <!-- #endregion -->
 
                 <!-- #region IMAGE FIELD -->
@@ -356,7 +208,7 @@
                       ng-if="ctrl.formValues.ResourcePool"
                       auto-complete="false"
                       label-class="col-sm-3 col-lg-2"
-                      input-class="col-sm-8"
+                      input-class="col-sm-9 col-lg-10"
                       namespace="ctrl.formValues.ResourcePool.Namespace.Name"
                       endpoint="ctrl.endpoint"
                       is-admin="ctrl.isAdmin"
@@ -373,29 +225,13 @@
 
                 <div ng-if="ctrl.formValues.ResourcePool">
                   <!-- #region STACK -->
-                  <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
-                    <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-                      Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to
-                      use the application name.
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
-                    <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">Stack</label>
-                    <div class="col-sm-8">
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="myStack"
-                        ng-model="ctrl.formValues.StackName"
-                        name="stack_name"
-                        uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
-                        typeahead-min-length="0"
-                        data-cy="k8sAppCreate-stackName"
-                      />
-                    </div>
-                  </div>
+                  <kube-stack-name
+                    ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    stack-name="ctrl.formValues.StackName"
+                    set-stack-name="(ctrl.onChangeStackName)"
+                    stacks="ctrl.stacks"
+                    input-class-name="'col-lg-10 col-sm-9'"
+                  ></kube-stack-name>
                   <!-- #endregion -->
 
                   <!-- #region ENVIRONMENT VARIABLES -->

@@ -15,7 +15,7 @@ import { buildConfirmButton } from './modals/utils';
 const otherEditorConfig = {
   tooltip: (
     <>
-      <div>Ctrl+F - Start searching</div>
+      <div>CtrlF - Start searching</div>
       <div>Ctrl+G - Find next</div>
       <div>Ctrl+Shift+G - Find previous</div>
       <div>Ctrl+Shift+F - Replace</div>
@@ -29,7 +29,7 @@ const otherEditorConfig = {
   searchCmdLabel: 'Ctrl+F for search',
 } as const;
 
-const editorConfig = {
+export const editorConfig = {
   mac: {
     tooltip: (
       <>
@@ -59,6 +59,7 @@ interface Props {
   placeholder?: string;
   yaml?: boolean;
   readonly?: boolean;
+  titleContent?: React.ReactNode;
   hideTitle?: boolean;
   error?: string;
   height?: string;
@@ -69,6 +70,7 @@ export function WebEditorForm({
   onChange,
   placeholder,
   value,
+  titleContent = '',
   hideTitle,
   readonly,
   yaml,
@@ -80,16 +82,11 @@ export function WebEditorForm({
     <div>
       <div className="web-editor overflow-x-hidden">
         {!hideTitle && (
-          <FormSectionTitle htmlFor={id}>
-            Web editor
-            <div className="text-muted small vertical-center ml-auto">
-              {editorConfig[BROWSER_OS_PLATFORM].searchCmdLabel}
-
-              <Tooltip message={editorConfig[BROWSER_OS_PLATFORM].tooltip} />
-            </div>
-          </FormSectionTitle>
+          <>
+            <DefaultTitle id={id} />
+            {titleContent ?? null}
+          </>
         )}
-
         {children && (
           <div className="form-group text-muted small">
             <div className="col-sm-12 col-lg-12">{children}</div>
@@ -113,6 +110,19 @@ export function WebEditorForm({
         </div>
       </div>
     </div>
+  );
+}
+
+function DefaultTitle({ id }: { id: string }) {
+  return (
+    <FormSectionTitle htmlFor={id}>
+      Web editor
+      <div className="text-muted small vertical-center ml-auto">
+        {editorConfig[BROWSER_OS_PLATFORM].searchCmdLabel}
+
+        <Tooltip message={editorConfig[BROWSER_OS_PLATFORM].tooltip} />
+      </div>
+    </FormSectionTitle>
   );
 }
 

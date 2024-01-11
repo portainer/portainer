@@ -181,6 +181,7 @@ export const ngModule = angular
       'isClearable',
       'components',
       'isLoading',
+      'noOptionsMessage',
     ])
   )
   .component(

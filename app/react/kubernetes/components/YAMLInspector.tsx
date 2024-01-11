@@ -54,7 +54,7 @@ export function YAMLInspector({ identifier, data, hideMessage }: Props) {
   );
 }
 
-function cleanYamlUnwantedFields(yml: string) {
+export function cleanYamlUnwantedFields(yml: string) {
   try {
     const ymls = yml.split('---');
     const cleanYmls = ymls.map((yml) => {

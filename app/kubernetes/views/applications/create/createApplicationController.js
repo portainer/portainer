@@ -151,6 +151,7 @@ class KubernetesCreateApplicationController {
     this.getAppType = this.getAppType.bind(this);
     this.showDataAccessPolicySection = this.showDataAccessPolicySection.bind(this);
     this.refreshReactComponent = this.refreshReactComponent.bind(this);
+    this.onChangeNamespaceName = this.onChangeNamespaceName.bind(this);
 
     this.$scope.$watch(
       () => this.formValues,
@@ -168,6 +169,15 @@ class KubernetesCreateApplicationController {
     this.$timeout(() => {
       this.isTemporaryRefresh = false;
     }, 10);
+    this.onChangeStackName = this.onChangeStackName.bind(this);
+    this.onChangeAppName = this.onChangeAppName.bind(this);
+  }
+  /* #endregion */
+
+  onChangeStackName(stackName) {
+    return this.$async(async () => {
+      this.formValues.StackName = stackName;
+    });
   }
 
   onChangePlacements(values) {
@@ -254,21 +264,16 @@ class KubernetesCreateApplicationController {
   }
 
   imageValidityIsValid() {
-    return this.state.pullImageValidity || this.formValues.ImageModel.Registry.Type !== RegistryTypes.DOCKERHUB;
+    return this.state.pullImageValidity || (this.formValues.registryDetails && this.formValues.registryDetails.Registry.Type !== RegistryTypes.DOCKERHUB);
   }
 
-  onChangeName() {
-    const existingApplication = _.find(this.applications, { Name: this.formValues.Name });
-    this.state.alreadyExists = (this.state.isEdit && existingApplication && this.application.Id !== existingApplication.Id) || (!this.state.isEdit && existingApplication);
+  onChangeAppName(appName) {
+    return this.$async(async () => {
+      this.formValues.Name = appName;
+    });
   }
 
   /* #region  AUTO SCALER UI MANAGEMENT */
-  unselectAutoScaler() {
-    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
-      this.formValues.AutoScaler.isUsed = false;
-    }
-  }
-
   onAutoScaleChange(values) {
     return this.$async(async () => {
       if (!this.formValues.AutoScaler.isUsed && values.isUsed) {
@@ -294,32 +299,6 @@ class KubernetesCreateApplicationController {
 
   clearConfigMaps() {
     this.formValues.ConfigMaps = [];
-  }
-
-  onChangeConfigMapPath() {
-    this.state.duplicates.configMapPaths.refs = [];
-
-    const paths = _.reduce(
-      this.formValues.ConfigMaps,
-      (result, config) => {
-        const uniqOverridenKeysPath = _.uniq(_.map(config.overridenKeys, 'path'));
-        return _.concat(result, uniqOverridenKeysPath);
-      },
-      []
-    );
-
-    const duplicatePaths = KubernetesFormValidationHelper.getDuplicates(paths);
-
-    _.forEach(this.formValues.ConfigMaps, (config, index) => {
-      _.forEach(config.overridenKeys, (overridenKey, keyIndex) => {
-        const findPath = _.find(duplicatePaths, (path) => path === overridenKey.path);
-        if (findPath) {
-          this.state.duplicates.configMapPaths.refs[index + '_' + keyIndex] = findPath;
-        }
-      });
-    });
-
-    this.state.duplicates.configMapPaths.hasRefs = Object.keys(this.state.duplicates.configMapPaths.refs).length > 0;
   }
   /* #endregion */
 
@@ -421,7 +400,6 @@ class KubernetesCreateApplicationController {
   /* #region  STATE VALIDATION FUNCTIONS */
   isValid() {
     return (
-      !this.state.alreadyExists &&
       !this.state.duplicates.environmentVariables.hasRefs &&
       !this.state.duplicates.persistedFolders.hasRefs &&
       !this.state.duplicates.configMapPaths.hasRefs &&
@@ -432,10 +410,6 @@ class KubernetesCreateApplicationController {
 
   storageClassAvailable() {
     return this.storageClasses && this.storageClasses.length > 0;
-  }
-
-  hasMultipleStorageClassesAvailable() {
-    return this.storageClasses && this.storageClasses.length > 1;
   }
 
   resetDeploymentType() {
@@ -740,6 +714,7 @@ class KubernetesCreateApplicationController {
     return this.$async(async () => {
       try {
         this.applications = await this.KubernetesApplicationService.get(namespace);
+        this.applicationNames = _.map(this.applications, 'Name');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve applications');
       }
@@ -796,7 +771,6 @@ class KubernetesCreateApplicationController {
         this.refreshIngresses(namespace),
         this.refreshVolumes(namespace),
       ]);
-      this.onChangeName();
     });
   }
 
@@ -806,13 +780,13 @@ class KubernetesCreateApplicationController {
     this.resetPersistedFolders();
   }
 
-  onResourcePoolSelectionChange() {
+  onChangeNamespaceName(namespaceName) {
     return this.$async(async () => {
-      const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.formValues.ResourcePool.Namespace.Name);
-      const namespace = this.formValues.ResourcePool.Namespace.Name;
+      this.formValues.ResourcePool.Namespace.Name = namespaceName;
+      const namespaceWithQuota = await this.KubernetesResourcePoolService.get(namespaceName);
       this.updateNamespaceLimits(namespaceWithQuota);
       this.updateSliders(namespaceWithQuota);
-      await this.refreshNamespaceData(namespace);
+      await this.refreshNamespaceData(namespaceName);
       this.resetFormValues();
     });
   }
