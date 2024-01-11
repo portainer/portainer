@@ -124,13 +124,19 @@ function useNodeLabels(): NodeLabels {
 
   // get unique node labels with each label's possible values
   const uniqueLabels = new Set(nodeLabelPairs.map((pair) => pair.key));
-  //   create a NodeLabels object with each label's possible values
-  const nodesLabels = Array.from(uniqueLabels).reduce((acc, key) => {
-    acc[key] = nodeLabelPairs
-      .filter((pair) => pair.key === key)
-      .map((pair) => pair.value);
-    return acc;
-  }, {} as NodeLabels);
+  // create a NodeLabels object with each label's possible values
+  const nodesLabels: NodeLabels = Array.from(uniqueLabels).reduce(
+    (acc: NodeLabels, key) => {
+      const allNodeValuesForKey = nodeLabelPairs
+        .filter((pair) => pair.key === key)
+        .map((pair) => pair.value);
+      const uniqueValues = Array.from(new Set(allNodeValuesForKey));
+
+      acc[key] = uniqueValues;
+      return acc;
+    },
+    {} as NodeLabels
+  );
 
   return nodesLabels;
 }
