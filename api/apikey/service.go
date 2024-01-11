@@ -32,9 +32,9 @@ func NewAPIKeyService(apiKeyRepository dataservices.APIKeyRepository, userReposi
 }
 
 // HashRaw computes a hash digest of provided raw API key.
-func (a *apiKeyService) HashRaw(rawKey string) []byte {
+func (a *apiKeyService) HashRaw(rawKey string) string {
 	hashDigest := sha256.Sum256([]byte(rawKey))
-	return hashDigest[:]
+	return base64.StdEncoding.EncodeToString(hashDigest[:])
 }
 
 // GenerateApiKey generates a raw API key for a user (for one-time display).
@@ -77,7 +77,7 @@ func (a *apiKeyService) GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey,
 
 // GetDigestUserAndKey returns the user and api-key associated to a specified hash digest.
 // A cache lookup is performed first; if the user/api-key is not found in the cache, respective database lookups are performed.
-func (a *apiKeyService) GetDigestUserAndKey(digest []byte) (portainer.User, portainer.APIKey, error) {
+func (a *apiKeyService) GetDigestUserAndKey(digest string) (portainer.User, portainer.APIKey, error) {
 	// get api key from cache if possible
 	cachedUser, cachedKey, ok := a.cache.Get(digest)
 	if ok {

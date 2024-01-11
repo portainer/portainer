@@ -6,11 +6,11 @@ import (
 
 // APIKeyService represents a service for managing API keys.
 type APIKeyService interface {
-	HashRaw(rawKey string) []byte
+	HashRaw(rawKey string) string
 	GenerateApiKey(user portainer.User, description string) (string, *portainer.APIKey, error)
 	GetAPIKey(apiKeyID portainer.APIKeyID) (*portainer.APIKey, error)
 	GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey, error)
-	GetDigestUserAndKey(digest []byte) (portainer.User, portainer.APIKey, error)
+	GetDigestUserAndKey(digest string) (portainer.User, portainer.APIKey, error)
 	UpdateAPIKey(apiKey *portainer.APIKey) error
 	DeleteAPIKey(apiKeyID portainer.APIKeyID) error
 	InvalidateUserKeyCache(userId portainer.UserID) bool

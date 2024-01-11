@@ -152,7 +152,7 @@ type (
 	APIKeyRepository interface {
 		BaseCRUD[portainer.APIKey, portainer.APIKeyID]
 		GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error)
-		GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error)
+		GetAPIKeyByDigest(digest string) (*portainer.APIKey, error)
 	}
 
 	// SettingsService represents a service for managing application settings
