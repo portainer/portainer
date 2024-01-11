@@ -41,6 +41,7 @@ export function EnvironmentStatsDocker({ snapshot }: Props) {
       )}
 
       <ContainerStats
+        total={snapshot.ContainerCount}
         running={snapshot.RunningContainerCount}
         stopped={snapshot.StoppedContainerCount}
         healthy={snapshot.HealthyContainerCount}
@@ -70,6 +71,7 @@ export function EnvironmentStatsDocker({ snapshot }: Props) {
 }
 
 interface ContainerStatsProps {
+  total: number;
   running: number;
   stopped: number;
   healthy: number;
@@ -77,16 +79,16 @@ interface ContainerStatsProps {
 }
 
 function ContainerStats({
+  total,
   running,
   stopped,
   healthy,
   unhealthy,
 }: ContainerStatsProps) {
-  const containersCount = running + stopped;
-
+  const actualTotal = total || running + stopped;
   return (
-    <StatsItem value={addPlural(containersCount, 'container')} icon={Box}>
-      {containersCount > 0 && (
+    <StatsItem value={addPlural(actualTotal, 'container')} icon={Box}>
+      {actualTotal > 0 && (
         <>
           <StatsItem value={running} icon={Power} iconClass="icon-success" />
           <StatsItem value={stopped} icon={Power} iconClass="icon-danger" />

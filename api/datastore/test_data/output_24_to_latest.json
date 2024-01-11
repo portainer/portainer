@@ -669,6 +669,7 @@
   "snapshots": [
     {
       "Docker": {
+        "ContainerCount": 0,
         "DockerSnapshotRaw": {
           "Containers": null,
           "Images": null,
