@@ -48,7 +48,7 @@ export function AutoScalingFormSection({
             <Input
               id="min-instances"
               type="number"
-              min="0"
+              min="1"
               value={values.minReplicas}
               max={values.maxReplicas || 1}
               onChange={(e) =>
