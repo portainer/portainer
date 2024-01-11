@@ -25,8 +25,9 @@ export function EnableMetricsInput({ value, error, environmentId }: Props) {
     <div className="mb-4">
       <TextTip color="blue">
         <p>
-          Enabling this feature will allow users to use specific features like
-          autoscaling and to see container and node resource usage.
+          Enabling the metrics feature will allow users to use specific
+          functionality like autoscaling and to see container and node resource
+          usage.
         </p>
         <p>
           Ensure that&nbsp;
