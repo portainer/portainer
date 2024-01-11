@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import { cleanGitRepoUrl } from '@/react/portainer/gitops/utils';
 
 import { buildNameColumn } from '@@/datatables/NameCell';
 import { Link } from '@@/Link';
@@ -152,9 +151,7 @@ export const columns = _.compact([
               <div className="text-center">
                 <a
                   target="_blank"
-                  href={`${cleanGitRepoUrl(item.GitConfig.URL)}/commit/${
-                    item.GitConfig.ConfigHash
-                  }`}
+                  href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
                   rel="noreferrer"
                 >
                   {item.GitConfig.ConfigHash.slice(0, 7)}

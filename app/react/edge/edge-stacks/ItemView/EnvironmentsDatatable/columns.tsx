@@ -9,7 +9,6 @@ import UpToDate from '@/assets/ico/icon_up-to-date.svg?c';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { getDashboardRoute } from '@/react/portainer/environments/utils';
-import { cleanGitRepoUrl } from '@/react/portainer/gitops/utils';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -188,9 +187,7 @@ function TargetVersionCell({
       {row.original.TargetCommitHash ? (
         <div>
           <a
-            href={`${cleanGitRepoUrl(row.original.GitConfigURL)}/commit/${
-              row.original.TargetCommitHash
-            }`}
+            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
             target="_blank"
             rel="noreferrer"
           >
@@ -239,9 +236,7 @@ function DeployedVersionCell({
         <div>
           {statusIcon}
           <a
-            href={`${cleanGitRepoUrl(row.original.GitConfigURL)}/commit/${
-              row.original.TargetCommitHash
-            }`}
+            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
             target="_blank"
             rel="noreferrer"
           >
