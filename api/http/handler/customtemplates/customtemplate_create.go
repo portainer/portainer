@@ -149,7 +149,7 @@ func isValidNote(note string) bool {
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /custom_templates/create/string [post]
+// @router /custom_templates/string [post]
 func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -263,7 +263,7 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /custom_templates/create/repository [post]
+// @router /custom_templates/repository [post]
 func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -443,7 +443,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /custom_templates/create/file [post]
+// @router /custom_templates/file [post]
 func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*portainer.CustomTemplate, error) {
 	payload := &customTemplateFromFileUploadPayload{}
 	err := payload.Validate(r)
