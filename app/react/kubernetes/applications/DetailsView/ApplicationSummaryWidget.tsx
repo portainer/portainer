@@ -97,10 +97,16 @@ export function ApplicationSummaryWidget() {
               <>
                 {failedCreateCondition && (
                   <div
-                    className="vertical-center alert alert-danger mb-2"
+                    className="flex gap-1 items-start alert alert-danger mb-2"
                     data-cy="k8sAppDetail-failedCreateMessage"
                   >
-                    <Icon icon={Info} className="mr-1" mode="danger" />
+                    <div className="mt-0.5">
+                      <Icon
+                        icon={Info}
+                        className="mr-1 shrink-0"
+                        mode="danger"
+                      />
+                    </div>
                     <div>
                       <div className="font-semibold">
                         Failed to create application

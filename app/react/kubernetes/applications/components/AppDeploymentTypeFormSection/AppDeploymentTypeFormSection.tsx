@@ -1,21 +1,25 @@
+import { FormikErrors } from 'formik';
+
 import { BoxSelector } from '@@/BoxSelector';
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
+import { FormError } from '@@/form-components/FormError';
 
-import { DeploymentType } from '../types';
-
-import { getDeploymentOptions } from './deploymentOptions';
+import { DeploymentType } from '../../types';
+import { getDeploymentOptions } from '../../CreateView/deploymentOptions';
 
 interface Props {
-  value: DeploymentType;
-  onChange(value: DeploymentType): void;
+  values: DeploymentType;
+  onChange(values: DeploymentType): void;
+  errors: FormikErrors<DeploymentType>;
   supportGlobalDeployment: boolean;
 }
 
 export function AppDeploymentTypeFormSection({
-  supportGlobalDeployment,
-  value,
+  values,
   onChange,
+  errors,
+  supportGlobalDeployment,
 }: Props) {
   const options = getDeploymentOptions(supportGlobalDeployment);
 
@@ -27,10 +31,11 @@ export function AppDeploymentTypeFormSection({
       <BoxSelector
         slim
         options={options}
-        value={value}
+        value={values}
         onChange={onChange}
         radioName="deploymentType"
       />
+      {!!errors && <FormError>{errors}</FormError>}
     </FormSection>
   );
 }

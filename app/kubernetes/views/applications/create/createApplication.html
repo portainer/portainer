@@ -294,16 +294,17 @@
                     namespace-has-quota="ctrl.state.resourcePoolHasQuota"
                     max-memory-limit="ctrl.state.sliders.memory.max"
                     max-cpu-limit="ctrl.state.sliders.cpu.max"
-                    validation-data="{maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max}"
+                    validation-data="{maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max, isEnvironmentAdmin: ctrl.state.isEnvironmentAdmin}"
                     resource-quota-capacity-exceeded="ctrl.resourceQuotaCapacityExceeded()"
                   ></resource-reservation-form-section>
 
                   <!-- deployment options -->
                   <app-deployment-type-form-section
-                    value="ctrl.formValues.DeploymentType"
+                    values="ctrl.formValues.DeploymentType"
                     on-change="(ctrl.onChangeDeploymentType)"
                     support-global-deployment="ctrl.supportGlobalDeployment()"
                     radio-name="'deploymentType'"
+                    validation-data="{isQuotaExceeded: ctrl.resourceReservationsOverflow()}"
                   ></app-deployment-type-form-section>
 
                   <!-- replica count -->

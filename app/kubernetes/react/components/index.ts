@@ -7,7 +7,6 @@ import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/Acce
 import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/RegistriesFormSection/RegistriesSelector';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
-import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/CreateView/AppDeploymentTypeFormSection';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import {
@@ -56,6 +55,8 @@ import {
   NameFormSection,
   appNameValidation,
 } from '@/react/kubernetes/applications/components/NameFormSection';
+import { deploymentTypeValidation } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/deploymentTypeValidation';
+import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/AppDeploymentTypeFormSection';
 
 import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -120,14 +121,6 @@ export const ngModule = angular
       'onChange',
       'isEdit',
       'persistedFoldersUseExistingVolumes',
-    ])
-  )
-  .component(
-    'appDeploymentTypeFormSection',
-    r2a(AppDeploymentTypeFormSection, [
-      'value',
-      'onChange',
-      'supportGlobalDeployment',
     ])
   )
   .component(
@@ -331,5 +324,14 @@ withFormValidation(
   'nameFormSection',
   ['isEdit'],
   appNameValidation,
+  true
+);
+
+withFormValidation(
+  ngModule,
+  AppDeploymentTypeFormSection,
+  'appDeploymentTypeFormSection',
+  ['supportGlobalDeployment'],
+  deploymentTypeValidation,
   true
 );

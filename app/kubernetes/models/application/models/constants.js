@@ -1,6 +1,6 @@
 export const KubernetesApplicationQuotaDefaults = {
   CpuLimit: 0.1,
-  MemoryLimit: 64, // MB
+  MemoryLimit: 128, // MB
 };
 
 export const KubernetesPortainerApplicationStackNameLabel = 'io.portainer.kubernetes.application.stack';
