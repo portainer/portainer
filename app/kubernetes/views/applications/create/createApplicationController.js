@@ -50,7 +50,9 @@ class KubernetesCreateApplicationController {
     KubernetesVolumeService,
     RegistryService,
     StackService,
-    KubernetesNodesLimitsService
+    KubernetesNodesLimitsService,
+    EndpointService,
+    StateManager
   ) {
     this.$scope = $scope;
     this.$async = $async;
@@ -69,6 +71,8 @@ class KubernetesCreateApplicationController {
     this.RegistryService = RegistryService;
     this.StackService = StackService;
     this.KubernetesNodesLimitsService = KubernetesNodesLimitsService;
+    this.EndpointService = EndpointService;
+    this.StateManager = StateManager;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
@@ -959,6 +963,9 @@ class KubernetesCreateApplicationController {
   $onInit() {
     return this.$async(async () => {
       try {
+        this.endpoint = await this.EndpointService.endpoint(this.endpoint.Id);
+        await this.StateManager.updateEndpointState(this.endpoint);
+
         this.storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
         this.state.useLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
         this.state.useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
