@@ -4,7 +4,7 @@ type ValidationData = {
   hasQuota: boolean;
   isResourceQuotaCapacityExceeded: boolean;
   namespaceOptionCount: number;
-  isAdmin: boolean;
+  isEnvironmentAdmin: boolean;
 };
 
 const emptyValue =
@@ -17,7 +17,7 @@ export function namespaceSelectorValidation(
     hasQuota,
     isResourceQuotaCapacityExceeded,
     namespaceOptionCount,
-    isAdmin,
+    isEnvironmentAdmin,
   } = validationData || {};
   return string()
     .required(emptyValue)
@@ -25,7 +25,7 @@ export function namespaceSelectorValidation(
     .test(
       'resourceQuotaCapacityExceeded',
       `This namespace has exhausted its resource capacity and you will not be able to deploy the application.${
-        isAdmin
+        isEnvironmentAdmin
           ? ''
           : ' Contact your administrator to expand the capacity of the namespace.'
       }`,
