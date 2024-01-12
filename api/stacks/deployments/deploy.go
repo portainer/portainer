@@ -34,22 +34,30 @@ var singleflightGroup = &singleflight.Group{}
 // RedeployWhenChanged pull and redeploy the stack when git repo changed
 // Stack will always be redeployed if force deployment is set to true
 func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
-	_, err, _ := singleflightGroup.Do(strconv.Itoa(int(stackID)), func() (any, error) {
-		return nil, redeployWhenChanged(stackID, deployer, datastore, gitService)
-	})
-
-	return err
-}
-
-func redeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
-	log.Debug().Int("stack_id", int(stackID)).Msg("redeploying stack")
-
 	stack, err := datastore.Stack().Read(stackID)
 	if dataservices.IsErrObjectNotFound(err) {
 		return scheduler.NewPermanentError(errors.WithMessagef(err, "failed to get the stack %v", stackID))
 	} else if err != nil {
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
 	}
+
+	// Webhook
+	if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != "" {
+		return redeployWhenChanged(stack, deployer, datastore, gitService)
+	}
+
+	// Polling
+	_, err, _ = singleflightGroup.Do(strconv.Itoa(int(stackID)), func() (any, error) {
+		return nil, redeployWhenChanged(stack, deployer, datastore, gitService)
+	})
+
+	return err
+}
+
+func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
+	stackID := stack.ID
+
+	log.Debug().Int("stack_id", int(stackID)).Msg("redeploying stack")
 
 	if stack.GitConfig == nil {
 		return nil // do nothing if it isn't a git-based stack
