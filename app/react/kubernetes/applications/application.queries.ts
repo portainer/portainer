@@ -306,11 +306,19 @@ export function useApplicationPods(
 export function usePatchApplicationMutation(
   environmentId: EnvironmentId,
   namespace: string,
-  name: string
+  name: string,
+  contentType: string = 'application/json-patch+json'
 ) {
   return useMutation(
     ({ appKind, patch }: { appKind: AppKind; patch: ApplicationPatch }) =>
-      patchApplication(environmentId, namespace, appKind, name, patch),
+      patchApplication(
+        environmentId,
+        namespace,
+        appKind,
+        name,
+        patch,
+        contentType
+      ),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(

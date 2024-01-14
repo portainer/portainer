@@ -10,11 +10,8 @@ export function parseCpu(cpu: string) {
   return res;
 }
 
-export function prepareAnnotations(annotations: Annotation[]) {
-  if (!annotations) {
-    return undefined;
-  }
-  const result = annotations.reduce(
+export function prepareAnnotations(annotations?: Annotation[]) {
+  const result = annotations?.reduce(
     (acc, a) => {
       acc[a.Key] = a.Value;
       return acc;

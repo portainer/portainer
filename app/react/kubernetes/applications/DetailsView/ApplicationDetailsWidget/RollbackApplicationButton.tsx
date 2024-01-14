@@ -58,7 +58,8 @@ export function RollbackApplicationButton({
   const patchAppMutation = usePatchApplicationMutation(
     environmentId,
     namespace,
-    appName
+    appName,
+    'application/strategic-merge-patch+json'
   );
 
   const isRollbackNotAvailable =
