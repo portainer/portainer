@@ -16,7 +16,7 @@ export function resourceReservationValidation(
       .min(0)
       .test(
         'exhaused',
-        `This namespace has exhausted its memory capacity and you will not be able to deploy the application.${
+        `The memory capacity for this namespace has been exhausted, so you cannot deploy the application.${
           validationData?.isEnvironmentAdmin
             ? ''
             : ' Contact your administrator to expand the memory capacity of the namespace.'
@@ -33,7 +33,7 @@ export function resourceReservationValidation(
       .min(0)
       .test(
         'exhaused',
-        `This namespace has exhausted its CPU capacity and you will not be able to deploy the application.${
+        `The CPU capacity for this namespace has been exhausted, so you cannot deploy the application.${
           validationData?.isEnvironmentAdmin
             ? ''
             : ' Contact your administrator to expand the CPU capacity of the namespace.'
