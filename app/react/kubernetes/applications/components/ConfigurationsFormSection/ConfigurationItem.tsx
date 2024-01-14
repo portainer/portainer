@@ -11,7 +11,11 @@ import { isErrorType } from '@@/form-components/formikUtils';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { ConfigurationFormValues, ConfigurationOverrideKey } from './types';
+import {
+  ConfigurationFormValues,
+  ConfigurationOverrideKey,
+  ConfigurationType,
+} from './types';
 import { ConfigurationData } from './ConfigurationKey';
 
 type Props = {
@@ -21,7 +25,7 @@ type Props = {
   configurations: Array<ConfigMap | Secret>;
   index: number;
   error?: ItemError<ConfigurationFormValues>;
-  dataCyType: 'config' | 'secret';
+  configurationType: ConfigurationType;
 };
 
 export function ConfigurationItem({
@@ -31,7 +35,7 @@ export function ConfigurationItem({
   configurations,
   index,
   onRemoveItem,
-  dataCyType,
+  configurationType,
 }: Props) {
   // rule out the error being of type string
   const formikError = isErrorType(error) ? error : undefined;
@@ -55,7 +59,7 @@ export function ConfigurationItem({
               )}
               onChange={onSelectConfigMap}
               size="sm"
-              data-cy={`k8sAppCreate-add${dataCyType}Select_${index}`}
+              data-cy={`k8sAppCreate-add${configurationType}Select_${index}`}
             />
           </InputGroup>
           {formikError?.selectedConfiguration && (
@@ -95,8 +99,8 @@ export function ConfigurationItem({
       {!item.overriden && (
         <TextTip color="blue">
           The following keys will be loaded from the{' '}
-          <code>{item.selectedConfiguration.metadata?.name}</code>
-          ConfigMap as environment variables:
+          <code>{item.selectedConfiguration.metadata?.name}</code>{' '}
+          {configurationType} as environment variables:
           {Object.keys(configurationData).map((key, index) => (
             <span key={key}>
               <code>{key}</code>
@@ -116,7 +120,7 @@ export function ConfigurationItem({
               onChange({ ...item, overridenKeys: newOverridenKeys });
             }}
             overrideKeysErrors={formikError?.overridenKeys}
-            dataCyType={dataCyType}
+            configurationType={configurationType}
             configurationIndex={index}
             keyIndex={keyIndex}
           />

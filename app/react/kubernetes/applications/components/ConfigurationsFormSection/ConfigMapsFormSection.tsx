@@ -62,7 +62,7 @@ export function ConfigMapsFormSection({
             configurations={configMaps}
             onRemoveItem={() => onRemoveItem(index)}
             index={index}
-            dataCyType="config"
+            configurationType="ConfigMap"
           />
         )}
         itemBuilder={() => ({

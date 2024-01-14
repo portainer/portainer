@@ -1,7 +1,5 @@
 import { SchemaOf, array, boolean, mixed, object, string } from 'yup';
 
-import { buildUniquenessTest } from '@@/form-components/validate-unique';
-
 import { ConfigurationFormValues } from './types';
 
 export function configurationsValidationSchema(
@@ -36,13 +34,7 @@ export function configurationsValidationSchema(
           }),
           type: mixed().oneOf(['NONE', 'ENVIRONMENT', 'FILESYSTEM']),
         })
-      )
-        .test(
-          'No duplicates',
-          'This path is already used.',
-          buildUniquenessTest(() => 'This path is already used.', 'path')
-        )
-        .required(),
+      ).required(),
     })
   );
 }

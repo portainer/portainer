@@ -12,4 +12,6 @@ export type ConfigurationOverrideKey = {
   path?: string;
 };
 
+export type ConfigurationType = 'ConfigMap' | 'Secret';
+
 type ConfigurationOverrideKeyType = 'NONE' | 'ENVIRONMENT' | 'FILESYSTEM';
