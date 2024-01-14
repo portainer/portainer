@@ -64,5 +64,5 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 
 // hideAPIKeyFields remove the digest from the API key (it is not needed in the response)
 func hideAPIKeyFields(apiKey *portainer.APIKey) {
-	apiKey.Digest = nil
+	apiKey.Digest = ""
 }

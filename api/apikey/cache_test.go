@@ -17,19 +17,19 @@ func Test_apiKeyCacheGet(t *testing.T) {
 	keyCache.cache.Add(string(""), entry{user: portainer.User{}, apiKey: portainer.APIKey{}})
 
 	tests := []struct {
-		digest []byte
+		digest string
 		found  bool
 	}{
 		{
-			digest: []byte("foo"),
+			digest: "foo",
 			found:  true,
 		},
 		{
-			digest: []byte(""),
+			digest: "",
 			found:  true,
 		},
 		{
-			digest: []byte("bar"),
+			digest: "bar",
 			found:  false,
 		},
 	}
@@ -48,11 +48,11 @@ func Test_apiKeyCacheSet(t *testing.T) {
 	keyCache := NewAPIKeyCache(10)
 
 	// pre-populate cache
-	keyCache.Set([]byte("bar"), portainer.User{ID: 2}, portainer.APIKey{})
-	keyCache.Set([]byte("foo"), portainer.User{ID: 1}, portainer.APIKey{})
+	keyCache.Set("bar", portainer.User{ID: 2}, portainer.APIKey{})
+	keyCache.Set("foo", portainer.User{ID: 1}, portainer.APIKey{})
 
 	// overwrite existing entry
-	keyCache.Set([]byte("foo"), portainer.User{ID: 3}, portainer.APIKey{})
+	keyCache.Set("foo", portainer.User{ID: 3}, portainer.APIKey{})
 
 	val, ok := keyCache.cache.Get(string("bar"))
 	is.True(ok)
@@ -74,14 +74,14 @@ func Test_apiKeyCacheDelete(t *testing.T) {
 
 	t.Run("Delete an existing entry", func(t *testing.T) {
 		keyCache.cache.Add(string("foo"), entry{user: portainer.User{ID: 1}, apiKey: portainer.APIKey{}})
-		keyCache.Delete([]byte("foo"))
+		keyCache.Delete("foo")
 
 		_, ok := keyCache.cache.Get(string("foo"))
 		is.False(ok)
 	})
 
 	t.Run("Delete a non-existing entry", func(t *testing.T) {
-		nonPanicFunc := func() { keyCache.Delete([]byte("non-existent-key")) }
+		nonPanicFunc := func() { keyCache.Delete("non-existent-key") }
 		is.NotPanics(nonPanicFunc)
 	})
 }
@@ -131,16 +131,16 @@ func Test_apiKeyCacheLRU(t *testing.T) {
 			keyCache := NewAPIKeyCache(test.cacheLen)
 
 			for _, key := range test.key {
-				keyCache.Set([]byte(key), portainer.User{ID: 1}, portainer.APIKey{})
+				keyCache.Set(key, portainer.User{ID: 1}, portainer.APIKey{})
 			}
 
 			for _, key := range test.foundKeys {
-				_, _, found := keyCache.Get([]byte(key))
+				_, _, found := keyCache.Get(key)
 				is.True(found, "Key %s not found", key)
 			}
 
 			for _, key := range test.evictedKeys {
-				_, _, found := keyCache.Get([]byte(key))
+				_, _, found := keyCache.Get(key)
 				is.False(found, "key %s should have been evicted", key)
 			}
 		})

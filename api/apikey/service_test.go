@@ -2,6 +2,7 @@ package apikey
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"testing"
@@ -68,7 +69,7 @@ func Test_GenerateApiKey(t *testing.T) {
 
 		generatedDigest := sha256.Sum256([]byte(rawKey))
 
-		is.Equal(apiKey.Digest, generatedDigest[:])
+		is.Equal(apiKey.Digest, base64.StdEncoding.EncodeToString(generatedDigest[:]))
 	})
 }
 

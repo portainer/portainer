@@ -68,7 +68,7 @@ func Test_userGetAccessTokens(t *testing.T) {
 
 		is.Len(resp, 1)
 		if len(resp) == 1 {
-			is.Nil(resp[0].Digest)
+			is.Equal(resp[0].Digest, "")
 			is.Equal(apiKey.ID, resp[0].ID)
 			is.Equal(apiKey.UserID, resp[0].UserID)
 			is.Equal(apiKey.Prefix, resp[0].Prefix)
@@ -129,10 +129,10 @@ func Test_hideAPIKeyFields(t *testing.T) {
 		UserID:      2,
 		Prefix:      "abc",
 		Description: "test",
-		Digest:      nil,
+		Digest:      "",
 	}
 
 	hideAPIKeyFields(apiKey)
 
-	is.Nil(apiKey.Digest, "digest should be cleared when hiding api key fields")
+	is.Equal(apiKey.Digest, "", "digest should be cleared when hiding api key fields")
 }
