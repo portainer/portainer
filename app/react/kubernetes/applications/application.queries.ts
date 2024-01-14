@@ -306,11 +306,18 @@ export function useApplicationPods(
 export function usePatchApplicationMutation(
   environmentId: EnvironmentId,
   namespace: string,
-  name: string,
-  contentType: string = 'application/json-patch+json'
+  name: string
 ) {
   return useMutation(
-    ({ appKind, patch }: { appKind: AppKind; patch: ApplicationPatch }) =>
+    ({
+      appKind,
+      patch,
+      contentType = 'application/json-patch+json',
+    }: {
+      appKind: AppKind;
+      patch: ApplicationPatch;
+      contentType?: string;
+    }) =>
       patchApplication(
         environmentId,
         namespace,
