@@ -66,7 +66,7 @@
               <namespace-selector
                 values="ctrl.formValues.ResourcePool.Namespace.Name"
                 on-change="(ctrl.onChangeNamespaceName)"
-                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isAdmin: ctrl.isAdmin}"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.state.isEnvironmentAdmin}"
                 is-edit="ctrl.state.isEdit"
               ></namespace-selector>
               <!-- kubernetes services options -->
@@ -159,7 +159,7 @@
               <namespace-selector
                 values="ctrl.formValues.ResourcePool.Namespace.Name"
                 on-change="(ctrl.onChangeNamespaceName)"
-                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isAdmin: ctrl.isAdmin}"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.state.isEnvironmentAdmin}"
                 is-edit="ctrl.state.isEdit"
               ></namespace-selector>
               <!-- #endregion -->
