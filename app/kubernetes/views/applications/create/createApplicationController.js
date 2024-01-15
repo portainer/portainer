@@ -216,10 +216,12 @@ class KubernetesCreateApplicationController {
   }
 
   onChangeFileContent(value) {
-    if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
-      this.state.isEditorDirty = true;
-      this.stackFileContent = value;
-    }
+    this.$scope.$evalAsync(() => {
+      if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
+        this.state.isEditorDirty = true;
+        this.stackFileContent = value;
+      }
+    });
   }
 
   onDataAccessPolicyChange(value) {
@@ -1055,9 +1057,6 @@ class KubernetesCreateApplicationController {
 
           this.formValues.OriginalIngresses = this.ingresses;
           this.formValues.ImageModel = await this.parseImageConfiguration(this.formValues.ImageModel);
-          this.savedFormValues = angular.copy(this.formValues);
-          this.updateNamespaceLimits(this.namespaceWithQuota);
-          this.updateSliders(this.namespaceWithQuota);
 
           if (this.application.ApplicationType !== KubernetesApplicationTypes.StatefulSet) {
             _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
@@ -1070,6 +1069,10 @@ class KubernetesCreateApplicationController {
           }
           this.formValues.OriginalPersistedFolders = this.formValues.PersistedFolders;
           await this.refreshNamespaceData(namespace);
+
+          this.savedFormValues = angular.copy(this.formValues);
+          this.updateNamespaceLimits(this.namespaceWithQuota);
+          this.updateSliders(this.namespaceWithQuota);
         } else {
           this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
         }

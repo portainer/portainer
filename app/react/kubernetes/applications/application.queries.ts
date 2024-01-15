@@ -316,7 +316,9 @@ export function usePatchApplicationMutation(
     }: {
       appKind: AppKind;
       patch: ApplicationPatch;
-      contentType?: string;
+      contentType?:
+        | 'application/json-patch+json'
+        | 'application/strategic-merge-patch+json';
     }) =>
       patchApplication(
         environmentId,
