@@ -121,7 +121,6 @@ class KubernetesCreateApplicationController {
       persistedFoldersUseExistingVolumes: false,
       pullImageValidity: false,
       nodePortServices: [],
-      isEnvironmentAdmin: this.Authentication.hasAuthorizations(['K8sResourcePoolsW']),
     };
 
     this.isAdmin = this.Authentication.isAdmin();
