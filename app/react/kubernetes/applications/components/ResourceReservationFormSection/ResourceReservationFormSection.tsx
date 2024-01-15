@@ -55,14 +55,16 @@ export function ResourceReservationFormSection({
         tooltip="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM."
       >
         <div className="col-xs-10">
-          <SliderWithInput
-            value={Number(values.memoryLimit) ?? 0}
-            onChange={(value) => onChange({ ...values, memoryLimit: value })}
-            max={maxMemoryLimit}
-            step={128}
-            dataCy="k8sAppCreate-memoryLimit"
-            visibleTooltip
-          />
+          {maxMemoryLimit > 0 && (
+            <SliderWithInput
+              value={Number(values.memoryLimit) ?? 0}
+              onChange={(value) => onChange({ ...values, memoryLimit: value })}
+              max={maxMemoryLimit}
+              step={128}
+              dataCy="k8sAppCreate-memoryLimit"
+              visibleTooltip
+            />
+          )}
           {errors?.memoryLimit && (
             <FormError className="pt-1">{errors.memoryLimit}</FormError>
           )}
@@ -74,21 +76,23 @@ export function ResourceReservationFormSection({
         tooltip="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling."
       >
         <div className="col-xs-10">
-          <Slider
-            onChange={(value) =>
-              onChange(
-                typeof value === 'number'
-                  ? { ...values, cpuLimit: value }
-                  : { ...values, cpuLimit: value[0] ?? 0 }
-              )
-            }
-            value={values.cpuLimit}
-            min={0}
-            max={maxCpuLimit}
-            step={0.01}
-            dataCy="k8sAppCreate-cpuLimitSlider"
-            visibleTooltip
-          />
+          {maxCpuLimit > 0 && (
+            <Slider
+              onChange={(value) =>
+                onChange(
+                  typeof value === 'number'
+                    ? { ...values, cpuLimit: value }
+                    : { ...values, cpuLimit: value[0] ?? 0 }
+                )
+              }
+              value={values.cpuLimit}
+              min={0}
+              max={maxCpuLimit}
+              step={0.1}
+              dataCy="k8sAppCreate-cpuLimitSlider"
+              visibleTooltip
+            />
+          )}
           {errors?.cpuLimit && (
             <FormError className="pt-1">{errors.cpuLimit}</FormError>
           )}

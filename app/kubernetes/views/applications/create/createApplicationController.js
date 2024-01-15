@@ -994,13 +994,28 @@ class KubernetesCreateApplicationController {
           this.state.nodes.cpu += item.CPU;
         });
 
+        var namespace = '';
+        this.formValues.ResourcePool = this.resourcePools[0];
+
         if (this.resourcePools.length) {
-          this.namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+          if (this.state.isEdit) {
+            namespace = this.$state.params.namespace;
+            this.formValues.ResourcePool = _.find(this.resourcePools, ['Namespace.Name', namespace]);
+          }
+
+          namespace = this.formValues.ResourcePool.Namespace.Name;
+          this.namespaceWithQuota = await this.KubernetesResourcePoolService.get(namespace);
           this.formValues.ResourcePool.Quota = this.namespaceWithQuota.Quota;
+
+          // this.savedFormValues is being used in updateNamespaceLimits behind a check to see isEdit
+          if (this.state.isEdit) {
+            this.savedFormValues = angular.copy(this.formValues);
+          }
+
           this.updateNamespaceLimits(this.namespaceWithQuota);
           this.updateSliders(this.namespaceWithQuota);
         }
-        this.formValues.ResourcePool = this.resourcePools[0];
+
         if (!this.formValues.ResourcePool) {
           return;
         }
@@ -1008,7 +1023,6 @@ class KubernetesCreateApplicationController {
         this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
         this.nodeNumber = nodes.length;
 
-        const namespace = this.state.isEdit ? this.$state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
         await this.refreshNamespaceData(namespace);
 
         if (this.state.isEdit) {
