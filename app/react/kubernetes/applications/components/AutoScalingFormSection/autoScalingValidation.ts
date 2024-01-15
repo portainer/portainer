@@ -12,26 +12,25 @@ export function autoScalingValidation(
   const { autoScalerOverflow } = validationData || {};
   return object({
     isUsed: boolean().required(),
-    minReplicas: number()
-      .min(0, 'Minimum instances must be greater than 0.')
-      .when('isUsed', (isUsed: boolean) =>
-        isUsed
-          ? number()
-              .required('Minimum instances is required.')
-              .test(
-                'maxReplicas',
-                'Minimum instances must be less than maximum instances.',
-                // eslint-disable-next-line func-names
-                function (this, value?: number): boolean {
-                  if (!value) {
-                    return false;
-                  }
-                  const { maxReplicas } = this.parent as AutoScalingFormValues;
-                  return !maxReplicas || value < maxReplicas;
+    minReplicas: number().when('isUsed', (isUsed: boolean) =>
+      isUsed
+        ? number()
+            .required('Minimum instances is required.')
+            .min(1, 'Minimum instances must be greater than 0.')
+            .test(
+              'maxReplicas',
+              'Minimum instances must be less than maximum instances.',
+              // eslint-disable-next-line func-names
+              function (this, value?: number): boolean {
+                if (!value) {
+                  return true;
                 }
-              )
-          : number()
-      ),
+                const { maxReplicas } = this.parent as AutoScalingFormValues;
+                return !maxReplicas || value < maxReplicas;
+              }
+            )
+        : number()
+    ),
     maxReplicas: number().when('isUsed', (isUsed: boolean) =>
       isUsed
         ? number()
