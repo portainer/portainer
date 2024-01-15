@@ -309,8 +309,23 @@ export function usePatchApplicationMutation(
   name: string
 ) {
   return useMutation(
-    ({ appKind, patch }: { appKind: AppKind; patch: ApplicationPatch }) =>
-      patchApplication(environmentId, namespace, appKind, name, patch),
+    ({
+      appKind,
+      patch,
+      contentType = 'application/json-patch+json',
+    }: {
+      appKind: AppKind;
+      patch: ApplicationPatch;
+      contentType?: string;
+    }) =>
+      patchApplication(
+        environmentId,
+        namespace,
+        appKind,
+        name,
+        patch,
+        contentType
+      ),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(

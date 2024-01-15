@@ -216,6 +216,7 @@ export function getRollbackPatchPayload(
       if (!previousRevision.data) {
         throw new Error('No data found in the previous revision.');
       }
+      // payload matches the strategic merge patch format for a StatefulSet and DaemonSet
       return previousRevision.data;
     }
     case 'ReplicaSetList': {
@@ -277,7 +278,7 @@ export function getRollbackPatchPayload(
           value: patchAnnotations,
         },
       ].filter((p) => !!p.value); // remove any patch that has no value
-
+      // payload matches the json patch format for a Deployment
       return deploymentRollbackPatch;
     }
     default:

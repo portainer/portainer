@@ -142,7 +142,8 @@ export async function patchApplication(
   namespace: string,
   appKind: AppKind,
   name: string,
-  patch: ApplicationPatch
+  patch: ApplicationPatch,
+  contentType: string = 'application/json-patch+json'
 ) {
   switch (appKind) {
     case 'Deployment':
@@ -151,7 +152,8 @@ export async function patchApplication(
         namespace,
         appKind,
         name,
-        patch
+        patch,
+        contentType
       );
     case 'DaemonSet':
       return patchApplicationByKind<DaemonSet>(
@@ -160,7 +162,7 @@ export async function patchApplication(
         appKind,
         name,
         patch,
-        'application/strategic-merge-patch+json'
+        contentType
       );
     case 'StatefulSet':
       return patchApplicationByKind<StatefulSet>(
@@ -169,7 +171,7 @@ export async function patchApplication(
         appKind,
         name,
         patch,
-        'application/strategic-merge-patch+json'
+        contentType
       );
     case 'Pod':
       return patchPod(environmentId, namespace, name, patch);
