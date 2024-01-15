@@ -16,7 +16,7 @@ export function autoScalingValidation(
       isUsed
         ? number()
             .required('Minimum instances is required.')
-            .min(1, 'Minimum instances must be greater than 1.')
+            .min(1, 'Minimum instances must be greater than 0.')
             .test(
               'maxReplicas',
               'Minimum instances must be less than maximum instances.',
