@@ -156,6 +156,7 @@ class KubernetesCreateApplicationController {
     this.showDataAccessPolicySection = this.showDataAccessPolicySection.bind(this);
     this.refreshReactComponent = this.refreshReactComponent.bind(this);
     this.onChangeNamespaceName = this.onChangeNamespaceName.bind(this);
+    this.canSupportSharedAccess = this.canSupportSharedAccess.bind(this);
 
     this.$scope.$watch(
       () => this.formValues,
@@ -209,7 +210,7 @@ class KubernetesCreateApplicationController {
     if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
       return this.ApplicationTypes.DaemonSet;
     }
-    if (this.formValues.PersistedFolders && this.formValues.PersistedFolders.length) {
+    if (this.formValues.PersistedFolders && this.formValues.PersistedFolders.length && this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.Isolated) {
       return this.ApplicationTypes.StatefulSet;
     }
     return this.ApplicationTypes.Deployment;
@@ -365,7 +366,6 @@ class KubernetesCreateApplicationController {
       this.formValues.PersistedFolders = values;
       if (values && values.length && !this.supportGlobalDeployment()) {
         this.onChangeDeploymentType(this.ApplicationDeploymentTypes.Replicated);
-        return;
       }
       this.updateApplicationType();
     });
@@ -440,6 +440,13 @@ class KubernetesCreateApplicationController {
     }
 
     return true;
+  }
+
+  // from the pvcs in the form values, get all selected storage classes and find if they are all support RWX
+  canSupportSharedAccess() {
+    const formStorageClasses = this.formValues.PersistedFolders.map((pf) => pf.storageClass);
+    const isRWXSupported = formStorageClasses.every((sc) => sc.AccessModes.includes('RWX'));
+    return isRWXSupported;
   }
 
   // A StatefulSet is defined by DataAccessPolicy === 'Isolated'

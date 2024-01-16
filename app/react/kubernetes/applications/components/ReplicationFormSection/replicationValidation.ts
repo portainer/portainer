@@ -34,7 +34,12 @@ export function replicationValidation(
       .test(
         'scalable',
         `The following storage option(s) do not support concurrent access from multiples instances: ${nonScalableStorage}. You will not be able to scale that application.`,
-        () => !!supportScalableReplicaDeployment // must have support scalable replica deployment
+        (value) => {
+          if (!value || value <= 1) {
+            return true;
+          }
+          return !!supportScalableReplicaDeployment;
+        } // must have support scalable replica deployment
       )
       .required('Instance count is required.'),
   });
