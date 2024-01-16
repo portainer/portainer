@@ -33,7 +33,7 @@ export function getAppResourceSummaries(
   newFormValues: ApplicationFormValues,
   oldFormValues?: ApplicationFormValues
 ): Array<Summary> {
-  if (!oldFormValues) {
+  if (!oldFormValues?.Name) {
     return getCreatedApplicationResourcesNew(newFormValues);
   }
   return getUpdatedApplicationResources(newFormValues, oldFormValues);
