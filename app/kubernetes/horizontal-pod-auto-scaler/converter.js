@@ -50,7 +50,7 @@ export class KubernetesHorizontalPodAutoScalerConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.MinReplicas = formValues.AutoScaler.minReplicas;
     res.MaxReplicas = formValues.AutoScaler.maxReplicas;
-    res.TargetCPUUtilization = formValues.AutoScaler.targetCpuUtilizationPercentage;
+    res.targetCpuUtilizationPercentage = formValues.AutoScaler.targetCpuUtilizationPercentage;
     res.TargetEntity.Name = formValues.Name;
     res.TargetEntity.Kind = kind;
     res.TargetEntity.ApiVersion = formValues.AutoScaler.apiVersion;
