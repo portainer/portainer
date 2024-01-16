@@ -52,6 +52,8 @@
   border-color: var(--border-form-control-color);
   background-color: var(--bg-inputbox);
   box-shadow: none;
+
+  @apply th-highcontrast:border-white;
 }
 
 /* Match the same box shadow styles as the other portainer inputs, which are inherited from the bootstrap form-control class */
