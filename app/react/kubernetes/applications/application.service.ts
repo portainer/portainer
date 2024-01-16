@@ -190,7 +190,7 @@ async function patchApplicationByKind<T extends Application>(
 ) {
   try {
     const res = await axios.patch<T>(
-      buildUrl(environmentId, namespace, `${appKind}s`, `${name}sd`),
+      buildUrl(environmentId, namespace, `${appKind}s`, name),
       patch,
       {
         headers: {
