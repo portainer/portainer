@@ -26,7 +26,6 @@ import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
 import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
-import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/ApplicationForm/kubeEnvVarValidationSchema';
 import { SecretsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/SecretsFormSection';
 import { configurationsValidationSchema } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/configurationValidationSchema';
 import { ConfigMapsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/ConfigMapsFormSection';
@@ -57,8 +56,8 @@ import {
 } from '@/react/kubernetes/applications/components/NameFormSection';
 import { deploymentTypeValidation } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/deploymentTypeValidation';
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/AppDeploymentTypeFormSection';
-
-import { EnvironmentVariablesFieldset } from '@@/form-components/EnvironmentVariablesFieldset';
+import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/EnvironmentVariablesFormSection';
+import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
 
 import { applicationsModule } from './applications';
 
@@ -221,17 +220,6 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withControlledInput(withControlledInput(EnvironmentVariablesFieldset), {
-    values: 'onChange',
-  }),
-  'kubeEnvironmentVariablesFieldset',
-  ['canUndoDelete'],
-  // use kubeEnvVarValidationSchema instead of envVarValidation to add a regex matches rule
-  kubeEnvVarValidationSchema
-);
-
-withFormValidation(
-  ngModule,
   withControlledInput(
     withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection))),
     { values: 'onChange' }
@@ -349,4 +337,17 @@ withFormValidation(
   ['supportGlobalDeployment'],
   deploymentTypeValidation,
   true
+);
+
+withFormValidation(
+  ngModule,
+  withControlledInput(
+    withUIRouter(
+      withCurrentUser(withReactQuery(EnvironmentVariablesFormSection))
+    ),
+    { values: 'onChange' }
+  ),
+  'environmentVariablesFormSection',
+  [],
+  kubeEnvVarValidationSchema
 );
