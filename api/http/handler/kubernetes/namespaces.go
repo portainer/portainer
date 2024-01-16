@@ -84,7 +84,6 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param namespace path string true "Namespace"
 // @param body body models.K8sNamespaceDetails true "Namespace configuration details"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
