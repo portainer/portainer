@@ -24,7 +24,13 @@ export function replicationValidation(
       .test(
         'overflow',
         'This application would exceed available resources. Please review resource reservations or the instance count.',
-        () => !resourceReservationsOverflow // must not have resource reservations overflow
+        (value) => {
+          // the user can't fix the error here with 1 replica. There are validation errors in the resource reservations section that are helpful in a case of resourceReservationsOverflow.
+          if (value === 1) {
+            return true;
+          }
+          return !resourceReservationsOverflow;
+        }
       )
       .test(
         'quota',
