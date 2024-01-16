@@ -91,7 +91,7 @@ export function ConfigurationItem({
         <Button
           color="dangerlight"
           size="medium"
-          onClick={() => onRemoveItem()}
+          onClick={onRemoveItem}
           className="!ml-0 vertical-center btn-only-icon"
           icon={Trash2}
         />

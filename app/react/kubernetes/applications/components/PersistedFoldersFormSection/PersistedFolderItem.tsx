@@ -16,7 +16,7 @@ import { ApplicationFormValues } from '../../types';
 import { ExistingVolume, PersistedFolderFormValue } from './types';
 
 type Props = {
-  initialValues: PersistedFolderFormValue[];
+  initialValues?: PersistedFolderFormValue[];
   item: PersistedFolderFormValue;
   onChange: (value: PersistedFolderFormValue) => void;
   error: ItemError<PersistedFolderFormValue>;
@@ -220,7 +220,6 @@ export function PersistedFolderItem({
   function isToggleVolumeTypeVisible() {
     return (
       !(isEdit && isExistingPersistedFolder()) && // if it's not an edit of an existing persisted folder
-      applicationValues.ApplicationType !== 'StatefulSet' && // and if it's not a statefulset
       applicationValues.Containers.length <= 1 // and if there is only one container);
     );
   }

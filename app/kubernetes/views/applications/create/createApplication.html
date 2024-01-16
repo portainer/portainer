@@ -278,14 +278,13 @@
                   ></persisted-folders-form-section>
 
                   <!-- #region DATA ACCESS POLICY -->
-                  <div ng-if="ctrl.showDataAccessPolicySection()">
-                    <access-policy-form-section
-                      value="ctrl.formValues.DataAccessPolicy"
-                      on-change="(ctrl.onDataAccessPolicyChange)"
-                      is-edit="ctrl.state.isEdit"
-                      persisted-folders-use-existing-volumes="ctrl.state.persistedFoldersUseExistingVolumes"
-                    ></access-policy-form-section>
-                  </div>
+                  <access-policy-form-section
+                    ng-if="ctrl.showDataAccessPolicySection()"
+                    value="ctrl.formValues.DataAccessPolicy"
+                    on-change="(ctrl.onDataAccessPolicyChange)"
+                    is-edit="ctrl.state.isEdit"
+                    persisted-folders-use-existing-volumes="ctrl.state.persistedFoldersUseExistingVolumes"
+                  ></access-policy-form-section>
                   <!-- #endregion -->
 
                   <resource-reservation-form-section

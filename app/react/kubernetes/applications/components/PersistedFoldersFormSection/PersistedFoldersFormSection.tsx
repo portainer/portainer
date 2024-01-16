@@ -57,7 +57,10 @@ export function PersistedFoldersFormSection({
         value={values}
         onChange={onChange}
         errors={errors}
-        isDeleteButtonHidden={isDeleteButtonHidden()}
+        isDeleteButtonHidden={
+          isEdit && applicationValues.ApplicationType === 'StatefulSet'
+        }
+        canUndoDelete={isEdit}
         deleteButtonDataCy="k8sAppCreate-persistentFolderRemoveButton"
         addButtonDataCy="k8sAppCreate-persistentFolderAddButton"
         disabled={storageClasses.length === 0}
@@ -77,33 +80,20 @@ export function PersistedFoldersFormSection({
             initialValues={initialValues}
           />
         )}
-        itemBuilder={() => {
-          const newVolumeClaimName = `${applicationValues.Name}-${uuidv4()}`;
-          return {
-            persistentVolumeClaimName:
-              availableVolumes[0]?.PersistentVolumeClaim.Name ||
-              newVolumeClaimName,
-            containerPath: '',
-            size: '',
-            sizeUnit: 'GB',
-            storageClass: storageClasses[0],
-            useNewVolume: true,
-            existingVolume: undefined,
-            needsDeletion: false,
-          };
-        }}
+        itemBuilder={() => ({
+          persistentVolumeClaimName: getNewPVCName(applicationValues.Name),
+          containerPath: '',
+          size: '',
+          sizeUnit: 'GB',
+          storageClass: storageClasses[0],
+          useNewVolume: true,
+          existingVolume: undefined,
+          needsDeletion: false,
+        })}
         addLabel="Add persisted folder"
-        canUndoDelete={isEdit}
       />
     </FormSection>
   );
-
-  function isDeleteButtonHidden() {
-    return (
-      (isEdit && applicationValues.ApplicationType === 'StatefulSet') ||
-      applicationValues.Containers.length >= 1
-    );
-  }
 }
 
 function usePVCOptions(existingPVCs: ExistingVolume[]): Option<string>[] {
@@ -122,4 +112,11 @@ function getAddButtonError(storageClasses: StorageClass[]) {
     return 'No storage option available';
   }
   return '';
+}
+
+function getNewPVCName(applicationName: string) {
+  const name = `${applicationName}-${uuidv4()}`;
+  // limit it to 63 characters to avoid exceeding the limit for the volume name
+  const nameLimited = name.length > 63 ? name.substring(0, 63) : name;
+  return nameLimited;
 }

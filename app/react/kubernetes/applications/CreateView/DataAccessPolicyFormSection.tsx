@@ -59,9 +59,13 @@ function getOptions(
       label: 'Shared',
       description:
         'Application will be deployed as a Deployment with a shared storage access',
-      tooltip: () =>
-        isEdit ? 'Changing the data access policy is not allowed' : '',
-      disabled: () => isEdit && value !== 'Shared',
+      tooltip: () => {
+        if (persistedFoldersUseExistingVolumes) {
+          return 'Changing the data access policy is not allowed';
+        }
+        return '';
+      },
+      disabled: () => persistedFoldersUseExistingVolumes,
     },
   ] as const;
 }

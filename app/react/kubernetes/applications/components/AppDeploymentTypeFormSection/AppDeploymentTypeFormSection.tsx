@@ -1,12 +1,12 @@
+import { Boxes, Sliders } from 'lucide-react';
 import { FormikErrors } from 'formik';
 
-import { BoxSelector } from '@@/BoxSelector';
+import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
 import { FormError } from '@@/form-components/FormError';
 
 import { DeploymentType } from '../../types';
-import { getDeploymentOptions } from '../../CreateView/deploymentOptions';
 
 interface Props {
   values: DeploymentType;
@@ -21,7 +21,7 @@ export function AppDeploymentTypeFormSection({
   errors,
   supportGlobalDeployment,
 }: Props) {
-  const options = getDeploymentOptions(supportGlobalDeployment);
+  const options = getOptions(supportGlobalDeployment);
 
   return (
     <FormSection title="Deployment">
@@ -38,4 +38,33 @@ export function AppDeploymentTypeFormSection({
       {!!errors && <FormError>{errors}</FormError>}
     </FormSection>
   );
+}
+
+function getOptions(
+  supportGlobalDeployment: boolean
+): ReadonlyArray<BoxSelectorOption<DeploymentType>> {
+  return [
+    {
+      id: 'deployment_replicated',
+      label: 'Replicated',
+      value: 'Replicated',
+      icon: Sliders,
+      iconType: 'badge',
+      description: 'Run one or multiple instances of this container',
+    },
+    {
+      id: 'deployment_global',
+      disabled: () => !supportGlobalDeployment,
+      tooltip: () =>
+        !supportGlobalDeployment
+          ? 'The storage or access policy used for persisted folders cannot be used with this option'
+          : '',
+      label: 'Global',
+      description:
+        'Application will be deployed as a DaemonSet with an instance on each node of the cluster',
+      value: 'Global',
+      icon: Boxes,
+      iconType: 'badge',
+    },
+  ] as const;
 }
