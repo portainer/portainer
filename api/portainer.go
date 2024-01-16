@@ -354,6 +354,8 @@ type (
 		EndpointID EndpointID
 		// EE only feature
 		DeploymentInfo StackDeploymentInfo
+		// ReadyRePullImage is a flag to indicate whether the auto update is trigger to re-pull image
+		ReadyRePullImage bool
 
 		// Deprecated
 		Details EdgeStackStatusDetails
