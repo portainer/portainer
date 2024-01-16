@@ -334,7 +334,7 @@
                 </div>
 
                 <placement-form-section
-                  ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated"
+                  ng-show="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated"
                   values="{placements: ctrl.formValues.Placements, placementType: ctrl.formValues.PlacementType}"
                   on-change="(ctrl.onChangePlacements)"
                 ></placement-form-section>
