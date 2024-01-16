@@ -25,28 +25,30 @@ export function EnableMetricsInput({ value, error, environmentId }: Props) {
     <div className="mb-4">
       <TextTip color="blue">
         <p>
-          Enabling the metrics feature will allow users to use specific
-          functionality like autoscaling and to see container and node resource
-          usage.
-        </p>
-        <p>
-          Ensure that&nbsp;
+          Enabling the metrics feature allows users to use horizontal pod
+          autoscaling and to see container and node resource usage. This
+          requires{' '}
           <a
             href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server"
             target="_blank"
             rel="noreferrer"
           >
             metrics server
-          </a>
-          &nbsp;or&nbsp;
+          </a>{' '}
+          or{' '}
           <a
             href="https://github.com/kubernetes-sigs/prometheus-adapter"
             target="_blank"
             rel="noreferrer"
           >
             prometheus
-          </a>
-          &nbsp;is running inside your cluster.
+          </a>{' '}
+          to be running in your cluster.
+        </p>
+        <p>
+          On any subsequent disabling of the feature, existing deployed
+          applications with autoscaling will still autoscale (you would have to
+          remove their autoscaler definitions to stop this).
         </p>
       </TextTip>
       <FormControl
