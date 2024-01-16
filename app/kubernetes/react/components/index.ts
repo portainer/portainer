@@ -134,8 +134,11 @@ export const ngModule = angular
   .component(
     'kubeStackName',
     r2a(
-      withUIRouter(
-        withReactQuery(withCurrentUser(withControlledInput(StackName)))
+      withControlledInput(
+        withUIRouter(
+          withReactQuery(withCurrentUser(withControlledInput(StackName)))
+        ),
+        { stackName: 'setStackName' }
       ),
       ['setStackName', 'stackName', 'stacks', 'inputClassName']
     )
@@ -218,7 +221,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withControlledInput(EnvironmentVariablesFieldset),
+  withControlledInput(withControlledInput(EnvironmentVariablesFieldset), {
+    values: 'onChange',
+  }),
   'kubeEnvironmentVariablesFieldset',
   ['canUndoDelete'],
   // use kubeEnvVarValidationSchema instead of envVarValidation to add a regex matches rule
@@ -228,7 +233,8 @@ withFormValidation(
 withFormValidation(
   ngModule,
   withControlledInput(
-    withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection)))
+    withUIRouter(withCurrentUser(withReactQuery(ConfigMapsFormSection))),
+    { values: 'onChange' }
   ),
   'configMapsFormSection',
   ['values', 'onChange', 'namespace'],
@@ -238,7 +244,8 @@ withFormValidation(
 withFormValidation(
   ngModule,
   withControlledInput(
-    withUIRouter(withCurrentUser(withReactQuery(SecretsFormSection)))
+    withUIRouter(withCurrentUser(withReactQuery(SecretsFormSection))),
+    { values: 'onChange' }
   ),
   'secretsFormSection',
   ['values', 'onChange', 'namespace'],
@@ -247,7 +254,10 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection))),
+  withControlledInput(
+    withUIRouter(withCurrentUser(withReactQuery(PersistedFoldersFormSection))),
+    { values: 'onChange' }
+  ),
   'persistedFoldersFormSection',
   [
     'isEdit',
@@ -264,7 +274,8 @@ withFormValidation(
   withControlledInput(
     withUIRouter(
       withCurrentUser(withReactQuery(ResourceReservationFormSection))
-    )
+    ),
+    { values: 'onChange' }
   ),
   'resourceReservationFormSection',
   [
@@ -279,7 +290,8 @@ withFormValidation(
 withFormValidation(
   ngModule,
   withControlledInput(
-    withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection)))
+    withUIRouter(withCurrentUser(withReactQuery(ReplicationFormSection))),
+    { values: 'onChange' }
   ),
   'replicationFormSection',
   [
@@ -294,7 +306,8 @@ withFormValidation(
 withFormValidation(
   ngModule,
   withControlledInput(
-    withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection)))
+    withUIRouter(withCurrentUser(withReactQuery(AutoScalingFormSection))),
+    { values: 'onChange' }
   ),
   'autoScalingFormSection',
   ['isMetricsEnabled'],
@@ -311,7 +324,9 @@ withFormValidation(
 
 withFormValidation(
   ngModule,
-  withUIRouter(withCurrentUser(NamespaceSelector)),
+  withControlledInput(withUIRouter(withCurrentUser(NamespaceSelector)), {
+    values: 'onChange',
+  }),
   'namespaceSelector',
   ['isEdit'],
   namespaceSelectorValidation,
