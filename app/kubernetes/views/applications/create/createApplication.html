@@ -235,18 +235,10 @@
                   <!-- #endregion -->
 
                   <!-- #region ENVIRONMENT VARIABLES -->
-                  <div class="form-group">
-                    <div class="col-sm-12 vertical-center">
-                      <label class="control-label !pt-0 text-left !text-sm">Environment variables</label>
-                    </div>
-                    <div class="col-sm-11 col-lg-10 mt-2">
-                      <kube-environment-variables-fieldset
-                        values="ctrl.formValues.EnvironmentVariables"
-                        on-change="(ctrl.onEnvironmentVariableChange)"
-                        can-undo-delete="true"
-                      ></kube-environment-variables-fieldset>
-                    </div>
-                  </div>
+                  <environment-variables-form-section
+                    values="ctrl.formValues.EnvironmentVariables"
+                    on-change="(ctrl.onEnvironmentVariableChange)"
+                  ></environment-variables-form-section>
                   <!-- #endregion -->
 
                   <!-- #region CONFIGMAPS -->

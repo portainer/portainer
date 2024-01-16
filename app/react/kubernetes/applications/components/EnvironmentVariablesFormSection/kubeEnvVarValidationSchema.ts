@@ -14,6 +14,7 @@ export function kubeEnvVarValidationSchema(): SchemaOf<EnvVar[]> {
         ),
       value: string().default(''),
       needsDeletion: bool().default(false),
+      isNew: bool().default(false),
     })
   ).test(
     'unique',
