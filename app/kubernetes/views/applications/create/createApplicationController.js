@@ -218,10 +218,12 @@ class KubernetesCreateApplicationController {
 
   onChangeFileContent(value) {
     this.$scope.$evalAsync(() => {
-      if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
+      if (this.oldStackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
         this.state.isEditorDirty = true;
-        this.stackFileContent = value;
+      } else {
+        this.state.isEditorDirty = false;
       }
+      this.stackFileContent = value;
     });
   }
 
@@ -1060,6 +1062,7 @@ class KubernetesCreateApplicationController {
               this.stack = await this.StackService.stack(this.application.StackId);
               if (this.state.appType === KubernetesDeploymentTypes.CONTENT) {
                 this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
+                this.oldStackFileContent = this.stackFileContent;
               }
             }
           }
