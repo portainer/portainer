@@ -19,6 +19,7 @@ import { FormActions } from '@@/form-components/FormActions';
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
+import { InsightsBox } from '@@/InsightsBox';
 
 import { useIngressControllerClassMapQuery } from '../../ingressClass/useIngressControllerClassMap';
 import { IngressControllerClassMap } from '../../ingressClass/types';
@@ -284,20 +285,26 @@ function InnerForm({
           </div>
         </FormSection>
         <FormSection title="Resources and Metrics">
-          <TextTip color="orange">
-            <p>
-              By ENABLING resource over-commit, you are able to assign more
-              resources to namespaces than is physically available in the
-              cluster. This may lead to unexpected deployment failures if there
-              is insufficient resource to service demand.
-            </p>
-          </TextTip>
+          <InsightsBox
+            insightCloseId="resourceOverCommit"
+            className="mb-4"
+            header="Allow resource over-commit - UI-only change in 2.20"
+            content="Resource over-commit has always been ENABLED in Portainer CE. However, the toggle was incorrectly shown as OFF. This has now been corrected but please note that no functionality has been removed."
+          />
           <TextTip color="blue">
             <p>
-              By DISABLING resource over-commit (highly recommended), you are
-              only able to assign resources to namespaces that are less (in
+              By DISABLING resource over-commit (highly recommended), you can
+              ONLY assign namespaces CPU and memory resources that are less (in
               aggregate) than the cluster total minus any system resource
               reservation.
+            </p>
+          </TextTip>
+          <TextTip color="orange">
+            <p>
+              By ENABLING resource over-commit, you can assign namespaces more
+              resources than are physically available in the cluster. This may
+              lead to unexpected deployment failures if there are insufficient
+              resources to service demand.
             </p>
           </TextTip>
           <div className="form-group">
@@ -306,7 +313,7 @@ function InnerForm({
                 label="Allow resource over-commit"
                 labelClass="col-sm-5 col-lg-4"
                 name="resourceOverCommitPercentage"
-                checked={values.enableResourceOverCommit}
+                checked
                 featureId={FeatureId.K8S_SETUP_DEFAULT}
                 onChange={(checked: boolean) => {
                   setFieldValue('enableResourceOverCommit', checked);
