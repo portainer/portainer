@@ -215,6 +215,7 @@ type (
 		Swarm                   bool              `json:"Swarm"`
 		TotalCPU                int               `json:"TotalCPU"`
 		TotalMemory             int64             `json:"TotalMemory"`
+		ContainerCount          int               `json:"ContainerCount"`
 		RunningContainerCount   int               `json:"RunningContainerCount"`
 		StoppedContainerCount   int               `json:"StoppedContainerCount"`
 		HealthyContainerCount   int               `json:"HealthyContainerCount"`
