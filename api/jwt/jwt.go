@@ -186,6 +186,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	if !expiresAt.IsZero() {
 		cl.RegisteredClaims = jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		}
 	}
 
