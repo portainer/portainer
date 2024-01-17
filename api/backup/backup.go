@@ -17,7 +17,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const rwxr__r__ os.FileMode = 0744
+const rwxr__r__ os.FileMode = 0o744
 
 var filesToBackup = []string{
 	"certs",
