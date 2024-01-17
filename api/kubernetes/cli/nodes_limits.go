@@ -24,7 +24,7 @@ func (kcl *KubeClient) GetNodesLimits() (portainer.K8sNodesLimits, error) {
 
 	for _, item := range nodes.Items {
 		cpu := item.Status.Allocatable.Cpu().MilliValue()
-		memory := item.Status.Allocatable.Memory().Value()
+		memory := item.Status.Allocatable.Memory().Value() // bytes
 
 		nodesLimits[item.ObjectMeta.Name] = &portainer.K8sNodeLimits{
 			CPU:    cpu,
@@ -57,7 +57,7 @@ func (client *KubeClient) GetMaxResourceLimits(skipNamespace string, overCommitE
 	memory := int64(0)
 	for _, node := range nodes.Items {
 		limits.CPU += node.Status.Allocatable.Cpu().MilliValue()
-		memory += node.Status.Allocatable.Memory().Value()
+		memory += node.Status.Allocatable.Memory().Value() // bytes
 	}
 	limits.Memory = memory / 1000000 // B to MB
 

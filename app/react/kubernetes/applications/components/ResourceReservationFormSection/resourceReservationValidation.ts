@@ -1,11 +1,21 @@
-import { SchemaOf, number, object } from 'yup';
+import { SchemaOf, TestContext, number, object } from 'yup';
+
+import KubernetesResourceReservationHelper from '@/kubernetes/helpers/resourceReservationHelper';
 
 import { ResourceQuotaFormValues } from './types';
+
+type NodeLimit = {
+  CPU: number;
+  Memory: number;
+};
+
+type NodesLimits = Record<string, NodeLimit>;
 
 type ValidationData = {
   maxMemoryLimit: number;
   maxCpuLimit: number;
   isEnvironmentAdmin: boolean;
+  nodeLimits: NodesLimits;
 };
 
 export function resourceReservationValidation(
@@ -28,6 +38,23 @@ export function resourceReservationValidation(
         ({ value }) =>
           `Value must be between 0 and ${validationData?.maxMemoryLimit}MB now - the previous value of ${value} exceeds this`
       )
+      .test(
+        'hasSuitableNode',
+        `These reservations would exceed the resources currently available in the cluster.`,
+        // eslint-disable-next-line prefer-arrow-callback, func-names
+        function (value: number | undefined, context: TestContext) {
+          if (!validationData || value === undefined) {
+            // explicitely check for undefined, since 0 is a valid value
+            return true;
+          }
+          const { memoryLimit, cpuLimit } = context.parent;
+          return hasSuitableNode(
+            memoryLimit,
+            cpuLimit,
+            validationData.nodeLimits
+          );
+        }
+      )
       .required(),
     cpuLimit: number()
       .min(0)
@@ -45,6 +72,41 @@ export function resourceReservationValidation(
         ({ value }) =>
           `Value must be between 0 and ${validationData?.maxCpuLimit} now - the previous value of ${value} exceeds this`
       )
+      .test(
+        'hasSuitableNode',
+        `These reservations would exceed the resources currently available in the cluster.`,
+        // eslint-disable-next-line prefer-arrow-callback, func-names
+        function (value: number | undefined, context: TestContext) {
+          if (!validationData || value === undefined) {
+            // explicitely check for undefined, since 0 is a valid value
+            return true;
+          }
+          const { memoryLimit, cpuLimit } = context.parent;
+          return hasSuitableNode(
+            memoryLimit,
+            cpuLimit,
+            validationData.nodeLimits
+          );
+        }
+      )
       .required(),
   });
+}
+
+function hasSuitableNode(
+  memoryLimit: number,
+  cpuLimit: number,
+  nodeLimits: NodesLimits
+) {
+  // transform the nodelimits from bytes to MB
+  const limits = Object.values(nodeLimits).map((nodeLimit) => ({
+    ...nodeLimit,
+    Memory: KubernetesResourceReservationHelper.megaBytesValue(
+      nodeLimit.Memory
+    ),
+  }));
+  // make sure there's a node available with enough memory and cpu
+  return limits.some(
+    (nodeLimit) => nodeLimit.Memory >= memoryLimit && nodeLimit.CPU >= cpuLimit
+  );
 }
