@@ -286,7 +286,7 @@ class KubernetesCreateApplicationController {
   onAutoScaleChange(values) {
     return this.$async(async () => {
       // when enabling the auto scaler, set the default values
-      if (!this.formValues.AutoScaler.isUsed && values.isUsed) {
+      if (!this.oldFormValues.AutoScaler.isUsed && values.isUsed) {
         this.formValues.AutoScaler = {
           isUsed: values.isUsed,
           minReplicas: 1,
@@ -297,6 +297,11 @@ class KubernetesCreateApplicationController {
       }
       // otherwise, just update the values
       this.formValues.AutoScaler = values;
+
+      // reset it to previous form values if the user disables the auto scaler
+      if (!this.oldFormValues.AutoScaler.isUsed && !values.isUsed) {
+        this.formValues.AutoScaler = this.oldFormValues.AutoScaler;
+      }
     });
   }
   /* #endregion */
