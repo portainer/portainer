@@ -122,11 +122,7 @@ class KubernetesApplicationsController {
   }
 
   removeAction(selectedItems) {
-    confirmDelete('Do you want to remove the selected application(s)?').then((confirmed) => {
-      if (confirmed) {
-        return this.$async(this.removeActionAsync, selectedItems);
-      }
-    });
+    this.$async(() => this.removeActionAsync(selectedItems));
   }
 
   onPublishingModeClick(application) {
@@ -173,7 +169,9 @@ class KubernetesApplicationsController {
   }
 
   setSystemResources(flag) {
-    this.state.isSystemResources = flag;
+    return this.$scope.$applyAsync(() => {
+      this.state.isSystemResources = flag;
+    });
   }
 
   getApplications() {

@@ -10,23 +10,18 @@
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills" ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
               <uib-tab-heading class="vertical-center"> <pr-icon icon="'box'"></pr-icon> Applications </uib-tab-heading>
+
               <kubernetes-applications-datatable
                 dataset="ctrl.state.applications"
-                table-key="kubernetes.applications"
-                settings-key="kubernetes.applications"
-                order-by="Name"
-                remove-action="ctrl.removeAction"
-                refresh-callback="ctrl.getApplications"
-                on-publishing-mode-click="(ctrl.onPublishingModeClick)"
-                is-primary="true"
+                on-refresh="(ctrl.getApplications)"
                 namespaces="ctrl.state.namespaces"
                 namespace="ctrl.state.namespaceName"
-                on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
-                is-apps-loading="ctrl.state.isAppsLoading"
-                is-system-resources="ctrl.state.isSystemResources"
-                is-visible="ctrl.state.activeTab === 0"
-                set-system-resources="(ctrl.setSystemResources)"
-                hide-stacks-functionality="ctrl.deploymentOptions.hideStacksFunctionality"
+                on-namespace-change="(ctrl.onChangeNamespaceDropdown)"
+                is-loading="ctrl.state.isAppsLoading"
+                show-system="ctrl.state.isSystemResources"
+                on-show-system-change="(ctrl.setSystemResources)"
+                on-remove="(ctrl.removeAction)"
+                hide-stacks="ctrl.deploymentOptions.hideStacksFunctionality"
               >
               </kubernetes-applications-datatable>
             </uib-tab>
@@ -50,20 +45,15 @@
           <kubernetes-applications-datatable
             ng-if="ctrl.deploymentOptions.hideStacksFunctionality"
             dataset="ctrl.state.applications"
-            table-key="kubernetes.applications"
-            settings-key="kubernetes.applications"
-            order-by="Name"
-            remove-action="ctrl.removeAction"
-            refresh-callback="ctrl.getApplications"
-            on-publishing-mode-click="(ctrl.onPublishingModeClick)"
-            is-primary="true"
+            on-refresh="(ctrl.getApplications)"
             namespaces="ctrl.state.namespaces"
             namespace="ctrl.state.namespaceName"
-            on-change-namespace-dropdown="(ctrl.onChangeNamespaceDropdown)"
-            is-apps-loading="ctrl.state.isAppsLoading"
-            is-system-resources="ctrl.state.isSystemResources"
-            set-system-resources="(ctrl.setSystemResources)"
-            hide-stacks-functionality="ctrl.deploymentOptions.hideStacksFunctionality"
+            on-namespace-change="(ctrl.onChangeNamespaceDropdown)"
+            is-loading="ctrl.state.isAppsLoading"
+            show-system="ctrl.state.isSystemResources"
+            on-show-system-change="(ctrl.setSystemResources)"
+            on-remove="(ctrl.removeAction)"
+            hide-stacks="ctrl.deploymentOptions.hideStacksFunctionality"
           >
           </kubernetes-applications-datatable>
         </rd-widget-body>
