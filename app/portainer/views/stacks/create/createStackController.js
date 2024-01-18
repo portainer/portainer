@@ -328,6 +328,7 @@ angular
           return;
         }
         const rendered = renderTemplate($scope.state.templateContent, $scope.formValues.Variables, $scope.state.selectedTemplate.Variables);
+        $scope.state.editorYamlValidationError = StackHelper.validateYAML(rendered, $scope.containerNames);
         onChangeFormValues({ StackFileContent: rendered });
       }
 

@@ -33,7 +33,7 @@ function validateYAML(yaml, containerNames, originalContainersNames = []) {
   let yamlObject;
 
   try {
-    yamlObject = YAML.parse(yaml);
+    yamlObject = YAML.parse(yaml, { mapAsMap: true });
   } catch (err) {
     return 'There is an error in the yaml syntax: ' + err;
   }
