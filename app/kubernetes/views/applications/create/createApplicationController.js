@@ -372,6 +372,10 @@ class KubernetesCreateApplicationController {
 
   onChangePersistedFolder(values) {
     this.$scope.$evalAsync(() => {
+      this.state.persistedFoldersUseExistingVolumes = values.some((pf) => pf.existingVolume);
+      if (!this.state.isEdit && this.state.persistedFoldersUseExistingVolumes) {
+        this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.Shared;
+      }
       this.formValues.PersistedFolders = values;
       if (values && values.length && !this.supportGlobalDeployment()) {
         this.onChangeDeploymentType(this.ApplicationDeploymentTypes.Replicated);

@@ -204,7 +204,7 @@ export function PersistedFolderItem({
             isDisabled={
               (isEdit && isExistingPersistedFolder()) ||
               applicationValues.Containers.length > 1 ||
-              availableVolumes.length <= 1
+              availableVolumes.length < 1
             }
             data-cy={`k8sAppCreate-pvcSelect_${index}`}
           />
