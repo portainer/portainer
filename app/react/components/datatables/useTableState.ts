@@ -25,8 +25,8 @@ export function useTableState<
   );
 }
 
-export function useTableStateWithStorage(
-  ...args: Parameters<typeof createPersistedStore>
+export function useTableStateWithStorage<T extends BasicTableSettings>(
+  ...args: Parameters<typeof createPersistedStore<T>>
 ) {
   const [store] = useState(() => createPersistedStore(...args));
   return useTableState(store, args[0]);
