@@ -42,13 +42,6 @@ export function ResourceReservationFormSection({
           application. Maximums are inherited from the namespace quota.
         </TextTip>
       )}
-      {namespaceHasQuota && resourceQuotaCapacityExceeded && (
-        <TextTip color="red">
-          This namespace has exhausted its resource capacity and you will not be
-          able to deploy the application. Contact your administrator to expand
-          the capacity of the namespace.
-        </TextTip>
-      )}
       <FormControl
         className="flex flex-row"
         label="Memory limit (MB)"
