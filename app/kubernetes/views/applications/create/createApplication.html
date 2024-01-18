@@ -66,7 +66,7 @@
               <namespace-selector
                 values="ctrl.formValues.ResourcePool.Namespace.Name"
                 on-change="(ctrl.onChangeNamespaceName)"
-                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.state.isEnvironmentAdmin}"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.isAdmin}"
                 is-edit="ctrl.state.isEdit"
               ></namespace-selector>
               <!-- kubernetes services options -->
@@ -325,14 +325,14 @@
                   <!-- #endregion -->
                 </div>
 
-                <placement-form-section
-                  ng-show="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated"
-                  values="{placements: ctrl.formValues.Placements, placementType: ctrl.formValues.PlacementType}"
-                  on-change="(ctrl.onChangePlacements)"
-                ></placement-form-section>
-
-                <!-- kubernetes services options -->
                 <div class="mb-8" ng-if="ctrl.formValues.ResourcePool">
+                  <placement-form-section
+                    ng-show="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated"
+                    values="{placements: ctrl.formValues.Placements, placementType: ctrl.formValues.PlacementType}"
+                    on-change="(ctrl.onChangePlacements)"
+                  ></placement-form-section>
+
+                  <!-- kubernetes services options -->
                   <kube-services-form
                     on-change="(ctrl.onServicesChange)"
                     values="ctrl.formValues.Services"
