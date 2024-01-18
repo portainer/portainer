@@ -1,6 +1,8 @@
 import { Box, Boxes } from 'lucide-react';
 
 import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
+import { FormSection } from '@@/form-components/FormSection';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { AppDataAccessPolicy } from '../types';
 
@@ -20,13 +22,18 @@ export function DataAccessPolicyFormSection({
   const options = getOptions(value, isEdit, persistedFoldersUseExistingVolumes);
 
   return (
-    <BoxSelector
-      slim
-      options={options}
-      value={value}
-      onChange={onChange}
-      radioName="data_access_policy"
-    />
+    <FormSection title="Data access policy" titleSize="sm">
+      <TextTip color="blue">
+        Specify how the data will be used across instances.
+      </TextTip>
+      <BoxSelector
+        slim
+        options={options}
+        value={value}
+        onChange={onChange}
+        radioName="data_access_policy"
+      />
+    </FormSection>
   );
 }
 
@@ -65,7 +72,7 @@ function getOptions(
         }
         return '';
       },
-      disabled: () => persistedFoldersUseExistingVolumes,
+      disabled: () => isEdit && value !== 'Shared',
     },
   ] as const;
 }

@@ -19,8 +19,8 @@ export type ExistingVolume = {
     Storage: string;
     storageClass: StorageClass;
     CreationDate: string;
-    ApplicationOwner: string;
-    ApplicationName: string;
+    ApplicationOwner?: string;
+    ApplicationName?: string;
     PreviousName?: string;
     MountPath?: string;
     Yaml?: string;
