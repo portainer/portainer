@@ -11,8 +11,8 @@ function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadServ
     return CustomTemplates.get({ id }).$promise;
   };
 
-  service.customTemplates = async function customTemplates(type) {
-    const templates = await CustomTemplates.query({ type }).$promise;
+  service.customTemplates = async function customTemplates(type, edge = false) {
+    const templates = await CustomTemplates.query({ type, edge }).$promise;
     templates.forEach((template) => {
       if (template.Note) {
         template.Note = $('<p>').html($sanitize(template.Note)).find('img').remove().end().html();

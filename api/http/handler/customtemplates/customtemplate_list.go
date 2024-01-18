@@ -8,7 +8,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/slices"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
@@ -21,6 +23,7 @@ import (
 // @security jwt
 // @produce json
 // @param type query []int true "Template types" Enums(1,2,3)
+// @param edge query boolean false "Filter by edge templates"
 // @success 200 {array} portainer.CustomTemplate "Success"
 // @failure 500 "Server error"
 // @router /custom_templates [get]
@@ -29,6 +32,8 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return httperror.BadRequest("Invalid Custom template type", err)
 	}
+
+	edge := retrieveEdgeParam(r)
 
 	customTemplates, err := handler.DataStore.CustomTemplate().ReadAll()
 	if err != nil {
@@ -63,7 +68,30 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 
 	customTemplates = filterByType(customTemplates, templateTypes)
 
+	if edge != nil {
+		customTemplates = slices.Filter(customTemplates, func(customTemplate portainer.CustomTemplate) bool {
+			return customTemplate.EdgeTemplate == *edge
+		})
+	}
+
+	for i := range customTemplates {
+		customTemplate := &customTemplates[i]
+		if customTemplate.GitConfig != nil && customTemplate.GitConfig.Authentication != nil {
+			customTemplate.GitConfig.Authentication.Password = ""
+		}
+	}
+
 	return response.JSON(w, customTemplates)
+}
+
+func retrieveEdgeParam(r *http.Request) *bool {
+	var edge *bool
+	edgeParam, _ := request.RetrieveQueryParameter(r, "edge", true)
+	if edgeParam != "" && (edgeParam == "true" || edgeParam == "false") {
+		edgeVal := edgeParam == "true"
+		edge = &edgeVal
+	}
+	return edge
 }
 
 func parseTemplateTypes(r *http.Request) ([]portainer.StackType, error) {
