@@ -8,7 +8,7 @@ import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsB
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
 import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
-import { TerminalTooltip } from '@/react/kubernetes/applications/ConsoleView/ConsoleView';
+import { TerminalTooltip } from '@/react/kubernetes/applications/components/TerminalTooltip';
 import { HelmRepositoryDatatable } from '@/react/portainer/account/AccountView/HelmRepositoryDatatable';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 
