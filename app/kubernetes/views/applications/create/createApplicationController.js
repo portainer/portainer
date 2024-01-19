@@ -211,21 +211,9 @@ class KubernetesCreateApplicationController {
 
   // keep the application type up to date
   updateApplicationType() {
-    this.$scope.$evalAsync(() => {
-      if (this.formValues.DeploymentType === KubernetesDeploymentTypes.GLOBAL) {
-        this.formValues.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
-        this.validatePersistedFolders();
-        return;
-      }
-      const persistedFolders = this.formValues.PersistedFolders && this.formValues.PersistedFolders.filter((pf) => !pf.NeedsDeletion);
-      if (persistedFolders && persistedFolders.length) {
-        this.formValues.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
-        this.validatePersistedFolders();
-        return;
-      }
-      this.formValues.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
+    return this.$scope.$evalAsync(() => {
+      this.formValues.ApplicationType = this.getAppType();
       this.validatePersistedFolders();
-      return;
     });
   }
 
@@ -286,7 +274,9 @@ class KubernetesCreateApplicationController {
   }
 
   imageValidityIsValid() {
-    return this.state.pullImageValidity || (this.formValues.registryDetails && this.formValues.registryDetails.Registry.Type !== RegistryTypes.DOCKERHUB);
+    return (
+      this.isExternalApplication() || this.state.pullImageValidity || (this.formValues.registryDetails && this.formValues.registryDetails.Registry.Type !== RegistryTypes.DOCKERHUB)
+    );
   }
 
   onChangeAppName(appName) {
