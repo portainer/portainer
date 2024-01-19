@@ -142,7 +142,8 @@ export async function patchApplication(
   namespace: string,
   appKind: AppKind,
   name: string,
-  patch: ApplicationPatch
+  patch: ApplicationPatch,
+  contentType: string = 'application/json-patch+json'
 ) {
   switch (appKind) {
     case 'Deployment':
@@ -151,7 +152,8 @@ export async function patchApplication(
         namespace,
         appKind,
         name,
-        patch
+        patch,
+        contentType
       );
     case 'DaemonSet':
       return patchApplicationByKind<DaemonSet>(
@@ -160,7 +162,7 @@ export async function patchApplication(
         appKind,
         name,
         patch,
-        'application/strategic-merge-patch+json'
+        contentType
       );
     case 'StatefulSet':
       return patchApplicationByKind<StatefulSet>(
@@ -169,7 +171,7 @@ export async function patchApplication(
         appKind,
         name,
         patch,
-        'application/strategic-merge-patch+json'
+        contentType
       );
     case 'Pod':
       return patchPod(environmentId, namespace, name, patch);
@@ -188,7 +190,7 @@ async function patchApplicationByKind<T extends Application>(
 ) {
   try {
     const res = await axios.patch<T>(
-      buildUrl(environmentId, namespace, `${appKind}s`, `${name}sd`),
+      buildUrl(environmentId, namespace, `${appKind}s`, name),
       patch,
       {
         headers: {
@@ -216,6 +218,14 @@ async function getApplicationByKind<
       buildUrl(environmentId, namespace, `${appKind}s`, name),
       {
         headers: { Accept: yaml ? 'application/yaml' : 'application/json' },
+        // this logic is to get the latest YAML response
+        // axios-cache-adapter looks for the response headers to determine if the response should be cached
+        // to avoid writing requestInterceptor, adding a query param to the request url
+        params: yaml
+          ? {
+              _: Date.now(),
+            }
+          : null,
       }
     );
     return data;

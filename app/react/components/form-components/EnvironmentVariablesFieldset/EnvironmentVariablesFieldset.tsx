@@ -1,31 +1,35 @@
 import { useState } from 'react';
-import { array, object, SchemaOf, string } from 'yup';
+import { array, boolean, object, SchemaOf, string } from 'yup';
 
 import { ArrayError } from '../InputList/InputList';
+import { buildUniquenessTest } from '../validate-unique';
 
 import { AdvancedMode } from './AdvancedMode';
 import { SimpleMode } from './SimpleMode';
-import { Value } from './types';
+import { Values } from './types';
 
 export function EnvironmentVariablesFieldset({
   onChange,
   values,
   errors,
+  canUndoDelete,
 }: {
-  values: Value;
-  onChange(value: Value): void;
-  errors?: ArrayError<Value>;
+  values: Values;
+  onChange(value: Values): void;
+  errors?: ArrayError<Values>;
+  canUndoDelete?: boolean;
 }) {
   const [simpleMode, setSimpleMode] = useState(true);
 
   return (
-    <div className="col-sm-12">
+    <>
       {simpleMode ? (
         <SimpleMode
           onAdvancedModeClick={() => setSimpleMode(false)}
           onChange={onChange}
           value={values}
           errors={errors}
+          canUndoDelete={canUndoDelete}
         />
       ) : (
         <AdvancedMode
@@ -34,15 +38,23 @@ export function EnvironmentVariablesFieldset({
           value={values}
         />
       )}
-    </div>
+    </>
   );
 }
 
-export function envVarValidation(): SchemaOf<Value> {
+export function envVarValidation(): SchemaOf<Values> {
   return array(
     object({
-      name: string().required('Name is required'),
+      name: string().required('Environment variable name is required'),
       value: string().default(''),
+      needsDeletion: boolean().default(false),
     })
+  ).test(
+    'unique',
+    'This environment variable is already defined',
+    buildUniquenessTest(
+      () => 'This environment variable is already defined',
+      'name'
+    )
   );
 }

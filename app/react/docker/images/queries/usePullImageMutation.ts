@@ -1,4 +1,4 @@
-import { AxiosRequestHeaders } from 'axios';
+import { RawAxiosRequestHeaders } from 'axios';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -31,7 +31,7 @@ export async function pullImage({
 
   const imageURI = buildImageFullURI(image, registry);
 
-  const headers: AxiosRequestHeaders = {
+  const headers: RawAxiosRequestHeaders = {
     'X-Registry-Auth': authenticationDetails,
   };
 

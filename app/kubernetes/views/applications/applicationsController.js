@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 import { confirmDelete } from '@@/modals/confirm';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
@@ -90,7 +90,7 @@ class KubernetesApplicationsController {
     let actionCount = selectedItems.length;
     for (const application of selectedItems) {
       try {
-        if (application.ApplicationType === KubernetesApplicationTypes.HELM) {
+        if (application.ApplicationType === KubernetesApplicationTypes.Helm) {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
           await this.KubernetesApplicationService.delete(application);

@@ -14,7 +14,7 @@ export function toViewModelMemory(value = 0): number {
   return value / 1024 / 1024;
 }
 
-function round(value: number, decimals: number) {
+export function round(value: number, decimals: number) {
   const tenth = 10 ** decimals;
   return Math.round((value + Number.EPSILON) * tenth) / tenth;
 }

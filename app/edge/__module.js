@@ -185,7 +185,7 @@ angular
 
       views: {
         'content@': {
-          component: 'edgeEditCustomTemplatesView',
+          component: 'editCustomTemplatesView',
         },
       },
     });

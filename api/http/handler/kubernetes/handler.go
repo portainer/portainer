@@ -107,6 +107,7 @@ func kubeOnlyMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		rw.Header().Set(portainer.PortainerCacheHeader, "true")
 		next.ServeHTTP(rw, request)
 	})
 }

@@ -1,7 +1,6 @@
 package apikeyrepository
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 
@@ -37,7 +36,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // GetAPIKeysByUserID returns a slice containing all the APIKeys a user has access to.
 func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error) {
-	var result = make([]portainer.APIKey, 0)
+	result := make([]portainer.APIKey, 0)
 
 	err := service.Connection.GetAll(
 		BucketName,
@@ -61,7 +60,7 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 
 // GetAPIKeyByDigest returns the API key for the associated digest.
 // Note: there is a 1-to-1 mapping of api-key and digest
-func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error) {
+func (service *Service) GetAPIKeyByDigest(digest string) (*portainer.APIKey, error) {
 	var k *portainer.APIKey
 	stop := fmt.Errorf("ok")
 	err := service.Connection.GetAll(
@@ -73,7 +72,7 @@ func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, err
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
 				return nil, fmt.Errorf("failed to convert to APIKey object: %s", obj)
 			}
-			if bytes.Equal(key.Digest, digest) {
+			if key.Digest == digest {
 				k = key
 				return nil, stop
 			}

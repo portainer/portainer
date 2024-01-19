@@ -35,3 +35,14 @@ export function arrayMove<T>(array: Array<T>, from: number, to: number) {
     return index >= 0 && index <= array.length;
   }
 }
+
+export function hasKey(
+  value: unknown,
+  key: string | number | symbol
+): value is { needsDeletion: boolean } {
+  return isObject(value) && key in value;
+}
+
+function isObject(value: unknown): value is object {
+  return typeof value === 'object' && value !== null;
+}

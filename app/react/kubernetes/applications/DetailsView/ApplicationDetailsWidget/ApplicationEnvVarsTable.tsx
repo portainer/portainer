@@ -73,14 +73,15 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                       )
                     </span>
                   )}
-                  {envVar.key ? (
-                    <span className="flex items-center">
-                      <Icon icon={Key} className="!mr-1" />
-                      {envVar.key}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
+                  {envVar.type !== 'env' &&
+                    (envVar.key ? (
+                      <span className="flex items-center">
+                        <Icon icon={Key} className="!mr-1" />
+                        {envVar.key}
+                      </span>
+                    ) : (
+                      '-'
+                    ))}
                 </td>
                 <td data-cy="k8sAppDetail-configName">
                   {!envVar.resourseName && <span>-</span>}
@@ -116,13 +117,14 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
   );
 }
 
+type EnvVarType = 'env' | 'configMap' | 'secret';
 interface ContainerEnvVar {
   key?: string;
   value?: string;
   fieldPath?: string;
   containerName: string;
   isInitContainer: boolean;
-  type: 'configMap' | 'secret';
+  type: EnvVarType;
   resourseName: string;
 }
 
@@ -143,17 +145,26 @@ function getApplicationEnvironmentVariables(
   const appContainersEnvVars =
     appContainers?.flatMap((container) => {
       const containerEnvVars: ContainerEnvVar[] =
-        container?.env?.map((envVar) => ({
-          key: envVar?.name,
-          fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
-          containerName: container.name,
-          isInitContainer: false,
-          type: envVar?.valueFrom?.configMapKeyRef ? 'configMap' : 'secret',
-          resourseName:
-            envVar?.valueFrom?.configMapKeyRef?.name ||
-            envVar?.valueFrom?.secretKeyRef?.name ||
-            '',
-        })) || [];
+        container?.env?.map((envVar) => {
+          let envtype: EnvVarType = 'env';
+          if (envVar?.valueFrom?.configMapKeyRef) {
+            envtype = 'configMap';
+          } else if (envVar?.valueFrom?.secretKeyRef) {
+            envtype = 'secret';
+          }
+          return {
+            key: envVar?.name,
+            fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
+            containerName: container.name,
+            isInitContainer: false,
+            type: envtype,
+            resourseName:
+              envVar?.valueFrom?.configMapKeyRef?.name ||
+              envVar?.valueFrom?.secretKeyRef?.name ||
+              '',
+            value: envVar?.value,
+          };
+        }) || [];
 
       const containerEnvFroms: ContainerEnvVar[] =
         container?.envFrom?.map((envFrom) => ({
@@ -171,17 +182,26 @@ function getApplicationEnvironmentVariables(
   const appInitContainersEnvVars =
     appInitContainers?.flatMap((container) => {
       const containerEnvVars: ContainerEnvVar[] =
-        container?.env?.map((envVar) => ({
-          key: envVar?.name,
-          fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
-          containerName: container.name,
-          isInitContainer: false,
-          type: envVar?.valueFrom?.configMapKeyRef ? 'configMap' : 'secret',
-          resourseName:
-            envVar?.valueFrom?.configMapKeyRef?.name ||
-            envVar?.valueFrom?.secretKeyRef?.name ||
-            '',
-        })) || [];
+        container?.env?.map((envVar) => {
+          let envtype: EnvVarType = 'env';
+          if (envVar?.valueFrom?.configMapKeyRef) {
+            envtype = 'configMap';
+          } else if (envVar?.valueFrom?.secretKeyRef) {
+            envtype = 'secret';
+          }
+          return {
+            key: envVar?.name,
+            fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
+            containerName: container.name,
+            isInitContainer: true,
+            type: envtype,
+            resourseName:
+              envVar?.valueFrom?.configMapKeyRef?.name ||
+              envVar?.valueFrom?.secretKeyRef?.name ||
+              '',
+            value: envVar?.value,
+          };
+        }) || [];
 
       const containerEnvFroms: ContainerEnvVar[] =
         container?.envFrom?.map((envFrom) => ({
@@ -189,7 +209,7 @@ function getApplicationEnvironmentVariables(
           resourseName:
             envFrom?.configMapRef?.name || envFrom?.secretRef?.name || '',
           containerName: container.name,
-          isInitContainer: false,
+          isInitContainer: true,
           type: envFrom?.configMapRef ? 'configMap' : 'secret',
         })) || [];
 

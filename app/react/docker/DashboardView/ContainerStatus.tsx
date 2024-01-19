@@ -2,7 +2,10 @@ import { Heart, Power } from 'lucide-react';
 
 import { Icon } from '@/react/components/Icon';
 
-import { DockerContainer } from '../containers/types';
+import {
+  DockerContainer,
+  ContainerStatus as Status,
+} from '../containers/types';
 
 interface Props {
   containers: DockerContainer[];
@@ -40,20 +43,22 @@ export function ContainerStatus({ containers }: Props) {
 }
 
 function runningContainersFilter(containers: DockerContainer[]) {
-  return containers.filter((container) => container.Status === 'running')
-    .length;
+  return containers.filter(
+    (container) =>
+      container.Status === Status.Running || container.Status === Status.Healthy
+  ).length;
 }
 function stoppedContainersFilter(containers: DockerContainer[]) {
   return containers.filter(
     (container) =>
-      container.Status === 'exited' || container.Status === 'stopped'
+      container.Status === Status.Exited || container.Status === Status.Stopped
   ).length;
 }
 function healthyContainersFilter(containers: DockerContainer[]) {
-  return containers.filter((container) => container.Status === 'healthy')
+  return containers.filter((container) => container.Status === Status.Healthy)
     .length;
 }
 function unhealthyContainersFilter(containers: DockerContainer[]) {
-  return containers.filter((container) => container.Status === 'unhealthy')
+  return containers.filter((container) => container.Status === Status.Unhealthy)
     .length;
 }

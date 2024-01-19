@@ -1,7 +1,10 @@
 import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  isDefaultResponse,
+  parseAxiosError,
+} from '@/portainer/services/axios';
 
 interface Creds {
   username?: string;
@@ -45,8 +48,10 @@ export async function checkRepo(
     );
     return true;
   } catch (error) {
-    throw parseAxiosError(error as Error, '', (axiosError: AxiosError) => {
-      let details = axiosError.response?.data.details;
+    throw parseAxiosError(error, '', (axiosError: AxiosError) => {
+      let details = isDefaultResponse(axiosError.response?.data)
+        ? axiosError.response?.data.details || ''
+        : '';
 
       const { creds = {} } = options;
       // If no credentials were provided alter error from git to indicate repository is not found or is private

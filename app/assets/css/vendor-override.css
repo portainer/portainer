@@ -238,6 +238,12 @@ textarea {
   background: var(--text-input-textarea);
 }
 
+[theme='highcontrast'] input,
+[theme='highcontrast'] select,
+[theme='highcontrast'] textarea {
+  border: 1px solid var(--white-color);
+}
+
 .daterangepicker {
   background-color: var(--bg-daterangepicker-color);
   border: 1px solid var(--border-daterangepicker-color);

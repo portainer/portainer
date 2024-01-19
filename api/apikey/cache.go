@@ -33,8 +33,8 @@ func NewAPIKeyCache(cacheSize int) *apiKeyCache {
 // Get returns the user/key associated to an api-key's digest
 // This is required because HTTP requests will contain the digest of the API key in header,
 // the digest value must be mapped to a portainer user.
-func (c *apiKeyCache) Get(digest []byte) (portainer.User, portainer.APIKey, bool) {
-	val, ok := c.cache.Get(string(digest))
+func (c *apiKeyCache) Get(digest string) (portainer.User, portainer.APIKey, bool) {
+	val, ok := c.cache.Get(digest)
 	if !ok {
 		return portainer.User{}, portainer.APIKey{}, false
 	}
@@ -44,23 +44,23 @@ func (c *apiKeyCache) Get(digest []byte) (portainer.User, portainer.APIKey, bool
 }
 
 // Set persists a user/key entry to the cache
-func (c *apiKeyCache) Set(digest []byte, user portainer.User, apiKey portainer.APIKey) {
-	c.cache.Add(string(digest), entry{
+func (c *apiKeyCache) Set(digest string, user portainer.User, apiKey portainer.APIKey) {
+	c.cache.Add(digest, entry{
 		user:   user,
 		apiKey: apiKey,
 	})
 }
 
 // Delete evicts a digest's user/key entry key from the cache
-func (c *apiKeyCache) Delete(digest []byte) {
-	c.cache.Remove(string(digest))
+func (c *apiKeyCache) Delete(digest string) {
+	c.cache.Remove(digest)
 }
 
 // InvalidateUserKeyCache loops through all the api-keys associated to a user and removes them from the cache
 func (c *apiKeyCache) InvalidateUserKeyCache(userId portainer.UserID) bool {
 	present := false
 	for _, k := range c.cache.Keys() {
-		user, _, _ := c.Get([]byte(k.(string)))
+		user, _, _ := c.Get(k.(string))
 		if user.ID == userId {
 			present = c.cache.Remove(k)
 		}

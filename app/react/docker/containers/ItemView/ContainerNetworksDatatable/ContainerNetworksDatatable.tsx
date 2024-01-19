@@ -1,4 +1,4 @@
-import { Share2 } from 'lucide-react';
+import { Network } from 'lucide-react';
 import { EndpointSettings, NetworkSettings } from 'docker-types/generated/1.41';
 
 import { createPersistedStore } from '@@/datatables/types';
@@ -40,7 +40,7 @@ export function ContainerNetworksDatatable({
       dataset={networks}
       settingsManager={tableState}
       title="Connected Networks"
-      titleIcon={Share2}
+      titleIcon={Network}
       disableSelect
       getRowCanExpand={(row) => !!row.original.GlobalIPv6Address}
       isLoading={!dataset}

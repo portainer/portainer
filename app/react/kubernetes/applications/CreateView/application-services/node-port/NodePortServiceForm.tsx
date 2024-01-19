@@ -94,10 +94,7 @@ export function NodePortServiceForm({
                         value={servicePort.targetPort}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           const newServicePorts = [...servicePorts];
-                          const newValue =
-                            e.target.value === ''
-                              ? undefined
-                              : Number(e.target.value);
+                          const newValue = e.target.valueAsNumber;
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
                             targetPort: newValue,
@@ -120,10 +117,7 @@ export function NodePortServiceForm({
                           const newServicePorts = [...servicePorts];
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
-                            port:
-                              e.target.value === ''
-                                ? undefined
-                                : Number(e.target.value),
+                            port: e.target.valueAsNumber,
                           };
                           onChangePort(newServicePorts);
                         }}

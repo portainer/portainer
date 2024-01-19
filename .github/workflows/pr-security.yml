@@ -23,7 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
-      github.event.review.body == '/scan'
+      github.event.review.body == '/scan' &&
+      github.event.pull_request.draft == false
     outputs:
       jsdiff: ${{ steps.set-diff-matrix.outputs.js_diff_result }}
     steps:
@@ -77,7 +78,8 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
-      github.event.review.body == '/scan'
+      github.event.review.body == '/scan' &&
+      github.event.pull_request.draft == false
     outputs:
       godiff: ${{ steps.set-diff-matrix.outputs.go_diff_result }}
     steps:
@@ -139,7 +141,8 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
-      github.event.review.body == '/scan'
+      github.event.review.body == '/scan' &&
+      github.event.pull_request.draft == false
     outputs:
       imagediff-trivy: ${{ steps.set-diff-trivy-matrix.outputs.image_diff_trivy_result }}
       imagediff-docker-scout: ${{ steps.set-diff-docker-scout-matrix.outputs.image_diff_docker_scout_result }}
@@ -268,7 +271,8 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request &&
-      github.event.review.body == '/scan'
+      github.event.review.body == '/scan' &&
+      github.event.pull_request.draft == false
     strategy:
       matrix:
         jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}

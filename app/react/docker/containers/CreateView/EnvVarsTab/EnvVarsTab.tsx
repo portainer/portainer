@@ -1,16 +1,17 @@
-import { EnvironmentVariablesPanel } from '@@/form-components/EnvironmentVariablesFieldset';
+import {
+  EnvVarValues,
+  EnvironmentVariablesPanel,
+} from '@@/form-components/EnvironmentVariablesFieldset';
 import { ArrayError } from '@@/form-components/InputList/InputList';
-
-import { Values } from './types';
 
 export function EnvVarsTab({
   values,
   onChange,
   errors,
 }: {
-  values: Values;
-  onChange(value: Values): void;
-  errors?: ArrayError<Values>;
+  values: EnvVarValues;
+  onChange(value: EnvVarValues): void;
+  errors?: ArrayError<EnvVarValues>;
 }) {
   return (
     <div className="form-group">
@@ -23,7 +24,7 @@ export function EnvVarsTab({
     </div>
   );
 
-  function handleChange(values: Values) {
+  function handleChange(values: EnvVarValues) {
     onChange(values);
   }
 }

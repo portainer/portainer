@@ -34,6 +34,7 @@ export function AppTemplatesView() {
         onSelect={(template) => setSelectedTemplateId(template.Id)}
         disabledTypes={[TemplateType.Container]}
         fixedCategories={['edge']}
+        storageKey="edge-app-templates"
       />
     </>
   );

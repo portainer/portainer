@@ -8,7 +8,7 @@ import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultD
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useApplicationsForCluster } from '@/react/kubernetes/applications/application.queries';
+import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
 import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
@@ -54,8 +54,10 @@ export function ConfigMapsDatatable() {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const { data: applications, ...applicationsQuery } =
-    useApplicationsForCluster(environmentId, namespaceNames);
+  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
+    environmentId,
+    namespaceNames
+  );
 
   const filteredConfigMaps = useMemo(
     () =>

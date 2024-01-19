@@ -1,4 +1,6 @@
-import { server, rest } from '@/setup-tests/server';
+import { http, HttpResponse } from 'msw';
+
+import { server } from '@/setup-tests/server';
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { renderWithQueryClient, within } from '@/react-tools/test-utils';
@@ -305,11 +307,11 @@ async function renderComponent(
   const state = { user };
 
   if (teams) {
-    server.use(rest.get('/api/teams', (req, res, ctx) => res(ctx.json(teams))));
+    server.use(http.get('/api/teams', () => HttpResponse.json(teams)));
   }
 
   if (users) {
-    server.use(rest.get('/api/users', (req, res, ctx) => res(ctx.json(users))));
+    server.use(http.get('/api/users', () => HttpResponse.json(users)));
   }
 
   const renderResult = renderWithQueryClient(

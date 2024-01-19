@@ -1,21 +1,19 @@
-import { DefaultBodyType, PathParams, rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { SystemInfo, SystemVersion } from 'docker-types/generated/1.41';
 
 export const dockerHandlers = [
-  rest.get<DefaultBodyType, PathParams, SystemInfo>(
+  http.get<never, never, SystemInfo>(
     '/api/endpoints/:endpointId/docker/info',
-    (req, res, ctx) =>
-      res(
-        ctx.json({
-          Plugins: { Authorization: [], Log: [], Network: [], Volume: [] },
-          MemTotal: 0,
-          NCPU: 0,
-          Runtimes: { runc: { path: 'runc' } },
-        })
-      )
+    () =>
+      HttpResponse.json({
+        Plugins: { Authorization: [], Log: [], Network: [], Volume: [] },
+        MemTotal: 0,
+        NCPU: 0,
+        Runtimes: { runc: { path: 'runc' } },
+      })
   ),
-  rest.get<DefaultBodyType, PathParams, SystemVersion>(
+  http.get<never, never, SystemVersion>(
     '/api/endpoints/:endpointId/docker/version',
-    (req, res, ctx) => res(ctx.json({ ApiVersion: '1.24' }))
+    () => HttpResponse.json({ ApiVersion: '1.24' })
   ),
 ];

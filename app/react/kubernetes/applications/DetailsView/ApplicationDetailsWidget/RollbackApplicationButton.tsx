@@ -121,7 +121,14 @@ export function RollbackApplicationButton({
     try {
       const patch = getRollbackPatchPayload(app, appRevisionList);
       patchAppMutation.mutateAsync(
-        { appKind: app.kind, patch },
+        {
+          appKind: app.kind,
+          patch,
+          contentType:
+            app.kind === 'Deployment'
+              ? 'application/json-patch+json'
+              : 'application/strategic-merge-patch+json',
+        },
         {
           onSuccess: () => {
             notifySuccess('Success', 'Application successfully rolled back');

@@ -25,6 +25,13 @@ export function useTableState<
   );
 }
 
+export function useTableStateWithStorage(
+  ...args: Parameters<typeof createPersistedStore>
+) {
+  const [store] = useState(() => createPersistedStore(...args));
+  return useTableState(store, args[0]);
+}
+
 export function useTableStateWithoutStorage(
   defaultSortKey?: string
 ): BasicTableSettings & {

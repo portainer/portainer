@@ -21,6 +21,7 @@ const (
 	tunnelCleanupInterval = 10 * time.Second
 	requiredTimeout       = 15 * time.Second
 	activeTimeout         = 4*time.Minute + 30*time.Second
+	pingTimeout           = 3 * time.Second
 )
 
 // Service represents a service to manage the state of multiple reverse tunnels.
@@ -59,14 +60,18 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 	}
 
 	httpClient := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: pingTimeout,
 	}
 
 	resp, err := httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+
 	io.Copy(io.Discard, resp.Body)
 	resp.Body.Close()
 
-	return err
+	return nil
 }
 
 // KeepTunnelAlive keeps the tunnel of the given environment for maxAlive duration, or until ctx is done

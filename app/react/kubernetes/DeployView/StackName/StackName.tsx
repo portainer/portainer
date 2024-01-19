@@ -1,15 +1,31 @@
+import { useMemo } from 'react';
+
+import { useCurrentUser } from '@/react/hooks/useUser';
+
 import { InsightsBox } from '@@/InsightsBox';
 import { Link } from '@@/Link';
 import { TextTip } from '@@/Tip/TextTip';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { AutocompleteSelect } from '@@/form-components/AutocompleteSelect';
 
 type Props = {
   stackName: string;
   setStackName: (name: string) => void;
-  isAdmin?: boolean;
+  stacks?: string[];
+  inputClassName?: string;
 };
 
-export function StackName({ stackName, setStackName, isAdmin = false }: Props) {
+export function StackName({
+  stackName,
+  setStackName,
+  stacks = [],
+  inputClassName,
+}: Props) {
+  const { isAdmin } = useCurrentUser();
+  const stackResults = useMemo(
+    () => stacks.filter((stack) => stack.includes(stackName ?? '')),
+    [stacks, stackName]
+  );
   const tooltip = (
     <>
       You may specify a stack name to label resources that you want to group.
@@ -68,14 +84,16 @@ export function StackName({ stackName, setStackName, isAdmin = false }: Props) {
           Stack
           <Tooltip message={tooltip} setHtmlMessage />
         </label>
-        <div className="col-sm-8">
-          <input
-            type="text"
-            className="form-control"
-            defaultValue={stackName}
-            onChange={(e) => setStackName(e.target.value)}
-            id="stack_name"
-            placeholder="myStack"
+        <div className={inputClassName || 'col-sm-8'}>
+          <AutocompleteSelect
+            searchResults={stackResults?.map((result) => ({
+              value: result,
+              label: result,
+            }))}
+            value={stackName ?? ''}
+            onChange={setStackName}
+            placeholder="e.g. myStack"
+            inputId="stack_name"
           />
         </div>
       </div>

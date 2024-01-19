@@ -1,5 +1,5 @@
 import { EndpointSettings } from 'docker-types/generated/1.41';
-import { AxiosRequestHeaders } from 'axios';
+import { RawAxiosRequestHeaders } from 'axios';
 import { useMutation, useQueryClient } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -56,7 +56,7 @@ export async function connectContainer({
     };
   }
 
-  const headers: AxiosRequestHeaders = {};
+  const headers: RawAxiosRequestHeaders = {};
 
   if (nodeName) {
     headers['X-PortainerAgent-Target'] = nodeName;

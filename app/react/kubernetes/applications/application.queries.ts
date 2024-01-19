@@ -108,7 +108,7 @@ const queryKeys = {
 };
 
 // useQuery to get a list of all applications from an array of namespaces
-export function useApplicationsForCluster(
+export function useApplicationsQuery(
   environemtId: EnvironmentId,
   namespaces?: string[]
 ) {
@@ -309,8 +309,25 @@ export function usePatchApplicationMutation(
   name: string
 ) {
   return useMutation(
-    ({ appKind, patch }: { appKind: AppKind; patch: ApplicationPatch }) =>
-      patchApplication(environmentId, namespace, appKind, name, patch),
+    ({
+      appKind,
+      patch,
+      contentType = 'application/json-patch+json',
+    }: {
+      appKind: AppKind;
+      patch: ApplicationPatch;
+      contentType?:
+        | 'application/json-patch+json'
+        | 'application/strategic-merge-patch+json';
+    }) =>
+      patchApplication(
+        environmentId,
+        namespace,
+        appKind,
+        name,
+        patch,
+        contentType
+      ),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(

@@ -33,7 +33,7 @@ class VariablesFieldController implements IComponentController {
   }
 
   $onChanges({ value }: IOnChangesObject) {
-    if (value.currentValue) {
+    if (value?.currentValue) {
       this.checkValidity(value.currentValue);
     }
   }

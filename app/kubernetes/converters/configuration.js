@@ -14,6 +14,7 @@ class KubernetesConfigurationConverter {
     _.forEach(secret.Data, (entry) => {
       res.Data[entry.Key] = entry.Value;
     });
+    res.data = res.Data;
     res.ConfigurationOwner = secret.ConfigurationOwner;
     res.IsRegistrySecret = secret.IsRegistrySecret;
     res.SecretType = secret.SecretType;
@@ -34,6 +35,7 @@ class KubernetesConfigurationConverter {
     _.forEach(configMap.Data, (entry) => {
       res.Data[entry.Key] = entry.Value;
     });
+    res.data = res.Data;
     res.ConfigurationOwner = configMap.ConfigurationOwner;
     return res;
   }

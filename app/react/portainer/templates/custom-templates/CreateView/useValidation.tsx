@@ -20,7 +20,11 @@ import {
 
 import { initialBuildMethods } from './types';
 
-export function useValidation(isEdge: boolean) {
+export function useValidation({
+  viewType,
+}: {
+  viewType: 'kube' | 'docker' | 'edge';
+}) {
   const { user } = useCurrentUser();
   const gitCredentialsQuery = useGitCredentials(user.Id);
   const customTemplatesQuery = useCustomTemplates();
@@ -52,10 +56,13 @@ export function useValidation(isEdge: boolean) {
           then: () => buildGitValidationSchema(gitCredentialsQuery.data || []),
         }),
         Variables: variablesValidation(),
-        EdgeSettings: isEdge ? edgeFieldsetValidation() : mixed(),
+        EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
       }).concat(
-        commonFieldsValidation({ templates: customTemplatesQuery.data })
+        commonFieldsValidation({
+          templates: customTemplatesQuery.data,
+          viewType,
+        })
       ),
-    [customTemplatesQuery.data, gitCredentialsQuery.data, isEdge]
+    [customTemplatesQuery.data, gitCredentialsQuery.data, viewType]
   );
 }

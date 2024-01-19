@@ -85,7 +85,11 @@ export default class CreateEdgeStackViewController {
         await this.onChangeTemplate(newTemplateValues.template);
       }
 
-      const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, this.state.templateValues.template.Variables);
+      let definitions = [];
+      if (this.state.templateValues.template) {
+        definitions = this.state.templateValues.template.Variables;
+      }
+      const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, definitions);
 
       this.formValues.StackFileContent = newFile;
     });
