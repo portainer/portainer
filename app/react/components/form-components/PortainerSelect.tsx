@@ -28,6 +28,7 @@ interface SharedProps extends AutomationTestingProps {
   isClearable?: boolean;
   bindToBody?: boolean;
   isLoading?: boolean;
+  noOptionsMessage?: () => string;
 }
 
 interface MultiProps<TValue> extends SharedProps {
@@ -85,6 +86,7 @@ export function SingleSelect<TValue = string>({
   bindToBody,
   components,
   isLoading,
+  noOptionsMessage,
 }: SingleProps<TValue>) {
   const selectedValue =
     value || (typeof value === 'number' && value === 0)
@@ -108,6 +110,7 @@ export function SingleSelect<TValue = string>({
       menuPortalTarget={bindToBody ? document.body : undefined}
       components={components}
       isLoading={isLoading}
+      noOptionsMessage={noOptionsMessage}
     />
   );
 }
@@ -148,6 +151,7 @@ export function MultiSelect<TValue = string>({
   bindToBody,
   components,
   isLoading,
+  noOptionsMessage,
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
@@ -169,6 +173,7 @@ export function MultiSelect<TValue = string>({
       menuPortalTarget={bindToBody ? document.body : undefined}
       components={components}
       isLoading={isLoading}
+      noOptionsMessage={noOptionsMessage}
     />
   );
 }

@@ -147,11 +147,11 @@ func addResourceLabels(yamlDoc interface{}, appLabels map[string]string) {
 	}
 
 	for _, v := range m {
-		switch v.(type) {
+		switch v := v.(type) {
 		case map[string]interface{}:
 			addResourceLabels(v, appLabels)
 		case []interface{}:
-			for _, item := range v.([]interface{}) {
+			for _, item := range v {
 				addResourceLabels(item, appLabels)
 			}
 		}

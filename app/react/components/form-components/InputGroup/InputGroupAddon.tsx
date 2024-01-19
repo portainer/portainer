@@ -6,11 +6,13 @@ import { useInputGroupContext } from './InputGroup';
 type BaseProps<TProps> = {
   as?: ComponentType<TProps> | string;
   required?: boolean;
+  className?: string;
 };
 
 export function InputGroupAddon<TProps>({
   children,
   as = 'span',
+  className,
   required,
   ...props
 }: PropsWithChildren<BaseProps<TProps> & TProps>) {
@@ -19,7 +21,7 @@ export function InputGroupAddon<TProps>({
 
   return (
     <Component
-      className={clsx('input-group-addon', required && 'required')}
+      className={clsx('input-group-addon', required && 'required', className)}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     >

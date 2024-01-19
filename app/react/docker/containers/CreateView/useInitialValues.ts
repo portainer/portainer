@@ -32,16 +32,15 @@ import {
   VolumesTabValues,
   volumesTabUtils,
 } from '@/react/docker/containers/CreateView/VolumesTab';
-import {
-  Values as EnvVarsTabValues,
-  envVarsTabUtils,
-} from '@/react/docker/containers/CreateView/EnvVarsTab';
+import { envVarsTabUtils } from '@/react/docker/containers/CreateView/EnvVarsTab';
 import { UserId } from '@/portainer/users/types';
 import { getImageConfig } from '@/react/portainer/registries/utils/getImageConfig';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useWebhooks } from '@/react/portainer/webhooks/useWebhooks';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
+
+import { EnvVarValues } from '@@/form-components/EnvironmentVariablesFieldset';
 
 import { useNetworksForSelector } from '../components/NetworkSelector';
 import { useContainers } from '../queries/containers';
@@ -55,7 +54,7 @@ export interface Values extends BaseFormValues {
   restartPolicy: RestartPolicy;
   resources: ResourcesTabValues;
   capabilities: CapabilitiesTabValues;
-  env: EnvVarsTabValues;
+  env: EnvVarValues;
 }
 
 export function useInitialValues(submitting: boolean) {

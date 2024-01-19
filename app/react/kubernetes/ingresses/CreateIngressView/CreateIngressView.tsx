@@ -4,10 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useConfigurations } from '@/react/kubernetes/configs/queries';
+import { useSecrets } from '@/react/kubernetes/configs/secret.service';
 import { useNamespaceServices } from '@/react/kubernetes/networks/services/queries';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
+import { Annotation } from '@/react/kubernetes/annotations/types';
+import { prepareAnnotations } from '@/react/kubernetes/utils';
 
 import { Link } from '@@/Link';
 import { PageHeader } from '@@/PageHeader';
@@ -22,7 +24,6 @@ import {
   useUpdateIngress,
   useIngressControllers,
 } from '../queries';
-import { Annotation } from '../../annotations/types';
 
 import {
   Rule,
@@ -35,7 +36,6 @@ import { IngressForm } from './IngressForm';
 import {
   prepareTLS,
   preparePaths,
-  prepareAnnotations,
   prepareRuleFromIngress,
   checkIfPathExistsWithHost,
 } from './utils';
@@ -68,7 +68,7 @@ export function CreateIngressView() {
     useNamespacesQuery(environmentId);
 
   const { data: allServices } = useNamespaceServices(environmentId, namespace);
-  const configResults = useConfigurations(environmentId, namespace);
+  const secretsResults = useSecrets(environmentId, namespace);
   const ingressesResults = useIngresses(
     environmentId,
     namespaces ? Object.keys(namespaces || {}) : []
@@ -266,20 +266,20 @@ export function CreateIngressView() {
     ingressRule.IngressClassName,
   ]);
 
-  const matchedConfigs = configResults?.data?.filter(
+  const secrets = secretsResults?.data?.filter(
     (config) =>
-      config.SecretType === 'kubernetes.io/tls' &&
-      config.Namespace === namespace
+      config.type === 'kubernetes.io/tls' &&
+      config.metadata?.namespace === namespace
   );
   const tlsOptions: Option<string>[] = useMemo(
     () => [
       { label: 'No TLS', value: '' },
-      ...(matchedConfigs?.map((config) => ({
-        label: config.Name,
-        value: config.Name,
+      ...(secrets?.map((config) => ({
+        label: config.metadata?.name as string,
+        value: config.metadata?.name as string,
       })) || []),
     ],
-    [matchedConfigs]
+    [secrets]
   );
 
   useEffect(() => {
@@ -811,7 +811,7 @@ export function CreateIngressView() {
   }
 
   function reloadTLSCerts() {
-    configResults.refetch();
+    secretsResults.refetch();
   }
 
   function handleCreateIngressRules() {

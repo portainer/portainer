@@ -1,10 +1,21 @@
-import { Ingress } from '@/react/kubernetes/ingresses/types';
+import { compare } from 'fast-json-patch';
+import { Service, ServiceSpec } from 'kubernetes-types/core/v1';
+import { ObjectMeta } from 'kubernetes-types/meta/v1';
+import angular from 'angular';
+
+import { Ingress as IngressFormValues } from '@/react/kubernetes/ingresses/types';
+
+import {
+  appNameLabel,
+  appOwnerLabel,
+  appStackNameLabel,
+} from '../../constants';
 
 import { ServiceFormValues, ServicePort } from './types';
 
-export function newPort(serviceName?: string) {
+export function newPort(serviceName?: string): ServicePort {
   return {
-    port: undefined,
+    port: 80,
     targetPort: undefined,
     name: '',
     protocol: 'TCP',
@@ -43,7 +54,7 @@ export const serviceFormDefaultValues: ServiceFormValues = {
   Name: '',
   StackName: '',
   Ports: [],
-  Type: 1, // clusterip type as default
+  Type: 'ClusterIP',
   ClusterIP: '',
   ApplicationName: '',
   ApplicationOwner: '',
@@ -54,16 +65,16 @@ export const serviceFormDefaultValues: ServiceFormValues = {
 
 /**
  * Generates new Ingress objects from form path data
- * @param {Ingress[]} oldIngresses - The old Ingress objects
+ * @param {IngressFormValues[]} oldIngresses - The old Ingress objects
  * @param {ServicePort[]} newServicesPorts - The new ServicePort objects from the form
  * @param {ServicePort[]} oldServicesPorts - The old ServicePort objects
- * @returns {Ingress[]} The new Ingress objects
+ * @returns {IngressFormValues[]} The new Ingress objects
  */
 export function generateNewIngressesFromFormPaths(
-  oldIngresses?: Ingress[],
+  oldIngresses?: IngressFormValues[],
   newServicesPorts?: ServicePort[],
   oldServicesPorts?: ServicePort[]
-): Ingress[] {
+): IngressFormValues[] {
   // filter the ports to only the ones that have an ingress
   const oldIngressPaths = oldServicesPorts
     ?.flatMap((port) => port.ingressPaths)
@@ -77,7 +88,7 @@ export function generateNewIngressesFromFormPaths(
   }
 
   // remove the old paths from the newIngresses copy
-  const newIngresses = structuredClone(oldIngresses) ?? [];
+  const newIngresses: IngressFormValues[] = angular.copy(oldIngresses) ?? []; // the current jest version doesn't support structured cloning, so we need to use angular.copy
   oldIngressPaths?.forEach((oldIngressPath) => {
     if (!oldIngressPath?.Path) return;
     const newMatchingIng = newIngresses?.find(
@@ -150,4 +161,58 @@ export function generateNewIngressesFromFormPaths(
 export function prependWithSlash(path?: string) {
   if (!path) return '';
   return path.startsWith('/') ? path : `/${path}`;
+}
+
+export function getServicePatchPayload(
+  oldService: ServiceFormValues,
+  newService: ServiceFormValues
+) {
+  const oldPayload = getServicePayload(oldService);
+  const newPayload = getServicePayload(newService);
+
+  const payload = compare(oldPayload, newPayload);
+  return payload;
+}
+
+function getServicePayload(service: ServiceFormValues): Service {
+  if (!service.Name || !service.Namespace) {
+    throw new Error('Service name and namespace are required');
+  }
+
+  // metadata
+  const labels: Record<string, string> = {};
+  if (service.ApplicationName) {
+    labels[appNameLabel] = service.ApplicationName;
+  }
+  if (service.ApplicationOwner) {
+    labels[appOwnerLabel] = service.ApplicationOwner;
+  }
+  if (service.StackName) {
+    labels[appStackNameLabel] = service.StackName;
+  }
+  const metadata: ObjectMeta = {
+    name: service.Name,
+    namespace: service.Namespace,
+    labels,
+  };
+
+  // spec
+  const ports = service.Headless ? [] : service.Ports;
+  const selector = service.Selector;
+  const clusterIP = service.Headless ? 'None' : service.ClusterIP;
+  const type = service.Headless ? 'ClusterIP' : service.Type;
+  const spec: ServiceSpec = {
+    ports,
+    selector,
+    clusterIP,
+    type,
+  };
+
+  const servicePayload: Service = {
+    apiVersion: 'v1',
+    kind: 'Service',
+    metadata,
+    spec,
+  };
+  return servicePayload;
 }

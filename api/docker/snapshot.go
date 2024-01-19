@@ -201,9 +201,12 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 			}
 		}
 
-		if strings.Contains(container.Status, "(healthy)") {
+		if container.State == "healthy" {
+			runningContainers++
 			healthyContainers++
-		} else if strings.Contains(container.Status, "(unhealthy)") {
+		}
+
+		if container.State == "unhealthy" {
 			unhealthyContainers++
 		}
 
@@ -222,6 +225,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	snapshot.GpuUseAll = gpuUseAll
 	snapshot.GpuUseList = gpuUseList
 
+	snapshot.ContainerCount = len(containers)
 	snapshot.RunningContainerCount = runningContainers
 	snapshot.StoppedContainerCount = stoppedContainers
 	snapshot.HealthyContainerCount = healthyContainers

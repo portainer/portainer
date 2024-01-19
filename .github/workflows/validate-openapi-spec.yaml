@@ -6,14 +6,20 @@ on:
       - master
       - develop
       - 'release/*'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 env:
-  GO_VERSION: 1.21.3
+  GO_VERSION: 1.21.5
   NODE_VERSION: 18.x
 
 jobs:
   openapi-spec:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v3
 

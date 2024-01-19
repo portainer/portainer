@@ -14,7 +14,6 @@ import {
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import {
   refetchIfAnyOffline,
-  SortType,
   useEnvironmentList,
 } from '@/react/portainer/environments/queries/useEnvironmentList';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
@@ -37,6 +36,7 @@ import { NoEnvironmentsInfoPanel } from './NoEnvironmentsInfoPanel';
 import { UpdateBadge } from './UpdateBadge';
 import { EnvironmentListFilters } from './EnvironmentListFilters';
 import { AMTButton } from './AMTButton/AMTButton';
+import { ListSortType } from './SortbySelector';
 
 interface Props {
   onClickBrowse(environment: Environment): void;
@@ -70,7 +70,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
     []
   );
   const [sortByFilter, setSortByFilter] = useHomePageFilter<
-    SortType | undefined
+    ListSortType | undefined
   >('sortBy', undefined);
   const [sortByDescending, setSortByDescending] = useHomePageFilter(
     'sortOrder',

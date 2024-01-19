@@ -14,21 +14,15 @@ import { ListState, TemplateType } from './types';
 import { useSortAndFilterTemplates } from './useSortAndFilter';
 import { Filters } from './Filters';
 
-const tableKey = 'app-templates-list';
-const store = createPersistedStore<ListState>(tableKey, undefined, (set) => ({
-  category: null,
-  setCategory: (category: ListState['category']) => set({ category }),
-  types: [],
-  setTypes: (types: ListState['types']) => set({ types }),
-}));
-
 export function AppTemplatesList({
   templates: initialTemplates,
   onSelect,
   selectedId,
   disabledTypes,
   fixedCategories,
+  storageKey,
 }: {
+  storageKey: string;
   templates?: TemplateViewModel[];
   onSelect: (template: TemplateViewModel) => void;
   selectedId?: TemplateViewModel['Id'];
@@ -36,8 +30,15 @@ export function AppTemplatesList({
   fixedCategories?: Array<string>;
 }) {
   const [page, setPage] = useState(0);
-
-  const listState = useTableState(store, tableKey);
+  const [store] = useState(() =>
+    createPersistedStore<ListState>(storageKey, undefined, (set) => ({
+      category: null,
+      setCategory: (category: ListState['category']) => set({ category }),
+      types: [],
+      setTypes: (types: ListState['types']) => set({ types }),
+    }))
+  );
+  const listState = useTableState(store, storageKey);
 
   const templates = useMemo(() => {
     if (!initialTemplates) {

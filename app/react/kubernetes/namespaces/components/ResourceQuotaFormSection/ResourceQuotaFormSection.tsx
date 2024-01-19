@@ -57,13 +57,24 @@ export function ResourceQuotaFormSection({
           <div className="flex flex-row">
             <FormSectionTitle>Resource Limits</FormSectionTitle>
           </div>
+
+          {(!cpuLimit || !memoryLimit) && (
+            <FormError>
+              Not enough resources available in the cluster to apply a resource
+              reservation.
+            </FormError>
+          )}
+
           {/* keep the FormError component present, but invisible to avoid layout shift */}
-          <FormError
-            className={typeof errors === 'string' ? 'visible' : 'invisible'}
-          >
-            {/* 'error' keeps the formerror the exact same height while hidden so there is no layout shift */}
-            {typeof errors === 'string' ? errors : 'error'}
-          </FormError>
+          {cpuLimit && memoryLimit ? (
+            <FormError
+              className={typeof errors === 'string' ? 'visible' : 'invisible'}
+            >
+              {/* 'error' keeps the formerror the exact same height while hidden so there is no layout shift */}
+              {typeof errors === 'string' ? errors : 'error'}
+            </FormError>
+          ) : null}
+
           <FormControl
             className="flex flex-row"
             label="Memory limit (MB)"

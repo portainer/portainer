@@ -1,15 +1,8 @@
 import angular from 'angular';
 
 import { kubeCustomTemplatesView } from './kube-custom-templates-view';
-import { kubeEditCustomTemplateView } from './kube-edit-custom-template-view';
-import { kubeCreateCustomTemplateView } from './kube-create-custom-template-view';
 
-export default angular
-  .module('portainer.kubernetes.custom-templates', [])
-  .config(config)
-  .component('kubeCustomTemplatesView', kubeCustomTemplatesView)
-  .component('kubeEditCustomTemplateView', kubeEditCustomTemplateView)
-  .component('kubeCreateCustomTemplateView', kubeCreateCustomTemplateView).name;
+export default angular.module('portainer.kubernetes.custom-templates', []).config(config).component('kubeCustomTemplatesView', kubeCustomTemplatesView).name;
 
 function config($stateRegistryProvider) {
   const templates = {
@@ -38,7 +31,7 @@ function config($stateRegistryProvider) {
 
     views: {
       'content@': {
-        component: 'kubeCreateCustomTemplateView',
+        component: 'createCustomTemplatesView',
       },
     },
     params: {
@@ -52,7 +45,7 @@ function config($stateRegistryProvider) {
 
     views: {
       'content@': {
-        component: 'kubeEditCustomTemplateView',
+        component: 'editCustomTemplatesView',
       },
     },
   };

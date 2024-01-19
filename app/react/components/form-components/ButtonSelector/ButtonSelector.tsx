@@ -9,6 +9,7 @@ import styles from './ButtonSelector.module.css';
 export interface Option<T> {
   value: T;
   label?: ReactNode;
+  disabled?: boolean;
 }
 
 interface Props<T> {
@@ -43,7 +44,7 @@ export function ButtonSelector<T extends string | number | boolean>({
           key={option.value.toString()}
           selected={value === option.value}
           onChange={() => onChange(option.value)}
-          disabled={disabled}
+          disabled={disabled || option.disabled}
           readOnly={readOnly}
         >
           {option.label || option.value.toString()}

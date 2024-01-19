@@ -48,6 +48,8 @@ export class TemplateViewModel {
 
   RestartPolicy!: string;
 
+  Hosts!: string[];
+
   Labels!: Pair[];
 
   Env!: Array<TemplateEnv & { type: EnvVarType; value: string }>;
@@ -112,6 +114,7 @@ function setTemplatesV2(this: TemplateViewModel, template: AppTemplate) {
     ? template.restart_policy
     : 'always';
   this.Labels = template.labels ? template.labels : [];
+  this.Hosts = template.hosts ? template.hosts : [];
   this.Env = templateEnv(template);
   this.Volumes = templateVolumes(template);
   this.Ports = templatePorts(template);

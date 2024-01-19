@@ -35,7 +35,7 @@ export function RelativePathFieldset({
 
   const { errors } = useValidation(value);
 
-  const { enableFsPath0, enableFsPath1, toggleFsPath } = useEnableFsPath();
+  const { enableFsPath0, enableFsPath1, toggleFsPath } = useEnableFsPath(value);
 
   const pathTip0 =
     'For relative path volumes use with Docker Swarm, you must have a network filesystem which all of your nodes can access.';

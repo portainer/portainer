@@ -12,6 +12,11 @@ class DockerComposeFormController {
     this.onChangeFile = this.onChangeFile.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
+    this.isGitTemplate = this.isGitTemplate.bind(this);
+  }
+
+  isGitTemplate() {
+    return this.state.Method === 'template' && !!this.templateValues.template && !!this.templateValues.template.GitConfig;
   }
 
   onChangeFormValues(newValues) {

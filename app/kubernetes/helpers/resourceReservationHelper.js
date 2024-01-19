@@ -28,9 +28,17 @@ class KubernetesResourceReservationHelper {
   static parseCPU(cpu) {
     let res = parseInt(cpu, 10);
     if (_.endsWith(cpu, 'm')) {
+      // milli
       res /= 1000;
+    } else if (_.endsWith(cpu, 'u')) {
+      // micro
+      res /= 1000000;
     } else if (_.endsWith(cpu, 'n')) {
+      // nano
       res /= 1000000000;
+    } else if (_.endsWith(cpu, 'p')) {
+      // pico
+      res /= 1000000000000;
     }
     return res;
   }

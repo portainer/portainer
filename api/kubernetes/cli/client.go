@@ -257,32 +257,6 @@ func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*re
 	return config, nil
 }
 
-func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernetes.Clientset, error) {
-	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
-	if err != nil {
-		return nil, err
-	}
-
-	config.Insecure = true
-	config.QPS = DefaultKubeClientQPS
-	config.Burst = DefaultKubeClientBurst
-
-	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
-		return &agentHeaderRoundTripper{
-			signatureHeader: signature,
-			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
-			roundTripper:    rt,
-		}
-	})
-
-	return kubernetes.NewForConfig(config)
-}
-
 func (factory *ClientFactory) CreateRemoteMetricsClient(endpoint *portainer.Endpoint) (*metricsv.Clientset, error) {
 	config, err := factory.CreateConfig(endpoint)
 	if err != nil {

@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"crypto/sha256"
-	"math/rand"
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
@@ -631,8 +629,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	configureLogger()
 	setLoggingMode("PRETTY")
 

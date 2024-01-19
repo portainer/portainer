@@ -173,7 +173,7 @@ func (service *Service) GetStackProjectPathByVersion(stackIdentifier string, ver
 	}
 
 	if commitHash != "" {
-		versionStr = fmt.Sprintf("%s", commitHash)
+		versionStr = commitHash
 	}
 	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier, versionStr)
 }

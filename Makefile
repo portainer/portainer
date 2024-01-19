@@ -7,9 +7,9 @@ ARCH=$(shell go env GOARCH)
 # build target, can be one of "production", "testing", "development"
 ENV=development
 WEBPACK_CONFIG=webpack/webpack.$(ENV).js
-TAG=latest
+TAG=local
 
-SWAG=go run github.com/swaggo/swag/cmd/swag@v1.8.11 
+SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.2 
 GOTESTSUM=go run gotest.tools/gotestsum@latest
 
 # Don't change anything below this line unless you know what you're doing
@@ -68,7 +68,7 @@ test-client: ## Run client tests
 	yarn test $(ARGS)
 
 test-server:	## Run server tests
-	cd api && $(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover  ./...
+	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover  ./...
 
 ##@ Dev
 .PHONY: dev dev-client dev-server
@@ -92,7 +92,7 @@ format-client: ## Format client code
 	yarn format
 
 format-server: ## Format server code
-	cd api && go fmt ./...
+	go fmt ./...
 
 ##@ Lint
 .PHONY: lint lint-client lint-server
@@ -102,7 +102,7 @@ lint-client: ## Lint client code
 	yarn lint
 
 lint-server: ## Lint server code
-	cd api && go vet ./...
+	golangci-lint run --timeout=10m -c .golangci.yaml
 
 
 ##@ Extension
@@ -114,7 +114,7 @@ dev-extension: build-server build-client ## Run the extension in development mod
 ##@ Docs
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean
 docs-build: init-dist ## Build docs
-	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./
+	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./ 
 
 docs-validate: docs-build ## Validate docs
 	yarn swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml

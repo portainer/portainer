@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  GO_VERSION: 1.21.3
+  GO_VERSION: 1.21.5
 
 jobs:
   client-dependencies:
@@ -144,7 +144,7 @@ jobs:
           image: portainerci/portainer:develop
           sarif-file: image-docker-scout.json
           dockerhub-user: ${{ secrets.DOCKER_HUB_USERNAME }}
-          dockerhub-password: ${{ secrets.DOCKER_HUB_PASSWORD }} 
+          dockerhub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: upload Docker Scout image security scan result as artifact
         uses: actions/upload-artifact@v3
@@ -197,7 +197,7 @@ jobs:
           matrix.js.status == 'failure' ||
           matrix.go.status == 'failure' || 
           matrix.image-trivy.status == 'failure' || 
-          matrix.image-docker-scout.status == 'failure' 
+          matrix.image-docker-scout.status == 'failure'
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |

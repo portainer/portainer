@@ -7,6 +7,8 @@ import {
   DefaultRegistryDomain,
   DefaultRegistryName,
 } from '@/react/portainer/registries/ListView/DefaultRegistry';
+import { RepositoriesDatatable } from '@/react/portainer/registries/repositories/ListView/RepositoriesDatatable';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 export const registriesModule = angular
   .module('portainer.app.react.components.registries', [])
@@ -21,4 +23,8 @@ export const registriesModule = angular
   .component(
     'defaultRegistryDomain',
     r2a(withReactQuery(DefaultRegistryDomain), [])
+  )
+  .component(
+    'registryRepositoriesDatatable',
+    r2a(withUIRouter(withReactQuery(RepositoriesDatatable)), ['dataset'])
   ).name;

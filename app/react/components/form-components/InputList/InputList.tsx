@@ -1,6 +1,7 @@
-import { ComponentType } from 'react';
+import { ComponentType, useRef } from 'react';
 import { FormikErrors } from 'formik';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, RotateCw, Trash2 } from 'lucide-react';
+import clsx from 'clsx';
 
 import { Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -9,7 +10,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Input } from '../Input';
 import { FormError } from '../FormError';
 
-import { arrayMove } from './utils';
+import { arrayMove, hasKey } from './utils';
 
 type ArrElement<ArrType> = ArrType extends readonly (infer ElementType)[]
   ? ElementType
@@ -30,10 +31,12 @@ export interface ItemProps<T> {
   readOnly?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   index: number;
+  needsDeletion?: boolean;
 }
 type Key = string | number;
 type ChangeType = 'delete' | 'create' | 'update';
-export type DefaultType = { value: string };
+export type DefaultType = { value: string; needsDeletion?: boolean };
+type CanUndoDeleteItem<T> = T & { needsDeletion: boolean };
 
 type OnChangeEvent<T> =
   | {
@@ -64,10 +67,15 @@ interface Props<T> {
   addLabel?: string;
   itemKeyGetter?(item: T, index: number): Key;
   movable?: boolean;
+  canUndoDelete?: boolean;
   errors?: ArrayError<T[]>;
   textTip?: string;
   isAddButtonHidden?: boolean;
+  addButtonDataCy?: string;
+  isDeleteButtonHidden?: boolean;
+  deleteButtonDataCy?: string;
   disabled?: boolean;
+  addButtonError?: string;
   readOnly?: boolean;
   'aria-label'?: string;
 }
@@ -83,14 +91,21 @@ export function InputList<T = DefaultType>({
   addLabel = 'Add item',
   itemKeyGetter = (item: T, index: number) => index,
   movable,
+  canUndoDelete = false,
   errors,
   textTip,
   isAddButtonHidden = false,
+  addButtonDataCy,
+  isDeleteButtonHidden = false,
+  deleteButtonDataCy,
   disabled,
+  addButtonError,
   readOnly,
   'aria-label': ariaLabel,
 }: Props<T>) {
+  const initialItemsCount = useRef(value.length);
   const isAddButtonVisible = !(isAddButtonHidden || readOnly);
+  const isDeleteButtonVisible = !(isDeleteButtonHidden || readOnly);
   return (
     <div className="form-group" aria-label={ariaLabel || label}>
       {label && (
@@ -154,15 +169,28 @@ export function InputList<T = DefaultType>({
                       />
                     </>
                   )}
-                  {!readOnly && (
+                  {isDeleteButtonVisible && !canUndoDelete && (
                     <Button
                       color="dangerlight"
                       size="medium"
                       onClick={() => handleRemoveItem(key, item)}
                       className="vertical-center btn-only-icon"
+                      data-cy={`${deleteButtonDataCy}_${index}`}
                       icon={Trash2}
                     />
                   )}
+                  {isDeleteButtonVisible &&
+                    canUndoDelete &&
+                    hasKey(item, 'needsDeletion') && (
+                      <CanUndoDeleteButton
+                        item={{ ...item, needsDeletion: !!item.needsDeletion }}
+                        itemIndex={index}
+                        initialItemsCount={initialItemsCount.current}
+                        handleRemoveItem={handleRemoveItem}
+                        handleToggleNeedsDeletion={handleToggleNeedsDeletion}
+                        dataCy={`${deleteButtonDataCy}_${index}`}
+                      />
+                    )}
                 </div>
               </div>
             );
@@ -171,19 +199,27 @@ export function InputList<T = DefaultType>({
       )}
 
       {isAddButtonVisible && (
-        <div className="col-sm-12 mt-3">
-          <Button
-            onClick={handleAdd}
-            disabled={disabled}
-            type="button"
-            color="default"
-            className="!ml-0"
-            size="small"
-            icon={Plus}
-          >
-            {addLabel}
-          </Button>
-        </div>
+        <>
+          <div className="col-sm-12 mt-3">
+            <Button
+              onClick={handleAdd}
+              disabled={disabled}
+              type="button"
+              color="default"
+              className="!ml-0"
+              size="small"
+              icon={Plus}
+              data-cy={addButtonDataCy}
+            >
+              {addLabel}
+            </Button>
+          </div>
+          {addButtonError && (
+            <div className="col-sm-12">
+              <FormError>{addButtonError}</FormError>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -224,6 +260,10 @@ export function InputList<T = DefaultType>({
     );
   }
 
+  function handleToggleNeedsDeletion(key: Key, item: CanUndoDeleteItem<T>) {
+    handleChangeItem(key, { ...item, needsDeletion: !item.needsDeletion });
+  }
+
   function handleAdd() {
     const newItem = itemBuilder();
     onChange([...value, newItem], { type: 'create', item: newItem });
@@ -260,8 +300,8 @@ function DefaultItem({
       <Input
         value={item.value}
         onChange={(e) => onChange({ value: e.target.value })}
-        className="!w-full"
-        disabled={disabled}
+        className={clsx('!w-full', item.needsDeletion && 'striked')}
+        disabled={disabled || item.needsDeletion}
         readOnly={readOnly}
       />
       {error && <FormError>{error}</FormError>}
@@ -278,4 +318,56 @@ function renderDefaultItem(
   return (
     <DefaultItem item={item} onChange={onChange} error={error} index={index} />
   );
+}
+
+type CanUndoDeleteButtonProps<T> = {
+  item: CanUndoDeleteItem<T>;
+  itemIndex: number;
+  initialItemsCount: number;
+  handleRemoveItem(key: Key, item: T): void;
+  handleToggleNeedsDeletion(key: Key, item: T): void;
+  dataCy: string;
+};
+
+function CanUndoDeleteButton<T>({
+  item,
+  itemIndex,
+  initialItemsCount,
+  handleRemoveItem,
+  handleToggleNeedsDeletion,
+  dataCy,
+}: CanUndoDeleteButtonProps<T>) {
+  return (
+    <div className="items-start">
+      {!item.needsDeletion && (
+        <Button
+          color="dangerlight"
+          size="medium"
+          onClick={handleDeleteClick}
+          className="vertical-center btn-only-icon"
+          icon={Trash2}
+          data-cy={`${dataCy}_delete`}
+        />
+      )}
+      {item.needsDeletion && (
+        <Button
+          color="default"
+          size="medium"
+          onClick={handleDeleteClick}
+          className="vertical-center btn-only-icon"
+          icon={RotateCw}
+          data-cy={`${dataCy}_undo_delete`}
+        />
+      )}
+    </div>
+  );
+
+  // if the item is new, we can just remove it, otherwise we need to toggle the needsDeletion flag
+  function handleDeleteClick() {
+    if (itemIndex < initialItemsCount) {
+      handleToggleNeedsDeletion(itemIndex, item);
+    } else {
+      handleRemoveItem(itemIndex, item);
+    }
+  }
 }

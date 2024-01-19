@@ -7,7 +7,6 @@ import {
   KubernetesResourcePoolIngressClassFormValue,
   KubernetesResourcePoolIngressClassHostFormValue,
 } from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesApplicationPublishingTypes } from '../models/application/models';
 import { KubernetesIngress, KubernetesIngressRule } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
 import { KubernetesIngressClassAnnotation, PortainerIngressClassTypes } from './constants';
@@ -46,36 +45,6 @@ export class KubernetesIngressConverter {
     }
     res.TLS = data.spec.tls;
     return res;
-  }
-
-  /**
-   * Converts Application Form Value (from Create Application View) to Ingresses
-   * @param {KubernetesApplicationFormValues} formValues
-   * @param {string} serviceName
-   * @returns {KubernetesIngressRule[]}
-   */
-  static applicationFormValuesToIngresses(formValues, serviceName) {
-    const isPublishingToIngress = formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS;
-    const ingresses = angular.copy(formValues.OriginalIngresses);
-    _.forEach(formValues.PublishedPorts, (p) => {
-      const ingress = _.find(ingresses, { Name: p.IngressName });
-      if (ingress) {
-        if (p.NeedsDeletion) {
-          _.remove(ingress.Paths, (path) => path.Port === p.ContainerPort && path.ServiceName === serviceName && path.Path === p.IngressRoute);
-        } else if (isPublishingToIngress && p.IsNew) {
-          const rule = new KubernetesIngressRule();
-          rule.IngressName = ingress.Name;
-          rule.ServiceName = serviceName;
-          rule.Port = p.ContainerPort;
-          if (p.IngressRoute) {
-            rule.Path = _.startsWith(p.IngressRoute, '/') ? p.IngressRoute : '/' + p.IngressRoute;
-          }
-          rule.Host = p.IngressHost;
-          ingress.Paths.push(rule);
-        }
-      }
-    });
-    return ingresses;
   }
 
   static applicationFormValuesToDeleteIngresses(formValues, application) {

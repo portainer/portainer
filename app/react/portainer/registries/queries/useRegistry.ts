@@ -29,6 +29,6 @@ async function getRegistry(registryId: Registry['Id'], environmentId: number) {
     });
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'XXXUnable to retrieve registry');
+    throw parseAxiosError(err as Error, 'Unable to retrieve registry');
   }
 }

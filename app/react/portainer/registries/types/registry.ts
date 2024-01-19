@@ -7,11 +7,6 @@ export type Catalog = {
   repositories: string[];
 };
 
-export type Repository = {
-  name: string;
-  tags: string[];
-};
-
 export enum RegistryTypes {
   ANONYMOUS,
   QUAY,

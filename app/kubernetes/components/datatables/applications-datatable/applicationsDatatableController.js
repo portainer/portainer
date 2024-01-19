@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 
 angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatableController', [
   '$scope',
@@ -31,13 +31,6 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatab
         enabled: false,
         values: [],
       },
-    };
-
-    this.applicationTypeEnumToParamMap = {
-      [KubernetesApplicationTypes.DEPLOYMENT]: 'Deployment',
-      [KubernetesApplicationTypes.DAEMONSET]: 'DaemonSet',
-      [KubernetesApplicationTypes.STATEFULSET]: 'StatefulSet',
-      [KubernetesApplicationTypes.POD]: 'Pod',
     };
 
     this.expandAll = function () {

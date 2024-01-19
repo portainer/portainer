@@ -9,3 +9,7 @@ export function buildUrl(registryId: RegistryId) {
 
   return base;
 }
+
+export function buildProxyUrl(registryId: RegistryId) {
+  return `${buildUrl(registryId)}/v2`;
+}

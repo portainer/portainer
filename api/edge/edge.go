@@ -51,6 +51,10 @@ type (
 		// Used only for EE
 		// EnvVars is a list of environment variables to inject into the stack
 		EnvVars []portainer.Pair
+
+		// Used only for EE async edge agent
+		// ReadyRePullImage is a flag to indicate whether the auto update is trigger to re-pull image
+		ReadyRePullImage bool
 	}
 
 	// RegistryCredentials holds the credentials for a Docker registry.

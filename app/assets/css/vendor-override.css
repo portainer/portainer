@@ -238,6 +238,12 @@ textarea {
   background: var(--text-input-textarea);
 }
 
+[theme='highcontrast'] input,
+[theme='highcontrast'] select,
+[theme='highcontrast'] textarea {
+  border: 1px solid var(--white-color);
+}
+
 .daterangepicker {
   background-color: var(--bg-daterangepicker-color);
   border: 1px solid var(--border-daterangepicker-color);
@@ -347,6 +353,26 @@ input:-webkit-autofill {
 
 .tippy-box[data-placement^='left'] > .tippy-arrow:before {
   border-left: 8px solid var(--bg-tooltip-color);
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='top'] > .tippy-arrow:before {
+  border-top: 8px solid var(--white-color);
+  margin-bottom: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+  border-bottom: 8px solid var(--white-color);
+  margin-top: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--white-color);
+  margin-left: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='left'] > .tippy-arrow:before {
+  border-left: 8px solid var(--white-color);
+  margin-right: -1px;
 }
 
 /* Sidebar */

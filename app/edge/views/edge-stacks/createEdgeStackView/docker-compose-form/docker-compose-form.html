@@ -15,7 +15,8 @@
   ng-required="true"
   yml="true"
   placeholder="Define or paste the content of your docker compose file here"
-  read-only="$ctrl.state.Method === 'template' && $ctrl.template.GitConfig"
+  versions="$ctrl.formValues.versions"
+  read-only="$ctrl.isGitTemplate()"
 >
   <editor-description>
     You can get more information about Compose file format in the
@@ -28,7 +29,7 @@
   <file-upload-description> You can upload a Compose file from your computer. </file-upload-description>
 </file-upload-form>
 
-<div ng-if="$ctrl.state.Method == 'repository'">
+<div ng-if="$ctrl.state.Method == 'repository' || $ctrl.isGitTemplate()">
   <git-form
     value="$ctrl.formValues"
     on-change="($ctrl.onChangeFormValues)"

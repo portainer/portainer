@@ -1,4 +1,4 @@
-import { EnvVar, Pod } from 'kubernetes-types/core/v1';
+import { Pod } from 'kubernetes-types/core/v1';
 import { Asterisk, File, FileCode, Key, Lock } from 'lucide-react';
 
 import { Icon } from '@@/Icon';
@@ -44,7 +44,7 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                   {envVar.isInitContainer && (
                     <span>
                       <Icon icon={Asterisk} className="!ml-1" />
-                      {envVar.valueFrom?.fieldRef?.fieldPath} (
+                      {envVar.fieldPath} (
                       <a
                         href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
                         target="_blank"
@@ -56,13 +56,13 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                     </span>
                   )}
                 </td>
-                <td data-cy="k8sAppDetail-envVarName">{envVar.name}</td>
+                <td data-cy="k8sAppDetail-envVarName">{envVar.key || '-'}</td>
                 <td data-cy="k8sAppDetail-envVarValue">
                   {envVar.value && <span>{envVar.value}</span>}
-                  {envVar.valueFrom?.fieldRef?.fieldPath && (
+                  {envVar.fieldPath && (
                     <span>
                       <Icon icon={Asterisk} className="!ml-1" />
-                      {envVar.valueFrom.fieldRef.fieldPath} (
+                      {envVar.fieldPath} (
                       <a
                         href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/"
                         target="_blank"
@@ -73,50 +73,37 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                       )
                     </span>
                   )}
-                  {envVar.valueFrom?.secretKeyRef?.key && (
-                    <span className="flex items-center">
-                      <Icon icon={Key} className="!mr-1" />
-                      {envVar.valueFrom.secretKeyRef.key}
-                    </span>
-                  )}
-                  {envVar.valueFrom?.configMapKeyRef?.key && (
-                    <span className="flex items-center">
-                      <Icon icon={Key} className="!mr-1" />
-                      {envVar.valueFrom.configMapKeyRef.key}
-                    </span>
-                  )}
-                  {!envVar.value && !envVar.valueFrom && <span>-</span>}
+                  {envVar.type !== 'env' &&
+                    (envVar.key ? (
+                      <span className="flex items-center">
+                        <Icon icon={Key} className="!mr-1" />
+                        {envVar.key}
+                      </span>
+                    ) : (
+                      '-'
+                    ))}
                 </td>
                 <td data-cy="k8sAppDetail-configName">
-                  {!envVar.valueFrom?.configMapKeyRef?.name &&
-                    !envVar.valueFrom?.secretKeyRef?.name && <span>-</span>}
-                  {envVar.valueFrom?.configMapKeyRef && (
+                  {!envVar.resourseName && <span>-</span>}
+                  {envVar.resourseName && (
                     <span>
                       <Link
-                        to="kubernetes.configmaps.configmap"
+                        to={
+                          envVar.type === 'configMap'
+                            ? 'kubernetes.configmaps.configmap'
+                            : 'kubernetes.secrets.secret'
+                        }
                         params={{
-                          name: envVar.valueFrom.configMapKeyRef.name,
+                          name: envVar.resourseName,
                           namespace,
                         }}
                         className="flex items-center"
                       >
-                        <Icon icon={FileCode} className="!mr-1" />
-                        {envVar.valueFrom.configMapKeyRef.name}
-                      </Link>
-                    </span>
-                  )}
-                  {envVar.valueFrom?.secretKeyRef && (
-                    <span>
-                      <Link
-                        to="kubernetes.secrets.secret"
-                        params={{
-                          name: envVar.valueFrom.secretKeyRef.name,
-                          namespace,
-                        }}
-                        className="flex items-center"
-                      >
-                        <Icon icon={Lock} className="!mr-1" />
-                        {envVar.valueFrom.secretKeyRef.name}
+                        <Icon
+                          icon={envVar.type === 'configMap' ? FileCode : Lock}
+                          className="!mr-1"
+                        />
+                        {envVar.resourseName}
                       </Link>
                     </span>
                   )}
@@ -130,9 +117,15 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
   );
 }
 
-interface ContainerEnvVar extends EnvVar {
+type EnvVarType = 'env' | 'configMap' | 'secret';
+interface ContainerEnvVar {
+  key?: string;
+  value?: string;
+  fieldPath?: string;
   containerName: string;
   isInitContainer: boolean;
+  type: EnvVarType;
+  resourseName: string;
 }
 
 function getApplicationEnvironmentVariables(
@@ -150,23 +143,78 @@ function getApplicationEnvironmentVariables(
 
   // get all the environment variables for each container
   const appContainersEnvVars =
-    appContainers?.flatMap(
-      (container) =>
-        container?.env?.map((envVar) => ({
-          ...envVar,
+    appContainers?.flatMap((container) => {
+      const containerEnvVars: ContainerEnvVar[] =
+        container?.env?.map((envVar) => {
+          let envtype: EnvVarType = 'env';
+          if (envVar?.valueFrom?.configMapKeyRef) {
+            envtype = 'configMap';
+          } else if (envVar?.valueFrom?.secretKeyRef) {
+            envtype = 'secret';
+          }
+          return {
+            key: envVar?.name,
+            fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
+            containerName: container.name,
+            isInitContainer: false,
+            type: envtype,
+            resourseName:
+              envVar?.valueFrom?.configMapKeyRef?.name ||
+              envVar?.valueFrom?.secretKeyRef?.name ||
+              '',
+            value: envVar?.value,
+          };
+        }) || [];
+
+      const containerEnvFroms: ContainerEnvVar[] =
+        container?.envFrom?.map((envFrom) => ({
+          name: '',
+          resourseName:
+            envFrom?.configMapRef?.name || envFrom?.secretRef?.name || '',
           containerName: container.name,
           isInitContainer: false,
-        })) || []
-    ) || [];
+          type: envFrom?.configMapRef ? 'configMap' : 'secret',
+        })) || [];
+
+      return [...containerEnvVars, ...containerEnvFroms];
+    }) || [];
+
   const appInitContainersEnvVars =
-    appInitContainers?.flatMap(
-      (container) =>
-        container?.env?.map((envVar) => ({
-          ...envVar,
+    appInitContainers?.flatMap((container) => {
+      const containerEnvVars: ContainerEnvVar[] =
+        container?.env?.map((envVar) => {
+          let envtype: EnvVarType = 'env';
+          if (envVar?.valueFrom?.configMapKeyRef) {
+            envtype = 'configMap';
+          } else if (envVar?.valueFrom?.secretKeyRef) {
+            envtype = 'secret';
+          }
+          return {
+            key: envVar?.name,
+            fieldPath: envVar?.valueFrom?.fieldRef?.fieldPath,
+            containerName: container.name,
+            isInitContainer: true,
+            type: envtype,
+            resourseName:
+              envVar?.valueFrom?.configMapKeyRef?.name ||
+              envVar?.valueFrom?.secretKeyRef?.name ||
+              '',
+            value: envVar?.value,
+          };
+        }) || [];
+
+      const containerEnvFroms: ContainerEnvVar[] =
+        container?.envFrom?.map((envFrom) => ({
+          name: '',
+          resourseName:
+            envFrom?.configMapRef?.name || envFrom?.secretRef?.name || '',
           containerName: container.name,
           isInitContainer: true,
-        })) || []
-    ) || [];
+          type: envFrom?.configMapRef ? 'configMap' : 'secret',
+        })) || [];
+
+      return [...containerEnvVars, ...containerEnvFroms];
+    }) || [];
 
   return [...appContainersEnvVars, ...appInitContainersEnvVars];
 }

@@ -32,7 +32,7 @@ type (
 	// Authorizations represents a set of authorizations associated to a role
 	Authorizations map[Authorization]bool
 
-	//AutoUpdateSettings represents the git auto sync config for stack deployment
+	// AutoUpdateSettings represents the git auto sync config for stack deployment
 	AutoUpdateSettings struct {
 		// Auto update interval
 		Interval string `example:"1m30s"`
@@ -215,6 +215,7 @@ type (
 		Swarm                   bool              `json:"Swarm"`
 		TotalCPU                int               `json:"TotalCPU"`
 		TotalMemory             int64             `json:"TotalMemory"`
+		ContainerCount          int               `json:"ContainerCount"`
 		RunningContainerCount   int               `json:"RunningContainerCount"`
 		StoppedContainerCount   int               `json:"StoppedContainerCount"`
 		HealthyContainerCount   int               `json:"HealthyContainerCount"`
@@ -311,7 +312,7 @@ type (
 		ConfigHash string `json:"ConfigHash"`
 	}
 
-	//EdgeStack represents an edge stack
+	// EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
 		ID     EdgeStackID                    `json:"Id" example:"1"`
@@ -335,7 +336,7 @@ type (
 
 	EdgeStackDeploymentType int
 
-	//EdgeStackID represents an edge stack id
+	// EdgeStackID represents an edge stack id
 	EdgeStackID int
 
 	EdgeStackStatusDetails struct {
@@ -348,12 +349,14 @@ type (
 		ImagesPulled        bool
 	}
 
-	//EdgeStackStatus represents an edge stack status
+	// EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
 		Status     []EdgeStackDeploymentStatus
 		EndpointID EndpointID
 		// EE only feature
 		DeploymentInfo StackDeploymentInfo
+		// ReadyRePullImage is a flag to indicate whether the auto update is trigger to re-pull image
+		ReadyRePullImage bool
 
 		// Deprecated
 		Details EdgeStackStatusDetails
@@ -372,7 +375,7 @@ type (
 		RollbackTo *int
 	}
 
-	//EdgeStackStatusType represents an edge stack status type
+	// EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
 	PendingActionsID int
@@ -905,7 +908,7 @@ type (
 		Prefix      string   `json:"prefix"`           // API key identifier (7 char prefix)
 		DateCreated int64    `json:"dateCreated"`      // Unix timestamp (UTC) when the API key was created
 		LastUsed    int64    `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
-		Digest      []byte   `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
+		Digest      string   `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
 	}
 
 	// Schedule represents a scheduled job.
@@ -1638,6 +1641,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token
 	AuthCookieKey = "portainer_api_key"
+	// PortainerCacheHeader is used to enabled FE caching for Kubernetes resources
+	PortainerCacheHeader = "X-Portainer-Cache"
 )
 
 // List of supported features
@@ -1655,7 +1660,7 @@ const (
 	AuthenticationInternal
 	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
 	AuthenticationLDAP
-	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
+	// AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
 	AuthenticationOAuth
 )
 
@@ -1695,13 +1700,13 @@ const (
 const (
 	// EdgeStackStatusPending represents a pending edge stack
 	EdgeStackStatusPending EdgeStackStatusType = iota
-	//EdgeStackStatusDeploymentReceived represents an edge environment which received the edge stack deployment
+	// EdgeStackStatusDeploymentReceived represents an edge environment which received the edge stack deployment
 	EdgeStackStatusDeploymentReceived
-	//EdgeStackStatusError represents an edge environment which failed to deploy its edge stack
+	// EdgeStackStatusError represents an edge environment which failed to deploy its edge stack
 	EdgeStackStatusError
-	//EdgeStackStatusAcknowledged represents an acknowledged edge stack
+	// EdgeStackStatusAcknowledged represents an acknowledged edge stack
 	EdgeStackStatusAcknowledged
-	//EdgeStackStatusRemoved represents a removed edge stack
+	// EdgeStackStatusRemoved represents a removed edge stack
 	EdgeStackStatusRemoved
 	// StatusRemoteUpdateSuccess represents a successfully updated edge stack
 	EdgeStackStatusRemoteUpdateSuccess

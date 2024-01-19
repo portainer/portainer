@@ -270,4 +270,10 @@
   <!-- container-form -->
 </div>
 
-<app-templates-list templates="templates" on-select="(selectTemplate)" selected-id="state.selectedTemplate.Id" disabled-types="disabledTypes"></app-templates-list>
+<app-templates-list
+  storage-key="'docker-app-templates'"
+  templates="templates"
+  on-select="(selectTemplate)"
+  selected-id="state.selectedTemplate.Id"
+  disabled-types="disabledTypes"
+></app-templates-list>

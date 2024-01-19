@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 
-import { ServiceTypeOption, ServiceTypeValue } from '../types';
+import { ServiceTypeOption, ServiceType } from '../types';
 
 type Props = {
   serviceTypeOptions: ServiceTypeOption[];
-  selectedServiceType: ServiceTypeValue;
-  setSelectedServiceType: (serviceTypeValue: ServiceTypeValue) => void;
+  selectedServiceType: ServiceType;
+  setSelectedServiceType: (serviceTypeValue: ServiceType) => void;
 };
 
 export function ServiceTabs({
@@ -32,7 +32,7 @@ export function ServiceTabs({
             value={serviceTypeOptions[index].value}
             checked={selectedServiceType === serviceTypeOptions[index].value}
             onChange={(e) =>
-              setSelectedServiceType(e.target.value as ServiceTypeValue)
+              setSelectedServiceType(e.target.value as ServiceType)
             }
           />
           {label}

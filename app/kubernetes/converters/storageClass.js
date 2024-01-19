@@ -5,7 +5,7 @@ import { KubernetesStorageClassCreatePayload } from 'Kubernetes/models/storage-c
 
 class KubernetesStorageClassConverter {
   /**
-   * API StorageClass to front StorageClass
+   * API storageClass to front storageClass
    */
   static apiToStorageClass(data) {
     const res = new KubernetesStorageClass();

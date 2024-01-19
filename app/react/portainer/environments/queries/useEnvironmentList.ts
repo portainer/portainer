@@ -12,10 +12,20 @@ import { environmentQueryKeys } from './query-keys';
 
 export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
-export const SortOptions = ['Name', 'Group', 'Status'] as const;
+export const SortOptions = [
+  'Name',
+  'Group',
+  'Status',
+  'LastCheckIn',
+  'EdgeID',
+] as const;
 export type SortType = (typeof SortOptions)[number];
 export function isSortType(value?: string): value is SortType {
   return SortOptions.includes(value as SortType);
+}
+
+export function getSortType(value?: string): SortType | undefined {
+  return isSortType(value) ? value : undefined;
 }
 
 export type Query = EnvironmentsQueryParams & {

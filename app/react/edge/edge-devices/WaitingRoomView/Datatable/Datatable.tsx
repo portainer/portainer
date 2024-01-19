@@ -22,6 +22,7 @@ export function Datatable() {
   } = useEnvironments({
     pageLimit: tableState.pageSize,
     search: tableState.search,
+    sortBy: tableState.sortBy,
   });
 
   return (

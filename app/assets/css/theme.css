@@ -566,6 +566,10 @@
   --border-widget: var(--white-color);
   --border-stepper-color: var(--ui-gray-warm-9);
 
+  --button-close-color: var(--white-color);
+  --button-opacity: 1;
+  --button-opacity-hover: 0.7;
+
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
 

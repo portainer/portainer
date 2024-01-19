@@ -1,8 +1,10 @@
+import { http, HttpResponse } from 'msw';
+
 import { Environment } from '@/react/portainer/environments/types';
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { rest, server } from '@/setup-tests/server';
+import { server } from '@/setup-tests/server';
 
 import { EnvironmentList } from './EnvironmentList';
 
@@ -37,12 +39,13 @@ async function renderComponent(
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 
   server.use(
-    rest.get('/api/endpoints', (req, res, ctx) =>
-      res(
-        ctx.set('x-total-available', environments.length.toString()),
-        ctx.set('x-total-count', environments.length.toString()),
-        ctx.json(environments)
-      )
+    http.get('/api/endpoints', () =>
+      HttpResponse.json(environments, {
+        headers: {
+          'x-total-available': environments.length.toString(),
+          'x-total-count': environments.length.toString(),
+        },
+      })
     )
   );
 

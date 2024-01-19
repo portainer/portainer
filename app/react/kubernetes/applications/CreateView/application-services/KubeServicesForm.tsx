@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FormikErrors } from 'formik';
 
-import { KubernetesApplicationPublishingTypes } from '@/kubernetes/models/application/models';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import {
   useIngressControllers,
@@ -10,12 +9,7 @@ import {
 
 import { FormSection } from '@@/form-components/FormSection';
 
-import {
-  ServiceFormValues,
-  ServiceTypeAngularEnum,
-  ServiceTypeOption,
-  ServiceTypeValue,
-} from './types';
+import { ServiceFormValues, ServiceTypeOption, ServiceType } from './types';
 import { generateUniqueName } from './utils';
 import { ClusterIpServicesForm } from './cluster-ip/ClusterIpServicesForm';
 import { ServiceTabs } from './components/ServiceTabs';
@@ -23,15 +17,6 @@ import { NodePortServicesForm } from './node-port/NodePortServicesForm';
 import { LoadBalancerServicesForm } from './load-balancer/LoadBalancerServicesForm';
 import { ServiceTabLabel } from './components/ServiceTabLabel';
 import { PublishingExplaination } from './PublishingExplaination';
-
-const serviceTypeEnumsToValues: Record<
-  ServiceTypeAngularEnum,
-  ServiceTypeValue
-> = {
-  [KubernetesApplicationPublishingTypes.CLUSTER_IP]: 'ClusterIP',
-  [KubernetesApplicationPublishingTypes.NODE_PORT]: 'NodePort',
-  [KubernetesApplicationPublishingTypes.LOAD_BALANCER]: 'LoadBalancer',
-};
 
 interface Props {
   values: ServiceFormValues[];
@@ -53,7 +38,7 @@ export function KubeServicesForm({
   namespace,
 }: Props) {
   const [selectedServiceType, setSelectedServiceType] =
-    useState<ServiceTypeValue>('ClusterIP');
+    useState<ServiceType>('ClusterIP');
 
   // start loading ingresses and controllers early to reduce perceived loading time
   const environmentId = useEnvironmentId();
@@ -195,17 +180,17 @@ function getUniqNames(appName: string, services: ServiceFormValues[]) {
  */
 function getServiceTypeCounts(
   services: ServiceFormValues[]
-): Record<ServiceTypeValue, number> {
+): Record<ServiceType, number> {
   return services.reduce(
     (acc, service) => {
-      const type = serviceTypeEnumsToValues[service.Type];
+      const type = service.Type;
       const count = acc[type];
       return {
         ...acc,
         [type]: count ? count + 1 : 1,
       };
     },
-    {} as Record<ServiceTypeValue, number>
+    {} as Record<ServiceType, number>
   );
 }
 
@@ -215,10 +200,10 @@ function getServiceTypeCounts(
 function getServiceTypeHasErrors(
   services: ServiceFormValues[],
   errors: FormikErrors<ServiceFormValues[] | undefined>
-): Record<ServiceTypeValue, boolean> {
+): Record<ServiceType, boolean> {
   return services.reduce(
     (acc, service, index) => {
-      const type = serviceTypeEnumsToValues[service.Type];
+      const type = service.Type;
       const serviceHasErrors = !!errors?.[index];
       // if the service type already has an error, don't overwrite it
       if (acc[type] === true) return acc;
@@ -228,6 +213,6 @@ function getServiceTypeHasErrors(
         [type]: serviceHasErrors,
       };
     },
-    {} as Record<ServiceTypeValue, boolean>
+    {} as Record<ServiceType, boolean>
   );
 }

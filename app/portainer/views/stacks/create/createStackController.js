@@ -305,7 +305,7 @@ angular
               $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
               onChangeFileContent($scope.state.templateContent);
 
-              $scope.state.isEditorReadOnly = true;
+              $scope.state.isEditorReadOnly = false;
             } catch (err) {
               $scope.state.templateLoadFailed = true;
               throw err;
@@ -328,6 +328,7 @@ angular
           return;
         }
         const rendered = renderTemplate($scope.state.templateContent, $scope.formValues.Variables, $scope.state.selectedTemplate.Variables);
+        $scope.state.editorYamlValidationError = StackHelper.validateYAML(rendered, $scope.containerNames);
         onChangeFormValues({ StackFileContent: rendered });
       }
 

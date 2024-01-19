@@ -1,14 +1,12 @@
-import { DefaultBodyType, PathParams, rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 import { TeamMembership } from '@/react/portainer/users/teams/types';
 import { createMockUsers } from '@/react-tools/test-mocks';
 
 export const userHandlers = [
-  rest.get('/api/users', async (req, res, ctx) =>
-    res(ctx.json(createMockUsers(10)))
-  ),
-  rest.get<DefaultBodyType, PathParams, TeamMembership[]>(
+  http.get('/api/users', async () => HttpResponse.json(createMockUsers(10))),
+  http.get<never, never, TeamMembership[]>(
     '/api/users/:userId/memberships',
-    (req, res, ctx) => res(ctx.json([]))
+    () => HttpResponse.json([])
   ),
 ];

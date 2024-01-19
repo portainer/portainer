@@ -35,6 +35,7 @@ export function parseArrayOfStrings(array: Array<string> = []): Array<EnvVar> {
       return {
         name: parsedKeyValArr[1].trim(),
         value: parsedKeyValArr[3].trim() || '',
+        needsDeletion: false,
       };
     })
   );
