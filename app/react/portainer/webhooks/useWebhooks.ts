@@ -17,8 +17,9 @@ export function useWebhooks(
 
 async function getWebhooks(filters: Filters) {
   try {
+    const jsonString = JSON.stringify(filters);
     const { data } = await axios.get<Array<Webhook>>(buildUrl(), {
-      params: { filters },
+      params: { filters: jsonString },
     });
     return data;
   } catch (err) {
