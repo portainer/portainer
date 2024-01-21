@@ -159,7 +159,7 @@
               <namespace-selector
                 values="ctrl.formValues.ResourcePool.Namespace.Name"
                 on-change="(ctrl.onChangeNamespaceName)"
-                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.state.isEnvironmentAdmin}"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.isAdmin}"
                 is-edit="ctrl.state.isEdit"
               ></namespace-selector>
               <!-- #endregion -->
