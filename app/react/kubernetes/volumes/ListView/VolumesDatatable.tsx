@@ -42,7 +42,7 @@ export function VolumesDatatable({
     })
   );
 
-  const hasWriteAuth = useAuthorizations('K8sVolumesW');
+  const hasWriteAuth = useAuthorizations('K8sVolumesW', undefined, true);
 
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
