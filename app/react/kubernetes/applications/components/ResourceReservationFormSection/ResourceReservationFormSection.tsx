@@ -15,6 +15,8 @@ type Props = {
   errors: FormikErrors<ResourceQuotaFormValues>;
   namespaceHasQuota: boolean;
   resourceQuotaCapacityExceeded: boolean;
+  minMemoryLimit: number;
+  minCpuLimit: number;
   maxMemoryLimit: number;
   maxCpuLimit: number;
 };
@@ -25,6 +27,8 @@ export function ResourceReservationFormSection({
   errors,
   namespaceHasQuota,
   resourceQuotaCapacityExceeded,
+  minMemoryLimit,
+  minCpuLimit,
   maxMemoryLimit,
   maxCpuLimit,
 }: Props) {
@@ -52,6 +56,7 @@ export function ResourceReservationFormSection({
             <SliderWithInput
               value={Number(values.memoryLimit) ?? 0}
               onChange={(value) => onChange({ ...values, memoryLimit: value })}
+              min={minMemoryLimit}
               max={maxMemoryLimit}
               step={128}
               dataCy="k8sAppCreate-memoryLimit"
@@ -79,7 +84,7 @@ export function ResourceReservationFormSection({
                 )
               }
               value={values.cpuLimit}
-              min={0}
+              min={minCpuLimit}
               max={maxCpuLimit}
               step={0.1}
               dataCy="k8sAppCreate-cpuLimitSlider"

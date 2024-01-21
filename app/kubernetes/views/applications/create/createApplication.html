@@ -283,6 +283,8 @@
                     values="{memoryLimit: ctrl.formValues.MemoryLimit, cpuLimit: ctrl.formValues.CpuLimit}"
                     on-change="(ctrl.onChangeResourceReservation)"
                     namespace-has-quota="ctrl.state.resourcePoolHasQuota"
+                    min-memory-limit="ctrl.state.sliders.memory.min"
+                    min-cpu-limit="ctrl.state.sliders.cpu.min"
                     max-memory-limit="ctrl.state.sliders.memory.max"
                     max-cpu-limit="ctrl.state.sliders.cpu.max"
                     validation-data="{maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max, isEnvironmentAdmin: ctrl.isAdmin, nodeLimits: ctrl.nodesLimits.nodesLimits}"
