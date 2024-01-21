@@ -41,7 +41,11 @@ export function NamespacesDatatable({
     })
   );
 
-  const hasWriteAuth = useAuthorizations('K8sResourcePoolDetailsW');
+  const hasWriteAuth = useAuthorizations(
+    'K8sResourcePoolDetailsW',
+    undefined,
+    true
+  );
   const columns = useColumns();
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
@@ -69,7 +73,7 @@ export function NamespacesDatatable({
         )
       }
       renderTableActions={(selectedItems) => (
-        <Authorized authorizations="K8sResourcePoolDetailsW">
+        <Authorized authorizations="K8sResourcePoolDetailsW" adminOnlyCE>
           <DeleteButton
             onClick={() => onRemove(selectedItems)}
             disabled={selectedItems.length === 0}

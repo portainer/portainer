@@ -12,7 +12,11 @@ import { helper } from './helper';
 import { actions } from './actions';
 
 export function useColumns() {
-  const hasAuth = useAuthorizations('K8sResourcePoolsAccessManagementRW');
+  const hasAuth = useAuthorizations(
+    'K8sResourcePoolsAccessManagementRW',
+    undefined,
+    true
+  );
   return useMemo(
     () =>
       _.compact([
