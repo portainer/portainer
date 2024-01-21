@@ -347,11 +347,6 @@ class KubernetesApplicationConverter {
 
     const pod = formValues.ApplicationType === KubernetesApplicationTypes.POD;
 
-    let serviceSelector = {};
-    if (formValues.Services.length) {
-      serviceSelector = formValues.Services[0].Selector || { app: formValues.Name };
-    }
-
     let app;
     if (deployment) {
       app = KubernetesDeploymentConverter.applicationFormValuesToDeployment(formValues, claims);
@@ -360,7 +355,7 @@ class KubernetesApplicationConverter {
     } else if (daemonSet) {
       app = KubernetesDaemonSetConverter.applicationFormValuesToDaemonSet(formValues, claims);
     } else if (pod) {
-      app = KubernetesPodConverter.applicationFormValuesToPod(formValues, claims, serviceSelector);
+      app = KubernetesPodConverter.applicationFormValuesToPod(formValues, claims);
     } else {
       throw new PortainerError('Unable to determine which association to use to convert form');
     }

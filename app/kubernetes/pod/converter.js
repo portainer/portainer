@@ -102,7 +102,12 @@ function computeContainers(data) {
 }
 
 export default class KubernetesPodConverter {
-  static applicationFormValuesToPod(formValues, volumeClaims, serviceSelector) {
+  static applicationFormValuesToPod(formValues, volumeClaims) {
+    let serviceSelector = {};
+    if (formValues.Services.length) {
+      serviceSelector = formValues.Services[0].Selector || { app: formValues.Name };
+    }
+
     const res = new KubernetesPod();
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
