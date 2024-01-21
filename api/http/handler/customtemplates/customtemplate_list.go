@@ -12,6 +12,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id CustomTemplateList
@@ -87,8 +88,13 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 func retrieveEdgeParam(r *http.Request) *bool {
 	var edge *bool
 	edgeParam, _ := request.RetrieveQueryParameter(r, "edge", true)
-	if edgeParam != "" && (edgeParam == "true" || edgeParam == "false") {
-		edgeVal := edgeParam == "true"
+	if edgeParam != "" {
+		edgeVal, err := strconv.ParseBool(edgeParam)
+		if err != nil {
+			log.Warn().Err(err).Msg("failed parsing edge param")
+			return nil
+		}
+
 		edge = &edgeVal
 	}
 	return edge
