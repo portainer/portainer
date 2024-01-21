@@ -5,7 +5,7 @@ import { Terminal } from 'xterm';
 
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifyError } from '@/portainer/services/notifications';
-import { TerminalTooltip } from '@/react/kubernetes/applications/components/TerminalTooltip';
+import { TerminalTooltip } from '@/react/components/TerminalTooltip';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody } from '@@/Widget';
