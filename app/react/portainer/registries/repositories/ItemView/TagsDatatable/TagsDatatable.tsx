@@ -1,8 +1,6 @@
 import { TagIcon } from 'lucide-react';
 import { useStore } from 'zustand';
 
-import { RepositoryTagViewModel } from '@/portainer/registry-management/models/repositoryTag';
-
 import { Datatable } from '@@/datatables';
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
@@ -11,6 +9,7 @@ import { withMeta } from '@@/datatables/extend-options/withMeta';
 import { Tag } from './types';
 import { useColumns } from './columns/useColumns';
 import { newNamesStore } from './useRetagState';
+import { RepositoryTagViewModel } from './view-model';
 
 export function TagsDatatable({
   dataset,

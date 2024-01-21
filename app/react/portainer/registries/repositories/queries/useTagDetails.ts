@@ -2,9 +2,9 @@ import { useQuery } from 'react-query';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types/registry';
-import { RepositoryTagViewModel } from '@/portainer/registry-management/models/repositoryTag';
 
 import { manifestsToTag } from '../ItemView/TagsDatatable/manifestsToTag';
+import { RepositoryTagViewModel } from '../ItemView/TagsDatatable/view-model';
 
 import { getTagManifestV1, getTagManifestV2 } from './manifest.service';
 import { ImageConfigs, getRegistryBlob } from './getRegistryBlobs';

@@ -1,10 +1,9 @@
 import { CellContext } from '@tanstack/react-table';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
-import { RepositoryTagViewModel } from '@/portainer/registry-management/models/repositoryTag';
-
 import { useTagDetails } from '../../../queries/useTagDetails';
 import { Tag } from '../types';
+import { RepositoryTagViewModel } from '../view-model';
 
 function useParams() {
   const {

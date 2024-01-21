@@ -1,8 +1,9 @@
 import _ from 'lodash';
 
-import { RepositoryTagViewModel } from '../../../../../../portainer/registry-management/models/repositoryTag';
 import { ManifestV1, ManifestV2 } from '../../queries/manifest.service';
 import { ImageConfigs } from '../../queries/getRegistryBlobs';
+
+import { RepositoryTagViewModel } from './view-model';
 
 function parseV1History(history: { v1Compatibility: string }[]) {
   return _.map(history, (item) => JSON.parse(item.v1Compatibility));

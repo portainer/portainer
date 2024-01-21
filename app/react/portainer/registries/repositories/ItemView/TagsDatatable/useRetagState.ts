@@ -1,6 +1,6 @@
 import { createStore } from 'zustand';
 
-import { RepositoryTagViewModel } from '@/portainer/registry-management/models/repositoryTag';
+import { RepositoryTagViewModel } from './view-model';
 
 interface Store {
   updates: Record<string, RepositoryTagViewModel>;
