@@ -318,8 +318,15 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Re
 		return transport.rewriteOperation(request, transport.networkListOperation)
 
 	default:
-		// assume /networks/{id}
-		networkID := path.Base(requestPath)
+		// This section assumes /networks/**
+		networkID := ""
+		if match, _ := path.Match("/networks/*/*", requestPath); match {
+			// Handle /networks/{id}/{action} requests
+			networkID = path.Base(path.Dir(requestPath))
+		} else {
+			// Handle /networks/{id} requests
+			networkID = path.Base(requestPath)
+		}
 
 		if request.Method == http.MethodGet {
 			return transport.rewriteOperation(request, transport.networkInspectOperation)
