@@ -315,7 +315,12 @@ class KubernetesApplicationHelper {
             ports.push(svcport);
           });
           svc.Ports = ports;
-          svc.Selector = app.Raw.spec.selector.matchLabels;
+          // if the app is a pod (doesn't have a selector), then get the pod labels
+          if (app.Raw.spec.selector) {
+            svc.Selector = app.Raw.spec.selector.matchLabels;
+          } else {
+            svc.Selector = app.Raw.metadata.labels || { app: app.Name };
+          }
           services.push(svc);
         }
       });

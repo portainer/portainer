@@ -199,13 +199,6 @@ class KubernetesCreateApplicationController {
     this.updateApplicationType();
   }
 
-  updateApplicationType() {
-    return this.$scope.$evalAsync(() => {
-      this.formValues.ApplicationType = this.getAppType();
-      this.validatePersistedFolders();
-    });
-  }
-
   getAppType() {
     if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
       return this.ApplicationTypes.DaemonSet;
@@ -214,6 +207,14 @@ class KubernetesCreateApplicationController {
       return this.ApplicationTypes.StatefulSet;
     }
     return this.ApplicationTypes.Deployment;
+  }
+
+  // keep the application type up to date
+  updateApplicationType() {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.ApplicationType = this.getAppType();
+      this.validatePersistedFolders();
+    });
   }
 
   onChangeFileContent(value) {
@@ -273,7 +274,9 @@ class KubernetesCreateApplicationController {
   }
 
   imageValidityIsValid() {
-    return this.state.pullImageValidity || (this.formValues.registryDetails && this.formValues.registryDetails.Registry.Type !== RegistryTypes.DOCKERHUB);
+    return (
+      this.isExternalApplication() || this.state.pullImageValidity || (this.formValues.registryDetails && this.formValues.registryDetails.Registry.Type !== RegistryTypes.DOCKERHUB)
+    );
   }
 
   onChangeAppName(appName) {
@@ -349,6 +352,7 @@ class KubernetesCreateApplicationController {
       persistedFolder.useNewVolume = true;
     });
     this.validatePersistedFolders();
+    this.updateApplicationType();
   }
   /* #endregion */
 
