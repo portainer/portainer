@@ -1,3 +1,8 @@
+import { useMemo } from 'react';
+
+import { useIsEnvironmentAdmin } from '@/react/hooks/useUser';
+import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
+
 import { InputList } from '@@/form-components/InputList';
 import { ArrayError } from '@@/form-components/InputList/InputList';
 
@@ -8,16 +13,29 @@ import { Item } from './Item';
 export function VolumesTab({
   onChange,
   values,
-  allowBindMounts,
   errors,
+  allowAuto = false,
 }: {
   onChange: (values: Values) => void;
   values: Values;
-  allowBindMounts: boolean;
   errors?: ArrayError<Values>;
+  allowAuto?: boolean;
 }) {
+  const isEnvironmentAdminQuery = useIsEnvironmentAdmin({ adminOnlyCE: true });
+  const envQuery = useCurrentEnvironment();
+
+  const allowBindMounts = !!(
+    isEnvironmentAdminQuery.authorized ||
+    envQuery.data?.SecuritySettings.allowBindMountsForRegularUsers
+  );
+
+  const inputContext = useMemo(
+    () => ({ allowBindMounts, allowAuto }),
+    [allowAuto, allowBindMounts]
+  );
+
   return (
-    <InputContext.Provider value={allowBindMounts}>
+    <InputContext.Provider value={inputContext}>
       <InputList<Volume>
         errors={Array.isArray(errors) ? errors : []}
         label="Volume mapping"

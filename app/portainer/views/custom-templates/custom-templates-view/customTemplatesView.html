@@ -1,67 +1,10 @@
 <page-header title="'Custom Templates'" breadcrumbs="['Custom Templates']" reload="true"> </page-header>
 
-<div class="row">
-  <stack-from-template-form
-    ng-if="$ctrl.state.selectedTemplate"
-    template="$ctrl.state.selectedTemplate"
-    form-values="$ctrl.formValues"
-    name-regex="$ctrl.state.templateNameRegex"
-    state="$ctrl.state"
-    create-template="$ctrl.createStack"
-    unselect-template="$ctrl.unselectTemplate"
-  >
-    <advanced-form>
-      <custom-templates-variables-field
-        ng-if="$ctrl.isTemplateVariablesEnabled"
-        definitions="$ctrl.state.selectedTemplate.Variables"
-        value="$ctrl.formValues.variables"
-        on-change="($ctrl.onChangeTemplateVariables)"
-      ></custom-templates-variables-field>
-
-      <div class="form-group" ng-if="$ctrl.state.selectedTemplate && !$ctrl.state.templateLoadFailed">
-        <div class="col-sm-12">
-          <a class="small interactive vertical-center" ng-show="!$ctrl.state.showAdvancedOptions" ng-click="$ctrl.state.showAdvancedOptions = true;">
-            <pr-icon icon="'plus'" class-name="space-right" feather="true"></pr-icon> {{ $ctrl.state.selectedTemplate.GitConfig !== null ? 'View' : 'Customize' }} stack
-          </a>
-          <a class="small interactive vertical-center" ng-show="$ctrl.state.showAdvancedOptions" ng-click="$ctrl.state.showAdvancedOptions = false;">
-            <pr-icon icon="'minus'" class-name="space-right" feather="true"></pr-icon> Hide {{ $ctrl.state.selectedTemplate.GitConfig === null ? 'custom' : '' }} stack
-          </a>
-        </div>
-      </div>
-
-      <span ng-if="$ctrl.state.selectedTemplate && $ctrl.state.templateLoadFailed">
-        <p class="small vertical-center text-danger mb-5" ng-if="$ctrl.currentUser.isAdmin || $ctrl.currentUser.id === $ctrl.state.selectedTemplate.CreatedByUserId">
-          <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
-          <a ui-sref="docker.templates.custom.edit({id: $ctrl.state.selectedTemplate.Id})">click here</a> for configuration.</p
-        >
-        <p class="small vertical-center text-danger mb-5" ng-if="!($ctrl.currentUser.isAdmin || $ctrl.currentUser.id === $ctrl.state.selectedTemplate.CreatedByUserId)">
-          <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
-        >
-      </span>
-
-      <!-- web-editor -->
-      <web-editor-form
-        ng-if="$ctrl.state.showAdvancedOptions"
-        identifier="custom-template-creation-editor"
-        value="$ctrl.formValues.fileContent"
-        on-change="($ctrl.editorUpdate)"
-        ng-required="true"
-        yml="true"
-        placeholder="Define or paste the content of your docker compose file here"
-        read-only="$ctrl.state.isEditorReadOnly"
-      >
-        <editor-description>
-          <p>
-            You can get more information about Compose file format in the
-            <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
-            .
-          </p>
-        </editor-description>
-      </web-editor-form>
-      <!-- !web-editor -->
-    </advanced-form>
-  </stack-from-template-form>
-</div>
+<stack-from-custom-template-form-widget
+  ng-if="$ctrl.state.selectedTemplate"
+  template="$ctrl.state.selectedTemplate"
+  unselect="$ctrl.unselectTemplate"
+></stack-from-custom-template-form-widget>
 
 <custom-templates-list
   templates="$ctrl.templates"

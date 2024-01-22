@@ -41,7 +41,9 @@ export function useServicePlugins(
   pluginType: keyof PluginsInfo,
   pluginVersion: string
 ) {
-  const systemPluginsQuery = useInfo(environmentId, (info) => info.Plugins);
+  const systemPluginsQuery = useInfo(environmentId, {
+    select: (info) => info.Plugins,
+  });
   const pluginsQuery = usePlugins(environmentId, { enabled: !systemOnly });
 
   return {

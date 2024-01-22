@@ -11,9 +11,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { isAgentEnvironment } from '@/react/portainer/environments/utils';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
-import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
-import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { ImageConfigFieldset, ImageConfigValues } from '@@/ImageConfigFieldset';
 import { LoadingButton } from '@@/buttons';
@@ -23,6 +21,7 @@ import {
   PortsMappingField,
   Values as PortMappingValue,
 } from './PortsMappingField';
+import { NameField } from './NameField';
 
 export interface Values {
   name: string;
@@ -74,19 +73,14 @@ export function BaseForm({
   return (
     <Widget>
       <Widget.Body>
-        <FormControl label="Name" inputId="name-input" errors={errors?.name}>
-          <Input
-            id="name-input"
-            value={values.name}
-            onChange={(e) => {
-              const name = e.target.value;
-              onChangeName(name);
-              setFieldValue('name', name);
-            }}
-            placeholder="e.g. myContainer"
-            data-cy="container-name-input"
-          />
-        </FormControl>
+        <NameField
+          value={values.name}
+          onChange={(name) => {
+            setFieldValue('name', name);
+            onChangeName(name);
+          }}
+          error={errors?.name}
+        />
 
         <FormSection title="Image Configuration">
           <ImageConfigFieldset

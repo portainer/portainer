@@ -1,10 +1,10 @@
 import { CustomTemplatesVariablesField } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
+import { TemplateNote } from '@/react/portainer/templates/components/TemplateNote';
 
 import { ArrayError } from '@@/form-components/InputList/InputList';
 
 import { Values } from './types';
-import { TemplateNote } from './TemplateNote';
 
 export function CustomTemplateFieldset({
   errors,

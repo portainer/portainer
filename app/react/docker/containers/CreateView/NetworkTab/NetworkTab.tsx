@@ -2,14 +2,13 @@ import { FormikErrors } from 'formik';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
-import { InputList, ItemProps } from '@@/form-components/InputList';
-import { InputGroup } from '@@/form-components/InputGroup';
-import { FormError } from '@@/form-components/FormError';
 
 import { NetworkSelector } from '../../components/NetworkSelector';
 
 import { CONTAINER_MODE, Values } from './types';
 import { ContainerSelector } from './ContainerSelector';
+import { HostsFileEntries } from './HostsFileEntries';
+import { HostnameField } from './HostnameField';
 
 export function NetworkTab({
   values,
@@ -39,14 +38,10 @@ export function NetworkTab({
         </FormControl>
       )}
 
-      <FormControl label="Hostname" errors={errors?.hostname}>
-        <Input
-          value={values.hostname}
-          onChange={(e) => setFieldValue('hostname', e.target.value)}
-          placeholder="e.g. web01"
-          data-cy="docker-container-hostname-input"
-        />
-      </FormControl>
+      <HostnameField
+        value={values.hostname}
+        onChange={(value) => setFieldValue('hostname', value)}
+      />
 
       <FormControl label="Domain Name" errors={errors?.domain}>
         <Input
@@ -102,43 +97,11 @@ export function NetworkTab({
         />
       </FormControl>
 
-      <InputList
-        label="Hosts file entries"
-        value={values.hostsFileEntries}
-        onChange={(hostsFileEntries) =>
-          setFieldValue('hostsFileEntries', hostsFileEntries)
-        }
+      <HostsFileEntries
+        values={values.hostsFileEntries}
+        onChange={(v) => setFieldValue('hostsFileEntries', v)}
         errors={errors?.hostsFileEntries}
-        item={HostsFileEntryItem}
-        itemBuilder={() => ''}
-        data-cy="docker-container-hosts-file-entries"
       />
-    </div>
-  );
-}
-
-function HostsFileEntryItem({
-  item,
-  onChange,
-  disabled,
-  error,
-  readOnly,
-  index,
-}: ItemProps<string>) {
-  return (
-    <div>
-      <InputGroup>
-        <InputGroup.Addon>value</InputGroup.Addon>
-        <Input
-          value={item}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          readOnly={readOnly}
-          data-cy={`docker-container-hosts-file-entry_${index}`}
-        />
-      </InputGroup>
-
-      {error && <FormError>{error}</FormError>}
     </div>
   );
 }
