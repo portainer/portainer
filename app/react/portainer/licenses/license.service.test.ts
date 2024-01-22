@@ -7,8 +7,8 @@ import type { License } from './types';
 
 describe('getLicenses', () => {
   it('on success should return the server body', async () => {
-    const catchFn = jest.fn();
-    const thenFn = jest.fn();
+    const catchFn = vi.fn();
+    const thenFn = vi.fn();
 
     const data: License[] = [];
     server.use(http.get('/api/licenses', () => HttpResponse.json(data)));
@@ -22,8 +22,8 @@ describe('getLicenses', () => {
   });
 
   it('on failure should return the server message', async () => {
-    const catchFn = jest.fn();
-    const thenFn = jest.fn();
+    const catchFn = vi.fn();
+    const thenFn = vi.fn();
 
     const message = 'message';
     const details = 'details';

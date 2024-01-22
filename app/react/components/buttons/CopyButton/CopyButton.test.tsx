@@ -15,7 +15,7 @@ test('should display a CopyButton with children', async () => {
 test('CopyButton should copy text to clipboard', async () => {
   // override navigator.clipboard.writeText (to test copy to clipboard functionality)
   let clipboardText = '';
-  const writeText = jest.fn((text) => {
+  const writeText = vi.fn((text) => {
     clipboardText = text;
   });
   Object.assign(navigator, {

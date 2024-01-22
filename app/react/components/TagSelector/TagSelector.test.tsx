@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import { Mock } from 'vitest';
 
 import { Tag, TagId } from '@/portainer/tags/types';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
@@ -43,11 +44,11 @@ async function renderComponent(
   {
     value = [],
     allowCreate = false,
-    onChange = jest.fn(),
+    onChange = vi.fn(),
   }: {
     value?: TagId[];
     allowCreate?: boolean;
-    onChange?: jest.Mock;
+    onChange?: Mock;
   } = {},
   tags: Tag[] = []
 ) {

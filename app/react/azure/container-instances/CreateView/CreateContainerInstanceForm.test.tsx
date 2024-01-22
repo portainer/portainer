@@ -6,9 +6,9 @@ import { renderWithQueryClient } from '@/react-tools/test-utils';
 
 import { CreateContainerInstanceForm } from './CreateContainerInstanceForm';
 
-jest.mock('@uirouter/react', () => ({
-  ...jest.requireActual('@uirouter/react'),
-  useCurrentStateAndParams: jest.fn(() => ({
+vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
+  ...(await importOriginal()),
+  useCurrentStateAndParams: vi.fn(() => ({
     params: { endpointId: 5 },
   })),
 }));
