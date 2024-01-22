@@ -4,6 +4,7 @@ import { Pod } from 'kubernetes-types/core/v1';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { useStackFile } from '@/react/common/stacks/stack.service';
+import { useNamespaceQuery } from '@/react/kubernetes/namespaces/queries/useNamespaceQuery';
 
 import { Widget, WidgetBody } from '@@/Widget';
 import { Button } from '@@/buttons';
@@ -14,7 +15,6 @@ import {
   useApplication,
   useApplicationServices,
 } from '../../application.queries';
-import { isSystemNamespace } from '../../../namespaces/utils';
 import { applicationIsKind, isExternalApplication } from '../../utils';
 import { appStackIdLabel } from '../../constants';
 
@@ -39,6 +39,9 @@ export function ApplicationDetailsWidget() {
     },
   } = stateAndParams;
 
+  const namespaceData = useNamespaceQuery(environmentId, namespace);
+  const isSystemNamespace = namespaceData.data?.IsSystem;
+
   // get app info
   const { data: app } = useApplication(
     environmentId,
@@ -61,7 +64,7 @@ export function ApplicationDetailsWidget() {
       <div className="col-sm-12">
         <Widget>
           <WidgetBody>
-            {!isSystemNamespace(namespace) && (
+            {!isSystemNamespace && (
               <div className="mb-4 flex flex-wrap gap-2">
                 <Authorized authorizations="K8sApplicationDetailsW">
                   <Link to="kubernetes.applications.application.edit">

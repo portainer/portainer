@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import { Shuffle, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
 
+import { Namespaces } from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
@@ -52,12 +54,17 @@ export function ServicesDatatable() {
   const filteredServices = services?.filter(
     (service) =>
       (canAccessSystemResources && tableState.showSystemResources) ||
-      !isSystemNamespace(service.Namespace)
+      !namespaces?.[service.Namespace].IsSystem
+  );
+
+  const servicesWithIsSystem = useServicesRowData(
+    filteredServices || [],
+    namespaces
   );
 
   return (
     <Datatable
-      dataset={filteredServices || []}
+      dataset={servicesWithIsSystem || []}
       columns={columns}
       settingsManager={tableState}
       isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
@@ -84,6 +91,21 @@ export function ServicesDatatable() {
       }
       renderRow={servicesRenderRow}
     />
+  );
+}
+
+// useServicesRowData appends the `isSyetem` property to the service data
+function useServicesRowData(
+  services: Service[],
+  namespaces?: Namespaces
+): Service[] {
+  return useMemo(
+    () =>
+      services.map((service) => ({
+        ...service,
+        IsSystem: namespaces ? namespaces?.[service.Namespace].IsSystem : false,
+      })),
+    [services, namespaces]
   );
 }
 

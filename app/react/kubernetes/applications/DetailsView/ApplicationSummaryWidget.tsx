@@ -18,7 +18,6 @@ import { InlineLoader } from '@@/InlineLoader';
 import { Icon } from '@@/Icon';
 import { Note } from '@@/Note';
 
-import { isSystemNamespace } from '../../namespaces/utils';
 import {
   appStackNameLabel,
   appKindToDeploymentTypeMap,
@@ -39,6 +38,7 @@ import {
   usePatchApplicationMutation,
 } from '../application.queries';
 import { Application, ApplicationPatch } from '../types';
+import { useNamespaceQuery } from '../../namespaces/queries/useNamespaceQuery';
 
 export function ApplicationSummaryWidget() {
   const stateAndParams = useCurrentStateAndParams();
@@ -56,7 +56,9 @@ export function ApplicationSummaryWidget() {
     name,
     resourceType
   );
-  const systemNamespace = isSystemNamespace(namespace);
+  const namespaceData = useNamespaceQuery(environmentId, namespace);
+  const isSystemNamespace = namespaceData.data?.IsSystem;
+
   const externalApplication = application && isExternalApplication(application);
   const applicationRequests = application && getResourceRequests(application);
   const applicationOwner = application?.metadata?.labels?.[appOwnerLabel];
@@ -124,7 +126,7 @@ export function ApplicationSummaryWidget() {
                         data-cy="k8sAppDetail-appName"
                       >
                         {name}
-                        {externalApplication && !systemNamespace && (
+                        {externalApplication && !isSystemNamespace && (
                           <Badge type="info">external</Badge>
                         )}
                       </div>
@@ -154,7 +156,7 @@ export function ApplicationSummaryWidget() {
                         >
                           {namespace}
                         </Link>
-                        {systemNamespace && <Badge type="info">system</Badge>}
+                        {isSystemNamespace && <Badge type="info">system</Badge>}
                       </div>
                     </td>
                   </tr>
@@ -231,7 +233,7 @@ export function ApplicationSummaryWidget() {
                             application?.metadata?.creationTimestamp
                           ).format('YYYY-MM-DD HH:mm:ss')}
                         </span>
-                        {(!externalApplication || systemNamespace) && (
+                        {(!externalApplication || isSystemNamespace) && (
                           <span
                             className="flex items-center gap-1"
                             data-cy="k8sAppDetail-creationMethod"

@@ -1,5 +1,4 @@
 import { Authorized } from '@/react/hooks/useUser';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 
 import { Badge } from '@@/Badge';
 
@@ -11,13 +10,12 @@ export const name = columnHelper.accessor(
 
     const isExternal =
       !row.Labels || !row.Labels['io.portainer.kubernetes.application.owner'];
-    const isSystem = isSystemNamespace(row.Namespace);
 
-    if (isExternal && !isSystem) {
+    if (isExternal && !row.IsSystem) {
       name = `${name} external`;
     }
 
-    if (isSystem) {
+    if (row.IsSystem) {
       name = `${name} system`;
     }
     return name;
@@ -27,7 +25,6 @@ export const name = columnHelper.accessor(
     id: 'name',
     cell: ({ row }) => {
       const name = row.original.Name;
-      const isSystem = isSystemNamespace(row.original.Namespace);
 
       const isExternal =
         !row.original.Labels ||
@@ -38,13 +35,13 @@ export const name = columnHelper.accessor(
           <Authorized authorizations="K8sServiceW" childrenUnauthorized={name}>
             {name}
 
-            {isSystem && (
+            {row.original.IsSystem && (
               <Badge type="success" className="ml-2">
                 System
               </Badge>
             )}
 
-            {isExternal && !isSystem && (
+            {isExternal && !row.original.IsSystem && (
               <Badge className="ml-2">External</Badge>
             )}
           </Authorized>

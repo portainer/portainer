@@ -1,6 +1,5 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { Authorized } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
@@ -13,13 +12,9 @@ import { columnHelper } from './helper';
 export const name = columnHelper.accessor(
   (row) => {
     const name = row.metadata?.name;
-    const namespace = row.metadata?.namespace;
 
     const isSystemToken = name?.includes('default-token-');
-    const isInSystemNamespace = namespace
-      ? isSystemNamespace(namespace)
-      : false;
-    const isSystemConfigMap = isSystemToken || isInSystemNamespace;
+    const isSystemConfigMap = isSystemToken || row.isSystem;
 
     const hasConfigurationOwner =
       !!row.metadata?.labels?.['io.portainer.kubernetes.configuration.owner'];
@@ -36,11 +31,9 @@ export const name = columnHelper.accessor(
 
 function Cell({ row }: CellContext<ConfigMapRowData, string>) {
   const name = row.original.metadata?.name;
-  const namespace = row.original.metadata?.namespace;
 
   const isSystemToken = name?.includes('default-token-');
-  const isInSystemNamespace = namespace ? isSystemNamespace(namespace) : false;
-  const isSystemConfigMap = isSystemToken || isInSystemNamespace;
+  const isSystemConfigMap = isSystemToken || row.original.isSystem;
 
   const hasConfigurationOwner =
     !!row.original.metadata?.labels?.[
