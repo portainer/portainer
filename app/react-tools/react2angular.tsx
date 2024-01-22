@@ -38,7 +38,16 @@ export function react2angular<T, U extends PropNames<T>[]>(
   Component: React.ComponentType<T & JSX.IntrinsicAttributes>,
   propNames: U & ([PropNames<T>] extends [U[number]] ? unknown : PropNames<T>)
 ): IComponentOptions & { name: string } {
-  const bindings = Object.fromEntries(propNames.map((key) => [key, '<']));
+  const bindings = Object.fromEntries(
+    propNames.map((key) => {
+      // use two way binding for errors, to avoid shifting the layout from errors going between undefined <-> some value when using inputs.
+      // See https://portainer.atlassian.net/browse/EE-6570 for more context
+      if (key === 'errors') {
+        return [key, '='];
+      }
+      return [key, '<'];
+    })
+  );
 
   return {
     bindings,
