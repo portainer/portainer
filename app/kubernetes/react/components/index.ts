@@ -269,6 +269,8 @@ withFormValidation(
   [
     'namespaceHasQuota',
     'resourceQuotaCapacityExceeded',
+    'minMemoryLimit',
+    'minCpuLimit',
     'maxMemoryLimit',
     'maxCpuLimit',
   ],

@@ -6,6 +6,7 @@ export function SliderWithInput({
   value,
   onChange,
   max,
+  min = 0,
   step = 1,
   dataCy,
   visibleTooltip = false,
@@ -13,6 +14,7 @@ export function SliderWithInput({
   value: number;
   onChange: (value: number) => void;
   max: number;
+  min?: number;
   dataCy: string;
   step?: number;
   visibleTooltip?: boolean;
@@ -26,7 +28,7 @@ export function SliderWithInput({
               onChange(typeof value === 'number' ? value : value[0])
             }
             value={value}
-            min={0}
+            min={min}
             max={max}
             step={step}
             dataCy={`${dataCy}Slider`}
