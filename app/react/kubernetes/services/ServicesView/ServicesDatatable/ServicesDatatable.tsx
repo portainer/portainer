@@ -10,7 +10,6 @@ import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
@@ -72,7 +71,7 @@ export function ServicesDatatable() {
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}
-      isRowSelectable={(row) => !isSystemNamespace(row.original.Namespace)}
+      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />

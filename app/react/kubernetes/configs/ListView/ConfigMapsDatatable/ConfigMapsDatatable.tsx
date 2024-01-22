@@ -6,7 +6,6 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
 import { Application } from '@/react/kubernetes/applications/types';
@@ -87,7 +86,7 @@ export function ConfigMapsDatatable() {
       titleIcon={FileCode}
       getRowId={(row) => row.metadata?.uid ?? ''}
       isRowSelectable={(row) =>
-        !isSystemNamespace(row.original.metadata?.namespace ?? '')
+        !namespaces?.[row.original.metadata?.namespace ?? ''].IsSystem
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
