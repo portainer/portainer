@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 
 import { isoDate } from '@/portainer/filters/filters';
 import { useAuthorizations } from '@/react/hooks/useUser';
-import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 
 import { Link } from '@@/Link';
 import { StatusBadge } from '@@/StatusBadge';
@@ -24,7 +23,7 @@ export function useColumns() {
         helper.accessor('Namespace.Name', {
           header: 'Name',
           id: 'Name',
-          cell: ({ getValue }) => {
+          cell: ({ getValue, row: { original: item } }) => {
             const name = getValue();
 
             return (
@@ -37,7 +36,7 @@ export function useColumns() {
                 >
                   {name}
                 </Link>
-                {KubernetesNamespaceHelper.isSystemNamespace(name) && (
+                {item.Namespace.IsSystem && (
                   <span className="ml-2">
                     <Badge type="info">system</Badge>
                   </span>

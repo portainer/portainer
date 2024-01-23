@@ -1,9 +1,6 @@
-// actions:
-
 import { Layers } from 'lucide-react';
 
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
-import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 
 import { refreshableSettings } from '@@/datatables/types';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -19,6 +16,7 @@ import {
   TableSettings,
 } from '../../datatables/DefaultDatatableSettings';
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
+import { isDefaultNamespace } from '../isDefaultNamespace';
 
 import { NamespaceViewModel } from './types';
 import { useColumns } from './columns/useColumns';
@@ -51,10 +49,7 @@ export function NamespacesDatatable({
 
   const filteredDataset = tableState.showSystemResources
     ? dataset
-    : dataset.filter(
-        (item) =>
-          !KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name)
-      );
+    : dataset.filter((item) => !item.Namespace.IsSystem);
 
   return (
     <Datatable
@@ -67,10 +62,8 @@ export function NamespacesDatatable({
       getRowId={(item) => item.Namespace.Id}
       isRowSelectable={({ original: item }) =>
         hasWriteAuth &&
-        !(
-          KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name) ||
-          KubernetesNamespaceHelper.isDefaultNamespace(item.Namespace.Name)
-        )
+        !item.Namespace.IsSystem &&
+        !isDefaultNamespace(item.Namespace.Name)
       }
       renderTableActions={(selectedItems) => (
         <Authorized authorizations="K8sResourcePoolDetailsW" adminOnlyCE>

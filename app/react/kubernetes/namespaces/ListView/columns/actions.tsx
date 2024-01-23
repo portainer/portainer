@@ -1,7 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 import { Users } from 'lucide-react';
 
-import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { Environment } from '@/react/portainer/environments/types';
 
@@ -9,6 +8,7 @@ import { Link } from '@@/Link';
 import { Button } from '@@/buttons';
 
 import { NamespaceViewModel } from '../types';
+import { isDefaultNamespace } from '../../isDefaultNamespace';
 
 import { helper } from './helper';
 
@@ -46,11 +46,11 @@ function Cell({
 
   function canManageAccess(item: NamespaceViewModel, environment: Environment) {
     const name = item.Namespace.Name;
-    const isSystem = KubernetesNamespaceHelper.isSystemNamespace(name);
+    const isSystem = item.Namespace.IsSystem;
 
     return (
       !isSystem &&
-      (!KubernetesNamespaceHelper.isDefaultNamespace(name) ||
+      (!isDefaultNamespace(name) ||
         environment.Kubernetes.Configuration.RestrictDefaultNamespace)
     );
   }

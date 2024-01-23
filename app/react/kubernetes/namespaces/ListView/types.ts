@@ -5,6 +5,7 @@ export interface NamespaceViewModel {
     Status: string;
     CreationDate: number;
     ResourcePoolOwner: string;
+    IsSystem: boolean;
   };
   Quota: number;
 }
