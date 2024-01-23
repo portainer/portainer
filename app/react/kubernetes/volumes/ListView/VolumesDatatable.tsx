@@ -1,10 +1,8 @@
-// actions:
-
 import { Database } from 'lucide-react';
 
 import { useAuthorizations } from '@/react/hooks/useUser';
-import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { refreshableSettings } from '@@/datatables/types';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -19,10 +17,10 @@ import {
   TableSettings,
 } from '../../datatables/DefaultDatatableSettings';
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
+import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 
 import { VolumeViewModel } from './types';
-import { columns } from './column';
-import { isSystemVolume } from './isSystemVolume';
+import { columns } from './columns';
 
 export function VolumesDatatable({
   dataset,
@@ -46,9 +44,12 @@ export function VolumesDatatable({
 
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
+  const envId = useEnvironmentId();
+  const namespaceListQuery = useNamespacesQuery(envId);
+
   const filteredDataset = tableState.showSystemResources
     ? dataset
-    : dataset.filter((item) => !isSystemVolume(item));
+    : dataset.filter((item) => !isSystem(item));
 
   return (
     <Datatable
@@ -61,11 +62,7 @@ export function VolumesDatatable({
       titleIcon={Database}
       isRowSelectable={({ original: item }) =>
         hasWriteAuth &&
-        !(
-          KubernetesNamespaceHelper.isSystemNamespace(
-            item.ResourcePool.Namespace.Name
-          ) && !KubernetesVolumeHelper.isUsed(item)
-        )
+        !(isSystem(item) && !KubernetesVolumeHelper.isUsed(item))
       }
       renderTableActions={(selectedItems) => (
         <>
@@ -89,4 +86,9 @@ export function VolumesDatatable({
       }
     />
   );
+
+  function isSystem(item: VolumeViewModel) {
+    return !!namespaceListQuery.data?.[item.ResourcePool.Namespace.Name]
+      .IsSystem;
+  }
 }

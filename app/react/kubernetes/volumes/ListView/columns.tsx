@@ -1,45 +1,12 @@
-import { createColumnHelper } from '@tanstack/react-table';
-
-import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
 import { isoDate } from '@/portainer/filters/filters';
 
 import { Link } from '@@/Link';
-import { Badge } from '@@/Badge';
 
-import { VolumeViewModel } from './types';
-import { isSystemVolume } from './isSystemVolume';
-
-const helper = createColumnHelper<VolumeViewModel>();
+import { name } from './columns.name';
+import { helper } from './columns.helper';
 
 export const columns = [
-  helper.accessor('PersistentVolumeClaim.Name', {
-    header: 'Name',
-    cell: ({ row: { original: item } }) => (
-      <>
-        <Link
-          to="kubernetes.volumes.volume"
-          params={{
-            namespace: item.ResourcePool.Namespace.Name,
-            name: item.PersistentVolumeClaim.Name,
-          }}
-        >
-          {item.PersistentVolumeClaim.Name}
-        </Link>
-        {isSystemVolume(item) ? (
-          <Badge type="info">system</Badge>
-        ) : (
-          <>
-            {KubernetesVolumeHelper.isExternalVolume(item) && (
-              <Badge type="success">external</Badge>
-            )}
-            {!KubernetesVolumeHelper.isUsed(item) && (
-              <Badge type="warn">unused</Badge>
-            )}
-          </>
-        )}
-      </>
-    ),
-  }),
+  name,
   helper.accessor('ResourcePool.Namespace.Name', {
     header: 'Namespace',
     cell: ({ getValue }) => {
