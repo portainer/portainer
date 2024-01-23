@@ -4,7 +4,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { notifyError } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { Namespaces } from '../types';
+import { DefaultOrSystemNamespace } from '../types';
 
 export function useNamespaceQuery(
   environmentId: EnvironmentId,
@@ -27,7 +27,7 @@ export async function getNamespace(
   namespace: string
 ) {
   try {
-    const { data: ns } = await axios.get<Namespaces>(
+    const { data: ns } = await axios.get<DefaultOrSystemNamespace>(
       `kubernetes/${environmentId}/namespaces/${namespace}`
     );
     return ns;

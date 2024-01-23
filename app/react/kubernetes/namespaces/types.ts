@@ -1,6 +1,8 @@
 export interface Namespaces {
-  [key: string]: {
-    IsDefault: boolean;
-    IsSystem: boolean;
-  };
+  [key: string]: DefaultOrSystemNamespace;
+}
+
+export interface DefaultOrSystemNamespace {
+  IsDefault: boolean;
+  IsSystem: boolean;
 }

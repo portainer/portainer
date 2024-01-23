@@ -7,7 +7,6 @@ import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import Route from '@/assets/ico/route.svg?c';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 
 import { confirmDelete } from '@@/modals/confirm';
@@ -19,6 +18,7 @@ import { useTableState } from '@@/datatables/useTableState';
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
+import { Namespaces } from '../../namespaces/types';
 
 import { columns } from './columns';
 
@@ -54,9 +54,14 @@ export function IngressDatatable() {
       ingresses?.filter(
         (ingress) =>
           (canAccessSystemResources && tableState.showSystemResources) ||
-          !isSystemNamespace(ingress.Namespace ?? '')
+          !namespaces?.[ingress.Namespace].IsSystem
       ) || [],
-    [ingresses, tableState, canAccessSystemResources]
+    [ingresses, tableState, canAccessSystemResources, namespaces]
+  );
+
+  const ingressesWithIsSystem = useIngressesRowData(
+    filteredIngresses || [],
+    namespaces
   );
 
   const deleteIngressesMutation = useDeleteIngresses();
@@ -66,13 +71,14 @@ export function IngressDatatable() {
   return (
     <Datatable
       settingsManager={tableState}
-      dataset={filteredIngresses}
+      dataset={ingressesWithIsSystem}
       columns={columns}
       isLoading={ingressesQuery.isLoading || namespacesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
       title="Ingresses"
       titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
+      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
       renderTableActions={tableActions}
       renderTableSettings={() => (
         <TableSettingsMenu>
@@ -87,6 +93,21 @@ export function IngressDatatable() {
       disableSelect={useCheckboxes()}
     />
   );
+
+  // useIngressesRowData appends the `isSyetem` property to the service data
+  function useIngressesRowData(
+    ingresses: Ingress[],
+    namespaces?: Namespaces
+  ): Ingress[] {
+    return useMemo(
+      () =>
+        ingresses.map((r) => ({
+          ...r,
+          IsSystem: namespaces ? namespaces?.[r.Namespace].IsSystem : false,
+        })),
+      [ingresses, namespaces]
+    );
+  }
 
   function tableActions(selectedFlatRows: Ingress[]) {
     return (

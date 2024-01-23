@@ -1,7 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 
 import { Link } from '@@/Link';
 import { Badge } from '@@/Badge';
@@ -19,7 +18,6 @@ export const name = columnHelper.accessor('Name', {
 function Cell({ row, getValue }: CellContext<Ingress, string>) {
   const name = getValue();
   const namespace = row.original.Namespace;
-  const isSystemIngress = isSystemNamespace(namespace);
 
   return (
     <div className="flex flex-nowrap whitespace-nowrap">
@@ -36,7 +34,7 @@ function Cell({ row, getValue }: CellContext<Ingress, string>) {
           {name}
         </Link>
       </Authorized>
-      {isSystemIngress && (
+      {row.original.IsSystem && (
         <Badge type="success" className="ml-2">
           System
         </Badge>

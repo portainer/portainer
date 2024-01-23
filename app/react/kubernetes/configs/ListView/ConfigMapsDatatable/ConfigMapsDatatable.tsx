@@ -6,12 +6,12 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
 import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import { Namespaces } from '@/react/kubernetes/namespaces/types';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { confirmDelete } from '@@/modals/confirm';
@@ -64,14 +64,15 @@ export function ConfigMapsDatatable() {
       configMaps?.filter(
         (configMap) =>
           (canAccessSystemResources && tableState.showSystemResources) ||
-          !isSystemNamespace(configMap.metadata?.namespace ?? '')
+          !namespaces?.[configMap.metadata?.namespace ?? '']?.IsSystem
       ) || [],
-    [configMaps, tableState, canAccessSystemResources]
+    [configMaps, tableState, canAccessSystemResources, namespaces]
   );
   const configMapRowData = useConfigMapRowData(
     filteredConfigMaps,
     applications ?? [],
-    applicationsQuery.isLoading
+    applicationsQuery.isLoading,
+    namespaces
   );
 
   return (
@@ -85,7 +86,7 @@ export function ConfigMapsDatatable() {
       titleIcon={FileCode}
       getRowId={(row) => row.metadata?.uid ?? ''}
       isRowSelectable={(row) =>
-        !isSystemNamespace(row.original.metadata?.namespace ?? '')
+        !namespaces?.[row.original.metadata?.namespace ?? ''].IsSystem
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -110,7 +111,8 @@ export function ConfigMapsDatatable() {
 function useConfigMapRowData(
   configMaps: ConfigMap[],
   applications: Application[],
-  applicationsLoading: boolean
+  applicationsLoading: boolean,
+  namespaces?: Namespaces
 ): ConfigMapRowData[] {
   return useMemo(
     () =>
@@ -119,8 +121,11 @@ function useConfigMapRowData(
         inUse:
           // if the apps are loading, set inUse to true to hide the 'unused' badge
           applicationsLoading || getIsConfigMapInUse(configMap, applications),
+        isSystem: namespaces
+          ? namespaces?.[configMap.metadata?.namespace ?? '']?.IsSystem
+          : false,
       })),
-    [configMaps, applicationsLoading, applications]
+    [configMaps, applicationsLoading, applications, namespaces]
   );
 }
 
