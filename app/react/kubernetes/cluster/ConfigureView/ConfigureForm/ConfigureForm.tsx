@@ -283,6 +283,20 @@ function InnerForm({
               />
             </div>
           </div>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <SwitchField
+                name="restrictSecrets"
+                data-cy="kubeSetup-restrictSecretsToggle"
+                label="In the UI, only admins may view and edit the contents of secrets that are not their own"
+                tooltip="This hides the ability to view or edit in the UI the contents of secrets that a non-admin user did not create themselves but does not prevent it via the command line."
+                labelClass="col-sm-5 col-lg-4"
+                checked={false}
+                featureId={FeatureId.K8S_ADM_ONLY_SECRETS}
+                onChange={() => {}}
+              />
+            </div>
+          </div>
         </FormSection>
         <FormSection title="Resources and Metrics">
           <InsightsBox
