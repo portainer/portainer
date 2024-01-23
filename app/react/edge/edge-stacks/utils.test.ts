@@ -32,7 +32,7 @@ describe('getValidEditorTypes', () => {
   ];
 
   tests.forEach((test) => {
-    // eslint-disable-next-line jest/valid-title
+    // eslint-disable-next-line vitest/valid-title
     it(test.title, () => {
       expect(getValidEditorTypes(test.endpointTypes)).toEqual(test.expected);
     });

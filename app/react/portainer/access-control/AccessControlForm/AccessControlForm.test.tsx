@@ -48,7 +48,7 @@ test.each([
   async (ownership) => {
     const values = buildFormData(ownership);
 
-    const { findByRole } = await renderComponent(values, jest.fn(), {
+    const { findByRole } = await renderComponent(values, vi.fn(), {
       isAdmin: true,
     });
 
@@ -76,7 +76,7 @@ test.each([
   async (ownership) => {
     const values = buildFormData(ownership);
 
-    const { findByRole } = await renderComponent(values, jest.fn(), {
+    const { findByRole } = await renderComponent(values, vi.fn(), {
       teams: [],
       isAdmin: false,
     });
@@ -99,7 +99,7 @@ test.each([
   async (ownership) => {
     const values = buildFormData(ownership);
 
-    const { findByRole } = await renderComponent(values, jest.fn(), {
+    const { findByRole } = await renderComponent(values, vi.fn(), {
       teams: createMockTeams(1),
       isAdmin: false,
     });
@@ -124,7 +124,7 @@ test('when ownership is public, ownership selector should be hidden', async () =
 test('when hideTitle is true, title should be hidden', async () => {
   const values = buildFormData();
 
-  const { queryByRole } = await renderComponent(values, jest.fn(), {
+  const { queryByRole } = await renderComponent(values, vi.fn(), {
     hideTitle: true,
   });
 
@@ -136,7 +136,7 @@ test('when isAdmin and admin ownership is selected, no extra options are visible
 
   const { findByRole, queryByLabelText } = await renderComponent(
     values,
-    jest.fn(),
+    vi.fn(),
     {
       isAdmin: true,
     }
@@ -162,7 +162,7 @@ test('when isAdmin and restricted ownership is selected, show team and users sel
 
   const { findByRole, findByLabelText } = await renderComponent(
     values,
-    jest.fn(),
+    vi.fn(),
     {
       isAdmin: true,
     }
@@ -200,7 +200,7 @@ test('when user is not an admin, there are more then 1 team and ownership is res
 
   const { findByRole, findByLabelText } = await renderComponent(
     values,
-    jest.fn()
+    vi.fn()
   );
 
   const ownershipSelector = await findByRole('radiogroup');
@@ -231,7 +231,7 @@ test('when user is not an admin, there is 1 team and ownership is restricted, te
 
   const { findByRole, findByLabelText } = await renderComponent(
     values,
-    jest.fn(),
+    vi.fn(),
     {
       teams: createMockTeams(1),
       isAdmin: false,
@@ -266,7 +266,7 @@ test('when user is not an admin, and ownership is restricted, user selector not 
 
   const { findByRole, findByLabelText } = await renderComponent(
     values,
-    jest.fn(),
+    vi.fn(),
     {
       isAdmin: false,
     }
@@ -300,7 +300,7 @@ interface AdditionalProps {
 
 async function renderComponent(
   values: AccessControlFormData,
-  onChange = jest.fn(),
+  onChange = vi.fn(),
   { isAdmin = false, hideTitle = false, teams, users }: AdditionalProps = {}
 ) {
   const user = new UserViewModel({ Username: 'user', Role: isAdmin ? 1 : 2 });

@@ -2,19 +2,8 @@
   "compilerOptions": {
     "target": "es2017",
     "allowSyntheticDefaultImports": false,
-    "baseUrl": "app",
-    "module": "commonjs",
-    "paths": {
-      "Agent/*": ["agent/*"],
-      "Azure/*": ["azure/*"],
-      "Docker/*": ["docker/*"],
-      "Kubernetes/*": ["kubernetes/*"],
-      "Portainer/*": ["portainer/*"],
-      "@/*": ["../app/*"]
-    }
+    "module": "commonjs"
   },
-  "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"],
-  "typeAcquisition": {
-    "include": ["jest"]
-  }
+
+  "extends": "./tsconfig.json"
 }

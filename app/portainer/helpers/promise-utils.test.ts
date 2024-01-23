@@ -6,7 +6,7 @@ describe('promiseSequence', () => {
   });
 
   it('provided two promise functions, the second should run after the first', async () => {
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     function first() {
       return Promise.resolve(callback(1));

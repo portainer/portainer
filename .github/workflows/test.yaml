@@ -12,7 +12,7 @@ on:
       - synchronize
       - ready_for_review
   push:
-    
+
 jobs:
   test-client:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
       - run: yarn --frozen-lockfile
 
       - name: Run tests
-        run: make test-client ARGS="--maxWorkers=2"
+        run: make test-client ARGS="--maxWorkers=2 --minWorkers=1"
   test-server:
     strategy:
       matrix:

@@ -116,10 +116,9 @@ overrides:
   - files:
       - app/**/*.test.*
     extends:
-      - 'plugin:jest/recommended'
-      - 'plugin:jest/style'
+      - 'plugin:vitest/recommended'
     env:
-      'jest/globals': true
+      'vitest/env': true
     rules:
       'react/jsx-no-constructed-context-values': off
   - files:

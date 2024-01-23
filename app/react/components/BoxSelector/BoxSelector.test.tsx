@@ -44,7 +44,7 @@ test('should render with the initial value selected and call onChange when click
     },
   ];
 
-  const onChange = jest.fn();
+  const onChange = vi.fn();
   const { getByLabelText } = renderDefault({
     options,
     onChange,

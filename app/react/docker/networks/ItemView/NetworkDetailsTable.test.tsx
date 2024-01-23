@@ -6,9 +6,9 @@ import { DockerNetwork } from '../types';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 
-jest.mock('@uirouter/react', () => ({
-  ...jest.requireActual('@uirouter/react'),
-  useCurrentStateAndParams: jest.fn(() => ({
+vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
+  ...(await importOriginal()),
+  useCurrentStateAndParams: vi.fn(() => ({
     params: { endpointId: 1 },
   })),
 }));

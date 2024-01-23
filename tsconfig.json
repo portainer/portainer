@@ -37,11 +37,9 @@
       "Docker/*": ["docker/*"],
       "Kubernetes/*": ["kubernetes/*"],
       "Portainer/*": ["portainer/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"],
-  "include": ["app"],
-  "typeAcquisition": {
-    "include": ["jest"]
-  }
+  "include": ["app"]
 }

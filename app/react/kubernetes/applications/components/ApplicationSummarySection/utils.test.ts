@@ -431,7 +431,7 @@ describe('getCreateAppSummaries', () => {
     },
   ];
   tests.forEach((test) => {
-    // eslint-disable-next-line jest/valid-title
+    // eslint-disable-next-line vitest/valid-title
     it(test.title, () => {
       expect(
         getAppResourceSummaries(test.newFormValues, test.oldFormValues)
@@ -507,7 +507,7 @@ describe('getUpdateAppSummaries', () => {
     },
   ];
   tests.forEach((test) => {
-    // eslint-disable-next-line jest/valid-title
+    // eslint-disable-next-line vitest/valid-title
     it(test.title, () => {
       expect(
         getAppResourceSummaries(test.newFormValues, test.oldFormValues)

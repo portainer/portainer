@@ -11,9 +11,9 @@ import {
 
 import { DashboardView } from './DashboardView';
 
-jest.mock('@uirouter/react', () => ({
-  ...jest.requireActual('@uirouter/react'),
-  useCurrentStateAndParams: jest.fn(() => ({
+vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
+  ...(await importOriginal()),
+  useCurrentStateAndParams: vi.fn(() => ({
     params: { endpointId: 1 },
   })),
 }));
@@ -73,7 +73,7 @@ test('should correctly show total number of resource groups across multiple subs
 });
 
 test("when only subscriptions fail to load, don't show the dashboard", async () => {
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 
   const { queryByLabelText } = await renderComponent(
     1,
@@ -86,7 +86,7 @@ test("when only subscriptions fail to load, don't show the dashboard", async () 
 });
 
 test('when only resource groups fail to load, still show the subscriptions', async () => {
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 
   const { queryByLabelText, findByLabelText } = await renderComponent(
     1,

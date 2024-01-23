@@ -1,5 +1,3 @@
-// test/setup-env.js
-// add this to your setupFilesAfterEnv config in jest so it's imported for every test file
 import { server } from './server';
 
 beforeAll(() => server.listen());
