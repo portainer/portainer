@@ -1,5 +1,4 @@
 import { useQuery } from 'react-query';
-import { RawAxiosRequestHeaders } from 'axios';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -7,6 +6,7 @@ import { genericHandler } from '@/docker/rest/response/handlers';
 
 import { ContainerId } from '../types';
 import { urlBuilder } from '../containers.service';
+import { addNodeName } from '../../proxy/addNodeName';
 
 import { queryKeys } from './query-keys';
 import { ContainerJSON } from './container';
@@ -27,16 +27,10 @@ export async function inspectContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
-  }
-
   try {
     const { data } = await axios.get<ContainerJSON>(
       urlBuilder(environmentId, id, 'json'),
-      { transformResponse: genericHandler, headers }
+      { transformResponse: genericHandler, headers: addNodeName(nodeName) }
     );
     return data;
   } catch (e) {
