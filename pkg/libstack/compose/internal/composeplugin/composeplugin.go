@@ -166,10 +166,9 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 	cmd.Env = append(cmd.Env, options.Env...)
 
 	log.Debug().
-		Str("command", program).
-		Strs("args", args).
+		Str("command", cmd.String()).
 		Interface("env", cmd.Env).
-		Msg("run command")
+		Msg("execute command")
 
 	cmd.Stderr = &stderr
 
@@ -177,6 +176,7 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 	if err != nil {
 		errOutput := stderr.String()
 		log.Warn().
+			Str("command", cmd.String()).
 			Str("output", string(output)).
 			Str("error_output", errOutput).
 			Err(err).
