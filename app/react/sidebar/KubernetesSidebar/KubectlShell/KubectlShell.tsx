@@ -46,19 +46,27 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     onClose();
   }, [onClose, terminal, socket]);
 
-  const openTerminal = useCallback(() => {
-    if (!terminalElem.current) {
-      return;
-    }
+  const openTerminal = useCallback(
+    (socket: WebSocket | null) => {
+      if (!terminalElem.current) {
+        return;
+      }
 
-    terminal.open(terminalElem.current);
-    terminal.setOption('cursorBlink', true);
-    terminal.focus();
-    fit(terminal);
-    terminal.writeln('#Run kubectl commands inside here');
-    terminal.writeln('#e.g. kubectl get all');
-    terminal.writeln('');
-  }, [terminal]);
+      terminal.open(terminalElem.current);
+      terminal.setOption('cursorBlink', true);
+      terminal.focus();
+      fit(terminal);
+      if (socket) {
+        socket.send('export LANG=C.UTF-8\n');
+        socket.send('export LC_ALL=C.UTF-8\n');
+        socket.send('clear\n');
+      }
+      terminal.writeln('#Run kubectl commands inside here');
+      terminal.writeln('#e.g. kubectl get all');
+      terminal.writeln('');
+    },
+    [terminal]
+  );
 
   // refresh socket listeners on socket updates
   useEffect(() => {
@@ -66,7 +74,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
       return () => {};
     }
     function onOpen() {
-      openTerminal();
+      openTerminal(socket);
     }
     function onMessage(e: MessageEvent) {
       terminal.write(e.data);
