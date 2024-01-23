@@ -1,12 +1,13 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import clsx from 'clsx';
 
 import { isoDate } from '@/portainer/filters/filters';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 
 import { Link } from '@@/Link';
+import { StatusBadge } from '@@/StatusBadge';
+import { Badge } from '@@/Badge';
 
 import { helper } from './helper';
 import { actions } from './actions';
@@ -37,8 +38,8 @@ export function useColumns() {
                   {name}
                 </Link>
                 {KubernetesNamespaceHelper.isSystemNamespace(name) && (
-                  <span className="label label-info image-tag ml-2">
-                    system
+                  <span className="ml-2">
+                    <Badge type="info">system</Badge>
                   </span>
                 )}
               </>
@@ -49,20 +50,16 @@ export function useColumns() {
           header: 'Status',
           cell({ getValue }) {
             const status = getValue();
-            return (
-              <span className={clsx('label', getLabelClass(status))}>
-                {status}
-              </span>
-            );
+            return <StatusBadge color={getColor(status)}>{status}</StatusBadge>;
 
-            function getLabelClass(status: string) {
+            function getColor(status: string) {
               switch (status.toLowerCase()) {
                 case 'active':
-                  return 'label-success';
+                  return 'success';
                 case 'terminating':
-                  return 'label-danger';
+                  return 'danger';
                 default:
-                  return 'label-primary';
+                  return 'info';
               }
             }
           },
@@ -75,7 +72,7 @@ export function useColumns() {
               return '-';
             }
 
-            return <span className="label label-warning">Enabled</span>;
+            return <Badge type="warn">Enabled</Badge>;
           },
         }),
         helper.accessor('Namespace.CreationDate', {
