@@ -2,7 +2,6 @@ import toastr from 'toastr';
 
 import { notifyError, notifySuccess, notifyWarning } from './notifications';
 
-vi.mock('toastr');
 vi.spyOn(console, 'error').mockImplementation(() => vi.fn());
 
 afterEach(() => {
