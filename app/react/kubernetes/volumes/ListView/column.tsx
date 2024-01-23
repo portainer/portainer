@@ -4,6 +4,7 @@ import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
 import { isoDate } from '@/portainer/filters/filters';
 
 import { Link } from '@@/Link';
+import { Badge } from '@@/Badge';
 
 import { VolumeViewModel } from './types';
 import { isSystemVolume } from './isSystemVolume';
@@ -25,20 +26,14 @@ export const columns = [
           {item.PersistentVolumeClaim.Name}
         </Link>
         {isSystemVolume(item) ? (
-          <span className="label label-info image-tag label-margins">
-            system
-          </span>
+          <Badge type="info">system</Badge>
         ) : (
           <>
             {KubernetesVolumeHelper.isExternalVolume(item) && (
-              <span className="label label-primary image-tag label-margins">
-                external
-              </span>
+              <Badge type="success">external</Badge>
             )}
             {!KubernetesVolumeHelper.isUsed(item) && (
-              <span className="label label-warning image-tag label-margins">
-                unused
-              </span>
+              <Badge type="warn">unused</Badge>
             )}
           </>
         )}
