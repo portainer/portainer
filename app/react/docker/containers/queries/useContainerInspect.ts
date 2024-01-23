@@ -17,7 +17,7 @@ export function useContainerInspect(
   params: { nodeName?: string } = {}
 ) {
   return useQuery({
-    queryKey: [...queryKeys.list(environmentId), 'inspect', id, params],
+    queryKey: [...queryKeys.container(environmentId, id), params] as const,
     queryFn: () => inspectContainer(environmentId, id, params),
   });
 }
