@@ -94,7 +94,7 @@ function getCreatedApplicationResourcesNew(
     // https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#stable-storage
     formValues.DataAccessPolicy === 'Shared'
       ? formValues.PersistedFolders?.filter(
-          // only create pvc summaries for new pvcss
+          // only create pvc summaries for new pvcs
           (volume) => !volume.existingVolume?.PersistentVolumeClaim.Name
         ).map((volume) => ({
           action: 'Create',
@@ -186,7 +186,10 @@ function getUpdatedApplicationResources(
     // statefulset pvcs are defined in spec.volumeClaimTemplates.
     // https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#stable-storage
     newFormValues.DataAccessPolicy === 'Shared'
-      ? newFormValues.PersistedFolders?.flatMap((newVolume) => {
+      ? newFormValues.PersistedFolders?.filter(
+          // only create pvc summaries for new pvcs
+          (volume) => !volume.existingVolume?.PersistentVolumeClaim.Name
+        ).flatMap((newVolume) => {
           const oldVolume = oldFormValues.PersistedFolders?.find(
             (oldVolume) =>
               oldVolume.persistentVolumeClaimName ===
