@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
@@ -12,7 +13,8 @@ import KubernetesPodConverter from 'Kubernetes/pod/converter';
 import { notifyError } from '@/portainer/services/notifications';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { generateNewIngressesFromFormPaths } from '@/react/kubernetes/applications/CreateView/application-services/utils';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
+import { KubernetesPod } from '../pod/models';
+import { KubernetesApplication } from '../models/application/models';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */
@@ -62,7 +64,7 @@ class KubernetesApplicationService {
       apiService = this.KubernetesDaemonSetService;
     } else if (app.ApplicationType === KubernetesApplicationTypes.StatefulSet) {
       apiService = this.KubernetesStatefulSetService;
-    } else if (app.ApplicationType === KubernetesApplicationTypes.Pod) {
+    } else if (app instanceof KubernetesPod || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.Pod)) {
       apiService = this.KubernetesPodService;
     } else {
       throw new PortainerError('Unable to determine which association to use to retrieve API Service');

@@ -345,7 +345,7 @@ class KubernetesApplicationConverter {
         (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.Shared && rwx))) ||
       formValues.ApplicationType === KubernetesApplicationTypes.DaemonSet;
 
-    const pod = formValues.ApplicationType === KubernetesApplicationTypes.POD;
+    const pod = formValues.ApplicationType === KubernetesApplicationTypes.Pod;
 
     let app;
     if (deployment) {
