@@ -203,7 +203,8 @@ class KubernetesCreateApplicationController {
     if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.Global) {
       return this.ApplicationTypes.DaemonSet;
     }
-    if (this.formValues.PersistedFolders && this.formValues.PersistedFolders.length && this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.Isolated) {
+    const persistedFolders = this.formValues.PersistedFolders && this.formValues.PersistedFolders.filter((pf) => !pf.NeedsDeletion);
+    if (persistedFolders && persistedFolders.length && this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.Isolated) {
       return this.ApplicationTypes.StatefulSet;
     }
     return this.ApplicationTypes.Deployment;
