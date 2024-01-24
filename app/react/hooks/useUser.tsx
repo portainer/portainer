@@ -138,11 +138,6 @@ export function useIsEnvironmentAdmin({
 
 /**
  * will return true if the user has the authorizations. assumes the user is authenticated and not an admin
- * @param user
- * @param authorizations
- * @param environmentId
- * @param adminOnlyCE
- * @returns
  */
 function hasAuthorizations(
   user: User,
