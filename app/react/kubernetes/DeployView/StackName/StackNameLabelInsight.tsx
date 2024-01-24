@@ -4,12 +4,12 @@ import { InsightsBox } from '@@/InsightsBox';
 import { Link } from '@@/Link';
 
 export function StackNameLabelInsight() {
-  const { isAdmin } = useCurrentUser();
+  const { isPureAdmin } = useCurrentUser();
   const insightsBoxContent = (
     <>
       The stack field below was previously labelled &apos;Name&apos; but, in
       fact, it&apos;s always been the stack name (hence the relabelling).
-      {isAdmin && (
+      {isPureAdmin && (
         <>
           <br />
           Kubernetes Stacks functionality can be turned off entirely via{' '}

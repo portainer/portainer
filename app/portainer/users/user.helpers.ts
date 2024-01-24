@@ -4,7 +4,7 @@ import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 import { Role, User } from './types';
 
 export function filterNonAdministratorUsers(users: User[]) {
-  return users.filter((user) => user.Role !== Role.Admin);
+  return users.filter((user) => !isPureAdmin(user));
 }
 
 type UserLike = Pick<User, 'Role'>;
