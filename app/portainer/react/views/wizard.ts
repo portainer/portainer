@@ -10,6 +10,7 @@ import {
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { AccessHeaders } from '@/portainer/authorization-guard';
 
 export const wizardModule = angular
   .module('portainer.app.react.views.wizard', [])
@@ -41,6 +42,9 @@ function config($stateRegistryProvider: StateRegistry) {
       'content@': {
         component: 'wizardMainView',
       },
+    },
+    data: {
+      access: AccessHeaders.Admin,
     },
   });
 

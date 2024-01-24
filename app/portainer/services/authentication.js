@@ -7,28 +7,34 @@ const DEFAULT_PASSWORD = 'K7yJPP5qNK4hf1QsRnfV';
 
 angular.module('portainer.app').factory('Authentication', [
   '$async',
+  '$state',
   'Auth',
   'OAuth',
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
   'ThemeManager',
-  function AuthenticationFactory($async, Auth, OAuth, LocalStorage, StateManager, EndpointProvider, ThemeManager) {
+  function AuthenticationFactory($async, $state, Auth, OAuth, LocalStorage, StateManager, EndpointProvider, ThemeManager) {
     'use strict';
 
-    var service = {};
     var user = {};
+    if (process.env.NODE_ENV === 'development') {
+      window.login = loginAsync;
+    }
 
-    service.init = init;
-    service.OAuthLogin = OAuthLogin;
-    service.login = login;
-    service.logout = logout;
-    service.isAuthenticated = isAuthenticated;
-    service.getUserDetails = getUserDetails;
-    service.isAdmin = isAdmin;
-    service.isEdgeAdmin = isEdgeAdmin;
-    service.isPureAdmin = isPureAdmin;
-    service.hasAuthorizations = hasAuthorizations;
+    return {
+      init,
+      OAuthLogin,
+      login,
+      logout,
+      isAuthenticated,
+      getUserDetails,
+      isAdmin,
+      isEdgeAdmin,
+      isPureAdmin,
+      hasAuthorizations,
+      redirectIfUnauthorized,
+    };
 
     async function initAsync() {
       try {
@@ -126,6 +132,7 @@ angular.module('portainer.app').factory('Authentication', [
 
     // To avoid creating divergence between CE and EE
     // isAdmin checks if the user is a portainer admin or edge admin
+
     function isEdgeAdmin() {
       const environment = EndpointProvider.currentEndpoint();
       return userHelpers.isEdgeAdmin({ Role: user.role }, environment);
@@ -156,10 +163,11 @@ angular.module('portainer.app').factory('Authentication', [
       return authorizations.some((authorization) => userEndpointAuthorizations[authorization]);
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      window.login = loginAsync;
+    function redirectIfUnauthorized(authorizations) {
+      const authorized = hasAuthorizations(authorizations);
+      if (!authorized) {
+        $state.go('portainer.home');
+      }
     }
-
-    return service;
   },
 ]);
