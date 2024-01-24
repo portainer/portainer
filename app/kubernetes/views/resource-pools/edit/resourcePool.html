@@ -309,19 +309,9 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.applications && ctrl.applications.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-resource-pool-applications-datatable
-        dataset="ctrl.applications"
-        table-key="kubernetes.resourcepool.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getApplications"
-        loading="ctrl.state.applicationsLoading"
-        title-text="Applications running in this namespace"
-        title-icon="code"
-      >
-      </kubernetes-resource-pool-applications-datatable>
-    </div>
+  <div ng-if="ctrl.applications && ctrl.applications.length > 0">
+    <kubernetes-namespace-applications-datatable dataset="ctrl.applications" on-refresh="(ctrl.getApplications)" is-loading="ctrl.state.applicationsLoading">
+    </kubernetes-namespace-applications-datatable>
   </div>
 
   <div class="row" ng-if="ctrl.ingresses && ctrl.ingresses.length > 0">
