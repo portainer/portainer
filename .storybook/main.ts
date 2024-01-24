@@ -3,6 +3,7 @@ import { StorybookConfig } from '@storybook/react-webpack5';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { Configuration } from 'webpack';
 import postcss from 'postcss';
+
 const config: StorybookConfig = {
   stories: ['../app/**/*.stories.@(ts|tsx)'],
   addons: [
@@ -86,9 +87,6 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
-  },
-  docs: {
-    autodocs: true,
   },
 };
 

@@ -41,5 +41,5 @@
     "types": ["vitest/globals"]
   },
   "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"],
-  "include": ["app"]
+  "include": ["app", ".storybook"]
 }
