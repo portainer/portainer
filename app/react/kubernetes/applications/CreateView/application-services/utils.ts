@@ -1,7 +1,6 @@
 import { compare } from 'fast-json-patch';
 import { Service, ServiceSpec } from 'kubernetes-types/core/v1';
 import { ObjectMeta } from 'kubernetes-types/meta/v1';
-import angular from 'angular';
 
 import { Ingress as IngressFormValues } from '@/react/kubernetes/ingresses/types';
 
@@ -88,7 +87,7 @@ export function generateNewIngressesFromFormPaths(
   }
 
   // remove the old paths from the newIngresses copy
-  const newIngresses: IngressFormValues[] = angular.copy(oldIngresses) ?? []; // the current jest version doesn't support structured cloning, so we need to use angular.copy
+  const newIngresses = structuredClone(oldIngresses) ?? [];
   oldIngressPaths?.forEach((oldIngressPath) => {
     if (!oldIngressPath?.Path) return;
     const newMatchingIng = newIngresses?.find(
