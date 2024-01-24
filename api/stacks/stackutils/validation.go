@@ -1,16 +1,19 @@
 package stackutils
 
 import (
+	"strings"
+
+	portainer "github.com/portainer/portainer/api"
+
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
 )
 
-func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.EndpointSecuritySettings) error {
+func loadComposeConfig(stackFileContent []byte) (*types.Config, error) {
 	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	composeConfigFile := types.ConfigFile{
@@ -22,14 +25,19 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 		Environment: map[string]string{},
 	}
 
-	composeConfig, err := loader.Load(composeConfigDetails, func(options *loader.Options) {
+	return loader.Load(composeConfigDetails, func(options *loader.Options) {
 		options.SkipValidation = true
 		options.SkipInterpolation = true
 	})
-	if err != nil {
-		return err
-	}
+}
 
+func IsValidStackFileAdapter(securitySettings *portainer.EndpointSecuritySettings) func(*types.Config) error {
+	return func(composeConfig *types.Config) error {
+		return IsValidStackFile(composeConfig, securitySettings)
+	}
+}
+
+func IsValidStackFile(composeConfig *types.Config, securitySettings *portainer.EndpointSecuritySettings) error {
 	for key := range composeConfig.Services {
 		service := composeConfig.Services[key]
 		if !securitySettings.AllowBindMountsForRegularUsers {
@@ -64,17 +72,42 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 	return nil
 }
 
-func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.EndpointSecuritySettings, fileService portainer.FileService) error {
+func ValidateStackFiles(stack *portainer.Stack, isValidFn func(content *types.Config) error, fileService portainer.FileService) error {
 	for _, file := range GetStackFilePaths(stack, false) {
 		stackContent, err := fileService.GetFileContent(stack.ProjectPath, file)
 		if err != nil {
 			return errors.Wrap(err, "failed to get stack file content")
 		}
 
-		err = IsValidStackFile(stackContent, securitySettings)
+		composeConfig, err := loadComposeConfig(stackContent)
+		if err != nil {
+			return err
+		}
+
+		err = isValidFn(composeConfig)
 		if err != nil {
 			return errors.Wrap(err, "stack config file is invalid")
 		}
 	}
+
+	return nil
+}
+
+func IsValidBuildContext(composeConfig *types.Config) error {
+	for key := range composeConfig.Services {
+		service := composeConfig.Services[key]
+
+		if strings.HasPrefix(service.Build.Context, "/") || strings.Contains(service.Build.Context, "..") {
+			return errors.New("invalid build context")
+		}
+
+		driveLetter, _, ok := strings.Cut(service.Build.Context, ":")
+		driveLetter = strings.ToUpper(driveLetter)
+
+		if ok && len(driveLetter) == 1 && driveLetter >= "A" && driveLetter <= "Z" {
+			return errors.New("invalid build context")
+		}
+	}
+
 	return nil
 }
