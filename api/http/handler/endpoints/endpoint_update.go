@@ -89,8 +89,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
-	updateEndpointProxy := shouldReloadTLSConfiguration(endpoint, &payload)
-
 	if payload.Name != nil {
 		name := *payload.Name
 		isUnique, err := handler.isNameUnique(name, endpoint.ID)
@@ -106,9 +104,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	}
 
-	if payload.URL != nil && *payload.URL != endpoint.URL {
+	if payload.URL != nil {
 		endpoint.URL = *payload.URL
-		updateEndpointProxy = true
 	}
 
 	if payload.PublicURL != nil {
@@ -182,8 +179,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if endpoint.Type == portainer.AzureEnvironment {
-		updateEndpointProxy = true
-
 		credentials := endpoint.AzureCredentials
 		if payload.AzureApplicationID != nil {
 			credentials.ApplicationID = *payload.AzureApplicationID
@@ -252,7 +247,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if updateEndpointProxy {
+	if (payload.URL != nil && *payload.URL != endpoint.URL) ||
+		(payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS) ||
+		endpoint.Type == portainer.AzureEnvironment ||
+		shouldReloadTLSConfiguration(endpoint, &payload) {
 		handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
@@ -293,12 +291,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 }
 
 func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpointUpdatePayload) bool {
-
-	// If we change anything in the tls config then we need to reload the proxy
-	if payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS {
-		return true
-	}
-
 	// When updating Docker API environment, as long as TLS is true and TLSSkipVerify is false,
 	// we assume that new TLS files have been uploaded and we need to reload the TLS configuration.
 	if endpoint.Type != portainer.DockerEnvironment ||

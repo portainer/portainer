@@ -165,8 +165,7 @@ export function gitAuthValidation(
     NewCredentialName: string()
       .default('')
       .when(['RepositoryAuthentication', 'SaveCredential'], {
-        is: (RepositoryAuthentication: boolean, SaveCredential: boolean) =>
-          RepositoryAuthentication && SaveCredential && !isAuthEdit,
+        is: true,
         then: string()
           .required('Name is required')
           .test(

@@ -52,7 +52,7 @@ export default class GitFormAuthFieldsetController {
       ...newValues,
     };
     this.onChange?.(value);
-    await this.runGitValidation(value, this.isAuthEdit);
+    await this.runGitValidation(value, false);
   }
 
   async runGitValidation(value: GitAuthModel, isAuthEdit: boolean) {

@@ -306,7 +306,7 @@ angular
               $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
               onChangeFileContent($scope.state.templateContent);
 
-              $scope.state.isEditorReadOnly = false;
+              $scope.state.isEditorReadOnly = true;
             } catch (err) {
               $scope.state.templateLoadFailed = true;
               throw err;

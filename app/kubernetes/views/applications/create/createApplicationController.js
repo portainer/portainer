@@ -1114,10 +1114,10 @@ class KubernetesCreateApplicationController {
         });
 
         if (this.resourcePools.length) {
-          this.namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
-          this.formValues.ResourcePool.Quota = this.namespaceWithQuota.Quota;
-          this.updateNamespaceLimits(this.namespaceWithQuota);
-          this.updateSliders(this.namespaceWithQuota);
+          const namespaceWithQuota = await this.KubernetesResourcePoolService.get(this.resourcePools[0].Namespace.Name);
+          this.formValues.ResourcePool.Quota = namespaceWithQuota.Quota;
+          this.updateNamespaceLimits(namespaceWithQuota);
+          this.updateSliders(namespaceWithQuota);
         }
         this.formValues.ResourcePool = this.resourcePools[0];
         if (!this.formValues.ResourcePool) {
@@ -1140,8 +1140,6 @@ class KubernetesCreateApplicationController {
             this.nodesLabels,
             this.ingresses
           );
-
-          this.formValues.Services = this.formValues.Services || [];
           this.originalServicePorts = structuredClone(this.formValues.Services.flatMap((service) => service.Ports));
           this.originalIngressPaths = structuredClone(this.originalServicePorts.flatMap((port) => port.ingressPaths).filter((ingressPath) => ingressPath.Host));
 
@@ -1162,8 +1160,6 @@ class KubernetesCreateApplicationController {
           this.formValues.OriginalIngresses = this.ingresses;
           this.formValues.ImageModel = await this.parseImageConfiguration(this.formValues.ImageModel);
           this.savedFormValues = angular.copy(this.formValues);
-          this.updateNamespaceLimits(this.namespaceWithQuota);
-          this.updateSliders(this.namespaceWithQuota);
           delete this.formValues.ApplicationType;
 
           if (this.application.ApplicationType !== KubernetesApplicationTypes.STATEFULSET) {
