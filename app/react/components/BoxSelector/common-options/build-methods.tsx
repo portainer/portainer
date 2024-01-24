@@ -32,15 +32,6 @@ export const git: BoxSelectorOption<'repository'> = {
   value: 'repository',
 };
 
-export const edgeStackTemplate: BoxSelectorOption<'template'> = {
-  id: 'method_template',
-  icon: FileText,
-  iconType: 'badge',
-  label: 'Template',
-  description: 'Use an Edge stack template',
-  value: 'template',
-};
-
 export const customTemplate: BoxSelectorOption<'template'> = {
   id: 'method_template',
   icon: FileText,
@@ -48,6 +39,11 @@ export const customTemplate: BoxSelectorOption<'template'> = {
   label: 'Custom template',
   description: 'Use a custom template',
   value: 'template',
+};
+
+export const edgeStackTemplate: BoxSelectorOption<'template'> = {
+  ...customTemplate,
+  description: 'Use an Edge stack custom template',
 };
 
 export const helm: BoxSelectorOption<'helm'> = {
