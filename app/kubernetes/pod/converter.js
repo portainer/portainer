@@ -166,10 +166,16 @@ function createPayload(pod) {
   const payload = createPayloadFactory();
   payload.metadata.name = pod.Name;
   payload.metadata.namespace = pod.Namespace;
-  payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
-  payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
-  payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pod.ApplicationOwner;
-  payload.metadata.labels = { ...(pod.Labels || {}), ...(pod.ServiceSelector || {}), ...payload.metadata.labels };
+  // it's possible for pods not to have labels. Keep labels empty in the oldpayload if there aren't any, otherwise patch will fail
+  // TODO: when migrating to react, the oldValues should just be the fetched manifest directly from the kube api
+  if (Object.keys(pod.Labels || {}).length || Object.keys(pod.ServiceSelector || {}).length) {
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pod.ApplicationOwner;
+    payload.metadata.labels = { ...(pod.Labels || {}), ...(pod.ServiceSelector || {}), ...payload.metadata.labels };
+  } else {
+    payload.metadata.labels = undefined;
+  }
   if (pod.Note) {
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = pod.Note;
   } else {
