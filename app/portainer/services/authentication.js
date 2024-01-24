@@ -1,7 +1,7 @@
+import { hasAuthorizations as useUserHasAuthorization } from '@/react/hooks/useUser';
 import { getCurrentUser } from '../users/queries/useLoadCurrentUser';
 import * as userHelpers from '../users/user.helpers';
 import { clear as clearSessionStorage } from './session-storage';
-
 const DEFAULT_USER = 'admin';
 const DEFAULT_PASSWORD = 'K7yJPP5qNK4hf1QsRnfV';
 
@@ -153,14 +153,18 @@ angular.module('portainer.app').factory('Authentication', [
 
     function hasAuthorizations(authorizations) {
       const endpointId = EndpointProvider.endpointID();
-      if (isAdmin()) {
+
+      if (isEdgeAdmin()) {
         return true;
       }
-      if (!user.endpointAuthorizations || !user.endpointAuthorizations[endpointId]) {
-        return false;
-      }
-      const userEndpointAuthorizations = user.endpointAuthorizations[endpointId];
-      return authorizations.some((authorization) => userEndpointAuthorizations[authorization]);
+
+      return useUserHasAuthorization(
+        {
+          EndpointAuthorizations: user.endpointAuthorizations,
+        },
+        authorizations,
+        endpointId
+      );
     }
 
     function redirectIfUnauthorized(authorizations) {
