@@ -110,6 +110,8 @@ jobs:
           export YARN_VERSION=$(yarn --version)
           export WEBPACK_VERSION=$(yarn list webpack --depth=0 | grep webpack | awk -F@ '{print $2}')
           export BUILDNUMBER=${GITHUB_RUN_NUMBER}
+          GIT_COMMIT_HASH_LONG=${{ github.sha }}
+          export GIT_COMMIT_HASH_SHORT={GIT_COMMIT_HASH_LONG:0:7}
           make build-all PLATFORM=${{ matrix.config.platform }} ARCH=${{ matrix.config.arch }} ENV=${NODE_ENV}
         env:
           CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
