@@ -1,7 +1,7 @@
 export class PersistedFolder {
-  MountPath: string = '';
+  MountPath = '';
 
-  persistentVolumeClaimName: string = '';
+  persistentVolumeClaimName = '';
 
-  HostPath: string = '';
+  HostPath = '';
 }

@@ -256,17 +256,11 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.applications && ctrl.applications.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-node-applications-datatable
-        dataset="ctrl.applications"
-        table-key="kubernetes.node.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getApplications"
-        loading="ctrl.state.applicationsLoading"
-        title-text="Applications running on this node"
-      >
-      </kubernetes-node-applications-datatable>
-    </div>
-  </div>
+  <kubernetes-node-applications-datatable
+    ng-if="ctrl.applications && ctrl.applications.length > 0"
+    dataset="ctrl.applications"
+    on-refresh="(ctrl.getApplications)"
+    is-loading="ctrl.state.applicationsLoading"
+  >
+  </kubernetes-node-applications-datatable>
 </div>
