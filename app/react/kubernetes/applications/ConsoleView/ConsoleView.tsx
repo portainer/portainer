@@ -75,14 +75,12 @@ export function ConsoleView() {
           terminal?.setOption('cursorBlink', true);
           terminal?.focus();
           setConnectionStatus('open');
-          socket.send('export LANG=C.UTF-8\n');
-          socket.send('export LC_ALL=C.UTF-8\n');
-          socket.send('clear\n');
         }
       };
 
       socket.onmessage = (msg) => {
-        terminal?.write(msg.data);
+        const encoded = new TextEncoder().encode(msg.data);
+        terminal?.writeUtf8(encoded);
       };
 
       socket.onerror = () => {

@@ -183,9 +183,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       socket.onopen = function () {
         $scope.state = states.connected;
         term = new Terminal();
-        socket.send('export LANG=C.UTF-8\n');
-        socket.send('export LC_ALL=C.UTF-8\n');
-        socket.send('clear\n');
 
         term.onData(function (data) {
           socket.send(data);
@@ -205,7 +202,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         });
 
         socket.onmessage = function (e) {
-          term.write(e.data);
+          var encoded = new TextEncoder().encode(e.data);
+          term.writeUtf8(encoded);
         };
         socket.onerror = function (err) {
           $scope.disconnect();
