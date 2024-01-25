@@ -44,7 +44,7 @@ export function HelmRepositoryDatatable() {
     <Datatable
       getRowId={(row) => String(row.Id)}
       dataset={helmRepos}
-      description={HelmDatatableDescription()}
+      description={<HelmDatatableDescription />}
       settingsManager={tableState}
       columns={columns}
       title="Helm Repositories"
