@@ -24,7 +24,9 @@ export const columns = [
           {item.Name}
         </Link>
         {isExternalApplication({ metadata: item.Metadata }) && (
-          <Badge type="info">external</Badge>
+          <div className="ml-2">
+            <Badge type="primary">external</Badge>
+          </div>
         )}
       </>
     ),
