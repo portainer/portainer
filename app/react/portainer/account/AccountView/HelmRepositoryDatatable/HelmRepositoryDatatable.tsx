@@ -6,6 +6,7 @@ import helm from '@/assets/ico/vendor/helm.svg?c';
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { columns } from './columns';
 import { HelmRepositoryDatatableActions } from './HelmRepositoryDatatableActions';
@@ -43,6 +44,7 @@ export function HelmRepositoryDatatable() {
     <Datatable
       getRowId={(row) => String(row.Id)}
       dataset={helmRepos}
+      description={<HelmDatatableDescription />}
       settingsManager={tableState}
       columns={columns}
       title="Helm Repositories"
@@ -54,5 +56,16 @@ export function HelmRepositoryDatatable() {
       isLoading={helmReposQuery.isLoading}
       isRowSelectable={(row) => !row.original.Global}
     />
+  );
+}
+
+function HelmDatatableDescription() {
+  return (
+    <TextTip color="blue" className="mb-3">
+      Adding a Helm repo here only makes it available in your own user
+      account&apos;s Portainer UI. Helm charts are pulled down from these repos
+      (plus the globally-set Helm repo) and shown in the Create from Manifest
+      screen&apos;s Helm charts list.
+    </TextTip>
   );
 }
