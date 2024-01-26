@@ -10,7 +10,12 @@ export async function getWebhooks(
 ) {
   try {
     const { data } = await axios.get<Array<Webhook>>(buildUrl(), {
-      params: { filters: { EndpointID: environmentId, ResourceID: serviceId } },
+      params: {
+        filters: JSON.stringify({
+          EndpointID: environmentId,
+          ResourceID: serviceId,
+        }),
+      },
     });
     return data;
   } catch (error) {
