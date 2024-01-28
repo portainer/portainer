@@ -234,7 +234,7 @@ function computeAffinities(
           }
         );
 
-        _.remove(unmatchedTerms, (i) => i?.length === 0);
+        _.remove(unmatchedTerms, (i) => !i);
         if (unmatchedTerms.length) {
           acceptsApplication = false;
         }
