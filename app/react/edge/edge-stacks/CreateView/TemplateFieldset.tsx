@@ -36,8 +36,9 @@ export function TemplateFieldset({
   }, [initialValues, values.template?.Id]);
 
   const templatesQuery = useCustomTemplates({
-    select: (templates) =>
-      templates.filter((template) => template.EdgeTemplate),
+    params: {
+      edge: true,
+    },
   });
 
   return (
@@ -111,8 +112,9 @@ function TemplateSelector({
   error?: string;
 }) {
   const templatesQuery = useCustomTemplates({
-    select: (templates) =>
-      templates.filter((template) => template.EdgeTemplate),
+    params: {
+      edge: true,
+    },
   });
 
   if (!templatesQuery.data) {

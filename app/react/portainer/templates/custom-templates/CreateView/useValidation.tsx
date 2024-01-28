@@ -27,7 +27,11 @@ export function useValidation({
 }) {
   const { user } = useCurrentUser();
   const gitCredentialsQuery = useGitCredentials(user.Id);
-  const customTemplatesQuery = useCustomTemplates();
+  const customTemplatesQuery = useCustomTemplates({
+    params: {
+      edge: undefined,
+    },
+  });
 
   return useMemo(
     () =>

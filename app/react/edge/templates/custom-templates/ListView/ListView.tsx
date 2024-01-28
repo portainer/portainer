@@ -9,8 +9,8 @@ import { confirmDelete } from '@@/modals/confirm';
 
 export function ListView() {
   const templatesQuery = useCustomTemplates({
-    select(templates) {
-      return templates.filter((t) => t.EdgeTemplate);
+    params: {
+      edge: true,
     },
   });
   const deleteMutation = useDeleteTemplateMutation();
