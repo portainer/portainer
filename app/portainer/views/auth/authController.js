@@ -2,7 +2,7 @@ import angular from 'angular';
 import uuidv4 from 'uuid/v4';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
-import { cache } from '../../services/axios';
+import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
 
 class AuthenticationController {
   /* @ngInject */
@@ -264,7 +264,7 @@ class AuthenticationController {
       }
 
       // always clear the kubernetes cache on login
-      cache.store.clear();
+      dispatchCacheRefreshEvent();
 
       if (this.Authentication.isAuthenticated()) {
         await this.postLoginSteps();
