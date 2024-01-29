@@ -26,6 +26,8 @@ func Test_SearchRepo(t *testing.T) {
 		{"portainer helm repo", "https://portainer.github.io/k8s/", false},
 		{"gitlap helm repo with trailing slash", "https://charts.gitlab.io/", false},
 		{"elastic helm repo with trailing slash", "https://helm.elastic.co/", false},
+		{"fabric8.io helm repo with trailing slash", "https://fabric8.io/helm/", false},
+		{"lensesio helm repo without trailing slash", "https://lensesio.github.io/kafka-helm-charts", false},
 	}
 
 	for _, test := range tests {

@@ -52,13 +52,14 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 	}
 
 	client := searchRepoOpts.Client
-	if searchRepoOpts.Client == nil {
+
+	if client == nil {
 		// The current index.yaml is ~9MB on bitnami.
 		// At a slow @2mbit download = 40s. @100bit = ~1s.
 		// I'm seeing 3 - 4s over wifi.
 		// Give ample time but timeout for now.  Can be improved in the future
 		client = &http.Client{
-			Timeout:   60 * time.Second,
+			Timeout:   300 * time.Second,
 			Transport: http.DefaultTransport,
 		}
 	}
