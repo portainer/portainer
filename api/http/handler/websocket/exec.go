@@ -102,7 +102,10 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return err
 	}
-	defer websocketConn.Close()
+	defer func() {
+		time.Sleep(10 * time.Second)
+		websocketConn.Close()
+	}()
 
 	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID, tokenData.Token)
 }
