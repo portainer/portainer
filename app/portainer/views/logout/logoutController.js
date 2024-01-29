@@ -1,5 +1,4 @@
 import angular from 'angular';
-
 import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
 
 class LogoutController {
