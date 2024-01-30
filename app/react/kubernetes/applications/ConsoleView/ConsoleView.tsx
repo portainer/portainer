@@ -75,6 +75,9 @@ export function ConsoleView() {
           terminal?.setOption('cursorBlink', true);
           terminal?.focus();
           setConnectionStatus('open');
+          socket.send('export LANG=C.UTF-8\n');
+          socket.send('export LC_ALL=C.UTF-8\n');
+          socket.send('clear\n');
         }
       };
 
