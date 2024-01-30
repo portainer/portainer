@@ -9,14 +9,21 @@ import {
   VariablesFieldValue,
   getVariablesFieldDefaultValues,
 } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { useAppTemplates } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+import { TemplateType } from '@/react/portainer/templates/app-templates/types';
 
 import { FormControl } from '@@/form-components/FormControl';
-import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { Select as ReactSelect } from '@@/form-components/ReactSelect';
 
-export interface Values {
-  template: CustomTemplate | undefined;
+type SelectedTemplateValue =
+  | { template: CustomTemplate; type: 'custom' }
+  | { template: TemplateViewModel; type: 'app' }
+  | { template: undefined; type: undefined };
+
+export type Values = {
   variables: VariablesFieldValue;
-}
+} & SelectedTemplateValue;
 
 export function TemplateFieldset({
   values: initialValues,
@@ -30,38 +37,50 @@ export function TemplateFieldset({
   const [values, setControlledValues] = useState(initialValues); // todo remove when all view is in react
 
   useEffect(() => {
-    if (initialValues.template?.Id !== values.template?.Id) {
+    if (
+      initialValues.type !== values.type ||
+      initialValues.template?.Id !== values.template?.Id
+    ) {
       setControlledValues(initialValues);
     }
-  }, [initialValues, values.template?.Id]);
-
-  const templatesQuery = useCustomTemplates({
-    params: {
-      edge: true,
-    },
-  });
+  }, [initialValues, values]);
 
   return (
     <>
       <TemplateSelector
-        error={errors?.template}
-        value={values.template?.Id}
+        error={
+          typeof errors?.template === 'string' ? errors?.template : undefined
+        }
+        value={values}
         onChange={(value) => {
-          setValues((values) => {
-            const template = templatesQuery.data?.find(
-              (template) => template.Id === value
-            );
+          setValues(() => {
+            if (!value || !value.type || !value.template) {
+              return {
+                type: undefined,
+                template: undefined,
+                variables: [],
+              };
+            }
+
+            if (value.type === 'app') {
+              return {
+                template: value.template,
+                type: value.type,
+                variables: [],
+              };
+            }
+
             return {
-              ...values,
-              template,
+              template: value.template,
+              type: value.type,
               variables: getVariablesFieldDefaultValues(
-                template?.Variables || []
+                value.template.Variables || []
               ),
             };
           });
         }}
       />
-      {values.template && (
+      {values.template && values.type === 'custom' && (
         <>
           {values.template.Note && (
             <div>
@@ -107,42 +126,111 @@ function TemplateSelector({
   onChange,
   error,
 }: {
-  value: CustomTemplate['Id'] | undefined;
-  onChange: (value: CustomTemplate['Id'] | undefined) => void;
+  value: SelectedTemplateValue | undefined;
+  onChange: (value: SelectedTemplateValue | undefined) => void;
   error?: string;
 }) {
-  const templatesQuery = useCustomTemplates({
+  const customTemplatesQuery = useCustomTemplates({
     params: {
       edge: true,
     },
   });
 
-  if (!templatesQuery.data) {
+  const appTemplatesQuery = useAppTemplates({
+    select: (templates) =>
+      templates.filter(
+        (template) =>
+          template.Categories.includes('edge') &&
+          template.Type !== TemplateType.Container
+      ),
+  });
+
+  if (!customTemplatesQuery.data || !appTemplatesQuery.data) {
     return null;
   }
 
+  const options = [
+    {
+      label: 'App templates',
+      options: appTemplatesQuery.data.map((template) => ({
+        label: `${template.Title} - ${template.Description}`,
+        value: {
+          id: template.Id,
+          type: 'app' as 'app' | 'custom',
+        },
+      })),
+    },
+    {
+      label: 'Custom templates',
+      options: customTemplatesQuery.data.map((template) => ({
+        label: `${template.Title} - ${template.Description}`,
+        value: {
+          id: template.Id,
+          type: 'custom' as 'app' | 'custom',
+        },
+      })),
+    },
+  ] as const;
+
   return (
     <FormControl label="Template" inputId="stack_template" errors={error}>
-      <PortainerSelect
+      <ReactSelect
         placeholder="Select an Edge stack template"
-        value={value}
-        onChange={handleChange}
-        options={templatesQuery.data.map((template) => ({
-          label: `${template.Title} - ${template.Description}`,
-          value: template.Id,
-        }))}
+        value={{
+          label: value?.template?.Title,
+          value: {
+            id: value?.template?.Id,
+            type: value?.type,
+          },
+        }}
+        onChange={(value) => {
+          if (!value) {
+            onChange(undefined);
+            return;
+          }
+
+          const { id, type } = value.value;
+          if (type === 'app') {
+            const template = appTemplatesQuery.data?.find(
+              (template) => template.Id === id
+            );
+
+            if (!template) {
+              throw new Error(`App template not found: ${id}`);
+            }
+
+            onChange({
+              template,
+              type: 'app',
+            });
+            return;
+          }
+
+          if (type === 'custom') {
+            const template = customTemplatesQuery.data?.find(
+              (template) => template.Id === id
+            );
+
+            if (!template) {
+              throw new Error(`Custom template not found: ${id}`);
+            }
+
+            onChange({
+              template,
+              type: 'custom',
+            });
+          }
+        }}
+        options={options}
       />
     </FormControl>
   );
-
-  function handleChange(value: CustomTemplate['Id']) {
-    onChange(value);
-  }
 }
 
 export function getInitialTemplateValues() {
   return {
     template: null,
+    type: undefined,
     variables: [],
     file: '',
   };
