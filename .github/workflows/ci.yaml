@@ -22,7 +22,7 @@ on:
 env:
   DOCKER_HUB_REPO: portainerci/portainer
   NODE_ENV: testing
-  GO_VERSION: 1.21.5
+  GO_VERSION: 1.21.6
   NODE_VERSION: 18.x
 
 jobs:
