@@ -1,6 +1,6 @@
 import { Form, Formik } from 'formik';
 import clsx from 'clsx';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { object } from 'yup';
 
 import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';

@@ -1,5 +1,5 @@
 import { Formik, Field, Form } from 'formik';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useReducer } from 'react';
 import { Plus } from 'lucide-react';
 

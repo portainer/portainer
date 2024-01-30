@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { useQueries } from 'react-query';
+import { useQueries } from '@tanstack/react-query';
 
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -16,8 +16,8 @@ export function useContainerGroups(
   subscriptions: Subscription[] = [],
   enabled?: boolean
 ) {
-  const queries = useQueries(
-    useMemo(
+  const queries = useQueries({
+    queries: useMemo(
       () =>
         subscriptions.map((subscription) => ({
           queryKey: queryKeys.containerGroups(
@@ -30,8 +30,8 @@ export function useContainerGroups(
           enabled,
         })),
       [subscriptions, enabled, environmentId]
-    )
-  );
+    ),
+  });
 
   return useMemo(
     () => ({

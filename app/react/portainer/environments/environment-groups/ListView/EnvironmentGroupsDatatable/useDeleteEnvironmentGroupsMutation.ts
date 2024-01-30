@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { withError, withInvalidate } from '@/react-tools/react-query';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';

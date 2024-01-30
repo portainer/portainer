@@ -1,6 +1,6 @@
 import { EndpointSettings } from 'docker-types/generated/1.41';
 import { RawAxiosRequestHeaders } from 'axios';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';

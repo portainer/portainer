@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
 import {
