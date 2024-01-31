@@ -126,7 +126,7 @@ func (h *Handler) getProxyKubeClient(r *http.Request) (*cli.KubeClient, *httperr
 		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	cli, ok := h.KubernetesClientFactory.GetProxyKubeClient(strconv.Itoa(endpointID), tokenData.Username)
+	cli, ok := h.KubernetesClientFactory.GetProxyKubeClient(strconv.Itoa(endpointID), tokenData.Token)
 	if !ok {
 		return nil, httperror.InternalServerError("Failed to lookup KubeClient", nil)
 	}
@@ -153,7 +153,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Check if we have a kubeclient against this auth token already, otherwise generate a new one
-		_, ok := handler.KubernetesClientFactory.GetProxyKubeClient(strconv.Itoa(endpointID), tokenData.Username)
+		_, ok := handler.KubernetesClientFactory.GetProxyKubeClient(strconv.Itoa(endpointID), tokenData.Token)
 		if ok {
 			next.ServeHTTP(w, r)
 			return
@@ -213,7 +213,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		handler.KubernetesClientFactory.SetProxyKubeClient(strconv.Itoa(int(endpoint.ID)), tokenData.Username, kubeCli)
+		handler.KubernetesClientFactory.SetProxyKubeClient(strconv.Itoa(int(endpoint.ID)), tokenData.Token, kubeCli)
 		next.ServeHTTP(w, r)
 	})
 }
