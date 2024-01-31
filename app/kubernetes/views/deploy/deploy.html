@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
+                  <label for="name" class="col-lg-2 col-sm-3 control-label text-left" ng-class="{ required: ctrl.state.BuildMethod === ctrl.BuildMethods.HELM }">Name</label>
                   <div class="col-sm-8 small text-muted pt-[7px]" ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
                     Resource names specified in the manifest will be used
                   </div>
