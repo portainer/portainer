@@ -2,6 +2,12 @@ import { TagId } from '@/portainer/tags/types';
 import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import { DockerSnapshot } from '@/react/docker/snapshots/types';
 
+import { Pair, TLSConfiguration } from '../settings/types';
+import {
+  TeamAccessPolicies,
+  UserAccessPolicies,
+} from '../registries/types/registry';
+
 export type EnvironmentId = number;
 
 export enum EnvironmentType {
@@ -107,6 +113,54 @@ export type DeploymentOptions = {
   hideFileUpload: boolean;
 };
 
+type AddonWithArgs = {
+  Name: string;
+  Args?: string;
+};
+
+export enum K8sDistributionType {
+  MICROK8S = 'microk8s',
+}
+
+export enum KaasProvider {
+  CIVO = 'civo',
+  LINODE = 'linode',
+  DIGITAL_OCEAN = 'digitalocean',
+  GOOGLE_CLOUD = 'gke',
+  AWS = 'amazon',
+  AZURE = 'azure',
+}
+
+export type CloudProviderSettings = {
+  Name:
+    | 'Civo'
+    | 'Linode'
+    | 'Digital Ocean'
+    | 'Google'
+    | 'Azure'
+    | 'Amazon'
+    | 'MicroK8s';
+  Provider: K8sDistributionType | KaasProvider;
+  URL: string;
+  Region: string | null;
+  Size: number | null;
+  NodeCount: number;
+  CPU: number | null;
+  AddonsWithArgs: AddonWithArgs[] | null;
+  AmiType: number | null;
+  CredentialID: number;
+  DNSPrefix: string;
+  HDD: number | null;
+  InstanceType: string | null;
+  KubernetesVersion: string;
+  NetworkID: number | null;
+  NodeIPs: string;
+  NodeVolumeSize: number | null;
+  PoolName: string;
+  RAM: number | null;
+  ResourceGroup: string;
+  Tier: string;
+};
 /**
  *  EndpointChangeWindow determine when GitOps stack/app updates may occur
  */
@@ -120,41 +174,186 @@ export interface EnvironmentStatusMessage {
   detail: string;
 }
 
-export type Environment = {
-  Agent: { Version: string };
-  Id: EnvironmentId;
-  Type: EnvironmentType;
-  TagIds: TagId[];
-  GroupId: EnvironmentGroupId;
-  DeploymentOptions: DeploymentOptions | null;
-  EnableGPUManagement: boolean;
-  EdgeID?: string;
-  EdgeKey: string;
-  EdgeCheckinInterval?: number;
-  QueryDate?: number;
-  Heartbeat?: boolean;
-  LastCheckInDate?: number;
-  Name: string;
-  Status: EnvironmentStatus;
-  URL: string;
-  Snapshots: DockerSnapshot[];
-  Kubernetes: KubernetesSettings;
-  PublicURL?: string;
-  UserTrusted: boolean;
-  AMTDeviceGUID?: string;
-  Edge: EnvironmentEdge;
-  SecuritySettings: EnvironmentSecuritySettings;
-  Gpus?: { name: string; value: string }[];
-  EnableImageNotification: boolean;
-  LocalTimeZone?: string;
-
-  /** GitOps update change window restriction for stacks and apps */
-  ChangeWindow: EndpointChangeWindow;
-  /**
-   *  A message that describes the status. Should be included for Status Provisioning or Error.
-   */
-  StatusMessage?: EnvironmentStatusMessage;
+type AzureCredentials = {
+  ApplicationID: string;
+  TenantID: string;
+  AuthenticationKey: string;
 };
+
+/**
+ * Represents an environment with all the info required to connect to it.
+ */
+export interface Environment {
+  /**
+   * Environment Identifier
+   */
+  Id: number;
+
+  /**
+   * Environment name
+   */
+  Name: string;
+
+  /**
+   * Environment type
+   */
+  Type: EnvironmentType;
+
+  /**
+   * URL or IP address of the Docker host associated with this environment.
+   */
+  URL: string;
+
+  /**
+   * Environment group identifier
+   */
+  GroupId: EnvironmentGroupId;
+
+  /**
+   * URL or IP address where exposed containers will be reachable
+   */
+  PublicURL: string;
+
+  /**
+   * List of GPU configurations associated with this environment.
+   */
+  Gpus: Pair[];
+
+  /**
+   * TLS configuration for connecting to the Docker host.
+   */
+  TLSConfig: TLSConfiguration;
+
+  /**
+   * Azure credentials if the environment is an Azure environment.
+   */
+  AzureCredentials?: AzureCredentials;
+
+  /**
+   * List of tag identifiers associated with this environment.
+   */
+  TagIds: TagId[];
+
+  /**
+   * The status of the environment (1 - up, 2 - down, 3 - provisioning, 4 - error).
+   */
+  Status: EnvironmentStatus;
+
+  /**
+   * A message that describes the status. Should be included for Status 3 or 4.
+   */
+  StatusMessage: EnvironmentStatusMessage;
+
+  /**
+   * Cloud provider information if the environment was created using KaaS provisioning.
+   */
+  CloudProvider?: CloudProviderSettings;
+
+  /**
+   * List of snapshots associated with this environment.
+   */
+  Snapshots: DockerSnapshot[];
+
+  /**
+   * User access policies for connecting to this environment.
+   */
+  UserAccessPolicies: UserAccessPolicies;
+
+  /**
+   * Team access policies for connecting to this environment.
+   */
+  TeamAccessPolicies: TeamAccessPolicies;
+
+  /**
+   * The identifier of the edge agent associated with this environment.
+   */
+  EdgeID?: string;
+
+  /**
+   * The key used to map the agent to Portainer.
+   */
+  EdgeKey: string;
+
+  /**
+   * Associated Kubernetes data.
+   */
+  Kubernetes: KubernetesSettings;
+
+  /**
+   * Maximum version of docker-compose.
+   */
+  ComposeSyntaxMaxVersion: string;
+
+  /**
+   * Environment-specific security settings.
+   */
+  SecuritySettings: EnvironmentSecuritySettings;
+
+  /**
+   * The identifier of the AMT Device associated with this environment.
+   */
+  AMTDeviceGUID?: string;
+
+  /**
+   * Mark last check-in date on check-in.
+   */
+  LastCheckInDate: number;
+
+  /**
+   * Query date of each query with the endpoints list.
+   */
+  QueryDate: number;
+
+  /**
+   * Heartbeat status of an edge environment.
+   */
+  Heartbeat: boolean;
+
+  /**
+   * Whether the device has been trusted by the user.
+   */
+  UserTrusted: boolean;
+
+  /**
+   * The check-in interval for the edge agent (in seconds).
+   */
+  EdgeCheckinInterval: number;
+
+  /**
+   * Edge settings for the environment.
+   */
+  Edge: EnvironmentEdge;
+
+  /**
+   * Agent data for the environment.
+   */
+  Agent: { Version?: string; PreviousVersion?: string };
+
+  /**
+   * Local time zone of the endpoint.
+   */
+  LocalTimeZone: string;
+
+  /**
+   * Change window restriction for GitOps updates.
+   */
+  ChangeWindow: EndpointChangeWindow;
+
+  /**
+   * Deployment options for the environment.
+   */
+  DeploymentOptions?: DeploymentOptions;
+
+  /**
+   * Enable image notification for the environment.
+   */
+  EnableImageNotification: boolean;
+
+  /**
+   * Enable GPU management for the environment.
+   */
+  EnableGPUManagement: boolean;
+}
 
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota

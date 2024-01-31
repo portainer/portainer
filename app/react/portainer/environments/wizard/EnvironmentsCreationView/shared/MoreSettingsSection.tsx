@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 
 import { FormSection } from '@@/form-components/FormSection';
 
-import { MetadataFieldset } from './MetadataFieldset';
+import { MetadataFieldset } from '../../../common/MetadataFieldset';
 
 export function MoreSettingsSection({ children }: PropsWithChildren<unknown>) {
   return (

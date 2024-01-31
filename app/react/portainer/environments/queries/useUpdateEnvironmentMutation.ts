@@ -6,14 +6,17 @@ import {
   EnvironmentStatusMessage,
   Environment,
   KubernetesSettings,
-  DeploymentOptions,
   EndpointChangeWindow,
+  DeploymentOptions,
 } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { TagId } from '@/portainer/tags/types';
 
-import { EnvironmentGroupId } from '../environment-groups/types';
 import { buildUrl } from '../environment.service/utils';
+import { Pair } from '../../settings/types';
+import {
+  TeamAccessPolicies,
+  UserAccessPolicies,
+} from '../../registries/types/registry';
 
 import { environmentQueryKeys } from './query-keys';
 
@@ -25,30 +28,117 @@ export function useUpdateEnvironmentMutation() {
   });
 }
 
-export interface UpdateEnvironmentPayload extends Partial<Environment> {
+interface TLSFiles {
   TLSCACert?: File;
   TLSCert?: File;
   TLSKey?: File;
+}
 
-  Name: string;
-  PublicURL: string;
-  GroupID: EnvironmentGroupId;
-  TagIds: TagId[];
+export interface UpdateEnvironmentPayload extends TLSFiles {
+  /**
+   * Name that will be used to identify this environment(endpoint)
+   */
+  Name?: string;
 
-  EdgeCheckinInterval: number;
+  /**
+   * URL or IP address of a Docker host
+   */
+  URL?: string;
 
-  TLS: boolean;
-  TLSSkipVerify: boolean;
-  TLSSkipClientVerify: boolean;
-  AzureApplicationID: string;
-  AzureTenantID: string;
-  AzureAuthenticationKey: string;
+  /**
+   * URL or IP address where exposed containers will be reachable. Defaults to URL if not specified
+   */
+  PublicURL?: string;
 
-  IsSetStatusMessage: boolean;
-  StatusMessage: EnvironmentStatusMessage;
+  /**
+   * GPUs information
+   */
+  Gpus?: Pair[];
+
+  /**
+   * Group identifier
+   */
+  GroupID?: number;
+
+  /**
+   * Require TLS to connect against this environment(endpoint)
+   */
+  TLS?: boolean;
+
+  /**
+   * Skip server verification when using TLS
+   */
+  TLSSkipVerify?: boolean;
+
+  /**
+   * Skip client verification when using TLS
+   */
+  TLSSkipClientVerify?: boolean;
+
+  /**
+   * The status of the environment(endpoint) (1 - up, 2 - down)
+   */
+  Status?: number;
+
+  /**
+   * Azure application ID
+   */
+  AzureApplicationID?: string;
+
+  /**
+   * Azure tenant ID
+   */
+  AzureTenantID?: string;
+
+  /**
+   * Azure authentication key
+   */
+  AzureAuthenticationKey?: string;
+
+  /**
+   * List of tag identifiers to which this environment(endpoint) is associated
+   */
+  TagIDs?: number[];
+
+  /**
+   * User access policies for the environment
+   */
+  UserAccessPolicies?: UserAccessPolicies;
+
+  /**
+   * Team access policies for the environment
+   */
+  TeamAccessPolicies?: TeamAccessPolicies;
+
+  /**
+   * Associated Kubernetes data
+   */
   Kubernetes?: KubernetesSettings;
-  DeploymentOptions?: DeploymentOptions | null;
+
+  /**
+   * Whether GitOps update time restrictions are enabled
+   */
   ChangeWindow?: EndpointChangeWindow;
+
+  /**
+   * Hide manual deployment forms for an environment
+   */
+  DeploymentOptions?: DeploymentOptions;
+
+  /**
+   * The check-in interval for edge agent (in seconds)
+   */
+  EdgeCheckinInterval?: number;
+
+  Edge: {
+    PingInterval?: number;
+    SnapshotInterval?: number;
+    CommandInterval?: number;
+  };
+
+  IsSetStatusMessage?: boolean;
+
+  StatusMessage?: EnvironmentStatusMessage;
 }
 
 export async function updateEnvironment({

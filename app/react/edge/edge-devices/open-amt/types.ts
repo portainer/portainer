@@ -9,15 +9,6 @@ export interface OpenAMTConfiguration {
   certFilePassword: string;
 }
 
-export interface AMTInformation {
-  uuid: string;
-  amt: string;
-  buildNumber: string;
-  controlMode: string;
-  dnsSuffix: string;
-  rawOutput: string;
-}
-
 export interface AuthorizationResponse {
   server: string;
   token: string;

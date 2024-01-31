@@ -7,8 +7,8 @@ import {
 import { validation as urlValidation } from '@/react/portainer/common/PortainerTunnelAddrField';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
-import { metadataValidation } from '../../MetadataFieldset/validation';
-import { useNameValidation } from '../../NameField';
+import { metadataValidation } from '../../../../../common/MetadataFieldset/validation';
+import { useNameValidation } from '../../../../../common/NameField';
 
 import { FormValues } from './types';
 

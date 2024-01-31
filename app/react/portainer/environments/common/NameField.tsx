@@ -12,12 +12,14 @@ interface Props {
   readonly?: boolean;
   tooltip?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function NameField({
   readonly,
   tooltip,
   placeholder = 'e.g. docker-prod01 / kubernetes-cluster01',
+  disabled,
 }: Props) {
   const [{ value }, meta, { setValue }] = useField('name');
 
@@ -35,12 +37,13 @@ export function NameField({
     >
       <Input
         id={id}
-        data-cy="environmentCreate-nameInput"
+        data-cy="name-input"
         name="name"
         onChange={(e) => setDebouncedValue(e.target.value)}
         value={debouncedValue}
         placeholder={placeholder}
         readOnly={readonly}
+        disabled={disabled}
       />
     </FormControl>
   );

@@ -14,9 +14,9 @@ import { FormControl } from '@@/form-components/FormControl';
 import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
 
-import { NameField, useNameValidation } from '../shared/NameField';
+import { NameField, useNameValidation } from '../../../common/NameField';
 import { AnalyticsStateKey } from '../types';
-import { metadataValidation } from '../shared/MetadataFieldset/validation';
+import { metadataValidation } from '../../../common/MetadataFieldset/validation';
 import { MoreSettingsSection } from '../shared/MoreSettingsSection';
 
 interface FormValues {

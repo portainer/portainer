@@ -6,6 +6,13 @@ import { IngressControllerClassMap } from '../../ingressClass/types';
 
 import { ConfigureFormValues } from './types';
 
+const deploymentOptionsSchema = object().shape({
+  overrideGlobalOptions: boolean(),
+  hideAddWithForm: boolean(),
+  hideWebEditor: boolean(),
+  hideFileUpload: boolean(),
+});
+
 // Define Yup schema for AccessMode
 const accessModeSchema = object().shape({
   Description: string().required(),
@@ -77,4 +84,6 @@ export const configureValidationSchema: SchemaOf<ConfigureFormValues> = object({
   changeWindow: isBE ? endpointChangeWindowSchema.required() : undefined,
   storageClasses: storageClassFormValuesSchema.required(),
   ingressClasses: array().of(ingressControllerClassMapSchema).required(),
+  timeZone: string(),
+  deploymentOptions: deploymentOptionsSchema.nullable(),
 });
