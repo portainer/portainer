@@ -1,7 +1,6 @@
 package testhelpers
 
 import (
-	"io"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -37,7 +36,7 @@ type testDatastore struct {
 	pendingActionsService   dataservices.PendingActionsService
 }
 
-func (d *testDatastore) BackupTo(io.Writer) error                            { return nil }
+func (d *testDatastore) Backup(path string) (string, error)                  { return "", nil }
 func (d *testDatastore) Open() (bool, error)                                 { return false, nil }
 func (d *testDatastore) Init() error                                         { return nil }
 func (d *testDatastore) Close() error                                        { return nil }
@@ -57,9 +56,11 @@ func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { re
 func (d *testDatastore) FDOProfile() dataservices.FDOProfileService {
 	return d.fdoProfile
 }
+
 func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService {
 	return d.endpointRelation
 }
+
 func (d *testDatastore) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
@@ -94,6 +95,7 @@ func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 func (d *testDatastore) Export(filename string) (err error) {
 	return nil
 }
+
 func (d *testDatastore) Import(filename string) (err error) {
 	return nil
 }
@@ -119,10 +121,12 @@ func (s *stubSettingsService) BucketName() string { return "settings" }
 func (s *stubSettingsService) Settings() (*portainer.Settings, error) {
 	return s.settings, nil
 }
+
 func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error {
 	s.settings = settings
 	return nil
 }
+
 func WithSettingsService(settings *portainer.Settings) datastoreOption {
 	return func(d *testDatastore) {
 		d.settings = &stubSettingsService{
@@ -162,15 +166,19 @@ func (s *stubEdgeJobService) ReadAll() ([]portainer.EdgeJob, error) { return s.j
 func (s *stubEdgeJobService) Read(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	return nil, nil
 }
+
 func (s *stubEdgeJobService) Create(edgeJob *portainer.EdgeJob) error {
 	return nil
 }
+
 func (s *stubEdgeJobService) CreateWithID(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	return nil
 }
+
 func (s *stubEdgeJobService) Update(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	return nil
 }
+
 func (s *stubEdgeJobService) UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFunc func(edgeJob *portainer.EdgeJob)) error {
 	return nil
 }
@@ -192,6 +200,7 @@ func (s *stubEndpointRelationService) BucketName() string { return "endpoint_rel
 func (s *stubEndpointRelationService) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	return s.relations, nil
 }
+
 func (s *stubEndpointRelationService) EndpointRelation(ID portainer.EndpointID) (*portainer.EndpointRelation, error) {
 	for _, relation := range s.relations {
 		if relation.EndpointID == ID {
@@ -201,9 +210,11 @@ func (s *stubEndpointRelationService) EndpointRelation(ID portainer.EndpointID) 
 
 	return nil, errors.ErrObjectNotFound
 }
+
 func (s *stubEndpointRelationService) Create(EndpointRelation *portainer.EndpointRelation) error {
 	return nil
 }
+
 func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.EndpointID, relation *portainer.EndpointRelation) error {
 	for i, r := range s.relations {
 		if r.EndpointID == ID {
@@ -213,6 +224,7 @@ func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.Endpoi
 
 	return nil
 }
+
 func (s *stubEndpointRelationService) DeleteEndpointRelation(ID portainer.EndpointID) error {
 	return nil
 }
@@ -307,7 +319,7 @@ func (s *stubEndpointService) GetNextIdentifier() int {
 }
 
 func (s *stubEndpointService) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error) {
-	var endpoints = make([]portainer.Endpoint, 0)
+	endpoints := make([]portainer.Endpoint, 0)
 
 	for _, e := range s.endpoints {
 		for t := range e.TeamAccessPolicies {

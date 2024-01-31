@@ -165,7 +165,7 @@ func TestRollback(t *testing.T) {
 		_, store := MustNewTestStore(t, false, false)
 		store.VersionService.UpdateVersion(&v)
 
-		_, err := store.Backup()
+		_, err := store.Backup("")
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
@@ -199,7 +199,7 @@ func TestRollback(t *testing.T) {
 		_, store := MustNewTestStore(t, true, false)
 		store.VersionService.UpdateVersion(&v)
 
-		_, err := store.Backup()
+		_, err := store.Backup("")
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
@@ -305,7 +305,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 		os.WriteFile(
 			gotPath,
 			gotJSON,
-			0600,
+			0o600,
 		)
 		t.Errorf(
 			"migrate data from %s to %s failed\nwrote migrated input to %s\nmismatch (-want +got):\n%s",

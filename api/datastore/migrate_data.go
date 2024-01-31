@@ -40,7 +40,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	// before we alter anything in the DB, create a backup
-	_, err = store.Backup()
+	_, err = store.Backup("")
 	if err != nil {
 		return errors.Wrap(err, "while backing up database")
 	}
@@ -131,7 +131,6 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version *models
 
 // Rollback to a pre-upgrade backup copy/snapshot of portainer.db
 func (store *Store) connectionRollback(force bool) error {
-
 	if !force {
 		confirmed, err := cli.Confirm("Are you sure you want to rollback your database to the previous backup?")
 		if err != nil || !confirmed {

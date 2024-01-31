@@ -31,7 +31,7 @@ func (store *Store) Open() (newStore bool, err error) {
 	}
 
 	if encryptionReq {
-		backupFilename, err := store.Backup()
+		backupFilename, err := store.Backup("")
 		if err != nil {
 			return false, fmt.Errorf("failed to backup database prior to encrypting: %w", err)
 		}
