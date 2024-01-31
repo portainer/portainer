@@ -3,7 +3,6 @@ package websocket
 import (
 	"bytes"
 	"net/http"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
@@ -101,11 +100,7 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 		return err
 	}
 
-	defer func() {
-		// Wait 10s before firing the close event to give the user time to read the last message
-		time.Sleep(10 * time.Second)
-		websocketConn.Close()
-	}()
+	defer websocketConn.Close()
 
 	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID, tokenData.Token)
 }
