@@ -9,12 +9,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (store *Store) Backup() (string, error) {
+// Backup takes an optional output path and creates a backup of the database.
+// The database connection is stopped before running the backup to avoid any
+// corruption and if a path is not given a default is used.
+// The path or an error are returned.
+func (store *Store) Backup(path string) (string, error) {
 	if err := store.createBackupPath(); err != nil {
 		return "", err
 	}
 
 	backupFilename := store.backupFilename()
+	if path != "" {
+		backupFilename = path
+	}
 	log.Info().Str("from", store.connection.GetDatabaseFilePath()).Str("to", backupFilename).Msgf("Backing up database")
 
 	// Close the store before backing up
@@ -69,7 +76,7 @@ func (store *Store) RestoreFromFile(backupFilename string) error {
 func (store *Store) createBackupPath() error {
 	backupDir := path.Join(store.connection.GetStorePath(), "backups")
 	if exists, _ := store.fileService.FileExists(backupDir); !exists {
-		if err := os.MkdirAll(backupDir, 0700); err != nil {
+		if err := os.MkdirAll(backupDir, 0o700); err != nil {
 			return fmt.Errorf("unable to create backup folder: %w", err)
 		}
 	}

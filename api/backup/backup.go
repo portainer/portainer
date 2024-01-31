@@ -82,14 +82,8 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 }
 
 func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
-	backupWriter, err := os.Create(filepath.Join(backupDirPath, "portainer.db"))
-	if err != nil {
-		return err
-	}
-	if err = datastore.BackupTo(backupWriter); err != nil {
-		return err
-	}
-	return backupWriter.Close()
+	_, err := datastore.Backup(filepath.Join(backupDirPath, "portainer.db"))
+	return err
 }
 
 func encrypt(path string, passphrase string) (string, error) {
