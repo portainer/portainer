@@ -12,6 +12,7 @@ const _KubernetesApplicationSecret = Object.freeze({
   Data: [],
   SecretType: '',
   Annotations: [],
+  Labels: {},
 });
 
 export class KubernetesApplicationSecret {
