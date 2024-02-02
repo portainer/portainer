@@ -159,6 +159,7 @@ class KubernetesConfigMapController {
       this.formValues.Type = this.configuration.Type;
       this.formValues.Kind = this.configuration.Kind;
       this.oldDataYaml = this.formValues.DataYaml;
+      this.formValues.Labels = this.configuration.Labels;
 
       return this.configuration;
     } catch (err) {

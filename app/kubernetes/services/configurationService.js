@@ -82,10 +82,12 @@ class KubernetesConfigurationService {
     if (formValues.Kind === KubernetesConfigurationKinds.CONFIGMAP) {
       const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
       configMap.ConfigurationOwner = configuration.ConfigurationOwner;
+      configMap.Labels = configuration.Labels;
       await this.KubernetesConfigMapService.update(configMap);
     } else {
       const secret = KubernetesSecretConverter.configurationFormValuesToSecret(formValues);
       secret.ConfigurationOwner = configuration.ConfigurationOwner;
+      secret.Labels = configuration.Labels;
       await this.KubernetesSecretService.update(secret);
     }
   }

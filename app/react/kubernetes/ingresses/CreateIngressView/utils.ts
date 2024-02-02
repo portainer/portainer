@@ -104,6 +104,7 @@ export function prepareRuleFromIngress(
     Hosts: prepareRuleHostsFromIngress(ing) || [],
     Annotations: ing.Annotations ? getAnnotationsForEdit(ing.Annotations) : [],
     IngressType: ing.Type,
+    Labels: ing.Labels,
   };
 }
 

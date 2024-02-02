@@ -241,7 +241,10 @@ func (kcl *KubeClient) DeleteIngresses(reqs models.K8sIngressDeleteRequests) err
 // UpdateIngress updates an existing ingress in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) UpdateIngress(namespace string, info models.K8sIngressInfo) error {
 	ingressClient := kcl.cli.NetworkingV1().Ingresses(namespace)
-	var ingress netv1.Ingress
+	ingress, err := ingressClient.Get(context.Background(), info.Name, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
 
 	ingress.Name = info.Name
 	ingress.Namespace = info.Namespace
@@ -299,6 +302,6 @@ func (kcl *KubeClient) UpdateIngress(namespace string, info models.K8sIngressInf
 		}
 	}
 
-	_, err := ingressClient.Update(context.Background(), &ingress, metav1.UpdateOptions{})
+	_, err = ingressClient.Update(context.Background(), ingress, metav1.UpdateOptions{})
 	return err
 }
