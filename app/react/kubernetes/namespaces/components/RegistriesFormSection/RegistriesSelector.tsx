@@ -19,13 +19,13 @@ export function RegistriesSelector({
   options = [],
   inputId,
 }: Props) {
-  const { isAdmin } = useCurrentUser();
+  const { isPureAdmin } = useCurrentUser();
 
   return (
     <>
       {options.length === 0 && (
         <p className="text-muted text-xs mb-1 mt-2">
-          {isAdmin ? (
+          {isPureAdmin ? (
             <span>
               No registries available. Head over to the{' '}
               <Link to="portainer.registries" target="_blank">

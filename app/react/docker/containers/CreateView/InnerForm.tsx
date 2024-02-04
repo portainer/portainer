@@ -102,7 +102,7 @@ export function InnerForm({
                             }
                             errors={errors.volumes}
                             allowBindMounts={
-                              isEnvironmentAdmin ||
+                              isEnvironmentAdmin.authorized ||
                               environment.SecuritySettings
                                 .allowBindMountsForRegularUsers
                             }
@@ -166,18 +166,18 @@ export function InnerForm({
                               setFieldValue(`resources.${field}`, value)
                             }
                             allowPrivilegedMode={
-                              isEnvironmentAdmin ||
+                              isEnvironmentAdmin.authorized ||
                               environment.SecuritySettings
                                 .allowPrivilegedModeForRegularUsers
                             }
                             isDevicesFieldVisible={
-                              isEnvironmentAdmin ||
+                              isEnvironmentAdmin.authorized ||
                               environment.SecuritySettings
                                 .allowDeviceMappingForRegularUsers
                             }
                             isInitFieldVisible={apiVersion >= 1.37}
                             isSysctlFieldVisible={
-                              isEnvironmentAdmin ||
+                              isEnvironmentAdmin.authorized ||
                               environment.SecuritySettings
                                 .allowSysctlSettingForRegularUsers
                             }

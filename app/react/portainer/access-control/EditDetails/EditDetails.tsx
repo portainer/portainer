@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { FormError } from '@@/form-components/FormError';
@@ -30,9 +30,10 @@ export function EditDetails({
   formNamespace,
   environmentId,
 }: Props) {
-  const { user, isAdmin } = useUser();
+  const { user } = useCurrentUser();
 
-  const { users, teams, isLoading } = useLoadState(environmentId, isAdmin);
+  const { users, teams, isLoading, isAdmin } = useLoadState(environmentId);
+
   const handleChange = useCallback(
     (partialValues: Partial<typeof values>) => {
       onChange({ ...values, ...partialValues });

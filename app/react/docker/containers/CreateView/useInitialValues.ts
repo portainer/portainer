@@ -36,7 +36,7 @@ import { envVarsTabUtils } from '@/react/docker/containers/CreateView/EnvVarsTab
 import { UserId } from '@/portainer/users/types';
 import { getImageConfig } from '@/react/portainer/registries/utils/getImageConfig';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsAdmin } from '@/react/hooks/useUser';
 import { useWebhooks } from '@/react/portainer/webhooks/useWebhooks';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
 
@@ -62,7 +62,9 @@ export function useInitialValues(submitting: boolean) {
     params: { nodeName, from },
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
-  const { isAdmin, user } = useCurrentUser();
+  const { user } = useCurrentUser();
+  const isAdminQuery = useIsAdmin();
+
   const networksQuery = useNetworksForSelector();
 
   const fromContainerQuery = useContainer(environmentId, from, {
@@ -79,9 +81,11 @@ export function useInitialValues(submitting: boolean) {
     enabled: !!from,
   });
 
-  if (!networksQuery.data) {
+  if (!networksQuery.data || isAdminQuery.isLoading) {
     return null;
   }
+
+  const { isAdmin } = isAdminQuery;
 
   if (!from) {
     return {

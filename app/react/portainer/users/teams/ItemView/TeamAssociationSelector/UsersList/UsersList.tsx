@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { UserPlus, Users } from 'lucide-react';
 
 import { User, UserId } from '@/portainer/users/types';
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useAddMemberMutation } from '@/react/portainer/users/teams/queries';
 import { TeamId } from '@/react/portainer/users/teams/types';
@@ -29,7 +29,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
     { id: string; desc: boolean } | undefined
   >({ id: 'name', desc: false });
 
-  const { isAdmin } = useUser();
+  const { isPureAdmin } = useCurrentUser();
 
   const rowContext = useMemo(() => ({ disabled, teamId }), [disabled, teamId]);
 
@@ -41,7 +41,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
         titleIcon={Users}
         title="Users"
         renderTableActions={() =>
-          isAdmin && (
+          isPureAdmin && (
             <Button
               onClick={() => handleAddAllMembers(users.map((u) => u.Id))}
               disabled={disabled || users.length === 0}

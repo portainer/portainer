@@ -12,7 +12,6 @@ export function CreateNamespaceView() {
   useUnauthorizedRedirect(
     {
       authorizations: 'K8sResourcePoolsW',
-      forceEnvironmentId: environmentId,
       adminOnlyCE: !isBE,
     },
     {

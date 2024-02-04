@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useIsAdmin } from '@/react/hooks/useUser';
 
 import { InsightsBox } from '@@/InsightsBox';
 import { Link } from '@@/Link';
@@ -21,11 +21,14 @@ export function StackName({
   stacks = [],
   inputClassName,
 }: Props) {
-  const { isAdmin } = useCurrentUser();
+  const isAdminQuery = useIsAdmin();
   const stackResults = useMemo(
     () => stacks.filter((stack) => stack.includes(stackName ?? '')),
     [stacks, stackName]
   );
+
+  const { isAdmin } = isAdminQuery;
+
   const tooltip = (
     <>
       You may specify a stack name to label resources that you want to group.

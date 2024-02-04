@@ -12,7 +12,6 @@ export function ConfigureView() {
   useUnauthorizedRedirect(
     {
       authorizations: 'K8sClusterW',
-      forceEnvironmentId: environment?.Id,
       adminOnlyCE: false,
     },
     {

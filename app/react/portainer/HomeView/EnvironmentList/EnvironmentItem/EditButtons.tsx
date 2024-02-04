@@ -2,7 +2,7 @@ import { Edit2, Settings } from 'lucide-react';
 import { ReactNode } from 'react';
 import clsx from 'clsx';
 
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import {
   Environment,
   PlatformType,
@@ -15,7 +15,7 @@ import {
 import { LinkButton } from '@@/LinkButton';
 
 export function EditButtons({ environment }: { environment: Environment }) {
-  const { isAdmin } = useUser();
+  const { isPureAdmin } = useCurrentUser();
 
   const isEdgeAsync = checkEdgeAsync(environment);
 
@@ -31,7 +31,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
   return (
     <ButtonsGrid className="ml-3 w-11">
       <LinkButton
-        disabled={!isAdmin}
+        disabled={!isPureAdmin}
         to="portainer.endpoints.endpoint"
         params={{ id: environment.Id, redirectTo: 'portainer.home' }}
         color="none"
@@ -42,7 +42,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
       />
 
       <LinkButton
-        disabled={!configRoute || isEdgeAsync || !isAdmin}
+        disabled={!configRoute || isEdgeAsync || !isPureAdmin}
         to={configRoute}
         params={{ endpointId: environment.Id }}
         color="none"
