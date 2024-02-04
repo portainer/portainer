@@ -1,7 +1,7 @@
 import { Layers } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 
-import { useAuthorizations, useIsAdmin } from '@/react/hooks/useUser';
+import { useAuthorizations, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
@@ -34,7 +34,7 @@ export function StacksDatatable({
 }) {
   const tableState = useTableState(settingsStore, tableKey);
   useRepeater(tableState.autoRefreshRate, onReload);
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
   const canManageStacks = useAuthorizations([
     'PortainerStackCreate',
     'PortainerStackDelete',

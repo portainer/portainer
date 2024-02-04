@@ -1,6 +1,6 @@
 import { FormikErrors } from 'formik';
 
-import { useIsAdmin } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { SwitchField } from '@@/form-components/SwitchField';
@@ -26,7 +26,7 @@ export function AccessControlForm({
   errors,
   environmentId,
 }: Props) {
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
 
   if (isAdminQuery.isLoading) {
     return null;

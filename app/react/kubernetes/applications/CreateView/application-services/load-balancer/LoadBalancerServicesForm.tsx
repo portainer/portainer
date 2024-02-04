@@ -1,7 +1,7 @@
 import { Plus, RefreshCw } from 'lucide-react';
 import { FormikErrors } from 'formik';
 
-import { useIsAdmin } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -39,7 +39,7 @@ export function LoadBalancerServicesForm({
   namespace,
   isEditMode,
 }: Props) {
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
 
   const environmentId = useEnvironmentId();
   const { data: loadBalancerEnabled, ...loadBalancerEnabledQuery } =

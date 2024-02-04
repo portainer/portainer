@@ -1,6 +1,6 @@
 import { FormikErrors } from 'formik';
 
-import { useIsAdmin } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 import { Link } from '@@/Link';
@@ -113,7 +113,7 @@ export function AutoScalingFormSection({
 }
 
 function NoMetricsServerWarning() {
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
   if (isAdminQuery.isLoading) {
     return null;
   }

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useIsAdmin } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { InsightsBox } from '@@/InsightsBox';
 import { Link } from '@@/Link';
@@ -21,7 +21,7 @@ export function StackName({
   stacks = [],
   inputClassName,
 }: Props) {
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
   const stackResults = useMemo(
     () => stacks.filter((stack) => stack.includes(stackName ?? '')),
     [stacks, stackName]
