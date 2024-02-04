@@ -58,7 +58,7 @@ export function useIsPureAdmin() {
  * @param forceEnvironmentId to force the environment id, used where the environment id can't be loaded from the router, like sidebar
  * @returns query result with isLoading and isAdmin - isAdmin is true if the user edge admin or admin.
  */
-export function useIsAdmin({
+export function useIsEdgeAdmin({
   forceEnvironmentId,
   noEnvScope,
 }: {
@@ -98,7 +98,7 @@ export function useAuthorizations(
     params: { endpointId },
   } = useCurrentStateAndParams();
   const envQuery = useEnvironment(forceEnvironmentId || endpointId);
-  const isAdmin = useIsAdmin({ forceEnvironmentId });
+  const isAdmin = useIsEdgeAdmin({ forceEnvironmentId });
 
   if (!user) {
     return { authorized: false, isLoading: false };

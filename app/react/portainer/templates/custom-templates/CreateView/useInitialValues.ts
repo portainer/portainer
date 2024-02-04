@@ -1,7 +1,7 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
-import { useCurrentUser, useIsAdmin } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
 
 import { Platform } from '../../types';
@@ -20,7 +20,7 @@ export function useInitialValues({
   buildMethods: Array<Method>;
 }): FormValues | undefined {
   const { user } = useCurrentUser();
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
 
   const { appTemplateId, type = defaultType } = useAppTemplateParams();
 

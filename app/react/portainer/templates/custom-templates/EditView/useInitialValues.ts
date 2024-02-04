@@ -1,5 +1,5 @@
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
-import { useCurrentUser, useIsAdmin } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
@@ -18,7 +18,7 @@ export function useInitialValues({
 }): FormValues | undefined {
   const { user } = useCurrentUser();
 
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
 
   if (isAdminQuery.isLoading) {
     return undefined;

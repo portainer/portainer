@@ -36,7 +36,7 @@ import { envVarsTabUtils } from '@/react/docker/containers/CreateView/EnvVarsTab
 import { UserId } from '@/portainer/users/types';
 import { getImageConfig } from '@/react/portainer/registries/utils/getImageConfig';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useCurrentUser, useIsAdmin } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { useWebhooks } from '@/react/portainer/webhooks/useWebhooks';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
 
@@ -63,7 +63,7 @@ export function useInitialValues(submitting: boolean) {
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
   const { user } = useCurrentUser();
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
 
   const networksQuery = useNetworksForSelector();
 

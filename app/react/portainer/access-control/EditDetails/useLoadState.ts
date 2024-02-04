@@ -1,10 +1,10 @@
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { useIsAdmin } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 export function useLoadState(environmentId: EnvironmentId) {
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
   const teams = useTeams(false, environmentId);
 
   const users = useUsers(false, environmentId, isAdminQuery.isAdmin);

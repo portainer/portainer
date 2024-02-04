@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Home } from 'lucide-react';
 
-import { useIsAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
 import { useIsCurrentUserTeamLeader } from '@/portainer/users/queries';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
@@ -26,7 +26,7 @@ export function Sidebar() {
 
 function InnerSidebar() {
   const isPureAdmin = useIsPureAdmin();
-  const isAdminQuery = useIsAdmin({ noEnvScope: true });
+  const isAdminQuery = useIsEdgeAdmin({ noEnvScope: true });
   const isTeamLeader = useIsCurrentUserTeamLeader();
   const { isOpen } = useSidebarState();
 

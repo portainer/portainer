@@ -8,7 +8,7 @@ import {
   useUserMembership,
 } from '@/portainer/users/queries';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { useCurrentUser, useIsAdmin } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -37,7 +37,7 @@ export function AccessControlPanel({
   onUpdateSuccess,
 }: Props) {
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
   const isTeamLeader = useIsCurrentUserTeamLeader();
 
   const isInherited = checkIfInherited();
@@ -117,7 +117,7 @@ export function AccessControlPanel({
 
 function useRestrictions(resourceControl?: ResourceControlViewModel) {
   const { user } = useCurrentUser();
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
   const memberships = useUserMembership(user.Id);
 
   if (isAdminQuery.isLoading) {

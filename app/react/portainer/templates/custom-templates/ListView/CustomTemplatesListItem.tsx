@@ -1,6 +1,6 @@
 import { Edit, Trash2 } from 'lucide-react';
 
-import { useCurrentUser, useIsAdmin } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
@@ -23,7 +23,7 @@ export function CustomTemplatesListItem({
   linkParams?: { to: string; params: object };
 }) {
   const { user } = useCurrentUser();
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsEdgeAdmin();
 
   if (isAdminQuery.isLoading) {
     return null;
