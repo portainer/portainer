@@ -16,10 +16,9 @@ export function isAdmin(
   environment?: Pick<Environment, 'Type'> | null
 ): boolean {
   return (
-    !!user &&
-    (user.Role === Role.Admin ||
-      ((!environment || isEdgeEnvironment(environment.Type)) &&
-        user.Role === Role.EdgeAdmin))
+    isPureAdmin(user) ||
+    (user?.Role === Role.EdgeAdmin &&
+      (!environment || isEdgeEnvironment(environment.Type)))
   );
 }
 
