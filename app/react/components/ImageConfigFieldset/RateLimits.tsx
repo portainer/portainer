@@ -66,7 +66,7 @@ function RateLimitsInner({
   environment: Environment;
 }) {
   const pullRateLimits = useRateLimits(registryId, environment, onRateLimit);
-  const { isAdmin } = useCurrentUser();
+  const { isPureAdmin } = useCurrentUser();
 
   if (!pullRateLimits) {
     return null;
@@ -88,7 +88,7 @@ function RateLimitsInner({
               </>
             ) : (
               <>
-                {isAdmin ? (
+                {isPureAdmin ? (
                   <>
                     You are currently using an anonymous account to pull images
                     from DockerHub and will be limited to 100 pulls every 6

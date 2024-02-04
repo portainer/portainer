@@ -46,7 +46,7 @@ export function EditForm({
     templateFile: fileContentQuery.data,
   });
 
-  if (fileContentQuery.isLoading) {
+  if (fileContentQuery.isLoading || !initialValues) {
     return null;
   }
 

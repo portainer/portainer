@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { UploadLicenseDialog } from './UploadLicenseDialog';
 import { LoadingDialog } from './LoadingDialog';
@@ -10,7 +10,7 @@ import { GetLicenseDialog } from './GetLicenseDialog';
 type Step = 'uploadLicense' | 'loading' | 'getLicense';
 
 export function UpgradeDialog({ onDismiss }: { onDismiss: () => void }) {
-  const { isAdmin } = useUser();
+  const { isPureAdmin } = useCurrentUser();
   const [currentStep, setCurrentStep] = useState<Step>('uploadLicense');
   const [isGetLicenseSubmitted, setIsGetLicenseSubmitted] = useState(false);
   const component = getDialog();
@@ -18,7 +18,7 @@ export function UpgradeDialog({ onDismiss }: { onDismiss: () => void }) {
   return component;
 
   function getDialog() {
-    if (!isAdmin) {
+    if (!isPureAdmin) {
       return <NonAdminUpgradeDialog onDismiss={onDismiss} />;
     }
 

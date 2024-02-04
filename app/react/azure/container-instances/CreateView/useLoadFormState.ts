@@ -37,7 +37,7 @@ export function useFormState(
   resourceGroups: Record<string, ResourceGroup[]> = {},
   providers: Record<string, ProviderViewModel> = {}
 ) {
-  const { isAdmin, user } = useCurrentUser();
+  const { user, isPureAdmin } = useCurrentUser();
 
   const subscriptionOptions = subscriptions.map((s) => ({
     value: s.subscriptionId,
@@ -67,7 +67,7 @@ export function useFormState(
     cpu: 1,
     ports: [{ container: 80, host: 80, protocol: 'TCP' }],
     allocatePublicIP: true,
-    accessControl: parseAccessControlFormData(isAdmin, user.Id),
+    accessControl: parseAccessControlFormData(isPureAdmin, user.Id),
   };
 
   return {
