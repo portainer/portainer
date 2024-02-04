@@ -47,7 +47,7 @@ export function BuildInfoModalButton() {
 }
 
 function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin } = useIsAdmin({ noEnvScope: true });
   const versionQuery = useSystemVersion();
   const statusQuery = useSystemStatus();
 
