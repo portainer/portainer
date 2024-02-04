@@ -26,7 +26,7 @@ export function Sidebar() {
 
 function InnerSidebar() {
   const isPureAdmin = useIsPureAdmin();
-  const isAdminQuery = useIsAdmin();
+  const isAdminQuery = useIsAdmin({ noEnvScope: true });
   const isTeamLeader = useIsCurrentUserTeamLeader();
   const { isOpen } = useSidebarState();
 

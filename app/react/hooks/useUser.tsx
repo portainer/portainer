@@ -60,8 +60,10 @@ export function useIsPureAdmin() {
  */
 export function useIsAdmin({
   forceEnvironmentId,
+  noEnvScope,
 }: {
   forceEnvironmentId?: EnvironmentId;
+  noEnvScope?: boolean;
 } = {}) {
   const { user } = useCurrentUser();
   const {
@@ -69,8 +71,7 @@ export function useIsAdmin({
   } = useCurrentStateAndParams();
 
   const envId = forceEnvironmentId || endpointId;
-  const envScope = !!envId;
-
+  const envScope = typeof noEnvScope === 'boolean' ? !noEnvScope : !!envId;
   const envQuery = useEnvironment(envScope ? envId : undefined);
 
   if (!envScope) {
