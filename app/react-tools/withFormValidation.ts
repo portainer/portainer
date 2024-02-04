@@ -17,6 +17,8 @@ interface FormFieldProps<TValue> {
 
 type WithFormFieldProps<TProps, TValue> = TProps & FormFieldProps<TValue>;
 
+type ValidationResult<T> = FormikErrors<T> | undefined;
+
 /**
  * This utility function is used for wrapping React components with form validation.
  * When used inside an Angular form, it sets the form to invalid if the component values are invalid.
@@ -109,6 +111,7 @@ function createFormValidatorController<TFormModel, TData = never>(
 
       this.handleChange = this.handleChange.bind(this);
       this.runValidation = this.runValidation.bind(this);
+      this.validate = this.validate.bind(this);
     }
 
     async handleChange(newValues: TFormModel) {
@@ -123,18 +126,28 @@ function createFormValidatorController<TFormModel, TData = never>(
         this.form?.$setValidity('form', true, this.form);
 
         const schema = schemaBuilder(this.validationData);
-        this.errors = undefined;
-        const errors = await (isPrimitive
-          ? validateForm<{ value: TFormModel }>(
-              () => object({ value: schema }),
-              { value }
-            ).then((r) => r?.value)
-          : validateForm<TFormModel>(() => schema, value));
+        this.errors = await this.validate(schema, value, isPrimitive);
 
-        if (errors && Object.keys(errors).length > 0) {
-          this.errors = errors as FormikErrors<TFormModel> | undefined;
+        if (this.errors && Object.keys(this.errors).length > 0) {
           this.form?.$setValidity('form', false, this.form);
         }
+      });
+    }
+
+    async validate(
+      schema: SchemaOf<TFormModel>,
+      value: TFormModel,
+      isPrimitive: boolean
+    ): Promise<ValidationResult<TFormModel>> {
+      return this.$async(async () => {
+        if (isPrimitive) {
+          const result = await validateForm<{ value: TFormModel }>(
+            () => object({ value: schema }),
+            { value }
+          );
+          return result?.value as ValidationResult<TFormModel>;
+        }
+        return validateForm<TFormModel>(() => schema, value);
       });
     }
 
