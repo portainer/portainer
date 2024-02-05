@@ -14,6 +14,7 @@ const _KubernetesConfigurationFormValues = Object.freeze({
   IsSimple: true,
   ServiceAccountName: '',
   Type: KubernetesSecretTypeOptions.OPAQUE.value,
+  Labels: {},
 });
 
 export class KubernetesConfigurationFormValues {

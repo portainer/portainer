@@ -21,6 +21,7 @@ class KubernetesConfigurationConverter {
     if (secret.Annotations) {
       res.ServiceAccountName = secret.Annotations['kubernetes.io/service-account.name'];
     }
+    res.Labels = secret.Labels;
     return res;
   }
 
@@ -37,6 +38,7 @@ class KubernetesConfigurationConverter {
     });
     res.data = res.Data;
     res.ConfigurationOwner = configMap.ConfigurationOwner;
+    res.Labels = configMap.Labels;
     return res;
   }
 }
