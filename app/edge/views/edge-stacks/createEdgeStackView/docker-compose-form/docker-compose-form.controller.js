@@ -1,4 +1,4 @@
-import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
+import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset';
 import { editor, git, edgeStackTemplate, upload } from '@@/BoxSelector/common-options/build-methods';
 
 class DockerComposeFormController {

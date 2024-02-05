@@ -74,3 +74,7 @@ function Item({
     </FormControl>
   );
 }
+
+export function getDefaultValues(definitions: Array<TemplateEnv>): Value {
+  return Object.fromEntries(definitions.map((v) => [v.name, v.default || '']));
+}
