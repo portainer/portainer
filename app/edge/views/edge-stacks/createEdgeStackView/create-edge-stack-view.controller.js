@@ -75,7 +75,7 @@ export default class CreateEdgeStackViewController {
   }
 
   /**
-   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset').Values>} templateAction
+   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset').Values>} templateAction
    */
   setTemplateValues(templateAction) {
     return this.$async(async () => {
@@ -219,6 +219,12 @@ export default class CreateEdgeStackViewController {
   createStack() {
     return this.$async(async () => {
       const name = this.formValues.Name;
+
+      let envVars = this.formValues.envVars;
+      if (this.state.Method === 'template' && this.state.templateValues.type === 'app') {
+        envVars = [...envVars, ...Object.entries(this.state.templateValues.envVars).map(([key, value]) => ({ name: key, value }))];
+      }
+
       const method = getMethod(this.state.Method, this.state.templateValues.template);
 
       if (!this.validateForm(method)) {
@@ -227,7 +233,7 @@ export default class CreateEdgeStackViewController {
 
       this.state.actionInProgress = true;
       try {
-        await this.createStackByMethod(name, method);
+        await this.createStackByMethod(name, method, envVars);
 
         this.Notifications.success('Success', 'Stack successfully deployed');
         this.state.isEditorDirty = false;
@@ -279,19 +285,19 @@ export default class CreateEdgeStackViewController {
     return true;
   }
 
-  createStackByMethod(name, method) {
+  createStackByMethod(name, method, envVars) {
     switch (method) {
       case 'editor':
-        return this.createStackFromFileContent(name);
+        return this.createStackFromFileContent(name, envVars);
       case 'upload':
-        return this.createStackFromFileUpload(name);
+        return this.createStackFromFileUpload(name, envVars);
       case 'repository':
-        return this.createStackFromGitRepository(name);
+        return this.createStackFromGitRepository(name, envVars);
     }
   }
 
-  createStackFromFileContent(name) {
-    const { StackFileContent, Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
+  createStackFromFileContent(name, envVars) {
+    const { StackFileContent, Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
 
     return this.EdgeStackService.createStackFromFileContent({
       name,
@@ -303,8 +309,9 @@ export default class CreateEdgeStackViewController {
     });
   }
 
-  createStackFromFileUpload(name) {
-    const { StackFile, Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
+  createStackFromFileUpload(name, envVars) {
+    const { StackFile, Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+
     return this.EdgeStackService.createStackFromFileUpload(
       {
         Name: name,
@@ -317,8 +324,9 @@ export default class CreateEdgeStackViewController {
     );
   }
 
-  createStackFromGitRepository(name) {
-    const { Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
+  async createStackFromGitRepository(name, envVars) {
+    const { Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+
     const repositoryOptions = {
       RepositoryURL: this.formValues.RepositoryURL,
       RepositoryReferenceName: this.formValues.RepositoryReferenceName,
