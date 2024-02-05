@@ -17,7 +17,7 @@ export function DeploymentOptionsSection() {
 
   const limitedFeature = isLimitedToBE(FeatureId.ENFORCE_DEPLOYMENT_OPTIONS);
   return (
-    <FormSection title="Deployment Options">
+    <FormSection title="Deployment options">
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
