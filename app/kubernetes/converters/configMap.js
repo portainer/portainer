@@ -38,6 +38,7 @@ class KubernetesConfigMapConverter {
     res.ConfigurationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = data.metadata.creationTimestamp;
     res.Yaml = yaml ? yaml.data : '';
+    res.Labels = data.metadata.labels;
 
     res.Data = _.concat(
       _.map(data.data, (value, key) => {
@@ -98,6 +99,7 @@ class KubernetesConfigMapConverter {
     res.metadata.uid = data.Id;
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
+    res.metadata.labels = data.Labels || {};
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = data.ConfigurationOwner;
     _.forEach(data.Data, (entry) => {
       if (entry.IsBinary) {

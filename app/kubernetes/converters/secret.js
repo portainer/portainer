@@ -39,6 +39,7 @@ class KubernetesSecretConverter {
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
     res.type = secret.Type;
+    res.metadata.labels = secret.Labels || {};
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = secret.ConfigurationOwner;
 
     let annotation = '';
@@ -67,6 +68,7 @@ class KubernetesSecretConverter {
     res.Name = payload.metadata.name;
     res.Namespace = payload.metadata.namespace;
     res.Type = payload.type;
+    res.Labels = payload.metadata.labels || {};
     res.ConfigurationOwner = payload.metadata.labels ? payload.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = payload.metadata.creationTimestamp;
     res.Annotations = payload.metadata.annotations;

@@ -828,6 +828,7 @@ export function CreateIngressView() {
       Paths: preparePaths(rule.IngressName, rule.Hosts),
       TLS: prepareTLS(rule.Hosts),
       Annotations: prepareAnnotations(rule.Annotations || []),
+      Labels: rule.Labels,
     };
 
     if (isEdit) {

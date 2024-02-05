@@ -28,6 +28,7 @@ export interface Rule {
   Hosts: Host[];
   Annotations?: Annotation[];
   IngressType?: string;
+  Labels?: Record<string, string>;
 }
 
 export interface ServicePorts {
