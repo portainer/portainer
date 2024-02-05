@@ -58,6 +58,7 @@ export interface Props<D extends DefaultType> extends AutomationTestingProps {
   emptyContentLabel?: string;
   title?: string;
   titleIcon?: IconProps['icon'];
+  titleId?: string;
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
   description?: ReactNode;
@@ -78,6 +79,7 @@ export function Datatable<D extends DefaultType>({
   getRowId = defaultGetRowId,
   isRowSelectable = () => true,
   title,
+  titleId,
   titleIcon,
   emptyContentLabel,
   initialTableState = {},
@@ -172,6 +174,7 @@ export function Datatable<D extends DefaultType>({
         onSearchChange={handleSearchBarChange}
         searchValue={settings.search}
         title={title}
+        titleId={titleId}
         titleIcon={titleIcon}
         description={description}
         renderTableActions={() => renderTableActions(selectedItems)}

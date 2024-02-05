@@ -9,7 +9,7 @@ export function HelmSection() {
   const [{ name }, { error }] = useField<string>('helmRepositoryUrl');
 
   return (
-    <FormSection title="Helm Repository">
+    <FormSection title="Helm repository">
       <div className="mb-2">
         <TextTip color="blue">
           You can specify the URL to your own Helm repository here. See the{' '}
