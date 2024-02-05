@@ -38,6 +38,7 @@ class KubernetesCreateApplicationController {
     $async,
     $state,
     $timeout,
+    $window,
     Notifications,
     Authentication,
     KubernetesResourcePoolService,
@@ -58,6 +59,7 @@ class KubernetesCreateApplicationController {
     this.$async = $async;
     this.$state = $state;
     this.$timeout = $timeout;
+    this.$window = $window;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
@@ -157,6 +159,7 @@ class KubernetesCreateApplicationController {
     this.refreshReactComponent = this.refreshReactComponent.bind(this);
     this.onChangeNamespaceName = this.onChangeNamespaceName.bind(this);
     this.canSupportSharedAccess = this.canSupportSharedAccess.bind(this);
+    this.isUpdateApplicationViaWebEditorButtonDisabled = this.isUpdateApplicationViaWebEditorButtonDisabled.bind(this);
 
     this.$scope.$watch(
       () => this.formValues,
@@ -255,7 +258,7 @@ class KubernetesCreateApplicationController {
           { stackFile: this.stackFileContent, stackName: this.formValues.StackName }
         );
         this.state.isEditorDirty = false;
-        await this.$state.reload(this.$state.current);
+        this.$window.location.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
       } finally {
@@ -641,6 +644,10 @@ class KubernetesCreateApplicationController {
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
     return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
+  }
+
+  isUpdateApplicationViaWebEditorButtonDisabled() {
+    return (this.savedFormValues.StackName === this.formValues.StackName && !this.state.isEditorDirty) || this.state.updateWebEditorInProgress;
   }
 
   isExternalApplication() {
