@@ -13,7 +13,7 @@ import { StackType } from '@/react/common/stacks/types';
 import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
-import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
+import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset';
 import { getAppTemplates } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
 import { fetchFilePreview } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
 
