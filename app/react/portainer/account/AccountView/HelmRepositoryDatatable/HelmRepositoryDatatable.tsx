@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import helm from '@/assets/ico/vendor/helm.svg?c';
 
+import { Link } from '@@/Link';
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
@@ -64,8 +65,11 @@ function HelmDatatableDescription() {
     <TextTip color="blue" className="mb-3">
       Adding a Helm repo here only makes it available in your own user
       account&apos;s Portainer UI. Helm charts are pulled down from these repos
-      (plus the globally-set Helm repo) and shown in the Create from Manifest
-      screen&apos;s Helm charts list.
+      (plus the{' '}
+      <Link to="portainer.settings" params={{ '#': 'kubernetes-settings' }}>
+        <span>globally-set Helm repo</span>
+      </Link>
+      ) and shown in the Create from Manifest screen&apos;s Helm charts list.
     </TextTip>
   );
 }
