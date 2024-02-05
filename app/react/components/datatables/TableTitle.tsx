@@ -8,6 +8,7 @@ interface Props {
   label: string;
   description?: ReactNode;
   className?: string;
+  id?: string;
 }
 
 export function TableTitle({
@@ -16,10 +17,11 @@ export function TableTitle({
   children,
   description,
   className,
+  id,
 }: PropsWithChildren<Props>) {
   return (
     <>
-      <div className={clsx('toolBar flex-col', className)}>
+      <div className={clsx('toolBar flex-col', className)} id={id}>
         <div className="flex w-full items-center gap-1 p-0">
           <div className="toolBarTitle">
             {icon && (

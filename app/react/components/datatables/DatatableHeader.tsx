@@ -13,6 +13,7 @@ type Props = {
   renderTableSettings?(): ReactNode;
   renderTableActions?(): ReactNode;
   description?: ReactNode;
+  titleId?: string;
 };
 
 export function DatatableHeader({
@@ -23,6 +24,7 @@ export function DatatableHeader({
   title,
   titleIcon,
   description,
+  titleId,
 }: Props) {
   if (!title) {
     return null;
@@ -37,7 +39,12 @@ export function DatatableHeader({
   );
 
   return (
-    <Table.Title label={title} icon={titleIcon} description={description}>
+    <Table.Title
+      id={titleId}
+      label={title}
+      icon={titleIcon}
+      description={description}
+    >
       {searchBar}
       {tableActions}
       {tableTitleSettings}

@@ -44,7 +44,7 @@ export function KubeSettingsPanel() {
   };
 
   return (
-    <Widget>
+    <Widget id="kubernetes-settings">
       <Widget.Title icon={kubeIcon} title="Kubernetes settings" />
       <Widget.Body>
         <Formik
@@ -66,7 +66,7 @@ export function KubeSettingsPanel() {
                     loadingText="Saving"
                     className="!ml-0"
                   >
-                    Save Kubernetes Settings
+                    Save Kubernetes settings
                   </LoadingButton>
                 </div>
               </div>

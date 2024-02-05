@@ -121,7 +121,7 @@ function SSLSettingsPanel() {
                     loadingText={reloadingPage ? 'Reloading' : 'Saving'}
                     className="!ml-0"
                   >
-                    Save SSL Settings
+                    Save SSL settings
                   </LoadingButton>
                 </div>
               </div>
