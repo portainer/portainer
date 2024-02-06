@@ -2,8 +2,8 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { FormikErrors } from 'formik';
 
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
-import { getDefaultValues as getAppVariablesDefaultValues } from '@/react/edge/templates/AppTemplatesView/EnvVarsFieldset';
 
+import { getDefaultValues as getAppVariablesDefaultValues } from './EnvVarsFieldset';
 import { TemplateSelector } from './TemplateSelector';
 import { SelectedTemplateValue, Values } from './types';
 import { CustomTemplateFieldset } from './CustomTemplateFieldset';
