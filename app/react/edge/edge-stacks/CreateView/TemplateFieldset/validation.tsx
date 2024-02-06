@@ -1,8 +1,9 @@
 import { mixed, object, SchemaOf, string } from 'yup';
 
-import { envVarsFieldsetValidation } from '@/react/edge/templates/AppTemplatesView/EnvVarsFieldset';
 import { variablesFieldValidation } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
+
+import { envVarsFieldsetValidation } from './EnvVarsFieldset';
 
 export function validation({
   definitions,

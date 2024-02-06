@@ -1,7 +1,9 @@
 import { FormikErrors } from 'formik';
 
-import { EnvVarsFieldset } from '@/react/edge/templates/AppTemplatesView/EnvVarsFieldset';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+
+import { EnvVarsFieldset } from './EnvVarsFieldset';
+import { TemplateNote } from './TemplateNote';
 
 export function AppTemplateFieldset({
   template,
@@ -15,11 +17,14 @@ export function AppTemplateFieldset({
   errors?: FormikErrors<Record<string, string>>;
 }) {
   return (
-    <EnvVarsFieldset
-      options={template.Env || []}
-      value={values}
-      onChange={onChange}
-      errors={errors}
-    />
+    <>
+      <TemplateNote note={template.Note} />
+      <EnvVarsFieldset
+        options={template.Env || []}
+        value={values}
+        onChange={onChange}
+        errors={errors}
+      />
+    </>
   );
 }

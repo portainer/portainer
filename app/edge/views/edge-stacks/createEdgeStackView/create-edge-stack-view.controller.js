@@ -16,6 +16,8 @@ import { renderTemplate } from '@/react/portainer/custom-templates/components/ut
 import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset';
 import { getAppTemplates } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
 import { fetchFilePreview } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+import { getDefaultValues as getAppVariablesDefaultValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/EnvVarsFieldset';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -75,7 +77,7 @@ export default class CreateEdgeStackViewController {
   }
 
   /**
-   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset').Values>} templateAction
+   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset/types').Values>} templateAction
    */
   setTemplateValues(templateAction) {
     return this.$async(async () => {
@@ -88,10 +90,7 @@ export default class CreateEdgeStackViewController {
       }
 
       if (newTemplateValues.type === 'custom') {
-        let definitions = [];
-        if (this.state.templateValues.template) {
-          definitions = this.state.templateValues.template.Variables;
-        }
+        const definitions = this.state.templateValues.template.Variables;
         const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, definitions);
 
         this.formValues.StackFileContent = newFile;
@@ -105,10 +104,7 @@ export default class CreateEdgeStackViewController {
         return;
       }
 
-      this.state.templateValues.template = template;
       if (type === 'custom') {
-        this.state.templateValues.variables = getVariablesFieldDefaultValues(template.Variables);
-
         const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
         this.state.templateValues.file = fileContent;
 
@@ -175,17 +171,27 @@ export default class CreateEdgeStackViewController {
     }
   }
 
+  /**
+   *
+   * @param {'app' | 'custom'} templateType
+   * @param {number} templateId
+   * @returns {Promise<void>}
+   */
   async preSelectTemplate(templateType, templateId) {
     return this.$async(async () => {
       try {
         this.state.Method = 'template';
         const template = await getTemplate(templateType, templateId);
-
         if (!template) {
           return;
         }
 
-        this.setTemplateValues({ template, type: templateType });
+        this.setTemplateValues({
+          template,
+          type: templateType,
+          envVars: templateType === 'app' ? getAppVariablesDefaultValues(template.Env) : {},
+          variables: templateType === 'custom' ? getVariablesFieldDefaultValues(template.Variables) : [],
+        });
       } catch (e) {
         notifyError('Failed loading template', e);
       }
@@ -199,9 +205,9 @@ export default class CreateEdgeStackViewController {
       this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
     }
 
-    const templateId = this.$state.params.templateId;
+    const templateId = parseInt(this.$state.params.templateId, 10);
     const templateType = this.$state.params.templateType;
-    if (templateType && templateId) {
+    if (templateType && templateId && !Number.isNaN(templateId)) {
       this.preSelectTemplate(templateType, templateId);
     }
 
@@ -398,8 +404,8 @@ async function getTemplate(templateType, templateId) {
 
   if (templateType === 'app') {
     const templatesResponse = await getAppTemplates();
-    const template = templatesResponse.templates.find((t) => t.Id === templateId);
-    return template;
+    const template = templatesResponse.templates.find((t) => t.id === templateId);
+    return new TemplateViewModel(template, templatesResponse.version);
   }
 
   const template = await getCustomTemplate(templateId);

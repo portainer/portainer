@@ -12,10 +12,12 @@ export function AppTemplatesListItem({
   template,
   onSelect,
   isSelected,
+  linkParams,
 }: {
   template: TemplateViewModel;
-  onSelect: (template: TemplateViewModel) => void;
+  onSelect?: (template: TemplateViewModel) => void;
   isSelected: boolean;
+  linkParams?: { to: string; params: object };
 }) {
   const duplicateCustomTemplateType = getCustomTemplateType(template.Type);
 
@@ -25,7 +27,8 @@ export function AppTemplatesListItem({
       typeLabel={
         template.Type === TemplateType.Container ? 'container' : 'stack'
       }
-      onSelect={() => onSelect(template)}
+      linkParams={linkParams}
+      onSelect={() => onSelect?.(template)}
       isSelected={isSelected}
       renderActions={
         duplicateCustomTemplateType && (
