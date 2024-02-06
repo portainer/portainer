@@ -22,8 +22,9 @@ export function TemplateSelector({
   const { getTemplate, options } = useOptions();
 
   return (
-    <FormControl label="Template" inputId="stack_template" errors={error}>
+    <FormControl label="Template" inputId="template_selector" errors={error}>
       <ReactSelect
+        inputId="template_selector"
         formatGroupLabel={GroupLabel}
         placeholder="Select an Edge stack template"
         value={{
@@ -102,6 +103,7 @@ function useOptions() {
       ] as const,
     [appTemplatesQuery.data, customTemplatesQuery.data]
   );
+
   return { options, getTemplate };
 
   function getTemplate({ type, id }: { type: 'app' | 'custom'; id: number }) {
