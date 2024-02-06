@@ -1,4 +1,8 @@
-/** Simulate user events on react-select dropdowns */
+/** Simulate user events on react-select dropdowns
+ *
+ * taken from https://github.com/lokalise/react-select-event/blob/migrate-to-user-event/src/index.ts
+ * until package is updated
+ */
 
 import {
   Matcher,
