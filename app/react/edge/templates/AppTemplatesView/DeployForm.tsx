@@ -1,8 +1,9 @@
 import { Rocket } from 'lucide-react';
 import { Form, Formik } from 'formik';
-import { array, lazy, number, object, string } from 'yup';
+import { SchemaOf, array, lazy, number, object } from 'yup';
 import { useRouter } from '@uirouter/react';
 import _ from 'lodash';
+import Lazy from 'yup/lib/Lazy';
 
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
 import { EnvironmentType } from '@/react/portainer/environments/types';
@@ -25,7 +26,7 @@ import { useEdgeStacks } from '../../edge-stacks/queries/useEdgeStacks';
 import { useEdgeGroups } from '../../edge-groups/queries/useEdgeGroups';
 import { useCreateEdgeStack } from '../../edge-stacks/queries/useCreateEdgeStack/useCreateEdgeStack';
 
-import { EnvVarsFieldset } from './EnvVarsFieldset';
+import { EnvVarsFieldset, envVarsFieldsetValidation } from './EnvVarsFieldset';
 
 export function DeployFormWidget({
   template,
@@ -168,7 +169,7 @@ function DeployForm({
 function validation(
   stacks: EdgeStack[],
   edgeGroupsType: Record<EdgeGroup['Id'], Array<EnvironmentType>>
-) {
+): Lazy<SchemaOf<FormValues>> {
   return lazy((values: FormValues) => {
     const types = getTypes(values.edgeGroupIds);
 
@@ -184,9 +185,7 @@ function validation(
           'Groups should be of the same type',
           (value) => _.uniq(getTypes(value)).length === 1
         ),
-      envVars: array()
-        .transform((_, orig) => Object.values(orig))
-        .of(string().required('Required')),
+      envVars: envVarsFieldsetValidation(),
     });
   });
 
