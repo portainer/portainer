@@ -1,4 +1,5 @@
 import { FormikErrors } from 'formik';
+import { SchemaOf, array, string } from 'yup';
 
 import { TemplateEnv } from '@/react/portainer/templates/app-templates/types';
 
@@ -77,4 +78,13 @@ function Item({
 
 export function getDefaultValues(definitions: Array<TemplateEnv>): Value {
   return Object.fromEntries(definitions.map((v) => [v.name, v.default || '']));
+}
+
+export function envVarsFieldsetValidation(): SchemaOf<Value> {
+  return (
+    array()
+      .transform((_, orig) => Object.values(orig))
+      // casting to return the correct type - validation works as expected
+      .of(string().required('Required')) as unknown as SchemaOf<Value>
+  );
 }
