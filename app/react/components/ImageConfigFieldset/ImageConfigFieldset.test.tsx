@@ -1,7 +1,9 @@
 import { FormikErrors } from 'formik';
 import { ComponentProps } from 'react';
+import { HttpResponse } from 'msw';
 
 import { renderWithQueryClient, fireEvent } from '@/react-tools/test-utils';
+import { http, server } from '@/setup-tests/server';
 
 import { ImageConfigFieldset } from './ImageConfigFieldset';
 import { Values } from './types';
@@ -66,6 +68,11 @@ function render({
   onChangeImage?: ComponentProps<typeof ImageConfigFieldset>['onChangeImage'];
   onRateLimit?: ComponentProps<typeof ImageConfigFieldset>['onRateLimit'];
 } = {}) {
+  server.use(
+    http.get('/api/registries/:id', () => HttpResponse.json({})),
+    http.get('/api/endpoints/:id', () => HttpResponse.json({}))
+  );
+
   return renderWithQueryClient(
     <ImageConfigFieldset
       values={{

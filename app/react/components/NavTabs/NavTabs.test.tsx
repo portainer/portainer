@@ -42,7 +42,7 @@ test('should call onSelect when clicked with id', async () => {
   const { findByText } = renderComponent(options, options[1].id, onSelect);
 
   const heading = await findByText(options[0].label);
-  userEvent.click(heading);
+  await userEvent.click(heading);
 
   expect(onSelect).toHaveBeenCalledWith(options[0].id);
 });
