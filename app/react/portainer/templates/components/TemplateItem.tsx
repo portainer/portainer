@@ -45,6 +45,7 @@ export function TemplateItem({
         as={linkParams ? Link : undefined}
         to={linkParams?.to}
         params={linkParams?.params}
+        aria-label={template.Title}
       >
         <div className="vertical-center min-w-[56px] justify-center">
           <FallbackImage
