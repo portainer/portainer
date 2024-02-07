@@ -58,6 +58,7 @@ import { deploymentTypeValidation } from '@/react/kubernetes/applications/compon
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/AppDeploymentTypeFormSection';
 import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/EnvironmentVariablesFormSection';
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
+import { HelmInsightsBox } from '@/react/kubernetes/applications/ListView/ApplicationsDatatable/HelmInsightsBox';
 
 import { applicationsModule } from './applications';
 
@@ -88,6 +89,7 @@ export const ngModule = angular
       'value',
     ])
   )
+  .component('helmInsightsBox', r2a(HelmInsightsBox, []))
   .component(
     'namespaceAccessUsersSelector',
     r2a(NamespaceAccessUsersSelector, [

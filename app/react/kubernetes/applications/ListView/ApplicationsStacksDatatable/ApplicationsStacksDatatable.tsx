@@ -8,9 +8,9 @@ import { createStore } from '@/react/kubernetes/datatables/default-kube-datatabl
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
-import { InsightsBox } from '@@/InsightsBox';
 
 import { KubernetesStack } from '../../types';
+import { HelmInsightsBox } from '../ApplicationsDatatable/HelmInsightsBox';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
@@ -88,11 +88,7 @@ export function ApplicationsStacksDatatable({
             />
 
             <div className="w-fit">
-              <InsightsBox
-                type="slim"
-                header="From 2.18 on, you can filter this view by namespace."
-                insightCloseId="k8s-namespace-filtering"
-              />
+              <HelmInsightsBox />
             </div>
           </div>
         </div>
