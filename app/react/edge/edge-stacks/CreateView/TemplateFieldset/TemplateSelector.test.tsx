@@ -10,7 +10,6 @@ import selectEvent from '@/react/test-utils/react-select';
 import { SelectedTemplateValue } from './types';
 import { TemplateSelector } from './TemplateSelector';
 
-// Test rendering of TemplateSelector component
 test('renders TemplateSelector component', async () => {
   render();
 

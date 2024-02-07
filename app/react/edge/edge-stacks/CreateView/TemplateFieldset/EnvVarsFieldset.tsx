@@ -21,13 +21,13 @@ export function EnvVarsFieldset({
 }) {
   return (
     <>
-      {options.map((env, index) => (
+      {options.map((env) => (
         <Item
           key={env.name}
           option={env}
           value={value[env.name]}
           onChange={(value) => handleChange(env.name, value)}
-          errors={errors?.[index]}
+          errors={errors?.[env.name]}
         />
       ))}
     </>
@@ -49,11 +49,13 @@ function Item({
   onChange: (value: string) => void;
   errors?: FormikErrors<string>;
 }) {
+  const inputId = `env_var_${option.name}`;
   return (
     <FormControl
       label={option.label || option.name}
       required={!option.preset}
       errors={errors}
+      inputId={inputId}
     >
       {option.select ? (
         <Select
@@ -64,12 +66,14 @@ function Item({
             value: o.value,
           }))}
           disabled={option.preset}
+          id={inputId}
         />
       ) : (
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={option.preset}
+          id={inputId}
         />
       )}
     </FormControl>
