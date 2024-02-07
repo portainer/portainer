@@ -7,7 +7,7 @@ import {
   PropsWithChildren,
 } from 'react';
 
-import { isAdmin, isPureAdmin } from '@/portainer/users/user.helpers';
+import { isEdgeAdmin, isPureAdmin } from '@/portainer/users/user.helpers';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { User } from '@/portainer/users/types';
 import { useLoadCurrentUser } from '@/portainer/users/queries/useLoadCurrentUser';
@@ -75,7 +75,7 @@ export function useIsEdgeAdmin({
   const envQuery = useEnvironment(envScope ? envId : undefined);
 
   if (!envScope) {
-    return { isLoading: false, isAdmin: isAdmin(user) };
+    return { isLoading: false, isAdmin: isEdgeAdmin(user) };
   }
 
   if (envQuery.isLoading) {
@@ -84,7 +84,7 @@ export function useIsEdgeAdmin({
 
   return {
     isLoading: false,
-    isAdmin: isAdmin(user, envQuery.data),
+    isAdmin: isEdgeAdmin(user, envQuery.data),
   };
 }
 
