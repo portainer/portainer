@@ -1,9 +1,11 @@
 import { http, HttpResponse } from 'msw';
 import { Mock } from 'vitest';
+import { render } from '@testing-library/react';
 
 import { Tag, TagId } from '@/portainer/tags/types';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { server } from '@/setup-tests/server';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { TagSelector } from './TagSelector';
 
@@ -54,8 +56,10 @@ async function renderComponent(
 ) {
   server.use(http.get('/api/tags', () => HttpResponse.json(tags)));
 
-  const queries = renderWithQueryClient(
-    <TagSelector value={value} allowCreate={allowCreate} onChange={onChange} />
+  const Wrapped = withTestQueryProvider(withTestRouter(TagSelector));
+
+  const queries = render(
+    <Wrapped value={value} allowCreate={allowCreate} onChange={onChange} />
   );
 
   const tagElement = await queries.findAllByText('tags', { exact: false });

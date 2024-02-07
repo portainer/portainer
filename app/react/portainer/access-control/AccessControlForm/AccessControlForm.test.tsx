@@ -1,12 +1,14 @@
 import { http, HttpResponse } from 'msw';
+import { render, within } from '@testing-library/react';
 
 import { server } from '@/setup-tests/server';
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { renderWithQueryClient, within } from '@/react-tools/test-utils';
 import { Team, TeamId } from '@/react/portainer/users/teams/types';
 import { createMockTeams } from '@/react-tools/test-mocks';
 import { UserId } from '@/portainer/users/types';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { withTestRouter } from '@/react/test-utils/withRouter';
 
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
 import { ResourceControlViewModel } from '../models/ResourceControlViewModel';
@@ -304,7 +306,6 @@ async function renderComponent(
   { isAdmin = false, hideTitle = false, teams, users }: AdditionalProps = {}
 ) {
   const user = new UserViewModel({ Username: 'user', Role: isAdmin ? 1 : 2 });
-  const state = { user };
 
   if (teams) {
     server.use(http.get('/api/teams', () => HttpResponse.json(teams)));
@@ -314,16 +315,18 @@ async function renderComponent(
     server.use(http.get('/api/users', () => HttpResponse.json(users)));
   }
 
-  const renderResult = renderWithQueryClient(
-    <UserContext.Provider value={state}>
-      <AccessControlForm
-        environmentId={1}
-        errors={{}}
-        values={values}
-        onChange={onChange}
-        hideTitle={hideTitle}
-      />
-    </UserContext.Provider>
+  const Wrapped = withTestRouter(
+    withTestQueryProvider(withUserProvider(AccessControlForm, user))
+  );
+
+  const renderResult = render(
+    <Wrapped
+      environmentId={1}
+      errors={{}}
+      values={values}
+      onChange={onChange}
+      hideTitle={hideTitle}
+    />
   );
 
   await expect(

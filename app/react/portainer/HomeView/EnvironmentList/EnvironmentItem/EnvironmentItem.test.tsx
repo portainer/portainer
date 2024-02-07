@@ -1,16 +1,18 @@
 import { http, HttpResponse } from 'msw';
+import { render } from '@testing-library/react';
 
 import {
   EnvironmentGroup,
   EnvironmentGroupId,
 } from '@/react/portainer/environments/environment-groups/types';
 import { Environment } from '@/react/portainer/environments/types';
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { Tag } from '@/portainer/tags/types';
 import { createMockEnvironment } from '@/react-tools/test-mocks';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { server } from '@/setup-tests/server';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { EnvironmentItem } from './EnvironmentItem';
 
@@ -43,15 +45,17 @@ function renderComponent(
 
   server.use(http.get('/api/tags', () => HttpResponse.json(tags)));
 
-  return renderWithQueryClient(
-    <UserContext.Provider value={{ user }}>
-      <EnvironmentItem
-        isActive={false}
-        onClickBrowse={() => {}}
-        onClickDisconnect={() => {}}
-        environment={env}
-        groupName={group.Name}
-      />
-    </UserContext.Provider>
+  const Wrapped = withTestQueryProvider(
+    withTestRouter(withUserProvider(EnvironmentItem, user))
+  );
+
+  return render(
+    <Wrapped
+      isActive={false}
+      onClickBrowse={() => {}}
+      onClickDisconnect={() => {}}
+      environment={env}
+      groupName={group.Name}
+    />
   );
 }

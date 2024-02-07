@@ -45,6 +45,12 @@ rules:
         pathGroupsExcludedImportTypes: ['internal'],
       },
     ]
+  no-restricted-imports:
+    - error
+    - patterns:
+        - group:
+            - '@/react/test-utils/*'
+          message: 'These utils are just for test files'
 
 settings:
   'import/resolver':
@@ -113,6 +119,12 @@ overrides:
       'no-await-in-loop': 'off'
       'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
       'regex/invalid': ['error', [{ 'regex': '<Icon icon="(.*)"', 'message': 'Please directly import the `lucide-react` icon instead of using the string' }]]
+      '@typescript-eslint/no-restricted-imports':
+        - error
+        - patterns:
+            - group:
+                - '@/react/test-utils/*'
+              message: 'These utils are just for test files'
     overrides: # allow props spreading for hoc files
       - files:
           - app/**/with*.ts{,x}
@@ -126,7 +138,11 @@ overrides:
       'vitest/env': true
     rules:
       'react/jsx-no-constructed-context-values': off
+      '@typescript-eslint/no-restricted-imports': off
+      no-restricted-imports: off
   - files:
       - app/**/*.stories.*
     rules:
       'no-alert': off
+      '@typescript-eslint/no-restricted-imports': off
+      no-restricted-imports: off

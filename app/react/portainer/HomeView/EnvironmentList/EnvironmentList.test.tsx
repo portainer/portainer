@@ -1,10 +1,12 @@
 import { http, HttpResponse } from 'msw';
+import { render } from '@testing-library/react';
 
 import { Environment } from '@/react/portainer/environments/types';
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { server } from '@/setup-tests/server';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { EnvironmentList } from './EnvironmentList';
 
@@ -49,10 +51,12 @@ async function renderComponent(
     )
   );
 
-  const queries = renderWithQueryClient(
-    <UserContext.Provider value={{ user }}>
-      <EnvironmentList onClickBrowse={vi.fn()} onRefresh={vi.fn()} />
-    </UserContext.Provider>
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(withTestRouter(EnvironmentList), user)
+  );
+
+  const queries = render(
+    <Wrapped onClickBrowse={vi.fn()} onRefresh={vi.fn()} />
   );
 
   await expect(queries.findByText('Environments')).resolves.toBeVisible();
