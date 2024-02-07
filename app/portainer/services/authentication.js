@@ -1,5 +1,5 @@
 import { getCurrentUser } from '../users/queries/useLoadCurrentUser';
-import { isAdmin as isAdminHelperFunc, isPureAdmin as isPureAdminHelperFunc } from '../users/user.helpers';
+import * as userHelpers from '../users/user.helpers';
 import { clear as clearSessionStorage } from './session-storage';
 
 const DEFAULT_USER = 'admin';
@@ -127,13 +127,13 @@ angular.module('portainer.app').factory('Authentication', [
     // isAdmin checks if the user is a portainer admin or edge admin
     function isAdmin() {
       const environment = EndpointProvider.currentEndpoint();
-      return isAdminHelperFunc({ Role: user.role }, environment);
+      return userHelpers.isEdgeAdmin({ Role: user.role }, environment);
     }
 
     // To avoid creating divergence between CE and EE
     // isPureAdmin checks if the user is portainer admin only
     function isPureAdmin() {
-      return isPureAdminHelperFunc({ Role: user.role });
+      return userHelpers.isPureAdmin({ Role: user.role });
     }
 
     function hasAuthorizations(authorizations) {

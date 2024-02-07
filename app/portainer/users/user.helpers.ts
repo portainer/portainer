@@ -11,7 +11,7 @@ type UserLike = Pick<User, 'Role'>;
 
 // To avoid creating divergence between CE and EE
 // isAdmin checks if the user is portainer admin or edge admin
-export function isAdmin(
+export function isEdgeAdmin(
   user: UserLike | undefined,
   environment?: Pick<Environment, 'Type'> | null
 ): boolean {
