@@ -19,7 +19,7 @@ test('filling the name should make the submit button clickable and emptying it s
   expect(button).toBeDisabled();
 
   const newValue = 'name';
-  userEvent.type(nameField, newValue);
+  await userEvent.type(nameField, newValue);
 
   await waitFor(() => {
     expect(nameField).toHaveDisplayValue(newValue);
