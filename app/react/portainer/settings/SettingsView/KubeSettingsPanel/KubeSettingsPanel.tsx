@@ -8,7 +8,8 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { LoadingButton } from '@@/buttons';
 import { Widget } from '@@/Widget';
 
-import { useSettings, useUpdateSettingsMutation } from '../../queries';
+import { useUpdateSettingsMutation } from '../../queries';
+import { Settings } from '../../types';
 
 import { HelmSection } from './HelmSection';
 import { KubeConfigSection } from './KubeConfigSection';
@@ -16,19 +17,14 @@ import { FormValues } from './types';
 import { DeploymentOptionsSection } from './DeploymentOptionsSection';
 import { validation } from './validation';
 
-export function KubeSettingsPanel() {
-  const settingsQuery = useSettings();
+export function KubeSettingsPanel({ settings }: { settings: Settings }) {
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId(false);
   const mutation = useUpdateSettingsMutation();
 
-  if (!settingsQuery.data) {
-    return null;
-  }
-
   const initialValues: FormValues = {
-    helmRepositoryUrl: settingsQuery.data.HelmRepositoryURL || '',
-    kubeconfigExpiry: settingsQuery.data.KubeconfigExpiry || '0',
+    helmRepositoryUrl: settings.HelmRepositoryURL || '',
+    kubeconfigExpiry: settings.KubeconfigExpiry || '0',
     globalDeploymentOptions: {
       ...{
         requireNoteOnApplications: false,
@@ -39,7 +35,7 @@ export function KubeSettingsPanel() {
         perEnvOverride: false,
         hideStacksFunctionality: false,
       },
-      ...settingsQuery.data.GlobalDeploymentOptions,
+      ...settings.GlobalDeploymentOptions,
     },
   };
 
