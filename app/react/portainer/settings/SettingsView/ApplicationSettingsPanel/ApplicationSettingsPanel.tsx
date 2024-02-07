@@ -2,10 +2,7 @@ import { Settings as SettingsIcon } from 'lucide-react';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
-import {
-  useSettings,
-  useUpdateSettingsMutation,
-} from '@/react/portainer/settings/queries';
+import { useUpdateSettingsMutation } from '@/react/portainer/settings/queries';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { Widget } from '@@/Widget';
@@ -24,17 +21,13 @@ import { EnableTelemetryField } from './EnableTelemetryField';
 
 export function ApplicationSettingsPanel({
   onSuccess,
+  settings,
 }: {
   onSuccess(settings: Settings): void;
+  settings: Settings;
 }) {
-  const settingsQuery = useSettings();
   const mutation = useUpdateSettingsMutation();
 
-  if (!settingsQuery.data) {
-    return null;
-  }
-
-  const settings = settingsQuery.data;
   const initialValues: Values = {
     edgeAgentCheckinInterval: settings.EdgeAgentCheckinInterval,
     enableTelemetry: settings.EnableTelemetry,
