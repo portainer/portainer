@@ -1,6 +1,5 @@
 import { Rocket } from 'lucide-react';
-
-import { render, fireEvent } from '@/react-tools/test-utils';
+import { render, fireEvent } from '@testing-library/react';
 
 import { BoxSelector } from './BoxSelector';
 import { BoxSelectorOption, Value } from './types';

@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@/react-tools/test-utils';
+import { render, fireEvent } from '@testing-library/react';
 
 import { SwitchField, Props } from './SwitchField';
 

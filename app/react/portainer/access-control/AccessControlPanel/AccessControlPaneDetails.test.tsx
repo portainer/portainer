@@ -1,11 +1,13 @@
 import _ from 'lodash';
 import { http, HttpResponse } from 'msw';
+import { render } from '@testing-library/react';
 
 import { createMockTeams, createMockUsers } from '@/react-tools/test-mocks';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { server } from '@/setup-tests/server';
 import { Role } from '@/portainer/users/types';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import {
   ResourceControlOwnership,
@@ -145,9 +147,11 @@ async function renderComponent(
   resourceType: ResourceControlType = ResourceControlType.Container,
   resourceControl?: ResourceControlViewModel
 ) {
-  const WithUser = withUserProvider(AccessControlPanelDetails);
-  const queries = renderWithQueryClient(
-    <WithUser resourceControl={resourceControl} resourceType={resourceType} />
+  const Wrapped = withTestQueryProvider(
+    withTestRouter(withUserProvider(AccessControlPanelDetails))
+  );
+  const queries = render(
+    <Wrapped resourceControl={resourceControl} resourceType={resourceType} />
   );
   await expect(queries.findByText('Ownership')).resolves.toBeVisible();
 

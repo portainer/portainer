@@ -1,10 +1,12 @@
 import userEvent from '@testing-library/user-event';
-import { HttpResponse } from 'msw';
+import { HttpResponse, http } from 'msw';
+import { render } from '@testing-library/react';
 
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { http, server } from '@/setup-tests/server';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { server } from '@/setup-tests/server';
 
 import { CreateContainerInstanceForm } from './CreateContainerInstanceForm';
 
@@ -19,12 +21,10 @@ test('submit button should be disabled when name or image is missing', async () 
   server.use(http.get('/api/endpoints/5', () => HttpResponse.json({})));
 
   const user = new UserViewModel({ Username: 'user' });
-
-  const { findByText, getByText, getByLabelText } = renderWithQueryClient(
-    <UserContext.Provider value={{ user }}>
-      <CreateContainerInstanceForm />
-    </UserContext.Provider>
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(withTestRouter(CreateContainerInstanceForm), user)
   );
+  const { findByText, getByText, getByLabelText } = render(<Wrapped />);
 
   await expect(findByText(/Azure settings/)).resolves.toBeVisible();
 

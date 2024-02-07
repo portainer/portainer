@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw';
+import { render } from '@testing-library/react';
 
 import { server } from '@/setup-tests/server';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { LicenseType } from '../licenses/types';
 
@@ -17,7 +18,7 @@ test('when user is using more nodes then allowed he should see message', async (
     http.get('/api/system/nodes', () => HttpResponse.json({ nodes: used }))
   );
 
-  const { findByText } = renderWithQueryClient(<LicenseNodePanel />);
+  const { findByText } = renderComponent();
 
   await expect(
     findByText(
@@ -36,7 +37,7 @@ test("when user is using less nodes then allowed he shouldn't see message", asyn
     http.get('/api/system/nodes', () => HttpResponse.json({ nodes: used }))
   );
 
-  const { findByText } = renderWithQueryClient(<LicenseNodePanel />);
+  const { findByText } = renderComponent();
 
   await expect(
     findByText(
@@ -44,3 +45,9 @@ test("when user is using less nodes then allowed he shouldn't see message", asyn
     )
   ).rejects.toBeTruthy();
 });
+
+function renderComponent() {
+  const Wrapped = withTestQueryProvider(LicenseNodePanel);
+
+  return render(<Wrapped />);
+}

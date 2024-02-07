@@ -1,11 +1,34 @@
-import { render } from '@/react-tools/test-utils';
+import { UIView } from '@uirouter/react';
+import { render } from '@testing-library/react';
+
+import { withTestRouter } from '@/react/test-utils/withRouter';
 
 import { AddButton } from './AddButton';
 
 function renderDefault({
   label = 'default label',
 }: Partial<{ label: string }> = {}) {
-  return render(<AddButton to="">{label}</AddButton>);
+  const Wrapped = withTestRouter(AddButton, {
+    stateConfig: [
+      {
+        name: 'root',
+        url: '/',
+
+        component: () => (
+          <>
+            <div>Root</div>
+            <UIView />
+          </>
+        ),
+      },
+      {
+        name: 'root.new',
+        url: 'new',
+      },
+    ],
+    route: 'root',
+  });
+  return render(<Wrapped to="">{label}</Wrapped>);
 }
 
 test('should display a AddButton component', async () => {

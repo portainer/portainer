@@ -1,6 +1,5 @@
 import { vi } from 'vitest';
-
-import { render, screen } from '@/react-tools/test-utils';
+import { render, screen } from '@testing-library/react';
 
 import { TemplateNote } from './TemplateNote';
 
