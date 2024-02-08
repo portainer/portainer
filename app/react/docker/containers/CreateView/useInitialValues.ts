@@ -36,7 +36,7 @@ import { envVarsTabUtils } from '@/react/docker/containers/CreateView/EnvVarsTab
 import { UserId } from '@/portainer/users/types';
 import { getImageConfig } from '@/react/portainer/registries/utils/getImageConfig';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { useWebhooks } from '@/react/portainer/webhooks/useWebhooks';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
 
@@ -62,8 +62,7 @@ export function useInitialValues(submitting: boolean) {
     params: { nodeName, from },
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
-  const { user } = useCurrentUser();
-  const isAdminQuery = useIsEdgeAdmin();
+  const { user, isPureAdmin } = useCurrentUser();
 
   const networksQuery = useNetworksForSelector();
 
@@ -81,15 +80,13 @@ export function useInitialValues(submitting: boolean) {
     enabled: !!from,
   });
 
-  if (!networksQuery.data || isAdminQuery.isLoading) {
+  if (!networksQuery.data) {
     return null;
   }
 
-  const { isAdmin } = isAdminQuery;
-
   if (!from) {
     return {
-      initialValues: defaultValues(isAdmin, user.Id, nodeName),
+      initialValues: defaultValues(isPureAdmin, user.Id, nodeName),
     };
   }
 
@@ -140,7 +137,7 @@ export function useInitialValues(submitting: boolean) {
     env: envVarsTabUtils.toViewModel(fromContainer),
     ...baseFormUtils.toViewModel(
       fromContainer,
-      isAdmin,
+      isPureAdmin,
       user.Id,
       nodeName,
       imageConfig,
@@ -152,7 +149,7 @@ export function useInitialValues(submitting: boolean) {
 }
 
 function defaultValues(
-  isAdmin: boolean,
+  isPureAdmin: boolean,
   currentUserId: UserId,
   nodeName: string
 ): Values {
@@ -165,6 +162,6 @@ function defaultValues(
     resources: resourcesTabUtils.getDefaultViewModel(),
     capabilities: capabilitiesTabUtils.getDefaultViewModel(),
     env: envVarsTabUtils.getDefaultViewModel(),
-    ...baseFormUtils.getDefaultViewModel(isAdmin, currentUserId, nodeName),
+    ...baseFormUtils.getDefaultViewModel(isPureAdmin, currentUserId, nodeName),
   };
 }
