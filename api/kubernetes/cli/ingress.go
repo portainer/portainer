@@ -281,6 +281,7 @@ func (kcl *KubeClient) UpdateIngress(namespace string, info models.K8sIngressInf
 		})
 	}
 
+	ingress.Spec.Rules = make([]netv1.IngressRule, 0)
 	for rule, paths := range rules {
 		ingress.Spec.Rules = append(ingress.Spec.Rules, netv1.IngressRule{
 			Host: rule,
