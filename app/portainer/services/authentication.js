@@ -26,6 +26,7 @@ angular.module('portainer.app').factory('Authentication', [
     service.isAuthenticated = isAuthenticated;
     service.getUserDetails = getUserDetails;
     service.isAdmin = isAdmin;
+    service.isEdgeAdmin = isEdgeAdmin;
     service.isPureAdmin = isPureAdmin;
     service.hasAuthorizations = hasAuthorizations;
 
@@ -125,9 +126,16 @@ angular.module('portainer.app').factory('Authentication', [
 
     // To avoid creating divergence between CE and EE
     // isAdmin checks if the user is a portainer admin or edge admin
-    function isAdmin() {
+    function isEdgeAdmin() {
       const environment = EndpointProvider.currentEndpoint();
       return userHelpers.isEdgeAdmin({ Role: user.role }, environment);
+    }
+
+    /**
+     * @deprecated use Authentication.isAdmin instead
+     */
+    function isAdmin() {
+      return isEdgeAdmin();
     }
 
     // To avoid creating divergence between CE and EE
