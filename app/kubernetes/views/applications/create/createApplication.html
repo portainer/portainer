@@ -135,11 +135,11 @@
                     class="btn btn-sm btn-primary"
                     ng-click="ctrl.updateApplicationViaWebEditor()"
                     ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
-                    ng-disabled="!kubernetesApplicationCreationForm.$valid || !ctrl.state.isEditorDirty || ctrl.state.updateWebEditorInProgress"
+                    ng-disabled="ctrl.isUpdateApplicationViaWebEditorButtonDisabled() || !kubernetesApplicationCreationForm.$valid"
                     style="margin-top: 7px; margin-left: 0"
                     button-spinner="ctrl.state.updateWebEditorInProgress"
                   >
-                    <span ng-show="!ctrl.state.updateWebEditorInProgress">Update the application</span>
+                    <span ng-show="!ctrl.state.updateWebEditorInProgress">Update application</span>
                     <span ng-show="ctrl.state.updateWebEditorInProgress">Update in progress...</span>
                   </button>
                 </div>
@@ -403,7 +403,7 @@
                     class="btn btn-sm btn-primary"
                     ng-click="ctrl.updateApplicationViaWebEditor()"
                     ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
-                    ng-disabled="!kubernetesApplicationCreationForm.$valid || !ctrl.state.isEditorDirty || ctrl.state.updateWebEditorInProgress"
+                    ng-disabled="ctrl.isUpdateApplicationViaWebEditorButtonDisabled() || !kubernetesApplicationCreationForm.$valid"
                     style="margin-top: 7px; margin-left: 0"
                     button-spinner="ctrl.state.updateWebEditorInProgress"
                   >
