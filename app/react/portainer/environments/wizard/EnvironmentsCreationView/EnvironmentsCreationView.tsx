@@ -33,7 +33,7 @@ import styles from './EnvironmentsCreationView.module.css';
 import { WizardEndpointsList } from './WizardEndpointsList';
 
 export function EnvironmentCreationView() {
-  // move this redirect logic to the router when migrating the router to react
+  // TODO: move this redirect logic to the router when migrating the router to react
   useAdminOnlyRedirect();
   const {
     params: { localEndpointId: localEndpointIdParam },

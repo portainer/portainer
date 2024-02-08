@@ -19,7 +19,7 @@ import {
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
-  // move this redirect logic to the router when migrating the router to react
+  // TODO: move this redirect logic to the router when migrating the router to react
   useAdminOnlyRedirect();
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();

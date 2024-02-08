@@ -16,7 +16,7 @@ import { useConnectLocalEnvironment } from './useFetchOrCreateLocalEnvironment';
 import styles from './HomeView.module.css';
 
 export function HomeView() {
-  // move this redirect logic to the router when migrating the router to react
+  // TODO: move this redirect logic to the router when migrating the router to react
   useAdminOnlyRedirect();
   const localEnvironmentAdded = useConnectLocalEnvironment();
   const { trackEvent } = useAnalytics();
