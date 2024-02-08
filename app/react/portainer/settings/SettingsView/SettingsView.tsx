@@ -21,14 +21,14 @@ export function SettingsView() {
   const settingsQuery = useSettings();
 
   useEffect(() => {
-    if (settingsQuery.isFetched) {
+    if (settingsQuery.data) {
       const regEx = /#!.*#(.*)/;
       const match = window.location.hash.match(regEx);
       if (match && match[1]) {
         document.getElementById(match[1])?.scrollIntoView();
       }
     }
-  }, [settingsQuery.isFetched]);
+  }, [settingsQuery.data]);
 
   if (!settingsQuery.data) {
     return null;
