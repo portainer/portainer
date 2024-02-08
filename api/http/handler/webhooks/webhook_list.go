@@ -22,7 +22,7 @@ type webhookListOperationFilters struct {
 // @tags webhooks
 // @accept json
 // @produce json
-// @param filters query webhookListOperationFilters false "Filters"
+// @param filters query string false "Filters (json-string)" example({"EndpointID":1,"ResourceID":"abc12345-abcd-2345-ab12-58005b4a0260"})
 // @success 200 {array} portainer.Webhook
 // @failure 400
 // @failure 500
