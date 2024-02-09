@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - 'develop'
-      - '!release/*'
+      - 'release/*'
   pull_request:
     branches:
       - 'develop'
@@ -37,7 +37,7 @@ jobs:
           - { platform: linux, arch: s390x, version: "" }
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
       - name: '[preparation] checkout the current branch'
@@ -48,38 +48,11 @@ jobs:
         uses: actions/setup-go@v5.0.0
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache: false
-      - name: '[preparation] cache paths'
-        id: cache-dir-path
-        run: |
-          echo "yarn-cache-dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
-          echo "go-build-dir=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
-          echo "go-mod-dir=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
-      - name: '[preparation] cache go'
-        uses: actions/cache@v4.0.0
-        with:
-          path: |
-            ${{ steps.cache-dir-path.outputs.go-build-dir }}
-            ${{ steps.cache-dir-path.outputs.go-mod-dir }}
-          key: ${{ matrix.config.platform }}-${{ matrix.config.arch }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ matrix.config.platform }}-${{ matrix.config.arch }}-go-
-          enableCrossOsArchive: true
       - name: '[preparation] set up node.js'
         uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: ''
-      - name: '[preparation] cache yarn'
-        uses: actions/cache@v4.0.0
-        with:
-          path: |
-            **/node_modules
-            ${{ steps.cache-dir-path.outputs.yarn-cache-dir }}
-          key: ${{ matrix.config.platform }}-${{ matrix.config.arch }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ matrix.config.platform }}-${{ matrix.config.arch }}-yarn-
-          enableCrossOsArchive: true
+          cache: 'yarn'
       - name: '[preparation] set up qemu'
         uses: docker/setup-qemu-action@v3.0.0
       - name: '[preparation] set up docker context for buildx'
@@ -95,10 +68,10 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: '[preparation] set the container image tag'
         run: |
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             # use the release branch name as the tag for release branches
             # for instance, release/2.19 becomes 2.19
-            CONTAINER_IMAGE_TAG=$(echo $GITHUB_BASE_REF | cut -d "/" -f 2)
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | cut -d "/" -f 2)
           elif [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             # use pr${{ github.event.number }} as the tag for pull requests
             # for instance, pr123
@@ -119,7 +92,7 @@ jobs:
           export GIT_COMMIT_HASH_SHORT={GIT_COMMIT_HASH_LONG:0:7}
           
           NODE_ENV="testing"
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             NODE_ENV="production"
           fi
           
@@ -135,7 +108,7 @@ jobs:
             docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
             docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
             
-            if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+            if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
               docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
               docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
             fi
@@ -143,7 +116,7 @@ jobs:
         env:
           CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
   build_manifests:
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     needs: [build_images]
     steps:
@@ -160,10 +133,10 @@ jobs:
           endpoint: builders
       - name: '[execution] build and push manifests'
         run: |
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             # use the release branch name as the tag for release branches
             # for instance, release/2.19 becomes 2.19
-            CONTAINER_IMAGE_TAG=$(echo $GITHUB_BASE_REF | cut -d "/" -f 2)
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | cut -d "/" -f 2)
           elif [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             # use pr${{ github.event.number }} as the tag for pull requests
             # for instance, pr123
@@ -188,7 +161,7 @@ jobs:
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64-alpine" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine"
             
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             docker buildx imagetools create -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" \
               "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64" \
               "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \
