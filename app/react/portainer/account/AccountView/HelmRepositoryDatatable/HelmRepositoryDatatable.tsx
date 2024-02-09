@@ -43,16 +43,14 @@ export function HelmRepositoryDatatable() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (helmReposQuery.isFetched) {
-        const regEx = /#!.*#(.*)/;
-        const match = window.location.hash.match(regEx);
-        if (match && match[1]) {
-          document.getElementById(match[1])?.scrollIntoView();
-        }
+      const regEx = /#!.*#(.*)/;
+      const match = window.location.hash.match(regEx);
+      if (match && match[1]) {
+        document.getElementById(match[1])?.scrollIntoView();
       }
     }, 1000);
     return () => clearTimeout(timeout);
-  }, [helmReposQuery.isFetched]);
+  }, []);
 
   return (
     <Datatable
