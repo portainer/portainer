@@ -30,21 +30,21 @@ export function SettingsView() {
     }
   }, [settingsQuery.data]);
 
-  if (!settingsQuery.data) {
-    return null;
-  }
-
   return (
     <>
       <PageHeader title="Settings" breadcrumbs="Settings" reload />
 
       <div className="mx-4 space-y-4">
-        <ApplicationSettingsPanel
-          onSuccess={handleSuccess}
-          settings={settingsQuery.data}
-        />
+        {settingsQuery.data && (
+          <>
+            <ApplicationSettingsPanel
+              onSuccess={handleSuccess}
+              settings={settingsQuery.data}
+            />
 
-        <KubeSettingsPanel settings={settingsQuery.data} />
+            <KubeSettingsPanel settings={settingsQuery.data} />
+          </>
+        )}
 
         <HelmCertPanel />
 
