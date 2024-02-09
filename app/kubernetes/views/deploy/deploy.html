@@ -47,6 +47,7 @@
                       ng-disabled="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                       class="form-control"
                       ng-model="ctrl.formValues.Namespace"
+                      ng-change="ctrl.onChangeNamespace()"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
                     ></select>
                     <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
@@ -90,6 +91,7 @@
                   stack-name="ctrl.formValues.StackName"
                   set-stack-name="(ctrl.setStackName)"
                   is-admin="ctrl.currentUser.isAdmin"
+                  stacks="ctrl.stacks"
                 ></kube-stack-name>
                 <!-- !namespace -->
 
