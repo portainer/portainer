@@ -62,8 +62,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
-          cache-dependency-path: |
-            ${{ steps.cache-dir-path.outputs.yarn-cache-dir }}
       - name: '[preparation] set up qemu'
         uses: docker/setup-qemu-action@v3.0.0
       - name: '[preparation] set up docker context for buildx'
