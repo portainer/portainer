@@ -37,7 +37,7 @@ jobs:
           - { platform: linux, arch: s390x, version: "" }
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
       - name: '[preparation] checkout the current branch'
@@ -48,38 +48,11 @@ jobs:
         uses: actions/setup-go@v5.0.0
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache: false
-      - name: '[preparation] cache paths'
-        id: cache-dir-path
-        run: |
-          echo "yarn-cache-dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
-          echo "go-build-dir=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
-          echo "go-mod-dir=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
-      - name: '[preparation] cache go'
-        uses: actions/cache@v4.0.0
-        with:
-          path: |
-            ${{ steps.cache-dir-path.outputs.go-build-dir }}
-            ${{ steps.cache-dir-path.outputs.go-mod-dir }}
-          key: ${{ matrix.config.platform }}-${{ matrix.config.arch }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ matrix.config.platform }}-${{ matrix.config.arch }}-go-
-          enableCrossOsArchive: true
       - name: '[preparation] set up node.js'
         uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: ''
-      - name: '[preparation] cache yarn'
-        uses: actions/cache@v4.0.0
-        with:
-          path: |
-            **/node_modules
-            ${{ steps.cache-dir-path.outputs.yarn-cache-dir }}
-          key: ${{ matrix.config.platform }}-${{ matrix.config.arch }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ matrix.config.platform }}-${{ matrix.config.arch }}-yarn-
-          enableCrossOsArchive: true
+          cache: 'yarn'
       - name: '[preparation] set up qemu'
         uses: docker/setup-qemu-action@v3.0.0
       - name: '[preparation] set up docker context for buildx'
@@ -143,7 +116,7 @@ jobs:
         env:
           CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
   build_manifests:
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     needs: [build_images]
     steps:
