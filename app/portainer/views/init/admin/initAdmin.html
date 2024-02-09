@@ -131,48 +131,150 @@
                 </span>
               </div>
             </div>
+            <!-- !note -->
 
             <box-selector slim="true" options="restoreOptions" value="formValues.restoreFormType" on-change="(onChangeRestoreType)" radio-name="'restore-type'"></box-selector>
 
-            <div class="form-group">
-              <div class="col-sm-12">
-                <span class="small text-muted"> You can upload a backup file from your computer. </span>
+            <div ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.FILE">
+              <!-- note -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small text-muted"> You can upload a backup file from your computer. </span>
+                </div>
               </div>
-            </div>
-            <!-- !note -->
-            <!-- select-file-input -->
-            <div class="form-group">
-              <div class="col-sm-12 vertical-center">
-                <button
-                  class="btn btn-sm btn-primary"
-                  ngf-select
-                  accept=".gz,.encrypted"
-                  ngf-accept="'application/x-tar,application/x-gzip'"
-                  ng-model="formValues.BackupFile"
-                  auto-focus
-                  data-cy="init-selectBackupFileButton"
-                  >Select file</button
-                >
-                <span class="space-left vertical-center">
-                  {{ formValues.BackupFile.name }}
-                  <pr-icon icon="'x-circle'" class-name="'icon-danger'" ng-if="!formValues.BackupFile"></pr-icon>
-                </span>
+              <!-- !note -->
+              <!-- select-file-input -->
+              <div class="form-group">
+                <div class="col-sm-12 vertical-center">
+                  <button
+                    class="btn btn-sm btn-primary"
+                    ngf-select
+                    accept=".gz,.encrypted"
+                    ngf-accept="'application/x-tar,application/x-gzip'"
+                    ng-model="formValues.BackupFile"
+                    auto-focus
+                    data-cy="init-selectBackupFileButton"
+                    >Select file</button
+                  >
+                  <span class="space-left vertical-center">
+                    {{ formValues.BackupFile.name }}
+                    <pr-icon icon="'x-circle'" class-name="'icon-danger'" ng-if="!formValues.BackupFile"></pr-icon>
+                  </span>
+                </div>
               </div>
+              <!-- password-input -->
+              <div class="form-group">
+                <label for="password" class="col-sm-3 control-label text-left">
+                  Password
+                  <portainer-tooltip
+                    message="'If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty.'"
+                  ></portainer-tooltip>
+                </label>
+                <div class="col-sm-4">
+                  <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="init-backupPasswordInput" />
+                </div>
+              </div>
+              <!-- !password-input -->
             </div>
             <!-- !select-file-input -->
-            <!-- password-input -->
-            <div class="form-group">
-              <label for="password" class="col-sm-3 control-label text-left">
-                Password
-                <portainer-tooltip
-                  message="'If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty.'"
-                ></portainer-tooltip>
-              </label>
-              <div class="col-sm-4">
-                <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="init-backupPasswordInput" />
+            <div class="limited-be-content" ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.S3">
+              <!-- Access key id  -->
+              <div class="form-group">
+                <label for="access_key_id" class="col-sm-3 control-label text-left">Access key ID</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="access_key_id" name="access_key_id" ng-model="formValues.AccessKeyId" required data-cy="init-accessKeyIdInput" />
+                </div>
               </div>
+              <!-- !Access key id  -->
+              <!-- Secret access key -->
+              <div class="form-group">
+                <label for="secret_access_key" class="col-sm-3 control-label text-left">Secret access key</label>
+                <div class="col-sm-9">
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="secret_access_key"
+                    name="secret_access_key"
+                    ng-model="formValues.SecretAccessKey"
+                    required
+                    data-cy="init-secretAccessKeyInput"
+                  />
+                </div>
+              </div>
+              <!-- !Secret access key -->
+              <!-- Region -->
+              <div class="form-group">
+                <label for="backup-s3-region" class="col-sm-3 control-label text-left">Region</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="default region is us-east-1 if left empty"
+                    id="backup-s3-region"
+                    name="backup-s3-region"
+                    ng-model="formValues.Region"
+                    data-cy="init-s3RegionInput"
+                  />
+                </div>
+              </div>
+              <!-- !Region -->
+              <!-- Bucket name -->
+              <div class="form-group">
+                <label for="bucket_name" class="col-sm-3 control-label text-left">Bucket name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="bucket_name" name="bucket_name" ng-model="formValues.BucketName" required data-cy="init-bucketNameInput" />
+                </div>
+              </div>
+              <!-- !Bucket name -->
+              <!-- S3 Compatible Host -->
+              <div class="form-group">
+                <label for="s3-compatible-host" class="col-sm-3 control-label text-left">
+                  S3 Compatible Host
+                  <portainer-tooltip message="'Hostname of a S3 service'"></portainer-tooltip>
+                </label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="s3-compatible-host"
+                    name="s3-compatible-host"
+                    ng-model="formValues.S3CompatibleHost"
+                    placeholder="leave empty for AWS S3"
+                    data-cy="init-s3CompatibleHostInput"
+                  />
+                </div>
+              </div>
+              <!-- !S3 Compatible Host -->
+              <!-- Filename -->
+              <div class="form-group">
+                <label for="backup-s3-filename" class="col-sm-3 control-label text-left">Filename</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="backup-s3-filename"
+                    name="backup-s3-filename"
+                    ng-model="formValues.Filename"
+                    required
+                    data-cy="init-backupFilenameInput"
+                  />
+                </div>
+              </div>
+              <!-- !Filename -->
+              <!-- password-input -->
+              <div class="form-group">
+                <label for="password" class="col-sm-3 control-label text-left">
+                  Password
+                  <portainer-tooltip
+                    message="'If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty.'"
+                  ></portainer-tooltip>
+                </label>
+                <div class="col-sm-4">
+                  <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="init-backupPasswordInput" />
+                </div>
+              </div>
+              <!-- !password-input -->
             </div>
-            <!-- !password-input -->
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
