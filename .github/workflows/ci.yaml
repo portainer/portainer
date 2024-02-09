@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - 'develop'
-      - '!release/*'
+      - 'release/*'
   pull_request:
     branches:
       - 'develop'
@@ -95,10 +95,10 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: '[preparation] set the container image tag'
         run: |
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             # use the release branch name as the tag for release branches
             # for instance, release/2.19 becomes 2.19
-            CONTAINER_IMAGE_TAG=$(echo $GITHUB_BASE_REF | cut -d "/" -f 2)
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | cut -d "/" -f 2)
           elif [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             # use pr${{ github.event.number }} as the tag for pull requests
             # for instance, pr123
@@ -119,7 +119,7 @@ jobs:
           export GIT_COMMIT_HASH_SHORT={GIT_COMMIT_HASH_LONG:0:7}
           
           NODE_ENV="testing"
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             NODE_ENV="production"
           fi
           
@@ -135,7 +135,7 @@ jobs:
             docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
             docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
             
-            if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+            if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
               docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
               docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
             fi
@@ -160,10 +160,10 @@ jobs:
           endpoint: builders
       - name: '[execution] build and push manifests'
         run: |
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             # use the release branch name as the tag for release branches
             # for instance, release/2.19 becomes 2.19
-            CONTAINER_IMAGE_TAG=$(echo $GITHUB_BASE_REF | cut -d "/" -f 2)
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | cut -d "/" -f 2)
           elif [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             # use pr${{ github.event.number }} as the tag for pull requests
             # for instance, pr123
@@ -188,7 +188,7 @@ jobs:
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64-alpine" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine"
             
-          if [[ "${GITHUB_BASE_REF}" =~ ^release/.*$ ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             docker buildx imagetools create -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" \
               "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64" \
               "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \
