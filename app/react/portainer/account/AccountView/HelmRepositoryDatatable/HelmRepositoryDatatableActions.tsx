@@ -36,7 +36,7 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
         data-cy="credentials-addButton"
         icon={Plus}
       >
-        Add Helm Repository
+        Add Helm repository
       </Button>
     </>
   );

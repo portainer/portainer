@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import helm from '@/assets/ico/vendor/helm.svg?c';
@@ -41,6 +41,19 @@ export function HelmRepositoryDatatable() {
     helmReposQuery.data?.UserRepositories,
   ]);
 
+  useEffect(() => {
+    // window.location.hash will get everything after the hashbang
+    // the regex will match the the content after each hash
+    const timeout = setTimeout(() => {
+      const regEx = /#!.*#(.*)/;
+      const match = window.location.hash.match(regEx);
+      if (match && match[1]) {
+        document.getElementById(match[1])?.scrollIntoView();
+      }
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
     <Datatable
       getRowId={(row) => String(row.Id)}
@@ -48,8 +61,9 @@ export function HelmRepositoryDatatable() {
       description={<HelmDatatableDescription />}
       settingsManager={tableState}
       columns={columns}
-      title="Helm Repositories"
+      title="Helm repositories"
       titleIcon={helm}
+      titleId="helm-repositories"
       renderTableActions={(selectedRows) => (
         <HelmRepositoryDatatableActions selectedItems={selectedRows} />
       )}

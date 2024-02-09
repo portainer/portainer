@@ -25,7 +25,7 @@ export const settingsModule = angular
   )
   .component(
     'applicationSettingsPanel',
-    r2a(withReactQuery(ApplicationSettingsPanel), ['onSuccess'])
+    r2a(withReactQuery(ApplicationSettingsPanel), ['onSuccess', 'settings'])
   )
   .component(
     'sslSettingsPanel',
@@ -38,5 +38,5 @@ export const settingsModule = angular
   )
   .component(
     'kubeSettingsPanel',
-    r2a(withUIRouter(withReactQuery(KubeSettingsPanel)), [])
+    r2a(withUIRouter(withReactQuery(KubeSettingsPanel)), ['settings'])
   ).name;

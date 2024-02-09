@@ -17,6 +17,7 @@
 html {
   font-size: 16px;
   overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 html[theme='dark'],
