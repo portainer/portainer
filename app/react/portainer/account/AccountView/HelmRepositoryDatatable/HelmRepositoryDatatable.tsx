@@ -42,6 +42,8 @@ export function HelmRepositoryDatatable() {
   ]);
 
   useEffect(() => {
+    // window.location.hash will get everything after the hashbang
+    // the regex will match the the content after each hash
     const timeout = setTimeout(() => {
       const regEx = /#!.*#(.*)/;
       const match = window.location.hash.match(regEx);
