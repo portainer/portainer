@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Wand2 } from 'lucide-react';
 
 import { useAnalytics } from '@/react/hooks/useAnalytics';
+import { useAdminOnlyRedirect } from '@/react/hooks/useAdminOnlyRedirect';
 
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';
@@ -18,6 +19,8 @@ import {
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
+  // TODO: move this redirect logic to the router when migrating the router to react
+  useAdminOnlyRedirect();
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
