@@ -1,11 +1,13 @@
 import { CellContext } from '@tanstack/react-table';
 
 import { Authorized } from '@/react/hooks/useUser';
+import { appOwnerLabel } from '@/react/kubernetes/applications/constants';
 
 import { Link } from '@@/Link';
 import { Badge } from '@@/Badge';
 
 import { SecretRowData } from '../types';
+import { configurationOwnerUsernameLabel } from '../../../constants';
 
 import { columnHelper } from './helper';
 
@@ -18,8 +20,10 @@ export const name = columnHelper.accessor(
       row.metadata?.annotations?.['portainer.io/registry.id'];
     const isSystemSecret = isSystemToken || row.isSystem || isRegistrySecret;
 
-    const hasConfigurationOwner =
-      !!row.metadata?.labels?.['io.portainer.kubernetes.configuration.owner'];
+    const hasConfigurationOwner = !!(
+      row.metadata?.labels?.[configurationOwnerUsernameLabel] ||
+      row.metadata?.labels?.[appOwnerLabel]
+    );
     return `${name} ${isSystemSecret ? 'system' : ''} ${
       !isSystemToken && !hasConfigurationOwner ? 'external' : ''
     } ${!row.inUse && !isSystemSecret ? 'unused' : ''}`;
