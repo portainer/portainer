@@ -389,6 +389,7 @@ class KubernetesDeployController {
         }
       }
 
+      this.onChangeNamespace();
       this.state.viewReady = true;
 
       this.$window.onbeforeunload = () => {
