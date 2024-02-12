@@ -10,7 +10,6 @@ import {
   EnvironmentId,
 } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
-import { useAdminOnlyRedirect } from '@/react/hooks/useAdminOnlyRedirect';
 
 import { Stepper } from '@@/Stepper';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -33,8 +32,6 @@ import styles from './EnvironmentsCreationView.module.css';
 import { WizardEndpointsList } from './WizardEndpointsList';
 
 export function EnvironmentCreationView() {
-  // TODO: move this redirect logic to the router when migrating the router to react
-  useAdminOnlyRedirect();
   const {
     params: { localEndpointId: localEndpointIdParam },
   } = useCurrentStateAndParams();
