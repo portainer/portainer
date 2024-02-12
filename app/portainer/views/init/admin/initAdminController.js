@@ -17,12 +17,14 @@ angular.module('portainer.app').controller('InitAdminController', [
     $scope.uploadBackup = uploadBackup;
 
     $scope.logo = StateManager.getState().application.logo;
+    $scope.RESTORE_FORM_TYPES = { S3: 's3', FILE: 'file' };
 
     $scope.formValues = {
       Username: 'admin',
       Password: '',
       ConfirmPassword: '',
       enableTelemetry: process.env.NODE_ENV === 'production',
+      restoreFormType: $scope.RESTORE_FORM_TYPES.FILE,
     };
 
     $scope.state = {
