@@ -41,10 +41,10 @@ function Cell({ row }: CellContext<SecretRowData, string>) {
   const isSystemToken = name?.includes('default-token-');
   const isSystemSecret = isSystemToken || row.original.isSystem;
 
-  const hasConfigurationOwner =
-    !!row.original.metadata?.labels?.[
-      'io.portainer.kubernetes.configuration.owner'
-    ];
+  const hasConfigurationOwner = !!(
+    row.original.metadata?.labels?.[configurationOwnerUsernameLabel] ||
+    row.original.metadata?.labels?.[appOwnerLabel]
+  );
 
   return (
     <Authorized authorizations="K8sSecretsR" childrenUnauthorized={name}>
