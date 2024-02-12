@@ -46,15 +46,9 @@
 </div>
 
 <docker-images-datatable
-  ng-if="images"
-  dataset="images"
   is-host-column-visible="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
   on-download="(downloadAction)"
   on-remove="(confirmRemovalAction)"
-  on-refresh="(getImages)"
   is-export-in-progress="state.exportInProgress"
-  storage-key="images"
   environment="endpoint"
-  settings-store="settingsStore"
-  containers="containers"
 ></docker-images-datatable>

@@ -20,7 +20,7 @@ angular.module('portainer.docker').controller('ServicesController', [
         .all({
           services: ServiceService.services(),
           tasks: TaskService.tasks(),
-          containers: agentProxy ? ContainerService.containers(1) : [],
+          containers: agentProxy ? ContainerService.containers(endpoint.Id, 1) : [],
           nodes: NodeService.nodes(),
         })
         .then(function success(data) {

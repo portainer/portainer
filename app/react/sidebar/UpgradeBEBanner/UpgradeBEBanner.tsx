@@ -2,7 +2,7 @@ import { ArrowUpCircle } from 'lucide-react';
 import { useState } from 'react';
 import clsx from 'clsx';
 
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
 import {
   ContainerPlatform,
@@ -78,8 +78,7 @@ function UpgradeBEBanner() {
         <ArrowUpCircle
           className={clsx(
             'lucide text-lg',
-            'fill-warning-6 stroke-[#023959] th-dark:stroke-black',
-            'th-highcontrast:fill-warning-6  th-highcontrast:stroke-black'
+            'fill-gray-6 stroke-[#023959] th-dark:stroke-black th-highcontrast:stroke-black'
           )}
         />
         {isSidebarOpen && <>Upgrade to Business Edition</>}

@@ -1,17 +1,16 @@
 package edgestacks
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
@@ -25,8 +24,6 @@ type Handler struct {
 	KubernetesDeployer portainer.KubernetesDeployer
 }
 
-const contextKey = "edgeStack_item"
-
 // NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
 	h := &Handler{
@@ -38,6 +35,8 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 
 	h.Handle("/edge_stacks/create/{method}",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
+	h.Handle("/edge_stacks",
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(middlewares.Deprecated(h, deprecatedEdgeStackCreateUrlParser)))).Methods(http.MethodPost) // Deprecated
 	h.Handle("/edge_stacks",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackList)))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}",
@@ -57,35 +56,6 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	edgeStackStatusRouter.PathPrefix("/edge_stacks/{id}/status/{endpoint_id}").Handler(bouncer.PublicAccess(httperror.LoggerHandler(h.edgeStackStatusDelete))).Methods(http.MethodDelete)
 
 	return h
-}
-
-func (handler *Handler) convertAndStoreKubeManifestIfNeeded(stackFolder string, projectPath, composePath string, relatedEndpointIds []portainer.EndpointID) (manifestPath string, err error) {
-	hasKubeEndpoint, err := hasKubeEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
-	if err != nil {
-		return "", fmt.Errorf("unable to check if edge stack has kube environments: %w", err)
-	}
-
-	if !hasKubeEndpoint {
-		return "", nil
-	}
-
-	composeConfig, err := handler.FileService.GetFileContent(projectPath, composePath)
-	if err != nil {
-		return "", fmt.Errorf("unable to retrieve Compose file from disk: %w", err)
-	}
-
-	kompose, err := handler.KubernetesDeployer.ConvertCompose(composeConfig)
-	if err != nil {
-		return "", fmt.Errorf("failed converting compose file to kubernetes manifest: %w", err)
-	}
-
-	komposeFileName := filesystem.ManifestFileDefaultName
-	_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, komposeFileName, kompose)
-	if err != nil {
-		return "", fmt.Errorf("failed to store kube manifest file: %w", err)
-	}
-
-	return komposeFileName, nil
 }
 
 func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerError {

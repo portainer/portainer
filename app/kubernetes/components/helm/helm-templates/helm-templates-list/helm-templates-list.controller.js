@@ -1,9 +1,8 @@
 export default class HelmTemplatesListController {
   /* @ngInject */
-  constructor($async, $scope, DatatableService, HelmService, Notifications) {
+  constructor($async, $scope, HelmService, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
-    this.DatatableService = DatatableService;
     this.HelmService = HelmService;
     this.Notifications = Notifications;
 
@@ -36,22 +35,9 @@ export default class HelmTemplatesListController {
     });
   }
 
-  onTextFilterChange() {
-    this.DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
-  }
-
   $onChanges() {
     if (this.charts.length > 0) {
       this.updateCategories();
     }
-  }
-
-  $onInit() {
-    return this.$async(async () => {
-      const textFilter = this.DatatableService.getDataTableTextFilters(this.tableKey);
-      if (textFilter !== null) {
-        this.state.textFilter = textFilter;
-      }
-    });
   }
 }

@@ -24,8 +24,8 @@ export default class KubeCustomTemplatesViewController {
     this.selectTemplate = this.selectTemplate.bind(this);
   }
 
-  selectTemplate(template) {
-    this.$state.go('kubernetes.deploy', { templateId: template.Id });
+  selectTemplate(templateId) {
+    this.$state.go('kubernetes.deploy', { templateId });
   }
 
   isEditAllowed(template) {
@@ -36,7 +36,8 @@ export default class KubeCustomTemplatesViewController {
   getTemplates() {
     return this.$async(async () => {
       try {
-        this.templates = await this.CustomTemplateService.customTemplates(3);
+        const templates = await this.CustomTemplateService.customTemplates(3);
+        this.templates = templates.filter((t) => !t.EdgeTemplate);
       } catch (err) {
         this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
       }
@@ -65,7 +66,7 @@ export default class KubeCustomTemplatesViewController {
         var template = _.find(this.templates, { Id: templateId });
         await this.CustomTemplateService.remove(templateId);
         this.Notifications.success('Template successfully deleted', template && template.Title);
-        _.remove(this.templates, { Id: templateId });
+        this.templates = this.templates.filter((template) => template.Id !== templateId);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed to delete template');
       }

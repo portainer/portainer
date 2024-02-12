@@ -3,9 +3,9 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { Terminal as TerminalIcon } from 'lucide-react';
 import { Terminal } from 'xterm';
 
-import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifyError } from '@/portainer/services/notifications';
+import { TerminalTooltip } from '@/react/components/TerminalTooltip';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody } from '@@/Widget';
@@ -27,7 +27,6 @@ export function ConsoleView() {
     },
   } = useCurrentStateAndParams();
 
-  const [jwtToken] = useLocalStorage('JWT', '');
   const [command, setCommand] = useState('/bin/sh');
   const [connectionStatus, setConnectionStatus] = useState('closed');
   const [terminal, setTerminal] = useState(null as Terminal | null);
@@ -76,11 +75,15 @@ export function ConsoleView() {
           terminal?.setOption('cursorBlink', true);
           terminal?.focus();
           setConnectionStatus('open');
+          socket.send('export LANG=C.UTF-8\n');
+          socket.send('export LC_ALL=C.UTF-8\n');
+          socket.send('clear\n');
         }
       };
 
       socket.onmessage = (msg) => {
-        terminal?.write(msg.data);
+        const encoded = new TextEncoder().encode(msg.data);
+        terminal?.writeUtf8(encoded);
       };
 
       socket.onerror = () => {
@@ -95,7 +98,7 @@ export function ConsoleView() {
   }, [disconnectConsole, setConnectionStatus, socket, terminal]);
 
   useEffect(() => {
-    terminal?.on('data', (data) => {
+    terminal?.onData((data) => {
       socket?.send(data);
     });
   }, [terminal, socket]);
@@ -120,6 +123,7 @@ export function ConsoleView() {
                   className="col-sm-3 col-lg-2 control-label m-0 p-0 text-left"
                 >
                   Command
+                  <TerminalTooltip />
                 </label>
                 <div className="col-sm-8 input-group p-0">
                   <span className="input-group-addon">
@@ -132,6 +136,10 @@ export function ConsoleView() {
                     value={command}
                     onChange={(e) => setCommand(e.target.value)}
                     id="consoleCommand"
+                    // disable eslint because we want to autofocus
+                    // this is ok because we only have one input on the page
+                    // https://portainer.atlassian.net/browse/EE-5752
+                    // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
                   />
                 </div>
@@ -167,7 +175,6 @@ export function ConsoleView() {
 
   function connectConsole() {
     const params: StringDictionary = {
-      token: jwtToken,
       endpointId: environmentId,
       namespace,
       podName: podID,

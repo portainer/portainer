@@ -1,17 +1,17 @@
-import { server, rest } from '@/setup-tests/server';
+import { http, HttpResponse } from 'msw';
+
+import { server } from '@/setup-tests/server';
 
 import { getLicenses } from './license.service';
 import type { License } from './types';
 
 describe('getLicenses', () => {
   it('on success should return the server body', async () => {
-    const catchFn = jest.fn();
-    const thenFn = jest.fn();
+    const catchFn = vi.fn();
+    const thenFn = vi.fn();
 
     const data: License[] = [];
-    server.use(
-      rest.get('/api/licenses', (req, res, ctx) => res(ctx.json(data)))
-    );
+    server.use(http.get('/api/licenses', () => HttpResponse.json(data)));
 
     const promise = getLicenses();
 
@@ -22,22 +22,22 @@ describe('getLicenses', () => {
   });
 
   it('on failure should return the server message', async () => {
-    const catchFn = jest.fn();
-    const thenFn = jest.fn();
+    const catchFn = vi.fn();
+    const thenFn = vi.fn();
 
     const message = 'message';
     const details = 'details';
 
     server.use(
-      rest.get('/api/licenses', (req, res, ctx) =>
-        res(ctx.status(400), ctx.json({ message, details }))
+      http.get('/api/licenses', () =>
+        HttpResponse.json({ message, details }, { status: 400 })
       )
     );
 
     const promise = getLicenses();
     await promise.then(thenFn, catchFn);
 
-    expect(catchFn).toHaveBeenCalledWith(new Error(message));
+    expect(catchFn).toHaveBeenCalledWith(new Error(details));
     expect(thenFn).not.toHaveBeenCalled();
   });
 });

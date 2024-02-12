@@ -9,11 +9,21 @@ import { useEnvironments } from './useEnvironments';
 
 const storageKey = 'edge-devices-waiting-room';
 
-const settingsStore = createPersistedStore(storageKey, 'Name');
+const settingsStore = createPersistedStore(storageKey, 'name');
 
 export function Datatable() {
   const tableState = useTableState(settingsStore, storageKey);
-  const { data: environments, totalCount, isLoading } = useEnvironments();
+  const {
+    data: environments,
+    totalCount,
+    isLoading,
+    page,
+    setPage,
+  } = useEnvironments({
+    pageLimit: tableState.pageSize,
+    search: tableState.search,
+    sortBy: tableState.sortBy,
+  });
 
   return (
     <GenericDatatable
@@ -26,6 +36,9 @@ export function Datatable() {
         <TableActions selectedRows={selectedRows} />
       )}
       isLoading={isLoading}
+      isServerSidePagination
+      page={page}
+      onPageChange={setPage}
       totalCount={totalCount}
       description={<Filter />}
     />

@@ -3,7 +3,6 @@ import * as JsonPatch from 'fast-json-patch';
 
 import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
 import {
-  KubernetesApplicationPublishingTypes,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationStackNameLabel,
@@ -42,11 +41,7 @@ class KubernetesServiceConverter {
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
-    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.NODE_PORT) {
-      res.Type = KubernetesServiceTypes.NODE_PORT;
-    } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
-      res.Type = KubernetesServiceTypes.LOAD_BALANCER;
-    }
+    res.Type = formValues.PublishingType;
     const ports = _.map(formValues.PublishedPorts, (item) => _publishedPortToServicePort(formValues, item, res.Type));
     res.Ports = _.uniqBy(_.without(ports, undefined), (p) => p.targetPort + p.protocol);
     return res;
@@ -61,13 +56,7 @@ class KubernetesServiceConverter {
       res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
       res.ApplicationOwner = formValues.ApplicationOwner;
       res.ApplicationName = formValues.Name;
-      if (service.Type === KubernetesApplicationPublishingTypes.NODE_PORT) {
-        res.Type = KubernetesServiceTypes.NODE_PORT;
-      } else if (service.Type === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
-        res.Type = KubernetesServiceTypes.LOAD_BALANCER;
-      } else if (service.Type === KubernetesApplicationPublishingTypes.CLUSTER_IP) {
-        res.Type = KubernetesServiceTypes.CLUSTER_IP;
-      }
+      res.Type = service.Type;
       res.Ingress = service.Ingress;
 
       if (service.Selector !== undefined) {
@@ -120,18 +109,7 @@ class KubernetesServiceConverter {
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = service.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = service.ApplicationOwner;
 
-    const ports = [];
-    service.Ports.forEach((port) => {
-      const p = {};
-      p.name = port.name;
-      p.port = port.port;
-      p.nodePort = port.nodePort;
-      p.protocol = port.protocol;
-      p.targetPort = port.targetPort;
-      ports.push(p);
-    });
-    payload.spec.ports = ports;
-
+    payload.spec.ports = service.Ports;
     payload.spec.selector = service.Selector;
     if (service.Headless) {
       payload.spec.clusterIP = KubernetesServiceHeadlessClusterIP;

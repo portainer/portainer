@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/apikey"
@@ -15,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/http/csrf"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
@@ -64,6 +66,7 @@ import (
 	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/libhelm"
@@ -90,7 +93,7 @@ type Server struct {
 	GitService                  portainer.GitService
 	OpenAMTService              portainer.OpenAMTService
 	APIKeyService               apikey.APIKeyService
-	JWTService                  dataservices.JWTService
+	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	SwarmStackManager           portainer.SwarmStackManager
@@ -110,6 +113,7 @@ type Server struct {
 	DemoService                 *demo.Service
 	UpgradeService              upgrade.Service
 	AdminCreationDone           chan struct{}
+	PendingActionsService       *pendingactions.PendingActionsService
 }
 
 // Start starts the HTTP server
@@ -173,17 +177,20 @@ func (server *Server) Start() error {
 	endpointHandler.ProxyManager = server.ProxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.K8sClientFactory = server.KubernetesClientFactory
+	endpointHandler.DockerClientFactory = server.DockerClientFactory
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
 	endpointHandler.AuthorizationService = server.AuthorizationService
 	endpointHandler.BindAddress = server.BindAddress
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
+	endpointHandler.PendingActionsService = server.PendingActionsService
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = server.AuthorizationService
 	endpointGroupHandler.DataStore = server.DataStore
+	endpointGroupHandler.PendingActionsService = server.PendingActionsService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.DataStore = server.DataStore
@@ -259,6 +266,7 @@ func (server *Server) Start() error {
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
+	teamMembershipHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var systemHandler = system.NewHandler(requestBouncer,
 		server.Status,
@@ -278,6 +286,7 @@ func (server *Server) Start() error {
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 	userHandler.AdminCreationDone = server.AdminCreationDone
+	userHandler.FileService = server.FileService
 
 	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore
@@ -334,6 +343,11 @@ func (server *Server) Start() error {
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 
 	handler = middlewares.WithSlowRequestsLogger(handler)
+
+	handler, err := csrf.WithProtect(handler)
+	if err != nil {
+		return errors.Wrap(err, "failed to create CSRF middleware")
+	}
 
 	if server.HTTPEnabled {
 		go func() {

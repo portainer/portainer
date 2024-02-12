@@ -1,5 +1,5 @@
 import { CellContext } from '@tanstack/react-table';
-import { AlertCircle, HelpCircle, Settings } from 'lucide-react';
+import { AlertCircle, HelpCircle, Loader2 } from 'lucide-react';
 
 import {
   EnvironmentStatus,
@@ -10,6 +10,8 @@ import { notifySuccess } from '@/portainer/services/notifications';
 
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 import { Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
+import { Tooltip } from '@@/Tip/Tooltip';
 
 import { EnvironmentListItem } from '../types';
 import { useUpdateEnvironmentMutation } from '../../queries/useUpdateEnvironmentMutation';
@@ -33,17 +35,17 @@ function Cell({
     return (
       <>
         {environment.URL}
-        {environment.StatusMessage?.Summary &&
-          environment.StatusMessage?.Detail && (
+        {environment.StatusMessage?.summary &&
+          environment.StatusMessage?.detail && (
             <div className="ml-2 inline-block">
               <span className="text-danger vertical-center inline-flex">
                 <AlertCircle className="lucide" aria-hidden="true" />
-                <span>{environment.StatusMessage.Summary}</span>
+                <span>{environment.StatusMessage.summary}</span>
               </span>
               <TooltipWithChildren
                 message={
                   <div>
-                    {environment.StatusMessage.Detail}
+                    {environment.StatusMessage.detail}
                     {environment.URL && (
                       <div className="mt-2 text-right">
                         <Button
@@ -71,27 +73,19 @@ function Cell({
     );
   }
 
-  if (environment.Type === 4) {
+  if (environment.Type === EnvironmentType.EdgeAgentOnDocker) {
     return <>-</>;
   }
 
-  if (environment.Status === 3) {
-    const status = (
-      <span className="vertical-center inline-flex text-base">
-        <Settings className="lucide animate-spin-slow" />
-        {environment.StatusMessage?.Summary}
-      </span>
-    );
-    if (!environment.StatusMessage?.Detail) {
-      return status;
-    }
+  if (environment.Status === EnvironmentStatus.Provisioning) {
     return (
-      <TooltipWithChildren
-        message={environment.StatusMessage?.Detail}
-        position="bottom"
-      >
-        {status}
-      </TooltipWithChildren>
+      <div className="inline-flex items-center text-base">
+        <Icon icon={Loader2} className="!mr-1 animate-spin-slow" />
+        {environment.StatusMessage?.summary}
+        {environment.StatusMessage?.detail && (
+          <Tooltip message={environment.StatusMessage?.detail} />
+        )}
+      </div>
     );
   }
 

@@ -1,13 +1,12 @@
 angular.module('portainer.docker').factory('Config', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
-  'EndpointProvider',
-  function ConfigFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function ConfigFactory($resource, API_ENDPOINT_ENDPOINTS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/configs/:id/:action',
+      API_ENDPOINT_ENDPOINTS + '/:environmentId/docker/configs/:id/:action',
       {
-        endpointId: EndpointProvider.endpointID,
+        environmentId: '@environmentId',
       },
       {
         get: { method: 'GET', params: { id: '@id' } },

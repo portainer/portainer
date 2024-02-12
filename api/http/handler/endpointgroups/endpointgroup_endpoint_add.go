@@ -4,12 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id EndpointGroupAddEndpoint
@@ -37,14 +36,9 @@ func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.
 		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = handler.addEndpoint(handler.DataStore, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.addEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return handler.addEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {

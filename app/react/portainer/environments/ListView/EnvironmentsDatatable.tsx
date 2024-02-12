@@ -11,7 +11,8 @@ import { Link } from '@@/Link';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { isBE } from '../../feature-flags/feature-flags.service';
-import { isSortType, refetchIfAnyOffline } from '../queries/useEnvironmentList';
+import { isSortType } from '../queries/useEnvironmentList';
+import { EnvironmentStatus } from '../types';
 
 import { columns } from './columns';
 import { EnvironmentListItem } from './types';
@@ -36,10 +37,12 @@ export function EnvironmentsDatatable({
       excludeSnapshots: true,
       page: page + 1,
       pageLimit: tableState.pageSize,
-      sort: isSortType(tableState.sortBy.id) ? tableState.sortBy.id : undefined,
-      order: tableState.sortBy.desc ? 'desc' : 'asc',
+      sort: isSortType(tableState.sortBy?.id)
+        ? tableState.sortBy?.id
+        : undefined,
+      order: tableState.sortBy?.desc ? 'desc' : 'asc',
     },
-    { enabled: groupsQuery.isSuccess, refetchInterval: refetchIfAnyOffline }
+    { enabled: groupsQuery.isSuccess, refetchInterval: 30 * 1000 }
   );
 
   const environmentsWithGroups = environments.map<EnvironmentListItem>(
@@ -60,10 +63,14 @@ export function EnvironmentsDatatable({
       dataset={environmentsWithGroups}
       columns={columns}
       settingsManager={tableState}
-      pageCount={Math.ceil(totalCount / tableState.pageSize)}
+      isServerSidePagination
+      page={page}
       onPageChange={setPage}
-      isLoading={isLoading}
       totalCount={totalCount}
+      isLoading={isLoading}
+      isRowSelectable={(row) =>
+        row.original.Status !== EnvironmentStatus.Provisioning
+      }
       renderTableActions={(selectedRows) => (
         <div className="flex items-center gap-2">
           <Button
@@ -88,15 +95,17 @@ export function EnvironmentsDatatable({
               Auto onboarding
             </Button>
           )}
-
-          <Button
-            as={Link}
-            props={{ to: 'portainer.wizard.endpoints' }}
-            icon={Plus}
-            className="!m-0"
-          >
-            Add environment
-          </Button>
+          <Link to="portainer.wizard.endpoints">
+            <Button
+              onClick={() =>
+                localStorage.setItem('wizardReferrer', 'environments')
+              }
+              icon={Plus}
+              className="!m-0"
+            >
+              Add environment
+            </Button>
+          </Link>
         </div>
       )}
     />

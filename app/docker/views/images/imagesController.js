@@ -57,7 +57,8 @@ angular.module('portainer.docker').controller('ImagesController', [
     function confirmImageForceRemoval() {
       return confirmDestructive({
         title: 'Are you sure?',
-        message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
+        message:
+          "Forcing removal of an image will remove it even if it's used by stopped containers, and delete all associated tags. Are you sure you want to remove the selected image(s)?",
         confirmButton: buildConfirmButton('Remove the image', 'danger'),
       });
     }
@@ -65,11 +66,16 @@ angular.module('portainer.docker').controller('ImagesController', [
     function confirmRegularRemove() {
       return confirmDestructive({
         title: 'Are you sure?',
-        message: 'Removing the image will remove all tags associated to that image. Are you sure you want to remove the image?',
+        message: 'Removing an image will also delete all associated tags. Are you sure you want to remove the selected image(s)?',
         confirmButton: buildConfirmButton('Remove the image', 'danger'),
       });
     }
 
+    /**
+     *
+     * @param {Array<import('@/react/docker/images/queries/useImages').ImagesListResponse>} selectedItems
+     * @param {boolean} force
+     */
     $scope.confirmRemovalAction = async function (selectedItems, force) {
       const confirmed = await (force ? confirmImageForceRemoval() : confirmRegularRemove());
 
@@ -80,11 +86,15 @@ angular.module('portainer.docker').controller('ImagesController', [
       $scope.removeAction(selectedItems, force);
     };
 
+    /**
+     *
+     * @param {Array<import('@/react/docker/images/queries/useImages').ImagesListResponse>} selectedItems
+     */
     function isAuthorizedToDownload(selectedItems) {
       for (var i = 0; i < selectedItems.length; i++) {
         var image = selectedItems[i];
 
-        var untagged = _.find(image.RepoTags, function (item) {
+        var untagged = _.find(image.tags, function (item) {
           return item.indexOf('<none>') > -1;
         });
 
@@ -102,8 +112,12 @@ angular.module('portainer.docker').controller('ImagesController', [
       return true;
     }
 
+    /**
+     *
+     * @param {Array<import('@/react/docker/images/queries/useImages').ImagesListResponse>} images
+     */
     function exportImages(images) {
-      HttpRequestHelper.setPortainerAgentTargetHeader(images[0].NodeName);
+      HttpRequestHelper.setPortainerAgentTargetHeader(images[0].nodeName);
       $scope.state.exportInProgress = true;
       ImageService.downloadImages(images)
         .then(function success(data) {
@@ -119,6 +133,10 @@ angular.module('portainer.docker').controller('ImagesController', [
         });
     }
 
+    /**
+     *
+     * @param {Array<import('@/react/docker/images/queries/useImages').ImagesListResponse>} selectedItems
+     */
     $scope.downloadAction = function (selectedItems) {
       if (!isAuthorizedToDownload(selectedItems)) {
         return;
@@ -132,15 +150,20 @@ angular.module('portainer.docker').controller('ImagesController', [
       });
     };
 
-    $scope.removeAction = function (selectedItems, force) {
+    $scope.removeAction = removeAction;
+
+    /**
+     *
+     * @param {Array<import('@/react/docker/images/queries/useImages').ImagesListResponse>} selectedItems
+     * @param {boolean} force
+     */
+    function removeAction(selectedItems, force) {
       var actionCount = selectedItems.length;
       angular.forEach(selectedItems, function (image) {
-        HttpRequestHelper.setPortainerAgentTargetHeader(image.NodeName);
-        ImageService.deleteImage(image.Id, force)
+        HttpRequestHelper.setPortainerAgentTargetHeader(image.nodeName);
+        ImageService.deleteImage(image.id, force)
           .then(function success() {
-            Notifications.success('Image successfully removed', image.Id);
-            var index = $scope.images.indexOf(image);
-            $scope.images.splice(index, 1);
+            Notifications.success('Image successfully removed', image.id);
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove image');
@@ -152,29 +175,11 @@ angular.module('portainer.docker').controller('ImagesController', [
             }
           });
       });
-    };
-
-    $scope.getImages = getImages;
-    function getImages() {
-      ImageService.images(true)
-        .then(function success(data) {
-          $scope.images = data;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve images');
-          $scope.images = [];
-        });
     }
 
     $scope.setPullImageValidity = setPullImageValidity;
     function setPullImageValidity(validity) {
       $scope.state.pullRateValid = validity;
     }
-
-    function initView() {
-      getImages();
-    }
-
-    initView();
   },
 ]);

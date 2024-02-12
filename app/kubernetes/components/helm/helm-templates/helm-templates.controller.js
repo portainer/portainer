@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
-
+import { HelmIcon } from './HelmIcon';
 export default class HelmTemplatesController {
   /* @ngInject */
   constructor($analytics, $async, $state, $window, $anchorScroll, Authentication, HelmService, KubernetesResourcePoolService, Notifications) {
@@ -15,6 +15,8 @@ export default class HelmTemplatesController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.Notifications = Notifications;
 
+    this.fallbackIcon = HelmIcon;
+
     this.editorUpdate = this.editorUpdate.bind(this);
     this.uiCanExit = this.uiCanExit.bind(this);
     this.installHelmchart = this.installHelmchart.bind(this);
@@ -23,12 +25,18 @@ export default class HelmTemplatesController {
     this.getHelmRepoURLs = this.getHelmRepoURLs.bind(this);
     this.getLatestCharts = this.getLatestCharts.bind(this);
     this.getResourcePools = this.getResourcePools.bind(this);
+    this.clearHelmChart = this.clearHelmChart.bind(this);
 
     $window.onbeforeunload = () => {
       if (this.state.isEditorDirty) {
         return '';
       }
     };
+  }
+
+  clearHelmChart() {
+    this.state.chart = null;
+    this.onSelectHelmChart('');
   }
 
   editorUpdate(contentvalues) {
@@ -50,14 +58,14 @@ export default class HelmTemplatesController {
     this.state.actionInProgress = true;
     try {
       const payload = {
-        Name: this.state.appName,
+        Name: this.name,
         Repo: this.state.chart.repo,
         Chart: this.state.chart.name,
         Values: this.state.values,
-        Namespace: this.state.resourcePool.Namespace.Name,
+        Namespace: this.namespace,
       };
       await this.HelmService.install(this.endpoint.Id, payload);
-      this.Notifications.success('Success', 'Helm Chart successfully installed');
+      this.Notifications.success('Success', 'Helm chart successfully installed');
       this.$analytics.eventTrack('kubernetes-helm-install', { category: 'kubernetes', metadata: { 'chart-name': this.state.chart.name } });
       this.state.isEditorDirty = false;
       this.$state.go('kubernetes.applications');
@@ -85,6 +93,7 @@ export default class HelmTemplatesController {
     window.scrollTo(0, 0);
     this.state.showCustomValues = false;
     this.state.chart = chart;
+    this.onSelectHelmChart(chart.name);
     await this.getHelmValues();
   }
 
@@ -96,7 +105,7 @@ export default class HelmTemplatesController {
     this.state.reposLoading = true;
     try {
       // fetch globally set helm repo and user helm repos (parallel)
-      const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
+      const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.user.ID);
       this.state.globalRepository = GlobalRepository;
       const userHelmReposUrls = UserRepositories.map((repo) => repo.URL);
       const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()).filter((url) => url); // remove duplicates and blank, to lowercase
@@ -155,6 +164,8 @@ export default class HelmTemplatesController {
 
   $onInit() {
     return this.$async(async () => {
+      this.user = this.Authentication.getUserDetails();
+
       this.state = {
         appName: '',
         chart: null,
@@ -176,7 +187,15 @@ export default class HelmTemplatesController {
       };
 
       const helmRepos = await this.getHelmRepoURLs();
-      await Promise.all([this.getLatestCharts(helmRepos), this.getResourcePools()]);
+      if (helmRepos) {
+        await Promise.all([this.getLatestCharts(helmRepos), this.getResourcePools()]);
+      }
+      if (this.state.charts.length > 0 && this.$state.params.chartName) {
+        const chart = this.state.charts.find((chart) => chart.name === this.$state.params.chartName);
+        if (chart) {
+          this.selectHelmChart(chart);
+        }
+      }
 
       this.state.viewReady = true;
     });

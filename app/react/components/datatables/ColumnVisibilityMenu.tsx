@@ -2,21 +2,26 @@ import _ from 'lodash';
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { Columns } from 'lucide-react';
-import { Column } from '@tanstack/react-table';
+import { Table } from '@tanstack/react-table';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 
 interface Props<D extends object> {
-  columns: Column<D>[];
   onChange: (value: string[]) => void;
   value: string[];
+  table: Table<D>;
 }
 
 export function ColumnVisibilityMenu<D extends object>({
-  columns,
   onChange,
   value,
+  table,
 }: Props<D>) {
+  const columnsToHide = table.getAllColumns().filter((col) => col.getCanHide());
+  if (!columnsToHide.length) {
+    return null;
+  }
+
   return (
     <Menu className="setting">
       {({ isExpanded }) => (
@@ -38,7 +43,7 @@ export function ColumnVisibilityMenu<D extends object>({
             <div className="tableMenu">
               <div className="menuHeader">Show / Hide Columns</div>
               <div className="menuContent">
-                {columns.map((column) => (
+                {columnsToHide.map((column) => (
                   <div key={column.id}>
                     <Checkbox
                       checked={column.getIsVisible()}
@@ -66,11 +71,21 @@ export function ColumnVisibilityMenu<D extends object>({
   );
 
   function handleChangeColumnVisibility(colId: string, visible: boolean) {
-    if (visible) {
-      onChange(value.filter((id) => id !== colId));
-      return;
-    }
+    const newValue = visible
+      ? value.filter((id) => id !== colId)
+      : [...value, colId];
 
-    onChange([...value, colId]);
+    table.setColumnVisibility(
+      Object.fromEntries(newValue.map((col) => [col, false]))
+    );
+    onChange(newValue);
   }
+}
+
+export function getColumnVisibilityState(hiddenColumns: string[]) {
+  return {
+    columnVisibility: Object.fromEntries(
+      hiddenColumns.map((col) => [col, false])
+    ),
+  };
 }

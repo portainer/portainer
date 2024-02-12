@@ -2,17 +2,16 @@ package edgestacks
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/pkg/errors"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/set"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 )
 
 type updateEdgeStackPayload struct {
@@ -64,15 +63,10 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var stack *portainer.EdgeStack
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		stack, err = handler.updateEdgeStack(handler.DataStore, portainer.EdgeStackID(stackID), payload)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			stack, err = handler.updateEdgeStack(tx, portainer.EdgeStackID(stackID), payload)
-			return err
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stack, err = handler.updateEdgeStack(tx, portainer.EdgeStackID(stackID), payload)
+		return err
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
@@ -194,27 +188,4 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 	}
 
 	return newRelatedEnvironmentIDs, endpointsToAdd, nil
-}
-
-func newStatus(oldStatus map[portainer.EndpointID]portainer.EdgeStackStatus, relatedEnvironmentIds []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeStackStatus {
-	newStatus := make(map[portainer.EndpointID]portainer.EdgeStackStatus)
-	for _, endpointID := range relatedEnvironmentIds {
-		newEnvStatus := portainer.EdgeStackStatus{}
-
-		oldEnvStatus, ok := oldStatus[endpointID]
-		if ok {
-			newEnvStatus = oldEnvStatus
-		}
-
-		newEnvStatus.Status = []portainer.EdgeStackDeploymentStatus{
-			{
-				Time: time.Now().Unix(),
-				Type: portainer.EdgeStackStatusPending,
-			},
-		}
-
-		newStatus[endpointID] = newEnvStatus
-	}
-
-	return newStatus
 }

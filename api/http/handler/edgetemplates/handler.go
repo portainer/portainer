@@ -3,11 +3,12 @@ package edgetemplates
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
-	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle edge environment(endpoint) operations.
@@ -25,7 +26,7 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 	}
 
 	h.Handle("/edge_templates",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeTemplateList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(middlewares.Deprecated(httperror.LoggerHandler(h.edgeTemplateList), func(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) { return "", nil }))).Methods(http.MethodGet)
 
 	return h
 }

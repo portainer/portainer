@@ -216,6 +216,7 @@ export function getRollbackPatchPayload(
       if (!previousRevision.data) {
         throw new Error('No data found in the previous revision.');
       }
+      // payload matches the strategic merge patch format for a StatefulSet and DaemonSet
       return previousRevision.data;
     }
     case 'ReplicaSetList': {
@@ -233,23 +234,31 @@ export function getRollbackPatchPayload(
       // keep the annotations to skip from the deployment, in the patch
       const applicationAnnotations = application.metadata?.annotations || {};
       const applicationAnnotationsInPatch =
-        unchangedAnnotationKeysForRollbackPatch.reduce((acc, annotationKey) => {
-          if (applicationAnnotations[annotationKey]) {
-            acc[annotationKey] = applicationAnnotations[annotationKey];
-          }
-          return acc;
-        }, {} as Record<string, string>);
+        unchangedAnnotationKeysForRollbackPatch.reduce(
+          (acc, annotationKey) => {
+            if (applicationAnnotations[annotationKey]) {
+              acc[annotationKey] = applicationAnnotations[annotationKey];
+            }
+            return acc;
+          },
+          {} as Record<string, string>
+        );
 
       // add any annotations from the target revision that shouldn't be skipped
       const revisionAnnotations = previousRevision.metadata?.annotations || {};
       const revisionAnnotationsInPatch = Object.entries(
         revisionAnnotations
-      ).reduce((acc, [annotationKey, annotationValue]) => {
-        if (!unchangedAnnotationKeysForRollbackPatch.includes(annotationKey)) {
-          acc[annotationKey] = annotationValue;
-        }
-        return acc;
-      }, {} as Record<string, string>);
+      ).reduce(
+        (acc, [annotationKey, annotationValue]) => {
+          if (
+            !unchangedAnnotationKeysForRollbackPatch.includes(annotationKey)
+          ) {
+            acc[annotationKey] = annotationValue;
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
       const patchAnnotations = {
         ...applicationAnnotationsInPatch,
@@ -269,7 +278,7 @@ export function getRollbackPatchPayload(
           value: patchAnnotations,
         },
       ].filter((p) => !!p.value); // remove any patch that has no value
-
+      // payload matches the json patch format for a Deployment
       return deploymentRollbackPatch;
     }
     default:

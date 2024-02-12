@@ -1,17 +1,8 @@
 export interface Namespaces {
-  [key: string]: {
-    IsDefault: boolean;
-    IsSystem: boolean;
-  };
+  [key: string]: DefaultOrSystemNamespace;
 }
 
-export interface SelfSubjectAccessReviewResponse {
-  status: {
-    allowed: boolean;
-  };
-  spec: {
-    resourceAttributes: {
-      namespace: string;
-    };
-  };
+export interface DefaultOrSystemNamespace {
+  IsDefault: boolean;
+  IsSystem: boolean;
 }

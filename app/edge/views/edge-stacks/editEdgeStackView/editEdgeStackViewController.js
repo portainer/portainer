@@ -101,6 +101,7 @@ export class EditEdgeStackViewController {
         edgeGroups: values.edgeGroups,
         deploymentType: values.deploymentType,
         updateVersion,
+        retryDeploy: values.retryDeploy,
         webhook: values.webhookEnabled ? this.stack.Webhook || createWebhookId() : '',
         envVars: values.envVars,
       });

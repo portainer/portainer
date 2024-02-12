@@ -4,13 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type registryAccessPayload struct {
@@ -51,14 +50,9 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 		return httperror.BadRequest("Invalid registry identifier route variable", err)
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = handler.updateRegistryAccess(handler.DataStore, r, portainer.EndpointID(endpointID), portainer.RegistryID(registryID))
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.updateRegistryAccess(tx, r, portainer.EndpointID(endpointID), portainer.RegistryID(registryID))
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return handler.updateRegistryAccess(tx, r, portainer.EndpointID(endpointID), portainer.RegistryID(registryID))
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
@@ -146,7 +140,7 @@ func (handler *Handler) updateKubeAccess(endpoint *portainer.Endpoint, registry 
 	}
 
 	for namespace := range namespacesToRemove {
-		err := cli.DeleteRegistrySecret(registry, namespace)
+		err := cli.DeleteRegistrySecret(registry.ID, namespace)
 		if err != nil {
 			return err
 		}

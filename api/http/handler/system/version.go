@@ -1,16 +1,19 @@
 package system
 
 import (
-	"encoding/json"
 	"net/http"
+	"os"
 
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/build"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/coreos/go-semver/semver"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 type versionResponse struct {
@@ -20,6 +23,7 @@ type versionResponse struct {
 	LatestVersion string `json:"LatestVersion" example:"2.0.0"`
 
 	ServerVersion   string
+	ServerEdition   string `json:"ServerEdition" example:"CE/EE"`
 	DatabaseVersion string
 	Build           BuildInfo
 }
@@ -31,6 +35,8 @@ type BuildInfo struct {
 	YarnVersion    string
 	WebpackVersion string
 	GoVersion      string
+	GitCommit      string
+	Env            []string `json:",omitempty"`
 }
 
 // @id systemVersion
@@ -43,11 +49,16 @@ type BuildInfo struct {
 // @produce json
 // @success 200 {object} versionResponse "Success"
 // @router /system/version [get]
-func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
+func (handler *Handler) version(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	isAdmin, err := security.IsAdmin(r)
+	if err != nil {
+		return httperror.Forbidden("Permission denied to access Portainer", err)
+	}
 
 	result := &versionResponse{
 		ServerVersion:   portainer.APIVersion,
 		DatabaseVersion: portainer.APIVersion,
+		ServerEdition:   portainer.Edition.GetEditionLabel(),
 		Build: BuildInfo{
 			BuildNumber:    build.BuildNumber,
 			ImageTag:       build.ImageTag,
@@ -55,7 +66,12 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 			YarnVersion:    build.YarnVersion,
 			WebpackVersion: build.WebpackVersion,
 			GoVersion:      build.GoVersion,
+			GitCommit:      build.GitCommit,
 		},
+	}
+
+	if isAdmin {
+		result.Build.Env = os.Environ()
 	}
 
 	latestVersion := GetLatestVersion()
@@ -64,7 +80,7 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 		result.LatestVersion = latestVersion
 	}
 
-	response.JSON(w, &result)
+	return response.JSON(w, &result)
 }
 
 func GetLatestVersion() string {

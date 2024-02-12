@@ -38,6 +38,8 @@ export type Service = {
   ExternalIPs?: Array<string>;
   CreationTimestamp: string;
   Applications?: Application[];
+
+  IsSystem?: boolean;
 };
 
 export type NodeMetrics = {

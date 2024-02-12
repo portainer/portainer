@@ -49,8 +49,8 @@ export function HelmService(HelmFactory) {
    * @returns {Promise} - Resolves with an object containing list of user helm repos and default/global settings helm repo
    * @throws {PortainerError} - Rejects with error if helm show fails
    */
-  async function getHelmRepositories(endpointId) {
-    return await HelmFactory.getHelmRepositories({ endpointId }).$promise;
+  async function getHelmRepositories(userId) {
+    return await HelmFactory.getHelmRepositories({ userId }).$promise;
   }
 
   /**

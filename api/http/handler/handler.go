@@ -81,10 +81,11 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
+	UserHelmHandler        *helm.Handler
 }
 
 // @title PortainerCE API
-// @version 2.20.0
+// @version 2.21.0
 // @description.markdown api-description.md
 // @termsOfService
 

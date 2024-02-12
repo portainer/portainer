@@ -84,7 +84,7 @@ func (config *ComposeStackDeploymentConfig) Deploy() error {
 			return err
 		}
 	}
-	if stackutils.IsGitStack(config.stack) {
+	if stackutils.IsRelativePathStack(config.stack) {
 		return config.StackDeployer.DeployRemoteComposeStack(config.stack, config.endpoint, config.registries, config.forcePullImage, config.ForceCreate)
 	}
 

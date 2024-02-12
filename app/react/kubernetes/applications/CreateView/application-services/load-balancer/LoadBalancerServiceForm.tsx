@@ -8,8 +8,9 @@ import { Button } from '@@/buttons';
 import { Widget } from '@@/Widget';
 import { Card } from '@@/Card';
 import { InputGroup } from '@@/form-components/InputGroup';
+import { isErrorType } from '@@/form-components/formikUtils';
 
-import { isErrorType, newPort } from '../utils';
+import { newPort } from '../utils';
 import { ContainerPortInput } from '../components/ContainerPortInput';
 import {
   ServiceFormValues,
@@ -92,10 +93,7 @@ export function LoadBalancerServiceForm({
                         value={servicePort.targetPort}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           const newServicePorts = [...servicePorts];
-                          const newValue =
-                            e.target.value === ''
-                              ? undefined
-                              : Number(e.target.value);
+                          const newValue = e.target.valueAsNumber;
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
                             targetPort: newValue,
@@ -118,10 +116,7 @@ export function LoadBalancerServiceForm({
                           const newServicePorts = [...servicePorts];
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
-                            port:
-                              e.target.value === ''
-                                ? undefined
-                                : Number(e.target.value),
+                            port: e.target.valueAsNumber,
                           };
                           onChangePort(newServicePorts);
                         }}
@@ -139,7 +134,7 @@ export function LoadBalancerServiceForm({
                           type="number"
                           className="form-control min-w-max"
                           name={`loadbalancer_port_${portIndex}`}
-                          placeholder="80"
+                          placeholder="e.g. 80"
                           min="1"
                           max="65535"
                           value={servicePort.port || ''}
@@ -147,10 +142,7 @@ export function LoadBalancerServiceForm({
                             const newServicePorts = [...servicePorts];
                             newServicePorts[portIndex] = {
                               ...newServicePorts[portIndex],
-                              port:
-                                e.target.value === ''
-                                  ? undefined
-                                  : Number(e.target.value),
+                              port: e.target.valueAsNumber,
                             };
                             onChangePort(newServicePorts);
                           }}

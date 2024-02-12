@@ -1,91 +1,52 @@
-import { useEffect, useState } from 'react';
-import { Database, AlertTriangle } from 'lucide-react';
+import Route from '@/assets/ico/route.svg?c';
 
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { Datatable } from '@@/datatables';
 import { Button, ButtonGroup } from '@@/buttons';
-import { Icon } from '@@/Icon';
 import { createPersistedStore } from '@@/datatables/types';
 import { buildConfirmButton } from '@@/modals/utils';
 import { useTableState } from '@@/datatables/useTableState';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { IngressControllerClassMap } from '../types';
 
 import { columns } from './columns';
 
 const storageKey = 'ingressClasses';
-const settingsStore = createPersistedStore(storageKey);
+const settingsStore = createPersistedStore(storageKey, 'name');
 
 interface Props {
-  onChangeControllers: (
-    controllerClassMap: IngressControllerClassMap[]
-  ) => void; // angular function to save the ingress class list
+  onChange: (controllerClassMap: IngressControllerClassMap[]) => void; // angular function to save the ingress class list
   description: string;
-  ingressControllers: IngressControllerClassMap[] | undefined;
-  allowNoneIngressClass: boolean;
+  values: IngressControllerClassMap[] | undefined;
+  initialValues: IngressControllerClassMap[] | undefined;
   isLoading: boolean;
   noIngressControllerLabel: string;
   view: string;
 }
 
 export function IngressClassDatatable({
-  onChangeControllers,
+  onChange,
   description,
-  ingressControllers,
-  allowNoneIngressClass,
+  initialValues,
+  values,
   isLoading,
   noIngressControllerLabel,
   view,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
 
-  const [ingControllerFormValues, setIngControllerFormValues] = useState(
-    ingressControllers || []
-  );
-
-  useEffect(() => {
-    if (allowNoneIngressClass === undefined) {
-      return;
-    }
-
-    let newIngFormValues: IngressControllerClassMap[];
-    const isCustomTypeExist = ingControllerFormValues.some(
-      (ic) => ic.Type === 'custom'
-    );
-    if (allowNoneIngressClass) {
-      newIngFormValues = [...ingControllerFormValues];
-      // add the ingress controller type 'custom' with a 'none' ingress class name
-      if (!isCustomTypeExist) {
-        newIngFormValues.push({
-          Name: 'none',
-          ClassName: 'none',
-          Type: 'custom',
-          Availability: true,
-          New: false,
-          Used: false,
-        });
-      }
-    } else {
-      newIngFormValues = ingControllerFormValues.filter(
-        (ingController) => ingController.ClassName !== 'none'
-      );
-    }
-    setIngControllerFormValues(newIngFormValues);
-    onChangeControllers(newIngFormValues);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allowNoneIngressClass, onChangeControllers]);
-
   return (
     <div className="-mx-[15px]">
       <Datatable
         settingsManager={tableState}
-        dataset={ingControllerFormValues || []}
+        dataset={values || []}
         columns={columns}
         isLoading={isLoading}
         emptyContentLabel={noIngressControllerLabel}
         title="Ingress Controllers"
-        titleIcon={Database}
+        titleIcon={Route}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
@@ -105,11 +66,7 @@ export function IngressClassDatatable({
             color="dangerlight"
             size="small"
             onClick={() =>
-              updateIngressControllers(
-                selectedRows,
-                ingControllerFormValues || [],
-                false
-              )
+              updateIngressControllers(selectedRows, values || [], false)
             }
           >
             Disallow selected
@@ -122,11 +79,7 @@ export function IngressClassDatatable({
             color="default"
             size="small"
             onClick={() =>
-              updateIngressControllers(
-                selectedRows,
-                ingControllerFormValues || [],
-                true
-              )
+              updateIngressControllers(selectedRows, values || [], true)
             }
           >
             Allow selected
@@ -140,40 +93,34 @@ export function IngressClassDatatable({
     return (
       <div className="text-muted flex w-full flex-col !text-xs">
         <div className="mt-1">{description}</div>
-        {ingressControllers &&
-          ingControllerFormValues &&
-          isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
-            <span className="text-warning mt-1 flex items-center">
-              <Icon icon={AlertTriangle} className="!mr-1" />
-              <span className="text-warning">Unsaved changes.</span>
-            </span>
-          )}
+        {initialValues && values && isUnsavedChanges(initialValues, values) && (
+          <TextTip>Unsaved changes.</TextTip>
+        )}
       </div>
     );
   }
 
   async function updateIngressControllers(
     selectedRows: IngressControllerClassMap[],
-    ingControllerFormValues: IngressControllerClassMap[],
+    values: IngressControllerClassMap[],
     availability: boolean
   ) {
     const updatedIngressControllers = getUpdatedIngressControllers(
       selectedRows,
-      ingControllerFormValues || [],
+      values || [],
       availability
     );
 
-    if (ingressControllers && ingressControllers.length) {
+    if (values && values.length) {
       const newAllowed = updatedIngressControllers.map(
         (ingController) => ingController.Availability
       );
       if (view === 'namespace') {
-        setIngControllerFormValues(updatedIngressControllers);
-        onChangeControllers(updatedIngressControllers);
+        onChange(updatedIngressControllers);
         return;
       }
 
-      const usedControllersToDisallow = ingressControllers.filter(
+      const usedControllersToDisallow = values.filter(
         (ingController, index) => {
           // if any of the current controllers are allowed, and are used, then become disallowed, then add the controller to a new list
           if (
@@ -215,8 +162,7 @@ export function IngressClassDatatable({
           return;
         }
       }
-      setIngControllerFormValues(updatedIngressControllers);
-      onChangeControllers(updatedIngressControllers);
+      onChange(updatedIngressControllers);
     }
   }
 }

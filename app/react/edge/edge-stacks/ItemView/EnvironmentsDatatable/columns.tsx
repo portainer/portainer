@@ -9,6 +9,7 @@ import UpToDate from '@/assets/ico/icon_up-to-date.svg?c';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { getDashboardRoute } from '@/react/portainer/environments/utils';
+import { GitCommitLink } from '@/react/portainer/gitops/GitCommitLink';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -121,10 +122,11 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
 
   return (
     <Button
+      color="none"
       className="flex cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
-      <div className="pt-0.5 pr-1">
+      <div className="pr-1 pt-0.5">
         <Icon icon={isExpanded ? ChevronDown : ChevronRight} />
       </div>
       <div
@@ -154,6 +156,15 @@ function endpointStatusLabel(statusArray: Array<DeploymentStatus>) {
     if (status.Type === StatusType.Error) {
       labels.push('Failed');
     }
+    if (status.Type === StatusType.PausedDeploying) {
+      labels.push('Paused');
+    }
+    if (status.Type === StatusType.RollingBack) {
+      labels.push('Rolling Back');
+    }
+    if (status.Type === StatusType.RolledBack) {
+      labels.push('Rolled Back');
+    }
   });
 
   if (!labels.length) {
@@ -176,13 +187,10 @@ function TargetVersionCell({
     <>
       {row.original.TargetCommitHash ? (
         <div>
-          <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {value}
-          </a>
+          <GitCommitLink
+            baseURL={row.original.GitConfigURL}
+            commitHash={row.original.TargetCommitHash}
+          />
         </div>
       ) : (
         <div>{value}</div>
@@ -225,13 +233,10 @@ function DeployedVersionCell({
       {row.original.TargetCommitHash ? (
         <div>
           {statusIcon}
-          <a
-            href={`${row.original.GitConfigURL}/commit/${row.original.TargetCommitHash}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {value}
-          </a>
+          <GitCommitLink
+            baseURL={row.original.GitConfigURL}
+            commitHash={row.original.TargetCommitHash}
+          />
         </div>
       ) : (
         <div>
@@ -282,6 +287,9 @@ function getStateColor(type: StatusType): 'orange' | 'green' | 'red' {
     case StatusType.Pending:
     case StatusType.Deploying:
     case StatusType.Removing:
+    case StatusType.PausedDeploying:
+    case StatusType.RollingBack:
+    case StatusType.RolledBack:
     default:
       return 'orange';
   }

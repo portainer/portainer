@@ -3,19 +3,19 @@ package edgegroups
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/internal/slices"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
-	HasEdgeStack  bool `json:"HasEdgeStack"`
-	HasEdgeJob    bool `json:"HasEdgeJob"`
-	EndpointTypes []portainer.EndpointType
+	HasEdgeStack     bool `json:"HasEdgeStack"`
+	HasEdgeJob       bool `json:"HasEdgeJob"`
+	EndpointTypes    []portainer.EndpointType
+	TrustedEndpoints []portainer.EndpointID `json:"TrustedEndpoints"`
 }
 
 // @id EdgeGroupList
@@ -33,14 +33,10 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	var decoratedEdgeGroups []decoratedEdgeGroup
 	var err error
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		decoratedEdgeGroups, err = getEdgeGroupList(handler.DataStore)
-	} else {
-		err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-			decoratedEdgeGroups, err = getEdgeGroupList(tx)
-			return err
-		})
-	}
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		decoratedEdgeGroups, err = getEdgeGroupList(tx)
+		return err
+	})
 
 	return txResponse(w, decoratedEdgeGroups, err)
 }
@@ -90,6 +86,14 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 			}
 
 			edgeGroup.Endpoints = endpointIDs
+			edgeGroup.TrustedEndpoints = endpointIDs
+		} else {
+			trustedEndpoints, err := getTrustedEndpoints(tx, edgeGroup.Endpoints)
+			if err != nil {
+				return nil, httperror.InternalServerError("Unable to retrieve environments for Edge group", err)
+			}
+
+			edgeGroup.TrustedEndpoints = trustedEndpoints
 		}
 
 		endpointTypes, err := getEndpointTypes(tx, edgeGroup.Endpoints)

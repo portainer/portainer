@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"strconv"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -59,6 +59,8 @@ type customTemplateUpdatePayload struct {
 	TLSSkipVerify bool `example:"false"`
 	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 	IsComposeFormat bool `example:"false"`
+	// EdgeTemplate indicates if this template purpose for Edge Stack
+	EdgeTemplate bool `example:"false"`
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
@@ -161,6 +163,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	customTemplate.Type = payload.Type
 	customTemplate.Variables = payload.Variables
 	customTemplate.IsComposeFormat = payload.IsComposeFormat
+	customTemplate.EdgeTemplate = payload.EdgeTemplate
 
 	if payload.RepositoryURL != "" {
 		if !govalidator.IsURL(payload.RepositoryURL) {
@@ -208,10 +211,12 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		customTemplate.GitConfig = gitConfig
 	} else {
 		templateFolder := strconv.Itoa(customTemplateID)
-		_, err = handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
+		projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
 		if err != nil {
 			return httperror.InternalServerError("Unable to persist updated custom template file on disk", err)
 		}
+
+		customTemplate.ProjectPath = projectPath
 	}
 
 	err = handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate)

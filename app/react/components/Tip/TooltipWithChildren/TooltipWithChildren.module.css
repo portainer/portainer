@@ -6,7 +6,9 @@
   background-color: var(--bg-tooltip-color) !important;
   color: var(--text-tooltip-color) !important;
   border-radius: 10px !important;
-  box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15) !important;
+  box-shadow:
+    0 2px 4px 0 rgba(34, 36, 38, 0.12),
+    0 2px 10px 0 rgba(34, 36, 38, 0.15) !important;
   min-width: 50px;
   font-size: 1rem !important;
   text-align: left;
@@ -17,6 +19,11 @@
 .tooltip:hover {
   visibility: visible !important;
   opacity: 1 !important;
+}
+
+[theme='highcontrast'] .tooltip {
+  border: 1px solid var(--border-widget);
+  border-color: var(--white-color) !important;
 }
 
 .tooltip-container {
@@ -34,9 +41,5 @@
 }
 
 .tooltip-beteaser {
-  @apply text-warning-5 th-dark:text-blue-8;
-}
-
-.tooltip-beteaser:hover {
-  @apply text-warning-5 th-dark:text-blue-8;
+  @apply text-blue-8 hover:text-blue-9;
 }

@@ -3,14 +3,13 @@ import { genericHandler, logsHandler } from './response/handlers';
 angular.module('portainer.docker').factory('Container', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
-  'EndpointProvider',
-  function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/containers/:id/:action',
+      API_ENDPOINT_ENDPOINTS + '/:environmentId/docker/containers/:id/:action',
       {
         name: '@name',
-        endpointId: EndpointProvider.endpointID,
+        environmentId: '@environmentId',
       },
       {
         query: {

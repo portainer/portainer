@@ -2,6 +2,8 @@ import { Activity } from 'lucide-react';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { Environment } from '@/react/portainer/environments/types';
+import heartbeatup from '@/assets/ico/heartbeat-up.svg?c';
+import heartbeatdown from '@/assets/ico/heartbeat-down.svg?c';
 
 import { EnvironmentStatusBadgeItem } from './EnvironmentStatusBadgeItem';
 
@@ -35,7 +37,7 @@ export function EdgeIndicator({
     >
       <EnvironmentStatusBadgeItem
         color={heartbeat ? 'success' : 'danger'}
-        icon={heartbeat ? 'svg-heartbeatup' : 'svg-heartbeatdown'}
+        icon={heartbeat ? heartbeatup : heartbeatdown}
         aria-label="edge-heartbeat"
       >
         heartbeat

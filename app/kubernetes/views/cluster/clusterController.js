@@ -7,7 +7,7 @@ import { getMetricsForAllNodes } from '@/react/kubernetes/services/service.ts';
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, $state, Notifications, LocalStorage, Authentication, KubernetesNodeService, KubernetesApplicationService, KubernetesEndpointService) {
+  constructor($async, $state, Notifications, LocalStorage, Authentication, KubernetesNodeService, KubernetesApplicationService, KubernetesEndpointService, EndpointService) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -16,6 +16,7 @@ class KubernetesClusterController {
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEndpointService = KubernetesEndpointService;
+    this.EndpointService = EndpointService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -120,6 +121,7 @@ class KubernetesClusterController {
   }
 
   async onInit() {
+    this.endpoint = await this.EndpointService.endpoint(this.endpoint.Id);
     this.isAdmin = this.Authentication.isAdmin();
     const useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
 

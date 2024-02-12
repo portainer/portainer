@@ -4,12 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type tagCreatePayload struct {
@@ -46,14 +46,10 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	var tag *portainer.Tag
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		tag, err = createTag(handler.DataStore, payload)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			tag, err = createTag(tx, payload)
-			return err
-		})
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		tag, err = createTag(tx, payload)
+		return err
+	})
 
 	return txResponse(w, tag, err)
 }
@@ -66,7 +62,7 @@ func createTag(tx dataservices.DataStoreTx, payload tagCreatePayload) (*portaine
 
 	for _, tag := range tags {
 		if tag.Name == payload.Name {
-			return nil, &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "This name is already associated to a tag", Err: errors.New("a tag already exists with this name")}
+			return nil, httperror.Conflict("This name is already associated to a tag", errors.New("a tag already exists with this name"))
 		}
 	}
 

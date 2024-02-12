@@ -21,6 +21,8 @@ export interface VersionResponse {
     YarnVersion: string;
     WebpackVersion: string;
     GoVersion: string;
+    GitCommit: string;
+    Env?: string[];
   };
 }
 

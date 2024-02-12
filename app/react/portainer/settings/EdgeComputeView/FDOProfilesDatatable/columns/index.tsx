@@ -1,10 +1,10 @@
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 
-import { buildNameColumn } from '@@/datatables/NameCell';
+import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
 import { created } from './created';
 
 export const columns = [
-  buildNameColumn<Profile>('name', 'id', 'portainer.endpoints.profile.edit'),
+  buildNameColumn<Profile>('name', 'portainer.endpoints.profile.edit'),
   created,
 ];

@@ -8,8 +8,9 @@ import { Button } from '@@/buttons';
 import { Widget } from '@@/Widget';
 import { Card } from '@@/Card';
 import { InputGroup } from '@@/form-components/InputGroup';
+import { isErrorType } from '@@/form-components/formikUtils';
 
-import { isErrorType, newPort } from '../utils';
+import { newPort } from '../utils';
 import { ContainerPortInput } from '../components/ContainerPortInput';
 import {
   ServiceFormValues,
@@ -93,10 +94,7 @@ export function NodePortServiceForm({
                         value={servicePort.targetPort}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           const newServicePorts = [...servicePorts];
-                          const newValue =
-                            e.target.value === ''
-                              ? undefined
-                              : Number(e.target.value);
+                          const newValue = e.target.valueAsNumber;
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
                             targetPort: newValue,
@@ -119,10 +117,7 @@ export function NodePortServiceForm({
                           const newServicePorts = [...servicePorts];
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
-                            port:
-                              e.target.value === ''
-                                ? undefined
-                                : Number(e.target.value),
+                            port: e.target.valueAsNumber,
                           };
                           onChangePort(newServicePorts);
                         }}
@@ -138,7 +133,7 @@ export function NodePortServiceForm({
                           type="number"
                           className="form-control min-w-max"
                           name={`node_port_${portIndex}`}
-                          placeholder="30080"
+                          placeholder="e.g. 30080"
                           min="30000"
                           max="32767"
                           value={servicePort.nodePort ?? ''}

@@ -13,8 +13,9 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
 import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
+import { TemplateFieldset } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
 
-export const componentsModule = angular
+const ngModule = angular
   .module('portainer.edge.react.components', [])
   .component(
     'edgeStackEnvironmentsDatatable',
@@ -28,6 +29,7 @@ export const componentsModule = angular
       'error',
       'horizontal',
       'isGroupVisible',
+      'required',
     ])
   )
   .component(
@@ -35,7 +37,6 @@ export const componentsModule = angular
     r2a(withReactQuery(EdgeScriptForm), [
       'edgeInfo',
       'commands',
-      'isNomadTokenVisible',
       'asyncMode',
       'showMetaFields',
     ])
@@ -69,7 +70,6 @@ export const componentsModule = angular
       'onChange',
       'hasDockerEndpoint',
       'hasKubeEndpoint',
-      'hasNomadEndpoint',
       'allowKubeToSelectCompose',
     ])
   )
@@ -92,7 +92,6 @@ export const componentsModule = angular
       'query',
       'title',
       'data-cy',
-      'hideEnvironmentIds',
     ])
   )
   .component(
@@ -101,4 +100,10 @@ export const componentsModule = angular
       'onChange',
       'value',
     ])
-  ).name;
+  )
+  .component(
+    'edgeStackCreateTemplateFieldset',
+    r2a(withReactQuery(TemplateFieldset), ['setValues', 'values', 'errors'])
+  );
+
+export const componentsModule = ngModule.name;

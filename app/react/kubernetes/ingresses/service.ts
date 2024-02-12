@@ -34,11 +34,13 @@ export async function getIngresses(
 
 export async function getIngressControllers(
   environmentId: EnvironmentId,
-  namespace: string
+  namespace: string,
+  allowedOnly?: boolean
 ) {
   try {
     const { data: ingresscontrollers } = await axios.get<IngressController[]>(
-      `kubernetes/${environmentId}/namespaces/${namespace}/ingresscontrollers`
+      `kubernetes/${environmentId}/namespaces/${namespace}/ingresscontrollers`,
+      allowedOnly ? { params: { allowedOnly: true } } : undefined
     );
     return ingresscontrollers;
   } catch (e) {

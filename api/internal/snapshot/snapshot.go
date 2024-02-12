@@ -11,7 +11,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/pkg/featureflags"
+	"github.com/portainer/portainer/api/pendingactions"
 
 	"github.com/rs/zerolog/log"
 )
@@ -26,10 +26,18 @@ type Service struct {
 	dockerSnapshotter         portainer.DockerSnapshotter
 	kubernetesSnapshotter     portainer.KubernetesSnapshotter
 	shutdownCtx               context.Context
+	pendingActionsService     *pendingactions.PendingActionsService
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
+func NewService(
+	snapshotIntervalFromFlag string,
+	dataStore dataservices.DataStore,
+	dockerSnapshotter portainer.DockerSnapshotter,
+	kubernetesSnapshotter portainer.KubernetesSnapshotter,
+	shutdownCtx context.Context,
+	pendingActionsService *pendingactions.PendingActionsService,
+) (*Service, error) {
 	interval, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
 	if err != nil {
 		return nil, err
@@ -42,6 +50,7 @@ func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStor
 		dockerSnapshotter:         dockerSnapshotter,
 		kubernetesSnapshotter:     kubernetesSnapshotter,
 		shutdownCtx:               shutdownCtx,
+		pendingActionsService:     pendingActionsService,
 	}, nil
 }
 
@@ -261,20 +270,16 @@ func (service *Service) snapshotEndpoints() error {
 
 		snapshotError := service.SnapshotEndpoint(&endpoint)
 
-		if featureflags.IsEnabled(portainer.FeatureNoTx) {
-			updateEndpointStatus(service.dataStore, &endpoint, snapshotError)
-		} else {
-			service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-				updateEndpointStatus(tx, &endpoint, snapshotError)
-				return nil
-			})
-		}
+		service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			updateEndpointStatus(tx, &endpoint, snapshotError, service.pendingActionsService)
+			return nil
+		})
 	}
 
 	return nil
 }
 
-func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, snapshotError error) {
+func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, snapshotError error, pendingActionsService *pendingactions.PendingActionsService) {
 	latestEndpointReference, err := tx.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
 		log.Debug().
@@ -303,6 +308,14 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 			Str("endpoint", endpoint.Name).
 			Str("URL", endpoint.URL).Err(err).
 			Msg("background schedule error (environment snapshot), unable to update environment")
+	}
+
+	// Run the pending actions
+	if latestEndpointReference.Status == portainer.EndpointStatusUp {
+		err = pendingActionsService.Execute(endpoint.ID)
+		if err != nil {
+			log.Error().Err(err).Msg("background schedule error (environment snapshot), unable to execute pending actions")
+		}
 	}
 }
 

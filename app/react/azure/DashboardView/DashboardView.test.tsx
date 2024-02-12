@@ -1,7 +1,9 @@
+import { http, HttpResponse } from 'msw';
+
 import { renderWithQueryClient, within } from '@/react-tools/test-utils';
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { server, rest } from '@/setup-tests/server';
+import { server } from '@/setup-tests/server';
 import {
   createMockResourceGroups,
   createMockSubscriptions,
@@ -9,9 +11,9 @@ import {
 
 import { DashboardView } from './DashboardView';
 
-jest.mock('@uirouter/react', () => ({
-  ...jest.requireActual('@uirouter/react'),
-  useCurrentStateAndParams: jest.fn(() => ({
+vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
+  ...(await importOriginal()),
+  useCurrentStateAndParams: vi.fn(() => ({
     params: { endpointId: 1 },
   })),
 }));
@@ -71,6 +73,8 @@ test('should correctly show total number of resource groups across multiple subs
 });
 
 test("when only subscriptions fail to load, don't show the dashboard", async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+
   const { queryByLabelText } = await renderComponent(
     1,
     { 'subscription-1': 1 },
@@ -82,6 +86,8 @@ test("when only subscriptions fail to load, don't show the dashboard", async () 
 });
 
 test('when only resource groups fail to load, still show the subscriptions', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+
   const { queryByLabelText, findByLabelText } = await renderComponent(
     1,
     { 'subscription-1': 1 },
@@ -102,30 +108,27 @@ async function renderComponent(
   const state = { user };
 
   server.use(
-    rest.get(
-      '/api/endpoints/:endpointId/azure/subscriptions',
-      (req, res, ctx) =>
-        res(
-          ctx.json(createMockSubscriptions(subscriptionsCount)),
-          ctx.status(subscriptionsStatus)
-        )
+    http.get('/api/endpoints/:endpointId/azure/subscriptions', () =>
+      HttpResponse.json(createMockSubscriptions(subscriptionsCount), {
+        status: subscriptionsStatus,
+      })
     ),
-    rest.get(
+    http.get(
       '/api/endpoints/:endpointId/azure/subscriptions/:subscriptionId/resourcegroups',
-      (req, res, ctx) => {
-        if (typeof req.params.subscriptionId !== 'string') {
+      ({ params }) => {
+        if (typeof params.subscriptionId !== 'string') {
           throw new Error("Provided subscriptionId must be of type: 'string'");
         }
 
-        const { subscriptionId } = req.params;
-        return res(
-          ctx.json(
-            createMockResourceGroups(
-              req.params.subscriptionId,
-              resourceGroups[subscriptionId] || 0
-            )
+        const { subscriptionId } = params;
+        return HttpResponse.json(
+          createMockResourceGroups(
+            subscriptionId,
+            resourceGroups[subscriptionId] || 0
           ),
-          ctx.status(resourceGroupsStatus)
+          {
+            status: resourceGroupsStatus,
+          }
         );
       }
     )

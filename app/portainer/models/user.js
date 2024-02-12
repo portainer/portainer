@@ -12,6 +12,7 @@ export function UserViewModel(data) {
   }
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.Checked = false;
+  this.UseCache = data.UseCache;
 }
 
 export function UserTokenModel(data) {

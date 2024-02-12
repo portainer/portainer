@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type swarmStackFromFileContentPayload struct {
@@ -214,7 +214,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		}
 		if !isUnique {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: stackutils.ErrWebhookIDAlreadyExists}
+			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
 		}
 	}
 

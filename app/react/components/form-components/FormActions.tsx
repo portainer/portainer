@@ -1,8 +1,12 @@
 import { PropsWithChildren } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { LoadingButton } from '@@/buttons';
 
-interface Props {
+import { FormSection } from './FormSection';
+
+interface Props extends AutomationTestingProps {
   submitLabel: string;
   loadingText: string;
   isLoading: boolean;
@@ -15,21 +19,25 @@ export function FormActions({
   isLoading,
   children,
   isValid,
+  'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="form-group">
-      <div className="col-sm-12">
-        <LoadingButton
-          className="!ml-0"
-          loadingText={loadingText}
-          isLoading={isLoading}
-          disabled={!isValid}
-        >
-          {submitLabel}
-        </LoadingButton>
+    <FormSection title="Actions">
+      <div className="form-group">
+        <div className="col-sm-12">
+          <LoadingButton
+            className="!ml-0"
+            loadingText={loadingText}
+            isLoading={isLoading}
+            disabled={!isValid}
+            data-cy={dataCy}
+          >
+            {submitLabel}
+          </LoadingButton>
 
-        {children}
+          {children}
+        </div>
       </div>
-    </div>
+    </FormSection>
   );
 }

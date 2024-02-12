@@ -6,15 +6,16 @@ import (
 	"os"
 	"strconv"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -23,6 +24,8 @@ import (
 
 type kubernetesFileStackUpdatePayload struct {
 	StackFileContent string
+	// Name of the stack
+	StackName string
 }
 
 type kubernetesGitStackUpdatePayload struct {
@@ -111,6 +114,22 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
 		return httperror.InternalServerError("Failed to persist deployment file in a temp directory", err)
+	}
+
+	if payload.StackName != stack.Name {
+		stack.Name = payload.StackName
+		err := handler.DataStore.Stack().Update(stack.ID, stack)
+		if err != nil {
+			return httperror.InternalServerError("Failed to update stack name", err)
+		}
+	}
+
+	// Refresh ECR registry secret if needed
+	// RefreshEcrSecret method checks if the namespace has any ECR registry
+	// otherwise return nil
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	if err == nil {
+		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, stack.Namespace)
 	}
 
 	//use temp dir as the stack project path for deployment

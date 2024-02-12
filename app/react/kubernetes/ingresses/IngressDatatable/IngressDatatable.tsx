@@ -1,20 +1,24 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import Route from '@/assets/ico/route.svg?c';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 
 import { confirmDelete } from '@@/modals/confirm';
-import { Datatable } from '@@/datatables';
+import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
-import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
+import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
+import { Namespaces } from '../../namespaces/types';
 
 import { columns } from './columns';
 
@@ -26,43 +30,90 @@ interface SelectedIngress {
 }
 const storageKey = 'ingressClassesNameSpace';
 
-const settingsStore = createPersistedStore(storageKey);
+const settingsStore = createStore(storageKey);
 
 export function IngressDatatable() {
+  const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
 
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
-  const ingressesQuery = useIngresses(
+  const canAccessSystemResources = useAuthorizations(
+    'K8sAccessSystemNamespaces'
+  );
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
+  const { data: ingresses, ...ingressesQuery } = useIngresses(
     environmentId,
-    Object.keys(namespaces || {})
+    Object.keys(namespaces || {}),
+    {
+      autoRefreshRate: tableState.autoRefreshRate * 1000,
+    }
+  );
+
+  const filteredIngresses = useMemo(
+    () =>
+      ingresses?.filter(
+        (ingress) =>
+          (canAccessSystemResources && tableState.showSystemResources) ||
+          !namespaces?.[ingress.Namespace].IsSystem
+      ) || [],
+    [ingresses, tableState, canAccessSystemResources, namespaces]
+  );
+
+  const ingressesWithIsSystem = useIngressesRowData(
+    filteredIngresses || [],
+    namespaces
   );
 
   const deleteIngressesMutation = useDeleteIngresses();
-  const tableState = useTableState(settingsStore, storageKey);
 
   const router = useRouter();
 
   return (
     <Datatable
       settingsManager={tableState}
-      dataset={ingressesQuery.data || []}
+      dataset={ingressesWithIsSystem}
       columns={columns}
       isLoading={ingressesQuery.isLoading || namespacesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
       title="Ingresses"
       titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
+      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
       renderTableActions={tableActions}
+      renderTableSettings={() => (
+        <TableSettingsMenu>
+          <DefaultDatatableSettings settings={tableState} />
+        </TableSettingsMenu>
+      )}
+      description={
+        <SystemResourceDescription
+          showSystemResources={tableState.showSystemResources}
+        />
+      }
       disableSelect={useCheckboxes()}
     />
   );
+
+  // useIngressesRowData appends the `isSyetem` property to the service data
+  function useIngressesRowData(
+    ingresses: Ingress[],
+    namespaces?: Namespaces
+  ): Ingress[] {
+    return useMemo(
+      () =>
+        ingresses.map((r) => ({
+          ...r,
+          IsSystem: namespaces ? namespaces?.[r.Namespace].IsSystem : false,
+        })),
+      [ingresses, namespaces]
+    );
+  }
 
   function tableActions(selectedFlatRows: Ingress[]) {
     return (
       <div className="ingressDatatable-actions">
         <Authorized authorizations="AzureContainerGroupDelete">
           <Button
-            className="btn-wrapper"
             color="dangerlight"
             disabled={selectedFlatRows.length === 0}
             onClick={() => handleRemoveClick(selectedFlatRows)}
@@ -77,11 +128,7 @@ export function IngressDatatable() {
             to="kubernetes.ingresses.create"
             className="space-left no-decoration"
           >
-            <Button
-              icon={Plus}
-              className="btn-wrapper vertical-center"
-              color="secondary"
-            >
+            <Button icon={Plus} color="secondary">
               Add with form
             </Button>
           </Link>
@@ -92,9 +139,7 @@ export function IngressDatatable() {
             className="space-left no-decoration"
             params={{ referrer: 'kubernetes.ingresses' }}
           >
-            <Button icon={Plus} className="btn-wrapper">
-              Create from manifest
-            </Button>
+            <Button icon={Plus}>Create from manifest</Button>
           </Link>
         </Authorized>
       </div>

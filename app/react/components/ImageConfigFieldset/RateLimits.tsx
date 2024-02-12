@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useQuery } from 'react-query';
+import { useEffect } from 'react';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
@@ -23,10 +23,10 @@ import { getIsDockerHubRegistry } from './utils';
 
 export function RateLimits({
   registryId,
-  setValidity,
+  onRateLimit,
 }: {
   registryId?: RegistryId;
-  setValidity: (error?: string) => void;
+  onRateLimit: (limited?: boolean) => void;
 }) {
   const registryQuery = useRegistry(registryId);
 
@@ -48,7 +48,7 @@ export function RateLimits({
     <RateLimitsInner
       isAuthenticated={registry?.Authentication}
       registryId={registryId}
-      setValidity={setValidity}
+      onRateLimit={onRateLimit}
       environment={environmentQuery.data}
     />
   );
@@ -57,15 +57,15 @@ export function RateLimits({
 function RateLimitsInner({
   isAuthenticated = false,
   registryId = 0,
-  setValidity,
+  onRateLimit,
   environment,
 }: {
   isAuthenticated?: boolean;
   registryId?: RegistryId;
-  setValidity: (error?: string) => void;
+  onRateLimit: (limited?: boolean) => void;
   environment: Environment;
 }) {
-  const pullRateLimits = useRateLimits(registryId, environment, setValidity);
+  const pullRateLimits = useRateLimits(registryId, environment, onRateLimit);
   const { isAdmin } = useCurrentUser();
 
   if (!pullRateLimits) {
@@ -143,7 +143,7 @@ interface PullRateLimits {
 function useRateLimits(
   registryId: RegistryId,
   environment: Environment,
-  setValidity: (error?: string) => void
+  onRateLimit: (limited?: boolean) => void
 ) {
   const isValidForPull =
     isAgentEnvironment(environment.Type) || isLocalEnvironment(environment);
@@ -153,32 +153,20 @@ function useRateLimits(
     () => getRateLimits(environment, registryId),
     {
       enabled: isValidForPull,
-      onError(e) {
-        // eslint-disable-next-line no-console
-        console.error('Failed loading DockerHub pull rate limits', e);
-        setValidity();
-      },
-      onSuccess(data) {
-        setValidity(
-          data.limit === 0 || data.remaining >= 0
-            ? undefined
-            : 'Rate limit exceeded'
-        );
-      },
     }
   );
 
   useEffect(() => {
-    if (!isValidForPull) {
-      setValidity();
+    if (!isValidForPull || query.isError) {
+      onRateLimit();
     }
-  });
 
-  if (!isValidForPull) {
-    return null;
-  }
+    if (query.data) {
+      onRateLimit(query.data.limit > 0 && query.data.remaining === 0);
+    }
+  }, [isValidForPull, onRateLimit, query.data, query.isError]);
 
-  return query.data;
+  return isValidForPull ? query.data : undefined;
 }
 
 function getRateLimits(environment: Environment, registryId: RegistryId) {

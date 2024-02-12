@@ -37,7 +37,7 @@ test('should call onSelect when clicked with id', async () => {
     { children: 'Content 2', id: 'option2', label: 'Option 2' },
   ];
 
-  const onSelect = jest.fn();
+  const onSelect = vi.fn();
 
   const { findByText } = renderComponent(options, options[1].id, onSelect);
 

@@ -9,7 +9,8 @@ import {
   Environment,
   EnvironmentId,
 } from '@/react/portainer/environments/types';
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
+import { useAdminOnlyRedirect } from '@/react/hooks/useAdminOnlyRedirect';
 
 import { Stepper } from '@@/Stepper';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -32,6 +33,8 @@ import styles from './EnvironmentsCreationView.module.css';
 import { WizardEndpointsList } from './WizardEndpointsList';
 
 export function EnvironmentCreationView() {
+  // TODO: move this redirect logic to the router when migrating the router to react
+  useAdminOnlyRedirect();
   const {
     params: { localEndpointId: localEndpointIdParam },
   } = useCurrentStateAndParams();
@@ -71,6 +74,7 @@ export function EnvironmentCreationView() {
       <PageHeader
         title="Quick Setup"
         breadcrumbs={[{ label: 'Environment Wizard' }]}
+        reload
       />
 
       <div className={styles.wizardWrapper}>
@@ -210,7 +214,6 @@ function useAnalyticsState() {
     kaasAgent: 0,
     aciApi: 0,
     localEndpoint: 0,
-    nomadEdgeAgentStandard: 0,
     dockerEdgeAgentAsync: 0,
     dockerEdgeAgentStandard: 0,
   });

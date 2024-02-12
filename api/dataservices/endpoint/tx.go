@@ -122,6 +122,23 @@ func (service ServiceTx) Create(endpoint *portainer.Endpoint) error {
 	return nil
 }
 
+func (service ServiceTx) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.Endpoint, error) {
+	var endpoints = make([]portainer.Endpoint, 0)
+
+	return endpoints, service.tx.GetAll(
+		BucketName,
+		&portainer.Endpoint{},
+		dataservices.FilterFn(&endpoints, func(e portainer.Endpoint) bool {
+			for t := range e.TeamAccessPolicies {
+				if t == teamID {
+					return true
+				}
+			}
+			return false
+		}),
+	)
+}
+
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service ServiceTx) GetNextIdentifier() int {
 	return service.tx.GetNextIdentifier(BucketName)

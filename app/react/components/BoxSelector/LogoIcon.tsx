@@ -1,8 +1,10 @@
+import clsx from 'clsx';
+
 import { Icon, IconProps } from '@@/Icon';
 
 type Props = IconProps;
 
-export function LogoIcon({ icon }: Props) {
+export function LogoIcon({ icon, iconClass }: Props) {
   return (
     <div
       className={`
@@ -10,7 +12,7 @@ export function LogoIcon({ icon }: Props) {
    items-center justify-center text-7xl
 `}
     >
-      <Icon icon={icon} className="!flex" />
+      <Icon icon={icon} className={clsx('!flex', iconClass)} />
     </div>
   );
 }

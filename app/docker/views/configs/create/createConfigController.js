@@ -5,7 +5,7 @@ import { confirmWebEditorDiscard } from '@@/modals/confirm';
 
 class CreateConfigController {
   /* @ngInject */
-  constructor($async, $state, $transition$, $window, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
+  constructor($async, $state, $transition$, $window, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService, endpoint) {
     this.$state = $state;
     this.$transition$ = $transition$;
     this.$window = $window;
@@ -15,6 +15,7 @@ class CreateConfigController {
     this.FormValidator = FormValidator;
     this.ResourceControlService = ResourceControlService;
     this.$async = $async;
+    this.endpoint = endpoint;
 
     this.formValues = {
       Name: '',
@@ -45,7 +46,7 @@ class CreateConfigController {
     }
 
     try {
-      let data = await this.ConfigService.config(this.$transition$.params().id);
+      let data = await this.ConfigService.config(this.endpoint.Id, this.$transition$.params().id);
       this.formValues.Name = data.Name + '_copy';
       this.formValues.ConfigContent = data.Data;
       let labels = _.keys(data.Labels);
@@ -135,7 +136,7 @@ class CreateConfigController {
     const config = this.prepareConfiguration();
 
     try {
-      const data = await this.ConfigService.create(config);
+      const data = await this.ConfigService.create(this.endpoint.Id, config);
       const resourceControl = data.Portainer.ResourceControl;
       const userId = userDetails.ID;
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);

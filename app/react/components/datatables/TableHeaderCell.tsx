@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import { CSSProperties, PropsWithChildren, ReactNode } from 'react';
 
-import styles from './TableHeaderCell.module.css';
 import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
 interface Props {
@@ -67,8 +66,7 @@ function SortWrapper({
       onClick={() => onClick(!isSortedDesc)}
       className={clsx(
         '!ml-0 h-full border-none !bg-transparent !px-0 focus:border-none',
-        styles.sortable,
-        isSorted && styles.sortingActive
+        !isSorted && 'group'
       )}
     >
       <div className="flex h-full w-full flex-row items-center justify-start">
@@ -82,7 +80,7 @@ function SortWrapper({
   );
 }
 
-interface TableColumnHeaderAngularProps {
+export interface TableColumnHeaderAngularProps {
   colTitle: string;
   canSort: boolean;
   isSorted?: boolean;
@@ -94,7 +92,8 @@ export function TableColumnHeaderAngular({
   isSorted,
   colTitle,
   isSortedDesc = true,
-}: TableColumnHeaderAngularProps) {
+  children,
+}: PropsWithChildren<TableColumnHeaderAngularProps>) {
   return (
     <div className="flex h-full flex-row flex-nowrap">
       <SortWrapper
@@ -103,6 +102,7 @@ export function TableColumnHeaderAngular({
         isSortedDesc={isSortedDesc}
       >
         {colTitle}
+        {children}
       </SortWrapper>
     </div>
   );

@@ -49,20 +49,27 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Storage</td>
-                      <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
+                      <td>Storage Class</td>
+                      <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.storageClass.Name }}</td>
                     </tr>
                     <tr>
-                      <td>Shared Access Policy</td>
-                      <td data-cy="k8sVolDetail-volAccessPolicy"
-                        >{{ ctrl.state.volumeSharedAccessPolicy }}
-                        <portainer-tooltip ng-if="ctrl.state.volumeSharedAccessPolicyTooltip" message="ctrl.state.volumeSharedAccessPolicyTooltip"></portainer-tooltip
-                      ></td>
+                      <td>Access Modes</td>
+                      <td data-cy="k8sVolDetail-volAccessPolicy">
+                        <div ng-repeat="(index, accessPolicy) in ctrl.state.volumeSharedAccessPolicies" class="flex flex-col gap-y-1">
+                          <div class="items-center flex gap-x-1">
+                            {{ accessPolicy }}
+                            <portainer-tooltip
+                              ng-if="ctrl.state.volumeSharedAccessPolicyTooltips[index]"
+                              message="ctrl.state.volumeSharedAccessPolicyTooltips[index]"
+                            ></portainer-tooltip>
+                          </div>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td>Provisioner</td>
                       <td data-cy="k8sVolDetail-volProvisioner">{{
-                        ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-'
+                        ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner : '-'
                       }}</td>
                     </tr>
                     <tr>
@@ -70,14 +77,14 @@
                       <td data-cy="k8sVolDetail-volCreatedAt">{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
                     </tr>
                     <tr>
-                      <td>Size</td>
+                      <td>size</td>
                       <td ng-if="!ctrl.state.increaseSize">
                         {{ ctrl.volume.PersistentVolumeClaim.Storage }}
                         <button
                           type="button"
                           class="btn btn-sm btn-primary"
                           ng-click="ctrl.state.increaseSize = true"
-                          ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass.AllowVolumeExpansion"
+                          ng-if="ctrl.volume.PersistentVolumeClaim.storageClass.AllowVolumeExpansion"
                           data-cy="k8sVolDetail-increaseSizeButton"
                           >Increase size</button
                         >
@@ -164,7 +171,7 @@
             <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center" data-cy="k8sVolDetail-volYamlTab"> <pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
-                <kubernetes-yaml-inspector key="volume-yaml" data="ctrl.volume.PersistentVolumeClaim.Yaml"></kubernetes-yaml-inspector>
+                <kube-yaml-inspector identifier="'volume-yaml'" data="ctrl.volume.PersistentVolumeClaim.Yaml" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>

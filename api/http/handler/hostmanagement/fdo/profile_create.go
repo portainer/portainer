@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type createProfileFromFileContentPayload struct {
@@ -69,7 +69,7 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 	}
 
 	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
+		return httperror.Conflict(fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), errors.New("a profile already exists with this name"))
 	}
 
 	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()

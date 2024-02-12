@@ -3,13 +3,14 @@ package system
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/upgrade"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle status operations.
@@ -46,7 +47,7 @@ func NewHandler(bouncer security.BouncerService,
 	authenticatedRouter := router.PathPrefix("/").Subrouter()
 	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
 
-	authenticatedRouter.Handle("/version", http.HandlerFunc(h.version)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/version", httperror.LoggerHandler(h.version)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/nodes", httperror.LoggerHandler(h.systemNodesCount)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/info", httperror.LoggerHandler(h.systemInfo)).Methods(http.MethodGet)
 

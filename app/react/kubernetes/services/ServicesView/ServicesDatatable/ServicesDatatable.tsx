@@ -1,16 +1,17 @@
+import { useMemo } from 'react';
 import { Shuffle, Trash2 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
 
+import { Namespaces } from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import {
-  Authorized,
-  useAuthorizations,
-  useCurrentUser,
-} from '@/react/hooks/useUser';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
 import { confirmDelete } from '@@/modals/confirm';
@@ -23,10 +24,6 @@ import {
   useServicesForCluster,
 } from '../../service';
 import { Service } from '../../types';
-import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSettings';
-import { isSystemNamespace } from '../../../namespaces/utils';
-import { useNamespaces } from '../../../namespaces/queries';
-import { SystemResourceDescription } from '../../../datatables/SystemResourceDescription';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
@@ -37,7 +34,8 @@ const settingsStore = createStore(storageKey);
 export function ServicesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(environmentId);
+  const { data: namespaces, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const namespaceNames = (namespaces && Object.keys(namespaces)) || [];
   const { data: services, ...servicesQuery } = useServicesForCluster(
     environmentId,
@@ -48,17 +46,24 @@ export function ServicesDatatable() {
   );
 
   const readOnly = !useAuthorizations(['K8sServiceW']);
-  const { isAdmin } = useCurrentUser();
+  const canAccessSystemResources = useAuthorizations(
+    'K8sAccessSystemNamespaces'
+  );
 
   const filteredServices = services?.filter(
     (service) =>
-      (isAdmin && tableState.showSystemResources) ||
-      !isSystemNamespace(service.Namespace)
+      (canAccessSystemResources && tableState.showSystemResources) ||
+      !namespaces?.[service.Namespace].IsSystem
+  );
+
+  const servicesWithIsSystem = useServicesRowData(
+    filteredServices || [],
+    namespaces
   );
 
   return (
     <Datatable
-      dataset={filteredServices || []}
+      dataset={servicesWithIsSystem || []}
       columns={columns}
       settingsManager={tableState}
       isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
@@ -66,26 +71,40 @@ export function ServicesDatatable() {
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}
-      isRowSelectable={(row) => !isSystemNamespace(row.original.Namespace)}
+      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings
-            settings={tableState}
-            hideShowSystemResources={!isAdmin}
-          />
+          <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
       description={
         <SystemResourceDescription
-          showSystemResources={tableState.showSystemResources || !isAdmin}
+          showSystemResources={
+            tableState.showSystemResources || !canAccessSystemResources
+          }
         />
       }
       renderRow={servicesRenderRow}
     />
+  );
+}
+
+// useServicesRowData appends the `isSyetem` property to the service data
+function useServicesRowData(
+  services: Service[],
+  namespaces?: Namespaces
+): Service[] {
+  return useMemo(
+    () =>
+      services.map((service) => ({
+        ...service,
+        IsSystem: namespaces ? namespaces?.[service.Namespace].IsSystem : false,
+      })),
+    [services, namespaces]
   );
 }
 

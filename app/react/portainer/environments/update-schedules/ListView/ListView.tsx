@@ -1,7 +1,10 @@
 import { Clock, Trash2 } from 'lucide-react';
+import { useMemo } from 'react';
+import _ from 'lodash';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
+import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
 import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
@@ -17,6 +20,7 @@ import { BetaAlert } from '../common/BetaAlert';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
+import { DecoratedItem } from './types';
 
 const storageKey = 'update-schedules-list';
 const settingsStore = createStore(storageKey);
@@ -27,8 +31,24 @@ export function ListView() {
   const tableState = useTableState(settingsStore, storageKey);
 
   const listQuery = useList(true);
+  const groupsQuery = useEdgeGroups({
+    select: (groups) => Object.fromEntries(groups.map((g) => [g.Id, g.Name])),
+  });
 
-  if (!listQuery.data) {
+  const items: Array<DecoratedItem> = useMemo(() => {
+    if (!listQuery.data || !groupsQuery.data) {
+      return [];
+    }
+
+    return listQuery.data.map((item) => ({
+      ...item,
+      edgeGroupNames: _.compact(
+        item.edgeGroupIds.map((id) => groupsQuery.data[id])
+      ),
+    }));
+  }, [listQuery.data, groupsQuery.data]);
+
+  if (!listQuery.data || !groupsQuery.data) {
     return null;
   }
 
@@ -36,24 +56,23 @@ export function ListView() {
     <>
       <PageHeader
         title="Update & Rollback"
-        reload
         breadcrumbs="Update and rollback"
+        reload
       />
 
       <BetaAlert
-        className="ml-[15px] mb-2"
-        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+        className="mb-2 ml-[15px]"
+        message="Beta feature - currently limited to standalone Linux edge devices."
       />
 
       <Datatable
-        dataset={listQuery.data}
+        dataset={items}
         columns={columns}
         settingsManager={tableState}
         title="Update & rollback"
         titleIcon={Clock}
         emptyContentLabel="No schedules found"
         isLoading={listQuery.isLoading}
-        totalCount={listQuery.data.length}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}

@@ -176,7 +176,7 @@ angular.module('portainer.app').controller('StackController', [
       // The EndpointID property is not available for these stacks, we can pass
       // the current endpoint identifier as a part of the migrate request. It will be used if
       // the EndpointID property is not defined on the stack.
-      if (stack.EndpointId === 0) {
+      if (!stack.EndpointId) {
         stack.EndpointId = endpoint.Id;
       }
 
@@ -248,7 +248,7 @@ angular.module('portainer.app').controller('StackController', [
         // The EndpointID property is not available for these stacks, we can pass
         // the current endpoint identifier as a part of the update request. It will be used if
         // the EndpointID property is not defined on the stack.
-        if (stack.EndpointId === 0) {
+        if (!stack.EndpointId) {
           stack.EndpointId = endpoint.Id;
         }
 
@@ -332,7 +332,7 @@ angular.module('portainer.app').controller('StackController', [
         $q.all({
           stack: StackService.stack(id),
           groups: GroupService.groups(),
-          containers: ContainerService.containers(true),
+          containers: ContainerService.containers(endpoint.Id, true),
         })
           .then(function success(data) {
             var stack = data.stack;
@@ -345,6 +345,11 @@ angular.module('portainer.app').controller('StackController', [
             let resourcesPromise = Promise.resolve({});
             if (!stack.Status || stack.Status === 1) {
               resourcesPromise = stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name);
+            }
+
+            // Workaround for EE-6118
+            if (!stack.EndpointId) {
+              stack.EndpointId = endpoint.Id;
             }
 
             return $q.all({
@@ -381,7 +386,7 @@ angular.module('portainer.app').controller('StackController', [
       return $q.all({
         services: ServiceService.services(stackFilter),
         tasks: TaskService.tasks(stackFilter),
-        containers: agentProxy ? ContainerService.containers(1) : [],
+        containers: agentProxy ? ContainerService.containers(endpoint.Id, 1) : [],
         nodes: NodeService.nodes(),
       });
     }
@@ -414,7 +419,7 @@ angular.module('portainer.app').controller('StackController', [
       };
 
       return $q.all({
-        containers: ContainerService.containers(1, stackFilter),
+        containers: ContainerService.containers(endpoint.Id, 1, stackFilter),
       });
     }
 

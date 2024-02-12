@@ -54,8 +54,8 @@ export function UserService($q, Users, TeamService, TeamMembershipService) {
     return Users.remove({ id: id }).$promise;
   };
 
-  service.updateUser = function (id, { password, role, username }) {
-    return Users.update({ id }, { password, role, username }).$promise;
+  service.updateUser = function (id, { newPassword, role, username }) {
+    return Users.update({ id }, { newPassword, role, username }).$promise;
   };
 
   service.updateUserPassword = function (id, currentPassword, newPassword) {
@@ -109,19 +109,6 @@ export function UserService($q, Users, TeamService, TeamMembershipService) {
         deferred.reject({ msg: 'Unable to retrieve user teams', err: err });
       });
 
-    return deferred.promise;
-  };
-
-  service.createAccessToken = function (id, description) {
-    const deferred = $q.defer();
-    const payload = { description };
-    Users.createAccessToken({ id }, payload)
-      .$promise.then((data) => {
-        deferred.resolve(data);
-      })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to create user', err: err });
-      });
     return deferred.promise;
   };
 

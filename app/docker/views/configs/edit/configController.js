@@ -6,15 +6,17 @@ angular.module('portainer.docker').controller('ConfigController', [
   '$state',
   'ConfigService',
   'Notifications',
-  function ($scope, $transition$, $state, ConfigService, Notifications) {
+  'endpoint',
+  function ($scope, $transition$, $state, ConfigService, Notifications, endpoint) {
     $scope.resourceType = ResourceControlType.Config;
+    $scope.endpoint = endpoint;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
     };
 
     $scope.removeConfig = function removeConfig(configId) {
-      ConfigService.remove(configId)
+      ConfigService.remove(endpoint.Id, configId)
         .then(function success() {
           Notifications.success('Success', 'Configuration successfully removed');
           $state.go('docker.configs', {});
@@ -25,7 +27,7 @@ angular.module('portainer.docker').controller('ConfigController', [
     };
 
     function initView() {
-      ConfigService.config($transition$.params().id)
+      ConfigService.config(endpoint.Id, $transition$.params().id)
         .then(function success(data) {
           $scope.config = data;
         })

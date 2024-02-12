@@ -6,7 +6,7 @@ function renderDefault({
   name = 'default name',
   checked = false,
   label = 'label',
-  onChange = jest.fn(),
+  onChange = vi.fn(),
   index,
 }: Partial<Props> = {}) {
   return render(
@@ -28,7 +28,7 @@ test('should display a Switch component', async () => {
 });
 
 test('clicking should emit on-change with the opposite value', async () => {
-  const onChange = jest.fn();
+  const onChange = vi.fn();
   const checked = true;
   const { findByRole } = renderDefault({ onChange, checked });
 
@@ -39,7 +39,7 @@ test('clicking should emit on-change with the opposite value', async () => {
 });
 
 test('clicking should emit on-change with the opposite value and index', async () => {
-  const onChange = jest.fn();
+  const onChange = vi.fn();
   const checked = true;
   const index = 3;
   const { findByRole } = renderDefault({ onChange, checked, index });

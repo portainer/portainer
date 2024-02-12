@@ -1,8 +1,18 @@
 import { useState } from 'react';
-import { Database, Hash, Server, Tag, Wrench } from 'lucide-react';
+import {
+  Database,
+  GitCommit,
+  Hash,
+  Server,
+  Tag,
+  Variable,
+  Wrench,
+} from 'lucide-react';
+import clsx from 'clsx';
 
 import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Modal } from '@@/modals';
 import { Button } from '@@/buttons';
@@ -37,6 +47,7 @@ export function BuildInfoModalButton() {
 }
 
 function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
+  const { isAdmin } = useCurrentUser();
   const versionQuery = useSystemVersion();
   const statusQuery = useSystemStatus();
 
@@ -82,6 +93,13 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
                   </span>
                 </td>
               </tr>
+              <tr>
+                <td>
+                  <GitCommit size="13" className="space-right" />
+                  Git Commit: {Build.GitCommit}
+                </td>
+                <td />
+              </tr>
             </tbody>
           </table>
         </div>
@@ -102,6 +120,25 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
             <span className="text-muted small">Go v{Build.GoVersion}</span>
           </div>
         </div>
+
+        {isAdmin && Build.Env && (
+          <div className={clsx(styles.toolsList, 'mt-3')}>
+            <span className="inline-flex items-center ">
+              <Variable size="13" className="space-right" />
+              Environment Variables
+            </span>
+
+            <div
+              className={clsx(styles.tools, 'max-h-32 overflow-auto space-y-2')}
+            >
+              {Build.Env.map((envVar) => (
+                <div key={envVar}>
+                  <code>{envVar}</code>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button className="w-full" onClick={closeModal}>

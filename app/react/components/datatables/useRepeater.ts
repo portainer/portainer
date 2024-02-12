@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 
 export function useRepeater(
   refreshRate: number,
-  onRefresh?: () => Promise<void>
+  onRefresh?: () => Promise<void> | void
 ) {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 

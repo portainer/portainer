@@ -20,14 +20,15 @@ import {
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 
+import { PrePullToggle } from '../../components/PrePullToggle';
+import { RetryDeployToggle } from '../../components/RetryDeployToggle';
+
 import { PrivateRegistryFieldsetWrapper } from './PrivateRegistryFieldsetWrapper';
 import { FormValues } from './types';
 import { ComposeForm } from './ComposeForm';
 import { KubernetesForm } from './KubernetesForm';
-import { NomadForm } from './NomadForm';
 import { GitForm } from './GitForm';
 import { useValidateEnvironmentTypes } from './useEdgeGroupHasType';
-import { atLeastTwo } from './atLeastTwo';
 
 interface Props {
   edgeStack: EdgeStack;
@@ -41,7 +42,6 @@ interface Props {
 const forms = {
   [DeploymentType.Compose]: ComposeForm,
   [DeploymentType.Kubernetes]: KubernetesForm,
-  [DeploymentType.Nomad]: NomadForm,
 };
 
 export function EditEdgeStackForm({
@@ -108,7 +108,6 @@ function InnerForm({
 
   const hasKubeEndpoint = hasType(EnvironmentType.EdgeAgentOnKubernetes);
   const hasDockerEndpoint = hasType(EnvironmentType.EdgeAgentOnDocker);
-  const hasNomadEndpoint = hasType(EnvironmentType.EdgeAgentOnNomad);
 
   const DeploymentForm = forms[values.deploymentType];
 
@@ -120,7 +119,7 @@ function InnerForm({
         error={errors.edgeGroups}
       />
 
-      {atLeastTwo(hasKubeEndpoint, hasDockerEndpoint, hasNomadEndpoint) && (
+      {hasKubeEndpoint && hasDockerEndpoint && (
         <TextTip>
           There are no available deployment types when there is more than one
           type of environment in your edge group selection (e.g. Kubernetes and
@@ -142,7 +141,6 @@ function InnerForm({
         value={values.deploymentType}
         hasDockerEndpoint={hasType(EnvironmentType.EdgeAgentOnDocker)}
         hasKubeEndpoint={hasType(EnvironmentType.EdgeAgentOnKubernetes)}
-        hasNomadEndpoint={hasType(EnvironmentType.EdgeAgentOnNomad)}
         onChange={(value) => {
           setFieldValue('content', getCachedContent(value));
           setFieldValue('deploymentType', value);
@@ -180,46 +178,30 @@ function InnerForm({
           <PrivateRegistryFieldsetWrapper
             value={values.privateRegistryId}
             onChange={(value) => setFieldValue('privateRegistryId', value)}
-            isValid={isValid}
-            values={values}
-            stackName={edgeStack.Name}
+            values={{
+              fileContent: values.content,
+            }}
             onFieldError={(error) => setFieldError('privateRegistryId', error)}
             error={errors.privateRegistryId}
           />
 
-          <EnvironmentVariablesPanel
-            onChange={(value) => setFieldValue('envVars', value)}
-            values={values.envVars}
-            errors={errors.envVars}
-          />
-
           {values.deploymentType === DeploymentType.Compose && (
             <>
-              <div className="form-group">
-                <div className="col-sm-12">
-                  <SwitchField
-                    checked={values.prePullImage}
-                    name="prePullImage"
-                    label="Pre-pull images"
-                    tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"
-                    labelClass="col-sm-3 col-lg-2"
-                    onChange={(value) => setFieldValue('prePullImage', value)}
-                  />
-                </div>
-              </div>
+              <EnvironmentVariablesPanel
+                onChange={(value) => setFieldValue('envVars', value)}
+                values={values.envVars}
+                errors={errors.envVars}
+              />
 
-              <div className="form-group">
-                <div className="col-sm-12">
-                  <SwitchField
-                    checked={values.retryDeploy}
-                    name="retryDeploy"
-                    label="Retry deployment"
-                    tooltip="When enabled, this will allow edge agent keep retrying deployment if failure occur"
-                    labelClass="col-sm-3 col-lg-2"
-                    onChange={(value) => setFieldValue('retryDeploy', value)}
-                  />
-                </div>
-              </div>
+              <PrePullToggle
+                onChange={(value) => setFieldValue('prePullImage', value)}
+                value={values.prePullImage}
+              />
+
+              <RetryDeployToggle
+                onChange={(value) => setFieldValue('retryDeploy', value)}
+                value={values.retryDeploy}
+              />
             </>
           )}
         </>
@@ -255,7 +237,6 @@ function useCachedContent() {
   const [cachedContent, setCachedContent] = useState({
     [DeploymentType.Compose]: '',
     [DeploymentType.Kubernetes]: '',
-    [DeploymentType.Nomad]: '',
   });
 
   function handleChangeContent(type: DeploymentType, content: string) {

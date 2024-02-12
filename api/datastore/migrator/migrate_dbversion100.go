@@ -10,8 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (m *Migrator) migrateDockerDesktopExtentionSetting() error {
-	log.Info().Msg("updating docker desktop extention flag in settings")
+func (m *Migrator) migrateDockerDesktopExtensionSetting() error {
+	log.Info().Msg("updating docker desktop extension flag in settings")
 
 	isDDExtension := false
 	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
@@ -115,10 +115,16 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 			}
 
 			if environmentStatus.Details.Ok {
-				statusArray = append(statusArray, portainer.EdgeStackDeploymentStatus{
-					Type: portainer.EdgeStackStatusRunning,
-					Time: time.Now().Unix(),
-				})
+				statusArray = append(statusArray,
+					portainer.EdgeStackDeploymentStatus{
+						Type: portainer.EdgeStackStatusDeploymentReceived,
+						Time: time.Now().Unix(),
+					},
+					portainer.EdgeStackDeploymentStatus{
+						Type: portainer.EdgeStackStatusRunning,
+						Time: time.Now().Unix(),
+					},
+				)
 			}
 
 			if environmentStatus.Details.ImagesPulled {

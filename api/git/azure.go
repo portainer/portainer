@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,12 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
 	gittypes "github.com/portainer/portainer/api/git/types"
 
+	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/pkg/errors"
+	"github.com/segmentio/encoding/json"
 )
 
 const (

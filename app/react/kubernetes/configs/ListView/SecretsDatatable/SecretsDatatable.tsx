@@ -3,19 +3,15 @@ import { Lock, Plus, Trash2 } from 'lucide-react';
 import { Secret } from 'kubernetes-types/core/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import {
-  Authorized,
-  useAuthorizations,
-  useCurrentUser,
-} from '@/react/hooks/useUser';
-import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useApplicationsForCluster } from '@/react/kubernetes/applications/application.queries';
+import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
 import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import { Namespaces } from '@/react/kubernetes/namespaces/types';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { confirmDelete } from '@@/modals/confirm';
@@ -39,10 +35,12 @@ const settingsStore = createStore(storageKey);
 export function SecretsDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const readOnly = !useAuthorizations(['K8sSecretsW']);
-  const { isAdmin } = useCurrentUser();
+  const canAccessSystemResources = useAuthorizations(
+    'K8sAccessSystemNamespaces'
+  );
 
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } = useNamespaces(
+  const { data: namespaces, ...namespacesQuery } = useNamespacesQuery(
     environmentId,
     {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
@@ -56,22 +54,25 @@ export function SecretsDatatable() {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const { data: applications, ...applicationsQuery } =
-    useApplicationsForCluster(environmentId, namespaceNames);
+  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
+    environmentId,
+    namespaceNames
+  );
 
   const filteredSecrets = useMemo(
     () =>
       secrets?.filter(
         (secret) =>
-          (isAdmin && tableState.showSystemResources) ||
-          !isSystemNamespace(secret.metadata?.namespace ?? '')
+          (canAccessSystemResources && tableState.showSystemResources) ||
+          !namespaces?.[secret.metadata?.namespace ?? '']?.IsSystem
       ) || [],
-    [secrets, tableState, isAdmin]
+    [secrets, tableState, canAccessSystemResources, namespaces]
   );
   const secretRowData = useSecretRowData(
     filteredSecrets,
     applications ?? [],
-    applicationsQuery.isLoading
+    applicationsQuery.isLoading,
+    namespaces
   );
 
   return (
@@ -85,7 +86,7 @@ export function SecretsDatatable() {
       titleIcon={Lock}
       getRowId={(row) => row.metadata?.uid ?? ''}
       isRowSelectable={(row) =>
-        !isSystemNamespace(row.original.metadata?.namespace ?? '')
+        !namespaces?.[row.original.metadata?.namespace ?? '']?.IsSystem
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -93,15 +94,12 @@ export function SecretsDatatable() {
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings
-            settings={tableState}
-            hideShowSystemResources={!isAdmin}
-          />
+          <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
       description={
         <SystemResourceDescription
-          showSystemResources={tableState.showSystemResources || !isAdmin}
+          showSystemResources={tableState.showSystemResources}
         />
       }
     />
@@ -113,7 +111,8 @@ export function SecretsDatatable() {
 function useSecretRowData(
   secrets: Secret[],
   applications: Application[],
-  applicationsLoading: boolean
+  applicationsLoading: boolean,
+  namespaces?: Namespaces
 ): SecretRowData[] {
   return useMemo(
     () =>
@@ -122,8 +121,11 @@ function useSecretRowData(
         inUse:
           // if the apps are loading, set inUse to true to hide the 'unused' badge
           applicationsLoading || getIsSecretInUse(secret, applications),
+        isSystem: namespaces
+          ? namespaces?.[secret.metadata?.namespace ?? '']?.IsSystem
+          : false,
       })),
-    [secrets, applicationsLoading, applications]
+    [secrets, applicationsLoading, applications, namespaces]
   );
 }
 

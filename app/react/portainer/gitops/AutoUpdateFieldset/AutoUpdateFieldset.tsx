@@ -51,8 +51,8 @@ export function AutoUpdateFieldset({
             We&#39;ve renamed &quot;Automatic updates&quot; to better align with
             industry terminology and clarify its purpose for all users.
             Originally chosen during the early emergence of GitOps, the name has
-            changed, but the functionality remains the same. GitOps has rapidly
-            emerged as a revolutionary approach to manage infrastructure and
+            changed, but the functionality remains unchanged. GitOps has rapidly
+            emerged as a revolutionary approach to managing infrastructure and
             application changes, and we want to ensure our platform reflects the
             latest advancements in the industry.
           </p>

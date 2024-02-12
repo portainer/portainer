@@ -1,16 +1,9 @@
 <page-header title="'Stacks list'" breadcrumbs="['Stacks']" reload="true"> </page-header>
 
-<div class="row">
-  <div class="col-sm-12">
-    <stacks-datatable
-      title-text="Stacks"
-      title-icon="list"
-      dataset="stacks"
-      table-key="stacks"
-      order-by="Name"
-      remove-action="removeAction"
-      refresh-callback="getStacks"
-      create-enabled="createEnabled"
-    ></stacks-datatable>
-  </div>
-</div>
+<docker-stacks-datatable
+  ng-if="stacks"
+  dataset="stacks"
+  is-image-notification-enabled="enableImageNotification"
+  on-remove="(removeAction)"
+  on-refresh="(getStacks)"
+></docker-stacks-datatable>

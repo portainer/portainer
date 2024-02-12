@@ -52,21 +52,35 @@
   border-color: var(--border-form-control-color);
   background-color: var(--bg-inputbox);
   box-shadow: none;
+
+  @apply th-highcontrast:border-white;
 }
 
 /* Match the same box shadow styles as the other portainer inputs, which are inherited from the bootstrap form-control class */
 .portainer-selector-root .portainer-selector__control--is-focused {
   border-color: #66afe9;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+  -webkit-box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  transition:
+    border-color ease-in-out 0.15s,
+    -webkit-box-shadow ease-in-out 0.15s;
 }
 
 .portainer-selector-root .portainer-selector__control--is-focused:hover {
   border-color: #66afe9;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+  -webkit-box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  transition:
+    border-color ease-in-out 0.15s,
+    -webkit-box-shadow ease-in-out 0.15s;
 }
 
 .portainer-selector-root.sm .portainer-selector__control {
@@ -75,6 +89,16 @@
 
 .portainer-selector-root.md .portainer-selector__control {
   min-height: 34px;
+}
+
+.input-group .portainer-selector-root .portainer-selector__control:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.input-group .portainer-selector-root .portainer-selector__control:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .portainer-selector-root .portainer-selector__multi-value {

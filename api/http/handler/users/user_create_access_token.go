@@ -4,28 +4,33 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type userAccessTokenCreatePayload struct {
+	Password    string `validate:"required" example:"password" json:"password"`
 	Description string `validate:"required" example:"github-api-key" json:"description"`
 }
 
 func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
+	if govalidator.IsNull(payload.Password) {
+		return errors.New("invalid password: cannot be empty")
+	}
 	if govalidator.IsNull(payload.Description) {
-		return errors.New("invalid description. cannot be empty")
+		return errors.New("invalid description: cannot be empty")
 	}
 	if govalidator.HasWhitespaceOnly(payload.Description) {
-		return errors.New("invalid description. cannot contain only whitespaces")
+		return errors.New("invalid description: cannot contain only whitespaces")
 	}
 	if govalidator.MinStringLength(payload.Description, "128") {
-		return errors.New("invalid description. cannot be longer than 128 characters")
+		return errors.New("invalid description: cannot be longer than 128 characters")
 	}
 	return nil
 }
@@ -54,9 +59,9 @@ type accessTokenResponse struct {
 // @failure 500 "Server error"
 // @router /users/{id}/tokens [post]
 func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	// specifically require JWT auth for this endpoint since API-Key based auth is not supported
-	if jwt := handler.bouncer.JWTAuthLookup(r); jwt == nil {
-		return httperror.Unauthorized("Auth not supported", errors.New("JWT Authentication required"))
+	// specifically require Cookie auth for this endpoint since API-Key based auth is not supported
+	if jwt, _ := handler.bouncer.CookieAuthLookup(r); jwt == nil {
+		return httperror.Unauthorized("Auth not supported", errors.New("Cookie Authentication required"))
 	}
 
 	var payload userAccessTokenCreatePayload
@@ -81,7 +86,12 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 
 	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if err != nil {
-		return httperror.BadRequest("Unable to find a user", err)
+		return httperror.InternalServerError("Unable to find a user with the specified identifier inside the database", err)
+	}
+
+	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
+	if err != nil {
+		return httperror.Forbidden("Current password doesn't match", errors.New("Current password does not match the password provided. Please try again"))
 	}
 
 	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(*user, payload.Description)

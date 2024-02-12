@@ -1,7 +1,9 @@
 import { IngressClassList } from 'kubernetes-types/networking/v1';
 
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+
+import { parseKubernetesAxiosError } from '../../axiosError';
 
 export async function getAllIngressClasses(environmentId: EnvironmentId) {
   try {
@@ -9,8 +11,8 @@ export async function getAllIngressClasses(environmentId: EnvironmentId) {
       data: { items },
     } = await axios.get<IngressClassList>(urlBuilder(environmentId));
     return items;
-  } catch (error) {
-    throw parseAxiosError(error as Error);
+  } catch (e) {
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve ingress classes');
   }
 }
 

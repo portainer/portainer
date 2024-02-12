@@ -3,18 +3,20 @@ package endpoints
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/unique"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+
+	"github.com/pkg/errors"
 )
 
 type EnvironmentsQuery struct {
@@ -34,6 +36,7 @@ type EnvironmentsQuery struct {
 	edgeCheckInPassedSeconds int
 	edgeStackId              portainer.EdgeStackID
 	edgeStackStatus          *portainer.EdgeStackStatusType
+	excludeIds               []portainer.EndpointID
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -69,6 +72,11 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		return EnvironmentsQuery{}, err
 	}
 
+	excludeIDs, err := getNumberArrayQueryParameter[portainer.EndpointID](r, "excludeIds")
+	if err != nil {
+		return EnvironmentsQuery{}, err
+	}
+
 	agentVersions := getArrayQueryParameter(r, "agentVersions")
 
 	name, _ := request.RetrieveQueryParameter(r, "name", true)
@@ -97,6 +105,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		types:                    endpointTypes,
 		tagIds:                   tagIDs,
 		endpointIds:              endpointIDs,
+		excludeIds:               excludeIDs,
 		tagsPartialMatch:         tagsPartialMatch,
 		groupIds:                 groupIDs,
 		status:                   status,
@@ -111,11 +120,23 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 	}, nil
 }
 
-func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.Endpoint, query EnvironmentsQuery, groups []portainer.EndpointGroup, settings *portainer.Settings) ([]portainer.Endpoint, int, error) {
+func (handler *Handler) filterEndpointsByQuery(
+	filteredEndpoints []portainer.Endpoint,
+	query EnvironmentsQuery,
+	groups []portainer.EndpointGroup,
+	edgeGroups []portainer.EdgeGroup,
+	settings *portainer.Settings,
+) ([]portainer.Endpoint, int, error) {
 	totalAvailableEndpoints := len(filteredEndpoints)
 
 	if len(query.endpointIds) > 0 {
 		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, query.endpointIds)
+	}
+
+	if len(query.excludeIds) > 0 {
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			return !slices.Contains(query.excludeIds, endpoint.ID)
+		})
 	}
 
 	if len(query.groupIds) > 0 {
@@ -177,7 +198,7 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 			tagsMap[tag.ID] = tag.Name
 		}
 
-		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, groups, tagsMap, query.search)
+		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, groups, edgeGroups, tagsMap, query.search)
 	}
 
 	if len(query.types) > 0 {
@@ -208,9 +229,12 @@ func endpointStatusInStackMatchesFilter(edgeStackStatus map[portainer.EndpointID
 	status, ok := edgeStackStatus[envId]
 
 	// consider that if the env has no status in the stack it is in Pending state
-	// workaround because Stack.Status[EnvId].Details.Pending is never set to True in the codebase
-	if !ok && statusFilter == portainer.EdgeStackStatusPending {
-		return true
+	if statusFilter == portainer.EdgeStackStatusPending {
+		return !ok || len(status.Status) == 0
+	}
+
+	if !ok {
+		return false
 	}
 
 	return slices.ContainsFunc(status.Status, func(s portainer.EdgeStackDeploymentStatus) bool {
@@ -269,7 +293,13 @@ func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs 
 	return endpoints[:n]
 }
 
-func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, tagsMap map[portainer.TagID]string, searchCriteria string) []portainer.Endpoint {
+func filterEndpointsBySearchCriteria(
+	endpoints []portainer.Endpoint,
+	endpointGroups []portainer.EndpointGroup,
+	edgeGroups []portainer.EdgeGroup,
+	tagsMap map[portainer.TagID]string,
+	searchCriteria string,
+) []portainer.Endpoint {
 	n := 0
 	for _, endpoint := range endpoints {
 		endpointTags := convertTagIDsToTags(tagsMap, endpoint.TagIDs)
@@ -283,6 +313,15 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 		if endpointGroupMatchSearchCriteria(&endpoint, endpointGroups, tagsMap, searchCriteria) {
 			endpoints[n] = endpoint
 			n++
+
+			continue
+		}
+
+		if edgeGroupMatchSearchCriteria(&endpoint, edgeGroups, searchCriteria, endpoints, endpointGroups) {
+			endpoints[n] = endpoint
+			n++
+
+			continue
 		}
 	}
 
@@ -353,6 +392,29 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 			tags := convertTagIDsToTags(tagsMap, group.TagIDs)
 			for _, tag := range tags {
 				if strings.Contains(strings.ToLower(tag), searchCriteria) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// search endpoint's related edgegroups
+func edgeGroupMatchSearchCriteria(
+	endpoint *portainer.Endpoint,
+	edgeGroups []portainer.EdgeGroup,
+	searchCriteria string,
+	endpoints []portainer.Endpoint,
+	endpointGroups []portainer.EndpointGroup,
+) bool {
+	for _, edgeGroup := range edgeGroups {
+		relatedEndpointIDs := edge.EdgeGroupRelatedEndpoints(&edgeGroup, endpoints, endpointGroups)
+
+		for _, endpointID := range relatedEndpointIDs {
+			if endpointID == endpoint.ID {
+				if strings.Contains(strings.ToLower(edgeGroup.Name), searchCriteria) {
 					return true
 				}
 			}

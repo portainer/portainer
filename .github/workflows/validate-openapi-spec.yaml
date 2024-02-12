@@ -6,22 +6,32 @@ on:
       - master
       - develop
       - 'release/*'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+env:
+  GO_VERSION: 1.21.6
+  NODE_VERSION: 18.x
 
 jobs:
   openapi-spec:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.18'
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Download golang modules
         run: cd ./api && go get -t -v -d ./...
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - run: yarn --frozen-lockfile
 

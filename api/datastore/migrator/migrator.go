@@ -148,6 +148,17 @@ func (m *Migrator) LatestMigrations() Migrations {
 	return m.migrations[len(m.migrations)-1]
 }
 
+func (m *Migrator) GetMigratorCountOfCurrentAPIVersion() int {
+	migratorCount := 0
+	latestMigrations := m.LatestMigrations()
+
+	if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
+		migratorCount = len(latestMigrations.MigrationFuncs)
+	}
+
+	return migratorCount
+}
+
 // !NOTE: Migration funtions should ideally be idempotent.
 // !      Which simply means the function can run over the same data many times but only transform it once.
 // !      In practice this really just means an extra check or two to ensure we're not destroying valid data.
@@ -214,8 +225,11 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.18", m.migrateDBVersionToDB90)
 	m.addMigrations("2.19",
 		m.convertSeedToPrivateKeyForDB100,
-		m.migrateDockerDesktopExtentionSetting,
+		m.migrateDockerDesktopExtensionSetting,
 		m.updateEdgeStackStatusForDB100,
+	)
+	m.addMigrations("2.20",
+		m.updateAppTemplatesVersionForDB110,
 	)
 
 	// Add new migrations below...

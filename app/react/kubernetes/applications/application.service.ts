@@ -13,6 +13,8 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
+import { parseKubernetesAxiosError } from '../axiosError';
+
 import { getPod, getNamespacePods, patchPod } from './pod.service';
 import { filterRevisionsByOwnerUid, getNakedPods } from './utils';
 import {
@@ -29,22 +31,15 @@ export async function getApplicationsForCluster(
   environmentId: EnvironmentId,
   namespaceNames?: string[]
 ) {
-  try {
-    if (!namespaceNames) {
-      return [];
-    }
-    const applications = await Promise.all(
-      namespaceNames.map((namespace) =>
-        getApplicationsForNamespace(environmentId, namespace)
-      )
-    );
-    return applications.flat();
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to retrieve applications for cluster'
-    );
+  if (!namespaceNames) {
+    return [];
   }
+  const applications = await Promise.all(
+    namespaceNames.map((namespace) =>
+      getApplicationsForNamespace(environmentId, namespace)
+    )
+  );
+  return applications.flat();
 }
 
 // get a list of all Deployments, DaemonSets, StatefulSets and naked pods (https://portainer.atlassian.net/browse/CE-2) in one namespace
@@ -52,105 +47,94 @@ async function getApplicationsForNamespace(
   environmentId: EnvironmentId,
   namespace: string
 ) {
-  try {
-    const [deployments, daemonSets, statefulSets, pods] = await Promise.all([
-      getApplicationsByKind<DeploymentList>(
-        environmentId,
-        namespace,
-        'Deployment'
-      ),
-      getApplicationsByKind<DaemonSetList>(
-        environmentId,
-        namespace,
-        'DaemonSet'
-      ),
-      getApplicationsByKind<StatefulSetList>(
-        environmentId,
-        namespace,
-        'StatefulSet'
-      ),
-      getNamespacePods(environmentId, namespace),
-    ]);
-    // find all pods which are 'naked' (not owned by a deployment, daemonset or statefulset)
-    const nakedPods = getNakedPods(pods, deployments, daemonSets, statefulSets);
-    return [...deployments, ...daemonSets, ...statefulSets, ...nakedPods];
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      `Unable to retrieve applications in namespace '${namespace}'`
-    );
-  }
+  const [deployments, daemonSets, statefulSets, pods] = await Promise.all([
+    getApplicationsByKind<DeploymentList>(
+      environmentId,
+      namespace,
+      'Deployment'
+    ),
+    getApplicationsByKind<DaemonSetList>(environmentId, namespace, 'DaemonSet'),
+    getApplicationsByKind<StatefulSetList>(
+      environmentId,
+      namespace,
+      'StatefulSet'
+    ),
+    getNamespacePods(environmentId, namespace),
+  ]);
+  // find all pods which are 'naked' (not owned by a deployment, daemonset or statefulset)
+  const nakedPods = getNakedPods(pods, deployments, daemonSets, statefulSets);
+  return [...deployments, ...daemonSets, ...statefulSets, ...nakedPods];
 }
 
 // if not known, get the type of an application (Deployment, DaemonSet, StatefulSet or naked pod) by name
-export async function getApplication(
+export async function getApplication<
+  T extends Application | string = Application,
+>(
   environmentId: EnvironmentId,
   namespace: string,
   name: string,
-  appKind?: AppKind
+  appKind?: AppKind,
+  yaml?: boolean
 ) {
-  try {
-    // if resourceType is known, get the application by type and name
-    if (appKind) {
-      switch (appKind) {
-        case 'Deployment':
-        case 'DaemonSet':
-        case 'StatefulSet':
-          return await getApplicationByKind(
-            environmentId,
-            namespace,
-            appKind,
-            name
-          );
-        case 'Pod':
-          return await getPod(environmentId, namespace, name);
-        default:
-          throw new Error('Unknown resource type');
-      }
+  // if resourceType is known, get the application by type and name
+  if (appKind) {
+    switch (appKind) {
+      case 'Deployment':
+      case 'DaemonSet':
+      case 'StatefulSet':
+        return getApplicationByKind<T>(
+          environmentId,
+          namespace,
+          appKind,
+          name,
+          yaml
+        );
+      case 'Pod':
+        return getPod(environmentId, namespace, name, yaml);
+      default:
+        throw new Error('Unknown resource type');
     }
-
-    // if resourceType is not known, get the application by name and return the first one that is fulfilled
-    const [deployment, daemonSet, statefulSet, pod] = await Promise.allSettled([
-      getApplicationByKind<Deployment>(
-        environmentId,
-        namespace,
-        'Deployment',
-        name
-      ),
-      getApplicationByKind<DaemonSet>(
-        environmentId,
-        namespace,
-        'DaemonSet',
-        name
-      ),
-      getApplicationByKind<StatefulSet>(
-        environmentId,
-        namespace,
-        'StatefulSet',
-        name
-      ),
-      getPod(environmentId, namespace, name),
-    ]);
-
-    if (isFulfilled(deployment)) {
-      return deployment.value;
-    }
-    if (isFulfilled(daemonSet)) {
-      return daemonSet.value;
-    }
-    if (isFulfilled(statefulSet)) {
-      return statefulSet.value;
-    }
-    if (isFulfilled(pod)) {
-      return pod.value;
-    }
-    throw new Error('Unable to retrieve application');
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      `Unable to retrieve application ${name} in namespace '${namespace}'`
-    );
   }
+
+  // if resourceType is not known, get the application by name and return the first one that is fulfilled
+  const [deployment, daemonSet, statefulSet, pod] = await Promise.allSettled([
+    getApplicationByKind<Deployment>(
+      environmentId,
+      namespace,
+      'Deployment',
+      name,
+      yaml
+    ),
+    getApplicationByKind<DaemonSet>(
+      environmentId,
+      namespace,
+      'DaemonSet',
+      name,
+      yaml
+    ),
+    getApplicationByKind<StatefulSet>(
+      environmentId,
+      namespace,
+      'StatefulSet',
+      name,
+      yaml
+    ),
+    getPod(environmentId, namespace, name, yaml),
+  ]);
+
+  if (isFulfilled(deployment)) {
+    return deployment.value;
+  }
+  if (isFulfilled(daemonSet)) {
+    return daemonSet.value;
+  }
+  if (isFulfilled(statefulSet)) {
+    return statefulSet.value;
+  }
+  if (isFulfilled(pod)) {
+    return pod.value;
+  }
+  throw new Error('Unable to retrieve application');
 }
 
 export async function patchApplication(
@@ -158,46 +142,41 @@ export async function patchApplication(
   namespace: string,
   appKind: AppKind,
   name: string,
-  patch: ApplicationPatch
+  patch: ApplicationPatch,
+  contentType: string = 'application/json-patch+json'
 ) {
-  try {
-    switch (appKind) {
-      case 'Deployment':
-        return await patchApplicationByKind<Deployment>(
-          environmentId,
-          namespace,
-          appKind,
-          name,
-          patch
-        );
-      case 'DaemonSet':
-        return await patchApplicationByKind<DaemonSet>(
-          environmentId,
-          namespace,
-          appKind,
-          name,
-          patch,
-          'application/strategic-merge-patch+json'
-        );
-      case 'StatefulSet':
-        return await patchApplicationByKind<StatefulSet>(
-          environmentId,
-          namespace,
-          appKind,
-          name,
-          patch,
-          'application/strategic-merge-patch+json'
-        );
-      case 'Pod':
-        return await patchPod(environmentId, namespace, name, patch);
-      default:
-        throw new Error(`Unknown application kind ${appKind}`);
-    }
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      `Unable to patch application ${name} in namespace '${namespace}'`
-    );
+  switch (appKind) {
+    case 'Deployment':
+      return patchApplicationByKind<Deployment>(
+        environmentId,
+        namespace,
+        appKind,
+        name,
+        patch,
+        contentType
+      );
+    case 'DaemonSet':
+      return patchApplicationByKind<DaemonSet>(
+        environmentId,
+        namespace,
+        appKind,
+        name,
+        patch,
+        contentType
+      );
+    case 'StatefulSet':
+      return patchApplicationByKind<StatefulSet>(
+        environmentId,
+        namespace,
+        appKind,
+        name,
+        patch,
+        contentType
+      );
+    case 'Pod':
+      return patchPod(environmentId, namespace, name, patch);
+    default:
+      throw new Error(`Unknown application kind ${appKind}`);
   }
 }
 
@@ -221,23 +200,37 @@ async function patchApplicationByKind<T extends Application>(
     );
     return res;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to patch application');
+    throw parseKubernetesAxiosError(e, 'Unable to patch application');
   }
 }
 
-async function getApplicationByKind<T extends Application>(
+async function getApplicationByKind<
+  T extends Application | string = Application,
+>(
   environmentId: EnvironmentId,
   namespace: string,
   appKind: 'Deployment' | 'DaemonSet' | 'StatefulSet',
-  name: string
+  name: string,
+  yaml?: boolean
 ) {
   try {
     const { data } = await axios.get<T>(
-      buildUrl(environmentId, namespace, `${appKind}s`, name)
+      buildUrl(environmentId, namespace, `${appKind}s`, name),
+      {
+        headers: { Accept: yaml ? 'application/yaml' : 'application/json' },
+        // this logic is to get the latest YAML response
+        // axios-cache-adapter looks for the response headers to determine if the response should be cached
+        // to avoid writing requestInterceptor, adding a query param to the request url
+        params: yaml
+          ? {
+              _: Date.now(),
+            }
+          : null,
+      }
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve application');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve application');
   }
 }
 
@@ -250,9 +243,17 @@ async function getApplicationsByKind<T extends ApplicationList>(
     const { data } = await axios.get<T>(
       buildUrl(environmentId, namespace, `${appKind}s`)
     );
-    return data.items as T['items'];
+    const items = (data.items || []).map((app) => ({
+      ...app,
+      kind: appKind,
+      apiVersion: data.apiVersion,
+    }));
+    return items as T['items'];
   } catch (e) {
-    throw parseAxiosError(e as Error, `Unable to retrieve ${appKind}s`);
+    throw parseKubernetesAxiosError(
+      e,
+      `Unable to retrieve ${appKind}s in namespace '${namespace}'`
+    );
   }
 }
 
@@ -337,7 +338,7 @@ export async function getReplicaSetList(
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve ReplicaSets');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve ReplicaSets');
   }
 }
 
@@ -357,7 +358,10 @@ export async function getControllerRevisionList(
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve ControllerRevisions');
+    throw parseKubernetesAxiosError(
+      e,
+      'Unable to retrieve ControllerRevisions'
+    );
   }
 }
 

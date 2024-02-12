@@ -4,11 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type teamCreatePayload struct {
@@ -52,7 +53,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 		return httperror.InternalServerError("Unable to retrieve teams from the database", err)
 	}
 	if team != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A team with the same name already exists", Err: errors.New("Team already exists")}
+		return httperror.Conflict("A team with the same name already exists", errors.New("Team already exists"))
 	}
 
 	team = &portainer.Team{

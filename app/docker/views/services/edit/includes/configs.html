@@ -4,7 +4,7 @@
     <rd-widget-body classes="no-padding">
       <div class="form-inline" style="padding: 10px" authorization="DockerServiceUpdate">
         Add a config:
-        <select class="form-control !h-[30px] !text-[13px]" ng-options="config.Name for config in configs | orderBy: 'Name'" ng-model="newConfig">
+        <select class="form-control !h-[30px] !text-[13px]" ng-options="config.Name for config in filterConfigs(configs) | orderBy: 'Name'" ng-model="newConfig">
           <option selected disabled hidden value="">Select a config</option>
         </select>
         <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)"> <pr-icon icon="'plus'"></pr-icon> add config </a>
@@ -22,10 +22,10 @@
         </thead>
         <tbody>
           <tr ng-repeat="config in service.ServiceConfigs">
-            <td
-              ><a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a></td
-            >
             <td>
+              <a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a>
+            </td>
+            <td ng-if="!config.credSpec">
               <input
                 class="form-control"
                 ng-model="config.FileName"
@@ -33,11 +33,13 @@
                 placeholder="e.g. /path/in/container"
                 required
                 disable-authorization="DockerServiceUpdate"
+                ng-disabled="config.credSpec"
               />
             </td>
-            <td>{{ config.Uid }}</td>
-            <td>{{ config.Gid }}</td>
-            <td>{{ config.Mode }}</td>
+            <td ng-if="!config.credSpec">{{ config.Uid }}</td>
+            <td ng-if="!config.credSpec">{{ config.Gid }}</td>
+            <td ng-if="!config.credSpec">{{ config.Mode }}</td>
+            <td ng-if="config.credSpec" colspan="4">Credential Spec</td>
             <td authorization="DockerServiceUpdate">
               <button class="btn btn-dangerlight pull-right" type="button" ng-click="removeConfig(service, $index)" ng-disabled="isUpdating">
                 <pr-icon icon="'trash-2'" size="'md'"></pr-icon>

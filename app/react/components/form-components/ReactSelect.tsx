@@ -10,6 +10,7 @@ import { RefAttributes } from 'react';
 import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
 import './ReactSelect.css';
+import { AutomationTestingProps } from '@/types';
 
 interface DefaultOption {
   value: string;
@@ -19,28 +20,30 @@ interface DefaultOption {
 type RegularProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > = { isCreatable?: false; size?: 'sm' | 'md' } & ReactSelectProps<
   Option,
   IsMulti,
   Group
 > &
-  RefAttributes<ReactSelectType<Option, IsMulti, Group>>;
+  RefAttributes<ReactSelectType<Option, IsMulti, Group>> &
+  AutomationTestingProps;
 
 type CreatableProps<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > = { isCreatable: true; size?: 'sm' | 'md' } & ReactSelectCreatableProps<
   Option,
   IsMulti,
   Group
->;
+> &
+  AutomationTestingProps;
 
 type Props<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > =
   | CreatableProps<Option, IsMulti, Group>
   | RegularProps<Option, IsMulti, Group>;
@@ -48,13 +51,13 @@ type Props<
 export function Select<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({
   className,
   isCreatable = false,
   size = 'md',
   ...props
-}: Props<Option, IsMulti, Group>) {
+}: Props<Option, IsMulti, Group> & AutomationTestingProps) {
   const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
 
   return (
@@ -70,7 +73,7 @@ export function Select<
 export function Creatable<
   Option = DefaultOption,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({ className, ...props }: ReactSelectCreatableProps<Option, IsMulti, Group>) {
   return (
     <ReactSelectCreatable

@@ -6,12 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/client"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 type endpointUpdatePayload struct {
@@ -89,6 +90,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
+	updateEndpointProxy := shouldReloadTLSConfiguration(endpoint, &payload)
+
 	if payload.Name != nil {
 		name := *payload.Name
 		isUnique, err := handler.isNameUnique(name, endpoint.ID)
@@ -97,15 +100,16 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 
 		if !isUnique {
-			return httperror.NewError(http.StatusConflict, "Name is not unique", nil)
+			return httperror.Conflict("Name is not unique", nil)
 		}
 
 		endpoint.Name = name
 
 	}
 
-	if payload.URL != nil {
+	if payload.URL != nil && *payload.URL != endpoint.URL {
 		endpoint.URL = *payload.URL
+		updateEndpointProxy = true
 	}
 
 	if payload.PublicURL != nil {
@@ -125,8 +129,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.GroupID != nil {
 		groupID := portainer.EndpointGroupID(*payload.GroupID)
 
-		endpoint.GroupID = groupID
 		updateRelations = updateRelations || groupID != endpoint.GroupID
+		endpoint.GroupID = groupID
 	}
 
 	if payload.TagIDs != nil {
@@ -179,6 +183,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if endpoint.Type == portainer.AzureEnvironment {
+		updateEndpointProxy = true
+
 		credentials := endpoint.AzureCredentials
 		if payload.AzureApplicationID != nil {
 			credentials.ApplicationID = *payload.AzureApplicationID
@@ -247,10 +253,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if (payload.URL != nil && *payload.URL != endpoint.URL) ||
-		(payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS) ||
-		endpoint.Type == portainer.AzureEnvironment ||
-		shouldReloadTLSConfiguration(endpoint, &payload) {
+	if updateEndpointProxy {
 		handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
@@ -262,7 +265,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 			err = handler.AuthorizationService.CleanNAPWithOverridePolicies(handler.DataStore, endpoint, nil)
 			if err != nil {
-				return httperror.InternalServerError("Unable to update user authorizations", err)
+				handler.PendingActionsService.Create(portainer.PendingActions{
+					EndpointID: endpoint.ID,
+					Action:     "CleanNAPWithOverridePolicies",
+					ActionData: nil,
+				})
+				log.Warn().Err(err).Msgf("Unable to clean NAP with override policies for endpoint (%d). Will try to update when endpoint is online.", endpoint.ID)
 			}
 		}
 	}
@@ -291,6 +299,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 }
 
 func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpointUpdatePayload) bool {
+
+	// If we change anything in the tls config then we need to reload the proxy
+	if payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS {
+		return true
+	}
+
 	// When updating Docker API environment, as long as TLS is true and TLSSkipVerify is false,
 	// we assume that new TLS files have been uploaded and we need to reload the TLS configuration.
 	if endpoint.Type != portainer.DockerEnvironment ||

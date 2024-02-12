@@ -6,10 +6,11 @@ import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.ser
 
 class PorAccessManagementController {
   /* @ngInject */
-  constructor($scope, Notifications, AccessService, RoleService) {
-    Object.assign(this, { $scope, Notifications, AccessService, RoleService });
+  constructor($scope, $state, Notifications, AccessService, RoleService) {
+    Object.assign(this, { $scope, $state, Notifications, AccessService, RoleService });
 
     this.limitedToBE = false;
+    this.$state = $state;
 
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
     this.updateAction = this.updateAction.bind(this);
@@ -75,7 +76,7 @@ class PorAccessManagementController {
     }
 
     if (this.isRoleLimitedToBE(role)) {
-      return `${role.Name} (Business Edition Feature)`;
+      return `${role.Name} (Business Feature)`;
     }
 
     return `${role.Name} (Default)`;
@@ -93,6 +94,7 @@ class PorAccessManagementController {
       const roles = await this.RoleService.roles();
       this.roles = _.orderBy(roles, 'Priority', 'asc');
       this.formValues = {
+        multiselectOutput: [],
         selectedRole: this.roles.find((role) => !this.isRoleLimitedToBE(role)),
       };
 
@@ -105,6 +107,7 @@ class PorAccessManagementController {
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {
+      this.$state.go('portainer.home');
       this.availableUsersAndTeams = [];
       this.authorizedUsersAndTeams = [];
       this.Notifications.error('Failure', err, 'Unable to retrieve accesses');

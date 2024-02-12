@@ -16,4 +16,5 @@ export const switchField = r2a(SwitchField, [
   'featureId',
   'switchClass',
   'setTooltipHtmlMessage',
+  'valueExplanation',
 ]);

@@ -35,6 +35,8 @@ export type Ingress = {
   Type?: string;
   Labels?: Record<string, string>;
   CreationDate?: string;
+
+  IsSystem?: boolean;
 };
 
 export interface DeleteIngressesRequest {

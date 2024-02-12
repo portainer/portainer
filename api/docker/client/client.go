@@ -1,18 +1,24 @@
 package client
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"maps"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"github.com/segmentio/encoding/json"
 )
 
-var errUnsupportedEnvironmentType = errors.New("Environment not supported")
+var errUnsupportedEnvironmentType = errors.New("environment not supported")
 
 const (
 	defaultDockerRequestTimeout = 60 * time.Second
@@ -42,9 +48,16 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeNam
 	case portainer.AzureEnvironment:
 		return nil, errUnsupportedEnvironmentType
 	case portainer.AgentOnDockerEnvironment:
-		return createAgentClient(endpoint, factory.signatureService, nodeName, timeout)
+		return createAgentClient(endpoint, endpoint.URL, factory.signatureService, nodeName, timeout)
 	case portainer.EdgeAgentOnDockerEnvironment:
-		return createEdgeClient(endpoint, factory.signatureService, factory.reverseTunnelService, nodeName, timeout)
+		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		endpointURL := fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+
+		return createAgentClient(endpoint, endpointURL, factory.signatureService, nodeName, timeout)
 	}
 
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
@@ -87,7 +100,7 @@ func createTCPClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*cli
 	)
 }
 
-func createEdgeClient(endpoint *portainer.Endpoint, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, nodeName string, timeout *time.Duration) (*client.Client, error) {
+func createAgentClient(endpoint *portainer.Endpoint, endpointURL string, signatureService portainer.DigitalSignatureService, nodeName string, timeout *time.Duration) (*client.Client, error) {
 	httpCli, err := httpClient(endpoint, timeout)
 	if err != nil {
 		return nil, err
@@ -107,51 +120,73 @@ func createEdgeClient(endpoint *portainer.Endpoint, signatureService portainer.D
 		headers[portainer.PortainerAgentTargetHeader] = nodeName
 	}
 
-	tunnel, err := reverseTunnelService.GetActiveTunnel(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	endpointURL := fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
-
-	return client.NewClientWithOpts(
+	opts := []client.Opt{
 		client.WithHost(endpointURL),
 		client.WithAPIVersionNegotiation(),
 		client.WithHTTPClient(httpCli),
 		client.WithHTTPHeaders(headers),
-	)
+	}
+
+	if nnTransport, ok := httpCli.Transport.(*NodeNameTransport); ok && nnTransport.TLSClientConfig != nil {
+		opts = append(opts, client.WithScheme("https"))
+	}
+
+	return client.NewClientWithOpts(opts...)
 }
 
-func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.DigitalSignatureService, nodeName string, timeout *time.Duration) (*client.Client, error) {
-	httpCli, err := httpClient(endpoint, timeout)
+type NodeNameTransport struct {
+	*http.Transport
+	nodeNames map[string]string
+}
+
+func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := t.Transport.RoundTrip(req)
+	if err != nil ||
+		resp.StatusCode != http.StatusOK ||
+		resp.ContentLength == 0 ||
+		!strings.HasSuffix(req.URL.Path, "/images/json") {
+		return resp, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		resp.Body.Close()
+		return resp, err
 	}
 
-	signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return nil, err
+	resp.Body.Close()
+
+	resp.Body = io.NopCloser(bytes.NewReader(body))
+
+	var rs []struct {
+		types.ImageSummary
+		Portainer struct {
+			Agent struct {
+				NodeName string
+			}
+		}
 	}
 
-	headers := map[string]string{
-		portainer.PortainerAgentPublicKeyHeader: signatureService.EncodedPublicKey(),
-		portainer.PortainerAgentSignatureHeader: signature,
+	if err = json.Unmarshal(body, &rs); err != nil {
+		return resp, nil
 	}
 
-	if nodeName != "" {
-		headers[portainer.PortainerAgentTargetHeader] = nodeName
+	t.nodeNames = make(map[string]string)
+	for _, r := range rs {
+		t.nodeNames[r.ID] = r.Portainer.Agent.NodeName
 	}
 
-	return client.NewClientWithOpts(
-		client.WithHost(endpoint.URL),
-		client.WithAPIVersionNegotiation(),
-		client.WithHTTPClient(httpCli),
-		client.WithHTTPHeaders(headers),
-	)
+	return resp, err
+}
+
+func (t *NodeNameTransport) NodeNames() map[string]string {
+	return maps.Clone(t.nodeNames)
 }
 
 func httpClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*http.Client, error) {
-	transport := &http.Transport{}
+	transport := &NodeNameTransport{
+		Transport: &http.Transport{},
+	}
 
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)

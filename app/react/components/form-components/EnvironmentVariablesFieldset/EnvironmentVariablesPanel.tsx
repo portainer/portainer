@@ -1,10 +1,11 @@
+import { ComponentProps } from 'react';
+
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { ArrayError } from '../InputList/InputList';
-
-import { Value } from './types';
 import { EnvironmentVariablesFieldset } from './EnvironmentVariablesFieldset';
+
+type FieldsetProps = ComponentProps<typeof EnvironmentVariablesFieldset>;
 
 export function EnvironmentVariablesPanel({
   explanation,
@@ -12,15 +13,18 @@ export function EnvironmentVariablesPanel({
   values,
   showHelpMessage,
   errors,
+  isFoldable = false,
 }: {
   explanation?: string;
-  values: Value;
-  onChange(value: Value): void;
   showHelpMessage?: boolean;
-  errors?: ArrayError<Value>;
-}) {
+  isFoldable?: boolean;
+} & FieldsetProps) {
   return (
-    <FormSection title="Environment variables">
+    <FormSection
+      title="Environment variables"
+      isFoldable={isFoldable}
+      defaultFolded={isFoldable}
+    >
       <div className="form-group">
         {!!explanation && (
           <div className="col-sm-12 environment-variables-panel--explanation">
@@ -28,11 +32,13 @@ export function EnvironmentVariablesPanel({
           </div>
         )}
 
-        <EnvironmentVariablesFieldset
-          values={values}
-          onChange={onChange}
-          errors={errors}
-        />
+        <div className="col-sm-12">
+          <EnvironmentVariablesFieldset
+            values={values}
+            onChange={onChange}
+            errors={errors}
+          />
+        </div>
 
         {showHelpMessage && (
           <div className="col-sm-12">

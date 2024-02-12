@@ -1,31 +1,29 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/utils';
 import { Authorized } from '@/react/hooks/useUser';
+import { appOwnerLabel } from '@/react/kubernetes/applications/constants';
 
 import { Link } from '@@/Link';
 import { Badge } from '@@/Badge';
 
 import { SecretRowData } from '../types';
+import { configurationOwnerUsernameLabel } from '../../../constants';
 
 import { columnHelper } from './helper';
 
 export const name = columnHelper.accessor(
   (row) => {
     const name = row.metadata?.name;
-    const namespace = row.metadata?.namespace;
-
     const isSystemToken = name?.includes('default-token-');
-    const isInSystemNamespace = namespace
-      ? isSystemNamespace(namespace)
-      : false;
+
     const isRegistrySecret =
       row.metadata?.annotations?.['portainer.io/registry.id'];
-    const isSystemSecret =
-      isSystemToken || isInSystemNamespace || isRegistrySecret;
+    const isSystemSecret = isSystemToken || row.isSystem || isRegistrySecret;
 
-    const hasConfigurationOwner =
-      !!row.metadata?.labels?.['io.portainer.kubernetes.configuration.owner'];
+    const hasConfigurationOwner = !!(
+      row.metadata?.labels?.[configurationOwnerUsernameLabel] ||
+      row.metadata?.labels?.[appOwnerLabel]
+    );
     return `${name} ${isSystemSecret ? 'system' : ''} ${
       !isSystemToken && !hasConfigurationOwner ? 'external' : ''
     } ${!row.inUse && !isSystemSecret ? 'unused' : ''}`;
@@ -39,11 +37,9 @@ export const name = columnHelper.accessor(
 
 function Cell({ row }: CellContext<SecretRowData, string>) {
   const name = row.original.metadata?.name;
-  const namespace = row.original.metadata?.namespace;
 
   const isSystemToken = name?.includes('default-token-');
-  const isInSystemNamespace = namespace ? isSystemNamespace(namespace) : false;
-  const isSystemSecret = isSystemToken || isInSystemNamespace;
+  const isSystemSecret = isSystemToken || row.original.isSystem;
 
   const hasConfigurationOwner =
     !!row.original.metadata?.labels?.[
@@ -66,15 +62,15 @@ function Cell({ row }: CellContext<SecretRowData, string>) {
         </Link>
         {isSystemSecret && (
           <Badge type="success" className="ml-2">
-            system
+            System
           </Badge>
         )}
         {!isSystemToken && !hasConfigurationOwner && (
-          <Badge className="ml-2">external</Badge>
+          <Badge className="ml-2">External</Badge>
         )}
         {!row.original.inUse && !isSystemSecret && (
           <Badge type="warn" className="ml-2">
-            unused
+            Unused
           </Badge>
         )}
       </div>

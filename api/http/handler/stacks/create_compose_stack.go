@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git/update"
@@ -13,6 +11,8 @@ import (
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -272,7 +272,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		}
 		if !isUnique {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: stackutils.ErrWebhookIDAlreadyExists}
+			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
 		}
 	}
 

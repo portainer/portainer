@@ -15,6 +15,7 @@ export interface DockerSnapshot {
   NodeCount: number;
   ImageCount: number;
   VolumeCount: number;
+  ContainerCount: number;
   RunningContainerCount: number;
   StoppedContainerCount: number;
   HealthyContainerCount: number;

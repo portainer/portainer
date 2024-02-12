@@ -11,7 +11,6 @@ import {
 } from '@/portainer/services/terminal-window';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
-import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 
 import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
@@ -39,8 +38,6 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
   const { socket } = shell;
 
   const terminalElem = useRef(null);
-
-  const [jwt] = useLocalStorage('JWT', '');
 
   const handleClose = useCallback(() => {
     terminalClose(); // only css trick
@@ -72,7 +69,8 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
       openTerminal();
     }
     function onMessage(e: MessageEvent) {
-      terminal.write(e.data);
+      const encoded = new TextEncoder().encode(e.data);
+      terminal.writeUtf8(encoded);
     }
     function onClose() {
       handleClose();
@@ -103,7 +101,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
 
   // on component load/destroy
   useEffect(() => {
-    const socket = new WebSocket(buildUrl(jwt, environmentId));
+    const socket = new WebSocket(buildUrl(environmentId));
     setShell((shell) => ({ ...shell, socket }));
 
     terminal.onData((data) => socket.send(data));
@@ -122,7 +120,7 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     }
 
     return close;
-  }, [environmentId, jwt, terminal]);
+  }, [environmentId, terminal]);
 
   return (
     <div className={clsx(styles.root, { [styles.minimized]: shell.minimized })}>
@@ -182,9 +180,8 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     }
   }
 
-  function buildUrl(jwt: string, environmentId: EnvironmentId) {
+  function buildUrl(environmentId: EnvironmentId) {
     const params = {
-      token: jwt,
       endpointId: environmentId,
     };
 

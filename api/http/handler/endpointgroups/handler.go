@@ -4,18 +4,20 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/pendingactions"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	AuthorizationService *authorization.Service
-	DataStore            dataservices.DataStore
+	AuthorizationService  *authorization.Service
+	DataStore             dataservices.DataStore
+	PendingActionsService *pendingactions.PendingActionsService
 }
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.

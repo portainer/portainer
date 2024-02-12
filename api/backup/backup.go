@@ -17,7 +17,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const rwxr__r__ os.FileMode = 0744
+const rwxr__r__ os.FileMode = 0o744
 
 var filesToBackup = []string{
 	"certs",
@@ -30,6 +30,7 @@ var filesToBackup = []string{
 	"portainer.key",
 	"portainer.pub",
 	"tls",
+	"chisel",
 }
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
@@ -81,14 +82,8 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 }
 
 func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
-	backupWriter, err := os.Create(filepath.Join(backupDirPath, "portainer.db"))
-	if err != nil {
-		return err
-	}
-	if err = datastore.BackupTo(backupWriter); err != nil {
-		return err
-	}
-	return backupWriter.Close()
+	_, err := datastore.Backup(filepath.Join(backupDirPath, "portainer.db"))
+	return err
 }
 
 func encrypt(path string, passphrase string) (string, error) {

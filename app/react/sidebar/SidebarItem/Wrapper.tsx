@@ -15,9 +15,8 @@ export function Wrapper({
   return (
     <li
       className={clsx(
-        'flex',
         className,
-        'min-h-8 text-gray-3 [&>a]:text-inherit [&>a]:hover:text-inherit [&>a]:hover:no-underline'
+        'flex min-h-8 text-gray-3 th-highcontrast:text-white [&>a]:text-inherit [&>a]:hover:text-inherit [&>a]:hover:no-underline'
       )}
       aria-label={label}
       // eslint-disable-next-line react/jsx-props-no-spreading

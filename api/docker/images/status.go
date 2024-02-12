@@ -2,6 +2,7 @@ package images
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"time"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	portainer "github.com/portainer/portainer/api"
 	consts "github.com/portainer/portainer/api/docker/consts"
-	"github.com/portainer/portainer/api/internal/slices"
 
 	"github.com/opencontainers/go-digest"
 	"github.com/patrickmn/go-cache"

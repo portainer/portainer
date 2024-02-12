@@ -1,6 +1,7 @@
 package deployments
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -9,15 +10,17 @@ import (
 	"strings"
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/swarm"
-	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/filesystem"
-	"github.com/rs/zerolog/log"
-
 	dockerclient "github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 const (
@@ -30,22 +33,29 @@ type RemoteStackDeployer interface {
 	// compose
 	DeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error
 	UndeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
-	StartRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
+	StartRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error
 	StopRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
 	// swarm
 	DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error
 	UndeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
-	StartRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
+	StartRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error
 	StopRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
 }
 
 // Deploy a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error {
+func (d *stackDeployer) DeployRemoteComposeStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+	forcePullImage bool,
+	forceRecreate bool,
+) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
 	d.swarmStackManager.Login(registries, endpoint)
 	defer d.swarmStackManager.Logout(endpoint)
+
 	// --force-recreate doesn't pull updated images
 	if forcePullImage {
 		err := d.composeStackManager.Pull(context.TODO(), stack, endpoint)
@@ -54,9 +64,14 @@ func (d *stackDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoin
 		}
 	}
 
-	return d.remoteStack(stack, endpoint, OperationDeploy, unpackerCmdBuilderOptions{
-		registries: registries,
-	})
+	return d.remoteStack(
+		stack,
+		endpoint,
+		OperationDeploy,
+		unpackerCmdBuilderOptions{
+			registries: registries,
+		},
+	)
 }
 
 // Undeploy a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
@@ -68,8 +83,19 @@ func (d *stackDeployer) UndeployRemoteComposeStack(stack *portainer.Stack, endpo
 }
 
 // Start a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) StartRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	return d.remoteStack(stack, endpoint, OperationComposeStart, unpackerCmdBuilderOptions{})
+func (d *stackDeployer) StartRemoteComposeStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+) error {
+	return d.remoteStack(
+		stack,
+		endpoint,
+		OperationComposeStart,
+		unpackerCmdBuilderOptions{
+			registries: registries,
+		},
+	)
 }
 
 // Stop a compose stack on remote environment using a https://github.com/portainer/compose-unpacker container
@@ -78,7 +104,13 @@ func (d *stackDeployer) StopRemoteComposeStack(stack *portainer.Stack, endpoint 
 }
 
 // Deploy a swarm stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error {
+func (d *stackDeployer) DeployRemoteSwarmStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+	prune bool,
+	pullImage bool,
+) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -102,8 +134,19 @@ func (d *stackDeployer) UndeployRemoteSwarmStack(stack *portainer.Stack, endpoin
 }
 
 // Start a swarm stack on remote environment using a https://github.com/portainer/compose-unpacker container
-func (d *stackDeployer) StartRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	return d.remoteStack(stack, endpoint, OperationSwarmStart, unpackerCmdBuilderOptions{})
+func (d *stackDeployer) StartRemoteSwarmStack(
+	stack *portainer.Stack,
+	endpoint *portainer.Endpoint,
+	registries []portainer.Registry,
+) error {
+	return d.remoteStack(
+		stack,
+		endpoint,
+		OperationSwarmStart,
+		unpackerCmdBuilderOptions{
+			registries: registries,
+		},
+	)
 }
 
 // Stop a swarm stack on remote environment using a https://github.com/portainer/compose-unpacker container
@@ -155,7 +198,6 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 		Str("cmd", strings.Join(cmd, " ")).
 		Msg("running unpacker")
 
-	rand.Seed(time.Now().UnixNano())
 	unpackerContainer, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: image,
 		Cmd:   cmd,
@@ -184,16 +226,18 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	case <-statusCh:
 	}
 
+	stdErr := &bytes.Buffer{}
+
 	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		log.Error().Err(err).Msg("unable to get logs from unpacker container")
 	} else {
-		outputBytes, err := io.ReadAll(out)
+		_, err = stdcopy.StdCopy(io.Discard, stdErr, out)
 		if err != nil {
-			log.Error().Err(err).Msg("unable to parse logs from unpacker container")
+			log.Warn().Err(err).Msg("unable to parse logs from unpacker container")
 		} else {
 			log.Info().
-				Str("output", string(outputBytes)).
+				Str("output", stdErr.String()).
 				Msg("Stack deployment output")
 		}
 	}
@@ -204,6 +248,26 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	}
 
 	if status.State.ExitCode != 0 {
+		dec := json.NewDecoder(stdErr)
+		for {
+			errorStruct := struct {
+				Level string
+				Error string
+			}{}
+
+			if err := dec.Decode(&errorStruct); errors.Is(err, io.EOF) {
+				break
+			} else if err != nil {
+				log.Warn().Err(err).Msg("unable to parse logs from unpacker container")
+
+				continue
+			}
+
+			if errorStruct.Level == "error" {
+				return fmt.Errorf("an error occurred while running unpacker container with exit code %d: %s", status.State.ExitCode, errorStruct.Error)
+			}
+		}
+
 		return fmt.Errorf("an error occurred while running unpacker container with exit code %d", status.State.ExitCode)
 	}
 

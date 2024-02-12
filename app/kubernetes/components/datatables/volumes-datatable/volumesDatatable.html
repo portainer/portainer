@@ -137,9 +137,9 @@
             <table-column-header
               col-title="'Storage'"
               can-sort="true"
-              is-sorted="$ctrl.state.orderBy === 'PersistentVolumeClaim.StorageClass.Name'"
-              is-sorted-desc="$ctrl.state.orderBy === 'PersistentVolumeClaim.StorageClass.Name' && $ctrl.state.reverseOrder"
-              ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.StorageClass.Name')"
+              is-sorted="$ctrl.state.orderBy === 'PersistentVolumeClaim.storageClass.Name'"
+              is-sorted-desc="$ctrl.state.orderBy === 'PersistentVolumeClaim.storageClass.Name' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.storageClass.Name')"
             ></table-column-header>
           </th>
           <th>
@@ -188,7 +188,7 @@
             <span ng-if="!item.Applications.length">-</span>
           </td>
           <td>
-            {{ item.PersistentVolumeClaim.StorageClass.Name }}
+            {{ item.PersistentVolumeClaim.storageClass.Name }}
           </td>
           <td>
             {{ item.PersistentVolumeClaim.Storage }}

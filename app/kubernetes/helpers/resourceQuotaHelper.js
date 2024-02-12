@@ -7,8 +7,8 @@ class KubernetesResourceQuotaHelper {
 
   static formatBytes(bytes, decimals = 0, base10 = true) {
     const res = {
-      Size: 0,
-      SizeUnit: 'B',
+      size: 0,
+      sizeUnit: 'B',
     };
 
     if (bytes === 0) {
@@ -22,8 +22,8 @@ class KubernetesResourceQuotaHelper {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return {
-      Size: parseFloat((bytes / Math.pow(k, i)).toFixed(dm)),
-      SizeUnit: sizes[i],
+      size: parseFloat((bytes / Math.pow(k, i)).toFixed(dm)),
+      sizeUnit: sizes[i],
     };
   }
 }

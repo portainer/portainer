@@ -4,9 +4,9 @@ import { useMemo, useState } from 'react';
 
 import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { useParamState } from '@/react/hooks/useParamState';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
@@ -41,12 +41,12 @@ export function EnvironmentsDatatable() {
     (value) => (value ? parseInt(value, 10) : undefined)
   );
   const tableState = useTableStateWithoutStorage('name');
-  const endpointsQuery = useEnvironmentList({
+  const environmentsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
-    sort: tableState.sortBy.id as 'Group' | 'Name',
-    order: tableState.sortBy.desc ? 'desc' : 'asc',
+    sort: tableState.sortBy?.id as 'Group' | 'Name',
+    order: tableState.sortBy?.desc ? 'desc' : 'asc',
     edgeStackId: stackId,
     edgeStackStatus: statusFilter,
   });
@@ -57,7 +57,7 @@ export function EnvironmentsDatatable() {
   const gitConfigCommitHash = edgeStackQuery.data?.GitConfig?.ConfigHash || '';
   const environments: Array<EdgeStackEnvironment> = useMemo(
     () =>
-      endpointsQuery.environments.map(
+      environmentsQuery.environments.map(
         (env) =>
           ({
             ...env,
@@ -68,46 +68,56 @@ export function EnvironmentsDatatable() {
               env.Id,
               edgeStackQuery.data?.Status[env.Id]
             ),
-          } satisfies EdgeStackEnvironment)
+          }) satisfies EdgeStackEnvironment
       ),
     [
       currentFileVersion,
       edgeStackQuery.data?.Status,
-      endpointsQuery.environments,
+      environmentsQuery.environments,
       gitConfigCommitHash,
       gitConfigURL,
     ]
   );
 
+  const envStatusSelectOptions = [
+    { value: StatusType.Pending, label: 'Pending' },
+    { value: StatusType.Acknowledged, label: 'Acknowledged' },
+    { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
+    { value: StatusType.Running, label: 'Deployed' },
+    { value: StatusType.Error, label: 'Failed' },
+  ];
+  if (isBE) {
+    envStatusSelectOptions.concat([
+      { value: StatusType.PausedDeploying, label: 'Paused' },
+      { value: StatusType.RollingBack, label: 'Rolling back' },
+      { value: StatusType.RolledBack, label: 'Rolled back' },
+    ]);
+  }
+
   return (
     <Datatable
       columns={columns}
-      isLoading={endpointsQuery.isLoading}
+      isLoading={environmentsQuery.isLoading}
       dataset={environments}
       settingsManager={tableState}
       title="Environments Status"
       titleIcon={HardDrive}
+      isServerSidePagination
+      page={page}
       onPageChange={setPage}
+      totalCount={environmentsQuery.totalCount}
       emptyContentLabel="No environment available."
       disableSelect
       description={
-        isBE && (
-          <div className="w-1/4">
-            <PortainerSelect<StatusType | undefined>
-              isClearable
-              bindToBody
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e || undefined)}
-              options={[
-                { value: StatusType.Pending, label: 'Pending' },
-                { value: StatusType.Acknowledged, label: 'Acknowledged' },
-                { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
-                { value: StatusType.Running, label: 'Deployed' },
-                { value: StatusType.Error, label: 'Failed' },
-              ]}
-            />
-          </div>
-        )
+        <div className="w-1/4">
+          <PortainerSelect<StatusType | undefined>
+            isClearable
+            bindToBody
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e ?? undefined)}
+            options={envStatusSelectOptions}
+          />
+        </div>
       }
     />
   );

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { joinCommand, trimSHA } from './utils';
+import { hideShaSum, joinCommand, nodeStatusBadge, taskStatusBadge, trimSHA, trimVersionTag } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
@@ -49,22 +49,7 @@ angular
   })
   .filter('taskstatusbadge', function () {
     'use strict';
-    return function (text) {
-      var status = _.toLower(text);
-      var labelStyle = 'default';
-      if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'preparing', 'ready', 'starting', 'remove'])) {
-        labelStyle = 'info';
-      } else if (includeString(status, ['pending'])) {
-        labelStyle = 'warning';
-      } else if (includeString(status, ['shutdown', 'failed', 'rejected', 'orphaned'])) {
-        labelStyle = 'danger';
-      } else if (includeString(status, ['complete'])) {
-        labelStyle = 'primary';
-      } else if (includeString(status, ['running'])) {
-        labelStyle = 'success';
-      }
-      return labelStyle;
-    };
+    return taskStatusBadge;
   })
   .filter('taskhaslogs', function () {
     'use strict';
@@ -90,26 +75,7 @@ angular
       return 'success';
     };
   })
-  .filter('nodestatusbadge', function () {
-    'use strict';
-    return function (text) {
-      if (text === 'down' || text === 'Unhealthy') {
-        return 'danger';
-      }
-      return 'success';
-    };
-  })
-  .filter('dockerNodeAvailabilityBadge', function () {
-    'use strict';
-    return function (text) {
-      if (text === 'pause') {
-        return 'warning';
-      } else if (text === 'drain') {
-        return 'danger';
-      }
-      return 'success';
-    };
-  })
+  .filter('nodestatusbadge', () => nodeStatusBadge)
   .filter('trimcontainername', function () {
     'use strict';
     return function (name) {
@@ -192,44 +158,7 @@ angular
   .filter('command', function () {
     return joinCommand;
   })
-  .filter('hideshasum', function () {
-    'use strict';
-    return function (imageName) {
-      if (imageName) {
-        return imageName.split('@sha')[0];
-      }
-      return '';
-    };
-  })
-  .filter('availablenodecount', [
-    'ConstraintsHelper',
-    function (ConstraintsHelper) {
-      'use strict';
-      return function (nodes, service) {
-        var availableNodes = 0;
-        for (var i = 0; i < nodes.length; i++) {
-          var node = nodes[i];
-          if (node.Availability === 'active' && node.Status === 'ready' && ConstraintsHelper.matchesServiceConstraints(service, node)) {
-            availableNodes++;
-          }
-        }
-        return availableNodes;
-      };
-    },
-  ])
-  .filter('runningtaskscount', function () {
-    'use strict';
-    return function (tasks) {
-      var runningTasks = 0;
-      for (var i = 0; i < tasks.length; i++) {
-        var task = tasks[i];
-        if (task.Status.State === 'running' && task.DesiredState === 'running') {
-          runningTasks++;
-        }
-      }
-      return runningTasks;
-    };
-  })
+  .filter('hideshasum', () => hideShaSum)
   .filter('tasknodename', function () {
     'use strict';
     return function (nodeId, nodes) {
@@ -255,20 +184,7 @@ angular
   })
   .filter('trimversiontag', function () {
     'use strict';
-    return function trimversiontag(fullName) {
-      if (!fullName) {
-        return fullName;
-      }
-      var versionIdx = fullName.lastIndexOf(':');
-      if (versionIdx < 0) {
-        return fullName;
-      }
-      var hostIdx = fullName.indexOf('/');
-      if (hostIdx > versionIdx) {
-        return fullName;
-      }
-      return fullName.substring(0, versionIdx);
-    };
+    return trimVersionTag;
   })
   .filter('unique', function () {
     return _.uniqBy;

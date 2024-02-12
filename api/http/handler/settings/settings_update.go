@@ -5,15 +5,14 @@ import (
 	"strings"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/libhelm"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -33,8 +32,9 @@ type settingsUpdatePayload struct {
 	SnapshotInterval *string `example:"5m"`
 	// URL to the templates that will be displayed in the UI when navigating to App Templates
 	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
-	// The default check in interval for edge agent (in seconds)
-	EdgeAgentCheckinInterval *int `example:"5"`
+	// Deployment options for encouraging deployment as code
+	GlobalDeploymentOptions  *portainer.GlobalDeploymentOptions // The default check in interval for edge agent (in seconds)
+	EdgeAgentCheckinInterval *int                               `example:"5"`
 	// Show the Kompose build option (discontinued in 2.18)
 	ShowKomposeBuildOption *bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
@@ -120,15 +120,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	var settings *portainer.Settings
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		settings, err = handler.updateSettings(handler.DataStore, payload)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			settings, err = handler.updateSettings(tx, payload)
-			return err
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		settings, err = handler.updateSettings(tx, payload)
+		return err
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
@@ -163,6 +158,11 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 
 	if payload.TemplatesURL != nil {
 		settings.TemplatesURL = *payload.TemplatesURL
+	}
+
+	// update the global deployment options, and the environment deployment options if they have changed
+	if payload.GlobalDeploymentOptions != nil {
+		settings.GlobalDeploymentOptions = *payload.GlobalDeploymentOptions
 	}
 
 	if payload.ShowKomposeBuildOption != nil {

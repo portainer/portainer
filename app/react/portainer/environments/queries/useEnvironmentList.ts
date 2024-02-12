@@ -2,20 +2,30 @@ import { useQuery } from 'react-query';
 
 import { withError } from '@/react-tools/react-query';
 
-import { EnvironmentStatus } from '../types';
+import { EnvironmentStatus, EnvironmentType } from '../types';
 import {
   EnvironmentsQueryParams,
   getEnvironments,
 } from '../environment.service';
 
-import { queryKeys } from './query-keys';
+import { environmentQueryKeys } from './query-keys';
 
 export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
-export const SortOptions = ['Name', 'Group', 'Status'] as const;
+export const SortOptions = [
+  'Name',
+  'Group',
+  'Status',
+  'LastCheckIn',
+  'EdgeID',
+] as const;
 export type SortType = (typeof SortOptions)[number];
-export function isSortType(value: string): value is SortType {
+export function isSortType(value?: string): value is SortType {
   return SortOptions.includes(value as SortType);
+}
+
+export function getSortType(value?: string): SortType | undefined {
+  return isSortType(value) ? value : undefined;
 }
 
 export type Query = EnvironmentsQueryParams & {
@@ -60,7 +70,7 @@ export function useEnvironmentList(
 ) {
   const { isLoading, data } = useQuery(
     [
-      ...queryKeys.base(),
+      ...environmentQueryKeys.base(),
       {
         page,
         pageLimit,
@@ -71,6 +81,24 @@ export function useEnvironmentList(
     ],
     async () => {
       const start = (page - 1) * pageLimit + 1;
+
+      // Workaround for EE-6060: filter out Nomad results when no filter is applied.
+      // Remove when cleaning up API.
+      if (!query.types || query.types.length === 0) {
+        const environmentTypesArray: EnvironmentType[] = [
+          EnvironmentType.Docker,
+          EnvironmentType.AgentOnDocker,
+          EnvironmentType.Azure,
+          EnvironmentType.EdgeAgentOnDocker,
+          EnvironmentType.KubernetesLocal,
+          EnvironmentType.AgentOnKubernetes,
+          EnvironmentType.EdgeAgentOnKubernetes,
+        ];
+
+        // eslint-disable-next-line no-param-reassign
+        query.types = environmentTypesArray;
+      }
+
       return getEnvironments({
         start,
         limit: pageLimit,

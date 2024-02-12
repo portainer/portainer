@@ -3,12 +3,12 @@ package users
 import (
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id UserGetAPIKeys
@@ -33,21 +33,21 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 		return httperror.BadRequest("Invalid user identifier route variable", err)
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
-	}
-
-	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return httperror.Forbidden("Permission denied to get user access tokens", httperrors.ErrUnauthorized)
-	}
-
-	_, err = handler.DataStore.User().Read(portainer.UserID(userID))
+	user, err := handler.DataStore.User().Read(portainer.UserID(userID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)
 		}
 		return httperror.InternalServerError("Unable to find a user with the specified identifier inside the database", err)
+	}
+
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
+	}
+
+	if tokenData.ID != portainer.UserID(userID) && (tokenData.Role != portainer.AdministratorRole || user.Role == portainer.AdministratorRole) {
+		return httperror.Forbidden("Permission denied to get user access tokens", httperrors.ErrUnauthorized)
 	}
 
 	apiKeys, err := handler.apiKeyService.GetAPIKeys(portainer.UserID(userID))
@@ -64,5 +64,5 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 
 // hideAPIKeyFields remove the digest from the API key (it is not needed in the response)
 func hideAPIKeyFields(apiKey *portainer.APIKey) {
-	apiKey.Digest = nil
+	apiKey.Digest = ""
 }

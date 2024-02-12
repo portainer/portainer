@@ -1,4 +1,6 @@
-import { server, rest } from '@/setup-tests/server';
+import { http, HttpResponse } from 'msw';
+
+import { server } from '@/setup-tests/server';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 
 import { LicenseType } from '../licenses/types';
@@ -9,12 +11,10 @@ test('when user is using more nodes then allowed he should see message', async (
   const allowed = 2;
   const used = 5;
   server.use(
-    rest.get('/api/licenses/info', (req, res, ctx) =>
-      res(ctx.json({ nodes: allowed, type: LicenseType.Subscription }))
+    http.get('/api/licenses/info', () =>
+      HttpResponse.json({ nodes: allowed, type: LicenseType.Subscription })
     ),
-    rest.get('/api/system/nodes', (req, res, ctx) =>
-      res(ctx.json({ nodes: used }))
-    )
+    http.get('/api/system/nodes', () => HttpResponse.json({ nodes: used }))
   );
 
   const { findByText } = renderWithQueryClient(<LicenseNodePanel />);
@@ -30,12 +30,10 @@ test("when user is using less nodes then allowed he shouldn't see message", asyn
   const allowed = 5;
   const used = 2;
   server.use(
-    rest.get('/api/licenses/info', (req, res, ctx) =>
-      res(ctx.json({ nodes: allowed, type: LicenseType.Subscription }))
+    http.get('/api/licenses/info', () =>
+      HttpResponse.json({ nodes: allowed, type: LicenseType.Subscription })
     ),
-    rest.get('/api/system/nodes', (req, res, ctx) =>
-      res(ctx.json({ nodes: used }))
-    )
+    http.get('/api/system/nodes', () => HttpResponse.json({ nodes: used }))
   );
 
   const { findByText } = renderWithQueryClient(<LicenseNodePanel />);

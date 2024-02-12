@@ -26,6 +26,7 @@ import { confirmServiceForceUpdate } from '@/react/docker/services/common/update
 import { confirm, confirmDelete } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
+import { convertServiceToConfig } from '@/react/docker/services/common/convertServiceToConfig';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -91,6 +92,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     endpoint
   ) {
     $scope.resourceType = ResourceControlType.Service;
+    $scope.WebhookExists = false;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
@@ -438,7 +440,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     function buildChanges(service) {
-      var config = ServiceHelper.serviceToConfig(service.Model);
+      var config = convertServiceToConfig(service.Model);
       config.Name = service.Name;
       config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
       config.TaskTemplate.ContainerSpec.Env = envVarsUtils.convertToArrayOfStrings(service.EnvironmentVariables);
@@ -462,6 +464,27 @@ angular.module('portainer.docker').controller('ServiceController', [
 
       config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
       config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
+
+      // support removal and (future) editing of credential specs
+      const credSpec = service.ServiceConfigs.find((config) => config.credSpec);
+      const credSpecId = credSpec ? credSpec.Id : '';
+      const oldCredSpecId =
+        (config.TaskTemplate.ContainerSpec.Privileges &&
+          config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec &&
+          config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec.Config) ||
+        '';
+      if (oldCredSpecId && !credSpecId) {
+        delete config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec;
+      } else if (credSpec && oldCredSpecId !== credSpec) {
+        config.TaskTemplate.ContainerSpec.Privileges = {
+          ...(config.TaskTemplate.ContainerSpec.Privileges || {}),
+          CredentialSpec: {
+            ...((config.TaskTemplate.ContainerSpec.Privileges && config.TaskTemplate.ContainerSpec.Privileges.CredentialSpec) || {}),
+            Config: credSpec,
+          },
+        };
+      }
+
       config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
 
       if (service.Mode === 'replicated') {
@@ -582,8 +605,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.updateService = function updateService(service) {
-      let config = {};
-      service, (config = buildChanges(service));
+      const config = buildChanges(service);
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
@@ -639,7 +661,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     function forceUpdateService(service, pullImage) {
-      var config = ServiceHelper.serviceToConfig(service.Model);
+      var config = convertServiceToConfig(service.Model);
       if (pullImage) {
         config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
       }
@@ -714,10 +736,10 @@ angular.module('portainer.docker').controller('ServiceController', [
           return $q.all({
             volumes: VolumeService.volumes(),
             tasks: TaskService.tasks({ service: [service.Name] }),
-            containers: agentProxy ? ContainerService.containers() : [],
+            containers: agentProxy ? ContainerService.containers(endpoint.Id) : [],
             nodes: NodeService.nodes(),
             secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-            configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
+            configs: apiVersion >= 1.3 ? ConfigService.configs(endpoint.Id) : [],
             availableImages: ImageService.images(),
             availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
             availableNetworks: NetworkService.networks(true, true, apiVersion >= 1.25),
@@ -735,7 +757,6 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
           $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');
-          $scope.WebhookExists = false;
 
           const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks || []), 'Target');
           const networks = _.filter(
@@ -830,6 +851,15 @@ angular.module('portainer.docker').controller('ServiceController', [
     $scope.filterNetworks = filterNetworks;
     function filterNetworks(networks, current) {
       return networks.filter((network) => !network.Ingress && (network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id)));
+    }
+
+    $scope.filterConfigs = filterConfigs;
+    function filterConfigs(configs) {
+      if (!configs) {
+        return [];
+      }
+
+      return configs.filter((config) => $scope.service.ServiceConfigs.every((serviceConfig) => config.Id !== serviceConfig.Id));
     }
 
     function updateServiceArray(service, name) {

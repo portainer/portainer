@@ -1,5 +1,4 @@
-import '@testing-library/jest-dom';
-
+import 'vitest-dom/extend-expect';
 import { render, RenderOptions } from '@testing-library/react';
 import { UIRouter, pushStateLocationPlugin } from '@uirouter/react';
 import { PropsWithChildren, ReactElement } from 'react';

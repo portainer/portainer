@@ -17,6 +17,7 @@ export function createMockUsers(
     Checked: false,
     EndpointAuthorizations: {},
     PortainerAuthorizations: {},
+    UseCache: false,
     ThemeSettings: {
       color: 'auto',
     },
@@ -80,7 +81,6 @@ export function createMockEnvironment(): Environment {
         AllowNoneIngressClass: false,
       },
     },
-    Nomad: { Snapshots: [] },
     EdgeKey: '',
     EnableGPUManagement: false,
     Id: 3,
@@ -117,8 +117,8 @@ export function createMockEnvironment(): Environment {
       StartTime: '',
     },
     StatusMessage: {
-      Detail: '',
-      Summary: '',
+      detail: '',
+      summary: '',
     },
   };
 }

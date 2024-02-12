@@ -7,6 +7,7 @@ export const appOwnerLabel = 'io.portainer.kubernetes.application.owner';
 export const appNoteAnnotation = 'io.portainer.kubernetes.application.note';
 export const appDeployMethodLabel = 'io.portainer.kubernetes.application.kind';
 export const defaultDeploymentUniqueLabel = 'pod-template-hash';
+export const appNameLabel = 'io.portainer.kubernetes.application.name';
 
 export const appRevisionAnnotation = 'deployment.kubernetes.io/revision';
 
@@ -30,4 +31,4 @@ export const appKindToDeploymentTypeMap: Record<
   StatefulSet: 'Replicated',
   DaemonSet: 'Global',
   Pod: null,
-};
+} as const;

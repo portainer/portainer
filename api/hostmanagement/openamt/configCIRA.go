@@ -2,7 +2,6 @@ package openamt
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io"
@@ -11,6 +10,8 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/segmentio/encoding/json"
 )
 
 type CIRAConfig struct {

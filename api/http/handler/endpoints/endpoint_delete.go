@@ -3,16 +3,16 @@ package endpoints
 import (
 	"errors"
 	"net/http"
+	"slices"
 	"strconv"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/rs/zerolog/log"
 )
@@ -47,14 +47,9 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.Forbidden(httperrors.ErrNotAvailableInDemo.Error(), httperrors.ErrNotAvailableInDemo)
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = handler.deleteEndpoint(handler.DataStore, portainer.EndpointID(endpointID), deleteCluster)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return handler.deleteEndpoint(tx, portainer.EndpointID(endpointID), deleteCluster)
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return handler.deleteEndpoint(tx, portainer.EndpointID(endpointID), deleteCluster)
+	})
 	if err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {
@@ -103,17 +98,11 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		if featureflags.IsEnabled(portainer.FeatureNoTx) {
-			err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
-				delete(tag.Endpoints, endpoint.ID)
-			})
-		} else {
-			var tag *portainer.Tag
-			tag, err = tx.Tag().Read(tagID)
-			if err == nil {
-				delete(tag.Endpoints, endpoint.ID)
-				err = tx.Tag().Update(tagID, tag)
-			}
+		var tag *portainer.Tag
+		tag, err = tx.Tag().Read(tagID)
+		if err == nil {
+			delete(tag.Endpoints, endpoint.ID)
+			err = tx.Tag().Update(tagID, tag)
 		}
 
 		if handler.DataStore.IsErrObjectNotFound(err) {
@@ -129,15 +118,11 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	}
 
 	for _, edgeGroup := range edgeGroups {
-		if featureflags.IsEnabled(portainer.FeatureNoTx) {
-			err = handler.DataStore.EdgeGroup().UpdateEdgeGroupFunc(edgeGroup.ID, func(g *portainer.EdgeGroup) {
-				g.Endpoints = removeElement(g.Endpoints, endpoint.ID)
-			})
-		} else {
-			edgeGroup.Endpoints = removeElement(edgeGroup.Endpoints, endpoint.ID)
-			tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
-		}
+		edgeGroup.Endpoints = slices.DeleteFunc(edgeGroup.Endpoints, func(e portainer.EndpointID) bool {
+			return e == endpoint.ID
+		})
 
+		err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
 		if err != nil {
 			log.Warn().Err(err).Msgf("Unable to update edge group")
 		}
@@ -184,15 +169,9 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 		for idx := range edgeJobs {
 			edgeJob := &edgeJobs[idx]
 			if _, ok := edgeJob.Endpoints[endpoint.ID]; ok {
-				if featureflags.IsEnabled(portainer.FeatureNoTx) {
-					err = tx.EdgeJob().UpdateEdgeJobFunc(edgeJob.ID, func(j *portainer.EdgeJob) {
-						delete(j.Endpoints, endpoint.ID)
-					})
-				} else {
-					delete(edgeJob.Endpoints, endpoint.ID)
-					err = tx.EdgeJob().Update(edgeJob.ID, edgeJob)
-				}
+				delete(edgeJob.Endpoints, endpoint.ID)
 
+				err = tx.EdgeJob().Update(edgeJob.ID, edgeJob)
 				if err != nil {
 					log.Warn().Err(err).Msgf("Unable to update edge job")
 				}
@@ -206,16 +185,4 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	}
 
 	return nil
-}
-
-func removeElement(slice []portainer.EndpointID, elem portainer.EndpointID) []portainer.EndpointID {
-	for i, id := range slice {
-		if id == elem {
-			slice[i] = slice[len(slice)-1]
-
-			return slice[:len(slice)-1]
-		}
-	}
-
-	return slice
 }

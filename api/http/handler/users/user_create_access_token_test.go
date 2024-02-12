@@ -2,8 +2,6 @@ package users
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +12,10 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
+
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,7 @@ func Test_userCreateAccessToken(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, true, true)
 
 	// create admin and standard user(s)
-	adminUser := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	adminUser := &portainer.User{ID: 1, Password: "password", Username: "admin", Role: portainer.AdministratorRole}
 	err := store.User().Create(adminUser)
 	is.NoError(err, "error creating admin user")
 
@@ -42,18 +43,19 @@ func Test_userCreateAccessToken(t *testing.T) {
 
 	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, nil, passwordChecker)
 	h.DataStore = store
+	h.CryptoService = testhelpers.NewCryptoService()
 
 	// generate standard and admin user tokens
-	adminJWT, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})
-	jwt, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role})
+	adminJWT, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})
+	jwt, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role})
 
 	t.Run("standard user successfully generates API key", func(t *testing.T) {
-		data := userAccessTokenCreatePayload{Description: "test-token"}
+		data := userAccessTokenCreatePayload{Password: "password", Description: "test-token"}
 		payload, err := json.Marshal(data)
 		is.NoError(err)
 
 		req := httptest.NewRequest(http.MethodPost, "/users/2/tokens", bytes.NewBuffer(payload))
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+		testhelpers.AddTestSecurityCookie(req, jwt)
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)
@@ -71,12 +73,12 @@ func Test_userCreateAccessToken(t *testing.T) {
 	})
 
 	t.Run("admin cannot generate API key for standard user", func(t *testing.T) {
-		data := userAccessTokenCreatePayload{Description: "test-token-admin"}
+		data := userAccessTokenCreatePayload{Password: "password", Description: "test-token-admin"}
 		payload, err := json.Marshal(data)
 		is.NoError(err)
 
 		req := httptest.NewRequest(http.MethodPost, "/users/2/tokens", bytes.NewBuffer(payload))
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
+		testhelpers.AddTestSecurityCookie(req, adminJWT)
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)
@@ -91,7 +93,7 @@ func Test_userCreateAccessToken(t *testing.T) {
 		rawAPIKey, _, err := apiKeyService.GenerateApiKey(*user, "test-api-key")
 		is.NoError(err)
 
-		data := userAccessTokenCreatePayload{Description: "test-token-fails"}
+		data := userAccessTokenCreatePayload{Password: "password", Description: "test-token-fails"}
 		payload, err := json.Marshal(data)
 		is.NoError(err)
 
@@ -105,7 +107,7 @@ func Test_userCreateAccessToken(t *testing.T) {
 
 		body, err := io.ReadAll(rr.Body)
 		is.NoError(err, "ReadAll should not return error")
-		is.Equal("{\"message\":\"Auth not supported\",\"details\":\"JWT Authentication required\"}\n", string(body))
+		is.Equal(`{"message":"Auth not supported","details":"Cookie Authentication required"}`, string(body))
 	})
 }
 
@@ -117,23 +119,23 @@ func Test_userAccessTokenCreatePayload(t *testing.T) {
 		shouldFail bool
 	}{
 		{
-			payload:    userAccessTokenCreatePayload{Description: "test-token"},
+			payload:    userAccessTokenCreatePayload{Password: "password", Description: "test-token"},
 			shouldFail: false,
 		},
 		{
-			payload:    userAccessTokenCreatePayload{Description: ""},
+			payload:    userAccessTokenCreatePayload{Password: "password", Description: ""},
 			shouldFail: true,
 		},
 		{
-			payload:    userAccessTokenCreatePayload{Description: "test token"},
+			payload:    userAccessTokenCreatePayload{Password: "password", Description: "test token"},
 			shouldFail: false,
 		},
 		{
-			payload:    userAccessTokenCreatePayload{Description: "test-token "},
+			payload:    userAccessTokenCreatePayload{Password: "password", Description: "test-token "},
 			shouldFail: false,
 		},
 		{
-			payload: userAccessTokenCreatePayload{Description: `
+			payload: userAccessTokenCreatePayload{Password: "password", Description: `
 this string is longer than 128 characters and hence this will fail.
 this string is longer than 128 characters and hence this will fail.
 this string is longer than 128 characters and hence this will fail.

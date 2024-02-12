@@ -12,6 +12,7 @@ import { Select as ReactSelect } from '@@/form-components/ReactSelect';
 export interface Option<TValue> {
   value: TValue;
   label: string;
+  disabled?: boolean;
 }
 
 type Options<TValue> = OptionsOrGroups<
@@ -26,6 +27,8 @@ interface SharedProps extends AutomationTestingProps {
   disabled?: boolean;
   isClearable?: boolean;
   bindToBody?: boolean;
+  isLoading?: boolean;
+  noOptionsMessage?: () => string;
 }
 
 interface MultiProps<TValue> extends SharedProps {
@@ -82,6 +85,8 @@ export function SingleSelect<TValue = string>({
   isClearable,
   bindToBody,
   components,
+  isLoading,
+  noOptionsMessage,
 }: SingleProps<TValue>) {
   const selectedValue =
     value || (typeof value === 'number' && value === 0)
@@ -97,12 +102,15 @@ export function SingleSelect<TValue = string>({
       options={options}
       value={selectedValue}
       onChange={(option) => onChange(option ? option.value : null)}
+      isOptionDisabled={(option) => !!option.disabled}
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}
       isDisabled={disabled}
       menuPortalTarget={bindToBody ? document.body : undefined}
       components={components}
+      isLoading={isLoading}
+      noOptionsMessage={noOptionsMessage}
     />
   );
 }
@@ -142,6 +150,8 @@ export function MultiSelect<TValue = string>({
   isClearable,
   bindToBody,
   components,
+  isLoading,
+  noOptionsMessage,
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
@@ -151,6 +161,7 @@ export function MultiSelect<TValue = string>({
       isClearable={isClearable}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => String(option.value)}
+      isOptionDisabled={(option) => !!option.disabled}
       options={options}
       value={selectedOptions}
       closeMenuOnSelect={false}
@@ -161,6 +172,8 @@ export function MultiSelect<TValue = string>({
       isDisabled={disabled}
       menuPortalTarget={bindToBody ? document.body : undefined}
       components={components}
+      isLoading={isLoading}
+      noOptionsMessage={noOptionsMessage}
     />
   );
 }

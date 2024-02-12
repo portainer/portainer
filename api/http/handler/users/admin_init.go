@@ -4,11 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type adminInitPayload struct {
@@ -54,7 +55,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Unable to create administrator user", Err: errAdminAlreadyInitialized}
+		return httperror.Conflict("Unable to create administrator user", errAdminAlreadyInitialized)
 	}
 
 	if !handler.passwordStrengthChecker.Check(payload.Password) {

@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type registryCreatePayload struct {
@@ -127,10 +128,10 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	}
 	for _, r := range registries {
 		if r.Name == registry.Name {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another registry with the same name already exists", Err: errors.New("A registry is already defined with this name")}
+			return httperror.Conflict("Another registry with the same name already exists", errors.New("A registry is already defined with this name"))
 		}
 		if handler.registriesHaveSameURLAndCredentials(&r, registry) {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another registry with the same URL and credentials already exists", Err: errors.New("A registry is already defined for this URL and credentials")}
+			return httperror.Conflict("Another registry with the same URL and credentials already exists", errors.New("A registry is already defined for this URL and credentials"))
 		}
 	}
 

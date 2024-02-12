@@ -8,7 +8,7 @@ interface Props {
   pageSize: number;
   page: number;
   onPageChange(page: number): void;
-  totalCount: number;
+  pageCount: number;
   onPageSizeChange(pageSize: number): void;
 }
 
@@ -17,7 +17,7 @@ export function DatatableFooter({
   pageSize,
   page,
   onPageChange,
-  totalCount,
+  pageCount,
   onPageSizeChange,
 }: Props) {
   return (
@@ -28,7 +28,7 @@ export function DatatableFooter({
         pageLimit={pageSize}
         page={page + 1}
         onPageChange={(page) => onPageChange(page - 1)}
-        totalCount={totalCount}
+        pageCount={pageCount}
         onPageLimitChange={onPageSizeChange}
       />
     </Table.Footer>

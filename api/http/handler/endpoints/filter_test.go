@@ -5,7 +5,9 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/internal/slices"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,12 +22,12 @@ func Test_Filter_AgentVersion(t *testing.T) {
 	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,
 		Agent: struct {
-			Version string "example:\"1.0.0\""
+			Version string `example:"1.0.0"`
 		}{Version: "1.0.0"}}
 	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,
 		Agent: struct {
-			Version string "example:\"1.0.0\""
+			Version string `example:"1.0.0"`
 		}{Version: "2.0.0"}}
 	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,
@@ -124,6 +126,28 @@ func Test_Filter_edgeFilter(t *testing.T) {
 	runTests(tests, t, handler, endpoints)
 }
 
+func Test_Filter_excludeIDs(t *testing.T) {
+	ids := []portainer.EndpointID{1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	environments := slices.Map(ids, func(id portainer.EndpointID) portainer.Endpoint {
+		return portainer.Endpoint{ID: id, GroupID: 1, Type: portainer.DockerEnvironment}
+	})
+
+	handler := setupFilterTest(t, environments)
+
+	tests := []filterTest{
+		{
+			title:    "should exclude IDs 2,5,8",
+			expected: []portainer.EndpointID{1, 3, 4, 6, 7, 9},
+			query: EnvironmentsQuery{
+				excludeIds: []portainer.EndpointID{2, 5, 8},
+			},
+		},
+	}
+
+	runTests(tests, t, handler, environments)
+}
+
 func runTests(tests []filterTest, t *testing.T, handler *Handler, endpoints []portainer.Endpoint) {
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
@@ -135,7 +159,13 @@ func runTests(tests []filterTest, t *testing.T, handler *Handler, endpoints []po
 func runTest(t *testing.T, test filterTest, handler *Handler, endpoints []portainer.Endpoint) {
 	is := assert.New(t)
 
-	filteredEndpoints, _, err := handler.filterEndpointsByQuery(endpoints, test.query, []portainer.EndpointGroup{}, &portainer.Settings{})
+	filteredEndpoints, _, err := handler.filterEndpointsByQuery(
+		endpoints,
+		test.query,
+		[]portainer.EndpointGroup{},
+		[]portainer.EdgeGroup{},
+		&portainer.Settings{},
+	)
 
 	is.NoError(err)
 

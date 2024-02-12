@@ -4,15 +4,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/portainer/portainer/pkg/libhelm"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/pkg/libhelm"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 )
 
 type helmUserRepositoryResponse struct {
@@ -28,7 +27,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 
-// @id HelmUserRepositoryCreate
+// @id HelmUserRepositoryCreateDeprecated
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
@@ -43,6 +42,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
+// @deprecated
 // @router /endpoints/{id}/kubernetes/helm/repositories [post]
 func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
@@ -86,7 +86,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	return response.JSON(w, record)
 }
 
-// @id HelmUserRepositoriesList
+// @id HelmUserRepositoriesListDeprecated
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated
@@ -99,6 +99,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
+// @deprecated
 // @router /endpoints/{id}/kubernetes/helm/repositories [get]
 func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)

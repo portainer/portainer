@@ -53,7 +53,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			},
 			SnapshotInterval:         portainer.DefaultSnapshotInterval,
 			EdgeAgentCheckinInterval: portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
-			TemplatesURL:             portainer.DefaultTemplatesURL,
+			TemplatesURL:             "",
 			HelmRepositoryURL:        portainer.DefaultHelmRepositoryURL,
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
 			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,

@@ -55,6 +55,9 @@ function config($stateRegistryProvider: StateRegistry) {
     params: {
       localEndpointId: 0,
     },
+    data: {
+      docs: '/admin/environments/add',
+    },
   });
 
   $stateRegistryProvider.register({

@@ -6,9 +6,9 @@ import { HeaderContainer } from './HeaderContainer';
 import { HeaderTitle } from './HeaderTitle';
 
 test('should not render without a wrapping HeaderContainer', async () => {
-  const consoleErrorFn = jest
+  const consoleErrorFn = vi
     .spyOn(console, 'error')
-    .mockImplementation(() => jest.fn());
+    .mockImplementation(() => vi.fn());
 
   const title = 'title';
   function renderComponent() {

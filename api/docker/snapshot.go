@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	_container "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
@@ -174,7 +174,12 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 				if !snapshot.Swarm {
 					return err
 				} else {
-					log.Info().Str("container", container.ID).Err(err).Msg("unable to inspect container in other Swarm nodes")
+					if !strings.Contains(err.Error(), "No such container") {
+						return err
+					}
+					// It is common to have containers running on different Swarm nodes,
+					// so we just log the error in the debug level
+					log.Debug().Str("container", container.ID).Err(err).Msg("unable to inspect container in other Swarm nodes")
 				}
 			} else {
 				var gpuOptions *_container.DeviceRequest = nil
@@ -196,9 +201,12 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 			}
 		}
 
-		if strings.Contains(container.Status, "(healthy)") {
+		if container.State == "healthy" {
+			runningContainers++
 			healthyContainers++
-		} else if strings.Contains(container.Status, "(unhealthy)") {
+		}
+
+		if container.State == "unhealthy" {
 			unhealthyContainers++
 		}
 
@@ -217,6 +225,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	snapshot.GpuUseAll = gpuUseAll
 	snapshot.GpuUseList = gpuUseList
 
+	snapshot.ContainerCount = len(containers)
 	snapshot.RunningContainerCount = runningContainers
 	snapshot.StoppedContainerCount = stoppedContainers
 	snapshot.HealthyContainerCount = healthyContainers
@@ -240,7 +249,7 @@ func snapshotImages(snapshot *portainer.DockerSnapshot, cli *client.Client) erro
 }
 
 func snapshotVolumes(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
-	volumes, err := cli.VolumeList(context.Background(), filters.Args{})
+	volumes, err := cli.VolumeList(context.Background(), volume.ListOptions{})
 	if err != nil {
 		return err
 	}

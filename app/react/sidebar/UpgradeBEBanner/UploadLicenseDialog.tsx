@@ -3,7 +3,7 @@ import { object, SchemaOf, string } from 'yup';
 
 import { useUpgradeEditionMutation } from '@/react/portainer/system/useUpgradeEditionMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+import { useAnalytics } from '@/react/hooks/useAnalytics';
 
 import { Button, LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';

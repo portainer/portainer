@@ -1,5 +1,6 @@
 import { FormikErrors } from 'formik';
 import { boolean, number, object, SchemaOf, string } from 'yup';
+import { useState } from 'react';
 
 import { GitAuthModel } from '@/react/portainer/gitops/types';
 import { useDebounce } from '@/react/hooks/useDebounce';
@@ -23,11 +24,12 @@ interface Props {
 }
 
 export function AuthFieldset({
-  value,
+  value: initialValue,
   onChange,
   isAuthExplanationVisible,
   errors,
 }: Props) {
+  const [value, setValue] = useState(initialValue); // TODO: remove this state when form is not inside angularjs
   const [username, setUsername] = useDebounce(
     value.RepositoryUsername || '',
     (username) => handleChange({ RepositoryUsername: username })
@@ -45,7 +47,7 @@ export function AuthFieldset({
             label="Authentication"
             labelClass="col-sm-3 col-lg-2"
             name="authentication"
-            checked={value.RepositoryAuthentication}
+            checked={value.RepositoryAuthentication || false}
             onChange={(value) =>
               handleChange({ RepositoryAuthentication: value })
             }
@@ -139,6 +141,7 @@ export function AuthFieldset({
 
   function handleChange(partialValue: Partial<GitAuthModel>) {
     onChange(partialValue);
+    setValue((value) => ({ ...value, ...partialValue }));
   }
 }
 
@@ -165,7 +168,8 @@ export function gitAuthValidation(
     NewCredentialName: string()
       .default('')
       .when(['RepositoryAuthentication', 'SaveCredential'], {
-        is: true,
+        is: (RepositoryAuthentication: boolean, SaveCredential: boolean) =>
+          RepositoryAuthentication && SaveCredential && !isAuthEdit,
         then: string()
           .required('Name is required')
           .test(

@@ -3,16 +3,19 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { buildUrl } from '../environment.service/utils';
 import { EnvironmentId } from '../types';
 import { Registry } from '../../registries/types/registry';
-import { useGenericRegistriesQuery } from '../../registries/queries/useRegistries';
+import {
+  GenericRegistriesQueryOptions,
+  useGenericRegistriesQuery,
+} from '../../registries/queries/useRegistries';
 
-import { queryKeys } from './query-keys';
+import { environmentQueryKeys } from './query-keys';
 
 export function useEnvironmentRegistries<T = Array<Registry>>(
   environmentId: EnvironmentId,
-  queryOptions: { select?(data: Array<Registry>): T; enabled?: boolean } = {}
+  queryOptions: GenericRegistriesQueryOptions<T> = {}
 ) {
   return useGenericRegistriesQuery(
-    queryKeys.registries(environmentId),
+    environmentQueryKeys.registries(environmentId),
     () => getEnvironmentRegistries(environmentId),
     queryOptions
   );

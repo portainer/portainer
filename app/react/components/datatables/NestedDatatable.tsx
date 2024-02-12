@@ -12,9 +12,9 @@ import { defaultGetRowId } from './defaultGetRowId';
 import { Table } from './Table';
 import { NestedTable } from './NestedTable';
 import { DatatableContent } from './DatatableContent';
-import { BasicTableSettings } from './types';
+import { BasicTableSettings, DefaultType } from './types';
 
-interface Props<D extends Record<string, unknown>> {
+interface Props<D extends DefaultType> {
   dataset: D[];
   columns: TableOptions<D>['columns'];
 
@@ -23,9 +23,14 @@ interface Props<D extends Record<string, unknown>> {
   initialTableState?: Partial<TableState>;
   isLoading?: boolean;
   initialSortBy?: BasicTableSettings['sortBy'];
+
+  /**
+   * keyword to filter by
+   */
+  search?: string;
 }
 
-export function NestedDatatable<D extends Record<string, unknown>>({
+export function NestedDatatable<D extends DefaultType>({
   columns,
   dataset,
   getRowId = defaultGetRowId,
@@ -33,6 +38,7 @@ export function NestedDatatable<D extends Record<string, unknown>>({
   initialTableState = {},
   isLoading,
   initialSortBy,
+  search,
 }: Props<D>) {
   const tableInstance = useReactTable<D>({
     columns,
@@ -45,6 +51,9 @@ export function NestedDatatable<D extends Record<string, unknown>>({
       enableColumnFilter: false,
       enableHiding: false,
     },
+    state: {
+      globalFilter: search,
+    },
     getRowId,
     autoResetExpanded: false,
     getCoreRowModel: getCoreRowModel(),
@@ -55,7 +64,7 @@ export function NestedDatatable<D extends Record<string, unknown>>({
 
   return (
     <NestedTable>
-      <Table.Container>
+      <Table.Container noWidget>
         <DatatableContent<D>
           tableInstance={tableInstance}
           isLoading={isLoading}

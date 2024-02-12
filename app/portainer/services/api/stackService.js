@@ -1,17 +1,18 @@
 import _ from 'lodash-es';
 import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
+import { StackViewModel } from '@/react/docker/stacks/view-models/stack';
 
 angular.module('portainer.app').factory('StackService', [
   '$q',
   '$async',
   'Stack',
+  'StackByName',
   'FileUploadService',
   'StackHelper',
   'ServiceService',
   'ContainerService',
   'SwarmService',
-  function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
+  function StackServiceFactory($q, $async, Stack, StackByName, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
     'use strict';
     var service = {
       updateGit,
@@ -126,10 +127,10 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.externalComposeStacks = function () {
+    service.externalComposeStacks = function (environmentId) {
       var deferred = $q.defer();
 
-      ContainerService.containers(1)
+      ContainerService.containers(environmentId, 1)
         .then(function success(containers) {
           deferred.resolve(StackHelper.getExternalStacksFromContainers(containers));
         })
@@ -160,15 +161,11 @@ angular.module('portainer.app').factory('StackService', [
 
       $q.all({
         stacks: Stack.query({ filters: filters }).$promise,
-        externalStacks: includeExternalStacks ? service.externalComposeStacks() : [],
+        externalStacks: includeExternalStacks ? service.externalComposeStacks(endpointId) : [],
       })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            if (item.EndpointId == endpointId) {
-              return new StackViewModel(item);
-            } else {
-              return new OrphanedStackViewModel(item);
-            }
+            return new StackViewModel(item, item.EndpointId != endpointId);
           });
 
           var externalStacks = data.externalStacks;
@@ -197,11 +194,7 @@ angular.module('portainer.app').factory('StackService', [
         })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            if (item.EndpointId == endpointId) {
-              return new StackViewModel(item);
-            } else {
-              return new OrphanedStackViewModel(item);
-            }
+            return new StackViewModel(item, item.EndpointId != endpointId);
           });
 
           var externalStacks = data.externalStacks;
@@ -219,6 +212,19 @@ angular.module('portainer.app').factory('StackService', [
       var deferred = $q.defer();
 
       Stack.remove({ id: stack.Id ? stack.Id : stack.Name, external: external, endpointId: endpointId })
+        .$promise.then(function success() {
+          deferred.resolve();
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to remove the stack', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.removeKubernetesStacksByName = function (name, namespace, external, endpointId) {
+      var deferred = $q.defer();
+      StackByName.remove({ name: name, external: external, endpointId: endpointId, namespace: namespace })
         .$promise.then(function success() {
           deferred.resolve();
         })
@@ -270,12 +276,13 @@ angular.module('portainer.app').factory('StackService', [
       ).$promise;
     };
 
-    service.updateKubeStack = function (stack, { stackFile, gitConfig, webhookId }) {
+    service.updateKubeStack = function (stack, { stackFile, gitConfig, webhookId, stackName }) {
       let payload = {};
 
       if (stackFile) {
         payload = {
           StackFileContent: stackFile,
+          StackName: stackName,
         };
       } else {
         payload = {

@@ -1,0 +1,176 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'develop'
+      - 'release/*'
+  pull_request:
+    branches:
+      - 'develop'
+      - 'release/*'
+      - 'feat/*'
+      - 'fix/*'
+      - 'refactor/*'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+env:
+  DOCKER_HUB_REPO: portainerci/portainer-ce
+  EXTENSION_HUB_REPO: portainerci/portainer-docker-extension
+  GO_VERSION: 1.21.6
+  NODE_VERSION: 18.x
+
+jobs:
+  build_images:
+    strategy:
+      matrix:
+        config:
+          - { platform: linux, arch: amd64, version: "" }
+          - { platform: linux, arch: arm64, version: "" }
+          - { platform: linux, arch: arm, version: "" }
+          - { platform: linux, arch: ppc64le, version: "" }
+          - { platform: linux, arch: s390x, version: "" }
+          - { platform: windows, arch: amd64, version: 1809 }
+          - { platform: windows, arch: amd64, version: ltsc2022 }
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: '[preparation] checkout the current branch'
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - name: '[preparation] set up golang'
+        uses: actions/setup-go@v5.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: '[preparation] set up node.js'
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+      - name: '[preparation] set up qemu'
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: '[preparation] set up docker context for buildx'
+        run: docker context create builders
+      - name: '[preparation] set up docker buildx'
+        uses: docker/setup-buildx-action@v3.0.0
+        with:
+          endpoint: builders
+      - name: '[preparation] docker login'
+        uses: docker/login-action@v3.0.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - name: '[preparation] set the container image tag'
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
+            # use the release branch name as the tag for release branches
+            # for instance, release/2.19 becomes 2.19
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | cut -d "/" -f 2)
+          elif [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+            # use pr${{ github.event.number }} as the tag for pull requests
+            # for instance, pr123
+            CONTAINER_IMAGE_TAG="pr${{ github.event.number }}"
+          else
+            # replace / with - in the branch name
+            # for instance, feature/1.0.0 -> feature-1.0.0
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//-/g')
+          fi
+          
+          echo "CONTAINER_IMAGE_TAG=${CONTAINER_IMAGE_TAG}-${{ matrix.config.platform }}${{ matrix.config.version }}-${{ matrix.config.arch }}" >> $GITHUB_ENV
+      - name: '[execution] build linux & windows portainer binaries'
+        run: |
+          export YARN_VERSION=$(yarn --version)
+          export WEBPACK_VERSION=$(yarn list webpack --depth=0 | grep webpack | awk -F@ '{print $2}')
+          export BUILDNUMBER=${GITHUB_RUN_NUMBER}
+          GIT_COMMIT_HASH_LONG=${{ github.sha }}
+          export GIT_COMMIT_HASH_SHORT={GIT_COMMIT_HASH_LONG:0:7}
+          
+          NODE_ENV="testing"
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
+            NODE_ENV="production"
+          fi
+          
+          make build-all PLATFORM=${{ matrix.config.platform }} ARCH=${{ matrix.config.arch }} ENV=${NODE_ENV}
+        env:
+          CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
+      - name: '[execution] build and push docker images'
+        run: |
+          if [ "${{ matrix.config.platform }}" == "windows" ]; then
+            mv dist/portainer dist/portainer.exe
+            docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} --build-arg OSVERSION=${{ matrix.config.version }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
+          else 
+            docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
+            docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
+            
+            if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
+              docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
+              docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
+            fi
+          fi
+        env:
+          CONTAINER_IMAGE_TAG: ${{ env.CONTAINER_IMAGE_TAG }}
+  build_manifests:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    needs: [build_images]
+    steps:
+      - name: '[preparation] docker login'
+        uses: docker/login-action@v3.0.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - name: '[preparation] set up docker context for buildx'
+        run: docker version && docker context create builders
+      - name: '[preparation] set up docker buildx'
+        uses: docker/setup-buildx-action@v3.0.0
+        with:
+          endpoint: builders
+      - name: '[execution] build and push manifests'
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
+            # use the release branch name as the tag for release branches
+            # for instance, release/2.19 becomes 2.19
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | cut -d "/" -f 2)
+          elif [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+            # use pr${{ github.event.number }} as the tag for pull requests
+            # for instance, pr123
+            CONTAINER_IMAGE_TAG="pr${{ github.event.number }}"
+          else
+            # replace / with - in the branch name
+            # for instance, feature/1.0.0 -> feature-1.0.0
+            CONTAINER_IMAGE_TAG=$(echo $GITHUB_REF_NAME | sed 's/\//-/g')
+          fi
+
+          docker buildx imagetools create -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-ppc64le" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-s390x" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-windows1809-amd64" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-windowsltsc2022-amd64"
+          
+          docker buildx imagetools create -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64-alpine" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64-alpine" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine"
+            
+          if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
+            docker buildx imagetools create -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-ppc64le" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-s390x"
+            
+            docker buildx imagetools create -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64-alpine" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64-alpine" \
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine"
+          fi

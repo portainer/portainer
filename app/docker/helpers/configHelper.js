@@ -7,10 +7,8 @@ angular.module('portainer.docker').factory('ConfigHelper', [
           return {
             Id: config.ConfigID,
             Name: config.ConfigName,
-            FileName: config.File.Name,
-            Uid: config.File.UID,
-            Gid: config.File.GID,
-            Mode: config.File.Mode,
+            ...(config.File ? { FileName: config.File.Name, Uid: config.File.UID, Gid: config.File.GID, Mode: config.File.Mode } : {}),
+            credSpec: !!config.Runtime,
           };
         }
         return {};
@@ -20,12 +18,15 @@ angular.module('portainer.docker').factory('ConfigHelper', [
           return {
             ConfigID: config.Id,
             ConfigName: config.Name,
-            File: {
-              Name: config.FileName || config.Name,
-              UID: config.Uid || '0',
-              GID: config.Gid || '0',
-              Mode: config.Mode || 292,
-            },
+            File: config.credSpec
+              ? null
+              : {
+                  Name: config.FileName || config.Name,
+                  UID: config.Uid || '0',
+                  GID: config.Gid || '0',
+                  Mode: config.Mode || 292,
+                },
+            Runtime: config.credSpec ? {} : null,
           };
         }
         return {};

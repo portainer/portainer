@@ -8,7 +8,8 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { LoadingButton } from '@@/buttons';
 import { Widget } from '@@/Widget';
 
-import { useSettings, useUpdateSettingsMutation } from '../../queries';
+import { useUpdateSettingsMutation } from '../../queries';
+import { Settings } from '../../types';
 
 import { HelmSection } from './HelmSection';
 import { KubeConfigSection } from './KubeConfigSection';
@@ -16,31 +17,30 @@ import { FormValues } from './types';
 import { DeploymentOptionsSection } from './DeploymentOptionsSection';
 import { validation } from './validation';
 
-export function KubeSettingsPanel() {
-  const settingsQuery = useSettings();
+export function KubeSettingsPanel({ settings }: { settings: Settings }) {
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId(false);
   const mutation = useUpdateSettingsMutation();
 
-  if (!settingsQuery.data) {
-    return null;
-  }
-
   const initialValues: FormValues = {
-    helmRepositoryUrl: settingsQuery.data.HelmRepositoryURL || '',
-    kubeconfigExpiry: settingsQuery.data.KubeconfigExpiry || '0',
-    globalDeploymentOptions: settingsQuery.data.GlobalDeploymentOptions || {
-      requireNoteOnApplications: false,
-      minApplicationNoteLength: 0,
-      hideAddWithForm: false,
-      hideFileUpload: false,
-      hideWebEditor: false,
-      perEnvOverride: false,
+    helmRepositoryUrl: settings.HelmRepositoryURL || '',
+    kubeconfigExpiry: settings.KubeconfigExpiry || '0',
+    globalDeploymentOptions: {
+      ...{
+        requireNoteOnApplications: false,
+        minApplicationNoteLength: 0,
+        hideAddWithForm: false,
+        hideFileUpload: false,
+        hideWebEditor: false,
+        perEnvOverride: false,
+        hideStacksFunctionality: false,
+      },
+      ...settings.GlobalDeploymentOptions,
     },
   };
 
   return (
-    <Widget>
+    <Widget id="kubernetes-settings">
       <Widget.Title icon={kubeIcon} title="Kubernetes settings" />
       <Widget.Body>
         <Formik
@@ -62,7 +62,7 @@ export function KubeSettingsPanel() {
                     loadingText="Saving"
                     className="!ml-0"
                   >
-                    Save Kubernetes Settings
+                    Save Kubernetes settings
                   </LoadingButton>
                 </div>
               </div>

@@ -3,10 +3,10 @@ package edgestacks
 import (
 	"net/http"
 
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/pkg/errors"
 )

@@ -4,13 +4,12 @@ import (
 	"errors"
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gofrs/uuid"
@@ -62,7 +61,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError("An error occurred retrieving webhooks from the database", err)
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A webhook for this resource already exists", Err: errors.New("A webhook for this resource already exists")}
+		return httperror.Conflict("A webhook for this resource already exists", errors.New("A webhook for this resource already exists"))
 	}
 
 	endpointID := payload.EndpointID

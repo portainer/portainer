@@ -13,6 +13,7 @@ type Props = {
   renderTableSettings?(): ReactNode;
   renderTableActions?(): ReactNode;
   description?: ReactNode;
+  titleId?: string;
 };
 
 export function DatatableHeader({
@@ -23,20 +24,30 @@ export function DatatableHeader({
   title,
   titleIcon,
   description,
+  titleId,
 }: Props) {
   if (!title) {
     return null;
   }
 
+  const searchBar = <SearchBar value={searchValue} onChange={onSearchChange} />;
+  const tableActions = !!renderTableActions && (
+    <Table.Actions>{renderTableActions()}</Table.Actions>
+  );
+  const tableTitleSettings = !!renderTableSettings && (
+    <Table.TitleActions>{renderTableSettings()}</Table.TitleActions>
+  );
+
   return (
-    <Table.Title label={title} icon={titleIcon} description={description}>
-      <SearchBar value={searchValue} onChange={onSearchChange} />
-      {renderTableActions && (
-        <Table.Actions>{renderTableActions()}</Table.Actions>
-      )}
-      <Table.TitleActions>
-        {!!renderTableSettings && renderTableSettings()}
-      </Table.TitleActions>
+    <Table.Title
+      id={titleId}
+      label={title}
+      icon={titleIcon}
+      description={description}
+    >
+      {searchBar}
+      {tableActions}
+      {tableTitleSettings}
     </Table.Title>
   );
 }

@@ -1,4 +1,5 @@
 import angular from 'angular';
+import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
 
 class LogoutController {
   /* @ngInject */
@@ -25,12 +26,14 @@ class LogoutController {
    */
   async logoutAsync() {
     const error = this.$transition$.params().error;
-    const performApiLogout = this.$transition$.params().performApiLogout;
     const settings = await this.SettingsService.publicSettings();
 
     try {
-      await this.Authentication.logout(performApiLogout);
+      await this.Authentication.logout();
     } finally {
+      // always clear the kubernetes cache
+      dispatchCacheRefreshEvent();
+
       this.LocalStorage.storeLogoutReason(error);
       if (settings.OAuthLogoutURI && this.Authentication.getUserDetails().ID !== 1) {
         this.$window.location.href = settings.OAuthLogoutURI;

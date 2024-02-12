@@ -18,6 +18,7 @@ interface Props {
   error?: string | string[];
   horizontal?: boolean;
   isGroupVisible?(group: EdgeGroup): boolean;
+  required?: boolean;
 }
 
 export function EdgeGroupsSelector({
@@ -26,6 +27,7 @@ export function EdgeGroupsSelector({
   error,
   horizontal,
   isGroupVisible = () => true,
+  required,
 }: Props) {
   const selector = (
     <InnerSelector
@@ -36,11 +38,11 @@ export function EdgeGroupsSelector({
   );
 
   return horizontal ? (
-    <FormControl errors={error} label="Edge Groups">
+    <FormControl errors={error} label="Edge Groups" required={required}>
       {selector}
     </FormControl>
   ) : (
-    <FormSection title="Edge Groups">
+    <FormSection title={`Edge Groups${required ? ' *' : ''}`}>
       <div className="form-group">
         <div className="col-sm-12">{selector} </div>
         {error && (

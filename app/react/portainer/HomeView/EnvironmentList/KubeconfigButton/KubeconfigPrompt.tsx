@@ -111,7 +111,7 @@ export function KubeconfigPrompt({
               onPageChange={setPage}
               pageLimit={pageLimit}
               onPageLimitChange={setPageLimit}
-              totalCount={totalCount}
+              pageCount={Math.ceil(totalCount / pageLimit)}
             />
           </div>
         </div>

@@ -16,7 +16,7 @@ import { EnvironmentId } from '../types';
 import { buildUrl } from '../environment.service/utils';
 import { EnvironmentGroupId } from '../environment-groups/types';
 
-import { queryKeys } from './query-keys';
+import { environmentQueryKeys } from './query-keys';
 
 export function useUpdateEnvironmentsRelationsMutation() {
   const queryClient = useQueryClient();
@@ -25,7 +25,7 @@ export function useUpdateEnvironmentsRelationsMutation() {
     updateEnvironmentRelations,
     mutationOptions(
       withInvalidate(queryClient, [
-        queryKeys.base(),
+        environmentQueryKeys.base(),
         edgeGroupQueryKeys.base(),
         groupQueryKeys.base(),
         tagKeys.all,

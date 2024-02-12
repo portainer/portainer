@@ -9,7 +9,7 @@
           <div class="form-group">
             <div class="row">
               <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display: table">
-                <div class="input-group col-md-1 !pr-3.5 !pl-3.5">
+                <div class="input-group col-md-1 !pl-3.5 !pr-3.5">
                   <span class="input-group-addon" style="border-right: 1px solid var(--border-input-group-addon-color); border-radius: 4px" data-cy="image-tag-{{ tag }}">{{
                     tag
                   }}</span>
@@ -20,13 +20,13 @@
                       </a>
                     </span>
 
-                    <span class="my-0 mx-1" authorization="DockerImageCreate">
+                    <span class="mx-1 my-0" authorization="DockerImageCreate">
                       <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)">
                         <pr-icon icon="'download'" class="text-white"></pr-icon>
                       </a>
                     </span>
 
-                    <span class="my-0 mx-1" authorization="DockerImageDelete">
+                    <span class="mx-1 my-0" authorization="DockerImageDelete">
                       <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
                         <pr-icon icon="'trash-2'" class="text-white"></pr-icon>
                       </a>
@@ -213,7 +213,7 @@
                     {{ layer.CreatedBy | imagelayercommand }}
                   </span>
                   <span id="layer-command-{{ $index }}-short">
-                    {{ layer.CreatedBy | imagelayercommand | truncate : 130 }}
+                    {{ layer.CreatedBy | imagelayercommand | truncate: 130 }}
                     <span ng-if="layer.CreatedBy.length > 130" class="ml-1">
                       <a id="layer-command-expander{{ $index }}" class="btn" ng-click="toggleLayerCommand($index)">
                         <pr-icon icon="'plus'" mode="'alt'"></pr-icon>

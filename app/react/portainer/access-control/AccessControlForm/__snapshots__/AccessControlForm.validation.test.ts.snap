@@ -1,5 +1,5 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`when ownership is restricted and no teams or users, should be invalid 1`] = `"You must specify at least one team or user."`;
+exports[`when ownership is restricted and no teams or users, should be invalid 1`] = `[ValidationError: You must specify at least one team or user.]`;
 
-exports[`when ownership is restricted and no teams or users, should be invalid 2`] = `"You must specify at least one team."`;
+exports[`when ownership is restricted and no teams or users, should be invalid 2`] = `[ValidationError: You must specify at least one team.]`;

@@ -1,15 +1,24 @@
-import { EditorType } from '@/react/edge/edge-stacks/types';
+import { DeploymentType, EditorType } from '@/react/edge/edge-stacks/types';
 import { getValidEditorTypes } from '@/react/edge/edge-stacks/utils';
 import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { getCustomTemplate } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplate';
+import { notifyError } from '@/portainer/services/notifications';
+import { getCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
+import { toGitFormModel } from '@/react/portainer/gitops/types';
+import { StackType } from '@/react/common/stacks/types';
+import { applySetStateAction } from '@/react-tools/apply-set-state-action';
+import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
-  constructor($state, $window, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope) {
-    Object.assign(this, { $state, $window, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope });
+  constructor($state, $window, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async, $scope) {
+    Object.assign(this, { $state, $window, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async, $scope });
 
     this.formValues = {
       Name: '',
@@ -41,6 +50,8 @@ export default class CreateEdgeStackViewController {
       hasKubeEndpoint: false,
       endpointTypes: [],
       baseWebhookUrl: baseEdgeStackWebhookUrl(),
+      isEdit: false,
+      templateValues: getInitialTemplateValues(),
     };
 
     this.edgeGroups = null;
@@ -57,6 +68,59 @@ export default class CreateEdgeStackViewController {
     this.hasType = this.hasType.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
     this.onEnvVarChange = this.onEnvVarChange.bind(this);
+    this.setTemplateValues = this.setTemplateValues.bind(this);
+    this.onChangeTemplate = this.onChangeTemplate.bind(this);
+  }
+
+  /**
+   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset').Values>} templateAction
+   */
+  setTemplateValues(templateAction) {
+    return this.$async(async () => {
+      const newTemplateValues = applySetStateAction(templateAction, this.state.templateValues);
+      const oldTemplateId = this.state.templateValues.template && this.state.templateValues.template.Id;
+      const newTemplateId = newTemplateValues.template && newTemplateValues.template.Id;
+      this.state.templateValues = newTemplateValues;
+      if (newTemplateId !== oldTemplateId) {
+        await this.onChangeTemplate(newTemplateValues.template);
+      }
+
+      let definitions = [];
+      if (this.state.templateValues.template) {
+        definitions = this.state.templateValues.template.Variables;
+      }
+      const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, definitions);
+
+      this.formValues.StackFileContent = newFile;
+    });
+  }
+
+  onChangeTemplate(template) {
+    return this.$async(async () => {
+      if (!template) {
+        return;
+      }
+
+      this.state.templateValues.template = template;
+      this.state.templateValues.variables = getVariablesFieldDefaultValues(template.Variables);
+
+      const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
+      this.state.templateValues.file = fileContent;
+
+      this.formValues = {
+        ...this.formValues,
+        DeploymentType: template.Type === StackType.Kubernetes ? DeploymentType.Kubernetes : DeploymentType.Compose,
+        ...toGitFormModel(template.GitConfig),
+        ...(template.EdgeSettings
+          ? {
+              PrePullImage: template.EdgeSettings.PrePullImage || false,
+              RetryDeploy: template.EdgeSettings.RetryDeploy || false,
+              PrivateRegistryId: template.EdgeSettings.PrivateRegistryId || null,
+              ...template.EdgeSettings.RelativePathSettings,
+            }
+          : {}),
+      };
+    });
   }
 
   onEnvVarChange(envVars) {
@@ -70,7 +134,7 @@ export default class CreateEdgeStackViewController {
     const metadata = { type: methodLabel(this.state.Method), format };
 
     if (metadata.type === 'template') {
-      metadata.templateName = this.selectedTemplate.title;
+      metadata.templateName = this.state.selectedTemplate && this.state.selectedTemplate.title;
     }
 
     return { metadata };
@@ -95,11 +159,29 @@ export default class CreateEdgeStackViewController {
     }
   }
 
+  async preSelectTemplate(templateId) {
+    return this.$async(async () => {
+      try {
+        this.state.Method = 'template';
+        const template = await getCustomTemplate(templateId);
+
+        this.setTemplateValues({ template });
+      } catch (e) {
+        notifyError('Failed loading template', e);
+      }
+    });
+  }
+
   async $onInit() {
     try {
       this.edgeGroups = await this.EdgeGroupService.groups();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
+    }
+
+    const templateId = this.$state.params.templateId;
+    if (templateId) {
+      this.preSelectTemplate(templateId);
     }
 
     this.$window.onbeforeunload = () => {
@@ -116,11 +198,7 @@ export default class CreateEdgeStackViewController {
   createStack() {
     return this.$async(async () => {
       const name = this.formValues.Name;
-      let method = this.state.Method;
-
-      if (method === 'template') {
-        method = 'editor';
-      }
+      const method = getMethod(this.state.Method, this.state.templateValues.template);
 
       if (!this.validateForm(method)) {
         return;
@@ -246,6 +324,7 @@ export default class CreateEdgeStackViewController {
       this.formValues.DeploymentType = deploymentType;
       this.state.Method = 'editor';
       this.formValues.StackFileContent = '';
+      this.state.templateValues = getInitialTemplateValues();
     });
   }
 
@@ -257,4 +336,21 @@ export default class CreateEdgeStackViewController {
       ('upload' === this.state.Method && !this.formValues.StackFile)
     );
   }
+}
+
+/**
+ *
+ * @param {'template'|'repository' | 'editor' | 'upload'} method
+ * @param {import('@/react/portainer/templates/custom-templates/types').CustomTemplate | undefined} template
+ * @returns 'repository' | 'editor' | 'upload'
+ */
+function getMethod(method, template) {
+  if (method !== 'template') {
+    return method;
+  }
+
+  if (template && template.GitConfig) {
+    return 'repository';
+  }
+  return 'editor';
 }

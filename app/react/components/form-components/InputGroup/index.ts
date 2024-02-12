@@ -6,6 +6,19 @@ import { InputGroupButtonWrapper } from './InputGroupButtonWrapper';
 
 interface InputGroupSubComponents {
   Addon: typeof InputGroupAddon;
+  /**
+   * Should wrap all buttons inside a InputGroup
+   *
+   * example:
+   * ```
+   * <InputGroup>
+   *  <InputGroup.ButtonWrapper>
+   *   <Button>...</Button>
+   *   <Button>...</Button>
+   *  </InputGroup.ButtonWrapper>
+   * </InputGroup>
+   * ```
+   */
   ButtonWrapper: typeof InputGroupButtonWrapper;
   Input: typeof Input;
   className: string | undefined;

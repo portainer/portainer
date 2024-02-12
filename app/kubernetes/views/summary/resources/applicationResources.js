@@ -1,12 +1,9 @@
 import _ from 'lodash-es';
 import { KubernetesResourceTypes, KubernetesResourceActions } from 'Kubernetes/models/resource-types/models';
 import { KubernetesApplicationFormValues } from 'Kubernetes/models/application/formValues';
-import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
-import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesService, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesApplication, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
-import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
+import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';
@@ -33,7 +30,7 @@ export function getApplicationResources(formValues, oldFormValues = {}) {
  * Get summary of Kubernetes resources to be created
  * @param {KubernetesApplicationFormValues} formValues
  */
-function getCreatedApplicationResources(formValues) {
+export function getCreatedApplicationResources(formValues) {
   const resources = [];
 
   let [app, headlessService, services, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
@@ -65,14 +62,14 @@ function getCreatedApplicationResources(formValues) {
   }
 
   // Horizontal pod autoscalers
-  if (formValues.AutoScaler.IsUsed && formValues.DeploymentType !== KubernetesApplicationDeploymentTypes.GLOBAL) {
-    const kind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(app);
+  if (formValues.AutoScaler.IsUsed && formValues.DeploymentType !== KubernetesApplicationDeploymentTypes.Global) {
+    const kind = app.ApplicationType;
     const autoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(formValues, kind);
     resources.push({ action: CREATE, kind: KubernetesResourceTypes.HORIZONTAL_POD_AUTOSCALER, name: autoScaler.Name });
   }
 
   // Deployment
-  const appResourceType = getApplicationResourceType(app);
+  const appResourceType = app.ApplicationType;
   if (appResourceType !== null) {
     resources.push({ action: CREATE, kind: appResourceType, name: app.Name });
   }
@@ -85,13 +82,13 @@ function getCreatedApplicationResources(formValues) {
  * @param {KubernetesApplicationFormValues} oldFormValues
  * @param {KubernetesApplicationFormValues} newFormValues
  */
-function getUpdatedApplicationResources(oldFormValues, newFormValues) {
+export function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   const resources = [];
 
   const [oldApp, oldHeadlessService, oldServices, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
   const [newApp, newHeadlessService, newServices, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
-  const oldAppResourceType = getApplicationResourceType(oldApp);
-  const newAppResourceType = getApplicationResourceType(newApp);
+  const oldAppResourceType = oldApp.ApplicationType;
+  const newAppResourceType = newApp.ApplicationType;
 
   if (oldAppResourceType !== newAppResourceType) {
     // Deployment
@@ -152,7 +149,7 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
     resources.push({ action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP });
   }
 
-  const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
+  const newKind = newApp.ApplicationType;
   const newAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(newFormValues, newKind);
   if (!oldFormValues.AutoScaler.IsUsed) {
     if (newFormValues.AutoScaler.IsUsed) {
@@ -161,7 +158,7 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
     }
   } else {
     // Horizontal pod autoscalers
-    const oldKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(oldApp);
+    const oldKind = oldApp.ApplicationType;
     const oldAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(oldFormValues, oldKind);
     if (newFormValues.AutoScaler.IsUsed) {
       const hpaUpdateSummary = getHorizontalPodAutoScalerUpdateResourceSummary(oldAutoScaler, newAutoScaler);
@@ -174,17 +171,6 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   }
 
   return resources;
-}
-
-function getApplicationResourceType(app) {
-  if (app instanceof KubernetesDeployment || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.DEPLOYMENT)) {
-    return KubernetesResourceTypes.DEPLOYMENT;
-  } else if (app instanceof KubernetesDaemonSet || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.DAEMONSET)) {
-    return KubernetesResourceTypes.DAEMONSET;
-  } else if (app instanceof KubernetesStatefulSet || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.STATEFULSET)) {
-    return KubernetesResourceTypes.STATEFULSET;
-  }
-  return null;
 }
 
 function getIngressUpdateSummary(oldIngresses, newIngresses) {

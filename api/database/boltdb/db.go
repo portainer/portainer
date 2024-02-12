@@ -144,6 +144,8 @@ func (connection *DbConnection) Open() error {
 // Close closes the BoltDB database.
 // Safe to being called multiple times.
 func (connection *DbConnection) Close() error {
+	log.Info().Msg("closing PortainerDB")
+
 	if connection.DB != nil {
 		return connection.DB.Close()
 	}
@@ -255,7 +257,7 @@ func (connection *DbConnection) UpdateObjectFunc(bucketName string, key []byte, 
 			return fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 		}
 
-		err := connection.UnmarshalObjectWithJsoniter(data, object)
+		err := connection.UnmarshalObject(data, object)
 		if err != nil {
 			return err
 		}

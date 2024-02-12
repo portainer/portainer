@@ -2,10 +2,10 @@ import toastr from 'toastr';
 
 import { notifyError, notifySuccess, notifyWarning } from './notifications';
 
-jest.mock('toastr');
+vi.spyOn(console, 'error').mockImplementation(() => vi.fn());
 
 afterEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
 it('calling success should show success message', () => {
@@ -18,9 +18,9 @@ it('calling success should show success message', () => {
 });
 
 it('calling error with Error should show error message', () => {
-  const consoleErrorFn = jest
+  const consoleErrorFn = vi
     .spyOn(console, 'error')
-    .mockImplementation(() => jest.fn());
+    .mockImplementation(() => vi.fn());
   const title = 'title';
   const errorMessage = 'message';
   const fallback = 'fallback';
@@ -37,9 +37,9 @@ it('calling error with Error should show error message', () => {
 });
 
 it('calling error without Error should show fallback message', () => {
-  const consoleErrorFn = jest
+  const consoleErrorFn = vi
     .spyOn(console, 'error')
-    .mockImplementation(() => jest.fn());
+    .mockImplementation(() => vi.fn());
   const title = 'title';
 
   const fallback = 'fallback';

@@ -1,7 +1,6 @@
 package helm
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,14 +10,16 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/testhelpers"
+	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/pkg/libhelm/binary/test"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/release"
-	"github.com/stretchr/testify/assert"
 
-	helper "github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/segmentio/encoding/json"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_helmList(t *testing.T) {
@@ -48,7 +49,7 @@ func Test_helmList(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/1/kubernetes/helm", nil)
 		ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
 		req = req.WithContext(ctx)
-		req.Header.Add("Authorization", "Bearer dummytoken")
+		testhelpers.AddTestSecurityCookie(req, "Bearer dummytoken")
 
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)

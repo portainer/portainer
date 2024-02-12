@@ -69,7 +69,7 @@ func GetEndpointsFromEdgeGroups(edgeGroupIDs []portainer.EdgeGroupID, datastore 
 	return response, nil
 }
 
-// edgeGroupRelatedToEndpoint returns true is edgeGroup is associated with environment(endpoint)
+// edgeGroupRelatedToEndpoint returns true if edgeGroup is associated with environment(endpoint)
 func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup) bool {
 	if !edgeGroup.Dynamic {
 		for _, endpointID := range edgeGroup.Endpoints {
@@ -91,5 +91,5 @@ func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portai
 		return len(intersection) != 0
 	}
 
-	return tag.Contains(edgeGroupTags, endpointTags)
+	return tag.FullMatch(edgeGroupTags, endpointTags)
 }

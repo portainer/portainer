@@ -31,6 +31,8 @@ func Test_ValidateHelmRepositoryURL(t *testing.T) {
 		{"portainer helm repo", "https://portainer.github.io/k8s/", false},
 		{"elastic helm repo", "https://helm.elastic.co/", false},
 		{"redirect", "https://charts.jetstack.io/", false},
+		{"fabric8.io helm repo", "https://fabric8.io/helm/", false},
+		{"lensesio helm repo", "https://lensesio.github.io/kafka-helm-charts", false},
 	}
 
 	for _, test := range tests {

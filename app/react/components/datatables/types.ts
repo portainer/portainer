@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 
 import { keyBuilder } from '@/react/hooks/useLocalStorage';
 
+export type DefaultType = object;
+
 export interface PaginationTableSettings {
   pageSize: number;
   setPageSize: (pageSize: number) => void;
@@ -23,21 +25,24 @@ export function paginationSettings<T extends PaginationTableSettings>(
 }
 
 export interface SortableTableSettings {
-  sortBy: { id: string; desc: boolean };
-  setSortBy: (id: string, desc: boolean) => void;
+  sortBy: { id: string; desc: boolean } | undefined;
+  setSortBy: (id: string | undefined, desc: boolean) => void;
 }
 
 export function sortableSettings<T extends SortableTableSettings>(
   set: ZustandSetFunc<T>,
-  initialSortBy: string | { id: string; desc: boolean }
+  initialSortBy?: string | { id: string; desc: boolean }
 ): SortableTableSettings {
   return {
     sortBy:
       typeof initialSortBy === 'string'
         ? { id: initialSortBy, desc: false }
         : initialSortBy,
-    setSortBy: (id: string, desc: boolean) =>
-      set((s) => ({ ...s, sortBy: { id, desc } })),
+    setSortBy: (id: string | undefined, desc: boolean) =>
+      set((s) => ({
+        ...s,
+        sortBy: typeof id === 'string' ? { id, desc } : id,
+      })),
   };
 }
 
@@ -77,39 +82,21 @@ export interface BasicTableSettings
 
 export function createPersistedStore<T extends BasicTableSettings>(
   storageKey: string,
-  initialSortBy: string | { id: string; desc: boolean } = 'name',
+  initialSortBy?: string | { id: string; desc: boolean },
   create: (set: ZustandSetFunc<T>) => Omit<T, keyof BasicTableSettings> = () =>
-    ({} as T)
+    ({}) as T
 ) {
   return createStore<T>()(
     persist(
       (set) =>
         ({
-          ...sortableSettings(
-            set as ZustandSetFunc<SortableTableSettings>,
-            initialSortBy
-          ),
-          ...paginationSettings(set as ZustandSetFunc<PaginationTableSettings>),
+          ...sortableSettings<T>(set, initialSortBy),
+          ...paginationSettings<T>(set),
           ...create(set),
-        } as T),
+        }) as T,
       {
-        name: `datatable_settings_${keyBuilder(storageKey)}`,
+        name: keyBuilder(`datatable_settings_${storageKey}`),
       }
     )
   );
 }
-
-/** this class is just a dummy class to get return type of createPersistedStore
- * can be fixed after upgrade to ts 4.7+
- * https://stackoverflow.com/a/64919133
- */
-class Wrapper<T extends BasicTableSettings> {
-  // eslint-disable-next-line class-methods-use-this
-  wrapped() {
-    return createPersistedStore<T>('', '');
-  }
-}
-
-export type CreatePersistedStoreReturn<
-  T extends BasicTableSettings = BasicTableSettings
-> = ReturnType<Wrapper<T>['wrapped']>;

@@ -3,14 +3,14 @@ package tags
 import (
 	"errors"
 	"net/http"
+	"slices"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id TagDelete
@@ -33,14 +33,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.BadRequest("Invalid tag identifier route variable", err)
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		err = deleteTag(handler.DataStore, portainer.TagID(id))
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			return deleteTag(tx, portainer.TagID(id))
-		})
-	}
-
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return deleteTag(tx, portainer.TagID(id))
+	})
 	if err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {
@@ -67,7 +62,10 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 		}
 
-		endpoint.TagIDs = removeElement(endpoint.TagIDs, tagID)
+		endpoint.TagIDs = slices.DeleteFunc(endpoint.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
+
 		err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
 			return httperror.InternalServerError("Unable to update environment", err)
@@ -80,7 +78,10 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 			return httperror.InternalServerError("Unable to retrieve environment group from the database", err)
 		}
 
-		endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagID)
+		endpointGroup.TagIDs = slices.DeleteFunc(endpointGroup.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
+
 		err = tx.EndpointGroup().Update(endpointGroup.ID, endpointGroup)
 		if err != nil {
 			return httperror.InternalServerError("Unable to update environment group", err)
@@ -111,23 +112,14 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 		}
 	}
 
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		for _, edgeGroup := range edgeGroups {
-			err = tx.EdgeGroup().UpdateEdgeGroupFunc(edgeGroup.ID, func(g *portainer.EdgeGroup) {
-				g.TagIDs = removeElement(g.TagIDs, tagID)
-			})
-			if err != nil {
-				return httperror.InternalServerError("Unable to update edge group", err)
-			}
-		}
-	} else {
-		for _, edgeGroup := range edgeGroups {
-			edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagID)
+	for _, edgeGroup := range edgeGroups {
+		edgeGroup.TagIDs = slices.DeleteFunc(edgeGroup.TagIDs, func(t portainer.TagID) bool {
+			return t == tagID
+		})
 
-			err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
-			if err != nil {
-				return httperror.InternalServerError("Unable to update edge group", err)
-			}
+		err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
+		if err != nil {
+			return httperror.InternalServerError("Unable to update edge group", err)
 		}
 	}
 
@@ -158,16 +150,4 @@ func updateEndpointRelations(tx dataservices.DataStoreTx, endpoint portainer.End
 	endpointRelation.EdgeStacks = stacksSet
 
 	return tx.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
-}
-
-func removeElement(slice []portainer.TagID, elem portainer.TagID) []portainer.TagID {
-	for i, id := range slice {
-		if id == elem {
-			slice[i] = slice[len(slice)-1]
-
-			return slice[:len(slice)-1]
-		}
-	}
-
-	return slice
 }

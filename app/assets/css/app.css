@@ -17,6 +17,13 @@
 html {
   font-size: 16px;
   overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+
+html[theme='dark'],
+html[theme='highcontrast'] {
+  /* make the scrollbars dark theme when in the dark modes */
+  color-scheme: dark;
 }
 
 body {
@@ -84,14 +91,18 @@ body,
 
 .form-section-title {
   @apply text-gray-9;
-  @apply th-dark:text-gray-5;
+  @apply th-dark:text-white;
   @apply th-highcontrast:text-white;
 
-  margin-top: 5px;
+  margin-top: 20px;
   margin-bottom: 10px;
   padding-left: 0;
   font-weight: 500;
   font-size: 16px;
+}
+
+.form-section-title:first-child {
+  margin-top: 5px;
 }
 
 .form-horizontal .control-label.text-left,

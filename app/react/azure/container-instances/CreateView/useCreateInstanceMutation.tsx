@@ -52,7 +52,7 @@ export function useCreateInstanceMutation(
         }
 
         const accessControlData = values.accessControl;
-        await applyResourceControl(accessControlData, resourceControl);
+        await applyResourceControl(accessControlData, resourceControl.Id);
         return queryClient.invalidateQueries(
           queryKeys.subscriptions(environmentId)
         );

@@ -5,14 +5,14 @@ import (
 	"errors"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id StackStop
@@ -125,7 +125,7 @@ func (handler *Handler) stopStack(stack *portainer.Stack, endpoint *portainer.En
 	case portainer.DockerComposeStack:
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
-		if stackutils.IsGitStack(stack) {
+		if stackutils.IsRelativePathStack(stack) {
 			return handler.StackDeployer.StopRemoteComposeStack(stack, endpoint)
 		}
 
@@ -133,7 +133,7 @@ func (handler *Handler) stopStack(stack *portainer.Stack, endpoint *portainer.En
 	case portainer.DockerSwarmStack:
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
-		if stackutils.IsGitStack(stack) {
+		if stackutils.IsRelativePathStack(stack) {
 			return handler.StackDeployer.StopRemoteSwarmStack(stack, endpoint)
 		}
 

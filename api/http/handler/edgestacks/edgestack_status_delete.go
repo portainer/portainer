@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
-	"github.com/portainer/portainer/pkg/featureflags"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id EdgeStackStatusDelete
@@ -45,14 +44,10 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 	}
 
 	var stack *portainer.EdgeStack
-	if featureflags.IsEnabled(portainer.FeatureNoTx) {
-		stack, err = handler.deleteEdgeStackStatus(handler.DataStore, portainer.EdgeStackID(stackID), endpoint)
-	} else {
-		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			stack, err = handler.deleteEdgeStackStatus(tx, portainer.EdgeStackID(stackID), endpoint)
-			return err
-		})
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stack, err = handler.deleteEdgeStackStatus(tx, portainer.EdgeStackID(stackID), endpoint)
+		return err
+	})
 	if err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {

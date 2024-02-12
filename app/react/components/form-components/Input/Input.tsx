@@ -13,7 +13,9 @@ export function Input({
   className,
   mRef: ref,
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { mRef?: Ref<HTMLInputElement> }) {
+}: InputHTMLAttributes<HTMLInputElement> & {
+  mRef?: Ref<HTMLInputElement>;
+}) {
   return (
     <input
       // eslint-disable-next-line react/jsx-props-no-spreading

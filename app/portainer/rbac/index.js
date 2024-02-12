@@ -27,6 +27,9 @@ function config($stateRegistryProvider) {
         component: 'rolesView',
       },
     },
+    data: {
+      docs: '/admin/users/roles',
+    },
   };
 
   $stateRegistryProvider.register(roles);

@@ -27,10 +27,9 @@ export function mockT(i18nKey: string, args?: Record<string, string>) {
   return key;
 }
 
-const i18next: Record<string, unknown> = jest.createMockFromModule('i18next');
-i18next.t = mockT;
-i18next.language = 'en';
-i18next.changeLanguage = () => new Promise(() => {});
-i18next.use = () => i18next;
-
-export default i18next;
+export default {
+  t: mockT,
+  language: 'en',
+  changeLanguage: () => new Promise(() => {}),
+  use: () => this,
+};

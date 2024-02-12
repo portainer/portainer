@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type stackMigratePayload struct {
@@ -145,7 +145,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 
 	if !isUnique {
 		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running on endpoint '%s'", stack.Name, targetEndpoint.Name)
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: errorMessage, Err: errors.New(errorMessage)}
+		return httperror.Conflict(errorMessage, errors.New(errorMessage))
 	}
 
 	migrationError := handler.migrateStack(r, stack, targetEndpoint)

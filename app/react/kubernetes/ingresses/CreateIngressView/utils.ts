@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { SupportedIngControllerTypes } from '@/react/kubernetes/cluster/ingressClass/types';
 
 import { TLS, Ingress } from '../types';
+import { Annotation } from '../../annotations/types';
 
-import { Annotation } from './Annotations/types';
 import { Host, Rule } from './types';
 
 const ignoreAnnotationsForEdit = [
@@ -35,14 +35,6 @@ export function preparePaths(ingressName: string, hosts: Host[]) {
       IngressName: ingressName,
     }))
   );
-}
-
-export function prepareAnnotations(annotations: Annotation[]) {
-  const result: Record<string, string> = {};
-  annotations.forEach((a) => {
-    result[a.Key] = a.Value;
-  });
-  return result;
 }
 
 function getSecretByHost(host: string, tls?: TLS[]) {
@@ -112,6 +104,7 @@ export function prepareRuleFromIngress(
     Hosts: prepareRuleHostsFromIngress(ing) || [],
     Annotations: ing.Annotations ? getAnnotationsForEdit(ing.Annotations) : [],
     IngressType: ing.Type,
+    Labels: ing.Labels,
   };
 }
 

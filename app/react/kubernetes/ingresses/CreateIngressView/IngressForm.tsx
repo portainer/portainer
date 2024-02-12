@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode, useEffect } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { Plus, RefreshCw, Trash2 } from 'lucide-react';
 
 import Route from '@/assets/ico/route.svg?c';
@@ -16,8 +16,14 @@ import { InputGroup } from '@@/form-components/InputGroup';
 import { InlineLoader } from '@@/InlineLoader';
 import { Select } from '@@/form-components/ReactSelect';
 
-import { Annotations } from './Annotations';
-import { GroupedServiceOptions, Rule, ServicePorts } from './types';
+import { AnnotationsForm } from '../../annotations/AnnotationsForm';
+
+import {
+  GroupedServiceOptions,
+  IngressErrors,
+  Rule,
+  ServicePorts,
+} from './types';
 
 import '../style.css';
 
@@ -36,7 +42,7 @@ interface Props {
   environmentID: number;
   rule: Rule;
 
-  errors: Record<string, ReactNode>;
+  errors: IngressErrors;
   isEdit: boolean;
   namespace: string;
 
@@ -47,6 +53,7 @@ interface Props {
   tlsOptions: Option<string>[];
   namespacesOptions: Option<string>[];
   isNamespaceOptionsLoading: boolean;
+  isIngressNamesLoading: boolean;
 
   removeIngressRoute: (hostIndex: number, pathIndex: number) => void;
   removeIngressHost: (hostIndex: number) => void;
@@ -102,6 +109,7 @@ export function IngressForm({
   errors,
   namespacesOptions,
   isNamespaceOptionsLoading,
+  isIngressNamesLoading,
   handleNamespaceChange,
   namespace,
 }: Props) {
@@ -114,10 +122,22 @@ export function IngressForm({
   // when the namespace options update the value to an available one
   useEffect(() => {
     const namespaces = namespacesOptions.map((option) => option.value);
-    if (!namespaces.includes(namespace) && namespaces.length > 0) {
+    if (
+      !isEdit &&
+      !namespaces.includes(namespace) &&
+      namespaces.length > 0 &&
+      !isIngressNamesLoading
+    ) {
       handleNamespaceChange(namespaces[0]);
     }
-  }, [namespacesOptions, namespace, handleNamespaceChange]);
+  }, [
+    namespacesOptions,
+    namespace,
+    handleNamespaceChange,
+    isNamespaceOptionsLoading,
+    isEdit,
+    isIngressNamesLoading,
+  ]);
 
   return (
     <Widget>
@@ -284,12 +304,12 @@ export function IngressForm({
             </div>
 
             {rule?.Annotations && (
-              <Annotations
+              <AnnotationsForm
                 placeholder={placeholderAnnotation}
                 annotations={rule.Annotations}
                 handleAnnotationChange={handleAnnotationChange}
                 removeAnnotation={removeAnnotation}
-                errors={errors}
+                errors={errors.annotations}
               />
             )}
 
@@ -297,7 +317,7 @@ export function IngressForm({
               <TooltipWithChildren message="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type.">
                 <span>
                   <Button
-                    className="btn btn-sm btn-light mb-2 !ml-0"
+                    className="btn btn-sm btn-light !ml-0 mb-2"
                     onClick={() => addNewAnnotation()}
                     icon={Plus}
                   >
@@ -392,13 +412,13 @@ export function IngressForm({
                         />
                       </InputGroup>
                       {errors[`hosts[${hostIndex}].host`] && (
-                        <FormError className="mt-1 !mb-0">
+                        <FormError className="!mb-0 mt-1">
                           {errors[`hosts[${hostIndex}].host`]}
                         </FormError>
                       )}
                     </div>
 
-                    <div className="form-group col-sm-6 col-lg-4 !pr-0 !pl-2">
+                    <div className="form-group col-sm-6 col-lg-4 !pl-2 !pr-0">
                       <InputGroup size="small">
                         <InputGroup.Addon>TLS secret</InputGroup.Addon>
                         <Select
@@ -422,6 +442,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No TLS secrets available'}
                           size="sm"
+                          options={tlsOptions}
                         />
                         {!host.NoHost && (
                           <div className="input-group-btn">
@@ -475,7 +496,7 @@ export function IngressForm({
 
                 {host.Paths.map((path, pathIndex) => (
                   <div
-                    className="row path mt-5 !mb-5"
+                    className="row path !mb-5 mt-5"
                     key={`path_${path.Key}}`}
                   >
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
@@ -489,7 +510,10 @@ export function IngressForm({
                             path.ServiceName
                               ? {
                                   value: path.ServiceName,
-                                  label: path.ServiceName,
+                                  label: getServiceLabel(
+                                    serviceOptions,
+                                    path.ServiceName
+                                  ),
                                 }
                               : null
                           }
@@ -513,7 +537,7 @@ export function IngressForm({
                       {errors[
                         `hosts[${hostIndex}].paths[${pathIndex}].servicename`
                       ] && (
-                        <FormError className="error-inline mt-1 !mb-0">
+                        <FormError className="error-inline !mb-0 mt-1">
                           {
                             errors[
                               `hosts[${hostIndex}].paths[${pathIndex}].servicename`
@@ -523,7 +547,7 @@ export function IngressForm({
                       )}
                     </div>
 
-                    <div className="form-group col-sm-2 col-xl-2 !m-0 !pl-0">
+                    <div className="form-group col-sm-2 col-xl-2 !m-0 min-w-[170px] !pl-0">
                       {servicePorts && (
                         <>
                           <InputGroup size="small">
@@ -569,7 +593,7 @@ export function IngressForm({
                           {errors[
                             `hosts[${hostIndex}].paths[${pathIndex}].serviceport`
                           ] && (
-                            <FormError className="mt-1 !mb-0">
+                            <FormError className="!mb-0 mt-1">
                               {
                                 errors[
                                   `hosts[${hostIndex}].paths[${pathIndex}].serviceport`
@@ -621,7 +645,7 @@ export function IngressForm({
                       {errors[
                         `hosts[${hostIndex}].paths[${pathIndex}].pathType`
                       ] && (
-                        <FormError className="mt-1 !mb-0">
+                        <FormError className="!mb-0 mt-1">
                           {
                             errors[
                               `hosts[${hostIndex}].paths[${pathIndex}].pathType`
@@ -654,7 +678,7 @@ export function IngressForm({
                       {errors[
                         `hosts[${hostIndex}].paths[${pathIndex}].path`
                       ] && (
-                        <FormError className="mt-1 !mb-0">
+                        <FormError className="!mb-0 mt-1">
                           {
                             errors[
                               `hosts[${hostIndex}].paths[${pathIndex}].path`
@@ -666,7 +690,7 @@ export function IngressForm({
 
                     <div className="form-group col-sm-1 !m-0 !pl-0">
                       <Button
-                        className="btn-only-icon vertical-center !ml-0"
+                        className="!ml-0 h-[30px]"
                         color="dangerlight"
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
@@ -727,4 +751,10 @@ export function IngressForm({
       </WidgetBody>
     </Widget>
   );
+}
+
+function getServiceLabel(options: GroupedServiceOptions, value: string) {
+  const allOptions = options.flatMap((group) => group.options);
+  const option = allOptions.find((o) => o.value === value);
+  return option?.selectedLabel || '';
 }

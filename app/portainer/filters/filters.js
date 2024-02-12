@@ -1,13 +1,11 @@
 import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
-import { Eye, EyeOff, Users, Cloud } from 'lucide-react';
+import { Cloud } from 'lucide-react';
 
 import Kube from '@/assets/ico/kube.svg?c';
 import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
 import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
-import NomadIcon from '@/assets/ico/vendor/nomad-icon.svg?c';
-import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 
 export function truncateLeftRight(text, max, left, right) {
@@ -43,16 +41,16 @@ export function isoDateFromTimestamp(timestamp) {
   return moment.unix(timestamp).format(TIME_FORMAT);
 }
 
-export function isoDate(date) {
-  return moment(date).format(TIME_FORMAT);
+export function isoDate(date, format = TIME_FORMAT) {
+  return moment(date).format(format);
 }
 
-export function parseIsoDate(date) {
-  return moment(date, TIME_FORMAT).toDate();
+export function parseIsoDate(date, format = TIME_FORMAT) {
+  return moment(date, format).toDate();
 }
 
-export function formatDate(date, strFormat = 'YYYY-MM-DD HH:mm:ss Z') {
-  return moment(date, strFormat).format(TIME_FORMAT);
+export function formatDate(date, strFormat = 'YYYY-MM-DD HH:mm:ss Z', outFormat = TIME_FORMAT) {
+  return moment(date, strFormat).format(outFormat);
 }
 
 export function getPairKey(pair, separator) {
@@ -120,23 +118,8 @@ export function environmentTypeIcon(type) {
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.Docker:
       return DockerIcon;
-    case EnvironmentType.EdgeAgentOnNomad:
-      return NomadIcon;
     default:
       throw new Error(`type ${type}-${EnvironmentType[type]} is not supported`);
-  }
-}
-
-export function ownershipIcon(ownership) {
-  switch (ownership) {
-    case RCO.PRIVATE:
-      return EyeOff;
-    case RCO.ADMINISTRATORS:
-      return EyeOff;
-    case RCO.RESTRICTED:
-      return Users;
-    default:
-      return Eye;
   }
 }
 

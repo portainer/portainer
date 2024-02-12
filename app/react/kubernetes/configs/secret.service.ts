@@ -1,4 +1,4 @@
-import { SecretList } from 'kubernetes-types/core/v1';
+import { Secret, SecretList } from 'kubernetes-types/core/v1';
 import { useMutation, useQuery } from 'react-query';
 
 import { queryClient, withError } from '@/react-tools/react-query';
@@ -117,17 +117,10 @@ async function getSecretsForCluster(
   environmentId: EnvironmentId,
   namespaces: string[]
 ) {
-  try {
-    const secrets = await Promise.all(
-      namespaces.map((namespace) => getSecrets(environmentId, namespace))
-    );
-    return secrets.flat();
-  } catch (e) {
-    throw parseKubernetesAxiosError(
-      e as Error,
-      'Unable to retrieve secrets for cluster'
-    );
-  }
+  const secrets = await Promise.all(
+    namespaces.map((namespace) => getSecrets(environmentId, namespace))
+  );
+  return secrets.flat();
 }
 
 // get all secrets for a namespace
@@ -136,9 +129,13 @@ async function getSecrets(environmentId: EnvironmentId, namespace: string) {
     const { data } = await axios.get<SecretList>(
       buildUrl(environmentId, namespace)
     );
-    return data.items;
+    const secretsWithKind: Secret[] = data.items.map((secret) => ({
+      ...secret,
+      kind: 'Secret',
+    }));
+    return secretsWithKind;
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to retrieve secrets');
+    throw parseKubernetesAxiosError(e, 'Unable to retrieve secrets');
   }
 }
 
@@ -150,7 +147,7 @@ async function deleteSecret(
   try {
     await axios.delete(buildUrl(environmentId, namespace, name));
   } catch (e) {
-    throw parseKubernetesAxiosError(e as Error, 'Unable to remove secret');
+    throw parseKubernetesAxiosError(e, 'Unable to remove secret');
   }
 }
 

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
 
-import { createOwnershipColumn } from '@/react/docker/components/datatable-helpers/createOwnershipColumn';
+import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
 import { DockerContainer } from '@/react/docker/containers/types';
 
 import { created } from './created';

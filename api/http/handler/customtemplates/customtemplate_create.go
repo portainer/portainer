@@ -1,24 +1,26 @@
 package customtemplates
 
 import (
-	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 )
 
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -101,6 +103,8 @@ type customTemplateFromFileContentPayload struct {
 	FileContent string `validate:"required"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
+	// EdgeTemplate indicates if this template purpose for Edge Stack
+	EdgeTemplate bool `example:"false"`
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
@@ -148,7 +152,7 @@ func isValidNote(note string) bool {
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /custom_templates/string [post]
+// @router /custom_templates/create/string [post]
 func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -158,15 +162,16 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:          portainer.CustomTemplateID(customTemplateID),
-		Title:       payload.Title,
-		EntryPoint:  filesystem.ComposeFileDefaultName,
-		Description: payload.Description,
-		Note:        payload.Note,
-		Platform:    (payload.Platform),
-		Type:        (payload.Type),
-		Logo:        payload.Logo,
-		Variables:   payload.Variables,
+		ID:           portainer.CustomTemplateID(customTemplateID),
+		Title:        payload.Title,
+		EntryPoint:   filesystem.ComposeFileDefaultName,
+		Description:  payload.Description,
+		Note:         payload.Note,
+		Platform:     (payload.Platform),
+		Type:         (payload.Type),
+		Logo:         payload.Logo,
+		Variables:    payload.Variables,
+		EdgeTemplate: payload.EdgeTemplate,
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
@@ -216,6 +221,8 @@ type customTemplateFromGitRepositoryPayload struct {
 	TLSSkipVerify bool `example:"false"`
 	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 	IsComposeFormat bool `example:"false"`
+	// EdgeTemplate indicates if this template purpose for Edge Stack
+	EdgeTemplate bool `example:"false"`
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -262,7 +269,7 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /custom_templates/repository [post]
+// @router /custom_templates/create/repository [post]
 func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -281,6 +288,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		Logo:            payload.Logo,
 		Variables:       payload.Variables,
 		IsComposeFormat: payload.IsComposeFormat,
+		EdgeTemplate:    payload.EdgeTemplate,
 	}
 
 	getProjectPath := func() string {
@@ -365,6 +373,8 @@ type customTemplateFromFileUploadPayload struct {
 	FileContent []byte
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
+	// EdgeTemplate indicates if this template purpose for Edge Stack
+	EdgeTemplate bool `example:"false"`
 }
 
 func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) error {
@@ -417,8 +427,15 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 		if err != nil {
 			return errors.New("Invalid variables. Ensure that the variables are valid JSON")
 		}
-		return validateVariablesDefinitions(payload.Variables)
+		err = validateVariablesDefinitions(payload.Variables)
+		if err != nil {
+			return err
+		}
 	}
+
+	edgeTemplate, _ := request.RetrieveBooleanMultiPartFormValue(r, "EdgeTemplate", true)
+	payload.EdgeTemplate = edgeTemplate
+
 	return nil
 }
 
@@ -442,7 +459,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /custom_templates/file [post]
+// @router /custom_templates/create/file [post]
 func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*portainer.CustomTemplate, error) {
 	payload := &customTemplateFromFileUploadPayload{}
 	err := payload.Validate(r)
@@ -452,15 +469,16 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:          portainer.CustomTemplateID(customTemplateID),
-		Title:       payload.Title,
-		Description: payload.Description,
-		Note:        payload.Note,
-		Platform:    payload.Platform,
-		Type:        payload.Type,
-		Logo:        payload.Logo,
-		EntryPoint:  filesystem.ComposeFileDefaultName,
-		Variables:   payload.Variables,
+		ID:           portainer.CustomTemplateID(customTemplateID),
+		Title:        payload.Title,
+		Description:  payload.Description,
+		Note:         payload.Note,
+		Platform:     payload.Platform,
+		Type:         payload.Type,
+		Logo:         payload.Logo,
+		EntryPoint:   filesystem.ComposeFileDefaultName,
+		Variables:    payload.Variables,
+		EdgeTemplate: payload.EdgeTemplate,
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
@@ -471,4 +489,30 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 	customTemplate.ProjectPath = projectPath
 
 	return customTemplate, nil
+}
+
+// @id CustomTemplateCreate
+// @summary Create a custom template
+// @description Create a custom template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @accept json,multipart/form-data
+// @produce json
+// @param method query string true "method for creating template" Enums(string, file, repository)
+// @param body body object true "for body documentation see the relevant /custom_templates/{method} endpoint"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @deprecated
+// @router /custom_templates [post]
+func deprecatedCustomTemplateCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
+	method, err := request.RetrieveQueryParameter(r, "method", false)
+	if err != nil {
+		return "", httperror.BadRequest("Invalid query parameter: method", err)
+	}
+
+	url := fmt.Sprintf("/custom_templates/create/%s", method)
+	return url, nil
 }

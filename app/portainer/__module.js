@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-
 import featureFlagModule from '@/react/portainer/feature-flags';
 
 import './rbac';
@@ -13,19 +11,7 @@ import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
 import { helpersModule } from './helpers';
 
-async function initAuthentication(authManager, Authentication, $rootScope, $state) {
-  authManager.checkAuthOnRefresh();
-  // The unauthenticated event is broadcasted by the jwtInterceptor when
-  // hitting a 401. We're using this instead of the usual combination of
-  // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
-  // to have more controls on which URL should trigger the unauthenticated state.
-  $rootScope.$on('unauthenticated', function (event, data) {
-    if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/') && isTransitionRequiresAuthentication($state.transition)) {
-      $state.go('portainer.logout', { error: 'Your session has expired' });
-      window.location.reload();
-    }
-  });
-
+async function initAuthentication(Authentication) {
   return await Authentication.init();
 }
 
@@ -50,14 +36,14 @@ angular
       var root = {
         name: 'root',
         abstract: true,
-        onEnter: /* @ngInject */ function onEnter($async, StateManager, Authentication, Notifications, authManager, $rootScope, $state) {
+        onEnter: /* @ngInject */ function onEnter($async, StateManager, Authentication, Notifications, $state) {
           return $async(async () => {
             const appState = StateManager.getState();
             if (!appState.loading) {
               return;
             }
             try {
-              const loggedIn = await initAuthentication(authManager, Authentication, $rootScope, $state);
+              const loggedIn = await initAuthentication(Authentication);
               await StateManager.initialize();
               if (!loggedIn && isTransitionRequiresAuthentication($state.transition)) {
                 $state.go('portainer.logout');
@@ -121,6 +107,9 @@ angular
             controller: 'AccountController',
           },
         },
+        data: {
+          docs: '/user/account-settings',
+        },
       };
 
       const tokenCreation = {
@@ -154,7 +143,6 @@ angular
         url: '/logout',
         params: {
           error: '',
-          performApiLogout: false,
         },
         views: {
           'content@': {
@@ -173,6 +161,9 @@ angular
           'content@': {
             component: 'environmentsListView',
           },
+        },
+        data: {
+          docs: '/admin/environments',
         },
       };
 
@@ -263,6 +254,9 @@ angular
             controller: 'GroupsController',
           },
         },
+        data: {
+          docs: '/admin/environments/groups',
+        },
       };
 
       var group = {
@@ -306,6 +300,9 @@ angular
             component: 'homeView',
           },
         },
+        data: {
+          docs: '/user/home',
+        },
       };
 
       var init = {
@@ -337,6 +334,9 @@ angular
             controller: 'RegistriesController',
           },
         },
+        data: {
+          docs: '/admin/registries',
+        },
       };
 
       var registry = {
@@ -367,6 +367,9 @@ angular
             component: 'settingsView',
           },
         },
+        data: {
+          docs: '/admin/settings',
+        },
       };
 
       var settingsAuthentication = {
@@ -378,6 +381,9 @@ angular
             controller: 'SettingsAuthenticationController',
           },
         },
+        data: {
+          docs: '/admin/settings/authentication',
+        },
       };
 
       var settingsEdgeCompute = {
@@ -387,6 +393,9 @@ angular
           'content@': {
             component: 'settingsEdgeComputeView',
           },
+        },
+        data: {
+          docs: '/admin/settings/edge',
         },
       };
 
@@ -399,6 +408,9 @@ angular
             controller: 'TagsController',
           },
         },
+        data: {
+          docs: '/admin/environments/tags',
+        },
       };
 
       var users = {
@@ -410,6 +422,9 @@ angular
             controller: 'UsersController',
           },
         },
+        data: {
+          docs: '/admin/users',
+        },
       };
 
       var user = {
@@ -419,6 +434,16 @@ angular
           'content@': {
             templateUrl: './views/users/edit/user.html',
             controller: 'UserController',
+          },
+        },
+      };
+
+      const createHelmRepository = {
+        name: 'portainer.account.createHelmRepository',
+        url: '/helm-repository/new',
+        views: {
+          'content@': {
+            component: 'createHelmRepositoryView',
           },
         },
       };
@@ -454,6 +479,7 @@ angular
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);
+      $stateRegistryProvider.register(createHelmRepository);
     },
   ]);
 

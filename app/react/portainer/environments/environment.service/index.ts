@@ -8,6 +8,7 @@ import {
   StatusType as EdgeStackStatusType,
 } from '@/react/edge/edge-stacks/types';
 
+import { getPublicSettings } from '../../settings/settings.service';
 import type {
   Environment,
   EnvironmentId,
@@ -32,6 +33,7 @@ export interface BaseEnvironmentsQueryParams {
   types?: EnvironmentType[] | readonly EnvironmentType[];
   tagIds?: TagId[];
   endpointIds?: EnvironmentId[];
+  excludeIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
   groupIds?: EnvironmentGroupId[];
   status?: EnvironmentStatus[];
@@ -128,6 +130,20 @@ export async function snapshotEndpoints() {
   } catch (e) {
     throw parseAxiosError(e as Error);
   }
+}
+
+export async function getDeploymentOptions(environmentId: EnvironmentId) {
+  const publicSettings = await getPublicSettings();
+  const endpoint = await getEndpoint(environmentId);
+
+  if (
+    publicSettings.GlobalDeploymentOptions.perEnvOverride &&
+    endpoint.DeploymentOptions?.overrideGlobalOptions
+  ) {
+    return endpoint.DeploymentOptions;
+  }
+
+  return publicSettings.GlobalDeploymentOptions;
 }
 
 export async function snapshotEndpoint(id: EnvironmentId) {

@@ -54,11 +54,12 @@ function CreateView() {
       <PageHeader
         title="Update & Rollback"
         breadcrumbs="Edge agent update and rollback"
+        reload
       />
 
       <BetaAlert
-        className="ml-[15px] mb-2"
-        message="Beta feature - currently limited to standalone Linux and Nomad edge devices."
+        className="mb-2 ml-[15px]"
+        message="Beta feature - currently limited to standalone Linux edge devices."
       />
 
       <div className="row">

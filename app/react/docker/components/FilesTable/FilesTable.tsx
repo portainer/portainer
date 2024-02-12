@@ -7,8 +7,9 @@ import { Datatable } from '@@/datatables';
 import { BasicTableSettings } from '@@/datatables/types';
 import { Button } from '@@/buttons';
 import { TableState } from '@@/datatables/useTableState';
+import { withMeta } from '@@/datatables/extend-options/withMeta';
 
-import { FileData, FilesTableMeta } from './types';
+import { FileData } from './types';
 import { columns } from './columns';
 
 interface Props {
@@ -72,14 +73,19 @@ export function FilesTable({
   }
 
   return (
-    <Datatable<FileData, FilesTableMeta>
+    <Datatable<FileData>
       title={title}
       titleIcon={FileIcon}
       dataset={isRoot ? dataset : [goToParent(onGoToParent), ...dataset]}
       settingsManager={tableState}
       columns={columns}
       getRowId={(row) => row.Name}
-      meta={{
+      initialTableState={{
+        columnVisibility: {
+          Dir: false,
+        },
+      }}
+      extendTableOptions={withMeta({
         table: 'files',
         isEdit,
         setIsEdit,
@@ -87,12 +93,7 @@ export function FilesTable({
         onBrowse,
         onDownload,
         onDelete,
-      }}
-      initialTableState={{
-        columnVisibility: {
-          Dir: false,
-        },
-      }}
+      })}
       disableSelect
       renderTableActions={() => {
         if (!isUploadAllowed) {

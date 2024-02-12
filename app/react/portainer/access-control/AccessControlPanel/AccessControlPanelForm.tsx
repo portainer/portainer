@@ -30,7 +30,7 @@ interface Props {
   resourceType: ResourceControlType;
   resourceId: ResourceId;
   resourceControl?: ResourceControlViewModel;
-  environmentId?: EnvironmentId;
+  environmentId: EnvironmentId;
   onCancelClick(): void;
   onUpdateSuccess(): Promise<void>;
 }

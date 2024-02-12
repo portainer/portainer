@@ -6,7 +6,7 @@ import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
 export interface Tab {
-  name: string;
+  name: ReactNode;
   icon: ReactNode;
   widget: ReactNode;
   selectedTabParam: string;
@@ -17,6 +17,7 @@ interface Props {
   tabs: Tab[];
 }
 
+// https://www.figma.com/file/g5TUMngrblkXM7NHSyQsD1/New-UI?type=design&node-id=148-2676&mode=design&t=JKyBWBupeC5WADk6-0
 export function WidgetTabs({ currentTabIndex, tabs }: Props) {
   // ensure that the selectedTab param is always valid
   const invalidQueryParamValue = tabs.every(
@@ -37,10 +38,13 @@ export function WidgetTabs({ currentTabIndex, tabs }: Props) {
               params={{ tab: tabs[index].selectedTabParam }}
               key={index}
               className={clsx(
-                'inline-flex items-center gap-2 border-0 border-b-2 border-solid bg-transparent px-4 py-2',
-                currentTabIndex === index
-                  ? 'border-blue-8  text-blue-8 th-highcontrast:border-blue-6 th-highcontrast:text-blue-6 th-dark:border-blue-6 th-dark:text-blue-6'
-                  : 'border-transparent'
+                'inline-flex items-center gap-2 border-0 border-b-2 border-solid bg-transparent px-4 py-2 hover:no-underline',
+                {
+                  'border-blue-8  text-blue-8 th-highcontrast:border-blue-6 th-highcontrast:text-blue-6 th-dark:border-blue-6 th-dark:text-blue-6':
+                    currentTabIndex === index,
+                  'border-transparent text-gray-7 hover:text-gray-8 th-highcontrast:text-gray-6 hover:th-highcontrast:text-gray-5 th-dark:text-gray-6 hover:th-dark:text-gray-5':
+                    currentTabIndex !== index,
+                }
               )}
             >
               <Icon icon={icon} />

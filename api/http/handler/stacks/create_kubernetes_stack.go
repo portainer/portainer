@@ -4,19 +4,20 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 type kubernetesStringDeploymentPayload struct {
@@ -93,9 +94,7 @@ func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) erro
 	if govalidator.IsNull(payload.StackFileContent) {
 		return errors.New("Invalid stack file content")
 	}
-	if govalidator.IsNull(payload.StackName) {
-		return errors.New("Invalid stack name")
-	}
+
 	return nil
 }
 
@@ -112,18 +111,12 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
-	if govalidator.IsNull(payload.StackName) {
-		return errors.New("Invalid stack name")
-	}
 	return nil
 }
 
 func (payload *kubernetesManifestURLDeploymentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ManifestURL) || !govalidator.IsURL(payload.ManifestURL) {
 		return errors.New("Invalid manifest URL")
-	}
-	if govalidator.IsNull(payload.StackName) {
-		return errors.New("Invalid stack name")
 	}
 	return nil
 }
@@ -160,13 +153,6 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
-	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: stackutils.ErrStackAlreadyExists}
-	}
 
 	stackPayload := createStackPayloadFromK8sFileContentPayload(payload.StackName, payload.Namespace, payload.StackFileContent, payload.ComposeFormat, payload.FromAppTemplate)
 
@@ -175,6 +161,14 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		handler.StackDeployer,
 		handler.KubernetesDeployer,
 		user)
+
+	// Refresh ECR registry secret if needed
+	// RefreshEcrSecret method checks if the namespace has any ECR registry
+	// otherwise return nil
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	if err == nil {
+		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace)
+	}
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
 	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
@@ -217,13 +211,6 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
-	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: stackutils.ErrStackAlreadyExists}
-	}
 
 	//make sure the webhook ID is unique
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
@@ -232,7 +219,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		}
 		if !isUnique {
-			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: stackutils.ErrWebhookIDAlreadyExists}
+			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
 		}
 	}
 
@@ -294,13 +281,6 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	user, err := handler.DataStore.User().Read(userID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load user information from the database", err)
-	}
-	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: stackutils.ErrStackAlreadyExists}
 	}
 
 	stackPayload := createStackPayloadFromK8sUrlPayload(payload.StackName,

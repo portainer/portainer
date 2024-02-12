@@ -18,7 +18,9 @@
 }
 
 .switch i {
-  background: var(--bg-switch-box-color);
+  @apply bg-gray-6;
+  @apply th-dark:bg-gray-warm-8;
+  @apply th-highcontrast:bg-gray-warm-8;
 }
 
 .table > thead > tr > th,
@@ -83,13 +85,6 @@ fieldset[disabled] .form-control {
 code {
   color: var(--text-code-color);
   background-color: var(--bg-code-color);
-}
-
-.nav-container {
-  border: 1px solid var(--border-nav-container-color);
-  background-color: var(--bg-nav-container-color);
-  border-radius: 8px;
-  padding: 10px;
 }
 
 .nav-tabs {
@@ -243,6 +238,12 @@ textarea {
   background: var(--text-input-textarea);
 }
 
+[theme='highcontrast'] input,
+[theme='highcontrast'] select,
+[theme='highcontrast'] textarea {
+  border: 1px solid var(--white-color);
+}
+
 .daterangepicker {
   background-color: var(--bg-daterangepicker-color);
   border: 1px solid var(--border-daterangepicker-color);
@@ -354,23 +355,48 @@ input:-webkit-autofill {
   border-left: 8px solid var(--bg-tooltip-color);
 }
 
+[theme='highcontrast'] .tippy-box[data-placement^='top'] > .tippy-arrow:before {
+  border-top: 8px solid var(--white-color);
+  margin-bottom: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+  border-bottom: 8px solid var(--white-color);
+  margin-top: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--white-color);
+  margin-left: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='left'] > .tippy-arrow:before {
+  border-left: 8px solid var(--white-color);
+  margin-right: -1px;
+}
+
 /* Sidebar */
 .sidebar .tippy-box {
   font-size: 12px;
 }
 
-.sidebar .tippy-box[data-placement^='right'] > .tippy-arrow {
+.sidebar.tippy-box[data-placement^='right'] > .tippy-arrow {
   width: 12px;
   height: 12px;
+  margin-left: -1px;
 }
 
-.sidebar .tippy-box[data-placement^='right'] > .tippy-arrow:before {
-  border-right: 8px solid var(--ui-gray-9);
+.sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-blue-9);
   border-width: 6px 8px 6px 0;
 }
 
-[theme='dark'] .sidebar .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+[theme='dark'] .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
   border-right: 8px solid var(--ui-gray-true-9);
+}
+
+[theme='highcontrast'] .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-white);
 }
 
 .sidebar .tippy-content {

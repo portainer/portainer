@@ -7,7 +7,7 @@ import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
+import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/useIngressControllerClassMap';
 
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -26,6 +26,7 @@ class KubernetesCreateResourcePoolController {
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
+    this.EndpointService = EndpointService;
     this.LBQuotaFeatureId = FeatureId.K8S_RESOURCE_POOL_LB_QUOTA;
 
     this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
@@ -175,7 +176,7 @@ class KubernetesCreateResourcePoolController {
   $onInit() {
     return this.$async(async () => {
       try {
-        const endpoint = this.endpoint;
+        const endpoint = await this.EndpointService.endpoint(this.endpoint.Id);
         this.defaults = KubernetesResourceQuotaDefaults;
         this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
         this.formValues.EndpointId = this.endpoint.Id;
@@ -201,6 +202,7 @@ class KubernetesCreateResourcePoolController {
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
           this.ingressControllers = await getIngressControllerClassMap({ environmentId: this.endpoint.Id, allowedOnly: true });
+          this.initialIngressControllers = structuredClone(this.ingressControllers);
         }
 
         _.forEach(nodes, (item) => {

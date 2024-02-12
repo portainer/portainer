@@ -43,7 +43,7 @@ export function TeamsField({
         />
       ) : (
         <span className="small text-muted">
-          You have not yet created any teams. Head over to the
+          You have not yet created any teams. Head over to the{' '}
           <Link to="portainer.teams">Teams view</Link> to manage teams.
         </span>
       )}

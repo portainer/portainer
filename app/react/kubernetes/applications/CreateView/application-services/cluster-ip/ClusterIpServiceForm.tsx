@@ -7,8 +7,9 @@ import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector
 import { Button } from '@@/buttons';
 import { Card } from '@@/Card';
 import { Widget } from '@@/Widget';
+import { isErrorType } from '@@/form-components/formikUtils';
 
-import { isErrorType, newPort } from '../utils';
+import { newPort } from '../utils';
 import {
   ServiceFormValues,
   ServicePort,
@@ -87,10 +88,7 @@ export function ClusterIpServiceForm({
                         value={servicePort.targetPort}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           const newServicePorts = [...servicePorts];
-                          const newValue =
-                            e.target.value === ''
-                              ? undefined
-                              : Number(e.target.value);
+                          const newValue = e.target.valueAsNumber;
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
                             targetPort: newValue,
@@ -112,10 +110,7 @@ export function ClusterIpServiceForm({
                           const newServicePorts = [...servicePorts];
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
-                            port:
-                              e.target.value === ''
-                                ? undefined
-                                : Number(e.target.value),
+                            port: e.target.valueAsNumber,
                           };
                           onChangePort(newServicePorts);
                         }}

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/rs/zerolog/log"
 	lock "github.com/viney-shih/go-lock"

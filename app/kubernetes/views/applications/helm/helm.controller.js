@@ -16,7 +16,7 @@ export default class KubernetesHelmApplicationController {
   async getHelmApplication() {
     try {
       this.state.dataLoading = true;
-      const releases = await this.HelmService.listReleases(this.endpoint.Id, { selector: `name=${this.state.params.name}`, namespace: this.state.params.namespace });
+      const releases = await this.HelmService.listReleases(this.endpoint.Id, { filter: `^${this.state.params.name}$`, namespace: this.state.params.namespace });
       if (releases.length > 0) {
         this.state.release = releases[0];
       } else {

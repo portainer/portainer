@@ -21,8 +21,6 @@ import { onStartupAngular } from './app';
 import { configApp } from './config';
 import { constantsModule } from './ng-constants';
 
-import { nomadModule } from './nomad';
-
 initFeatureService(Edition[process.env.PORTAINER_EDITION]);
 
 angular
@@ -36,7 +34,6 @@ angular
     'ngResource',
     'angularUtils.directives.dirPagination',
     'LocalStorageModule',
-    'angular-jwt',
     'angular-json-tree',
     'angular-loading-bar',
     'angular-clipboard',
@@ -47,7 +44,6 @@ angular
     azureModule,
     'portainer.docker',
     'portainer.kubernetes',
-    nomadModule,
     'portainer.edge',
     'rzModule',
     'moment-picker',

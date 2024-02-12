@@ -21,6 +21,7 @@ const (
 	tunnelCleanupInterval = 10 * time.Second
 	requiredTimeout       = 15 * time.Second
 	activeTimeout         = 4*time.Minute + 30*time.Second
+	pingTimeout           = 3 * time.Second
 )
 
 // Service represents a service to manage the state of multiple reverse tunnels.
@@ -59,14 +60,18 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 	}
 
 	httpClient := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: pingTimeout,
 	}
 
 	resp, err := httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+
 	io.Copy(io.Discard, resp.Body)
 	resp.Body.Close()
 
-	return err
+	return nil
 }
 
 // KeepTunnelAlive keeps the tunnel of the given environment for maxAlive duration, or until ctx is done
@@ -75,10 +80,11 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 		log.Debug().
 			Int("endpoint_id", int(endpointID)).
 			Float64("max_alive_minutes", maxAlive.Minutes()).
-			Msg("start")
+			Msg("KeepTunnelAlive: start")
 
 		maxAliveTicker := time.NewTicker(maxAlive)
 		defer maxAliveTicker.Stop()
+
 		pingTicker := time.NewTicker(tunnelCleanupInterval)
 		defer pingTicker.Stop()
 
@@ -91,13 +97,13 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 					log.Debug().
 						Int("endpoint_id", int(endpointID)).
 						Err(err).
-						Msg("ping agent")
+						Msg("KeepTunnelAlive: ping agent")
 				}
 			case <-maxAliveTicker.C:
 				log.Debug().
 					Int("endpoint_id", int(endpointID)).
 					Float64("timeout_minutes", maxAlive.Minutes()).
-					Msg("tunnel keep alive timeout")
+					Msg("KeepTunnelAlive: tunnel keep alive timeout")
 
 				return
 			case <-ctx.Done():
@@ -105,7 +111,7 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 				log.Debug().
 					Int("endpoint_id", int(endpointID)).
 					Err(err).
-					Msg("tunnel stop")
+					Msg("KeepTunnelAlive: tunnel stop")
 
 				return
 			}
@@ -126,8 +132,8 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotService por
 	}
 
 	config := &chserver.Config{
-		Reverse:        true,
-		PrivateKeyFile: privateKeyFile,
+		Reverse: true,
+		KeyFile: privateKeyFile,
 	}
 
 	chiselServer, err := chserver.NewServer(config)

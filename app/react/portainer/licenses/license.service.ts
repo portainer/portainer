@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { AxiosError } from 'axios';
 
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { License, LicenseInfo } from './types';
 
@@ -25,8 +25,7 @@ export async function getLicenses() {
 
     return data;
   } catch (e) {
-    const axiosError = e as AxiosError;
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e);
   }
 }
 
@@ -55,7 +54,7 @@ export async function attachLicense(licenseKeys: string[]) {
         'Your session has expired, please refresh the browser and log in again.'
       );
     }
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e);
   }
 }
 
@@ -76,8 +75,7 @@ export async function removeLicense(licenseKeys: string[]) {
     getLicenseInfo();
     return data;
   } catch (e) {
-    const axiosError = e as AxiosError;
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e);
   }
 }
 
@@ -105,8 +103,7 @@ export async function getLicenseInfo() {
 
     return info;
   } catch (e) {
-    const axiosError = e as AxiosError;
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e);
   }
 }
 

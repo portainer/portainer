@@ -9,7 +9,9 @@ import {
   KubernetesPortainerApplicationNote,
 } from 'Kubernetes/models/application/models';
 
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes, KubernetesPodEviction } from 'Kubernetes/pod/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { createPayloadFactory } from './payloads/create';
 
 function computeStatus(statuses) {
@@ -100,6 +102,32 @@ function computeContainers(data) {
 }
 
 export default class KubernetesPodConverter {
+  static applicationFormValuesToPod(formValues, volumeClaims) {
+    let serviceSelector = {};
+    if (formValues.Services.length) {
+      serviceSelector = formValues.Services[0].Selector || { app: formValues.Name };
+    }
+
+    const res = new KubernetesPod();
+    res.Namespace = formValues.ResourcePool.Namespace.Name;
+    res.Name = formValues.Name;
+    res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    res.ApplicationOwner = formValues.ApplicationOwner;
+    res.ApplicationName = formValues.Name;
+    res.ImageModel = formValues.ImageModel;
+    res.CpuLimit = formValues.CpuLimit;
+    res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
+    res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
+    res.Containers = formValues.Containers;
+    res.ApplicationType = formValues.ApplicationType;
+    res.ServiceSelector = serviceSelector;
+    res.Labels = formValues.Labels;
+    KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
+    KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.ConfigMaps, formValues.Secrets);
+    KubernetesApplicationHelper.generateAffinityFromPlacements(res, formValues);
+    return res;
+  }
+
   static apiToModel(data) {
     const res = new KubernetesPod();
     res.Id = data.metadata.uid;
@@ -115,6 +143,7 @@ export default class KubernetesPodConverter {
     res.Affinity = computeAffinity(data.spec.affinity);
     res.NodeSelector = data.spec.nodeSelector;
     res.Tolerations = computeTolerations(data.spec.tolerations);
+    res.Labels = data.metadata.labels;
     return res;
   }
 
@@ -137,9 +166,16 @@ function createPayload(pod) {
   const payload = createPayloadFactory();
   payload.metadata.name = pod.Name;
   payload.metadata.namespace = pod.Namespace;
-  payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
-  payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
-  payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pod.ApplicationOwner;
+  // it's possible for pods not to have labels. Keep labels empty in the oldpayload if there aren't any, otherwise patch will fail
+  // TODO: when migrating to react, the oldValues should just be the fetched manifest directly from the kube api
+  if (Object.keys(pod.Labels || {}).length || Object.keys(pod.ServiceSelector || {}).length) {
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pod.ApplicationOwner;
+    payload.metadata.labels = { ...(pod.Labels || {}), ...(pod.ServiceSelector || {}), ...payload.metadata.labels };
+  } else {
+    payload.metadata.labels = undefined;
+  }
   if (pod.Note) {
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = pod.Note;
   } else {

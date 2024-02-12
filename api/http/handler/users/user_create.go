@@ -4,11 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type userCreatePayload struct {
@@ -58,7 +59,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
 	if user != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Another user with the same username already exists", Err: errUserAlreadyExists}
+		return httperror.Conflict("Another user with the same username already exists", errUserAlreadyExists)
 	}
 
 	user = &portainer.User{

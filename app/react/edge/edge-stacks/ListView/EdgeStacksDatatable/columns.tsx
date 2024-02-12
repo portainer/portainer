@@ -3,8 +3,9 @@ import _ from 'lodash';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { GitCommitLink } from '@/react/portainer/gitops/GitCommitLink';
 
-import { buildNameColumn } from '@@/datatables/NameCell';
+import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { Link } from '@@/Link';
 
 import { StatusType } from '../../types';
@@ -16,12 +17,7 @@ import { DeploymentCounter } from './DeploymentCounter';
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
 export const columns = _.compact([
-  buildNameColumn<DecoratedEdgeStack>(
-    'Name',
-    'Id',
-    'edge.stacks.edit',
-    'stackId'
-  ),
+  buildNameColumn<DecoratedEdgeStack>('Name', 'edge.stacks.edit', 'stackId'),
   columnHelper.accessor(
     (item) => item.aggregatedStatus[StatusType.Acknowledged] || 0,
     {
@@ -45,13 +41,19 @@ export const columns = _.compact([
       (item) => item.aggregatedStatus[StatusType.ImagesPulled] || 0,
       {
         header: 'Images pre-pulled',
-        cell: ({ getValue, row }) => (
-          <DeploymentCounter
-            count={getValue()}
-            type={StatusType.ImagesPulled}
-            total={row.original.NumDeployments}
-          />
-        ),
+        cell: ({ getValue, row: { original: item } }) => {
+          if (!item.PrePullImage) {
+            return <div className="text-center">-</div>;
+          }
+
+          return (
+            <DeploymentCounter
+              count={getValue()}
+              type={StatusType.ImagesPulled}
+              total={item.NumDeployments}
+            />
+          );
+        },
         enableSorting: false,
         enableHiding: false,
         meta: {
@@ -143,13 +145,10 @@ export const columns = _.compact([
           if (item.GitConfig) {
             return (
               <div className="text-center">
-                <a
-                  target="_blank"
-                  href={`${item.GitConfig.URL}/commit/${item.GitConfig.ConfigHash}`}
-                  rel="noreferrer"
-                >
-                  {item.GitConfig.ConfigHash.slice(0, 7)}
-                </a>
+                <GitCommitLink
+                  baseURL={item.GitConfig.URL}
+                  commitHash={item.GitConfig.ConfigHash}
+                />
               </div>
             );
           }

@@ -4,11 +4,10 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id RegistryInspect
