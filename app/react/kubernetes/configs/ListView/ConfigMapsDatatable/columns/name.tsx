@@ -1,11 +1,13 @@
 import { CellContext } from '@tanstack/react-table';
 
 import { Authorized } from '@/react/hooks/useUser';
+import { appOwnerLabel } from '@/react/kubernetes/applications/constants';
 
 import { Link } from '@@/Link';
 import { Badge } from '@@/Badge';
 
 import { ConfigMapRowData } from '../types';
+import { configurationOwnerUsernameLabel } from '../../../constants';
 
 import { columnHelper } from './helper';
 
@@ -16,8 +18,11 @@ export const name = columnHelper.accessor(
     const isSystemToken = name?.includes('default-token-');
     const isSystemConfigMap = isSystemToken || row.isSystem;
 
-    const hasConfigurationOwner =
-      !!row.metadata?.labels?.['io.portainer.kubernetes.configuration.owner'];
+    const hasConfigurationOwner = !!(
+      row.metadata?.labels?.[configurationOwnerUsernameLabel] ||
+      row.metadata?.labels?.[appOwnerLabel]
+    );
+
     return `${name} ${isSystemConfigMap ? 'system' : ''} ${
       !isSystemToken && !hasConfigurationOwner ? 'external' : ''
     } ${!row.inUse && !isSystemConfigMap ? 'unused' : ''}`;
