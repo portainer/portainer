@@ -226,7 +226,7 @@
                 <div ng-if="ctrl.formValues.ResourcePool">
                   <!-- #region STACK -->
                   <kube-stack-name
-                    ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    ng-if="!ctrl.deploymentOptions.hideStacksFunctionality"
                     stack-name="ctrl.formValues.StackName"
                     set-stack-name="(ctrl.onChangeStackName)"
                     stacks="ctrl.stacks"
