@@ -25,8 +25,13 @@ const (
 )
 
 func isAzureUrl(s string) bool {
-	return strings.Contains(s, azureDevOpsHost) ||
+	condition := strings.Contains(s, azureDevOpsHost) ||
 		strings.Contains(s, visualStudioHostSuffix)
+	azureDevOpsServerHost, azureDevOpsServerHostOK := os.LookupEnv("AZURE_DEVOPS_SERVER_HOST")
+	if azureDevOpsServerHostOK {
+		return condition || strings.Contains(s, azureDevOpsServerHost)
+	}
+	return condition
 }
 
 type azureOptions struct {
@@ -54,6 +59,18 @@ type azureClient struct {
 }
 
 func NewAzureClient() *azureClient {
+	azureDevOpsServerHost, azureDevOpsServerHostOK := os.LookupEnv("AZURE_DEVOPS_SERVER_HOST")
+	azureDevOpsServerBaseUrl, azureDevOpsServerBaseUrlOK := os.LookupEnv("AZURE_DEVOPS_SERVER_BASE_URL")
+	if azureDevOpsServerHostOK && azureDevOpsServerBaseUrlOK {
+		return &azureClient{
+			baseUrl: "https://" + azureDevOpsServerHost + "/" + azureDevOpsServerBaseUrl,
+		}
+	}
+	if azureDevOpsServerHostOK {
+		return &azureClient{
+			baseUrl: "https://" + azureDevOpsServerHost,
+		}
+	}
 	return &azureClient{
 		baseUrl: "https://dev.azure.com",
 	}
@@ -241,13 +258,24 @@ func parseHttpUrl(rawUrl string) (*azureOptions, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse HTTP url")
 	}
-
+	azureDevOpsServerHost, azureDevOpsServerHostOK := os.LookupEnv("AZURE_DEVOPS_SERVER_HOST")
+	azureDevOpsServerBaseUrl, azureDevOpsServerBaseUrlOK := os.LookupEnv("AZURE_DEVOPS_SERVER_BASE_URL")
 	opt := azureOptions{}
 	switch {
-	case u.Host == azureDevOpsHost:
+	case (u.Host == azureDevOpsHost) || (azureDevOpsServerHostOK && u.Host == azureDevOpsServerHost):
 		path := strings.Split(u.Path, "/")
+		if azureDevOpsServerBaseUrlOK {
+			path = strings.Split(strings.ReplaceAll(u.Path, azureDevOpsServerBaseUrl+"/", ""), "/")
+		}
 		if len(path) != 5 {
-			return nil, errors.Errorf("want url %s, got %s", expectedAzureDevOpsHttpUrl, u)
+			expectedUrl := expectedAzureDevOpsHttpUrl
+			if azureDevOpsServerHostOK && azureDevOpsServerBaseUrlOK {
+				expectedUrl = "https://" + azureDevOpsServerHost + "/" + azureDevOpsServerBaseUrl + "/Organisation/Project/_git/Repository"
+			}
+			if azureDevOpsServerHostOK {
+				expectedUrl = "https://" + azureDevOpsServerHost + "/Organisation/Project/_git/Repository"
+			}
+			return nil, errors.Errorf("want url %s, got %s", expectedUrl, u)
 		}
 		opt.organisation = path[1]
 		opt.project = path[2]
