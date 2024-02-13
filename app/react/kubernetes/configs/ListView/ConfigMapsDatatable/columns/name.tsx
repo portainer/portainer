@@ -40,10 +40,10 @@ function Cell({ row }: CellContext<ConfigMapRowData, string>) {
   const isSystemToken = name?.includes('default-token-');
   const isSystemConfigMap = isSystemToken || row.original.isSystem;
 
-  const hasConfigurationOwner =
-    !!row.original.metadata?.labels?.[
-      'io.portainer.kubernetes.configuration.owner'
-    ];
+  const hasConfigurationOwner = !!(
+    row.original.metadata?.labels?.[configurationOwnerUsernameLabel] ||
+    row.original.metadata?.labels?.[appOwnerLabel]
+  );
 
   return (
     <Authorized authorizations="K8sConfigMapsR" childrenUnauthorized={name}>
