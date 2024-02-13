@@ -13,6 +13,7 @@ type Props = {
   setStackName: (name: string) => void;
   stacks?: string[];
   inputClassName?: string;
+  textTip?: string;
 };
 
 export function StackName({
@@ -20,6 +21,7 @@ export function StackName({
   setStackName,
   stacks = [],
   inputClassName,
+  textTip = "Enter or select a 'stack' name to group multiple deployments together, or else leave empty to ignore.",
 }: Props) {
   const { isAdmin } = useCurrentUser();
   const stackResults = useMemo(
@@ -73,8 +75,7 @@ export function StackName({
       </div>
 
       <TextTip className="mb-4" color="blue">
-        Enter or select a &apos;stack&apos; name to group multiple deployments
-        together, or else leave empty to ignore.
+        {textTip}
       </TextTip>
       <div className="form-group">
         <label
