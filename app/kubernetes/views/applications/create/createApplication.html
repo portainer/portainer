@@ -169,6 +169,7 @@
                 ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
                 stack-name="ctrl.formValues.StackName"
                 set-stack-name="(ctrl.onChangeStackName)"
+                text-tip="'Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use the application name.'"
                 stacks="ctrl.stacks"
                 input-class-name="'col-lg-10 col-sm-9'"
               ></kube-stack-name>
@@ -226,9 +227,10 @@
                 <div ng-if="ctrl.formValues.ResourcePool">
                   <!-- #region STACK -->
                   <kube-stack-name
-                    ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    ng-if="!ctrl.deploymentOptions.hideStacksFunctionality"
                     stack-name="ctrl.formValues.StackName"
                     set-stack-name="(ctrl.onChangeStackName)"
+                    text-tip="'Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use the application name.'"
                     stacks="ctrl.stacks"
                     input-class-name="'col-lg-10 col-sm-9'"
                   ></kube-stack-name>
