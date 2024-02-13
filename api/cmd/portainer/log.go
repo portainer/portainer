@@ -42,6 +42,13 @@ func setLoggingMode(mode string) {
 			TimeFormat:    "2006/01/02 03:04PM",
 			FormatMessage: formatMessage,
 		})
+	case "NOCOLOR":
+		log.Logger = log.Output(zerolog.ConsoleWriter{
+			Out:           os.Stderr,
+			TimeFormat:    "2006/01/02 03:04PM",
+			FormatMessage: formatMessage,
+			NoColor:       true,
+		})
 	case "JSON":
 		log.Logger = log.Output(os.Stderr)
 	}
