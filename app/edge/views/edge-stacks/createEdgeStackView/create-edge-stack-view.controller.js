@@ -56,6 +56,7 @@ export default class CreateEdgeStackViewController {
       baseWebhookUrl: baseEdgeStackWebhookUrl(),
       isEdit: false,
       templateValues: getInitialTemplateValues(),
+      loading: false,
     };
 
     this.edgeGroups = null;
@@ -199,6 +200,8 @@ export default class CreateEdgeStackViewController {
   }
 
   async $onInit() {
+    this.state.loading = true;
+
     try {
       this.edgeGroups = await this.EdgeGroupService.groups();
     } catch (err) {
@@ -210,7 +213,6 @@ export default class CreateEdgeStackViewController {
     if (templateType && templateId && !Number.isNaN(templateId)) {
       this.preSelectTemplate(templateType, templateId);
     }
-
     this.$window.onbeforeunload = () => {
       if (this.state.Method === 'editor' && this.formValues.StackFileContent && this.state.isEditorDirty) {
         return '';
