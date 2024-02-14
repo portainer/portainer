@@ -63,7 +63,7 @@ export function CustomTemplatesList({
         )}
       />
 
-      <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]">
+      <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]" role="list">
         {pagedTemplates.map((template) => (
           <CustomTemplatesListItem
             key={template.Id}

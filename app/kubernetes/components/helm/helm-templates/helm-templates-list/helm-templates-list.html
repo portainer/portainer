@@ -30,7 +30,7 @@
     ></beta-alert>
   </div>
 
-  <div class="blocklist !px-0">
+  <div class="blocklist !px-0" role="list">
     <helm-templates-list-item
       ng-repeat="chart in allCharts = ($ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory)"
       model="chart"
