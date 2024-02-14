@@ -56,7 +56,6 @@ export default class CreateEdgeStackViewController {
       baseWebhookUrl: baseEdgeStackWebhookUrl(),
       isEdit: false,
       templateValues: getInitialTemplateValues(),
-      loading: false,
     };
 
     this.edgeGroups = null;
@@ -106,9 +105,6 @@ export default class CreateEdgeStackViewController {
       }
 
       if (type === 'custom') {
-        const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
-        this.state.templateValues.file = fileContent;
-
         this.formValues = {
           ...this.formValues,
           DeploymentType: template.Type === StackType.Kubernetes ? DeploymentType.Kubernetes : DeploymentType.Compose,
@@ -122,6 +118,9 @@ export default class CreateEdgeStackViewController {
               }
             : {}),
         };
+
+        const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
+        this.state.templateValues.file = fileContent;
       }
 
       if (type === 'app') {
@@ -200,8 +199,6 @@ export default class CreateEdgeStackViewController {
   }
 
   async $onInit() {
-    this.state.loading = true;
-
     try {
       this.edgeGroups = await this.EdgeGroupService.groups();
     } catch (err) {
@@ -213,6 +210,7 @@ export default class CreateEdgeStackViewController {
     if (templateType && templateId && !Number.isNaN(templateId)) {
       this.preSelectTemplate(templateType, templateId);
     }
+
     this.$window.onbeforeunload = () => {
       if (this.state.Method === 'editor' && this.formValues.StackFileContent && this.state.isEditorDirty) {
         return '';
