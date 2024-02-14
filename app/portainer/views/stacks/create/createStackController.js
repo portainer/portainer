@@ -302,10 +302,11 @@ angular
             $scope.state.selectedTemplate = template;
 
             try {
-              $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, template.GitConfig !== null);
+              const isGit = template.GitConfig !== null;
+              $scope.state.templateContent = await this.CustomTemplateService.customTemplateFile(templateId, isGit);
               onChangeFileContent($scope.state.templateContent);
 
-              $scope.state.isEditorReadOnly = false;
+              $scope.state.isEditorReadOnly = isGit;
             } catch (err) {
               $scope.state.templateLoadFailed = true;
               throw err;
