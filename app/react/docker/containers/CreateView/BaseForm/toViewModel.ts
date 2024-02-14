@@ -10,7 +10,7 @@ import { Values } from './BaseForm';
 
 export function toViewModel(
   config: ContainerResponse,
-  isAdmin: boolean,
+  isPureAdmin: boolean,
   currentUserId: UserId,
   nodeName: string,
   image: Values['image'],
@@ -18,7 +18,7 @@ export function toViewModel(
 ): Values {
   // accessControl shouldn't be copied to new container
 
-  const accessControl = parseAccessControlFormData(isAdmin, currentUserId);
+  const accessControl = parseAccessControlFormData(isPureAdmin, currentUserId);
 
   if (config.Portainer?.ResourceControl?.Public) {
     accessControl.ownership = ResourceControlOwnership.PUBLIC;
@@ -38,11 +38,11 @@ export function toViewModel(
 }
 
 export function getDefaultViewModel(
-  isAdmin: boolean,
+  isPureAdmin: boolean,
   currentUserId: UserId,
   nodeName: string
 ): Values {
-  const accessControl = parseAccessControlFormData(isAdmin, currentUserId);
+  const accessControl = parseAccessControlFormData(isPureAdmin, currentUserId);
 
   return {
     nodeName,

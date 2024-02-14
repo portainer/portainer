@@ -1,11 +1,14 @@
 import { useReducer } from 'react';
 import { Edit, Eye } from 'lucide-react';
 
-import { useUser } from '@/react/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
-import { useIsTeamLeader, useUserMembership } from '@/portainer/users/queries';
+import {
+  useIsCurrentUserTeamLeader,
+  useUserMembership,
+} from '@/portainer/users/queries';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -34,19 +37,26 @@ export function AccessControlPanel({
   onUpdateSuccess,
 }: Props) {
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
-  const { user, isAdmin } = useUser();
+  const isAdminQuery = useIsEdgeAdmin();
+  const isTeamLeader = useIsCurrentUserTeamLeader();
 
   const isInherited = checkIfInherited();
 
+  const restrictions = useRestrictions(resourceControl);
+
+  if (isAdminQuery.isLoading || !restrictions) {
+    return null;
+  }
+
   const { isPartOfRestrictedUsers, isLeaderOfAnyRestrictedTeams } =
-    useRestrictions(resourceControl);
+    restrictions;
+
+  const { isAdmin } = isAdminQuery;
 
   const isEditDisabled =
     disableOwnershipChange ||
     isInherited ||
     (!isAdmin && !isPartOfRestrictedUsers && !isLeaderOfAnyRestrictedTeams);
-
-  const isTeamLeader = useIsTeamLeader(user) as boolean;
 
   return (
     <TableContainer>
@@ -106,9 +116,15 @@ export function AccessControlPanel({
 }
 
 function useRestrictions(resourceControl?: ResourceControlViewModel) {
-  const { user, isAdmin } = useUser();
-
+  const { user } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
   const memberships = useUserMembership(user.Id);
+
+  if (isAdminQuery.isLoading) {
+    return undefined;
+  }
+
+  const { isAdmin } = isAdminQuery;
 
   if (!resourceControl || isAdmin) {
     return {

@@ -1,7 +1,7 @@
 import { Plus, RefreshCw } from 'lucide-react';
 import { FormikErrors } from 'formik';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -39,13 +39,20 @@ export function LoadBalancerServicesForm({
   namespace,
   isEditMode,
 }: Props) {
-  const { isAdmin } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
+
   const environmentId = useEnvironmentId();
   const { data: loadBalancerEnabled, ...loadBalancerEnabledQuery } =
     useEnvironment(
       environmentId,
       (environment) => environment?.Kubernetes.Configuration.UseLoadBalancer
     );
+
+  if (isAdminQuery.isLoading) {
+    return null;
+  }
+
+  const { isAdmin } = isAdminQuery;
 
   const loadBalancerServiceCount = services.filter(
     (service) => service.Type === 'LoadBalancer'

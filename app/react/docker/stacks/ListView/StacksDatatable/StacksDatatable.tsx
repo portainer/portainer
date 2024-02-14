@@ -1,7 +1,7 @@
 import { Layers } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 
-import { useAuthorizations, useCurrentUser } from '@/react/hooks/useUser';
+import { useAuthorizations, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
@@ -34,7 +34,7 @@ export function StacksDatatable({
 }) {
   const tableState = useTableState(settingsStore, tableKey);
   useRepeater(tableState.autoRefreshRate, onReload);
-  const { isAdmin } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
   const canManageStacks = useAuthorizations([
     'PortainerStackCreate',
     'PortainerStackDelete',
@@ -58,7 +58,7 @@ export function StacksDatatable({
       columns={columns}
       dataset={dataset}
       isRowSelectable={({ original: item }) =>
-        allowSelection(item, isAdmin, canManageStacks)
+        allowSelection(item, isAdminQuery.isAdmin, canManageStacks.authorized)
       }
       getRowId={(item) => item.Id.toString()}
       initialTableState={{

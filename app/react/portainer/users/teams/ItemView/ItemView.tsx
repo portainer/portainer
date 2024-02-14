@@ -1,7 +1,7 @@
 import { useRouter } from '@uirouter/react';
 
 import { useUsers } from '@/portainer/users/queries';
-import { useUser } from '@/react/hooks/useUser';
+import { useIsPureAdmin } from '@/react/hooks/useUser';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { TextTip } from '@@/Tip/TextTip';
@@ -16,7 +16,7 @@ import { useTeamIdParam } from './useTeamIdParam';
 export function ItemView() {
   const teamId = useTeamIdParam();
 
-  const { isAdmin } = useUser();
+  const isPureAdmin = useIsPureAdmin();
   const router = useRouter();
   const teamQuery = useTeam(teamId, () =>
     router.stateService.go('portainer.teams')
@@ -45,7 +45,7 @@ export function ItemView() {
         <Details
           team={team}
           memberships={membershipsQuery.data}
-          isAdmin={isAdmin}
+          isAdmin={isPureAdmin}
         />
       )}
 

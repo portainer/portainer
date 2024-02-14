@@ -1,5 +1,5 @@
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
@@ -15,8 +15,14 @@ export function useInitialValues({
   template: CustomTemplate;
   templateFile: string | undefined;
   isEdge: boolean;
-}): FormValues {
-  const { user, isAdmin } = useCurrentUser();
+}): FormValues | undefined {
+  const { user } = useCurrentUser();
+
+  const isAdminQuery = useIsEdgeAdmin();
+
+  if (isAdminQuery.isLoading) {
+    return undefined;
+  }
 
   return {
     Title: template.Title,
@@ -31,7 +37,7 @@ export function useInitialValues({
     AccessControl:
       !isEdge && template.ResourceControl
         ? parseAccessControlFormData(
-            isAdmin,
+            isAdminQuery.isAdmin,
             user.Id,
             new ResourceControlViewModel(template.ResourceControl)
           )

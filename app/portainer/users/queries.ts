@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
 
 import { TeamRole, TeamMembership } from '@/react/portainer/users/teams/types';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { User, UserId } from './types';
-import { isAdmin } from './user.helpers';
 import { getUserMemberships, getUsers } from './user.service';
 
 interface UseUserMembershipOptions<TSelect> {
@@ -22,14 +22,21 @@ export function useUserMembership<TSelect = TeamMembership[]>(
   );
 }
 
-export function useIsTeamLeader(user: User) {
+export function useIsCurrentUserTeamLeader() {
+  const { user } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
+
   const query = useUserMembership(user.Id, {
-    enabled: !isAdmin(user),
+    enabled: !isAdminQuery.isLoading && !isAdminQuery.isAdmin,
     select: (memberships) =>
       memberships.some((membership) => membership.Role === TeamRole.Leader),
   });
 
-  return isAdmin(user) ? true : query.data;
+  if (isAdminQuery.isLoading) {
+    return false;
+  }
+
+  return isAdminQuery.isAdmin ? true : !!query.data;
 }
 
 export function useUsers<T = User[]>(

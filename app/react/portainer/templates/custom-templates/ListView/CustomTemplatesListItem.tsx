@@ -1,6 +1,6 @@
 import { Edit, Trash2 } from 'lucide-react';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
@@ -22,8 +22,15 @@ export function CustomTemplatesListItem({
   isSelected: boolean;
   linkParams?: { to: string; params: object };
 }) {
-  const { isAdmin, user } = useCurrentUser();
-  const isEditAllowed = isAdmin || template.CreatedByUserId === user.Id;
+  const { user } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
+
+  if (isAdminQuery.isLoading) {
+    return null;
+  }
+
+  const isEditAllowed =
+    isAdminQuery.isAdmin || template.CreatedByUserId === user.Id;
 
   return (
     <TemplateItem

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { FormError } from '@@/form-components/FormError';
@@ -30,9 +30,10 @@ export function EditDetails({
   formNamespace,
   environmentId,
 }: Props) {
-  const { user, isAdmin } = useUser();
+  const { user, isPureAdmin } = useCurrentUser();
 
-  const { users, teams, isLoading } = useLoadState(environmentId, isAdmin);
+  const { users, teams, isLoading } = useLoadState(environmentId);
+
   const handleChange = useCallback(
     (partialValues: Partial<typeof values>) => {
       onChange({ ...values, ...partialValues });
@@ -41,7 +42,12 @@ export function EditDetails({
     [values, onChange]
   );
 
-  if (isLoading || !teams || (isAdmin && !users) || !values.authorizedUsers) {
+  if (
+    isLoading ||
+    !teams ||
+    (isPureAdmin && !users) ||
+    !values.authorizedUsers
+  ) {
     return null;
   }
 
@@ -51,14 +57,14 @@ export function EditDetails({
         onChange={handleChangeOwnership}
         name={withNamespace('ownership')}
         value={values.ownership}
-        isAdmin={isAdmin}
+        isAdmin={isPureAdmin}
         isPublicVisible={isPublicVisible}
         teams={teams}
       />
 
       {values.ownership === ResourceControlOwnership.RESTRICTED && (
         <div aria-label="extra-options">
-          {isAdmin && (
+          {isPureAdmin && (
             <UsersField
               name={withNamespace('authorizedUsers')}
               users={users || []}
@@ -68,12 +74,12 @@ export function EditDetails({
             />
           )}
 
-          {(isAdmin || teams.length > 1) && (
+          {(isPureAdmin || teams.length > 1) && (
             <TeamsField
               name={withNamespace('authorizedTeams')}
               teams={teams}
               overrideTooltip={
-                !isAdmin && teams.length > 1
+                !isPureAdmin && teams.length > 1
                   ? 'As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource.'
                   : undefined
               }
@@ -111,7 +117,7 @@ export function EditDetails({
       // Non admin team leaders/members under only one team can
       // automatically grant the resource access to all members
       // under the team
-      if (!isAdmin && teams && teams.length === 1) {
+      if (!isPureAdmin && teams && teams.length === 1) {
         authorizedTeams = teams.map((team) => team.Id);
       }
     }

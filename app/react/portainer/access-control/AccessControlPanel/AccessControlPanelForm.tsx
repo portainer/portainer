@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useMutation } from 'react-query';
 import { object } from 'yup';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -43,7 +43,8 @@ export function AccessControlPanelForm({
   onCancelClick,
   onUpdateSuccess,
 }: Props) {
-  const { isAdmin, user } = useCurrentUser();
+  const { user } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
 
   const updateAccess = useMutation(
     (variables: AccessControlFormData) =>
@@ -62,6 +63,12 @@ export function AccessControlPanelForm({
       },
     }
   );
+
+  if (isAdminQuery.isLoading) {
+    return null;
+  }
+
+  const { isAdmin } = isAdminQuery;
 
   const initialValues = {
     accessControl: parseAccessControlFormData(

@@ -1,4 +1,5 @@
 import { getCurrentUser } from '../users/queries/useLoadCurrentUser';
+import * as userHelpers from '../users/user.helpers';
 import { clear as clearSessionStorage } from './session-storage';
 
 const DEFAULT_USER = 'admin';
@@ -25,6 +26,9 @@ angular.module('portainer.app').factory('Authentication', [
     service.isAuthenticated = isAuthenticated;
     service.getUserDetails = getUserDetails;
     service.isAdmin = isAdmin;
+    service.isEdgeAdmin = isEdgeAdmin;
+    service.isPureAdmin = isPureAdmin;
+    service.hasAuthorizations = hasAuthorizations;
 
     async function initAsync() {
       try {
@@ -120,8 +124,36 @@ angular.module('portainer.app').factory('Authentication', [
       return login(DEFAULT_USER, DEFAULT_PASSWORD);
     }
 
+    // To avoid creating divergence between CE and EE
+    // isAdmin checks if the user is a portainer admin or edge admin
+    function isEdgeAdmin() {
+      const environment = EndpointProvider.currentEndpoint();
+      return userHelpers.isEdgeAdmin({ Role: user.role }, environment);
+    }
+
+    /**
+     * @deprecated use Authentication.isAdmin instead
+     */
     function isAdmin() {
-      return !!user && user.role === 1;
+      return isEdgeAdmin();
+    }
+
+    // To avoid creating divergence between CE and EE
+    // isPureAdmin checks if the user is portainer admin only
+    function isPureAdmin() {
+      return userHelpers.isPureAdmin({ Role: user.role });
+    }
+
+    function hasAuthorizations(authorizations) {
+      const endpointId = EndpointProvider.endpointID();
+      if (isAdmin()) {
+        return true;
+      }
+      if (!user.endpointAuthorizations || !user.endpointAuthorizations[endpointId]) {
+        return false;
+      }
+      const userEndpointAuthorizations = user.endpointAuthorizations[endpointId];
+      return authorizations.some((authorization) => userEndpointAuthorizations[authorization]);
     }
 
     if (process.env.NODE_ENV === 'development') {

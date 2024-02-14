@@ -64,7 +64,7 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
 
     this.$onInit = $onInit;
     function $onInit() {
-      var isAdmin = Authentication.isAdmin();
+      var isAdmin = Authentication.isPureAdmin();
       ctrl.isAdmin = isAdmin;
 
       if (isAdmin) {
