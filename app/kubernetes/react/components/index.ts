@@ -26,6 +26,7 @@ import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
 import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
+import { StackNameLabelInsight } from '@/react/kubernetes/DeployView/StackName/StackNameLabelInsight';
 import { SecretsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/SecretsFormSection';
 import { configurationsValidationSchema } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/configurationValidationSchema';
 import { ConfigMapsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/ConfigMapsFormSection';
@@ -143,6 +144,10 @@ export const ngModule = angular
       ),
       ['setStackName', 'stackName', 'stacks', 'inputClassName', 'textTip']
     )
+  )
+  .component(
+    'stackNameLabelInsight',
+    r2a(withUIRouter(withCurrentUser(StackNameLabelInsight)), [])
   )
   .component(
     'editYamlFormSection',
