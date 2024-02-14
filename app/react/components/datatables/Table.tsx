@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PropsWithChildren } from 'react';
+import { AriaAttributes, PropsWithChildren } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -14,23 +14,21 @@ import { TableHeaderCell } from './TableHeaderCell';
 import { TableHeaderRow } from './TableHeaderRow';
 import { TableRow } from './TableRow';
 
-interface Props extends AutomationTestingProps {
+interface Props extends AutomationTestingProps, AriaAttributes {
   className?: string;
 }
 
 function MainComponent({
   children,
   className,
-  'data-cy': dataCy,
+  ...props
 }: PropsWithChildren<Props>) {
   return (
     <div className="table-responsive">
       <table
-        data-cy={dataCy}
-        className={clsx(
-          'table-hover table-filters nowrap-cells table',
-          className
-        )}
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...props}
+        className={clsx('table-hover table-filters table', className)}
       >
         {children}
       </table>

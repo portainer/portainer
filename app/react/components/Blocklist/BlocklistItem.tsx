@@ -28,6 +28,7 @@ export function BlocklistItem<T extends ElementType>({
           'blocklist-item--selected': isSelected,
         }
       )}
+      role="listitem"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     >

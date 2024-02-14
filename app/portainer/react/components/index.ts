@@ -184,6 +184,7 @@ export const ngModule = angular
       'components',
       'isLoading',
       'noOptionsMessage',
+      'aria-label',
     ])
   )
   .component(

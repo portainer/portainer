@@ -11,6 +11,7 @@ interface Props<D extends DefaultType> extends AutomationTestingProps {
   onSortChange?(colId: string, desc: boolean): void;
   isLoading?: boolean;
   emptyContentLabel?: string;
+  'aria-label'?: string;
 }
 
 export function DatatableContent<D extends DefaultType>({
@@ -20,12 +21,13 @@ export function DatatableContent<D extends DefaultType>({
   isLoading,
   emptyContentLabel,
   'data-cy': dataCy,
+  'aria-label': ariaLabel,
 }: Props<D>) {
   const headerGroups = tableInstance.getHeaderGroups();
   const pageRowModel = tableInstance.getPaginationRowModel();
 
   return (
-    <Table data-cy={dataCy} className="nowrap-cells">
+    <Table data-cy={dataCy} className="nowrap-cells" aria-label={ariaLabel}>
       <thead>
         {headerGroups.map((headerGroup) => (
           <Table.HeaderRow<D>
