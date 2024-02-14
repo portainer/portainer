@@ -62,7 +62,8 @@ export function useInitialValues(submitting: boolean) {
     params: { nodeName, from },
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
-  const { isAdmin, user } = useCurrentUser();
+  const { user, isPureAdmin } = useCurrentUser();
+
   const networksQuery = useNetworksForSelector();
 
   const fromContainerQuery = useContainer(environmentId, from, {
@@ -85,7 +86,7 @@ export function useInitialValues(submitting: boolean) {
 
   if (!from) {
     return {
-      initialValues: defaultValues(isAdmin, user.Id, nodeName),
+      initialValues: defaultValues(isPureAdmin, user.Id, nodeName),
     };
   }
 
@@ -136,7 +137,7 @@ export function useInitialValues(submitting: boolean) {
     env: envVarsTabUtils.toViewModel(fromContainer),
     ...baseFormUtils.toViewModel(
       fromContainer,
-      isAdmin,
+      isPureAdmin,
       user.Id,
       nodeName,
       imageConfig,
@@ -148,7 +149,7 @@ export function useInitialValues(submitting: boolean) {
 }
 
 function defaultValues(
-  isAdmin: boolean,
+  isPureAdmin: boolean,
   currentUserId: UserId,
   nodeName: string
 ): Values {
@@ -161,6 +162,6 @@ function defaultValues(
     resources: resourcesTabUtils.getDefaultViewModel(),
     capabilities: capabilitiesTabUtils.getDefaultViewModel(),
     env: envVarsTabUtils.getDefaultViewModel(),
-    ...baseFormUtils.getDefaultViewModel(isAdmin, currentUserId, nodeName),
+    ...baseFormUtils.getDefaultViewModel(isPureAdmin, currentUserId, nodeName),
   };
 }

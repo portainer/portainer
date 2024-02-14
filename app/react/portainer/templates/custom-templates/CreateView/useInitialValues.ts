@@ -1,7 +1,7 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
 
 import { Platform } from '../../types';
@@ -19,11 +19,13 @@ export function useInitialValues({
   isEdge?: boolean;
   buildMethods: Array<Method>;
 }): FormValues | undefined {
-  const { user, isAdmin } = useCurrentUser();
+  const { user } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
+
   const { appTemplateId, type = defaultType } = useAppTemplateParams();
 
   const fileContentQuery = useFetchTemplateFile(appTemplateId);
-  if (fileContentQuery.isLoading) {
+  if (fileContentQuery.isLoading || isAdminQuery.isLoading) {
     return undefined;
   }
 
@@ -51,7 +53,7 @@ export function useInitialValues({
     },
     AccessControl: isEdge
       ? undefined
-      : parseAccessControlFormData(isAdmin, user.Id),
+      : parseAccessControlFormData(isAdminQuery.isAdmin, user.Id),
     EdgeSettings: isEdge ? getDefaultEdgeTemplateSettings() : undefined,
   };
 }

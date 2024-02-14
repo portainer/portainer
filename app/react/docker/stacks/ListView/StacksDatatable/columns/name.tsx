@@ -1,6 +1,6 @@
 import { CellContext, Column } from '@tanstack/react-table';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { StackStatus } from '@/react/common/stacks/types';
 import {
@@ -67,7 +67,7 @@ function NameCell({
 }
 
 function NameLink({ item }: { item: DecoratedStack }) {
-  const { isAdmin } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
 
   const name = item.Name;
 
@@ -87,7 +87,7 @@ function NameLink({ item }: { item: DecoratedStack }) {
     );
   }
 
-  if (!isAdmin && isOrphanedStack(item)) {
+  if (!isAdminQuery.isAdmin && isOrphanedStack(item)) {
     return <>{name}</>;
   }
 

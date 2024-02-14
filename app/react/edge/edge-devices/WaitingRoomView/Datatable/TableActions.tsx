@@ -4,6 +4,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/queries/useDeleteEnvironmentsMutation';
 import { Environment } from '@/react/portainer/environments/types';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { useIsPureAdmin } from '@/react/hooks/useUser';
 
 import { Button } from '@@/buttons';
 import { ModalType, openModal } from '@@/modals';
@@ -28,6 +29,7 @@ export function TableActions({
 }: {
   selectedRows: WaitingRoomEnvironment[];
 }) {
+  const isPureAdmin = useIsPureAdmin();
   const associateMutation = useAssociateDeviceMutation();
   const removeMutation = useDeleteEnvironmentsMutation();
   const licenseOverused = useLicenseOverused(selectedRows.length);
@@ -58,7 +60,9 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateAndAssign(selectedRows)}
-            disabled={selectedRows.length === 0 || licenseOverused}
+            disabled={
+              selectedRows.length === 0 || licenseOverused || !isPureAdmin
+            }
             color="secondary"
             icon={CheckCircle}
           >

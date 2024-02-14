@@ -7,14 +7,14 @@ import { Environment, EnvironmentId } from '../types';
 
 import { environmentQueryKeys } from './query-keys';
 
-export function useEnvironment<T = Environment | null>(
+export function useEnvironment<T = Environment>(
   environmentId?: EnvironmentId,
-  select?: (environment: Environment | null) => T,
+  select?: (environment: Environment) => T,
   options?: { autoRefreshRate?: number }
 ) {
   return useQuery(
-    environmentId ? environmentQueryKeys.item(environmentId) : [],
-    () => (environmentId ? getEndpoint(environmentId) : null),
+    environmentQueryKeys.item(environmentId!),
+    () => getEndpoint(environmentId!),
     {
       select,
       ...withError('Failed loading environment'),

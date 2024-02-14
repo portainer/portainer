@@ -12,7 +12,7 @@ import clsx from 'clsx';
 
 import { useSystemStatus } from '@/react/portainer/system/useSystemStatus';
 import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { Modal } from '@@/modals';
 import { Button } from '@@/buttons';
@@ -47,7 +47,7 @@ export function BuildInfoModalButton() {
 }
 
 function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
-  const { isAdmin } = useCurrentUser();
+  const { isAdmin } = useIsEdgeAdmin({ noEnvScope: true });
   const versionQuery = useSystemVersion();
   const statusQuery = useSystemStatus();
 

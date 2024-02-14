@@ -1,4 +1,4 @@
-import { render } from '@/react-tools/test-utils';
+import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
@@ -50,7 +50,7 @@ test('Non system networks should have a delete button', async () => {
 async function renderComponent(isAdmin: boolean, network: DockerNetwork) {
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 
-  const queries = render(
+  const queries = renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
       <NetworkDetailsTable
         network={network}

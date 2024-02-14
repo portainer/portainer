@@ -1,5 +1,5 @@
 import { useUsers } from '@/portainer/users/queries';
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { PageHeader } from '@@/PageHeader';
 
@@ -9,10 +9,10 @@ import { CreateTeamForm } from './CreateTeamForm';
 import { TeamsDatatable } from './TeamsDatatable';
 
 export function ListView() {
-  const { isAdmin } = useUser();
+  const { isPureAdmin } = useCurrentUser();
 
   const usersQuery = useUsers(false);
-  const teamsQuery = useTeams(!isAdmin, 0, { enabled: !!usersQuery.data });
+  const teamsQuery = useTeams(!isPureAdmin, 0);
 
   return (
     <>
@@ -22,12 +22,12 @@ export function ListView() {
         reload
       />
 
-      {isAdmin && usersQuery.data && teamsQuery.data && (
+      {isPureAdmin && usersQuery.data && teamsQuery.data && (
         <CreateTeamForm users={usersQuery.data} teams={teamsQuery.data} />
       )}
 
       {teamsQuery.data && (
-        <TeamsDatatable teams={teamsQuery.data} isAdmin={isAdmin} />
+        <TeamsDatatable teams={teamsQuery.data} isAdmin={isPureAdmin} />
       )}
     </>
   );

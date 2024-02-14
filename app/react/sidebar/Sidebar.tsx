@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import { Home } from 'lucide-react';
 
-import { useUser } from '@/react/hooks/useUser';
-import { useIsTeamLeader } from '@/portainer/users/queries';
+import { useIsEdgeAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
+import { useIsCurrentUserTeamLeader } from '@/portainer/users/queries';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import styles from './Sidebar.module.css';
@@ -25,15 +25,18 @@ export function Sidebar() {
 }
 
 function InnerSidebar() {
-  const { isAdmin, user } = useUser();
-  const isTeamLeader = useIsTeamLeader(user) as boolean;
+  const isPureAdmin = useIsPureAdmin();
+  const isAdminQuery = useIsEdgeAdmin({ noEnvScope: true });
+  const isTeamLeader = useIsCurrentUserTeamLeader();
   const { isOpen } = useSidebarState();
 
   const settingsQuery = usePublicSettings();
 
-  if (!settingsQuery.data) {
+  if (!settingsQuery.data || isAdminQuery.isLoading) {
     return null;
   }
+
+  const { isAdmin } = isAdminQuery;
 
   const { LogoURL } = settingsQuery.data;
 
@@ -66,7 +69,11 @@ function InnerSidebar() {
             />
             <EnvironmentSidebar />
             {isAdmin && <EdgeComputeSidebar />}
-            <SettingsSidebar isAdmin={isAdmin} isTeamLeader={isTeamLeader} />
+            <SettingsSidebar
+              isPureAdmin={isPureAdmin}
+              isAdmin={isAdmin}
+              isTeamLeader={isTeamLeader}
+            />
           </ul>
         </div>
         <div className="mt-auto pt-8">

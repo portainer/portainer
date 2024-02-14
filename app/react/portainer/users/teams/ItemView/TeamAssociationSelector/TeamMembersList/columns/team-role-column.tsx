@@ -2,7 +2,7 @@ import { User as UserIcon, UserPlus, UserX } from 'lucide-react';
 import { CellContext } from '@tanstack/react-table';
 
 import { User } from '@/portainer/users/types';
-import { useUser as useCurrentUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 import { TeamRole } from '@/react/portainer/users/teams/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
@@ -23,7 +23,7 @@ export const teamRole = columnHelper.accessor('Id', {
   cell: RoleCell,
 });
 
-export function RoleCell({
+function RoleCell({
   row: { original: user },
   getValue,
 }: CellContext<User, User['Id']>) {
@@ -38,12 +38,16 @@ export function RoleCell({
 
   const role = getRole(id);
 
-  const { isAdmin } = useCurrentUser();
+  const { isPureAdmin } = useCurrentUser();
 
   const Cell = role === TeamRole.Leader ? LeaderCell : MemberCell;
 
   return (
-    <Cell isAdmin={isAdmin} onClick={handleUpdateRole} disabled={disabled} />
+    <Cell
+      isAdmin={isPureAdmin}
+      onClick={handleUpdateRole}
+      disabled={disabled}
+    />
   );
 
   function handleUpdateRole(role: TeamRole, onSuccessMessage: string) {

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
 import { TextTip } from '@@/Tip/TextTip';
@@ -22,11 +22,14 @@ export function StackName({
   inputClassName,
   textTip = "Enter or select a 'stack' name to group multiple deployments together, or else leave empty to ignore.",
 }: Props) {
-  const { isAdmin } = useCurrentUser();
+  const isAdminQuery = useIsEdgeAdmin();
   const stackResults = useMemo(
     () => stacks.filter((stack) => stack.includes(stackName ?? '')),
     [stacks, stackName]
   );
+
+  const { isAdmin } = isAdminQuery;
+
   const tooltip = (
     <>
       You may specify a stack name to label resources that you want to group.
