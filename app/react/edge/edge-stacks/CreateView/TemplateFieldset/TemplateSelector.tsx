@@ -131,5 +131,9 @@ function useOptions() {
 }
 
 function GroupLabel({ label }: GroupBase<unknown>) {
-  return <span className="font-bold text-black">{label}</span>;
+  return (
+    <span className="font-bold text-black th-dark:text-white th-highcontrast:text-white">
+      {label}
+    </span>
+  );
 }
