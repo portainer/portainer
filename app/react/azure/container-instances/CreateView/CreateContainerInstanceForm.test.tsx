@@ -29,15 +29,15 @@ test('submit button should be disabled when name or image is missing', async () 
   expect(button).toBeDisabled();
 
   const nameInput = getByLabelText(/name/i);
-  userEvent.type(nameInput, 'name');
+  await userEvent.type(nameInput, 'name');
 
   const imageInput = getByLabelText(/image/i);
-  userEvent.type(imageInput, 'image');
+  await userEvent.type(imageInput, 'image');
 
   await expect(findByText(/Deploy the container/)).resolves.toBeEnabled();
 
   expect(nameInput).toHaveValue('name');
-  userEvent.clear(nameInput);
+  await userEvent.clear(nameInput);
 
   await expect(findByText(/Deploy the container/)).resolves.toBeDisabled();
 });

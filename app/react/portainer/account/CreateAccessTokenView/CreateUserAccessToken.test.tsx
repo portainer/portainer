@@ -17,14 +17,14 @@ test('the button is disabled when all fields are blank and enabled when all fiel
   const descriptionField = getByLabelText(/Description/);
   const passwordField = getByLabelText(/Current password/);
 
-  userEvent.type(passwordField, 'password');
-  userEvent.type(descriptionField, 'description');
+  await userEvent.type(passwordField, 'password');
+  await userEvent.type(descriptionField, 'description');
 
   await waitFor(() => {
     expect(button).toBeEnabled();
   });
 
-  userEvent.clear(descriptionField);
+  await userEvent.clear(descriptionField);
   await waitFor(() => {
     expect(button).toBeDisabled();
   });
