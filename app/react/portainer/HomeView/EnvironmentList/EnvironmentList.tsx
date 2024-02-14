@@ -212,6 +212,7 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
           <div
             className="blocklist mt-5 !space-y-2 !p-0"
             data-cy="home-endpointList"
+            role="list"
           >
             {renderItems(
               isLoading,
