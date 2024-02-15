@@ -16,7 +16,7 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
 }));
 
 test('submit button should be disabled when name or image is missing', async () => {
-  server.use(http.get('/api/endpoints/1', () => HttpResponse.json({})));
+  server.use(http.get('/api/endpoints/5', () => HttpResponse.json({})));
 
   const user = new UserViewModel({ Username: 'user' });
 
