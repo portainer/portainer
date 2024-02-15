@@ -2,6 +2,7 @@ import { useMemo, useEffect } from 'react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import helm from '@/assets/ico/vendor/helm.svg?c';
+import { isPureAdmin } from '@/portainer/users/user.helpers';
 
 import { Link } from '@@/Link';
 import { Datatable } from '@@/datatables';
@@ -21,6 +22,8 @@ const settingsStore = createPersistedStore(storageKey);
 export function HelmRepositoryDatatable() {
   const { user } = useCurrentUser();
   const helmReposQuery = useHelmRepositories(user.Id);
+
+  const isAdminUser = isPureAdmin(user);
 
   const tableState = useTableState(settingsStore, storageKey);
 
@@ -58,7 +61,7 @@ export function HelmRepositoryDatatable() {
     <Datatable
       getRowId={(row) => String(row.Id)}
       dataset={helmRepos}
-      description={<HelmDatatableDescription />}
+      description={<HelmDatatableDescription isAdmin={isAdminUser} />}
       settingsManager={tableState}
       columns={columns}
       title="Helm repositories"
@@ -74,15 +77,19 @@ export function HelmRepositoryDatatable() {
   );
 }
 
-function HelmDatatableDescription() {
+function HelmDatatableDescription({ isAdmin }: { isAdmin: boolean }) {
   return (
     <TextTip color="blue" className="mb-3">
       Adding a Helm repo here only makes it available in your own user
       account&apos;s Portainer UI. Helm charts are pulled down from these repos
       (plus the{' '}
-      <Link to="portainer.settings" params={{ '#': 'kubernetes-settings' }}>
+      {isAdmin ? (
+        <Link to="portainer.settings" params={{ '#': 'kubernetes-settings' }}>
+          <span>globally-set Helm repo</span>
+        </Link>
+      ) : (
         <span>globally-set Helm repo</span>
-      </Link>
+      )}
       ) and shown in the Create from Manifest screen&apos;s Helm charts list.
     </TextTip>
   );
