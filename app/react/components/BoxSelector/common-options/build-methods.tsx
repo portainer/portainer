@@ -37,7 +37,7 @@ export const edgeStackTemplate: BoxSelectorOption<'template'> = {
   icon: FileText,
   iconType: 'badge',
   label: 'Template',
-  description: 'Use an Edge stack template',
+  description: 'Use an Edge stack app or custom template',
   value: 'template',
 };
 
