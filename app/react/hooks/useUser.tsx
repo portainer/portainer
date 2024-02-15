@@ -139,7 +139,7 @@ export function useIsEnvironmentAdmin({
 /**
  * will return true if the user has the authorizations. assumes the user is authenticated and not an admin
  */
-function hasAuthorizations(
+export function hasAuthorizations(
   user: User,
   authorizations: string | string[],
   environmentId?: EnvironmentId
