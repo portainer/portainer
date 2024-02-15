@@ -82,7 +82,7 @@ func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) error {
 		return err
 	}
 
-	if info.ResourceQuota != nil && !info.ResourceQuota.Enabled {
+	if info.ResourceQuota != nil && info.ResourceQuota.Enabled {
 		log.Info().Msgf("Creating resource quota for namespace %s", info.Name)
 		log.Debug().Msgf("Creating resource quota with details: %+v", info.ResourceQuota)
 
