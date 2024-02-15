@@ -1,4 +1,6 @@
-import { SchemaOf, number, object } from 'yup';
+import { SchemaOf, object } from 'yup';
+
+import { nanableNumber } from '@/react-tools/yup-schemas';
 
 import { ReplicaCountFormValues } from './types';
 
@@ -19,7 +21,7 @@ export function replicationValidation(
     supportScalableReplicaDeployment,
   } = validationData || {};
   return object({
-    replicaCount: number()
+    replicaCount: nanableNumber('Instance count is required')
       .min(0, 'Instance count must be greater than or equal to 0.')
       .test(
         'overflow',
