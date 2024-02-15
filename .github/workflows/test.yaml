@@ -6,12 +6,20 @@ env:
 
 on:
   pull_request:
+    branches:
+      - master
+      - develop
+      - release/*
     types:
       - opened
       - reopened
       - synchronize
       - ready_for_review
   push:
+    branches:
+      - master
+      - develop
+      - release/*
 
 jobs:
   test-client:
