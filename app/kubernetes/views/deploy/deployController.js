@@ -34,7 +34,7 @@ class KubernetesDeployController {
       { ...git, value: KubernetesDeployBuildMethods.GIT },
       { ...editor, value: KubernetesDeployBuildMethods.WEB_EDITOR },
       { ...url, value: KubernetesDeployBuildMethods.URL },
-      { ...customTemplate, description: 'Use custom template', value: KubernetesDeployBuildMethods.CUSTOM_TEMPLATE },
+      { ...customTemplate, value: KubernetesDeployBuildMethods.CUSTOM_TEMPLATE },
       { ...helm, value: KubernetesDeployBuildMethods.HELM },
     ];
 
