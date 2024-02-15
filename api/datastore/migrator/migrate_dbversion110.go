@@ -34,7 +34,10 @@ func (migrator *Migrator) updateResourceOverCommitToDB110() error {
 	}
 
 	for _, endpoint := range endpoints {
-		if endpoint.Type == portainer.KubernetesLocalEnvironment {
+		if endpoint.Type == portainer.KubernetesLocalEnvironment ||
+			endpoint.Type == portainer.AgentOnKubernetesEnvironment ||
+			endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+
 			endpoint.Kubernetes.Configuration.EnableResourceOverCommit = true
 
 			err = migrator.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
