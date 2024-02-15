@@ -108,6 +108,8 @@ async function renderComponent(
   const state = { user };
 
   server.use(
+    http.get('/api/endpoints/1', () => HttpResponse.json({})),
+
     http.get('/api/endpoints/:endpointId/azure/subscriptions', () =>
       HttpResponse.json(createMockSubscriptions(subscriptionsCount), {
         status: subscriptionsStatus,

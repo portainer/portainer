@@ -10,6 +10,7 @@ import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
 import { helpersModule } from './helpers';
+import { AccessHeaders, requiresAuthHook } from './authorization-guard';
 
 async function initAuthentication(Authentication) {
   return await Authentication.init();
@@ -59,6 +60,9 @@ angular
           'sidebar@': {
             component: 'sidebar',
           },
+        },
+        data: {
+          access: AccessHeaders.Restricted,
         },
       };
 
@@ -122,6 +126,16 @@ angular
         },
       };
 
+      const createHelmRepository = {
+        name: 'portainer.account.createHelmRepository',
+        url: '/helm-repository/new',
+        views: {
+          'content@': {
+            component: 'createHelmRepositoryView',
+          },
+        },
+      };
+
       var authentication = {
         name: 'portainer.auth',
         url: '/auth',
@@ -135,6 +149,9 @@ angular
             controllerAs: 'ctrl',
           },
           'sidebar@': {},
+        },
+        data: {
+          access: undefined,
         },
       };
 
@@ -151,6 +168,9 @@ angular
             controllerAs: 'ctrl',
           },
           'sidebar@': {},
+        },
+        data: {
+          access: undefined,
         },
       };
 
@@ -256,6 +276,7 @@ angular
         },
         data: {
           docs: '/admin/environments/groups',
+          access: AccessHeaders.Admin,
         },
       };
 
@@ -312,6 +333,9 @@ angular
         views: {
           'sidebar@': {},
         },
+        data: {
+          access: undefined,
+        },
       };
 
       var initAdmin = {
@@ -336,6 +360,7 @@ angular
         },
         data: {
           docs: '/admin/registries',
+          access: AccessHeaders.Admin,
         },
       };
 
@@ -369,6 +394,7 @@ angular
         },
         data: {
           docs: '/admin/settings',
+          access: AccessHeaders.Admin,
         },
       };
 
@@ -410,6 +436,7 @@ angular
         },
         data: {
           docs: '/admin/environments/tags',
+          access: AccessHeaders.Admin,
         },
       };
 
@@ -424,6 +451,7 @@ angular
         },
         data: {
           docs: '/admin/users',
+          access: AccessHeaders.Restricted, // allow for team leaders
         },
       };
 
@@ -434,16 +462,6 @@ angular
           'content@': {
             templateUrl: './views/users/edit/user.html',
             controller: 'UserController',
-          },
-        },
-      };
-
-      const createHelmRepository = {
-        name: 'portainer.account.createHelmRepository',
-        url: '/helm-repository/new',
-        views: {
-          'content@': {
-            component: 'createHelmRepositoryView',
           },
         },
       };
@@ -481,7 +499,8 @@ angular
       $stateRegistryProvider.register(user);
       $stateRegistryProvider.register(createHelmRepository);
     },
-  ]);
+  ])
+  .run(run);
 
 function isTransitionRequiresAuthentication(transition) {
   const UNAUTHENTICATED_ROUTES = ['portainer.logout', 'portainer.auth'];
@@ -491,4 +510,9 @@ function isTransitionRequiresAuthentication(transition) {
   const nextTransition = transition && transition.to();
   const nextTransitionName = nextTransition ? nextTransition.name : '';
   return !UNAUTHENTICATED_ROUTES.some((route) => nextTransitionName.startsWith(route));
+}
+
+/* @ngInject */
+function run($transitions) {
+  requiresAuthHook($transitions);
 }

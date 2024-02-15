@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import { NotificationsViewAngular } from '@/react/portainer/notifications/NotificationsView';
+import { AccessHeaders } from '../authorization-guard';
 import authLogsViewModule from './auth-logs-view';
 import activityLogsViewModule from './activity-logs-view';
 
@@ -18,6 +19,7 @@ function config($stateRegistryProvider) {
     },
     data: {
       docs: '/admin/logs',
+      access: AccessHeaders.Admin,
     },
   });
 
@@ -31,6 +33,7 @@ function config($stateRegistryProvider) {
     },
     data: {
       docs: '/admin/logs/activity',
+      access: AccessHeaders.Admin,
     },
   });
 

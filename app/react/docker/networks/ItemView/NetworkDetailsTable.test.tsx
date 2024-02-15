@@ -1,6 +1,9 @@
+import { HttpResponse, http } from 'msw';
+
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
+import { server } from '@/setup-tests/server';
 
 import { DockerNetwork } from '../types';
 
@@ -48,6 +51,8 @@ test('Non system networks should have a delete button', async () => {
 });
 
 async function renderComponent(isAdmin: boolean, network: DockerNetwork) {
+  server.use(http.get('/api/endpoints/1', () => HttpResponse.json({})));
+
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 
   const queries = renderWithQueryClient(

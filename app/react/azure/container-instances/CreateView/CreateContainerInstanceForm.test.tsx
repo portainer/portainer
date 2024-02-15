@@ -1,8 +1,10 @@
 import userEvent from '@testing-library/user-event';
+import { HttpResponse } from 'msw';
 
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
+import { http, server } from '@/setup-tests/server';
 
 import { CreateContainerInstanceForm } from './CreateContainerInstanceForm';
 
@@ -14,6 +16,8 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
 }));
 
 test('submit button should be disabled when name or image is missing', async () => {
+  server.use(http.get('/api/endpoints/5', () => HttpResponse.json({})));
+
   const user = new UserViewModel({ Username: 'user' });
 
   const { findByText, getByText, getByLabelText } = renderWithQueryClient(
