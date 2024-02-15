@@ -18,11 +18,11 @@ export function useAdminOnlyRedirect(
 ) {
   const router = useRouter();
 
-  const { isAdmin } = useCurrentUser();
+  const { isPureAdmin } = useCurrentUser();
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isPureAdmin) {
       router.stateService.go(to, params);
     }
-  }, [isAdmin, to, params, router.stateService]);
+  }, [isPureAdmin, to, params, router.stateService]);
 }
