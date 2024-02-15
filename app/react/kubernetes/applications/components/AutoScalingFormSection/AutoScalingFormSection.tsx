@@ -54,7 +54,7 @@ export function AutoScalingFormSection({
               onChange={(e) =>
                 onChange({
                   ...values,
-                  minReplicas: Number(e.target.value) || 0,
+                  minReplicas: e.target.valueAsNumber,
                 })
               }
               data-cy="k8sAppCreate-autoScaleMin"
@@ -73,7 +73,7 @@ export function AutoScalingFormSection({
               onChange={(e) =>
                 onChange({
                   ...values,
-                  maxReplicas: Number(e.target.value) || 1,
+                  maxReplicas: e.target.valueAsNumber,
                 })
               }
               data-cy="k8sAppCreate-autoScaleMax"
@@ -97,7 +97,7 @@ export function AutoScalingFormSection({
               onChange={(e) =>
                 onChange({
                   ...values,
-                  targetCpuUtilizationPercentage: Number(e.target.value) || 1,
+                  targetCpuUtilizationPercentage: e.target.valueAsNumber,
                 })
               }
               data-cy="k8sAppCreate-targetCPUInput"
