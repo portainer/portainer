@@ -3,10 +3,11 @@ package portainer
 func KubernetesDefault() KubernetesData {
 	return KubernetesData{
 		Configuration: KubernetesConfiguration{
-			UseLoadBalancer:  false,
-			UseServerMetrics: false,
-			StorageClasses:   []KubernetesStorageClassConfig{},
-			IngressClasses:   []KubernetesIngressClassConfig{},
+			UseLoadBalancer:          false,
+			UseServerMetrics:         false,
+			EnableResourceOverCommit: true,
+			StorageClasses:           []KubernetesStorageClassConfig{},
+			IngressClasses:           []KubernetesIngressClassConfig{},
 		},
 		Snapshots: []KubernetesSnapshot{},
 	}

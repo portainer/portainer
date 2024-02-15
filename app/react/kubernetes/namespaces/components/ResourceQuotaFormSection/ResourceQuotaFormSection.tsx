@@ -44,7 +44,7 @@ export function ResourceQuotaFormSection({
 
       <SwitchField
         data-cy="k8sNamespaceCreate-resourceAssignmentToggle"
-        disabled={enableResourceOverCommit}
+        disabled={!enableResourceOverCommit}
         label="Resource assignment"
         labelClass="col-sm-3 col-lg-2"
         fieldClass="pt-2"
