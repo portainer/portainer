@@ -10,6 +10,7 @@ globals:
 extends:
   - 'eslint:recommended'
   - 'plugin:storybook/recommended'
+  - 'plugin:import/typescript'
   - prettier
 
 plugins:
@@ -29,6 +30,7 @@ rules:
   no-empty: warn
   no-empty-function: warn
   no-useless-escape: 'off'
+  import/named: error
   import/order:
     [
       'error',
@@ -51,6 +53,8 @@ settings:
         - ['@@', './app/react/components']
         - ['@', './app']
       extensions: ['.js', '.ts', '.tsx']
+    typescript: true
+    node: true
 
 overrides:
   - files:
@@ -75,6 +79,7 @@ overrides:
     settings:
       react:
         version: 'detect'
+
     rules:
       import/order:
         [

@@ -1,5 +1,6 @@
-import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 import { FileCode, Lock } from 'lucide-react';
+
+import { KubernetesConfigurationKinds } from '@/kubernetes/models/configuration/models';
 
 import { BoxSelectorOption } from '@@/BoxSelector';
 
