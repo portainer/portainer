@@ -48,6 +48,7 @@ export const ngModule = angular
       'disabledTypes',
       'fixedCategories',
       'storageKey',
+      'templateLinkParams',
     ])
   )
   .component(

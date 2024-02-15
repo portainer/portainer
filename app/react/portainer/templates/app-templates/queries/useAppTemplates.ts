@@ -10,7 +10,9 @@ import { TemplateViewModel } from '../view-model';
 
 import { buildUrl } from './build-url';
 
-export function useAppTemplates() {
+export function useAppTemplates<T = Array<TemplateViewModel>>({
+  select,
+}: { select?: (templates: Array<TemplateViewModel>) => T } = {}) {
   const registriesQuery = useRegistries();
 
   return useQuery(
@@ -18,6 +20,7 @@ export function useAppTemplates() {
     () => getTemplatesWithRegistry(registriesQuery.data),
     {
       enabled: !!registriesQuery.data,
+      select,
     }
   );
 }
@@ -29,7 +32,7 @@ async function getTemplatesWithRegistry(
     return [];
   }
 
-  const { templates, version } = await getTemplates();
+  const { templates, version } = await getAppTemplates();
   return templates.map((item) => {
     const template = new TemplateViewModel(item, version);
     const registryURL = item.registry;
@@ -41,7 +44,7 @@ async function getTemplatesWithRegistry(
   });
 }
 
-async function getTemplates() {
+export async function getAppTemplates() {
   try {
     const { data } = await axios.get<{
       version: string;

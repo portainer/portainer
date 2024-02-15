@@ -13,7 +13,11 @@ import { StackType } from '@/react/common/stacks/types';
 import { applySetStateAction } from '@/react-tools/apply-set-state-action';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
-import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset';
+import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset';
+import { getAppTemplates } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
+import { fetchFilePreview } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+import { getDefaultValues as getAppVariablesDefaultValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/EnvVarsFieldset';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */
@@ -73,7 +77,7 @@ export default class CreateEdgeStackViewController {
   }
 
   /**
-   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset').Values>} templateAction
+   * @param {import('react').SetStateAction<import('@/react/edge/edge-stacks/CreateView/TemplateFieldset/types').Values>} templateAction
    */
   setTemplateValues(templateAction) {
     return this.$async(async () => {
@@ -82,44 +86,52 @@ export default class CreateEdgeStackViewController {
       const newTemplateId = newTemplateValues.template && newTemplateValues.template.Id;
       this.state.templateValues = newTemplateValues;
       if (newTemplateId !== oldTemplateId) {
-        await this.onChangeTemplate(newTemplateValues.template);
+        await this.onChangeTemplate(newTemplateValues.type, newTemplateValues.template);
       }
 
-      let definitions = [];
-      if (this.state.templateValues.template) {
-        definitions = this.state.templateValues.template.Variables;
-      }
-      const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, definitions);
+      if (newTemplateValues.type === 'custom') {
+        const definitions = this.state.templateValues.template.Variables;
+        const newFile = renderTemplate(this.state.templateValues.file, this.state.templateValues.variables, definitions);
 
-      this.formValues.StackFileContent = newFile;
+        this.formValues.StackFileContent = newFile;
+      }
     });
   }
 
-  onChangeTemplate(template) {
+  onChangeTemplate(type, template) {
     return this.$async(async () => {
       if (!template) {
         return;
       }
 
-      this.state.templateValues.template = template;
-      this.state.templateValues.variables = getVariablesFieldDefaultValues(template.Variables);
+      if (type === 'custom') {
+        const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
+        this.state.templateValues.file = fileContent;
 
-      const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
-      this.state.templateValues.file = fileContent;
+        this.formValues = {
+          ...this.formValues,
+          DeploymentType: template.Type === StackType.Kubernetes ? DeploymentType.Kubernetes : DeploymentType.Compose,
+          ...toGitFormModel(template.GitConfig),
+          ...(template.EdgeSettings
+            ? {
+                PrePullImage: template.EdgeSettings.PrePullImage || false,
+                RetryDeploy: template.EdgeSettings.RetryDeploy || false,
+                PrivateRegistryId: template.EdgeSettings.PrivateRegistryId || null,
+                ...template.EdgeSettings.RelativePathSettings,
+              }
+            : {}),
+        };
+      }
 
-      this.formValues = {
-        ...this.formValues,
-        DeploymentType: template.Type === StackType.Kubernetes ? DeploymentType.Kubernetes : DeploymentType.Compose,
-        ...toGitFormModel(template.GitConfig),
-        ...(template.EdgeSettings
-          ? {
-              PrePullImage: template.EdgeSettings.PrePullImage || false,
-              RetryDeploy: template.EdgeSettings.RetryDeploy || false,
-              PrivateRegistryId: template.EdgeSettings.PrivateRegistryId || null,
-              ...template.EdgeSettings.RelativePathSettings,
-            }
-          : {}),
-      };
+      if (type === 'app') {
+        this.formValues.StackFileContent = '';
+        try {
+          const fileContent = await fetchFilePreview(template.Id);
+          this.formValues.StackFileContent = fileContent;
+        } catch (err) {
+          this.Notifications.error('Failure', err, 'Unable to retrieve Template');
+        }
+      }
     });
   }
 
@@ -159,13 +171,27 @@ export default class CreateEdgeStackViewController {
     }
   }
 
-  async preSelectTemplate(templateId) {
+  /**
+   *
+   * @param {'app' | 'custom'} templateType
+   * @param {number} templateId
+   * @returns {Promise<void>}
+   */
+  async preSelectTemplate(templateType, templateId) {
     return this.$async(async () => {
       try {
         this.state.Method = 'template';
-        const template = await getCustomTemplate(templateId);
+        const template = await getTemplate(templateType, templateId);
+        if (!template) {
+          return;
+        }
 
-        this.setTemplateValues({ template });
+        this.setTemplateValues({
+          template,
+          type: templateType,
+          envVars: templateType === 'app' ? getAppVariablesDefaultValues(template.Env) : {},
+          variables: templateType === 'custom' ? getVariablesFieldDefaultValues(template.Variables) : [],
+        });
       } catch (e) {
         notifyError('Failed loading template', e);
       }
@@ -179,9 +205,10 @@ export default class CreateEdgeStackViewController {
       this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
     }
 
-    const templateId = this.$state.params.templateId;
-    if (templateId) {
-      this.preSelectTemplate(templateId);
+    const templateId = parseInt(this.$state.params.templateId, 10);
+    const templateType = this.$state.params.templateType;
+    if (templateType && templateId && !Number.isNaN(templateId)) {
+      this.preSelectTemplate(templateType, templateId);
     }
 
     this.$window.onbeforeunload = () => {
@@ -198,6 +225,12 @@ export default class CreateEdgeStackViewController {
   createStack() {
     return this.$async(async () => {
       const name = this.formValues.Name;
+
+      let envVars = this.formValues.envVars;
+      if (this.state.Method === 'template' && this.state.templateValues.type === 'app') {
+        envVars = [...envVars, ...Object.entries(this.state.templateValues.envVars).map(([key, value]) => ({ name: key, value }))];
+      }
+
       const method = getMethod(this.state.Method, this.state.templateValues.template);
 
       if (!this.validateForm(method)) {
@@ -206,7 +239,7 @@ export default class CreateEdgeStackViewController {
 
       this.state.actionInProgress = true;
       try {
-        await this.createStackByMethod(name, method);
+        await this.createStackByMethod(name, method, envVars);
 
         this.Notifications.success('Success', 'Stack successfully deployed');
         this.state.isEditorDirty = false;
@@ -258,19 +291,19 @@ export default class CreateEdgeStackViewController {
     return true;
   }
 
-  createStackByMethod(name, method) {
+  createStackByMethod(name, method, envVars) {
     switch (method) {
       case 'editor':
-        return this.createStackFromFileContent(name);
+        return this.createStackFromFileContent(name, envVars);
       case 'upload':
-        return this.createStackFromFileUpload(name);
+        return this.createStackFromFileUpload(name, envVars);
       case 'repository':
-        return this.createStackFromGitRepository(name);
+        return this.createStackFromGitRepository(name, envVars);
     }
   }
 
-  createStackFromFileContent(name) {
-    const { StackFileContent, Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
+  createStackFromFileContent(name, envVars) {
+    const { StackFileContent, Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
 
     return this.EdgeStackService.createStackFromFileContent({
       name,
@@ -282,8 +315,9 @@ export default class CreateEdgeStackViewController {
     });
   }
 
-  createStackFromFileUpload(name) {
-    const { StackFile, Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
+  createStackFromFileUpload(name, envVars) {
+    const { StackFile, Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+
     return this.EdgeStackService.createStackFromFileUpload(
       {
         Name: name,
@@ -296,8 +330,9 @@ export default class CreateEdgeStackViewController {
     );
   }
 
-  createStackFromGitRepository(name) {
-    const { Groups, DeploymentType, UseManifestNamespaces, envVars } = this.formValues;
+  async createStackFromGitRepository(name, envVars) {
+    const { Groups, DeploymentType, UseManifestNamespaces } = this.formValues;
+
     const repositoryOptions = {
       RepositoryURL: this.formValues.RepositoryURL,
       RepositoryReferenceName: this.formValues.RepositoryReferenceName,
@@ -353,4 +388,26 @@ function getMethod(method, template) {
     return 'repository';
   }
   return 'editor';
+}
+
+/**
+ *
+ * @param {'app' | 'custom'} templateType
+ * @param {number} templateId
+ * @returns {Promise<import('@/react/portainer/templates/app-templates/view-model').TemplateViewModel | import('@/react/portainer/templates/custom-templates/types').CustomTemplate | undefined>}
+ */
+async function getTemplate(templateType, templateId) {
+  if (!['app', 'custom'].includes(templateType)) {
+    notifyError('Invalid template type', `Invalid template type: ${templateType}`);
+    return;
+  }
+
+  if (templateType === 'app') {
+    const templatesResponse = await getAppTemplates();
+    const template = templatesResponse.templates.find((t) => t.id === templateId);
+    return new TemplateViewModel(template, templatesResponse.version);
+  }
+
+  const template = await getCustomTemplate(templateId);
+  return template;
 }

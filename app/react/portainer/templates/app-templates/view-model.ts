@@ -150,7 +150,7 @@ function templateVolumes(data: AppTemplate) {
   );
 }
 
-enum EnvVarType {
+export enum EnvVarType {
   PreSelected = 1,
   Text = 2,
   Select = 3,

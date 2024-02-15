@@ -21,13 +21,18 @@ export function AppTemplatesList({
   disabledTypes,
   fixedCategories,
   storageKey,
+  templateLinkParams,
 }: {
   storageKey: string;
   templates?: TemplateViewModel[];
-  onSelect: (template: TemplateViewModel) => void;
+  onSelect?: (template: TemplateViewModel) => void;
   selectedId?: TemplateViewModel['Id'];
   disabledTypes?: Array<TemplateType>;
   fixedCategories?: Array<string>;
+  templateLinkParams?: (template: TemplateViewModel) => {
+    to: string;
+    params: object;
+  };
 }) {
   const [page, setPage] = useState(0);
   const [store] = useState(() =>
@@ -88,6 +93,7 @@ export function AppTemplatesList({
             template={template}
             onSelect={onSelect}
             isSelected={selectedId === template.Id}
+            linkParams={templateLinkParams?.(template)}
           />
         ))}
         {!templates && <div className="text-muted text-center">Loading...</div>}

@@ -62,7 +62,7 @@ angular
 
     const stacksNew = {
       name: 'edge.stacks.new',
-      url: '/new?templateId',
+      url: '/new?templateId&templateType',
       views: {
         'content@': {
           component: 'createEdgeStackView',
