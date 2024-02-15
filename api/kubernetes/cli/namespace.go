@@ -73,30 +73,29 @@ func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) error {
 	ns.Annotations = info.Annotations
 	ns.Labels = portainerLabels
 
-	resourceQuota := &v1.ResourceQuota{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "portainer-rq-" + info.Name,
-			Namespace: info.Name,
-			Labels:    portainerLabels,
-		},
-		Spec: v1.ResourceQuotaSpec{
-			Hard: v1.ResourceList{},
-		},
-	}
-
 	_, err := kcl.cli.CoreV1().Namespaces().Create(context.Background(), &ns, metav1.CreateOptions{})
 	if err != nil {
 		log.Error().
 			Err(err).
 			Str("Namespace", info.Name).
-			Interface("ResourceQuota", resourceQuota).
-			Msg("Failed to create the namespace due to a resource quota issue.")
+			Msg("Failed to create the namespace")
 		return err
 	}
 
-	if info.ResourceQuota != nil {
+	if info.ResourceQuota != nil && info.ResourceQuota.Enabled {
 		log.Info().Msgf("Creating resource quota for namespace %s", info.Name)
 		log.Debug().Msgf("Creating resource quota with details: %+v", info.ResourceQuota)
+
+		resourceQuota := &v1.ResourceQuota{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "portainer-rq-" + info.Name,
+				Namespace: info.Name,
+				Labels:    portainerLabels,
+			},
+			Spec: v1.ResourceQuotaSpec{
+				Hard: v1.ResourceList{},
+			},
+		}
 
 		if info.ResourceQuota.Enabled {
 			memory := resource.MustParse(info.ResourceQuota.Memory)
