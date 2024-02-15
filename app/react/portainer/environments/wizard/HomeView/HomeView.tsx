@@ -4,7 +4,6 @@ import { EnvironmentType } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
 import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
 import Kube from '@/assets/ico/kube.svg?c';
-import { useAdminOnlyRedirect } from '@/react/hooks/useAdminOnlyRedirect';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -16,8 +15,6 @@ import { useConnectLocalEnvironment } from './useFetchOrCreateLocalEnvironment';
 import styles from './HomeView.module.css';
 
 export function HomeView() {
-  // TODO: move this redirect logic to the router when migrating the router to react
-  useAdminOnlyRedirect();
   const localEnvironmentAdded = useConnectLocalEnvironment();
   const { trackEvent } = useAnalytics();
   return (

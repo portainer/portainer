@@ -1,5 +1,6 @@
 import angular from 'angular';
 
+import { AccessHeaders } from '@/portainer/authorization-guard';
 import edgeStackModule from './views/edge-stacks';
 import { reactModule } from './react';
 
@@ -12,6 +13,9 @@ angular
       url: '/edge',
       parent: 'root',
       abstract: true,
+      data: {
+        access: AccessHeaders.EdgeAdmin,
+      },
     };
 
     const groups = {

@@ -1,6 +1,9 @@
+import { HttpResponse } from 'msw';
+
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
+import { http, server } from '@/setup-tests/server';
 
 import { NetworkContainer } from '../types';
 
@@ -26,6 +29,8 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
 }));
 
 test('Network container values should be visible and the link should be valid', async () => {
+  server.use(http.get('/api/endpoints/1', () => HttpResponse.json({})));
+
   const user = new UserViewModel({ Username: 'test', Role: 1 });
   const { findByText } = renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
