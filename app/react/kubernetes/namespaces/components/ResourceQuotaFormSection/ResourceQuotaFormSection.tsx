@@ -44,15 +44,15 @@ export function ResourceQuotaFormSection({
 
       <SwitchField
         data-cy="k8sNamespaceCreate-resourceAssignmentToggle"
-        disabled={enableResourceOverCommit}
+        disabled={!enableResourceOverCommit}
         label="Resource assignment"
         labelClass="col-sm-3 col-lg-2"
         fieldClass="pt-2"
-        checked={values.enabled || !!enableResourceOverCommit}
+        checked={values.enabled || !enableResourceOverCommit}
         onChange={(enabled) => onChange({ ...values, enabled })}
       />
 
-      {(values.enabled || !!enableResourceOverCommit) && (
+      {(values.enabled || !enableResourceOverCommit) && (
         <div className="pt-5">
           <div className="flex flex-row">
             <FormSectionTitle>Resource Limits</FormSectionTitle>
