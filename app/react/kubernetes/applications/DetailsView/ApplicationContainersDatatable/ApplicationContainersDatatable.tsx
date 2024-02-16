@@ -5,6 +5,7 @@ import { ContainerStatus, Pod } from 'kubernetes-types/core/v1';
 
 import { IndexOptional } from '@/react/kubernetes/configs/types';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 
 import { Datatable } from '@@/datatables';
@@ -19,42 +20,41 @@ const storageKey = 'k8sContainersDatatable';
 const settingsStore = createStore(storageKey);
 
 export function ApplicationContainersDatatable() {
+  const environmentId = useEnvironmentId();
+  const useServerMetricsQuery = useEnvironment(
+    environmentId,
+    (env) => !!env?.Kubernetes?.Configuration.UseServerMetrics
+  );
   const tableState = useTableState(settingsStore, storageKey);
   const {
-    params: {
-      endpointId: environmentId,
-      name,
-      namespace,
-      'resource-type': resourceType,
-    },
+    params: { name, namespace, 'resource-type': resourceType },
   } = useCurrentStateAndParams();
 
   // get the containers from the aapplication pods
-  const { data: application, ...applicationQuery } = useApplication(
+  const applicationQuery = useApplication(
     environmentId,
     namespace,
     name,
     resourceType
   );
-  const { data: pods, ...podsQuery } = useApplicationPods(
+  const podsQuery = useApplicationPods(
     environmentId,
     namespace,
     name,
-    application
+    applicationQuery.data
   );
-  const appContainers = useContainersRowData(pods);
-
-  const { data: isServerMetricsEnabled } = useEnvironment(
-    environmentId,
-    (environment) => !!environment?.Kubernetes?.Configuration.UseServerMetrics
-  );
+  const appContainers = useContainersRowData(podsQuery.data);
 
   return (
     <Datatable<IndexOptional<ContainerRowData>>
       dataset={appContainers}
-      columns={getColumns(!!isServerMetricsEnabled)}
+      columns={getColumns(!!useServerMetricsQuery.data)}
       settingsManager={tableState}
-      isLoading={applicationQuery.isLoading || podsQuery.isLoading}
+      isLoading={
+        applicationQuery.isLoading ||
+        podsQuery.isLoading ||
+        useServerMetricsQuery.isLoading
+      }
       emptyContentLabel="No containers found"
       title="Application containers"
       titleIcon={Server}
