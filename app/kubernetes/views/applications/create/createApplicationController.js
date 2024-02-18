@@ -293,17 +293,6 @@ class KubernetesCreateApplicationController {
   /* #region  AUTO SCALER UI MANAGEMENT */
   onAutoScaleChange(values) {
     return this.$async(async () => {
-      // when enabling the auto scaler, set the default values
-      if (!this.formValues.AutoScaler.isUsed && values.isUsed) {
-        this.formValues.AutoScaler = {
-          isUsed: values.isUsed,
-          minReplicas: 1,
-          maxReplicas: 3,
-          targetCpuUtilizationPercentage: 50,
-        };
-        return;
-      }
-      // otherwise, just update the values
       this.formValues.AutoScaler = values;
 
       // reset it to previous form values if the user disables the auto scaler
