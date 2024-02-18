@@ -105,9 +105,6 @@ export default class CreateEdgeStackViewController {
       }
 
       if (type === 'custom') {
-        const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
-        this.state.templateValues.file = fileContent;
-
         this.formValues = {
           ...this.formValues,
           DeploymentType: template.Type === StackType.Kubernetes ? DeploymentType.Kubernetes : DeploymentType.Compose,
@@ -121,6 +118,9 @@ export default class CreateEdgeStackViewController {
               }
             : {}),
         };
+
+        const fileContent = await getCustomTemplateFile({ id: template.Id, git: !!template.GitConfig });
+        this.state.templateValues.file = fileContent;
       }
 
       if (type === 'app') {
