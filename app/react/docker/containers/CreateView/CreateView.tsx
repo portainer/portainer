@@ -189,9 +189,10 @@ function useOldContainer(initialName?: string) {
       name: [`^/${debouncedName}$`],
     },
   });
+
   useEffect(() => {
-    if (initialName && initialName !== name) {
-      setName(initialName);
+    if (initialName || name) {
+      setName(name !== undefined ? name : initialName);
     }
   }, [initialName, name]);
 
