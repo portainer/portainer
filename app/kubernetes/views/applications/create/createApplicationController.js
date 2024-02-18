@@ -236,6 +236,7 @@ class KubernetesCreateApplicationController {
     this.$scope.$evalAsync(() => {
       this.formValues.DataAccessPolicy = value;
       this.resetDeploymentType();
+      this.updateApplicationType();
     });
   }
 
