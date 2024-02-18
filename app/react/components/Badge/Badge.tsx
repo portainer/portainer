@@ -69,10 +69,13 @@ export function Badge({
   children,
 }: PropsWithChildren<Props>) {
   const baseClasses =
-    'flex w-fit items-center !text-xs font-medium rounded-full px-2 py-0.5';
+    'inline-flex w-fit items-center !text-xs font-medium rounded-full px-2 py-0.5';
 
   return (
-    <span className={clsx(baseClasses, typeClasses[type], className)}>
+    <span
+      className={clsx(baseClasses, typeClasses[type], className)}
+      role="status"
+    >
       {children}
     </span>
   );
