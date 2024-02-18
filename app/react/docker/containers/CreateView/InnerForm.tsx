@@ -41,7 +41,7 @@ export function InnerForm({
   const environmentId = useEnvironmentId();
   const [tab, setTab] = useState('commands');
   const apiVersion = useApiVersion(environmentId);
-  const isEnvironmentAdmin = useIsEnvironmentAdmin();
+  const isEnvironmentAdminQuery = useIsEnvironmentAdmin();
   const envQuery = useCurrentEnvironment();
 
   if (!envQuery.data) {
@@ -102,7 +102,7 @@ export function InnerForm({
                             }
                             errors={errors.volumes}
                             allowBindMounts={
-                              isEnvironmentAdmin.authorized ||
+                              isEnvironmentAdminQuery.authorized ||
                               environment.SecuritySettings
                                 .allowBindMountsForRegularUsers
                             }
@@ -166,18 +166,18 @@ export function InnerForm({
                               setFieldValue(`resources.${field}`, value)
                             }
                             allowPrivilegedMode={
-                              isEnvironmentAdmin.authorized ||
+                              isEnvironmentAdminQuery.authorized ||
                               environment.SecuritySettings
                                 .allowPrivilegedModeForRegularUsers
                             }
                             isDevicesFieldVisible={
-                              isEnvironmentAdmin.authorized ||
+                              isEnvironmentAdminQuery.authorized ||
                               environment.SecuritySettings
                                 .allowDeviceMappingForRegularUsers
                             }
                             isInitFieldVisible={apiVersion >= 1.37}
                             isSysctlFieldVisible={
-                              isEnvironmentAdmin.authorized ||
+                              isEnvironmentAdminQuery.authorized ||
                               environment.SecuritySettings
                                 .allowSysctlSettingForRegularUsers
                             }

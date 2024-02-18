@@ -38,7 +38,7 @@ function QuickActionsCell({
     wrapperState.showQuickActionLogs ||
     wrapperState.showQuickActionStats;
 
-  const isAuthorized = useAuthorizations([
+  const { authorized } = useAuthorizations([
     'DockerContainerStats',
     'DockerContainerLogs',
     'DockerExecStart',
@@ -47,7 +47,7 @@ function QuickActionsCell({
     'DockerTaskLogs',
   ]);
 
-  if (!someOn || !isAuthorized) {
+  if (!someOn || !authorized) {
     return null;
   }
 

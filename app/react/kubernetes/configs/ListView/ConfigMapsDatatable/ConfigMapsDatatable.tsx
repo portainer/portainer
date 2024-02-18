@@ -34,8 +34,9 @@ const settingsStore = createStore(storageKey);
 
 export function ConfigMapsDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
-  const readOnly = !useAuthorizations(['K8sConfigMapsW']);
-  const canAccessSystemResources = useAuthorizations(
+  const { authorized: canWrite } = useAuthorizations(['K8sConfigMapsW']);
+  const readOnly = !canWrite;
+  const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
 

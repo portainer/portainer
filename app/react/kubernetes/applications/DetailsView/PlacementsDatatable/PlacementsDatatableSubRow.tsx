@@ -13,7 +13,7 @@ interface SubRowProps {
 }
 
 export function SubRow({ node, cellCount }: SubRowProps) {
-  const authorized = useAuthorizations(
+  const { authorized } = useAuthorizations(
     'K8sApplicationErrorDetailsR',
     undefined,
     true
