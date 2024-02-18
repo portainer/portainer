@@ -30,7 +30,9 @@ interface Props {
 }
 
 export function DockerSidebar({ environmentId, environment }: Props) {
-  const isEnvironmentAdmin = useIsEnvironmentAdmin({ adminOnlyCE: true });
+  const { authorized: isEnvironmentAdmin } = useIsEnvironmentAdmin({
+    adminOnlyCE: true,
+  });
 
   const areStacksVisible =
     isEnvironmentAdmin ||

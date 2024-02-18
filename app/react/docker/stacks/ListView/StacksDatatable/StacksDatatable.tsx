@@ -35,7 +35,7 @@ export function StacksDatatable({
   const tableState = useTableState(settingsStore, tableKey);
   useRepeater(tableState.autoRefreshRate, onReload);
   const isAdminQuery = useIsEdgeAdmin();
-  const canManageStacks = useAuthorizations([
+  const { authorized: canManageStacks } = useAuthorizations([
     'PortainerStackCreate',
     'PortainerStackDelete',
   ]);
@@ -58,7 +58,7 @@ export function StacksDatatable({
       columns={columns}
       dataset={dataset}
       isRowSelectable={({ original: item }) =>
-        allowSelection(item, isAdminQuery.isAdmin, canManageStacks.authorized)
+        allowSelection(item, isAdminQuery.isAdmin, canManageStacks)
       }
       getRowId={(item) => item.Id.toString()}
       initialTableState={{

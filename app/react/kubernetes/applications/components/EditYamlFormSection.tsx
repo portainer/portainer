@@ -22,7 +22,7 @@ export function EditYamlFormSection({
   const environmentId = useEnvironmentId();
   const { data: deploymentOptions } =
     useEnvironmentDeploymentOptions(environmentId);
-  const roleHasAuth = useAuthorizations('K8sYAMLW');
+  const { authorized: roleHasAuth } = useAuthorizations('K8sYAMLW');
   const isAllowedToEdit = roleHasAuth && !deploymentOptions?.hideWebEditor;
   const formId = 'kubernetes-deploy-editor';
 

@@ -25,7 +25,7 @@ export function ConnectNetworkForm({
   selectedNetworks: string[];
 }) {
   const environmentId = useEnvironmentId();
-  const authorized = useAuthorizations('DockerNetworkConnect');
+  const { authorized } = useAuthorizations('DockerNetworkConnect');
   const connectMutation = useConnectContainerMutation(environmentId);
   const router = useRouter();
   if (!authorized) {

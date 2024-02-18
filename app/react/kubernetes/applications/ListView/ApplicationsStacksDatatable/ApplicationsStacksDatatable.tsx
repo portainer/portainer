@@ -53,7 +53,7 @@ export function ApplicationsStacksDatatable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showSystem]);
 
-  const authorized = useAuthorizations('K8sApplicationsW');
+  const { authorized } = useAuthorizations('K8sApplicationsW');
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
   return (

@@ -177,13 +177,13 @@ export function Authorized({
   children,
   childrenUnauthorized = null,
 }: PropsWithChildren<AuthorizedProps>) {
-  const isAllowed = useAuthorizations(
+  const { authorized } = useAuthorizations(
     authorizations,
     environmentId,
     adminOnlyCE
   );
 
-  return isAllowed ? <>{children}</> : <>{childrenUnauthorized}</>;
+  return authorized ? <>{children}</> : <>{childrenUnauthorized}</>;
 }
 
 interface UserProviderProps {
