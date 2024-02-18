@@ -32,12 +32,22 @@ export function AutoScalingFormSection({
         label="Enable auto scaling for this application"
         labelClass="col-sm-3 col-lg-2"
         checked={values.isUsed}
-        onChange={(value: boolean) =>
+        onChange={(value: boolean) => {
+          // when enabling the auto scaler, set the default values
+          const newValues =
+            !values.isUsed && value
+              ? {
+                  minReplicas: 1,
+                  maxReplicas: 3,
+                  targetCpuUtilizationPercentage: 50,
+                }
+              : {};
           onChange({
             ...values,
+            ...newValues,
             isUsed: value,
-          })
-        }
+          });
+        }}
       />
       {values.isUsed && (
         <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-x-4 gap-y-2 my-3">
