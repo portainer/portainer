@@ -86,16 +86,12 @@
                   </div>
                 </div>
 
-                <div class="w-fit mb-4">
-                  <stack-name-label-insight></stack-name-label-insight>
+                <div ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
+                  <div class="w-fit mb-4">
+                    <stack-name-label-insight></stack-name-label-insight>
+                  </div>
+                  <kube-stack-name stack-name="ctrl.formValues.StackName" set-stack-name="(ctrl.setStackName)" stacks="ctrl.stacks"></kube-stack-name>
                 </div>
-                <kube-stack-name
-                  ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
-                  stack-name="ctrl.formValues.StackName"
-                  set-stack-name="(ctrl.setStackName)"
-                  is-admin="ctrl.currentUser.isAdmin"
-                  stacks="ctrl.stacks"
-                ></kube-stack-name>
                 <!-- !namespace -->
 
                 <!-- repository -->
