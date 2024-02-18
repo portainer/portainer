@@ -7,6 +7,7 @@ const kubernetesRedeployAppGitForm = {
   bindings: {
     stack: '<',
     namespace: '<',
+    stackName: '<',
   },
 };
 

@@ -27,6 +27,8 @@ type stackGitRedployPayload struct {
 	Prune                    bool
 	// Force a pulling to current image with the original tag though the image is already the latest
 	PullImage bool `example:"false"`
+
+	StackName string
 }
 
 func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
@@ -134,6 +136,10 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		stack.Option = &portainer.StackOption{
 			Prune: payload.Prune,
 		}
+	}
+
+	if payload.StackName != "" {
+		stack.Name = payload.StackName
 	}
 
 	repositoryUsername := ""

@@ -126,6 +126,10 @@ class KubernetesRedeployAppGitFormController {
           return;
         }
 
+        if (this.stack.Name !== this.stackName) {
+          this.formValues.StackName = this.stackName;
+        }
+
         this.state.redeployInProgress = true;
         await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.formValues);
         this.Notifications.success('Success', 'Pulled and redeployed stack successfully');
