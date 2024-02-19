@@ -24,6 +24,7 @@ export function TasksDatatable({
       dataset={dataset}
       search={search}
       emptyContentLabel="No task matching filter."
+      aria-label="Tasks table"
     />
   );
 }
