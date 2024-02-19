@@ -16,5 +16,11 @@ export function NestedNetworksDatatable({
   const isSwarm = useIsSwarm(environmentId);
 
   const columns = useColumns(isSwarm);
-  return <NestedDatatable columns={columns} dataset={dataset} />;
+  return (
+    <NestedDatatable
+      columns={columns}
+      dataset={dataset}
+      aria-label="Networks table"
+    />
+  );
 }

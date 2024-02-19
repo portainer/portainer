@@ -1,6 +1,7 @@
 import { truncate } from '@/portainer/filters/filters';
 
 import { Link } from '@@/Link';
+import { Badge } from '@@/Badge';
 
 import { columnHelper } from './helper';
 
@@ -18,12 +19,9 @@ export const name = columnHelper.accessor('Name', {
           {truncate(item.Name, 40)}
         </Link>
         {item.ResourceControl?.System && (
-          <span
-            style={{ marginLeft: '10px' }}
-            className="label label-info image-tag space-left"
-          >
+          <Badge type="info" className="ml-2">
             System
-          </span>
+          </Badge>
         )}
       </>
     );

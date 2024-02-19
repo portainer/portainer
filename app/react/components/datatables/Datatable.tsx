@@ -188,6 +188,7 @@ export function Datatable<D extends DefaultType>({
         isLoading={isLoading}
         onSortChange={handleSortChange}
         data-cy={dataCy}
+        aria-label={`${title} table`}
       />
 
       <DatatableFooter

@@ -182,7 +182,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         icon={setupSubMenuProps.icon}
         to={setupSubMenuProps.to}
         params={{ endpointId: environmentId }}
-        data-cy="portainerSidebar-host"
+        data-cy="portainerSidebar-host-area"
       >
         <SidebarItem
           label="Details"

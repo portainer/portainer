@@ -108,7 +108,9 @@ function Cell({
         </Authorized>
       )}
       {item.dangling && (
-        <span className="label label-warning image-tag ml-2">Unused</span>
+        <span className="label label-warning image-tag ml-2" role="status">
+          Unused
+        </span>
       )}
     </>
   );

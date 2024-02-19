@@ -42,6 +42,7 @@ export function SearchBar({
         onChange={(e) => setSearchValue(e.target.value)}
         placeholder={placeholder}
         data-cy={dataCy}
+        aria-label="Search input"
       />
       {children}
       <Button onClick={onClear} icon={X} color="none" disabled={!searchValue} />
