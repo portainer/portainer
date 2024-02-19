@@ -41,8 +41,9 @@ export function AutoScalingFormSection({
                   maxReplicas: 3,
                   targetCpuUtilizationPercentage: 50,
                 }
-              : { ...values };
+              : {};
           onChange({
+            ...values,
             ...newValues,
             isUsed: value,
           });
