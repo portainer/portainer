@@ -159,6 +159,7 @@ export function MultiSelect<TValue = string>({
   components,
   isLoading,
   noOptionsMessage,
+  ...aria
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
@@ -181,6 +182,8 @@ export function MultiSelect<TValue = string>({
       components={components}
       isLoading={isLoading}
       noOptionsMessage={noOptionsMessage}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...aria}
     />
   );
 }
