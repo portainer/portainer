@@ -16,6 +16,9 @@ import { TextTip } from '@@/Tip/TextTip';
 
 import { FormValues } from './types';
 
+import 'react-datetime-picker/dist/DateTimePicker.css';
+import 'react-calendar/dist/Calendar.css';
+
 interface Props {
   disabled?: boolean;
 }

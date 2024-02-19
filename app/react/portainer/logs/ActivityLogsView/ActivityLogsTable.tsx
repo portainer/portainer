@@ -7,19 +7,14 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { Button } from '@@/buttons';
 import { JsonTree } from '@@/JsonTree';
 
-interface ActivityLog {
-  timestamp: number;
-  action: string;
-  context: string;
-  id: number;
-  payload: object;
-  username: string;
-}
+import { ActivityLog } from './types';
+import { getSortType } from './useActivityLogs';
 
 const columnHelper = createColumnHelper<ActivityLog>();
 
 const columns = [
   columnHelper.accessor('timestamp', {
+    id: 'Timestamp',
     header: 'Time',
     cell: ({ getValue }) => {
       const value = getValue();
@@ -27,12 +22,15 @@ const columns = [
     },
   }),
   columnHelper.accessor('username', {
+    id: 'Username',
     header: 'User',
   }),
   columnHelper.accessor('context', {
+    id: 'Context',
     header: 'Environment',
   }),
   columnHelper.accessor('action', {
+    id: 'Action',
     header: 'Action',
   }),
   columnHelper.accessor('payload', {
@@ -61,8 +59,8 @@ export function ActivityLogsTable({
 }: {
   keyword: string;
   onChangeKeyword(keyword: string): void;
-  sort: { key: string; desc: boolean };
-  onChangeSort(sort: { key: string; desc: boolean }): void;
+  sort: { id: string; desc: boolean } | undefined;
+  onChangeSort(sort: { id: string; desc: boolean } | undefined): void;
   limit: number;
   onChangeLimit(limit: number): void;
   currentPage: number;
@@ -82,12 +80,14 @@ export function ActivityLogsTable({
         search: keyword,
         setPageSize: onChangeLimit,
         setSearch: onChangeKeyword,
-        setSortBy: (key, desc) =>
-          onChangeSort({ key: key || 'timestamp', desc }),
-        sortBy: {
-          id: sort.key,
-          desc: sort.desc,
-        },
+        setSortBy: (id, desc) =>
+          onChangeSort({ id: getSortType(id) || 'Timestamp', desc }),
+        sortBy: sort
+          ? {
+              id: sort.id,
+              desc: sort.desc,
+            }
+          : undefined,
       }}
       page={currentPage}
       onPageChange={onChangePage}
