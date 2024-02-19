@@ -13,12 +13,14 @@ export function RefSelector({
   onChange,
   isUrlValid,
   stackId,
+  inputId,
 }: {
   model: RefFieldModel;
   value: string;
   stackId?: StackId;
   onChange: (value: string) => void;
   isUrlValid?: boolean;
+  inputId: string;
 }) {
   const creds = getAuthentication(model);
   const payload = {
@@ -64,6 +66,7 @@ export function RefSelector({
 
   return (
     <PortainerSelect
+      inputId={inputId}
       value={value}
       options={refs || [{ value: 'refs/heads/main', label: 'refs/heads/main' }]}
       onChange={(e) => e && onChange(e)}

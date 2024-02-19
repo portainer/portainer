@@ -55,6 +55,7 @@ export function Filters({
             value={listState.category}
             bindToBody
             isClearable
+            aria-label="Category filter"
           />
         </div>
       )}
@@ -71,6 +72,7 @@ export function Filters({
             value={listState.types}
             bindToBody
             isClearable
+            aria-label="Type filter"
           />
         </div>
       )}
@@ -83,6 +85,7 @@ export function Filters({
           options={orderByFields}
           placeholder="Sort By"
           value={listState.sortBy}
+          aria-label="Sort"
         />
       </div>
     </div>

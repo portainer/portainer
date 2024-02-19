@@ -209,7 +209,7 @@
           </uib-tab>
           <uib-tab index="1" disable="!buildLogs">
             <uib-tab-heading class="vertical-center"> <pr-icon icon="'file-text'" class="leading-none"></pr-icon> Output </uib-tab-heading>
-            <pre class="log_viewer">
+            <pre class="log_viewer" data-cy="logViewer">
               <div ng-repeat="line in buildLogs track by $index" class="line"><p class="inner_line" ng-click="active=!active" ng-class="{'line_selected': active}">{{ line }}</p></div>
               <div ng-if="!buildLogs.length" class="line"><p class="inner_line">No build output available.</p></div>
             </pre>

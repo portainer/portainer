@@ -4,6 +4,7 @@ import {
   SelectComponentsConfig,
 } from 'react-select';
 import _ from 'lodash';
+import { AriaAttributes } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -20,7 +21,9 @@ type Options<TValue> = OptionsOrGroups<
   GroupBase<Option<TValue>>
 >;
 
-interface SharedProps extends AutomationTestingProps {
+interface SharedProps
+  extends AutomationTestingProps,
+    Pick<AriaAttributes, 'aria-label'> {
   name?: string;
   inputId?: string;
   placeholder?: string;
@@ -87,6 +90,8 @@ export function SingleSelect<TValue = string>({
   components,
   isLoading,
   noOptionsMessage,
+  isMulti,
+  ...aria
 }: SingleProps<TValue>) {
   const selectedValue =
     value || (typeof value === 'number' && value === 0)
@@ -111,6 +116,8 @@ export function SingleSelect<TValue = string>({
       components={components}
       isLoading={isLoading}
       noOptionsMessage={noOptionsMessage}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...aria}
     />
   );
 }
@@ -152,6 +159,7 @@ export function MultiSelect<TValue = string>({
   components,
   isLoading,
   noOptionsMessage,
+  ...aria
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
@@ -174,6 +182,8 @@ export function MultiSelect<TValue = string>({
       components={components}
       isLoading={isLoading}
       noOptionsMessage={noOptionsMessage}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...aria}
     />
   );
 }

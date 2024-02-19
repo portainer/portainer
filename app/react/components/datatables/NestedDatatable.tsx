@@ -28,6 +28,8 @@ interface Props<D extends DefaultType> {
    * keyword to filter by
    */
   search?: string;
+
+  'aria-label'?: string;
 }
 
 export function NestedDatatable<D extends DefaultType>({
@@ -39,6 +41,7 @@ export function NestedDatatable<D extends DefaultType>({
   isLoading,
   initialSortBy,
   search,
+  'aria-label': ariaLabel,
 }: Props<D>) {
   const tableInstance = useReactTable<D>({
     columns,
@@ -70,6 +73,7 @@ export function NestedDatatable<D extends DefaultType>({
           isLoading={isLoading}
           emptyContentLabel={emptyContentLabel}
           renderRow={(row) => <Table.Row<D> cells={row.getVisibleCells()} />}
+          aria-label={ariaLabel}
         />
       </Table.Container>
     </NestedTable>
