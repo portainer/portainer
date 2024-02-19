@@ -2,6 +2,8 @@ import { useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
+import { isBE } from '../../feature-flags/feature-flags.service';
+
 import { ActivityLog } from './types';
 
 export const sortKeys = ['Context', 'Action', 'Timestamp', 'Username'] as const;
@@ -36,8 +38,15 @@ interface ActivityLogsResponse {
   totalCount: number;
 }
 
-async function fetchActivityLogs(query: Query) {
+async function fetchActivityLogs(query: Query): Promise<ActivityLogsResponse> {
   try {
+    if (!isBE) {
+      return {
+        logs: [{}, {}, {}, {}, {}] as Array<ActivityLog>,
+        totalCount: 5,
+      };
+    }
+
     const { data } = await axios.get<ActivityLogsResponse>(
       '/useractivity/logs',
       { params: query }

@@ -2,6 +2,9 @@ import { useState } from 'react';
 
 import { PageHeader } from '@@/PageHeader';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
+import { BEOverlay } from '@@/BEFeatureIndicator/BEOverlay';
+
+import { FeatureId } from '../../feature-flags/enums';
 
 import { ActivityLogsTable } from './ActivityLogsTable';
 import { useActivityLogs, getSortType } from './useActivityLogs';
@@ -37,22 +40,32 @@ export function ActivityLogsView() {
     <>
       <PageHeader title="User Activity" breadcrumbs="Activity Logs" reload />
 
-      <FilterBar value={range} onChange={setRange} onExport={handleExport} />
+      <div className="mx-4">
+        <BEOverlay featureId={FeatureId.ACTIVITY_AUDIT}>
+          <FilterBar
+            value={range}
+            onChange={setRange}
+            onExport={handleExport}
+          />
 
-      <ActivityLogsTable
-        sort={tableState.sortBy}
-        onChangeSort={(value) =>
-          tableState.setSortBy(value?.id, value?.desc || false)
-        }
-        limit={tableState.pageSize}
-        onChangeLimit={tableState.setPageSize}
-        keyword={tableState.search}
-        onChangeKeyword={tableState.setSearch}
-        currentPage={page}
-        onChangePage={setPage}
-        totalItems={logsQuery.data?.totalCount || 0}
-        dataset={logsQuery.data?.logs}
-      />
+          <div className="-mx-[15px] mt-4">
+            <ActivityLogsTable
+              sort={tableState.sortBy}
+              onChangeSort={(value) =>
+                tableState.setSortBy(value?.id, value?.desc || false)
+              }
+              limit={tableState.pageSize}
+              onChangeLimit={tableState.setPageSize}
+              keyword={tableState.search}
+              onChangeKeyword={tableState.setSearch}
+              currentPage={page}
+              onChangePage={setPage}
+              totalItems={logsQuery.data?.totalCount || 0}
+              dataset={logsQuery.data?.logs}
+            />
+          </div>
+        </BEOverlay>
+      </div>
     </>
   );
 

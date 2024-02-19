@@ -18,32 +18,28 @@ export function FilterBar({
   onExport: () => void;
 }) {
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <Widget.Body>
-            <form className="form-horizontal">
-              <DateRangePicker value={value} onChange={onChange} />
+    <Widget>
+      <Widget.Body>
+        <form className="form-horizontal">
+          <DateRangePicker value={value} onChange={onChange} />
 
-              <TextTip color="blue">
-                Portainer user activity logs have a maximum retention of 7 days.
-              </TextTip>
+          <TextTip color="blue">
+            Portainer user activity logs have a maximum retention of 7 days.
+          </TextTip>
 
-              <div className="mt-4">
-                <Button
-                  color="primary"
-                  icon={DownloadIcon}
-                  onClick={onExport}
-                  className="!ml-0"
-                >
-                  Export as CSV
-                </Button>
-                <BEFeatureIndicator featureId={FeatureId.ACTIVITY_AUDIT} />
-              </div>
-            </form>
-          </Widget.Body>
-        </Widget>
-      </div>
-    </div>
+          <div className="mt-4">
+            <Button
+              color="primary"
+              icon={DownloadIcon}
+              onClick={onExport}
+              className="!ml-0"
+            >
+              Export as CSV
+            </Button>
+            <BEFeatureIndicator featureId={FeatureId.ACTIVITY_AUDIT} />
+          </div>
+        </form>
+      </Widget.Body>
+    </Widget>
   );
 }
