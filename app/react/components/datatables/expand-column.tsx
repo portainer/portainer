@@ -17,6 +17,7 @@ export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
             onClick={table.getToggleAllRowsExpandedHandler()}
             color="none"
             icon={table.getIsAllRowsExpanded() ? ChevronDown : ChevronUp}
+            title="Expand all"
           />
         )
       );
@@ -32,6 +33,7 @@ export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
           }}
           color="none"
           icon={row.getIsExpanded() ? ChevronDown : ChevronUp}
+          title={row.getIsExpanded() ? 'Collapse' : 'Expand'}
         />
       ),
     enableColumnFilter: false,
