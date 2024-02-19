@@ -461,6 +461,7 @@ angular.module('portainer.app').factory('StackService', [
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
           RepositoryPassword: gitConfig.RepositoryPassword,
+          StackName: gitConfig.StackName,
         }
       ).$promise;
     }
