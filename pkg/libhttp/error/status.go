@@ -44,3 +44,7 @@ func Forbidden(message string, err error) *HandlerError {
 func Conflict(message string, err error) *HandlerError {
 	return NewError(http.StatusConflict, message, err)
 }
+
+func PreconditionFailed(message string, err error) *HandlerError {
+	return NewError(http.StatusPreconditionFailed, message, err)
+}
