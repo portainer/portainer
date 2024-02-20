@@ -69,12 +69,14 @@ func NewTemplateHandler(bouncer security.BouncerService, helmPackageManager libh
 		requestBouncer:     bouncer,
 	}
 
+	h.Use(bouncer.AuthenticatedAccess)
+
 	h.Handle("/templates/helm",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmRepoSearch))).Methods(http.MethodGet)
+		httperror.LoggerHandler(h.helmRepoSearch)).Methods(http.MethodGet)
 
 	// helm show [COMMAND] [CHART] [REPO] flags
 	h.Handle("/templates/helm/{command:chart|values|readme}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmShow))).Methods(http.MethodGet)
+		httperror.LoggerHandler(h.helmShow)).Methods(http.MethodGet)
 
 	return h
 }
