@@ -1,4 +1,6 @@
-import { SchemaOf, object, string, boolean, number } from 'yup';
+import { SchemaOf, object, string, boolean } from 'yup';
+
+import { nanNumberSchema } from '@/react-tools/yup-schemas';
 
 import { isValidUrl } from '@@/form-components/validate-url';
 
@@ -17,8 +19,7 @@ export function validation(): SchemaOf<FormValues> {
       hideFileUpload: boolean().required(),
       requireNoteOnApplications: boolean().required(),
       hideStacksFunctionality: boolean().required(),
-      minApplicationNoteLength: number()
-        .typeError('Must be a number')
+      minApplicationNoteLength: nanNumberSchema('Must be a number')
         .default(0)
         .when('requireNoteOnApplications', {
           is: true,

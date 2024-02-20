@@ -20,7 +20,7 @@ export function SliderWithInput({
   visibleTooltip?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-6">
       {max && (
         <div className="mr-2 flex-1">
           <Slider
@@ -41,9 +41,7 @@ export function SliderWithInput({
         min="0"
         max={max}
         value={value}
-        onChange={({ target: { valueAsNumber: value } }) =>
-          onChange(Number.isNaN(value) ? 0 : value)
-        }
+        onChange={(e) => onChange(e.target.valueAsNumber)}
         className="w-32"
         data-cy={`${dataCy}Input`}
       />

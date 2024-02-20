@@ -1,5 +1,7 @@
 import { SchemaOf, array, object, boolean, string, mixed, number } from 'yup';
 
+import { nanNumberSchema } from '@/react-tools/yup-schemas';
+
 import { ServiceFormValues, ServicePort } from './types';
 import { prependWithSlash } from './utils';
 
@@ -53,9 +55,8 @@ export function kubeServicesValidation(
       Selector: object(),
       Ports: array(
         object({
-          port: number()
+          port: nanNumberSchema('Service port number is required.')
             .required('Service port number is required.')
-            .typeError('Service port number is required.')
             .min(1, 'Service port number must be inside the range 1-65535.')
             .max(65535, 'Service port number must be inside the range 1-65535.')
             .test(
@@ -86,9 +87,8 @@ export function kubeServicesValidation(
                 return duplicateServicePortCount <= 1;
               }
             ),
-          targetPort: number()
+          targetPort: nanNumberSchema('Container port number is required.')
             .required('Container port number is required.')
-            .typeError('Container port number is required.')
             .min(1, 'Container port number must be inside the range 1-65535.')
             .max(
               65535,

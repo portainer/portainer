@@ -1,6 +1,7 @@
 import { SchemaOf, TestContext, number, object } from 'yup';
 
 import KubernetesResourceReservationHelper from '@/kubernetes/helpers/resourceReservationHelper';
+import { nanNumberSchema } from '@/react-tools/yup-schemas';
 
 import { ResourceQuotaFormValues } from './types';
 
@@ -22,8 +23,8 @@ export function resourceReservationValidation(
   validationData?: ValidationData
 ): SchemaOf<ResourceQuotaFormValues> {
   return object().shape({
-    memoryLimit: number()
-      .min(0)
+    memoryLimit: nanNumberSchema()
+      .min(0, 'Value must be greater than or equal to 0')
       .test(
         'exhaused',
         `The memory capacity for this namespace has been exhausted, so you cannot deploy the application.${
