@@ -4,6 +4,7 @@ package error
 import (
 	"errors"
 	"net/http"
+	"unicode"
 
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
@@ -26,9 +27,19 @@ func (handler LoggerHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 }
 
+func capitalize(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+
+	// Capitalize the first letter of the word or sentence
+	firstLetter := unicode.ToUpper(rune(s[0]))
+	return string(firstLetter) + s[1:]
+}
+
 func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 	if err.Err == nil {
-		err.Err = errors.New(err.Message)
+		err.Err = errors.New(capitalize(err.Message))
 	}
 
 	log.Debug().CallerSkipFrame(2).Err(err.Err).Int("status_code", err.StatusCode).Str("msg", err.Message).Msg("HTTP error")
@@ -40,7 +51,7 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 	enc.SetSortMapKeys(false)
 	enc.SetAppendNewline(false)
 
-	enc.Encode(&errorResponse{Message: err.Message, Details: err.Err.Error()})
+	enc.Encode(&errorResponse{Message: err.Message, Details: capitalize(err.Err.Error())})
 }
 
 // WriteError is a convenience function that creates a new HandlerError before calling writeErrorResponse.
