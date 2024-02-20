@@ -87,6 +87,10 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		return nil, errInvalidRepoURL
 	}
 
+	if file.APIVersion == "" || file.Entries == nil {
+		return nil, errInvalidRepoURL
+	}
+
 	result, err := json.Marshal(file)
 	if err != nil {
 		return nil, errInvalidRepoURL
