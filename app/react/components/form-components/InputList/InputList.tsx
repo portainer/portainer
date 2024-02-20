@@ -215,8 +215,8 @@ export function InputList<T = DefaultType>({
             </Button>
           </div>
           {addButtonError && (
-            <div className="col-sm-12">
-              <FormError>{addButtonError}</FormError>
+            <div className="col-sm-12 mt-1">
+              <TextTip color="blue">{addButtonError}</TextTip>
             </div>
           )}
         </>
