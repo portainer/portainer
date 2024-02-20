@@ -18,7 +18,7 @@ import (
 )
 
 var errRequiredSearchOptions = errors.New("repo is required")
-var errInvalidRepoURL = errors.New("request failed since either the Helm repository was not found or the index.yaml is not valid")
+var errInvalidRepoURL = errors.New("the request failed since either the Helm repository was not found or the index.yaml is not valid")
 
 type File struct {
 	APIVersion string             `yaml:"apiVersion" json:"apiVersion"`

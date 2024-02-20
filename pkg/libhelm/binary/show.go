@@ -22,7 +22,7 @@ func (hbpm *helmBinaryPackageManager) Show(showOpts options.ShowOptions) ([]byte
 
 	result, err := hbpm.run("show", args, showOpts.Env)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to run helm show on specified args")
+		return nil, errors.New("the request failed since either the Helm repository was not found or the chart does not exist")
 	}
 
 	return result, nil
