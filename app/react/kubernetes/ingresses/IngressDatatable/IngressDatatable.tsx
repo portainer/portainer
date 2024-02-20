@@ -36,7 +36,7 @@ export function IngressDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
 
-  const canAccessSystemResources = useAuthorizations(
+  const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
   const { data: namespaces, ...namespacesQuery } =
@@ -147,7 +147,8 @@ export function IngressDatatable() {
   }
 
   function useCheckboxes() {
-    return !useAuthorizations(['K8sIngressesW']);
+    const { authorized } = useAuthorizations(['K8sIngressesW']);
+    return !authorized;
   }
 
   async function handleRemoveClick(ingresses: SelectedIngress[]) {

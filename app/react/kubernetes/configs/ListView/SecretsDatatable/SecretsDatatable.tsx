@@ -34,8 +34,9 @@ const settingsStore = createStore(storageKey);
 
 export function SecretsDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
-  const readOnly = !useAuthorizations(['K8sSecretsW']);
-  const canAccessSystemResources = useAuthorizations(
+  const { authorized: canWrite } = useAuthorizations(['K8sSecretsW']);
+  const readOnly = !canWrite;
+  const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
 

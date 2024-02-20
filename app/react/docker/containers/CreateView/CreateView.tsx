@@ -49,7 +49,7 @@ function CreateForm() {
   const router = useRouter();
   const { trackEvent } = useAnalytics();
   const isAdminQuery = useIsEdgeAdmin();
-  const isEnvironmentAdmin = useIsEnvironmentAdmin();
+  const { authorized: isEnvironmentAdmin } = useIsEnvironmentAdmin();
   const [isDockerhubRateLimited, setIsDockerhubRateLimited] = useState(false);
 
   const mutation = useCreateOrReplaceMutation();

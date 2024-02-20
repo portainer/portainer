@@ -45,8 +45,9 @@ export function ServicesDatatable() {
     }
   );
 
-  const readOnly = !useAuthorizations(['K8sServiceW']);
-  const canAccessSystemResources = useAuthorizations(
+  const { authorized: canWrite } = useAuthorizations(['K8sServiceW']);
+  const readOnly = !canWrite;
+  const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
 

@@ -68,7 +68,7 @@ export function ContainersDatatableActions({
     ].includes(item.Status)
   );
 
-  const isAuthorized = useAuthorizations([
+  const { authorized } = useAuthorizations([
     'DockerContainerStart',
     'DockerContainerStop',
     'DockerContainerKill',
@@ -81,12 +81,12 @@ export function ContainersDatatableActions({
 
   const router = useRouter();
 
-  if (!isAuthorized) {
+  if (!authorized) {
     return null;
   }
 
   return (
-    <>
+    <div className="flex gap-2">
       <ButtonGroup>
         <Authorized authorizations="DockerContainerStart">
           <Button
@@ -165,7 +165,6 @@ export function ContainersDatatableActions({
           </Button>
         </Authorized>
       </ButtonGroup>
-
       {isAddActionVisible && (
         <Authorized authorizations="DockerContainerCreate">
           <Link to="docker.containers.new" className="space-left">
@@ -173,7 +172,7 @@ export function ContainersDatatableActions({
           </Link>
         </Authorized>
       )}
-    </>
+    </div>
   );
 
   function onStartClick(selectedItems: DockerContainer[]) {
