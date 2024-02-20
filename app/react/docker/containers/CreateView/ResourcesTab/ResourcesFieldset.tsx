@@ -3,7 +3,7 @@ import { object, SchemaOf } from 'yup';
 
 import { useSystemLimits } from '@/react/docker/proxy/queries/useInfo';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { nanableNumber } from '@/react-tools/yup-schemas';
+import { nanNumberSchema } from '@/react-tools/yup-schemas';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
@@ -95,15 +95,15 @@ export function resourcesValidation({
   maxCpu?: number;
 } = {}): SchemaOf<Values> {
   return object({
-    reservation: nanableNumber()
+    reservation: nanNumberSchema()
       .min(0)
       .max(maxMemory, `Value must be between 0 and ${maxMemory}`)
       .default(0),
-    limit: nanableNumber()
+    limit: nanNumberSchema()
       .min(0)
       .max(maxMemory, `Value must be between 0 and ${maxMemory}`)
       .default(0),
-    cpu: nanableNumber()
+    cpu: nanNumberSchema()
       .min(0)
       .max(maxCpu, `Value must be between 0 and ${maxCpu}`)
       .default(0),
