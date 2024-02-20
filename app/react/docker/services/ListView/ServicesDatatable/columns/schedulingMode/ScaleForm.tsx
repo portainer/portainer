@@ -32,7 +32,7 @@ export function ScaleForm({
             type="number"
             min={0}
             step={1}
-            value={values.replicas}
+            value={Number.isNaN(values.replicas) ? '' : values.replicas}
             onKeyUp={(event) => {
               if (event.key === 'Escape') {
                 onClose();
@@ -48,6 +48,11 @@ export function ScaleForm({
           <Button color="none" icon={X} onClick={() => onClose()} />
           <LoadingButton
             isLoading={mutation.isLoading}
+            disabled={
+              values.replicas === service.Replicas ||
+              values.replicas < 0 ||
+              Number.isNaN(values.replicas)
+            }
             loadingText="Scaling..."
             color="none"
             icon={CheckSquare}

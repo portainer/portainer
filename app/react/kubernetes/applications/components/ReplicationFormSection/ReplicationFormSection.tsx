@@ -4,7 +4,6 @@ import { round } from 'lodash';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { TextTip } from '@@/Tip/TextTip';
-import { FormError } from '@@/form-components/FormError';
 
 import { ReplicaCountFormValues } from './types';
 
@@ -31,16 +30,18 @@ export function ReplicationFormSection({
 
   return (
     <>
-      <FormControl label="Instance count" required>
+      <FormControl
+        label="Instance count"
+        required
+        errors={errors?.replicaCount}
+      >
         <Input
           type="number"
           min="0"
           max="9999"
           value={values.replicaCount}
           disabled={!supportScalableReplicaDeployment}
-          onChange={(e) =>
-            onChange({ replicaCount: e.target.valueAsNumber || 0 })
-          }
+          onChange={(e) => onChange({ replicaCount: e.target.valueAsNumber })}
           className="w-1/4"
           data-cy="k8sAppCreate-replicaCountInput"
         />
@@ -54,7 +55,6 @@ export function ReplicationFormSection({
             <b>{memoryLimit * values.replicaCount} MB</b> of memory.
           </TextTip>
         )}
-      {errors?.replicaCount && <FormError>{errors.replicaCount}</FormError>}
     </>
   );
 }
