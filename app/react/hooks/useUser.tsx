@@ -138,6 +138,8 @@ export function useIsEnvironmentAdmin({
 
 /**
  * will return true if the user has the authorizations. assumes the user is authenticated and not an admin
+ *
+ * @private Please use `useAuthorizations` instead. Exported only for angular's authentication service app/portainer/services/authentication.js:154
  */
 export function hasAuthorizations(
   user: User,
