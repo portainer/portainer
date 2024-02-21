@@ -226,13 +226,13 @@ export default class CreateEdgeStackViewController {
     return this.$async(async () => {
       const name = this.formValues.Name;
 
+      if (!this.validateTemplate()) {
+        return;
+      }
+
       let envVars = this.formValues.envVars;
       if (this.state.Method === 'template' && this.state.templateValues.type === 'app') {
         envVars = [...envVars, ...Object.entries(this.state.templateValues.envVars).map(([key, value]) => ({ name: key, value }))];
-
-        if (!this.validateEnvVars(envVars)) {
-          return;
-        }
       }
 
       const method = getMethod(this.state.Method, this.state.templateValues.template);
@@ -367,22 +367,15 @@ export default class CreateEdgeStackViewController {
     });
   }
 
-  validateEnvVars(envVars) {
-    for (const obj of envVars) {
-      for (const key in obj) {
-        if (obj[key] === '') {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  validateAppTemplate() {
-    let envVars = this.formValues.envVars;
+  validateTemplate() {
     if (this.state.Method === 'template' && this.state.templateValues.type === 'app') {
-      envVars = [...envVars, ...Object.entries(this.state.templateValues.envVars).map(([key, value]) => ({ name: key, value }))];
-      return this.validateEnvVars(envVars);
+      return Object.entries(this.state.templateValues.envVars).every(([, value]) => !!value);
+    }
+
+    if (this.state.Method === 'template' && this.state.templateValues.type === 'custom') {
+      return Object.entries(this.state.templateValues.variables).every(([, v]) => {
+        return !!v.value;
+      });
     }
     return true;
   }
@@ -393,7 +386,7 @@ export default class CreateEdgeStackViewController {
       !this.formValues.Groups.length ||
       (['template', 'editor'].includes(this.state.Method) && !this.formValues.StackFileContent) ||
       ('upload' === this.state.Method && !this.formValues.StackFile) ||
-      !this.validateAppTemplate()
+      !this.validateTemplate()
     );
   }
 }
