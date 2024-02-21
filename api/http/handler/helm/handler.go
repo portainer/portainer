@@ -38,19 +38,20 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 		kubeClusterAccessService: kubeClusterAccessService,
 	}
 
-	h.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
+	h.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"),
+		bouncer.AuthenticatedAccess)
 
 	// `helm list -o json`
 	h.Handle("/{id}/kubernetes/helm",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmList))).Methods(http.MethodGet)
+		httperror.LoggerHandler(h.helmList)).Methods(http.MethodGet)
 
 	// `helm delete RELEASE_NAME`
 	h.Handle("/{id}/kubernetes/helm/{release}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmDelete))).Methods(http.MethodDelete)
+		httperror.LoggerHandler(h.helmDelete)).Methods(http.MethodDelete)
 
 	// `helm install [NAME] [CHART] flags`
 	h.Handle("/{id}/kubernetes/helm",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmInstall))).Methods(http.MethodPost)
+		httperror.LoggerHandler(h.helmInstall)).Methods(http.MethodPost)
 
 	// Deprecated
 	h.Handle("/{id}/kubernetes/helm/repositories",
@@ -69,12 +70,14 @@ func NewTemplateHandler(bouncer security.BouncerService, helmPackageManager libh
 		requestBouncer:     bouncer,
 	}
 
+	h.Use(bouncer.AuthenticatedAccess)
+
 	h.Handle("/templates/helm",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmRepoSearch))).Methods(http.MethodGet)
+		httperror.LoggerHandler(h.helmRepoSearch)).Methods(http.MethodGet)
 
 	// helm show [COMMAND] [CHART] [REPO] flags
 	h.Handle("/templates/helm/{command:chart|values|readme}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmShow))).Methods(http.MethodGet)
+		httperror.LoggerHandler(h.helmShow)).Methods(http.MethodGet)
 
 	return h
 }
