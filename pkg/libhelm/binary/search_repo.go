@@ -65,8 +65,9 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		}
 	}
 
+	// Allow redirect behavior to be overriden if specified.
 	if client.CheckRedirect != nil {
-		client.CheckRedirect = CheckRedirect
+		client.CheckRedirect = defaultCheckRedirect
 	}
 
 	url, err := url.ParseRequestURI(searchRepoOpts.Repo)
@@ -87,6 +88,7 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		return nil, errInvalidRepoURL
 	}
 
+	// Validate index.yaml
 	if file.APIVersion == "" || file.Entries == nil {
 		return nil, errInvalidRepoURL
 	}
@@ -99,7 +101,11 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 	return result, nil
 }
 
-func CheckRedirect(req *http.Request, via []*http.Request) error {
+// defaultCheckRedirect is a default CheckRedirect for helm
+// We don't allow redirects to URLs not ending in index.yaml
+// After that we follow the go http client behavior which is to stop
+// after a maximum of 10 redirects
+func defaultCheckRedirect(req *http.Request, via []*http.Request) error {
 	// The request url must end in index.yaml
 	if path.Base(req.URL.Path) != "index.yaml" {
 		return errors.New("the request URL must end in index.yaml")
