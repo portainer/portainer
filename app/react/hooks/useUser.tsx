@@ -98,14 +98,10 @@ export function useAuthorizations(
     params: { endpointId },
   } = useCurrentStateAndParams();
   const envQuery = useEnvironment(forceEnvironmentId || endpointId);
-  const isAdmin = useIsEdgeAdmin({ forceEnvironmentId });
+  const { isAdmin } = useIsEdgeAdmin({ forceEnvironmentId });
 
   if (!user) {
     return { authorized: false, isLoading: false };
-  }
-
-  if (envQuery.isLoading) {
-    return { authorized: false, isLoading: true };
   }
 
   if (isAdmin) {
@@ -114,6 +110,10 @@ export function useAuthorizations(
 
   if (!isBE && adminOnlyCE) {
     return { authorized: false, isLoading: false };
+  }
+
+  if (envQuery.isLoading) {
+    return { authorized: false, isLoading: true };
   }
 
   return {
@@ -144,6 +144,10 @@ export function hasAuthorizations(
   authorizations: string | string[],
   environmentId?: EnvironmentId
 ) {
+  if (!isBE) {
+    return true;
+  }
+
   const authorizationsArray =
     typeof authorizations === 'string' ? [authorizations] : authorizations;
 
