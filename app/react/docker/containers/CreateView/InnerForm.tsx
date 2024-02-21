@@ -41,7 +41,7 @@ export function InnerForm({
   const environmentId = useEnvironmentId();
   const [tab, setTab] = useState('commands');
   const apiVersion = useApiVersion(environmentId);
-  const isEnvironmentAdminQuery = useIsEnvironmentAdmin();
+  const isEnvironmentAdminQuery = useIsEnvironmentAdmin({ adminOnlyCE: true });
   const envQuery = useCurrentEnvironment();
 
   if (!envQuery.data) {
