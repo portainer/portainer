@@ -99,6 +99,8 @@ function hasSuitableNode(
   cpuLimit: number,
   nodeLimits: NodesLimits
 ) {
+  const nanParsedMemoryLimit = Number.isNaN(memoryLimit) ? 0 : memoryLimit;
+  const nanParsedCPULimit = Number.isNaN(cpuLimit) ? 0 : cpuLimit;
   // transform the nodelimits from bytes to MB
   const limits = Object.values(nodeLimits).map((nodeLimit) => ({
     ...nodeLimit,
@@ -108,6 +110,8 @@ function hasSuitableNode(
   }));
   // make sure there's a node available with enough memory and cpu
   return limits.some(
-    (nodeLimit) => nodeLimit.Memory >= memoryLimit && nodeLimit.CPU >= cpuLimit
+    (nodeLimit) =>
+      nodeLimit.Memory >= nanParsedMemoryLimit &&
+      nodeLimit.CPU >= nanParsedCPULimit
   );
 }
