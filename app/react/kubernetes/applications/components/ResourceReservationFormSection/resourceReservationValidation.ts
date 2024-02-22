@@ -23,8 +23,8 @@ export function resourceReservationValidation(
   validationData?: ValidationData
 ): SchemaOf<ResourceQuotaFormValues> {
   return object().shape({
-    memoryLimit: nanNumberSchema()
-      .min(0, 'Value must be greater than or equal to 0')
+    memoryLimit: nanNumberSchema('Memory limit is required.')
+      .min(0, 'Value must be greater than or equal to 0.')
       .test(
         'exhaused',
         `The memory capacity for this namespace has been exhausted, so you cannot deploy the application.${
@@ -37,7 +37,7 @@ export function resourceReservationValidation(
       .max(
         validationData?.maxMemoryLimit || 0,
         ({ value }) =>
-          `Value must be between 0 and ${validationData?.maxMemoryLimit}MB now - the previous value of ${value} exceeds this`
+          `Value must be between 0 and ${validationData?.maxMemoryLimit}MB now - the previous value of ${value} exceeds this.`
       )
       .test(
         'hasSuitableNode',
@@ -56,7 +56,7 @@ export function resourceReservationValidation(
           );
         }
       )
-      .required(),
+      .required('Memory limit is required.'),
     cpuLimit: number()
       .min(0)
       .test(
@@ -71,7 +71,7 @@ export function resourceReservationValidation(
       .max(
         validationData?.maxCpuLimit || 0,
         ({ value }) =>
-          `Value must be between 0 and ${validationData?.maxCpuLimit} now - the previous value of ${value} exceeds this`
+          `Value must be between 0 and ${validationData?.maxCpuLimit} now - the previous value of ${value} exceeds this.`
       )
       .test(
         'hasSuitableNode',
