@@ -1,6 +1,6 @@
 {
   "docker": "v24.0.7",
-  "dockerCompose": "v2.23.3",
+  "dockerCompose": "v2.24.6",
   "helm": "v3.13.3",
   "kubectl": "v1.29.0",
   "mingit": "2.42.0.2"
