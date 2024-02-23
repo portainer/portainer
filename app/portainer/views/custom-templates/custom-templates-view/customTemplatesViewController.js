@@ -204,6 +204,9 @@ class CustomTemplatesViewController {
 
     const template = _.find(this.templates, { Id: templateId });
 
+    const isGit = template.GitConfig !== null;
+    this.state.isEditorReadOnly = isGit;
+
     try {
       this.state.templateContent = this.formValues.fileContent = await this.CustomTemplateService.customTemplateFile(template.Id, template.GitConfig !== null);
     } catch (err) {
