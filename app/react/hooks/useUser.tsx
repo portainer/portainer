@@ -98,17 +98,17 @@ export function useAuthorizations(
     params: { endpointId },
   } = useCurrentStateAndParams();
   const envQuery = useEnvironment(forceEnvironmentId || endpointId);
-  const isAdmin = useIsEdgeAdmin({ forceEnvironmentId });
+  const isAdminQuery = useIsEdgeAdmin({ forceEnvironmentId });
 
   if (!user) {
     return { authorized: false, isLoading: false };
   }
 
-  if (envQuery.isLoading) {
+  if (envQuery.isLoading || isAdminQuery.isLoading) {
     return { authorized: false, isLoading: true };
   }
 
-  if (isAdmin) {
+  if (isAdminQuery.isAdmin) {
     return { authorized: true, isLoading: false };
   }
 
@@ -138,12 +138,18 @@ export function useIsEnvironmentAdmin({
 
 /**
  * will return true if the user has the authorizations. assumes the user is authenticated and not an admin
+ *
+ * @private Please use `useAuthorizations` instead. Exported only for angular's authentication service app/portainer/services/authentication.js:154
  */
 export function hasAuthorizations(
   user: User,
   authorizations: string | string[],
   environmentId?: EnvironmentId
 ) {
+  if (!isBE) {
+    return true;
+  }
+
   const authorizationsArray =
     typeof authorizations === 'string' ? [authorizations] : authorizations;
 
