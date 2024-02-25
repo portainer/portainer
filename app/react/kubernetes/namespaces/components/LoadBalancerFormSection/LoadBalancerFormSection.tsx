@@ -13,7 +13,7 @@ export function LoadBalancerFormSection() {
         disable the use of load balancers in this namespace.
       </TextTip>
       <SwitchField
-        dataCy="k8sNamespaceCreate-loadBalancerQuotaToggle"
+        data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
         label="Load balancer quota"
         labelClass="col-sm-3 col-lg-2"
         fieldClass="pt-2"

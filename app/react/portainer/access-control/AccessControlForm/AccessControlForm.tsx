@@ -43,7 +43,7 @@ export function AccessControlForm({
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
-            dataCy="portainer-accessMgmtToggle"
+            data-cy="portainer-accessMgmtToggle"
             checked={accessControlEnabled}
             name={withNamespace('accessControlEnabled')}
             label="Enable access control"

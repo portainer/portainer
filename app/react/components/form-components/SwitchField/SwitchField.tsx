@@ -3,13 +3,14 @@ import uuid from 'uuid';
 import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { AutomationTestingProps } from '@/types';
 
 import { Tooltip } from '@@/Tip/Tooltip';
 
 import styles from './SwitchField.module.css';
 import { Switch } from './Switch';
 
-export interface Props {
+export interface Props extends AutomationTestingProps {
   label: string;
   checked: boolean;
   onChange(value: boolean, index?: number): void;
@@ -21,7 +22,7 @@ export interface Props {
   labelClass?: string;
   switchClass?: string;
   fieldClass?: string;
-  dataCy?: string;
+
   disabled?: boolean;
   featureId?: FeatureId;
   valueExplanation?: ReactNode;
@@ -35,7 +36,7 @@ export function SwitchField({
   name = uuid(),
   labelClass,
   fieldClass,
-  dataCy,
+  'data-cy': dataCy,
   disabled,
   onChange,
   featureId,
@@ -65,7 +66,7 @@ export function SwitchField({
         onChange={onChange}
         index={index}
         featureId={featureId}
-        dataCy={dataCy}
+        data-cy={dataCy}
       />
       {valueExplanation && <span>{valueExplanation}</span>}
     </div>

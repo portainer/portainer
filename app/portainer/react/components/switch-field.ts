@@ -10,7 +10,7 @@ export const switchField = r2a(SwitchField, [
   'name',
   'labelClass',
   'fieldClass',
-  'dataCy',
+  'data-cy',
   'disabled',
   'onChange',
   'featureId',

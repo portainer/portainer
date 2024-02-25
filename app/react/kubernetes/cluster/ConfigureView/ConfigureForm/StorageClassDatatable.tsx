@@ -40,7 +40,7 @@ export function StorageClassDatatable({ storageClassValues }: Props) {
                       className="mr-2 mb-0"
                       id={`kubeSetup-storageToggle${storageClassValue.Name}`}
                       name={`kubeSetup-storageToggle${storageClassValue.Name}`}
-                      dataCy={`kubeSetup-storageToggle${storageClassValue.Name}`}
+                      data-cy={`kubeSetup-storageToggle${storageClassValue.Name}`}
                     />
                     <span>{storageClassValue.Name}</span>
                   </div>
@@ -69,7 +69,7 @@ export function StorageClassDatatable({ storageClassValues }: Props) {
                         )
                       }
                       className="mr-2 mb-0"
-                      dataCy={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}
+                      data-cy={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}
                       id={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}
                       name={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}
                     />
