@@ -81,6 +81,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         to="docker.templates"
         params={{ endpointId: environmentId }}
         data-cy="portainerSidebar-templates"
+        listId="dockerSidebar-templates"
       >
         <SidebarItem
           label="Application"
@@ -185,6 +186,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         to={setupSubMenuProps.to}
         params={{ endpointId: environmentId }}
         data-cy="portainerSidebar-host-area"
+        listId="portainerSidebar-host-area"
       >
         <SidebarItem
           label="Details"
