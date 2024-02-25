@@ -2,6 +2,7 @@ import clsx from 'clsx';
 
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { AutomationTestingProps } from '@/types';
 
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
@@ -9,7 +10,7 @@ import './Switch.css';
 
 import styles from './Switch.module.css';
 
-export interface Props {
+export interface Props extends AutomationTestingProps {
   checked: boolean;
   id: string;
   name: string;
@@ -17,7 +18,6 @@ export interface Props {
 
   index?: number;
   className?: string;
-  dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
 }
@@ -27,7 +27,7 @@ export function Switch({
   checked,
   id,
   disabled,
-  dataCy,
+  'data-cy': dataCy,
   onChange,
   index,
   featureId,
