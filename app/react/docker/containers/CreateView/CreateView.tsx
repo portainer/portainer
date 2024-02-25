@@ -191,10 +191,8 @@ function useOldContainer(initialName?: string) {
   });
 
   useEffect(() => {
-    if (initialName || name) {
-      setName(name !== undefined ? name : initialName);
-    }
-  }, [initialName, name]);
+    setName(initialName);
+  }, [initialName]);
 
   return {
     syncName: setName,
