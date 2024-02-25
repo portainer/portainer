@@ -226,6 +226,10 @@ export default class CreateEdgeStackViewController {
     return this.$async(async () => {
       const name = this.formValues.Name;
 
+      if (!this.validateTemplate()) {
+        return;
+      }
+
       let envVars = this.formValues.envVars;
       if (this.state.Method === 'template' && this.state.templateValues.type === 'app') {
         envVars = [...envVars, ...Object.entries(this.state.templateValues.envVars).map(([key, value]) => ({ name: key, value }))];
@@ -363,12 +367,26 @@ export default class CreateEdgeStackViewController {
     });
   }
 
+  validateTemplate() {
+    if (this.state.Method === 'template' && this.state.templateValues.type === 'app') {
+      return Object.entries(this.state.templateValues.envVars).every(([, value]) => !!value);
+    }
+
+    if (this.state.Method === 'template' && this.state.templateValues.type === 'custom') {
+      return Object.entries(this.state.templateValues.variables).every(([, v]) => {
+        return !!v.value;
+      });
+    }
+    return true;
+  }
+
   formIsInvalid() {
     return (
       this.form.$invalid ||
       !this.formValues.Groups.length ||
       (['template', 'editor'].includes(this.state.Method) && !this.formValues.StackFileContent) ||
-      ('upload' === this.state.Method && !this.formValues.StackFile)
+      ('upload' === this.state.Method && !this.formValues.StackFile) ||
+      !this.validateTemplate()
     );
   }
 }
