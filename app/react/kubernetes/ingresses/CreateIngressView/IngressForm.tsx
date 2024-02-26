@@ -11,11 +11,10 @@ import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 import { TextTip } from '@@/Tip/TextTip';
-import { Card } from '@@/Card';
-import { InputGroup } from '@@/form-components/InputGroup';
 import { InlineLoader } from '@@/InlineLoader';
 import { Select } from '@@/form-components/ReactSelect';
-import { InputLabeled } from '@@/form-components/Input/InputLabeled';
+import { Card } from '@@/Card';
+import { InputGroup } from '@@/form-components/InputGroup';
 
 import { AnnotationsForm } from '../../annotations/AnnotationsForm';
 
@@ -399,19 +398,26 @@ export function IngressForm({
                 {!host.NoHost && (
                   <div className="row">
                     <div className="form-group col-sm-6 col-lg-4 !pl-0 !pr-2">
-                      <InputLabeled
-                        size="small"
-                        label="Hostname"
-                        required
-                        name={`ingress_host_${hostIndex}`}
-                        type="text"
-                        placeholder="e.g. example.com"
-                        defaultValue={host.Host}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          handleHostChange(hostIndex, e.target.value)
-                        }
-                        id={`ingress_host_${hostIndex}`}
-                      />
+                      <InputGroup size="small">
+                        <InputGroup.Addon
+                          required
+                          as="label"
+                          htmlFor={`ingress_host_${hostIndex}`}
+                        >
+                          Hostname
+                        </InputGroup.Addon>
+                        <InputGroup.Input
+                          name={`ingress_host_${hostIndex}`}
+                          id={`ingress_host_${hostIndex}`}
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="e.g. example.com"
+                          defaultValue={host.Host}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleHostChange(hostIndex, e.target.value)
+                          }
+                        />
+                      </InputGroup>
 
                       {errors[`hosts[${hostIndex}].host`] && (
                         <FormError className="!mb-0 mt-1">
@@ -509,10 +515,17 @@ export function IngressForm({
                   >
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <InputGroup size="small">
-                        <InputGroup.Addon required>Service</InputGroup.Addon>
+                        <InputGroup.Addon
+                          required
+                          as="label"
+                          htmlFor={`ingress_service_${hostIndex}_${pathIndex}`}
+                        >
+                          Service
+                        </InputGroup.Addon>
                         <Select
                           key={serviceOptions.toString() + path.ServiceName}
                           name={`ingress_service_${hostIndex}_${pathIndex}`}
+                          id={`ingress_service_${hostIndex}_${pathIndex}`}
                           options={serviceOptions}
                           value={
                             path.ServiceName
@@ -559,12 +572,17 @@ export function IngressForm({
                       {servicePorts && (
                         <>
                           <InputGroup size="small">
-                            <InputGroup.Addon required>
+                            <InputGroup.Addon
+                              required
+                              as="label"
+                              htmlFor={`ingress_servicePort_${hostIndex}_${pathIndex}`}
+                            >
                               Service port
                             </InputGroup.Addon>
                             <Select
                               key={servicePorts.toString() + path.ServicePort}
                               name={`ingress_servicePort_${hostIndex}_${pathIndex}`}
+                              id={`ingress_servicePort_${hostIndex}_${pathIndex}`}
                               options={
                                 servicePorts[path.ServiceName]?.map(
                                   (portOption) => ({
@@ -615,10 +633,16 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-2 !m-0 !pl-0">
                       <InputGroup size="small">
-                        <InputGroup.Addon>Path type</InputGroup.Addon>
-                        <Select<Option<string>>
+                        <InputGroup.Addon
+                          as="label"
+                          htmlFor={`ingress_pathType_${hostIndex}_${pathIndex}`}
+                        >
+                          Path type
+                        </InputGroup.Addon>
+                        <Select
                           key={servicePorts.toString() + path.PathType}
                           name={`ingress_pathType_${hostIndex}_${pathIndex}`}
+                          id={`ingress_pathType_${hostIndex}_${pathIndex}`}
                           options={
                             pathTypes?.map((type) => ({
                               label: type,
@@ -665,10 +689,17 @@ export function IngressForm({
 
                     <div className="form-group col-sm-3 col-xl-3 !m-0 !pl-0">
                       <InputGroup size="small">
-                        <InputGroup.Addon required>Path</InputGroup.Addon>
+                        <InputGroup.Addon
+                          required
+                          as="label"
+                          htmlFor={`ingress_route_${hostIndex}-${pathIndex}`}
+                        >
+                          Path
+                        </InputGroup.Addon>
                         <InputGroup.Input
                           className="form-control"
                           name={`ingress_route_${hostIndex}-${pathIndex}`}
+                          id={`ingress_route_${hostIndex}-${pathIndex}`}
                           placeholder="/example"
                           data-pattern="/^(\/?[a-zA-Z0-9]+([a-zA-Z0-9-/_]*[a-zA-Z0-9])?|[a-zA-Z0-9]+)|(\/){1}$/"
                           data-cy={`k8sAppCreate-route_${hostIndex}-${pathIndex}`}
