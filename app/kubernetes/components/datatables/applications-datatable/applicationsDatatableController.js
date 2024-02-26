@@ -169,20 +169,22 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatab
     };
 
     this.$onChanges = function (changes) {
-      // when the table is visible, sync the show system setting with the stack show system setting
-      if (changes.isVisible && changes.isVisible.currentValue) {
-        const storedStacksSettings = DatatableService.getDataTableSettings('kubernetes.applications.stacks');
-        if (storedStacksSettings && storedStacksSettings.state) {
-          this.settings.showSystem = storedStacksSettings.state.showSystemResources;
+      if (this.settingsLoaded) {
+        // when the table is visible, sync the show system setting with the stack show system setting
+        if (changes.isVisible && changes.isVisible.currentValue) {
+          const storedStacksSettings = DatatableService.getDataTableSettings('kubernetes.applications.stacks');
+          if (storedStacksSettings && storedStacksSettings.state) {
+            this.settings.showSystem = storedStacksSettings.state.showSystemResources;
+            DatatableService.setDataTableSettings(this.settingsKey, this.settings);
+          }
+        } else if (typeof this.isSystemResources !== 'undefined') {
+          this.settings.showSystem = this.isSystemResources;
           DatatableService.setDataTableSettings(this.settingsKey, this.settings);
         }
-      } else if (typeof this.isSystemResources !== 'undefined') {
-        this.settings.showSystem = this.isSystemResources;
-        DatatableService.setDataTableSettings(this.settingsKey, this.settings);
+        this.state.namespace = this.namespace;
+        this.updateNamespace();
+        this.prepareTableFromDataset();
       }
-      this.state.namespace = this.namespace;
-      this.updateNamespace();
-      this.prepareTableFromDataset();
     };
 
     this.$onInit = function () {
@@ -226,7 +228,7 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatab
         // make show system in sync with the stack show system settings
         const storedStacksSettings = DatatableService.getDataTableSettings('kubernetes.applications.stacks');
         if (storedStacksSettings && storedStacksSettings.state) {
-          this.settings.showSystem = storedStacksSettings.state.showSystemResources;
+          this.settings.showSystem = storedStacksSettings.state.showSystemResources || this.settings.showSystem;
         }
 
         this.setSystemResources && this.setSystemResources(this.settings.showSystem);
