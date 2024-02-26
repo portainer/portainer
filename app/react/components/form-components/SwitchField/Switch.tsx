@@ -42,6 +42,8 @@ export function Switch({
           business: limitedToBE,
           limited: limitedToBE,
         })}
+        data-cy={dataCy}
+        aria-checked={checked}
       >
         <input
           type="checkbox"
@@ -51,7 +53,7 @@ export function Switch({
           disabled={disabled || limitedToBE}
           onChange={({ target: { checked } }) => onChange(checked, index)}
         />
-        <span className="slider round before:content-['']" data-cy={dataCy} />
+        <span className="slider round before:content-['']" />
       </label>
       {limitedToBE && <BEFeatureIndicator featureId={featureId} />}
     </>
