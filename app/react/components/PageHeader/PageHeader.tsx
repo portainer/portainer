@@ -43,6 +43,7 @@ export function PageHeader({
             onClick={onClickedRefresh}
             className="m-0 p-0 focus:text-inherit"
             disabled={loading}
+            title="Refresh page"
           >
             <RefreshCw className="icon" />
           </Button>
