@@ -15,6 +15,7 @@ import { Card } from '@@/Card';
 import { InputGroup } from '@@/form-components/InputGroup';
 import { InlineLoader } from '@@/InlineLoader';
 import { Select } from '@@/form-components/ReactSelect';
+import { InputLabeled } from '@@/form-components/Input/InputLabeled';
 
 import { AnnotationsForm } from '../../annotations/AnnotationsForm';
 
@@ -398,19 +399,20 @@ export function IngressForm({
                 {!host.NoHost && (
                   <div className="row">
                     <div className="form-group col-sm-6 col-lg-4 !pl-0 !pr-2">
-                      <InputGroup size="small">
-                        <InputGroup.Addon required>Hostname</InputGroup.Addon>
-                        <InputGroup.Input
-                          name={`ingress_host_${hostIndex}`}
-                          type="text"
-                          className="form-control form-control-sm"
-                          placeholder="e.g. example.com"
-                          defaultValue={host.Host}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleHostChange(hostIndex, e.target.value)
-                          }
-                        />
-                      </InputGroup>
+                      <InputLabeled
+                        size="small"
+                        label="Hostname"
+                        required
+                        name={`ingress_host_${hostIndex}`}
+                        type="text"
+                        placeholder="e.g. example.com"
+                        defaultValue={host.Host}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleHostChange(hostIndex, e.target.value)
+                        }
+                        id={`ingress_host_${hostIndex}`}
+                      />
+
                       {errors[`hosts[${hostIndex}].host`] && (
                         <FormError className="!mb-0 mt-1">
                           {errors[`hosts[${hostIndex}].host`]}
@@ -420,10 +422,17 @@ export function IngressForm({
 
                     <div className="form-group col-sm-6 col-lg-4 !pl-2 !pr-0">
                       <InputGroup size="small">
-                        <InputGroup.Addon>TLS secret</InputGroup.Addon>
+                        <InputGroup.Addon
+                          as="label"
+                          htmlFor={`ingress_tls_${hostIndex}`}
+                        >
+                          TLS secret
+                        </InputGroup.Addon>
                         <Select
                           key={tlsOptions.toString() + host.Secret}
                           name={`ingress_tls_${hostIndex}`}
+                          inputId={`ingress_tls_${hostIndex}`}
+                          options={tlsOptions}
                           value={
                             host.Secret !== undefined
                               ? {
@@ -442,7 +451,6 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No TLS secrets available'}
                           size="sm"
-                          options={tlsOptions}
                         />
                         {!host.NoHost && (
                           <div className="input-group-btn">
