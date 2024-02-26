@@ -61,7 +61,7 @@ export function InnerForm({
   const texts = textByType[values.Type];
 
   return (
-    <Form className="form-horizontal">
+    <Form className="form-horizontal" autoComplete="off">
       <CommonFields
         values={values}
         onChange={(newValues) =>
