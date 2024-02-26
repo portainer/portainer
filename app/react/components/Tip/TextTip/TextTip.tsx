@@ -29,6 +29,7 @@ export function TextTip({
         'small gap-1 align-top text-xs',
         inline ? 'inline-flex' : 'flex'
       )}
+      role="status"
     >
       <Icon icon={icon} mode={getMode(color)} className="!mt-0.5 flex-none" />
 
