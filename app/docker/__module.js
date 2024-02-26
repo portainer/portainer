@@ -165,7 +165,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         },
       },
       data: {
-        docs: '/user/docker/host',
+        docs: '/user/docker/host/details',
       },
     };
 
@@ -280,7 +280,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/nodes',
       abstract: true,
       data: {
-        docs: '/user/docker/swarm',
+        docs: '/user/docker/swarm/details',
       },
     };
 
