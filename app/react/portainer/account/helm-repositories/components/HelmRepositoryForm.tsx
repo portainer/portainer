@@ -39,13 +39,18 @@ export function HelmRepositoryForm({
     >
       {({ values, errors, handleSubmit, isValid, dirty }) => (
         <Form className="form-horizontal" onSubmit={handleSubmit} noValidate>
-          <FormControl inputId="url" label="URL" errors={errors.URL} required>
+          <FormControl
+            inputId="url-field"
+            label="URL"
+            errors={errors.URL}
+            required
+          >
             <Field
               as={Input}
               name="URL"
               value={values.URL}
               autoComplete="off"
-              id="URL"
+              id="url-field"
             />
           </FormControl>
           <div className="form-group">
