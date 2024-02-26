@@ -79,7 +79,7 @@ const ngModule = angular
   )
   .component(
     'dockerConfigsDatatable',
-    r2a(withUIRouter(ConfigsDatatable), [
+    r2a(withUIRouter(withCurrentUser(ConfigsDatatable)), [
       'dataset',
       'onRemoveClick',
       'onRefresh',
@@ -121,7 +121,11 @@ const ngModule = angular
   .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
   .component(
     'dockerSecretsDatatable',
-    r2a(withUIRouter(SecretsDatatable), ['dataset', 'onRefresh', 'onRemove'])
+    r2a(withUIRouter(withCurrentUser(SecretsDatatable)), [
+      'dataset',
+      'onRefresh',
+      'onRemove',
+    ])
   )
   .component(
     'dockerStacksDatatable',
