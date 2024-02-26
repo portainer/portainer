@@ -1,5 +1,7 @@
 import { Clipboard, Plus, Trash2 } from 'lucide-react';
 
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
+
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { useRepeater } from '@@/datatables/useRepeater';
@@ -26,6 +28,11 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
 
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
+  const hasWriteAccessQuery = useAuthorizations([
+    'DockerConfigCreate',
+    'DockerConfigDelete',
+  ]);
+
   return (
     <Datatable
       dataset={dataset}
@@ -42,21 +49,33 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
           />
         </TableSettingsMenu>
       )}
-      renderTableActions={(selectedRows) => (
-        <div className="flex items-center gap-3">
-          <Button
-            icon={Trash2}
-            color="dangerlight"
-            onClick={() => onRemoveClick(selectedRows)}
-            disabled={selectedRows.length === 0}
-          >
-            Remove
-          </Button>
-          <Button icon={Plus} as={Link} props={{ to: 'docker.configs.new' }}>
-            Add config
-          </Button>
-        </div>
-      )}
+      disableSelect={!hasWriteAccessQuery.authorized}
+      renderTableActions={(selectedRows) =>
+        hasWriteAccessQuery.authorized && (
+          <div className="flex items-center gap-3">
+            <Authorized authorizations="DockerConfigDelete">
+              <Button
+                icon={Trash2}
+                color="dangerlight"
+                onClick={() => onRemoveClick(selectedRows)}
+                disabled={selectedRows.length === 0}
+              >
+                Remove
+              </Button>
+            </Authorized>
+
+            <Authorized authorizations="DockerConfigCreate">
+              <Button
+                icon={Plus}
+                as={Link}
+                props={{ to: 'docker.configs.new' }}
+              >
+                Add config
+              </Button>
+            </Authorized>
+          </div>
+        )
+      }
     />
   );
 }

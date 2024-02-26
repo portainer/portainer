@@ -88,6 +88,14 @@ export function useIsEdgeAdmin({
   };
 }
 
+/**
+ * Check if the user has some of the authorizations
+ *
+ * @param authorizations a list of authorizations to check
+ * @param forceEnvironmentId to force the environment id, used where the environment id can't be loaded from the router, like sidebar
+ * @param adminOnlyCE if true, will return false if the user is not an admin in CE
+ * @returns query result with isLoading and authorized - authorized is true if the user has some of the authorizations
+ */
 export function useAuthorizations(
   authorizations: string | string[],
   forceEnvironmentId?: EnvironmentId,
@@ -137,7 +145,7 @@ export function useIsEnvironmentAdmin({
 }
 
 /**
- * will return true if the user has the authorizations. assumes the user is authenticated and not an admin
+ * will return true if the user has some of the authorizations. assumes the user is authenticated and not an admin
  *
  * @private Please use `useAuthorizations` instead. Exported only for angular's authentication service app/portainer/services/authentication.js:154
  */
