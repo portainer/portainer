@@ -3,6 +3,7 @@ import { Lock, Plus, Trash2 } from 'lucide-react';
 
 import { SecretViewModel } from '@/docker/models/secret';
 import { isoDate } from '@/portainer/filters/filters';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -53,6 +54,11 @@ export function SecretsDatatable({
   const tableState = useTableState(store, storageKey);
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
+  const hasWriteAccessQuery = useAuthorizations([
+    'DockerSecretCreate',
+    'DockerSecretDelete',
+  ]);
+
   return (
     <Datatable
       title="Secrets"
@@ -60,11 +66,14 @@ export function SecretsDatatable({
       columns={columns}
       dataset={dataset || []}
       isLoading={!dataset}
+      disableSelect={!hasWriteAccessQuery.authorized}
       settingsManager={tableState}
       emptyContentLabel="No secret available."
-      renderTableActions={(selectedItems) => (
-        <TableActions selectedItems={selectedItems} onRemove={onRemove} />
-      )}
+      renderTableActions={(selectedItems) =>
+        hasWriteAccessQuery.authorized && (
+          <TableActions selectedItems={selectedItems} onRemove={onRemove} />
+        )
+      }
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
@@ -86,26 +95,30 @@ function TableActions({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <Button
-        color="dangerlight"
-        disabled={selectedItems.length === 0}
-        onClick={() => onRemove(selectedItems)}
-        icon={Trash2}
-        className="!m-0"
-        data-cy="secret-removeSecretButton"
-      >
-        Remove
-      </Button>
+      <Authorized authorizations="DockerSecretDelete">
+        <Button
+          color="dangerlight"
+          disabled={selectedItems.length === 0}
+          onClick={() => onRemove(selectedItems)}
+          icon={Trash2}
+          className="!m-0"
+          data-cy="secret-removeSecretButton"
+        >
+          Remove
+        </Button>
+      </Authorized>
 
-      <Button
-        as={Link}
-        props={{ to: '.new' }}
-        icon={Plus}
-        className="!m-0"
-        data-cy="secret-addSecretButton"
-      >
-        Add secret
-      </Button>
+      <Authorized authorizations="DockerSecretCreate">
+        <Button
+          as={Link}
+          props={{ to: '.new' }}
+          icon={Plus}
+          className="!m-0"
+          data-cy="secret-addSecretButton"
+        >
+          Add secret
+        </Button>
+      </Authorized>
     </div>
   );
 }
