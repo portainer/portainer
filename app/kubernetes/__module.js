@@ -131,6 +131,19 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const helmApplication = {
+      name: 'kubernetes.helm',
+      url: '/helm/:namespace/:name',
+      views: {
+        'content@': {
+          component: 'kubernetesHelmApplicationView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/inspect-helm',
+      },
+    };
+
     const services = {
       name: 'kubernetes.services',
       url: '/services',
@@ -165,6 +178,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesIngressesCreateView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/networking/ingresses/add',
+      },
     };
 
     const ingressesEdit = {
@@ -198,6 +214,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateApplicationView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/applications/add',
+      },
     };
 
     const application = {
@@ -208,6 +227,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'applicationDetailsView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/applications/inspect',
+      },
     };
 
     const applicationEdit = {
@@ -217,6 +239,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesCreateApplicationView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/applications/edit',
       },
     };
 
@@ -304,6 +329,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateConfigMapView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/configurations/add-configmap',
+      },
     };
 
     const configMap = {
@@ -332,6 +360,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesCreateSecretView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/configurations/add-secret',
       },
     };
 
@@ -365,6 +396,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesNodeView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/cluster/node',
       },
     };
 
@@ -425,6 +459,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateNamespaceView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/namespaces/add',
+      },
     };
 
     const resourcePool = {
@@ -435,6 +472,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesResourcePoolView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/namespaces/manage',
+      },
     };
 
     const resourcePoolAccess = {
@@ -444,6 +484,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesResourcePoolAccessView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/namespaces/access',
       },
     };
 
@@ -521,6 +564,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     };
 
     $stateRegistryProvider.register(kubernetes);
+    $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);
     $stateRegistryProvider.register(application);

@@ -72,6 +72,9 @@ angular
           component: 'createEdgeStackView',
         },
       },
+      data: {
+        docs: '/user/edge/stacks/add',
+      },
     };
 
     const stacksEdit = {
@@ -141,7 +144,7 @@ angular
           },
         },
         data: {
-          docs: '/user/edge/devices',
+          docs: '/user/edge/waiting-room',
         },
       });
     }
@@ -155,7 +158,7 @@ angular
         },
       },
       data: {
-        docs: '/user/edge/templates',
+        docs: '/user/edge/templates/application',
       },
     });
 

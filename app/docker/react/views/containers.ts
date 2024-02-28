@@ -85,6 +85,9 @@ function config($stateRegistryProvider: StateRegistry) {
         component: 'createContainerView',
       },
     },
+    data: {
+      docs: '/user/docker/containers/add',
+    },
   });
 
   $stateRegistryProvider.register({
