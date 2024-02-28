@@ -23,7 +23,7 @@ export function TableTitle({
     <>
       <div className={clsx('toolBar flex-col', className)} id={id}>
         <div className="flex w-full items-center gap-1 p-0">
-          <h2 className="toolBarTitle m-0 text-2xl">
+          <h2 className="toolBarTitle m-0 text-base">
             {icon && (
               <div className="widget-icon">
                 <Icon icon={icon} className="space-right" />
