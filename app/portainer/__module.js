@@ -183,7 +183,7 @@ angular
           },
         },
         data: {
-          docs: '/admin/environments',
+          docs: '/admin/environments/environments',
         },
       };
 
@@ -219,6 +219,9 @@ angular
           'content@': {
             component: 'edgeAutoCreateScriptView',
           },
+        },
+        data: {
+          docs: '/admin/environments/aeec',
         },
       };
 
@@ -372,6 +375,9 @@ angular
             component: 'editRegistry',
           },
         },
+        data: {
+          docs: '/admin/registries/edit',
+        },
       };
 
       const registryCreation = {
@@ -381,6 +387,9 @@ angular
           'content@': {
             component: 'createRegistry',
           },
+        },
+        data: {
+          docs: '/admin/registries/add',
         },
       };
 
@@ -450,7 +459,7 @@ angular
           },
         },
         data: {
-          docs: '/admin/users',
+          docs: '/admin/user/users',
           access: AccessHeaders.Restricted, // allow for team leaders
         },
       };

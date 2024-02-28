@@ -31,7 +31,7 @@ function config($stateRegistryProvider: StateRegistry) {
       },
     },
     data: {
-      docs: '/admin/users/teams',
+      docs: '/admin/user/teams',
       access: AccessHeaders.Restricted, // allow for team leaders
     },
   });

@@ -36,6 +36,9 @@ function config($stateRegistryProvider: StateRegistry) {
         component: 'updateSchedulesListView',
       },
     },
+    data: {
+      docs: '/admin/environments/update',
+    },
   });
 
   $stateRegistryProvider.register({
