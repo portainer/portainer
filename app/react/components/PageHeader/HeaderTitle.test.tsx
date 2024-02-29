@@ -1,3 +1,5 @@
+import { QueryClient, QueryClientProvider } from 'react-query';
+
 import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { render } from '@/react-tools/test-utils';
@@ -23,14 +25,17 @@ test('should not render without a wrapping HeaderContainer', async () => {
 test('should display a HeaderTitle', async () => {
   const username = 'username';
   const user = new UserViewModel({ Username: username });
+  const queryClient = new QueryClient();
 
   const title = 'title';
   const { queryByText } = render(
-    <UserContext.Provider value={{ user }}>
-      <HeaderContainer>
-        <HeaderTitle title={title} />
-      </HeaderContainer>
-    </UserContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <UserContext.Provider value={{ user }}>
+        <HeaderContainer>
+          <HeaderTitle title={title} />
+        </HeaderContainer>
+      </UserContext.Provider>
+    </QueryClientProvider>
   );
 
   const heading = queryByText(title);
