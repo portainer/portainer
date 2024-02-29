@@ -26,15 +26,15 @@ export function useUnauthorizedRedirect(
 ) {
   const router = useRouter();
 
-  const isAuthorized = useAuthorizations(
+  const isAuthorizedQuery = useAuthorizations(
     authorizations,
     undefined,
     adminOnlyCE
   );
 
   useEffect(() => {
-    if (!isAuthorized) {
+    if (!isAuthorizedQuery.isLoading && !isAuthorizedQuery.authorized) {
       router.stateService.go(to, params);
     }
-  }, [isAuthorized, params, to, router.stateService]);
+  }, [isAuthorizedQuery, params, to, router.stateService]);
 }
