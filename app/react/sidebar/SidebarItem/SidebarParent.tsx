@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import { PropsWithChildren, useState } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
@@ -15,9 +17,9 @@ type Props = {
   label: string;
   icon: React.ReactNode;
   to: string;
-  'data-cy': string;
   pathOptions?: PathOptions;
   params?: object;
+  listId: string;
 };
 
 export function SidebarParent({
@@ -27,8 +29,9 @@ export function SidebarParent({
   to,
   params,
   pathOptions,
+  listId,
   'data-cy': dataCy,
-}: PropsWithChildren<Props>) {
+}: PropsWithChildren<Props & AutomationTestingProps>) {
   const anchorProps = useSidebarSrefActive(
     to,
     undefined,
@@ -78,7 +81,14 @@ export function SidebarParent({
           <button
             type="button"
             className="flex-none border-none bg-transparent flex items-center group p-0 px-3 h-8"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsExpanded((isExpanded) => !isExpanded);
+            }}
+            title={isExpanded ? 'Collapse' : 'Expand'}
+            aria-expanded={isExpanded}
+            aria-controls={listId}
           >
             <div className="flex items-center group-hover:bg-blue-5 be:group-hover:bg-gray-5 group-hover:th-dark:bg-gray-true-7 group-hover:bg-opacity-10 be:group-hover:bg-opacity-10 rounded-full p-[3px] transition ease-in-out">
               <Icon
@@ -98,6 +108,7 @@ export function SidebarParent({
 
   const childList = (
     <ul
+      id={listId}
       // pl-11 must be important because it needs to avoid the padding from '.root ul' in sidebar.module.css
       className={clsx('text-white !pl-11', {
         hidden: !isExpanded,

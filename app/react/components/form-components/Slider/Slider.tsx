@@ -17,6 +17,7 @@ export interface Props {
   dataCy?: string;
   // true if you want to always show the tooltip
   visibleTooltip?: boolean;
+  disabled?: boolean;
 }
 
 export function Slider({
@@ -27,6 +28,7 @@ export function Slider({
   onChange,
   dataCy,
   visibleTooltip: visible,
+  disabled,
 }: Props) {
   const marks = {
     [min]: visible && value / max < 0.1 ? '' : translateMinValue(min),
@@ -34,14 +36,14 @@ export function Slider({
   };
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-cy={dataCy}>
       <RcSlider
         handleRender={visible ? sliderTooltip : undefined}
         min={min}
         max={max}
         marks={marks}
         step={step}
-        data-cy={dataCy}
+        disabled={disabled}
         value={value}
         onChange={onChange}
       />

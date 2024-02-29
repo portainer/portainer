@@ -39,6 +39,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
           to="portainer.users"
           pathOptions={{ includePaths: ['portainer.teams', 'portainer.roles'] }}
           data-cy="portainerSidebar-userRelated"
+          listId="portainerSidebar-userRelated"
         >
           <SidebarItem
             to="portainer.users"
@@ -77,6 +78,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
               ],
             }}
             data-cy="portainerSidebar-environments-area"
+            listId="portainer-environments"
           >
             <SidebarItem
               label="Environments"
@@ -125,6 +127,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
               includePaths: ['portainer.activityLogs'],
             }}
             data-cy="k8sSidebar-logs"
+            listId="k8sSidebar-logs"
           >
             <SidebarItem
               label="Authentication"
@@ -147,6 +150,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
           icon={HardDrive}
           to="portainer.endpoints.updateSchedules"
           data-cy="portainerSidebar-environments-area"
+          listId="portainer-environments-area"
         >
           <EdgeUpdatesSidebarItem />
         </SidebarParent>
@@ -164,6 +168,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
           label="Settings"
           icon={Settings}
           data-cy="portainerSidebar-settings"
+          listId="portainer-settings"
         >
           <SidebarItem
             to="portainer.settings"

@@ -81,16 +81,19 @@ export function ResourceQuotaFormSection({
             inputId="memory-limit"
           >
             <div className="col-xs-8">
-              <SliderWithInput
-                value={Number(values.memory) ?? 0}
-                onChange={(value) =>
-                  onChange({ ...values, memory: `${value}` })
-                }
-                max={memoryLimit}
-                step={128}
-                dataCy="k8sNamespaceCreate-memoryLimit"
-                visibleTooltip
-              />
+              {memoryLimit >= 0 && (
+                <SliderWithInput
+                  value={Number(values.memory) ?? 0}
+                  onChange={(value) =>
+                    onChange({ ...values, memory: `${value}` })
+                  }
+                  max={memoryLimit}
+                  step={128}
+                  dataCy="k8sNamespaceCreate-memoryLimit"
+                  visibleTooltip
+                  inputId="memory-limit"
+                />
+              )}
               {errors?.memory && (
                 <FormError className="pt-1">{errors.memory}</FormError>
               )}

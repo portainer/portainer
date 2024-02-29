@@ -1,10 +1,10 @@
 import { useRouter } from '@uirouter/react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 import { pluralize } from '@/portainer/helpers/strings';
 
 import { confirmDestructive } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
+import { AddButton, Button } from '@@/buttons';
 
 import { HelmRepository } from './types';
 import { useDeleteHelmRepositoriesMutation } from './helm-repositories.service';
@@ -18,7 +18,7 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
   const deleteHelmRepoMutation = useDeleteHelmRepositoriesMutation();
 
   return (
-    <>
+    <div className="flex gap-2">
       <Button
         disabled={selectedItems.length < 1}
         color="dangerlight"
@@ -29,16 +29,10 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
         Remove
       </Button>
 
-      <Button
-        onClick={() =>
-          router.stateService.go('portainer.account.createHelmRepository')
-        }
-        data-cy="credentials-addButton"
-        icon={Plus}
-      >
+      <AddButton to="portainer.account.createHelmRepository">
         Add Helm repository
-      </Button>
-    </>
+      </AddButton>
+    </div>
   );
 
   async function onDeleteClick(selectedItems: HelmRepository[]) {

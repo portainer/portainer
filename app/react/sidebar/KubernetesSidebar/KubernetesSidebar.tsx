@@ -59,6 +59,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         params={{ endpointId: environmentId }}
         pathOptions={{ includePaths: ['kubernetes.ingresses'] }}
         data-cy="k8sSidebar-networking"
+        listId="k8sSidebar-networking"
       >
         <SidebarItem
           to="kubernetes.services"
@@ -97,7 +98,8 @@ export function KubernetesSidebar({ environmentId }: Props) {
         to="kubernetes.cluster"
         params={{ endpointId: environmentId }}
         pathOptions={{ includePaths: ['kubernetes.registries'] }}
-        data-cy="k8sSidebar-cluster"
+        data-cy="k8sSidebar-cluster-area"
+        listId="k8sSidebar-cluster-area"
       >
         <SidebarItem
           label="Details"
@@ -108,7 +110,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           ]}
           params={{ endpointId: environmentId }}
           isSubMenu
-          data-cy="k8sSidebar-clusterDetails"
+          data-cy="k8sSidebar-cluster"
         />
         <Authorized
           authorizations="K8sClusterSetupRW"
