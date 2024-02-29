@@ -39,11 +39,13 @@ export function DeploymentCounter({
   total: number;
   type?: StatusType;
 }) {
+  const width = total ? (count / total) * 100 : 0;
+
   return (
     <TooltipWithChildren message={getTooltip(count, total, type)}>
       <div className="h-2 w-full overflow-hidden rounded-lg bg-gray-4">
         <div
-          style={{ width: `${(count / total) * 100}%` }}
+          style={{ width: `${width}%` }}
           className={clsx('h-full rounded-lg', {
             'bg-success-7': type === StatusType.Running,
             'bg-error-7': type === StatusType.Error,
