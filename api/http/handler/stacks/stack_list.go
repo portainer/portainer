@@ -98,19 +98,26 @@ func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters, 
 	}
 
 	filteredStacks := make([]portainer.Stack, 0, len(stacks))
+	uniqueStackNames := make(map[string]struct{})
 	for _, stack := range stacks {
-		if filters.IncludeOrphanedStacks && isOrphanedStack(stack, endpoints) {
-			if (stack.Type == portainer.DockerComposeStack && filters.SwarmID == "") || (stack.Type == portainer.DockerSwarmStack && filters.SwarmID != "") {
-				filteredStacks = append(filteredStacks, stack)
-			}
-			continue
-		}
-
 		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == portainer.EndpointID(filters.EndpointID) {
 			filteredStacks = append(filteredStacks, stack)
+			uniqueStackNames[stack.Name] = struct{}{}
 		}
 		if stack.Type == portainer.DockerSwarmStack && stack.SwarmID == filters.SwarmID {
 			filteredStacks = append(filteredStacks, stack)
+			uniqueStackNames[stack.Name] = struct{}{}
+		}
+	}
+
+	for _, stack := range stacks {
+		if filters.IncludeOrphanedStacks && isOrphanedStack(stack, endpoints) {
+			if (stack.Type == portainer.DockerComposeStack && filters.SwarmID == "") || (stack.Type == portainer.DockerSwarmStack && filters.SwarmID != "") {
+				if _, exists := uniqueStackNames[stack.Name]; !exists {
+					// Only append the orphaned stacks that do not have the same name as the normal stacks
+					filteredStacks = append(filteredStacks, stack)
+				}
+			}
 		}
 	}
 
