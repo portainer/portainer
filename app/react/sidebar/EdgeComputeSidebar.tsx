@@ -58,6 +58,7 @@ export function EdgeComputeSidebar() {
         label="Edge Templates"
         to="edge.templates"
         data-cy="edgeSidebar-templates"
+        listId="edgeSidebar-templates"
       >
         <SidebarItem
           label="Application"

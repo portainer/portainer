@@ -1,4 +1,4 @@
-<div class="datatable">
+<section class="datatable" aria-label="Helm charts">
   <div class="toolBar vertical-center relative w-full flex-wrap !gap-x-5 !gap-y-1 !px-0">
     <div class="toolBarTitle vertical-center">
       {{ $ctrl.titleText }}
@@ -6,7 +6,7 @@
 
     <div class="searchBar vertical-center !mr-0">
       <pr-icon icon="'search'" class="searchIcon"></pr-icon>
-      <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+      <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" aria-label="Search input" />
     </div>
     <div class="w-1/5">
       <por-select
@@ -45,4 +45,4 @@
     </div>
     <div ng-if="!$ctrl.loading && $ctrl.charts.length === 0" class="text-muted text-center"> No helm charts available. </div>
   </div>
-</div>
+</section>

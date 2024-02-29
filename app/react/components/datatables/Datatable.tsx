@@ -169,7 +169,7 @@ export function Datatable<D extends DefaultType>({
   const selectedItems = selectedRowModel.rows.map((row) => row.original);
 
   return (
-    <Table.Container noWidget={noWidget}>
+    <Table.Container noWidget={noWidget} aria-label={title}>
       <DatatableHeader
         onSearchChange={handleSearchBarChange}
         searchValue={settings.search}
