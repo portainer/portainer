@@ -200,7 +200,7 @@ export function InputList<T = DefaultType>({
 
       {isAddButtonVisible && (
         <>
-          <div className="col-sm-12 mt-3">
+          <div className="col-sm-12 mt-7">
             <Button
               onClick={handleAdd}
               disabled={disabled}
