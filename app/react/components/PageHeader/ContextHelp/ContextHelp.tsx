@@ -42,8 +42,16 @@ function useDocsUrl(): string {
 
   let url = 'https://docs.portainer.io/';
   if (versionQuery.data) {
-    const version = versionQuery.data.ServerVersion.match(/^(\d+\.\d+)/);
-    url += `v/${version}/`;
+    let { ServerVersion } = versionQuery.data;
+    if (ServerVersion[0] === 'v') {
+      ServerVersion = ServerVersion.substring(1);
+    }
+
+    const parts = ServerVersion.split('.');
+    if (parts.length >= 2) {
+      const version = parts.slice(0, 2).join('.');
+      url += `v/${version}/`;
+    }
   }
 
   const { data } = state;
