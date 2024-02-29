@@ -135,6 +135,11 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 }
 
 func updateEnvStatus(environmentId portainer.EndpointID, stack *portainer.EdgeStack, deploymentStatus portainer.EdgeStackDeploymentStatus) {
+	if deploymentStatus.Type == portainer.EdgeStackStatusRemoved {
+		delete(stack.Status, environmentId)
+		return
+	}
+
 	environmentStatus, ok := stack.Status[environmentId]
 	if !ok {
 		environmentStatus = portainer.EdgeStackStatus{

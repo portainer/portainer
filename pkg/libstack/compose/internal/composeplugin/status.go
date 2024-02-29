@@ -127,6 +127,12 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 				log.Debug().
 					Str("project_name", name).
 					Msg("no output from docker compose ps")
+
+				if status == libstack.StatusRemoved {
+					errorMessageCh <- ""
+					return
+				}
+
 				continue
 			}
 
