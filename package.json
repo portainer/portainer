@@ -114,7 +114,7 @@
     "react-is": "^17.0.2",
     "react-query": "^3.33.4",
     "react-select": "^5.2.1",
-    "sanitize-html": "^2.8.1",
+    "sanitize-html": "^2.12.1",
     "spinkit": "^2.0.1",
     "strip-ansi": "^6.0.0",
     "tippy.js": "^6.3.7",
