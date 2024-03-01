@@ -7314,10 +7314,9 @@ axios-cache-interceptor@^1.4.1:
     fast-defer "1.1.8"
     object-code "1.3.2"
 
-axios-progress-bar@^1.2.0:
+axios-progress-bar@portainer/progress-bar-4-axios:
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/axios-progress-bar/-/axios-progress-bar-1.2.0.tgz#f9ee88dc9af977246be1ef07eedfa4c990c639c5"
-  integrity sha512-PEgWb/b2SMyHnKJ/cxA46OdCuNeVlo8eqL0HxXPtz+6G/Jtpyo49icPbW+jpO1wUeDEjbqpseMoCyWxESxf5pA==
+  resolved "https://codeload.github.com/portainer/progress-bar-4-axios/tar.gz/d424cd29f5b629af9ffc5c3d6db8d92d11d82f0f"
 
 axios@^1.6.2:
   version "1.6.2"
