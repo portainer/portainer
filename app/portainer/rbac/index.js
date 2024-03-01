@@ -29,7 +29,7 @@ function config($stateRegistryProvider) {
       },
     },
     data: {
-      docs: '/admin/users/roles',
+      docs: '/admin/user/roles',
       access: AccessHeaders.Admin,
     },
   };

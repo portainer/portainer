@@ -140,7 +140,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         },
       },
       data: {
-        docs: '/user/kubernetes/helm',
+        docs: '/user/kubernetes/inspect-helm',
       },
     };
 
@@ -153,7 +153,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         },
       },
       data: {
-        docs: '/user/kubernetes/services',
+        docs: '/user/kubernetes/networking/services',
       },
     };
 
@@ -166,7 +166,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         },
       },
       data: {
-        docs: '/user/kubernetes/ingresses',
+        docs: '/user/kubernetes/networking/ingresses',
       },
     };
 
@@ -177,6 +177,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesIngressesCreateView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/networking/ingresses/add',
       },
     };
 
@@ -211,6 +214,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateApplicationView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/applications/add',
+      },
     };
 
     const application = {
@@ -221,6 +227,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'applicationDetailsView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/applications/inspect',
+      },
     };
 
     const applicationEdit = {
@@ -230,6 +239,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesCreateApplicationView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/applications/edit',
       },
     };
 
@@ -317,6 +329,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateConfigMapView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/configurations/add-configmap',
+      },
     };
 
     const configMap = {
@@ -346,6 +361,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateSecretView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/configurations/add-secret',
+      },
     };
 
     const secret = {
@@ -367,7 +385,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         },
       },
       data: {
-        docs: '/user/kubernetes/cluster',
+        docs: '/user/kubernetes/cluster/details',
       },
     };
 
@@ -378,6 +396,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesNodeView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/cluster/node',
       },
     };
 
@@ -412,6 +433,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesDeployView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/applications/manifest',
+      },
     };
 
     const resourcePools = {
@@ -435,6 +459,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesCreateNamespaceView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/namespaces/add',
+      },
     };
 
     const resourcePool = {
@@ -445,6 +472,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           component: 'kubernetesResourcePoolView',
         },
       },
+      data: {
+        docs: '/user/kubernetes/namespaces/manage',
+      },
     };
 
     const resourcePoolAccess = {
@@ -454,6 +484,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesResourcePoolAccessView',
         },
+      },
+      data: {
+        docs: '/user/kubernetes/namespaces/access',
       },
     };
 
