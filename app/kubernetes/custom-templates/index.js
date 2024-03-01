@@ -37,6 +37,9 @@ function config($stateRegistryProvider) {
     params: {
       fileContent: '',
     },
+    data: {
+      docs: '/user/kubernetes/templates/add',
+    },
   };
 
   const customTemplatesEdit = {

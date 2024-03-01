@@ -104,6 +104,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controllerAs: 'ctrl',
         },
       },
+      data: {
+        docs: '/user/docker/configs/add',
+      },
     };
 
     const customTemplates = {
@@ -165,7 +168,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         },
       },
       data: {
-        docs: '/user/docker/host',
+        docs: '/user/docker/host/details',
       },
     };
 
@@ -227,6 +230,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'BuildImageController',
         },
       },
+      data: {
+        docs: '/user/docker/images/build',
+      },
     };
 
     var imageImport = {
@@ -237,6 +243,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: './views/images/import/importimage.html',
           controller: 'ImportImageController',
         },
+      },
+      data: {
+        docs: '/user/docker/images/import',
       },
     };
 
@@ -273,6 +282,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'CreateNetworkController',
         },
       },
+      data: {
+        docs: '/user/docker/networks/add',
+      },
     };
 
     var nodes = {
@@ -280,7 +292,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/nodes',
       abstract: true,
       data: {
-        docs: '/user/docker/swarm',
+        docs: '/user/docker/swarm/details',
       },
     };
 
@@ -338,6 +350,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           controller: 'CreateSecretController',
         },
       },
+      data: {
+        docs: '/user/docker/secrets/add',
+      },
     };
 
     var services = {
@@ -373,6 +388,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: './views/services/create/createservice.html',
           controller: 'CreateServiceController',
         },
+      },
+      data: {
+        docs: '/user/docker/stacks/add',
       },
     };
 
@@ -444,7 +462,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         },
       },
       data: {
-        docs: '/user/docker/swarm',
+        docs: '/user/docker/swarm/details',
       },
     };
 
@@ -500,7 +518,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         },
       },
       data: {
-        docs: '/user/docker/templates',
+        docs: '/user/docker/templates/application',
       },
     };
 
@@ -548,6 +566,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: './views/volumes/create/createvolume.html',
           controller: 'CreateVolumeController',
         },
+      },
+      data: {
+        docs: '/user/docker/volumes/add',
       },
     };
 
