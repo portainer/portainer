@@ -81,7 +81,15 @@ function Item({
 }
 
 export function getDefaultValues(definitions: Array<TemplateEnv>): Value {
-  return Object.fromEntries(definitions.map((v) => [v.name, v.default || '']));
+  return Object.fromEntries(
+    definitions.map((v) => {
+      if (v.select) {
+        return [v.name, v.select.find((v) => v.default)?.value || ''];
+      }
+
+      return [v.name, v.default || ''];
+    })
+  );
 }
 
 export function envVarsFieldsetValidation(): SchemaOf<Value> {
