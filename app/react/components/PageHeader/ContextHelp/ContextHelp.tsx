@@ -2,6 +2,8 @@ import { HelpCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
+import { useSystemVersion } from '@/react/portainer/system/useSystemVersion';
+
 import headerStyles from '../HeaderTitle.module.css';
 import './ContextHelp.css';
 
@@ -11,7 +13,7 @@ export function ContextHelp() {
   return (
     <div className={headerStyles.menuButton}>
       <a
-        href={`https://docs.portainer.io${docsUrl}`}
+        href={docsUrl}
         target="_blank"
         color="none"
         className={clsx(
@@ -32,9 +34,24 @@ export function ContextHelp() {
 
 function useDocsUrl(): string {
   const { state } = useCurrentStateAndParams();
+  const versionQuery = useSystemVersion();
 
   if (!state) {
     return '';
+  }
+
+  let url = 'https://docs.portainer.io/';
+  if (versionQuery.data) {
+    let { ServerVersion } = versionQuery.data;
+    if (ServerVersion[0] === 'v') {
+      ServerVersion = ServerVersion.substring(1);
+    }
+
+    const parts = ServerVersion.split('.');
+    if (parts.length >= 2) {
+      const version = parts.slice(0, 2).join('.');
+      url += `v/${version}/`;
+    }
   }
 
   const { data } = state;
@@ -44,8 +61,8 @@ function useDocsUrl(): string {
     'docs' in data &&
     typeof data.docs === 'string'
   ) {
-    return data.docs;
+    return url + data.docs;
   }
 
-  return '';
+  return url;
 }
