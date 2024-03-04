@@ -21,7 +21,11 @@ func WithProtect(handler http.Handler) (http.Handler, error) {
 		return nil, fmt.Errorf("failed to generate CSRF token: %w", err)
 	}
 
-	handler = gorillacsrf.Protect([]byte(token), gorillacsrf.Path("/"))(handler)
+	handler = gorillacsrf.Protect(
+		[]byte(token),
+		gorillacsrf.Path("/"),
+		gorillacsrf.Secure(false),
+	)(handler)
 
 	return withSkipCSRF(handler), nil
 }
