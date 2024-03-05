@@ -171,6 +171,11 @@ angular.module('portainer.docker').factory('ImageService', [
       return Image.tag({ id: id, repo: image }).$promise;
     };
 
+    /**
+     *
+     * @param {Array<{tags: Array<string>; id: string;}>} images
+     * @returns {Promise<unknown>}
+     */
     service.downloadImages = function (images) {
       var names = ImageHelper.getImagesNamesForDownload(images);
       return Image.download(names).$promise;
