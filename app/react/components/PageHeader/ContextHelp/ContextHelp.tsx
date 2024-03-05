@@ -50,7 +50,7 @@ function useDocsUrl(): string {
     const parts = ServerVersion.split('.');
     if (parts.length >= 2) {
       const version = parts.slice(0, 2).join('.');
-      url += `v/${version}/`;
+      url += `v/${version}`;
     }
   }
 
