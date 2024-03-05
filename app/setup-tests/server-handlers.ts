@@ -87,7 +87,7 @@ export const handlers = [
     HttpResponse.json({})
   ),
   http.get<never, never, Partial<VersionResponse>>('/api/system/version', () =>
-    HttpResponse.json({})
+    HttpResponse.json({ ServerVersion: 'v2.10.0' })
   ),
   http.get('/api/teams/:id/memberships', () => HttpResponse.json([])),
   http.get('/api/endpoints/agent_versions', () => HttpResponse.json([])),
