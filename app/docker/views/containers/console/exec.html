@@ -69,10 +69,10 @@
             </div>
           </div>
           <div ng-if="state !== states.disconnected">
-            <label class="control-label text-left"
-              >Exec into container as <code>{{ ::formValues.user || 'default user' }}</code> using command
-              <code>{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code>
-              <terminal-tooltip> </terminal-tooltip>
+            <label
+              >Exec into container as <code class="!text-sm align-middle">{{ ::formValues.user || 'default user' }}</code> using command
+              <code class="!text-sm align-middle">{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code>
+              <terminal-tooltip class="align-middle"> </terminal-tooltip>
             </label>
             <button type="button" class="btn btn-primary" ng-click="disconnect()">
               <span ng-show="state === states.connected">Disconnect</span>
