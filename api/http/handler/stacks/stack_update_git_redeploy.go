@@ -46,7 +46,7 @@ func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path int true "Stack identifier"
 // @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
-// @param body body stackGitRedployPayload true "Git configs for pull and redeploy a stack"
+// @param body body stackGitRedployPayload true "Git configs for pull and redeploy of a stack. **StackName** may only be populated for Kuberenetes stacks, and if specified with a blank string, it will be set to blank"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -138,7 +138,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	if payload.StackName != "" {
+	if stack.Type == portainer.KubernetesStack {
 		stack.Name = payload.StackName
 	}
 
