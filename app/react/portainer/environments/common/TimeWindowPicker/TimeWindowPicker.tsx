@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { FormikErrors } from 'formik';
 
 import { Button } from '@@/buttons';
 import { Alert } from '@@/Alert';
@@ -13,14 +14,10 @@ type Props = {
    * The current start and end time values. in 'HH:mm' format (e.g. '00:00') and in UTC timezone.
    */
   values: EndpointChangeWindow;
+  errors?: FormikErrors<EndpointChangeWindow>;
   initialValues: EndpointChangeWindow;
-  onChange: ({
-    changeWindow,
-    timeZone,
-  }: {
-    changeWindow: EndpointChangeWindow;
-    timeZone?: string;
-  }) => void;
+  onChangeTimeZone: (timeZone: string) => void;
+  onChangeChangeWindow: (changeWindow: EndpointChangeWindow) => void;
   isEditMode: boolean;
   setIsEditMode: (isEditMode: boolean) => void;
   timeZone?: string;
@@ -31,8 +28,10 @@ const summaryTimeFormat = 'h:mmA';
 
 export function TimeWindowPicker({
   values,
+  errors,
   initialValues,
-  onChange,
+  onChangeTimeZone,
+  onChangeChangeWindow,
   isEditMode,
   setIsEditMode,
   timeZone = moment.tz.guess(),
@@ -43,8 +42,10 @@ export function TimeWindowPicker({
       {isEditMode && (
         <TimeWindowPickerInputGroup
           values={values}
-          onChange={onChange}
+          onChangeTimeZone={onChangeTimeZone}
+          onChangeChangeWindow={onChangeChangeWindow}
           timeZone={timeZone}
+          errors={errors}
         />
       )}
       <Alert color="info" className="[&>div]:!text-xs">
@@ -83,10 +84,8 @@ export function TimeWindowPicker({
               className="!ml-0"
               onClick={() => {
                 setIsEditMode(false);
-                onChange({
-                  changeWindow: initialValues,
-                  timeZone: initialTimeZone,
-                });
+                onChangeChangeWindow(initialValues);
+                onChangeTimeZone(initialTimeZone || moment.tz.guess());
               }}
             >
               Cancel
