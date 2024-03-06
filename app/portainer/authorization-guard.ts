@@ -62,7 +62,7 @@ export async function checkAuthorizations(transition: Transition) {
     }
 
     if (access === 'edge-admin') {
-      if (authService.isAdmin()) {
+      if (authService.isAdmin(true)) {
         return undefined;
       }
 
