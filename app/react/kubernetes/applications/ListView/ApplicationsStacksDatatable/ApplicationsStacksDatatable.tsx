@@ -10,7 +10,6 @@ import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { KubernetesStack } from '../../types';
-import { HelmInsightsBox } from '../ApplicationsDatatable/HelmInsightsBox';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
@@ -86,10 +85,6 @@ export function ApplicationsStacksDatatable({
             <SystemResourceDescription
               showSystemResources={tableState.showSystemResources}
             />
-
-            <div className="w-fit">
-              <HelmInsightsBox />
-            </div>
           </div>
         </div>
       }
