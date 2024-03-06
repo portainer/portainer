@@ -1,8 +1,10 @@
 import moment from 'moment';
 import { useMemo } from 'react';
+import { FormikErrors } from 'formik';
 
 import { Select } from '@@/form-components/ReactSelect';
 import { Option } from '@@/form-components/PortainerSelect';
+import { FormError } from '@@/form-components/FormError';
 
 import { EndpointChangeWindow } from '../../types';
 
@@ -14,19 +16,17 @@ type Props = {
    * The current start and end time values. in 'HH:mm' format (e.g. '00:00') and in UTC timezone.
    */
   values: EndpointChangeWindow;
-  onChange: ({
-    changeWindow,
-    timeZone,
-  }: {
-    changeWindow: EndpointChangeWindow;
-    timeZone: string;
-  }) => void;
+  errors?: FormikErrors<EndpointChangeWindow>;
+  onChangeTimeZone: (timeZone: string) => void;
+  onChangeChangeWindow: (changeWindow: EndpointChangeWindow) => void;
   timeZone?: string;
 };
 
 export function TimeWindowPickerInputGroup({
   values,
-  onChange,
+  errors,
+  onChangeTimeZone,
+  onChangeChangeWindow,
   timeZone = moment.tz.guess(),
 }: Props) {
   // all unique timezones for all countries as options
@@ -47,14 +47,12 @@ export function TimeWindowPickerInputGroup({
   // set the initial timezone to the user's timezone if it is not set
   if (!timeZone) {
     const newTimeZone = moment.tz.guess();
-    onChange({
-      changeWindow: {
-        ...values,
-        StartTime: timeZoneToUtc(values.StartTime, newTimeZone),
-        EndTime: timeZoneToUtc(values.EndTime, newTimeZone),
-      },
-      timeZone: newTimeZone,
+    onChangeChangeWindow({
+      ...values,
+      StartTime: timeZoneToUtc(values.StartTime, newTimeZone),
+      EndTime: timeZoneToUtc(values.EndTime, newTimeZone),
     });
+    onChangeTimeZone(newTimeZone);
   }
 
   // find the option index for react-select to scroll to the current option
@@ -64,63 +62,59 @@ export function TimeWindowPickerInputGroup({
   );
 
   return (
-    <div className="flex flex-wrap items-center gap-x-5">
-      <div className="flex items-center gap-x-5">
-        <TimePickerInput
-          utcTime={values.StartTime}
-          timeZone={timeZone}
-          onChange={(time) =>
-            onChange({
-              changeWindow: {
+    <div className="flex-col">
+      <div className="flex flex-wrap items-center gap-x-5">
+        <div className="inline-flex flex-wrap items-center gap-x-5">
+          <TimePickerInput
+            utcTime={values.StartTime}
+            timeZone={timeZone}
+            onChange={(time) =>
+              onChangeChangeWindow({
                 ...values,
                 StartTime: timeZoneToUtc(time, timeZone),
-              },
-              timeZone,
-            })
-          }
-        />
-        to
-        <TimePickerInput
-          utcTime={values.EndTime}
-          timeZone={timeZone}
-          onChange={(time) =>
-            onChange({
-              changeWindow: {
+              })
+            }
+          />
+          to
+          <TimePickerInput
+            utcTime={values.EndTime}
+            timeZone={timeZone}
+            onChange={(time) =>
+              onChangeChangeWindow({
                 ...values,
                 EndTime: timeZoneToUtc(time, timeZone),
-              },
+              })
+            }
+          />
+        </div>
+        <Select<Option<string>>
+          options={timeZoneOptions}
+          value={timeZoneOptions[timeZoneOptionIndex]}
+          className="basis-[fit-content] flex-1 min-w-fit max-w-xs"
+          onChange={(newTimeZone) => {
+            if (!newTimeZone) return;
+            // update the utc time so that the local time displayed remains the same
+            const updatedStartTime = onTimezoneChangeUpdateUTCTime(
+              values.StartTime,
               timeZone,
-            })
-          }
-        />
-      </div>
-      <Select<Option<string>>
-        options={timeZoneOptions}
-        value={timeZoneOptions[timeZoneOptionIndex]}
-        className="w-72 min-w-fit"
-        onChange={(newTimeZone) => {
-          if (!newTimeZone) return;
-          // update the utc time so that the local time displayed remains the same
-          const updatedStartTime = onTimezoneChangeUpdateUTCTime(
-            values.StartTime,
-            timeZone,
-            newTimeZone.value
-          );
-          const updatedEndTime = onTimezoneChangeUpdateUTCTime(
-            values.EndTime,
-            timeZone,
-            newTimeZone.value
-          );
-          onChange({
-            changeWindow: {
+              newTimeZone.value
+            );
+            const updatedEndTime = onTimezoneChangeUpdateUTCTime(
+              values.EndTime,
+              timeZone,
+              newTimeZone.value
+            );
+            onChangeChangeWindow({
               ...values,
               StartTime: updatedStartTime,
               EndTime: updatedEndTime,
-            },
-            timeZone: newTimeZone.value,
-          });
-        }}
-      />
+            });
+            onChangeTimeZone(newTimeZone.value);
+          }}
+        />
+      </div>
+      {errors?.StartTime && <FormError>{errors.StartTime}</FormError>}
+      {errors?.EndTime && <FormError>{errors.EndTime}</FormError>}
     </div>
   );
 }
