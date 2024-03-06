@@ -133,16 +133,16 @@ angular.module('portainer.app').factory('Authentication', [
     // To avoid creating divergence between CE and EE
     // isAdmin checks if the user is a portainer admin or edge admin
 
-    function isEdgeAdmin() {
+    function isEdgeAdmin(noEnvScope = false) {
       const environment = EndpointProvider.currentEndpoint();
-      return userHelpers.isEdgeAdmin({ Role: user.role }, environment);
+      return userHelpers.isEdgeAdmin({ Role: user.role }, noEnvScope ? undefined : environment);
     }
 
     /**
      * @deprecated use Authentication.isAdmin instead
      */
-    function isAdmin() {
-      return isEdgeAdmin();
+    function isAdmin(noEnvScope = false) {
+      return isEdgeAdmin(noEnvScope);
     }
 
     // To avoid creating divergence between CE and EE
