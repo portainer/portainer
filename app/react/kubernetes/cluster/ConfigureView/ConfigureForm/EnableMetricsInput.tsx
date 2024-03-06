@@ -56,11 +56,13 @@ export function EnableMetricsInput({ value, error, environmentId }: Props) {
         className="mb-0"
         size="large"
         errors={error}
+        inputId="kubeSetup-metricsToggle"
       >
         <Field
           name="useServerMetrics"
           as={Switch}
           checked={value}
+          id="kubeSetup-metricsToggle"
           onChange={(checked: boolean) => {
             // if turning off, just set the value
             if (!checked) {
