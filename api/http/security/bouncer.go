@@ -27,6 +27,7 @@ type (
 		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
 		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
 		CookieAuthLookup(*http.Request) (*portainer.TokenData, error)
+		JWTAuthLookup(*http.Request) (*portainer.TokenData, error)
 	}
 
 	// RequestBouncer represents an entity that manages API request accesses

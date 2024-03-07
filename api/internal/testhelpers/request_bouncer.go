@@ -54,6 +54,10 @@ func (testRequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.TokenDat
 	return nil, nil
 }
 
+func (testRequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenData, error) {
+	return nil, nil
+}
+
 // AddTestSecurityCookie adds a security cookie to the request
 func AddTestSecurityCookie(r *http.Request, jwt string) {
 	r.AddCookie(&http.Cookie{
