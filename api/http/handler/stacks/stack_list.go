@@ -91,25 +91,55 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	return response.JSON(w, stacks)
 }
 
+// filterStacks refines a collection of Stack instances using specified criteria.
+// This function examines the provided filters: EndpointID, SwarmID, and IncludeOrphanedStacks.
+// - If both EndpointID is zero and SwarmID is an empty string, the function directly returns the original stack list without any modifications.
+// - If either filter is specified, it proceeds to selectively include stacks that match the criteria.
+
+// Key Points on Business Logic:
+// 1. Determining Inclusion of Orphaned Stacks:
+//    - The decision to include orphaned stacks is influenced by the user's role and usually set by the client (UI).
+//    - Administrators or environment administrators can include orphaned stacks by setting IncludeOrphanedStacks to true, reflecting their broader access rights.
+//    - For non-administrative users, this is typically set to false, limiting their visibility to only stacks within their purview.
+
+// 2. Inclusion Criteria for Orphaned Stacks:
+//    - When IncludeOrphanedStacks is true and an EndpointID is specified (not zero), the function selects:
+//      a) Stacks linked to the specified EndpointID.
+//      b) Orphaned stacks that don't have a naming conflict with any stack associated with the EndpointID.
+//    - This approach is designed to avoid name conflicts within Docker Compose, which restricts the creation of multiple stacks with the same name.
+
+// 3. Type Matching for Orphaned Stacks:
+//    - The function ensures that orphaned stacks are compatible with the environment's stack type (compose or swarm).
+//    - It filters out orphaned swarm stacks in Docker standalone environments
+//    - It filters out orphaned standalone stack in Docker swarm environments
+//    - This ensures that re-association respects the constraints of the environment and stack type.
+
+// The outcome is a new list of stacks that align with these filtering and business logic criteria.
 func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters, endpoints []portainer.Endpoint) []portainer.Stack {
 	if filters.EndpointID == 0 && filters.SwarmID == "" {
 		return stacks
 	}
 
 	filteredStacks := make([]portainer.Stack, 0, len(stacks))
+	uniqueStackNames := make(map[string]struct{})
 	for _, stack := range stacks {
-		if filters.IncludeOrphanedStacks && isOrphanedStack(stack, endpoints) {
-			if (stack.Type == portainer.DockerComposeStack && filters.SwarmID == "") || (stack.Type == portainer.DockerSwarmStack && filters.SwarmID != "") {
-				filteredStacks = append(filteredStacks, stack)
-			}
-			continue
-		}
-
 		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == portainer.EndpointID(filters.EndpointID) {
 			filteredStacks = append(filteredStacks, stack)
+			uniqueStackNames[stack.Name] = struct{}{}
 		}
 		if stack.Type == portainer.DockerSwarmStack && stack.SwarmID == filters.SwarmID {
 			filteredStacks = append(filteredStacks, stack)
+			uniqueStackNames[stack.Name] = struct{}{}
+		}
+	}
+
+	for _, stack := range stacks {
+		if filters.IncludeOrphanedStacks && isOrphanedStack(stack, endpoints) {
+			if (stack.Type == portainer.DockerComposeStack && filters.SwarmID == "") || (stack.Type == portainer.DockerSwarmStack && filters.SwarmID != "") {
+				if _, exists := uniqueStackNames[stack.Name]; !exists {
+					filteredStacks = append(filteredStacks, stack)
+				}
+			}
 		}
 	}
 
