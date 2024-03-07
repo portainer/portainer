@@ -82,6 +82,7 @@ function config($analyticsProvider, $windowProvider) {
     push('setReferrerUrl', '');
     push('setCustomUrl', basePath + path);
     push('trackPageView');
+    push('enableLinkTracking');
   });
 
   /**
