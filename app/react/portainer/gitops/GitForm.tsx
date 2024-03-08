@@ -33,6 +33,7 @@ interface Props {
   baseWebhookUrl?: string;
   webhookId?: string;
   webhooksDocs?: string;
+  createdFromCustomTemplateId?: number;
 }
 
 export function GitForm({
@@ -48,6 +49,7 @@ export function GitForm({
   baseWebhookUrl,
   webhookId,
   webhooksDocs,
+  createdFromCustomTemplateId,
 }: Props) {
   const [value, setValue] = useState(initialValue); // TODO: remove this state when form is not inside angularjs
   return (
@@ -66,6 +68,7 @@ export function GitForm({
           handleChange({ RepositoryURLValid: value })
         }
         model={value}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
         errors={errors.RepositoryURL}
       />
 
@@ -75,6 +78,7 @@ export function GitForm({
         model={value}
         error={errors.RepositoryReferenceName}
         isUrlValid={value.RepositoryURLValid}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
       />
 
       <ComposePathField
@@ -86,6 +90,7 @@ export function GitForm({
         model={value}
         isDockerStandalone={isDockerStandalone}
         errors={errors.ComposeFilePathInRepository}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
       />
 
       {isAdditionalFilesFieldVisible && (
@@ -134,16 +139,18 @@ export function GitForm({
 
 export async function validateGitForm(
   gitCredentials: Array<GitCredential>,
-  formValues: GitFormModel
+  formValues: GitFormModel,
+  isCreatedFromCustomTemplate: boolean
 ) {
   return validateForm<GitFormModel>(
-    () => buildGitValidationSchema(gitCredentials),
+    () => buildGitValidationSchema(gitCredentials, isCreatedFromCustomTemplate),
     formValues
   );
 }
 
 export function buildGitValidationSchema(
-  gitCredentials: Array<GitCredential>
+  gitCredentials: Array<GitCredential>,
+  isCreatedFromCustomTemplate: boolean
 ): SchemaOf<GitFormModel> {
   return object({
     RepositoryURL: string()
@@ -168,5 +175,7 @@ export function buildGitValidationSchema(
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials, false)) as SchemaOf<GitFormModel>;
+  }).concat(
+    gitAuthValidation(gitCredentials, false, isCreatedFromCustomTemplate)
+  ) as SchemaOf<GitFormModel>;
 }
