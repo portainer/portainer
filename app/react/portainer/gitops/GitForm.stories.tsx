@@ -73,7 +73,7 @@ export function Primary({
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={() => buildGitValidationSchema([])}
+      validationSchema={() => buildGitValidationSchema([], false)}
       onSubmit={() => {}}
     >
       {({ values, errors, setValues }) => (

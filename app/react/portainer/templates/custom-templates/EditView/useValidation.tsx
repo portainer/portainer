@@ -47,7 +47,7 @@ export function useValidation({
         FileContent: string().required('Template is required.'),
 
         Git: isGit
-          ? buildGitValidationSchema(gitCredentialsQuery.data || [])
+          ? buildGitValidationSchema(gitCredentialsQuery.data || [], false)
           : mixed(),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),

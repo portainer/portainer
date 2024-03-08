@@ -24,6 +24,8 @@ export default class GitFormController {
 
   onChange?: (value: GitFormModel) => void;
 
+  createdFromCustomTemplateId?: number;
+
   /* @ngInject */
   constructor(
     $async: <T>(fn: () => Promise<T>) => Promise<T>,
@@ -47,15 +49,26 @@ export default class GitFormController {
       ...newValues,
     };
     this.onChange?.(value);
-    await this.runGitFormValidation(value);
+
+    const isCreatedFromCustomTemplate =
+      !!this.createdFromCustomTemplateId &&
+      this.createdFromCustomTemplateId > 0;
+    await this.runGitFormValidation(value, isCreatedFromCustomTemplate);
   }
 
-  async runGitFormValidation(value: GitFormModel) {
+  async runGitFormValidation(
+    value: GitFormModel,
+    isCreatedFromCustomTemplate: boolean
+  ) {
     return this.$async(async () => {
       this.errors = {};
       this.gitForm?.$setValidity('gitForm', true, this.gitForm);
 
-      this.errors = await validateGitForm(this.gitCredentials, value);
+      this.errors = await validateGitForm(
+        this.gitCredentials,
+        value,
+        isCreatedFromCustomTemplate
+      );
       if (this.errors && Object.keys(this.errors).length > 0) {
         this.gitForm?.$setValidity('gitForm', false, this.gitForm);
       }
@@ -82,6 +95,9 @@ export default class GitFormController {
       throw new Error('GitFormController: value is required');
     }
 
-    await this.runGitFormValidation(this.value);
+    const isCreatedFromCustomTemplate =
+      !!this.createdFromCustomTemplateId &&
+      this.createdFromCustomTemplateId > 0;
+    await this.runGitFormValidation(this.value, isCreatedFromCustomTemplate);
   }
 }
