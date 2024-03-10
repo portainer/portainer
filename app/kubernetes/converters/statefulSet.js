@@ -24,7 +24,9 @@ class KubernetesStatefulSetConverter {
     const res = new KubernetesStatefulSet();
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
-    res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    if (formValues.StackName) {
+      res.StackName = formValues.StackName;
+    }
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
     res.ReplicaCount = formValues.ReplicaCount;
