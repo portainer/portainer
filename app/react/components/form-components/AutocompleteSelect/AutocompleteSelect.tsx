@@ -53,6 +53,7 @@ export function AutocompleteSelect({
         placeholder={placeholder}
         readOnly={readOnly}
         id={inputId}
+        autoComplete="off"
       />
       {!selected && searchResults && searchResults.length > 0 && (
         <ComboboxPopover>
