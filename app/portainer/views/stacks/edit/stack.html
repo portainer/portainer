@@ -139,7 +139,7 @@
               <pr-icon icon="'edit-2'" class-name="'mr-1'"></pr-icon>
               Editor
             </uib-tab-heading>
-            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm" autocomplete="off">
+            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == STACK_TYPES.DockerCompose && composeSyntaxMaxVersion == 2">
                   This stack will be deployed using the equivalent of <code>docker compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
