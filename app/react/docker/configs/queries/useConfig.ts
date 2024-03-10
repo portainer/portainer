@@ -4,14 +4,14 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
-import { DockerConfig } from '../types';
+import { PortainerResponse } from '../../types';
 
 export async function getConfig(
   environmentId: EnvironmentId,
-  configId: DockerConfig['Id']
+  configId: Config['ID']
 ) {
   try {
-    const { data } = await axios.get<Config>(
+    const { data } = await axios.get<PortainerResponse<Config>>(
       buildDockerProxyUrl(environmentId, 'configs', configId)
     );
     return data;
