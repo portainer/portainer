@@ -1,6 +1,5 @@
 import { User } from 'lucide-react';
-
-import { render } from '@/react-tools/test-utils';
+import { render } from '@testing-library/react';
 
 import { DashboardItem } from './DashboardItem';
 

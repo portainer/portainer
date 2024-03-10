@@ -1,12 +1,15 @@
 import userEvent from '@testing-library/user-event';
+import { render, waitFor } from '@testing-library/react';
 
-import { renderWithQueryClient, waitFor } from '@/react-tools/test-utils';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { CreateTeamForm } from './CreateTeamForm';
 
 test('filling the name should make the submit button clickable and emptying it should make it disabled', async () => {
-  const { findByLabelText, findByText } = renderWithQueryClient(
-    <CreateTeamForm users={[]} teams={[]} />
+  const Wrapped = withTestQueryProvider(CreateTeamForm);
+
+  const { findByLabelText, findByText } = render(
+    <Wrapped users={[]} teams={[]} />
   );
 
   const button = await findByText('Create team');

@@ -1,9 +1,10 @@
 import { Meta, Story } from '@storybook/react';
-import { useMemo, useState } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { useState } from 'react';
 
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
+import { Role, User } from '@/portainer/users/types';
+import { isPureAdmin } from '@/portainer/users/user.helpers';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
 
 import { parseAccessControlFormData } from '../utils';
 
@@ -16,41 +17,25 @@ const meta: Meta = {
 
 export default meta;
 
-enum Role {
-  Admin = 1,
-  User,
-}
-
-const testQueryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false } },
-});
-
 interface Args {
   userRole: Role;
 }
 
 function Template({ userRole }: Args) {
-  const isAdmin = userRole === Role.Admin;
-  const defaults = parseAccessControlFormData(isAdmin, 0);
+  const defaults = parseAccessControlFormData(
+    isPureAdmin({ Role: userRole } as User),
+    0
+  );
 
   const [value, setValue] = useState(defaults);
 
-  const userProviderState = useMemo(
-    () => ({ user: new UserViewModel({ Role: userRole }) }),
-    [userRole]
+  const Wrapped = withUserProvider(
+    AccessControlForm,
+    new UserViewModel({ Role: userRole })
   );
 
   return (
-    <QueryClientProvider client={testQueryClient}>
-      <UserContext.Provider value={userProviderState}>
-        <AccessControlForm
-          values={value}
-          onChange={setValue}
-          errors={{}}
-          environmentId={1}
-        />
-      </UserContext.Provider>
-    </QueryClientProvider>
+    <Wrapped values={value} onChange={setValue} errors={{}} environmentId={1} />
   );
 }
 
@@ -61,5 +46,5 @@ AdminAccessControl.args = {
 
 export const NonAdminAccessControl: Story<Args> = Template.bind({});
 NonAdminAccessControl.args = {
-  userRole: Role.User,
+  userRole: Role.Standard,
 };

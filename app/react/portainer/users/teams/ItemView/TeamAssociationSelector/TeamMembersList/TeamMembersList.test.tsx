@@ -1,6 +1,8 @@
-import { UserContext } from '@/react/hooks/useUser';
+import { render } from '@testing-library/react';
+
 import { UserViewModel } from '@/portainer/models/user';
-import { renderWithQueryClient } from '@/react-tools/test-utils';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { TeamMembersList } from './TeamMembersList';
 
@@ -13,11 +15,11 @@ test('renders correctly', () => {
 function renderComponent() {
   const user = new UserViewModel({ Username: 'user' });
 
-  return renderWithQueryClient(
-    <UserContext.Provider value={{ user }}>
-      <TeamMembersList users={[]} roles={{}} teamId={3} />
-    </UserContext.Provider>
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(TeamMembersList, user)
   );
+
+  return render(<Wrapped users={[]} roles={{}} teamId={3} />);
 }
 
 test.todo('when users list is empty, add all users button is disabled');

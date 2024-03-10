@@ -1,8 +1,9 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { render } from '@testing-library/react';
 
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { render } from '@/react-tools/test-utils';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { HeaderContainer } from './HeaderContainer';
 import { HeaderTitle } from './HeaderTitle';
@@ -14,7 +15,8 @@ test('should not render without a wrapping HeaderContainer', async () => {
 
   const title = 'title';
   function renderComponent() {
-    return render(<HeaderTitle title={title} />);
+    const Wrapped = withTestQueryProvider(HeaderTitle);
+    return render(<Wrapped title={title} />);
   }
 
   expect(renderComponent).toThrowErrorMatchingSnapshot();
@@ -25,18 +27,21 @@ test('should not render without a wrapping HeaderContainer', async () => {
 test('should display a HeaderTitle', async () => {
   const username = 'username';
   const user = new UserViewModel({ Username: username });
-  const queryClient = new QueryClient();
 
   const title = 'title';
-  const { queryByText } = render(
-    <QueryClientProvider client={queryClient}>
-      <UserContext.Provider value={{ user }}>
+
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(
+      withTestRouter(() => (
         <HeaderContainer>
           <HeaderTitle title={title} />
         </HeaderContainer>
-      </UserContext.Provider>
-    </QueryClientProvider>
+      )),
+      user
+    )
   );
+
+  const { queryByText } = render(<Wrapped />);
 
   const heading = queryByText(title);
   expect(heading).toBeVisible();

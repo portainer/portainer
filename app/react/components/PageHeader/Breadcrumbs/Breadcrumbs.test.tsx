@@ -1,4 +1,4 @@
-import { render } from '@/react-tools/test-utils';
+import { render } from '@testing-library/react';
 
 import { Breadcrumbs } from './Breadcrumbs';
 
