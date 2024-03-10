@@ -17,6 +17,7 @@ type ValidationData = {
   maxCpuLimit: number;
   isEnvironmentAdmin: boolean;
   nodeLimits: NodesLimits;
+  isEdit: boolean;
 };
 
 export function resourceReservationValidation(
@@ -34,10 +35,10 @@ export function resourceReservationValidation(
         }`,
         () => !!validationData && validationData.maxMemoryLimit > 0
       )
-      .max(
-        validationData?.maxMemoryLimit || 0,
-        ({ value }) =>
-          `Value must be between 0 and ${validationData?.maxMemoryLimit}MB now - the previous value of ${value} exceeds this.`
+      .max(validationData?.maxMemoryLimit || 0, ({ value }) =>
+        validationData?.isEdit
+          ? `Value must be between 0 and ${validationData?.maxMemoryLimit}MB now - the previous value of ${value} exceeds this.`
+          : `Value must be between 0 and ${validationData?.maxMemoryLimit}MB.`
       )
       .test(
         'hasSuitableNode',
@@ -68,10 +69,10 @@ export function resourceReservationValidation(
         }`,
         () => !!validationData && validationData.maxCpuLimit > 0
       )
-      .max(
-        validationData?.maxCpuLimit || 0,
-        ({ value }) =>
-          `Value must be between 0 and ${validationData?.maxCpuLimit} now - the previous value of ${value} exceeds this.`
+      .max(validationData?.maxCpuLimit || 0, ({ value }) =>
+        validationData?.isEdit
+          ? `Value must be between 0 and ${validationData?.maxCpuLimit} now - the previous value of ${value} exceeds this.`
+          : `Value must be between 0 and ${validationData?.maxCpuLimit}.`
       )
       .test(
         'hasSuitableNode',
