@@ -1,5 +1,7 @@
 import { object, string, boolean, array, number, SchemaOf } from 'yup';
 
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+
 import { IngressControllerClassMap } from '../../ingressClass/types';
 
 import { ConfigureFormValues } from './types';
@@ -37,6 +39,20 @@ const storageClassFormValuesSchema = array()
     }
   );
 
+// Define Yup schema for EndpointChangeWindow
+const endpointChangeWindowSchema = object().shape({
+  Enabled: boolean().required(),
+  StartTime: string().test(
+    'startTime should not be the same as endTime',
+    'The chosen time configuration is invalid.',
+    (value, context) => {
+      const { EndTime, Enabled } = context.parent;
+      return !Enabled || value !== EndTime;
+    }
+  ),
+  EndTime: string(),
+});
+
 // Define Yup schema for IngressControllerClassMap
 const ingressControllerClassMapSchema: SchemaOf<IngressControllerClassMap> =
   object().shape({
@@ -58,6 +74,7 @@ export const configureValidationSchema: SchemaOf<ConfigureFormValues> = object({
   restrictStandardUserIngressW: boolean().required(),
   ingressAvailabilityPerNamespace: boolean().required(),
   allowNoneIngressClass: boolean().required(),
+  changeWindow: isBE ? endpointChangeWindowSchema.required() : undefined,
   storageClasses: storageClassFormValuesSchema.required(),
   ingressClasses: array().of(ingressControllerClassMapSchema).required(),
 });
