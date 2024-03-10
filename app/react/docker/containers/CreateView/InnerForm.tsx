@@ -51,7 +51,7 @@ export function InnerForm({
   const environment = envQuery.data;
 
   return (
-    <Form className="form-horizontal" autoComplete="off">
+    <Form className="form-horizontal">
       <div className="row">
         <div className="col-sm-12">
           <div>
