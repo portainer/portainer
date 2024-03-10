@@ -1,13 +1,15 @@
 import { http, HttpResponse } from 'msw';
+import { render, within } from '@testing-library/react';
 
-import { renderWithQueryClient, within } from '@/react-tools/test-utils';
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
 import {
   createMockResourceGroups,
   createMockSubscriptions,
 } from '@/react-tools/test-mocks';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestRouter } from '@/react/test-utils/withRouter';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { DashboardView } from './DashboardView';
 
@@ -105,7 +107,6 @@ async function renderComponent(
   resourceGroupsStatus = 200
 ) {
   const user = new UserViewModel({ Username: 'user' });
-  const state = { user };
 
   server.use(
     http.get('/api/endpoints/1', () => HttpResponse.json({})),
@@ -135,11 +136,12 @@ async function renderComponent(
       }
     )
   );
-  const renderResult = renderWithQueryClient(
-    <UserContext.Provider value={state}>
-      <DashboardView />
-    </UserContext.Provider>
+
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(withTestRouter(DashboardView), user)
   );
+
+  const renderResult = render(<Wrapped />);
 
   await expect(renderResult.findByText(/Home/)).resolves.toBeVisible();
 

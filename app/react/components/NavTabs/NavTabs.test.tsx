@@ -1,5 +1,7 @@
-import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
+
+import { withTestRouter } from '@/react/test-utils/withRouter';
 
 import { NavTabs, Option } from './NavTabs';
 
@@ -32,6 +34,7 @@ test('should show selected id content', async () => {
 });
 
 test('should call onSelect when clicked with id', async () => {
+  const user = userEvent.setup();
   const options = [
     { children: 'Content 1', id: 'option1', label: 'Option 1' },
     { children: 'Content 2', id: 'option2', label: 'Option 2' },
@@ -42,7 +45,7 @@ test('should call onSelect when clicked with id', async () => {
   const { findByText } = renderComponent(options, options[1].id, onSelect);
 
   const heading = await findByText(options[0].label);
-  await userEvent.click(heading);
+  await user.click(heading);
 
   expect(onSelect).toHaveBeenCalledWith(options[0].id);
 });
@@ -52,7 +55,9 @@ function renderComponent(
   selectedId?: string | number,
   onSelect?: (id: string | number) => void
 ) {
+  const Wrapped = withTestRouter(NavTabs);
+
   return render(
-    <NavTabs options={options} selectedId={selectedId} onSelect={onSelect} />
+    <Wrapped options={options} selectedId={selectedId} onSelect={onSelect} />
   );
 }

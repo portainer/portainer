@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@/react-tools/test-utils';
+import { fireEvent, render } from '@testing-library/react';
 
 import { FileUploadField } from './FileUploadField';
 

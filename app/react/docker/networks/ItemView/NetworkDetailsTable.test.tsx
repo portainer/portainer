@@ -1,9 +1,10 @@
 import { HttpResponse, http } from 'msw';
+import { render } from '@testing-library/react';
 
-import { renderWithQueryClient } from '@/react-tools/test-utils';
-import { UserContext } from '@/react/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { DockerNetwork } from '../types';
 
@@ -26,7 +27,9 @@ test('Network details values should be visible', async () => {
   await expect(findByText(network.Driver)).resolves.toBeVisible();
   await expect(findByText(network.Scope)).resolves.toBeVisible();
   await expect(
-    findByText(network.IPAM?.Config[0].Gateway || 'not found', { exact: false })
+    findByText(network.IPAM?.Config[0].Gateway || 'not found', {
+      exact: false,
+    })
   ).resolves.toBeVisible();
   await expect(
     findByText(network.IPAM?.Config[0].Subnet || 'not found', { exact: false })
@@ -55,13 +58,12 @@ async function renderComponent(isAdmin: boolean, network: DockerNetwork) {
 
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 
-  const queries = renderWithQueryClient(
-    <UserContext.Provider value={{ user }}>
-      <NetworkDetailsTable
-        network={network}
-        onRemoveNetworkClicked={() => {}}
-      />
-    </UserContext.Provider>
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(NetworkDetailsTable, user)
+  );
+
+  const queries = render(
+    <Wrapped network={network} onRemoveNetworkClicked={() => {}} />
   );
 
   await expect(queries.findByText('Network details')).resolves.toBeVisible();

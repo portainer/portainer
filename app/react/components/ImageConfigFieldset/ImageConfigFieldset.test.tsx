@@ -1,9 +1,10 @@
 import { FormikErrors } from 'formik';
 import { ComponentProps } from 'react';
 import { HttpResponse } from 'msw';
+import { render, fireEvent } from '@testing-library/react';
 
-import { renderWithQueryClient, fireEvent } from '@/react-tools/test-utils';
 import { http, server } from '@/setup-tests/server';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { ImageConfigFieldset } from './ImageConfigFieldset';
 import { Values } from './types';
@@ -16,20 +17,20 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
 }));
 
 it('should render SimpleForm when useRegistry is true', () => {
-  const { getByText } = render({ values: { useRegistry: true } });
+  const { getByText } = renderComponent({ values: { useRegistry: true } });
 
   expect(getByText('Advanced mode')).toBeInTheDocument();
 });
 
 it('should render AdvancedForm when useRegistry is false', () => {
-  const { getByText } = render({ values: { useRegistry: false } });
+  const { getByText } = renderComponent({ values: { useRegistry: false } });
 
   expect(getByText('Simple mode')).toBeInTheDocument();
 });
 
 it('should call setFieldValue with useRegistry set to false when "Advanced mode" button is clicked', () => {
   const setFieldValue = vi.fn();
-  const { getByText } = render({
+  const { getByText } = renderComponent({
     values: { useRegistry: true },
     setFieldValue,
   });
@@ -41,7 +42,7 @@ it('should call setFieldValue with useRegistry set to false when "Advanced mode"
 
 it('should call setFieldValue with useRegistry set to true when "Simple mode" button is clicked', () => {
   const setFieldValue = vi.fn();
-  const { getByText } = render({
+  const { getByText } = renderComponent({
     values: { useRegistry: false },
     setFieldValue,
   });
@@ -51,7 +52,7 @@ it('should call setFieldValue with useRegistry set to true when "Simple mode" bu
   expect(setFieldValue).toHaveBeenCalledWith('useRegistry', true);
 });
 
-function render({
+function renderComponent({
   values = {
     useRegistry: true,
     registryId: 123,
@@ -73,8 +74,10 @@ function render({
     http.get('/api/endpoints/:id', () => HttpResponse.json({}))
   );
 
-  return renderWithQueryClient(
-    <ImageConfigFieldset
+  const Wrapped = withTestQueryProvider(ImageConfigFieldset);
+
+  return render(
+    <Wrapped
       values={{
         useRegistry: true,
         registryId: 123,

@@ -1,6 +1,8 @@
-import { UserContext } from '@/react/hooks/useUser';
+import { render, within } from '@testing-library/react';
+
 import { UserViewModel } from '@/portainer/models/user';
-import { render, within } from '@/react-tools/test-utils';
+import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestRouter } from '@/react/test-utils/withRouter';
 
 import { TestSidebarProvider } from '../useSidebarState';
 
@@ -30,11 +32,11 @@ test('dashboard items should render correctly', () => {
 function renderComponent() {
   const user = new UserViewModel({ Username: 'user' });
 
+  const Wrapped = withUserProvider(withTestRouter(AzureSidebar), user);
+
   return render(
-    <UserContext.Provider value={{ user }}>
-      <TestSidebarProvider>
-        <AzureSidebar environmentId={1} />
-      </TestSidebarProvider>
-    </UserContext.Provider>
+    <TestSidebarProvider>
+      <Wrapped environmentId={1} />
+    </TestSidebarProvider>
   );
 }

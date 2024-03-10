@@ -11,6 +11,7 @@ import { StatusResponse } from '@/react/portainer/system/useSystemStatus';
 import { createMockTeams } from '@/react-tools/test-mocks';
 import { PublicSettingsResponse } from '@/react/portainer/settings/types';
 import { UserId } from '@/portainer/users/types';
+import { VersionResponse } from '@/react/portainer/system/useSystemVersion';
 
 import { azureHandlers } from './setup-handlers/azure';
 import { dockerHandlers } from './setup-handlers/docker';
@@ -84,6 +85,9 @@ export const handlers = [
   ),
   http.get<never, never, Partial<StatusResponse>>('/api/status', () =>
     HttpResponse.json({})
+  ),
+  http.get<never, never, Partial<VersionResponse>>('/api/system/version', () =>
+    HttpResponse.json({ ServerVersion: 'v2.10.0' })
   ),
   http.get('/api/teams/:id/memberships', () => HttpResponse.json([])),
   http.get('/api/endpoints/agent_versions', () => HttpResponse.json([])),

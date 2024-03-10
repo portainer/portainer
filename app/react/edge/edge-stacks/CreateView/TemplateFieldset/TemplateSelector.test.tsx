@@ -1,17 +1,18 @@
 import { vi } from 'vitest';
 import { HttpResponse, http } from 'msw';
+import { render, screen } from '@testing-library/react';
 
-import { renderWithQueryClient, screen } from '@/react-tools/test-utils';
 import { AppTemplate } from '@/react/portainer/templates/app-templates/types';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 import { server } from '@/setup-tests/server';
 import selectEvent from '@/react/test-utils/react-select';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { SelectedTemplateValue } from './types';
 import { TemplateSelector } from './TemplateSelector';
 
 test('renders TemplateSelector component', async () => {
-  render();
+  renderComponent();
 
   const templateSelectorElement = screen.getByLabelText('Template');
   expect(templateSelectorElement).toBeInTheDocument();
@@ -30,7 +31,7 @@ test.skip('selects an edge app template', async () => {
     categories: ['edge'],
   };
 
-  const { select } = render({
+  const { select } = renderComponent({
     onChange,
     appTemplates: [
       {
@@ -59,7 +60,7 @@ test.skip('selects an edge custom template', async () => {
     Id: 2,
   };
 
-  const { select } = render({
+  const { select } = renderComponent({
     onChange,
     customTemplates: [
       {
@@ -75,7 +76,7 @@ test.skip('selects an edge custom template', async () => {
 });
 
 test('renders with error', async () => {
-  render({
+  renderComponent({
     error: 'Invalid template',
   });
 
@@ -87,7 +88,7 @@ test('renders with error', async () => {
 });
 
 test.skip('renders TemplateSelector component with no custom templates available', async () => {
-  render({
+  renderComponent({
     customTemplates: [],
   });
 
@@ -102,7 +103,7 @@ test.skip('renders TemplateSelector component with no custom templates available
   expect(noCustomTemplatesElement).toBeInTheDocument();
 });
 
-function render({
+function renderComponent({
   onChange = vi.fn(),
   appTemplates = [],
   customTemplates = [],
@@ -123,8 +124,10 @@ function render({
     )
   );
 
-  renderWithQueryClient(
-    <TemplateSelector
+  const Wrapped = withTestQueryProvider(TemplateSelector);
+
+  render(
+    <Wrapped
       value={{ template: undefined, type: undefined }}
       onChange={onChange}
       error={error}

@@ -1,7 +1,6 @@
 import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-
-import { render, screen } from '@/react-tools/test-utils';
+import { render, screen } from '@testing-library/react';
 
 import {
   CustomTemplatesVariablesField,
