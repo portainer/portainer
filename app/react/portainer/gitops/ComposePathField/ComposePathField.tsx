@@ -73,6 +73,7 @@ export function ComposePathField({
               }}
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
               id="stack_repository_path"
+              autoComplete="off"
             />
           )}
         </FormControl>
