@@ -281,7 +281,7 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 		for _, lookup := range tokenLookups {
 			resultToken, err := lookup(r)
 			if err != nil {
-				httperror.WriteError(w, http.StatusUnauthorized, "Invalid API key", httperrors.ErrUnauthorized)
+				httperror.WriteError(w, http.StatusUnauthorized, "Invalid token", httperrors.ErrUnauthorized)
 				return
 			}
 
