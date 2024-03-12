@@ -111,7 +111,6 @@ function createFormValidatorController<TFormModel, TData = never>(
 
       this.handleChange = this.handleChange.bind(this);
       this.runValidation = this.runValidation.bind(this);
-      this.validate = this.validate.bind(this);
     }
 
     async handleChange(newValues: TFormModel) {
@@ -126,28 +125,11 @@ function createFormValidatorController<TFormModel, TData = never>(
         this.form?.$setValidity('form', true, this.form);
 
         const schema = schemaBuilder(this.validationData);
-        this.errors = await this.validate(schema, value, isPrimitive);
+        this.errors = await validate<TFormModel>(schema, value, isPrimitive);
 
         if (this.errors && Object.keys(this.errors).length > 0) {
           this.form?.$setValidity('form', false, this.form);
         }
-      });
-    }
-
-    async validate(
-      schema: SchemaOf<TFormModel>,
-      value: TFormModel,
-      isPrimitive: boolean
-    ): Promise<ValidationResult<TFormModel>> {
-      return this.$async(async () => {
-        if (isPrimitive) {
-          const result = await validateForm<{ value: TFormModel }>(
-            () => object({ value: schema }),
-            { value }
-          );
-          return result?.value as ValidationResult<TFormModel>;
-        }
-        return validateForm<TFormModel>(() => schema, value);
       });
     }
 
@@ -164,4 +146,19 @@ function createFormValidatorController<TFormModel, TData = never>(
       }
     }
   };
+}
+
+async function validate<TFormModel>(
+  schema: SchemaOf<TFormModel>,
+  value: TFormModel,
+  isPrimitive: boolean
+): Promise<ValidationResult<TFormModel>> {
+  if (isPrimitive) {
+    const result = await validateForm<{ value: TFormModel }>(
+      () => object({ value: schema }),
+      { value }
+    );
+    return result?.value as ValidationResult<TFormModel>;
+  }
+  return validateForm<TFormModel>(() => schema, value);
 }
