@@ -1,6 +1,7 @@
 package security
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 )
@@ -27,6 +29,7 @@ type (
 		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
 		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
 		CookieAuthLookup(*http.Request) (*portainer.TokenData, error)
+		JWTAuthLookup(*http.Request) (*portainer.TokenData, error)
 	}
 
 	// RequestBouncer represents an entity that manages API request accesses
@@ -280,7 +283,7 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 		for _, lookup := range tokenLookups {
 			resultToken, err := lookup(r)
 			if err != nil {
-				httperror.WriteError(w, http.StatusUnauthorized, "Invalid API key", httperrors.ErrUnauthorized)
+				httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", httperrors.ErrUnauthorized)
 				return
 			}
 
@@ -316,7 +319,7 @@ func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.Tok
 
 	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
-		return nil, ErrInvalidKey
+		return nil, err
 	}
 
 	return tokenData, nil
@@ -332,7 +335,7 @@ func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenD
 
 	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
-		return nil, ErrInvalidKey
+		return nil, err
 	}
 
 	return tokenData, nil
@@ -366,7 +369,8 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenDa
 		Role:     user.Role,
 	}
 	if _, _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
-		return nil, ErrInvalidKey
+		log.Debug().Err(err).Msg("Failed to generate token")
+		return nil, fmt.Errorf("failed to generate token")
 	}
 
 	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
