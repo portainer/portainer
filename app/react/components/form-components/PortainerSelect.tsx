@@ -94,7 +94,9 @@ export function SingleSelect<TValue = string>({
   ...aria
 }: SingleProps<TValue>) {
   const selectedValue =
-    value || (typeof value === 'number' && value === 0)
+    value ||
+    (typeof value === 'number' && value === 0) ||
+    (typeof value === 'string' && value === '')
       ? _.first(findSelectedOptions<TValue>(options, value))
       : null;
 
