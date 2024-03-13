@@ -290,7 +290,7 @@
                     min-cpu-limit="ctrl.state.sliders.cpu.min"
                     max-memory-limit="ctrl.state.sliders.memory.max"
                     max-cpu-limit="ctrl.state.sliders.cpu.max"
-                    validation-data="{isEdit: ctrl.state.isEdit, maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max, isEnvironmentAdmin: ctrl.isAdmin, nodeLimits: ctrl.nodesLimits.nodesLimits}"
+                    validation-data="{isExistingCPUReservationUnchanged: ctrl.state.isExistingCPUReservationUnchanged, isExistingMemoryReservationUnchanged: ctrl.state.isExistingMemoryReservationUnchanged, maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max, isEnvironmentAdmin: ctrl.isAdmin, nodeLimits: ctrl.nodesLimits.nodesLimits}"
                     resource-quota-capacity-exceeded="ctrl.resourceQuotaCapacityExceeded()"
                   ></resource-reservation-form-section>
 
