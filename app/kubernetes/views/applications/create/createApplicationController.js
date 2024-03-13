@@ -123,6 +123,10 @@ class KubernetesCreateApplicationController {
       persistedFoldersUseExistingVolumes: false,
       pullImageValidity: false,
       nodePortServices: [],
+      // when the namespace available resources changes, and the existing app not has a resource limit that exceeds whats available,
+      // a validation message will be shown. isExistingCPUReservationUnchanged and isExistingMemoryReservationUnchanged (with available resources being exceeded) is used to decide whether to show the message or not.
+      isExistingCPUReservationUnchanged: false,
+      isExistingMemoryReservationUnchanged: false,
     };
 
     this.isAdmin = this.Authentication.isAdmin();
@@ -514,6 +518,13 @@ class KubernetesCreateApplicationController {
     return this.$async(async () => {
       this.formValues.MemoryLimit = values.memoryLimit;
       this.formValues.CpuLimit = values.cpuLimit;
+
+      if (this.oldFormValues.CpuLimit !== this.formValues.CpuLimit && this.state.isExistingCPUReservationUnchanged) {
+        this.state.isExistingCPUReservationUnchanged = false;
+      }
+      if (this.oldFormValues.MemoryLimit !== this.formValues.MemoryLimit && this.state.isExistingMemoryReservationUnchanged) {
+        this.state.isExistingMemoryReservationUnchanged = false;
+      }
     });
   }
 
@@ -1062,6 +1073,13 @@ class KubernetesCreateApplicationController {
           this.formValues.Services = this.formValues.Services || [];
           this.originalServicePorts = structuredClone(this.formValues.Services.flatMap((service) => service.Ports));
           this.originalIngressPaths = structuredClone(this.originalServicePorts.flatMap((port) => port.ingressPaths).filter((ingressPath) => ingressPath.Host));
+
+          if (this.formValues.CpuLimit) {
+            this.state.isExistingCPUReservationUnchanged = true;
+          }
+          if (this.formValues.MemoryLimit) {
+            this.state.isExistingMemoryReservationUnchanged = true;
+          }
 
           if (this.application.ApplicationKind) {
             this.state.appType = KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];

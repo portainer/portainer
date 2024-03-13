@@ -17,7 +17,8 @@ type ValidationData = {
   maxCpuLimit: number;
   isEnvironmentAdmin: boolean;
   nodeLimits: NodesLimits;
-  isEdit: boolean;
+  isExistingCPUReservationUnchanged: boolean;
+  isExistingMemoryReservationUnchanged: boolean;
 };
 
 export function resourceReservationValidation(
@@ -36,15 +37,16 @@ export function resourceReservationValidation(
         () => !!validationData && validationData.maxMemoryLimit > 0
       )
       .max(validationData?.maxMemoryLimit || 0, ({ value }) =>
-        validationData?.isEdit
+        // when the existing reservation is unchanged and exceeds the new limit, show a different error message
+        // https://portainer.atlassian.net/browse/EE-5933?focusedCommentId=29308
+        validationData?.isExistingMemoryReservationUnchanged
           ? `Value must be between 0 and ${validationData?.maxMemoryLimit}MB now - the previous value of ${value} exceeds this.`
           : `Value must be between 0 and ${validationData?.maxMemoryLimit}MB.`
       )
       .test(
         'hasSuitableNode',
         `These reservations would exceed the resources currently available in the cluster.`,
-        // eslint-disable-next-line prefer-arrow-callback, func-names
-        function (value: number | undefined, context: TestContext) {
+        (value: number | undefined, context: TestContext) => {
           if (!validationData || value === undefined) {
             // explicitely check for undefined, since 0 is a valid value
             return true;
@@ -70,15 +72,16 @@ export function resourceReservationValidation(
         () => !!validationData && validationData.maxCpuLimit > 0
       )
       .max(validationData?.maxCpuLimit || 0, ({ value }) =>
-        validationData?.isEdit
+        // when the existing reservation is unchanged and exceeds the new limit, show a different error message
+        // https://portainer.atlassian.net/browse/EE-5933?focusedCommentId=29308
+        validationData?.isExistingCPUReservationUnchanged
           ? `Value must be between 0 and ${validationData?.maxCpuLimit} now - the previous value of ${value} exceeds this.`
           : `Value must be between 0 and ${validationData?.maxCpuLimit}.`
       )
       .test(
         'hasSuitableNode',
         `These reservations would exceed the resources currently available in the cluster.`,
-        // eslint-disable-next-line prefer-arrow-callback, func-names
-        function (value: number | undefined, context: TestContext) {
+        (value: number | undefined, context: TestContext) => {
           if (!validationData || value === undefined) {
             // explicitely check for undefined, since 0 is a valid value
             return true;
